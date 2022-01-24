@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2020, Imperial College London, Royal Holloway University of London, Universitry of Rochester, University of Oxford, University of Geneva, Stony Brook University, ETH Zurich
+Copyright (c) 2020, Imperial College London, Royal Holloway University of London, Universitry of Rochester, University of Oxford, University of Geneva, Stony Brook University, ETH Zurich, Lawrence Berkeley National Laboratory, University of Sheffield
 All rights reserved.
 
 
