@@ -1,0 +1,143 @@
+
+20090831
+
+Prob3++ is an Engine for computing three-flavor neutrino oscillation
+probabilities. The main library libThreeProb.a can be used
+to externally call routines to compute said probabilities. These 
+routines are used in the Osc3++ code to perform a three-flavor
+oscillation analysis and are provided here for general use.
+
+////// main library compilation
+
+
+Imakefile:
+    > make -f Makefile
+
+Included in this module are two simple programs to give the user a general feel
+for how the library works. 
+
+probLiner.cc:
+
+ made with ->make -f Makefile probLinear 
+ run with -> ./probLinear
+
+ This program will compute neutrino oscillations for neutrinos passing through
+a slab of the constant density. The output file, LinearProb.root will contain 
+ROOT histograms of these probabilities as a function of density, L/E, and as functions
+of L and E separately. The oscillation probabilities are set with the main body of the code.
+
+
+probRoot.cc:
+
+  made with ->make -f Makefile probRoot
+  run with  ->probRoot
+
+  ProbRoot similarly computes oscillations but for neutrinos travelling through a sphere. The defualt 
+radial denisty profile is that of the Earth. However a density profile may be loaded from a text file
+for a sphere of any denisty profile and radius. More will be discussed below. In this case oscillation
+probabiliteies as a funciton of neutrino zenith angle, and energy are computed and dumped into 
+a file RawProb.root. The histograms therein can readily be viewed using makeOne.C 
+ 
+
+    > root -l makeOne.C
+
+ 
+///// About propagators 
+
+  There are a few "propagators" included in this module, all of which derive from the
+  NeutrinoPropagator class. The most commonly used one is the BargerPropagator. 
+  The neutrino oscillation probabilities are stored as doubles.
+  Its use follows:
+
+      // create a pointer to a new BargerPropagator Object
+      BargerPropagator * bNu  = new BargerPropagator(  ); 
+
+                    OR to use a user-defined density profile
+
+      BargerPropagator * bNu  = new BargerPropagator( some-file-name ); 
+ 
+      // specify the neutrino oscillation parameters
+      // the form of the variables is interpreted by the last boolean, kSquared
+      // when true, it means that mixing angles, theta23, etc. are of the form sin^2(  theta23 )
+      // when false, the mixing angles,                        are of the form sin^2(2 theta23 )
+      // Delta cp should be entered in radians
+      bNu->SetMNS( theta12,  Theta13, Theta23, dm12, DM23, Delta_cp , Energy, kSquared); 
+
+      
+
+  After the propagator has been created there is a choice of propagation modes
+
+      // to progagate through linear matter of constant density
+      // type is an integer,  +: neutrino propagaton  -: anti-neutrino propagation
+      // PathLength is the pathlength through the matter in [km]
+      // Density is the matter's density in [g/cm^3]
+      bNu->propagateLinear( type, PathLength , Density );
+
+                    OR 
+
+      // to propagate through matter in a sphere:
+      // cosineZ is the neutrino zenith angle  -1: upward going, 0: horizontal +1:downward going
+      // prod_height is the production height in the atmosphere [km]
+      // type is an integer,  +: neutrino propagaton  -: anti-neutrino propagation
+      bNu->DefinePath( cosineZ, prod_height );
+      bNu->propagate( type );
+
+
+   At this point the computed oscillation probabilities can be obtained with a call to:
+      // the neutrino types are:
+      // 1:e 2:mu 3:tau   -1: e_bar -2: mu_bar -3: tau_bar
+      prob = bNu->GetProb( nu_in, nu_out );
+     
+                    OR
+  
+   For Vacuum oscillation probabilities the situation is more straightforward
+      // Energy is [GeV]
+      // Path is [km] 
+      prob = bNu->GetVacuumProb( nu_in, nu_out , Energy,  Path );
+
+   Everytime a the energy or desired oscillation probabilities change one must call 
+   the SetMNS() routine before calling one of the above three propagation routines.
+   If for instance these parameters are not changed, subsequent calls to the 
+   propagation routines may be made _without_ another call to SetMNS().
+
+
+
+/////// about input density profiles
+
+  User-specified density profiles must contain two columns of floating point
+  numbers, the first is the radial distance [km] from the sphere center, the second
+  is the density [g/cm^3] for 
+  0.      x_0
+  r_1     x_1
+  ..      ..
+  r_n     x_n
+  the last entry should contain the radius of the sphere.
+  each x_i represents the density up to and including r_i
+  the entry for zero radial density must be included. 
+
+
+  so in PREM.dat, the lines
+  1220    13.0
+  3480    11.3
+
+  indicate that the density of the earth from 1220 to 3480 radial km 
+  is 11.3 g/cm^3. ( Below 1220 km, is 13.0 g/cm^3 )
+
+//////////
+
+
+
+///////////// About
+
+  This code has been written by members of the Super-Kamiokande collaboration
+and is presented here in a purified form. Though not the sole author,
+Roger Wendell (-rvw) is presently maintaining the software. Comments and suggestions
+are welcome at:
+
+   raw22@phy.duke.edu
+
+   Other types of oscillation modules may be provided in the future.  Thanks kindly, 
+and please enjoy your personal search for theta_13!
+
+
+
