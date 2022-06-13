@@ -99,8 +99,10 @@ covarianceBase::~covarianceBase(){
     fPropKernel = new TF1*[size]();
   for(int i = 0; i < size; i++) 
   {
+    delete[] InvertCovMatrix[i];
     delete  fPropKernel[i];
   }
+  delete[] InvertCovMatrix;
   delete[] fPropKernel;
   
 #ifdef MULTITHREAD
@@ -239,8 +241,8 @@ void covarianceBase::ConstructPCA() {
   
 }
 
-void covarianceBase::init(const char *name, const char *file) {
-
+void covarianceBase::init(const char *name, const char *file)
+{
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file, "READ");
   if (infile->IsZombie()) {
@@ -259,13 +261,27 @@ void covarianceBase::init(const char *name, const char *file) {
   }
 
   // Set the covariance matrix
-  setCovMatrix(covMatrix);
-  setName(name);
   size = covMatrix->GetNrows();
-  if (size <= 0) {
+  if (size <= 0)
+  {
     std::cerr << "Covariance matrix " << getName() << " has " << size << " entries!" << std::endl;
     throw;
   }
+  InvertCovMatrix = new double*[size]();
+  // Set the defaults to true
+  for(int i = 0; i < size; i++)
+  {
+    InvertCovMatrix[i] = new double[size]();
+    for (int j = 0; j < size; j++)
+    {
+        InvertCovMatrix[i][j] = 0.;
+    }
+  }
+
+  // Set the covariance matrix
+  setCovMatrix(covMatrix);
+  setName(name);
+
   npars = size;
 
   // Set the nominal values to 1
@@ -323,6 +339,14 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
   covMatrix = cov;
   invCovMatrix = (TMatrixDSym*)cov->Clone();
   invCovMatrix->Invert();
+  //KS: ROOT has bad memory managment, using standard double means we can decrease most operation by factor 2 simply due to cache hits
+  for (int i = 0; i < size; i++)
+  {
+    for (int j = 0; j < size; ++j)
+    {
+        InvertCovMatrix[i][j] = (*invCovMatrix)(i,j);
+    }
+  }
 }
 
 // Set all the covariance matrix parameters to a user-defined value
@@ -839,9 +863,6 @@ double covarianceBase::getLikelihood() {
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
-  // Profiling shows that invCovMatrix almost always cache misses, change this to an array instead
-  // Probably some strange structure of the TMatrixTSym
-
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:logL)
 #endif
@@ -859,11 +880,10 @@ double covarianceBase::getLikelihood() {
         //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
         int scale = 1;
         if(i != j) scale = 2;
-        logL += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+        logL += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];
       }
     }
   }
-
   //clock.Stop();
   //std::cout << __FILE__ << "::getLikelihood took " << clock.RealTime() << "s" << std::endl;
 

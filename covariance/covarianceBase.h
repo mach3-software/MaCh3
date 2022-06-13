@@ -229,6 +229,8 @@ class covarianceBase {
   TMatrixDSym *covMatrix;
   // The inverse covariance matrix
   TMatrixDSym *invCovMatrix;
+  //KS: Same as above but much faster as TMatrixDSym cache miss
+  double **InvertCovMatrix;
   // The nominal
   std::vector<double> nominal;
     

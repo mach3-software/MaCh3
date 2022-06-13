@@ -153,9 +153,9 @@ double covarianceOsc::getLikelihood() {
 
   double logL = 0.0;
   if(size==6) {
-    for(int i = 0; i < covMatrix->GetNrows()-1; i++) //delta is last, don't loop over, as it gets flat prior
+    for(int i = 0; i < covMatrix->GetNrows()-1; ++i) //delta is last, don't loop over, as it gets flat prior
     {
-      for(int j = 0; j < covMatrix->GetNcols()-1; j++) //delta is last, don't loop over, as it gets flat prior
+      for(int j = 0; j < covMatrix->GetNcols()-1; ++j) //delta is last, don't loop over, as it gets flat prior
       {
         // If parameter 23 histogram exists, use that instead of matrix
         if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -167,9 +167,9 @@ double covarianceOsc::getLikelihood() {
         if(fParEvalLikelihood[i] && fParEvalLikelihood[j])
         {
           /*std::cout << i << " " << j << " nominal i " << nominal[i] << " nominal j " << nominal[j] << std::endl;
-            std::cout << "parcurr " << fParProp[i] << " invmatrix " << (*invCovMatrix)(i,j) << std::endl;
+            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j]; << std::endl;
             std::cout << "diff " << fParProp[i] - nominal[i] << std::endl;
-            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j) << std::endl;*/
+            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j]; << std::endl;*/
 
           //check
           if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -177,7 +177,7 @@ double covarianceOsc::getLikelihood() {
           if ((h_dcpth13NH || h_dcpth13IH) && (i==2 || j==2))
             std::cout << "Error: using matrix when theta13-dcp histogram exists" << std::endl;
 
-          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];;
         }
       }
     }
@@ -237,9 +237,9 @@ double covarianceOsc::getLikelihood() {
         if(fParEvalLikelihood[i] && fParEvalLikelihood[j])
         {
           /*std::cout << i << " " << j << " nominal i " << nominal[i] << " nominal j " << nominal[j] << std::endl;
-            std::cout << "parcurr " << fParProp[i] << " invmatrix " << (*invCovMatrix)(i,j) << std::endl;
+            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j]; << std::endl;
             std::cout << "diff " << fParProp[i] - nominal[i] << std::endl;
-            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j) << std::endl;*/
+            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j]; << std::endl;*/
 
           //check
           if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -247,7 +247,7 @@ double covarianceOsc::getLikelihood() {
           if ((h_dcpth13NH || h_dcpth13IH) && (i==2 || j==2))
             std::cout << "Error: using matrix when theta13-dcp histogram exists" << std::endl;
 
-          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];;
         }
       }
     }
