@@ -833,7 +833,7 @@ void covarianceXsec::initParams(double fScale) {
       // If the fParInit is negative we should try to throw it above this
       // We don't really do this ever...
       while (fParInit[i] <= 0) {
-        fParInit[i] = random_number->Gaus((*xsec_param_prior)[i], 0.1*fScale*TMath::Sqrt( (*covMatrix)(i,i) ));
+        fParInit[i] = random_number[0]->Gaus((*xsec_param_prior)[i], 0.1*fScale*TMath::Sqrt( (*covMatrix)(i,i) ));
       }
     }
 
@@ -860,7 +860,7 @@ void covarianceXsec::initParams(double fScale) {
 
 // ********************************************
 // Get the likelihood for moving the cross-section parameters to these values
-double covarianceXsec::GetLikelihood() {
+double covarianceXsec::getLikelihood() {
   // ********************************************
 
   double xsecLogL = 0.0;

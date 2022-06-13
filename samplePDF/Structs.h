@@ -729,7 +729,7 @@ class TSpline3_red {
 
 
 // ***************************
-// A handy namespace for ND280 psyche extraction
+// A handy namespace for variables extraction
 namespace MaCh3Utils {
   // ***************************
 
@@ -739,13 +739,6 @@ namespace MaCh3Utils {
   // ***************************
 
   TString SKSampleName_toLatexString(TString String);
-
-#ifdef PSYCHESETUP
-  // ***************************
-  // Return mass for given PDG
-  TLorentzVector GetHMParticle(AnaEventSummaryB const * Summary, int PDG, bool Primary = false);
-  // ***************************
-#endif
 
   // Neutrino direction
   extern const double ND280NuDir[3];

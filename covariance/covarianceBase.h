@@ -33,12 +33,12 @@
 class covarianceBase {
  public:
   // The constructors
-  covarianceBase();
+  covarianceBase(){};
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
   // For Eigen Value decomp
   covarianceBase(const char *name, const char *file, int seed, double threshold,int firstpcapar, int lastpcapar);
-  virtual ~covarianceBase() {};
+  virtual ~covarianceBase();
   
   // Setters
   // need virtual for eRPA parameter over-ride
@@ -211,7 +211,6 @@ class covarianceBase {
 
  protected:
   void init(const char *name, const char *file);
-  void init(TMatrixDSym* covMat);
 
   void MakePosDef();
 
@@ -233,8 +232,8 @@ class covarianceBase {
   // The nominal
   std::vector<double> nominal;
     
-  // Random numbers
-  TRandom3 *random_number;
+  //KS: set Random numbers for each thread so each thread has differnt seed
+  TRandom3 **random_number;
   // For Cholesky decomposed parameter throw
   TVectorD randParams;
   TMatrixD *chel;

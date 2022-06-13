@@ -26,7 +26,7 @@ class covarianceXsec : public covarianceBase {
     void throwNominal(bool nomValues=true, int seed = 0);
 
     // General Getter functions not split by detector
-    double GetLikelihood();
+    double getLikelihood();
     const double GetParamUpperBound(int i) {return xsec_param_ub_a[i];}
     const double GetParamLowerBound(int i) {return xsec_param_lb_a[i];}
     const double GetParamPrior(int i)      {return xsec_param_prior_a[i];}
