@@ -1,16 +1,9 @@
 #include <TROOT.h>
 #include <TRandom.h>
 #include "samplePDFBase.h"
-#ifdef PSYCHESETUP
-#include "psycheinc/AnalysisManager.hxx"
-#endif
+
 
 samplePDFBase::samplePDFBase(double pot) {
-  // Make sure no parameters have been accessed yet
-#ifdef PSYCHESETUP
-  ND::params().SetReadParamOverrideFilePointPassed();
-#endif
-
   rnd = new TRandom3(0);
   MCthrow=false;
 }

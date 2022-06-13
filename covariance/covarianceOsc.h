@@ -1,20 +1,9 @@
 #ifndef _covarianceOsc_h_
 #define _covarianceOsc_h_
 
-#include <TMatrixT.h>
-#include <TMatrixDSym.h>
-#include <TVectorT.h>
-#include <TVectorD.h>
-#include <TCanvas.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TTree.h>
-#include <TF1.h>
-#include <TFile.h>
-#include <TAxis.h>
-#include <TRandom3.h>
-#include <vector>
+// MaCh3 includes
 #include "covarianceBase.h"
+#include "throwParms/ThrowParms.h"
 
 class covarianceOsc : public covarianceBase
 {
@@ -34,6 +23,11 @@ class covarianceOsc : public covarianceBase
       void setFlipBeta(bool flip){flipBeta=flip;}
       void useReactorPrior(bool reactor){reactorPrior = reactor;};
       void setExtraBranches(TTree &tree);
+      
+      //KS: Print all usefull informations after initialization
+      void Print();
+      //KS: Currently prob3++/probgp requiers particular order so we need to check this is the case
+      void CheckOrderOfParams();
 
  protected:
       double L, density;

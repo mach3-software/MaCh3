@@ -56,8 +56,9 @@ class manager {
   int GetNSteps() { return n_steps; }
   int GetBurnInSteps() { return n_burnin_steps; }
 
+  int GetAutoSave() { return n_AutoSave; }
+  
   double GetStepScale()     { return step_scale; }
-  double GetFluxStepScale() { return step_scale_flux; }
   double GetXsecStepScale() { return step_scale_xsec; }
   double GetNearDetStepScale(){ return step_scale_near_det;}
   double GetFarDetStepScale(){ return step_scale_far_det;}
@@ -94,8 +95,6 @@ class manager {
   std::string const & GetToyFilename() const { return toy_experiment_file; }
   std::string const & GetDataFilename() const { return data_file; }
   std::string const & GetFakeDataFilename() const { return fake_data_file; }
-  std::string const & GetNDPsycheIndDataFilename() const { return nd_psycheind_data_file; }
-
 
   // ! This single function is deprecated but used in old code!
   bool GetDetSystOpt() { std::cerr << "ERROR YOU'RE USING A DEPRECATED PARAMETER!" << std::endl;
@@ -106,7 +105,6 @@ class manager {
   //bool GetNearDetSystOpt() { return near_det_syst_opt; }
   //bool GetFarDetSystOpt() { return far_det_syst_opt; }
   bool GetXsecSystOpt()  { return xsec_syst_opt; }
-  bool GetFluxSystOpt()  { return flux_syst_opt; }
 
   bool GetSaveNom() { return save_nom; }
 
@@ -119,8 +117,6 @@ class manager {
   std::vector<int> GetNearDetFix()  { return near_det_fix; }
   std::vector<int> GetFarDetFlat() { return far_det_flat; }
   std::vector<int> GetFarDetFix()  { return far_det_fix; }
-  std::vector<int> GetFluxFlat()  { return flux_flat; }
-  std::vector<int> GetFluxFix()   { return flux_fix; }
   std::vector<int> GetXsecFlat()  { return xsec_flat; }
   std::vector<int> GetXsecFix()   { return xsec_fix; }
   std::vector<int> GetOscFlat()   { return osc_flat; }
@@ -149,14 +145,12 @@ class manager {
 
   int GetSampleNumber() {return sample_number;}
 
-  const char* GetFluxCovMatrix() { return (const char*)flux_cov_file.c_str(); }
   const char* GetXsecCovMatrix() { return (const char*)xsec_cov_file.c_str(); }
   const char* GetNearDetCovMatrix() { return (const char*)near_det_cov_file.c_str(); }
   const char* GetFarDetCovMatrix() { return (const char*)far_det_cov_file.c_str(); }
   const char* GetOscCovMatrix()         { return (const char*)osc_cov_file.c_str(); }
   const char* GetOscCovMatrix_antinu()  { return (const char*)osc_cov_antinu_file.c_str(); }
 
-  const char* GetFluxCovName() { return (const char*)flux_cov_name.c_str(); }
   const char* GetXsecCovName() { return (const char*)xsec_cov_name.c_str(); }
   const char* GetNearDetCovName() { return (const char*)near_det_cov_name.c_str(); }
   const char* GetFarDetCovName() { return (const char*)far_det_cov_name.c_str(); }
@@ -198,6 +192,10 @@ class manager {
   // nsteps
   int n_steps;
   int n_burnin_steps;
+  
+  //KS: Sets how frequent (number of steps) you want to autosave your chain, if you autosave rarely chain will be sliglhy faster, if you job wall is small you might want more freqeunt autosave to reduce number of lost steps
+  int n_AutoSave;
+  
   // cooling temperature(for simulated annealing)
   double temp;
 
@@ -205,7 +203,6 @@ class manager {
   //double step_size;
   // step scale for nuisance parameters
   double step_scale;
-  double step_scale_flux;
   double step_scale_xsec;
   double step_scale_near_det;
   double step_scale_far_det;
@@ -250,7 +247,6 @@ class manager {
   std::string toy_experiment_file;
   std::string data_file;
   std::string fake_data_file;
-  std::string nd_psycheind_data_file;
   std::string pos_files;
 
   std::string poly_file;
@@ -267,14 +263,12 @@ class manager {
   std::vector<double> osc_bins ;
 
   // Priors
-  std::vector<int> flux_flat;
   std::vector<int> xsec_flat;
   std::vector<int> near_det_flat;
   std::vector<int> far_det_flat;
   std::vector<int> osc_flat;
   std::vector<int> osc_flat_antinu;
   
-  std::vector<int> flux_fix;
   std::vector<int> xsec_fix;
   std::vector<int> near_det_fix;
   std::vector<int> far_det_fix;
@@ -296,7 +290,6 @@ class manager {
   std::vector<double> yaxisbins;
 
   //General inputs
-  std::string flux_cov_file ;
   std::string xsec_cov_file ;
   std::string near_det_cov_file ;
   std::string far_det_cov_file ;
@@ -304,7 +297,6 @@ class manager {
   std::string osc_cov_antinu_file ;
  
   //name of the useful matrices in the above files
-  std::string flux_cov_name ;
   std::string xsec_cov_name ;
   std::string near_det_cov_name ;
   std::string far_det_cov_name ;
@@ -333,8 +325,6 @@ class manager {
   bool far_det_syst_opt;
   // Cross section systematics option (0: off, 1: on)
   bool xsec_syst_opt;
-  // Flux systematics option (0: off, 1: on)
-  bool flux_syst_opt;
 
   // Start chain in random position?
   bool random_start;
