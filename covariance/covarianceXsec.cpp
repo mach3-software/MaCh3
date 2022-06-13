@@ -1,4 +1,3 @@
-
 #include "covarianceXsec.h"
 
 // ********************************************
@@ -866,8 +865,10 @@ double covarianceXsec::GetLikelihood() {
 
   double xsecLogL = 0.0;
 
-  // Commented parallel for cross-section systematics since profiling shows it's marginally faster on single core
-  // Probably want to turn on this when we Get bigger cross-section systematic sets
+//KS: This brings speed up of the order 2 per thread, since xsec matix can only grow this might be even more profitable in the future
+#ifdef MULTITHREAD
+#pragma omp parallel for reduction(+:xsecLogL)
+#endif
   for (int i = 0; i < nPars; i++) {
 
     // Make sure we're in a good region for parameter i
@@ -876,11 +877,13 @@ double covarianceXsec::GetLikelihood() {
     }
 
     // Apply the prior
-    for (int j = 0; j < nPars; ++j) {
+    for (int j = 0; j <= i; ++j) {
       // If we want to evaluate likelihood (Gaussian prior essentially, not flat)
-      // If we are not on the diagonal of the spectral fns and we want to evaluate those parameters
       if (fParEvalLikelihood[i] && fParEvalLikelihood[j]) {
-        xsecLogL += 0.5*( nominal[i]-fParProp[i])*(nominal[j]-fParProp[j])*(*invCovMatrix)(i,j);
+        //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
+        int scale = 1;
+        if(i != j) scale = 2;
+        xsecLogL += scale * 0.5*( nominal[i]-fParProp[i])*(nominal[j]-fParProp[j])*(*invCovMatrix)(i,j);
       }
     } // end j for loop
   } // end i for loop
@@ -1059,3 +1062,21 @@ void covarianceXsec::Print() {
 
 } // End
 
+// ********************************************
+// Sets the proposed Flux parameters to the nominal values
+void covarianceXsec::setFluxOnlyParameters() {
+// ********************************************
+    for (int i = 0; i < size; i++) 
+    {
+      if(isFlux[i]) fParProp[i] = nominal[i];
+    }
+}
+// ********************************************
+// Sets the proposed Flux parameters to the nominal values
+void covarianceXsec::setXsecOnlyParameters() {
+// ********************************************
+    for (int i = 0; i < size; i++) 
+    {
+      if(!isFlux[i]) fParProp[i] = nominal[i];
+    }
+}

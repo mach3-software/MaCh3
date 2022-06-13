@@ -809,12 +809,14 @@ double covarianceBase::getLikelihood() {
       std::cout << "Rejecting!" << std::endl;
     }
 
-    for (int j = 0; j < size; j++) {
+    for (int j = 0; j <= i; ++j) {
       if (fParEvalLikelihood[i] && fParEvalLikelihood[j]) {
-        logL += 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+        //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
+        int scale = 1;
+        if(i != j) scale = 2;
+        logL += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
       }
     }
-
   }
 
   //clock.Stop();

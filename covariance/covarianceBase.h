@@ -1,33 +1,26 @@
 #ifndef _covarianceBase_h_
 #define _covarianceBase_h_
 
-#include <iomanip>
-
-#include <TMatrixT.h>
-#include <TMatrixDSym.h>
-#include <TVectorT.h>
-#include <TVectorD.h>
-#include <TCanvas.h>
-#include <TH1D.h>
-#include <TTree.h>
-#include <TF1.h>
-#include <TFile.h>
-#include <TAxis.h>
-#include <TRandom3.h>
-#include <vector>
-#include <TMath.h>
-
-#include <iostream>
-#include <math.h>
-#include <TDecompChol.h>
-#include "throwParms/ThrowParms.h"
-
-#include "samplePDF/Structs.h"
-//#include "manager/manager.cpp"
-
+// ROOT includes
+#include "TMatrixT.h"
+#include "TMatrixDSym.h"
+#include "TVectorT.h"
+#include "TVectorD.h"
+#include "TCanvas.h"
+#include "TH1D.h"
+#include "TTree.h"
+#include "TFile.h"
+#include "TAxis.h"
+#include "TRandom3.h"
+#include "TMath.h"
+#include "math.h"
+#include "TDecompChol.h"
 #include "TStopwatch.h"
-
 #include "TMatrixDSymEigen.h"
+
+// MaCh3 includes
+#include "samplePDF/Structs.h"
+#include "throwParms/ThrowParms.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"

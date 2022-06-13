@@ -3,23 +3,11 @@
 #define _covarianceXsec_h_
 
 // C++ includes
-#include <iostream>
-#include <iomanip>
-#include <vector>
 #include <math.h>
 #include <map>
 
 // ROOT includes
-#include <TDecompChol.h>
-#include <TList.h>
-#include <TStopwatch.h>
-#include <TMatrixT.h>
-#include <TVectorT.h>
-#include <TVectorD.h>
-#include <TF1.h>
-#include <TFile.h>
-#include <TAxis.h>
-#include <TSpline.h>
+#include "TList.h"
 
 // MaCh3 includes
 #include "covarianceBase.h"
@@ -116,7 +104,11 @@ class covarianceXsec : public covarianceBase {
     // If we want to over-ride the default of running with a Gaussian prior on parameter i
     void setEvalLikelihood(int i, bool eL);
     void toggleFixParameter(int i);
-
+    
+    //KS Function to set to nominal either flux or xsec parmeters
+    void setXsecOnlyParameters();
+    void setFluxOnlyParameters();
+    
     // What parameter Gets reweighted by what amount according to MCMC
     inline double calcReWeight(int bin){
 	  if (bin >= 0 && bin < nPars) {
