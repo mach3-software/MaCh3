@@ -21,28 +21,23 @@
 
 #define __DEFAULT_RETURN_VAL__ -999999.123456
 
-//#include "NIWGReWeight/src/Interface/NIWGSyst.h"
-
+// C++ includes
 #include <sstream>
 #include <fstream> 
 #include <iostream>
 #include <vector>
 #include <iomanip>
-#include <set>
-#include <TSpline.h>
-#include <TF1.h>
-#include <TLorentzVector.h>
-#include <TObjString.h>
-#include <unordered_map>
 
-#ifdef PSYCHESETUP
-#include "psycheinc/CoreDataClasses.hxx"
-#include "psycheinc/CoreUtils.hxx"
-#include "psycheinc/BaseDataClasses.hxx"
-#endif
+// ROOT include
+#include "set"
+#include "TSpline.h"
+#include "TF1.h"
+#include "TLorentzVector.h"
+#include "TObjString.h"
+#include "unordered_map"
+#include "TH2Poly.h"
+#include "list"
 
-#include <TH2Poly.h>
-#include <list>
 // *******************
 // Template to make vector out of an array of any length
 template< typename T, size_t N >
@@ -387,65 +382,6 @@ class xsecBase {
     // One time weight to apply to event, e.g. NC1gamma
     __float__ weight;
 };
-
-
-// ********************************************
-// NIWG 2015 struct
-class xsec2015 : public xsecBase {
-  // ********************************************
-
-  public:
-    // And the Struct's constructor
-    xsec2015();
-    ~xsec2015();
-    void Print();
-
-    // Still good for Winter 2016
-    TSpline3* splMAQE;
-    TSpline3* splCA5;
-    TSpline3* splMARES;
-    TSpline3* splBGSCLLOWPPI;
-    TSpline3* splBGSCL;
-    TSpline3* splBYDIS;
-    TSpline3* splBYMPI;
-    TSpline3* splAGKYMULT;
-    TSpline3* splFEFABS;
-    TSpline3* splFEFCX;
-    TSpline3* splFEFQE;
-    TSpline3* splFEFINEL;
-    TSpline3* splFEFCXH;
-    TSpline3* splFEFQEH;
-
-    // New for Summer 2017
-    TSpline3* splPDDC;
-    TSpline3* splPDDO;
-
-    // New for 2020
-    TSpline3* splMECENULOW;
-    TSpline3* splMECENUHIGH;
-    TSpline3* splMECENUBARLOW;
-    TSpline3* splMECENUBARHIGH;
-
-    // Deprecated for Summer 2017
-    TSpline3* splEBC;
-    TSpline3* splEBO;
-    TSpline3* splSCCV;
-    TSpline3* splSCCA;
-
-    // New for 2020
-    TSpline3* spl2P2HEDEP_LOWENU;
-    TSpline3* spl2P2HEDEP_HIGHENU;
-    TSpline3* spl2P2HEDEP_LOWENUBAR;
-    TSpline3* spl2P2HEDEP_HIGHENUBAR;
-    TSpline3* splISO_BKG_LOWPPI;
-	TSpline3* splDIS_BY;
-	TSpline3* splMPI_BY;
-	TSpline3* splMPI_AGKY_XSEC;
-
-    // Relativistic RPA weight of event
-    __float__ relRPA;
-};
-
 
 // ********************************************
 // Generic xsec2018 class
@@ -825,9 +761,54 @@ namespace MaCh3Utils {
 // Enum to track the target material
 enum TargetMat {
   // *****************
-  kTarget_C = 12,
-  kTarget_O = 16
+  kTarget_H  = 1,
+  kTarget_C  = 12,
+  kTarget_N  = 14,
+  kTarget_O  = 16,
+  kTarget_Al = 27,
+  kTarget_Ti = 48,
+  kTarget_Fe = 56,
+  kTarget_Pb = 207
 };
+
+// *****************
+// Converted the Target Mat to a string
+inline std::string TargetMat_ToString(TargetMat i) {
+  // *****************
+  std::string name;
+
+  switch(i) {
+    case kTarget_H:
+      name = "Hydrogen";
+      break;
+    case kTarget_C:
+      name = "Carbon";
+      break;
+    case kTarget_N:
+      name = "Nitrogen";
+      break;
+    case kTarget_O:
+      name = "Oxygen";
+      break;
+    case kTarget_Al:
+      name = "Aluminium";
+      break;
+    case kTarget_Ti:
+      name = "Titanium";
+      break;
+    case kTarget_Fe:
+      name = "Iron";
+      break;
+    case kTarget_Pb:
+      name = "Lead";
+      break;
+    default:
+      name = "TargetMat_Undefined";
+      break;
+  }
+
+  return name;
+}
 
 // *****************
 // Enum to track the incoming neutrino species
@@ -835,6 +816,8 @@ enum NuPDG {
   // *****************
   kNue = 12,
   kNumu = 14,
+  kNutau = 16,
+  kNutau_bar = -16,
   kNumu_bar = -14,
   kNue_bar = -12
 };
@@ -846,8 +829,16 @@ double OverflowIntegral(TH2Poly*);
 double NoOverflowIntegral(TH2Poly*);
 
 // Poly Projectors
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins);
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins);
+TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
+TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
+
+// Helper to Normalise histograms
+TH2Poly* NormalisePoly(TH2Poly* Histogram);
+
+// Helper to scale th2poly analogous to th2d scale with option "width"
+TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
+// Helper to calc integral of th2poly analogous to th2d integra; with option "width"
+double PolyIntegralWidth(TH2Poly *Histogram);
 
 // Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {
