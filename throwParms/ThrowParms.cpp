@@ -28,12 +28,11 @@ ThrowParms::ThrowParms(TVectorD &parms, TMatrixDSym &covm) {
   CheloskyDecomp((*chel_dec));
 }
 
-ThrowParms::~ThrowParms() {
-  /*   
-    if(pvals!=NULL)    pvals->Delete();
-    if(covar!=NULL)    covar->Delete();
-    if(chel_dec!=NULL) chel_dec->Delete();
-  */
+ThrowParms::~ThrowParms() 
+{
+    delete pvals;
+    delete covar;
+    delete chel_dec;
 }
 
 void ThrowParms::ThrowSet(std::vector<double> &parms) {
