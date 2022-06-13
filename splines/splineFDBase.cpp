@@ -173,12 +173,6 @@ void splineFDBase::SetupSplines()
     syst* temp = new syst(SplineFileParsNames[isyst], &(dev_1D_vec.at(isyst)));
     systs.push_back(temp);
   }
- 
-  // Dummy spline: flat     
-  TGraph *dummy_gr = new TGraph();
-  dummy_gr->SetPoint(0,-99999999999,1);
-  dummy_gr->SetPoint(1,0,1);
-  dummy_gr->SetPoint(2,99999999999,1);
 
   /////////////////
   // Now load the splines from the spline file
@@ -399,12 +393,6 @@ void splineFDBase::SetupSplines(int opt_binning) // 2d version
 	syst2D* temp = new syst2D(SplineFileParsNames[isyst], &(dev_2D_vec.at(isyst)));
 	systs.push_back(temp);
   }
-
-  // Dummy splines: flat               
-  TGraph *dummy_gr = new TGraph();
-  dummy_gr->SetPoint(0,-99999999999,1);
-  dummy_gr->SetPoint(1,0,1);
-  dummy_gr->SetPoint(2,99999999999,1);
 
   /////////////////
   // Now load the splines from the spline file
