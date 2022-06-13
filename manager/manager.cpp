@@ -85,6 +85,10 @@ int manager::readConfig(char *config) {
       if (verbosity) std::cout << "Number of steps not specified, using " << n_steps << std::endl;
     }
 
+    //How often (number of steps) you want to autosave chain
+    if (cfg.exists("AUTOSAVE")) n_AutoSave = cfg.lookup("AUTOSAVE");
+    else n_AutoSave = 500;
+    
     //Number of burn in steps
     if (cfg.exists("NBURNINSTEPS")){
       n_burnin_steps = cfg.lookup("NBURNINSTEPS");
@@ -119,13 +123,6 @@ int manager::readConfig(char *config) {
       step_scale = cfg.lookup("STEPSCALE");
     } else {
       step_scale = 0.05;
-    }
-
-    // Stepping scale for flux
-    if (cfg.exists("STEPSCALEFLUX")) {
-      step_scale_flux = cfg.lookup("STEPSCALEFLUX");
-    } else {
-      step_scale_flux = 0.05;
     }
 
     // Stepping scale for xsec
@@ -306,13 +303,6 @@ int manager::readConfig(char *config) {
       xsec_syst_opt = true;
     }
 
-    // Turn off flux systematics
-    if (cfg.exists("FLUXSYSTOPT")) {
-      flux_syst_opt = (bool)cfg.lookup("FLUXSYSTOPT");
-    } else {
-      flux_syst_opt = true;
-    }
-
     // Set annealing temp (not used by standard!)
     if (cfg.exists("TEMP")) {
       temp = cfg.lookup("TEMP");
@@ -378,24 +368,6 @@ int manager::readConfig(char *config) {
       const libconfig::Setting &setting = root["OSCPARAMEVAL"];
       for (int i = 0; i < int(setting.getLength()); i++)
         osc_parameters_eval.push_back((int)setting[i]);
-    }
-
-    // Where is flux covariance
-    if (cfg.exists("FLUXCOVFILE")) {
-      flux_cov_file = (const char*)cfg.lookup("FLUXCOVFILE");
-      if (verbosity) std::cout << "- found fluxCovMatrix = " << flux_cov_file << std::endl;
-    } else {
-      flux_cov_file = std::string("inputs/flux_covariance_banff_13av2.root");
-      if (verbosity) std::cout << "- didn't find fluxCovMatrix! Setting default = " << flux_cov_file << std::endl;
-    }
-
-    // The name of the matrix to use
-    if(cfg.exists("FLUXCOVNAME")) {
-      flux_cov_name = (const char*)cfg.lookup("FLUXCOVNAME") ;
-      if (verbosity) std::cout << "- found fluxCovMatrix name = " << flux_cov_name << std::endl;
-    } else {
-      flux_cov_name = "total_flux_cov";
-      if (verbosity) std::cout << "- didn't find fluxCovMatrix! Setting default = " << flux_cov_name << std::endl;
     }
 
     // Where is xsec covariance
@@ -555,24 +527,6 @@ int manager::readConfig(char *config) {
       const libconfig::Setting &setting = root["FARDETPARAMFIX"];
       for (int i = 0; i < int(setting.getLength()); i++)
         far_det_fix.push_back((int)setting[i]);
-    }
-
-    // What flux params are flat
-    if (cfg.exists("FLUXPARAMFLAT")) {
-      const libconfig::Setting &root = cfg.getRoot();
-      const libconfig::Setting &setting = root["FLUXPARAMFLAT"];
-      for (int i = 0; i < int(setting.getLength()); i++) {
-        flux_flat.push_back((int)setting[i]);
-      }
-    }
-
-    // What flux params are fixed
-    if (cfg.exists("FLUXPARAMFIX")) {
-      const libconfig::Setting &root = cfg.getRoot();
-      const libconfig::Setting &setting = root["FLUXPARAMFIX"];
-      for (int i = 0; i < int(setting.getLength()); i++) {
-        flux_fix.push_back((int)setting[i]);
-      }
     }
 
     // What xsec params are flat
@@ -754,7 +708,7 @@ void manager::Print() {
   std::cout << "---------------------------------" << std::endl;
   std::cout << "MCMC settings         "    << std::endl;
   std::cout << "    N steps:          " << GetNSteps() << std::endl;
-  std::cout << "    Flux step scale:  " << GetFluxStepScale() << std::endl;
+  std::cout << "    AutoSave:         " << GetAutoSave() << std::endl;
   std::cout << "    Xsec step scale:  " << GetXsecStepScale() << std::endl;
   std::cout << "    ND det step scale:" << GetNearDetStepScale() << std::endl;
   std::cout << "    Far det step scale:" << GetFarDetStepScale() << std::endl;
