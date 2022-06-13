@@ -11,7 +11,7 @@
 // MCMC stuff to implement:
 // Trace plots            -- DONE
 // LogL vs step plots     -- DONE
-// Acceptance probability -- SOON DONE
+// Acceptance probability -- DONE
 // Autocorrelation        -- DONE
 // _Batched Means_        -- DONE
 
@@ -89,7 +89,8 @@ class MCMCDiag_Handler {
     void ParamTraces();
     void AutoCorrelation();
     void BatchedMeans();
-
+    void AcceptanceProbabilities();
+    
     // Number of parameters
     int nParams;
     int nXsec;
@@ -116,6 +117,10 @@ class MCMCDiag_Handler {
     // Holds the systs values
     double **SystValues;
 
+    // Holds all accProb
+    double *AccProbValues;
+    double *AccProbBatchedAverages;
+    
     // Trace plots
     TH1D **TraceParamPlots;
     TH1D **TraceSamplePlots;
@@ -125,6 +130,10 @@ class MCMCDiag_Handler {
     // LagK autocorrelation plots
     TH1D **LagKPlots;
 
+    // Acceptance Prob Plots
+    TH1D *AcceptanceProbPlot;
+    TH1D *BatchedAcceptanceProblot;
+    
     // Vector of the total logL for each step
     std::vector<double> LogL_v;
     std::vector<std::string> ParamName_v;

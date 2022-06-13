@@ -115,9 +115,11 @@ void MCMCDiag_Handler::DiagMCMC() {
   // Draw the auto-correlations
   AutoCorrelation();
 
+  // Draw acceptance Probability
+  AcceptanceProbabilities();
+  
   // Draw the logL
   // DrawL
-  // Draw and fit the acceptance probabilities
   // Draw 
 
   // Close the output file
@@ -183,6 +185,7 @@ void MCMCDiag_Handler::CountBranches() {
   ParamValues = new double*[nEntries]();
   SampleValues = new double*[nEntries]();
   SystValues = new double*[nEntries]();
+  AccProbValues = new double[nEntries]();
   for (int i = 0; i < nEntries; ++i) {
     ParamValues[i] = new double[nParams]();
     SampleValues[i] = new double[nSamples]();
@@ -196,6 +199,7 @@ void MCMCDiag_Handler::CountBranches() {
     for (int j = 0; j < nSysts; ++j) {
       SystValues[i][j] = -999.99;
     }
+    AccProbValues[i] = -999.99;
   }
 
   // Initialise the sums
@@ -243,6 +247,9 @@ void MCMCDiag_Handler::ReadInputTree() {
     Chain->SetBranchStatus(SystName_v[i].c_str(), true);
   }
 
+  // Turn on the branches which we want for acc prob
+  Chain->SetBranchStatus("accProb", true);
+  
   // 10 entries output
   int countwidth = nEntries/10;
 
@@ -251,8 +258,10 @@ void MCMCDiag_Handler::ReadInputTree() {
   // The length of each batch
   int BatchLength = nEntries/nBatches+1;
   BatchedAverages = new double*[nBatches]();
+  AccProbBatchedAverages = new double[nBatches]();
   for (int i = 0; i < nBatches; ++i) {
     BatchedAverages[i] = new double[nParams];
+    AccProbBatchedAverages[i] = 0;
     for (int j = 0; j < nParams; ++j) {
       BatchedAverages[i][j] = 0.0;
     }
@@ -279,7 +288,11 @@ void MCMCDiag_Handler::ReadInputTree() {
     for (int j = 0; j < nSysts; ++j) {
       Chain->SetBranchAddress(SystName_v[j].c_str(), &SystValues[i][j]);
     }
+      
+    // Set the branch addresses for Acceptance Probability
+    Chain->SetBranchAddress("accProb", &AccProbValues[i]);
 
+    
     // Fill up the ParamValues array
     Chain->GetEntry(i);
 
@@ -298,6 +311,9 @@ void MCMCDiag_Handler::ReadInputTree() {
       ParamSums[j] += ParamValues[i][j];
       BatchedAverages[BatchNumber][j] += ParamValues[i][j];
     }
+    
+      //KS: Could easyli add this to above loop but I accProb is different beast so better keep it like this
+      AccProbBatchedAverages[BatchNumber] += AccProbValues[i];
   }
 
   clock.Stop();
@@ -310,6 +326,7 @@ void MCMCDiag_Handler::ReadInputTree() {
     for (int j = 0; j < nBatches; ++j) {
       // Divide by the total number of events in the batch
       BatchedAverages[j][i] /= BatchLength;
+      if(i==0) AccProbBatchedAverages[j] /= BatchLength; //KS: we have only one accProb, keep it like this for now
     }
   }
 
@@ -336,10 +353,10 @@ void MCMCDiag_Handler::ParamTraces() {
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nParams; ++j) {
 
-    std::string HistName = ParamName_v[j];
-    if (BeginString(ParamName_v[j],"xsec_") && j >= nFlux) {
-      HistName = XsecNames[j-nFlux];
-    }
+    std::string HistName = XsecNames[j] +"_"+ ParamName_v[j]+"_Trace";
+    //if (BeginString(ParamName_v[j],"xsec_") && j >= nFlux) {
+    //  HistName = XsecNames[j-nFlux];
+    //}
 
     TraceParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
     TraceParamPlots[j]->GetXaxis()->SetTitle("Step");
@@ -415,8 +432,6 @@ void MCMCDiag_Handler::ParamTraces() {
   }
   delete[] TraceSystsPlots;
   delete[] SystValues;
-
-
 }
 
 
@@ -425,7 +440,7 @@ void MCMCDiag_Handler::AutoCorrelation() {
   // *********************************
 
   std::cout << "Making auto-correlations..." << std::endl;
-  const int nLags = 15000;
+  const int nLags = 25000;
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter
   double **DenomSum = new double*[nParams]();
@@ -446,7 +461,8 @@ void MCMCDiag_Handler::AutoCorrelation() {
     }
 
     // Make TH1Ds for each parameter which hold the lag
-    LagKPlots[j] = new TH1D(ParamName_v[j].c_str(), ParamName_v[j].c_str(), nLags, 0.0, nLags);
+    std::string HistName = XsecNames[j] +"_"+ ParamName_v[j]+"_Lag";
+    LagKPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
     LagKPlots[j]->GetXaxis()->SetTitle("Lag");
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
@@ -511,7 +527,8 @@ void MCMCDiag_Handler::BatchedMeans() {
 
   BatchedParamPlots = new TH1D*[nParams];
   for (int j = 0; j < nParams; ++j) {
-    BatchedParamPlots[j] = new TH1D((ParamName_v[j]+"_batch").c_str(), (ParamName_v[j]+"_batch").c_str(), nBatches, 0, nBatches);
+      std::string HistName = XsecNames[j] +"_"+ ParamName_v[j]+"_batch";
+    BatchedParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nBatches, 0, nBatches);
   }
 
   for (int i = 0; i < nBatches; ++i) {
@@ -543,6 +560,51 @@ void MCMCDiag_Handler::BatchedMeans() {
 
   delete[] BatchedAverages;
 
+}
+
+// **************************
+// Acceptance Probability
+void MCMCDiag_Handler::AcceptanceProbabilities() {
+  // **************************
+
+    std::cout << "Making AccProb plots..." << std::endl;
+
+    // Set the titles and limits for TH2Ds
+
+    AcceptanceProbPlot = new TH1D("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
+    AcceptanceProbPlot->GetXaxis()->SetTitle("Step");
+    AcceptanceProbPlot->GetYaxis()->SetTitle("Acceptance Probability");
+
+    BatchedAcceptanceProblot = new TH1D("AcceptanceProbability_Batch", "AcceptanceProbability_Batch", nBatches, 0, nBatches);
+    BatchedAcceptanceProblot->GetYaxis()->SetTitle("Acceptance Probability");
+    
+  for (int i = 0; i < nBatches; ++i) {
+      BatchedAcceptanceProblot->SetBinContent(i+1, AccProbBatchedAverages[i]);
+      int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
+      int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+      std::stringstream ss;
+      ss << BatchRangeLow << " - " << BatchRangeHigh;
+      BatchedAcceptanceProblot->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
+  }
+  
+  
+#ifdef MULTITHREAD
+  std::cout << "Using multi-threading..." << std::endl;
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < nEntries; ++i) {
+    // Set bin content for the ith bin to the parameter values
+      AcceptanceProbPlot->SetBinContent(i, AccProbValues[i]);
+  }
+    
+  TDirectory *probDir = OutputFile->mkdir("AccProb");
+  probDir->cd();
+  
+  AcceptanceProbPlot->Write();
+  BatchedAcceptanceProblot->Write();
+  
+  delete AcceptanceProbPlot;  
+  delete BatchedAcceptanceProblot; 
 }
 
 // **************************
