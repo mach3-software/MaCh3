@@ -51,11 +51,6 @@ SOFLAGS= -shared $(EXPORT_DYNAMIC) $(ROOTCFLAGS)
 LDFLAGS=
 ARFLAGS= rcsv
 
-ifdef PSYCHESETUP
-INCDIR+=-I../psycheinc/
-CXXFLAGS+=-DPSYCHESETUP
-endif
-
 # openMP defines
 ifdef MULTITHREAD
 CXXFLAGS += -fopenmp
