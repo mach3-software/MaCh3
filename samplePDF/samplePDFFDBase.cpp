@@ -1,9 +1,3 @@
-#include <TROOT.h>
-#include "manager/manager.h"
-#include "TString.h"
-#include <assert.h>
-#include <stdexcept>
-#include "TMath.h"
 #include "samplePDFFDBase.h"
 
 // Constructors for erec-binned errors
@@ -30,7 +24,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   useBeta=false;
   applyBetaNue=false;
   applyBetaDiag=false;
-
+  
   //ETA - leave this out for now, need to fix and make things nice and configurable
   //EnergyScale *energy_first = new EnergyScale();
   //energy_first->SetUncertainty(1.2);
@@ -40,7 +34,16 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-
+    int nYBins = YBinEdges.size()-1;  
+    for (int yBin = 0 ;yBin < nYBins; yBin++) 
+    {
+      delete[] samplePDFFD_array[yBin];
+      delete[] samplePDFFD_array_w2[yBin];
+      delete[] samplePDFFD_data[yBin];
+    }
+    delete[] samplePDFFD_array;
+    delete[] samplePDFFD_array_w2;
+    delete[] samplePDFFD_data;
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -220,6 +223,7 @@ void samplePDFFDBase::fillArray() {
   for (int yBin=0;yBin<nYBins;yBin++) {
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -339,8 +343,9 @@ void samplePDFFDBase::fillArray() {
 
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
-		std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-	samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
+        std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
+        samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
+        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight;
       }
 	  else{
 		std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
@@ -354,8 +359,8 @@ void samplePDFFDBase::fillArray() {
 }
 
 #ifdef MULTITHREAD
-void samplePDFFDBase::fillArray_MP() {
-
+void samplePDFFDBase::fillArray_MP() 
+{
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
@@ -363,35 +368,28 @@ void samplePDFFDBase::fillArray_MP() {
   for (int yBin=0;yBin<nYBins;yBin++) {
 	for (int xBin=0;xBin<nXBins;xBin++) {
 	  samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
 	}
   }
 
   reconfigureFuncPars();
 
-  //DB Unfortunately need to have this because OMP doesn't allow member variables to be used in the shared environment
-  //At end of function, copy contents of 'samplePDFFD_array_class' into 'samplePDFFD_array' which can then be used in getLikelihood
-  //
   //This is stored as [y][x] due to shifts only occuring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses 
-  double** samplePDFFD_array_class = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	samplePDFFD_array_class[yBin] = new double[nXBins];
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array_class[yBin][xBin] = 0.;
-	}
-  }
-
   double** samplePDFFD_array_private = NULL;
-
+  double** samplePDFFD_array_private_w2 = NULL;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
-#pragma omp parallel private(samplePDFFD_array_private)
+#pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
   {
 	// private to each thread
 	samplePDFFD_array_private = new double*[nYBins];
+    samplePDFFD_array_private_w2 = new double*[nYBins];
 	for (int yBin=0;yBin<nYBins;yBin++) {
 	  samplePDFFD_array_private[yBin] = new double[nXBins];
+      samplePDFFD_array_private_w2[yBin] = new double[nXBins];
 	  for (int xBin=0;xBin<nXBins;xBin++) {
 		samplePDFFD_array_private[yBin][xBin] = 0.;
+        samplePDFFD_array_private_w2[yBin][xBin] = 0.;
 	  }
 	}
 
@@ -547,6 +545,7 @@ void samplePDFFDBase::fillArray_MP() {
 		if (XBinToFill != -1 && YBinToFill != -1) {
 		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		  samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
+          samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
 		}
 		else{
 		  //std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
@@ -557,34 +556,23 @@ void samplePDFFDBase::fillArray_MP() {
 
 	//End of Calc Weights and fill Array
 	//==================================================
-
-#pragma omp parallel shared(samplePDFFD_array_class)
-	{
+  // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in getLikelihood
 	  for (int yBin=0;yBin<nYBins;yBin++) {
 		for (int xBin=0;xBin<nXBins;xBin++) {
 #pragma omp atomic
-		  samplePDFFD_array_class[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
+		  samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
+#pragma omp atomic    
+          samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
 		}
 	  }
-	}
 
 	for (int yBin=0;yBin<nYBins;yBin++) {
 	  delete[] samplePDFFD_array_private[yBin];
+      delete[] samplePDFFD_array_private_w2[yBin];
 	}
 	delete[] samplePDFFD_array_private;
-  }
-
-  // DB Copy contents of 'samplePDFFD_array_class' into 'samplePDFFD_array' which can then be used in getLikelihood
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array[yBin][xBin] = samplePDFFD_array_class[yBin][xBin];
-	}
-  }
-
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	delete[] samplePDFFD_array_class[yBin];
-  }
-  delete[] samplePDFFD_array_class;
+    delete[] samplePDFFD_array_private_w2;
+  } //end of parallel region
 }
 #endif
 
@@ -636,10 +624,13 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -668,10 +659,13 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -757,10 +751,13 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -790,10 +787,13 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -1047,7 +1047,7 @@ void samplePDFFDBase::fillSplineBins()
 
 double samplePDFFDBase::getLikelihood()
 {
-  if (samplePDFFD_data==NULL) {
+  if (samplePDFFD_data == NULL) {
       std::cerr << "data sample is empty!" << std::endl;
       return -1;
   }
@@ -1058,32 +1058,21 @@ double samplePDFFDBase::getLikelihood()
   int xBin;
   int yBin;
 
-  double negLogL = 0;
-
+  double negLogL = 0.;
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:negLogL) private(xBin, yBin)
 #endif
-
-  for (xBin=0;xBin<nXBins;xBin++) {
-    double negLogLsample = 0.;
-
-    for (yBin=0;yBin<nYBins;yBin++) {
-
-      double MCPred = samplePDFFD_array[yBin][xBin];
-      if (MCPred<=0) {MCPred = 1E-8;}
-
-      double DataVal = samplePDFFD_data[yBin][xBin];
-      if (DataVal > 0) {
-	negLogLsample += (MCPred - DataVal + DataVal * TMath::Log(DataVal/MCPred));
-      }
-      else {
-	negLogLsample += MCPred;
-      }
-
+  for (xBin = 0; xBin < nXBins; xBin++) 
+  {
+    for (yBin = 0; yBin < nYBins; yBin++) 
+    {
+        double DataVal = samplePDFFD_data[yBin][xBin];
+        double MCPred = samplePDFFD_array[yBin][xBin];
+        double w2 = samplePDFFD_array_w2[yBin][xBin];
+        //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
+        negLogL += getTestStatLLH(DataVal, MCPred, w2);
     }
-
-    negLogL += negLogLsample;
   }
-
   return negLogL;
 }
+

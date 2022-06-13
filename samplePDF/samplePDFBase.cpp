@@ -1,5 +1,3 @@
-#include <TROOT.h>
-#include <TRandom.h>
 #include "samplePDFBase.h"
 
 
@@ -20,6 +18,11 @@ void samplePDFBase::init(double pot)
 
 void samplePDFBase::init(double pot, std::string mc_version)
 {
+    
+    
+  //TODO KS: Need to set test stat from config file
+  // Set the test-statistic
+  //SetTestStatistic(static_cast<TestStatistic>(FitManager->GetMCStatLLH()));
 }
 
 void samplePDFBase::addData(std::vector<double> &data)
@@ -306,6 +309,95 @@ double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
   std::cout << "finished." << std::endl;
   return -1 * TMath::Log(sum); */
   return 0;
+}
+
+
+// *************************
+// Calculate the Barlow-Beeston likelhood contribution from MC statistics
+// Assumes the beta scaling parameters are Gaussian distributed
+// Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
+// Essentially solves equation 11
+// data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
+double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
+  // *************************
+
+  // Need some MC
+  if (mc == 0) return 0.0;
+
+  // The MC used in the likeliihood calculation
+  // Is allowed to be changed by Barlow Beeston beta parameters
+  double newmc = mc;
+
+  // Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
+  // Assume the MC has a Gaussian distribution around generated
+  // As in https://arxiv.org/abs/1103.0354 eq 10, 11
+
+  // The penalty from MC statistics using Barlow-Beeston
+  double penalty = 0;
+  if (fTestStatistic == kBarlowBeeston) {
+    // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
+    double fractional = sqrt(w2)/mc;
+    // -b/2a in quadratic equation
+    double temp = mc*fractional*fractional-1;
+    // b^2 - 4ac in quadratic equation
+    double temp2 = temp*temp + 4*data*fractional*fractional;
+    if (temp2 < 0) {
+      std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }  
+    // Solve for the positive beta
+    double beta = (-1*temp+sqrt(temp2))/2.;
+    newmc = mc*beta;
+    // And penalise the movement in beta relative the mc uncertainty
+    if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+    else penalty = 0;
+  }
+
+  // Calculate the new Poisson likelihood
+  // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
+  // For the Poisson likelihood, this is just the usual calculation
+  // For IceCube likelihood, we calculate it later
+  double stat = 0;
+  // All likelihood calculations may use the bare Poisson likelihood, so calculate here
+  if (data == 0) stat = newmc;
+  else if (newmc > 0) stat = newmc-data+data*TMath::Log(data/newmc);
+
+  // Also try the IceCube likelihood
+  // It does not modify the MC content
+  // https://arxiv.org/abs/1901.04645
+  // Argüelles, C.A., Schneider, A. & Yuan, T. J. High Energ. Phys. (2019) 2019: 30. https://doi.org/10.1007/JHEP06(2019)030
+  // We essentially construct eq 3.16 and take the logarithm
+  // in eq 3.16, mu is MC, sigma2 is w2, k is data
+  if (fTestStatistic == kIceCube) {
+    // If there for some reason is 0 mc uncertainty, return the Poisson LLH
+    if (w2 == 0) return stat;
+
+    // Reset the penalties if there is mc uncertainty
+     stat = 0.0;
+     penalty = 0.0;
+     // Auxillary variables
+     long double b = mc/w2;
+     long double a = mc*b+1;
+     long double k = data;
+     // Use C99's implementation of log of gamma function to not be C++11 dependent
+     stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
+   }
+
+   // Return the statistical contribution and penalty
+   return stat+penalty;
+ }
+
+// **************************************************
+// Helper function to set LLH type used in the fit
+void samplePDFBase::SetTestStatistic(TestStatistic test_stat) {
+// **************************************************
+  fTestStatistic = test_stat;
+  
+  std::string name = TestStatistic_ToString((TestStatistic)test_stat);
+  std::cout << "Using "<< name <<" likelihood in ND280" << std::endl;
+  //if(UpdateW2) std::cout << "With updating W2" << std::endl;
+  //else  std::cout << "Without updating W2" << std::endl;
 }
 
 void samplePDFBase::set1DBinning(int nbins, double* boundaries)

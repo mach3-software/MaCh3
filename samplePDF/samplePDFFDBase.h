@@ -2,6 +2,7 @@
 #define _samplePDFFDBase_h_
 
 #include <iostream>
+
 #include <TTree.h>
 #include <TH1D.h>
 #include <TH2D.h>
@@ -12,6 +13,9 @@
 #include <TGraph2DErrors.h>
 #include <vector>
 #include <list>
+#include <TROOT.h>
+#include <TRandom.h>
+
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
 #include "../Prob3++/BargerPropagator.h"
@@ -161,6 +165,8 @@ public:
 
   //DB Array to be filled after reweighting
   double** samplePDFFD_array;
+  //KS Array used for MC stat
+  double** samplePDFFD_array_w2;
   //DB Array to be filled in AddData
   double** samplePDFFD_data;
   //===============================================================================
