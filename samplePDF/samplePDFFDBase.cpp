@@ -345,7 +345,7 @@ void samplePDFFDBase::fillArray() {
       if (XBinToFill != -1 && YBinToFill != -1) {
         std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
         samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight;
+        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
 	  else{
 		std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
@@ -544,7 +544,7 @@ void samplePDFFDBase::fillArray_MP()
 		//DB Fill relevant part of thread array
 		if (XBinToFill != -1 && YBinToFill != -1) {
 		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-		  samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
+          samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
           samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
 		}
 		else{
