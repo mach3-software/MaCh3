@@ -18,7 +18,7 @@ add_library(Splines SHARED ${Splines_implementation_files})
 
 add_library(gpuSpline gpuSplineUtils.cu)
 
-target_include_directories(Splines PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 target_compile_features(Splines PUBLIC)
 
