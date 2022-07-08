@@ -44,12 +44,38 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(${CMAKE_SOURCE_DIR}/cmake/CUDASetup.cmake)
 #endif()
 
-# ROOT  
-list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-include(${CMAKE_SOURCE_DIR}/cmake/ROOTSetup.cmake)
+#CPM
+set(CPM_DOWNLOAD_VERSION 0.34.0)
+
+if(CPM_SOURCE_CACHE)
+  set(CPM_DOWNLOAD_LOCATION "${CPM_SOURCE_CACHE}/cpm/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+elseif(DEFINED ENV{CPM_SOURCE_CACHE})
+  set(CPM_DOWNLOAD_LOCATION "$ENV{CPM_SOURCE_CACHE}/cpm/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+else()
+  set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+endif()
+
+if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
+  message(STATUS "Downloading CPM.cmake to ${CPM_DOWNLOAD_LOCATION}")
+  file(DOWNLOAD
+       https://github.com/TheLartians/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake
+       ${CPM_DOWNLOAD_LOCATION}
+  )
+endif()
+
+include(${CPM_DOWNLOAD_LOCATION})
+
+##Prob3++ with CPM
+#CPMFindPackage(
+#   NAME prob3
+#   URL "https://github.com/hyperk/Prob3.git"
+#)
+
 
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
+#Compile and link options 
 add_compile_options(-L$ENV{CUDAPATH}/targets/x86_64-linux/lib -L${ROOT_LIBDIR})
 add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include -I${CUDA_SAMPLES}/common/inc)
 add_compile_options(-g -fopenmp -std=c++11)
@@ -58,13 +84,13 @@ add_link_options(-fopenmp)
 
 
 # Build components
-add_subdirectory(libconfig)
+#add_subdirectory(libconfig)
 #add_subdirectory(Diagnostics)
 add_subdirectory(Prob3++)
 #add_subdirectory(CUDAProb3)
 add_subdirectory(throwParms)
-add_subdirectory(manager)
+#add_subdirectory(manager)
 add_subdirectory(covariance)
 add_subdirectory(splines)
 add_subdirectory(samplePDF)
-add_subdirectory(mcmc)
+#add_subdirectory(mcmc)
