@@ -31,12 +31,18 @@ void samplePDFBase::init(double pot, std::string mc_version)
 
 void samplePDFBase::addData(std::vector<double> &data)
 {
+  if(nDims != 0 && nDims != 1)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
   nDims = 1;
   dataSample = new std::vector<double>(data);
   if(dathist == NULL)
   {
       std::cerr<<"dathist not initialised"<<std::endl;
-      std::cerr <<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+      std::cerr<<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
       throw;
   }
   dathist->Reset();                                                         
@@ -46,6 +52,12 @@ void samplePDFBase::addData(std::vector<double> &data)
 
 void samplePDFBase::addData(std::vector< vector <double> > &data)
 {
+  if(nDims != 0 && nDims != 2)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
   nDims = 2;  
   dataSample2D = new std::vector< vector <double> >(data);
   if(dathist2d == NULL)
@@ -61,6 +73,12 @@ void samplePDFBase::addData(std::vector< vector <double> > &data)
 
 void samplePDFBase::addData(TH1D* binneddata)
 {
+  if(nDims != 0 && nDims != 1)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
   nDims = 1;
   std::cout << "adding 1D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
   //KS: If exist delete to avoid memory leak
@@ -70,6 +88,12 @@ void samplePDFBase::addData(TH1D* binneddata)
 
 void samplePDFBase::addData(TH2D* binneddata)
 {
+  if(nDims != 0 && nDims != 2)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
   nDims = 2;
   std::cout << "adding 2D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
   //KS: If exist delete to avoid memory leak
