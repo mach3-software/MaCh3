@@ -1,17 +1,24 @@
-#include <TROOT.h>
-#include <TRandom.h>
 #include "samplePDFBase.h"
 
 
-samplePDFBase::samplePDFBase(double pot) {
+samplePDFBase::samplePDFBase(double pot) 
+{
+  nDims = 0;
   rnd = new TRandom3(0);
-  MCthrow=false;
+  MCthrow = false;
+  dathist = NULL;
+  dathist2d = NULL;
+  dataSample = NULL;
+  dataSample2D = NULL;
 }
 
 samplePDFBase::~samplePDFBase()
 {
-  rnd = new TRandom3(0);
-  MCthrow=false;
+  if(dathist != NULL) delete dathist;
+  if(dathist2d != NULL) delete dathist2d;
+  if(dataSample != NULL) delete dataSample;
+  if(dataSample2D != NULL) delete dataSample2D;  
+  delete rnd;
 }
 
 void samplePDFBase::init(double pot)
@@ -24,9 +31,20 @@ void samplePDFBase::init(double pot, std::string mc_version)
 
 void samplePDFBase::addData(std::vector<double> &data)
 {
+  if(nDims != 0 && nDims != 1)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 1;
   dataSample = new std::vector<double>(data);
-  dataSample2D = NULL;
-  dathist2d = NULL;
+  if(dathist == NULL)
+  {
+      std::cerr<<"dathist not initialised"<<std::endl;
+      std::cerr<<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
   dathist->Reset();                                                         
   for (int i = 0; i < int(dataSample->size()); i++)                         
     dathist->Fill(dataSample->at(i));
@@ -34,30 +52,53 @@ void samplePDFBase::addData(std::vector<double> &data)
 
 void samplePDFBase::addData(std::vector< vector <double> > &data)
 {
+  if(nDims != 0 && nDims != 2)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 2;  
   dataSample2D = new std::vector< vector <double> >(data);
-  dataSample = NULL;
-  dathist = NULL;
+  if(dathist2d == NULL)
+  {
+      std::cerr<<"dathist2d not initialised"<<std::endl;
+      std::cerr <<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
   dathist2d->Reset();                                                       
   for (int i = 0; i < int(dataSample2D->size()); i++)                       
-    dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);   
+    dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]); 
 }
 
 void samplePDFBase::addData(TH1D* binneddata)
 {
+  if(nDims != 0 && nDims != 1)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 1;
   std::cout << "adding 1D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
-  dathist=binneddata;
-  dathist2d = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  //KS: If exist delete to avoid memory leak
+  if(dathist != NULL) delete dathist;
+  dathist = binneddata;
 }
 
 void samplePDFBase::addData(TH2D* binneddata)
 {
+  if(nDims != 0 && nDims != 2)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 2;
   std::cout << "adding 2D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
-  dathist2d=binneddata;
-  dathist = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  //KS: If exist delete to avoid memory leak
+  if(dathist2d != NULL) delete dathist;
+  dathist2d = binneddata;
 }
 
 std::vector<double> samplePDFBase::generate()
@@ -65,8 +106,7 @@ std::vector<double> samplePDFBase::generate()
   std::vector<double> data;
   TH1D *pdf = (TH1D*)get1DHist();
   double evrate = getEventRate();
-  TRandom3 *rndm = new TRandom3(0);
-  int num = rndm->Poisson(evrate);
+  int num = rnd->Poisson(evrate);
   std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
 
   // rejection sampling
@@ -96,14 +136,13 @@ std::vector<double> samplePDFBase::generate()
   }
 
   std::cout << "sampling complete" << std::endl;
-
   return data;
 }
+
 std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 {
   std::vector< vector <double> > data;
-  if(!pdf)
-    pdf = (TH2D*)get2DHist();
+  if(!pdf) pdf = (TH2D*)get2DHist();
 
   if(MCthrow)
   {
@@ -117,8 +156,7 @@ std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
   }
 
   double evrate = pdf->Integral();
-  TRandom3 *rndm = new TRandom3(0);
-  int num = rndm->Poisson(evrate);
+  int num = rnd->Poisson(evrate);
   std::cout << "sampling " << num << " events from " << evrate << std::endl;
 
   std::vector<double> var1;
@@ -127,7 +165,7 @@ std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 
   dathist2d->Reset();
 
-  for(int i=0; i<num; i++)
+  for(int i=0; i < num; i++)
   {
     pdf->GetRandom2(x,y);
     var1.push_back(x);
@@ -136,8 +174,6 @@ std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
   }
   data.push_back(var1);
   data.push_back(var2);
-
-
 
   std::cout << "sampling complete " << data[0].size() << std::endl;
   return data;
@@ -163,39 +199,17 @@ double samplePDFBase::getEventRate()
 
 double samplePDFBase::getLikelihood()
 {
-  if(!dataSample && !dataSample2D && !dathist && !dathist2d)    
+  if(nDims == 0)    
   {
     std::cerr << "data sample is empty!" << std::endl;
     return -1;
   }
-
-  int ndim=0;
-  bool whoops=true;
-  if(dataSample || dathist)
-  {
-    ndim=1;
-    whoops = !whoops;
-  }
-
-  else if(dataSample2D || dathist2d)
-  {
-    ndim=2;
-    whoops=!whoops;
-  }
-
-  if(whoops)
-  {    
-    std::cerr << "too many data samples!" << std::endl;
-    return -1;
-  }
-
-  double negLogL = 9999999;
+  double negLogL = 0;
 
   // for now, bin up dataset and do a binned fit
   // mc
-  if(ndim==1)
+  if(nDims == 1)
   {
-    negLogL=0;
     TH1D* pdf = (TH1D*)get1DHist();
     // data
     if (!dathist)
@@ -214,21 +228,12 @@ double samplePDFBase::getLikelihood()
     for (int i = 1; i <= pdf->GetNbinsX(); i++)
     {
       double mc = pdf->GetBinContent(i);
-      if(mc==0)
-        mc=1E-8;
       double dat = dathist->GetBinContent(i);
-      if(mc > 0 && dat > 0)
-      {
-        //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-        negLogL += (mc - dat + dat * TMath::Log(dat/mc));// + 1 / (12 * dat) + 0.5 *  TMath::Log(2*TMath::Pi() * dat));
-      }
-      else if(mc > 0 && dat == 0)
-        negLogL += mc;
+      negLogL += getTestStatLLH(dat, mc);
     }
   }
-  if(ndim==2)
+  if(nDims == 2)
   {
-    negLogL=0;
     TH2D* pdf = (TH2D*)get2DHist();
     // data
     if(dataSample2D && !dathist2d)
@@ -243,28 +248,31 @@ double samplePDFBase::getLikelihood()
     // get likelihood
     for (int i = 1; i <= pdf->GetNbinsX(); i++)
     {
-      for(int j=1; j <= pdf->GetNbinsY(); j++)
+      for(int j = 1; j <= pdf->GetNbinsY(); j++)
       {
+        double dat = dathist2d->GetBinContent(i,j); 
         double mc = pdf->GetBinContent(i,j);
-        if(mc==0)
-          mc=1E-8;
-        double dat = dathist2d->GetBinContent(i,j);
-
-        if(mc > 0 && dat > 0)
-        {
-          negLogL += (mc - dat + dat * TMath::Log(dat/mc));// + 1 / (12 * dat) + 0.5 *  TMath::Log(2*TMath::Pi() * dat));
-        }
-        else if(mc > 0 && dat == 0)
-          negLogL += mc;
+        negLogL += getTestStatLLH(dat, mc);
       }
     }
-
-
   }
   return negLogL;
 }
-
-
+// ***************************************************************************
+//KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
+double getTestStatLLH(double data, double mc) {
+// ***************************************************************************
+    double negLogL = 0;
+    if(mc == 0) mc = 1E-8;
+    if(mc > 0 && data > 0)
+    {
+        //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+        negLogL += (mc - data + data * TMath::Log(data/mc));
+    }
+    else if(mc > 0 && data == 0) negLogL += mc;
+    
+    return negLogL; 
+}
 
 // this function will compute the likelihood against a nominal dataset (histogram)
 /*double samplePDFBase::getLikelihoodNominal()
@@ -357,7 +365,6 @@ void samplePDFBase::getSampleName(std::vector<std::string> &sampleNameVect, bool
     sampleNameVect.push_back("oscillated $\\nu_{e}$") ;
     sampleNameVect.push_back("oscillated $\\bar{\\nu_{e}}$") ;
   }
-
 }
 
 
@@ -392,5 +399,4 @@ void samplePDFBase::getModeName(std::vector<std::string> &modeNameVect, bool lat
     modeNameVect.push_back("2p-2h");
     modeNameVect.push_back("NC 1$\\gamma$");
   }
-
 }
