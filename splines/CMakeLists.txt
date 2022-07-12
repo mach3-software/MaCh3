@@ -1,33 +1,39 @@
-set(Splines_implementation_files 
-	splineBase.cpp 
-	splineFDBase.cpp
-	SplineMonolith.cpp
-        gpuSplineUtils.cu)
-
-
-
 set(Splines_header_files 
 	splineBase.h 
 	splineInterface.h 
 	splineFDBase.h 
         splineMonolith.h)
-	
+
+set(Splines_implementation_files 
+	splineBase.cpp 
+	splineFDBase.cpp
+	SplineMonolith.cpp
+        gpuSplineUtils.cu)
 # Note: SplineMonolith is for GPU
 
-add_library(Splines SHARED ${Splines_implementation_files})
 
-add_library(gpuSpline gpuSplineUtils.cu)
+set(Splines_implementation_files_CPU 
+	splineBase.cpp 
+	splineFDBase.cpp)
 
-target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+if(NOT ${CPU_ONLY})
 
-target_compile_features(Splines PUBLIC)
+  add_library(Splines SHARED ${Splines_implementation_files})
+  target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+  target_compile_features(Splines PUBLIC)
+  add_library(gpuSpline gpuSplineUtils.cu)
+  set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+  set_property(TARGET gpuSpline Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+  add_dependencies(Splines throwParms gpuSpline)
 
-set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+else()
 
-set_property(TARGET gpuSpline Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+  add_library(Splines SHARED ${Splines_implementation_files_CPU})
+  target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+  target_compile_features(Splines PUBLIC)
+  add_dependencies(Splines throwParms)
 
-target_link_libraries(Splines)
-add_dependencies(Splines throwParms gpuSpline)
+endif()
 
 install(TARGETS Splines DESTINATION lib)
 
