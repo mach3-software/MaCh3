@@ -57,6 +57,6 @@ cmessage(STATUS "CUDA_MAJOR_VERSION: ${CUDAToolkit_VERSION}")
   
    add_compile_options(
   	"$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-O3;-Werror;cross-execution-space-call;-w>"
-  	"$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills>"
+  	"$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
   	"$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
   	)
