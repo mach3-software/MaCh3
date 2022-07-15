@@ -10,7 +10,7 @@ set(Covariance_header_files
 	covarianceXsec.cpp)
 
 add_library(Covariance SHARED ${Covariance_implementation_files})
-target_include_directories(Covariance PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(Covariance PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(Covariance)
 add_dependencies(Covariance throwParms)
 
