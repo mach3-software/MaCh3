@@ -23,17 +23,22 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
   if(!(xsec_param_norm_nupdg = (TObjArray*)(infile->Get("xsec_norm_nupdg")))){std::cerr<<"Can't find xec_norm_nupdg in xseccov"<<std::endl;throw;}
   if(!(xsec_param_norm_preoscnupdg = (TObjArray*)(infile->Get("xsec_norm_prod_nupdg")))){std::cerr<<"Can't find xec_norm_prod_nupdg in xseccov"<<std::endl;throw;}
   //ETA - adding in string which will then be parsed in samplePDF class into a kinematic variable to cut on
-  if(!(xsec_kinematic_type = (TObjArray*)(infile->Get("xsec_norm_kinematic_type")))){std::cerr<< "[ERROR]::" << __FILE__ << ":" << __LINE__ << " cannot find xsec_kinematic_type in xseccov" << std::endl; throw;}
+  //LW - Chaning to if no kinematic type, make empty array
+  //if(!(xsec_kinematic_type = (TObjArray*)(infile->Get("xsec_norm_kinematic_type")))){std::cerr<< "[ERROR]::" << __FILE__ << ":" << __LINE__ << " cannot find xsec_kinematic_type in xseccov" << std::endl; throw;}
   if(!(xsec_param_fd_spline_modes = (TObjArray*)(infile->Get("fd_spline_modes")))){std::cerr<<"Can't find fd_spline_modes in xseccov"<<std::endl;throw;}
   if(!(xsec_param_fd_spline_names = (TObjArray*)(infile->Get("fd_spline_names")))){std::cerr<<"Can't find fd_spline_names in xseccov"<<std::endl;throw;}
-  if(!(xsec_param_nd_spline_names = (TObjArray*)(infile->Get("nd_spline_names")))){std::cerr<<"Can't find nd_spline_names in xseccov"<<std::endl;throw;}
+  //if(!(xsec_param_nd_spline_names = (TObjArray*)(infile->Get("nd_spline_names")))){std::cerr<<"Can't find nd_spline_names in xseccov"<<std::endl;throw;}
   
+  if(!(xsec_kinematic_type = (TObjArray*)(infile->Get("xsec_norm_kinematic_type")))){xsec_kinematic_type = new TObjArray();}
+  if(!(xsec_param_nd_spline_names = (TObjArray*)(infile->Get("nd_spline_names")))){xsec_param_nd_spline_names= new TObjArray();}
+
+
   // Check that the size of all the arrays are good
   if (xsec_param_norm_modes->GetEntries() != xsec_param_norm_elem->GetEntries() || 
       xsec_param_norm_modes->GetEntries() != xsec_param_norm_nupdg->GetEntries() ||
       xsec_param_norm_modes->GetEntries() != xsec_param_norm_horncurrents->GetEntries() ||
-      xsec_param_norm_modes->GetEntries() != xsec_param_norm_preoscnupdg->GetEntries() ||
-	  xsec_param_norm_modes->GetEntries() != xsec_kinematic_type->GetEntries() ){	
+      xsec_param_norm_modes->GetEntries() != xsec_param_norm_preoscnupdg->GetEntries() /* ||
+	   xsec_param_norm_modes->GetEntries() != xsec_kinematic_type->GetEntries() */ ){	
     std::cerr << "Number of entries in input matrix normalisation parameters is wrong!" << std::endl;
     std::cerr << "Element GetEntries =    " << xsec_param_norm_elem->GetEntries() << std::endl;
     std::cerr << "Modes GetEntries =      " << xsec_param_norm_modes->GetEntries() << std::endl;
@@ -137,9 +142,9 @@ covarianceXsec::~covarianceXsec() {
 
 // ********************************************
 // DB Grab the Number of splines for the relevant DetID
-const int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
+int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
   int returnVal = 0;
-
+  
   for (int i = 0; i < nPars; ++i) {
     if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
       if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
@@ -156,7 +161,6 @@ const int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
 // DB Grab the Spline Names for the relevant DetID
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int DetID) {
   std::vector<std::string> returnVec;
-
   for (int i = 0; i < nPars; ++i) {
     if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
       if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
@@ -334,7 +338,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 
 // ********************************************
 // DB Grab the number of Normalisation parameters for the relevant DetID
-const int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
+int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
   int returnVal = 0;
 
   for (int i = 0; i < nPars; ++i) {
@@ -707,7 +711,7 @@ void covarianceXsec::scanParameters() {
         nNearSplineParams++;
 	
 	//Fill the name of the Far spline objects in the spline files
-	NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
+	//NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
       }//End Near affecting spline pars
       else {
 	std::cerr << "Found a parameter in covarianceXsec which wasn't -2, -1 or above 0!" << std::endl;

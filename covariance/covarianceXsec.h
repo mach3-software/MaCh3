@@ -39,27 +39,27 @@ class covarianceXsec : public covarianceBase {
 
     // General Getter functions not split by detector
     double GetLikelihood();
-    const double GetParamUpperBound(int i) {return xsec_param_ub_a[i];}
-    const double GetParamLowerBound(int i) {return xsec_param_lb_a[i];}
-    const double GetParamPrior(int i)      {return xsec_param_prior_a[i];}
-    const int  GetXSecParamID(int i, int j) const {return xsec_param_id_a[i][j];}
+    double GetParamUpperBound(int i) {return xsec_param_ub_a[i];}
+    double GetParamLowerBound(int i) {return xsec_param_lb_a[i];}
+    double GetParamPrior(int i)      {return xsec_param_prior_a[i];}
+    int  GetXSecParamID(int i, int j) const {return xsec_param_id_a[i][j];}
     const std::string & GetParameterName(int i) const {return xsec_param_names[i];}
-    const int    GetNumParams()               {return nPars;}
+    int    GetNumParams()               {return nPars;}
     const char* GetParName(int i) const {return xsec_param_names[i].c_str();}
 
-    const bool isParFlux(int i){
+    bool isParFlux(int i){
       return isFlux[i];
     }
 
     // Get functions for Near normalisation parameters
     const std::vector<XsecNorms4> GetNearNormPars() const{return NearNormParams;}
-    const int                       GetNumNearNormParams() const  {return nNearNormParams;}
+    int                       GetNumNearNormParams() const  {return nNearNormParams;}
 
     // Get functions for Far normalisation parameters
     const std::vector<XsecNorms4> GetFarNormPars() const{return FarNormParams;}
 
     // Get functions for Near spline parameters
-    const int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
+    int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
     const std::vector<std::string>& GetNearSplineParsNames() const  {return NearsplineParsNames;}
     const std::vector<std::string>& GetNearSplineFileParsNames() const  {return NearSplineFileParsNames;}
     const std::vector<int>&         GetNearSplineParsIndex() const  {return NearsplineParsIndex;}
@@ -69,16 +69,16 @@ class covarianceXsec : public covarianceBase {
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
-    const int GetNumSplineParamsFromDetID(int DetID);
+    int GetNumSplineParamsFromDetID(int DetID);
 
     //DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
-    const int GetNumFuncParamsFromDetID(int DetID);
+    int GetNumFuncParamsFromDetID(int DetID);
     const std::vector<std::string> GetFuncParsNamesFromDetID(int DetID);
     const std::vector<int> GetFuncParsIndexFromDetID(int DetID);
 
     // Get functions for Far spline parameters
-    const int                       GetNumFarSplineParams() const  {return nFarSplineParams;}
+    int                       GetNumFarSplineParams() const  {return nFarSplineParams;}
     const std::vector<std::string>& GetFarSplineParsNames() const  {return FarSplineParsNames;}
     const std::vector<std::string>& GetFarSplineFileParsNames() const  {return FarSplineFileParsNames;}
     //TVectorT<double> *GetFarSplineParsModes_TVec() {return FarSplineParsModes;}
@@ -87,23 +87,23 @@ class covarianceXsec : public covarianceBase {
     const std::vector<int>&         GetFarSplineModeVec(int i) const {return FarSplineModes[i];}
 	
     // Get functions for uniq spline parameters //!!decide what to do about these
-    const int                       GetNumSplineParamsUniq() const  {return nSplineParamsUniq;}
+    int                       GetNumSplineParamsUniq() const  {return nSplineParamsUniq;}
     const std::vector<std::string>& GetSplineParsUniqNames() const  {return splineParsUniqNames;}
     const std::vector<int>&         GetSplineParsUniqIndex() const  {return splineParsUniqIndex;}
 
     // Get functions for shared spline parameters //!!decide what to do about these
-    const int                       GetNumSplineParamsShare() const  {return nSplineParamsShare;}
+    int                       GetNumSplineParamsShare() const  {return nSplineParamsShare;}
     const std::vector<std::string>& GetSplineParsShareNames() const  {return splineParsShareNames;}
     const std::vector<int>&         GetSplineParsShareIndex() const  {return splineParsShareIndex;}
     const std::vector<int>&         GetSplineParsShareToUniq() const {return splineParsShareToUniq;}
     
     // Get functions for Near functional parameter (e.g. BeRPA)
-    const int                       GetNumNearFuncParams() const     {return nNearFuncParams;}
+    int                       GetNumNearFuncParams() const     {return nNearFuncParams;}
     const std::vector<std::string>& GetNearFuncParsNames() const  {return NearfuncParsNames;}
     const std::vector<int>&         GetNearFuncParsIndex() const  {return NearfuncParsIndex;}
 
     // Get functions for Far functional parameter (e.g. BeRPA)
-    const int                       GetNumFarFuncParams() const     {return nFarFuncParams;}
+    int                       GetNumFarFuncParams() const     {return nFarFuncParams;}
     const std::vector<std::string>& GetFarFuncParsNames() const  {return FarFuncParsNames;}
     const std::vector<int>&         GetFarFuncParsIndex() const  {return FarFuncParsIndex;}
 

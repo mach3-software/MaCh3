@@ -99,7 +99,7 @@ class covarianceBase {
   std::string const getInputFile() const { return inputFile; };
 
   // Get diagonal error for ith parameter
-  const double getDiagonalError(const int i) { 
+  double getDiagonalError(const int i) { 
     return sqrt((*covMatrix)(i,i));
   }
 
@@ -110,25 +110,25 @@ class covarianceBase {
 
   const std::vector<double> & getNominalArray() const { return nominal; };
   const std::vector<double> getProposed() const;
-  const double getNominal(int i) { 
+  double getNominal(int i) { 
     return nominal[i]; };
-  const double getParProp(int i) { 
+  double getParProp(int i) { 
     return fParProp[i]; 
   };
-  const double getParCurr(int i) { 
+  double getParCurr(int i) { 
     return fParCurr[i];
   };
-  const double getParInit(int i) { 
+  double getParInit(int i) { 
     return fParInit[i];
   };
-  const double getParProp_PCA(int i) {
+  double getParProp_PCA(int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;
     }
     return fParProp_PCA(i);
   };
-  const double getParCurr_PCA(int i) {
+  double getParCurr_PCA(int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;
@@ -180,8 +180,8 @@ class covarianceBase {
     TransferToParam();
   }
 
-  const int getSize() { return size; };
-  const int getNpars() { 
+  int getSize() { return size; };
+  int getNpars() { 
     if (pca) return npars;
     else return size;
   }
