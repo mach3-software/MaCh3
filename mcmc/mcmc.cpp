@@ -1,82 +1,35 @@
 #include "mcmc.h"
 
 // *************************
-mcmc::mcmc(bool verbose) : fitMan(NULL){
-// *************************
-
-  random = new TRandom3(0);
-
-  init("output.root", verbose);
-
-  anneal = false;
-
-  std::cout << "************************" << std::endl;
-  std::cout << "************************" << std::endl;
-  std::cout << "WARNING WILL NOT SAVE MANAGER OUTPUT TO FILE BECAUSE YOU USED A DEPRECATED CONSTRUCTOR" << std::endl;
-  std::cout << "************************" << std::endl;
-  std::cout << "************************" << std::endl;
-}
-
-// *************************
-mcmc::mcmc(const char *outfile, bool verbose) : fitMan(NULL) {
-// *************************
-  random = new TRandom3(0);
-
-  init(outfile, verbose);
-
-  anneal = false;
-
-  std::cout << "************************" << std::endl;
-  std::cout << "************************" << std::endl;
-  std::cout << "WARNING WILL NOT SAVE MANAGER OUTPUT TO FILE BECAUSE YOU USED A DEPRECATED CONSTRUCTOR" << std::endl;
-  std::cout << "************************" << std::endl;
-  std::cout << "************************" << std::endl;
-}
-
-// *************************
-// Constructor for enabling annealing
-mcmc::mcmc(const char *outfile, double t, bool verbose) : fitMan(NULL) {
-// *************************
-  random = new TRandom3(0);
-
-  init(outfile, verbose);
-
-  std::cout << "- Enabling simulated annealing with T = " << t << std::endl;
-  anneal = true;
-  T = t;
-
-  std::cout << "************************" << std::endl;
-  std::cout << "************************" << std::endl;
-  std::cout << "WARNING WILL NOT SAVE MANAGER OUTPUT TO FILE BECAUSE YOU USED A DEPRECATED CONSTRUCTOR" << std::endl;
-  std::cout << "************************" << std::endl;
-  std::cout << "************************" << std::endl;
-}
-
-// *************************
 // Initialise the manager and make it an object of mcmc class
 // Now we can dump manager settings to the output file
 mcmc::mcmc(manager * const man) : fitMan(man) {
 // *************************
-
-  random = new TRandom3(fitMan->GetSeed());
-
-  init(fitMan->GetOutputFilename(), fitMan->GetDebug());
-
-  anneal = false;
+  random = new TRandom3(fitMan->GetSeed());  
+  AnnealTemp = fitMan->GetTemp();
+  if(AnnealTemp < 0) anneal = false;
+  else 
+  {
+    std::cout << "- Enabling simulated annealing with T = " << AnnealTemp << std::endl;
+    anneal = true;
+  }
+  // Fit summary and debug info
+  debug =  fitMan->GetDebug();
+  init(fitMan->GetOutputFilename());
 
 }
 
 // *************************
 // Initialise the MCMC, called from constructor
-void mcmc::init(std::string outfile, bool verbose) {
+void mcmc::init(std::string outfile) {
 // *************************
 
   // Could set these from manager which is passed!
   osc_only = false;
   // Counter of the accepted # of steps
   accCount = 0;
-  // Save output every auto_save steps
-  auto_save = 500;
+  //KS: you don't want to do this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
+  auto_save = fitMan->GetAutoSave();
   // Do we want to save the nominal parameters to output
   save_nominal = true;
   // Starting parameters should be thrown 
@@ -92,13 +45,8 @@ void mcmc::init(std::string outfile, bool verbose) {
   // Auto-save every 100MB
   outTree->SetAutoSave(-100E6);
 
-  // Fit summary and debug info
-  debug = verbose;
-
   // Prepare the output log file
-  if (debug) {
-    debugFile.open((outfile+".log").c_str());
-  }
+  if (debug) debugFile.open((outfile+".log").c_str());
 
   // Clear the samples and systematics
   samples.clear();
@@ -111,6 +59,9 @@ void mcmc::init(std::string outfile, bool verbose) {
 // Destructor: close the logger and output file
 mcmc::~mcmc() {
 // *************************
+  delete random;
+  delete[] sample_llh;
+  delete[] syst_llh;
   std::cout << "Done!" << std::endl;
 }
 
@@ -280,11 +231,8 @@ void mcmc::CheckStep() {
   accProb = 0.0;
 
   // Calculate acceptance probability
-  if (anneal) {
-    accProb = TMath::Min(1.,TMath::Exp( -(logLProp-logLCurr) / (TMath::Exp(-step/T)))); 
-  } else {
-    accProb = TMath::Min(1., TMath::Exp(logLCurr-logLProp));
-  }
+  if (anneal) accProb = TMath::Min(1.,TMath::Exp( -(logLProp-logLCurr) / (TMath::Exp(-step/AnnealTemp)))); 
+  else accProb = TMath::Min(1., TMath::Exp(logLCurr-logLProp));
 
   // Get the random number
   double fRandom = random->Rndm();
@@ -297,7 +245,7 @@ void mcmc::CheckStep() {
     accept = false;
   }
 
-  debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
+  if(debug) debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
 
   // Update all the handlers to accept the step
   if (accept && !reject) {
@@ -364,9 +312,7 @@ void mcmc::runMCMC() {
     CheckStep();
 
     // Auto save the output
-    if (step % auto_save == 0) {
-      outTree->AutoSave();
-    }
+    if (step % auto_save == 0) outTree->AutoSave();
   }
   clock.Stop();
 
@@ -575,9 +521,7 @@ void mcmc::ProposeStep() {
     // Add the oscillation likelihoods to the reconfigure likelihoods
     llh += osc_llh;
 
-    if (debug) {
-      debugFile << "LLH for oscillation handler: " << llh << std::endl;
-    }
+    if (debug) debugFile << "LLH for oscillation handler: " << llh << std::endl;
   }
 
   int stdIt = 0;
@@ -594,16 +538,14 @@ void mcmc::ProposeStep() {
     syst_llh[stdIt] = (*it)->getLikelihood();
     llh += syst_llh[stdIt];
 
-    if (debug) {
-      debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
-    }
+    if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
   }
 
   // Check if we've hit a boundary in the systematics
   // In this case we can save time by not having to reconfigure the simulation
   if (llh >= __LARGE_LOGL__) {
     reject = true;
-    debugFile << "Rejecting based on boundary" << std::endl;
+    if (debug) debugFile << "Rejecting based on boundary" << std::endl;
   }
 
   // Only reweight when we have a good parameter configuration
@@ -631,9 +573,7 @@ void mcmc::ProposeStep() {
       // Get the sample likelihoods and add them
       sample_llh[i] = samples[i]->getLikelihood();
       llh += sample_llh[i];
-      if (debug) {
-        debugFile << "LLH after sample " << i << " " << llh << std::endl;
-      }
+      if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
     }
 
   // For when we don't have to reweight, set sample to madness
@@ -641,9 +581,7 @@ void mcmc::ProposeStep() {
     for (size_t i = 0; i < samples.size(); i++) {
       // Set the sample_llh[i] to be madly high also to signfiy a step out of bounds
       sample_llh[i] = __LARGE_LOGL__;
-      if (debug) {
-        debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
-      }
+      if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
     }
   }
 
@@ -726,9 +664,7 @@ void mcmc::SaveChain() {
     outTree->Write();
   }
 
-  if(debug) {
-    debugFile.close();
-  }
+  if(debug) debugFile.close();
 
   outputFile->Close();
 }

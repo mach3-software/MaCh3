@@ -10,7 +10,6 @@
 #include "TTree.h"
 #include "TString.h"
 #include "TRandom.h"
-#include <map>
 
 #include "TVectorT.h"
 
@@ -25,11 +24,7 @@
 class mcmc {
 
  public:
-  mcmc(bool verbose = false);
-  mcmc(const char *name = "output.root", bool verbose = false);
-  mcmc(const char *name = "output.root", double t = 1000.0, bool verbose = false);
-  mcmc(manager * const fitMan = NULL);
-
+  mcmc(manager * const fitMan);
   ~mcmc();
 
   void addSamplePDF(samplePDFBase* sample);
@@ -56,7 +51,7 @@ class mcmc {
   
  private:
   // Helper function called from constructors
-  inline void init(std::string name, bool verbose);
+  inline void init(std::string name);
 
   // Prepare the output file
   inline void PrepareOutput();
@@ -138,7 +133,7 @@ class mcmc {
 
   // simulated annealing
   bool anneal; 
-  double T;
+  double AnnealTemp;
 
   // starting positions
   bool init_pos; // have the starting parameters been set manually?

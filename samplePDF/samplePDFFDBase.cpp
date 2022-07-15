@@ -1070,16 +1070,9 @@ double samplePDFFDBase::getLikelihood()
     for (yBin=0;yBin<nYBins;yBin++) {
 
       double MCPred = samplePDFFD_array[yBin][xBin];
-      if (MCPred<=0) {MCPred = 1E-8;}
-
       double DataVal = samplePDFFD_data[yBin][xBin];
-      if (DataVal > 0) {
-	negLogLsample += (MCPred - DataVal + DataVal * TMath::Log(DataVal/MCPred));
-      }
-      else {
-	negLogLsample += MCPred;
-      }
-
+      
+      negLogLsample += getTestStatLLH(DataVal, MCPred);
     }
 
     negLogL += negLogLsample;

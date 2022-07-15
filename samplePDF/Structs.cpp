@@ -115,148 +115,6 @@ namespace MaCh3Utils {
 }
 
 
-// ********************
-// Constructor
-xsec2015::xsec2015() {
-// ********************
-  splMAQE = NULL;
-  splCA5 = NULL;
-  splMARES = NULL;
-  splBGSCLLOWPPI = NULL;
-  splBGSCL = NULL;
-  splBYDIS = NULL;
-  splBYMPI = NULL;
-  splAGKYMULT = NULL;
-  splFEFABS = NULL;
-  splFEFCX = NULL;
-  splFEFQE = NULL;
-  splFEFINEL = NULL;
-  splFEFCXH = NULL;
-  splFEFQEH = NULL;
-  splPDDC = NULL;
-  splPDDO = NULL;
-  splMECENULOW = NULL;
-  splMECENUHIGH = NULL;
-  splMECENUBARLOW = NULL;
-  splMECENUBARHIGH = NULL;
-  splEBC = NULL;
-  splEBO = NULL;
-  splSCCV = NULL;
-  splSCCA = NULL;
-  spl2P2HEDEP_LOWENU = NULL;
-  spl2P2HEDEP_HIGHENU = NULL;
-  spl2P2HEDEP_LOWENUBAR = NULL;
-  spl2P2HEDEP_HIGHENUBAR = NULL;
-  splISO_BKG_LOWPPI = NULL;
-  splDIS_BY = NULL;
-  splMPI_BY = NULL;
-  splMPI_AGKY_XSEC = NULL;
-
-  relRPA = __BAD_DOUBLE__;
-}
-
-// ************************
-// Destructor
-xsec2015::~xsec2015() {
-// ************************
-  if (splMAQE) {
-    delete splMAQE;
-  }
-  if (splCA5) {
-    delete splCA5;
-  }
-  if (splMARES) {
-    delete splMARES;
-  }
-  if (splBGSCLLOWPPI) {
-    delete splBGSCLLOWPPI;
-  }
-  if (splBGSCL) {
-    delete splBGSCL;
-  }
-  if (splBYDIS) {
-    delete splBYDIS;
-  }
-  if (splBYMPI) {
-    delete splBYMPI;
-  }
-  if (splAGKYMULT) {
-    delete splAGKYMULT;
-  }
-  if (splFEFABS) {
-    delete splFEFABS;
-  }
-  if (splFEFCX) {
-    delete splFEFCX;
-  }
-  if (splFEFQE) {
-    delete splFEFQE;
-  }
-  if (splFEFINEL) {
-    delete splFEFINEL;
-  }
-  if (splFEFCXH) {
-    delete splFEFCXH;
-  }
-  if (splFEFQEH) {
-    delete splFEFQEH;
-  }
-  if (splPDDC) {
-    delete splPDDC;
-  }
-  if (splPDDO) {
-    delete splPDDO;
-  }
-  if (splMECENULOW) {
-    delete splMECENULOW;
-  }
-  if (splMECENUHIGH) {
-    delete splMECENUHIGH;
-  }
-  if (splMECENUBARLOW) {
-    delete splMECENUBARLOW;
-  }
-  if (splMECENUBARHIGH) {
-    delete splMECENUBARHIGH;
-  }
-  if (splEBC) {
-    delete splEBC;
-  }
-  if (splEBO) {
-    delete splEBO;
-  }
-  if (splSCCV) {
-    delete splSCCV;
-  }
-  if (splSCCA) {
-    delete splSCCA;
-  }
-  if (spl2P2HEDEP_LOWENU) {
-    delete spl2P2HEDEP_LOWENU;
-  }
-  if (spl2P2HEDEP_HIGHENU) {
-    delete spl2P2HEDEP_HIGHENU;
-  }
-  if (spl2P2HEDEP_LOWENUBAR) {
-    delete spl2P2HEDEP_LOWENUBAR;
-  }
-  if (spl2P2HEDEP_HIGHENUBAR) {
-    delete spl2P2HEDEP_HIGHENUBAR;
-  }
-  if (splISO_BKG_LOWPPI) {
-    delete splISO_BKG_LOWPPI;
-  }
-  if (splDIS_BY) {
-	delete splDIS_BY;
-  }
-  if (splMPI_BY) {
-	delete splMPI_BY;
-  }
-  if (splMPI_AGKY_XSEC) {
-	delete splMPI_AGKY_XSEC;
-  }
-}
-
 // Constructor
 xsecBase::xsecBase() {
   mode    = __BAD_INT__;
@@ -277,50 +135,10 @@ void xsecBase::Print() {
   std::cout << "    " << std::left << std::setw(20) << "weight  : "<< weight << std::endl;
 }
 
-
-// ************************
-// Print the cross-section information for one given event
-void xsec2015::Print() {
-// ************************
-  xsecBase::Print();
-  std::cout << "    " << std::left << std::setw(20) << "relRPA  : "<< relRPA << std::endl;
-
-  std::cout << "    Splines: " << std::endl;
-  if (splMAQE != NULL)    std::cout << "    " << std::left << std::setw(25) << "MAQE" << std::endl;
-  if (splPDDC != NULL)    std::cout << "    " << std::left << std::setw(25) << "PDDC" << std::endl;
-  if (splPDDO != NULL)    std::cout << "    " << std::left << std::setw(25) << "PDDO" << std::endl;
-  if (splMECENULOW != NULL)    std::cout << "    " << std::left << std::setw(25) << "MECENULOW" << std::endl;
-  if (splMECENUHIGH != NULL)    std::cout << "    " << std::left << std::setw(25) << "MECENUHIGH" << std::endl;
-  if (splMECENUBARLOW != NULL)    std::cout << "    " << std::left << std::setw(25) << "MECENUBARLOW" << std::endl;
-  if (splMECENUBARHIGH != NULL)    std::cout << "    " << std::left << std::setw(25) << "MECENUBARHIGH" << std::endl;
-  if (splCA5 != NULL)     std::cout << "    " << std::left << std::setw(25) << "CA5" << std::endl;
-  if (splMARES != NULL)   std::cout << "    " << std::left << std::setw(25) << "MARES" << std::endl;
-  if (splBGSCLLOWPPI != NULL)   std::cout << "    " << std::left << std::setw(25) << "I12 LOW PPI" << std::endl;
-  if (splBGSCL != NULL)   std::cout << "    " << std::left << std::setw(25) << "I12" << std::endl;
-  if (splBYDIS != NULL)  std::cout << "    " << std::left << std::setw(25) << "BY DIS" << std::endl;
-  if (splBYMPI != NULL)  std::cout << "    " << std::left << std::setw(25) << "BY MPI" << std::endl;
-  if (splAGKYMULT != NULL)  std::cout << "    " << std::left << std::setw(25) << "AGKY MULT" << std::endl;
-  if (splFEFABS != NULL)  std::cout << "    " << std::left << std::setw(25) << "FSI PI ABS" << std::endl;
-  if (splFEFCX != NULL)   std::cout << "    " << std::left << std::setw(25) << "FSI CEX LO" << std::endl;
-  if (splFEFQE != NULL)   std::cout << "    " << std::left << std::setw(25) << "FSI INEL LO" << std::endl;
-  if (splFEFINEL != NULL) std::cout << "    " << std::left << std::setw(25) << "FSI PI PROD" << std::endl;
-  if (splFEFCXH != NULL)  std::cout << "    " << std::left << std::setw(25) << "FSI CEX HI" << std::endl;
-  if (splFEFQEH != NULL)  std::cout << "    " << std::left << std::setw(25) << "FSI INEL HI" << std::endl;
-  if (spl2P2HEDEP_LOWENU != NULL)  std::cout << "    " << std::left << std::setw(25) << "2P2H EDEP LOWENU" << std::endl;
-  if (spl2P2HEDEP_HIGHENU != NULL)  std::cout << "    " << std::left << std::setw(25) << "2P2H EDEP HIGHENU" << std::endl;
-  if (spl2P2HEDEP_LOWENUBAR != NULL)  std::cout << "    " << std::left << std::setw(25) << "2P2H EDEP LOWENUBAR" << std::endl;
-  if (spl2P2HEDEP_HIGHENUBAR != NULL)  std::cout << "    " << std::left << std::setw(25) << "2P2H EDEP HIGHENUBAR" << std::endl;
-  if (splISO_BKG_LOWPPI != NULL)  std::cout << "    " << std::left << std::setw(25) << "ISO_BKG_LOWPPI" << std::endl;
-  if (splDIS_BY != NULL)  std::cout << "    " << std::left << std::setw(25) << "DIS_BY" << std::endl;
-  if (splMPI_BY != NULL)  std::cout << "    " << std::left << std::setw(25) << "MPI_BY" << std::endl;
-  if (splMPI_AGKY_XSEC != NULL)  std::cout << "    " << std::left << std::setw(25) << "MPI_AGKY_XSEC" << std::endl;
-
-}
-
 // **************************************************
 // Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly) {
-  // **************************************************
+// **************************************************
 
   double overflow = 0;
   //TH2Polys have 9 overflow bins
@@ -341,7 +159,7 @@ double NoOverflowIntegral(TH2Poly* poly) {
 
   double integral=0;
 
-  for(int i=1; i<poly->GetNumberOfBins()+1; i++)
+  for(int i=1; i < poly->GetNumberOfBins()+1; i++)
     {
       integral += poly->GetBinContent(i);
     }
@@ -352,19 +170,21 @@ double NoOverflowIntegral(TH2Poly* poly) {
 
 // **************************************************
 // Helper function for projecting TH2Poly onto the X axis
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins) {
-  // **************************************************
+TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors) {
+// **************************************************
 
   TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(),xbins.size()-1,&xbins[0]);
+  //KS: Temp Histogram to store error
+  TH1D* hProjX_Error = new TH1D((TempName+"_x_Err").c_str(),(TempName+"_x_Err").c_str(),xbins.size()-1,&xbins[0]);
   double xlow, xup, frac=0;
 
   //loop over bins in the poly
-  for(int i=0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
     {
       //get bin and its edges
       TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
-      xlow=bin->GetXMin();
-      xup=bin->GetXMax();
+      xlow = bin->GetXMin();
+      xup = bin->GetXMax();
 
       //Loop over projected bins, find fraction of poly bin in each
       for(int dx=0; dx<int(xbins.size()); dx++)
@@ -394,26 +214,45 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
               frac=0;
             }
           hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
+          //KS: Follow ROOT implementation and sum up the variance 
+          if(computeErrors)
+          {
+              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+              //but numbering of GetBinError is differnt than GetBins...
+             double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+             hProjX_Error->SetBinContent(dx+1, hProjX_Error->GetBinContent(dx+1)+Temp_Err);
+          }
         }
     }
+    //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
+    if(computeErrors)
+    {
+        for (int i = 1; i <= hProjX_Error->GetXaxis()->GetNbins(); ++i) 
+        {
+            double Error = TMath::Sqrt(hProjX_Error->GetBinContent(i));
+            hProjX->SetBinError(i, Error);
+        }   
+    }
+  delete hProjX_Error;
   return hProjX;
 } // end project poly X function
 
 // **************************************************
 // Helper function for projecting TH2Poly onto the Y axis
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins) {
-  // **************************************************
+TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors) {
+// **************************************************
 
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),ybins.size()-1,&ybins[0]);
+  TH1D* hProjY_Error = new TH1D((TempName+"_y_Err").c_str(),(TempName+"_y_Err").c_str(),ybins.size()-1,&ybins[0]);
   double ylow, yup, frac=0;
 
   //loop over bins in the poly
-  for(int i=0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
     {
       //get bin and its edges
       TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
-      ylow=bin->GetYMin();
-      yup=bin->GetYMax();
+      ylow = bin->GetYMin();
+      yup = bin->GetYMax();
 
       //Loop over projected bins, find fraction of poly bin in each
       for(int dy=0; dy<int(ybins.size()); dy++)
@@ -443,10 +282,88 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
               frac=0;
             }
           hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
+          //KS: Follow ROOT implementation and sum up the variance 
+          if(computeErrors)
+          {
+              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+              //but numbering of GetBinError is differnt than GetBins... 
+             double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+             hProjY_Error->SetBinContent(dy+1, hProjY_Error->GetBinContent(dy+1)+Temp_Err);
+          }
         }
     }
+    //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
+    if(computeErrors)
+    {
+        for (int i = 1; i <= hProjY_Error->GetXaxis()->GetNbins(); ++i) 
+        {
+            double Error = TMath::Sqrt(hProjY_Error->GetBinContent(i));
+            hProjY->SetBinError(i, Error);
+        }   
+    }
+  delete hProjY_Error;
   return hProjY;
 } // end project poly Y function
+
+// ****************
+// Normalise a th2poly
+TH2Poly* NormalisePoly(TH2Poly *Histogram) {
+// ****************
+
+  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  double IntegralWidth = PolyIntegralWidth(HistCopy);
+  HistCopy = PolyScaleWidth(HistCopy, IntegralWidth);
+  std::string title = std::string(HistCopy->GetName())+"_norm";
+  HistCopy->SetNameTitle(title.c_str(), title.c_str());
+
+  return HistCopy;
+}
+
+// ****************
+// Scale a TH2Poly and divide by bin width
+TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
+// ****************
+
+  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  double xlow, xup, ylow, yup, area;
+
+  for(int i=1; i<HistCopy->GetNumberOfBins()+1; i++)
+    {
+      TH2PolyBin* bin = (TH2PolyBin*)HistCopy->GetBins()->At(i-1)->Clone();
+      xlow=bin->GetXMin();
+      xup=bin->GetXMax();
+      ylow=bin->GetYMin();
+      yup=bin->GetYMax();
+      area = (xup-xlow)*(yup-ylow);
+      HistCopy->SetBinContent(i, Histogram->GetBinContent(i)/(area*scale));
+      delete bin;
+    }
+
+  return HistCopy;
+}
+
+// ****************
+// Integral of TH2Poly multiplied by bin width
+double PolyIntegralWidth(TH2Poly *Histogram) {
+  // ****************
+
+  double integral=0;
+  double xlow, xup, ylow, yup, area;
+
+  for(int i=1; i<Histogram->GetNumberOfBins()+1; i++)
+    {
+      TH2PolyBin* bin = (TH2PolyBin*)Histogram->GetBins()->At(i-1)->Clone();
+      xlow=bin->GetXMin();
+      xup=bin->GetXMax();
+      ylow=bin->GetYMin();
+      yup=bin->GetYMax();
+      area = (xup-xlow)*(yup-ylow);
+      integral += Histogram->GetBinContent(i)*area;
+      delete bin;
+    }
+
+  return integral;
+}
 
 //DB Get the Cernekov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {
