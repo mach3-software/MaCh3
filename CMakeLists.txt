@@ -84,7 +84,7 @@ if(NOT ${SINGLE_THREAD_ONLY})
 
   #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
   add_compile_options(-I${CUDA_SAMPLES}/common/inc -L${ROOT_LIBDIR})
-  add_compile_options(-g -fopenmp -std=c++11 -O3 -Wextra -DMULTITHREAD)
+  add_compile_options(-g -fopenmp -std=c++11 -O3 -Wextra -Werror -DMULTITHREAD)
   add_compile_options(-I$ENV{MACH3CORE})
   add_link_options(-fopenmp -DMULTITHREAD)
 
@@ -92,7 +92,7 @@ else()
 
   #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
   add_compile_options(-I${CUDA_SAMPLES}/common/inc -L${ROOT_LIBDIR})
-  add_compile_options(-g -std=c++11 -O3 -Wextra)
+  add_compile_options(-g -std=c++11 -O3 -Wextra -Werror)
   add_compile_options(-I$ENV{MACH3CORE})
 
 endif()
