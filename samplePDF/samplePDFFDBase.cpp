@@ -274,7 +274,7 @@ void samplePDFFDBase::fillArray() {
 
       funcweight = calcFuncSystWeight(iSample,iEvent);
       //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-      if (funcweight <= 0.){
+      if (funcweight <= 0.){          
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
@@ -961,7 +961,6 @@ void samplePDFFDBase::setupSplines(fdmc_base *fdobj, const char *splineFile, int
   // Only works with 2017 splines
   std::string str_splineFile(splineFile);
   int nevents = fdobj->nEvents;
-
   std::cout << "##################" << std::endl;
   std::cout << "I AM LOOKING FOR " << splineFile << std::endl;
   std::cout << "FDOBJ has " << nevents << std::endl;
@@ -970,10 +969,10 @@ void samplePDFFDBase::setupSplines(fdmc_base *fdobj, const char *splineFile, int
   std::cout << "Using 2020 splines" << std::endl;
   if (BinningOpt == 0){ // Splines binned in erec
 	if (signal){
-	  fdobj->splineFile = new splineFDBase((char*)splineFile, nutype, nevents, SampleDetID, xsecCov);
+	  fdobj->splineFile = new splineFDBase((char*)splineFile, nutype, nevents, fdobj->SampleDetID, xsecCov);
 	}
 	else{
-	  fdobj->splineFile = new splineFDBase((char*)splineFile, nutype, nevents, SampleDetID, xsecCov);
+	  fdobj->splineFile = new splineFDBase((char*)splineFile, nutype, nevents, fdobj->SampleDetID, xsecCov);
 	  if (!(nutype==1 || nutype==-1 || nutype==2 || nutype==-2)){
 		std::cerr << "problem setting up splines in erec" << std::endl;
 	  }
@@ -1006,8 +1005,7 @@ void samplePDFFDBase::fillSplineBins()
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
 
       std::vector< std::vector<int> > EventSplines;
-	
-	  double erec = *(MCSamples[i].x_var[j]) * 1000;
+	  double erec = *(MCSamples[i].x_var[j]);
 	  switch (BinningOpt) {
 		//ETA - factor of 1000 needed here because for some reason Erec is in units of MeV for Etrue-Erec splines and GeV for Etrue-Erec-theta splines?!?
 		case 0: // splines binned in erec
@@ -1019,7 +1017,8 @@ void samplePDFFDBase::fillSplineBins()
 		  EventSplines = MCSamples[i].splineFile->getEventSplines(j, *(MCSamples[i].mode[j]), MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j], MCSamples[i].yvar_s_bin[j]); 
 		  break;
 		case 3: // splines binned in erec-Q2 (not implemented yet!)
-		  std::cerr << "ERROR : splines not available for erec-Q2 ! Code it in samplePDFSKBase.cpp if you have them " << std::endl ;
+		  std::cerr << "ERROR : splines not available for erec-Q2 ! Code it in samplePDFSKBase.cpp if you have them " << std::endl;
+                  break;
 		default:
 		  std::cout << "Error in assigning spline bins because BinningOpt = " << BinningOpt << std::endl;
 		  break;
@@ -1038,6 +1037,8 @@ void samplePDFFDBase::fillSplineBins()
 	  }
 
 	}
+
+    MCSamples[i].splineFile->SetSplineInfoArrays();
   }
 
   std::cout << "Filled spline bins" << std::endl;

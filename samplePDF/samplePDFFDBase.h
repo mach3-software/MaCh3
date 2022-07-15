@@ -14,13 +14,14 @@
 #include <list>
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
-#include "../Prob3++/BargerPropagator.h"
+#include "Prob3++/BargerPropagator.h"
 #include "interfacePDFEbE.h"
+//#include "manager/manager.h"
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
-#include "libconfig/lib/libconfig.h++"
+//#include "libconfig/lib/libconfig.h++"
 #include "FDMCStruct.h"
 #include "ShiftFunctors.h"
 
@@ -41,9 +42,6 @@ public:
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
-  void reweight(double *oscpar);
-  void reweight(double *oscpar_nub, double *oscpar_nu);
-
   //ETA - abstract these to samplePDFFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded getLikelihood
   void addData(TH1D* Data);
@@ -53,6 +51,10 @@ public:
   //DB Multi-threaded getLikelihood
   double getLikelihood();
   //===============================================================================
+
+  void reweight(double *oscpar);
+  void reweight(double *oscpar_nub, double *oscpar_nu);
+  double getEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
   void useNonDoubledAngles(bool ans) {doubled_angle = ans;};
@@ -105,14 +107,13 @@ public:
   //ETA - abstracting these core functions
   //init will setup all the specific variables 
   void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
-  void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
+  //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
   void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
   void fillSplineBins();
 
   //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
   //DB Function to determine which weights apply to which types of samples
   virtual void setupWeightPointers(){};
-  double getEventWeight(int iSample, int iEntry);
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();

@@ -8,6 +8,8 @@ struct fdmc_base {
   std::string flavourName;
   int *isbound;
 
+  int SampleDetID;
+
   //THe x_var and y_vars that you're binning in
   double** x_var;
   double** y_var;
