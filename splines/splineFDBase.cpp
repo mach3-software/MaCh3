@@ -17,7 +17,8 @@ splineFDBase::splineFDBase(const char *name, int ntype, int nevents, int DetID, 
   SampleDetID = DetID;
 
   FindUniqueModes();
-
+  nUniqueModes = 1;
+  xsec_cov->GetSplineParsNamesFromDetID(25);
   std::cout << "Creating Etrue-Erec splines" << std::endl;
 #if USE_SPLINE_FD == USE_TSpline3_FD
   std::cout << "Using normal TSpline3 splines" << std::endl;
@@ -661,7 +662,7 @@ std::vector< std::vector<int> > splineFDBase::getEventSplines(int &event_i, int 
   std::vector< std::vector<int> > SplineModeVecs = StripDuplicatedModes(covxsec->GetSplineModeVecFromDetID(SampleDetID));
   std::vector<int> SplineParsIndex = covxsec->GetSplineParsIndexFromDetID(SampleDetID);
 
-  int ebin = enu_bin;  
+  int ebin = enu_bin;
   if(ebin<0 || ebin>=enu_spline->GetNbins()) 
   {
     return returnVec;  
@@ -758,6 +759,7 @@ void splineFDBase::SetupSplineInfoArray(covarianceXsec * xsec){
   covxsec = xsec;
 
   //DB Now use detid to determine number of spline systematics, names and corresponding modes
+  std::vector<std::string> splinenames = covxsec->GetSplineParsNamesFromDetID(SampleDetID);
   int numSplineParams = covxsec->GetNumSplineParamsFromDetID(SampleDetID);
   std::vector<std::string> SplineFileParsNames = covxsec->GetSplineFileParsNamesFromDetID(SampleDetID);
   std::vector< std::vector<int> > SplineModeVecs = StripDuplicatedModes(covxsec->GetSplineModeVecFromDetID(SampleDetID));
@@ -845,6 +847,7 @@ void splineFDBase::SetSplineInfoArrays(){
   switch (BinningOpt)
     {
 	  //for 1D spline (i.e. splines binned in etrue-var1)
+	  case 0:
 	  case 1:
 	for(unsigned spline_i = 0 ; spline_i < (unsigned)numSplineParams ; spline_i++){
 	  is_null = true;
@@ -982,8 +985,10 @@ void splineFDBase::FindSplineSegment() {
 
 //TODO (ETA) - need to pass number of interaction modes and unique spline modes to spline object
 //the mode inofrmation etc. will be defined for each experiment
-/*
+
 void splineFDBase::FindUniqueModes() {
+
+/*  
   nUniqueModes = 0;
 
   for (int iMode=0;iMode<kMaCh3_nModes;iMode++) {
@@ -1008,9 +1013,17 @@ void splineFDBase::FindUniqueModes() {
   for (int iMode=0;iMode<kMaCh3_nModes;iMode++) {
     MaCh3Mode_SplineMode_Map[iMode] = MaCh3Mode_to_SplineMode(iMode);
   }
+   
+*/
+MaCh3Mode_SplineMode_Map.push_back(0); 
+MaCh3Mode_SplineMode_Map.push_back(1); 
+MaCh3Mode_SplineMode_Map.push_back(2); 
+MaCh3Mode_SplineMode_Map.push_back(3); 
+UniqueModeFarSplineNames.push_back("ccqe"); 
+std::cout << "Temp implementation" << std::endl;
 
 }
-*/
+
 
 std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
   
