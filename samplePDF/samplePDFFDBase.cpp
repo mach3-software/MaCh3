@@ -1,9 +1,3 @@
-#include <TROOT.h>
-#include "manager/manager.h"
-#include "TString.h"
-#include <assert.h>
-#include <stdexcept>
-#include "TMath.h"
 #include "samplePDFFDBase.h"
 
 // Constructors for erec-binned errors
@@ -158,7 +152,9 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 	}
 
   }
-    
+  //KS: Reset the histograms before reweight 
+  ResetHistograms();
+  
   fillArray();
 
   return;
@@ -171,6 +167,8 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
       MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
     }
   }
+  //KS: Reset the histograms before reweight
+  ResetHistograms();
 
   fillArray();
 }
@@ -212,16 +210,6 @@ void samplePDFFDBase::fillArray() {
 #ifdef MULTITHREAD
   fillArray_MP();
 #else
-
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
-
-  //DB Reset values stored in PDF array to 0.
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-    }
-  }
 
   reconfigureFuncPars();
 
@@ -358,13 +346,6 @@ void samplePDFFDBase::fillArray_MP() {
 
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
-
-  //DB Reset values stored in PDF array to 0.
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array[yBin][xBin] = 0.;
-	}
-  }
 
   reconfigureFuncPars();
 
@@ -587,6 +568,25 @@ void samplePDFFDBase::fillArray_MP() {
   delete[] samplePDFFD_array_class;
 }
 #endif
+
+
+// **************************************************
+// Helper function to reset the data and MC histograms
+void samplePDFFDBase::ResetHistograms() {
+// **************************************************
+  
+  int nXBins = XBinEdges.size()-1;
+  int nYBins = YBinEdges.size()-1;
+  
+  //DB Reset values stored in PDF array to 0.
+  for (int yBin = 0; yBin < nYBins; yBin++) {
+    for (int xBin = 0; xBin < nXBins; xBin++) {
+      samplePDFFD_array[yBin][xBin] = 0.;
+    }
+  }
+  
+  
+} // end function
 
 //ETA
 void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
