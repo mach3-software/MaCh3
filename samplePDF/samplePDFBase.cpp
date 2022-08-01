@@ -260,7 +260,7 @@ double samplePDFBase::getLikelihood()
 }
 // ***************************************************************************
 //KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
-double getTestStatLLH(double data, double mc) {
+double samplePDFBase::getTestStatLLH(double data, double mc) {
 // ***************************************************************************
     double negLogL = 0;
     if(mc == 0) mc = 1E-8;
@@ -344,59 +344,41 @@ void samplePDFBase::set2DBinning(int nbins1, double low1, double high1, int nbin
 }
 
 
-void samplePDFBase::getSampleName(std::vector<std::string> &sampleNameVect, bool latex) 
-{
+// ***************************************************************************
+//KS: Sample getter
+std::string samplePDFBase::GetSampleName(int Sample) {
+// ***************************************************************************
+
+  if(Sample > nSamples)
+  {
+   std::cerr<<" You are asking for sample "<< Sample <<" I only have "<< nSamples<<std::endl;
+   throw;
+  }
+
+  return SampleName[Sample];
+}
+// ***************************************************************************
+void samplePDFBase::GetSampleNames(std::vector<std::string> &sampleNameVect) {
+// ***************************************************************************
   if(sampleNameVect.size() !=0)
     sampleNameVect.clear() ;
 
-  if(!latex) {
-    sampleNameVect.push_back("beam nu_mu") ;
-    sampleNameVect.push_back("beam nu_e") ;
-    sampleNameVect.push_back("beam antinu_mu") ;
-    sampleNameVect.push_back("beam antinu_e") ;
-    sampleNameVect.push_back("oscillated nu_e") ;
-    sampleNameVect.push_back("oscillated antinu_e") ;
-  }
-  else{
-    sampleNameVect.push_back("beam $\\nu_{\\mu}$") ;
-    sampleNameVect.push_back("beam $\\nu_{e}$") ;
-    sampleNameVect.push_back("beam $\\bar{\\nu_{\\mu}}$") ;
-    sampleNameVect.push_back("beam $\\bar{\\nu_{e}}$") ;
-    sampleNameVect.push_back("oscillated $\\nu_{e}$") ;
-    sampleNameVect.push_back("oscillated $\\bar{\\nu_{e}}$") ;
+  for(int i = 0; nSamples; i++)
+  {
+    sampleNameVect.push_back(GetSampleName(i));
   }
 }
 
+// ***************************************************************************
+void samplePDFBase::GetModeName(std::vector<std::string> &modeNameVect) {
+// ***************************************************************************
 
-void samplePDFBase::getModeName(std::vector<std::string> &modeNameVect, bool latex) 
-{
   if(modeNameVect.size() !=0)
     modeNameVect.clear() ;
 
-  if(!latex) {
-    modeNameVect.push_back("CCQE") ;
-    modeNameVect.push_back("CC-1pi") ;
-    modeNameVect.push_back("CC-coherent") ;
-    modeNameVect.push_back("CC-Npi") ;
-    modeNameVect.push_back("CC-other") ;
-    modeNameVect.push_back("NC pi0") ;
-    modeNameVect.push_back("NC-1pi +/-") ;
-    modeNameVect.push_back("NC-coherent") ;
-    modeNameVect.push_back("NC-other") ;
-    modeNameVect.push_back("2p2h") ;
-    modeNameVect.push_back("NC-1gamma") ;
+  for(int i = 0; ModeStruct->GetNModes()+1; i++)
+  {
+    modeNameVect.push_back(ModeStruct->Mode_ToString(i));
   }
-  else{
-    modeNameVect.push_back("CCQE");
-    modeNameVect.push_back("CC 1$\\pi$");
-    modeNameVect.push_back("CC coherent");
-    modeNameVect.push_back("CC n$\\pi$");
-    modeNameVect.push_back("CC other");
-    modeNameVect.push_back("NC $\\pi^{0}$");
-    modeNameVect.push_back("NC $\\pi^{+/-}$");
-    modeNameVect.push_back("NC coherent");
-    modeNameVect.push_back("NC other");
-    modeNameVect.push_back("2p-2h");
-    modeNameVect.push_back("NC 1$\\gamma$");
-  }
+
 }

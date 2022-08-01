@@ -145,7 +145,12 @@ public:
   bool IsEventSelected(int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
   virtual void reconfigureFuncPars(){};
-  virtual double calcFuncSystWeight(int iSample, int iEvent) = 0;
+    
+  // Calculate the spline weight for a given event
+  double CalcXsecWeight_Spline(const int iSample, const int iEvent);
+  // Calculate the norm weight for a given event
+  double CalcXsecWeight_Norm(const int iSample, const int iEvent);
+  virtual double CalcXsecWeight_Func(int iSample, int iEvent) = 0;
 
   virtual double ReturnKinematicParameter(KinematicTypes Var, int i, int j) = 0;       //Returns parameter Var for event j in sample i
   virtual std::vector<double> ReturnKinematicParameterBinning(KinematicTypes Var) = 0; //Returns binning for parameter Var
