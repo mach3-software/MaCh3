@@ -4,7 +4,7 @@
 #ifndef __UNDEF__
 #define __UNDEF__ 1234567890
 #endif
-
+// C++ includes
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cmath>
 
+// ROOT includes
 #include "TObjArray.h"
 #include "TChain.h"
 #include "TFile.h"
@@ -23,9 +24,12 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TF1.h"
+#include "TH2Poly.h"
+#include "TGraphErrors.h"
 #include "TVectorD.h"
 #include "TColor.h"
 #include "TStyle.h"
+#include "TStopwatch.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -38,9 +42,12 @@
 // Make LLH scans around output
 
 enum ParameterEnum {
-  kFluxPar = 0,
-  kXSecPar = 1,
-  kNearDetPar = 2
+  kXSecPar  = 0, //KS: This hold both xsec and flux
+  kND280Par = 1,
+  kFDDetPar = 2,
+  kOSCPar   = 3,
+  
+  kNParameterEnum = 4 //KS: keep it at the end to keep track of all parameters
 };
 
 class MCMCProcessor {
@@ -48,6 +55,7 @@ class MCMCProcessor {
     MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
     ~MCMCProcessor();
 
+    void Initialise();
     // Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
     // Get the post-fit covariances and correlations
@@ -55,18 +63,34 @@ class MCMCProcessor {
     // Or the individual post-fits
     void GetPostfit_Ind(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Peaks, ParameterEnum kParam);
 
+    void MakeCovariance();
+    void MakeCovariance_MP();
+    
+    void GetArithmetic(TH1D * const hpost, int i);
+    void GetGaussian(TH1D *& hpost, int i);
+    void GetHPD(TH1D * const hpost, int i);
+    
     void MakePostfit();
-
+    
+    //KS:By caching each step we use multithreading
+    void CacheSteps();
+    void ResetHistograms();
+    
     // Get the number of parameters
     int GetNParams() { return nDraw; };
     int GetNFlux() { return nFlux; };
-    int GetNXSec() { return nXSec; };
-    int GetNND() { return nNear; };
+    int GetNXSec() { return nParam[kXSecPar]; };
+    int GetNND() { return nParam[kND280Par]; };
+    int GetNFD() { return nParam[kFDDetPar]; };
+    int GetOSC() { return nParam[kOSCPar]; };
+        
+    TH1D* const GetHpost(int i) { return hpost[i]; };
 
-    std::string const & GetFluxCov() const { return FluxCov; };
-    std::string const & GetXSecCov() const { return XSecCov; };
-    std::string const & GetNearCov() const { return NearCov; };
-    std::string const & GetNDruns() const { return NDruns; };
+    std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
+    std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
+    std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
+    std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
+    std::string const & GetNDruns()   const { return NDruns; };
     std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
     // Draw the post-fit comparisons
@@ -77,34 +101,41 @@ class MCMCProcessor {
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
 
+    void GetNthParameter(int param, double &Nominal, double &NominalError, TString &Title);
+    
     // Set the step cutting
     // Either by string
     void SetStepCut(std::string Cuts);
     // Or by int
     void SetStepCut(int Cuts);
 
+    void SetMakeOnlyXsecCorr(bool PlotOrNot){MakeOnlyXsecCorr = PlotOrNot; };
+    void SetMakeOnlyXsecCorrFlux(bool PlotOrNot){MakeOnlyXsecCorrFlux = PlotOrNot; };
+
+    void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
+    void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
+    void SetPlotDet(bool PlotOrNot){PlotDet = PlotOrNot; };
+    void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
+    
   private:
     inline TH1D* MakePrefit();
-    inline void MakeCovariance();
     inline void MakeOutputFile();
 
     inline void ReadInputCov();
     inline void FindInputFiles();
-    inline void ReadFluxFile();
     inline void ReadXSecFile();
-    inline void ReadNearFile();
-
+    inline void ReadND280File();
+    inline void ReadFDFile();
+    inline void ReadOSCFile();
+    
     inline void ScanInput();
+    inline void ScanParameterOrder();
     inline void SetupOutput();
 
     std::string MCMCFile;
 
-    // Cross-section covariance matrix name position
-    std::string XSecCov;
-    // Flux covariance matrix name position
-    std::string FluxCov;
-    // Near cov
-    std::string NearCov;
+    // Covariance matrix name position
+    std::vector<std::string> CovPos;
     // ND runs
     std::string NDruns;
     // ND selections
@@ -112,61 +143,82 @@ class MCMCProcessor {
 
     TChain *Chain;
     std::string StepCut;
+    int BurnInCut;
     int nBranches;
 
     std::vector<TString> BranchNames;
-    std::vector<TString> FluxNames;
-    std::vector<TString> XSecNames;
-    std::vector<TString> NearNames;
-
     // Is the ith parameter varied
     std::vector<bool> IamVaried;
-
-    std::vector<double> FluxCentral;
-    std::vector<double> FluxErrors;
-    std::vector<double> XSecCentral;
-    std::vector<double> XSecErrors;
-    std::vector<double> NearCentral;
-    std::vector<double> NearErrors;
-
+    std::vector<std::vector<TString>> ParamNames;
+    std::vector<std::vector<double>>  ParamCentral;
+    std::vector<std::vector<double>>  ParamNom;
+    std::vector<std::vector<double>>  ParamErrors;
+    // Make an enum for which class this parameter belongs to so we don't have to keep string comparing
+    std::vector<ParameterEnum> ParamType;
+    //KS: in MCMC output there is order of parameters so for example first goes xsec then nd det etc.
+    //Idea is that this paraemter will keep track of it so code is flexible
+    std::vector<int> ParamTypeStartPos;
+    
+    //In XsecMatrix we have both xsec and flux parameters, this is just for some ploting options
+    std::vector<bool>   IsXsec; 
+    
     std::string OutputName;
     TString CanvasName;
 
-    bool PlotFlux;
     bool PlotXSec;
     bool PlotDet;
 
     bool MakeCorr;
+    bool MakeOnlyXsecCorr;
+    bool MakeOnlyXsecCorrFlux; //Makes only the cov matrix w/ flux
+    bool plotRelativeToPrior;
     bool MadePostfit;
-
+    bool printToPDF;
+    bool FancyPlotNames;
+    bool plotBinValue; //If true it will print value on each bin of covariance matrix
+    
     // The output file
     TFile *OutputFile;
     // Directory for posteriors
     TDirectory *PostDir;
 
     int nDraw;
-    int nFlux;
-    int nXSec;
-    int nNear;
+    std::vector<int> nParam;
+    int nFlux; // This keep number of Flux params in xsec matrix
     int nEntries;
+
+    std::vector< int > NDSamplesBins;
+    std::vector< std::string > NDSamplesNames;
 
     // Gaussian fitter
     TF1 *Gauss;
 
-    // Make an enum for which class this parameter belongs to so we don't have to keep string comparing
-    std::vector<ParameterEnum> ParamType;
-
     TCanvas *Posterior;
 
+    TVectorD *Central_Value;
     TVectorD *Means;
     TVectorD *Errors;
     TVectorD *Means_Gauss;
     TVectorD *Errors_Gauss;
-    TVectorD *Peaks;
+    TVectorD *Means_HPD;
+    TVectorD *Errors_HPD; 
+    TVectorD *Errors_HPD_Positive; 
+    TVectorD *Errors_HPD_Negative; 
 
     TMatrixDSym *Covariance;
     TMatrixDSym *Correlation;
 
+    bool CacheMCMCM;
+    // Holds Posterior Distributions
+    TH1D **hpost;
+    TH2D ***hpost2D;
+    
+    double** ParStep = NULL;
+    int* StepNumber = NULL;
+    
+    
+    double* Min_Chain;
+    double* Max_Chain;
     // Number of bins
     int nBins;
     // Drawrange for SetMaximum

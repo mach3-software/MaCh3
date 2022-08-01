@@ -338,6 +338,7 @@ void mcmc::ProcessMCMC() {
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()), false);
 
+    Processor.Initialise();
     // Make the TVectorD pointers which hold the processed output
     TVectorD *Central = NULL;
     TVectorD *Errors = NULL;

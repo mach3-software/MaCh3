@@ -378,6 +378,7 @@ void covarianceOsc::throwNominal(bool nomValues)
     for (int i = 0; i < int(nominal.size()); i++)
       nominal[i]=(*osc_prior)(i);
   }
+  delete nom_throws;
 
 }
 

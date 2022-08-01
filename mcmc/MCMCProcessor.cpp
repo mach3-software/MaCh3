@@ -1,5 +1,4 @@
 #include "MCMCProcessor.h"
-
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
   Chain(NULL), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
 
@@ -7,14 +6,37 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
 
   std::cout << "Making post-fit processor for " << MCMCFile << std::endl;
 
-  // Read the input Covariances
-  ReadInputCov();
-
-  // Scan the ROOT file for useful branches
-  ScanInput();
-
-  // Setup the output
-  SetupOutput();
+  Posterior = NULL;
+  
+  //KS:Hardcoded should be a way to get it via config or something
+  PlotDet = false;
+  MakeOnlyXsecCorr = false;
+  MakeOnlyXsecCorrFlux = false;
+  plotRelativeToPrior = false;
+  printToPDF = false;
+  plotBinValue = false;
+  CacheMCMCM = false;
+  FancyPlotNames = true;
+  
+  nDraw = 0;
+  nFlux = 0;
+  nEntries = 0;
+  
+  //KS:Those keep basic information for ParameterEnum
+  ParamNames.resize(kNParameterEnum);
+  ParamCentral.resize(kNParameterEnum);
+  ParamNom.resize(kNParameterEnum);
+  ParamErrors.resize(kNParameterEnum);
+  ParamTypeStartPos.resize(kNParameterEnum);
+  nParam.resize(kNParameterEnum);
+  CovPos.resize(kNParameterEnum);
+  
+  for(int i =0; i<kNParameterEnum; i++)
+  {
+     ParamTypeStartPos[i] = 0;
+     nParam[i] = 0;
+     CovPos[i] = "";
+  }
 }
 
 // ****************************
@@ -25,12 +47,54 @@ MCMCProcessor::~MCMCProcessor() {
   // Close the pdf file
   std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
   CanvasName += "]";
-  //Posterior->Print(CanvasName);
+  if(printToPDF) Posterior->Print(CanvasName);
 
   if (OutputFile != NULL) OutputFile->Close();
+  if (Posterior != NULL)  delete Posterior;
+      
+  delete OutputFile;
+  delete Gauss;
+  
+  delete Covariance;
+  delete Correlation;
+  delete Central_Value;
+  delete Means;
+  delete Errors;
+  delete Means_Gauss;
+  delete Errors_Gauss;
+  delete Means_HPD;
+  delete Errors_HPD; 
+  delete Errors_HPD_Positive; 
+  delete Errors_HPD_Negative; 
+  
+  if(CacheMCMCM)
+  {
+    for (int i = 0; i < nDraw; ++i) 
+    {
+        delete[] ParStep[i];
+        delete[] hpost2D[i];
+    }
+
+    delete[] ParStep; 
+    delete[] Min_Chain;
+    delete[] Max_Chain;
+    delete[] hpost;
+    delete[] hpost2D;
+
+  }
+  delete Chain;
 }
 
+
+void MCMCProcessor::Initialise(){
 // ***************
+  // Scan the ROOT file for useful branches
+  ScanInput();
+
+  // Setup the output
+  SetupOutput();
+}
+
 void MCMCProcessor::GetPostfit(TVectorD *&Central_PDF, TVectorD *&Errors_PDF, TVectorD *&Central_G, TVectorD *&Errors_G, TVectorD *&Peak_Values) {
 // ***************
   // Make the post fit
@@ -41,11 +105,11 @@ void MCMCProcessor::GetPostfit(TVectorD *&Central_PDF, TVectorD *&Errors_PDF, TV
   Errors_PDF = Errors;
   Central_G = Means_Gauss;
   Errors_G = Errors_Gauss;
-  Peak_Values = Peaks;
+  Peak_Values = Means_HPD;
 }
 
 // ***************
-// Get post-fits for the ParameterEnum type, e.g. xsec params, Near Det params or flux params
+// Get post-fits for the ParameterEnum type, e.g. xsec params, ND280 params or flux params
 void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors, TVectorD *&Peak_Values, ParameterEnum kParam) {
 // ***************
   // Make the post fit
@@ -58,7 +122,7 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
     if (ParamType[i] != kParam) continue;
     (*PDF_Central)(ParamNumber) = (*Means)(i);
     (*PDF_Errors)(ParamNumber) = (*Errors)(i);
-    (*Peak_Values)(ParamNumber) = (*Peaks)(i);
+    (*Peak_Values)(ParamNumber) = (*Means_HPD)(i);
     ++ParamNumber;
   }
 }
@@ -67,6 +131,9 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
 // ***************
 void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 // ***************
+  if(MakeOnlyXsecCorr) std::cout<<"Will plot only xsec covariance"<<std::endl;
+  if(MakeOnlyXsecCorrFlux) std::cout<<"Will plot only xsec covariances and flux"<<std::endl;
+
   MakeCovariance();
   Cov = Covariance;
   Corr = Correlation;
@@ -108,16 +175,22 @@ void MCMCProcessor::MakePostfit() {
 
   // Check if the output file is ready
   if (OutputFile == NULL) MakeOutputFile();
-
+  
   std::cout << "MCMCProcessor is making post-fit plots..." << std::endl;
 
   PostDir = OutputFile->mkdir("Post");
-  nBins = 50;
-  DrawRange = 1.3;
+  nBins = 70;
+  DrawRange = 1.5;
 
+  
+  // We fit with this Gaussian
+  Gauss = new TF1("Gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",-5,5);
+  Gauss->SetLineWidth(2);
+  Gauss->SetLineColor(kOrange-5);
+  
   // nDraw is number of draws we want to do
-  for (int i = 0; i < nDraw; ++i) {
-
+  for (int i = 0; i < nDraw; ++i)
+  {
     if (i % (nDraw/5) == 0) {
       std::cout << "  " << i << "/" << nDraw << " (" << int((double(i)/double(nDraw)*100.0))+1 << "%)" << std::endl;
     }
@@ -125,120 +198,157 @@ void MCMCProcessor::MakePostfit() {
     OutputFile->cd();
     TString Title = BranchNames[i];
     double Nominal = 1.0;
-
-    if (ParamType[i] == kXSecPar) {
-      int ParamNo = __UNDEF__;
-      if (PlotFlux) {
-        ParamNo = i - nFlux;
-      } 
-      Nominal = XSecCentral[ParamNo];
-      Title = XSecNames[ParamNo];
-    }
+    double NominalError = 1.0;
+    
+    GetNthParameter(i, Nominal, NominalError, Title);
 
     OutputFile->cd();
     // This holds the posterior density
-    TH1D *hpost = new TH1D(BranchNames[i], BranchNames[i], nBins, 0., 2.);
-    hpost->SetMinimum(0);
-    hpost->GetYaxis()->SetTitle("Steps");
-    hpost->GetYaxis()->SetNoExponent(false);
-    double maximum = Chain->GetMaximum(BranchNames[i]);
-    double minimum = Chain->GetMinimum(BranchNames[i]);
-    hpost->SetBins(nBins, minimum, maximum);
-    hpost->SetTitle(BranchNames[i]);
-
+    double maxi = Chain->GetMaximum(BranchNames[i]);
+    double mini = Chain->GetMinimum(BranchNames[i]);
+    // This holds the posterior density
+    hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
+    hpost[i]->SetMinimum(0);
+    hpost[i]->GetYaxis()->SetTitle("Steps");
+    hpost[i]->GetYaxis()->SetNoExponent(false);
     // Project BranchNames[i] onto hpost, applying stepcut
     Chain->Project(BranchNames[i], BranchNames[i], StepCut.c_str());
 
-    // Get the characteristics of the histogram
-    double mean = hpost->GetMean();
-    double rms = hpost->GetRMS();
-    double peakval = hpost->GetBinCenter(hpost->GetMaximumBin());
+    hpost[i]->Smooth();
 
-    // Set the range for the Gaussian fit
-    Gauss->SetRange(mean - 1.5*rms , mean + 1.5*rms);
-    // Set the starting parameters close to RMS and peaks of the histograms
-    Gauss->SetParameters(hpost->GetMaximum()*rms*sqrt(2*3.14), peakval, rms);
+    for(int ik = 0; ik < kNParameterEnum; ik++)
+    {
+        if (ParamType[i] == ParameterEnum(ik))
+        {
+            int ParamNo = __UNDEF__;
+            ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
 
-    // Perform the fit
-    hpost->Fit("Gauss","Rq");
-    hpost->SetStats(0);
+            (*Central_Value)(i)  = ParamCentral[ParameterEnum(ik)][ParamNo];
+        }
+    }
 
+    GetArithmetic(hpost[i], i);
+    GetGaussian(hpost[i], i);
+    GetHPD(hpost[i], i);
+    
     // Write the results from the projection into the TVectors and TMatrices
-    (*Means)(i) = mean;
-    (*Errors)(i) = rms;
-    (*Means_Gauss)(i) = Gauss->GetParameter(1);
-    (*Errors_Gauss)(i) = Gauss->GetParameter(2);
-    (*Peaks)(i) = peakval;
-    (*Covariance)(i,i) = rms*rms;
+    (*Covariance)(i,i) = (*Errors)(i)*(*Errors)(i);
     (*Correlation)(i,i) = 1.0;
 
-    hpost->SetLineWidth(2);
-    hpost->SetMaximum(hpost->GetMaximum()*DrawRange);
-    hpost->SetTitle(Title);
-    hpost->GetXaxis()->SetTitle(hpost->GetTitle());
-    Gauss->SetLineWidth(2);
-
-    // Now make the TLine for the asimov
-    TLine *Asimov = new TLine(Nominal, hpost->GetMinimum(), Nominal, hpost->GetMaximum());
-    Asimov->SetLineColor(kBlack);
+    //KS: This need to be before SetMaximum(), this way plot is nicer as line end at the maximum
+    TLine *hpd = new TLine((*Means_HPD)(i), hpost[i]->GetMinimum(), (*Means_HPD)(i), hpost[i]->GetMaximum());
+    hpd->SetLineColor(kBlack);
+    hpd->SetLineWidth(2);
+    hpd->SetLineStyle(kSolid);
+    
+    hpost[i]->SetLineWidth(2);
+    hpost[i]->SetLineColor(kBlue-1);
+    hpost[i]->SetMaximum(hpost[i]->GetMaximum()*DrawRange);
+    hpost[i]->SetTitle(Title);
+    hpost[i]->GetXaxis()->SetTitle(hpost[i]->GetTitle());
+    
+    // Now make the TLine for the Asimov
+    TLine *Asimov = new TLine(Nominal, hpost[i]->GetMinimum(), Nominal, hpost[i]->GetMaximum());
+    Asimov->SetLineColor(kRed-3);
     Asimov->SetLineWidth(2);
     Asimov->SetLineStyle(kDashed);
 
-    // Make the legend
     TLegend *leg = new TLegend(0.12, 0.6, 0.6, 0.97);
     leg->SetTextSize(0.04);
-    leg->AddEntry(hpost, Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost->GetMean(), hpost->GetRMS()), "l");
+    leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
     leg->AddEntry(Gauss, Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
-    leg->AddEntry(Asimov, Form("#splitline{Asimov}{x = %.2f}", Nominal), "l");
+    leg->AddEntry(hpd, Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
+    leg->AddEntry(Asimov, Form("#splitline{Asimov}{x = %.2f , #sigma = %.2f}", Nominal, NominalError), "l");
     leg->SetLineColor(0);
     leg->SetLineStyle(0);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if (hpost->GetMaximum() == hpost->Integral()*DrawRange) {
-      std::cout << "Found fixed parameter, moving on" << std::endl;
-      IamVaried[i] = false;
-      delete hpost;
-      delete Asimov;
-      delete leg;
-      continue;
+    if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
+    {
+        std::cout << "Found fixed parameter, moving on" << std::endl;
+        IamVaried[i] = false;
+        //KS:Set mean and error to prior for fixed parameters, this is mostly for comaprison with BANFF
+        //but it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
+        for(int ik = 0; ik < kNParameterEnum; ik++)
+        {
+            if (ParamType[i] == ParameterEnum(ik)) 
+            {
+                int ParamNo = __UNDEF__;
+                ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
+                
+                (*Means_HPD)(i)  = ParamCentral[ParameterEnum(ik)][ParamNo];
+                (*Errors_HPD)(i) = ParamErrors[ParameterEnum(ik)][ParamNo];
+            }
+        }
+        delete Asimov;
+        delete hpd;
+        delete leg;
+        continue;
     }
 
     // Store that this parameter is indeed being varied
     IamVaried[i] = true;
 
     // Write to file
-    Posterior->SetName(hpost->GetName());
-    Posterior->SetTitle(hpost->GetTitle());
-    //Posterior->Print(CanvasName);
+    Posterior->SetName(hpost[i]->GetName());
+    Posterior->SetTitle(hpost[i]->GetTitle());
 
     // Draw onto the TCanvas
-    hpost->Draw();
+    hpost[i]->Draw();
+    hpd->Draw("same");
     Asimov->Draw("same");
-    leg->Draw("same");
-
+    leg->Draw("same");  
+    
+    if(printToPDF) Posterior->Print(CanvasName);
+        
     // cd into params directory in root file
     PostDir->cd();
     Posterior->Write();
 
-    delete hpost;
     delete Asimov;
+    delete hpd;
     delete leg;
   } // end the for loop over nParams
 
   OutputFile->cd();
+  TTree *SettingsBranch = new TTree("Settings", "Settings");
+  int CrossSectionParameters = nParam[kXSecPar];
+  SettingsBranch->Branch("CrossSectionParameters", &CrossSectionParameters);
+  int FluxParameters = nFlux;
+  SettingsBranch->Branch("FluxParameters", &FluxParameters);
+  int NDParameters = nParam[kND280Par];
+  SettingsBranch->Branch("NDParameters", &NDParameters);
+  int FDParameters = nParam[kFDDetPar];
+  SettingsBranch->Branch("FDParameters", &FDParameters);
+  int OscParameters = nParam[kOSCPar];
+  SettingsBranch->Branch("OscParameters", &OscParameters);
+
+  SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
+  SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
+
+
+  SettingsBranch->Fill();
+  SettingsBranch->Write();
+
+  delete SettingsBranch;
+
   TDirectory *Names = OutputFile->mkdir("Names");
   Names->cd();
   for (std::vector<TString>::iterator it = BranchNames.begin(); it != BranchNames.end(); ++it) {
     TObjString((*it)).Write();
   }
   OutputFile->cd();
+  Central_Value->Write("Central_Value");
   Means->Write("PDF_Means");
   Errors->Write("PDF_Error");
   Means_Gauss->Write("Gauss_Means");
   Errors_Gauss->Write("Gauss_Errors");
-  Peaks->Write("Peaks");
+  Means_HPD->Write("Means_HPD");
+  Errors_HPD->Write("Errors_HPD");
+  Errors_HPD_Positive->Write("Errors_HPD_Positive");
+  Errors_HPD_Negative->Write("Errors_HPD_Negative");
 
 } // Have now written the postfit projections
 
@@ -254,13 +364,13 @@ void MCMCProcessor::DrawPostfit() {
 
   // cd into the output file
   OutputFile->cd();
-
+ 
   // Make a TH1D of the central values and the errors
   TH1D *paramPlot = new TH1D("paramPlot", "paramPlot", nDraw, 0, nDraw);
   paramPlot->SetName("mach3params");
   paramPlot->SetTitle(StepCut.c_str());
-  paramPlot->SetFillStyle(3144);
-  paramPlot->SetFillColor(kBlue-3);
+  paramPlot->SetFillStyle(3001);
+  paramPlot->SetFillColor(kBlue-1);
   paramPlot->SetMarkerColor(paramPlot->GetFillColor());
   paramPlot->SetMarkerStyle(20);
   paramPlot->SetLineColor(paramPlot->GetFillColor());
@@ -268,104 +378,235 @@ void MCMCProcessor::DrawPostfit() {
 
   // Same but with Gaussian output
   TH1D *paramPlot_Gauss = (TH1D*)(paramPlot->Clone());
-  paramPlot_Gauss->SetMarkerColor(kYellow-7);
-  paramPlot_Gauss->SetMarkerStyle(21);
+  paramPlot_Gauss->SetMarkerColor(kOrange-5);
+  paramPlot_Gauss->SetMarkerStyle(23);
   paramPlot_Gauss->SetLineWidth(2);
-  paramPlot_Gauss->SetMarkerSize(1.3);
-  paramPlot_Gauss->SetFillColor(0);
-  paramPlot_Gauss->SetFillStyle(0);
+  paramPlot_Gauss->SetMarkerSize((prefit->GetMarkerSize())*0.75);
+  paramPlot_Gauss->SetFillColor(paramPlot_Gauss->GetMarkerColor());
+  paramPlot_Gauss->SetFillStyle(3244);
   paramPlot_Gauss->SetLineColor(paramPlot_Gauss->GetMarkerColor());
 
+  // Same but with Gaussian output
+  TH1D *paramPlot_HPD = (TH1D*)(paramPlot->Clone());
+  paramPlot_HPD->SetMarkerColor(kBlack);
+  paramPlot_HPD->SetMarkerStyle(25);
+  paramPlot_HPD->SetLineWidth(2);
+  paramPlot_HPD->SetMarkerSize((prefit->GetMarkerSize())*0.5);
+  paramPlot_HPD->SetFillColor(0);
+  paramPlot_HPD->SetFillStyle(0);
+  paramPlot_HPD->SetLineColor(paramPlot_HPD->GetMarkerColor());
+  
+  
   // Set labels and data
-  for (int i = 0; i < nDraw; ++i) {
+  for (int i = 0; i < nDraw; ++i)
+  {
+      
+    //Those keep which parameter type we run currently and realtive number  
+    int ParamNo = __UNDEF__;
+    int ParamEnu = __UNDEF__;
+    for(int ik = 0; ik < kNParameterEnum; ik++)
+    {
+        if (ParamType[i] == ParameterEnum(ik)) 
+        {
+            ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
+            ParamEnu = ParameterEnum(ik);
+        }
+    }
+      
+    //KS: Sliglthy hacky way to get realtive to prior or nominal as this is convention we use
+    //This only applies for xsec for other systematic types doesn't matter
+    double CentralValueTemp = 0;
+    double Central, Central_gauss, Central_HPD;
+    double Err, Err_Gauss, Err_HPD;
+    
+    if(plotRelativeToPrior)
+    {
+        CentralValueTemp = ParamCentral[ParamEnu][ParamNo];
+        // Normalise the prior relative the nominal/prior, just the way we get our fit results in MaCh3
+        if ( CentralValueTemp != 0) 
+        {
+        Central = (*Means)(i) / CentralValueTemp;
+        Err = (*Errors)(i) / CentralValueTemp;
+            
+        Central_gauss = (*Means_Gauss)(i) / CentralValueTemp;
+        Err_Gauss = (*Errors_Gauss)(i) / CentralValueTemp;
+        
+        Central_HPD = (*Means_HPD)(i) / CentralValueTemp;
+        Err_HPD = (*Errors_HPD)(i) / CentralValueTemp;
+        } 
+        else {
+        Central = 1+(*Means)(i);
+        Err = (*Errors)(i);
+            
+        Central_gauss = 1+(*Means_Gauss)(i);
+        Err_Gauss = (*Errors_Gauss)(i);
+        
+        Central_HPD = 1+(*Means_HPD)(i) ;
+        Err_HPD = (*Errors_HPD)(i);
+        }
+    }
+    //KS: Just get value of each parmeter without dividing by prior
+    else
+    {
+        Central = (*Means)(i);
+        Err = (*Errors)(i);
+            
+        Central_gauss = (*Means_Gauss)(i);
+        Err_Gauss = (*Errors_Gauss)(i);
+        
+        Central_HPD = (*Means_HPD)(i) ;
+        Err_HPD = (*Errors_HPD)(i);
+    }
+    
+    paramPlot->SetBinContent(i+1, Central);
+    paramPlot->SetBinError(i+1, Err);
 
-    paramPlot->SetBinContent(i+1, (*Means)(i));
-    paramPlot->SetBinError(i+1, (*Errors)(i));
+    paramPlot_Gauss->SetBinContent(i+1, Central_gauss);
+    paramPlot_Gauss->SetBinError(i+1, Err_Gauss);
 
-    paramPlot_Gauss->SetBinContent(i+1, (*Means_Gauss)(i));
-    paramPlot_Gauss->SetBinError(i+1, (*Errors_Gauss)(i));
-
+    paramPlot_HPD->SetBinContent(i+1, Central_HPD);
+    paramPlot_HPD->SetBinError(i+1, Err_HPD);
+    
     paramPlot->GetXaxis()->SetBinLabel(i+1, prefit->GetXaxis()->GetBinLabel(i+1));
     paramPlot_Gauss->GetXaxis()->SetBinLabel(i+1, prefit->GetXaxis()->GetBinLabel(i+1));
+    paramPlot_HPD->GetXaxis()->SetBinLabel(i+1, prefit->GetXaxis()->GetBinLabel(i+1));
   }
 
   // Make a TLegend
   TLegend *CompLeg = new TLegend(0.33, 0.73, 0.76, 0.95);
   CompLeg->AddEntry(prefit, "Prefit", "fp");
   CompLeg->AddEntry(paramPlot, "Postfit PDF", "fp");
-  CompLeg->AddEntry(paramPlot_Gauss, "Postfit Gauss", "lfep");
+  CompLeg->AddEntry(paramPlot_Gauss, "Postfit Gauss", "fp");
+  CompLeg->AddEntry(paramPlot_HPD, "Postfit HPD", "lfep");
   CompLeg->SetFillColor(0);
   CompLeg->SetFillStyle(0);
   CompLeg->SetLineWidth(0);
   CompLeg->SetLineStyle(0);
   CompLeg->SetBorderSize(0);
 
-  OutputFile->cd();
-  // Plot the flux parameters (0 to 100) if enabled
-  // Have already looked through the branches earlier
-  if (PlotFlux == true) {
-    prefit->GetYaxis()->SetTitle("Variation");
-    prefit->GetYaxis()->SetRangeUser(0.7, 1.3);
-    prefit->GetXaxis()->SetRangeUser(0, nFlux);
-    prefit->GetXaxis()->SetTitle("");
-    prefit->GetXaxis()->LabelsOption("v");
-
-    paramPlot->GetYaxis()->SetTitle("Variation");
-    paramPlot->GetYaxis()->SetRangeUser(0.7, 1.3);
-    paramPlot->GetXaxis()->SetRangeUser(0, nFlux);
-    paramPlot->GetXaxis()->SetTitle("");
-    paramPlot->SetTitle(StepCut.c_str());
-    paramPlot->GetXaxis()->LabelsOption("v");
-
-    paramPlot_Gauss->GetYaxis()->SetTitle("Variation");
-    paramPlot_Gauss->GetYaxis()->SetRangeUser(0.7, 1.3);
-    paramPlot_Gauss->GetXaxis()->SetRangeUser(0, nFlux);
-    paramPlot_Gauss->GetXaxis()->SetTitle("");
-    paramPlot_Gauss->SetTitle(StepCut.c_str());
-    paramPlot_Gauss->GetXaxis()->LabelsOption("v");
-
-    prefit->Write("param_flux_prefit");
-    paramPlot->Write("param_flux");
-    paramPlot_Gauss->Write("param_flux_gaus");
-
-    prefit->Draw("e2");
-    paramPlot->Draw("e2, same");
-    paramPlot_Gauss->Draw("e1, same");
-
-    CompLeg->Draw("same");
-    Posterior->Write("param_flux_canv");
-    Posterior->Clear();
-  }
-
   Posterior->SetBottomMargin(0.2);
-  // Plot the xsec parameters (100 to ~125)
-  // Have already looked through the branches earlier
+
   OutputFile->cd();
+  //KS: Plot Xsec and Flux
   if (PlotXSec == true) {
-    prefit->GetYaxis()->SetTitle("Variation relative prefit");
-    prefit->GetYaxis()->SetRangeUser(-0.0, 2.0);
+      
+    int Start = ParamTypeStartPos[kXSecPar];
+    // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
+    // Have already looked through the branches earlier
+    if(plotRelativeToPrior)  prefit->GetYaxis()->SetTitle("Variation rel. prior"); 
+    else prefit->GetYaxis()->SetTitle("Parameter Value");
+    prefit->GetYaxis()->SetRangeUser(-2.5, 2.5);
     prefit->GetXaxis()->SetTitle("");
     prefit->GetXaxis()->LabelsOption("v");
 
-    prefit->GetXaxis()->SetRangeUser(nFlux, nFlux+nXSec);
-    paramPlot->GetXaxis()->SetRangeUser(nFlux, nFlux+nXSec);
-    paramPlot_Gauss->GetXaxis()->SetRangeUser(nFlux, nFlux+nXSec);
+    prefit->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
+    paramPlot->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
+    paramPlot_Gauss->GetXaxis()->SetRangeUser(Start, Start+ nParam[kXSecPar]-nFlux);
+    paramPlot_HPD->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
 
     // Write the individual ones
     prefit->Write("param_xsec_prefit");
     paramPlot->Write("param_xsec");
     paramPlot_Gauss->Write("param_xsec_gaus");
-
+    paramPlot_HPD->Write("param_xsec_HPD");
+    
     // And the combined
     prefit->Draw("e2");
     paramPlot->Draw("e2, same");
-    paramPlot_Gauss->Draw("same");
+    paramPlot_Gauss->Draw("e2, same");
+    paramPlot_HPD->Draw("e1, same");
     CompLeg->Draw("same");
     Posterior->Write("param_xsec_canv");
+    if(printToPDF) Posterior->Print(CanvasName);
+    Posterior->Clear();
+  
+    OutputFile->cd();
+    // Plot the flux parameters (nXSec to nxsec+nflux) if enabled
+    // Have already looked through the branches earlier
+    prefit->GetYaxis()->SetRangeUser(0.7, 1.3);
+    paramPlot->GetYaxis()->SetRangeUser(0.7, 1.3);
+    paramPlot_Gauss->GetYaxis()->SetRangeUser(0.7, 1.3);
+    paramPlot_HPD->GetYaxis()->SetRangeUser(0.7, 1.3);
+    
+    prefit->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
+    paramPlot->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
+    paramPlot_Gauss->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
+    paramPlot_HPD->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
+
+    prefit->Write("param_flux_prefit");
+    paramPlot->Write("param_flux");
+    paramPlot_Gauss->Write("param_flux_gaus");
+    paramPlot_HPD->Write("param_flux_HPD");
+
+    prefit->Draw("e2");
+    paramPlot->Draw("e2, same");
+    paramPlot_Gauss->Draw("e1, same");
+    paramPlot_HPD->Draw("e1, same");
+    CompLeg->Draw("same");
+    Posterior->Write("param_flux_canv");
+    if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
+  
+  if(PlotDet)
+  {
+    int Start = ParamTypeStartPos[kND280Par];
+    int NDbinCounter = Start;
+    //KS: Make prefit postfit for each ND sample, having all of them at the same plot is unreadable
+    for(unsigned int i = 0; i < NDSamplesNames.size(); i++ )
+    {
+      std::string NDname = NDSamplesNames[i];
+      NDbinCounter += NDSamplesBins[i];
+      OutputFile->cd();
+      prefit->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
+      prefit->GetYaxis()->SetRangeUser(0.6, 1.4);
+      prefit->GetXaxis()->SetRangeUser(Start, NDbinCounter);
+      prefit->GetXaxis()->SetTitle();
+      prefit->GetXaxis()->LabelsOption("v");
 
+      paramPlot->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
+      paramPlot->GetYaxis()->SetRangeUser(0.6, 1.4);
+      paramPlot->GetXaxis()->SetRangeUser(Start, NDbinCounter);
+      paramPlot->GetXaxis()->SetTitle("");
+      paramPlot->SetTitle(StepCut.c_str());
+      paramPlot->GetXaxis()->LabelsOption("v");
+
+      paramPlot_Gauss->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
+      paramPlot_Gauss->GetYaxis()->SetRangeUser(0.6, 1.4);
+      paramPlot_Gauss->GetXaxis()->SetRangeUser(Start, NDbinCounter);
+      paramPlot_Gauss->GetXaxis()->SetTitle("");
+      paramPlot_Gauss->SetTitle(StepCut.c_str());
+      paramPlot_Gauss->GetXaxis()->LabelsOption("v");
+
+      paramPlot_HPD->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
+      paramPlot_HPD->GetYaxis()->SetRangeUser(0.6, 1.4);
+      paramPlot_HPD->GetXaxis()->SetRangeUser(Start, NDbinCounter);
+      paramPlot_HPD->GetXaxis()->SetTitle("");
+      paramPlot_HPD->SetTitle(StepCut.c_str());
+      paramPlot_HPD->GetXaxis()->LabelsOption("v");
+
+      prefit->Write(("param_"+NDname+"_prefit").c_str());
+      paramPlot->Write(("param_"+NDname).c_str());
+      paramPlot_Gauss->Write(("param_"+NDname+"_gaus").c_str());
+      paramPlot_HPD->Write(("param_"+NDname+"_HPD").c_str());
+
+      prefit->Draw("e2");
+      paramPlot->Draw("e2, same");
+      paramPlot_Gauss->Draw("e1, same");
+      paramPlot_HPD->Draw("e1, same");
+      CompLeg->Draw("same");
+      Posterior->Write(("param_"+NDname+"_canv").c_str());
+      if(printToPDF) Posterior->Print(CanvasName);
+      Posterior->Clear();
+      Start += NDSamplesBins[i];
+    }
+  }
+
+  delete paramPlot;
   delete CompLeg;
+
+  //KS: Return Margin to default one
+  Posterior->SetBottomMargin(0.1);
 }
 
 // *********************
@@ -394,24 +635,26 @@ void MCMCProcessor::MakeCovariance() {
     MakePostfit();
   }
 
+  int covBinning = nDraw;
+  //If we only plot correlation/covariance between xsec (without flux)
+  if(MakeOnlyXsecCorr)
+  {
+     covBinning = nParam[kXSecPar] - nFlux; 
+  }
+    
+    
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
-  for (int i = 0; i < nDraw; ++i) {
+  for (int i = 0; i < covBinning; ++i) {
 
-    if (i % (nDraw/5) == 0) {
-      std::cout << "  " << i << "/" << nDraw << " (" << int((double(i)/double(nDraw)*100.0))+1 << "%)" << std::endl;
+    if (i % (covBinning/5) == 0) {
+      std::cout << "  " << i << "/" << covBinning << " (" << int((double(i)/double(covBinning)*100.0))+1 << "%)" << std::endl;
     }
-
+      
     TString Title_i = BranchNames[i];
+    double Nominal_i, NominalError;
 
-    // For xsec parameters get the parameter name
-    if (ParamType[i] == kXSecPar) {
-      int ParamNo = 0;
-      if (PlotFlux && i >= nFlux) {
-        ParamNo = i - nFlux;
-      }
-      Title_i = XSecNames[ParamNo];
-    }
-
+    GetNthParameter(i, Nominal_i, NominalError, Title_i);
+    
     double min_i = Chain->GetMinimum(BranchNames[i]);
     double max_i = Chain->GetMaximum(BranchNames[i]);
 
@@ -424,20 +667,15 @@ void MCMCProcessor::MakeCovariance() {
       // If this parameter isn't varied
       if (IamVaried[j] == false) {
         (*Covariance)(i,j) = 0.0;
+        (*Covariance)(j,i) = (*Covariance)(i,j);
         (*Correlation)(i,j) = 0.0;
+        (*Correlation)(j,i) = (*Correlation)(i,j);
         continue;
       }
 
       TString Title_j = BranchNames[j];
-
-      // For xsec parameters get the parameter name
-      if (ParamType[j] == kXSecPar) {
-        int ParamNo = 0;
-        if (PlotFlux && j >= nFlux) {
-          ParamNo = j - nFlux;
-        }
-        Title_j = XSecNames[ParamNo];
-      }
+      double Nominal_j, NominalError_j;
+      GetNthParameter(j, Nominal_j, NominalError_j, Title_j);
 
       OutputFile->cd();
 
@@ -448,34 +686,241 @@ void MCMCProcessor::MakeCovariance() {
       double min_j = Chain->GetMinimum(BranchNames[j]);
 
       // TH2F to hold the Correlation 
-      TH2D *hpost = new TH2D(DrawMe, DrawMe, nBins, min_i, max_i, nBins, min_j, max_j);
+      TH2D *hpost_2D = new TH2D(DrawMe, DrawMe, nBins, min_i, max_i, nBins, min_j, max_j);
 
-      hpost->SetMinimum(0);
-      hpost->GetXaxis()->SetTitle(Title_i);
-      hpost->GetYaxis()->SetTitle(Title_j);
-      hpost->GetZaxis()->SetTitle("Steps");
+      hpost_2D->SetMinimum(0);
+      hpost_2D->GetXaxis()->SetTitle(Title_i);
+      hpost_2D->GetYaxis()->SetTitle(Title_j);
+      hpost_2D->GetZaxis()->SetTitle("Steps");
 
       // The draw command we want, i.e. draw param j vs param i
       Chain->Project(DrawMe, DrawMe, StepCut.c_str());
-
+      
       // Get the Covariance for these two parameters
-      (*Covariance)(i,j) = hpost->GetCovariance();
+      (*Covariance)(i,j) = hpost_2D->GetCovariance();
       (*Covariance)(j,i) = (*Covariance)(i,j);
 
-      (*Correlation)(i,j) = hpost->GetCorrelationFactor();
+      (*Correlation)(i,j) = hpost_2D->GetCorrelationFactor();
       (*Correlation)(j,i) = (*Correlation)(i,j);
 
-      Posterior->SetName(hpost->GetName());
-      Posterior->SetTitle(hpost->GetTitle());
-      //Posterior->Print(CanvasName);
-
+      if(printToPDF)
+      {
+          //KS: Skip Flux Params
+          if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
+          {
+          if(IsXsec[j] && IsXsec[i])
+          {
+              hpost_2D->Draw("colz");
+              Posterior->SetName(hpost_2D->GetName());
+              Posterior->SetTitle(hpost_2D->GetTitle());
+              Posterior->Print(CanvasName);
+          }
+          }
+      }
       // Write it to root file
       //OutputFile->cd();
-      //hpost->Write();
+      //hpost_2D->Write();
 
-      delete hpost;
+      delete hpost_2D;
     } // End j loop
   } // End i loop
+  OutputFile->cd();
+  Covariance->Write("Covariance");
+  Correlation->Write("Correlation");
+}
+
+
+// ***************
+//KS: Cache all steps to allow multithreading, hit RAM quite a bit
+void MCMCProcessor::CacheSteps() {
+// ***************
+    CacheMCMCM = true;
+    std::cout << "Caching input tree..." << std::endl;
+    TStopwatch clock;
+    clock.Start();
+    
+    ParStep = new double*[nDraw];
+    StepNumber = new int[nEntries];
+    
+    Min_Chain = new double[nDraw];
+    Max_Chain= new double[nDraw];
+    
+    hpost2D = new TH2D**[nDraw]();
+
+    #ifdef MULTITHREAD
+    #pragma omp parallel for private(nDraw, nEntries)
+    #endif
+    for (int i = 0; i < nDraw; ++i) 
+    {
+        ParStep[i] = new double[nEntries];
+        hpost2D[i] = new TH2D*[nDraw]();
+        Min_Chain[i] = -999.99;
+        Max_Chain[i] = -999.99;
+
+        for (int j = 0; j < nEntries; ++j) 
+        {
+            ParStep[i][j] = -999.99;
+            //KS: Set this only once
+            if(i == 0) StepNumber[j] = -999.99;
+        }
+    }
+    // Set all the branches to off
+    Chain->SetBranchStatus("*", false);
+    
+    // Turn on the branches which we want for parameters
+    for (int i = 0; i < nDraw; ++i) 
+    {
+        Chain->SetBranchStatus(BranchNames[i].Data(), true);
+    }
+    Chain->SetBranchStatus("step", true);
+
+    int countwidth = nEntries/10;
+    // Loop over the entries
+    for (int j = 0; j < nEntries; ++j) {
+        if (j % countwidth == 0) {
+        std::cout << j << "/" << nEntries << " (" << double(j)/double(nEntries)*100. << "%)" << std::endl;
+        }
+
+        Chain->SetBranchAddress("step", &StepNumber[j]);
+        // Set the branch addresses for params
+        for (int i = 0; i < nDraw; ++i) 
+        {
+            Chain->SetBranchAddress(BranchNames[i].Data(), &ParStep[i][j]);
+        }
+        
+        // Fill up the ParamValues array
+        Chain->GetEntry(j);
+    }
+    
+    // Set all the branches to on
+    Chain->SetBranchStatus("*", true);
+    
+    // Cache max and min in chain for covariance matrix
+    for (int i = 0; i < nDraw; ++i) 
+    {
+        Min_Chain[i] = Chain->GetMinimum(BranchNames[i]);
+        Max_Chain[i] = Chain->GetMaximum(BranchNames[i]);
+        for (int j = 0; j <= i; ++j)
+        {
+            // TH2D to hold the Correlation 
+            hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain[i], Max_Chain[i], nBins, Min_Chain[j], Max_Chain[j]);
+        }
+    }
+        
+    clock.Stop();
+    std::cout << "Caching steps took " << clock.RealTime() << "s to finish for " << nEntries << " events" << std::endl;
+}
+
+
+// *********************
+// Make the post-fit covariance matrix in all dimensions
+void MCMCProcessor::MakeCovariance_MP() {
+// *********************
+    
+  if (OutputFile == NULL) MakeOutputFile();
+    
+  int covBinning = nDraw;
+  //If we only plot correlation/covariance between xsec (without flux)
+  if(MakeOnlyXsecCorr)
+  {
+     covBinning = nParam[kXSecPar] - nFlux; 
+  }
+
+  bool HaveMadeDiagonal = false;
+  std::cout << "Making post-fit covariances..." << std::endl;
+    
+  // Check that the diagonal entries have been filled
+  // i.e. MakePostfit() has been called
+  for (int i = 0; i < covBinning; ++i) {
+    if ((*Covariance)(i,i) == __UNDEF__) {
+      HaveMadeDiagonal = false;
+      std::cout << "Have not run diagonal elements in covariance, will do so now by calling MakePostfit()" << std::endl;
+      break;
+    } else {
+      HaveMadeDiagonal = true;
+    }
+  }
+    
+ if (HaveMadeDiagonal == false) MakePostfit();
+  
+std::cout << "Calculating covaraince matrix" << std::endl;
+TStopwatch clock;
+clock.Start();
+  
+// Now we are sure we have the diagonal elements, let's make the off-diagonals
+#ifdef MULTITHREAD
+#pragma omp parallel for
+#endif
+for (int i = 0; i < covBinning; ++i) 
+{
+    TString Title_i = BranchNames[i];
+    double Nominal_i, NominalError_i;
+    GetNthParameter(i, Nominal_i, NominalError_i, Title_i);
+    
+    for (int j = 0; j <= i; ++j)
+    {
+        // Skip the diagonal elements which we've already done above
+        if (j == i) continue;
+        
+        // If this parameter isn't varied
+        if (IamVaried[j] == false) {
+            (*Covariance)(i,j) = 0.0;
+            (*Covariance)(j,i) = (*Covariance)(i,j);
+            (*Correlation)(i,j) = 0.0;
+            (*Correlation)(j,i) = (*Correlation)(i,j);
+            continue;
+        }
+      
+        TString Title_j = BranchNames[j];
+        double Nominal_j, NominalError_j;
+        GetNthParameter(j, Nominal_j, NominalError_j, Title_j);
+      
+        //OutputFile->cd();
+
+        hpost2D[i][j]->SetMinimum(0);
+        hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
+        hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);
+        hpost2D[i][j]->GetZaxis()->SetTitle("Steps");
+            
+        for (int k = 0; k < nEntries; ++k) 
+        {
+            //KS: Burn in cut
+            if(StepNumber[k] < BurnInCut) continue;
+
+            //KS: Fill histogram with cached steps
+            hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k]);
+        }
+        // Get the Covariance for these two parameters
+        (*Covariance)(i,j) = hpost2D[i][j]->GetCovariance();
+        (*Covariance)(j,i) = (*Covariance)(i,j);
+
+        (*Correlation)(i,j) = hpost2D[i][j]->GetCorrelationFactor();
+        (*Correlation)(j,i) = (*Correlation)(i,j);
+
+        /*
+        if(printToPDF)
+        {
+            //KS: Skip Flux Params
+            if(IsXsec[j] && IsXsec[i])
+            {
+                hpost2D->Draw("colz");
+                Posterior->SetName(hpost2D->GetName());
+                Posterior->SetTitle(hpost2D->GetTitle());
+                Posterior->Print(CanvasName);
+            }
+        }
+        */
+        // Write it to root file
+        //OutputFile->cd();
+        //hpost2D->Write();
+
+        //delete hpost2D;
+    }// End j loop
+}// End i loop
+
+clock.Stop();
+std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for " << nEntries << " events" << std::endl;
+    
   OutputFile->cd();
   Covariance->Write("Covariance");
   Correlation->Write("Correlation");
@@ -485,14 +930,22 @@ void MCMCProcessor::MakeCovariance() {
 // Make the covariance plots
 void MCMCProcessor::DrawCovariance() {
 // *********************
+    
+  int covBinning = nDraw;
+  //If we only plot correlation/covariance between xsec (without flux)
+  if(MakeOnlyXsecCorr)
+  {
+     covBinning = nParam[kXSecPar] - nFlux; 
+  }
+  
   // The Covariance matrix from the fit
-  TH2D* hCov = new TH2D("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  TH2D* hCov = new TH2D("hCov", "hCov", covBinning, 0, covBinning, covBinning, 0, covBinning);
   hCov->GetZaxis()->SetTitle("Covariance");
   // The Covariance matrix square root, with correct sign
-  TH2D* hCovSq = new TH2D("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  TH2D* hCovSq = new TH2D("hCovSq", "hCovSq", covBinning, 0, covBinning, covBinning, 0, covBinning);
   hCovSq->GetZaxis()->SetTitle("Covariance");
   // The Correlation
-  TH2D* hCorr = new TH2D("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  TH2D* hCorr = new TH2D("hCorr", "hCorr", covBinning, 0, covBinning, covBinning, 0, covBinning);
   hCorr->GetZaxis()->SetTitle("Correlation");
   hCorr->SetMinimum(-1);
   hCorr->SetMaximum(1);
@@ -504,22 +957,17 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->GetYaxis()->SetLabelSize(0.015);
 
   // Loop over the Covariance matrix entries
-  for (int i = 0; i < nDraw; i++) {
-
+  for (int i = 0; i < covBinning; i++)
+  {
     TString titlex = "";
-    if (ParamType[i] == kFluxPar){
-      titlex = FluxNames[i];
-    } else if (ParamType[i] == kXSecPar) {
-      titlex = XSecNames[i-nFlux];
-    } else if (ParamType[i] == kNearDetPar) {
-      titlex = "";
-    }
-
+    double nom, err;
+    GetNthParameter(i, nom, err, titlex);
+    
     hCov->GetXaxis()->SetBinLabel(i+1, titlex);
     hCovSq->GetXaxis()->SetBinLabel(i+1, titlex);
     hCorr->GetXaxis()->SetBinLabel(i+1, titlex);
 
-    for (int j = 0; j < nDraw; j++) {
+    for (int j = 0; j < covBinning; j++) {
 
       // The value of the Covariance
       double cov = (*Covariance)(i,j);
@@ -529,24 +977,20 @@ void MCMCProcessor::DrawCovariance() {
       hCovSq->SetBinContent(i+1, j+1, ((cov > 0) - (cov < 0))*sqrt(fabs(cov)));
       hCorr->SetBinContent(i+1, j+1, corr);
 
+      
       TString titley = "";
-      if (ParamType[j] == kFluxPar){
-        titley = FluxNames[j];
-      } else if (ParamType[j] == kXSecPar) {
-        titley = XSecNames[j-nFlux];
-      } else if (ParamType[j] == kNearDetPar) {
-        titley = "";
-      }
+      double nom_j, err_j;
+      GetNthParameter(j, nom_j, err_j, titley);
 
       hCov->GetYaxis()->SetBinLabel(j+1, titley);
       hCovSq->GetYaxis()->SetBinLabel(j+1, titley);
       hCorr->GetYaxis()->SetBinLabel(j+1, titley);
     }
-
   }
 
   // Take away the stat box
   gStyle->SetOptStat(0);
+  if(plotBinValue)gStyle->SetPaintTextFormat("4.1f"); //Precision of value in matrix element
   // Make pretty Correlation colors (red to blue)
   const int NRGBs = 5;
   TColor::InitializeColors();
@@ -562,19 +1006,25 @@ void MCMCProcessor::DrawCovariance() {
 
   Posterior->cd();
   Posterior->Clear();
-  hCov->Draw("colz");
+  if(plotBinValue) hCov->Draw("colz text");
+  else hCov->Draw("colz");
   Posterior->SetRightMargin(0.15);
-  //Posterior->Print(CanvasName);
+  if(printToPDF) Posterior->Print(CanvasName);
 
   Posterior->cd();
   Posterior->Clear();
-  hCorr->Draw("colz");
+  if(plotBinValue) hCorr->Draw("colz text");
+  else hCorr->Draw("colz");
   Posterior->SetRightMargin(0.15);
-  //Posterior->Print(CanvasName);
+  if(printToPDF) Posterior->Print(CanvasName);
 
   hCov->Write("Covariance_plot");
   hCovSq->Write("Covariance_sq_plot");
   hCorr->Write("Correlation_plot");
+  
+  delete hCov;
+  delete hCovSq;
+  delete hCorr;
 }
 
 // **************************
@@ -597,10 +1047,6 @@ void MCMCProcessor::ScanInput() {
   IamVaried.reserve(nBranches);
   ParamType.reserve(nBranches);
 
-  // Number of flux, cross-section and ND280 parameters
-  nFlux = 0;
-  nXSec = 0;
-  nNear = 0;
 
   // Loop over the number of branches
   // Find the name and how many of each systematic we have
@@ -611,39 +1057,60 @@ void MCMCProcessor::ScanInput() {
     TString bname = br->GetName();
 
     // If we're on beam systematics
-    if (bname.BeginsWith("b_")) {
-      BranchNames.push_back(bname);
-      ParamType.push_back(kFluxPar);
-      PlotFlux = true;
-      nFlux++;
-    } else if(bname.BeginsWith("xsec_")) {
-      BranchNames.push_back(bname);
-      ParamType.push_back(kXSecPar);
-      PlotXSec = true;
-      nXSec++;
-    } else if (bname.BeginsWith("ndd_")) {
-      BranchNames.push_back(bname);
-      ParamType.push_back(kNearDetPar);
-      PlotDet = true;
-      nNear++;
+    if(bname.BeginsWith("xsec_")) 
+      {
+	BranchNames.push_back(bname);
+	ParamType.push_back(kXSecPar);
+	PlotXSec = true;
+	nParam[kXSecPar]++;
+      }
+    if(!MakeOnlyXsecCorrFlux) //HI a bit of a dodgy way to do this, for now just want to get the work flow sorted 
+      {
+      if (bname.BeginsWith("ndd_") && PlotDet) 
+	{
+	  BranchNames.push_back(bname);
+	  ParamType.push_back(kND280Par);
+	  nParam[kND280Par]++;
+	}
+      else if (bname.BeginsWith("skd_joint_") && PlotDet)
+	{
+	  BranchNames.push_back(bname);
+	  ParamType.push_back(kFDDetPar);
+	  nParam[kFDDetPar]++;
+	}
+      else if (bname.BeginsWith("sin2th_") || 
+	       bname.BeginsWith("delm2_")  || 
+	       bname.BeginsWith("delta_")    ) 
+	{
+	  BranchNames.push_back(bname);
+	  ParamType.push_back(kOSCPar);
+	  nParam[kOSCPar]++;
+	}
     }
   }
-
   nDraw = BranchNames.size();
 
+  
+  // Read the input Covariances
+  ReadInputCov();
+  
+  // Check order of parameter types
+  ScanParameterOrder();
+  
   std::cout << "************************************************" << std::endl;
   std::cout << "Scanning output branches..." << std::endl;
-  std::cout << "# useful entries in tree: " << nDraw << std::endl;
-  std::cout << "# Flux params: " << nFlux << std::endl;
-  std::cout << "# XSec params: " << nXSec << std::endl;
-  std::cout << "# ND280 params: " << nNear << std::endl;
+  std::cout << "# useful entries in tree: " << nDraw  << std::endl;
+  std::cout << "# XSec params:  " << nParam[kXSecPar] - nFlux <<" starting at "<<ParamTypeStartPos[kXSecPar] << std::endl;
+  std::cout << "# Flux params:  " << nFlux << std::endl;
+  std::cout << "# ND280 params: " << nParam[kND280Par] <<" starting at  "<<ParamTypeStartPos[kND280Par] << std::endl;
+  std::cout << "# FD params:    " << nParam[kFDDetPar] <<" starting at  "<<ParamTypeStartPos[kFDDetPar] << std::endl;
+  std::cout << "# Osc params:   " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   << std::endl;
   std::cout << "************************************************" << std::endl;
 
-  // Also read what input Covariances were used
-  ReadInputCov();
 
-  // Set the step cut to be 25%
-  SetStepCut(nEntries/4);
+  // Set the step cut to be 20%
+  int cut = Chain->GetMaximum("step")/5;
+  SetStepCut(cut);
 }
 
 // ****************************
@@ -654,41 +1121,77 @@ void MCMCProcessor::SetupOutput() {
   // Make sure we can read files located anywhere and strip the .root ending
   MCMCFile = MCMCFile.substr(0, MCMCFile.find(".root"));
 
+  // Check if the output file is ready
+  if (OutputFile == NULL) MakeOutputFile();
+  
   CanvasName = MCMCFile + "_Process.pdf[";
-  //Posterior->Print(CanvasName);
+  if(printToPDF) Posterior->Print(CanvasName);
 
   // Once the pdf file is open no longer need to bracket
   CanvasName.ReplaceAll("[","");
 
   // We fit with this Gaussian
-  Gauss = new TF1("Gauss", "[0]/(sqrt(2.0*3.14159)*[2])*TMath::Exp(-0.5*pow(x-[1],2)/pow([2],2))", -2.0, 3.0);
+  Gauss = new TF1("gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",   -5, 5);
 
   // Declare the TVectors
   Covariance = new TMatrixDSym(nDraw);
   Correlation = new TMatrixDSym(nDraw);
+  Central_Value = new TVectorD(nDraw);
   Means = new TVectorD(nDraw);
   Errors = new TVectorD(nDraw);
   Means_Gauss = new TVectorD(nDraw);
   Errors_Gauss = new TVectorD(nDraw);
-  Peaks = new TVectorD(nDraw);
-
+  Means_HPD    = new TVectorD(nDraw);
+  Errors_HPD   = new TVectorD(nDraw); 
+  Errors_HPD_Positive = new TVectorD(nDraw); 
+  Errors_HPD_Negative = new TVectorD(nDraw); 
+    
   // Initialise to something silly
-  for (int i = 0; i < nDraw; ++i) {
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < nDraw; ++i)
+  {
+    (*Central_Value)(i) = __UNDEF__;
     (*Means)(i) = __UNDEF__;
     (*Errors)(i) = __UNDEF__;
     (*Means_Gauss)(i) = __UNDEF__;
     (*Errors_Gauss)(i) = __UNDEF__;
-    (*Peaks)(i) = __UNDEF__;
+    (*Means_HPD)(i) = __UNDEF__;
+    (*Errors_HPD)(i) = __UNDEF__;
+    (*Errors_HPD_Positive)(i) = __UNDEF__;
+    (*Errors_HPD_Negative)(i) = __UNDEF__;
     for (int j = 0; j < nDraw; ++j) {
       (*Covariance)(i, j) = __UNDEF__;
       (*Correlation)(i, j) = __UNDEF__;
     }
-  }
+  } 
+  
+  hpost = new TH1D*[nDraw]();
 
   OutputFile = NULL;
 }
 
 
+// ****************************
+// Check order of parameter types
+void MCMCProcessor::ScanParameterOrder() {
+// *****************************
+  for(int i = 0; i < kNParameterEnum; i++)
+  {
+      for(unsigned int j = 0; j < ParamType.size(); j++)
+      {
+          if(ParamType[j] == ParameterEnum(i)) 
+          {
+            //KS: When we find that i-th parameter types start at j, save and move to the next parameter.
+            ParamTypeStartPos[i] = j;
+            break;
+          }
+      }
+  }
+}
+    
+    
 // *****************************
 // Make the prefit plots
 TH1D* MCMCProcessor::MakePrefit() {
@@ -702,24 +1205,47 @@ TH1D* MCMCProcessor::MakePrefit() {
     PreFitPlot->SetBinError(i+1, 0);
   }
 
-  // Set the flux values
-  for (int i = 0; i < nFlux; ++i) {
-    PreFitPlot->SetBinContent(i+1, FluxCentral[i]);
-    PreFitPlot->SetBinError(i+1, FluxErrors[i]);
+  //KS: Sliglthy hacky way to get realtive to prior or nominal as this is convention we use,
+  //Only applies for xsec, for other systematic it make no difference
+  double CentralValueTemp, Central, Error;
 
-    // Set title for every fifth parameter
-    if (i % 5 == 0) {
-      PreFitPlot->GetXaxis()->SetBinLabel(i+1, Form("Flux param %i", i));
+  // Set labels and data
+  for (int i = 0; i < nDraw; ++i)
+  {
+    //Those keep which parameter type we run currently and realtive number  
+    int ParamNo = __UNDEF__;
+    int ParamEnu = __UNDEF__;
+    for(int ik = 0; ik < kNParameterEnum; ik++)
+    {
+        if (ParamType[i] == ParameterEnum(ik)) 
+        {
+            ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
+            ParamEnu = ParameterEnum(ik);
+        }
     }
+    CentralValueTemp = ParamCentral[ParamEnu][ParamNo];
+    if(plotRelativeToPrior) 
+    {
+        // Normalise the prior relative the nominal/prior, just the way we get our fit results in MaCh3
+        if ( CentralValueTemp != 0)
+        {
+            Central = ParamCentral[ParamEnu][ParamNo] / CentralValueTemp;
+            Error = ParamErrors[ParamEnu][ParamNo]/CentralValueTemp;
+        } else 
+        {
+            Central = CentralValueTemp + 1.0;
+            Error = ParamErrors[ParamEnu][ParamNo];
+        }
+    }
+    else
+    {
+        Central = CentralValueTemp;
+        Error = ParamErrors[ParamEnu][ParamNo]; 
+    }
+    PreFitPlot->SetBinContent(i+1, Central);
+    PreFitPlot->SetBinError(i+1, Error);
+    PreFitPlot->GetXaxis()->SetBinLabel(i+1, ParamNames[ParamEnu][ParamNo]);
   }
-
-  // Set the xsec values
-  for (int i = nFlux; i < nFlux + nXSec; ++i) {
-    PreFitPlot->SetBinContent(i+1, XSecCentral[i-nFlux]);
-    PreFitPlot->SetBinError(i+1, XSecErrors[i-nFlux]);
-    PreFitPlot->GetXaxis()->SetBinLabel(i+1, XSecNames[i-nFlux]);
-  }
-
   PreFitPlot->SetDirectory(0);
 
   PreFitPlot->SetFillStyle(1001);
@@ -740,9 +1266,10 @@ TH1D* MCMCProcessor::MakePrefit() {
 void MCMCProcessor::ReadInputCov() {
   // **************************
   FindInputFiles();
-  ReadFluxFile();
-  ReadXSecFile();
-  ReadNearFile();
+  if(nParam[kXSecPar] > 0)  ReadXSecFile();
+  if(nParam[kND280Par] > 0) ReadND280File();
+  if(nParam[kFDDetPar] > 0) ReadFDFile();
+  if(nParam[kOSCPar] > 0)   ReadOSCFile();
 }
 
 // **************************
@@ -772,22 +1299,30 @@ void MCMCProcessor::FindInputFiles() {
     throw;
   }
 
-  // And the flux Covariance matrix
-  std::string *FluxInput = 0;
-  if (Settings->SetBranchAddress("FluxCov", &FluxInput) < 0) {
-    std::cerr << "Couldn't find FluxCov branch in output" << std::endl;
-    Settings->Print();
-    throw;
-  }
-
-  // And the flux Covariance matrix
-  std::string *NearInput = 0;
-  if (Settings->SetBranchAddress("NDCov", &NearInput) < 0) {
+  // And the ND Covariance matrix
+  std::string *ND280Input = 0;
+  if (Settings->SetBranchAddress("NDCov", &ND280Input) < 0) {
     std::cerr << "Couldn't find NDCov branch in output" << std::endl;
     Settings->Print();
     throw;
   }
 
+  // And the FD Covariance matrix
+  std::string *FDInput = 0;
+  if (Settings->SetBranchAddress("SKCov", &FDInput) < 0) {
+    std::cerr << "Couldn't find SKCov branch in output" << std::endl;
+    Settings->Print();
+    throw;
+  }
+  
+  // And the Osc Covariance matrix
+  std::string *OscInput = 0;
+  if (Settings->SetBranchAddress("oscCov", &OscInput) < 0) {
+    std::cerr << "Couldn't find oscCov branch in output" << std::endl;
+    Settings->Print();
+    throw;
+  }
+  
   // Get the ND runs (needed for post fit distributions)
   std::string *NDrunsInput = 0;
   if (Settings->SetBranchAddress("NDruns", &NDrunsInput) < 0) {
@@ -796,7 +1331,7 @@ void MCMCProcessor::FindInputFiles() {
     throw;
   }
 
-  // Get the vector of Near selections
+  // Get the vector of ND280 selections
   std::vector<std::string> *NDselInput = 0;
   if (Settings->SetBranchAddress("ND_Sel", &NDselInput) < 0) {
     std::cerr << "Couldn't find ND_Sel branch in output" << std::endl;
@@ -815,52 +1350,30 @@ void MCMCProcessor::FindInputFiles() {
   delete TempFile;
 
   // Save the variables
-  FluxCov = *FluxInput;
-  XSecCov = *XSecInput;
-  NearCov = *NearInput;
+  CovPos[kXSecPar]  = *XSecInput;
+  CovPos[kND280Par] = *ND280Input;
+  CovPos[kFDDetPar] = *FDInput;
+  CovPos[kOSCPar]   = *OscInput;
   NDruns = *NDrunsInput;
   NDsel = *NDselInput;
 }
 
 
 // ***************
-// Read the flux file and get the input central values and errors
-void MCMCProcessor::ReadFluxFile() {
-  // ***************
-  // Get the flux Covariance matrix
-  TFile *FluxFile = new TFile(FluxCov.c_str(), "open");
-  if (FluxFile->IsZombie()) {
-    std::cerr << "Couldn't find FluxFile " << FluxCov << std::endl;
-    throw;
-  }
-  FluxFile->cd();
-
-  TMatrixDSym *FluxMatrix = (TMatrixDSym*)(FluxFile->Get("total_flux_cov"));
-  int nFlux = FluxMatrix->GetNrows();
-
-  FluxCentral.reserve(nFlux);
-  FluxErrors.reserve(nFlux);
-
-  for (int i = 0; i < nFlux; ++i) {
-    FluxCentral.push_back(1.0);
-    FluxErrors.push_back((*FluxMatrix)(i,i));
-    FluxNames.push_back(Form("Flux %i", i));
-  }
-
-  FluxFile->Close();
-  delete FluxFile;
-  delete FluxMatrix;
-}
-
-// ***************
 // Read the xsec file and get the input central values and errors
 void MCMCProcessor::ReadXSecFile() {
   // ***************
 
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != NULL) {
+     std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
+      CovPos[kXSecPar].insert(0, std::string(std::getenv("MACH3"))+"/");
+   }
+   
   // Do the same for the cross-section
-  TFile *XSecFile = new TFile(XSecCov.c_str(), "open");
+  TFile *XSecFile = new TFile(CovPos[kXSecPar].c_str(), "open");
   if (XSecFile->IsZombie()) {
-    std::cerr << "Couldn't find XSecFile " << XSecCov << std::endl;
+    std::cerr << "Couldn't find XSecFile " << CovPos[kXSecPar] << std::endl;
     throw;
   }
   XSecFile->cd();
@@ -877,34 +1390,30 @@ void MCMCProcessor::ReadXSecFile() {
   TObjArray* xsec_param_names = (TObjArray*)(XSecFile->Get("xsec_param_names"));
 
   // Now make a TH1D of it
-  int nXSec = XSecPrior->GetNrows();
-  XSecCentral.reserve(nXSec);
-  XSecErrors.reserve(nXSec);
+  ParamNames[kXSecPar].reserve(nParam[kXSecPar]);
+  ParamCentral[kXSecPar].reserve(nParam[kXSecPar]);
+  ParamNom[kXSecPar].reserve(nParam[kXSecPar]);
+  ParamErrors[kXSecPar].reserve(nParam[kXSecPar]);
 
-  for (int i = 0; i < nXSec; ++i) {
-
-    double central = __UNDEF__;
-    double error = __UNDEF__;
+  for (int i = 0; i < nParam[kXSecPar]; ++i) {
 
     // Push back the name
     std::string TempString = std::string(((TObjString*)xsec_param_names->At(i))->GetString());
-    XSecNames.push_back(TempString);
-
-    // Normalise the prior relative the nominal, just the way we get our fit results in MaCh3
-    if (((*XSecNominal)(i)) != 0 && ((*XSecID)(i,0)) != -2) {
-      central = ((*XSecPrior)(i)) / ((*XSecNominal)(i));
-      error = sqrt((*XSecMatrix)(i,i))/((*XSecNominal)(i));
-      // If the nominal is zero or a function we set it to the prior
-    } else {
-      central = ((*XSecPrior)(i));
-      error = sqrt((*XSecMatrix)(i,i));
-    }
-
-    XSecCentral.push_back(central);
-    XSecErrors.push_back(error);
+    ParamNames[kXSecPar].push_back(TempString);
+    if(ParamNames[kXSecPar][i].BeginsWith("b_"))
+    {
+      IsXsec.push_back(false);
+      nFlux++;
+    } 
+    else IsXsec.push_back(true);  
+    
+    ParamCentral[kXSecPar].push_back( ((*XSecPrior)(i)) );
+    ParamNom[kXSecPar].push_back( ((*XSecNominal)(i)) );
+    ParamErrors[kXSecPar].push_back( sqrt((*XSecMatrix)(i,i)) );
   }
 
   XSecFile->Close();
+  delete XSecFile;
   delete XSecMatrix;
   delete XSecPrior;
   delete XSecNominal;
@@ -912,17 +1421,147 @@ void MCMCProcessor::ReadXSecFile() {
 }
 
 // ***************
-// TODO SET NEAR DET PARS
-void MCMCProcessor::ReadNearFile() {
+// Read the ND cov file and get the input central values and errors
+void MCMCProcessor::ReadND280File() {
 // ***************
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != NULL) {
+      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
+      CovPos[kND280Par].insert(0, std::string(std::getenv("MACH3"))+"/");
+   }
+   
+    // Do the same for the ND280
+    TFile *NDdetFile = new TFile(CovPos[kND280Par].c_str(), "open");
+    if (NDdetFile->IsZombie()) {
+        std::cerr << "Couldn't find NDdetFile " << CovPos[kND280Par] << std::endl;
+        throw;
+    }
+    NDdetFile->cd();
+    
+    TMatrixDSym *NDdetMatrix = (TMatrixDSym*)(NDdetFile->Get("nddet_cov"));
+    TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
+    TObjArray* det_poly = (TObjArray*)(NDdetFile->Get("det_polys")->Clone());
+
+    ParamNames[kND280Par].reserve(nParam[kND280Par]);
+    ParamCentral[kND280Par].reserve(nParam[kND280Par]);
+    ParamNom[kND280Par].reserve(nParam[kND280Par]);
+    ParamErrors[kND280Par].reserve(nParam[kND280Par]);
+
+    for (int i = 0; i < nParam[kND280Par]; ++i) 
+    {
+        ParamNom[kND280Par].push_back( (*NDdetNominal)(i) );
+        ParamCentral[kND280Par].push_back( (*NDdetNominal)(i) );
+        
+        ParamErrors[kND280Par].push_back( sqrt((*NDdetMatrix)(i,i)) );
+        ParamNames[kND280Par].push_back( Form("ND Det %i", i) );
+    }  
+
+    for (int j = 0; j <det_poly->GetLast()+1; ++j)
+    {
+        if( det_poly->At(j) != NULL)
+        {
+            TH2Poly *RefPoly = (TH2Poly*)det_poly->At(j);
+            int size = RefPoly->GetNumberOfBins();
+            NDSamplesBins.push_back(size);
+            NDSamplesNames.push_back(RefPoly->GetTitle());
+        }
+    }
+
+    NDdetFile->Close();
+    delete NDdetFile;
+    delete NDdetMatrix;
+    delete NDdetNominal;
 }
 
+
+// ***************
+// Read the FD cov file and get the input central values and errors
+void MCMCProcessor::ReadFDFile() {
+// ***************
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != NULL) {
+      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
+      CovPos[kFDDetPar].insert(0, std::string(std::getenv("MACH3"))+"/");
+   }
+   
+    // Do the same for the FD
+    TFile *FDdetFile = new TFile(CovPos[kFDDetPar].c_str(), "open");
+    if (FDdetFile->IsZombie()) {
+        std::cerr << "Couldn't find FDdetFile " << CovPos[kFDDetPar] << std::endl;
+        throw;
+    }
+    FDdetFile->cd();
+    
+    TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
+    
+    ParamNames[kFDDetPar].reserve(nParam[kFDDetPar]);
+    ParamCentral[kFDDetPar].reserve(nParam[kFDDetPar]);
+    ParamNom[kFDDetPar].reserve(nParam[kFDDetPar]);
+    ParamErrors[kFDDetPar].reserve(nParam[kFDDetPar]);
+
+    for (int i = 0; i < nParam[kFDDetPar]; ++i) 
+    {
+        //KS: FD parameters start at 1. in contrary to ND280
+        ParamNom[kFDDetPar].push_back(1.);
+        ParamCentral[kFDDetPar].push_back(1.);
+        
+        ParamErrors[kFDDetPar].push_back( sqrt((*FDdetMatrix)(i,i)) );
+        ParamNames[kFDDetPar].push_back( Form("FD Det %i", i) );
+    }  
+    //KS: The last parameter is p scale
+    if(FancyPlotNames) ParamNames[kFDDetPar].back() = "Momentum Scale";
+
+    FDdetFile->Close();
+    delete FDdetFile;
+    delete FDdetMatrix;
+}
+
+// ***************
+// Read the Osc cov file and get the input central values and errors
+void MCMCProcessor::ReadOSCFile() {
+// ***************
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != NULL) {
+      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
+      CovPos[kOSCPar].insert(0, std::string(std::getenv("MACH3"))+"/");
+   }
+   
+    // Do the same for the ND280
+    TFile *OscFile = new TFile(CovPos[kOSCPar].c_str(), "open");
+    if (OscFile->IsZombie()) {
+        std::cerr << "Couldn't find OSCFile " << CovPos[kOSCPar] << std::endl;
+        throw;
+    }
+    OscFile->cd();
+    
+    TMatrixDSym *OscMatrix = (TMatrixDSym*)(OscFile->Get("osc_cov"));
+    //KS: Osc nominal we can also set via config so there is danger that this will nor corrspond to what was used in the fit
+    TVectorD *OscNominal = (TVectorD*)(OscFile->Get("osc_nom"));
+    TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
+
+    for (int i = 0; i < nParam[kOSCPar]; ++i) 
+    {
+        ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
+        ParamCentral[kOSCPar].push_back( (*OscNominal)(i) );
+        
+        ParamErrors[kOSCPar].push_back( sqrt((*OscMatrix)(i,i)) );
+        // Push back the name
+        std::string TempString = std::string(((TObjString*)osc_param_names->At(i))->GetString());
+        ParamNames[kOSCPar].push_back(TempString);
+    }  
+
+    OscFile->Close();
+    delete OscFile;
+    delete OscMatrix;
+    delete OscNominal;
+}
 
 // ***************
 // Make the step cut from a string
 void MCMCProcessor::SetStepCut(std::string Cuts) {
 // ***************
   StepCut = Cuts;
+  BurnInCut = std::stoi( Cuts );
 }
 
 // ***************
@@ -932,5 +1571,156 @@ void MCMCProcessor::SetStepCut(int Cuts) {
   std::stringstream TempStream;
   TempStream << "step > " << Cuts;
   StepCut = TempStream.str();
+  BurnInCut = Cuts;
 }
 
+
+// **************************
+// Get the mean and RMS of a 1D posterior
+void MCMCProcessor::GetArithmetic(TH1D * const hpost, int i) {
+  // **************************
+  (*Means)(i) = hpost->GetMean();
+  (*Errors)(i) = hpost->GetRMS();
+}
+
+// **************************
+// Get Gaussian characteristics
+void MCMCProcessor::GetGaussian(TH1D *& hpost , int i) {
+// **************************
+
+  double mean = hpost->GetMean();
+  double err = hpost->GetRMS();
+  double peakval = hpost->GetBinCenter(hpost->GetMaximumBin());
+
+  // Set the range for the Gaussian fit
+  Gauss->SetRange(mean - 1.5*err , mean + 1.5*err);
+  // Set the starting parameters close to RMS and peaks of the histograms
+  Gauss->SetParameters(hpost->GetMaximum()*err*sqrt(2*3.14), peakval, err);
+
+  // Perform the fit
+  hpost->Fit(Gauss->GetName(),"Rq");
+  hpost->SetStats(0);
+
+  (*Means_Gauss)(i) = Gauss->GetParameter(1);
+  (*Errors_Gauss)(i) = Gauss->GetParameter(2);
+}
+
+
+// ***************
+// Get the highest posterior density from a TH1D
+void MCMCProcessor::GetHPD(TH1D * const hpost, int i) {
+// ***************
+  // Get the bin which has the largest posterior density
+  int MaxBin = hpost->GetMaximumBin();
+  // And it's value
+  double peakval = hpost->GetBinCenter(MaxBin);
+
+  // The total integral of the posterior
+  double integral = hpost->Integral();
+
+  // Keep count of how much area we're covering
+  double sum = 0.0;
+
+  // Counter for current bin
+  int CurrBin = MaxBin;
+  while (sum/integral < 0.6827/2.0 && CurrBin < hpost->GetNbinsX()+1) {
+    sum += hpost->GetBinContent(CurrBin);
+    CurrBin++;
+  }
+  double sigma_p = fabs(hpost->GetBinCenter(MaxBin)-hpost->GetBinCenter(CurrBin));
+  // Reset the sum
+  sum = 0.0;
+
+  // Reset the bin counter
+  CurrBin = MaxBin;
+  // Counter for current bin
+  while (sum/integral < 0.6827/2.0 && CurrBin >= 0) {
+    sum += hpost->GetBinContent(CurrBin);
+    CurrBin--;
+  }
+  double sigma_m = fabs(hpost->GetBinCenter(CurrBin)-hpost->GetBinCenter(MaxBin));
+
+  // Now do the double sided HPD
+  sum = 0.0;
+  int LowBin = MaxBin-1;
+  int HighBin = MaxBin+1;
+  double LowCon = 0.0;
+  double HighCon = 0.0;
+
+  while (sum/integral < 0.6827 && (LowBin >= 0 || HighBin < hpost->GetNbinsX()+1)) 
+  {
+    // Get the slice
+    //KS:: If each slice reached histogram end then set value to 0, then other slice will be able to move further
+    if(LowBin >= 0)LowCon = hpost->GetBinContent(LowBin);
+    else LowCon = 0.0;
+        
+    if(HighBin < hpost->GetNbinsX()+1){HighCon = hpost->GetBinContent(HighBin);}
+    else HighCon = 0.0;
+
+    // If we're on the last slice and the lower contour is larger than the upper
+    if ((sum+LowCon+HighCon)/integral > 0.6827 && LowCon > HighCon) {
+      sum += LowCon;
+      break;
+      // If we're on the last slice and the upper contour is larger than the lower
+    } else if ((sum+LowCon+HighCon)/integral > 0.6827 && HighCon >= LowCon) {
+      sum += HighCon;
+      break;
+    } else {
+      sum += LowCon + HighCon;
+    }
+
+    //KS:: Move further only if you haven't reached histogram end
+    if(LowBin >= 0) LowBin--;
+    if(HighBin < hpost->GetNbinsX()+1) HighBin++;
+  }
+
+  double sigma_hpd = 0.0;
+  if (LowCon > HighCon) {
+    sigma_hpd = fabs(hpost->GetBinCenter(LowBin)-hpost->GetBinCenter(MaxBin));
+  } else {
+    sigma_hpd = fabs(hpost->GetBinCenter(HighBin)-hpost->GetBinCenter(MaxBin));
+  }
+
+  (*Means_HPD)(i) = peakval;
+  (*Errors_HPD)(i) = sigma_hpd;
+  (*Errors_HPD_Positive)(i) = sigma_p;
+  (*Errors_HPD_Negative)(i) = sigma_m;
+}
+
+
+// ***************
+// Pass central value
+void MCMCProcessor::GetNthParameter(int param, double &Nominal, double &NominalError, TString &Title){
+// **************************
+    for(int i = 0; i < kNParameterEnum; i++)
+    {
+        if (ParamType[param] == ParameterEnum(i)) 
+        {
+            int ParamNo = __UNDEF__;
+            ParamNo = param - ParamTypeStartPos[ParameterEnum(i)];
+            
+            Nominal = ParamCentral[ParameterEnum(i)][ParamNo];
+            NominalError = ParamErrors[ParameterEnum(i)][ParamNo];
+            Title = ParamNames[ParameterEnum(i)][ParamNo];
+        }
+    }
+}
+
+
+// **************************************************
+// Helper function to reset  histograms
+void MCMCProcessor::ResetHistograms() {
+  // **************************************************
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
+    for (int i = 0; i < nDraw; ++i) 
+    {
+        for (int j = 0; j <= i; ++j)
+        {
+            // TH2D to hold the Correlation 
+            hpost2D[i][j]->Reset("");
+            hpost2D[i][j]->Fill(0.0, 0.0, 0.0);
+        }
+    }
+}
