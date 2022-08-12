@@ -197,7 +197,7 @@ class LIBCONFIGXX_API Setting
 
   Setting(config_setting_t *setting);
 
-  void assertType(Type type) const throw(SettingTypeException);
+  void assertType(Type type) const; //throw(SettingTypeException); LW - WASNT WORKING WITH -Werror
   static Setting & wrapSetting(config_setting_t *setting);
 
   Setting(const Setting& other); // not supported
