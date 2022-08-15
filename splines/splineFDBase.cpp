@@ -1015,9 +1015,9 @@ void splineFDBase::FindUniqueModes() {
   }
    
 */
- for (int i = 0; i < 27;i++) {
+ for (int i = 0; i < 1;i++) {
    MaCh3Mode_SplineMode_Map.push_back(i); }
-   nUniqueModes = 27;
+   nUniqueModes = 1;
    UniqueModeFarSplineNames.push_back("ccqe"); 
    std::cout << "Temp implementation" << std::endl;
 
