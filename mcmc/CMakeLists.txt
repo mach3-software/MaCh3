@@ -11,7 +11,7 @@ set(mcmc_header_files
 	MCMCProcessor.h)
 
 add_library(MCMC SHARED ${mcmc_implementation_files})
-target_include_directories(MCMC PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(MCMC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(MCMC)
 
 install(TARGETS MCMC DESTINATION lib)

@@ -84,7 +84,7 @@ if(NOT ${SINGLE_THREAD_ONLY})
 
   #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
   add_compile_options(-I${CUDA_SAMPLES}/common/inc -L${ROOT_LIBDIR})
-  add_compile_options(-g -fopenmp -std=c++11 -O3 -Wextra -Werror -DMULTITHREAD)
+  add_compile_options(-g -fopenmp -O3 -Wextra -Werror -DMULTITHREAD)
   add_compile_options(-I$ENV{MACH3CORE})
   add_link_options(-fopenmp -DMULTITHREAD)
 
@@ -92,19 +92,18 @@ else()
 
   #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
   add_compile_options(-I${CUDA_SAMPLES}/common/inc -L${ROOT_LIBDIR})
-  add_compile_options(-g -std=c++11 -O3 -Wextra -Werror)
-  add_compile_options(-I$ENV{MACH3CORE})
+  add_compile_options(-I$ENV{MACH3CORE} -g -O3 -Wextra -Werror)
 
 endif()
 
 # Build components
-#add_subdirectory(libconfig)
+add_subdirectory(libconfig)
 #add_subdirectory(Diagnostics)
 add_subdirectory(Prob3++)
 #add_subdirectory(CUDAProb3)
 add_subdirectory(throwParms)
-#add_subdirectory(manager)
+add_subdirectory(manager)
 add_subdirectory(covariance)
 add_subdirectory(splines)
 add_subdirectory(samplePDF)
-#add_subdirectory(mcmc)
+add_subdirectory(mcmc)
