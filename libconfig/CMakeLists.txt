@@ -6,7 +6,7 @@ execute_process(COMMAND make
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 #file(GLOB_RECURSE LIBCONFIG_FILES lib/.libs/lib*.so*)
-file(GLOB_RECURSE LIBCONFIG_FILES lib/.libs/libconfig++.so.9.2.0)
+file(GLOB_RECURSE LIBCONFIG_FILES lib/.libs/libconfig++.so.9.1.3)
 
 cmessage ( STATUS "[LIBCONFIG]: files : ${LIBCONFIG_FILES} ")
 
