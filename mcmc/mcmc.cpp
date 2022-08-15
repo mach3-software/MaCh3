@@ -701,7 +701,7 @@ void mcmc::SaveSettings() {
     std::cout << "************************" << std::endl;
   } else {
     // Save the settings we have in the manager
-    fitMan->SaveSettings(outputFile);
+    //fitMan->SaveSettings(outputFile);
     // Warn if we're running a deprecated constructor (again)
   }
 

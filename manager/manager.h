@@ -41,9 +41,9 @@ class manager {
 
 // Print and checks
   void Print();
-  bool checkSettings();
+  //bool checkSettings();
 
-  void SaveSettings(TFile * const OutputFile);
+  //void SaveSettings(TFile * const OutputFile);
 
 // Lots of yummy Get functions
   const char *GetOutputFilename() { return (const char*)output_file.c_str(); }

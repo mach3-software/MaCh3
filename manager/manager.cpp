@@ -732,10 +732,10 @@ int manager::readConfig(char *config) {
 #endif
 
   // Check that all the settings make sense for us
-  if (!checkSettings()) {
-    std::cerr << "Invalid settings combination" << std::endl;
-    return(EXIT_FAILURE);
-  }
+  //if (!checkSettings()) {
+    //std::cerr << "Invalid settings combination" << std::endl;
+    //return(EXIT_FAILURE);
+  //}
 
   return(EXIT_SUCCESS);
 }
