@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdexcept>
 #include "TMath.h"
+#include <chrono>
 #include "samplePDFFDBase.h"
 
 // Constructors for erec-binned errors
@@ -166,12 +167,16 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 
 void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweight function (this should be different for one vs 2 sets of oscpars)
 {
+  auto start = std::chrono::high_resolution_clock::now();
   for(int i = 0; i < (int)MCSamples.size(); ++i) {
     for(int j = 0; j < MCSamples[i].nEvents; ++j) {
       MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
     }
   }
 
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  std::cout << "calcOscWeight took: " << duration.count() << " ms " << std::endl;
   fillArray();
 }
 
@@ -234,9 +239,9 @@ void samplePDFFDBase::fillArray() {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       
      applyShifts(iSample, iEvent);
-     if(!IsEventSelected(iSample, iEvent)){
-	   continue;
-	 }
+     //if(!IsEventSelected(iSample, iEvent)){
+//	   continue;
+//	 }
 
 #if USEBETA == 1
       MCSamples[iSample].osc_w[iEvent] = ApplyBetaWeights(MCSamples[iSample].osc_w[iEvent],iSample);
@@ -261,7 +266,6 @@ void samplePDFFDBase::fillArray() {
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
-
       //Loop over stored normalisation and function pointers 
       for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent];iParam++) {
 	normweight *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
@@ -283,10 +287,10 @@ void samplePDFFDBase::fillArray() {
       
       //DB Set oscillation weights for NC events to 1.0
       //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupMC
-      if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		MCSamples[iSample].osc_w[iEvent] = 1.0;
-		continue;
-      }
+      //if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+	//	MCSamples[iSample].osc_w[iEvent] = 1.0;
+	//	continue;
+      //}
 
       //DB Total weight
       for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEvent];iParam++) {
@@ -339,11 +343,11 @@ void samplePDFFDBase::fillArray() {
 
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
-		std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
+		//std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 	samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
       }
 	  else{
-		std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
+		std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill <<  " || X var  = " << XVar << std::endl;
 	  }
 
     }

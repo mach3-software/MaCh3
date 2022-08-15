@@ -17,7 +17,6 @@ splineFDBase::splineFDBase(const char *name, int ntype, int nevents, int DetID, 
   SampleDetID = DetID;
 
   FindUniqueModes();
-  nUniqueModes = 1;
   xsec_cov->GetSplineParsNamesFromDetID(25);
   std::cout << "Creating Etrue-Erec splines" << std::endl;
 #if USE_SPLINE_FD == USE_TSpline3_FD
@@ -131,6 +130,7 @@ void splineFDBase::SetupSplines()
 	std::vector<std::vector<std::vector<bool> > > tmp_flat_mode; 
 	//ETA adding in this to store weights for all splines
 	std::vector<std::vector<std::vector<double> > > tmp_w_mode; 
+        std::cout << "Num of modes: " << nUniqueModes << std::endl;
 	for(int imode = 0; imode<nUniqueModes; imode++){ // loop over modes
 #if USE_SPLINE_FD == USE_TSpline3_FD
 	  std::vector<std::vector<TSpline3*> > tmp_mbin;
@@ -1015,12 +1015,11 @@ void splineFDBase::FindUniqueModes() {
   }
    
 */
-MaCh3Mode_SplineMode_Map.push_back(0); 
-MaCh3Mode_SplineMode_Map.push_back(1); 
-MaCh3Mode_SplineMode_Map.push_back(2); 
-MaCh3Mode_SplineMode_Map.push_back(3); 
-UniqueModeFarSplineNames.push_back("ccqe"); 
-std::cout << "Temp implementation" << std::endl;
+ for (int i = 0; i < 27;i++) {
+   MaCh3Mode_SplineMode_Map.push_back(i); }
+   nUniqueModes = 27;
+   UniqueModeFarSplineNames.push_back("ccqe"); 
+   std::cout << "Temp implementation" << std::endl;
 
 }
 
