@@ -56,6 +56,7 @@ class splineFDBase : public splineBase
 
   //DB Function which interregates MaCh3Mode_to_SplineMode to determine which MaCh3Modes have splines and which modes piggy-back of the splines of other modes
   //TODO (ETA) - reimplement this in a generic way for all experiments.
+  //This is to become pure virtual and defined in experiment specific implementation of splines
   void FindUniqueModes();
   //DB Function which removes any modes which piggy-back off other modes out of the vector given by covarianceXsec::GetSplineModeVecFromDetID() so they can be added in the XML but won't throw exception when trying to load up splines
   std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
@@ -115,55 +116,60 @@ class splineFDBase : public splineBase
 
 #endif
 
-  //ETA - store weights for each eval spline
-  //DB Move this out of #ifdef statement
+  //Store weights for each eval spline
   std::vector< std::vector< std::vector< std::vector< double > > > > dev_1D_w;
   std::vector< std::vector< std::vector< std::vector< std::vector< double > > > > > dev_2D_w;
 
   //This basically just keeps a collection of one spline parameter
   //together with the name of the spline and is used to get the
   //splines out of the spline root file
+  //There are two implementations depending on whether you're using
+  //reduced TSpline3s or not.
+#if USE_SPLINE_FD == USE_TSpline3_FD
+  //First a struct to hold Enu-Var1 splines
   struct syst{
-    std::string name;
-#if USE_SPLINE_FD == USE_TSpline3_FD
-    std::vector< std::vector< std::vector< TSpline3* > > >* spline;
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-    std::vector< std::vector< std::vector< TSpline3_red* > > >* spline;
-#endif
+	std::string name;
+	std::vector< std::vector< std::vector< TSpline3* > > > * spline;
   public:
-#if USE_SPLINE_FD == USE_TSpline3_FD
     syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3* > > >* splinein){
       name=namein;
       spline=splinein;
     };
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-    syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3_red* > > >* splinein){
-      name=namein;
-      spline=splinein;
-    };
-#endif
   };
 
+  //First a struct to hold Enu-Var1-Var-2 splines
   struct syst2D{
     std::string name;
-#if USE_SPLINE_FD == USE_TSpline3_FD
     std::vector< std::vector< std::vector< std::vector< TSpline3* > > > >* spline;
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-    std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > >* spline;
-#endif
-  public:
-#if USE_SPLINE_FD == USE_TSpline3_FD
+	public:
     syst2D(std::string namein,    std::vector<std::vector< std::vector< std::vector< TSpline3* > > > >* splinein){
       name=namein;
       spline=splinein;
     };
+  };
+
 #elif USE_SPLINE_FD == USE_TSpline3_red_FD
+  //First a struct to hold Enu-Var1 splines
+  struct syst{
+	std::string name;
+	std::vector< std::vector< std::vector< TSpline3_red* > > > * spline;
+  public:
+    syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3_red* > > >* splinein){
+      name=namein;
+      spline=splinein;
+    };
+  };
+
+  //First a struct to hold Enu-Var1-Var-2 splines
+  struct syst2D{
+    std::string name;
+    std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > >* spline;
+	public:
     syst2D(std::string namein,    std::vector<std::vector< std::vector< std::vector< TSpline3_red* > > > >* splinein){
       name=namein;
       spline=splinein;
     };
-#endif
   };
-
+#endif
 };
 #endif
