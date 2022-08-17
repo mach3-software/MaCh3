@@ -13,7 +13,7 @@ cmessage ( STATUS "[LIBCONFIG]: files : ${LIBCONFIG_FILES} ")
 foreach(a ${LIBCONFIG_FILES})
 	 get_filename_component(barename ${a} NAME)
          file(COPY ${a} DESTINATION ${CMAKE_BINARY_DIR}/lib/)
-	 execute_process(COMMAND ln -sf ${barename} ${CMAKE_BINARY_DIR}/lib/libconfig++.so.9
+	 execute_process(COMMAND ln -sf ${barename} ${CMAKE_BINARY_DIR}/lib/libconfig++.so.9.1.3
 	 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 #	  install(FILES ${a} DESTINATION lib)
