@@ -16,15 +16,12 @@
 #include "samplePDFBase.h"
 #include "Prob3++/BargerPropagator.h"
 #include "interfacePDFEbE.h"
-#include "manager/manager.h"
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
-#include "libconfig/lib/libconfig.h++"
 #include "FDMCStruct.h"
 #include "ShiftFunctors.h"
-
 
 #define USEBETA 0
 

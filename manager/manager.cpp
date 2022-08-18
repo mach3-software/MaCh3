@@ -2,7 +2,7 @@
 // This class reads the configuration file config.cfg
 // More documentation is available in the header.
 //
-// A brief description of each parameter is available 
+// A brief description of each parameter is available
 // in doc/executables_description/run_executable
 // and the README of this folder
 // look also at example_config in the main dir.
@@ -10,11 +10,18 @@
 
 #include "manager.h"
 
+manager::manager(std::string const &filename)
+    : config(YAML::LoadFile(filename)) {}
+
+YAML::Node const & manager::raw(){ return config; }
+
+/* Old Mananger that needs translation
 
 manager::manager(char *config, bool print) {
 
   verbosity = print;
-  if (verbosity) std::cout << std::endl << "Reading configuration from " << config << std::endl;
+  if (verbosity) std::cout << std::endl << "Reading configuration from " <<
+config << std::endl;
 
   int success = readConfig(config);
 
@@ -24,12 +31,12 @@ manager::manager(char *config, bool print) {
   }
 
   if (success == EXIT_FAILURE) {
-    std::cerr << "Something went wrong in the manager, check above error message and your config file" << std::endl;
-    is_good_config = false;
-    exit(EXIT_FAILURE);
+    std::cerr << "Something went wrong in the manager, check above error message
+and your config file" << std::endl; is_good_config = false; exit(EXIT_FAILURE);
   } else {
     is_good_config = true;
-    if (verbosity) std::cout << "Succesfully read config " << config << ", now proceeding" << std::endl;
+    if (verbosity) std::cout << "Succesfully read config " << config << ", now
+proceeding" << std::endl;
   }
 
 }
@@ -44,7 +51,8 @@ int manager::readConfig(char *config) {
 
   // Create the libconfig object
   libconfig::Config cfg;
-  // Could turn on automatic type conversion in the future, but could be a bad idea..
+  // Could turn on automatic type conversion in the future, but could be a bad
+idea..
   // cfg.setAutoConvert(true);
 
   // Read the config file
@@ -61,15 +69,15 @@ int manager::readConfig(char *config) {
 
   // Catch parsing exception
   catch(const libconfig::ParseException &pex) {
-    std::cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine() << " - " << pex.getError() << std::endl;
-    return(EXIT_FAILURE);
+    std::cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine() << "
+- " << pex.getError() << std::endl; return(EXIT_FAILURE);
   }
 
   // Get the diferent entries in the config file
   // Catch any errors at the end of the try (all through libconfig)
   // Note, exception is only thrown on cfg.lookup
-  // Any crucial settings should hence not be wrapped in the if(cfg.exists("PARNAME"))
-  try {
+  // Any crucial settings should hence not be wrapped in the
+if(cfg.exists("PARNAME")) try {
     // Output filename for the sampling
     if (cfg.exists("OUTPUTNAME")) {
       output_file = (const char*)cfg.lookup("OUTPUTNAME");
@@ -82,7 +90,8 @@ int manager::readConfig(char *config) {
       n_steps = cfg.lookup("NSTEPS");
     } else {
       n_steps = 10;
-      if (verbosity) std::cout << "Number of steps not specified, using " << n_steps << std::endl;
+      if (verbosity) std::cout << "Number of steps not specified, using " <<
+n_steps << std::endl;
     }
 
     //Number of burn in steps
@@ -90,7 +99,8 @@ int manager::readConfig(char *config) {
       n_burnin_steps = cfg.lookup("NBURNINSTEPS");
     } else {
       n_burnin_steps = 1000;
-      if (verbosity) std::cout << "Number of burn in steps not specified, using " << n_burnin_steps << std::endl;
+      if (verbosity) std::cout << "Number of burn in steps not specified, using
+" << n_burnin_steps << std::endl;
     }
 
     // Use Barlow Beeston likelihood in ND280?
@@ -99,19 +109,16 @@ int manager::readConfig(char *config) {
       if (likelihood == "Barlow-Beeston") mc_stat_llh = 1;
       else if (likelihood == "IceCube")   mc_stat_llh = 2;
       else if (likelihood == "Poisson")   mc_stat_llh = 0;
-      else { 
+      else {
         std::cerr << "Wrong form of test-statistic specified!" << std::endl;
-        std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
-        std::cerr << "   Poisson" << std::endl;
-        std::cerr << "   Barlow-Beeston" << std::endl;
-        std::cerr << "   Poisson" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        std::cerr << "You gave " << likelihood << " and I only support:" <<
+std::endl; std::cerr << "   Poisson" << std::endl; std::cerr << "
+Barlow-Beeston" << std::endl; std::cerr << "   Poisson" << std::endl; std::cerr
+<< __FILE__ << ":" << __LINE__ << std::endl; throw;
       }
-      if (verbosity) std::cout << "- MC stat test statistic specified, using " << likelihood << std::endl;
-    } else {
-      mc_stat_llh = 0;
-      if (verbosity) std::cout << "- MC stat test statistic not specified, using Poisson" << std::endl;
+      if (verbosity) std::cout << "- MC stat test statistic specified, using "
+<< likelihood << std::endl; } else { mc_stat_llh = 0; if (verbosity) std::cout
+<< "- MC stat test statistic not specified, using Poisson" << std::endl;
     }
 
     // Stepping scale for nuisance parameters
@@ -141,7 +148,7 @@ int manager::readConfig(char *config) {
     } else {
       step_scale_near_det = 0.04;
     }
-    
+
     // Stepping scale for far detector systematics
     if (cfg.exists("STEPSCALEFARDET")) {
       step_scale_far_det = cfg.lookup("STEPSCALEFARDET");
@@ -160,16 +167,18 @@ int manager::readConfig(char *config) {
     if (cfg.exists("POT")) {
       protons_on_target = cfg.lookup("POT");
     } else {
-      protons_on_target = 3.01E20; 
-      if (verbosity) std::cout << "- no POT specified, setting to 3.01E20" << std::endl;
+      protons_on_target = 3.01E20;
+      if (verbosity) std::cout << "- no POT specified, setting to 3.01E20" <<
+std::endl;
     }
 
     // Anti-neutrino POT
     if (cfg.exists("NUBARPOT")) {
       nubar_protons_on_target = cfg.lookup("NUBARPOT");
     } else {
-      nubar_protons_on_target = 3.01E20; 
-      if (verbosity) std::cout << "- no nubar POT specified, setting to 3.01E20" << std::endl;
+      nubar_protons_on_target = 3.01E20;
+      if (verbosity) std::cout << "- no nubar POT specified, setting to 3.01E20"
+<< std::endl;
     }
 
     // Eigen value threshold for PCA
@@ -177,7 +186,8 @@ int manager::readConfig(char *config) {
       pca_threshold = cfg.lookup("PCA_THRESHOLD");
     } else {
       pca_threshold = -1;
-      if (verbosity) std::cout << "- no PCA threshold specified, setting to -1" << std::endl;
+      if (verbosity) std::cout << "- no PCA threshold specified, setting to -1"
+<< std::endl;
     }
 
     // Debug / Summary info
@@ -193,21 +203,21 @@ int manager::readConfig(char *config) {
     } else {
       save_nom = false;
     }
-    
+
     // posterior files (to use for posterior predictive)
     if (cfg.exists("STARTFROMPOS")) {
       start_from_pos = cfg.lookup("STARTFROMPOS");
     } else {
       start_from_pos = false;
     }
-    
+
     // posterior files (to use for posterior predictive)
     if (cfg.exists("POSFILES")) {
       pos_files = (const char*)cfg.lookup("POSFILES");
     } else {
       pos_files = "EMPTY";
     }
-    
+
     // DB X-axis Sample Binning
     if (cfg.exists("XAXISBINS")) {
       const libconfig::Setting &root = cfg.getRoot();
@@ -217,9 +227,8 @@ int manager::readConfig(char *config) {
       }
 
     } else {
-	  std::cout << "[WARNING] - now x-axis bins specified. Using 0 and 1 as default" << std::endl;
-      xaxisbins.push_back(0);
-      xaxisbins.push_back(1);
+          std::cout << "[WARNING] - now x-axis bins specified. Using 0 and 1 as
+default" << std::endl; xaxisbins.push_back(0); xaxisbins.push_back(1);
     }
 
     // DB Y-axis Sample Binning
@@ -231,9 +240,8 @@ int manager::readConfig(char *config) {
       }
 
     } else {
-	  std::cout << "[WARNING] - now y-axis bins specified. Using 0 and 1 as default" << std::endl;
-      yaxisbins.push_back(0);
-      yaxisbins.push_back(1);
+          std::cout << "[WARNING] - now y-axis bins specified. Using 0 and 1 as
+default" << std::endl; yaxisbins.push_back(0); yaxisbins.push_back(1);
     }
 
     // Binning option for splines
@@ -242,7 +250,7 @@ int manager::readConfig(char *config) {
     } else {
       binning_opt = 0.;
     }
-	
+
     // Seed for our random number
     if (cfg.exists("SEED")) {
       random_seed = cfg.lookup("SEED");
@@ -337,7 +345,7 @@ int manager::readConfig(char *config) {
       }
     }
 
-    // Ask if use sin2(2theta23) or sin2(2theta13) 
+    // Ask if use sin2(2theta23) or sin2(2theta13)
     if (cfg.exists("DOUBLEANGLE")) {
       double_angle = (bool)cfg.lookup("DOUBLEANGLE");
     } else {
@@ -368,7 +376,7 @@ int manager::readConfig(char *config) {
       const libconfig::Setting &root = cfg.getRoot();
       const libconfig::Setting &setting = root["OSCPARAM_ASIMOVINPUT"];
       for (int i = 0; i < int(setting.getLength()); i++){
-	osc_parameters_asimovinput.push_back((double)setting[i]);
+        osc_parameters_asimovinput.push_back((double)setting[i]);
       }
     }
 
@@ -383,110 +391,110 @@ int manager::readConfig(char *config) {
     // Where is flux covariance
     if (cfg.exists("FLUXCOVFILE")) {
       flux_cov_file = (const char*)cfg.lookup("FLUXCOVFILE");
-      if (verbosity) std::cout << "- found fluxCovMatrix = " << flux_cov_file << std::endl;
-    } else {
-      flux_cov_file = std::string("inputs/flux_covariance_banff_13av2.root");
-      if (verbosity) std::cout << "- didn't find fluxCovMatrix! Setting default = " << flux_cov_file << std::endl;
+      if (verbosity) std::cout << "- found fluxCovMatrix = " << flux_cov_file <<
+std::endl; } else { flux_cov_file =
+std::string("inputs/flux_covariance_banff_13av2.root"); if (verbosity) std::cout
+<< "- didn't find fluxCovMatrix! Setting default = " << flux_cov_file <<
+std::endl;
     }
 
     // The name of the matrix to use
     if(cfg.exists("FLUXCOVNAME")) {
       flux_cov_name = (const char*)cfg.lookup("FLUXCOVNAME") ;
-      if (verbosity) std::cout << "- found fluxCovMatrix name = " << flux_cov_name << std::endl;
-    } else {
-      flux_cov_name = "total_flux_cov";
-      if (verbosity) std::cout << "- didn't find fluxCovMatrix! Setting default = " << flux_cov_name << std::endl;
+      if (verbosity) std::cout << "- found fluxCovMatrix name = " <<
+flux_cov_name << std::endl; } else { flux_cov_name = "total_flux_cov"; if
+(verbosity) std::cout << "- didn't find fluxCovMatrix! Setting default = " <<
+flux_cov_name << std::endl;
     }
 
     // Where is xsec covariance
     if(cfg.exists("XSECCOVFILE")) {
       xsec_cov_file = (const char*)cfg.lookup("XSECCOVFILE");
-      if (verbosity) std::cout << "- found xsecCovMatrix = " << xsec_cov_file << std::endl;
-    } else {
-	  //TODO (ETA) - support not specifiying xsec cov if xsec systs are turned off in xsec_syst_opt
-	  std::cerr << "[ERROR] - no xsec covariance matrix specified which is required!" << std::endl;
-	  throw;
+      if (verbosity) std::cout << "- found xsecCovMatrix = " << xsec_cov_file <<
+std::endl; } else {
+          //TODO (ETA) - support not specifiying xsec cov if xsec systs are
+turned off in xsec_syst_opt std::cerr << "[ERROR] - no xsec covariance matrix
+specified which is required!" << std::endl; throw;
     }
 
     // The name of the matrix to use
     if(cfg.exists("XSECCOVNAME")) {
       xsec_cov_name = (const char*)cfg.lookup("XSECCOVNAME") ;
-      if (verbosity) std::cout << "- found xsec covariance name = " << xsec_cov_name << std::endl;
-    } else {
-      xsec_cov_name = "xsec_cov";
-      if (verbosity) std::cout << "- didn't find xsec covariance matrix name! Setting default = " << xsec_cov_name << std::endl;
+      if (verbosity) std::cout << "- found xsec covariance name = " <<
+xsec_cov_name << std::endl; } else { xsec_cov_name = "xsec_cov"; if (verbosity)
+std::cout << "- didn't find xsec covariance matrix name! Setting default = " <<
+xsec_cov_name << std::endl;
     }
 
     // Look for specified ND280 covariance
     if (cfg.exists("NEARDETCOVFILE")) {
       near_det_cov_file = (const char*)cfg.lookup("NEARDETCOVFILE");
-      if (verbosity) std::cout << "- found Near detector covariance matrix file = " << near_det_cov_file << std::endl;
-    } else {
-	  //TODO (ETA) - support not specifiying near detector covariance matrix if near det systs are turned off in near_det_syst_opt
-	  std::cerr << "[ERROR] - no near detector covariance matrix specified which is required!" << std::endl;
-	  throw;
+      if (verbosity) std::cout << "- found Near detector covariance matrix file
+= " << near_det_cov_file << std::endl; } else {
+          //TODO (ETA) - support not specifiying near detector covariance matrix
+if near det systs are turned off in near_det_syst_opt std::cerr << "[ERROR] - no
+near detector covariance matrix specified which is required!" << std::endl;
+          throw;
     }
 
     // The name of the matrix to use
     if(cfg.exists("NEARDETCOVNAME")) {
       near_det_cov_name = (const char*)cfg.lookup("NEARDETCOVNAME") ;
-      if (verbosity) std::cout << "- found Near detector covariance matrix name = " << near_det_cov_name << std::endl;
-    } else {
-      near_det_cov_name = "near_det_cov";
-      if (verbosity) std::cout << "- didn't find Near detector covariance matrix name! Setting default = " << near_det_cov_name << std::endl;
+      if (verbosity) std::cout << "- found Near detector covariance matrix name
+= " << near_det_cov_name << std::endl; } else { near_det_cov_name =
+"near_det_cov"; if (verbosity) std::cout << "- didn't find Near detector
+covariance matrix name! Setting default = " << near_det_cov_name << std::endl;
     }
 
     // Where is Far detector covariance
     if(cfg.exists("FARDETCOVFILE")) {
       far_det_cov_file = (const char*)cfg.lookup("FARDETCOVFILE") ;
     } else {
-	  //TODO (ETA) - support not specifiying far detector covariance matrix if far det systs are turned off in far_det_syst_opt
-	  std::cerr << "[ERROR] - no far detector covariance matrix specified which is required!" << std::endl;
-	  throw;
+          //TODO (ETA) - support not specifiying far detector covariance matrix
+if far det systs are turned off in far_det_syst_opt std::cerr << "[ERROR] - no
+far detector covariance matrix specified which is required!" << std::endl;
+          throw;
 
     }
 
     // The name of the matrix to use
     if(cfg.exists("FARDETCOVNAME")) {
       far_det_cov_name = (const char*)cfg.lookup("FARDETCOVNAME") ;
-      if (verbosity) std::cout << "- found Far detector covariance matrix name = " << far_det_cov_name << std::endl;
-    } else {
-      far_det_cov_name = "far_det_cov";
-      if (verbosity) std::cout << "- didn't find Far detector covariance matrix name! Setting default = " << far_det_cov_name << std::endl;
+      if (verbosity) std::cout << "- found Far detector covariance matrix name =
+" << far_det_cov_name << std::endl; } else { far_det_cov_name = "far_det_cov";
+      if (verbosity) std::cout << "- didn't find Far detector covariance matrix
+name! Setting default = " << far_det_cov_name << std::endl;
     }
 
     // Where is osc covariance
     if(cfg.exists("OSCCOVFILE")) {
       osc_cov_file = (const char*)cfg.lookup("OSCCOVFILE") ;
-      if (verbosity) std::cout << "- found oscCovMatrix = " << osc_cov_file << std::endl;
-    } else {
-      osc_cov_file = "inputs/oscillation_covariance_6par_nondouble.root";
-      if (verbosity) std::cout << "- didn't find oscCovMatrix! Setting default = " << osc_cov_file << std::endl;
+      if (verbosity) std::cout << "- found oscCovMatrix = " << osc_cov_file <<
+std::endl; } else { osc_cov_file =
+"inputs/oscillation_covariance_6par_nondouble.root"; if (verbosity) std::cout <<
+"- didn't find oscCovMatrix! Setting default = " << osc_cov_file << std::endl;
     }
 
     // The name of the matrix to use
     if(cfg.exists("OSCCOVNAME")) {
       osc_cov_name = (const char*)cfg.lookup("OSCCOVNAME") ;
-      if (verbosity) std::cout << "- found oscCovMatrix name = " << osc_cov_name << std::endl;
-    } else {
-      osc_cov_name = "osc_cov";
-      if (verbosity) std::cout << "- didn't find oscCovMatrix! Setting default = " << osc_cov_name << std::endl;
+      if (verbosity) std::cout << "- found oscCovMatrix name = " << osc_cov_name
+<< std::endl; } else { osc_cov_name = "osc_cov"; if (verbosity) std::cout << "-
+didn't find oscCovMatrix! Setting default = " << osc_cov_name << std::endl;
     }
 
     // Where is osc covariance (if we need a different one for antinu)
     if(cfg.exists("OSCCOVFILE_ANTINU")) {
       osc_cov_antinu_file = (const char*)cfg.lookup("OSCCOVFILE_ANTINU") ;
-      if (verbosity) std::cout << "- found oscCovMatrix_antinu = " << osc_cov_antinu_file << std::endl;
-    } else {
-      osc_cov_antinu_file = "osc_cov";
+      if (verbosity) std::cout << "- found oscCovMatrix_antinu = " <<
+osc_cov_antinu_file << std::endl; } else { osc_cov_antinu_file = "osc_cov";
     }
 
     // The name of the matrix to use
     if(cfg.exists("OSCCOVNAME_ANTINU")) {
       osc_cov_antinu_name = (const char*)cfg.lookup("OSCCOVNAME_ANTINU") ;
-      if (verbosity) std::cout << "- found oscCovMatrix_antinu name = " << osc_cov_antinu_name << std::endl;
-    } else {
-      osc_cov_antinu_name = "";
+      if (verbosity) std::cout << "- found oscCovMatrix_antinu name = " <<
+osc_cov_antinu_name << std::endl; } else { osc_cov_antinu_name = "";
     }
 
     // Are we using reactor constraints on 13 oscillation params
@@ -517,35 +525,31 @@ int manager::readConfig(char *config) {
     // Is this statistics only fit?
     if (cfg.exists("STATONLY")) {
       is_stat_only = cfg.lookup("STATONLY");
-      if (verbosity) std::cout << "- found STAT only, setting " << is_stat_only << std::endl;
-    } else {
-      is_stat_only = 0;
-      if (verbosity) std::cout << "- didn't find STATONLY, setting default " << is_stat_only << std::endl;
+      if (verbosity) std::cout << "- found STAT only, setting " << is_stat_only
+<< std::endl; } else { is_stat_only = 0; if (verbosity) std::cout << "- didn't
+find STATONLY, setting default " << is_stat_only << std::endl;
     }
 
     // Do oscillation?
     if (cfg.exists("DOOSC")) {
       do_osc = cfg.lookup("DOOSC");
-      if (verbosity) std::cout << "- found DOOSC, setting " << do_osc << std::endl;
-    } else {
-      do_osc = 0;
-      if (verbosity) std::cout << "- didn't find DOOSC, setting default " << do_osc << std::endl;
+      if (verbosity) std::cout << "- found DOOSC, setting " << do_osc <<
+std::endl; } else { do_osc = 0; if (verbosity) std::cout << "- didn't find
+DOOSC, setting default " << do_osc << std::endl;
     }
 
     // Is this statistics only fit?
     if (cfg.exists("USEFARSYST")) {
       use_far_syst = cfg.lookup("USEFARSYST");
-      if (verbosity) std::cout << "- found USEFARSYST, setting " << use_far_syst << std::endl;
-    } else {
-      use_far_syst = true;
-      if (verbosity) std::cout << "- didn't find USEFARSYST, setting default " << use_far_syst << std::endl;
+      if (verbosity) std::cout << "- found USEFARSYST, setting " << use_far_syst
+<< std::endl; } else { use_far_syst = true; if (verbosity) std::cout << "-
+didn't find USEFARSYST, setting default " << use_far_syst << std::endl;
     }
 
-    // What far detector params have flat priors ("array" in libconfig, std::vector<int> in class)
-    if (cfg.exists("FARDETPARAMFLAT")) {
-      const libconfig::Setting &root = cfg.getRoot();
-      const libconfig::Setting &setting = root["FARDETPARAMFLAT"];
-      for (int i = 0; i < int(setting.getLength()); i++)
+    // What far detector params have flat priors ("array" in libconfig,
+std::vector<int> in class) if (cfg.exists("FARDETPARAMFLAT")) { const
+libconfig::Setting &root = cfg.getRoot(); const libconfig::Setting &setting =
+root["FARDETPARAMFLAT"]; for (int i = 0; i < int(setting.getLength()); i++)
         far_det_flat.push_back((int)setting[i]);
     }
 
@@ -593,7 +597,7 @@ int manager::readConfig(char *config) {
       }
     }
 
-    // DB Xsec Param Step Sizes 
+    // DB Xsec Param Step Sizes
     if (cfg.exists("XSECSTEPSIZE")) {
       const libconfig::Setting &root = cfg.getRoot();
       const libconfig::Setting &setting = root["XSECSTEPSIZE"];
@@ -617,37 +621,39 @@ int manager::readConfig(char *config) {
     } else {
       process_mcmc = false;
     }
-    
+
     // Decide whether or not to apply beta to the nuebar appearance probability
     // Default is not to use it
     if(cfg.exists("USEBETA")){
       use_beta = cfg.lookup("USEBETA");
-	} else {
+        } else {
       use_beta = false;
-	}
-    
+        }
+
     // Decide whether beta should flip (true) or be continuous (false)
     // Default is continuous
     if(cfg.exists("FLIPBETA")){
       flip_beta = cfg.lookup("FLIPBETA");
-	} else{
+        } else{
       flip_beta = false;
-	}
-    
-    // Decide whether beta should be applied to nue (true) appearance probability instead of nuebar
+        }
+
+    // Decide whether beta should be applied to nue (true) appearance
+probability instead of nuebar
     // Default is nuebar (false)
     if(cfg.exists("APPLYBETANUE"))
       apply_beta_nue = cfg.lookup("APPLYBETANUE");
     else
       apply_beta_nue = false;
-    
-    // Decide wheter you should apply (1/beta) to nue appearance probability and beta to nuebar appearance probability (true)
+
+    // Decide wheter you should apply (1/beta) to nue appearance probability and
+beta to nuebar appearance probability (true)
     // Default is to just apply beta to nuebar (false)
     if(cfg.exists("APPLYBETADIAG"))
       apply_beta_diag = cfg.lookup("APPLYBETADIAG");
     else
       apply_beta_diag = false;
-        
+
     if (cfg.exists("sample_name")) {
       sample_name = (std::string) cfg.lookup("sample_name").c_str();
     } else {
@@ -665,7 +671,7 @@ int manager::readConfig(char *config) {
     } else {
       sample_det_id = -1;
     }
-    
+
     if (cfg.exists("kinematic_cut_vars")) {
       const libconfig::Setting &root = cfg.getRoot();
       const libconfig::Setting &setting = root["kinematic_cut_vars"];
@@ -693,15 +699,15 @@ int manager::readConfig(char *config) {
     if (cfg.exists("up_bnd")) {
       up_bnd = cfg.lookup("up_bnd");
     } else {
-      up_bnd = -999;	
+      up_bnd = -999;
     }
 
   } // end the try
 
-  // Catch if the config file doesn't contain some crucial parameter which we haven't wrapped in exist
-  catch (const libconfig::SettingNotFoundException &nfex) {
-    std::cerr << "Setting " << nfex.getPath() << " not found in file " << config << std::endl;
-    return(EXIT_FAILURE);
+  // Catch if the config file doesn't contain some crucial parameter which we
+haven't wrapped in exist catch (const libconfig::SettingNotFoundException &nfex)
+{ std::cerr << "Setting " << nfex.getPath() << " not found in file " << config
+<< std::endl; return(EXIT_FAILURE);
   }
 
   // Catch invalid names in config
@@ -710,8 +716,8 @@ int manager::readConfig(char *config) {
     return(EXIT_FAILURE);
   }
 
-  // If invalid type conversion (e.g. char* to double) - Catches if we give FLUXCOVFILE=-1 or suttin
-  catch (const libconfig::SettingTypeException &tyex) {
+  // If invalid type conversion (e.g. char* to double) - Catches if we give
+FLUXCOVFILE=-1 or suttin catch (const libconfig::SettingTypeException &tyex) {
     std::cerr << "Invalid type conversion in " << tyex.getPath() << std::endl;
     return(EXIT_FAILURE);
   }
@@ -771,3 +777,5 @@ void manager::Print() {
   std::cout << "    Antinu POT:    " << GetNubarPOT() << std::endl;
   std::cout << "    Save nominal:     " << GetSaveNom() << std::endl;
 }
+
+*/
