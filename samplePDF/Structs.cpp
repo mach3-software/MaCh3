@@ -1,5 +1,8 @@
 #include "Structs.h"
 
+#include "TList.h"
+#include "TObjArray.h"
+
 namespace MaCh3Utils {
 
   // *****************************

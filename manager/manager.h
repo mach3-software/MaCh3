@@ -9,30 +9,40 @@
 #define EXIT_SUCCESS 0
 #endif
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include "libconfig/lib/libconfig.h++"
+// #include <iostream>
+// #include <fstream>
+// #include <string>
+// #include <vector>
+// #include <cstdlib>
 
-#include "TFile.h"
-#include "TTree.h"
-#include "TBranch.h"
+// #include "TFile.h"
+// #include "TTree.h"
+// #include "TBranch.h"
 
-// Only needed to Get number of threads
-// Could alternatively set-up by setting a static global?
-#ifdef MULTITHREAD
-#include <omp.h>
-#endif
+// // Only needed to Get number of threads
+// // Could alternatively set-up by setting a static global?
+// #ifdef MULTITHREAD
+// #include <omp.h>
+// #endif
 
 //******************************************************
 // This class reads the configuration file config.cfg
 // More documentation is available in the README
 //******************************************************
 
+
+#include "yaml-cpp/yaml.h"
+
 class manager {
 
+public:
+  manager(std::string const &);
+  YAML::Node const &raw();
+
+private:
+  YAML::Node config;
+
+/*
  public:
   manager(char *config, bool print = true);
   virtual ~manager();
@@ -380,6 +390,8 @@ class manager {
   std::vector<int> nu_type;
   std::vector<int> oscnu_type;
   std::vector<bool> signal;
+
+  */
 };
 
 #endif

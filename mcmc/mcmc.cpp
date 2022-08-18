@@ -58,9 +58,9 @@ mcmc::mcmc(const char *outfile, double t, bool verbose) : fitMan(NULL) {
 mcmc::mcmc(manager * const man) : fitMan(man) {
 // *************************
 
-  random = new TRandom3(fitMan->GetSeed());
+  random = new TRandom3(fitMan->raw()["General.Seed"].as<int>());
 
-  init(fitMan->GetOutputFilename(), fitMan->GetDebug());
+  init(fitMan->raw()["General.Output.Filename"].as<std::string>(), fitMan->raw()["General.Debug"].as<bool>());
 
   anneal = false;
 
@@ -387,7 +387,7 @@ void mcmc::ProcessMCMC() {
   }
 
   // Process the MCMC
-  if (fitMan->GetProcessMCMC()) {
+  if (fitMan->raw()["General.ProcessMCMC"].as<bool>()) {
 
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()), false);
@@ -416,7 +416,7 @@ void mcmc::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       std::cout << "Opening output again to update with means..." << std::endl;
-      outputFile = new TFile(fitMan->GetOutputFilename(), "UPDATE");
+      outputFile = new TFile(fitMan->raw()["General.Output.Filename"].as<std::string>().c_str(), "UPDATE");
     }
 
     Central->Write("PDF_Means");

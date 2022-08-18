@@ -1,5 +1,7 @@
 #include "MCMCProcessor.h"
 
+#include "TObjString.h"
+
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
   Chain(NULL), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
 

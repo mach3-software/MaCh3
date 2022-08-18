@@ -16,6 +16,7 @@ add_library(SamplePDF SHARED ${SamplePDF_implementation_files})
 
 target_include_directories(SamplePDF PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_compile_features(SamplePDF PUBLIC)
+target_link_libraries(SamplePDF yaml-cpp)
 
 if(NOT ${CPU_ONLY})
   add_library(probGpu probGpu.cu)
