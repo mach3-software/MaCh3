@@ -10,10 +10,14 @@ set(Covariance_header_files
 	covarianceXsec.cpp)
 
 add_library(Covariance SHARED ${Covariance_implementation_files})
-target_include_directories(Covariance PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(Covariance)
-add_dependencies(Covariance throwParms)
+target_include_directories(Covariance PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(Covariance ThrowParms ROOT::ROOT)
 
+set_target_properties(Covariance PROPERTIES 
+  PUBLIC_HEADER "${Covariance_header_files}"
+  EXPORT_NAME Covariance)
 
-install(TARGETS Covariance DESTINATION lib)
-
+install(TARGETS Covariance
+    EXPORT MaCh3-target
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include/covariance)

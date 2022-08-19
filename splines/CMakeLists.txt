@@ -19,23 +19,28 @@ set(Splines_implementation_files_CPU
 if(NOT ${CPU_ONLY})
 
   add_library(Splines SHARED ${Splines_implementation_files})
-  target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-  target_compile_features(Splines PUBLIC)
+  target_include_directories(Splines PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
   add_library(gpuSpline gpuSplineUtils.cu)
   set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
   set_property(TARGET gpuSpline Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-  add_dependencies(Splines throwParms gpuSpline)
+  target_link_libraries(Splines ThrowParms gpuSpline)
 
 else()
 
   add_library(Splines SHARED ${Splines_implementation_files_CPU})
   target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-  target_compile_features(Splines PUBLIC)
-  add_dependencies(Splines throwParms)
+  target_link_libraries(Splines ThrowParms)
 
 endif()
 
-install(TARGETS Splines DESTINATION lib)
+set_target_properties(Splines PROPERTIES 
+  PUBLIC_HEADER "${Splines_header_files}"
+  EXPORT_NAME Splines)
+
+install(TARGETS Splines
+    EXPORT MaCh3-target
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include/splines)
 
 #############################
 # For testing purposes...

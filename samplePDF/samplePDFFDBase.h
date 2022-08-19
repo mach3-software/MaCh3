@@ -14,7 +14,7 @@
 #include <list>
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
-#include "Prob3++/BargerPropagator.h"
+#include "BargerPropagator.h"
 #include "interfacePDFEbE.h"
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
