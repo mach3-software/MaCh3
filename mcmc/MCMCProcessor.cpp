@@ -17,10 +17,18 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   plotBinValue = false;
   CacheMCMCM = false;
   FancyPlotNames = true;
-  
+  doDiagMCMC = false;
+  OutputSuffix = "_Process";
+
   nDraw = 0;
   nFlux = 0;
   nEntries = 0;
+  nBatches = 0;
+  nSysts = 0;
+  nSamples = 0;
+  
+  nBins = 70;
+  DrawRange = 1.5;
   
   //KS:Those keep basic information for ParameterEnum
   ParamNames.resize(kNParameterEnum);
@@ -48,13 +56,9 @@ MCMCProcessor::~MCMCProcessor() {
   std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
-
-  if (OutputFile != NULL) OutputFile->Close();
   if (Posterior != NULL)  delete Posterior;
-      
-  delete OutputFile;
+
   delete Gauss;
-  
   delete Covariance;
   delete Correlation;
   delete Central_Value;
@@ -69,8 +73,12 @@ MCMCProcessor::~MCMCProcessor() {
   
   if(CacheMCMCM)
   {
-    for (int i = 0; i < nDraw; ++i) 
+      for (int i = 0; i < nDraw; ++i) 
     {
+        for (int j = 0; j < nDraw; ++j) 
+        {
+            delete hpost2D[i][j];
+        }
         delete[] ParStep[i];
         delete[] hpost2D[i];
     }
@@ -80,8 +88,9 @@ MCMCProcessor::~MCMCProcessor() {
     delete[] Max_Chain;
     delete[] hpost;
     delete[] hpost2D;
-
   }
+  OutputFile->Close();
+  delete OutputFile;
   delete Chain;
 }
 
@@ -154,9 +163,9 @@ void MCMCProcessor::MakeOutputFile() {
   Posterior->SetTopMargin(0.05);
   Posterior->SetRightMargin(0.03);
   Posterior->SetLeftMargin(0.10);
-
+  
   // Output file to write to
-  OutputName = MCMCFile + "_Process.root";
+  OutputName = MCMCFile + OutputSuffix +".root";
 
   // Output file
   OutputFile = new TFile(OutputName.c_str(), "recreate");
@@ -179,8 +188,6 @@ void MCMCProcessor::MakePostfit() {
   std::cout << "MCMCProcessor is making post-fit plots..." << std::endl;
 
   PostDir = OutputFile->mkdir("Post");
-  nBins = 70;
-  DrawRange = 1.5;
 
   
   // We fit with this Gaussian
@@ -310,7 +317,7 @@ void MCMCProcessor::MakePostfit() {
     delete Asimov;
     delete hpd;
     delete leg;
-  } // end the for loop over nParams
+  } // end the for loop over nDraw
 
   OutputFile->cd();
   TTree *SettingsBranch = new TTree("Settings", "Settings");
@@ -748,7 +755,7 @@ void MCMCProcessor::CacheSteps() {
     hpost2D = new TH2D**[nDraw]();
 
     #ifdef MULTITHREAD
-    #pragma omp parallel for private(nDraw, nEntries)
+    #pragma omp parallel for
     #endif
     for (int i = 0; i < nDraw; ++i) 
     {
@@ -788,7 +795,7 @@ void MCMCProcessor::CacheSteps() {
             Chain->SetBranchAddress(BranchNames[i].Data(), &ParStep[i][j]);
         }
         
-        // Fill up the ParamValues array
+        // Fill up the ParStep array
         Chain->GetEntry(j);
     }
     
@@ -1087,6 +1094,15 @@ void MCMCProcessor::ScanInput() {
 	  nParam[kOSCPar]++;
 	}
     }
+    //KS: as a bonus get LogL systeamtic
+    else if (bname.BeginsWith("LogL_sample_")) {
+      SampleName_v.push_back(bname);
+      nSamples++;
+    }
+    else if (bname.BeginsWith("LogL_systematic_")) {
+      SystName_v.push_back(bname);
+      nSysts++;
+    }
   }
   nDraw = BranchNames.size();
 
@@ -1124,7 +1140,7 @@ void MCMCProcessor::SetupOutput() {
   // Check if the output file is ready
   if (OutputFile == NULL) MakeOutputFile();
   
-  CanvasName = MCMCFile + "_Process.pdf[";
+  CanvasName = MCMCFile + OutputSuffix + ".pdf[";
   if(printToPDF) Posterior->Print(CanvasName);
 
   // Once the pdf file is open no longer need to bracket
@@ -1724,3 +1740,470 @@ void MCMCProcessor::ResetHistograms() {
         }
     }
 }
+
+
+// **************************
+// Diagnose the MCMC
+void MCMCProcessor::DiagMCMC() {
+  // **************************
+
+// MCMC stuff to implement:
+// Trace plots            -- DONE
+// LogL vs step plots     -- DONE
+// Acceptance probability -- DONE
+// Autocorrelation        -- DONE
+// _Batched Means_        -- DONE
+
+    
+  // Prepare branches etc for DiagMCMC
+  PrepareDiagMCMC();
+
+  // Draw the simple trace matrices
+  ParamTraces();
+
+  // Get the batched means
+  BatchedMeans();
+
+  // Draw the auto-correlations
+  AutoCorrelation();
+
+  // Draw acceptance Probability
+  AcceptanceProbabilities();
+}
+
+
+// **************************
+// Prepare branches etc. for DiagMCMC
+void MCMCProcessor::PrepareDiagMCMC() {
+  // **************************
+  
+   //bool doDiagMCMC = true;
+    
+    if(ParStep != NULL)
+    {
+        std::cout<<"It look like ParStep was already filled "<<std::endl;
+        std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
+        std::cout<<"it has differnt structure in both for cache hits, sorry "<<std::endl;
+        throw;
+    }
+  // Initialise ParStep
+  ParStep = new double*[nEntries]();
+  SampleValues = new double*[nEntries]();
+  SystValues = new double*[nEntries]();
+  AccProbValues = new double[nEntries]();
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < nEntries; ++i) {
+    ParStep[i] = new double[nDraw]();
+    SampleValues[i] = new double[nSamples]();
+    SystValues[i] = new double[nSysts]();
+    for (int j = 0; j < nDraw; ++j) {
+      ParStep[i][j] = -999.99;
+    }
+    for (int j = 0; j < nSamples; ++j) {
+      SampleValues[i][j] = -999.99;
+    }
+    for (int j = 0; j < nSysts; ++j) {
+      SystValues[i][j] = -999.99;
+    }
+    AccProbValues[i] = -999.99;
+  }
+
+  // Initialise the sums
+  ParamSums = new double[nDraw]();
+  for (int i = 0; i < nDraw; ++i) {
+    ParamSums[i] = 0.0;
+  }
+  
+  std::cout << "Reading input tree..." << std::endl;
+  TStopwatch clock;
+  clock.Start();
+
+  // Set all the branches to off
+  Chain->SetBranchStatus("*", false);
+
+// Turn on the branches which we want for parameters
+  for (int i = 0; i < nDraw; ++i) {
+    Chain->SetBranchStatus(BranchNames[i].Data(), true);
+  }
+  
+  // Turn on the branches which we want for LogL sample
+  for (int i = 0; i < nSamples; ++i) {
+    Chain->SetBranchStatus(SampleName_v[i].Data(), true);
+  }
+
+  // Turn on the branches which we want for LogL systs
+  for (int i = 0; i < nSysts; ++i) {
+    Chain->SetBranchStatus(SystName_v[i].Data(), true);
+  }
+
+  // Turn on the branches which we want for acc prob
+  Chain->SetBranchStatus("accProb", true);
+  
+  // 10 entries output
+  int countwidth = nEntries/10;
+
+  // Can also do the batched means here to minimize excessive loops
+  // The length of each batch
+  int BatchLength = nEntries/nBatches+1;
+  BatchedAverages = new double*[nBatches]();
+  AccProbBatchedAverages = new double[nBatches]();
+  for (int i = 0; i < nBatches; ++i) {
+    BatchedAverages[i] = new double[nDraw];
+    AccProbBatchedAverages[i] = 0;
+    for (int j = 0; j < nDraw; ++j) {
+      BatchedAverages[i][j] = 0.0;
+    }
+  }
+
+  // Loop over the entries
+  for (int i = 0; i < nEntries; ++i) {
+
+    if (i % countwidth == 0) {
+      std::cout << i << "/" << nEntries << " (" << double(i)/double(nEntries)*100. << "%)" << std::endl;
+    }
+
+    // Set the branch addresses for params
+    for (int j = 0; j < nDraw; ++j) {
+      Chain->SetBranchAddress(BranchNames[j].Data(), &ParStep[i][j]);
+    }
+
+    // Set the branch addresses for samples
+    for (int j = 0; j < nSamples; ++j) {
+      Chain->SetBranchAddress(SampleName_v[j].Data(), &SampleValues[i][j]);
+    }
+
+    // Set the branch addresses for systematics
+    for (int j = 0; j < nSysts; ++j) {
+      Chain->SetBranchAddress(SystName_v[j].Data(), &SystValues[i][j]);
+    }
+      
+    // Set the branch addresses for Acceptance Probability
+    Chain->SetBranchAddress("accProb", &AccProbValues[i]);
+
+    
+    // Fill up the arrays
+    Chain->GetEntry(i);
+
+    // Find which batch the event belongs in
+    int BatchNumber = -1;
+    // I'm so lazy! But it's OK, the major overhead here is GetEntry: saved by ROOT!
+    for (int j = 0; j < nBatches; ++j) {
+      if (i < (j+1)*BatchLength) {
+        BatchNumber = j;
+        break;
+      }
+    }
+
+    // Fill up the sum for each j param
+    for (int j = 0; j < nDraw; ++j) {
+      ParamSums[j] += ParStep[i][j];
+      BatchedAverages[BatchNumber][j] += ParStep[i][j];
+    }
+    
+      //KS: Could easyli add this to above loop but I accProb is different beast so better keep it like this
+      AccProbBatchedAverages[BatchNumber] += AccProbValues[i];
+  }
+
+  clock.Stop();
+
+  std::cout << "Took " << clock.RealTime() << "s to finish cachin statysitc for Diag MCMC with " << nEntries << " events" << std::endl;
+
+  // Make the sums into average
+  for (int i = 0; i < nDraw; ++i) {
+    ParamSums[i] /= nEntries;
+    for (int j = 0; j < nBatches; ++j) {
+      // Divide by the total number of events in the batch
+      BatchedAverages[j][i] /= BatchLength;
+      if(i==0) AccProbBatchedAverages[j] /= BatchLength; //KS: we have only one accProb, keep it like this for now
+    }
+  }
+
+  // And make our sweet output file
+  if (OutputFile == NULL) MakeOutputFile();
+  
+}
+
+
+// *****************
+// Draw trace plots of the parameters
+// i.e. parameter vs step
+void MCMCProcessor::ParamTraces() {
+  // *****************
+
+  std::cout << "Making trace plots..." << std::endl;
+
+  // Make the TH1Ds
+  TraceParamPlots = new TH1D*[nDraw];
+  TraceSamplePlots = new TH1D*[nSamples];
+  TraceSystsPlots = new TH1D*[nSysts];
+
+  // Set the titles and limits for TH2Ds
+  for (int j = 0; j < nDraw; ++j) {
+
+    TString Title = BranchNames[j];
+    double Nominal = 1.0;
+    double NominalError = 1.0;
+    
+    GetNthParameter(j, Nominal, NominalError, Title);
+    std::string HistName = Form("%s_%s_Trace", Title.Data(), BranchNames[j].Data());
+
+    TraceParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceParamPlots[j]->GetXaxis()->SetTitle("Step");
+    TraceParamPlots[j]->GetYaxis()->SetTitle("Parameter Variation");
+  }
+
+  for (int j = 0; j < nSamples; ++j) {
+    std::string HistName = SampleName_v[j].Data();
+    TraceSamplePlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSamplePlots[j]->GetXaxis()->SetTitle("Step");
+    TraceSamplePlots[j]->GetYaxis()->SetTitle("Sample -logL");
+  }
+
+  for (int j = 0; j < nSysts; ++j) {
+    std::string HistName = SystName_v[j].Data();
+    TraceSystsPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSystsPlots[j]->GetXaxis()->SetTitle("Step");
+    TraceSystsPlots[j]->GetYaxis()->SetTitle("Systematic -logL");
+  }
+
+  // Have now made the empty TH2Ds, now for writing content to them!
+
+  // Loop over the number of parameters to draw their traces
+  // Each histogram
+#ifdef MULTITHREAD
+  std::cout << "Using multi-threading..." << std::endl;
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < nEntries; ++i) {
+    // Set bin content for the ith bin to the parameter values
+    for (int j = 0; j < nDraw; ++j) {
+      TraceParamPlots[j]->SetBinContent(i, ParStep[i][j]);
+    }
+
+    for (int j = 0; j < nSamples; ++j) {
+      TraceSamplePlots[j]->SetBinContent(i, SampleValues[i][j]);
+    }
+
+    for (int j = 0; j < nSysts; ++j) {
+      TraceSystsPlots[j]->SetBinContent(i, SystValues[i][j]);
+    }
+  }
+
+
+  // Write the output and delete the TH2Ds
+  TDirectory *TraceDir = OutputFile->mkdir("Trace");
+  TraceDir->cd();
+  for (int j = 0; j < nDraw; ++j) {
+    // Fit a linear function to the traces
+    TF1 *Fitter = new TF1("Fitter","[0]", int(nEntries/2), nEntries);
+    Fitter->SetLineColor(kRed);
+    TraceParamPlots[j]->Fit("Fitter","Rq");
+    TraceParamPlots[j]->Write();
+    delete Fitter;
+    delete TraceParamPlots[j];
+  }
+  delete[] TraceParamPlots;
+
+  TDirectory *LLDir = OutputFile->mkdir("LogL");
+  LLDir->cd();
+  for (int j = 0; j < nSamples; ++j) {
+    TraceSamplePlots[j]->Write();
+    delete TraceSamplePlots[j];
+    delete SampleValues[j];
+  }
+  delete[] TraceSamplePlots;
+  delete[] SampleValues;
+
+  for (int j = 0; j < nSysts; ++j) {
+    TraceSystsPlots[j]->Write();
+    delete TraceSystsPlots[j];
+    delete SystValues[j];
+  }
+  delete[] TraceSystsPlots;
+  delete[] SystValues;
+}
+
+
+// *********************************
+void MCMCProcessor::AutoCorrelation() {
+  // *********************************
+
+  std::cout << "Making auto-correlations..." << std::endl;
+  const int nLags = 25000;
+
+  // The sum of (Y-Ymean)^2 over all steps for each parameter
+  double **DenomSum = new double*[nDraw]();
+  double **NumeratorSum = new double*[nDraw]();
+  for (int i = 0; i < nDraw; ++i) {
+    DenomSum[i] = new double[nLags];
+    NumeratorSum[i] = new double[nLags];
+  }
+  LagKPlots = new TH1D*[nDraw];
+
+  // Loop over the parameters of interacts
+  for (int j = 0; j < nDraw; ++j) {
+
+    // Loop over each lag
+    for (int k = 0; k < nLags; ++k) {
+      NumeratorSum[j][k] = 0.0;
+      DenomSum[j][k] = 0.0;
+    }
+
+    // Make TH1Ds for each parameter which hold the lag
+    TString Title = BranchNames[j];
+    double Nominal = 1.0;
+    double NominalError = 1.0;
+    
+    GetNthParameter(j, Nominal, NominalError, Title);
+    std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
+    LagKPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
+    LagKPlots[j]->GetXaxis()->SetTitle("Lag");
+    LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
+  }
+
+  // Loop over the lags
+  // Each lag is indepdent so might as well multi-thread them!
+#ifdef MULTITHREAD
+  std::cout << "Using multi-threading..." << std::endl;
+#pragma omp parallel for
+#endif
+  for (int k = 0; k < nLags; ++k) {
+
+    // Loop over the number of entries
+    for (int i = 0; i < nEntries; ++i) {
+
+      // Loop over the number of parameters
+      for (int j = 0; j < nDraw; ++j) {
+
+        double Diff = ParStep[i][j]-ParamSums[j];
+
+        // Only sum the numerator up to i = N-k
+        if (i < nEntries-k) {
+          double LagTerm = ParStep[i+k][j]-ParamSums[j];
+          double Product = Diff*LagTerm;
+          NumeratorSum[j][k] += Product;
+        }
+
+        // Square the difference to form the denominator
+        double Denom = Diff*Diff;
+        DenomSum[j][k] += Denom;
+      }
+    }
+  }
+
+  OutputFile->cd();
+  TDirectory *AutoCorrDir = OutputFile->mkdir("Auto_corr");
+  // Now fill the LagK auto-correlation plots
+  for (int j = 0; j < nDraw; ++j) {
+    for (int k = 0; k < nLags; ++k) {
+      LagKPlots[j]->SetBinContent(k, NumeratorSum[j][k]/DenomSum[j][k]);
+    }
+    AutoCorrDir->cd();
+    LagKPlots[j]->Write();
+    delete LagKPlots[j];
+  }
+  delete[] LagKPlots;
+  for (int i = 0; i < nEntries; ++i) {
+    delete ParStep[i];
+  }
+  delete[] ParStep;
+  
+  delete ParamSums;
+
+}
+
+
+// **************************
+// Batched means, literally read from an array and chuck into TH1D
+void MCMCProcessor::BatchedMeans() {
+  // **************************
+
+  BatchedParamPlots = new TH1D*[nDraw];
+  for (int j = 0; j < nDraw; ++j) {
+    TString Title = BranchNames[j];
+    double Nominal = 1.0;
+    double NominalError = 1.0;
+    
+    GetNthParameter(j, Nominal, NominalError, Title);
+    
+    std::string HistName = Form("%s_%s_batch", Title.Data(), BranchNames[j].Data());
+    BatchedParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nBatches, 0, nBatches);
+  }
+
+  for (int i = 0; i < nBatches; ++i) {
+    for (int j = 0; j < nDraw; ++j) {
+      BatchedParamPlots[j]->SetBinContent(i+1, BatchedAverages[i][j]);
+      int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
+      int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+      std::stringstream ss;
+      ss << BatchRangeLow << " - " << BatchRangeHigh;
+      BatchedParamPlots[j]->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
+    }
+  }
+
+  TDirectory *BatchDir = OutputFile->mkdir("Batched_means");
+  BatchDir->cd();
+  for (int j = 0; j < nDraw; ++j) {
+    TF1 *Fitter = new TF1("Fitter","[0]", 0, nBatches);
+    Fitter->SetLineColor(kRed);
+    BatchedParamPlots[j]->Fit("Fitter","Rq");
+    BatchedParamPlots[j]->Write();
+    delete Fitter;
+    delete BatchedParamPlots[j];
+  }
+  delete[] BatchedParamPlots;
+
+  for (int i = 0; i < nBatches; ++i) {
+    delete BatchedAverages[i];
+  }
+
+  delete[] BatchedAverages;
+
+}
+
+// **************************
+// Acceptance Probability
+void MCMCProcessor::AcceptanceProbabilities() {
+  // **************************
+    std::cout << "Making AccProb plots..." << std::endl;
+
+    // Set the titles and limits for TH2Ds
+
+    AcceptanceProbPlot = new TH1D("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
+    AcceptanceProbPlot->GetXaxis()->SetTitle("Step");
+    AcceptanceProbPlot->GetYaxis()->SetTitle("Acceptance Probability");
+
+    BatchedAcceptanceProblot = new TH1D("AcceptanceProbability_Batch", "AcceptanceProbability_Batch", nBatches, 0, nBatches);
+    BatchedAcceptanceProblot->GetYaxis()->SetTitle("Acceptance Probability");
+    
+  for (int i = 0; i < nBatches; ++i) {
+      BatchedAcceptanceProblot->SetBinContent(i+1, AccProbBatchedAverages[i]);
+      int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
+      int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+      std::stringstream ss;
+      ss << BatchRangeLow << " - " << BatchRangeHigh;
+      BatchedAcceptanceProblot->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
+  }
+  
+  
+#ifdef MULTITHREAD
+  std::cout << "Using multi-threading..." << std::endl;
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < nEntries; ++i) {
+    // Set bin content for the ith bin to the parameter values
+      AcceptanceProbPlot->SetBinContent(i, AccProbValues[i]);
+  }
+    
+  TDirectory *probDir = OutputFile->mkdir("AccProb");
+  probDir->cd();
+  
+  AcceptanceProbPlot->Write();
+  BatchedAcceptanceProblot->Write();
+  
+  delete AcceptanceProbPlot;  
+  delete BatchedAcceptanceProblot; 
+}
+

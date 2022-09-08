@@ -66,6 +66,8 @@ class MCMCProcessor {
     void MakeCovariance();
     void MakeCovariance_MP();
     
+    void DiagMCMC();
+        
     void GetArithmetic(TH1D * const hpost, int i);
     void GetGaussian(TH1D *& hpost, int i);
     void GetHPD(TH1D * const hpost, int i);
@@ -116,24 +118,36 @@ class MCMCProcessor {
     void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
     void SetPlotDet(bool PlotOrNot){PlotDet = PlotOrNot; };
     void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
+      
+    void SetnBatches(int Batches){nBatches = Batches; };
+    void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
     
   private:
     inline TH1D* MakePrefit();
     inline void MakeOutputFile();
 
+    // Read Matrices
     inline void ReadInputCov();
     inline void FindInputFiles();
     inline void ReadXSecFile();
     inline void ReadND280File();
     inline void ReadFDFile();
     inline void ReadOSCFile();
-    
+   
+    // Scan Input etc.
     inline void ScanInput();
     inline void ScanParameterOrder();
     inline void SetupOutput();
 
+    // MCMC Diagnsotic
+    inline void PrepareDiagMCMC();
+    inline void ParamTraces();
+    inline void AutoCorrelation();
+    inline void BatchedMeans();
+    inline void AcceptanceProbabilities();
+    
     std::string MCMCFile;
-
+    std::string OutputSuffix;
     // Covariance matrix name position
     std::vector<std::string> CovPos;
     // ND runs
@@ -145,6 +159,9 @@ class MCMCProcessor {
     std::string StepCut;
     int BurnInCut;
     int nBranches;
+    int nEntries;
+    int nSamples;
+    int nSysts;
 
     std::vector<TString> BranchNames;
     // Is the ith parameter varied
@@ -161,6 +178,10 @@ class MCMCProcessor {
     
     //In XsecMatrix we have both xsec and flux parameters, this is just for some ploting options
     std::vector<bool>   IsXsec; 
+    
+    // Vector of each systematic
+    std::vector<TString> SampleName_v;
+    std::vector<TString> SystName_v;
     
     std::string OutputName;
     TString CanvasName;
@@ -185,7 +206,6 @@ class MCMCProcessor {
     int nDraw;
     std::vector<int> nParam;
     int nFlux; // This keep number of Flux params in xsec matrix
-    int nEntries;
 
     std::vector< int > NDSamplesBins;
     std::vector< std::string > NDSamplesNames;
@@ -209,6 +229,7 @@ class MCMCProcessor {
     TMatrixDSym *Correlation;
 
     bool CacheMCMCM;
+    bool doDiagMCMC;
     // Holds Posterior Distributions
     TH1D **hpost;
     TH2D ***hpost2D;
@@ -216,13 +237,41 @@ class MCMCProcessor {
     double** ParStep = NULL;
     int* StepNumber = NULL;
     
-    
     double* Min_Chain;
     double* Max_Chain;
     // Number of bins
     int nBins;
     // Drawrange for SetMaximum
     double DrawRange;
+    
+    int nBatches;
+    
+    // Holds all the parameter variations
+    double **ParamValues;
+    double *ParamSums;
+    double **BatchedAverages;
+
+    // Holds the sample values
+    double **SampleValues;
+    // Holds the systs values
+    double **SystValues;
+
+    // Holds all accProb
+    double *AccProbValues;
+    double *AccProbBatchedAverages;
+    
+    // Trace plots
+    TH1D **TraceParamPlots;
+    TH1D **TraceSamplePlots;
+    TH1D **TraceSystsPlots;
+    TH1D **BatchedParamPlots;
+
+    // LagK autocorrelation plots
+    TH1D **LagKPlots;
+
+    // Acceptance Prob Plots
+    TH1D *AcceptanceProbPlot;
+    TH1D *BatchedAcceptanceProblot;
 };
 
 #endif
