@@ -67,15 +67,15 @@ MCMCProcessor::~MCMCProcessor() {
   delete Means_Gauss;
   delete Errors_Gauss;
   delete Means_HPD;
-  delete Errors_HPD; 
-  delete Errors_HPD_Positive; 
-  delete Errors_HPD_Negative; 
-  
+  delete Errors_HPD;
+  delete Errors_HPD_Positive;
+  delete Errors_HPD_Negative;
+
   if(CacheMCMCM)
   {
-      for (int i = 0; i < nDraw; ++i) 
+      for (int i = 0; i < nDraw; ++i)
     {
-        for (int j = 0; j < nDraw; ++j) 
+        for (int j = 0; j < nDraw; ++j)
         {
             delete hpost2D[i][j];
         }
@@ -83,14 +83,14 @@ MCMCProcessor::~MCMCProcessor() {
         delete[] hpost2D[i];
     }
 
-    delete[] ParStep; 
+    delete[] ParStep;
     delete[] Min_Chain;
     delete[] Max_Chain;
     delete[] hpost;
     delete[] hpost2D;
   }
-  OutputFile->Close();
-  delete OutputFile;
+  if (OutputFile != NULL) OutputFile->Close();
+  if (OutputFile != NULL) delete OutputFile;
   delete Chain;
 }
 

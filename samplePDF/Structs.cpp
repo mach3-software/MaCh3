@@ -353,6 +353,49 @@ double returnCherenkovThresholdMomentum(int PDG) {
   return momentumThreshold;
 }
 
+// **************************************************************************
+// Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
+double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
+// ***************************************************************************
+
+  const double MLep = 0.10565837;
+
+  // Caluclate muon energy
+  double ELep = sqrt((MLep*MLep)+(PLep*PLep));
+
+  double CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);
+
+  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));
+
+  // Calculate the new Q2
+  double Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
+
+  return Q2Upd - InitialQ2;
+}
+
+
+// **************************************************************************
+// Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
+double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
+// ***************************************************************************
+
+  double mNeff = 0.93956536 - Eb / 1000.;
+  double mNoth = 0.93827203;
+
+  if (!neutrino) {
+    mNeff = 0.93827203 - Eb / 1000.;
+    mNoth = 0.93956536;
+  }
+
+  double mLep = 0.10565837;
+  double eLep = sqrt(PLep * PLep + mLep * mLep);
+
+  double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
+
+  return Enu;
+
+}
+
 /*
 //DB Function used to define which mode splines are selected for which MaCh3 modes
 int MaCh3Mode_to_SplineMode(int Mode) {

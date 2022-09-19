@@ -8,9 +8,11 @@
 #ifdef __LOW_MEMORY_STRUCTS__
 #define __float__ float
 #define __int__ short int
+#define __unsigned_int__ unsigned short int
 #else
 #define __float__ double
 #define __int__ int
+#define __unsigned_int__ unsigned int
 #endif
 
 // Include some healthy defines for constructors
@@ -1378,4 +1380,9 @@ inline std::string file_exists(std::string filename) {
 
   return filename;
 }
+//DB Get the Cernekov momentum threshold in MeV
+double returnCherenkovThresholdMomentum(int PDG);
+
+double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
+double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
 #endif
