@@ -97,20 +97,26 @@ public:
  
   //================================================================================
 
+  virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
 
  protected:
+
+
+  //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
+  //DB Function to determine which weights apply to which types of samples
+  //pure virtual!!
+  virtual void setupWeightPointers() = 0;
+
   //===============================================================================
   //DB Functions relating to sample and exec setup  
   //ETA - abstracting these core functions
   //init will setup all the specific variables 
   void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
   //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
-  void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
+  //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
+
   void fillSplineBins();
 
-  //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
-  //DB Function to determine which weights apply to which types of samples
-  virtual void setupWeightPointers(){};
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();
@@ -131,6 +137,8 @@ public:
   bool IsEventSelected(std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
   virtual void reconfigureFuncPars(){};
   virtual double calcFuncSystWeight(int iSample, int iEvent) = 0;
+  void CalcXsecNormsBins(fdmc_base *fdobj);
+  bool GetIsRHC() {return IsRHC;}
 
   virtual double ReturnKinematicParameter(KinematicTypes Var, int i, int j) = 0;       //Returns parameter Var for event j in sample i
   virtual std::vector<double> ReturnKinematicParameterBinning(KinematicTypes Var) = 0; //Returns binning for parameter Var
@@ -200,6 +208,7 @@ public:
   //ETA - binning opt can probably go soon...
   int BinningOpt;
   int SampleDetID;
+  bool IsRHC;
 
   std::string samplename;
 
