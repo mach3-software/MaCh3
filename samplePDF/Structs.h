@@ -825,8 +825,10 @@ namespace MaCh3Utils {
 // Enum to track the target material
 enum TargetMat {
   // *****************
+  kTarget_H = 1,
   kTarget_C = 12,
-  kTarget_O = 16
+  kTarget_O = 16,
+  kTarget_Ar = 40
 };
 
 // *****************
@@ -835,8 +837,10 @@ enum NuPDG {
   // *****************
   kNue = 12,
   kNumu = 14,
+  kTau = 16,
   kNumu_bar = -14,
-  kNue_bar = -12
+  kNue_bar = -12,
+  kTau_bar = -16
 };
 
 // Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
