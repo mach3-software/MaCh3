@@ -4,9 +4,10 @@ struct fdmc_base {
   int oscnutype;    
   int nupdg;
   bool signal; // true if signue                                              
-  int nEvents; // how many SKMC events are there                              
+  int nEvents; // how many MC events are there                              
   std::string flavourName;
   int *isbound;
+  int **Target; // target the interaction was on
 
   int SampleDetID;
 
