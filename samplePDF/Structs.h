@@ -35,12 +35,6 @@
 #include <TObjString.h>
 #include <unordered_map>
 
-#ifdef PSYCHESETUP
-#include "psycheinc/CoreDataClasses.hxx"
-#include "psycheinc/CoreUtils.hxx"
-#include "psycheinc/BaseDataClasses.hxx"
-#endif
-
 #include <TH2Poly.h>
 #include <list>
 // *******************
@@ -50,56 +44,6 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
 // *******************
   return std::vector<T>(data, data+N);
 }
-
-// *******************
-// Normalisations for cross-section parameters
-class XsecNorms2 {
-  // *******************
-  public:
-    // Bins for normalisation parameter
-    TAxis *ebins;
-    // Name of parameters
-    std::string name;
-    // Mode which parameter applies to
-    int mode;
-    // PDG which parameter applies to
-    std::vector<int> pdgs;
-    // Targets which parameter applies to
-    std::vector<int> targets;
-    // Parameter number of this normalisation in current NIWG parameterisation
-    int startbin;
-};
-
-// *******************
-// Normalisations for cross-section parameters
-class XsecNorms3 {
-  // *******************
-  public:
-    // Bins for normalisation parameter
-    TAxis *ebins;
-    // Name of parameters
-    std::string name;
-    // Mode which parameter applies to
-    std::vector<int> modes;
-    // Horn currents which parameter applies to
-    std::vector<int> horncurrents;
-    // PDG which parameter applies to
-    std::vector<int> pdgs;
-    // Preosc PDG which parameter applies to
-    std::vector<int> preoscpdgs;
-    // Targets which parameter applies to
-    std::vector<int> targets;
-    //Does this parameter have kinematic bounds
-    bool hasKinBounds;
-    //Etrue bounds
-    double etru_bnd_low;
-    double etru_bnd_high;
-    //Etrue bounds
-    double q2_true_bnd_low;
-    double q2_true_bnd_high;
-    // Parameter number of this normalisation in current NIWG parameterisation
-    int index;
-};
 
 // *******************
 // ETA - new version of this for refactor
@@ -134,7 +78,7 @@ class XsecNorms4 {
 	//The bounds for each kinematic variable are given in Selection
 	std::vector< std::string > KinematicVarStr;
 	
-    // Parameter number of this normalisation in current NIWG parameterisation
+    // Parameter number of this normalisation in current systematic model
     int index;
 };
 
@@ -156,363 +100,6 @@ struct FastSplineInfo {
 
   //ETA trying to change things so we don't read in all flat splines
   int flat;
-};
-
-// *******************
-// The kinematic types to be enjoyed by all
-enum KinematicTypes {
-  // ******************
-  kLeptonMomentum        = 0,
-  kLeptonCosTheta        = 1,
-  kNeutrinoEnergy        = 2,
-  kQ2                    = 3,
-  kErecQE                = 4,
-  kQ2QE                  = 5,
-  kLeptonTheta           = 6,
-  kq0                    = 7,
-  kq3                    = 8,
-  kProtonMomentumReco    = 9,
-  kProtonCosThetaReco    = 10,
-  kPionMomentum          = 11,
-  kPionCosTheta          = 12,
-  kPionMomentumFS        = 13,
-  kProtonMomentumFS      = 14,
-  kLeptonTrueTheta       = 15,
-  kW                     = 16,
-  kW2                    = 17,
-  kM3Mode                = 18,
-  kOscChannel            = 19,
-  kErec                  = 20,
-  //kPDFBinning has to be the final one
-  kPDFBinning            = 21,
-  kNKinematicParams   
-};
-
-
-// *******************
-// Get the name of a kinematic type
-// Useful for setting x and y axis of TH2D samples and so on
-inline std::string Kinematic_ToString(KinematicTypes type) {
-  // *******************
-  std::string ReturnString = "";
-  switch(type) {
-    case kLeptonMomentum:
-      ReturnString = "p_{#mu} (MeV)";
-      break;
-    case kLeptonCosTheta:
-      ReturnString = "cos #theta_{#mu}";
-      break;
-    case kNeutrinoEnergy:
-      ReturnString = "E_{#nu}^{true} (GeV)";
-      break;
-    case kQ2:
-      ReturnString = "Q^{2}_{true} (GeV^{2})";
-      break;
-    case kErecQE:
-      ReturnString = "E_{#nu}^{QE} (GeV)";
-      break;
-    case kQ2QE:
-      ReturnString = "Q^{2}_{QE} (GeV^{2})";
-      break;
-    case kLeptonTheta:
-      ReturnString = "#theta_{lep} (degrees)";
-      break;
-    case kq0:
-      ReturnString = "|q_{0}| (Mev)";
-      break;
-    case kq3:
-      ReturnString = "|q_{3}| (Gev)";
-      break;
-    case kProtonMomentumReco:
-      ReturnString = "p_{proton} (MeV)";
-      break;
-    case kProtonCosThetaReco:
-      ReturnString = "cos #theta_{proton}";
-      break;
-    case kPionMomentum:
-      ReturnString = "High. interaction p_{#pi^{#pm}}(MeV)";
-      break;
-    case kPionCosTheta:
-      ReturnString = "cos #theta_{#pi}";
-      break;
-    case kPionMomentumFS:
-      ReturnString = "High. FS p_{#pi^{#pm}}(MeV)";
-      break;
-    case kProtonMomentumFS:
-      ReturnString = "True proton momentum in Final State (MeV)";
-      break;
-    case kLeptonTrueTheta:
-      ReturnString = "True #theta_{lep} (degrees)";
-      break;
-    case kW2:
-      ReturnString = "W^{2} (GeV^{2})";
-      break;
-    case kW:
-      ReturnString = "W (GeV)";
-      break;
-    case kM3Mode:
-      ReturnString = "Mode";
-      break;
-    case kOscChannel:
-      ReturnString = "Oscillation Channel";
-      break;
-    case kPDFBinning:
-      std::cout << "You shouldn't be here because PDF binning is different for each sample." << std::endl;
-      std::cout << "Given kPDFBinning. Exitting.." << std::endl;
-      throw;
-    default:
-      std::cerr << "Error, did not find ToString conversion for " << type << std::endl;
-      break;
-  }
-  return ReturnString;
-};
-
-inline double StringToKinematicVar(std::string kinematic_str){
-
-  if(strcmp(kinematic_str.c_str(), "Etrue") == 0){
-	return kNeutrinoEnergy;
-  }
-  else if(strcmp(kinematic_str.c_str(), "Q2true") == 0){
-	return kQ2;
-  }	
-  else{
-	std::cerr << "[ERROR] " << __FILE__ << ":" << __LINE__ << " Unknown string " << kinematic_str << " passed from xsec cov" << std::endl; 
-	std::cerr << "Have you added this kinematic parameter into StringToKinematicVar?" << std::endl;
-	throw;
-  }
-
-  return 0;
-}
-
-
-
-// Useful for printing out ot pngs or writing out to histograms
-inline std::string Kinematic_ToShortString(KinematicTypes type) {
-  // *******************
-  std::string ReturnString = "";
-  switch(type) {
-    case kLeptonMomentum:
-      ReturnString = "LepMom";
-      break;
-    case kLeptonCosTheta:
-      ReturnString = "CosThetaLep";
-      break;
-    case kNeutrinoEnergy:
-      ReturnString = "TrueEnu";
-      break;
-    case kQ2:
-      ReturnString = "TrueQ2";
-      break;
-    case kErecQE:
-      ReturnString = "TrueEnuQE";
-      break;
-    case kQ2QE:
-      ReturnString = "TrueQ2QE";
-      break;
-    case kLeptonTheta:
-      ReturnString = "ThetaLep";
-      break;
-    case kq0:
-      ReturnString = "q0";
-      break;
-    case kq3:
-      ReturnString = "q3";
-      break;
-    case kProtonMomentumReco:
-      ReturnString = "ProtonMom";
-      break; 
-    case kProtonCosThetaReco:
-      ReturnString = "CosThetaProton";
-      break; 
-    case kPionMomentum:
-      ReturnString = "PiMomInt";
-      break;
-    case kPionCosTheta:
-      ReturnString = "CosThetaPi";
-      break;
-    case kPionMomentumFS:
-      ReturnString = "LeadingPiMomFS";
-      break;
-    case kProtonMomentumFS:
-      ReturnString = "ProtonMomFS";
-      break;
-    case kLeptonTrueTheta:
-      ReturnString = "TrueThetaLep";
-      break;
-    case kW2:
-      ReturnString = "TrueW2";
-      break;
-    case kW:
-      ReturnString = "TrueW";
-      break;
-    case kM3Mode:
-      ReturnString = "Mode";
-      break;
-    case kOscChannel:
-      ReturnString = "OscChannel";
-      break;
-    case kErec:
-      ReturnString = "Erec";
-      break;
-    case kPDFBinning:
-      std::cout << "You shouldn't be here because PDF binning is different for each sample." << std::endl;
-      std::cout << "Given kPDFBinning. Exitting.." << std::endl;
-      throw;
-    default:
-      std::cerr << "Error, did not find ToShortString conversion for " << type << std::endl;
-      break;
-  }
-  return ReturnString;
-};
-
-// ***************************
-// The base for the cross-section class
-class xsecBase {
-  // ***************************
-  public:
-    // Virtual functions
-    xsecBase();
-    ~xsecBase() {};
-    void Print();
-    // Mode
-    __int__ mode;
-    // Which species
-    __int__ species;
-    // Which target the event is on
-    __int__ target;
-    // Q2 of event
-    __float__ Q2;
-    // Enu of event
-    __float__ Enu;
-    // One time weight to apply to event, e.g. NC1gamma
-    __float__ weight;
-};
-
-
-// ********************************************
-// NIWG 2015 struct
-class xsec2015 : public xsecBase {
-  // ********************************************
-
-  public:
-    // And the Struct's constructor
-    xsec2015();
-    ~xsec2015();
-    void Print();
-
-    // Still good for Winter 2016
-    TSpline3* splMAQE;
-    TSpline3* splCA5;
-    TSpline3* splMARES;
-    TSpline3* splBGSCLLOWPPI;
-    TSpline3* splBGSCL;
-    TSpline3* splBYDIS;
-    TSpline3* splBYMPI;
-    TSpline3* splAGKYMULT;
-    TSpline3* splFEFABS;
-    TSpline3* splFEFCX;
-    TSpline3* splFEFQE;
-    TSpline3* splFEFINEL;
-    TSpline3* splFEFCXH;
-    TSpline3* splFEFQEH;
-
-    // New for Summer 2017
-    TSpline3* splPDDC;
-    TSpline3* splPDDO;
-
-    // New for 2020
-    TSpline3* splMECENULOW;
-    TSpline3* splMECENUHIGH;
-    TSpline3* splMECENUBARLOW;
-    TSpline3* splMECENUBARHIGH;
-
-    // Deprecated for Summer 2017
-    TSpline3* splEBC;
-    TSpline3* splEBO;
-    TSpline3* splSCCV;
-    TSpline3* splSCCA;
-
-    // New for 2020
-    TSpline3* spl2P2HEDEP_LOWENU;
-    TSpline3* spl2P2HEDEP_HIGHENU;
-    TSpline3* spl2P2HEDEP_LOWENUBAR;
-    TSpline3* spl2P2HEDEP_HIGHENUBAR;
-    TSpline3* splISO_BKG_LOWPPI;
-	TSpline3* splDIS_BY;
-	TSpline3* splMPI_BY;
-	TSpline3* splMPI_AGKY_XSEC;
-
-    // Relativistic RPA weight of event
-    __float__ relRPA;
-};
-
-
-// ********************************************
-// Generic xsec2018 class
-// Can use TF1 or TSpline3 or TSpline5 here, tjoho
-template <class T>
-class xsec2018 : public xsecBase {
-  // ********************************************
-  public:
-    // The light constructor
-    xsec2018(__int__ NumberOfSplines) { 
-      nParams = NumberOfSplines;
-      Func.reserve(nParams);
-      for (int i = 0; i < nParams; ++i) {
-        Func[i] = NULL;
-      }
-    }
-
-    // The empty constructor
-    xsec2018() {
-      nParams = 0;
-      Func = NULL;
-    };
-
-    // The light destructor
-    ~xsec2018() {
-      for (int i = 0; i < nParams; ++i) {
-        if (Func[i]) delete Func[i];
-      }
-    }
-
-    // Get number of splines
-    inline __int__ GetNumberOfParams() { return nParams; }
-
-    // The Printer
-    inline void Print() {
-      xsecBase::Print();
-      std::cout << "    Splines: " << std::endl;
-      for (int i = 0; i < nParams; ++i) {
-        if (!Func[i]) continue;
-        std::cout << "    " << std::left << std::setw(25) << Func[i]->GetName() << std::endl;
-      }
-    }
-
-    // Set the number of splines for this event
-    inline void SetSplineNumber(__int__ NumberOfSplines) {
-      nParams = NumberOfSplines;
-      Func = new T[nParams];
-    }
-
-    // Get the function for the nth spline
-    inline T GetFunc(__int__ nSpline) { return Func[nSpline]; }
-    // Set the function for the nth spline
-    inline void SetFunc(__int__ nSpline, T Function) { Func[nSpline] = Function; }
-    // Eval the current variation
-    inline double Eval(__int__ nSpline, __float__ variation) { 
-      // Some will be NULL, check this
-      if (Func[nSpline]) {
-        return Func[nSpline]->Eval(variation);
-      } else {
-        return 1.0;
-      }
-    }
-  private:
-    // Number of parameters
-    __int__ nParams;
-    // The function
-    T* Func;
 };
 
 // ************************
@@ -791,7 +378,6 @@ class TSpline3_red {
     __int__ ParamNo;
 };
 
-
 // ***************************
 // A handy namespace for ND280 psyche extraction
 namespace MaCh3Utils {
@@ -801,20 +387,6 @@ namespace MaCh3Utils {
   // Return mass for given PDG
   double GetMassFromPDG(int PDG);
   // ***************************
-
-  TString SKSampleName_toLatexString(TString String);
-
-#ifdef PSYCHESETUP
-  // ***************************
-  // Return mass for given PDG
-  TLorentzVector GetHMParticle(AnaEventSummaryB const * Summary, int PDG, bool Primary = false);
-  // ***************************
-#endif
-
-  // Neutrino direction
-  extern const double ND280NuDir[3];
-
-  extern const double SKNuDir[3];
 
   extern std::unordered_map<int,int> KnownDetIDsMap;
   extern int nKnownDetIDs;
@@ -837,11 +409,53 @@ enum NuPDG {
   // *****************
   kNue = 12,
   kNumu = 14,
-  kTau = 16,
-  kNumu_bar = -14,
-  kNue_bar = -12,
-  kTau_bar = -16
+  kNutau = 16,
+  kNueBar = -12,
+  kNumuBar = -14,
+  kNutauBar = -16
 };
+
+enum ProbNu {
+  kProbNue = 1,
+  kProbNumu = 2,
+  kProbNutau = 3,
+  kProbNueBar = -1,
+  kProbNumuBar = -2,
+  kProbNutauBar = -3
+};
+
+//ETA - Probs3++ doesn't use the PDG codes for the neutrino type
+//so add in a small converter
+inline int PDGToProbs(NuPDG pdg){
+
+  int ReturnProbNu = -999;
+
+  switch (pdg){
+    case kNue:
+	  ReturnProbNu = kProbNue;
+	  break;
+    case kNumu:
+	  ReturnProbNu = kProbNumu;
+	  break;
+    case kNutau:
+	  ReturnProbNu = kProbNutau;
+	  break;
+    case kNueBar:
+	  ReturnProbNu = kProbNueBar;
+	  break;
+	case kNumuBar:
+	  ReturnProbNu = kProbNumuBar;
+	  break;
+	case kNutauBar:
+	  ReturnProbNu = kProbNutauBar;
+	  break;
+	default:
+	  std::cout << "Unrecognised pdg for the neutrino so can't map this to an int for Prob3++" << std::endl;
+	  break;
+  }
+
+  return ReturnProbNu;
+}
 
 // Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly*);
