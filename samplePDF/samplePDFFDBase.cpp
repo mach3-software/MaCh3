@@ -95,18 +95,19 @@ void samplePDFFDBase::useBinnedOscReweighting(bool ans, int nbins, double *osc_b
   }
 }
 
-bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
+bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iEvent) {
   
   double Val;
 
-  for (unsigned int iSelection=0;iSelection<Selection.size();iSelection++) {
+  for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
  
-    Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
+	Val = ReturnKinematicParameter(SelectionStr[iSelection], iEvent);
+    //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
-    if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
+    if ((Val<Selection[iSelection][0])||(Val>=Selection[iSelection][1])) {
 	return false;
     }
 
@@ -117,24 +118,24 @@ bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
 }
 
 //Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(std::vector< std::vector<double> > &Selection, int iSample, int iEvent) {
+bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iEvent) {
   
   double Val;
 
-  for (unsigned int iSelection=0;iSelection<Selection.size();iSelection++) {
+  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
 
     
-    Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
+    Val = ReturnKinematicParameter(ParameterStr[iSelection], iEvent);
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
 	//ETA - also check whether we're actually applying a lower or upper cut by checking they aren't -999
-	if(Val >= Selection[iSelection][2] && Selection[iSelection][2] != -999){
+	if(Val >= Selection[iSelection][1] && Selection[iSelection][0] != -999){
 	  //std::cout << "Cutting event as " << Val << " is greater than " << Selection[iSelection][1]
 	  return false;
 	}
-	else if(Val < Selection[iSelection][1] && Selection[iSelection][1] != -999){
+	else if(Val < Selection[iSelection][0] && Selection[iSelection][1] != -999){
 	  return false;
 	}
   }
@@ -146,19 +147,20 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::vector<double> > &Select
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
 {
 
-  if (MCSamples.size()==6) {
+/*  if (MCSamples.size()==6) {
 	reweight(oscpar, oscpar);
 	return;
   }
   else {
-
 	for (int i=0; i< (int)MCSamples.size(); ++i) {
 	  for (int j = 0; j < MCSamples[i].nEvents; ++j) {
 		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
 	  }
 	}
   }
+  */
     
+  reweight(oscpar, oscpar);
   fillArray();
 
   return;
@@ -169,10 +171,11 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
   auto start = std::chrono::high_resolution_clock::now();
   for(int i = 0; i < (int)MCSamples.size(); ++i) {
     for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-		std::cout << "CalcOscWeights!!!" << std::endl;
+		/*std::cout << "calcOscWeights!!!" << std::endl;
 		std::cout << "MCSamples[i].nutype = " << MCSamples[i].nutype << std::endl;
 		std::cout << "MCSamples[i].oscnutype = " << MCSamples[i].oscnutype << std::endl;
 		std::cout << "MCSamples[i].rw_etru = " << *(MCSamples[i].rw_etru[j]) << std::endl;
+		*/
 		//std::cout << "Oscnupar_nub is " << *(oscpar_nub) << std::endl;
 		//std::cout << "Oscnupar_nu is " << *(oscpar_nu) << std::endl;
 		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
@@ -257,10 +260,6 @@ void samplePDFFDBase::fillArray() {
       double funcweight = 1.0;
       double totalweight = 1.0;
       
-      //DB SKDet Syst
-      //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-      //MCSamples[iSample].skdet_w[iEvent] = *(MCSamples[iSample].skdet_pointer[iEvent]);
-
       //DB Xsec syst
       //Loop over stored spline pointers
       for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
@@ -505,7 +504,6 @@ void samplePDFFDBase::fillArray_MP() {
 
 		//std::cout << "Oscillation weight is " << MCSamples[iSample].osc_w[iEvent] << std::endl;
 
-		//std::cout << "Total weight is " << totalweight << std::endl;
 		//DB Catch negative weights and skip any event with a negative event
 		if (totalweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -526,7 +524,6 @@ void samplePDFFDBase::fillArray_MP() {
 		//std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		//std::cout << "XVar is " << XVar << " and rw_upper_bin_edge is " << MCSamples[iSample].rw_upper_xbinedge[iEvent] << " and rw_lower_xbinedge is " << MCSamples[iSample].rw_lower_xbinedge[iEvent] << std::endl;
 		//DB Check to see if momentum shift has moved bins
-		//
 		//DB - First, check to see if the event is still in the nominal bin	
 		if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
 		  XBinToFill = MCSamples[iSample].NomXBin[iEvent];
@@ -614,10 +611,8 @@ void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
   funcParsNames = xsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = xsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
-
   // Assign xsec norm bins in MCSamples tree
   for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
-	std::cout << "Calling CalcXsecNorms!!" << std::endl;
 	CalcXsecNormsBins(&(MCSamples[iSample]));
   }
 
@@ -664,7 +659,6 @@ void samplePDFFDBase::CalcXsecNormsBins(fdmc_base *fdobj){
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins;
-    
 	if (xsecCov) {
 	  for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
 		// Skip oscillated NC events
@@ -672,10 +666,7 @@ void samplePDFFDBase::CalcXsecNormsBins(fdmc_base *fdobj){
 		// no need to waste our time calculating and storing information about xsec parameters
 		// that will never be used.
 		if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		// Define which modes each parameter should apply to by skipping events that aren't correct.
-		// That way, only "correct" events (for which the xsec normalisation parameter given by (*it)
-		// should be applied) store something for that parameter.
-
+		
 		//Check whether the normalisation parameter applies to the target the event was on
 		bool TargetMatch = false;
 		//If no target(s) specified then the syst applies to all targets
@@ -684,7 +675,7 @@ void samplePDFFDBase::CalcXsecNormsBins(fdmc_base *fdobj){
 		  for (unsigned iTarget = 0 ; iTarget < (*it).targets.size() ; ++iTarget) {
 			//ETA - this assumes no weird convention of specifying target exists in MC
 			//i.e. this assumes atomic mass is always used to specify target nucleus
-            if ((*it).targets.at(iTarget) == fdobj->Target[iEvent]) {TargetMatch = true;}
+            if ((*it).targets.at(iTarget) == *(fdobj->Target[iEvent])) {TargetMatch = true;}
 		  }
 		}
 		if (!TargetMatch) {continue;}
@@ -692,84 +683,86 @@ void samplePDFFDBase::CalcXsecNormsBins(fdmc_base *fdobj){
 		// If the parameter *should* apply to this event, it will get through to setting 'start bin' below. If it shouldn't,
 		// it will hit a 'continue' statement, break out of the loop over (*it), and move on to the next
 		// xsec parameter in (*it).
-		bool horncurrentmatch=false;
-		if ((*it).horncurrents.size()==0) {horncurrentmatch=true;}
+		bool HornCurrentMatch=false;
+		if ((*it).horncurrents.size()==0) {HornCurrentMatch=true;}
 		else {
 		  for(unsigned ihorncurrent=0;ihorncurrent<(*it).horncurrents.size();ihorncurrent++){//Check if is right horncurrent
-			if ((*it).horncurrents.at(ihorncurrent)==1 && !GetIsRHC()) {horncurrentmatch=true;}
-			if ((*it).horncurrents.at(ihorncurrent)==-1 && GetIsRHC()) {horncurrentmatch=true;}
+			if ((*it).horncurrents.at(ihorncurrent)==1 && !GetIsRHC()) {HornCurrentMatch=true;}
+			if ((*it).horncurrents.at(ihorncurrent)==-1 && GetIsRHC()) {HornCurrentMatch=true;}
 		  }
 		}
-		if (!horncurrentmatch) {continue;}
+		if (!HornCurrentMatch) {continue;}
 
-		bool flavmatch = false;
-		if ((*it).pdgs.size()==0) {flavmatch=true;}
+		//Check on the oscillated neutrino flavour
+		bool FlavMatch = false;
+		if ((*it).pdgs.size()==0) {FlavMatch=true;}
 		else {
 		  for(unsigned ipdg=0;ipdg<(*it).pdgs.size();ipdg++){	    //Check if is right neutrino flavour
-			if ((*it).pdgs.at(ipdg) == kNue && fdobj->oscnutype==1) {flavmatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNumu && fdobj->oscnutype==2) {flavmatch=true;}
-			if ((*it).pdgs.at(ipdg) == kTau && fdobj->oscnutype==3) {flavmatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNue_bar && fdobj->oscnutype==-1) {flavmatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNumu_bar && fdobj->oscnutype==-2) {flavmatch=true;}
-			if ((*it).pdgs.at(ipdg) == kTau_bar && fdobj->oscnutype==-3) {flavmatch=true;}
+			if ((*it).pdgs.at(ipdg) == kNue && fdobj->oscnutype == kProbNue) {FlavMatch=true;}
+			if ((*it).pdgs.at(ipdg) == kNumu && fdobj->oscnutype == kProbNumu) {FlavMatch=true;}
+			if ((*it).pdgs.at(ipdg) == kNutau && fdobj->oscnutype == kProbNutau) {FlavMatch=true;}
+			if ((*it).pdgs.at(ipdg) == kNueBar && fdobj->oscnutype == kProbNueBar) {FlavMatch=true;}
+			if ((*it).pdgs.at(ipdg) == kNumuBar && fdobj->oscnutype == kProbNumuBar) {FlavMatch=true;}
+			if ((*it).pdgs.at(ipdg) == kNutauBar && fdobj->oscnutype == kProbNutauBar) {FlavMatch=true;}
 		  }
 		}
-		if (!flavmatch) {continue;}
+        if (!FlavMatch) {continue;}
 
-		bool prodflavmatch=false;
-		if((*it).preoscpdgs.size()==0)prodflavmatch=true;
-		else{
-		  for(unsigned ipdg=0;ipdg<(*it).preoscpdgs.size();ipdg++){	    //Check if is right neutrino flavour
-			if((*it).preoscpdgs.at(ipdg) == kNue && fdobj->nutype==1){prodflavmatch=true;}
-			if((*it).preoscpdgs.at(ipdg) == kNumu && fdobj->nutype==2){prodflavmatch=true;}
-			if((*it).preoscpdgs.at(ipdg) == kTau && fdobj->nutype==3){prodflavmatch=true;}
-			if((*it).preoscpdgs.at(ipdg) == kNue_bar && fdobj->nutype==-1){prodflavmatch=true;}
-			if((*it).preoscpdgs.at(ipdg) == kNumu_bar && fdobj->nutype==-2){prodflavmatch=true;}
-			if((*it).preoscpdgs.at(ipdg) == kTau_bar && fdobj->nutype==-3){prodflavmatch=true;}
+		//Check on the flavour that the neutrino was produced as
+		//i.e. before oscillations
+		bool ProdFlavMatch=false;
+		if ((*it).preoscpdgs.size()==0) {ProdFlavMatch=true;}
+		else {
+		  for (unsigned ipdg=0;ipdg<(*it).preoscpdgs.size();ipdg++) {
+			//Check if is right neutrino flavour
+			if ((*it).preoscpdgs.at(ipdg) == fdobj->nutype) {ProdFlavMatch=true;}
+			if ((*it).preoscpdgs.at(ipdg) == kNue && fdobj->nutype == kProbNue) {ProdFlavMatch=true;}
+			if ((*it).preoscpdgs.at(ipdg) == kNumu && fdobj->nutype == kProbNumu) {ProdFlavMatch=true;}
+			if ((*it).preoscpdgs.at(ipdg) == kNutau && fdobj->nutype == kProbNutau) {ProdFlavMatch=true;}
+			if ((*it).preoscpdgs.at(ipdg) == kNueBar && fdobj->nutype == kProbNueBar) {ProdFlavMatch=true;}
+			if ((*it).preoscpdgs.at(ipdg) == kNumuBar && fdobj->nutype == kProbNumuBar) {ProdFlavMatch=true;}
+			if ((*it).preoscpdgs.at(ipdg) == kNutauBar && fdobj->nutype == kProbNutauBar) {ProdFlavMatch=true;}
+
 		  }
 		}
-		if(!prodflavmatch)continue;
+		if (!ProdFlavMatch) {continue;}	
 
-		bool modematch=false;
-		if((*it).modes.size()==0)modematch=true;
-		else{
+		//Now check that the mode of an interaction matches with the normalisation parameters
+		bool ModeMatch=false;
+		//If no mode specified then apply to all modes
+		if ((*it).modes.size()==0) {
+		  ModeMatch=true;}
+		else {
 		  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
 			if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
-			  modematch=true;
+			  ModeMatch=true;
 			}
 		  }
 		}
-		if(!modematch)continue;
+		if (!ModeMatch) {continue;}
 
 		//ETA - this bit needs to change.....
-		/*
-		   if((*it).hasKinBounds){
-		   if((*it).etru_bnd_low>=fdobj->rw_etru[iEvent] && (*it).etru_bnd_low!=-999)continue;
-		   if((*it).etru_bnd_high<fdobj->rw_etru[iEvent] && (*it).etru_bnd_high!=-999)continue;
-		   if((*it).q2_true_bnd_low>=fdobj->rw_Q2[iEvent] && (*it).q2_true_bnd_low!=-999)continue;
-		   if((*it).q2_true_bnd_high<fdobj->rw_Q2[iEvent] && (*it).q2_true_bnd_high!=-999)continue;
-		   }
-		   */
+		//Now check whether the norm has kinematic bounds
+		//i.e. does it only apply to events in a particular kinematic region?
+		if ((*it).hasKinBounds) {
+		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
+			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iEvent) < (*it).Selection[iKinematicParameter][0]) {continue;}
+			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iEvent) > (*it).Selection[iKinematicParameter][1]) {continue;}
+		  } 
+		}
 
 		// Now set 'index bin' for each normalisation parameter
 		// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
 		int bin = (*it).index;
-		//Check if parameter applies to SK detector
-		// 16 = parameter should be applied to nue selection, 8 = parameter should be applied to numu selection, 64 = atmospherics numu, 128 = atmospheric nue
 
 		//If syst on applies to a particular detector
 		if ((xsecCov->GetXSecParamID(bin,1)&SampleDetID)==SampleDetID) {
 		  XsecBins.push_back(bin);
 		}
-
 	  } // end iteration over xsec_norms
 	} // end if (xsecCov)
-
 	fdobj->xsec_norms_bins[iEvent]=XsecBins;
-
   }//end loop over events
-
-  
   return;
 }
 
@@ -1198,6 +1191,7 @@ void samplePDFFDBase::fillSplineBins()
 	  double erec = *(MCSamples[i].x_var[j]);
 	  switch (BinningOpt) {
 		case 0: // splines binned in erec
+		case 1:
 		  //First set up the spline binning
 		  MCSamples[i].splineFile->GetSplineBins(MCSamples[i].nutype, MCSamples[i].signal, *(MCSamples[i].rw_etru[j]), erec, MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j]);
 		  EventSplines = MCSamples[i].splineFile->getEventSplines(j, *(MCSamples[i].mode[j]), MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j]); 
@@ -1216,6 +1210,7 @@ void samplePDFFDBase::fillSplineBins()
 
 	  switch(BinningOpt){
 		case 0:
+		case 1:
 		  for (int spline=0;spline<MCSamples[i].nxsec_spline_pointers[j];++spline) {
 			MCSamples[i].xsec_spline_pointers[j][spline] = MCSamples[i].splineFile->retPointer(EventSplines[spline][0],EventSplines[spline][1],EventSplines[spline][2],EventSplines[spline][3]);
 		  }
@@ -1226,18 +1221,6 @@ void samplePDFFDBase::fillSplineBins()
 		  }
 		  break;
 	  }
-
-	  /*
-	  for (int spline=0;spline<MCSamples[i].nxsec_spline_pointers[j];++spline) {
-	  std::cout << "EventSplines[" << spline << "][] is size " << EventSplines[spline].size() << std::endl;
-		if (EventSplines[spline].size()==4) {
-		  MCSamples[i].xsec_spline_pointers[j][spline] = MCSamples[i].splineFile->retPointer(EventSplines[spline][0],EventSplines[spline][1],EventSplines[spline][2],EventSplines[spline][3]);
-		} else {
-		  MCSamples[i].xsec_spline_pointers[j][spline] = MCSamples[i].splineFile->retPointer(EventSplines[spline][0],EventSplines[spline][1],EventSplines[spline][2],EventSplines[spline][3],EventSplines[spline][4]);
-		}
-	  }
-	  */
-
 	}
 
     MCSamples[i].splineFile->SetSplineInfoArrays();
