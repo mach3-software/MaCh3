@@ -9,9 +9,10 @@
 //******************************************************
 
 #include "manager.h"
+#include <iostream>
 
 manager::manager(std::string const &filename)
-    : config(YAML::LoadFile(filename)) {}
+    : config(YAML::LoadFile(filename)) {std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;}
 
 YAML::Node const & manager::raw(){ return config; }
 
