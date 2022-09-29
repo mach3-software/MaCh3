@@ -8,8 +8,8 @@
 covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpth13NH, TH2D *hist_dcpth13IH, TH2D *hist_23)
 : covarianceBase(name, file) {
 
-  L = 295;
-  density = 2.6;
+  L = 1284.9;// Dune, T2K is  L = 295;
+  density = 2.848; // DUNE, T2K is 2.6
 
   if (hist_dcpth13NH) {
     h_dcpth13NH = hist_dcpth13NH;
