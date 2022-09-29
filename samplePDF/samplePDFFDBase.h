@@ -107,6 +107,7 @@ public:
   //pure virtual!!
   virtual void setupWeightPointers() = 0;
 
+
   //===============================================================================
   //DB Functions relating to sample and exec setup  
   //ETA - abstracting these core functions
@@ -133,15 +134,16 @@ public:
   //ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){};
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound},{{ND280KinematicTypes Var2, douuble LowBound, double UpBound},..}
-  bool IsEventSelected(int iSample, int iEvent);
-  bool IsEventSelected(std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
+  bool IsEventSelected(std::vector< std::string > ParameterStr, int iEvent);
+  bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iEvent);
   virtual void reconfigureFuncPars(){};
   virtual double calcFuncSystWeight(int iSample, int iEvent) = 0;
   void CalcXsecNormsBins(fdmc_base *fdobj);
   bool GetIsRHC() {return IsRHC;}
 
-  virtual double ReturnKinematicParameter(KinematicTypes Var, int i, int j) = 0;       //Returns parameter Var for event j in sample i
-  virtual std::vector<double> ReturnKinematicParameterBinning(KinematicTypes Var) = 0; //Returns binning for parameter Var
+  //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
+  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
   virtual void setXsecCov(covarianceXsec* xsec_cov);
@@ -220,6 +222,7 @@ public:
 
   //===============================================================================
   //DB Vectors to store which kinematic cuts we apply
+  std::vector< std::string > SelectionStr;
   std::vector< std::vector<double> > Selection; //What gets used in IsEventSelected, which gets set equal to user input plus all the vectors in StoreSelection
   std::vector< std::vector<double> > StoredSelection; //What gets pulled from config options
   //===============================================================================
