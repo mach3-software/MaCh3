@@ -24,6 +24,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 include(CPM)
 
+#Luke's handing cmake modules which Neutrino hep experiments might want
 CPMFindPackage(
     NAME CMakeModules
     GIT_TAG v0.0.11
@@ -32,6 +33,7 @@ CPMFindPackage(
 )
 include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
 
+#YAML for reading in config files
 CPMFindPackage(
     NAME yaml-cpp
     VERSION 0.7.0
@@ -41,6 +43,8 @@ CPMFindPackage(
       "YAML_BUILD_SHARED_LIBS ON"
 )
 
+# Oscillation calcualtion
+# In the future which osc calc we use might be set with a flag
 CPMFindPackage(
     NAME Prob3plusplus
     VERSION 3.10.3
