@@ -62,204 +62,174 @@ covarianceParserYAML::covarianceParserYAML(const char* filename)
       (*fID)(i,1) = param["detid"].as<int>();
       error[i]=param["error"].as<double>();
 
-      if(param["flatprior"])
-	 (*fFlatPrior)(i) = param["flatprior"].as<double>();
-      else
-	 (*fFlatPrior)(i) = 0;
+	  if (param["flatprior"]) {
+		(*fFlatPrior)(i) = param["flatprior"].as<double>();
+	  } else {
+		(*fFlatPrior)(i) = 0;
+	  }
 
 
-      if(param["type"].as<std::string>() == "spline")
-      {
-	 (*fID)(i,0) = param["splineind"].as<int>();
-	 *fd_spl_name = "";
-	 if (param["fd_spline_name"]) {
-	    *fd_spl_name = param["fd_spline_name"].as<std::string>().c_str();
-	 }
-	 fFD_spline_names->AddAtAndExpand(fd_spl_name->Clone(),i);
-	 
-	 fd_modes->ResizeTo(0);
-	 if(param["fd_mode"])
-	 {
-	    std::vector<double> fd_modes_vec = param["fd_mode"].as<std::vector<double>>();
-	    fd_modes->ResizeTo(fd_modes_vec.size());
-	    for(std::size_t k = 0; k < fd_modes_vec.size(); k++)
-	       (*fd_modes)(k)=fd_modes_vec[k];
+	  //Now load in varaibles for spline systematics only
+	  if (param["type"].as<std::string>() == "spline") {
+		(*fID)(i,0) = param["splineind"].as<int>();
+		*fd_spl_name = "";
+		if (param["fd_spline_name"]) {
+		  *fd_spl_name = param["fd_spline_name"].as<std::string>().c_str();
+		}
+		fFD_spline_names->AddAtAndExpand(fd_spl_name->Clone(),i);
 
-	 }
-	 fFD_spline_modes->AddAtAndExpand(fd_modes->Clone(),i);
+		fd_modes->ResizeTo(0);
+		if (param["fd_mode"]) {
+		  std::vector<double> fd_modes_vec = param["fd_mode"].as<std::vector<double>>();
+		  fd_modes->ResizeTo(fd_modes_vec.size());
+		  for (std::size_t k = 0; k < fd_modes_vec.size(); k++) {
+			(*fd_modes)(k)=fd_modes_vec[k];
+		  }
+		}
+		fFD_spline_modes->AddAtAndExpand(fd_modes->Clone(),i);
 
-	 *nd_spl_name = "";
-	 if (param["nd_spline_name"]) {
-	    *nd_spl_name = param["nd_spline_name"].as<std::string>().c_str();
-	 }
-	 fND_spline_names->AddAtAndExpand(nd_spl_name->Clone(),i);
-
-      }
-      else if (param["type"].as<std::string>() == "norm")
-      {
-	 (*fID)(i,0) = -1;
-
-      }
-      else if (param["type"].as<std::string>() == "function")
-      {
-	 (*fID)(i,0) = -2;
-      }
-      else
-      {
-	 std::cout << "Wrong spline type!" << std::endl;
-	 exit(5);
-      }
+		*nd_spl_name = "";
+		if (param["nd_spline_name"]) {
+		  *nd_spl_name = param["nd_spline_name"].as<std::string>().c_str();
+		}
+		fND_spline_names->AddAtAndExpand(nd_spl_name->Clone(),i);
+	  } else if (param["type"].as<std::string>() == "norm") {
+		(*fID)(i,0) = -1;
+	  } else if (param["type"].as<std::string>() == "function") {
+		(*fID)(i,0) = -2;
+      } else {
+		std::cout << "Wrong spline type!" << std::endl;
+		exit(5);
+	  }
 
       modes->ResizeTo(0);
-      if(param["mode"])
-      {
-	 if(!param["mode"].IsNull())
-	 {
-	    std::vector<double> modes_vec = param["mode"].as<std::vector<double>>();
-	    modes->ResizeTo(modes_vec.size());
-	    for(std::size_t k = 0; k < modes_vec.size(); k++)
-	       (*modes)(k)=modes_vec[k];
-	 }
-      }
+	  if (param["mode"]) {
+		if (!param["mode"].IsNull()) {
+		  std::vector<double> modes_vec = param["mode"].as<std::vector<double>>();
+		  modes->ResizeTo(modes_vec.size());
+		  for (std::size_t k = 0; k < modes_vec.size(); k++) {
+			(*modes)(k)=modes_vec[k];
+		  }
+		}
+	  }
       fNorm_modes->AddAtAndExpand(modes->Clone(),i);
 
       elements->ResizeTo(0);
-      if(param["elements"])
-      {
-	 if(!param["elements"].IsNull())
-	 {
-	    std::vector<double> elem_vec = param["elements"].as<std::vector<double>>();
-	    elements->ResizeTo(elem_vec.size());
-	    for(std::size_t k = 0; k < elem_vec.size(); k++)
-	       (*elements)(k)=elem_vec[k];
-	 }
-      }
+	  if (param["elements"]) {
+		if(!param["elements"].IsNull()) {
+		  std::vector<double> elem_vec = param["elements"].as<std::vector<double>>();
+		  elements->ResizeTo(elem_vec.size());
+		  for (std::size_t k = 0; k < elem_vec.size(); k++) {
+			(*elements)(k)=elem_vec[k];
+		  }
+		}
+	  }
       fNorm_elem->AddAtAndExpand(elements->Clone(),i);
 
       horncurrents->ResizeTo(0);
-      if(param["horncurrents"])
-      {
-	 if(!param["horncurrents"].IsNull())
-	 {
-	    std::vector<double> hc_vec = param["horncurrents"].as<std::vector<double>>();
-	    horncurrents->ResizeTo(hc_vec.size());
-	    for(std::size_t k = 0; k < hc_vec.size(); k++)
-	       (*horncurrents)(k)=hc_vec[k];
-	 }
+      if (param["horncurrents"]) {
+		if(!param["horncurrents"].IsNull()) {
+		  std::vector<double> hc_vec = param["horncurrents"].as<std::vector<double>>();
+		  horncurrents->ResizeTo(hc_vec.size());
+		  for(std::size_t k = 0; k < hc_vec.size(); k++) {
+			(*horncurrents)(k)=hc_vec[k];
+		  }
+		}
       }
       fNorm_horncurrents->AddAtAndExpand(horncurrents->Clone(),i);
 
       nupdg->ResizeTo(0);
-      if(param["nupdg"])
-      {
-	 if(!param["nupdg"].IsNull())
-	 {
-	    std::vector<double> pdg_vec = param["nupdg"].as<std::vector<double>>();
-	    nupdg->ResizeTo(pdg_vec.size());
-	    for(std::size_t k = 0; k < pdg_vec.size(); k++)
-	       (*nupdg)(k)=pdg_vec[k];
-	 }
-      }
+	  if (param["nupdg"]) {
+		if(!param["nupdg"].IsNull()) {
+		  std::vector<double> pdg_vec = param["nupdg"].as<std::vector<double>>();
+		  nupdg->ResizeTo(pdg_vec.size());
+		  for(std::size_t k = 0; k < pdg_vec.size(); k++) {
+			(*nupdg)(k)=pdg_vec[k];
+		  }
+		}
+	  }
       fNorm_nupdg->AddAtAndExpand(nupdg->Clone(),i);
 
       prodnupdg->ResizeTo(0);
-      if(param["prodnupdg"])
-      {
-	 if(!param["prodnupdg"].IsNull())
-	 {
-	    std::vector<double> prodnupdg_vec = param["prodnupdg"].as<std::vector<double>>();
-	    prodnupdg->ResizeTo(prodnupdg_vec.size());
-	    for(std::size_t k = 0; k < prodnupdg_vec.size(); k++)
-	       (*prodnupdg)(k)=prodnupdg_vec[k];
-	 }
-      }
+	  if (param["prodnupdg"]) {
+		if(!param["prodnupdg"].IsNull()) {
+		  std::vector<double> prodnupdg_vec = param["prodnupdg"].as<std::vector<double>>();
+		  prodnupdg->ResizeTo(prodnupdg_vec.size());
+		  for (std::size_t k = 0; k < prodnupdg_vec.size(); k++) {
+			(*prodnupdg)(k)=prodnupdg_vec[k];
+		  }
+		}
+	  }
       fNorm_preoscnupdg->AddAtAndExpand(prodnupdg->Clone(),i);
 
       kinematicpar->ResizeTo(0);
-      if(param["kinematicpars"])
-      {
-	 if(!param["kinematicpars"].IsNull())
-	 {
+      if (param["kinematicpars"]) {
+		if(!param["kinematicpars"].IsNull()) {
 	    std::vector<std::string> kinpar_vec = param["kinematicpars"].as<std::vector<std::string>>();
 	    kinematicpar->ResizeTo(kinpar_vec.size());
 	    for(std::size_t k = 0; k < kinpar_vec.size(); k++)
-	       (*kinematicpar)(k)=StringToKinematicVar(kinpar_vec[k]);
+	       //(*kinematicpar)(k)=StringToKinematicVar(kinpar_vec[k]);
+		   (*kinematicpar)(k) = -999;
 
-	 }
+		}
       }
       fKinematicPars->AddAtAndExpand(kinematicpar->Clone(),i);
 
-      kinematicbound->ResizeTo(0,0);
-      if(param["kinematicbounds"])
-      {
-	 if(!param["kinematicbounds"].IsNull())
-	 {
-	    std::vector<std::vector<double>> kinbound_vec = param["kinematicbounds"].as<std::vector<std::vector<double>>>();
-	    kinematicbound->ResizeTo(kinbound_vec.size(),2);
-	    for(std::size_t k = 0; k < kinbound_vec.size(); k++)
-	    {
-	       if(kinbound_vec[k].size()!=2)
-		  exit(5);
-	       (*kinematicbound)(k,0)=kinbound_vec[k][0];
-	       (*kinematicbound)(k,1)=kinbound_vec[k][1];
-	    }
-	 }
-      }
-      fKinematicBounds->AddAtAndExpand(kinematicbound->Clone(),i);
+	  kinematicbound->ResizeTo(0,0);
+	  if(param["kinematicbounds"]) {
+		if(!param["kinematicbounds"].IsNull()) {
+		  std::vector<std::vector<double>> kinbound_vec = param["kinematicbounds"].as<std::vector<std::vector<double>>>();
+		  kinematicbound->ResizeTo(kinbound_vec.size(),2);
+		  for(std::size_t k = 0; k < kinbound_vec.size(); k++) {
+			if(kinbound_vec[k].size()!=2) {
+			  exit(5);
+			}
+			(*kinematicbound)(k,0)=kinbound_vec[k][0];
+			(*kinematicbound)(k,1)=kinbound_vec[k][1];
+		  }
+		}
+	  }
+	  fKinematicBounds->AddAtAndExpand(kinematicbound->Clone(),i);
       
-
-      if(param["correlation"])
-      {
-	 for (auto const &corr : param["correlation"]) 
-	    correlations[i][corr.first.as<std::string>()]=corr.second.as<double>();
-      }
-
-
-      i++;
+	  if(param["correlation"]) {
+		for (auto const &corr : param["correlation"]) { 
+		  correlations[i][corr.first.as<std::string>()]=corr.second.as<double>();
+		}
+	  }
+	  i++;
    }
 
-   for(int i=0; i<fNumPar; i++)
-   {
-      (*fCovMatrix)(i,i)=error[i]*error[i];
-      for (auto const& [key, val] : correlations[i])
-      {
-	 int index = -1;
+   for(int i=0; i<fNumPar; i++) {
+	 (*fCovMatrix)(i,i)=error[i]*error[i];
+	 for (auto const& [key, val] : correlations[i]) {
+	   int index = -1;
+	 }
 	 if (corrNames.find(key) != corrNames.end()) {
-	    index=corrNames[key];
+	   index=corrNames[key];
 	 }
-	 else
-	 {
-	    std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
-	    exit(5);
+	 else {
+	   std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
+	   exit(5);
 	 }
-	 
+
 	 double corr1 = val;
 	 double corr2 = 0;
-	 if(correlations[index].find(fNames[i]) != correlations[index].end())
-	 {
-	    corr2 = correlations[index][fNames[i]];
-	    if(corr2 != corr1)
-	    {
-	       std::cout << "Correlations are not equal between " << fNames[i] << " and " << key << std::endl;
-	       exit(5);
-	    }
+	 if(correlations[index].find(fNames[i]) != correlations[index].end()) {
+	   corr2 = correlations[index][fNames[i]];
+	   if(corr2 != corr1) {
+		 std::cout << "Correlations are not equal between " << fNames[i] << " and " << key << std::endl;
+		 exit(5);
+	   }
 	 }
-	 else
-	 {
-	    std::cout << "Correlation does not appear reciprocally between " << fNames[i] << " and " << key << std::endl;
-	    exit(5);
+	 else {
+	   std::cout << "Correlation does not appear reciprocally between " << fNames[i] << " and " << key << std::endl;
+	   exit(5);
 	 }
-	 
+
 	 (*fCovMatrix)(i,index)= (*fCovMatrix)(index,i) = corr1*error[i]*error[index];
-
-      }
-
    }
-
-
 }
 
-covarianceParserYAML::~covarianceParserYAML()
-{
+covarianceParserYAML::~covarianceParserYAML() {
 
 }
