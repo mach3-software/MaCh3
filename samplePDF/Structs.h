@@ -889,7 +889,9 @@ class Monotone_Spline: public TSpline3_red {
 
     // Empty destructor
     ~Monotone_Spline() {
-      // this should call base class destructor automatically
+      delete[] Secants;
+      delete[] Tangents;
+      // this should also call base class destructor automatically
     }
 
     // Set a function

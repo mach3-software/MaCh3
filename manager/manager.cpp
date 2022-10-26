@@ -108,7 +108,7 @@ int manager::readConfig(char *config) {
         std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
         std::cerr << "   Poisson" << std::endl;
         std::cerr << "   Barlow-Beeston" << std::endl;
-        std::cerr << "   Poisson" << std::endl;
+        std::cerr << "   IceCube" << std::endl;
         std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
         throw;
       }
