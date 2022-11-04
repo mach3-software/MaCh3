@@ -1,0 +1,7 @@
+#ignore any object files
+*.o
+
+#ingore some stuff in libconfig
+*.lo
+*.la
+*.Plo
