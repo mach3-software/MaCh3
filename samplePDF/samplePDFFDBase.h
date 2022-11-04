@@ -1,33 +1,42 @@
 #ifndef _samplePDFFDBase_h_
 #define _samplePDFFDBase_h_
-
+//C++ includes
 #include <iostream>
-
-#include <TTree.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <THStack.h>
-#include <TLegend.h>
-#include <TMath.h>
-#include <TFile.h>
-#include <TGraph2DErrors.h>
-#include <vector>
+#include <assert.h>
+#include <stdexcept>
 #include <list>
-#include <TROOT.h>
-#include <TRandom.h>
+#include <vector>
 
+//ROOT includes
+#include "TTree.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "THStack.h"
+#include "TLegend.h"
+#include "TMath.h"
+#include "TFile.h"
+#include "TGraph2DErrors.h"
+#include "TROOT.h"
+#include "TRandom.h"
+#include "TString.h"
+
+//MaCh3 includes
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
-#include "../Prob3++/BargerPropagator.h"
-#include "interfacePDFEbE.h"
+
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
+
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
-#include "libconfig/lib/libconfig.h++"
+
 #include "FDMCStruct.h"
 #include "ShiftFunctors.h"
 
+#include "manager/manager.h"
+//Other
+#include "../Prob3++/BargerPropagator.h"
+#include "libconfig/lib/libconfig.h++"
 
 #define USEBETA 0
 
@@ -136,7 +145,12 @@ public:
   bool IsEventSelected(int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
   virtual void reconfigureFuncPars(){};
-  virtual double calcFuncSystWeight(int iSample, int iEvent) = 0;
+    
+  // Calculate the spline weight for a given event
+  double CalcXsecWeight_Spline(const int iSample, const int iEvent);
+  // Calculate the norm weight for a given event
+  double CalcXsecWeight_Norm(const int iSample, const int iEvent);
+  virtual double CalcXsecWeight_Func(int iSample, int iEvent) = 0;
 
   virtual double ReturnKinematicParameter(KinematicTypes Var, int i, int j) = 0;       //Returns parameter Var for event j in sample i
   virtual std::vector<double> ReturnKinematicParameterBinning(KinematicTypes Var) = 0; //Returns binning for parameter Var
@@ -156,6 +170,9 @@ public:
 #endif
   void fillArray();
 
+  // Helper function to reset histograms
+  inline void ResetHistograms();
+      
   //===============================================================================
   //DB Variables required for getLikelihood
   //

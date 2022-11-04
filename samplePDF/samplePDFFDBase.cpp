@@ -24,6 +24,13 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   useBeta=false;
   applyBetaNue=false;
   applyBetaDiag=false;
+
+  samplePDFFD_array = NULL;
+  samplePDFFD_data = NULL;
+  
+  //KS: For now FD support only one sample
+  nSamples = 1;
+  SampleName.push_back("FDsample");
   
   //ETA - leave this out for now, need to fix and make things nice and configurable
   //EnergyScale *energy_first = new EnergyScale();
@@ -161,7 +168,9 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 	}
 
   }
-    
+  //KS: Reset the histograms before reweight 
+  ResetHistograms();
+  
   fillArray();
 
   return;
@@ -174,6 +183,8 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
       MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
     }
   }
+  //KS: Reset the histograms before reweight
+  ResetHistograms();
 
   fillArray();
 }
@@ -255,28 +266,21 @@ void samplePDFFDBase::fillArray() {
       //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
       //MCSamples[iSample].skdet_w[iEvent] = *(MCSamples[iSample].skdet_pointer[iEvent]);
 
-      //DB Xsec syst
-      //Loop over stored spline pointers
-      for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
-		splineweight *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
-      }
+      splineweight *= CalcXsecWeight_Spline(iSample, iEvent);
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
 
-      //Loop over stored normalisation and function pointers 
-      for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent];iParam++) {
-	normweight *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-      }
+      normweight *= CalcXsecWeight_Norm(iSample, iEvent);
       //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (normweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
 
-      funcweight = calcFuncSystWeight(iSample,iEvent);
+      funcweight = CalcXsecWeight_Func(iSample,iEvent);
       //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (funcweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -366,10 +370,10 @@ void samplePDFFDBase::fillArray_MP()
 
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array[yBin][xBin] = 0.;
+	  for (int xBin=0;xBin<nXBins;xBin++) {
+	    samplePDFFD_array[yBin][xBin] = 0.;
       samplePDFFD_array_w2[yBin][xBin] = 0.;
-	}
+	  }
   }
 
   reconfigureFuncPars();
@@ -446,11 +450,7 @@ void samplePDFFDBase::fillArray_MP()
 		//ETA - removing this,  
 		//MCSamples[iSample].skdet_w[iEvent] = *(MCSamples[iSample].skdet_pointer[iEvent]);
 
-		//DB Xsec syst
-		//Loop over stored spline pointers
-		for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
-		  splineweight *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
-		}
+        splineweight *= CalcXsecWeight_Spline(iSample, iEvent);
 		//std::cout << "Spline weight is " << splineweight << std::endl;
 		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
 		if (splineweight <= 0.){
@@ -458,10 +458,7 @@ void samplePDFFDBase::fillArray_MP()
 		  continue;
 		}
 
-		//Loop over stored normalisation and function pointers
-		for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent];iParam++) {
-		  normweight *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-		}
+        normweight *= CalcXsecWeight_Norm(iSample, iEvent);
 		//DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
 		//std::cout << "norm weight is " << normweight << std::endl;
 		if (normweight <= 0.){
@@ -469,7 +466,7 @@ void samplePDFFDBase::fillArray_MP()
 		  continue;
 		}
 
-		funcweight = calcFuncSystWeight(iSample,iEvent);
+		funcweight = CalcXsecWeight_Func(iSample,iEvent);
 		//DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
 		//std::cout << "Func weight is " << funcweight << std::endl;
 		if (funcweight <= 0.){
@@ -575,6 +572,54 @@ void samplePDFFDBase::fillArray_MP()
   } //end of parallel region
 }
 #endif
+
+
+// **************************************************
+// Helper function to reset the data and MC histograms
+void samplePDFFDBase::ResetHistograms() {
+// **************************************************
+  
+  int nXBins = XBinEdges.size()-1;
+  int nYBins = YBinEdges.size()-1;
+  
+  //DB Reset values stored in PDF array to 0.
+  for (int yBin = 0; yBin < nYBins; yBin++) {
+    for (int xBin = 0; xBin < nXBins; xBin++) {
+      samplePDFFD_array[yBin][xBin] = 0.;
+    }
+  }
+} // end function
+
+// ***************************************************************************
+// Calculate the normalisation weight for one event
+double samplePDFFDBase::CalcXsecWeight_Spline(const int iSample, const int iEvent) {
+// ***************************************************************************
+
+  double xsecw = 1.0;
+  //DB Xsec syst
+  //Loop over stored spline pointers
+  for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
+    xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
+  }
+  return xsecw;
+}
+
+// ***************************************************************************
+// Calculate the normalisation weight for one event
+double samplePDFFDBase::CalcXsecWeight_Norm(const int iSample, const int iEvent) {
+// ***************************************************************************
+
+  double xsecw = 1.0;
+  //Loop over stored normalisation and function pointers
+  for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
+  {
+      xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+      #ifdef DEBUG
+      if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
+      #endif
+  }
+  return xsecw;
+}
 
 //ETA
 void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
@@ -1062,6 +1107,7 @@ double samplePDFFDBase::getLikelihood()
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:negLogL) private(xBin, yBin)
 #endif
+
   for (xBin = 0; xBin < nXBins; xBin++) 
   {
     for (yBin = 0; yBin < nYBins; yBin++) 
@@ -1071,6 +1117,7 @@ double samplePDFFDBase::getLikelihood()
         double w2 = samplePDFFD_array_w2[yBin][xBin];
         //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
         negLogL += getTestStatLLH(DataVal, MCPred, w2);
+
     }
   }
   return negLogL;

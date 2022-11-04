@@ -1,11 +1,13 @@
 #ifndef _samplePDFBase_h_
 #define _samplePDFBase_h_
 
+//C++ includes
 #include <iostream>
 #include <vector>
 #include <assert.h>
 #include <stdexcept>
 
+//ROOT includes
 #include "TTree.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -19,22 +21,27 @@
 #include "TMath.h"
 
 #include "manager/manager.h"
+
+//MaCh3 includes
 #include "samplePDFInterface.h"
 #include "splines/splineBase.h"
 #include "Structs.h"
 
 
-class samplePDFBase : public samplePDFInterface {
+class samplePDFBase : public samplePDFInterface 
+{
  public:
   samplePDFBase(){};
   samplePDFBase(double pot);
 
   virtual ~samplePDFBase();
 
-  void getModeName(std::vector<std::string> &modeNameVect, bool latex=false) ;
-  void getSampleName(std::vector<std::string> &sampleNameVect, bool latex=false) ;
-
-
+  __int__ GetNsamples(){ return nSamples; };
+  std::string GetSampleName(int Sample);
+  inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
+  inline void GetModeName(std::vector<std::string> &modeNameVect);
+  MaCh3_Modes* const GetModeStruct() const { return ModeStruct;};
+  
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
   TH1D* get1DDataHist(){return dathist;}
@@ -44,14 +51,13 @@ class samplePDFBase : public samplePDFInterface {
   void set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
   void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
   double getEventRate();
-  void setMCthrow(bool mc){MCthrow=mc;}
+  void setMCthrow(bool mc){MCthrow= mc;}
       
   // generate fake dataset based on rejection sampling    
-  vector< vector <double> > generate2D(TH2D* pdf=0);
+  vector< vector <double> > generate2D(TH2D* pdf = 0);
   vector<double> generate();
   virtual double getLikelihood();
-  virtual std::vector<double>* getDataSample()
-    {return dataSample;};
+  virtual std::vector<double>* getDataSample() {return dataSample;};
   // nominal spectrum things
   //  double getLikelihoodNominal(); // computes the likelihood against a nominal spectra
   /*  TH1D *generateNominal1D();
@@ -65,7 +71,7 @@ class samplePDFBase : public samplePDFInterface {
   void addData(TH2D* binneddata);
 
   void addXsecSplines(splineBase* splines){xsecsplines=splines;}
-  //virtual void whatAmI(){std::cout << "wai:samplePDFBase" << std::endl;};
+  //virtual void whatAmI(){std::cout << "__FILE__" << std::endl;};
 
   // For adding sample dependent branches to the posteriors tree
   virtual void setMCMCBranches(TTree *outtree) {};
@@ -82,8 +88,20 @@ class samplePDFBase : public samplePDFInterface {
   // Provide a setter for the test-statistic
   void SetTestStatistic(TestStatistic test_stat);
 
+
   std::vector<double>* dataSample;
   std::vector< vector <double> >* dataSample2D;
+   
+  // Contains how many samples we've got
+  __int__ nSamples;
+  //KS: number of dimension for this sample
+  int nDims;
+  //Name of Sample
+  std::vector<std::string> SampleName;
+
+  //GetterForModes
+  MaCh3_Modes* ModeStruct;
+  
   TH1D *dathist; // tempstore for likelihood calc
   TH2D *dathist2d;    
   
@@ -96,9 +114,8 @@ class samplePDFBase : public samplePDFInterface {
 
   TRandom3* rnd;
   bool MCthrow;
-  
+ 
   TestStatistic fTestStatistic;
-      
-};
 
+};
 #endif

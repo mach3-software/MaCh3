@@ -812,6 +812,7 @@ void covarianceXsec::throwNominal(bool nomValues, int seed) {
       //nominal[i] = (*xsec_param_nom)(i);
     }
   }
+  delete nom_throws;
 }
 
 // ********************************************
@@ -869,7 +870,7 @@ double covarianceXsec::getLikelihood() {
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:xsecLogL)
 #endif
-  for (int i = 0; i < nPars; i++) {
+  for (int i = 0; i < nPars; ++i) {
 
     // Make sure we're in a good region for parameter i
     if (fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]) {
@@ -883,7 +884,7 @@ double covarianceXsec::getLikelihood() {
         //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
         int scale = 1;
         if(i != j) scale = 2;
-        xsecLogL += scale * 0.5*( nominal[i]-fParProp[i])*(nominal[j]-fParProp[j])*(*invCovMatrix)(i,j);
+        xsecLogL += scale * 0.5*( nominal[i]-fParProp[i])*(nominal[j]-fParProp[j])*InvertCovMatrix[i][j];
       }
     } // end j for loop
   } // end i for loop

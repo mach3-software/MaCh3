@@ -1,26 +1,25 @@
 #ifndef SPLINEMONOLITH_H
 #define SPLINEMONOLITH_H
 
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <iomanip>
+// C++ includes
 #include <cstdlib>
+#include <iomanip>
 
-#include <TFile.h>
-#include <TH1F.h>
-#include <TKey.h>
-#include <TString.h>
-#include <TIterator.h>
-#include <TSpline.h>
-#include <TStopwatch.h>
-#include <TCanvas.h>
-#include <TStyle.h>
+// ROOT include
+#include "TFile.h"
+#include "TH1F.h"
+#include "TKey.h"
+#include "TString.h"
+#include "TIterator.h"
+#include "TStopwatch.h"
+#include "TCanvas.h"
+#include "TStyle.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
 
+// MaCh3  includes
 #include "samplePDF/Structs.h"
 
 // Make template class so we can use TF1 and TSpline3
@@ -31,6 +30,8 @@ class SMonolith {
     SMonolith(std::vector< std::vector<TSpline3_red*> > &MasterSpline);
     SMonolith(std::vector< std::vector<TF1*> > &MasterSpline);
     SMonolith(std::vector< std::vector<TF1_red*> > &MasterSpline);
+    SMonolith(std::vector< std::vector<Akima_Spline*> > &MasterSpline);
+    SMonolith(std::vector< std::vector<Monotone_Spline*> > &MasterSpline);
     ~SMonolith();
 
     // This EvalGPU should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here!
@@ -42,19 +43,31 @@ class SMonolith {
     void EvalGPU_TF1(float *val, bool plotWeight = false);
 
     // The returned gpu weights, read by the GPU
-    float *cpu_weights;
-
+#ifdef Weight_On_SplineBySpline_Basis
+    float* cpu_weights;
+#else
+    float *cpu_total_weights;
+#endif
   private:
     // Function to scan through the MasterSpline of TSpline3
-    void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, int &nParams);
+    void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, int &nParams, int &nSplines);
     // Function to scan through the MasterSpline of TF1
     void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, int &nParams);
     // Prepare the TSpline3_red objects for the GPU
     void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
+    // Prepare the Monotone Spline objects for the GPU
+    void PrepareForGPU(std::vector<std::vector<Monotone_Spline*> > &MasterSpline);
+    // Prepare the Akima_Spline objects for the GPU
+    void PrepareForGPU(std::vector<std::vector<Akima_Spline*> > &MasterSpline);
+
     // Prepare the TF1_red objects for the GPU
     void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
     // Reduced the TSpline3 to TSpline3_red
     std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline);
+    // Reduced the Akima spline to TSpline3_red
+    std::vector<std::vector<TSpline3_red*> > ReduceAkima(std::vector<std::vector<Akima_Spline*> > &MasterSpline);
+    // Reduced the monotone spline to TSpline3_red
+    std::vector<std::vector<TSpline3_red*> > ReduceMonotone(std::vector<std::vector<Monotone_Spline*> > &MasterSpline);
     // Reduced the TF1 to TF1_red
     std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline);
 
@@ -72,17 +85,27 @@ class SMonolith {
     // Max knots for production
     int _max_knots;
     // holds the index for good splines; don't do unsigned since starts with negative value!
-    int *index;
+    int *index_cpu;
+#ifndef Weight_On_SplineBySpline_Basis
+    int *index_gpu;
+#endif
     // Number of valid splines
     unsigned int NSplines_valid;
-    // Number of total splines we can maximally have
+    // Number of total splines we can maximally have, if each event had the maximum number of splines found across all events
     unsigned int NSplines_total;
-    // CPU arrays to hold monolith and weights
-    float *cpu_weights_var;  
+
+    // Number of total splines if each event had every parameter's spline
+    unsigned int NSplines_total_large;
 
     // Just some pointers to memory that doesn't get allocated so we can access the GPU
     // GPU arrays to hold monolith and weights
     float *gpu_weights;
+#ifndef Weight_On_SplineBySpline_Basis
+    float *gpu_total_weights;
+#else
+    // CPU arrays to hold monolith and weights
+    float *cpu_weights_var;
+#endif
     // GPU arrays to hold coefficients and number of points separately
     int   *gpu_nPoints_arr;
     int   *gpu_paramNo_arr;
@@ -90,4 +113,3 @@ class SMonolith {
     float *gpu_coeff_many;
 };
 #endif
-
