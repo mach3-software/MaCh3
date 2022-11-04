@@ -1,9 +1,11 @@
 #ifndef _samplePDFBase_h_
 #define _samplePDFBase_h_
 
+//C++ includes
 #include <iostream>
 #include <vector>
 
+//ROOT includes
 #include "TTree.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -14,6 +16,7 @@
 #include "TSpline.h"
 #include "TRandom3.h"
 
+//MaCh3 includes
 #include "samplePDFInterface.h"
 #include "splines/splineBase.h"
 #include "Structs.h"
@@ -26,9 +29,12 @@ class samplePDFBase : public samplePDFInterface
 
   virtual ~samplePDFBase();
 
-  void getModeName(std::vector<std::string> &modeNameVect, bool latex=false) ;
-  void getSampleName(std::vector<std::string> &sampleNameVect, bool latex=false) ;
-
+  __int__ GetNsamples(){ return nSamples; };
+  std::string GetSampleName(int Sample);
+  inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
+  inline void GetModeName(std::vector<std::string> &modeNameVect);
+  MaCh3_Modes* const GetModeStruct() const { return ModeStruct;};
+  
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
   TH1D* get1DDataHist(){return dathist;}
@@ -75,8 +81,17 @@ class samplePDFBase : public samplePDFInterface
 
   std::vector<double>* dataSample;
   std::vector< vector <double> >* dataSample2D;
+   
+  // Contains how many samples we've got
+  __int__ nSamples;
   //KS: number of dimension for this sample
   int nDims;
+  //Name of Sample
+  std::vector<std::string> SampleName;
+
+  //GetterForModes
+  MaCh3_Modes* ModeStruct;
+  
   TH1D *dathist; // tempstore for likelihood calc
   TH2D *dathist2d;    
   

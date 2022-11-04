@@ -812,6 +812,7 @@ void covarianceXsec::throwNominal(bool nomValues, int seed) {
       //nominal[i] = (*xsec_param_nom)(i);
     }
   }
+  delete nom_throws;
 }
 
 // ********************************************

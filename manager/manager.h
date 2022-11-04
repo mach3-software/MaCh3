@@ -9,16 +9,22 @@
 #define EXIT_SUCCESS 0
 #endif
 
+// C++ includes
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "libconfig/lib/libconfig.h++"
 
+// ROOT include
 #include "TFile.h"
 #include "TTree.h"
 #include "TBranch.h"
+
+// MaCh3 samplePDF includes
+#include "samplePDF/Structs.h"
+
+#include "libconfig/lib/libconfig.h++"
 
 // Only needed to Get number of threads
 // Could alternatively set-up by setting a static global?
@@ -49,7 +55,8 @@ class manager {
   const char *GetOutputFilename() { return (const char*)output_file.c_str(); }
 
   int GetMCStatLLH() { return mc_stat_llh; }
-
+  int GetUpdateW2() { return UpdateW2; }
+  
   double GetPOT()       { return protons_on_target; }
   double GetNubarPOT()  { return nubar_protons_on_target; }
 
@@ -360,6 +367,9 @@ class manager {
   // Apply Barlow Beeston
   int mc_stat_llh;
 
+  //Whether you want to update W2 in Likelihood calcaution
+  int UpdateW2;
+  
   // Variables to read in sample config files
   // these are thnigs that typically need to be used in samplePDF
   std::string sample_name;

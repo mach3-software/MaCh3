@@ -6,7 +6,7 @@ namespace MaCh3Utils {
   // Get the mass of a particle from the PDG
   // In GeV, not MeV!
   double GetMassFromPDG(int PDG) {
-    // *****************************
+  // *****************************
 
     switch (abs(PDG)) {
       
@@ -114,27 +114,6 @@ namespace MaCh3Utils {
 
 }
 
-
-// Constructor
-xsecBase::xsecBase() {
-  mode    = __BAD_INT__;
-  species = __BAD_INT__;
-  target  = __BAD_INT__;
-  Q2      = __BAD_DOUBLE__;
-  Enu     = __BAD_DOUBLE__;
-  weight  = __BAD_DOUBLE__;
-}
-
-void xsecBase::Print() {
-  std::cout << "*** Printing cross-section info:" << std::endl;
-  std::cout << "    " << std::left << std::setw(20) << "species : "<< species << std::endl;
-  std::cout << "    " << std::left << std::setw(20) << "mode    : "<< mode << std::endl;
-  std::cout << "    " << std::left << std::setw(20) << "target  : "<< target << std::endl;
-  std::cout << "    " << std::left << std::setw(20) << "Enu     : "<< Enu <<  " GeV" << std::endl;
-  std::cout << "    " << std::left << std::setw(20) << "Q2      : "<< Q2 <<  " GeV2" << std::endl;
-  std::cout << "    " << std::left << std::setw(20) << "weight  : "<< weight << std::endl;
-}
-
 // **************************************************
 // Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly) {
@@ -155,7 +134,7 @@ double OverflowIntegral(TH2Poly* poly) {
 // **************************************************
 // Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly* poly) {
-  // **************************************************
+// **************************************************
 
   double integral=0;
 
@@ -176,7 +155,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
   TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(),xbins.size()-1,&xbins[0]);
   //KS: Temp Histogram to store error
   TH1D* hProjX_Error = new TH1D((TempName+"_x_Err").c_str(),(TempName+"_x_Err").c_str(),xbins.size()-1,&xbins[0]);
-  double xlow, xup, frac=0;
+  double xlow, xup, frac = 0;
 
   //loop over bins in the poly
   for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
@@ -187,31 +166,31 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
       xup = bin->GetXMax();
 
       //Loop over projected bins, find fraction of poly bin in each
-      for(int dx=0; dx<int(xbins.size()); dx++)
+      for(int dx=0; dx < int(xbins.size()); dx++)
         {
           if(xbins[dx+1]<=xlow || xbins[dx]>=xup)
             {
-              frac=0;
+              frac = 0;
             }
           else if(xbins[dx]<=xlow && xbins[dx+1]>=xup)
             {
-              frac=1;
+              frac = 1;
             }
           else if(xbins[dx]<=xlow && xbins[dx+1]<=xup)
             {
-              frac=(xbins[dx+1]-xlow)/(xup-xlow);
+              frac = (xbins[dx+1]-xlow)/(xup-xlow);
             }
           else if(xbins[dx]>=xlow && xbins[dx+1]>=xup)
             {
-              frac=(xup-xbins[dx])/(xup-xlow);
+              frac = (xup-xbins[dx])/(xup-xlow);
             }
           else if(xbins[dx]>=xlow && xbins[dx+1]<=xup)
             {
-              frac=(xbins[dx+1]-xbins[dx])/(xup-xlow);
+              frac = (xbins[dx+1]-xbins[dx])/(xup-xlow);
             }
           else
             {
-              frac=0;
+              frac = 0;
             }
           hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
           //KS: Follow ROOT implementation and sum up the variance 
@@ -247,7 +226,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
   double ylow, yup, frac=0;
 
   //loop over bins in the poly
-  for(int i = 0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
     {
       //get bin and its edges
       TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
@@ -263,7 +242,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
             }
           else if(ybins[dy]<=ylow && ybins[dy+1]>=yup)
             {
-              frac=1;
+              frac = 1;
             }
           else if(ybins[dy]<=ylow && ybins[dy+1]<=yup)
             {
@@ -345,7 +324,7 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 // ****************
 // Integral of TH2Poly multiplied by bin width
 double PolyIntegralWidth(TH2Poly *Histogram) {
-  // ****************
+// ****************
 
   double integral=0;
   double xlow, xup, ylow, yup, area;
@@ -364,13 +343,57 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
 
   return integral;
 }
-
+// ****************
 //DB Get the Cernekov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {
+// ****************
   double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
+}
+
+// **************************************************************************
+// Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
+double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
+// ***************************************************************************
+
+  const double MLep = 0.10565837;
+
+  // Caluclate muon energy
+  double ELep = sqrt((MLep*MLep)+(PLep*PLep));
+
+  double CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);
+
+  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));
+
+  // Calculate the new Q2
+  double Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
+
+  return Q2Upd - InitialQ2;
+}
+
+
+// **************************************************************************
+// Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
+double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
+// ***************************************************************************
+
+  double mNeff = 0.93956536 - Eb / 1000.;
+  double mNoth = 0.93827203;
+
+  if (!neutrino) {
+    mNeff = 0.93827203 - Eb / 1000.;
+    mNoth = 0.93956536;
+  }
+
+  double mLep = 0.10565837;
+  double eLep = sqrt(PLep * PLep + mLep * mLep);
+
+  double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
+
+  return Enu;
+
 }
 
 /*
