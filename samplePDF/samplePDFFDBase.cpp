@@ -95,22 +95,23 @@ void samplePDFFDBase::useBinnedOscReweighting(bool ans, int nbins, double *osc_b
   }
 }
 
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iEvent) {
+bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iSample, int iEvent) {
   
   double Val;
 
   for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
  
-	Val = ReturnKinematicParameter(SelectionStr[iSelection], iEvent);
+	Val = ReturnKinematicParameter(SelectionStr[iSelection], iSample, iEvent);
+	//ETA - still need to support other method of you specifying the cut you want in ReturnKinematicParameter
+	//like in Dan's version below from T2K
     //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
-    if ((Val<Selection[iSelection][0])||(Val>=Selection[iSelection][1])) {
-	return false;
+    if ((Val<SelectionBounds[iSelection][0])||(Val>=SelectionBounds[iSelection][1])) {
+	  return false;
     }
-
   }
 
   //DB To avoid unneccessary checks, now return false rather than setting bool to true and continuing to check
@@ -118,14 +119,14 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, i
 }
 
 //Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iEvent) {
+bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent) {
   
   double Val;
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
 
     
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iEvent);
+    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
@@ -146,20 +147,7 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
 
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
 {
-
-/*  if (MCSamples.size()==6) {
-	reweight(oscpar, oscpar);
-	return;
-  }
-  else {
-	for (int i=0; i< (int)MCSamples.size(); ++i) {
-	  for (int j = 0; j < MCSamples[i].nEvents; ++j) {
-		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-	  }
-	}
-  }
-  */
-    
+     
   reweight(oscpar, oscpar);
   fillArray();
 
@@ -168,23 +156,13 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 
 void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweight function (this should be different for one vs 2 sets of oscpars)
 {
-  auto start = std::chrono::high_resolution_clock::now();
   for(int i = 0; i < (int)MCSamples.size(); ++i) {
     for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-		/*std::cout << "calcOscWeights!!!" << std::endl;
-		std::cout << "MCSamples[i].nutype = " << MCSamples[i].nutype << std::endl;
-		std::cout << "MCSamples[i].oscnutype = " << MCSamples[i].oscnutype << std::endl;
-		std::cout << "MCSamples[i].rw_etru = " << *(MCSamples[i].rw_etru[j]) << std::endl;
-		*/
-		//std::cout << "Oscnupar_nub is " << *(oscpar_nub) << std::endl;
-		//std::cout << "Oscnupar_nu is " << *(oscpar_nu) << std::endl;
+
 		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
     }
   }
 
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-  std::cout << "calcOscWeight took: " << duration.count() << " ms " << std::endl;
   fillArray();
 }
 
@@ -221,6 +199,8 @@ void samplePDFFDBase::fillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
+  std::cout << "Selection is of size " << Selection.size() << std::endl;
+
   // Call entirely different routine if we're running with openMP
 #ifdef MULTITHREAD
   fillArray_MP();
@@ -246,10 +226,12 @@ void samplePDFFDBase::fillArray() {
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       
-     applyShifts(iSample, iEvent);
-     //if(!IsEventSelected(iSample, iEvent)){
-//	   continue;
-//	 }
+	  applyShifts(iSample, iEvent);
+
+	  if (!IsEventSelected(SelectionStr, iSample, iEvent)) { 
+		continue;
+	  } 
+
 
 #if USEBETA == 1
       MCSamples[iSample].osc_w[iEvent] = ApplyBetaWeights(MCSamples[iSample].osc_w[iEvent],iSample);
@@ -440,7 +422,7 @@ void samplePDFFDBase::fillArray_MP() {
 		applyShifts(iSample, iEvent);
 
         //ETA - generic functions to apply shifts to kinematic variable
-		if(!IsEventSelected(iSample, iEvent)){
+		if(!IsEventSelected(SelectionStr, iSample, iEvent)){
 		  continue;
 		}
 
@@ -455,8 +437,6 @@ void samplePDFFDBase::fillArray_MP() {
 
 		//DB SKDet Syst
 		//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-		//ETA - removing this,  
-		//MCSamples[iSample].skdet_w[iEvent] = *(MCSamples[iSample].skdet_pointer[iEvent]);
 
 		//DB Xsec syst
 		//Loop over stored spline pointers
@@ -613,7 +593,7 @@ void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
 
   // Assign xsec norm bins in MCSamples tree
   for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
-	CalcXsecNormsBins(&(MCSamples[iSample]));
+	CalcXsecNormsBins(iSample);
   }
 
   //DB =====
@@ -655,7 +635,9 @@ void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
 }
 
 //A way to check whether a normalisation parameter applies to an event or not
-void samplePDFFDBase::CalcXsecNormsBins(fdmc_base *fdobj){
+void samplePDFFDBase::CalcXsecNormsBins(int iSample){
+
+  fdmc_base *fdobj = &MCSamples[iSample];
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins;
@@ -746,8 +728,8 @@ void samplePDFFDBase::CalcXsecNormsBins(fdmc_base *fdobj){
 		//i.e. does it only apply to events in a particular kinematic region?
 		if ((*it).hasKinBounds) {
 		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iEvent) < (*it).Selection[iKinematicParameter][0]) {continue;}
-			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iEvent) > (*it).Selection[iKinematicParameter][1]) {continue;}
+			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) < (*it).Selection[iKinematicParameter][0]) {continue;}
+			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {continue;}
 		  } 
 		}
 

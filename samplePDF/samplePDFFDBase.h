@@ -74,6 +74,7 @@ public:
   inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar);
   inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
 
+  std::string GetSampleName(){return samplename;}
 
   //============================= Should be deprecated =============================
   // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
@@ -84,7 +85,6 @@ public:
 
   // ETA - in the future it would be nice to have some generic getHIst functions
   // although, this introduces a root dependence into the core code?
-  // for now these live in the experiment specific daughter class
   //TH1D *getModeHist1D(int s, int m, int style = 0);
   //TH2D *getModeHist2D(int s, int m, int style = 0);
   // Direct translation of getModeHist1D(s,m,style) = get1DVarHist(kPDFBinning,m,s,style)
@@ -133,16 +133,17 @@ public:
 
   //ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){};
-  //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound},{{ND280KinematicTypes Var2, douuble LowBound, double UpBound},..}
-  bool IsEventSelected(std::vector< std::string > ParameterStr, int iEvent);
-  bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iEvent);
+  //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
+  bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
+  bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
   virtual void reconfigureFuncPars(){};
   virtual double calcFuncSystWeight(int iSample, int iEvent) = 0;
-  void CalcXsecNormsBins(fdmc_base *fdobj);
+  void CalcXsecNormsBins(int iSample);
+  //This just gets read in from a yaml file
   bool GetIsRHC() {return IsRHC;}
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
@@ -222,8 +223,11 @@ public:
 
   //===============================================================================
   //DB Vectors to store which kinematic cuts we apply
-  std::vector< std::string > SelectionStr;
+  std::vector< std::string > SelectionStr; //like in XsecNorms but for events in sample. Read in from sample yaml file 
+  std::vector< std::vector<double> > SelectionBounds; // like in XsecNorms but for events in sample. Read in from sample yaml file in samplePDFExperimentBase.cpp
+
   std::vector< std::vector<double> > Selection; //What gets used in IsEventSelected, which gets set equal to user input plus all the vectors in StoreSelection
+  int NSelections;
   std::vector< std::vector<double> > StoredSelection; //What gets pulled from config options
   //===============================================================================
   //
