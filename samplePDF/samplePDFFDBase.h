@@ -17,8 +17,8 @@
 #include "TFile.h"
 #include "TGraph2DErrors.h"
 #include "TROOT.h"
+#include "TRandom.h"
 #include "TString.h"
-#include "TMath.h"
 
 //MaCh3 includes
 #include "interfacePDFEbE.h"
@@ -182,6 +182,8 @@ public:
 
   //DB Array to be filled after reweighting
   double** samplePDFFD_array;
+  //KS Array used for MC stat
+  double** samplePDFFD_array_w2;
   //DB Array to be filled in AddData
   double** samplePDFFD_data;
   //===============================================================================

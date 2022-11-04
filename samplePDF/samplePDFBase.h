@@ -4,6 +4,8 @@
 //C++ includes
 #include <iostream>
 #include <vector>
+#include <assert.h>
+#include <stdexcept>
 
 //ROOT includes
 #include "TTree.h"
@@ -15,11 +17,16 @@
 #include "TRandom.h"
 #include "TSpline.h"
 #include "TRandom3.h"
+#include "TString.h"
+#include "TMath.h"
+
+#include "manager/manager.h"
 
 //MaCh3 includes
 #include "samplePDFInterface.h"
 #include "splines/splineBase.h"
 #include "Structs.h"
+
 
 class samplePDFBase : public samplePDFInterface 
 {
@@ -77,7 +84,10 @@ class samplePDFBase : public samplePDFInterface
   double up_bnd; // highest energy to use (MeV)
 
   double getLikelihood_kernel(std::vector<double> &data);
-  double getTestStatLLH(double data, double mc);
+  double getTestStatLLH(double data, double mc, double w2);
+  // Provide a setter for the test-statistic
+  void SetTestStatistic(TestStatistic test_stat);
+
 
   std::vector<double>* dataSample;
   std::vector< vector <double> >* dataSample2D;
@@ -104,6 +114,8 @@ class samplePDFBase : public samplePDFInterface
 
   TRandom3* rnd;
   bool MCthrow;
-};
+ 
+  TestStatistic fTestStatistic;
 
+};
 #endif
