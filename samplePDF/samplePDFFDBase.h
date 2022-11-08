@@ -1,27 +1,43 @@
 #ifndef _samplePDFFDBase_h_
 #define _samplePDFFDBase_h_
-
+//C++ includes
 #include <iostream>
-#include <TTree.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <THStack.h>
-#include <TLegend.h>
-#include <TMath.h>
-#include <TFile.h>
-#include <TGraph2DErrors.h>
-#include <vector>
+#include <assert.h>
+#include <stdexcept>
 #include <list>
+#include <vector>
+
+//ROOT includes
+#include "TTree.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "THStack.h"
+#include "TLegend.h"
+#include "TMath.h"
+#include "TFile.h"
+#include "TGraph2DErrors.h"
+#include "TROOT.h"
+#include "TRandom.h"
+#include "TString.h"
+
+//MaCh3 includes
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
-#include "BargerPropagator.h"
-#include "interfacePDFEbE.h"
+
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
+
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
+
 #include "FDMCStruct.h"
 #include "ShiftFunctors.h"
+
+#include "manager/manager.h"
+
+//Other
+#include "BargerPropagator.h"
+
 
 #define USEBETA 0
 
@@ -137,10 +153,16 @@ public:
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
   virtual void reconfigureFuncPars(){};
-  virtual double calcFuncSystWeight(int iSample, int iEvent) = 0;
+
   void CalcXsecNormsBins(int iSample);
   //This just gets read in from a yaml file
   bool GetIsRHC() {return IsRHC;}
+  // Calculate the spline weight for a given event
+  double CalcXsecWeightSpline(const int iSample, const int iEvent);
+  // Calculate the norm weight for a given event
+  double CalcXsecWeightNorm(const int iSample, const int iEvent);
+  virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
+
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
@@ -161,6 +183,9 @@ public:
 #endif
   void fillArray();
 
+  // Helper function to reset histograms
+  inline void ResetHistograms();
+      
   //===============================================================================
   //DB Variables required for getLikelihood
   //
@@ -170,6 +195,8 @@ public:
 
   //DB Array to be filled after reweighting
   double** samplePDFFD_array;
+  //KS Array used for MC stat
+  double** samplePDFFD_array_w2;
   //DB Array to be filled in AddData
   double** samplePDFFD_data;
   //===============================================================================

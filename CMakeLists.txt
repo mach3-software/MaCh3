@@ -76,6 +76,7 @@ endif()
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+
 #If Single thread is chosen MultiThread flags are omitted
 if(NOT ${SINGLE_THREAD_ONLY})
 

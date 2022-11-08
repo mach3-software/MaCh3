@@ -1,18 +1,23 @@
-#include <TROOT.h>
-#include <TRandom.h>
 #include "samplePDFBase.h"
 
-samplePDFBase::samplePDFBase(double pot) {
-  // Make sure no parameters have been accessed yet
-
+samplePDFBase::samplePDFBase(double pot) 
+{
+  nDims = 0;
   rnd = new TRandom3(0);
-  MCthrow=false;
+  MCthrow = false;
+  dathist = NULL;
+  dathist2d = NULL;
+  dataSample = NULL;
+  dataSample2D = NULL;
 }
 
 samplePDFBase::~samplePDFBase()
 {
-  rnd = new TRandom3(0);
-  MCthrow=false;
+  if(dathist != NULL) delete dathist;
+  if(dathist2d != NULL) delete dathist2d;
+  if(dataSample != NULL) delete dataSample;
+  if(dataSample2D != NULL) delete dataSample2D;  
+  delete rnd;
 }
 
 void samplePDFBase::init(double pot)
@@ -21,13 +26,29 @@ void samplePDFBase::init(double pot)
 
 void samplePDFBase::init(double pot, std::string mc_version)
 {
+    
+    
+  //TODO KS: Need to set test stat from config file
+  // Set the test-statistic
+  //SetTestStatistic(static_cast<TestStatistic>(FitManager->GetMCStatLLH()));
 }
 
 void samplePDFBase::addData(std::vector<double> &data)
 {
+  if(nDims != 0 && nDims != 1)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 1;
   dataSample = new std::vector<double>(data);
-  dataSample2D = NULL;
-  dathist2d = NULL;
+  if(dathist == NULL)
+  {
+      std::cerr<<"dathist not initialised"<<std::endl;
+      std::cerr<<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
   dathist->Reset();                                                         
   for (int i = 0; i < int(dataSample->size()); i++)                         
     dathist->Fill(dataSample->at(i));
@@ -35,30 +56,53 @@ void samplePDFBase::addData(std::vector<double> &data)
 
 void samplePDFBase::addData(std::vector< vector <double> > &data)
 {
+  if(nDims != 0 && nDims != 2)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 2;  
   dataSample2D = new std::vector< vector <double> >(data);
-  dataSample = NULL;
-  dathist = NULL;
+  if(dathist2d == NULL)
+  {
+      std::cerr<<"dathist2d not initialised"<<std::endl;
+      std::cerr <<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
   dathist2d->Reset();                                                       
   for (int i = 0; i < int(dataSample2D->size()); i++)                       
-    dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);   
+    dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]); 
 }
 
 void samplePDFBase::addData(TH1D* binneddata)
 {
+  if(nDims != 0 && nDims != 1)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 1;
   std::cout << "adding 1D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
-  dathist=binneddata;
-  dathist2d = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  //KS: If exist delete to avoid memory leak
+  if(dathist != NULL) delete dathist;
+  dathist = binneddata;
 }
 
 void samplePDFBase::addData(TH2D* binneddata)
 {
+  if(nDims != 0 && nDims != 2)
+  {
+    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
+    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  nDims = 2;
   std::cout << "adding 2D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
-  dathist2d=binneddata;
-  dathist = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  //KS: If exist delete to avoid memory leak
+  if(dathist2d != NULL) delete dathist;
+  dathist2d = binneddata;
 }
 
 std::vector<double> samplePDFBase::generate()
@@ -66,8 +110,7 @@ std::vector<double> samplePDFBase::generate()
   std::vector<double> data;
   TH1D *pdf = (TH1D*)get1DHist();
   double evrate = getEventRate();
-  TRandom3 *rndm = new TRandom3(0);
-  int num = rndm->Poisson(evrate);
+  int num = rnd->Poisson(evrate);
   std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
 
   // rejection sampling
@@ -97,14 +140,13 @@ std::vector<double> samplePDFBase::generate()
   }
 
   std::cout << "sampling complete" << std::endl;
-
   return data;
 }
+
 std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 {
   std::vector< vector <double> > data;
-  if(!pdf)
-    pdf = (TH2D*)get2DHist();
+  if(!pdf) pdf = (TH2D*)get2DHist();
 
   if(MCthrow)
   {
@@ -118,8 +160,7 @@ std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
   }
 
   double evrate = pdf->Integral();
-  TRandom3 *rndm = new TRandom3(0);
-  int num = rndm->Poisson(evrate);
+  int num = rnd->Poisson(evrate);
   std::cout << "sampling " << num << " events from " << evrate << std::endl;
 
   std::vector<double> var1;
@@ -128,7 +169,7 @@ std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 
   dathist2d->Reset();
 
-  for(int i=0; i<num; i++)
+  for(int i=0; i < num; i++)
   {
     pdf->GetRandom2(x,y);
     var1.push_back(x);
@@ -137,8 +178,6 @@ std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
   }
   data.push_back(var1);
   data.push_back(var2);
-
-
 
   std::cout << "sampling complete " << data[0].size() << std::endl;
   return data;
@@ -164,39 +203,17 @@ double samplePDFBase::getEventRate()
 
 double samplePDFBase::getLikelihood()
 {
-  if(!dataSample && !dataSample2D && !dathist && !dathist2d)    
+  if(nDims == 0)    
   {
     std::cerr << "data sample is empty!" << std::endl;
     return -1;
   }
-
-  int ndim=0;
-  bool whoops=true;
-  if(dataSample || dathist)
-  {
-    ndim=1;
-    whoops = !whoops;
-  }
-
-  else if(dataSample2D || dathist2d)
-  {
-    ndim=2;
-    whoops=!whoops;
-  }
-
-  if(whoops)
-  {    
-    std::cerr << "too many data samples!" << std::endl;
-    return -1;
-  }
-
-  double negLogL = 9999999;
+  double negLogL = 0;
 
   // for now, bin up dataset and do a binned fit
   // mc
-  if(ndim==1)
+  if(nDims == 1)
   {
-    negLogL=0;
     TH1D* pdf = (TH1D*)get1DHist();
     // data
     if (!dathist)
@@ -215,21 +232,12 @@ double samplePDFBase::getLikelihood()
     for (int i = 1; i <= pdf->GetNbinsX(); i++)
     {
       double mc = pdf->GetBinContent(i);
-      if(mc==0)
-        mc=1E-8;
       double dat = dathist->GetBinContent(i);
-      if(mc > 0 && dat > 0)
-      {
-        //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-        negLogL += (mc - dat + dat * TMath::Log(dat/mc));// + 1 / (12 * dat) + 0.5 *  TMath::Log(2*TMath::Pi() * dat));
-      }
-      else if(mc > 0 && dat == 0)
-        negLogL += mc;
+      negLogL += getTestStatLLH(dat, mc);
     }
   }
-  if(ndim==2)
+  if(nDims == 2)
   {
-    negLogL=0;
     TH2D* pdf = (TH2D*)get2DHist();
     // data
     if(dataSample2D && !dathist2d)
@@ -244,28 +252,31 @@ double samplePDFBase::getLikelihood()
     // get likelihood
     for (int i = 1; i <= pdf->GetNbinsX(); i++)
     {
-      for(int j=1; j <= pdf->GetNbinsY(); j++)
+      for(int j = 1; j <= pdf->GetNbinsY(); j++)
       {
+        double dat = dathist2d->GetBinContent(i,j); 
         double mc = pdf->GetBinContent(i,j);
-        if(mc==0)
-          mc=1E-8;
-        double dat = dathist2d->GetBinContent(i,j);
-
-        if(mc > 0 && dat > 0)
-        {
-          negLogL += (mc - dat + dat * TMath::Log(dat/mc));// + 1 / (12 * dat) + 0.5 *  TMath::Log(2*TMath::Pi() * dat));
-        }
-        else if(mc > 0 && dat == 0)
-          negLogL += mc;
+        negLogL += getTestStatLLH(dat, mc);
       }
     }
-
-
   }
   return negLogL;
 }
-
-
+// ***************************************************************************
+//KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
+double samplePDFBase::getTestStatLLH(double data, double mc) {
+// ***************************************************************************
+    double negLogL = 0;
+    if(mc == 0) mc = 1E-8;
+    if(mc > 0 && data > 0)
+    {
+        //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+        negLogL += (mc - data + data * TMath::Log(data/mc));
+    }
+    else if(mc > 0 && data == 0) negLogL += mc;
+    
+    return negLogL; 
+}
 
 // this function will compute the likelihood against a nominal dataset (histogram)
 /*double samplePDFBase::getLikelihoodNominal()
@@ -309,6 +320,95 @@ double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
   return 0;
 }
 
+
+// *************************
+// Calculate the Barlow-Beeston likelhood contribution from MC statistics
+// Assumes the beta scaling parameters are Gaussian distributed
+// Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
+// Essentially solves equation 11
+// data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
+double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
+  // *************************
+
+  // Need some MC
+  if (mc == 0) return 0.0;
+
+  // The MC used in the likeliihood calculation
+  // Is allowed to be changed by Barlow Beeston beta parameters
+  double newmc = mc;
+
+  // Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
+  // Assume the MC has a Gaussian distribution around generated
+  // As in https://arxiv.org/abs/1103.0354 eq 10, 11
+
+  // The penalty from MC statistics using Barlow-Beeston
+  double penalty = 0;
+  if (fTestStatistic == kBarlowBeeston) {
+    // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
+    double fractional = sqrt(w2)/mc;
+    // -b/2a in quadratic equation
+    double temp = mc*fractional*fractional-1;
+    // b^2 - 4ac in quadratic equation
+    double temp2 = temp*temp + 4*data*fractional*fractional;
+    if (temp2 < 0) {
+      std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }  
+    // Solve for the positive beta
+    double beta = (-1*temp+sqrt(temp2))/2.;
+    newmc = mc*beta;
+    // And penalise the movement in beta relative the mc uncertainty
+    if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+    else penalty = 0;
+  }
+
+  // Calculate the new Poisson likelihood
+  // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
+  // For the Poisson likelihood, this is just the usual calculation
+  // For IceCube likelihood, we calculate it later
+  double stat = 0;
+  // All likelihood calculations may use the bare Poisson likelihood, so calculate here
+  if (data == 0) stat = newmc;
+  else if (newmc > 0) stat = newmc-data+data*TMath::Log(data/newmc);
+
+  // Also try the IceCube likelihood
+  // It does not modify the MC content
+  // https://arxiv.org/abs/1901.04645
+  // Argüelles, C.A., Schneider, A. & Yuan, T. J. High Energ. Phys. (2019) 2019: 30. https://doi.org/10.1007/JHEP06(2019)030
+  // We essentially construct eq 3.16 and take the logarithm
+  // in eq 3.16, mu is MC, sigma2 is w2, k is data
+  if (fTestStatistic == kIceCube) {
+    // If there for some reason is 0 mc uncertainty, return the Poisson LLH
+    if (w2 == 0) return stat;
+
+    // Reset the penalties if there is mc uncertainty
+     stat = 0.0;
+     penalty = 0.0;
+     // Auxillary variables
+     long double b = mc/w2;
+     long double a = mc*b+1;
+     long double k = data;
+     // Use C99's implementation of log of gamma function to not be C++11 dependent
+     stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
+   }
+
+   // Return the statistical contribution and penalty
+   return stat+penalty;
+ }
+
+// **************************************************
+// Helper function to set LLH type used in the fit
+void samplePDFBase::SetTestStatistic(TestStatistic test_stat) {
+// **************************************************
+  fTestStatistic = test_stat;
+  
+  std::string name = TestStatistic_ToString((TestStatistic)test_stat);
+  std::cout << "Using "<< name <<" likelihood in ND280" << std::endl;
+  //if(UpdateW2) std::cout << "With updating W2" << std::endl;
+  //else  std::cout << "Without updating W2" << std::endl;
+}
+
 void samplePDFBase::set1DBinning(int nbins, double* boundaries)
 {
   _hPDF1D->Reset();
@@ -337,61 +437,41 @@ void samplePDFBase::set2DBinning(int nbins1, double low1, double high1, int nbin
 }
 
 
-void samplePDFBase::getSampleName(std::vector<std::string> &sampleNameVect, bool latex) 
-{
+// ***************************************************************************
+//KS: Sample getter
+std::string samplePDFBase::GetSampleName(int Sample) {
+// ***************************************************************************
+
+  if(Sample > nSamples)
+  {
+   std::cerr<<" You are asking for sample "<< Sample <<" I only have "<< nSamples<<std::endl;
+   throw;
+  }
+
+  return SampleName[Sample];
+}
+// ***************************************************************************
+void samplePDFBase::GetSampleNames(std::vector<std::string> &sampleNameVect) {
+// ***************************************************************************
   if(sampleNameVect.size() !=0)
     sampleNameVect.clear() ;
 
-  if(!latex) {
-    sampleNameVect.push_back("beam nu_mu") ;
-    sampleNameVect.push_back("beam nu_e") ;
-    sampleNameVect.push_back("beam antinu_mu") ;
-    sampleNameVect.push_back("beam antinu_e") ;
-    sampleNameVect.push_back("oscillated nu_e") ;
-    sampleNameVect.push_back("oscillated antinu_e") ;
+  for(int i = 0; nSamples; i++)
+  {
+    sampleNameVect.push_back(GetSampleName(i));
   }
-  else{
-    sampleNameVect.push_back("beam $\\nu_{\\mu}$") ;
-    sampleNameVect.push_back("beam $\\nu_{e}$") ;
-    sampleNameVect.push_back("beam $\\bar{\\nu_{\\mu}}$") ;
-    sampleNameVect.push_back("beam $\\bar{\\nu_{e}}$") ;
-    sampleNameVect.push_back("oscillated $\\nu_{e}$") ;
-    sampleNameVect.push_back("oscillated $\\bar{\\nu_{e}}$") ;
-  }
-
 }
 
+// ***************************************************************************
+void samplePDFBase::GetModeName(std::vector<std::string> &modeNameVect) {
+// ***************************************************************************
 
-void samplePDFBase::getModeName(std::vector<std::string> &modeNameVect, bool latex) 
-{
   if(modeNameVect.size() !=0)
     modeNameVect.clear() ;
 
-  if(!latex) {
-    modeNameVect.push_back("CCQE") ;
-    modeNameVect.push_back("CC-1pi") ;
-    modeNameVect.push_back("CC-coherent") ;
-    modeNameVect.push_back("CC-Npi") ;
-    modeNameVect.push_back("CC-other") ;
-    modeNameVect.push_back("NC pi0") ;
-    modeNameVect.push_back("NC-1pi +/-") ;
-    modeNameVect.push_back("NC-coherent") ;
-    modeNameVect.push_back("NC-other") ;
-    modeNameVect.push_back("2p2h") ;
-    modeNameVect.push_back("NC-1gamma") ;
-  }
-  else{
-    modeNameVect.push_back("CCQE");
-    modeNameVect.push_back("CC 1$\\pi$");
-    modeNameVect.push_back("CC coherent");
-    modeNameVect.push_back("CC n$\\pi$");
-    modeNameVect.push_back("CC other");
-    modeNameVect.push_back("NC $\\pi^{0}$");
-    modeNameVect.push_back("NC $\\pi^{+/-}$");
-    modeNameVect.push_back("NC coherent");
-    modeNameVect.push_back("NC other");
-    modeNameVect.push_back("2p-2h");
-    modeNameVect.push_back("NC 1$\\gamma$");
+  for(int i = 0; ModeStruct->GetNModes()+1; i++)
+  {
+    modeNameVect.push_back(ModeStruct->Mode_ToString(i));
   }
 
 }

@@ -17,6 +17,7 @@ manager::manager(std::string const &filename)
 YAML::Node const & manager::raw(){ return config; }
 
 /* Old Mananger that needs translation
+ * we're moving to YAML BABY!
 
 manager::manager(char *config, bool print) {
 
@@ -95,6 +96,10 @@ if(cfg.exists("PARNAME")) try {
 n_steps << std::endl;
     }
 
+    //How often (number of steps) you want to autosave chain
+    if (cfg.exists("AUTOSAVE")) n_AutoSave = cfg.lookup("AUTOSAVE");
+    else n_AutoSave = 500;
+    
     //Number of burn in steps
     if (cfg.exists("NBURNINSTEPS")){
       n_burnin_steps = cfg.lookup("NBURNINSTEPS");
@@ -107,19 +112,28 @@ n_steps << std::endl;
     // Use Barlow Beeston likelihood in ND280?
     if (cfg.exists("MCSTAT")) {
       std::string likelihood = cfg.lookup("MCSTAT");
-      if (likelihood == "Barlow-Beeston") mc_stat_llh = 1;
-      else if (likelihood == "IceCube")   mc_stat_llh = 2;
-      else if (likelihood == "Poisson")   mc_stat_llh = 0;
-      else {
+      if (likelihood == "Barlow-Beeston") mc_stat_llh = TestStatistic(kBarlowBeeston);
+      else if (likelihood == "IceCube")   mc_stat_llh = TestStatistic(kIceCube);
+      else if (likelihood == "Poisson")   mc_stat_llh = TestStatistic(kPoisson);
+      else { 
         std::cerr << "Wrong form of test-statistic specified!" << std::endl;
-        std::cerr << "You gave " << likelihood << " and I only support:" <<
-std::endl; std::cerr << "   Poisson" << std::endl; std::cerr << "
-Barlow-Beeston" << std::endl; std::cerr << "   Poisson" << std::endl; std::cerr
-<< __FILE__ << ":" << __LINE__ << std::endl; throw;
+        std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
+        std::cerr << "   Poisson" << std::endl;
+        std::cerr << "   Barlow-Beeston" << std::endl;
+        std::cerr << "   IceCube" << std::endl;
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        throw;
       }
-      if (verbosity) std::cout << "- MC stat test statistic specified, using "
-<< likelihood << std::endl; } else { mc_stat_llh = 0; if (verbosity) std::cout
-<< "- MC stat test statistic not specified, using Poisson" << std::endl;
+      if (verbosity) std::cout << "- MC stat test statistic specified, using " << TestStatistic_ToString(TestStatistic(mc_stat_llh)) << std::endl;
+    } else {
+      mc_stat_llh = kPoisson;
+      if (verbosity) std::cout << "- MC stat test statistic not specified," << TestStatistic_ToString(TestStatistic(mc_stat_llh)) << std::endl;
+    }
+    
+    if (cfg.exists("USE_UpdateW2")) {
+      UpdateW2 = cfg.lookup("USE_UpdateW2");
+    } else {
+      UpdateW2 = true;
     }
 
     // Stepping scale for nuisance parameters
@@ -127,13 +141,6 @@ Barlow-Beeston" << std::endl; std::cerr << "   Poisson" << std::endl; std::cerr
       step_scale = cfg.lookup("STEPSCALE");
     } else {
       step_scale = 0.05;
-    }
-
-    // Stepping scale for flux
-    if (cfg.exists("STEPSCALEFLUX")) {
-      step_scale_flux = cfg.lookup("STEPSCALEFLUX");
-    } else {
-      step_scale_flux = 0.05;
     }
 
     // Stepping scale for xsec
@@ -313,13 +320,6 @@ default" << std::endl; yaxisbins.push_back(0); yaxisbins.push_back(1);
       xsec_syst_opt = (bool)cfg.lookup("XSECSYSTOPT");
     } else {
       xsec_syst_opt = true;
-    }
-
-    // Turn off flux systematics
-    if (cfg.exists("FLUXSYSTOPT")) {
-      flux_syst_opt = (bool)cfg.lookup("FLUXSYSTOPT");
-    } else {
-      flux_syst_opt = true;
     }
 
     // Set annealing temp (not used by standard!)
@@ -562,24 +562,6 @@ root["FARDETPARAMFLAT"]; for (int i = 0; i < int(setting.getLength()); i++)
         far_det_fix.push_back((int)setting[i]);
     }
 
-    // What flux params are flat
-    if (cfg.exists("FLUXPARAMFLAT")) {
-      const libconfig::Setting &root = cfg.getRoot();
-      const libconfig::Setting &setting = root["FLUXPARAMFLAT"];
-      for (int i = 0; i < int(setting.getLength()); i++) {
-        flux_flat.push_back((int)setting[i]);
-      }
-    }
-
-    // What flux params are fixed
-    if (cfg.exists("FLUXPARAMFIX")) {
-      const libconfig::Setting &root = cfg.getRoot();
-      const libconfig::Setting &setting = root["FLUXPARAMFIX"];
-      for (int i = 0; i < int(setting.getLength()); i++) {
-        flux_fix.push_back((int)setting[i]);
-      }
-    }
-
     // What xsec params are flat
     if (cfg.exists("XSECPARAMFLAT")) {
       const libconfig::Setting &root = cfg.getRoot();
@@ -761,7 +743,7 @@ void manager::Print() {
   std::cout << "---------------------------------" << std::endl;
   std::cout << "MCMC settings         "    << std::endl;
   std::cout << "    N steps:          " << GetNSteps() << std::endl;
-  std::cout << "    Flux step scale:  " << GetFluxStepScale() << std::endl;
+  std::cout << "    AutoSave:         " << GetAutoSave() << std::endl;
   std::cout << "    Xsec step scale:  " << GetXsecStepScale() << std::endl;
   std::cout << "    ND det step scale:" << GetNearDetStepScale() << std::endl;
   std::cout << "    Far det step scale:" << GetFarDetStepScale() << std::endl;

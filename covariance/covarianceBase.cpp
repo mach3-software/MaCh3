@@ -1,24 +1,48 @@
 #include "covarianceBase.h"
 
-covarianceBase::covarianceBase() {
-  random_number = new TRandom3(0);
-  firstpcadpar=-999;
-  lastpcadpar=-999;
-}
 
 covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {
-  random_number = new TRandom3(0);
+#ifdef MULTITHREAD
+  int nThreads = omp_get_max_threads();
+#else
+  int nThreads = 1;
+#endif
+  //KS: set Random numbers for each thread so each thread has differnt seed
+  //or for one thread if without MULTITHREAD 
+  random_number = new TRandom3*[(const int)nThreads]();
+  for (int iThread=0;iThread<nThreads;iThread++) {
+    random_number[iThread] = new TRandom3(0);
+  }
+  
   init(name, file);
   firstpcadpar=-999;
   lastpcadpar=-999;
 }
 
 covarianceBase::covarianceBase(const char *name, const char *file, int seed) : inputFile(std::string(file)), pca(false) {
-  random_number = new TRandom3(seed);
+#ifdef MULTITHREAD
+  int nThreads = omp_get_max_threads();
+  if(seed != 0)
+  {
+     std::cerr<<"You have set seed to "<<seed<<std::endl;
+     std::cerr<<"And you are running with MULTITHREAD"<<std::endl;
+     std::cerr<<"TRandom for each thread will have same seed"<<std::endl;
+     std::cerr<<"This is fine if this was your intetnion"<<std::endl;
+  }
+  #else
+  int nThreads = 1;
+#endif
+   //KS: set Random numbers for each thread so each thread has differnt seed
+  //or for one thread if without MULTITHREAD 
+  random_number = new TRandom3*[(const int)nThreads]();
+  for (int iThread=0;iThread<nThreads;iThread++) {
+    random_number[iThread] = new TRandom3(seed);
+  }
   init(name, file);
   firstpcadpar=-999;
   lastpcadpar=-999;
 }
+
 
 covarianceBase::covarianceBase(const char *name, const char *file, int seed, double threshold, int firstpcapar, int lastpcapar) : inputFile(std::string(file)), pca(true), eigen_threshold(threshold), firstpcadpar(firstpcapar), lastpcadpar(lastpcapar) {
 
@@ -30,11 +54,64 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed, dou
     std::cerr << "    Am instead calling the usual non-PCA constructor..." << std::endl;
     pca = false;
   }
-  random_number = new TRandom3(seed);
+  
+  #ifdef MULTITHREAD
+  int nThreads = omp_get_max_threads();
+  if(seed != 0)
+  {
+     std::cerr<<"You have set seed to "<<seed<<std::endl;
+     std::cerr<<"And you are running with MULTITHREAD"<<std::endl;
+     std::cerr<<"TRandom for each thread will have same seed"<<std::endl;
+     std::cerr<<"This is fine if this was your intetnion"<<std::endl;
+  }
+#else
+  int nThreads = 1;
+#endif
+  //KS: set Random numbers for each thread so each thread has differnt seed
+  //or for one thread if without MULTITHREAD 
+  random_number = new TRandom3*[(const int)nThreads]();
+  for (int iThread=0;iThread<nThreads;iThread++) {
+    random_number[iThread] = new TRandom3(seed);
+  }
   init(name, file);
 
   // Call the innocent helper function
   if (pca) ConstructPCA();
+}
+
+
+// ********************************************
+//Desctructor
+covarianceBase::~covarianceBase(){
+// ********************************************
+  delete[] fParInit;
+  delete[] fParSigma;
+  delete[] fParCurr;
+  delete[] fParProp;
+  delete[] fParLoLimit;
+  delete[] fParHiLimit;
+  delete[] fIndivStepScale;
+  delete[] fParEvalLikelihood;
+  
+  if (covMatrix != NULL) delete covMatrix;
+  if (invCovMatrix != NULL) delete invCovMatrix;
+  if (chel != NULL) delete chel;
+    fPropKernel = new TF1*[size]();
+  for(int i = 0; i < size; i++) 
+  {
+    delete[] InvertCovMatrix[i];
+    delete  fPropKernel[i];
+  }
+  delete[] InvertCovMatrix;
+  delete[] fPropKernel;
+  
+#ifdef MULTITHREAD
+  int nThreads = omp_get_max_threads();
+#else
+  int nThreads = 1;
+#endif
+  for (int iThread=0;iThread < nThreads; iThread++)  delete random_number[iThread];
+  delete[] random_number;
 }
 
 void covarianceBase::ConstructPCA() {
@@ -164,8 +241,8 @@ void covarianceBase::ConstructPCA() {
   
 }
 
-void covarianceBase::init(const char *name, const char *file) {
-
+void covarianceBase::init(const char *name, const char *file)
+{
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file, "READ");
   if (infile->IsZombie()) {
@@ -184,13 +261,27 @@ void covarianceBase::init(const char *name, const char *file) {
   }
 
   // Set the covariance matrix
-  setCovMatrix(covMatrix);
-  setName(name);
   size = covMatrix->GetNrows();
-  if (size <= 0) {
+  if (size <= 0)
+  {
     std::cerr << "Covariance matrix " << getName() << " has " << size << " entries!" << std::endl;
     throw;
   }
+  InvertCovMatrix = new double*[size]();
+  // Set the defaults to true
+  for(int i = 0; i < size; i++)
+  {
+    InvertCovMatrix[i] = new double[size]();
+    for (int j = 0; j < size; j++)
+    {
+        InvertCovMatrix[i][j] = 0.;
+    }
+  }
+
+  // Set the covariance matrix
+  setCovMatrix(covMatrix);
+  setName(name);
+
   npars = size;
 
   // Set the nominal values to 1
@@ -208,7 +299,6 @@ void covarianceBase::init(const char *name, const char *file) {
   fParHiLimit = new Double_t[size]();
   fIndivStepScale = new Double_t[size];
   fParEvalLikelihood =  new bool[size]();
-  fParDoStep = new bool[size]();
 
   // Set the defaults to true
   for(int i = 0; i < size; i++) {
@@ -220,7 +310,6 @@ void covarianceBase::init(const char *name, const char *file) {
     fParHiLimit[i] = 999.99;
     fParEvalLikelihood[i] = true;
     fIndivStepScale[i] = 1.;
-    fParDoStep[i] = true;
   }
 
   // Set the logLs to very large so next step is accepted
@@ -240,55 +329,6 @@ void covarianceBase::init(const char *name, const char *file) {
   delete infile;
 }
 
-
-void covarianceBase::init(TMatrixDSym* covMat) {
-
-  setCovMatrix(covMat);
-
-  size = covMatrix->GetNrows();
-
-  nominal.clear();
-
-  // Set nominal values to 1
-  for (int i = 0; i < size; i++) {
-    nominal.push_back(1.0);
-  }
-
-  fPropKernel = new TF1*[size];
-  fParNames = new Char_t*[size];
-  fParInit = new Double_t[size];
-  fParSigma = new Double_t[size];
-  fParCurr = new Double_t[size];
-  fParProp = new Double_t[size];
-  fParLoLimit = new Double_t[size]();
-  fParHiLimit = new Double_t[size]();
-  fIndivStepScale = new Double_t[size];
-  fParEvalLikelihood =  new bool[size];
-  fParDoStep = new bool[size];
-  for (int i = 0; i < size; i++) {
-    fParInit[i] = 0;
-    fParSigma[i] = 0;
-    fParCurr[i] = 0;
-    fParProp[i] = 0;
-    fParLoLimit[i] = -999.99;
-    fParHiLimit[i] = 999.99;
-    fParEvalLikelihood[i] = true;
-    fIndivStepScale[i] = 1.;
-    fParDoStep[i] = true;
-  }
-
-  // dont need these 2 i tihnk
-  currLogL = __LARGE_LOGL__;
-  propLogL = __LARGE_LOGL__;
-
-  // set random parameter vector (for correlated steps)
-  randParams.ResizeTo(size);
-
-  fStepScale = 1.0;
-
-  std::cout << "Created covariance matrix named: " << getName() << std::endl;
-}
-
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
   if (cov == NULL) {
@@ -299,6 +339,14 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
   covMatrix = cov;
   invCovMatrix = (TMatrixDSym*)cov->Clone();
   invCovMatrix->Invert();
+  //KS: ROOT has bad memory managment, using standard double means we can decrease most operation by factor 2 simply due to cache hits
+  for (int i = 0; i < size; i++)
+  {
+    for (int j = 0; j < size; ++j)
+    {
+        InvertCovMatrix[i][j] = (*invCovMatrix)(i,j);
+    }
+  }
 }
 
 // Set all the covariance matrix parameters to a user-defined value
@@ -512,20 +560,31 @@ void covarianceBase::throwParameters() {
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (fParProp[i] > fParHiLimit[i] || fParProp[i] < fParLoLimit[i]) {
-        if (throws > 1000) {
+        randParams(i) = random_number[0]->Gaus(0,1);
+   
+        fParProp[i] = fParInit[i] + ((*chel)*randParams)(i);
+        if (throws > 10000) 
+        {
           std::cerr << "Tried " << throws << " times to throw parameter " << i << " but failed" << std::endl;
           std::cerr << "Matrix: " << matrixName << std::endl;
           std::cerr << "Param:  " << fParNames[i] << std::endl;
-          throw;
+          std::cerr << "Setting fParProp:  " << fParProp[i] <<" to "<<fParInit[i]<<std::endl;
+          std::cerr << "I live at " << __FILE__ << ":" << __LINE__ << std::endl;
+          fParProp[i] = fParInit[i];
+          //throw;
         }
-        randParams(i) = random_number->Gaus(0,1);
-        fParProp[i] = fParInit[i] + ((*chel)*randParams)(i);
         throws++;
       }
       fParCurr[i] = fParProp[i];
     }
   }
-
+  else
+  {      
+      std::cerr << "Hold on, you are trying to run Prior/Posterior Predicitve Code with PCA, which is wrong" << std::endl;
+      std::cerr << "Sorry I have to kill you, I mean your job" << std::endl;
+      std::cerr << "I live at " << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
 }
 
 // *************************************
@@ -547,7 +606,7 @@ void covarianceBase::RandomConfiguration() {
     double throwrange = sigma;
     if (paramrange < sigma) throwrange = paramrange;
 
-    fParProp[i] = fParInit[i] + random_number->Gaus(0, 1)*throwrange;
+    fParProp[i] = fParInit[i] + random_number[0]->Gaus(0, 1)*throwrange;
     // Try again if we the initial parameter proposal falls outside of the range of the parameter
     // Really only relevant for the xsec parameters; the flux and ND280 have -999 and 999 set to the limits!
     double oldval = fParProp[i];
@@ -560,7 +619,7 @@ void covarianceBase::RandomConfiguration() {
         throw;
       }
       fParProp[i] = oldval;
-      fParProp[i] = fParInit[i] + random_number->Gaus(0, 1)*throwrange;
+      fParProp[i] = fParInit[i] + random_number[0]->Gaus(0, 1)*throwrange;
       throws++;
     }
     std::cout << "Setting current step in " << matrixName << " param " << i << " = " << fParProp[i] << " from " << fParCurr[i] << std::endl;
@@ -626,14 +685,20 @@ void covarianceBase::proposeStep() {
 void covarianceBase::randomize() {
 // ************************************************
   if (!pca) {
+//KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit      
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
     for (int i = 0; i < size; i++) {
       // If parameter isn't fixed
       if (fParSigma[i] > 0.0) {
-        fParProp[i] = fParCurr[i] + fPropKernel[i]->GetRandom();
-        randParams(i) = random_number->Gaus(0, 1);
+#ifdef MULTITHREAD
+        //fParProp[i] = fParCurr[i] + fPropKernel[i]->GetRandom(); //this is overwritten in CorrelateSteps()
+        randParams(i) = random_number[omp_get_thread_num()]->Gaus(0, 1);
+#else
+        //fParProp[i] = fParCurr[i] + fPropKernel[i]->GetRandom(); //this is overwritten in CorrelateSteps()
+        randParams(i) = random_number[0]->Gaus(0, 1);
+#endif 
         // If parameter IS fixed
       } else {
         randParams(i) = 0.0;
@@ -646,11 +711,15 @@ void covarianceBase::randomize() {
 #pragma omp parallel for
 #endif
     for (int i = 0; i < npars; i++) {
-      randParams(i) = random_number->Gaus(0,1);
+#ifdef MULTITHREAD        
+      randParams(i) = random_number[omp_get_thread_num()]->Gaus(0,1);
+#else        
+      randParams(i) = random_number[0]->Gaus(0,1);
+#endif
     }
   }
 }
-// ************************************************
+
 
 // ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
@@ -794,9 +863,6 @@ double covarianceBase::getLikelihood() {
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
-  // Profiling shows that invCovMatrix almost always cache misses, change this to an array instead
-  // Probably some strange structure of the TMatrixTSym
-
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:logL)
 #endif
@@ -809,14 +875,15 @@ double covarianceBase::getLikelihood() {
       std::cout << "Rejecting!" << std::endl;
     }
 
-    for (int j = 0; j < size; j++) {
+    for (int j = 0; j <= i; ++j) {
       if (fParEvalLikelihood[i] && fParEvalLikelihood[j]) {
-        logL += 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+        //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
+        int scale = 1;
+        if(i != j) scale = 2;
+        logL += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];
       }
     }
-
   }
-
   //clock.Stop();
   //std::cout << __FILE__ << "::getLikelihood took " << clock.RealTime() << "s" << std::endl;
 
@@ -1049,5 +1116,8 @@ void covarianceBase::MakePosDef() //Makes sure that matrix is positive-definite 
   std::cout << "Had to shift diagonal " << iAttempt << " time(s) to allow the covariance matrix to be decomposed" << std::endl;
   //DB Reseting warning level
   gErrorIgnoreLevel = originalErrorWarning;
+
+  // TH: Allows LLH calculator to pick up correct matrix
+  setCovMatrix(covMatrix);
 }
 

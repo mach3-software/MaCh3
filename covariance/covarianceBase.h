@@ -1,33 +1,26 @@
 #ifndef _covarianceBase_h_
 #define _covarianceBase_h_
 
-#include <iomanip>
-
-#include <TMatrixT.h>
-#include <TMatrixDSym.h>
-#include <TVectorT.h>
-#include <TVectorD.h>
-#include <TCanvas.h>
-#include <TH1D.h>
-#include <TTree.h>
-#include <TF1.h>
-#include <TFile.h>
-#include <TAxis.h>
-#include <TRandom3.h>
-#include <vector>
-#include <TMath.h>
-
-#include <iostream>
-#include <math.h>
-#include <TDecompChol.h>
-#include "throwParms/ThrowParms.h"
-
-#include "samplePDF/Structs.h"
-//#include "manager/manager.cpp"
-
+// ROOT includes
+#include "TMatrixT.h"
+#include "TMatrixDSym.h"
+#include "TVectorT.h"
+#include "TVectorD.h"
+#include "TCanvas.h"
+#include "TH1D.h"
+#include "TTree.h"
+#include "TFile.h"
+#include "TAxis.h"
+#include "TRandom3.h"
+#include "TMath.h"
+#include "math.h"
+#include "TDecompChol.h"
 #include "TStopwatch.h"
-
 #include "TMatrixDSymEigen.h"
+
+// MaCh3 includes
+#include "samplePDF/Structs.h"
+#include "throwParms/ThrowParms.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
@@ -40,12 +33,12 @@
 class covarianceBase {
  public:
   // The constructors
-  covarianceBase();
+  covarianceBase(){};
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
   // For Eigen Value decomp
   covarianceBase(const char *name, const char *file, int seed, double threshold,int firstpcapar, int lastpcapar);
-  virtual ~covarianceBase() {};
+  virtual ~covarianceBase();
   
   // Setters
   // need virtual for eRPA parameter over-ride
@@ -218,7 +211,6 @@ class covarianceBase {
 
  protected:
   void init(const char *name, const char *file);
-  void init(TMatrixDSym* covMat);
 
   void MakePosDef();
 
@@ -237,11 +229,13 @@ class covarianceBase {
   TMatrixDSym *covMatrix;
   // The inverse covariance matrix
   TMatrixDSym *invCovMatrix;
+  //KS: Same as above but much faster as TMatrixDSym cache miss
+  double **InvertCovMatrix;
   // The nominal
   std::vector<double> nominal;
     
-  // Random numbers
-  TRandom3 *random_number;
+  //KS: set Random numbers for each thread so each thread has differnt seed
+  TRandom3 **random_number;
   // For Cholesky decomposed parameter throw
   TVectorD randParams;
   TMatrixD *chel;

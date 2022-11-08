@@ -1,10 +1,3 @@
-#include <TROOT.h>
-#include "manager/manager.h"
-#include "TString.h"
-#include <assert.h>
-#include <stdexcept>
-#include "TMath.h"
-#include <chrono>
 #include "samplePDFFDBase.h"
 
 // Constructors for erec-binned errors
@@ -32,6 +25,13 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   applyBetaNue=false;
   applyBetaDiag=false;
 
+  samplePDFFD_array = NULL;
+  samplePDFFD_data = NULL;
+  
+  //KS: For now FD support only one sample
+  nSamples = 1;
+  SampleName.push_back("FDsample");
+  
   //ETA - leave this out for now, need to fix and make things nice and configurable
   //EnergyScale *energy_first = new EnergyScale();
   //energy_first->SetUncertainty(1.2);
@@ -41,7 +41,16 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-
+    int nYBins = YBinEdges.size()-1;  
+    for (int yBin = 0 ;yBin < nYBins; yBin++) 
+    {
+      delete[] samplePDFFD_array[yBin];
+      delete[] samplePDFFD_array_w2[yBin];
+      delete[] samplePDFFD_data[yBin];
+    }
+    delete[] samplePDFFD_array;
+    delete[] samplePDFFD_array_w2;
+    delete[] samplePDFFD_data;
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -147,8 +156,23 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
 
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
 {
-     
-  reweight(oscpar, oscpar);
+
+  if (MCSamples.size()==6) {
+	reweight(oscpar, oscpar);
+	return;
+  }
+  else {
+
+	for (int i=0; i< (int)MCSamples.size(); ++i) {
+	  for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+	  }
+	}
+
+  }
+  //KS: Reset the histograms before reweight 
+  ResetHistograms();
+  
   fillArray();
 
   return;
@@ -162,6 +186,8 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
 		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
     }
   }
+  //KS: Reset the histograms before reweight
+  ResetHistograms();
 
   fillArray();
 }
@@ -213,6 +239,7 @@ void samplePDFFDBase::fillArray() {
   for (int yBin=0;yBin<nYBins;yBin++) {
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -242,29 +269,23 @@ void samplePDFFDBase::fillArray() {
       double funcweight = 1.0;
       double totalweight = 1.0;
       
-      //DB Xsec syst
-      //Loop over stored spline pointers
-      for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
-		splineweight *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
-      }
-      //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient. Do this on a spline-by-spline basis
+      splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+      //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
+
       //Loop over stored normalisation and function pointers 
-	  //std::cout << "Found " << MCSamples[iSample].nxsec_norm_pointers[iEvent] << std::endl;
-	  //std::cout << "And to be sure " << MCSamples[iSample].xsec_norm_pointers[iEvent].size() << std::endl;
-      for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent]; ++iParam) {
-		normweight *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-      }
+      normweight *= CalcXsecWeightNorm(iSample, iEvent);
+
       //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (normweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
 
-      funcweight = calcFuncSystWeight(iSample,iEvent);
+      funcweight = CalcXsecWeightFunc(iSample,iEvent);
       //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (funcweight <= 0.){          
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -321,18 +342,19 @@ void samplePDFFDBase::fillArray() {
 		XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
       }
       //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-      else {
-	for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-	  if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-	    XBinToFill = iBin;
+	  else {
+		for (unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
+		  if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
+			XBinToFill = iBin;
+		  }
+		}
 	  }
-	}
-      }
 
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
 		//std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
+		samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
 	  else{
 		//std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill <<  " || X var  = " << XVar << std::endl;
@@ -346,44 +368,37 @@ void samplePDFFDBase::fillArray() {
 }
 
 #ifdef MULTITHREAD
-void samplePDFFDBase::fillArray_MP() {
-
+void samplePDFFDBase::fillArray_MP() 
+{
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array[yBin][xBin] = 0.;
-	}
+	  for (int xBin=0;xBin<nXBins;xBin++) {
+	    samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
+	  }
   }
 
   reconfigureFuncPars();
 
-  //DB Unfortunately need to have this because OMP doesn't allow member variables to be used in the shared environment
-  //At end of function, copy contents of 'samplePDFFD_array_class' into 'samplePDFFD_array' which can then be used in getLikelihood
-  //
   //This is stored as [y][x] due to shifts only occuring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses 
-  double** samplePDFFD_array_class = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	samplePDFFD_array_class[yBin] = new double[nXBins];
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array_class[yBin][xBin] = 0.;
-	}
-  }
-
   double** samplePDFFD_array_private = NULL;
-
+  double** samplePDFFD_array_private_w2 = NULL;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
-#pragma omp parallel private(samplePDFFD_array_private)
+#pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
   {
 	// private to each thread
 	samplePDFFD_array_private = new double*[nYBins];
+    samplePDFFD_array_private_w2 = new double*[nYBins];
 	for (int yBin=0;yBin<nYBins;yBin++) {
 	  samplePDFFD_array_private[yBin] = new double[nXBins];
+      samplePDFFD_array_private_w2[yBin] = new double[nXBins];
 	  for (int xBin=0;xBin<nXBins;xBin++) {
 		samplePDFFD_array_private[yBin][xBin] = 0.;
+        samplePDFFD_array_private_w2[yBin][xBin] = 0.;
 	  }
 	}
 
@@ -438,11 +453,7 @@ void samplePDFFDBase::fillArray_MP() {
 		//DB SKDet Syst
 		//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
-		//DB Xsec syst
-		//Loop over stored spline pointers
-		for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
-		  splineweight *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
-		}
+        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
 		//std::cout << "Spline weight is " << splineweight << std::endl;
 		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
 		if (splineweight <= 0.){
@@ -450,10 +461,7 @@ void samplePDFFDBase::fillArray_MP() {
 		  continue;
 		}
 
-		//Loop over stored normalisation and function pointers
-		for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent];iParam++) {
-		  normweight *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-		}
+        normweight *= CalcXsecWeightNorm(iSample, iEvent);
 		//DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
 		//std::cout << "norm weight is " << normweight << std::endl;
 		if (normweight <= 0.){
@@ -461,7 +469,7 @@ void samplePDFFDBase::fillArray_MP() {
 		  continue;
 		}
 
-		funcweight = calcFuncSystWeight(iSample,iEvent);
+		funcweight = CalcXsecWeightFunc(iSample,iEvent);
 		//DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
 		//std::cout << "Func weight is " << funcweight << std::endl;
 		if (funcweight <= 0.){
@@ -534,7 +542,8 @@ void samplePDFFDBase::fillArray_MP() {
 		//DB Fill relevant part of thread array
 		if (XBinToFill != -1 && YBinToFill != -1) {
 		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-		  samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
+          samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
+          samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
 		}
 		else{
 		  //std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
@@ -545,36 +554,73 @@ void samplePDFFDBase::fillArray_MP() {
 
 	//End of Calc Weights and fill Array
 	//==================================================
-
-#pragma omp parallel shared(samplePDFFD_array_class)
-	{
+  // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in getLikelihood
 	  for (int yBin=0;yBin<nYBins;yBin++) {
 		for (int xBin=0;xBin<nXBins;xBin++) {
 #pragma omp atomic
-		  samplePDFFD_array_class[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
+		  samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
+#pragma omp atomic    
+          samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
 		}
 	  }
-	}
 
 	for (int yBin=0;yBin<nYBins;yBin++) {
 	  delete[] samplePDFFD_array_private[yBin];
+      delete[] samplePDFFD_array_private_w2[yBin];
 	}
 	delete[] samplePDFFD_array_private;
-  }
-
-  // DB Copy contents of 'samplePDFFD_array_class' into 'samplePDFFD_array' which can then be used in getLikelihood
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array[yBin][xBin] = samplePDFFD_array_class[yBin][xBin];
-	}
-  }
-
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	delete[] samplePDFFD_array_class[yBin];
-  }
-  delete[] samplePDFFD_array_class;
+    delete[] samplePDFFD_array_private_w2;
+  } //end of parallel region
 }
 #endif
+
+
+// **************************************************
+// Helper function to reset the data and MC histograms
+void samplePDFFDBase::ResetHistograms() {
+// **************************************************
+  
+  int nXBins = XBinEdges.size()-1;
+  int nYBins = YBinEdges.size()-1;
+  
+  //DB Reset values stored in PDF array to 0.
+  for (int yBin = 0; yBin < nYBins; yBin++) {
+    for (int xBin = 0; xBin < nXBins; xBin++) {
+      samplePDFFD_array[yBin][xBin] = 0.;
+    }
+  }
+} // end function
+
+// ***************************************************************************
+// Calculate the spline weight for one event
+double samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) {
+// ***************************************************************************
+
+  double xsecw = 1.0;
+  //DB Xsec syst
+  //Loop over stored spline pointers
+  for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
+    xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
+  }
+  return xsecw;
+}
+
+// ***************************************************************************
+// Calculate the normalisation weight for one event
+double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) {
+// ***************************************************************************
+
+  double xsecw = 1.0;
+  //Loop over stored normalisation and function pointers
+  for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
+  {
+      xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+      #ifdef DEBUG
+      if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
+      #endif
+  }
+  return xsecw;
+}
 
 //ETA
 void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
@@ -596,7 +642,7 @@ void samplePDFFDBase::setXsecCov(covarianceXsec *xsec){
 	CalcXsecNormsBins(iSample);
   }
 
-  //DB =====
+  //DB
   //Attempt at reducing impact of covarianceXsec::calcReweight()
   int counter;
 
@@ -780,10 +826,13 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -812,10 +861,13 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -901,10 +953,13 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -934,10 +989,13 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
   int nYBins = YBinEdges.size()-1;
 
   samplePDFFD_array = new double*[nYBins];
+  samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -1215,7 +1273,7 @@ void samplePDFFDBase::fillSplineBins()
 
 double samplePDFFDBase::getLikelihood()
 {
-  if (samplePDFFD_data==NULL) {
+  if (samplePDFFD_data == NULL) {
       std::cerr << "data sample is empty!" << std::endl;
       return -1;
   }
@@ -1226,32 +1284,23 @@ double samplePDFFDBase::getLikelihood()
   int xBin;
   int yBin;
 
-  double negLogL = 0;
-
+  double negLogL = 0.;
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:negLogL) private(xBin, yBin)
 #endif
 
-  for (xBin=0;xBin<nXBins;xBin++) {
-    double negLogLsample = 0.;
-
-    for (yBin=0;yBin<nYBins;yBin++) {
-
-      double MCPred = samplePDFFD_array[yBin][xBin];
-      if (MCPred<=0) {MCPred = 1E-8;}
-
-      double DataVal = samplePDFFD_data[yBin][xBin];
-      if (DataVal > 0) {
-	negLogLsample += (MCPred - DataVal + DataVal * TMath::Log(DataVal/MCPred));
-      }
-      else {
-	negLogLsample += MCPred;
-      }
+  for (xBin = 0; xBin < nXBins; xBin++) 
+  {
+    for (yBin = 0; yBin < nYBins; yBin++) 
+    {
+        double DataVal = samplePDFFD_data[yBin][xBin];
+        double MCPred = samplePDFFD_array[yBin][xBin];
+        double w2 = samplePDFFD_array_w2[yBin][xBin];
+        //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
+        negLogL += getTestStatLLH(DataVal, MCPred, w2);
 
     }
-
-    negLogL += negLogLsample;
   }
-
   return negLogL;
 }
+

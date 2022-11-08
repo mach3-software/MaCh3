@@ -9,7 +9,7 @@ namespace MaCh3Utils {
   // Get the mass of a particle from the PDG
   // In GeV, not MeV!
   double GetMassFromPDG(int PDG) {
-    // *****************************
+  // *****************************
 
     switch (abs(PDG)) {  
     case 11:
@@ -94,7 +94,7 @@ namespace MaCh3Utils {
 // **************************************************
 // Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly) {
-  // **************************************************
+// **************************************************
 
   double overflow = 0;
   //TH2Polys have 9 overflow bins
@@ -111,11 +111,11 @@ double OverflowIntegral(TH2Poly* poly) {
 // **************************************************
 // Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly* poly) {
-  // **************************************************
+// **************************************************
 
   double integral=0;
 
-  for(int i=1; i<poly->GetNumberOfBins()+1; i++)
+  for(int i=1; i < poly->GetNumberOfBins()+1; i++)
     {
       integral += poly->GetBinContent(i);
     }
@@ -126,68 +126,89 @@ double NoOverflowIntegral(TH2Poly* poly) {
 
 // **************************************************
 // Helper function for projecting TH2Poly onto the X axis
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins) {
-  // **************************************************
+TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors) {
+// **************************************************
 
   TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(),xbins.size()-1,&xbins[0]);
-  double xlow, xup, frac=0;
+  //KS: Temp Histogram to store error
+  TH1D* hProjX_Error = new TH1D((TempName+"_x_Err").c_str(),(TempName+"_x_Err").c_str(),xbins.size()-1,&xbins[0]);
+  double xlow, xup, frac = 0;
 
   //loop over bins in the poly
-  for(int i=0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
     {
       //get bin and its edges
       TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
-      xlow=bin->GetXMin();
-      xup=bin->GetXMax();
+      xlow = bin->GetXMin();
+      xup = bin->GetXMax();
 
       //Loop over projected bins, find fraction of poly bin in each
-      for(int dx=0; dx<int(xbins.size()); dx++)
+      for(int dx=0; dx < int(xbins.size()); dx++)
         {
           if(xbins[dx+1]<=xlow || xbins[dx]>=xup)
             {
-              frac=0;
+              frac = 0;
             }
           else if(xbins[dx]<=xlow && xbins[dx+1]>=xup)
             {
-              frac=1;
+              frac = 1;
             }
           else if(xbins[dx]<=xlow && xbins[dx+1]<=xup)
             {
-              frac=(xbins[dx+1]-xlow)/(xup-xlow);
+              frac = (xbins[dx+1]-xlow)/(xup-xlow);
             }
           else if(xbins[dx]>=xlow && xbins[dx+1]>=xup)
             {
-              frac=(xup-xbins[dx])/(xup-xlow);
+              frac = (xup-xbins[dx])/(xup-xlow);
             }
           else if(xbins[dx]>=xlow && xbins[dx+1]<=xup)
             {
-              frac=(xbins[dx+1]-xbins[dx])/(xup-xlow);
+              frac = (xbins[dx+1]-xbins[dx])/(xup-xlow);
             }
           else
             {
-              frac=0;
+              frac = 0;
             }
           hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
+          //KS: Follow ROOT implementation and sum up the variance 
+          if(computeErrors)
+          {
+              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+              //but numbering of GetBinError is differnt than GetBins...
+             double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+             hProjX_Error->SetBinContent(dx+1, hProjX_Error->GetBinContent(dx+1)+Temp_Err);
+          }
         }
     }
+    //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
+    if(computeErrors)
+    {
+        for (int i = 1; i <= hProjX_Error->GetXaxis()->GetNbins(); ++i) 
+        {
+            double Error = TMath::Sqrt(hProjX_Error->GetBinContent(i));
+            hProjX->SetBinError(i, Error);
+        }   
+    }
+  delete hProjX_Error;
   return hProjX;
 } // end project poly X function
 
 // **************************************************
 // Helper function for projecting TH2Poly onto the Y axis
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins) {
-  // **************************************************
+TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors) {
+// **************************************************
 
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),ybins.size()-1,&ybins[0]);
+  TH1D* hProjY_Error = new TH1D((TempName+"_y_Err").c_str(),(TempName+"_y_Err").c_str(),ybins.size()-1,&ybins[0]);
   double ylow, yup, frac=0;
 
   //loop over bins in the poly
-  for(int i=0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
     {
       //get bin and its edges
       TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
-      ylow=bin->GetYMin();
-      yup=bin->GetYMax();
+      ylow = bin->GetYMin();
+      yup = bin->GetYMax();
 
       //Loop over projected bins, find fraction of poly bin in each
       for(int dy=0; dy<int(ybins.size()); dy++)
@@ -198,7 +219,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
             }
           else if(ybins[dy]<=ylow && ybins[dy+1]>=yup)
             {
-              frac=1;
+              frac = 1;
             }
           else if(ybins[dy]<=ylow && ybins[dy+1]<=yup)
             {
@@ -217,15 +238,137 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
               frac=0;
             }
           hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
+          //KS: Follow ROOT implementation and sum up the variance 
+          if(computeErrors)
+          {
+              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+              //but numbering of GetBinError is differnt than GetBins... 
+             double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+             hProjY_Error->SetBinContent(dy+1, hProjY_Error->GetBinContent(dy+1)+Temp_Err);
+          }
         }
     }
+    //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
+    if(computeErrors)
+    {
+        for (int i = 1; i <= hProjY_Error->GetXaxis()->GetNbins(); ++i) 
+        {
+            double Error = TMath::Sqrt(hProjY_Error->GetBinContent(i));
+            hProjY->SetBinError(i, Error);
+        }   
+    }
+  delete hProjY_Error;
   return hProjY;
 } // end project poly Y function
 
+// ****************
+// Normalise a th2poly
+TH2Poly* NormalisePoly(TH2Poly *Histogram) {
+// ****************
+
+  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  double IntegralWidth = PolyIntegralWidth(HistCopy);
+  HistCopy = PolyScaleWidth(HistCopy, IntegralWidth);
+  std::string title = std::string(HistCopy->GetName())+"_norm";
+  HistCopy->SetNameTitle(title.c_str(), title.c_str());
+
+  return HistCopy;
+}
+
+// ****************
+// Scale a TH2Poly and divide by bin width
+TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
+// ****************
+
+  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  double xlow, xup, ylow, yup, area;
+
+  for(int i=1; i<HistCopy->GetNumberOfBins()+1; i++)
+    {
+      TH2PolyBin* bin = (TH2PolyBin*)HistCopy->GetBins()->At(i-1)->Clone();
+      xlow=bin->GetXMin();
+      xup=bin->GetXMax();
+      ylow=bin->GetYMin();
+      yup=bin->GetYMax();
+      area = (xup-xlow)*(yup-ylow);
+      HistCopy->SetBinContent(i, Histogram->GetBinContent(i)/(area*scale));
+      delete bin;
+    }
+
+  return HistCopy;
+}
+
+// ****************
+// Integral of TH2Poly multiplied by bin width
+double PolyIntegralWidth(TH2Poly *Histogram) {
+// ****************
+
+  double integral=0;
+  double xlow, xup, ylow, yup, area;
+
+  for(int i=1; i<Histogram->GetNumberOfBins()+1; i++)
+    {
+      TH2PolyBin* bin = (TH2PolyBin*)Histogram->GetBins()->At(i-1)->Clone();
+      xlow=bin->GetXMin();
+      xup=bin->GetXMax();
+      ylow=bin->GetYMin();
+      yup=bin->GetYMax();
+      area = (xup-xlow)*(yup-ylow);
+      integral += Histogram->GetBinContent(i)*area;
+      delete bin;
+    }
+
+  return integral;
+}
+// ****************
 //DB Get the Cernekov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {
+// ****************
   double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
+}
+
+// **************************************************************************
+// Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
+double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
+// ***************************************************************************
+
+  const double MLep = 0.10565837;
+
+  // Caluclate muon energy
+  double ELep = sqrt((MLep*MLep)+(PLep*PLep));
+
+  double CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);
+
+  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));
+
+  // Calculate the new Q2
+  double Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
+
+  return Q2Upd - InitialQ2;
+}
+
+
+// **************************************************************************
+// Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
+double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
+// ***************************************************************************
+
+  double mNeff = 0.93956536 - Eb / 1000.;
+  double mNoth = 0.93827203;
+
+  if (!neutrino) {
+    mNeff = 0.93827203 - Eb / 1000.;
+    mNoth = 0.93956536;
+  }
+
+  double mLep = 0.10565837;
+  double eLep = sqrt(PLep * PLep + mLep * mLep);
+
+  double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
+
+  return Enu;
+
 }

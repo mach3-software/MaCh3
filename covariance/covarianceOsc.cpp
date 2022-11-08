@@ -1,15 +1,7 @@
-#include <iostream>
-#include <math.h>
-#include <TDecompChol.h>
-#include "throwParms/ThrowParms.h"
-
 #include "covarianceOsc.h"
 
 covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpth13NH, TH2D *hist_dcpth13IH, TH2D *hist_23)
 : covarianceBase(name, file) {
-
-  L = 1284.9;// Dune, T2K is  L = 295;
-  density = 2.848; // DUNE, T2K is 2.6
 
   if (hist_dcpth13NH) {
     h_dcpth13NH = hist_dcpth13NH;
@@ -35,44 +27,39 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
     h_23 = NULL;
   }
 
+  //Read in osc pars from xml file
   TFile *infile = new TFile(file, "READ");
   osc_prior = (TVectorD*)infile->Get("osc_nom");
+  TVectorD* osc_stepscale = (TVectorD*)infile->Get("osc_stepscale");
+  TVectorD* osc_sigma = (TVectorD*)infile->Get("osc_sigma");
+  TVectorD* osc_flat_prior = (TVectorD*)infile->Get("osc_flat_prior");
 
+  TObjArray* objarr_name = (TObjArray*)(infile->Get("osc_param_names"));
+
+  TVectorD* osc_baseline = (TVectorD*)infile->Get("osc_baseline");
+  TVectorD* osc_density = (TVectorD*)infile->Get("osc_density");
   double fScale = 1.0;//2.38 / TMath::Sqrt(211); // 211 = number of parameters in fit 
 
-  // initialization
-  fParNames[0] = (char*)("sin2th_12");
-  fParInit[0] = (*osc_prior)(0);
-  fParSigma[0] = /*0.01629 **/ fScale;
-
-  fParNames[1] = (char*)("sin2th_23");
-  fParInit[1] = (*osc_prior)(1); 
-  fParSigma[1] = /*0.0539931 **/ fScale * 2; 
-
-  fParNames[2] = (char*)("sin2th_13");
-  fParInit[2] = (*osc_prior)(2);
-  fParSigma[2] = /*0.00740547 **/ fScale * 30; 
-
-  fParNames[3] = (char*)("delm2_12");
-  fParInit[3] = (*osc_prior)(3);
-  fParSigma[3] = /*1.96789E-6 **/ fScale; 
-
-  fParNames[4] = (char*)("delm2_23");
-  fParInit[4] = (*osc_prior)(4);
-  fParSigma[4] = /*0.000116712 **/ fScale * 10; 
-
-  fParNames[5] = (char*)("delta_cp");
-  fParInit[5] = (*osc_prior)(5);
-  fParSigma[5] = /*2.8 **/ fScale;
-
-  if(size==7) {
-    fParNames[6] = (char*)("beta");
-    fParInit[6] = (*osc_prior)(6);
-    fParSigma[6] = /*2.8 **/ fScale;
+  //KS: Save all neccesary information from covariance
+  for(int io = 0; io <size; io++)
+  {
+    char name[21];
+    fParNames[io] = new Char_t[21];
+      
+    sprintf(name, std::string(((TObjString*)objarr_name->At(io))->GetString()).c_str());
+    strcpy(fParNames[io], name);
+    
+    fParInit[io]  = (*osc_prior)(io);
+    fParCurr[io] = fParProp[io] = fParInit[io];
+    fParSigma[io] = (*osc_sigma)(io);
+    fIndivStepScale[io] = fScale * (*osc_stepscale)(io);
+    
+    //KS: Set flat prior
+    if( (bool)((*osc_flat_prior)(io)) ) setEvalLikelihood(io,false);
   }
-
-  for (int i = 0; i < size; i++)
-    fParCurr[i] = fParProp[i] = fParInit[i];
+    
+  L = (*osc_baseline)(0); //295 for T2K
+  density = (*osc_density)(0); //2.6 for T2K
 
   flipdelM=false;
   reactorPrior = false;
@@ -87,10 +74,19 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
   randomize();
   throwNominal();
 
-  printPars();
-
   oscpars1 = new double[10];
-
+  
+  //KS:those are constant no need to overwrite them each time
+  oscpars1[6] = 2;
+  oscpars1[7] = L;
+  oscpars1[8] = density;
+  
+  Print();
+  CheckOrderOfParams();
+    
+  infile->Close();
+  delete infile;
+  
   std::cout << "created oscillation parameter handler" << std::endl;
 }
 
@@ -158,9 +154,9 @@ double covarianceOsc::getLikelihood() {
 
   double logL = 0.0;
   if(size==6) {
-    for(int i = 0; i < covMatrix->GetNrows()-1; i++) //delta is last, don't loop over, as it gets flat prior
+    for(int i = 0; i < covMatrix->GetNrows()-1; ++i) //delta is last, don't loop over, as it gets flat prior
     {
-      for(int j = 0; j < covMatrix->GetNcols()-1; j++) //delta is last, don't loop over, as it gets flat prior
+      for(int j = 0; j < covMatrix->GetNcols()-1; ++j) //delta is last, don't loop over, as it gets flat prior
       {
         // If parameter 23 histogram exists, use that instead of matrix
         if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -172,9 +168,9 @@ double covarianceOsc::getLikelihood() {
         if(fParEvalLikelihood[i] && fParEvalLikelihood[j])
         {
           /*std::cout << i << " " << j << " nominal i " << nominal[i] << " nominal j " << nominal[j] << std::endl;
-            std::cout << "parcurr " << fParProp[i] << " invmatrix " << (*invCovMatrix)(i,j) << std::endl;
+            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j]; << std::endl;
             std::cout << "diff " << fParProp[i] - nominal[i] << std::endl;
-            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j) << std::endl;*/
+            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j]; << std::endl;*/
 
           //check
           if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -182,7 +178,7 @@ double covarianceOsc::getLikelihood() {
           if ((h_dcpth13NH || h_dcpth13IH) && (i==2 || j==2))
             std::cout << "Error: using matrix when theta13-dcp histogram exists" << std::endl;
 
-          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];;
         }
       }
     }
@@ -242,9 +238,9 @@ double covarianceOsc::getLikelihood() {
         if(fParEvalLikelihood[i] && fParEvalLikelihood[j])
         {
           /*std::cout << i << " " << j << " nominal i " << nominal[i] << " nominal j " << nominal[j] << std::endl;
-            std::cout << "parcurr " << fParProp[i] << " invmatrix " << (*invCovMatrix)(i,j) << std::endl;
+            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j]; << std::endl;
             std::cout << "diff " << fParProp[i] - nominal[i] << std::endl;
-            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j) << std::endl;*/
+            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j]; << std::endl;*/
 
           //check
           if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -252,7 +248,7 @@ double covarianceOsc::getLikelihood() {
           if ((h_dcpth13NH || h_dcpth13IH) && (i==2 || j==2))
             std::cout << "Error: using matrix when theta13-dcp histogram exists" << std::endl;
 
-          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*(*invCovMatrix)(i,j);
+          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];;
         }
       }
     }
@@ -323,10 +319,11 @@ double covarianceOsc::getLikelihood() {
     
     // Reactor prior from 2018 PDG: sin^2(theta13) = 0.0212 +/- 0.0008
     // Reactor prior from 2019 PDG: sin^2(theta13) = 0.0218 +/- 0.0007
+    // Reactor prior from 2021 PDG: sin^2(theta13) = 0.0220 +/- 0.0007
     // This time we don't have to convert between single<->double angle, PDG gives RC in single angle.
 
     // Now calculate penalty           
-    double tmp = (fParProp[2]-0.0218) / 0.0007;
+    double tmp = (fParProp[2]-0.0220) / 0.0007;
     //double tmp = (dblang-0.095) / 0.01;
 
     // this line for T2K joint fit result, NOT REACTOR CONSTRAINT!
@@ -382,6 +379,7 @@ void covarianceOsc::throwNominal(bool nomValues)
     for (int i = 0; i < int(nominal.size()); i++)
       nominal[i]=(*osc_prior)(i);
   }
+  delete nom_throws;
 
 }
 
@@ -390,9 +388,10 @@ double *covarianceOsc::getPropPars()
   for(int i = 0; i < 6; i++)
     oscpars1[i] = fParProp[i];
 
-  oscpars1[6] = 2;
-  oscpars1[7] = L;
-  oscpars1[8] = density;
+  //Those are constant we initalised them already
+  //oscpars1[6] = 2;
+  //oscpars1[7] = L;
+  //oscpars1[8] = density;
   if(size==7)
     oscpars1[9]=fParProp[6];
   else
@@ -408,17 +407,17 @@ void covarianceOsc::proposeStep() {
     {
       /*if (i == 4) // Don't do gaussian proposal - randomly sample dm23 from a uniform distribution
         {
-        fParProp[i] = random_number->Uniform() * 20E-3;
+        fParProp[i] = random_number[0]->Uniform() * 20E-3;
         }
         else */
-      fParProp[i] = fParCurr[i] + fParSigma[i] * fPropKernel[i]->GetRandom()*fStepScale; //random_number->Gaus(0, fParSigma[i]);  
+      fParProp[i] = fParCurr[i] + fParSigma[i] * fPropKernel[i]->GetRandom()*fStepScale*fIndivStepScale[i]; //random_number[0]->Gaus(0, fParSigma[i]);  
 
-      if (i==4 && random_number->Uniform()<0.5 && flipdelM) // flip sign for delm2_23 (after taking step)
+      if (i==4 && random_number[0]->Uniform()<0.5 && flipdelM) // flip sign for delm2_23 (after taking step)
         fParProp[i]*=-1;
 
       if(i==6 && flipBeta)
       {
-        if(random_number->Uniform()<0.5)
+        if(random_number[0]->Uniform()<0.5)
         {
           if(fParCurr[i]==0.0)
             fParProp[i]=1.0;
@@ -449,7 +448,7 @@ void covarianceOsc::proposeStep() {
       std::cout << "ERROR: fParCurr[1] = " << fParCurr[1] << " is not equal to fixth23NH (" << fixth23NH << ") or fixth23IH (" << fixth23IH << "). Not changing this parameter." << std::endl;
 
     // Flip parameters together
-    double a = random_number->Uniform();
+    double a = random_number[0]->Uniform();
     if (a<0.5) 
     {
       if (fParCurr[4] == fixdm23NH)
@@ -530,3 +529,50 @@ void covarianceOsc::setFlipDeltaM23(double dm23NH, double dm23IH, double th23NH,
 
   flipdelM = true;
 }
+
+
+
+//KS: Print all usefull informations after initialization
+void covarianceOsc::Print() {
+  std::cout << "Number of pars: " << size << std::endl;
+  std::cout << "current " << matrixName << " parameters:" << std::endl;
+  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(15) << "IndivStepScale" << std::setw(2) << "|" <<std::setw(15) << "fParSigma"  << std::endl;
+  for(int i = 0; i < size; i++) {
+    std::cout << std::fixed << std::setprecision(5) << std::left << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << fParNames[i] << std::setw(2) << "|" << std::setw(10) << fParInit[i]<< std::setw(2) << "|" << std::setw(15) << fIndivStepScale[i] << std::setw(2) << "|" << std::setw(15)<< fParSigma[i]<< std::endl;
+  }
+  
+  std::cout<<"Baseline: "<<L<<std::endl;
+  std::cout<<"Earth Density: "<<density<<std::endl;
+}
+
+
+
+//KS: Currently prob3++/probgp requiers particular order so we need to check this is the case
+void covarianceOsc::CheckOrderOfParams() 
+{
+    std::vector<int> wrongParam;
+    bool wrongMatrix = false;
+    if(strcmp( fParNames[0], "sin2th_12") != 0 ){wrongParam.push_back(0); wrongMatrix = true;};
+    if(strcmp( fParNames[1], "sin2th_23") != 0 ){wrongParam.push_back(1); wrongMatrix = true;};
+    if(strcmp( fParNames[2], "sin2th_13") != 0 ){wrongParam.push_back(2); wrongMatrix = true;};
+    if(strcmp( fParNames[3], "delm2_12")  != 0 ){wrongParam.push_back(3); wrongMatrix = true;};
+    if(strcmp( fParNames[4], "delm2_23")  != 0 ){wrongParam.push_back(4); wrongMatrix = true;};
+    if(strcmp( fParNames[5], "delta_cp")  != 0 ){wrongParam.push_back(5); wrongMatrix = true;};
+    if(size == 7 && strcmp( fParNames[6], "beta")  != 0 ){wrongParam.push_back(6); wrongMatrix = true;};
+
+        
+    if(wrongMatrix)
+    {
+        for(unsigned int i =0; i < wrongParam.size(); i++ )
+        {
+            std::cerr << "Osc Patameter "<<fParNames[i]<<" isn't in good order"<<std::endl;  
+        }
+        std::cerr << "Currently prob3++/probgp requiers particular order"<< std::endl;
+        std::cerr << "Please modify XML and make new matrix with good order"<< std::endl;
+        std::cerr << "Find me here "<<__FILE__ << ":" << __LINE__ << std::endl;
+        throw;  
+    }
+
+}
+
+
