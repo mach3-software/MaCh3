@@ -829,7 +829,7 @@ void covarianceXsec::initParams(double fScale) {
 
 // ********************************************
 // Get the likelihood for moving the cross-section parameters to these values
-double covarianceXsec::getLikelihood() {
+double covarianceXsec::GetLikelihood() {
   // ********************************************
 
   double xsecLogL = 0.0;
