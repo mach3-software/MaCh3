@@ -1,5 +1,8 @@
 #include "Structs.h"
 
+#include "TList.h"
+#include "TObjArray.h"
+
 namespace MaCh3Utils {
 
   // *****************************
@@ -8,8 +11,7 @@ namespace MaCh3Utils {
   double GetMassFromPDG(int PDG) {
   // *****************************
 
-    switch (abs(PDG)) {
-      
+    switch (abs(PDG)) {  
     case 11:
       return 0.511E-3;
       break;
@@ -70,46 +72,21 @@ namespace MaCh3Utils {
     return 0;
   }
 
-  TString SKSampleName_toLatexString(TString String) {
-    TString ReturnString;
-
-    TObjArray *Arr = String.Tokenize("-");
-    TString Str1 = ((TObjString *)(Arr->At(0)))->String();
-    TString Str2 = ((TObjString *)(Arr->At(2)))->String();
-
-    if (Str1.CompareTo("numu")==0) {ReturnString = "$\\nu_{\\mu}$";}
-    else if (Str1.CompareTo("numub")==0) {ReturnString = "$\\bar{\\nu_{\\mu}}$";}
-    else if (Str1.CompareTo("nue")==0) {ReturnString = "$\\nu_{e}$";}
-    else if (Str1.CompareTo("nueb")==0) {ReturnString = "$\\bar{\\nu_{e}}$";}
-    else {std::cout << "Something's broken in SKSampleName_toLatexString. Given:" << String << std::endl; std::cout << "Exitting.." << std::endl; throw;}
-
-    if (Str1.CompareTo(Str2.Data())) {ReturnString += " sig";}
-    return ReturnString;
-  }
-
-
-  // ************************
-  // The mean neutrino direction, amazingly enough hard-coded for our pleasure!
-  // https://www.t2k.org/nd280/physics/xsec/meetings/2015/jan142015/nudir
-  extern const double ND280NuDir[3] = {-0.0128224, -0.0249785, 0.999586};
-  // ************************
-
-  // Beam direction at SK
-  extern const double SKNuDir[3] = {0.669764, -0.742179, 0.024223};
-
+ 
   //DB Anything added here must be of the form 2^X, where X is an integer
   //
   //DB Used to contain which DetIDs are supported
   std::unordered_map<int,int>KnownDetIDsMap({
-      {0,1},    //ND280
-      {1,8},    //SK1Re
+      {0,1},    //ND
+      {1,8},    //FD
       {2,16},   //SK1Rmu
       {3,32},   //Nova
       {4,64},   //Atm SubGeV e-like
       {5,128},  //Atm SubGeV mu-like 
       {6,256},  //Atm MultiGeV e-like
       {7,512},  //Atm MultiGeV mu-like
-    });
+	  });
+	
   int nKnownDetIDs = KnownDetIDsMap.size();
 
 }
@@ -395,151 +372,3 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   return Enu;
 
 }
-
-/*
-//DB Function used to define which mode splines are selected for which MaCh3 modes
-int MaCh3Mode_to_SplineMode(int Mode) {
-  int returnMode = -1;
-
-  switch (Mode) {
-  case kMaCh3_CCQE:
-    returnMode = kMaCh3_CCQE;
-    break;
-  case kMaCh3_2p2h:
-    returnMode = kMaCh3_2p2h;
-    break;
-  case kMaCh3_CC1pi0:
-  case kMaCh3_CC1pipm:
-    returnMode = kMaCh3_CC1pipm;
-    break;
-  case kMaCh3_CCcoh:
-    returnMode = kMaCh3_CCcoh;
-    break;
-  case kMaCh3_CCMpi:
-    returnMode = kMaCh3_CCMpi;
-    break;
-  case kMaCh3_CCDIS:
-    returnMode = kMaCh3_CCDIS;
-    break;
-  case kMaCh3_NC1pi0:
-    returnMode = kMaCh3_NC1pi0;
-    break;
-  case kMaCh3_NC1pipm:
-    returnMode = kMaCh3_NC1pipm;
-    break;
-  case kMaCh3_NCcoh:
-    returnMode = kMaCh3_NCcoh;
-    break;
-  case kMaCh3_NCoth:
-  case kMaCh3_NCMpi:
-  case kMaCh3_NCDIS:
-    returnMode = kMaCh3_NCoth;
-    break;
-  case kMaCh3_NC1gam:
-    returnMode = kMaCh3_NC1gam;
-    break;
-  case kMaCh3_CCMisc:
-    returnMode = kMaCh3_CCMisc;
-    break;
-  //DB NewMaCh3Mode: Add case for which spline mode applies to new MaCh3 mode. If new mode doesn't have its own splines, indicate which mode it should piggy-back off
-  default:
-    std::cerr << "Mode " << Mode << " not found - Quitting!" << std::endl;
-    throw;
-  }
-
-  return returnMode;
-}
-
-
-//DB Function used to define which MaCh3 modes are Neutral current
-bool isMaCh3ModeNC(int Mode) {
-  bool isNC = false;
-
-  switch (Mode) {
-  case kMaCh3_CCQE:
-  case kMaCh3_2p2h:
-  case kMaCh3_CC1pi0:
-  case kMaCh3_CC1pipm:
-  case kMaCh3_CCcoh:
-  case kMaCh3_CCMpi:
-  case kMaCh3_CCDIS:
-  case kMaCh3_CCMisc:
-    isNC = false;
-    break;
-  case kMaCh3_NC1pi0:
-  case kMaCh3_NC1pipm:
-  case kMaCh3_NCcoh:
-  case kMaCh3_NCoth:
-  case kMaCh3_NC1gam:
-  case kMaCh3_NCMpi:
-  case kMaCh3_NCDIS:
-    isNC = true;
-    break;
-  //DB NewMaCh3Mode: Add case for whether new MaCh3 mode is neutral current or charged current
-  default:
-    std::cerr << "Mode " << Mode << " not found - Quitting!" << std::endl;
-    throw;
-  }
-
-  return isNC;
-}
-
-//DB Function used to give by-mode colours
-int MaCh3ModeColor(int Mode) {
-  int Colour = -1;
-  
-  switch (Mode) {
-  case kMaCh3_CCQE:
-    Colour = kCyan;
-    break;
-  case kMaCh3_2p2h:
-    Colour = kMagenta+2;
-    break;
-  case kMaCh3_CC1pi0:
-    Colour = kTeal;
-    break;
-  case kMaCh3_CC1pipm:
-    Colour = kCyan-8;
-    break;
-  case kMaCh3_CCcoh:
-    Colour = kTeal-6;
-    break;
-  case kMaCh3_CCMpi:
-    Colour = kGreen+1;
-    break;
-  case kMaCh3_CCDIS:
-    Colour = kSpring+8;
-    break;
-  case kMaCh3_CCMisc:
-    Colour = kGray+2;
-    break;
-  case kMaCh3_NC1pi0:
-    Colour = kYellow-7;
-    break;
-  case kMaCh3_NC1pipm:
-    Colour = kOrange+1;
-    break;
-  case kMaCh3_NCcoh:
-    Colour = kRed+1;
-    break;
-  case kMaCh3_NCoth:
-    Colour = kPink+7;
-    break;
-  case kMaCh3_NC1gam:
-    Colour = kViolet+7;
-    break;
-  case kMaCh3_NCMpi:
-    Colour = kBlue;
-    break;
-  case kMaCh3_NCDIS:
-    Colour = kGreen-2;
-    break;
-  //DB NewMaCh3Mode: Add case for the new MaCh3 mode's colour in THStack hists
-  default:
-    std::cerr << "Mode " << Mode << " not found - Quitting!" << std::endl;
-    throw;
-  }
-
-  return Colour;
-}
-*/

@@ -33,17 +33,17 @@
 //ETA - covariance xsec need to get the number of splines which apply to each det for example
 #include "../covariance/covarianceXsec.h"
 
-// Note: etrue-var1-var2 spline binning not yet implemented for 2017!
 
 class splineFDBase : public splineBase
 {
+
  public:
   splineFDBase(const char *spline, int nutype, int nevents, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1 splines
   splineFDBase(const char *spline, int nutype, int nevents, double BinningOpt, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1-var2 splines
   virtual ~splineFDBase();
   //TODO (ETA) - should we make these pure virutal functions? That way each experiment can read in their own spline files in a nice way?
-  void SetupSplines();
-  void SetupSplines(int BinningOpt);//~~~
+  virtual void SetupSplines(){};
+  virtual void SetupSplines(int BinningOpt){};//~~~
   void SetSplineBinning();
   void SetSplineBinning(int BinningOpt);//~~~
   void GetSplineBins(int &nutype, bool &sig, double &enu, double &var1, unsigned int &enu_bin, unsigned int &var1_bin);
@@ -56,7 +56,8 @@ class splineFDBase : public splineBase
 
   //DB Function which interregates MaCh3Mode_to_SplineMode to determine which MaCh3Modes have splines and which modes piggy-back of the splines of other modes
   //TODO (ETA) - reimplement this in a generic way for all experiments.
-  void FindUniqueModes();
+  //This is to become pure virtual and defined in experiment specific implementation of splines
+  virtual void FindUniqueModes(){};
   //DB Function which removes any modes which piggy-back off other modes out of the vector given by covarianceXsec::GetSplineModeVecFromDetID() so they can be added in the XML but won't throw exception when trying to load up splines
   std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
 
@@ -68,8 +69,8 @@ class splineFDBase : public splineBase
   void SetSplineInfoArrays();
   void SetupSplineInfoArray(covarianceXsec * xsec);
 
-  FastSplineInfo * SplineInfoArray;
-  covarianceXsec * covxsec;
+  FastSplineInfo* SplineInfoArray;
+  covarianceXsec* covxsec;
   int nSplineParams;
   std::vector<int> splineParsIndex;
   std::vector<std::string> splineParsNames;
@@ -79,7 +80,9 @@ class splineFDBase : public splineBase
   std::vector< std::vector<int> > getEventSplines(int &event, int mode, unsigned int &enu_bin, unsigned int &var1_bin, unsigned int &var2_bin);
   void calcWeights();
 
-  const double* retPointer(int parambin,int modebin,int etruebin,int var1bin) {return &dev_1D_w[parambin][modebin][etruebin][var1bin];}
+  const double* retPointer(int parambin,int modebin,int etruebin,int var1bin) {
+	return &dev_1D_w[parambin][modebin][etruebin][var1bin];
+  }
   const double* retPointer(int parambin,int modebin,int etruebin,int var1bin,int var2bin) {return &dev_2D_w[parambin][modebin][etruebin][var1bin][var2bin];}
 
   //TODO (ETA) - have a nice print function giving the modes to spline mode mapping etc.
@@ -115,55 +118,60 @@ class splineFDBase : public splineBase
 
 #endif
 
-  //ETA - store weights for each eval spline
-  //DB Move this out of #ifdef statement
+  //Store weights for each eval spline
   std::vector< std::vector< std::vector< std::vector< double > > > > dev_1D_w;
   std::vector< std::vector< std::vector< std::vector< std::vector< double > > > > > dev_2D_w;
 
   //This basically just keeps a collection of one spline parameter
   //together with the name of the spline and is used to get the
   //splines out of the spline root file
+  //There are two implementations depending on whether you're using
+  //reduced TSpline3s or not.
+#if USE_SPLINE_FD == USE_TSpline3_FD
+  //First a struct to hold Enu-Var1 splines
   struct syst{
-    std::string name;
-#if USE_SPLINE_FD == USE_TSpline3_FD
-    std::vector< std::vector< std::vector< TSpline3* > > >* spline;
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-    std::vector< std::vector< std::vector< TSpline3_red* > > >* spline;
-#endif
+	std::string name;
+	std::vector< std::vector< std::vector< TSpline3* > > > * spline;
   public:
-#if USE_SPLINE_FD == USE_TSpline3_FD
     syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3* > > >* splinein){
       name=namein;
       spline=splinein;
     };
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-    syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3_red* > > >* splinein){
-      name=namein;
-      spline=splinein;
-    };
-#endif
   };
 
+  //First a struct to hold Enu-Var1-Var-2 splines
   struct syst2D{
     std::string name;
-#if USE_SPLINE_FD == USE_TSpline3_FD
     std::vector< std::vector< std::vector< std::vector< TSpline3* > > > >* spline;
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-    std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > >* spline;
-#endif
-  public:
-#if USE_SPLINE_FD == USE_TSpline3_FD
+	public:
     syst2D(std::string namein,    std::vector<std::vector< std::vector< std::vector< TSpline3* > > > >* splinein){
       name=namein;
       spline=splinein;
     };
+  };
+
 #elif USE_SPLINE_FD == USE_TSpline3_red_FD
+  //First a struct to hold Enu-Var1 splines
+  struct syst{
+	std::string name;
+	std::vector< std::vector< std::vector< TSpline3_red* > > > * spline;
+  public:
+    syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3_red* > > >* splinein){
+      name=namein;
+      spline=splinein;
+    };
+  };
+
+  //First a struct to hold Enu-Var1-Var-2 splines
+  struct syst2D{
+    std::string name;
+    std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > >* spline;
+	public:
     syst2D(std::string namein,    std::vector<std::vector< std::vector< std::vector< TSpline3_red* > > > >* splinein){
       name=namein;
       spline=splinein;
     };
-#endif
   };
-
+#endif
 };
 #endif

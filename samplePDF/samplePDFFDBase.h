@@ -34,9 +34,10 @@
 #include "ShiftFunctors.h"
 
 #include "manager/manager.h"
+
 //Other
-#include "../Prob3++/BargerPropagator.h"
-#include "libconfig/lib/libconfig.h++"
+#include "BargerPropagator.h"
+
 
 #define USEBETA 0
 
@@ -54,9 +55,6 @@ public:
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
-  void reweight(double *oscpar);
-  void reweight(double *oscpar_nub, double *oscpar_nu);
-
   //ETA - abstract these to samplePDFFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded getLikelihood
   void addData(TH1D* Data);
@@ -66,6 +64,10 @@ public:
   //DB Multi-threaded getLikelihood
   double getLikelihood();
   //===============================================================================
+
+  void reweight(double *oscpar);
+  void reweight(double *oscpar_nub, double *oscpar_nu);
+  double getEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
   void useNonDoubledAngles(bool ans) {doubled_angle = ans;};
@@ -88,6 +90,7 @@ public:
   inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar);
   inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
 
+  std::string GetSampleName(){return samplename;}
 
   //============================= Should be deprecated =============================
   // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
@@ -98,7 +101,6 @@ public:
 
   // ETA - in the future it would be nice to have some generic getHIst functions
   // although, this introduces a root dependence into the core code?
-  // for now these live in the experiment specific daughter class
   //TH1D *getModeHist1D(int s, int m, int style = 0);
   //TH2D *getModeHist2D(int s, int m, int style = 0);
   // Direct translation of getModeHist1D(s,m,style) = get1DVarHist(kPDFBinning,m,s,style)
@@ -111,21 +113,27 @@ public:
  
   //================================================================================
 
+  virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
 
  protected:
+
+
+  //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
+  //DB Function to determine which weights apply to which types of samples
+  //pure virtual!!
+  virtual void setupWeightPointers() = 0;
+
+
   //===============================================================================
   //DB Functions relating to sample and exec setup  
   //ETA - abstracting these core functions
   //init will setup all the specific variables 
   void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
-  void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
-  void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
+  //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
+  //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
+
   void fillSplineBins();
 
-  //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
-  //DB Function to determine which weights apply to which types of samples
-  virtual void setupWeightPointers(){};
-  double getEventWeight(int iSample, int iEntry);
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();
@@ -141,19 +149,24 @@ public:
 
   //ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){};
-  //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound},{{ND280KinematicTypes Var2, douuble LowBound, double UpBound},..}
-  bool IsEventSelected(int iSample, int iEvent);
-  bool IsEventSelected(std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
+  //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
+  bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
+  bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
   virtual void reconfigureFuncPars(){};
-    
-  // Calculate the spline weight for a given event
-  double CalcXsecWeight_Spline(const int iSample, const int iEvent);
-  // Calculate the norm weight for a given event
-  double CalcXsecWeight_Norm(const int iSample, const int iEvent);
-  virtual double CalcXsecWeight_Func(int iSample, int iEvent) = 0;
 
-  virtual double ReturnKinematicParameter(KinematicTypes Var, int i, int j) = 0;       //Returns parameter Var for event j in sample i
-  virtual std::vector<double> ReturnKinematicParameterBinning(KinematicTypes Var) = 0; //Returns binning for parameter Var
+  void CalcXsecNormsBins(int iSample);
+  //This just gets read in from a yaml file
+  bool GetIsRHC() {return IsRHC;}
+  // Calculate the spline weight for a given event
+  double CalcXsecWeightSpline(const int iSample, const int iEvent);
+  // Calculate the norm weight for a given event
+  double CalcXsecWeightNorm(const int iSample, const int iEvent);
+  virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
+
+
+  //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
+  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
   virtual void setXsecCov(covarianceXsec* xsec_cov);
@@ -225,6 +238,7 @@ public:
   //ETA - binning opt can probably go soon...
   int BinningOpt;
   int SampleDetID;
+  bool IsRHC;
 
   std::string samplename;
 
@@ -236,7 +250,11 @@ public:
 
   //===============================================================================
   //DB Vectors to store which kinematic cuts we apply
+  std::vector< std::string > SelectionStr; //like in XsecNorms but for events in sample. Read in from sample yaml file 
+  std::vector< std::vector<double> > SelectionBounds; // like in XsecNorms but for events in sample. Read in from sample yaml file in samplePDFExperimentBase.cpp
+
   std::vector< std::vector<double> > Selection; //What gets used in IsEventSelected, which gets set equal to user input plus all the vectors in StoreSelection
+  int NSelections;
   std::vector< std::vector<double> > StoredSelection; //What gets pulled from config options
   //===============================================================================
   //

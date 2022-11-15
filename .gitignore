@@ -1,32 +1,8 @@
-bin/*
-
+#ignore any object files
 *.o
-*.so
-*/*.o
-*/*/*.o
-*/*/*/*.o
-*/*.so
-*.a
 
+#ingore some stuff in libconfig
+*.lo
+*.la
+*.Plo
 lib/*
-
-libconfig/*
-libconfig/lib/*
-libconfig/Makefile
-libconfig/config.status
-libconfig/doc/Makefile
-libconfig/examples/Makefile
-libconfig/examples/c++/Makefile
-libconfig/examples/c/Makefile
-libconfig/lib/.libs/
-libconfig/lib/Makefile
-libconfig/lib/libconfig++.la
-libconfig/lib/libconfig.la
-libconfig/libtool
-libconfig/tests/.libs/
-libconfig/tests/Makefile
-libconfig/tests/libconfig_tests
-libconfig/tinytest/Makefile
-libconfig/tinytest/libtinytest.a
-
-Diagnostics/DiagMCMC

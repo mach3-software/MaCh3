@@ -24,8 +24,6 @@
 // MaCh3 samplePDF includes
 #include "samplePDF/Structs.h"
 
-#include "libconfig/lib/libconfig.h++"
-
 // Only needed to Get number of threads
 // Could alternatively set-up by setting a static global?
 #ifdef MULTITHREAD
@@ -37,8 +35,19 @@
 // More documentation is available in the README
 //******************************************************
 
+
+#include "yaml-cpp/yaml.h"
+
 class manager {
 
+public:
+  manager(std::string const &);
+  YAML::Node const &raw();
+
+private:
+  YAML::Node config;
+
+/*
  public:
   manager(char *config, bool print = true);
   virtual ~manager();
@@ -47,9 +56,9 @@ class manager {
 
 // Print and checks
   void Print();
-  bool checkSettings();
+  //bool checkSettings();
 
-  void SaveSettings(TFile * const OutputFile);
+  //void SaveSettings(TFile * const OutputFile);
 
 // Lots of yummy Get functions
   const char *GetOutputFilename() { return (const char*)output_file.c_str(); }
@@ -380,6 +389,8 @@ class manager {
   std::vector<int> nu_type;
   std::vector<int> oscnu_type;
   std::vector<bool> signal;
+
+  */
 };
 
 #endif

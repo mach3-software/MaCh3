@@ -3,11 +3,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)  
 
-project(MaCh3 LANGUAGES CXX)
-
-# creates a custom target to drive download, update/patch, configure, build, 
-# install and test steps of an external project
-include(ExternalProject)
+SET(MaCh3_VERSION 0.0.2)
+project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
 
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -18,15 +16,48 @@ elseif(NOT DEFINED CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
 endif()
 
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
 # Use the compilers found in the path
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
-# To make output lines about environment vars
-include(${CMAKE_SOURCE_DIR}/cmake/cmessage.cmake)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+
+include(CPM)
+
+#Luke's handing cmake modules which Neutrino hep experiments might want
+CPMFindPackage(
+    NAME CMakeModules
+    GIT_TAG v0.0.11
+    GITHUB_REPOSITORY NuHepMC/CMakeModules
+    DOWNLOAD_ONLY
+)
+include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
+
+#YAML for reading in config files
+CPMFindPackage(
+    NAME yaml-cpp
+    VERSION 0.7.0
+    GITHUB_REPOSITORY "jbeder/yaml-cpp"
+    GIT_TAG "yaml-cpp-0.7.0"
+    OPTIONS
+      "YAML_BUILD_SHARED_LIBS ON"
+)
+
+# Oscillation calcualtion
+# In the future which osc calc we use might be set with a flag
+CPMFindPackage(
+    NAME Prob3plusplus
+    VERSION 3.10.3
+    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
+    GIT_TAG v3.10.3
+)
+
+include(NuHepMCUtils)
+dump_cmake_variables(Prob3plusplus)
+
+include(CMessage)
+
+include(ROOT)
 
 # Check the where to install 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
@@ -40,64 +71,45 @@ if(NOT ${CMAKE_SCRIPT_SETUP})  #Check if setup by Experiment MaCh3
     include(${CMAKE_SOURCE_DIR}/cmake/CUDASetup.cmake)
   endif()
 
-  # ROOT  
-  list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-  include(${CMAKE_SOURCE_DIR}/cmake/ROOTSetup.cmake)
-
 endif()
-
-#LW - Possibly use CPM to install dependencies...
-#CPM
-#set(CPM_DOWNLOAD_VERSION 0.34.0)
-
-#if(CPM_SOURCE_CACHE)
-#  set(CPM_DOWNLOAD_LOCATION "${CPM_SOURCE_CACHE}/cpm/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
-#elseif(DEFINED ENV{CPM_SOURCE_CACHE})
-#  set(CPM_DOWNLOAD_LOCATION "$ENV{CPM_SOURCE_CACHE}/cpm/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
-#else()
-#  set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
-#endif()
-
-#if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
-#  message(STATUS "Downloading CPM.cmake to ${CPM_DOWNLOAD_LOCATION}")
-#  file(DOWNLOAD
-#       https://github.com/TheLartians/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake
-#       ${CPM_DOWNLOAD_LOCATION}
-#  )
-#endif()
-
-#include(${CPM_DOWNLOAD_LOCATION})
-
-##Prob3++ with CPM
-#CPMFindPackage(
-#   NAME prob3
-#   URL "https://github.com/hyperk/Prob3.git"
-#)
-
 
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 
-#Compile and link options (Should be in experiment project but copied in case CORE is built alone)
-add_compile_options(-I${CUDA_SAMPLES}/common/inc -L${ROOT_LIBDIR})
-add_compile_options(-g -std=c++11 -O3 -Wextra)
-add_compile_options(-I$ENV{MACH3CORE})
-
 #If Single thread is chosen MultiThread flags are omitted
 if(NOT ${SINGLE_THREAD_ONLY})
-  add_compile_options(-fopenmp -DMULTITHREAD)
+
+  #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
+  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
+  add_compile_options(-g -fopenmp -O3 -Wextra-DMULTITHREAD)
   add_link_options(-fopenmp -DMULTITHREAD)
+
+else()
+
+  #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
+  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
+  add_compile_options(-g -O3 -Wextra)
+
 endif()
 
 # Build components
-#add_subdirectory(libconfig)
-#add_subdirectory(Diagnostics)
-add_subdirectory(Prob3++)
-#add_subdirectory(CUDAProb3)
+# add_subdirectory(Diagnostics)
+# add_subdirectory(CUDAProb3)
+add_subdirectory(manager)
 add_subdirectory(throwParms)
-#add_subdirectory(manager)
 add_subdirectory(covariance)
 add_subdirectory(splines)
 add_subdirectory(samplePDF)
-#add_subdirectory(mcmc)
+add_subdirectory(mcmc)
+add_subdirectory(yaml_test)
+
+if(NOT TARGET MaCh3)
+  add_library(MaCh3 INTERFACE)
+  set_target_properties(MaCh3 PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}"
+      INTERFACE_LINK_LIBRARIES "MCMC;SamplePDF;Covariance;Splines;ThrowParms;Manager"
+      EXPORT_NAME MaCh3
+  )
+  cmessage(STATUS "Added target MaCh3")
+endif()

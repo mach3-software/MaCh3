@@ -5,8 +5,11 @@
 // Now we can dump manager settings to the output file
 mcmc::mcmc(manager * const man) : fitMan(man) {
 // *************************
-  random = new TRandom3(fitMan->GetSeed());  
-  AnnealTemp = fitMan->GetTemp();
+
+  random = new TRandom3(fitMan->raw()["General.Seed"].as<int>());  
+  //ETA - currently don't have this in manager as it needs some love 
+  //AnnealTemp = fitMan->GetTemp();
+  AnnealTemp = -999;
   if(AnnealTemp < 0) anneal = false;
   else 
   {
@@ -14,8 +17,8 @@ mcmc::mcmc(manager * const man) : fitMan(man) {
     anneal = true;
   }
   // Fit summary and debug info
-  debug =  fitMan->GetDebug();
-  init(fitMan->GetOutputFilename());
+  debug =  fitMan->raw()["General.Debug"].as<bool>();
+  init(fitMan->raw()["General.Output"].as<std::string>().c_str());
 
 }
 
@@ -29,7 +32,7 @@ void mcmc::init(std::string outfile) {
   // Counter of the accepted # of steps
   accCount = 0;
   //KS: you don't want to do this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = fitMan->GetAutoSave();
+  auto_save = fitMan->raw()["General.AutoSave"].as<int>();//GetAutoSave();
   // Do we want to save the nominal parameters to output
   save_nominal = true;
   // Starting parameters should be thrown 
@@ -333,7 +336,7 @@ void mcmc::ProcessMCMC() {
   }
 
   // Process the MCMC
-  if (fitMan->GetProcessMCMC()) {
+  if (fitMan->raw()["General.ProcessMCMC"].as<bool>()) {
 
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()), false);
@@ -363,7 +366,7 @@ void mcmc::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       std::cout << "Opening output again to update with means..." << std::endl;
-      outputFile = new TFile(fitMan->GetOutputFilename(), "UPDATE");
+      outputFile = new TFile(fitMan->raw()["General.Output.Filename"].as<std::string>().c_str(), "UPDATE");
     }
 
     Central->Write("PDF_Means");
@@ -640,7 +643,7 @@ void mcmc::SaveSettings() {
     std::cout << "************************" << std::endl;
   } else {
     // Save the settings we have in the manager
-    fitMan->SaveSettings(outputFile);
+    //fitMan->SaveSettings(outputFile);
     // Warn if we're running a deprecated constructor (again)
   }
 

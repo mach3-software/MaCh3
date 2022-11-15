@@ -22,11 +22,12 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
   if (hist_23) {
     h_23 = hist_23;
     std::cout << "Using th23 and dm23 correlated prior from histogram" << std::endl;
-    std::cout << "NOTE: THIS WILL IGNORE ANY CORRELATIONS BETWEEN 23 PARAMETERS AND OTHER PARAMETERS" << std::endl;
+    std::cout << "NOTE: THIS WILL IGNORE ANY CORRELATIONS BETWEEN th_23 PARAMETERS AND OTHER PARAMETERS" << std::endl;
   } else {
     h_23 = NULL;
   }
 
+  //Read in osc pars from xml file
   TFile *infile = new TFile(file, "READ");
   osc_prior = (TVectorD*)infile->Get("osc_nom");
   TVectorD* osc_stepscale = (TVectorD*)infile->Get("osc_stepscale");
@@ -37,7 +38,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
 
   TVectorD* osc_baseline = (TVectorD*)infile->Get("osc_baseline");
   TVectorD* osc_density = (TVectorD*)infile->Get("osc_density");
-  double fScale = 1.0;//2.38 / TMath::Sqrt(211); // 211 = number of parameters in fit 
+  double fScale = 1.0;
 
   //KS: Save all neccesary information from covariance
   for(int io = 0; io <size; io++)
@@ -57,8 +58,8 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
     if( (bool)((*osc_flat_prior)(io)) ) setEvalLikelihood(io,false);
   }
     
-  L = (*osc_baseline)(0); //295 for T2K
-  density = (*osc_density)(0); //2.6 for T2K
+  L = (*osc_baseline)(0);
+  density = (*osc_density)(0);
 
   flipdelM=false;
   reactorPrior = false;
@@ -529,8 +530,6 @@ void covarianceOsc::setFlipDeltaM23(double dm23NH, double dm23IH, double th23NH,
   flipdelM = true;
 }
 
-
-
 //KS: Print all usefull informations after initialization
 void covarianceOsc::Print() {
   std::cout << "Number of pars: " << size << std::endl;
@@ -543,7 +542,6 @@ void covarianceOsc::Print() {
   std::cout<<"Baseline: "<<L<<std::endl;
   std::cout<<"Earth Density: "<<density<<std::endl;
 }
-
 
 
 //KS: Currently prob3++/probgp requiers particular order so we need to check this is the case
@@ -573,5 +571,3 @@ void covarianceOsc::CheckOrderOfParams()
     }
 
 }
-
-
