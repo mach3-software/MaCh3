@@ -93,14 +93,13 @@ void splineFDBase::SetSplineBinning() // erec version
   if(!splinefile){std::cout << "Couldn't find spline file...." << std::endl;}
 
   TH2F *hist0 = (TH2F*)splinefile->Get("dev_tmp_0_0");
-  std::cout << "Looking in splinefile " << splinefile << "for dev_tmp_0_0" << std::endl;
   if (!hist0){
     std::cout << "[ERROR]: " << __FILE__ << ":" << __LINE__ << " could not find dev_tmp_0_0 in spline file. Spline binning will not be Set!" << std::endl;
     throw;
   }
   else{
 	std::cout << "Found dev_tmp_0_0 in 1D version" << std::endl;
-	std::cout << "Setting spline spline binning!!" << std::endl;
+	std::cout << "Setting spline binning from this" << std::endl;
   }
 
   const int netrue = hist0->GetXaxis()->GetNbins(); 
@@ -330,14 +329,14 @@ std::vector< std::vector<int> > splineFDBase::getEventSplines(int &event_i, int 
 //Needed for FastSplineEval
 void splineFDBase::SetupSplineInfoArray(covarianceXsec * xsec){
 
-  if(!xsec){std::cout << "[ERROR]:: " << __FILE__ << ":" << __LINE__ << " xsec cov is NULL" << std::endl;}
-  else{
-    std::cout << " xsec cov is not null " << std::endl;
+  if (!xsec) {
+	std::cout << "[ERROR]:: " << __FILE__ << ":" << __LINE__ << " xsec cov is NULL" << std::endl;
+	throw;
   }
+
   covxsec = xsec;
 
   std::cout << "Now in SetupSplineInfoArray!!" << std::endl;
-  std::cout << "xsec is " << xsec << std::endl;
 
   //DB Now use detid to determine number of spline systematics, names and corresponding modes 
   std::vector<std::string> splinenames = covxsec->GetSplineParsNamesFromDetID(SampleDetID);
