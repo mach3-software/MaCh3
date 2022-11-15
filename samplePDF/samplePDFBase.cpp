@@ -114,7 +114,6 @@ std::vector<double> samplePDFBase::generate()
   std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
 
   // rejection sampling
-  //double upp = up_bnd; // upper energy bound for sampling
   //double M = 6; // *** DO NOT HARDCODE THIS, WILL ALTER RESULTS WHEN POT IS CHANGED ***
   int count = 0;
 
@@ -262,6 +261,7 @@ double samplePDFBase::getLikelihood()
   }
   return negLogL;
 }
+
 // ***************************************************************************
 //KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
 double samplePDFBase::getTestStatLLH(double data, double mc) {

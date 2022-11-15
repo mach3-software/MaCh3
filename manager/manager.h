@@ -24,8 +24,6 @@
 // MaCh3 samplePDF includes
 #include "samplePDF/Structs.h"
 
-#include "libconfig/lib/libconfig.h++"
-
 // Only needed to Get number of threads
 // Could alternatively set-up by setting a static global?
 #ifdef MULTITHREAD

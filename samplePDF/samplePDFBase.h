@@ -81,9 +81,9 @@ class samplePDFBase : public samplePDFInterface
   void init(double pot, std::string mc_version);
   
   //bool gpu_rw; 
-  double up_bnd; // highest energy to use (MeV)
 
   double getLikelihood_kernel(std::vector<double> &data);
+  double getTestStatLLH(double data, double mc);
   double getTestStatLLH(double data, double mc, double w2);
   // Provide a setter for the test-statistic
   void SetTestStatistic(TestStatistic test_stat);
