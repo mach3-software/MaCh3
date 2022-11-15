@@ -157,26 +157,20 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
 {
 
-  if (MCSamples.size()==6) {
-	reweight(oscpar, oscpar);
-	return;
-  }
-  else {
-
-	for (int i=0; i< (int)MCSamples.size(); ++i) {
-	  for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-	  }
+  for (int i=0; i< (int)MCSamples.size(); ++i) {
+	for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+	  MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
 	}
-
   }
+
   //KS: Reset the histograms before reweight 
   ResetHistograms();
-  
+
   fillArray();
 
   return;
 }
+
 
 void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweight function (this should be different for one vs 2 sets of oscpars)
 {
@@ -192,9 +186,10 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
   fillArray();
 }
 
+
 double samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double en, double *oscpar)
 {
-  bNu->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle);
+  bNu->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
   bNu->propagateLinear(nutype , oscpar[7], oscpar[8]); 
 
   return bNu->GetProb(nutype, oscnutype);
@@ -224,8 +219,6 @@ void samplePDFFDBase::fillArray() {
 
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-
-  std::cout << "Selection is of size " << Selection.size() << std::endl;
 
   // Call entirely different routine if we're running with openMP
 #ifdef MULTITHREAD
