@@ -52,6 +52,19 @@ CPMFindPackage(
     GIT_TAG v3.10.3
 )
 
+CPMAddPackage(
+  NAME Eigen
+  VERSION 3.2.8
+  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
+  # Eigen's CMakelists are not intended for library use
+  DOWNLOAD_ONLY YES 
+)
+
+if(Eigen_ADDED)
+  add_library(Eigen INTERFACE IMPORTED)
+  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
+endif()
+
 include(NuHepMCUtils)
 dump_cmake_variables(Prob3plusplus)
 
@@ -82,7 +95,7 @@ if(NOT ${SINGLE_THREAD_ONLY})
 
   #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
   add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-g -fopenmp -O3 -Wextra-DMULTITHREAD)
+  add_compile_options(-g -fopenmp -O3 -Wextra -DMULTITHREAD)
   add_link_options(-fopenmp -DMULTITHREAD)
 
 else()

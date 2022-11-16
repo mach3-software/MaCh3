@@ -225,6 +225,7 @@ void samplePDFFDBase::fillArray() {
   fillArray_MP();
 #else
 
+  //ETA we should probably store this in samplePDFFDBase
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
@@ -322,7 +323,7 @@ void samplePDFFDBase::fillArray() {
 		XBinToFill = MCSamples[iSample].NomXBin[iEvent];
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-      else if (XVar < XBinEdges[0] || XVar >= up_bnd) {
+      else if (XVar < XBinEdges[0] || XVar >= XBinToFill[nXBins]) {
 		continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
@@ -413,9 +414,7 @@ void samplePDFFDBase::fillArray_MP()
 	// 5. Do explict check on adjacent bins when finding event XBin instead of looping over all BinEdge indicies - Implemented but doesn't significantly affect s/step
 	//
 	//Other aspects
-	// 1. Multi-thread getLikelihood() - Implemented and doesn't significantly affect s/step
-	// 2. Don't use TH objects in getLikelihood() and instead just use arrays - Implemented and doesn't significantly affect s/step
-	// 3. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside samplePDFFD_array_class[yBin][xBin]
+	// 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside samplePDFFD_array_class[yBin][xBin]
 	//
 	// We will hit <0.1 s/step eventually! :D
 
@@ -430,6 +429,8 @@ void samplePDFFDBase::fillArray_MP()
 		applyShifts(iSample, iEvent);
 
         //ETA - generic functions to apply shifts to kinematic variable
+		//this is going to be slow right now due to string comps under the hood.
+		//Need to implement a more efficient version of event-by-event cut checks
 		if(!IsEventSelected(SelectionStr, iSample, iEvent)){
 		  continue;
 		}
@@ -511,7 +512,7 @@ void samplePDFFDBase::fillArray_MP()
 		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		}
 		//DB - Second, check to see if the event is outside of the binning range and skip event if it is
-		else if (XVar < XBinEdges[0] || XVar >= up_bnd) {
+		else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
 		  continue;
 		}
 		//DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width

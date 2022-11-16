@@ -203,30 +203,31 @@ covarianceParserYAML::covarianceParserYAML(const char* filename)
 	 (*fCovMatrix)(i,i)=error[i]*error[i];
 	 for (auto const& [key, val] : correlations[i]) {
 	   int index = -1;
-	 }
-	 if (corrNames.find(key) != corrNames.end()) {
-	   index=corrNames[key];
-	 }
-	 else {
-	   std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
-	   exit(5);
-	 }
 
-	 double corr1 = val;
-	 double corr2 = 0;
-	 if(correlations[index].find(fNames[i]) != correlations[index].end()) {
-	   corr2 = correlations[index][fNames[i]];
-	   if(corr2 != corr1) {
-		 std::cout << "Correlations are not equal between " << fNames[i] << " and " << key << std::endl;
+	   if (corrNames.find(key) != corrNames.end()) {
+		 index=corrNames[key];
+	   }
+	   else {
+		 std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
 		 exit(5);
 	   }
-	 }
-	 else {
-	   std::cout << "Correlation does not appear reciprocally between " << fNames[i] << " and " << key << std::endl;
-	   exit(5);
-	 }
 
-	 (*fCovMatrix)(i,index)= (*fCovMatrix)(index,i) = corr1*error[i]*error[index];
+	   double corr1 = val;
+	   double corr2 = 0;
+	   if(correlations[index].find(fNames[i]) != correlations[index].end()) {
+		 corr2 = correlations[index][fNames[i]];
+		 if(corr2 != corr1) {
+		   std::cout << "Correlations are not equal between " << fNames[i] << " and " << key << std::endl;
+		   exit(5);
+		 }
+	   }
+	   else {
+		 std::cout << "Correlation does not appear reciprocally between " << fNames[i] << " and " << key << std::endl;
+		 exit(5);
+	   }
+
+	   (*fCovMatrix)(i,index)= (*fCovMatrix)(index,i) = corr1*error[i]*error[index];
+	 }
    }
 }
 

@@ -3,7 +3,7 @@
 #include "covarianceParserYAML.h"
 
 #include <iostream>
-#include "/scratch2/akaboth/MaCh3_YAML/build/_deps/eigen-src/Eigen/Dense"
+#include "Eigen/Dense"
 
 int main(int argc, char const *argv[]) {
 
