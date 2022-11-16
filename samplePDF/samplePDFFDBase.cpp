@@ -225,6 +225,7 @@ void samplePDFFDBase::fillArray() {
   fillArray_MP();
 #else
 
+  //ETA we should probably store this in samplePDFFDBase
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
@@ -322,7 +323,7 @@ void samplePDFFDBase::fillArray() {
 		XBinToFill = MCSamples[iSample].NomXBin[iEvent];
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-      else if (XVar < XBinEdges[0] || XVar >= up_bnd) {
+      else if (XVar < XBinEdges[0] || XVar >= XBinToFill[nXBins]) {
 		continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
@@ -511,7 +512,7 @@ void samplePDFFDBase::fillArray_MP()
 		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		}
 		//DB - Second, check to see if the event is outside of the binning range and skip event if it is
-		else if (XVar < XBinEdges[0] || XVar >= up_bnd) {
+		else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
 		  continue;
 		}
 		//DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
