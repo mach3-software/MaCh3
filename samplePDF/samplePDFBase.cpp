@@ -327,7 +327,7 @@ double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
 // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
 // Essentially solves equation 11
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFND::getTestStatLLH(double data, double mc, double w2) {
+double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
 // *************************
 
   // Need some MC
