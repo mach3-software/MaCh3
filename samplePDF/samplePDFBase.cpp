@@ -327,8 +327,8 @@ double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
 // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
 // Essentially solves equation 11
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
-  // *************************
+double samplePDFND::getTestStatLLH(double data, double mc, double w2) {
+// *************************
 
   // Need some MC
   if (mc == 0) return 0.0;
@@ -345,18 +345,18 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
   double penalty = 0;
   if (fTestStatistic == kBarlowBeeston) {
     // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
-    double fractional = sqrt(w2)/mc;
+    const double fractional = sqrt(w2)/mc;
     // -b/2a in quadratic equation
-    double temp = mc*fractional*fractional-1;
+    const double temp = mc*fractional*fractional-1;
     // b^2 - 4ac in quadratic equation
-    double temp2 = temp*temp + 4*data*fractional*fractional;
+    const double temp2 = temp*temp + 4*data*fractional*fractional;
     if (temp2 < 0) {
       std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
-    }  
+    }
     // Solve for the positive beta
-    double beta = (-1*temp+sqrt(temp2))/2.;
+    const double beta = (-1*temp+sqrt(temp2))/2.;
     newmc = mc*beta;
     // And penalise the movement in beta relative the mc uncertainty
     if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
@@ -386,16 +386,23 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
      stat = 0.0;
      penalty = 0.0;
      // Auxillary variables
-     long double b = mc/w2;
-     long double a = mc*b+1;
-     long double k = data;
+     const long double b = mc/w2;
+     const long double a = mc*b+1;
+     const long double k = data;
      // Use C99's implementation of log of gamma function to not be C++11 dependent
      stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
    }
 
+   //KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk
+   if (fTestStatistic == kPearson)
+   {
+      stat = 0;
+      stat = (data-mc)*(data-mc)/mc;
+   }
+
    // Return the statistical contribution and penalty
    return stat+penalty;
- }
+}
 
 // **************************************************
 // Helper function to set LLH type used in the fit

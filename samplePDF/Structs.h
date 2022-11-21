@@ -1088,7 +1088,9 @@ inline int PDGToProbs(NuPDG pdg){
 enum TestStatistic {
   kPoisson,
   kBarlowBeeston,
-  kIceCube
+  kIceCube,
+  kPearson,
+  kNTestStatistics //This only enumarates statistic
 };
 
 // **************************************************
@@ -1106,6 +1108,9 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
         break;
         case kIceCube:
         name = "IceCube";
+        break;
+        case kPearson:
+        name = "Pearson";
         break;
         default:
             std::cerr << "UNKNOWN LIKELHOOD SPECIFIED TO ND280!" << std::endl;
