@@ -10,12 +10,12 @@
 #export MACH3_DATA=/home/cwret/P6Data
 #export MACH3_MC=/home/cwret/P6MC
 
-source /vols/t2k/users/ea2817/Software/ND280/highland2_install/ROOT/v5r34p34n00/Linux-x86_64/bin/thisroot.sh
+#source /vols/t2k/users/ea2817/Software/ND280/highland2_install/ROOT/v5r34p34n00/Linux-x86_64/bin/thisroot.sh
 #module load 
 #export CUDAPATH=${CUDA_HOME}
 export MACH3=${PWD}
-export MACH3_DATA=/vols/t2k/users/ea2817/MaCh3_OA2019_inputs/asg2019oa/Data_nd280Psyche_v3r47 
-export MACH3_MC=/vols/t2k/users/ea2817/MaCh3_OA2021_inputs/ND280_inputs
+#export MACH3_DATA=/vols/t2k/users/ea2817/MaCh3_OA2019_inputs/asg2019oa/Data_nd280Psyche_v3r47 
+#export MACH3_MC=/vols/t2k/users/ea2817/MaCh3_OA2021_inputs/ND280_inputs
 
 
 #################################################################
