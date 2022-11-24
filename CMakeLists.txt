@@ -89,22 +89,16 @@ endif()
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+#Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
+add_compile_options(-I${CUDA_SAMPLES}/common/inc)
+add_compile_options(-g -O3 -Wextra)
 
-#If Single thread is chosen MultiThread flags are omitted
+#Add MultiThread flags
 if(NOT ${SINGLE_THREAD_ONLY})
-
-  #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-g -fopenmp -O3 -Wextra -DMULTITHREAD)
+  add_compile_options(-fopenmp -DMULTITHREAD)
   add_link_options(-fopenmp -DMULTITHREAD)
-
-else()
-
-  #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-g -O3 -Wextra)
-
 endif()
+
 
 # Build components
 # add_subdirectory(Diagnostics)

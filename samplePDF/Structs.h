@@ -492,6 +492,7 @@ class TSpline3_red {
     __int__ ParamNo;
 };
 
+
 // ************************
 // Akima Spline class
 class Akima_Spline: public TSpline3_red {
@@ -597,6 +598,20 @@ class Akima_Spline: public TSpline3_red {
         Par[i][1] = c;
         Par[i][2] = d;
       }
+
+      // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
+      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+      for(int i = 0; i <nPoints-1; i++){
+        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+        spline->GetCoeff(i, x, y, b, c, d);
+
+        if((c == 0.0 && d == 0.0)){
+          Par[i][0] = b;
+          Par[i][1] = 0.0;
+          Par[i][2] = 0.0;
+        }
+      }
+
       delete spline;
       spline = NULL;
     }
@@ -604,13 +619,15 @@ class Akima_Spline: public TSpline3_red {
 };
 
 
+
+
 // ************************
 // Monotone Spline class
 class Monotone_Spline: public TSpline3_red {
 // ************************
 // closely follows TSpline3_red class to fit in easily with existing machinery
-// Akima spline is similar to regular cubic spline but enforce the condition that the interpolated value at any point
-// must be between its two nearest knots, DOES NOT make the entire spline monotone, only the segments
+// Monotone spline is similar to regular cubic spline but enforce the condition that the interpolated value at any point
+// must be between its two nearest knots, DOES NOT make the entire spline monotonic, only the segments
 
   public:
     // Empty constructor
@@ -706,7 +723,7 @@ class Monotone_Spline: public TSpline3_red {
       }
 
       // third pass over knots to rescale tangents
-      for (int i = 1; i < nPoints-1; ++i) {
+      for (int i = 0; i < nPoints-1; ++i) {
         if (Secants[i] == 0.0){
           Tangents[i] = 0.0;
           Tangents[i+1] = 0.0;
@@ -763,6 +780,19 @@ class Monotone_Spline: public TSpline3_red {
       Par[nPoints-1][0] = 0.0;
       Par[nPoints-1][1] = 0.0;
       Par[nPoints-1][2] = 0.0;
+
+      // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
+      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+      for(int i = 0; i <nPoints-1; i++){
+        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+        spline->GetCoeff(i, x, y, b, c, d);
+
+        if((c == 0.0 && d == 0.0)){
+          Par[i][0] = b;
+          Par[i][1] = 0.0;
+          Par[i][2] = 0.0;
+        }
+      }
 
       delete spline;
       spline = NULL;
@@ -867,6 +897,8 @@ class Truncated_Spline: public TSpline3_red {
 };
 
 
+
+
 // ************************
 // Truncated Akima Spline class
 class Truncated_Akima_Spline :public Akima_Spline {
@@ -891,6 +923,7 @@ class Truncated_Akima_Spline :public Akima_Spline {
     ~Truncated_Akima_Spline()
     {
     }
+
 
     // See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
     inline int FindX(double x) {
@@ -957,6 +990,7 @@ class Truncated_Akima_Spline :public Akima_Spline {
       return weight;
     }
 };
+
 
 // ***************************
 // A handy namespace for variables extraction
@@ -1088,7 +1122,9 @@ inline int PDGToProbs(NuPDG pdg){
 enum TestStatistic {
   kPoisson,
   kBarlowBeeston,
-  kIceCube
+  kIceCube,
+  kPearson,
+  kNTestStatistics //This only enumarates statistic
 };
 
 // **************************************************
@@ -1106,6 +1142,9 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
         break;
         case kIceCube:
         name = "IceCube";
+        break;
+        case kPearson:
+        name = "Pearson";
         break;
         default:
             std::cerr << "UNKNOWN LIKELHOOD SPECIFIED TO ND280!" << std::endl;

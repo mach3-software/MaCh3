@@ -115,12 +115,14 @@ n_steps << std::endl;
       if (likelihood == "Barlow-Beeston") mc_stat_llh = TestStatistic(kBarlowBeeston);
       else if (likelihood == "IceCube")   mc_stat_llh = TestStatistic(kIceCube);
       else if (likelihood == "Poisson")   mc_stat_llh = TestStatistic(kPoisson);
+      else if (likelihood == "Pearson")   mc_stat_llh = TestStatistic(kPearson);
       else { 
         std::cerr << "Wrong form of test-statistic specified!" << std::endl;
         std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
-        std::cerr << "   Poisson" << std::endl;
-        std::cerr << "   Barlow-Beeston" << std::endl;
-        std::cerr << "   IceCube" << std::endl;
+        for(int i = 0; i < kNTestStatistics; i++)
+        {
+          std::cerr << TestStatistic_ToString(TestStatistic(i)) << std::endl;
+        }
         std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
         throw;
       }

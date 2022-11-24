@@ -130,12 +130,14 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
 // **************************************************
 
   TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(),xbins.size()-1,&xbins[0]);
-  //KS: Temp Histogram to store error
-  TH1D* hProjX_Error = new TH1D((TempName+"_x_Err").c_str(),(TempName+"_x_Err").c_str(),xbins.size()-1,&xbins[0]);
-  double xlow, xup, frac = 0;
+
+  //KS: Temp Histogram to store error, use double as this is thread safe
+  double *hProjX_Error = new double[hProjX->GetXaxis()->GetNbins()+1];
+  for (int i = 0; i <= hProjX->GetXaxis()->GetNbins(); ++i) {hProjX_Error[i] = 0;}
+  double xlow, xup, frac=0;
 
   //loop over bins in the poly
-  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
     {
       //get bin and its edges
       TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
@@ -143,53 +145,53 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
       xup = bin->GetXMax();
 
       //Loop over projected bins, find fraction of poly bin in each
-      for(int dx=0; dx < int(xbins.size()); dx++)
+      for(int dx=0; dx<int(xbins.size()); dx++)
         {
           if(xbins[dx+1]<=xlow || xbins[dx]>=xup)
             {
-              frac = 0;
+              frac=0;
             }
           else if(xbins[dx]<=xlow && xbins[dx+1]>=xup)
             {
-              frac = 1;
+              frac=1;
             }
           else if(xbins[dx]<=xlow && xbins[dx+1]<=xup)
             {
-              frac = (xbins[dx+1]-xlow)/(xup-xlow);
+              frac=(xbins[dx+1]-xlow)/(xup-xlow);
             }
           else if(xbins[dx]>=xlow && xbins[dx+1]>=xup)
             {
-              frac = (xup-xbins[dx])/(xup-xlow);
+              frac=(xup-xbins[dx])/(xup-xlow);
             }
           else if(xbins[dx]>=xlow && xbins[dx+1]<=xup)
             {
-              frac = (xbins[dx+1]-xbins[dx])/(xup-xlow);
+              frac=(xbins[dx+1]-xbins[dx])/(xup-xlow);
             }
           else
             {
-              frac = 0;
+              frac=0;
             }
           hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
-          //KS: Follow ROOT implementation and sum up the variance 
+          //KS: Follow ROOT implementation and sum up the variance
           if(computeErrors)
           {
-              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
               //but numbering of GetBinError is differnt than GetBins...
              double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
-             hProjX_Error->SetBinContent(dx+1, hProjX_Error->GetBinContent(dx+1)+Temp_Err);
+             hProjX_Error[dx+1] += Temp_Err;
           }
         }
     }
     //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
     if(computeErrors)
     {
-        for (int i = 1; i <= hProjX_Error->GetXaxis()->GetNbins(); ++i) 
+        for (int i = 1; i <= hProjX->GetXaxis()->GetNbins(); ++i)
         {
-            double Error = TMath::Sqrt(hProjX_Error->GetBinContent(i));
+            double Error = TMath::Sqrt(hProjX_Error[i]);
             hProjX->SetBinError(i, Error);
-        }   
+        }
     }
-  delete hProjX_Error;
+  delete[] hProjX_Error;
   return hProjX;
 } // end project poly X function
 
@@ -199,7 +201,10 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
 // **************************************************
 
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),ybins.size()-1,&ybins[0]);
-  TH1D* hProjY_Error = new TH1D((TempName+"_y_Err").c_str(),(TempName+"_y_Err").c_str(),ybins.size()-1,&ybins[0]);
+  //KS: Temp Histogram to store error, use double as this is thread safe
+  double *hProjY_Error = new double[hProjY->GetXaxis()->GetNbins()+1];
+  for (int i = 0; i <= hProjY->GetXaxis()->GetNbins(); ++i) {hProjY_Error[i] = 0;}
+
   double ylow, yup, frac=0;
 
   //loop over bins in the poly
@@ -219,7 +224,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
             }
           else if(ybins[dy]<=ylow && ybins[dy+1]>=yup)
             {
-              frac = 1;
+              frac=1;
             }
           else if(ybins[dy]<=ylow && ybins[dy+1]<=yup)
             {
@@ -238,26 +243,26 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
               frac=0;
             }
           hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
-          //KS: Follow ROOT implementation and sum up the variance 
+          //KS: Follow ROOT implementation and sum up the variance
           if(computeErrors)
           {
-              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
-              //but numbering of GetBinError is differnt than GetBins... 
+              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
+              //but numbering of GetBinError is differnt than GetBins...
              double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
-             hProjY_Error->SetBinContent(dy+1, hProjY_Error->GetBinContent(dy+1)+Temp_Err);
+             hProjY_Error[dy+1] += Temp_Err;
           }
         }
     }
     //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
     if(computeErrors)
     {
-        for (int i = 1; i <= hProjY_Error->GetXaxis()->GetNbins(); ++i) 
+        for (int i = 1; i <= hProjY->GetXaxis()->GetNbins(); ++i)
         {
-            double Error = TMath::Sqrt(hProjY_Error->GetBinContent(i));
+            double Error = TMath::Sqrt(hProjY_Error[i]);
             hProjY->SetBinError(i, Error);
-        }   
+        }
     }
-  delete hProjY_Error;
+  delete[] hProjY_Error;
   return hProjY;
 } // end project poly Y function
 
