@@ -1,5 +1,4 @@
 #include "MCMCProcessor.h"
-
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
   Chain(NULL), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
 
@@ -68,15 +67,15 @@ MCMCProcessor::~MCMCProcessor() {
   delete Means_Gauss;
   delete Errors_Gauss;
   delete Means_HPD;
-  delete Errors_HPD;
-  delete Errors_HPD_Positive;
-  delete Errors_HPD_Negative;
-
+  delete Errors_HPD; 
+  delete Errors_HPD_Positive; 
+  delete Errors_HPD_Negative; 
+  
   if(CacheMCMCM)
   {
-      for (int i = 0; i < nDraw; ++i)
+      for (int i = 0; i < nDraw; ++i) 
     {
-        for (int j = 0; j < nDraw; ++j)
+        for (int j = 0; j < nDraw; ++j) 
         {
             delete hpost2D[i][j];
         }
@@ -84,7 +83,7 @@ MCMCProcessor::~MCMCProcessor() {
         delete[] hpost2D[i];
     }
 
-    delete[] ParStep;
+    delete[] ParStep; 
     delete[] Min_Chain;
     delete[] Max_Chain;
     delete[] hpost;
@@ -1992,7 +1991,6 @@ void MCMCProcessor::ParamTraces() {
     }
   }
 
-
   // Write the output and delete the TH2Ds
   TDirectory *TraceDir = OutputFile->mkdir("Trace");
   TraceDir->cd();
@@ -2032,6 +2030,8 @@ void MCMCProcessor::AutoCorrelation() {
   // *********************************
 
   std::cout << "Making auto-correlations..." << std::endl;
+  TStopwatch clock;
+  clock.Start();
   const int nLags = 25000;
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter
@@ -2044,6 +2044,9 @@ void MCMCProcessor::AutoCorrelation() {
   LagKPlots = new TH1D*[nDraw];
 
   // Loop over the parameters of interacts
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
   for (int j = 0; j < nDraw; ++j) {
 
     // Loop over each lag
@@ -2068,6 +2071,7 @@ void MCMCProcessor::AutoCorrelation() {
   // Each lag is indepdent so might as well multi-thread them!
 #ifdef MULTITHREAD
   std::cout << "Using multi-threading..." << std::endl;
+//KS: Consider moving it to GPU, and have huge loop over nLag*nDraw, should work
 #pragma omp parallel for
 #endif
   for (int k = 0; k < nLags; ++k) {
@@ -2113,6 +2117,8 @@ void MCMCProcessor::AutoCorrelation() {
   
   delete ParamSums;
 
+  clock.Stop();
+  std::cout << "It took " << clock.RealTime() << std::endl;
 }
 
 
