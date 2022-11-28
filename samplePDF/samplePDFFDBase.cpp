@@ -13,17 +13,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
 
-  init(pot, mc_version, xsec_cov);          
-
-  bNu = new BargerPropagator();
-  bNu->UseMassEigenstates(false);
-  bNu->SetOneMassScaleMode(false);
-  bNu->SetWarningSuppression(true);
-  
-  Beta=1;
-  useBeta=false;
-  applyBetaNue=false;
-  applyBetaDiag=false;
+  init(pot, mc_version, xsec_cov);         
 
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
@@ -154,6 +144,8 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
   return true;
 }
 
+#ifdef USE_PROB3
+
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
 {
 
@@ -186,11 +178,43 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
   fillArray();
 }
 
+#else
+
+void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
+{
+
+  for (int i=0; i< (int)MCSamples.size(); ++i) {
+    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, MCSamples[i].osc_w, oscpar);
+    }
+
+  //KS: Reset the histograms before reweight 
+  ResetHistograms();
+
+  fillArray();
+
+  return;
+}
+
+
+void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweight function (this should be different for one vs 2 sets of oscpars)
+{
+  for(int i = 0; i < (int)MCSamples.size(); ++i) {
+    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, MCSamples[i].osc_w, oscpar_nub, oscpar_nu);
+    }
+  //KS: Reset the histograms before reweight
+  ResetHistograms();
+
+  fillArray();
+}
+
+#endif
+
+#ifdef USE_PROB3
 
 double samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double en, double *oscpar)
 {
-  bNu->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
-  bNu->propagateLinear(nutype , oscpar[7], oscpar[8]); 
+  Oscillator->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
+  Oscillator->propagateLinear(nutype , oscpar[7], oscpar[8]); 
 
   return bNu->GetProb(nutype, oscnutype);
 }
@@ -199,18 +223,92 @@ double samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double en, dou
 {
   if (nutype < 0) // is antinu
     {
-      bNu->SetMNS(oscpar_nub[0], oscpar_nub[2], oscpar_nub[1], oscpar_nub[3], oscpar_nub[4], oscpar_nub[5], en, doubled_angle, nutype);
+      Oscillator->SetMNS(oscpar_nub[0], oscpar_nub[2], oscpar_nub[1], oscpar_nub[3], oscpar_nub[4], oscpar_nub[5], en, doubled_angle, nutype);
       bNu->propagateLinear(nutype , oscpar_nub[7], oscpar_nub[8]);
       return bNu->GetProb(nutype, oscnutype);
     }
   else // is nu
     {
-      bNu->SetMNS(oscpar_nu[0], oscpar_nu[2], oscpar_nu[1], oscpar_nu[3], oscpar_nu[4], oscpar_nu[5], en, doubled_angle); 
-      bNu->propagateLinear(nutype , oscpar_nu[7], oscpar_nu[8]);
+      Oscillator->SetMNS(oscpar_nu[0], oscpar_nu[2], oscpar_nu[1], oscpar_nu[3], oscpar_nu[4], oscpar_nu[5], en, doubled_angle); 
+      Oscillator->propagateLinear(nutype , oscpar_nu[7], oscpar_nu[8]);
       return bNu->GetProb(nutype, oscnutype);
     }
 }
 
+#else
+
+
+void samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar_nub, double *oscpar_nu)
+{
+
+  if (nutype < 0) 
+    {
+      MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar_nub[0])),asin(sqrt(oscpar_nub[2])), asin(sqrt(oscpar_nub[1])), oscpar_nub[5]);
+      MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar_nub[3], oscpar_nub[4]);
+      MCSamples[sample].Oscillator->setPathLength(oscpar_nub[7]);
+      MCSamples[sample].Oscillator->setDensity(oscpar_nub[8]);
+      MCSamples[sample].Oscillator->calculateProbabilities(cudaprob3::Antineutrino);
+      if (nutype == -1 && oscnutype == -1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_e);}
+      else if (nutype == -1 && oscnutype == -2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_m);}
+      else if (nutype == -1 && oscnutype == -3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_t);}
+      else if (nutype == -2 && oscnutype == -1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_e);}
+      else if (nutype == -2 && oscnutype == -2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_m);}
+      else if (nutype == -2 && oscnutype == -3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_t);}
+    }
+
+  else
+    {
+      MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar_nu[0])),asin(sqrt(oscpar_nu[2])), asin(sqrt(oscpar_nu[1])), oscpar_nu[5]);
+      MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar_nu[3], oscpar_nu[4]);
+      MCSamples[sample].Oscillator->setPathLength(oscpar_nu[7]);
+      MCSamples[sample].Oscillator->setDensity(oscpar_nu[8]);
+      MCSamples[sample].Oscillator->calculateProbabilities(cudaprob3::Neutrino);
+      if (nutype == 1 && oscnutype == 1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_e);}
+      else if (nutype == 1 && oscnutype == 2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_m);}
+      else if (nutype == 1 && oscnutype == 3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_t);}
+      else if (nutype == 2 && oscnutype == 1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_e);}
+      else if (nutype == 2 && oscnutype == 2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_m);}
+      else if (nutype == 2 && oscnutype == 3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_t);}
+    }
+    
+}
+
+void samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar_nu)
+{
+
+  if (nutype < 0) 
+    {
+      MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar_nu[0])),asin(sqrt(oscpar_nu[2])), asin(sqrt(oscpar_nu[1])), oscpar_nu[5]);
+      MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar_nu[3], oscpar_nu[4]);
+      MCSamples[sample].Oscillator->setPathLength(oscpar_nu[7]);
+      MCSamples[sample].Oscillator->setDensity(oscpar_nu[8]);
+      MCSamples[sample].Oscillator->calculateProbabilities(cudaprob3::Antineutrino);
+      if (nutype == -1 && oscnutype == -1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_e);}
+      else if (nutype == -1 && oscnutype == -2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_m);}
+      else if (nutype == -1 && oscnutype == -3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_t);}
+      else if (nutype == -2 && oscnutype == -1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_e);}
+      else if (nutype == -2 && oscnutype == -2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_m);}
+      else if (nutype == -2 && oscnutype == -3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_t);}
+    }
+
+  else
+    {
+      MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar_nu[0])),asin(sqrt(oscpar_nu[2])), asin(sqrt(oscpar_nu[1])), oscpar_nu[5]);
+      MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar_nu[3], oscpar_nu[4]);
+      MCSamples[sample].Oscillator->setPathLength(oscpar_nu[7]);
+      MCSamples[sample].Oscillator->setDensity(oscpar_nu[8]);
+      MCSamples[sample].Oscillator->calculateProbabilities(cudaprob3::Neutrino);
+      if (nutype == 1 && oscnutype == 1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_e);}
+      else if (nutype == 1 && oscnutype == 2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_m);}
+      else if (nutype == 1 && oscnutype == 3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::e_t);}
+      else if (nutype == 2 && oscnutype == 1) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_e);}
+      else if (nutype == 2 && oscnutype == 2) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_m);}
+      else if (nutype == 2 && oscnutype == 3) {MCSamples[sample].Oscillator->getProbabilityArr(w, cudaprob3::ProbType::m_t);}
+    }
+
+#endif
+    
+}
 //DB Function which does the core reweighting. This assumes that oscillation weights have already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]
 //This function takes advantage of most of the things called in setupSKMC to reduce reweighting time
 //It also follows the ND code reweighting pretty closely
@@ -323,7 +421,7 @@ void samplePDFFDBase::fillArray() {
 		XBinToFill = MCSamples[iSample].NomXBin[iEvent];
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-      else if (XVar < XBinEdges[0] || XVar >= XBinToFill[nXBins]) {
+      else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
 		continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
@@ -497,7 +595,7 @@ void samplePDFFDBase::fillArray_MP()
 		double XVar = (*(MCSamples[iSample].x_var[iEvent]));
 
 		//DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-		//double YVar = skmcSamples[iSample].rw_theta[iEvent];
+		//double YVar = MCSamples[iSample].rw_theta[iEvent];
 
 		//DB Find the relevant bin in the PDF for each event
 		int XBinToFill = -1;
@@ -788,6 +886,34 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
   return;
 }
 
+//LW 
+//Setup chosen oscillation calculator for each subsample
+void samplePDFFDBase::SetupOscCalc()
+{
+
+  Beta=1;
+  useBeta=false;
+  applyBetaNue=false;
+  applyBetaDiag=false;
+
+  for (int iSample=0; iSample < (int)MCSamples.size(); iSample++) {
+#ifdef USE_PROB3 
+    MCSamples[iSample].Oscillator = new BargerPropagator();
+    MCSamples[iSample].Oscillator->UseMassEigenstates(false);
+    MCSamples[iSample].Oscillator->SetOneMassScaleMode(false);
+    MCSamples[iSample].Oscillator->SetWarningSuppression(true);
+#else
+    std::vector<double> etruVector(*(MCSamples[iSample].rw_etru), *(MCSamples[iSample].rw_etru) + MCSamples[iSample].nEvents);
+#ifdef CPU_ONLY
+    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
+#else
+    MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, skobj->nEvents);
+#endif
+    MCSamples[iSample].Oscillator->setEnergyList(etruVector);
+#endif
+  }
+  return;
+}
 
 //ETA
 //New versions of set binning funcitons is samplePDFBase

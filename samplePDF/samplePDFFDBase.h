@@ -20,6 +20,11 @@
 #include "TRandom.h"
 #include "TString.h"
 
+//Propagator includes
+#include "BargerPropagator.h"
+#include "beamcudapropagator.cuh"
+#include "atmoscudapropagator.cuh"
+
 //MaCh3 includes
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
@@ -35,8 +40,6 @@
 
 #include "manager/manager.h"
 
-//Other
-#include "BargerPropagator.h"
 
 
 #define USEBETA 0
@@ -87,8 +90,13 @@ public:
     if (applyBetaDiag){std::cout << "useBeta implementation hidden behind '#ifdef USEBETA' in samplePDFSKBase - Check USEBETA is true, recompile and remove this comment" << std::endl; throw;}
   }; 
 
-  inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar);
-  inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
+#ifdef USE_PROB3
+  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
+  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
+#else
+  void calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar);
+  void calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar_nub, double *oscpar_nu);
+#endif
 
   std::string GetSampleName(){return samplename;}
 
@@ -134,6 +142,7 @@ public:
 
   void fillSplineBins();
 
+  void SetupOscCalc();
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();
@@ -210,8 +219,11 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
+
   // Propagator
-  BargerPropagator *bNu;
+  // Will initialise either Prob3++ or CUDAProb3 depending on USE_PROB3 flag
+  // CUDA/CPU versions of CUDAProb3 set with CPU_ONLY flag
+  // If USEPROB3=true and CPU_ONLY=false, probGpu is setup in source code
 
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;
