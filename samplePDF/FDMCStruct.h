@@ -69,10 +69,12 @@ struct fdmc_base {
   // CUDAProb3 CPU
 #if not defined (USE_PROB3) && defined (CPU_ONLY)
   cudaprob3::BeamCpuPropagator<double>  *Oscillator;
+  cudaprob3::ProbType  cudaprob_type;
 #endif
 
   // CUDAProb3 GPU
 #if not defined (USE_PROB3) && not defined (CPU_ONLY)
   cudaprob3::BeamCudaPropagatorSingle *Oscillator;
+  cudaprob3::ProbType cudaprob_type;
 #endif
 };

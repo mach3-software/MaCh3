@@ -192,6 +192,8 @@ public:
 #endif
   void fillArray();
 
+  inline cudaprob3::ProbType GetCUDAProbFlavour(int nu_i, int nu_f);
+
   // Helper function to reset histograms
   inline void ResetHistograms();
       
