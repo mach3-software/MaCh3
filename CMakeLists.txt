@@ -4,7 +4,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)  
 
 SET(MaCh3_VERSION 0.0.2)
-project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
+project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 set(CMAKE_CXX_STANDARD 17)
 
 # Changes default install path to be a subdirectory of the build dir.
@@ -45,6 +45,14 @@ CPMFindPackage(
 
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
+
+
+CPMFindPackage(
+    NAME CUDAProb3
+    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+    GIT_TAG "master"
+)
+
 CPMFindPackage(
     NAME Prob3plusplus
     VERSION 3.10.3
@@ -90,20 +98,21 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 
+#Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
+add_compile_options(-I${CUDA_SAMPLES}/common/inc)
+add_compile_options(-g -O3 -Wextra)
+
 #If Single thread is chosen MultiThread flags are omitted
 if(NOT ${SINGLE_THREAD_ONLY})
-
-  #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-g -fopenmp -O3 -Wextra -DMULTITHREAD)
   add_link_options(-fopenmp -DMULTITHREAD)
+endif()
 
-else()
+if(${CPU_ONLY})
+  add_compile_options(-DCPU_ONLY)
+endif()
 
-  #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-g -O3 -Wextra)
-
+if(${USE_PROB3})
+  add_compile_options(-DUSE_PROB3)
 endif()
 
 # Build components
