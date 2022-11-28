@@ -60,4 +60,19 @@ struct fdmc_base {
   double *xsec_w;
 
   splineFDBase *splineFile; 
+
+  // Prob3++
+#if defined (USE_PROB3) && defined (CPU_ONLY)
+  BargerPropagator *Oscillator;
+#endif
+
+  // CUDAProb3 CPU
+#if not defined (USE_PROB3) && defined (CPU_ONLY)
+  cudaprob3::BeamCpuPropagator<double>  *Oscillator;
+#endif
+
+  // CUDAProb3 GPU
+#if not defined (USE_PROB3) && not defined (CPU_ONLY)
+  cudaprob3::BeamCudaPropagatorSingle *Oscillator;
+#endif
 };
