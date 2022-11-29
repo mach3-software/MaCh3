@@ -152,7 +152,6 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
   for (int i=0; i< (int)MCSamples.size(); ++i) {
     for(int j = 0; j < MCSamples[i].nEvents; ++j) {
       MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-      std::cout << "nutype = " << MCSamples[i].nutype << " || osc nutype = " << MCSamples[i].oscnutype << " || osc weight = " << MCSamples[i].osc_w[j] << std::endl;
 	}
   }
 
@@ -873,7 +872,8 @@ void samplePDFFDBase::SetupOscCalc()
 #ifdef CPU_ONLY
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
 #else
-    MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, skobj->nEvents);
+    MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, MCSamples[iSample].nEvents);
+
 #endif
     MCSamples[iSample].Oscillator->setEnergyList(etruVector);
 #endif
