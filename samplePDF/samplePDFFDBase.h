@@ -94,8 +94,8 @@ public:
   inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
   inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
 #else
-  void calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar);
-  void calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar_nub, double *oscpar_nu);
+  void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
+  void calcOscWeights(int sample, int nutype, double *w, double *oscpar_nub, double *oscpar_nu);
 #endif
 
   std::string GetSampleName(){return samplename;}

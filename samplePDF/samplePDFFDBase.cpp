@@ -150,8 +150,9 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 {
 
   for (int i=0; i< (int)MCSamples.size(); ++i) {
-	for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-	  MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+    for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+      MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+      std::cout << "nutype = " << MCSamples[i].nutype << " || osc nutype = " << MCSamples[i].oscnutype << " || osc weight = " << MCSamples[i].osc_w[j] << std::endl;
 	}
   }
 
@@ -168,8 +169,7 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
 {
   for(int i = 0; i < (int)MCSamples.size(); ++i) {
     for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-
-		MCSamples[i].osc_w[j] = calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
+      MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar_nub, oscpar_nu);
     }
   }
   //KS: Reset the histograms before reweight
@@ -184,7 +184,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 {
 
   for (int i=0; i< (int)MCSamples.size(); ++i) {
-    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, MCSamples[i].osc_w, oscpar);
+    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
     }
 
   //KS: Reset the histograms before reweight 
@@ -199,7 +199,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweight function (this should be different for one vs 2 sets of oscpars)
 {
   for(int i = 0; i < (int)MCSamples.size(); ++i) {
-    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, MCSamples[i].osc_w, oscpar_nub, oscpar_nu);
+    calcOscWeights(i, MCSamples[i].nutype,  MCSamples[i].osc_w, oscpar_nub, oscpar_nu);
     }
   //KS: Reset the histograms before reweight
   ResetHistograms();
@@ -211,33 +211,33 @@ void samplePDFFDBase::reweight(double *oscpar_nub, double *oscpar_nu) // Reweigh
 
 #ifdef USE_PROB3
 
-double samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double en, double *oscpar)
+double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar)
 {
-  Oscillator->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
-  Oscillator->propagateLinear(nutype , oscpar[7], oscpar[8]); 
+  MCSamples[sample].Oscillator->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
+  MCSamples[sample].Oscillator->propagateLinear(nutype , oscpar[7], oscpar[8]); 
 
-  return bNu->GetProb(nutype, oscnutype);
+  return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
 }
 
-double samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu)
+double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu)
 {
   if (nutype < 0) // is antinu
     {
-      Oscillator->SetMNS(oscpar_nub[0], oscpar_nub[2], oscpar_nub[1], oscpar_nub[3], oscpar_nub[4], oscpar_nub[5], en, doubled_angle, nutype);
-      bNu->propagateLinear(nutype , oscpar_nub[7], oscpar_nub[8]);
-      return bNu->GetProb(nutype, oscnutype);
+      MCSamples[sample].Oscillator->SetMNS(oscpar_nub[0], oscpar_nub[2], oscpar_nub[1], oscpar_nub[3], oscpar_nub[4], oscpar_nub[5], en, doubled_angle, nutype);
+      MCSamples[sample].Oscillator->propagateLinear(nutype , oscpar_nub[7], oscpar_nub[8]);
+      return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
     }
   else // is nu
     {
-      Oscillator->SetMNS(oscpar_nu[0], oscpar_nu[2], oscpar_nu[1], oscpar_nu[3], oscpar_nu[4], oscpar_nu[5], en, doubled_angle); 
-      Oscillator->propagateLinear(nutype , oscpar_nu[7], oscpar_nu[8]);
-      return bNu->GetProb(nutype, oscnutype);
+      MCSamples[sample].Oscillator->SetMNS(oscpar_nu[0], oscpar_nu[2], oscpar_nu[1], oscpar_nu[3], oscpar_nu[4], oscpar_nu[5], en, doubled_angle, nutype); 
+      MCSamples[sample].Oscillator->propagateLinear(nutype , oscpar_nu[7], oscpar_nu[8]);
+      return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
     }
 }
 
 #else
 
-void samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar)
+void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *oscpar)
 {
 
   MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar[0])),asin(sqrt(oscpar[2])), asin(sqrt(oscpar[1])), oscpar[5]);
@@ -250,7 +250,7 @@ void samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, doub
     
 }
 
-void samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double *w, double *oscpar_nub, double *oscpar_nu)
+void samplePDFFDBase::calcOscWeights(int sample, int nutype,  double *w, double *oscpar_nub, double *oscpar_nu)
 {
 
   if (nutype < 0) 
@@ -870,7 +870,6 @@ void samplePDFFDBase::SetupOscCalc()
 #else
     std::vector<double> etruVector(*(MCSamples[iSample].rw_etru), *(MCSamples[iSample].rw_etru) + MCSamples[iSample].nEvents);
     MCSamples[iSample].cudaprob_type = GetCUDAProbFlavour(MCSamples[iSample].nutype, MCSamples[iSample].oscnutype);
-    std::cout << "CUDAProb type: " << MCSamples[iSample].cudaprob_type << std::endl;
 #ifdef CPU_ONLY
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
 #else
