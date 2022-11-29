@@ -112,6 +112,8 @@ endif()
 
 if(${CPU_ONLY})
   add_compile_options(-DCPU_ONLY)
+else()
+  add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
 endif()
 
 if(${USE_PROB3})
