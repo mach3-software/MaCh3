@@ -90,10 +90,17 @@ public:
     if (applyBetaDiag){std::cout << "useBeta implementation hidden behind '#ifdef USEBETA' in samplePDFSKBase - Check USEBETA is true, recompile and remove this comment" << std::endl; throw;}
   }; 
 
-#ifdef USE_PROB3
+#if defined (USE_PROB3) && defined (CPU_ONLY)
   inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
   inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
-#else
+#endif
+
+#if defined (USE_PROB3) && not defined (CPU_ONLY)
+  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar);
+  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar_nub, double *oscpar_nu);
+#endif
+
+#if not defined (USE_PROB3)
   void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
   void calcOscWeights(int sample, int nutype, double *w, double *oscpar_nub, double *oscpar_nu);
 #endif
