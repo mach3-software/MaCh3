@@ -18,7 +18,6 @@ class samplePDFInterface
 {
  public:
   virtual void reweight(double *oscpar)=0;
-  virtual void reweight(double *oscpar, double *oscpar2)=0;
 
   virtual double getEventRate()=0;
  

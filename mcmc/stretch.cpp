@@ -203,11 +203,7 @@ void stretch::runStretch()
      
      for (size_t i = 0; i < samples.size(); i++)
      {
-	if(osc!=-1 && oscbar!=-1)
-	{
-	   samples[i]->reweight(((covarianceOsc*)systematics[oscbar])->getPropPars(), ((covarianceOsc*)systematics[osc])->getPropPars());
-	}
-	else if (osc!=-1)
+	if (osc!=-1)
 	{
 	   samples[i]->reweight(((covarianceOsc*)systematics[osc])->getPropPars());
 	}
@@ -265,11 +261,7 @@ void stretch::runStretch()
 	}
 	for (size_t i = 0; i < samples.size(); i++)
 	{
-	   if(osc!=-1 && oscbar!=-1)
-	   {
-	      samples[i]->reweight(((covarianceOsc*)systematics[oscbar])->getPropPars(), ((covarianceOsc*)systematics[osc])->getPropPars());
-	   }
-	   else if (osc!=-1)
+	   if (osc!=-1)
 	   {
 	      samples[i]->reweight(((covarianceOsc*)systematics[osc])->getPropPars());
 	   }
