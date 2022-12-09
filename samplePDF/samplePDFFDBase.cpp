@@ -152,7 +152,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
   for (int i=0; i< (int)MCSamples.size(); ++i) {
     for(int j = 0; j < MCSamples[i].nEvents; ++j) {
       MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-	}
+    }
   }
 
   //KS: Reset the histograms before reweight 
@@ -180,7 +180,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 {
   for (int i=0; i< (int)MCSamples.size(); ++i) {
     calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
-    }
+  }
 
   //KS: Reset the histograms before reweight 
   ResetHistograms();
@@ -215,7 +215,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 
   for (int i=0; i< (int)MCSamples.size(); ++i) {
     calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
-    }
+  }
 
   //KS: Reset the histograms before reweight 
   ResetHistograms();
@@ -228,7 +228,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *oscpar)
 {
 
-  MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar[0])),asin(sqrt(oscpar[2])), asin(sqrt(oscpar[1])), oscpar[5]);
+  MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar[0])),asin(sqrt(oscpar[2])), asin(sqrt(oscpar[1])), oscpar[5], nutype);
   MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar[3], oscpar[4]);
   MCSamples[sample].Oscillator->setPathLength(oscpar[7]);
   MCSamples[sample].Oscillator->setDensity(oscpar[8]);
@@ -827,7 +827,7 @@ void samplePDFFDBase::SetupOscCalc()
   applyBetaDiag=false;
 
   for (int iSample=0; iSample < (int)MCSamples.size(); iSample++) {
-#if defined (USE_PROB3) && defined (USE_CPU) 
+#if defined (USE_PROB3) && defined (CPU_ONLY) 
     MCSamples[iSample].Oscillator = new BargerPropagator();
     MCSamples[iSample].Oscillator->UseMassEigenstates(false);
     MCSamples[iSample].Oscillator->SetOneMassScaleMode(false);
