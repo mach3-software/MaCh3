@@ -327,7 +327,7 @@ double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
 // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
 // Essentially solves equation 11
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
+double samplePDFND::getTestStatLLH(double data, double mc, double w2) {
 // *************************
 
   // Need some MC
@@ -346,7 +346,7 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
   if (fTestStatistic == kBarlowBeeston) {
     // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
     const double fractional = sqrt(w2)/mc;
-    // -b/2a in quadratic equation
+    // b in quadratic equation
     const double temp = mc*fractional*fractional-1;
     // b^2 - 4ac in quadratic equation
     const double temp2 = temp*temp + 4*data*fractional*fractional;
@@ -397,7 +397,8 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
    if (fTestStatistic == kPearson)
    {
       stat = 0;
-      stat = (data-mc)*(data-mc)/mc;
+      //KS: 2 is beacuese this function returns -LLH not -2LLH
+      stat = (data-mc)*(data-mc)/(2*mc);
    }
 
    // Return the statistical contribution and penalty
