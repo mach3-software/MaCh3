@@ -212,7 +212,6 @@ void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, doub
 
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
 {
-
   for (int i=0; i< (int)MCSamples.size(); ++i) {
     calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
   }
@@ -840,7 +839,11 @@ void samplePDFFDBase::SetupOscCalc()
     if (MCSamples[iSample].nutype < 0) {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Antineutrino;}
     else {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Neutrino;}
 #if defined (CPU_ONLY)
+#if defined (MULTITHREAD)
+    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, std::atoi(std::getenv("OMP_NUM_THREADS")));
+#else
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
+#endif //MULTITHREAD
 #else
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, MCSamples[iSample].nEvents);
 #endif // CPU_ONLY
