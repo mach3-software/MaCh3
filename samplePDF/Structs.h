@@ -1124,6 +1124,7 @@ enum TestStatistic {
   kBarlowBeeston,
   kIceCube,
   kPearson,
+  kDembinskiAbdelmottele,
   kNTestStatistics //This only enumarates statistic
 };
 
@@ -1145,6 +1146,9 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
         break;
         case kPearson:
         name = "Pearson";
+        break;
+        case kDembinskiAbdelmottele:
+        name = "DembinskiAbdelmottele";
         break;
         default:
             std::cerr << "UNKNOWN LIKELHOOD SPECIFIED TO ND280!" << std::endl;
