@@ -2,9 +2,7 @@ set(SamplePDF_implementation_files
 	samplePDFBase.cpp 
 	samplePDFFDBase.cpp 
 	interfacePDFEbE.cpp 
-	Structs.cpp
-        probGpu.cu )
-        
+	Structs.cpp)
 
 set(SamplePDF_header_files 
 	samplePDFBase.h
@@ -12,8 +10,11 @@ set(SamplePDF_header_files
 	interfacePDFEbE.h
 	Structs.h )
 
-add_library(SamplePDF SHARED ${SamplePDF_implementation_files})
+if(NOT ${CPU_ONLY})
+  list(APPEND SamplePDF_implementation_files probGpu.cu)
+endif()
 
+add_library(SamplePDF SHARED ${SamplePDF_implementation_files})
 target_include_directories(SamplePDF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(SamplePDF Splines Covariance Manager Prob3plusplus CUDAProb3Beam CUDAProb3Atmos)
 
@@ -22,7 +23,6 @@ if(NOT ${CPU_ONLY})
   set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
   set_property(TARGET probGpu SamplePDF PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
   target_link_libraries(SamplePDF probGpu)
-else()
 endif()
 
 set_target_properties(SamplePDF PROPERTIES 
