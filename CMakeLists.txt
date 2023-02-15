@@ -50,7 +50,7 @@ CPMFindPackage(
 CPMFindPackage(
     NAME CUDAProb3
     GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-    GIT_TAG "master"
+    GIT_TAG "main"
 )
 
 CPMFindPackage(
@@ -99,7 +99,6 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_compile_options(-I${CUDA_SAMPLES}/common/inc)
 add_compile_options(-g -O3 -Wextra)
 add_compile_options(-fopenmp)
 add_link_options(-fopenmp)
@@ -113,6 +112,7 @@ endif()
 if(${CPU_ONLY})
   add_compile_options(-DCPU_ONLY)
 else()
+  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
   add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
 endif()
 
