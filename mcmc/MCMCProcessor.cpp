@@ -1,7 +1,46 @@
 #include "MCMCProcessor.h"
+
+//Only if GPU is enabled
+#ifdef CUDA
+extern void InitGPU_AutoCorr(
+    float **ParStep_gpu,
+    float **NumeratorSum_gpu,
+    float **ParamSums_gpu,
+    float **DenomSum_gpu,
+    int n_Entries,
+    int n_Pars,
+    int n_Lags);
+
+extern void CopyToGPU_AutoCorr(
+    float *ParStep_cpu,
+    float *NumeratorSum_cpu,
+    float *ParamSums_cpu,
+    float *DenomSum_cpu,
+
+    float *ParStep_gpu,
+    float *NumeratorSum_gpu,
+    float *ParamSums_gpu,
+    float *DenomSum_gpu);
+
+extern void RunGPU_AutoCorr(
+    float *ParStep_gpu,
+    float *ParamSums_gpu,
+    float *NumeratorSum_gpu,
+    float *DenomSum_gpu,
+    float *NumeratorSum_cpu,
+    float *DenomSum_cpu);
+
+extern void CleanupGPU_AutoCorr(
+    float *ParStep_gpu,
+    float *NumeratorSum_gpu,
+    float *ParamSums_gpu,
+    float *DenomSum_gpu);
+#endif
+
+// ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
   Chain(NULL), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
-
+// ****************************
   MCMCFile = InputFile;
 
   std::cout << "Making post-fit processor for " << MCMCFile << std::endl;
@@ -9,7 +48,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   Posterior = NULL;
   
   //KS:Hardcoded should be a way to get it via config or something
-  PlotDet = false;
+  PlotDet = true;
   MakeOnlyXsecCorr = false;
   MakeOnlyXsecCorrFlux = false;
   plotRelativeToPrior = false;
@@ -39,7 +78,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
   
-  for(int i =0; i<kNParameterEnum; i++)
+  for(int i =0; i < kNParameterEnum; i++)
   {
      ParamTypeStartPos[i] = 0;
      nParam[i] = 0;
@@ -94,7 +133,7 @@ MCMCProcessor::~MCMCProcessor() {
   delete Chain;
 }
 
-
+// ***************
 void MCMCProcessor::Initialise(){
 // ***************
   // Scan the ROOT file for useful branches
@@ -104,6 +143,7 @@ void MCMCProcessor::Initialise(){
   SetupOutput();
 }
 
+// ***************
 void MCMCProcessor::GetPostfit(TVectorD *&Central_PDF, TVectorD *&Errors_PDF, TVectorD *&Central_G, TVectorD *&Errors_G, TVectorD *&Peak_Values) {
 // ***************
   // Make the post fit
@@ -1037,7 +1077,7 @@ void MCMCProcessor::DrawCovariance() {
 // **************************
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
-  // **************************
+// **************************
   // Open the Chain
   Chain = new TChain("posteriors","posteriors");
   Chain->Add(MCMCFile.c_str());
@@ -1054,7 +1094,6 @@ void MCMCProcessor::ScanInput() {
   IamVaried.reserve(nBranches);
   ParamType.reserve(nBranches);
 
-
   // Loop over the number of branches
   // Find the name and how many of each systematic we have
   for (int i = 0; i < nBranches; i++) {
@@ -1065,34 +1104,35 @@ void MCMCProcessor::ScanInput() {
 
     // If we're on beam systematics
     if(bname.BeginsWith("xsec_")) 
-      {
-	BranchNames.push_back(bname);
-	ParamType.push_back(kXSecPar);
-	PlotXSec = true;
-	nParam[kXSecPar]++;
-      }
-    if(!MakeOnlyXsecCorrFlux) //HI a bit of a dodgy way to do this, for now just want to get the work flow sorted 
-      {
+    {
+        BranchNames.push_back(bname);
+        ParamType.push_back(kXSecPar);
+        PlotXSec = true;
+        nParam[kXSecPar]++;
+    }
+
+    if(!MakeOnlyXsecCorrFlux) //HI a bit of a dodgy way to do this, for now just want to get the work flow sorted
+    {
       if (bname.BeginsWith("ndd_") && PlotDet) 
-	{
-	  BranchNames.push_back(bname);
-	  ParamType.push_back(kND280Par);
-	  nParam[kND280Par]++;
-	}
-      else if (bname.BeginsWith("skd_joint_") && PlotDet)
-	{
-	  BranchNames.push_back(bname);
-	  ParamType.push_back(kFDDetPar);
-	  nParam[kFDDetPar]++;
-	}
-      else if (bname.BeginsWith("sin2th_") || 
-	       bname.BeginsWith("delm2_")  || 
-	       bname.BeginsWith("delta_")    ) 
-	{
-	  BranchNames.push_back(bname);
-	  ParamType.push_back(kOSCPar);
-	  nParam[kOSCPar]++;
-	}
+      {
+        BranchNames.push_back(bname);
+        ParamType.push_back(kND280Par);
+        nParam[kND280Par]++;
+      }
+        else if (bname.BeginsWith("skd_joint_") && PlotDet)
+      {
+        BranchNames.push_back(bname);
+        ParamType.push_back(kFDDetPar);
+        nParam[kFDDetPar]++;
+      }
+        else if (bname.BeginsWith("sin2th_") ||
+            bname.BeginsWith("delm2_")  ||
+            bname.BeginsWith("delta_")    )
+      {
+        BranchNames.push_back(bname);
+        ParamType.push_back(kOSCPar);
+        nParam[kOSCPar]++;
+      }
     }
     //KS: as a bonus get LogL systeamtic
     else if (bname.BeginsWith("LogL_sample_")) {
@@ -1132,7 +1172,7 @@ void MCMCProcessor::ScanInput() {
 // ****************************
 // Set up the output files and canvases
 void MCMCProcessor::SetupOutput() {
-  // ****************************
+// ****************************
 
   // Make sure we can read files located anywhere and strip the .root ending
   MCMCFile = MCMCFile.substr(0, MCMCFile.find(".root"));
@@ -1211,7 +1251,7 @@ void MCMCProcessor::ScanParameterOrder() {
 // *****************************
 // Make the prefit plots
 TH1D* MCMCProcessor::MakePrefit() {
-  // *****************************
+// *****************************
   
   if (OutputFile == NULL) MakeOutputFile();
 
@@ -1280,7 +1320,7 @@ TH1D* MCMCProcessor::MakePrefit() {
 // Read the input Covariance matrix entries
 // Get stuff like parameter input errors, names, and so on
 void MCMCProcessor::ReadInputCov() {
-  // **************************
+// **************************
   FindInputFiles();
   if(nParam[kXSecPar] > 0)  ReadXSecFile();
   if(nParam[kND280Par] > 0) ReadND280File();
@@ -1291,7 +1331,7 @@ void MCMCProcessor::ReadInputCov() {
 // **************************
 // Read the output MCMC file and find what inputs were used
 void MCMCProcessor::FindInputFiles() {
-  // **************************
+// **************************
 
   // Now read the MCMC file
   TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
@@ -1378,7 +1418,7 @@ void MCMCProcessor::FindInputFiles() {
 // ***************
 // Read the xsec file and get the input central values and errors
 void MCMCProcessor::ReadXSecFile() {
-  // ***************
+// ***************
 
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
   if (std::getenv("MACH3") != NULL) {
@@ -1594,7 +1634,7 @@ void MCMCProcessor::SetStepCut(int Cuts) {
 // **************************
 // Get the mean and RMS of a 1D posterior
 void MCMCProcessor::GetArithmetic(TH1D * const hpost, int i) {
-  // **************************
+// **************************
   (*Means)(i) = hpost->GetMean();
   (*Errors)(i) = hpost->GetRMS();
 }
@@ -1726,7 +1766,7 @@ void MCMCProcessor::GetNthParameter(int param, double &Nominal, double &NominalE
 // **************************************************
 // Helper function to reset  histograms
 void MCMCProcessor::ResetHistograms() {
-  // **************************************************
+// **************************************************
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
@@ -1745,7 +1785,7 @@ void MCMCProcessor::ResetHistograms() {
 // **************************
 // Diagnose the MCMC
 void MCMCProcessor::DiagMCMC() {
-  // **************************
+// **************************
 
 // MCMC stuff to implement:
 // Trace plots            -- DONE
@@ -1753,7 +1793,6 @@ void MCMCProcessor::DiagMCMC() {
 // Acceptance probability -- DONE
 // Autocorrelation        -- DONE
 // _Batched Means_        -- DONE
-
     
   // Prepare branches etc for DiagMCMC
   PrepareDiagMCMC();
@@ -1775,7 +1814,7 @@ void MCMCProcessor::DiagMCMC() {
 // **************************
 // Prepare branches etc. for DiagMCMC
 void MCMCProcessor::PrepareDiagMCMC() {
-  // **************************
+// **************************
   
    //bool doDiagMCMC = true;
     
@@ -1908,7 +1947,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
 
   clock.Stop();
 
-  std::cout << "Took " << clock.RealTime() << "s to finish cachin statysitc for Diag MCMC with " << nEntries << " events" << std::endl;
+  std::cout << "Took " << clock.RealTime() << "s to finish caching statistic for Diag MCMC with " << nEntries << " events" << std::endl;
 
   // Make the sums into average
   for (int i = 0; i < nDraw; ++i) {
@@ -1930,7 +1969,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
 // Draw trace plots of the parameters
 // i.e. parameter vs step
 void MCMCProcessor::ParamTraces() {
-  // *****************
+// *****************
 
   std::cout << "Making trace plots..." << std::endl;
 
@@ -2009,8 +2048,8 @@ void MCMCProcessor::ParamTraces() {
   LLDir->cd();
   for (int j = 0; j < nSamples; ++j) {
     TraceSamplePlots[j]->Write();
-    delete TraceSamplePlots[j];
-    delete SampleValues[j];
+    delete[] TraceSamplePlots[j];
+    delete[] SampleValues[j];
   }
   delete[] TraceSamplePlots;
   delete[] SampleValues;
@@ -2026,13 +2065,14 @@ void MCMCProcessor::ParamTraces() {
 
 
 // *********************************
+//KS: Calculate autocoraetlions supports both OpenMP and CUDA :)
 void MCMCProcessor::AutoCorrelation() {
-  // *********************************
+// *********************************
 
-  std::cout << "Making auto-correlations..." << std::endl;
   TStopwatch clock;
   clock.Start();
-  const int nLags = 25000;
+  int nLags = 25000;
+  std::cout << "Making auto-correlations for nLags = "<< nLags << std::endl;
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter
   double **DenomSum = new double*[nDraw]();
@@ -2044,11 +2084,8 @@ void MCMCProcessor::AutoCorrelation() {
   LagKPlots = new TH1D*[nDraw];
 
   // Loop over the parameters of interacts
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int j = 0; j < nDraw; ++j) {
-
+  for (int j = 0; j < nDraw; ++j)
+  {
     // Loop over each lag
     for (int k = 0; k < nLags; ++k) {
       NumeratorSum[j][k] = 0.0;
@@ -2066,14 +2103,14 @@ void MCMCProcessor::AutoCorrelation() {
     LagKPlots[j]->GetXaxis()->SetTitle("Lag");
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
-
+//KS: If CUDA is not enabled do calcualtions on CPU
+#ifndef CUDA
   // Loop over the lags
   // Each lag is indepdent so might as well multi-thread them!
-#ifdef MULTITHREAD
+  #ifdef MULTITHREAD
   std::cout << "Using multi-threading..." << std::endl;
-//KS: Consider moving it to GPU, and have huge loop over nLag*nDraw, should work
-#pragma omp parallel for
-#endif
+  #pragma omp parallel for
+  #endif
   for (int k = 0; k < nLags; ++k) {
 
     // Loop over the number of entries
@@ -2097,6 +2134,48 @@ void MCMCProcessor::AutoCorrelation() {
       }
     }
   }
+#else //NOW GPU specific code
+  std::cout << "Using GPU" << std::endl;
+  //KS: This allocates memory and copy data from CPU to GPU
+  PrepareGPU_AutoCorr(nLags);
+
+  //KS: This runs the main kernel and copy results back to CPU
+  RunGPU_AutoCorr(
+    ParStep_gpu,
+    ParamSums_gpu,
+    NumeratorSum_gpu,
+    DenomSum_gpu,
+    NumeratorSum_cpu,
+    DenomSum_cpu);
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for collapse(2)
+  #endif
+  //KS: Now that that we recieved data from GPU convert it to CPU-like format
+  for (int j = 0; j < nDraw; ++j)
+  {
+    for (int k = 0; k < nLags; ++k)
+    {
+      int temp_index = j*nLags+k;
+      NumeratorSum[j][k] = NumeratorSum_cpu[temp_index];
+      DenomSum[j][k] = DenomSum_cpu[temp_index];
+    }
+  }
+  //delete auxilary variables
+  delete[] NumeratorSum_cpu;
+  delete[] DenomSum_cpu;
+  delete[] ParStep_cpu;
+
+
+  //KS: Delete stuff at GPU as well
+  CleanupGPU_AutoCorr(
+      ParStep_gpu,
+      NumeratorSum_gpu,
+      ParamSums_gpu,
+      DenomSum_gpu);
+
+//KS: End of GPU specific code
+#endif
 
   OutputFile->cd();
   TDirectory *AutoCorrDir = OutputFile->mkdir("Auto_corr");
@@ -2111,7 +2190,7 @@ void MCMCProcessor::AutoCorrelation() {
   }
   delete[] LagKPlots;
   for (int i = 0; i < nEntries; ++i) {
-    delete ParStep[i];
+    delete[] ParStep[i];
   }
   delete[] ParStep;
   
@@ -2121,11 +2200,90 @@ void MCMCProcessor::AutoCorrelation() {
   std::cout << "It took " << clock.RealTime() << std::endl;
 }
 
+#ifdef CUDA
+// **************************
+//KS: Allocates memory and copy data from CPU to GPU
+void MCMCProcessor::PrepareGPU_AutoCorr(int nLags) {
+// **************************
+
+  //KS: Create temproary arrays that will comiunicate with GPU code
+  ParStep_cpu = new float[nDraw*nEntries];
+  NumeratorSum_cpu = new float[nDraw*nEntries];
+  DenomSum_cpu = new float[nDraw*nEntries];
+  ParamSums_cpu = new float[nDraw];
+
+  #ifdef MULTITHREAD
+  //KS: Open parallel region
+  #pragma omp parallel
+  {
+  #endif
+    //KS: Operations are indepenedt thus we are using nowait close
+    #ifdef MULTITHREAD
+    #pragma omp for nowait
+    #endif
+    for (int i = 0; i < nDraw; ++i)
+    {
+      //KS: We basically need this to convert from double to float for GPU
+      ParamSums_cpu[i]  = ParamSums[i];
+    }
+
+    #ifdef MULTITHREAD
+    #pragma omp for collapse(2) nowait
+    #endif
+    for (int j = 0; j < nDraw; ++j)
+    {
+      for (int k = 0; k < nLags; ++k)
+      {
+        const int temp = j*nLags+k;
+        NumeratorSum_cpu[temp] = 0.0;
+        DenomSum_cpu[temp] = 0.0;
+      }
+    }
+
+    #ifdef MULTITHREAD
+    #pragma omp for collapse(2)
+    #endif
+    for (int j = 0; j < nDraw; ++j)
+    {
+      for (int i = 0; i < nEntries; ++i)
+      {
+        const int temp = j*nEntries+i;
+        ParStep_cpu[temp] = ParStep[i][j];
+      }
+    }
+  #ifdef MULTITHREAD
+  //KS: End parallel region
+  }
+  #endif
+
+  //KS: First allocate memory on GPU
+  InitGPU_AutoCorr(&ParStep_gpu,
+                   &NumeratorSum_gpu,
+                   &ParamSums_gpu,
+                   &DenomSum_gpu,
+
+                   nEntries,
+                   nDraw,
+                   nLags);
+
+
+  //KS: Now copy from CPU to GPU
+  CopyToGPU_AutoCorr(ParStep_cpu,
+                     NumeratorSum_cpu,
+                     ParamSums_cpu,
+                     DenomSum_cpu,
+
+                     ParStep_gpu,
+                     NumeratorSum_gpu,
+                     ParamSums_gpu,
+                     DenomSum_gpu);
+}
+#endif
 
 // **************************
 // Batched means, literally read from an array and chuck into TH1D
 void MCMCProcessor::BatchedMeans() {
-  // **************************
+// **************************
 
   BatchedParamPlots = new TH1D*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
@@ -2173,7 +2331,7 @@ void MCMCProcessor::BatchedMeans() {
 // **************************
 // Acceptance Probability
 void MCMCProcessor::AcceptanceProbabilities() {
-  // **************************
+// **************************
     std::cout << "Making AccProb plots..." << std::endl;
 
     // Set the titles and limits for TH2Ds
@@ -2213,4 +2371,5 @@ void MCMCProcessor::AcceptanceProbabilities() {
   delete AcceptanceProbPlot;  
   delete BatchedAcceptanceProblot; 
 }
+
 

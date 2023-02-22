@@ -272,6 +272,22 @@ class MCMCProcessor {
     // Acceptance Prob Plots
     TH1D *AcceptanceProbPlot;
     TH1D *BatchedAcceptanceProblot;
+
+
+  //Only if GPU is enabled
+  #ifdef CUDA
+    void PrepareGPU_AutoCorr(int nLags);
+
+    float* ParStep_cpu;
+    float* NumeratorSum_cpu;
+    float* ParamSums_cpu;
+    float* DenomSum_cpu;
+
+    float* ParStep_gpu;
+    float* NumeratorSum_gpu;
+    float* ParamSums_gpu;
+    float* DenomSum_gpu;
+  #endif
 };
 
 #endif
