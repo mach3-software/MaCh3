@@ -26,8 +26,8 @@
 #include "omp.h"
 #endif
 
-//KS: This exe is meant to calcuate R hat estimator. For a wel converged this dsitribution should be centered at one. 
-//Based on Gelman et. atl. arXiv:1903.08008v5
+//KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one. 
+//Based on Gelman et. al. arXiv:1903.08008v5
 
 // *******************
 int Ntoys;
@@ -51,6 +51,7 @@ double* StandardDeviationGlobal;
 double* BetweenChainVariance;
 double* MarginalPosteriorVariance;
 double* RHat;
+double* EffectiveSampleSize;
 
 double ***DrawsFolded;
 double* MedianArr;
@@ -64,14 +65,20 @@ double* StandardDeviationGlobalFolded;
 double* BetweenChainVarianceFolded;
 double* MarginalPosteriorVarianceFolded;
 double* RHatFolded;
-
+double* EffectiveSampleSizeFolded;
 // *******************
 void PrepareChains();
 void InitialiseArrays();
+
+void RunDiagnostic();
 void CalcRhat();
+
 void SaveResults();
 void DestroyArrays();
 double CalcMedian(double arr[], int size);
+
+void CapVariable(double var, double cap);
+
 // *******************
 int main(int argc, char *argv[]) {
 // *******************    
@@ -85,6 +92,7 @@ int main(int argc, char *argv[]) {
     BetweenChainVariance = NULL;
     MarginalPosteriorVariance = NULL;
     RHat = NULL;
+    EffectiveSampleSize = NULL;
     
     DrawsFolded = NULL;
     MedianArr = NULL;
@@ -97,6 +105,7 @@ int main(int argc, char *argv[]) {
     BetweenChainVarianceFolded = NULL;
     MarginalPosteriorVarianceFolded = NULL;
     RHatFolded = NULL;
+    EffectiveSampleSizeFolded = NULL;
     
     VERBOSE = false;
     Nchains = 0;
@@ -110,7 +119,7 @@ int main(int argc, char *argv[]) {
     
     Ntoys = atoi(argv[1]);
     
-    //KS Gelman suggest to diangose on more than one chain
+    //KS Gelman suggests to diagnose on more than one chain
     for (int i = 2; i < argc; i++)
     {
         MCMCFile.push_back(std::string(argv[i]));
@@ -124,14 +133,19 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
         
-    if(Nchains == 1) std::cout<<" Gellman is going to be sad :(. He suggested you should use more than one chian. Code works fine for one chai, however estiamted might be biased."<<std::endl;
+    if(Nchains == 1)
+    {
+        std::cout<<" Gelman is going to be sad :(. He suggested you should use more than one chain (at least 4). Code works fine for one chain, however, estimator might be biased."<<std::endl;
+        std::cout<<" Multiple chains are more likely to reveal multimodality and poor adaptation or mixing:"<<std::endl;
+    }
     std::cout<<"Diagnosing "<<Nchains<<" chians, with "<<Ntoys<<" toys"<<std::endl;
     
     PrepareChains();
     
     InitialiseArrays();
     
-    CalcRhat();
+    //KS: Main function
+    RunDiagnostic();
     
     SaveResults();
     
@@ -141,7 +155,7 @@ int main(int argc, char *argv[]) {
 }
 
 // *******************
-//Load chain and preapre toys
+// Load chain and prepare toys
 void PrepareChains() {
 // *******************
     
@@ -159,7 +173,7 @@ void PrepareChains() {
     
     int step[Nchains];
     // Open the Chain
-    //It is tempting to multihread here but unfortuanelty ROOT files are not thread safe :(
+    //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
     for (int m = 0; m < Nchains; m++) 
     {
         Chain[m] = new TChain("posteriors");
@@ -201,7 +215,7 @@ void PrepareChains() {
             }
             else
             {
-                //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this does't make sense either way
+                //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
                 if(m == 0) BranchNames.push_back(bname);
                 Chain[m]->SetBranchStatus(bname, true);
                 if (VERBOSE) std::cout<<bname<<std::endl;
@@ -217,8 +231,8 @@ void PrepareChains() {
       {
         if(nBranches[m] != nBranches[mi])
         {
-            std::cerr<<"Ups, somehting went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while "<<mi<<" called "<<MCMCFile[mi]<<" has "<<nBranches[mi]<<" branches"<<std::endl;
-            std::cerr<<"All chains shoudl have the same nuimber of brnaches"<<std::endl;
+            std::cerr<<"Ups, something went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while "<<mi<<" called "<<MCMCFile[mi]<<" has "<<nBranches[mi]<<" branches"<<std::endl;
+            std::cerr<<"All chains should have the same number of branches"<<std::endl;
             throw;
         }
       }
@@ -243,16 +257,16 @@ void PrepareChains() {
     }
   
   
-    //KS: Now we will sample through MCMC posteriors distirubtions
-    //It is tempting to multihread here but unfortuanelty ROOT files are not thread safe :(
+    //KS: Now we will sample through MCMC posteriors distributions
+    //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
     for (int m = 0; m < Nchains; m++) 
     {
         if(BurnIn[m] >= nEntries[m])
         {
             std::cerr<<"You are running on a chain shorter than BurnIn cut"<<std::endl; 
             std::cerr<<"Number of entries "<<nEntries[m]<<" BurnIn cut "<<BurnIn<<std::endl;
-            std::cerr<<"You will run into infinite loop"<<std::endl;
-            std::cerr<<"You can make new chain or modify BurnIn cut"<<std::endl;
+            std::cerr<<"You will run into the infinite loop"<<std::endl;
+            std::cerr<<"You can make a new chain or modify BurnIn cut"<<std::endl;
             std::cerr<<"Find me here: "<<__FILE__ << ":" << __LINE__ << std::endl;
             throw;
         }
@@ -265,7 +279,7 @@ void PrepareChains() {
             Chain[m]->GetEntry(entry);
     
             // If we have combined chains by hadd need to check the step in the chain
-            // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
+            // Note, entry is not necessarily the same as the step due to merged ROOT files, so can't choose an entry in the range BurnIn - nEntries :(
             if (step[m] < BurnIn[m]) 
             {
                 i--;
@@ -273,7 +287,7 @@ void PrepareChains() {
             }
             
             // Output some info for the user
-            if (i % (Ntoys/10) == 0) {
+            if (Ntoys > 10 && i % (Ntoys/10) == 0) {
                 std::cout << "On toy " << i << "/" << Ntoys << " (" << int(double(i)/double(Ntoys)*100.0) << "%)" << std::endl;
                 std::cout << "   Getting random entry " << entry << std::endl;
             }
@@ -289,7 +303,7 @@ void PrepareChains() {
         }//end loop over toys
     }
     
-    //KS: Now prepare folded draws, quiting Gelman
+    //KS: Now prepare folded draws, quoting Gelman
     //"We propose to report the maximum of rank normalized split-Rb and rank normalized folded-split-Rb for each parameter"
     MedianArr = new double[nDraw]();
     #ifdef MULTITHREAD
@@ -356,6 +370,7 @@ void InitialiseArrays() {
     
     MarginalPosteriorVariance = new double[nDraw]();
     RHat = new double[nDraw]();
+    EffectiveSampleSize = new double[nDraw]();
     
     MeanFolded = new double*[Nchains]();
     StandardDeviationFolded = new double*[Nchains]();
@@ -366,6 +381,7 @@ void InitialiseArrays() {
     
     MarginalPosteriorVarianceFolded = new double[nDraw]();
     RHatFolded = new double[nDraw]();
+    EffectiveSampleSizeFolded = new double[nDraw]();
     
     for (int m = 0; m < Nchains; ++m) 
     {
@@ -388,19 +404,29 @@ void InitialiseArrays() {
                 BetweenChainVariance[j] = 0.;
                 MarginalPosteriorVariance[j] = 0.;
                 RHat[j] = 0.;
+                EffectiveSampleSize[j] = 0.;
                 
                 MeanGlobalFolded[j] = 0.;
                 StandardDeviationGlobalFolded[j] = 0.;
                 BetweenChainVarianceFolded[j] = 0.;
                 MarginalPosteriorVarianceFolded[j] = 0.;
                 RHatFolded[j] = 0.;
+                EffectiveSampleSizeFolded[j] = 0.;
             }
         }
     }
 }
+
 // *******************
-//KS: Based on Gelman et. atl. arXiv:1903.08008v5
-// Probably most of it could be moved cleverly to MCMC Processor, keep it seprate for now
+void RunDiagnostic() {
+// *******************    
+    CalcRhat();
+    //In case in future we expand this
+}
+
+// *******************
+//KS: Based on Gelman et. al. arXiv:1903.08008v5
+// Probably most of it could be moved cleverly to MCMC Processor, keep it separate for now
 void CalcRhat() {
 // *******************
     
@@ -408,7 +434,7 @@ void CalcRhat() {
     clock.Start();
     
 //KS: Start parallel region
-// If we would like to do this for thousand of chains we might consider using GPU for this
+// If we would like to do this for thousands of chains we might consider using GPU for this
 #ifdef MULTITHREAD
 #pragma omp parallel 
 {
@@ -417,6 +443,8 @@ void CalcRhat() {
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
     #endif
+    //KS: loop over chains and draws are independent so might as well collapse for sweet cache hits
+    //Calculate the mean for each parameter within each considered chain
     for (int m = 0; m < Nchains; ++m) 
     {
         for (int j = 0; j < nDraw; ++j) 
@@ -434,6 +462,7 @@ void CalcRhat() {
     #ifdef MULTITHREAD
     #pragma omp for
     #endif
+    //Calculate the mean for each parameter global means we include information from several chains
     for (int j = 0; j < nDraw; ++j) 
     {
         for (int m = 0; m < Nchains; ++m) 
@@ -449,6 +478,7 @@ void CalcRhat() {
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
     #endif
+     //Calculate the standard deviation for each parameter within each considered chain
     for (int m = 0; m < Nchains; ++m) 
     {
         for (int j = 0; j < nDraw; ++j) 
@@ -463,10 +493,10 @@ void CalcRhat() {
         }
     }
     
-    
     #ifdef MULTITHREAD
     #pragma omp for
     #endif
+    //Calculate the standard deviation for each parameter combining information from all chains
     for (int j = 0; j < nDraw; ++j) 
     {
         for (int m = 0; m < Nchains; ++m) 
@@ -483,7 +513,7 @@ void CalcRhat() {
     #endif
     for (int j = 0; j < nDraw; ++j) 
     {
-        //KS: This term only make sense if we have at least 2 chains
+        //KS: This term only makes sense if we have at least 2 chains
         if(Nchains == 1)
         {
             BetweenChainVariance[j] = 0.;
@@ -513,18 +543,36 @@ void CalcRhat() {
     #ifdef MULTITHREAD
     #pragma omp for
     #endif
+    //Finally calculate our estimator
     for (int j = 0; j < nDraw; ++j) 
     {
         RHat[j] = sqrt(MarginalPosteriorVariance[j]/StandardDeviationGlobal[j]);
         RHatFolded[j] = sqrt(MarginalPosteriorVarianceFolded[j]/StandardDeviationGlobalFolded[j]);
+        
+        //KS: For flat params values can be crazy so cap at 0
+        CapVariable(RHat[j], 0);
+        CapVariable(RHatFolded[j], 0);
     }
-    
+
+    #ifdef MULTITHREAD
+    #pragma omp for
+    #endif
+    //KS: Additionaly calculates effective step size which is an estimate of the sample size required to achieve the same level of precision if that sample was a simple random sample.
+    for (int j = 0; j < nDraw; ++j) 
+    {
+        if(Nchains > 1) EffectiveSampleSize[j] = Nchains * Ntoys * MarginalPosteriorVariance[j] / BetweenChainVariance[j];
+        if(Nchains > 1) EffectiveSampleSizeFolded[j] = Nchains * Ntoys * MarginalPosteriorVarianceFolded[j] / BetweenChainVarianceFolded[j];
+        
+        //KS: For flat params values can be crazy so cap at 0
+        CapVariable(EffectiveSampleSize[j], 0);
+        CapVariable(EffectiveSampleSizeFolded[j], 0);
+    }
   #ifdef MULTITHREAD
   } //End parallel region
   #endif
 
     clock.Stop();
-    std::cout << "Finsihed calcaulting RHar, it took " << clock.RealTime() << "s to finish" << std::endl;
+    std::cout << "Finsihed calcaulting RHat, it took " << clock.RealTime() << "s to finish" << std::endl;
 }
 
 
@@ -552,73 +600,119 @@ void SaveResults() {
     TH1D *BetweenChainVariancePlot = new TH1D("BetweenChainVariancePlot", "BetweenChainVariancePlot", 200, 0, 2);
     TH1D *MarginalPosteriorVariancePlot = new TH1D("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", 200, 0, 2);
     TH1D *RhatPlot = new TH1D("RhatPlot", "RhatPlot", 200, 0, 2);
+    TH1D *EffectiveSampleSizePlot = new TH1D("EffectiveSampleSizePlot", "EffectiveSampleSizePlot", 400, 0, 10000);
     
     TH1D *StandardDeviationGlobalFoldedPlot = new TH1D("StandardDeviationGlobalFoldedPlot", "StandardDeviationGlobalFoldedPlot", 200, 0, 2);
     TH1D *BetweenChainVarianceFoldedPlot = new TH1D("BetweenChainVarianceFoldedPlot", "BetweenChainVarianceFoldedPlot", 200, 0, 2);
     TH1D *MarginalPosteriorVarianceFoldedPlot = new TH1D("MarginalPosteriorVarianceFoldedPlot", "MarginalPosteriorVarianceFoldedPlot", 200, 0, 2);
     TH1D *RhatFoldedPlot = new TH1D("RhatFoldedPlot", "RhatFoldedPlot", 200, 0, 2);
-    
+    TH1D *EffectiveSampleSizeFoldedPlot = new TH1D("EffectiveSampleSizeFoldedPlot", "EffectiveSampleSizeFoldedPlot", 400, 0, 10000);
+            
+    int Criterium = 0;
+    int CiteriumFolded = 0;
     for(int j = 0; j < nDraw; j++)
     {
       StandardDeviationGlobalPlot->Fill(StandardDeviationGlobal[j]);
       BetweenChainVariancePlot->Fill(BetweenChainVariance[j]); 
       MarginalPosteriorVariancePlot->Fill(MarginalPosteriorVariance[j]); 
       RhatPlot->Fill(RHat[j]);
-      
+      EffectiveSampleSizePlot->Fill(EffectiveSampleSize[j]);
+      if(RHat[j] > 1.1) Criterium++;
+          
+          
       StandardDeviationGlobalFoldedPlot->Fill(StandardDeviationGlobalFolded[j]);
       BetweenChainVarianceFoldedPlot->Fill(BetweenChainVarianceFolded[j]); 
       MarginalPosteriorVarianceFoldedPlot->Fill(MarginalPosteriorVarianceFolded[j]); 
       RhatFoldedPlot->Fill(RHatFolded[j]);  
+      EffectiveSampleSizeFoldedPlot->Fill(EffectiveSampleSizeFolded[j]);
+      if(RHatFolded[j] > 1.1) CiteriumFolded++;
     }
+    //KS: 1.1 is standard criterium as long as number of dials which go above this criterium is small there is no need to worry
+    std::cout<<" Number of parameters which has R hat greater than 1.1 is "<<Criterium<<"("<<100*double(Criterium)/double(nDraw)<<"%) while for R hat folded "<<CiteriumFolded<<"("<<100*double(CiteriumFolded)/double(nDraw)<<"%)"<<std::endl;
+    
     StandardDeviationGlobalPlot->Write();
     BetweenChainVariancePlot->Write();
     MarginalPosteriorVariancePlot->Write();
     RhatPlot->Write();
+    EffectiveSampleSizePlot->Write();
     
     StandardDeviationGlobalFoldedPlot->Write();
     BetweenChainVarianceFoldedPlot->Write();
     MarginalPosteriorVarianceFoldedPlot->Write();
     RhatFoldedPlot->Write();
-    
+    EffectiveSampleSizeFoldedPlot->Write();
+
     TCanvas *TempCanvas = new TCanvas("Canvas", "Canvas", 1024, 1024);
     gStyle->SetOptStat(0);
     TempCanvas->SetGridx();
     TempCanvas->SetGridy();
     
-    // Write a TCanvas and make a line and a filled histogram
+    // Random line to write useful information to TLegend
     TLine *TempLine = new TLine(0 , 0, 0, 0);
     TempLine->SetLineColor(kBlack);
   
+    RhatPlot->GetXaxis()->SetTitle("R hat");
     RhatPlot->SetLineColor(kRed);
     RhatPlot->SetFillColor(kRed);
     RhatFoldedPlot->SetLineColor(kBlue);
     RhatFoldedPlot->SetFillColor(kBlue);
     
-    TLegend *Legend = new TLegend(0.6, 0.6, 0.9, 0.9);
+    TLegend *Legend = new TLegend(0.55, 0.6, 0.9, 0.9);
+    Legend->SetTextSize(0.04);
     Legend->SetFillColor(0);
     Legend->SetFillStyle(0);
     Legend->SetLineWidth(0);
     Legend->SetLineColor(0);
     
-    Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chians=%.1i", Ntoys, Nchains), "l");
+    Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
     Legend->AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
     Legend->AddEntry(RhatFoldedPlot, "Rhat-Folded Gelman 2021", "l");
       
     RhatPlot->Draw();
     RhatFoldedPlot->Draw("same");
     Legend->Draw("same");
-    TempCanvas->Write();
+    TempCanvas->Write("Rhat");
+    delete Legend;
+    Legend = NULL;
+    
+    EffectiveSampleSizePlot->GetXaxis()->SetTitle("S_{eff, BDA2}");
+    EffectiveSampleSizePlot->SetLineColor(kRed);
+    EffectiveSampleSizeFoldedPlot->SetLineColor(kBlue);
+    
+    Legend = new TLegend(0.45, 0.6, 0.9, 0.9);
+    Legend->SetTextSize(0.03);
+    Legend->SetFillColor(0);
+    Legend->SetFillStyle(0);
+    Legend->SetLineWidth(0);
+    Legend->SetLineColor(0);
+    
+    const double Mean1 = EffectiveSampleSizePlot->GetMean(); 
+    const double RMS1 = EffectiveSampleSizePlot->GetRMS();
+    const double Mean2 = EffectiveSampleSizeFoldedPlot->GetMean();
+    const double RMS2 = EffectiveSampleSizeFoldedPlot->GetRMS();
+    
+    Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+    Legend->AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
+    Legend->AddEntry(EffectiveSampleSizeFoldedPlot, Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f",Mean2 ,RMS2), "l");
+        
+    EffectiveSampleSizePlot->Draw();
+    EffectiveSampleSizeFoldedPlot->Draw("same");
+    Legend->Draw("same");
+    TempCanvas->Write("EffectiveSampleSize");
   
+    //Fancy memory cleaning
     delete StandardDeviationGlobalPlot;
     delete BetweenChainVariancePlot;
     delete MarginalPosteriorVariancePlot;
     delete RhatPlot;
+    delete EffectiveSampleSizePlot;
     
     delete StandardDeviationGlobalFoldedPlot;
     delete BetweenChainVarianceFoldedPlot;
     delete MarginalPosteriorVarianceFoldedPlot;
     delete RhatFoldedPlot;
-    
+    delete EffectiveSampleSizeFoldedPlot;
+
     delete Legend;
     delete TempCanvas;
     delete TempLine;
@@ -640,13 +734,15 @@ void DestroyArrays() {
     delete[] BetweenChainVariance;
     delete[] MarginalPosteriorVariance;
     delete[] RHat;
+    delete[] EffectiveSampleSize;
     
     delete[] MeanGlobalFolded;
     delete[] StandardDeviationGlobalFolded;
     delete[] BetweenChainVarianceFolded;
     delete[] MarginalPosteriorVarianceFolded;
     delete[] RHatFolded;
-    
+    delete[] EffectiveSampleSizeFolded;
+
     for(int m = 0; m < Nchains; m++)
     {
         for(int i = 0; i < Ntoys; i++)
@@ -661,8 +757,6 @@ void DestroyArrays() {
         delete[] DrawsFolded[m];
         delete[] MeanFolded[m];
         delete[] StandardDeviationFolded[m];
-        
-        
     }
     delete[] Draws;
     delete[] Mean;
@@ -683,4 +777,13 @@ double CalcMedian(double arr[], int size) {
    if (size % 2 != 0)
       return (double)arr[size/2];
    return (double)(arr[(size-1)/2] + arr[size/2])/2.0;
+}
+
+
+// *******************
+//calculate median
+void CapVariable(double var, double cap) {
+// *******************   
+
+    if(std::isnan(var) || !std::isfinite(var)) var = cap;
 }
