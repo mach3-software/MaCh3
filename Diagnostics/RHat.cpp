@@ -39,6 +39,7 @@ int nDraw;
 bool VERBOSE;
 std::vector<TString> BranchNames;  
 std::vector<std::string> MCMCFile;  
+std::vector<bool> ValidPar;
 
 double ***Draws;
 
@@ -190,7 +191,7 @@ void PrepareChains() {
         // Get the number of branches
         nBranches[m] = brlis->GetEntries();
 
-        BranchNames.reserve(nBranches[m]);
+        if(m == 0) BranchNames.reserve(nBranches[m]);
 
         // Set all the branches to off
         Chain[m]->SetBranchStatus("*", false);
@@ -209,14 +210,26 @@ void PrepareChains() {
                 Chain[m]->SetBranchAddress(bname, &step[m]);
             }
             //Count all branches
-            else if (bname.BeginsWith("LogL") || bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
+            else if (bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
             {
                 continue;
             }
             else
             {
                 //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
-                if(m == 0) BranchNames.push_back(bname);
+                if(m == 0)
+                {
+                    BranchNames.push_back(bname);
+                    //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+                    if(bname.BeginsWith("LogL"))
+                    {
+                        ValidPar.push_back(false);
+                    }
+                    else
+                    {
+                        ValidPar.push_back(true);
+                    }
+                }
                 Chain[m]->SetBranchStatus(bname, true);
                 if (VERBOSE) std::cout<<bname<<std::endl;
             }
@@ -607,29 +620,48 @@ void SaveResults() {
     TH1D *MarginalPosteriorVarianceFoldedPlot = new TH1D("MarginalPosteriorVarianceFoldedPlot", "MarginalPosteriorVarianceFoldedPlot", 200, 0, 2);
     TH1D *RhatFoldedPlot = new TH1D("RhatFoldedPlot", "RhatFoldedPlot", 200, 0, 2);
     TH1D *EffectiveSampleSizeFoldedPlot = new TH1D("EffectiveSampleSizeFoldedPlot", "EffectiveSampleSizeFoldedPlot", 400, 0, 10000);
-            
+
+    TH1D *RhatLogPlot = new TH1D("RhatLogPlot", "RhatLogPlot", 200, 0, 2);
+    TH1D *RhatFoldedLogPlot = new TH1D("RhatFoldedLogPlot", "RhatFoldedLogPlot", 200, 0, 2);
+
     int Criterium = 0;
     int CiteriumFolded = 0;
     for(int j = 0; j < nDraw; j++)
     {
-      StandardDeviationGlobalPlot->Fill(StandardDeviationGlobal[j]);
-      BetweenChainVariancePlot->Fill(BetweenChainVariance[j]); 
-      MarginalPosteriorVariancePlot->Fill(MarginalPosteriorVariance[j]); 
-      RhatPlot->Fill(RHat[j]);
-      EffectiveSampleSizePlot->Fill(EffectiveSampleSize[j]);
-      if(RHat[j] > 1.1) Criterium++;
-          
-          
-      StandardDeviationGlobalFoldedPlot->Fill(StandardDeviationGlobalFolded[j]);
-      BetweenChainVarianceFoldedPlot->Fill(BetweenChainVarianceFolded[j]); 
-      MarginalPosteriorVarianceFoldedPlot->Fill(MarginalPosteriorVarianceFolded[j]); 
-      RhatFoldedPlot->Fill(RHatFolded[j]);  
-      EffectiveSampleSizeFoldedPlot->Fill(EffectiveSampleSizeFolded[j]);
-      if(RHatFolded[j] > 1.1) CiteriumFolded++;
+      //KS: Fill only valid parameters
+      if(ValidPar[j])
+      {
+        StandardDeviationGlobalPlot->Fill(StandardDeviationGlobal[j]);
+        BetweenChainVariancePlot->Fill(BetweenChainVariance[j]);
+        MarginalPosteriorVariancePlot->Fill(MarginalPosteriorVariance[j]);
+        RhatPlot->Fill(RHat[j]);
+        EffectiveSampleSizePlot->Fill(EffectiveSampleSize[j]);
+        if(RHat[j] > 1.1) Criterium++;
+
+
+        StandardDeviationGlobalFoldedPlot->Fill(StandardDeviationGlobalFolded[j]);
+        BetweenChainVarianceFoldedPlot->Fill(BetweenChainVarianceFolded[j]);
+        MarginalPosteriorVarianceFoldedPlot->Fill(MarginalPosteriorVarianceFolded[j]);
+        RhatFoldedPlot->Fill(RHatFolded[j]);
+        EffectiveSampleSizeFoldedPlot->Fill(EffectiveSampleSizeFolded[j]);
+        if(RHatFolded[j] > 1.1) CiteriumFolded++;
+      }
+      else
+      {
+         RhatLogPlot->Fill(RHat[j]);
+         RhatFoldedLogPlot->Fill(RHatFolded[j]);
+      }
     }
-    //KS: 1.1 is standard criterium as long as number of dials which go above this criterium is small there is no need to worry
+    //KS: We set criterium of 1.1 based on Gelman et al. (2003) Bayesian Data Analysis
     std::cout<<" Number of parameters which has R hat greater than 1.1 is "<<Criterium<<"("<<100*double(Criterium)/double(nDraw)<<"%) while for R hat folded "<<CiteriumFolded<<"("<<100*double(CiteriumFolded)/double(nDraw)<<"%)"<<std::endl;
-    
+
+    for(int j = 0; j < nDraw; j++)
+    {
+      if( (RHat[j] > 1.1 || RHatFolded[j] > 1.1) && ValidPar[j])
+      {
+        std::cout<<"Parameter "<<BranchNames[j]<<" has R hat higher than 1.1"<<std::endl;
+      }
+    }
     StandardDeviationGlobalPlot->Write();
     BetweenChainVariancePlot->Write();
     MarginalPosteriorVariancePlot->Write();
@@ -642,6 +674,10 @@ void SaveResults() {
     RhatFoldedPlot->Write();
     EffectiveSampleSizeFoldedPlot->Write();
 
+    RhatLogPlot->Write();
+    RhatFoldedLogPlot->Write();
+
+    //KS: Now we make fancy canvases, consider some function to have less copy pasting
     TCanvas *TempCanvas = new TCanvas("Canvas", "Canvas", 1024, 1024);
     gStyle->SetOptStat(0);
     TempCanvas->SetGridx();
@@ -675,6 +711,32 @@ void SaveResults() {
     delete Legend;
     Legend = NULL;
     
+    //Now R hat for log L
+    RhatLogPlot->GetXaxis()->SetTitle("R hat for LogL");
+    RhatLogPlot->SetLineColor(kRed);
+    RhatLogPlot->SetFillColor(kRed);
+    RhatFoldedLogPlot->SetLineColor(kBlue);
+    RhatFoldedLogPlot->SetFillColor(kBlue);
+
+    Legend = new TLegend(0.55, 0.6, 0.9, 0.9);
+    Legend->SetTextSize(0.04);
+    Legend->SetFillColor(0);
+    Legend->SetFillStyle(0);
+    Legend->SetLineWidth(0);
+    Legend->SetLineColor(0);
+
+    Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+    Legend->AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
+    Legend->AddEntry(RhatFoldedLogPlot, "Rhat-Folded Gelman 2021", "l");
+
+    RhatLogPlot->Draw();
+    RhatFoldedLogPlot->Draw("same");
+    Legend->Draw("same");
+    TempCanvas->Write("RhatLog");
+    delete Legend;
+    Legend = NULL;
+
+    //Now canvas for effective sample size
     EffectiveSampleSizePlot->GetXaxis()->SetTitle("S_{eff, BDA2}");
     EffectiveSampleSizePlot->SetLineColor(kRed);
     EffectiveSampleSizeFoldedPlot->SetLineColor(kBlue);
@@ -717,6 +779,9 @@ void SaveResults() {
     delete TempCanvas;
     delete TempLine;
     
+    delete RhatLogPlot;
+    delete RhatFoldedLogPlot;
+
     DiagFile->Close();
     delete DiagFile;
     
