@@ -91,7 +91,7 @@ __host__ void InitGPU_AutoCorr(
 
                           int n_Entries,
                           int n_Pars,
-                          int n_Lags) {
+                          const int n_Lags) {
 
   // Write to the global statics (h_* denotes host stored variable)
   h_nDraws = n_Pars;

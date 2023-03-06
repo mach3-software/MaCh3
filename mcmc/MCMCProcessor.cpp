@@ -9,7 +9,7 @@ extern void InitGPU_AutoCorr(
     float **DenomSum_gpu,
     int n_Entries,
     int n_Pars,
-    int n_Lags);
+    const int n_Lags);
 
 extern void CopyToGPU_AutoCorr(
     float *ParStep_cpu,
@@ -2048,7 +2048,7 @@ void MCMCProcessor::ParamTraces() {
   LLDir->cd();
   for (int j = 0; j < nSamples; ++j) {
     TraceSamplePlots[j]->Write();
-    delete[] TraceSamplePlots[j];
+    delete TraceSamplePlots[j];
     delete[] SampleValues[j];
   }
   delete[] TraceSamplePlots;
@@ -2071,7 +2071,7 @@ void MCMCProcessor::AutoCorrelation() {
 
   TStopwatch clock;
   clock.Start();
-  int nLags = 25000;
+  const int nLags = 25000;
   std::cout << "Making auto-correlations for nLags = "<< nLags << std::endl;
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter
@@ -2165,6 +2165,7 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] NumeratorSum_cpu;
   delete[] DenomSum_cpu;
   delete[] ParStep_cpu;
+  delete[] ParamSums_cpu;
 
 
   //KS: Delete stuff at GPU as well
@@ -2189,11 +2190,14 @@ void MCMCProcessor::AutoCorrelation() {
     delete LagKPlots[j];
   }
   delete[] LagKPlots;
+  delete[] NumeratorSum;
+  delete[] DenomSum;
   for (int i = 0; i < nEntries; ++i) {
     delete[] ParStep[i];
   }
   delete[] ParStep;
   
+
   delete ParamSums;
 
   clock.Stop();
@@ -2203,13 +2207,13 @@ void MCMCProcessor::AutoCorrelation() {
 #ifdef CUDA
 // **************************
 //KS: Allocates memory and copy data from CPU to GPU
-void MCMCProcessor::PrepareGPU_AutoCorr(int nLags) {
+void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // **************************
 
   //KS: Create temproary arrays that will comiunicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
-  NumeratorSum_cpu = new float[nDraw*nEntries];
-  DenomSum_cpu = new float[nDraw*nEntries];
+  NumeratorSum_cpu = new float[nDraw*nLags];
+  DenomSum_cpu = new float[nDraw*nLags];
   ParamSums_cpu = new float[nDraw];
 
   #ifdef MULTITHREAD

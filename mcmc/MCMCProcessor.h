@@ -276,7 +276,7 @@ class MCMCProcessor {
 
   //Only if GPU is enabled
   #ifdef CUDA
-    void PrepareGPU_AutoCorr(int nLags);
+    void PrepareGPU_AutoCorr(const int nLags);
 
     float* ParStep_cpu;
     float* NumeratorSum_cpu;
