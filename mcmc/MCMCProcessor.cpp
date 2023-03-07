@@ -2190,6 +2190,10 @@ void MCMCProcessor::AutoCorrelation() {
     delete LagKPlots[j];
   }
   delete[] LagKPlots;
+  for (int j = 0; j < nDraw; ++j) {
+    delete[] NumeratorSum[j];
+    delete[] DenomSum[j];
+  }
   delete[] NumeratorSum;
   delete[] DenomSum;
   for (int i = 0; i < nEntries; ++i) {
