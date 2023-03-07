@@ -4,7 +4,11 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)  
 
 SET(MaCh3_VERSION 0.0.2)
-project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
+if(${CPU_ONLY})
+  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
+else()
+  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
+endif()
 set(CMAKE_CXX_STANDARD 17)
 
 # Changes default install path to be a subdirectory of the build dir.
