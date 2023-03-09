@@ -157,7 +157,6 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 
   //KS: Reset the histograms before reweight 
   ResetHistograms();
-
   fillArray();
 
   return;
@@ -184,7 +183,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
 
   //KS: Reset the histograms before reweight 
   ResetHistograms();
-
+  
   fillArray();
 
   return;
@@ -215,7 +214,7 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should
   for (int i=0; i< (int)MCSamples.size(); ++i) {
     calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
   }
-
+  
   //KS: Reset the histograms before reweight 
   ResetHistograms();
 
@@ -317,10 +316,16 @@ void samplePDFFDBase::fillArray() {
       
       //DB Set oscillation weights for NC events to 1.0
       //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupMC
-      //if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  //	MCSamples[iSample].osc_w[iEvent] = 1.0;
-	  //	continue;
-      //}
+	  //
+	  //LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
+      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+	  	MCSamples[iSample].osc_w[iEvent] = 0.0;
+	  	continue;
+      }
+      if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
+	  	continue;
+      }
 
       //DB Total weight
       for (int iParam=0; iParam<MCSamples[iSample].ntotal_weight_pointers[iEvent] ; ++iParam) {
@@ -502,9 +507,15 @@ void samplePDFFDBase::fillArray_MP()
 
 		//DB Set oscillation weights for NC events to 1.0
 		//DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
-		if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		  MCSamples[iSample].osc_w[iEvent] = 1.0;	
-		}
+	  //LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
+      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+	  	MCSamples[iSample].osc_w[iEvent] = 0.0;
+	  	continue;
+      }
+      if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
+	  	continue;
+      }
 
 		//DB Total weight
 		for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEvent];iParam++) {
