@@ -9,12 +9,12 @@ set(Splines_implementation_files
 	splineFDBase.cpp
 	SplineMonolith.cpp
         gpuSplineUtils.cu)
-# Note: SplineMonolith is for GPU
 
 
 set(Splines_implementation_files_CPU 
 	splineBase.cpp 
-	splineFDBase.cpp)
+	splineFDBase.cpp
+	SplineMonolith.cpp)
 
 if(NOT ${CPU_ONLY})
 
