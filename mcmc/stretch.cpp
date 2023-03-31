@@ -196,7 +196,7 @@ void stretch::runStretch()
 	systematics[i]->throwNominal();
 //	systematics[i]->printPars();
 
-	llh_init[k] += systematics[i]->getLikelihood();
+	llh_init[k] += systematics[i]->GetLikelihood();
 	if(debug)
 	   debugFile << "LLH after " << systematics[i]->getName() << " " << llh_init[k] << std::endl;
      }
@@ -213,7 +213,7 @@ void stretch::runStretch()
 	   samples[i]->reweight(fake);
 	}
 	
-	llh_init[k] += samples[i]->getLikelihood();
+	llh_init[k] += samples[i]->GetLikelihood();
 	
 	if(debug)
 	   debugFile << "LLH after sample " << i << " " << llh_init[k] << std::endl;
@@ -257,7 +257,7 @@ void stretch::runStretch()
 	   }
 	   systematics[i]->setParameters(pars);
 //	   systematics[i]->printPars();
-	   logLProp[nw] += systematics[i]->getLikelihood();
+	   logLProp[nw] += systematics[i]->GetLikelihood();
 	}
 	for (size_t i = 0; i < samples.size(); i++)
 	{
@@ -271,7 +271,7 @@ void stretch::runStretch()
 	      samples[i]->reweight(fake);
 	   }
 	   
-	   logLProp[nw] += samples[i]->getLikelihood();
+	   logLProp[nw] += samples[i]->GetLikelihood();
 	}
 	double q = pow(z,N-1)*exp(logLCurr[nw]-logLProp[nw]);
 //	std::cout << nw << "," << ow << ": " << logLCurr[nw] << "," << logLProp[nw] << "," << z << "," << q << std::endl;

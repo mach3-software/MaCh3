@@ -13,7 +13,7 @@ class covarianceOsc : public covarianceBase
       virtual ~covarianceOsc();
   
       void throwNominal(bool nomValues=true);
-      double getLikelihood();
+      double GetLikelihood();
       bool checkBounds();
       double *getPropPars();//double *retrn);
       void proposeStep();

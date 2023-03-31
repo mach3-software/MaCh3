@@ -59,13 +59,13 @@ public:
   // DB Reweighting and Likelihood functions
 
   //ETA - abstract these to samplePDFFDBase
-  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded getLikelihood
+  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
   void addData(TH1D* Data);
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
   void addData(std::vector< vector <double> > &data);
-  //DB Multi-threaded getLikelihood
-  double getLikelihood();
+  //DB Multi-threaded GetLikelihood
+  double GetLikelihood();
   //===============================================================================
 
   void reweight(double *oscpar);
@@ -201,7 +201,7 @@ public:
   inline void ResetHistograms();
       
   //===============================================================================
-  //DB Variables required for getLikelihood
+  //DB Variables required for GetLikelihood
   //
   //DB Vectors to hold bin edges
   std::vector<double> XBinEdges;

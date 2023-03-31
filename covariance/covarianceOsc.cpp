@@ -150,7 +150,7 @@ bool covarianceOsc::checkBounds() {
   return true;
 }
 
-double covarianceOsc::getLikelihood() {
+double covarianceOsc::GetLikelihood() {
 
   double logL = 0.0;
   if(size==6) {

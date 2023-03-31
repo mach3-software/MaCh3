@@ -45,8 +45,8 @@ samplePDFFDBase::~samplePDFFDBase()
 
 void samplePDFFDBase::fill1DHist()
 {
-  // DB Commented out by default - Code heading towards getLikelihood using arrays instead of root objects 
-  // Wouldn't actually need this for getLikelihood as TH objects wouldn't be filled   
+  // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects 
+  // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled   
   _hPDF1D->Reset();
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     for (unsigned int xBin=0;xBin<(XBinEdges.size()-1);xBin++) {
@@ -58,8 +58,8 @@ void samplePDFFDBase::fill1DHist()
 
 void samplePDFFDBase::fill2DHist()
 {
-  // DB Commented out by default - Code heading towards getLikelihood using arrays instead of root objects 
-  // Wouldn't actually need this for getLikelihood as TH objects wouldn't be filled   
+  // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects 
+  // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled   
   _hPDF2D->Reset();
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     for (unsigned int xBin=0;xBin<(XBinEdges.size()-1);xBin++) {
@@ -586,7 +586,7 @@ void samplePDFFDBase::fillArray_MP()
 
 	//End of Calc Weights and fill Array
 	//==================================================
-  // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in getLikelihood
+  // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in GetLikelihood
 	  for (int yBin=0;yBin<nYBins;yBin++) {
 		for (int xBin=0;xBin<nXBins;xBin++) {
 #pragma omp atomic
@@ -1340,7 +1340,7 @@ void samplePDFFDBase::fillSplineBins()
   return;
 }
 
-double samplePDFFDBase::getLikelihood()
+double samplePDFFDBase::GetLikelihood()
 {
   if (samplePDFFD_data == NULL) {
       std::cerr << "data sample is empty!" << std::endl;
