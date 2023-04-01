@@ -1,11 +1,12 @@
 #include "covarianceXsec.h"
 
 // ********************************************
-covarianceXsec::covarianceXsec(const char *name, const char *file, double threshold,int firstpcapar,int lastpcapar)
-  : covarianceBase(name, file,0,threshold,firstpcapar,lastpcapar) {
+covarianceXsec::covarianceXsec(const char *name, const char *file,
+   	                           double threshold,int FirstPCAdpar,
+							   int LastPCAdpar)
+  : covarianceBase(name, file,0,threshold,FirstPCAdpar,LastPCAdpar) {
 // ********************************************
 
-  MakePosDef();
   TFile *infile = new TFile(file, "READ");
 
   xsec_param_norm_modes = NULL;
@@ -14,13 +15,19 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
   xsec_param_norm_nupdg = NULL;
 
   // Now to the special objects that only 2016a and above have
-  if(!(xsec_param_norm_modes = (TObjArray*)(infile->Get("xsec_norm_modes")))){std::cerr<<"Can't find xec_norm_modes in xseccov"<<std::endl;throw;}
-  if(!(xsec_param_norm_horncurrents = (TObjArray*)(infile->Get("xsec_norm_horncurrents")))){std::cerr<<"Can't find xec_norm_horncurrents in xseccov"<<std::endl;throw;}
+  if(!(xsec_param_norm_modes = (TObjArray*)(infile->Get("xsec_norm_modes")))){
+	std::cerr<<"Can't find xec_norm_modes in xseccov"<<std::endl;
+	throw;
+  }
+  if(!(xsec_param_norm_horncurrents = (TObjArray*)(infile->Get("xsec_norm_horncurrents")))){
+	std::cerr<<"Can't find xec_norm_horncurrents in xseccov"<<std::endl;
+	throw;
+  }
   if(!(xsec_param_norm_elem  = (TObjArray*)(infile->Get("xsec_norm_elements")))){std::cerr<<"Can't find xec_norm_elements in xseccov"<<std::endl;throw;}
   if(!(xsec_param_norm_nupdg = (TObjArray*)(infile->Get("xsec_norm_nupdg")))){std::cerr<<"Can't find xec_norm_nupdg in xseccov"<<std::endl;throw;}
   if(!(xsec_param_norm_preoscnupdg = (TObjArray*)(infile->Get("xsec_norm_prod_nupdg")))){std::cerr<<"Can't find xec_norm_prod_nupdg in xseccov"<<std::endl;throw;}
   //ETA - adding in string which will then be parsed in samplePDF class into a kinematic variable to cut on
-  //LW - Chaning to if no kinematic type, make empty array
+  //LW - Changing to if no kinematic type, make empty array
   //if(!(xsec_kinematic_type = (TObjArray*)(infile->Get("xsec_norm_kinematic_type")))){std::cerr<< "[ERROR]::" << __FILE__ << ":" << __LINE__ << " cannot find xsec_kinematic_type in xseccov" << std::endl; throw;}
   if(!(xsec_param_fd_spline_modes = (TObjArray*)(infile->Get("fd_spline_modes")))){std::cerr<<"Can't find fd_spline_modes in xseccov"<<std::endl;throw;}
   if(!(xsec_param_fd_spline_names = (TObjArray*)(infile->Get("fd_spline_names")))){std::cerr<<"Can't find fd_spline_names in xseccov"<<std::endl;throw;}
@@ -46,6 +53,10 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
     throw;
   }
 
+  //ETA- don't need this explicit difference.
+  // I think we just keep one vector for the spline modes. This could get a bit
+  // weird in the case that there are different modes across systs that you
+  // want to correlate. But I think this will be fine.
   if(xsec_param_fd_spline_modes->GetEntries() != xsec_param_fd_spline_names->GetEntries() ){
     std::cerr <<"Number of entries in input matrix fd spline parameters is wrong!"<<std::endl;
     std::cerr <<"Far spline modes GetEntries = "<<xsec_param_fd_spline_modes->GetEntries()<<std::endl;
@@ -60,6 +71,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
   xsec_param_lb     = (TVectorD*)(infile->Get("xsec_param_lb"));
   xsec_param_ub     = (TVectorD*)(infile->Get("xsec_param_ub"));
   xsec_stepscale    = (TVectorD*)(infile->Get("xsec_stepscale"));
+  TVectorD* flat_prior = (TVectorD*)(infile->Get("xsec_flat_prior"));
   xsec_kinematic_ub = (TVectorD*)(infile->Get("xsec_norm_kinematic_ub"));
   xsec_kinematic_lb = (TVectorD*)(infile->Get("xsec_norm_kinematic_lb"));
   TObjArray* objarr_name = (TObjArray*)(infile->Get("xsec_param_names"));
@@ -103,9 +115,13 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
     xsec_param_prior_a[i]=(*xsec_param_prior)(i);
     // Fill the names
     xsec_param_names.push_back(std::string(((TObjString*)objarr_name->At(i))->GetString()));
+
+    if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
 
+    if((*flat_prior)(i)) setEvalLikelihood(i, false);
+    
     for (int j = 0; j < ncols; j++) {
       xsec_param_id_a[i][j] = (*xsec_param_id)(i,j);
     }
@@ -119,12 +135,10 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
 
   infile->Close();
   delete infile;
-
   // Scan through the input parameters and find which are normalisation, which are splines, and so on
-  scanParameters();
+  ScanParameters();
 
   initParams(0.001);
-
   // Print
   Print();
 
@@ -139,9 +153,8 @@ covarianceXsec::~covarianceXsec() {
 
 // ********************************************
 // DB Grab the Number of splines for the relevant DetID
-int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
-  int returnVal = 0;
-  
+const int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
+  int returnVal = 0; 
   for (int i = 0; i < nPars; ++i) {
     if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
       if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
@@ -196,18 +209,17 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   std::vector< std::vector<int> > returnVec;
 
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
-      if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
-        
-	TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
-	std::vector<int> temp;
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-	returnVec.push_back(temp);	
+	if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
+	  if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
 
-      }
-    }
+		TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
+		std::vector<int> temp;
+		for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		}
+          returnVec.push_back(temp);	
+	  }
+	}
   }
 
   return returnVec;
@@ -335,7 +347,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 
 // ********************************************
 // DB Grab the number of Normalisation parameters for the relevant DetID
-int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
+const int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
   int returnVal = 0;
 
   for (int i = 0; i < nPars; ++i) {
@@ -386,7 +398,7 @@ const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(int DetID) {
 
 // ********************************************
 // Scan the parameters, e.g. number of spline parameters, functional parameters, Far only parameters, and so on
-void covarianceXsec::scanParameters() {
+void covarianceXsec::ScanParameters() {
   // ********************************************
   
   // Should be able to count the normalisation parameters from the covarianceXsec class
@@ -404,8 +416,6 @@ void covarianceXsec::scanParameters() {
   int norm_counter = -1;
 
   for (int i = 0; i < nPars; ++i) {
-
-
 
     bool isValidDetID = false;
     int DetIDCounter = 0;
@@ -732,57 +742,6 @@ void covarianceXsec::scanParameters() {
   return;
 } // end ScanParameters
 
-
-// ********************************************
-// Throw the nominal values according to the cholesky decomposed
-void covarianceXsec::throwNominal(bool nomValues, int seed) {
-  // ********************************************
-
-  TDecompChol chdcmp(*covMatrix);
-
-  if(!chdcmp.Decompose()) {
-    std::cerr << "Cholesky decomposition failed for " << matrixName << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
-  }
-
-  chel = new TMatrixD(chdcmp.GetU());
-  CholeskyDecomp(size, *chel);
-
-  ThrowParms* nom_throws = new ThrowParms((*xsec_param_prior), (*covMatrix));
-  nom_throws->SetSeed(seed);
-  nominal.clear();
-  nominal.resize(size);
-
-  // default is nomValues = true
-  if(!nomValues) {
-    // Need to throw again if we throw the nominal outside the upper or lower bound
-    bool throw_again = true;
-    while(throw_again == true) {
-      throw_again = false;
-      nom_throws->ThrowSet(nominal);
-      for (int i = 0; i < int(nominal.size()); i++) {
-        // If the parameter is fixed, set to the prior
-        if (fParSigma[i] < 0) {
-          nominal[i] = (*xsec_param_prior)(i);
-          continue;
-        }
-        // If the throw is outside the lower bound
-        if (nominal[i] < (*xsec_param_lb)(i)) throw_again = true;
-        // If the throw is outside the upper bound
-        if (nominal[i] > (*xsec_param_ub)(i)) throw_again = true;
-      }
-    }
-  } else {
-    // Set nominals to prior
-    for (int i = 0; i < int(nominal.size()); i++) {
-      nominal[i] = (*xsec_param_prior)(i);
-      //nominal[i] = (*xsec_param_nom)(i);
-    }
-  }
-  delete nom_throws;
-}
-
 // ********************************************
 void covarianceXsec::initParams(double fScale) {
   // ********************************************
@@ -815,50 +774,29 @@ void covarianceXsec::initParams(double fScale) {
   //DB Set Individual Step scale for PCA parameters to the lastpcadpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
   //   However, individual step scale for non-PCA parameters needs to be set correctly
   if (pca) {
-    for (int i=firstpcadpar;i<=lastpcadpar;i++) {
-      xsec_stepscale_vec[i] = xsec_stepscale_vec[lastpcadpar-1];
+    for (int i=FirstPCAdpar;i<=LastPCAdpar;i++) {
+      xsec_stepscale_vec[i] = xsec_stepscale_vec[LastPCAdpar-1];
     }
   }
 
   setIndivStepScale(xsec_stepscale_vec);
-  genPropKernels();
   randomize();
-  throwNominal();
+  //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
+  if (pca) TransferToPCA();
   CorrelateSteps();
 }
 
-// ********************************************
-// Get the likelihood for moving the cross-section parameters to these values
-double covarianceXsec::GetLikelihood() {
-  // ********************************************
-
-  double xsecLogL = 0.0;
-
-//KS: This brings speed up of the order 2 per thread, since xsec matix can only grow this might be even more profitable in the future
-#ifdef MULTITHREAD
-#pragma omp parallel for reduction(+:xsecLogL)
-#endif
-  for (int i = 0; i < nPars; ++i) {
-
-    // Make sure we're in a good region for parameter i
-    if (fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]) {
-      xsecLogL += __LARGE_LOGL__;
-    }
-
-    // Apply the prior
-    for (int j = 0; j <= i; ++j) {
-      // If we want to evaluate likelihood (Gaussian prior essentially, not flat)
-      if (fParEvalLikelihood[i] && fParEvalLikelihood[j]) {
-        //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
-        int scale = 1;
-        if(i != j) scale = 2;
-        xsecLogL += scale * 0.5*( nominal[i]-fParProp[i])*(nominal[j]-fParProp[j])*InvertCovMatrix[i][j];
+int covarianceXsec::CheckBounds(){
+  int NOutside=0;
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:NOutside)
+  #endif
+  for (int i = 0; i < nPars; i++){
+      if(fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]){
+        NOutside++;
       }
-    } // end j for loop
-  } // end i for loop
-
-
-  return xsecLogL;
+  }
+  return NOutside;
 }
 
 // ********************************************
@@ -879,14 +817,33 @@ void covarianceXsec::setEvalLikelihood(int i, bool eL) {
 void covarianceXsec::toggleFixParameter(int i) {
   // ********************************************
 
-  if (i > size) {
-    std::cerr << "Can't toggleFixParameter for parameter " << i << " because size of covariance =" << size << std::endl;
-    std::cerr << "Fix this in your config file please!" << std::endl;
-    exit(-1);
-  } else {
-    fParSigma[i] *= -1.0;
-    std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to fixed at " << fParCurr[i] << std::endl;
+  if(!pca){
+	if (i > size) {
+	  std::cerr << "Can't toggleFixParameter for parameter " << i << " because size of covariance =" << size << std::endl;
+	  std::cerr << "Fix this in your config file please!" << std::endl;
+	  exit(-1);
+	} else {
+	  fParSigma[i] *= -1.0;
+	  std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to fixed at " << fParCurr[i] << std::endl;
+
+	}
+  } else
+  {
+	//KS: Find xsec parameter  in PCA base
+	int isDecom = -1;
+	for (int im = 0; im < npars; ++im) { if(isDecomposed_PCA[im] == i) isDecom = im; }
+	if(isDecom < 0)
+	{
+	  std::cerr << "Parameter " << GetParameterName(i) << " is PCA decomposed can't fix this" << std::endl;
+	  //throw; 
+	}
+	else
+	{
+	  fParSigma_PCA[isDecom] *= -1.0;
+	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << fParCurr[i] << std::endl;
+	}
   }
+  return;
 }
 
 // ********************************************
@@ -948,7 +905,7 @@ void covarianceXsec::Print() {
 
   std::cout << std::endl;
 
-  // Start Far priting
+  // Start Far printing
 
 
   std::cout << std::endl;
@@ -1032,20 +989,20 @@ void covarianceXsec::Print() {
 } // End
 
 // ********************************************
-// Sets the proposed Flux parameters to the nominal values
+// Sets the proposed Flux parameters to the prior values
 void covarianceXsec::setFluxOnlyParameters() {
 // ********************************************
     for (int i = 0; i < size; i++) 
     {
-      if(isFlux[i]) fParProp[i] = nominal[i];
+      if(isFlux[i]) fParProp[i] = fParInit[i];
     }
 }
 // ********************************************
-// Sets the proposed Flux parameters to the nominal values
+// Sets the proposed Flux parameters to the prior values
 void covarianceXsec::setXsecOnlyParameters() {
 // ********************************************
     for (int i = 0; i < size; i++) 
     {
-      if(!isFlux[i]) fParProp[i] = nominal[i];
+      if(!isFlux[i]) fParProp[i] = fParInit[i];
     }
 }

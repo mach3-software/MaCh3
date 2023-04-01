@@ -70,9 +70,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
   fixth23NH = -999;
   fixth23IH = -999;
 
-  genPropKernels();
   randomize();
-  throwNominal();
 
   oscpars1 = new double[10];
   
@@ -93,70 +91,46 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
 
 covarianceOsc::~covarianceOsc()
 {
-  //  delete[] fPropKernel;
 }
 
-// void covarianceOsc::genPosteriorHists()
-// {
-//   Char_t name[256];
-//   posterior[0] = new TH1D("post_osc_0", "sin2th_12",100,0.5, 1);
-//   posterior[1] = new TH1D("post_osc_1", "sin2th_23",100, 0.7, 1);
-//   posterior[2] = new TH1D("post_osc_2", "sin2th_13",100, 0, 0.3);
-//   posterior[3] = new TH1D("post_osc_3", "delm_12",100, 0, 0.00001);
-//   posterior[4] = new TH1D("post_osc_4", "delm_23",100, 0, 0.004);
-//   posterior[5] = new TH1D("post_osc_5", "delta_cp",100, 0, 0.3);
-
-
-//   /*
-//   for (int i = 0; i < size; i++)
-//     {
-//       posterior[i] = NULL;
-//       sprintf(name, "post_%s_%03i",getName(), i);
-//       posterior[i] = new TH1D(name, name, 100, 0, 1);
-//     }*/
-// }
-
-// CWRET changed this from double to bool!
-bool covarianceOsc::checkBounds() {
-
+int covarianceOsc::CheckBounds() {
+  int NOutside = 0;
   // wrap delta cp 
   // NB: previous to ~summer 2016 steps outside of this range were instead rejected
   if(fParProp[5] > TMath::Pi()) {
     fParProp[5] = (-2.*TMath::Pi() + fParProp[5]);
 
   } else if (fParProp[5] < -TMath::Pi()) {
-
     fParProp[5] = (2.*TMath::Pi() + fParProp[5]);
   }
 
   // ensure osc params dont go unphysical
   if (fParProp[0] > 1.0 || fParProp[0] < 0 ||
       fParProp[1] > 1.0 || fParProp[1] < 0 ||
-      fParProp[2] > 1.0 || fParProp[2] < 0 
-      //|| fParProp[4] < 0.0 || fParProp[4] > 20E-3 // dont let dm32 go to IH
-      //|| fabs(fParProp[4]) > 0.004 || fabs(fParProp[4]) < 0.001 
-      //|| fParProp[5] < -1*TMath::Pi() || fParProp[5] > TMath::Pi()
-     )
+      fParProp[2] > 1.0 || fParProp[2] < 0 )
   {
-    return false;
+     NOutside++;
   }
 
   if(size==7) {
     if(fParProp[6]<0) { // Don't let beta be less than 0 (no upper limit)
-      return false;
+      NOutside++;
     }
   }
 
-  return true;
+  return NOutside;
 }
 
-double covarianceOsc::getLikelihood() {
+double covarianceOsc::calcLikelihood() {
 
   double logL = 0.0;
   if(size==6) {
-    for(int i = 0; i < covMatrix->GetNrows()-1; ++i) //delta is last, don't loop over, as it gets flat prior
+    #ifdef MULTITHREAD
+    #pragma omp parallel for reduction(+:logL)
+    #endif
+    for(int i = 0; i < size; i++) 
     {
-      for(int j = 0; j < covMatrix->GetNcols()-1; ++j) //delta is last, don't loop over, as it gets flat prior
+      for(int j = 0; j <= i; j++)
       {
         // If parameter 23 histogram exists, use that instead of matrix
         if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -167,10 +141,10 @@ double covarianceOsc::getLikelihood() {
 
         if(fParEvalLikelihood[i] && fParEvalLikelihood[j])
         {
-          /*std::cout << i << " " << j << " nominal i " << nominal[i] << " nominal j " << nominal[j] << std::endl;
-            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j]; << std::endl;
-            std::cout << "diff " << fParProp[i] - nominal[i] << std::endl;
-            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j]; << std::endl;*/
+          /*std::cout << i << " " << j << " fParInit i " << fParInit[i] << " fParInit j " << fParInit[j] << std::endl;
+            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j] << std::endl;
+            std::cout << "diff " << fParProp[i] - fParInit[i] << std::endl;
+            std::cout << "likelihood " << 0.5*(fParProp[i] - fParInit[i])*(fParProp[j] - fParInit[j])*InvertCovMatrix[i][j]; << std::endl;*/
 
           //check
           if (h_23 && (i==1 || i==4 || j==1 || j==4))
@@ -178,7 +152,9 @@ double covarianceOsc::getLikelihood() {
           if ((h_dcpth13NH || h_dcpth13IH) && (i==2 || j==2))
             std::cout << "Error: using matrix when theta13-dcp histogram exists" << std::endl;
 
-          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];;
+          int scale = 1;
+          if(i != j) scale = 2;
+          logL += scale * 0.5*(fParProp[i] - fParInit[i])*(fParProp[j] - fParInit[j])*InvertCovMatrix[i][j];
         }
       }
     }
@@ -224,10 +200,10 @@ double covarianceOsc::getLikelihood() {
 
   else if(size==7)
   {
-    for(int i = 0; i < covMatrix->GetNrows()-2; i++) //delta is last, don't loop over, as it gets flat prior
+    for(int i = 0; i < size; ++i)
     {
-      for(int j = 0; j < covMatrix->GetNcols()-2; j++) //delta is last, don't loop over, as it gets flat prior
-      {
+      for(int j = 0; j <= i; ++j)
+	  {
         // If parameter 23 histogram exists, use that instead of matrix
         if (h_23 && (i==1 || i==4 || j==1 || j==4))
           continue;
@@ -237,18 +213,20 @@ double covarianceOsc::getLikelihood() {
 
         if(fParEvalLikelihood[i] && fParEvalLikelihood[j])
         {
-          /*std::cout << i << " " << j << " nominal i " << nominal[i] << " nominal j " << nominal[j] << std::endl;
-            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j]; << std::endl;
-            std::cout << "diff " << fParProp[i] - nominal[i] << std::endl;
-            std::cout << "likelihood " << 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j]; << std::endl;*/
+          /*std::cout << i << " " << j << " fParInit i " << fParInit[i] << " fParInit j " << fParInit[j] << std::endl;
+            std::cout << "parcurr " << fParProp[i] << " invmatrix " << InvertCovMatrix[i][j] << std::endl;
+            std::cout << "diff " << fParProp[i] - fParInit[i] << std::endl;
+            std::cout << "likelihood " << 0.5*(fParProp[i] - fParInit[i])*(fParProp[j] - fParInit[j])*InvertCovMatrix[i][j]; << std::endl;*/
 
           //check
           if (h_23 && (i==1 || i==4 || j==1 || j==4))
             std::cout << "Error: using matrix when parameter-23 histogram exists" << std::endl;
           if ((h_dcpth13NH || h_dcpth13IH) && (i==2 || j==2))
             std::cout << "Error: using matrix when theta13-dcp histogram exists" << std::endl;
+          int scale = 1;
+          if(i != j) scale = 2;
+          logL += scale * 0.5*(fParProp[i] - fParInit[i])*(fParProp[j] - fParInit[j])*InvertCovMatrix[i][j];
 
-          logL+=0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*InvertCovMatrix[i][j];;
         }
       }
     }
@@ -296,13 +274,6 @@ double covarianceOsc::getLikelihood() {
     //if (fParEvalLikelihood[6])
     // logL+=1/(3.0); 
   }
-  
-  // Check parameter boundaries:  if bad (checkBound == false), add large logL
-  //                              if good (checkBound == true), add nothing
-  if (!checkBounds()) {
-    logL += __LARGE_LOGL__;
-  }
-
   //std::cout << "oscpars: " << fParProp[0] << "  " << fParProp[1] << "  " << fParProp[2] << "  " << fParProp[3] << "  " << fParProp[4] << "  " << fParProp[5] <<std::endl;
   //std::cout << "oscllh pre-RC: " << logL << std::endl;
 
@@ -339,50 +310,6 @@ double covarianceOsc::getLikelihood() {
   return logL;
 }
 
-void covarianceOsc::throwNominal(bool nomValues)
-{
-  //   cout << "entering throwNominal " << nomValues << endl;
-
-  TDecompChol chdcmp(*covMatrix);
-
-  if(!chdcmp.Decompose())
-  {
-    std::cerr << "Cholesky decomposition failed for " << matrixName << std::endl;
-    exit(-1);
-  }
-
-  chel = new TMatrixD(chdcmp.GetU());
-  CholeskyDecomp(size, *chel);
-
-  ThrowParms* nom_throws = new ThrowParms(/**vec*/(*osc_prior), (*covMatrix));
-  nom_throws->SetSeed(0);
-  nominal.clear();
-  nominal.resize(size);
-  if(!nomValues)
-  {
-    nom_throws->ThrowSet(nominal);
-    for (int i = 0; i < 3; i++)//only the angles
-    {
-      if (nominal[i] > 1.0) nominal[i] = 1.0;
-      if (nominal[i] < 0.0) nominal[i] = 0.0;
-    }
-    if(nominal[5]>TMath::Pi())
-      nominal[5]=TMath::Pi();
-    if(nominal[5]<-1*TMath::Pi())
-      nominal[5]=-1*TMath::Pi();
-    if(size==7)
-      if(nominal[6]<0)
-        nominal[6]=0.0;
-  }
-  else
-  {
-    for (int i = 0; i < int(nominal.size()); i++)
-      nominal[i]=(*osc_prior)(i);
-  }
-  delete nom_throws;
-
-}
-
 double *covarianceOsc::getPropPars()
 {
   for(int i = 0; i < 6; i++)
@@ -401,36 +328,29 @@ double *covarianceOsc::getPropPars()
 }
 
 void covarianceOsc::proposeStep() {
-  for (int i = 0; i < size; i++)
-  {
-    if (fParSigma[i] > 0.0)
-    {
-      /*if (i == 4) // Don't do gaussian proposal - randomly sample dm23 from a uniform distribution
-        {
-        fParProp[i] = random_number[0]->Uniform() * 20E-3;
-        }
-        else */
-      fParProp[i] = fParCurr[i] + fParSigma[i] * fPropKernel[i]->GetRandom()*fStepScale*fIndivStepScale[i]; //random_number[0]->Gaus(0, fParSigma[i]);  
+  if(use_adaptive && total_steps<upper_adapt) updateAdaptiveCovariance();
 
-      if (i==4 && random_number[0]->Uniform()<0.5 && flipdelM) // flip sign for delm2_23 (after taking step)
-        fParProp[i]*=-1;
+  randomize();
+  CorrelateSteps();
 
-      if(i==6 && flipBeta)
-      {
-        if(random_number[0]->Uniform()<0.5)
-        {
-          if(fParCurr[i]==0.0)
-            fParProp[i]=1.0;
-          if(fParCurr[i]==1.0)
-            fParProp[i]=0.0;
-        }
-        else 
-          fParProp[i]=fParCurr[i];
-      }
-
-    }
+  // Okay now we've done the standard steps, we can add in our nice flips
+  // hierarchy flip first
+  if(random_number[0]->Uniform()<0.5 && flipdelM){
+    fParProp[4]*=-1;
+  }
+  // now octant flip
+  if(random_number[0]->Uniform()<0.5){
+    // flip octant around point of maximal disappearance (0.5112)
+    // this ensures we move to a parameter value which has the same oscillation probability
+    fParProp[1] = 0.5112 - (fParProp[1] - 0.5112);
+  }
+  // And the beta flip (not sure if beta will still work...)
+  if(random_number[0]->Uniform()<0.5 && flipBeta){
+    fParProp[6]=1-fParCurr[6];
   }
 
+
+  // HI This bit lived outside the loop anywhere, let's leave it!
   // if flipdelM and parameter 4 is fixed, flip between fixed parameters for two hierarchies (Note: this will flip parameters 4 and 1 - dm23 *and* theta23).
   if (fParSigma[4] < 0.0 && flipdelM)
   {
@@ -469,7 +389,6 @@ void covarianceOsc::proposeStep() {
     }
     //std::cout << a << "\t" << fParProp[4] << "\t" << fParProp[1] << std::endl;
   }
-
 }
 
 std::vector<double> covarianceOsc::defaultPars(bool doubled)

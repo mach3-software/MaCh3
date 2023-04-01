@@ -12,42 +12,40 @@
 // MaCh3 includes
 #include "covarianceBase.h"
 #include "samplePDF/Structs.h"
-#include "throwParms/ThrowParms.h"
 
 class covarianceXsec : public covarianceBase {
 
   public:
-  covarianceXsec(const char *name, const char *file, double threshold=-1,int firstpcapar=-999,int lastpcapar=-999);
+  covarianceXsec(const char *name, const char *file, double threshold=-1,int FirstPCAdpar=-999,int LastPCAdpar=-999);
     ~covarianceXsec();
 
     // Print information about the whole object once it is set
     void Print();
 
-    void throwNominal(bool nomValues=true, int seed = 0);
-
     // General Getter functions not split by detector
-    double GetLikelihood();
-    double GetParamUpperBound(int i) {return xsec_param_ub_a[i];}
-    double GetParamLowerBound(int i) {return xsec_param_lb_a[i];}
-    double GetParamPrior(int i)      {return xsec_param_prior_a[i];}
-    int  GetXSecParamID(int i, int j) const {return xsec_param_id_a[i][j];}
-    const std::string & GetParameterName(int i) const {return xsec_param_names[i];}
-    int    GetNumParams()               {return nPars;}
-    const char* GetParName(int i) const {return xsec_param_names[i].c_str();}
+    inline int CheckBounds();
+    const double GetParamUpperBound(const int i) {return xsec_param_ub_a[i];}
+    const double GetParamLowerBound(const int i) {return xsec_param_lb_a[i];}
+    const double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
+    const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
+    const std::string & GetParameterName(const int i) const {return xsec_param_names[i];}
+    const int    GetNumParams()               {return nPars;}
+    const char* GetParName(const int i) const {return xsec_param_names[i].c_str();}
 
-    bool isParFlux(int i){
+    const bool IsParFlux(const int i){
       return isFlux[i];
     }
 
+	//ETA - these can be removed as Near params will be given by DetID so this is defunct.
     // Get functions for Near normalisation parameters
     const std::vector<XsecNorms4> GetNearNormPars() const{return NearNormParams;}
-    int                       GetNumNearNormParams() const  {return nNearNormParams;}
+    const int                     GetNumNearNormParams() const  {return nNearNormParams;}
 
     // Get functions for Far normalisation parameters
     const std::vector<XsecNorms4> GetFarNormPars() const{return FarNormParams;}
 
     // Get functions for Near spline parameters
-    int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
+    const int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
     const std::vector<std::string>& GetNearSplineParsNames() const  {return NearsplineParsNames;}
     const std::vector<std::string>& GetNearSplineFileParsNames() const  {return NearSplineFileParsNames;}
     const std::vector<int>&         GetNearSplineParsIndex() const  {return NearsplineParsIndex;}
@@ -57,11 +55,11 @@ class covarianceXsec : public covarianceBase {
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
-    int GetNumSplineParamsFromDetID(int DetID);
+    const int GetNumSplineParamsFromDetID(int DetID);
 
     //DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
-    int GetNumFuncParamsFromDetID(int DetID);
+    const int GetNumFuncParamsFromDetID(int DetID);
     const std::vector<std::string> GetFuncParsNamesFromDetID(int DetID);
     const std::vector<int> GetFuncParsIndexFromDetID(int DetID);
 
@@ -95,6 +93,22 @@ class covarianceXsec : public covarianceBase {
     const std::vector<std::string>& GetFarFuncParsNames() const  {return FarFuncParsNames;}
     const std::vector<int>&         GetFarFuncParsIndex() const  {return FarFuncParsIndex;}
 
+    //KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be differrent
+    // For example Sigma Var are done around nominal in ND280, no idea why though...
+    std::vector<double> getNominalArray()
+    {
+      std::vector<double> nominal;
+      for (int i = 0; i < size; i++)
+      {
+        nominal.push_back((*xsec_param_nom)(i));
+      }
+      return nominal;
+    }
+
+    const double getNominal(const int i)
+    {
+      return (*xsec_param_nom)(i);
+    };
 
     // Get nominal and prior for saving to the output file
     TVectorT<double> *GetNominal_TVec() {return xsec_param_nom;}
@@ -110,7 +124,7 @@ class covarianceXsec : public covarianceBase {
     void setFluxOnlyParameters();
     
     // What parameter Gets reweighted by what amount according to MCMC
-    inline double calcReWeight(int bin){
+    inline double calcReWeight(const int bin){
 	  if (bin >= 0 && bin < nPars) {
 		return fParProp[bin];
 	  } else {
@@ -128,7 +142,7 @@ class covarianceXsec : public covarianceBase {
 
   protected:
     // Helper functions to decide on what setup we're running
-    void scanParameters();
+    void ScanParameters();
 
     void initParams(double fScale);
     void setXsecParNames();
@@ -145,15 +159,13 @@ class covarianceXsec : public covarianceBase {
     std::vector<double> xsec_stepscale_vec;
 
     // TObjArrays from the input root file
+	// ETA - a lot of these can go soon. Just a string for each of these can be
+	// checked via a kinematic variable so we just need to pass a string
     TObjArray* xsec_param_norm_modes;
     TObjArray* xsec_param_norm_horncurrents;
     TObjArray* xsec_param_norm_elem;
     TObjArray* xsec_param_norm_nupdg;
     TObjArray* xsec_param_norm_preoscnupdg;
-    //TObjArray* xsec_param_norm_etru_bnd_low;
-    //TObjArray* xsec_param_norm_etru_bnd_high;
-    //TObjArray* xsec_param_norm_q2_true_bnd_low;
-    //TObjArray* xsec_param_norm_q2_true_bnd_high;
 	TObjArray* xsec_kinematic_type;
 	TVectorT<double> *xsec_kinematic_ub;
 	TVectorT<double> *xsec_kinematic_lb;
@@ -224,6 +236,8 @@ class covarianceXsec : public covarianceBase {
     std::vector<int> splineParsShareIndex;
     std::vector<int> splineParsShareToUniq;
 
+	// ETA - again, these can be removed soon as we get this info from a check
+	// against DetID
     // Number of functional parameter
     int nNearFuncParams;
     std::vector<std::string> NearfuncParsNames;
