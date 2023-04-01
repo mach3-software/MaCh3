@@ -15,6 +15,9 @@
 #define __unsigned_int__ unsigned int
 #endif
 
+//
+#define __TH2PolyOverflowBins__ 9
+
 // Include some healthy defines for constructors
 #define __BAD_DOUBLE__ -999.99
 #define __BAD_INT__ -999
@@ -39,6 +42,7 @@
 #include "unordered_map"
 #include "TH2Poly.h"
 #include "list"
+#include "TFile.h"
 
 // *******************
 // Template to make vector out of an array of any length
@@ -1184,6 +1188,9 @@ TH2Poly* NormalisePoly(TH2Poly* Histogram);
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
 // Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
+
+//KS: Sanity check for TH2Poly
+void CheckTH2PolyFileVersion(TFile *file);
 
 // Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {
