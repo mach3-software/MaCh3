@@ -1417,7 +1417,7 @@ void SMonolith::CalcSplineWeights() {
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (unsigned int splineNum = 0; splineNum < NSplines_valid; splineNum++)
+  for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
   {
     //Which Parameter we are accesing
     const short int Param = cpu_paramNo_arr[splineNum];
@@ -1566,7 +1566,7 @@ void SMonolith::ModifyWeights_GPU(){
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (unsigned int i = 0; i < NSplines_total; i++) {
+  for (unsigned int i = 0; i < NSplines_total; ++i) {
     if (index_cpu[i] >= 0) {
       cpu_weights[i] = cpu_weights_var[index_cpu[i]];
     } else {
