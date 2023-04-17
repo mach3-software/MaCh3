@@ -1135,7 +1135,7 @@ void MCMCProcessor::ScanInput() {
       }
     }
     //KS: as a bonus get LogL systeamtic
-    else if (bname.BeginsWith("LogL_sample_")) {
+    if (bname.BeginsWith("LogL_sample_")) {
       SampleName_v.push_back(bname);
       nSamples++;
     }
@@ -2077,19 +2077,21 @@ void MCMCProcessor::AutoCorrelation() {
   // The sum of (Y-Ymean)^2 over all steps for each parameter
   double **DenomSum = new double*[nDraw]();
   double **NumeratorSum = new double*[nDraw]();
-  for (int i = 0; i < nDraw; ++i) {
-    DenomSum[i] = new double[nLags];
-    NumeratorSum[i] = new double[nLags];
+  LagL = new double*[nDraw];
+  for (int j = 0; j < nDraw; ++j) {
+    DenomSum[j] = new double[nLags];
+    NumeratorSum[j] = new double[nLags];
+    LagL[j] = new double[nLags];
   }
   LagKPlots = new TH1D*[nDraw];
-
-  // Loop over the parameters of interacts
+  // Loop over the parameters of interest
   for (int j = 0; j < nDraw; ++j)
   {
     // Loop over each lag
     for (int k = 0; k < nLags; ++k) {
       NumeratorSum[j][k] = 0.0;
       DenomSum[j][k] = 0.0;
+      LagL[j][k] = 0.0;
     }
 
     // Make TH1Ds for each parameter which hold the lag
@@ -2183,6 +2185,7 @@ void MCMCProcessor::AutoCorrelation() {
   // Now fill the LagK auto-correlation plots
   for (int j = 0; j < nDraw; ++j) {
     for (int k = 0; k < nLags; ++k) {
+      LagL[j][k] = NumeratorSum[j][k]/DenomSum[j][k];
       LagKPlots[j]->SetBinContent(k, NumeratorSum[j][k]/DenomSum[j][k]);
     }
     AutoCorrDir->cd();
@@ -2190,19 +2193,24 @@ void MCMCProcessor::AutoCorrelation() {
     delete LagKPlots[j];
   }
   delete[] LagKPlots;
+
+
+  //KS: This is different diagnostic however it relies on calucated Lag, thus we call it before we delete LagKPlots
+  CalculateESS(nLags);
+
   for (int j = 0; j < nDraw; ++j) {
     delete[] NumeratorSum[j];
     delete[] DenomSum[j];
+    delete[] LagL[j];
   }
   delete[] NumeratorSum;
   delete[] DenomSum;
+  delete[] LagL;
   for (int i = 0; i < nEntries; ++i) {
     delete[] ParStep[i];
   }
   delete[] ParStep;
-  
-
-  delete ParamSums;
+  delete[] ParamSums;
 
   clock.Stop();
   std::cout << "It took " << clock.RealTime() << std::endl;
@@ -2287,6 +2295,64 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
                      DenomSum_gpu);
 }
 #endif
+
+
+// **************************
+// KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
+void MCMCProcessor::CalculateESS(const int nLags) {
+// **************************
+
+  if(LagL == NULL)
+  {
+    std::cerr<<"Trying to call CalculateESS before LagL was calcauted, this will not work"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  double* EffectiveSampleSize = new double[nDraw];
+  OutputFile->cd();
+  TDirectory *ESSDir = OutputFile->mkdir("ESS");
+  ESSDir->cd();
+  TTree* ESSTree = new TTree("ESS_tree", "ESS_tree");
+
+  // Loop over the parameters of interest
+  for (int j = 0; j < nDraw; ++j)
+  {
+    // Make TH1Ds for each parameter which hold the lag
+    TString Title = BranchNames[j];
+    double Nominal = 1.0;
+    double NominalError = 1.0;
+
+    GetNthParameter(j, Nominal, NominalError, Title);
+    std::string HistName = Form("%s_%s_ESS", Title.Data(), BranchNames[j].Data());
+
+    ESSTree->Branch(HistName.c_str(), &EffectiveSampleSize[j]);
+  }
+
+  double *TempDenominator = new double[nDraw]();
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  //KS: Calculate ESS for each parameter
+  for (int j = 0; j < nDraw; ++j)
+  {
+    //KS: Firs sum over all Calculated autoceralations
+    for (int k = 0; k < nLags; ++k)
+    {
+      TempDenominator[j] += LagL[j][k];
+    }
+    TempDenominator[j] = 1+2*TempDenominator[j];
+    EffectiveSampleSize[j] = nEntries/TempDenominator[j];
+  }
+
+  //KS Write to the output tree
+  ESSTree->Fill();
+  ESSTree->Write();
+
+  delete ESSTree;
+  //KS Remove auxilarry arrays
+  delete[] EffectiveSampleSize;
+  delete[] TempDenominator;
+}
 
 // **************************
 // Batched means, literally read from an array and chuck into TH1D

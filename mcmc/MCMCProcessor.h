@@ -143,6 +143,7 @@ class MCMCProcessor {
     inline void PrepareDiagMCMC();
     inline void ParamTraces();
     inline void AutoCorrelation();
+    inline void CalculateESS(const int nLags);
     inline void BatchedMeans();
     inline void AcceptanceProbabilities();
     
@@ -250,6 +251,7 @@ class MCMCProcessor {
     double **ParamValues;
     double *ParamSums;
     double **BatchedAverages;
+    double **LagL;
 
     // Holds the sample values
     double **SampleValues;
