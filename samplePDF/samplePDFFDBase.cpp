@@ -228,8 +228,6 @@ void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *
 
   MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar[0])),asin(sqrt(oscpar[2])), asin(sqrt(oscpar[1])), oscpar[5], nutype);
   MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar[3], oscpar[4]);
-  MCSamples[sample].Oscillator->setPathLength(oscpar[7]);
-  MCSamples[sample].Oscillator->setDensity(oscpar[8]);
   MCSamples[sample].Oscillator->calculateProbabilities(MCSamples[sample].NeutrinoType);
   MCSamples[sample].Oscillator->getProbabilityArr(w, MCSamples[sample].ProbType);
 }
@@ -828,7 +826,9 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
 //LW 
 //Setup chosen oscillation calculator for each subsample
-void samplePDFFDBase::SetupOscCalc()
+//Default Baseline Implementation
+//Add your own implementation in experiment specific SamplePDF Class if necessary!!
+void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 {
 
   Beta=1;
@@ -846,17 +846,23 @@ void samplePDFFDBase::SetupOscCalc()
 
 #if not defined (USE_PROB3)
     std::vector<double> etruVector(*(MCSamples[iSample].rw_etru), *(MCSamples[iSample].rw_etru) + MCSamples[iSample].nEvents);
-    MCSamples[iSample].ProbType = GetCUDAProbFlavour(MCSamples[iSample].nutype, MCSamples[iSample].oscnutype);
+    MCSamples[iSample].ProbType = SwitchToCUDAProbType(GetCUDAProbFlavour(MCSamples[iSample].nutype, MCSamples[iSample].oscnutype));
     if (MCSamples[iSample].nutype < 0) {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Antineutrino;}
     else {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Neutrino;}
 #if defined (CPU_ONLY)
 #if defined (MULTITHREAD)
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, std::atoi(std::getenv("OMP_NUM_THREADS")));
+  MCSamples[iSample].Oscillator->setPathLength(PathLength);
+  MCSamples[iSample].Oscillator->setDensity(Density);
 #else
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
+  MCSamples[iSample].Oscillator->setPathLength(PathLength);
+  MCSamples[iSample].Oscillator->setDensity(Density);
 #endif //MULTITHREAD
 #else
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, MCSamples[iSample].nEvents);
+    MCSamples[iSample].Oscillator->setPathLength(PathLength);
+    MCSamples[iSample].Oscillator->setDensity(Density);
 #endif // CPU_ONLY
     MCSamples[iSample].Oscillator->setEnergyList(etruVector);
 #endif // USE_PROB3
@@ -1372,50 +1378,23 @@ double samplePDFFDBase::GetLikelihood()
   }
   return negLogL;
 }
-
-  // ************************************************
-  // Get CUDAProb3 flavour from intital and final states
-  inline cudaprob3::ProbType samplePDFFDBase::GetCUDAProbFlavour(int nu_i, int nu_f) {
-  //*************************************************  
-    
-    switch (abs(nu_i)) {
-    case 1:
-      switch (abs(nu_f)) {
-      case 1:
-        return cudaprob3::ProbType::e_e;
-        break;
-      case 2:
-        return cudaprob3::ProbType::e_m;
-        break;
-      case 3:
-        return cudaprob3::ProbType::e_t;
-        break;
-      } 
-    case 2:
-      switch (abs(nu_f)) {
-      case 1:
-        return cudaprob3::ProbType::m_e;
-        break;
-      case 2:
-        return cudaprob3::ProbType::m_m;
-        break;
-      case 3:
-        return cudaprob3::ProbType::m_t;
-        break;
-      } 
-    case 3:
-      switch (abs(nu_f)) {
-      case 1:
-        return cudaprob3::ProbType::t_e;
-        break;
-      case 2:
-        return cudaprob3::ProbType::t_m;
-        break;
-      case 3:
-        return cudaprob3::ProbType::t_t;
-        break;
-      }
-    }
-
+ 
+ 
+// ************************************************
+// Switch from MaCh3 CUDAProb flavour to CUDAProb Probtype
+inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu) {
+//*************************************************  
+  switch(CUDAProb_nu)
+  {	
+    case CUDAProb_nu::e_e : return cudaprob3::ProbType::e_e;
+    case CUDAProb_nu::e_m : return cudaprob3::ProbType::e_m;
+    case CUDAProb_nu::e_t : return cudaprob3::ProbType::e_m;
+    case CUDAProb_nu::m_e : return cudaprob3::ProbType::m_e;
+    case CUDAProb_nu::m_m : return cudaprob3::ProbType::m_m;
+    case CUDAProb_nu::m_t : return cudaprob3::ProbType::m_t;
+    case CUDAProb_nu::t_e : return cudaprob3::ProbType::t_e;
+    case CUDAProb_nu::t_m : return cudaprob3::ProbType::t_m;
+    case CUDAProb_nu::t_t : return cudaprob3::ProbType::t_t;
+  }
 }
 

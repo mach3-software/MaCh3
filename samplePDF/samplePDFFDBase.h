@@ -126,6 +126,10 @@ public:
 
   virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
 
+
+  // LW - Setup Osc 
+  void virtual SetupOscCalc(double PathLength, double Density);
+
  protected:
 
 
@@ -144,8 +148,6 @@ public:
   //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
 
   void fillSplineBins();
-
-  void SetupOscCalc();
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();
@@ -195,11 +197,10 @@ public:
 #endif
   void fillArray();
 
-  inline cudaprob3::ProbType GetCUDAProbFlavour(int nu_i, int nu_f);
-
   // Helper function to reset histograms
   inline void ResetHistograms();
-      
+  
+  inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
   //===============================================================================
   //DB Variables required for GetLikelihood
   //
