@@ -23,6 +23,7 @@ if(NOT ${CPU_ONLY})
   set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
   set_property(TARGET probGpu SamplePDF PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
   target_link_libraries(SamplePDF probGpu)
+  target_compile_options(SamplePDF PUBLIC -DGPU_ON)
 endif()
 
 set_target_properties(SamplePDF PROPERTIES 
