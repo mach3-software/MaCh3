@@ -2317,7 +2317,6 @@ void MCMCProcessor::CalculateESS(const int nLags) {
   // Loop over the parameters of interest
   for (int j = 0; j < nDraw; ++j)
   {
-    // Make TH1Ds for each parameter which hold the lag
     TString Title = BranchNames[j];
     double Nominal = 1.0;
     double NominalError = 1.0;
@@ -2335,6 +2334,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
   //KS: Calculate ESS for each parameter
   for (int j = 0; j < nDraw; ++j)
   {
+    TempDenominator[j] = 0.;
     //KS: Firs sum over all Calculated autoceralations
     for (int k = 0; k < nLags; ++k)
     {
@@ -2349,7 +2349,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
   ESSTree->Write();
 
   delete ESSTree;
-  //KS Remove auxilarry arrays
+  //KS Remove auxiliary arrays
   delete[] EffectiveSampleSize;
   delete[] TempDenominator;
 }
