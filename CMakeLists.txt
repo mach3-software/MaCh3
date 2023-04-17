@@ -55,7 +55,7 @@ if (${CPU_ONLY})
   CPMFindPackage(
       NAME CUDAProb3
       GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-      GIT_TAG "main"
+      GIT_TAG "feature_cleanup"
   )
 
 else()
@@ -63,8 +63,8 @@ else()
   CPMFindPackage(
       NAME CUDAProb3
       GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-      GIT_TAG "main"
-	  OPTIONS "GPU_ON=ON"
+      GIT_TAG "feature_cleanup"
+	  OPTIONS "GPU_ON ON"
   )
 
 endif()
