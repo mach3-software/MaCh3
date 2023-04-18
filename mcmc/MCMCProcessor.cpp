@@ -54,6 +54,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   plotRelativeToPrior = false;
   printToPDF = false;
   plotBinValue = false;
+  PlotFlatPrior = true;
   CacheMCMCM = false;
   FancyPlotNames = true;
   doDiagMCMC = false;
@@ -74,6 +75,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   ParamCentral.resize(kNParameterEnum);
   ParamNom.resize(kNParameterEnum);
   ParamErrors.resize(kNParameterEnum);
+  ParamFlat.resize(kNParameterEnum);
   ParamTypeStartPos.resize(kNParameterEnum);
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
@@ -1270,37 +1272,43 @@ TH1D* MCMCProcessor::MakePrefit() {
   {
     //Those keep which parameter type we run currently and realtive number  
     int ParamNo = __UNDEF__;
-    int ParamEnu = __UNDEF__;
+    int ParamEnum = __UNDEF__;
     for(int ik = 0; ik < kNParameterEnum; ik++)
     {
         if (ParamType[i] == ParameterEnum(ik)) 
         {
             ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
-            ParamEnu = ParameterEnum(ik);
+            ParamEnum = ParameterEnum(ik);
         }
     }
-    CentralValueTemp = ParamCentral[ParamEnu][ParamNo];
+    CentralValueTemp = ParamCentral[ParamEnum][ParamNo];
     if(plotRelativeToPrior) 
     {
         // Normalise the prior relative the nominal/prior, just the way we get our fit results in MaCh3
         if ( CentralValueTemp != 0)
         {
-            Central = ParamCentral[ParamEnu][ParamNo] / CentralValueTemp;
-            Error = ParamErrors[ParamEnu][ParamNo]/CentralValueTemp;
+            Central = ParamCentral[ParamEnum][ParamNo] / CentralValueTemp;
+            Error = ParamErrors[ParamEnum][ParamNo]/CentralValueTemp;
         } else 
         {
             Central = CentralValueTemp + 1.0;
-            Error = ParamErrors[ParamEnu][ParamNo];
+            Error = ParamErrors[ParamEnum][ParamNo];
         }
     }
     else
     {
         Central = CentralValueTemp;
-        Error = ParamErrors[ParamEnu][ParamNo]; 
+        Error = ParamErrors[ParamEnum][ParamNo];
     }
+    //KS: If plotting error for param with flatp prior is turned off and given param really has flat prior set error to 0
+    if(!PlotFlatPrior && ParamFlat[ParamEnum][ParamNo])
+    {
+      Error = 0.;
+    }
+
     PreFitPlot->SetBinContent(i+1, Central);
     PreFitPlot->SetBinError(i+1, Error);
-    PreFitPlot->GetXaxis()->SetBinLabel(i+1, ParamNames[ParamEnu][ParamNo]);
+    PreFitPlot->GetXaxis()->SetBinLabel(i+1, ParamNames[ParamEnum][ParamNo]);
   }
   PreFitPlot->SetDirectory(0);
 
@@ -1444,13 +1452,14 @@ void MCMCProcessor::ReadXSecFile() {
   TMatrixT<double> *XSecID = (TMatrixD*)(XSecFile->Get("xsec_param_id"));
   // Names
   TObjArray* xsec_param_names = (TObjArray*)(XSecFile->Get("xsec_param_names"));
-
+  //Flat prior
+  TVectorD* flat_prior = (TVectorD*)(XSecFile->Get("xsec_flat_prior"));
   // Now make a TH1D of it
   ParamNames[kXSecPar].reserve(nParam[kXSecPar]);
   ParamCentral[kXSecPar].reserve(nParam[kXSecPar]);
   ParamNom[kXSecPar].reserve(nParam[kXSecPar]);
   ParamErrors[kXSecPar].reserve(nParam[kXSecPar]);
-
+  ParamFlat[kXSecPar].reserve(nParam[kXSecPar]);
   for (int i = 0; i < nParam[kXSecPar]; ++i) {
 
     // Push back the name
@@ -1466,6 +1475,7 @@ void MCMCProcessor::ReadXSecFile() {
     ParamCentral[kXSecPar].push_back( ((*XSecPrior)(i)) );
     ParamNom[kXSecPar].push_back( ((*XSecNominal)(i)) );
     ParamErrors[kXSecPar].push_back( sqrt((*XSecMatrix)(i,i)) );
+    ParamFlat[kXSecPar].push_back( (bool)(*flat_prior)(i) );
   }
 
   XSecFile->Close();
@@ -1502,7 +1512,7 @@ void MCMCProcessor::ReadND280File() {
     ParamCentral[kND280Par].reserve(nParam[kND280Par]);
     ParamNom[kND280Par].reserve(nParam[kND280Par]);
     ParamErrors[kND280Par].reserve(nParam[kND280Par]);
-
+    ParamFlat[kND280Par].reserve(nParam[kND280Par]);
     for (int i = 0; i < nParam[kND280Par]; ++i) 
     {
         ParamNom[kND280Par].push_back( (*NDdetNominal)(i) );
@@ -1510,6 +1520,8 @@ void MCMCProcessor::ReadND280File() {
         
         ParamErrors[kND280Par].push_back( sqrt((*NDdetMatrix)(i,i)) );
         ParamNames[kND280Par].push_back( Form("ND Det %i", i) );
+        //KS: Currently we can only set it via config, change it in future
+        ParamFlat[kND280Par].push_back( false );
     }  
 
     for (int j = 0; j <det_poly->GetLast()+1; ++j)
@@ -1549,12 +1561,12 @@ void MCMCProcessor::ReadFDFile() {
     FDdetFile->cd();
     
     TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
-    
+
     ParamNames[kFDDetPar].reserve(nParam[kFDDetPar]);
     ParamCentral[kFDDetPar].reserve(nParam[kFDDetPar]);
     ParamNom[kFDDetPar].reserve(nParam[kFDDetPar]);
     ParamErrors[kFDDetPar].reserve(nParam[kFDDetPar]);
-
+    ParamFlat[kFDDetPar].reserve(nParam[kFDDetPar]);
     for (int i = 0; i < nParam[kFDDetPar]; ++i) 
     {
         //KS: FD parameters start at 1. in contrary to ND280
@@ -1563,6 +1575,9 @@ void MCMCProcessor::ReadFDFile() {
         
         ParamErrors[kFDDetPar].push_back( sqrt((*FDdetMatrix)(i,i)) );
         ParamNames[kFDDetPar].push_back( Form("FD Det %i", i) );
+
+        //KS: Currently we can only set it via config, change it in future
+        ParamFlat[kFDDetPar].push_back( false );
     }  
     //KS: The last parameter is p scale
     if(FancyPlotNames) ParamNames[kFDDetPar].back() = "Momentum Scale";
@@ -1594,7 +1609,13 @@ void MCMCProcessor::ReadOSCFile() {
     //KS: Osc nominal we can also set via config so there is danger that this will nor corrspond to what was used in the fit
     TVectorD *OscNominal = (TVectorD*)(OscFile->Get("osc_nom"));
     TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
+    TVectorD* osc_flat_prior = (TVectorD*)OscFile->Get("osc_flat_prior");
 
+    ParamNom[kOSCPar].reserve(nParam[kOSCPar]);
+    ParamCentral[kOSCPar].reserve(nParam[kOSCPar]);
+    ParamErrors[kOSCPar].reserve(nParam[kOSCPar]);
+    ParamNames[kOSCPar].reserve(nParam[kOSCPar]);
+    ParamFlat[kOSCPar].reserve(nParam[kOSCPar]);
     for (int i = 0; i < nParam[kOSCPar]; ++i) 
     {
         ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
@@ -1604,6 +1625,8 @@ void MCMCProcessor::ReadOSCFile() {
         // Push back the name
         std::string TempString = std::string(((TObjString*)osc_param_names->At(i))->GetString());
         ParamNames[kOSCPar].push_back(TempString);
+
+        ParamFlat[kOSCPar].push_back( (bool)((*osc_flat_prior)(i)) );
     }  
 
     OscFile->Close();

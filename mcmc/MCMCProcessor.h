@@ -105,6 +105,7 @@ class MCMCProcessor {
 
     void GetNthParameter(int param, double &Nominal, double &NominalError, TString &Title);
     
+    //KS: Many setters which in future will be loaded via config
     // Set the step cutting
     // Either by string
     void SetStepCut(std::string Cuts);
@@ -117,7 +118,9 @@ class MCMCProcessor {
     void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
     void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
     void SetPlotDet(bool PlotOrNot){PlotDet = PlotOrNot; };
+    void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
     void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
+    void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
       
     void SetnBatches(int Batches){nBatches = Batches; };
     void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
@@ -171,6 +174,7 @@ class MCMCProcessor {
     std::vector<std::vector<double>>  ParamCentral;
     std::vector<std::vector<double>>  ParamNom;
     std::vector<std::vector<double>>  ParamErrors;
+    std::vector<std::vector<bool>>    ParamFlat;
     // Make an enum for which class this parameter belongs to so we don't have to keep string comparing
     std::vector<ParameterEnum> ParamType;
     //KS: in MCMC output there is order of parameters so for example first goes xsec then nd det etc.
@@ -189,6 +193,7 @@ class MCMCProcessor {
 
     bool PlotXSec;
     bool PlotDet;
+    bool PlotFlatPrior;
 
     bool MakeCorr;
     bool MakeOnlyXsecCorr;
