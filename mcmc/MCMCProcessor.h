@@ -103,8 +103,10 @@ class MCMCProcessor {
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
 
-    void GetNthParameter(int param, double &Nominal, double &NominalError, TString &Title);
+    void GetNthParameter(const int param, double &Nominal, double &NominalError, TString &Title);
     
+    int GetnEntries(){return nEntries;};
+    int GetnSteps(){return nSteps;};
     //KS: Many setters which in future will be loaded via config
     // Set the step cutting
     // Either by string
@@ -163,7 +165,9 @@ class MCMCProcessor {
     std::string StepCut;
     int BurnInCut;
     int nBranches;
+    //KS: For merged chains number of entires will be different fron nSteps
     int nEntries;
+    int nSteps;
     int nSamples;
     int nSysts;
 
@@ -234,7 +238,7 @@ class MCMCProcessor {
     TMatrixDSym *Covariance;
     TMatrixDSym *Correlation;
 
-    bool CacheMCMCM;
+    bool CacheMCMC;
     bool doDiagMCMC;
     // Holds Posterior Distributions
     TH1D **hpost;
@@ -242,9 +246,7 @@ class MCMCProcessor {
     
     double** ParStep = NULL;
     int* StepNumber = NULL;
-    
-    double* Min_Chain;
-    double* Max_Chain;
+
     // Number of bins
     int nBins;
     // Drawrange for SetMaximum
@@ -253,7 +255,6 @@ class MCMCProcessor {
     int nBatches;
     
     // Holds all the parameter variations
-    double **ParamValues;
     double *ParamSums;
     double **BatchedAverages;
     double **LagL;

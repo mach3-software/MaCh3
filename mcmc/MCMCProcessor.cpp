@@ -55,7 +55,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   printToPDF = false;
   plotBinValue = false;
   PlotFlatPrior = true;
-  CacheMCMCM = false;
+  CacheMCMC = false;
   FancyPlotNames = true;
   doDiagMCMC = false;
   OutputSuffix = "_Process";
@@ -63,6 +63,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nDraw = 0;
   nFlux = 0;
   nEntries = 0;
+  nSteps = 0;
   nBatches = 0;
   nSysts = 0;
   nSamples = 0;
@@ -96,7 +97,7 @@ MCMCProcessor::~MCMCProcessor() {
   // Close the pdf file
   std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
   CanvasName += "]";
-  if(printToPDF) Posterior->Print(CanvasName);
+  Posterior->Print(CanvasName);
   if (Posterior != NULL)  delete Posterior;
 
   delete Gauss;
@@ -112,9 +113,9 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive; 
   delete Errors_HPD_Negative; 
   
-  if(CacheMCMCM)
+  if(CacheMCMC)
   {
-      for (int i = 0; i < nDraw; ++i) 
+    for (int i = 0; i < nDraw; ++i) 
     {
         for (int j = 0; j < nDraw; ++j) 
         {
@@ -124,12 +125,11 @@ MCMCProcessor::~MCMCProcessor() {
         delete[] hpost2D[i];
     }
 
-    delete[] ParStep; 
-    delete[] Min_Chain;
-    delete[] Max_Chain;
+    delete[] ParStep;
     delete[] hpost;
     delete[] hpost2D;
   }
+
   if (OutputFile != NULL) OutputFile->Close();
   if (OutputFile != NULL) delete OutputFile;
   delete Chain;
@@ -185,9 +185,10 @@ void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
   if(MakeOnlyXsecCorr) std::cout<<"Will plot only xsec covariance"<<std::endl;
   if(MakeOnlyXsecCorrFlux) std::cout<<"Will plot only xsec covariances and flux"<<std::endl;
 
-  MakeCovariance();
-  Cov = Covariance;
-  Corr = Correlation;
+  if (CacheMCMC) MakeCovariance_MP();
+  else MakeCovariance();
+  Cov = (TMatrixDSym*)Covariance->Clone();
+  Corr = (TMatrixDSym*)Correlation->Clone();
 }
 
 // ***************
@@ -783,7 +784,9 @@ void MCMCProcessor::MakeCovariance() {
 //KS: Cache all steps to allow multithreading, hit RAM quite a bit
 void MCMCProcessor::CacheSteps() {
 // ***************
-    CacheMCMCM = true;
+    if(CacheMCMC == true) continue;
+    
+    CacheMCMC = true;
     std::cout << "Caching input tree..." << std::endl;
     TStopwatch clock;
     clock.Start();
@@ -791,20 +794,12 @@ void MCMCProcessor::CacheSteps() {
     ParStep = new double*[nDraw];
     StepNumber = new int[nEntries];
     
-    Min_Chain = new double[nDraw];
-    Max_Chain= new double[nDraw];
-    
     hpost2D = new TH2D**[nDraw]();
 
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
     for (int i = 0; i < nDraw; ++i) 
     {
         ParStep[i] = new double[nEntries];
         hpost2D[i] = new TH2D*[nDraw]();
-        Min_Chain[i] = -999.99;
-        Max_Chain[i] = -999.99;
 
         for (int j = 0; j < nEntries; ++j) 
         {
@@ -813,6 +808,7 @@ void MCMCProcessor::CacheSteps() {
             if(i == 0) StepNumber[j] = -999.99;
         }
     }
+
     // Set all the branches to off
     Chain->SetBranchStatus("*", false);
     
@@ -847,12 +843,30 @@ void MCMCProcessor::CacheSteps() {
     // Cache max and min in chain for covariance matrix
     for (int i = 0; i < nDraw; ++i) 
     {
-        Min_Chain[i] = Chain->GetMinimum(BranchNames[i]);
-        Max_Chain[i] = Chain->GetMaximum(BranchNames[i]);
+        double Min_Chain_i = Chain->GetMinimum(BranchNames[i]);
+        double Max_Chain_i = Chain->GetMaximum(BranchNames[i]);
+        
+        TString Title_i = BranchNames[i];
+        double Nominal_i, NominalError_i;
+        GetNthParameter(i, Nominal_i, NominalError_i, Title_i);
+        
         for (int j = 0; j <= i; ++j)
         {
+            double Min_Chain_j = Chain->GetMinimum(BranchNames[j]);
+            double Max_Chain_j = Chain->GetMaximum(BranchNames[j]);
+        
+            
             // TH2D to hold the Correlation 
-            hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain[i], Max_Chain[i], nBins, Min_Chain[j], Max_Chain[j]);
+            hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain_i, Max_Chain_i, nBins, Min_Chain_j, Max_Chain_j);
+            
+            TString Title_j = BranchNames[j];
+            double Nominal_j, NominalError_j;
+            GetNthParameter(j, Nominal_j, NominalError_j, Title_j);
+        
+            hpost2D[i][j]->SetMinimum(0);
+            hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
+            hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);
+            hpost2D[i][j]->GetZaxis()->SetTitle("Steps");
         }
     }
         
@@ -868,6 +882,8 @@ void MCMCProcessor::MakeCovariance_MP() {
     
   if (OutputFile == NULL) MakeOutputFile();
     
+  if(!CacheMCMC) CacheSteps();
+  
   int covBinning = nDraw;
   //If we only plot correlation/covariance between xsec (without flux)
   if(MakeOnlyXsecCorr)
@@ -901,11 +917,7 @@ clock.Start();
 #pragma omp parallel for
 #endif
 for (int i = 0; i < covBinning; ++i) 
-{
-    TString Title_i = BranchNames[i];
-    double Nominal_i, NominalError_i;
-    GetNthParameter(i, Nominal_i, NominalError_i, Title_i);
-    
+{    
     for (int j = 0; j <= i; ++j)
     {
         // Skip the diagonal elements which we've already done above
@@ -919,17 +931,7 @@ for (int i = 0; i < covBinning; ++i)
             (*Correlation)(j,i) = (*Correlation)(i,j);
             continue;
         }
-      
-        TString Title_j = BranchNames[j];
-        double Nominal_j, NominalError_j;
-        GetNthParameter(j, Nominal_j, NominalError_j, Title_j);
-      
-        //OutputFile->cd();
-
         hpost2D[i][j]->SetMinimum(0);
-        hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
-        hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);
-        hpost2D[i][j]->GetZaxis()->SetTitle("Steps");
             
         for (int k = 0; k < nEntries; ++k) 
         {
@@ -945,25 +947,6 @@ for (int i = 0; i < covBinning; ++i)
 
         (*Correlation)(i,j) = hpost2D[i][j]->GetCorrelationFactor();
         (*Correlation)(j,i) = (*Correlation)(i,j);
-
-        /*
-        if(printToPDF)
-        {
-            //KS: Skip Flux Params
-            if(IsXsec[j] && IsXsec[i])
-            {
-                hpost2D->Draw("colz");
-                Posterior->SetName(hpost2D->GetName());
-                Posterior->SetTitle(hpost2D->GetTitle());
-                Posterior->Print(CanvasName);
-            }
-        }
-        */
-        // Write it to root file
-        //OutputFile->cd();
-        //hpost2D->Write();
-
-        //delete hpost2D;
     }// End j loop
 }// End i loop
 
@@ -1165,9 +1148,10 @@ void MCMCProcessor::ScanInput() {
   std::cout << "# Osc params:   " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   << std::endl;
   std::cout << "************************************************" << std::endl;
 
-
+  
+  nSteps = Chain->GetMaximum("step")/5;
   // Set the step cut to be 20%
-  int cut = Chain->GetMaximum("step")/5;
+  int cut = nSteps/5;
   SetStepCut(cut);
 }
 
@@ -1769,7 +1753,7 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, int i) {
 
 // ***************
 // Pass central value
-void MCMCProcessor::GetNthParameter(int param, double &Nominal, double &NominalError, TString &Title){
+void MCMCProcessor::GetNthParameter(const int param, double &Nominal, double &NominalError, TString &Title){
 // **************************
     for(int i = 0; i < kNParameterEnum; i++)
     {
@@ -1787,7 +1771,7 @@ void MCMCProcessor::GetNthParameter(int param, double &Nominal, double &NominalE
 
 
 // **************************************************
-// Helper function to reset  histograms
+// Helper function to reset histograms
 void MCMCProcessor::ResetHistograms() {
 // **************************************************
     #ifdef MULTITHREAD
@@ -1984,7 +1968,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
 
   // And make our sweet output file
   if (OutputFile == NULL) MakeOutputFile();
-  
 }
 
 
@@ -2191,7 +2174,6 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] DenomSum_cpu;
   delete[] ParStep_cpu;
   delete[] ParamSums_cpu;
-
 
   //KS: Delete stuff at GPU as well
   CleanupGPU_AutoCorr(
@@ -2449,7 +2431,6 @@ void MCMCProcessor::AcceptanceProbabilities() {
       BatchedAcceptanceProblot->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
   }
   
-  
 #ifdef MULTITHREAD
   std::cout << "Using multi-threading..." << std::endl;
 #pragma omp parallel for
@@ -2464,9 +2445,11 @@ void MCMCProcessor::AcceptanceProbabilities() {
   
   AcceptanceProbPlot->Write();
   BatchedAcceptanceProblot->Write();
-  
+    
   delete AcceptanceProbPlot;  
   delete BatchedAcceptanceProblot; 
+  delete[] AccProbValues;
+  delete[] AccProbBatchedAverages;
 }
 
 
