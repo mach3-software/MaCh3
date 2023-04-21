@@ -784,7 +784,7 @@ void MCMCProcessor::MakeCovariance() {
 //KS: Cache all steps to allow multithreading, hit RAM quite a bit
 void MCMCProcessor::CacheSteps() {
 // ***************
-    if(CacheMCMC == true) continue;
+    if(CacheMCMC == true) return;
     
     CacheMCMC = true;
     std::cout << "Caching input tree..." << std::endl;
