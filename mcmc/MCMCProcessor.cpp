@@ -787,7 +787,8 @@ void MCMCProcessor::CacheSteps() {
     if(CacheMCMC == true) return;
     
     CacheMCMC = true;
-    std::cout << "Caching input tree..." << std::endl;
+    std::cout << "Caching input tree..." << std::endl;    
+    std::cout << "Allocating " << (sizeof(double)*nDraw*nEntries)/1.E6 << " MB" << std::endl;
     TStopwatch clock;
     clock.Start();
     
@@ -871,7 +872,7 @@ void MCMCProcessor::CacheSteps() {
     }
         
     clock.Stop();
-    std::cout << "Caching steps took " << clock.RealTime() << "s to finish for " << nEntries << " events" << std::endl;
+    std::cout << "Caching steps took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
 }
 
 
@@ -945,17 +946,44 @@ for (int i = 0; i < covBinning; ++i)
         (*Covariance)(i,j) = hpost2D[i][j]->GetCovariance();
         (*Covariance)(j,i) = (*Covariance)(i,j);
 
+        //KS: Since we already have covariance consider calcaulating correlation using it, right now we effectively calcaualte covariance twice
+        //https://root.cern.ch/doc/master/TH2_8cxx_source.html#l01099
         (*Correlation)(i,j) = hpost2D[i][j]->GetCorrelationFactor();
         (*Correlation)(j,i) = (*Correlation)(i,j);
     }// End j loop
 }// End i loop
 
 clock.Stop();
-std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for " << nEntries << " events" << std::endl;
+std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
     
-  OutputFile->cd();
-  Covariance->Write("Covariance");
-  Correlation->Write("Correlation");
+    OutputFile->cd();
+    if(printToPDF)
+    {
+        for (int i = 0; i < covBinning; ++i) 
+        {    
+            for (int j = 0; j <= i; ++j)
+            {
+                // Skip the diagonal elements which we've already done above
+                if (j == i) continue;
+                if (IamVaried[j] == false) continue;
+        
+                if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
+                {
+                    //KS: Skip Flux Params
+                    if(IsXsec[j] && IsXsec[i])
+                    {
+                        hpost2D[i][j]->Draw("colz");
+                        Posterior->SetName(hpost2D[i][j]->GetName());
+                        Posterior->SetTitle(hpost2D[i][j]->GetTitle());
+                        Posterior->Print(CanvasName);
+                    }
+                }
+                //hpost2D[i][j]->Write();
+            }// End j loop
+        }// End i loop
+    } //end if pdf
+    Covariance->Write("Covariance");
+    Correlation->Write("Correlation");
 }
 
 // *********************
@@ -1954,7 +1982,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
 
   clock.Stop();
 
-  std::cout << "Took " << clock.RealTime() << "s to finish caching statistic for Diag MCMC with " << nEntries << " events" << std::endl;
+  std::cout << "Took " << clock.RealTime() << "s to finish caching statistic for Diag MCMC with " << nEntries << " steps" << std::endl;
 
   // Make the sums into average
   for (int i = 0; i < nDraw; ++i) {
