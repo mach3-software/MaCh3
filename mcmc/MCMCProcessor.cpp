@@ -760,6 +760,7 @@ void MCMCProcessor::MakeCovariance() {
           {
           if(IsXsec[j] && IsXsec[i])
           {
+              Posterior->cd();
               hpost_2D->Draw("colz");
               Posterior->SetName(hpost_2D->GetName());
               Posterior->SetTitle(hpost_2D->GetTitle());
@@ -959,6 +960,7 @@ std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for "
     OutputFile->cd();
     if(printToPDF)
     {
+        Posterior->cd();
         for (int i = 0; i < covBinning; ++i) 
         {    
             for (int j = 0; j <= i; ++j)
