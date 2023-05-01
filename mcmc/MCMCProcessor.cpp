@@ -45,10 +45,31 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
 
   std::cout << "Making post-fit processor for " << MCMCFile << std::endl;
 
+  ParStep = NULL;
+  StepNumber = NULL;
+    
   Posterior = NULL;
+  hpost = NULL;
+  hpost2D = NULL;
+  hviolin = NULL;
   
+  ParamSums = NULL;
+  BatchedAverages = NULL;
+  LagL = NULL;
+  SampleValues = NULL;
+  SystValues = NULL;
+  AccProbValues = NULL;
+  AccProbBatchedAverages = NULL;
+  TraceParamPlots = NULL;
+  TraceSamplePlots = NULL;
+  TraceSystsPlots = NULL;
+  BatchedParamPlots = NULL;
+  LagKPlots = NULL;
+  AcceptanceProbPlot = NULL;
+  BatchedAcceptanceProblot = NULL;
+    
   //KS:Hardcoded should be a way to get it via config or something
-  PlotDet = true;
+  PlotDet = false;
   MakeOnlyXsecCorr = false;
   MakeOnlyXsecCorrFlux = false;
   plotRelativeToPrior = false;
@@ -56,6 +77,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   plotBinValue = false;
   PlotFlatPrior = true;
   CacheMCMC = false;
+  ApplySmoothing = true;
   FancyPlotNames = true;
   doDiagMCMC = false;
   OutputSuffix = "_Process";
@@ -87,6 +109,19 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
      nParam[i] = 0;
      CovPos[i] = "";
   }
+  //Only if GPU is enabled
+  #ifdef CUDA
+   ParStep_cpu = NULL;
+   NumeratorSum_cpu = NULL;
+   ParamSums_cpu = NULL;
+   DenomSum_cpu = NULL;
+
+   ParStep_gpu = NULL;
+   NumeratorSum_gpu = NULL;
+   ParamSums_gpu = NULL;
+   DenomSum_gpu = NULL;
+  #endif
+    
 }
 
 // ****************************
@@ -97,7 +132,7 @@ MCMCProcessor::~MCMCProcessor() {
   // Close the pdf file
   std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
   CanvasName += "]";
-  Posterior->Print(CanvasName);
+  if(printToPDF) Posterior->Print(CanvasName);
   if (Posterior != NULL)  delete Posterior;
 
   delete Gauss;
@@ -113,6 +148,14 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive; 
   delete Errors_HPD_Negative; 
   
+  if(hpost != NULL)
+  {
+    for (int i = 0; i < nDraw; ++i) 
+    {
+        delete hpost[i];
+    }
+      delete[] hpost;
+  }
   if(CacheMCMC)
   {
     for (int i = 0; i < nDraw; ++i) 
@@ -124,12 +167,11 @@ MCMCProcessor::~MCMCProcessor() {
         delete[] ParStep[i];
         delete[] hpost2D[i];
     }
-
     delete[] ParStep;
-    delete[] hpost;
+    
     delete[] hpost2D;
   }
-
+  if(hviolin != NULL) delete hviolin;
   if (OutputFile != NULL) OutputFile->Close();
   if (OutputFile != NULL) delete OutputFile;
   delete Chain;
@@ -264,7 +306,7 @@ void MCMCProcessor::MakePostfit() {
     // Project BranchNames[i] onto hpost, applying stepcut
     Chain->Project(BranchNames[i], BranchNames[i], StepCut.c_str());
 
-    hpost[i]->Smooth();
+    if(ApplySmoothing) hpost[i]->Smooth();
 
     for(int ik = 0; ik < kNParameterEnum; ik++)
     {
@@ -366,18 +408,28 @@ void MCMCProcessor::MakePostfit() {
   TTree *SettingsBranch = new TTree("Settings", "Settings");
   int CrossSectionParameters = nParam[kXSecPar];
   SettingsBranch->Branch("CrossSectionParameters", &CrossSectionParameters);
+  int CrossSectionParametersStartingPos = ParamTypeStartPos[kXSecPar];
+  SettingsBranch->Branch("CrossSectionParametersStartingPos", &CrossSectionParametersStartingPos);
   int FluxParameters = nFlux;
   SettingsBranch->Branch("FluxParameters", &FluxParameters);
+  
   int NDParameters = nParam[kND280Par];
   SettingsBranch->Branch("NDParameters", &NDParameters);
+  int NDParametersStartingPos = ParamTypeStartPos[kND280Par];
+  SettingsBranch->Branch("NDParametersStartingPos", &NDParametersStartingPos);
+
   int FDParameters = nParam[kFDDetPar];
   SettingsBranch->Branch("FDParameters", &FDParameters);
+  int FDParametersStartingPos = ParamTypeStartPos[kFDDetPar];
+  SettingsBranch->Branch("FDParametersStartingPos", &FDParametersStartingPos);
+  
   int OscParameters = nParam[kOSCPar];
   SettingsBranch->Branch("OscParameters", &OscParameters);
-
+  int OscParametersStartingPos = ParamTypeStartPos[kOSCPar];
+  SettingsBranch->Branch("OscParametersStartingPos", &OscParametersStartingPos);
+  
   SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
   SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
-
 
   SettingsBranch->Fill();
   SettingsBranch->Write();
@@ -446,11 +498,9 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot_HPD->SetFillStyle(0);
   paramPlot_HPD->SetLineColor(paramPlot_HPD->GetMarkerColor());
   
-  
   // Set labels and data
   for (int i = 0; i < nDraw; ++i)
   {
-      
     //Those keep which parameter type we run currently and realtive number  
     int ParamNo = __UNDEF__;
     int ParamEnu = __UNDEF__;
@@ -652,9 +702,98 @@ void MCMCProcessor::DrawPostfit() {
     }
   }
 
+  delete prefit;
   delete paramPlot;
+  delete paramPlot_Gauss;
+  delete paramPlot_HPD;
   delete CompLeg;
 
+  //KS: Return Margin to default one
+  Posterior->SetBottomMargin(0.1);
+}
+
+
+// *********************
+// Make fancy violin plots
+void MCMCProcessor::MakeViolin() {
+// *********************
+
+    //KS: Make sure we have steps
+    if(!CacheMCMC) CacheSteps();
+    
+    //KS: Find min and max to make histogram in range
+    double maxi_y = Chain->GetMaximum(BranchNames[0]);
+    double mini_y = Chain->GetMinimum(BranchNames[0]);
+    for (int i = 1; i < nDraw; ++i)
+    {
+        if(Chain->GetMaximum(BranchNames[i]) > maxi_y) maxi_y = Chain->GetMaximum(BranchNames[i]);
+        if(Chain->GetMinimum(BranchNames[i]) < mini_y) mini_y = Chain->GetMinimum(BranchNames[i]);
+    }
+
+    const int vBins = (maxi_y-mini_y)*25;
+  
+    hviolin = new TH2D("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y); 
+   
+    TStopwatch clock;
+    clock.Start();
+
+    // nDraw is number of draws we want to do
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
+    for (int x = 0; x < nDraw; ++x)
+    {
+        for (int k = 0; k < nEntries; ++k)
+        {
+            //KS: Consider another treatment for fixed params
+            //if (IamVaried[j] == false) continue;
+            
+            //KS: Burn in cut
+            if(StepNumber[k] < BurnInCut) continue;
+            //KS: We know exaclty which x bin we will end up, find y bin. This allow to avoid coslty Fill() and enable multithreading becasue I am master of faster
+            const double y = hviolin->GetYaxis()->FindBin(ParStep[x][k]);
+            hviolin->SetBinContent(x+1, y,  hviolin->GetBinContent(x+1, y)+1);
+        }
+        TString Title;
+        double Nominal, NominalError;
+
+        GetNthParameter(x, Nominal, NominalError, Title);
+        //Set fancy labels
+        hviolin->GetXaxis()->SetBinLabel(x+1, Title);
+    } // end the for loop over nDraw
+    clock.Stop();
+    std::cout << "Making Violin plot took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
+    
+    //KS: Tells how many parameters in one canvas we want
+    const int IntervalsSize = 10;
+    const int NIntervals = nDraw/IntervalsSize;
+
+    hviolin->GetYaxis()->SetTitle("Parameter Value");
+    hviolin->GetXaxis()->SetTitle();
+    hviolin->GetXaxis()->LabelsOption("v");
+    
+    hviolin->SetFillColor(kBlue);
+    hviolin->SetMarkerColor(kRed);
+    hviolin->SetMarkerStyle(20);
+    hviolin->SetMarkerSize(0.5);
+    
+    Posterior->SetBottomMargin(0.2);
+      
+    OutputFile->cd();
+    hviolin->Write("param_violin");
+    //KS: This is moslty for example plots, we have full file in the ROOT file so can do much better plot later
+    hviolin->GetYaxis()->SetRangeUser(-1, +2);
+    for (int i = 0; i < NIntervals+1; ++i)
+    {
+        hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, i*IntervalsSize+IntervalsSize);
+        if(i == NIntervals+1)
+        {
+           hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw); 
+        }
+        //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
+        hviolin->Draw("VIOLIN");
+        if(printToPDF) Posterior->Print(CanvasName);
+    }
   //KS: Return Margin to default one
   Posterior->SetBottomMargin(0.1);
 }
@@ -746,6 +885,7 @@ void MCMCProcessor::MakeCovariance() {
       // The draw command we want, i.e. draw param j vs param i
       Chain->Project(DrawMe, DrawMe, StepCut.c_str());
       
+      if(ApplySmoothing) hpost_2D->Smooth();
       // Get the Covariance for these two parameters
       (*Covariance)(i,j) = hpost_2D->GetCovariance();
       (*Covariance)(j,i) = (*Covariance)(i,j);
@@ -823,6 +963,7 @@ void MCMCProcessor::CacheSteps() {
 
     int countwidth = nEntries/10;
     // Loop over the entries
+    //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
     for (int j = 0; j < nEntries; ++j) {
         if (j % countwidth == 0) {
         std::cout << j << "/" << nEntries << " (" << double(j)/double(nEntries)*100. << "%)" << std::endl;
@@ -893,9 +1034,7 @@ void MCMCProcessor::MakeCovariance_MP() {
      covBinning = nParam[kXSecPar] - nFlux; 
   }
 
-  bool HaveMadeDiagonal = false;
-  std::cout << "Making post-fit covariances..." << std::endl;
-    
+  bool HaveMadeDiagonal = false;    
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < covBinning; ++i) {
@@ -943,6 +1082,8 @@ for (int i = 0; i < covBinning; ++i)
             //KS: Fill histogram with cached steps
             hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k]);
         }
+        if(ApplySmoothing) hpost2D[i][j]->Smooth();
+        
         // Get the Covariance for these two parameters
         (*Covariance)(i,j) = hpost2D[i][j]->GetCovariance();
         (*Covariance)(j,i) = (*Covariance)(i,j);
@@ -1934,6 +2075,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   }
 
   // Loop over the entries
+  //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
   for (int i = 0; i < nEntries; ++i) {
 
     if (i % countwidth == 0) {

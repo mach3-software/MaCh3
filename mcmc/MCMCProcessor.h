@@ -86,7 +86,7 @@ class MCMCProcessor {
     int GetNFD() { return nParam[kFDDetPar]; };
     int GetOSC() { return nParam[kOSCPar]; };
         
-    TH1D* const GetHpost(int i) { return hpost[i]; };
+    inline TH1D* const GetHpost(int i) { return hpost[i]; };
 
     std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
     std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
@@ -97,6 +97,8 @@ class MCMCProcessor {
 
     // Draw the post-fit comparisons
     void DrawPostfit();
+    // Make and Draw Violin
+    void MakeViolin();
     // Draw the post-fit covariances
     void DrawCovariance();
 
@@ -123,7 +125,8 @@ class MCMCProcessor {
     void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
     void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
     void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
-      
+    void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
+    
     void SetnBatches(int Batches){nBatches = Batches; };
     void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
     
@@ -240,12 +243,14 @@ class MCMCProcessor {
 
     bool CacheMCMC;
     bool doDiagMCMC;
+    bool ApplySmoothing;
     // Holds Posterior Distributions
     TH1D **hpost;
     TH2D ***hpost2D;
+    TH2D *hviolin;
     
-    double** ParStep = NULL;
-    int* StepNumber = NULL;
+    double** ParStep;
+    int* StepNumber;
 
     // Number of bins
     int nBins;
