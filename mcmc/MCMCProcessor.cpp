@@ -154,7 +154,7 @@ MCMCProcessor::~MCMCProcessor() {
     {
         delete hpost[i];
     }
-      delete[] hpost;
+    delete[] hpost;
   }
   if(CacheMCMC)
   {
@@ -209,7 +209,7 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
   MakePostfit();
 
   // Loop over the loaded param types
-  int ParamTypeSize = ParamType.size();
+  const int ParamTypeSize = ParamType.size();
   int ParamNumber = 0;
   for (int i = 0; i < ParamTypeSize; ++i) {
     if (ParamType[i] != kParam) continue;
@@ -296,8 +296,8 @@ void MCMCProcessor::MakePostfit() {
 
     OutputFile->cd();
     // This holds the posterior density
-    double maxi = Chain->GetMaximum(BranchNames[i]);
-    double mini = Chain->GetMinimum(BranchNames[i]);
+    const double maxi = Chain->GetMaximum(BranchNames[i]);
+    const double mini = Chain->GetMinimum(BranchNames[i]);
     // This holds the posterior density
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
     hpost[i]->SetMinimum(0);
@@ -308,7 +308,7 @@ void MCMCProcessor::MakePostfit() {
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
-    for(int ik = 0; ik < kNParameterEnum; ik++)
+    for(int ik = 0; ik < kNParameterEnum; ++ik)
     {
         if (ParamType[i] == ParameterEnum(ik))
         {
@@ -590,7 +590,7 @@ void MCMCProcessor::DrawPostfit() {
   //KS: Plot Xsec and Flux
   if (PlotXSec == true) {
       
-    int Start = ParamTypeStartPos[kXSecPar];
+    const int Start = ParamTypeStartPos[kXSecPar];
     // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
     // Have already looked through the branches earlier
     if(plotRelativeToPrior)  prefit->GetYaxis()->SetTitle("Variation rel. prior"); 
@@ -844,8 +844,8 @@ void MCMCProcessor::MakeCovariance() {
 
     GetNthParameter(i, Nominal_i, NominalError, Title_i);
     
-    double min_i = Chain->GetMinimum(BranchNames[i]);
-    double max_i = Chain->GetMaximum(BranchNames[i]);
+    const double min_i = Chain->GetMinimum(BranchNames[i]);
+    const double max_i = Chain->GetMaximum(BranchNames[i]);
 
     // Loop over the other parameters to get the correlations
     for (int j = 0; j <= i; ++j) {
@@ -871,8 +871,8 @@ void MCMCProcessor::MakeCovariance() {
       // The draw which we want to perform
       TString DrawMe = BranchNames[j]+":"+BranchNames[i];
 
-      double max_j = Chain->GetMaximum(BranchNames[j]);
-      double min_j = Chain->GetMinimum(BranchNames[j]);
+      const double max_j = Chain->GetMaximum(BranchNames[j]);
+      const double min_j = Chain->GetMinimum(BranchNames[j]);
 
       // TH2F to hold the Correlation 
       TH2D *hpost_2D = new TH2D(DrawMe, DrawMe, nBins, min_i, max_i, nBins, min_j, max_j);
@@ -961,7 +961,7 @@ void MCMCProcessor::CacheSteps() {
     }
     Chain->SetBranchStatus("step", true);
 
-    int countwidth = nEntries/10;
+    const int countwidth = nEntries/10;
     // Loop over the entries
     //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
     for (int j = 0; j < nEntries; ++j) {
@@ -986,8 +986,8 @@ void MCMCProcessor::CacheSteps() {
     // Cache max and min in chain for covariance matrix
     for (int i = 0; i < nDraw; ++i) 
     {
-        double Min_Chain_i = Chain->GetMinimum(BranchNames[i]);
-        double Max_Chain_i = Chain->GetMaximum(BranchNames[i]);
+        const double Min_Chain_i = Chain->GetMinimum(BranchNames[i]);
+        const double Max_Chain_i = Chain->GetMaximum(BranchNames[i]);
         
         TString Title_i = BranchNames[i];
         double Nominal_i, NominalError_i;
@@ -995,10 +995,9 @@ void MCMCProcessor::CacheSteps() {
         
         for (int j = 0; j <= i; ++j)
         {
-            double Min_Chain_j = Chain->GetMinimum(BranchNames[j]);
-            double Max_Chain_j = Chain->GetMaximum(BranchNames[j]);
+            const double Min_Chain_j = Chain->GetMinimum(BranchNames[j]);
+            const double Max_Chain_j = Chain->GetMaximum(BranchNames[j]);
         
-            
             // TH2D to hold the Correlation 
             hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain_i, Max_Chain_i, nBins, Min_Chain_j, Max_Chain_j);
             
@@ -1160,7 +1159,7 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->GetYaxis()->SetLabelSize(0.015);
 
   // Loop over the Covariance matrix entries
-  for (int i = 0; i < covBinning; i++)
+  for (int i = 0; i < covBinning; ++i)
   {
     TString titlex = "";
     double nom, err;
@@ -1170,7 +1169,7 @@ void MCMCProcessor::DrawCovariance() {
     hCovSq->GetXaxis()->SetBinLabel(i+1, titlex);
     hCorr->GetXaxis()->SetBinLabel(i+1, titlex);
 
-    for (int j = 0; j < covBinning; j++) {
+    for (int j = 0; j < covBinning; ++j) {
 
       // The value of the Covariance
       double cov = (*Covariance)(i,j);
@@ -1800,7 +1799,7 @@ void MCMCProcessor::SetStepCut(std::string Cuts) {
 
 // ***************
 // Make the step cut from an int
-void MCMCProcessor::SetStepCut(int Cuts) {
+void MCMCProcessor::SetStepCut(const int Cuts) {
 // ***************
   std::stringstream TempStream;
   TempStream << "step > " << Cuts;
@@ -1811,7 +1810,7 @@ void MCMCProcessor::SetStepCut(int Cuts) {
 
 // **************************
 // Get the mean and RMS of a 1D posterior
-void MCMCProcessor::GetArithmetic(TH1D * const hpost, int i) {
+void MCMCProcessor::GetArithmetic(TH1D * const hpost, const int i) {
 // **************************
   (*Means)(i) = hpost->GetMean();
   (*Errors)(i) = hpost->GetRMS();
@@ -1819,12 +1818,12 @@ void MCMCProcessor::GetArithmetic(TH1D * const hpost, int i) {
 
 // **************************
 // Get Gaussian characteristics
-void MCMCProcessor::GetGaussian(TH1D *& hpost , int i) {
+void MCMCProcessor::GetGaussian(TH1D *& hpost , const int i) {
 // **************************
 
-  double mean = hpost->GetMean();
-  double err = hpost->GetRMS();
-  double peakval = hpost->GetBinCenter(hpost->GetMaximumBin());
+  const double mean = hpost->GetMean();
+  const double err = hpost->GetRMS();
+  const double peakval = hpost->GetBinCenter(hpost->GetMaximumBin());
 
   // Set the range for the Gaussian fit
   Gauss->SetRange(mean - 1.5*err , mean + 1.5*err);
@@ -1842,54 +1841,62 @@ void MCMCProcessor::GetGaussian(TH1D *& hpost , int i) {
 
 // ***************
 // Get the highest posterior density from a TH1D
-void MCMCProcessor::GetHPD(TH1D * const hpost, int i) {
+void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
 // ***************
   // Get the bin which has the largest posterior density
   int MaxBin = hpost->GetMaximumBin();
   // And it's value
-  double peakval = hpost->GetBinCenter(MaxBin);
+  const double peakval = hpost->GetBinCenter(MaxBin);
 
   // The total integral of the posterior
-  double integral = hpost->Integral();
+  const double integral = hpost->Integral();
 
   // Keep count of how much area we're covering
-  double sum = 0.0;
+  //KS: Start from HPD
+  double sum = hpost->GetBinContent(MaxBin);
 
   // Counter for current bin
   int CurrBin = MaxBin;
-  while (sum/integral < 0.6827/2.0 && CurrBin < hpost->GetNbinsX()+1) {
-    sum += hpost->GetBinContent(CurrBin);
+  while (sum/integral < 0.6827/2.0 && CurrBin < hpost->GetNbinsX()) {
     CurrBin++;
+    sum += hpost->GetBinContent(CurrBin);
   }
-  double sigma_p = fabs(hpost->GetBinCenter(MaxBin)-hpost->GetBinCenter(CurrBin));
+  const double sigma_p = fabs(hpost->GetBinCenter(MaxBin)-hpost->GetBinCenter(CurrBin));
   // Reset the sum
-  sum = 0.0;
+  sum = hpost->GetBinContent(MaxBin);
 
   // Reset the bin counter
   CurrBin = MaxBin;
   // Counter for current bin
-  while (sum/integral < 0.6827/2.0 && CurrBin >= 0) {
-    sum += hpost->GetBinContent(CurrBin);
+  while (sum/integral < 0.6827/2.0 && CurrBin > 1) {
     CurrBin--;
+    sum += hpost->GetBinContent(CurrBin);
   }
-  double sigma_m = fabs(hpost->GetBinCenter(CurrBin)-hpost->GetBinCenter(MaxBin));
+  const double sigma_m = fabs(hpost->GetBinCenter(CurrBin)-hpost->GetBinCenter(MaxBin));
 
   // Now do the double sided HPD
-  sum = 0.0;
-  int LowBin = MaxBin-1;
-  int HighBin = MaxBin+1;
+  //KS: Start sum from the HPD
+  sum = hpost->GetBinContent(MaxBin);
+  int LowBin = MaxBin;
+  int HighBin = MaxBin;
   double LowCon = 0.0;
   double HighCon = 0.0;
 
-  while (sum/integral < 0.6827 && (LowBin >= 0 || HighBin < hpost->GetNbinsX()+1)) 
+  while (sum/integral < 0.6827 && (LowBin > 0 || HighBin < hpost->GetNbinsX()+1)) 
   {
-    // Get the slice
-    //KS:: If each slice reached histogram end then set value to 0, then other slice will be able to move further
-    if(LowBin >= 0)LowCon = hpost->GetBinContent(LowBin);
-    else LowCon = 0.0;
-        
-    if(HighBin < hpost->GetNbinsX()+1){HighCon = hpost->GetBinContent(HighBin);}
-    else HighCon = 0.0;
+    LowCon = 0.0;
+    HighCon = 0.0;
+    //KS:: Move further only if you haven't reached histogram end
+    if(LowBin > 1)
+    {
+        LowBin--;
+        LowCon = hpost->GetBinContent(LowBin);
+    }
+    if(HighBin < hpost->GetNbinsX())
+    {
+        HighBin++;
+        HighCon = hpost->GetBinContent(HighBin);
+    }
 
     // If we're on the last slice and the lower contour is larger than the upper
     if ((sum+LowCon+HighCon)/integral > 0.6827 && LowCon > HighCon) {
@@ -1902,10 +1909,6 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, int i) {
     } else {
       sum += LowCon + HighCon;
     }
-
-    //KS:: Move further only if you haven't reached histogram end
-    if(LowBin >= 0) LowBin--;
-    if(HighBin < hpost->GetNbinsX()+1) HighBin++;
   }
 
   double sigma_hpd = 0.0;
@@ -2059,11 +2062,11 @@ void MCMCProcessor::PrepareDiagMCMC() {
   Chain->SetBranchStatus("accProb", true);
   
   // 10 entries output
-  int countwidth = nEntries/10;
+  const int countwidth = nEntries/10;
 
   // Can also do the batched means here to minimize excessive loops
   // The length of each batch
-  int BatchLength = nEntries/nBatches+1;
+  const int BatchLength = nEntries/nBatches+1;
   BatchedAverages = new double*[nBatches]();
   AccProbBatchedAverages = new double[nBatches]();
   for (int i = 0; i < nBatches; ++i) {
@@ -2299,17 +2302,17 @@ void MCMCProcessor::AutoCorrelation() {
       // Loop over the number of parameters
       for (int j = 0; j < nDraw; ++j) {
 
-        double Diff = ParStep[i][j]-ParamSums[j];
+        const double Diff = ParStep[i][j]-ParamSums[j];
 
         // Only sum the numerator up to i = N-k
         if (i < nEntries-k) {
-          double LagTerm = ParStep[i+k][j]-ParamSums[j];
-          double Product = Diff*LagTerm;
+          const double LagTerm = ParStep[i+k][j]-ParamSums[j];
+          const double Product = Diff*LagTerm;
           NumeratorSum[j][k] += Product;
         }
 
         // Square the difference to form the denominator
-        double Denom = Diff*Diff;
+        const double Denom = Diff*Diff;
         DenomSum[j][k] += Denom;
       }
     }
@@ -2336,7 +2339,7 @@ void MCMCProcessor::AutoCorrelation() {
   {
     for (int k = 0; k < nLags; ++k)
     {
-      int temp_index = j*nLags+k;
+      const int temp_index = j*nLags+k;
       NumeratorSum[j][k] = NumeratorSum_cpu[temp_index];
       DenomSum[j][k] = DenomSum_cpu[temp_index];
     }
@@ -2501,6 +2504,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
     GetNthParameter(j, Nominal, NominalError, Title);
     std::string HistName = Form("%s_%s_ESS", Title.Data(), BranchNames[j].Data());
 
+    EffectiveSampleSize[j] = __UNDEF__;
     ESSTree->Branch(HistName.c_str(), &EffectiveSampleSize[j]);
   }
 
@@ -2551,8 +2555,8 @@ void MCMCProcessor::BatchedMeans() {
   for (int i = 0; i < nBatches; ++i) {
     for (int j = 0; j < nDraw; ++j) {
       BatchedParamPlots[j]->SetBinContent(i+1, BatchedAverages[i][j]);
-      int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
-      int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+      const int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
+      const int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
       std::stringstream ss;
       ss << BatchRangeLow << " - " << BatchRangeHigh;
       BatchedParamPlots[j]->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
@@ -2576,7 +2580,6 @@ void MCMCProcessor::BatchedMeans() {
   }
 
   delete[] BatchedAverages;
-
 }
 
 // **************************
@@ -2596,8 +2599,8 @@ void MCMCProcessor::AcceptanceProbabilities() {
     
   for (int i = 0; i < nBatches; ++i) {
       BatchedAcceptanceProblot->SetBinContent(i+1, AccProbBatchedAverages[i]);
-      int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
-      int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+      const int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
+      const int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
       std::stringstream ss;
       ss << BatchRangeLow << " - " << BatchRangeHigh;
       BatchedAcceptanceProblot->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());

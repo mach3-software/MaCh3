@@ -67,10 +67,6 @@ class MCMCProcessor {
     void MakeCovariance_MP();
     
     void DiagMCMC();
-        
-    void GetArithmetic(TH1D * const hpost, int i);
-    void GetGaussian(TH1D *& hpost, int i);
-    void GetHPD(TH1D * const hpost, int i);
     
     void MakePostfit();
     
@@ -114,7 +110,7 @@ class MCMCProcessor {
     // Either by string
     void SetStepCut(std::string Cuts);
     // Or by int
-    void SetStepCut(int Cuts);
+    void SetStepCut(const int Cuts);
 
     void SetMakeOnlyXsecCorr(bool PlotOrNot){MakeOnlyXsecCorr = PlotOrNot; };
     void SetMakeOnlyXsecCorrFlux(bool PlotOrNot){MakeOnlyXsecCorrFlux = PlotOrNot; };
@@ -147,6 +143,11 @@ class MCMCProcessor {
     inline void ScanParameterOrder();
     inline void SetupOutput();
 
+    //Analyse posterior distribution
+    inline void GetArithmetic(TH1D * const hpost, const int i);
+    inline void GetGaussian(TH1D *& hpost, const int i);
+    inline void GetHPD(TH1D * const hpost, const int i);
+    
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();
     inline void ParamTraces();
