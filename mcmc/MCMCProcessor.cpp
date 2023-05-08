@@ -60,13 +60,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   SystValues = NULL;
   AccProbValues = NULL;
   AccProbBatchedAverages = NULL;
-  TraceParamPlots = NULL;
-  TraceSamplePlots = NULL;
-  TraceSystsPlots = NULL;
-  BatchedParamPlots = NULL;
-  LagKPlots = NULL;
-  AcceptanceProbPlot = NULL;
-  BatchedAcceptanceProblot = NULL;
     
   //KS:Hardcoded should be a way to get it via config or something
   PlotDet = false;
@@ -928,6 +921,15 @@ void MCMCProcessor::CacheSteps() {
     if(CacheMCMC == true) return;
     
     CacheMCMC = true;
+    
+    if(ParStep != NULL)
+    {
+        std::cout<<"It look like ParStep was already filled "<<std::endl;
+        std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
+        std::cout<<"it has differnt structure in both for cache hits, sorry "<<std::endl;
+        throw;
+    }
+  
     std::cout << "Caching input tree..." << std::endl;    
     std::cout << "Allocating " << (sizeof(double)*nDraw*nEntries)/1.E6 << " MB" << std::endl;
     TStopwatch clock;
@@ -1852,8 +1854,8 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
   const double integral = hpost->Integral();
 
   // Keep count of how much area we're covering
-  //KS: Start from HPD
-  double sum = hpost->GetBinContent(MaxBin);
+  //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
+  double sum = hpost->GetBinContent(MaxBin)/2.0;
 
   // Counter for current bin
   int CurrBin = MaxBin;
@@ -1863,7 +1865,8 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
   }
   const double sigma_p = fabs(hpost->GetBinCenter(MaxBin)-hpost->GetBinCenter(CurrBin));
   // Reset the sum
-  sum = hpost->GetBinContent(MaxBin);
+  //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
+  sum = hpost->GetBinContent(MaxBin)/2.0;
 
   // Reset the bin counter
   CurrBin = MaxBin;
@@ -1997,15 +2000,22 @@ void MCMCProcessor::DiagMCMC() {
 void MCMCProcessor::PrepareDiagMCMC() {
 // **************************
   
-   //bool doDiagMCMC = true;
+  doDiagMCMC = true;
     
-    if(ParStep != NULL)
-    {
-        std::cout<<"It look like ParStep was already filled "<<std::endl;
-        std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
-        std::cout<<"it has differnt structure in both for cache hits, sorry "<<std::endl;
-        throw;
-    }
+  if(ParStep != NULL)
+  {
+    std::cout<<"It look like ParStep was already filled "<<std::endl;
+    std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
+    std::cout<<"it has differnt structure in both for cache hits, sorry "<<std::endl;
+    throw;
+  }
+  if(nBatches == 0)
+  {
+    std::cout<<"nBatches is equal to 0 "<<std::endl;
+    std::cout<<"please use SetnBatches to set other value fore exampl 20 "<<std::endl; 
+    throw;      
+  }
+    
   // Initialise ParStep
   ParStep = new double*[nEntries]();
   SampleValues = new double*[nEntries]();
@@ -2155,9 +2165,9 @@ void MCMCProcessor::ParamTraces() {
   std::cout << "Making trace plots..." << std::endl;
 
   // Make the TH1Ds
-  TraceParamPlots = new TH1D*[nDraw];
-  TraceSamplePlots = new TH1D*[nSamples];
-  TraceSystsPlots = new TH1D*[nSysts];
+  TH1D** TraceParamPlots = new TH1D*[nDraw];
+  TH1D** TraceSamplePlots = new TH1D*[nSamples];
+  TH1D** TraceSystsPlots = new TH1D*[nSysts];
 
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nDraw; ++j) {
@@ -2264,7 +2274,7 @@ void MCMCProcessor::AutoCorrelation() {
     NumeratorSum[j] = new double[nLags];
     LagL[j] = new double[nLags];
   }
-  LagKPlots = new TH1D*[nDraw];
+  TH1D** LagKPlots = new TH1D*[nDraw];
   // Loop over the parameters of interest
   for (int j = 0; j < nDraw; ++j)
   {
@@ -2540,7 +2550,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
 void MCMCProcessor::BatchedMeans() {
 // **************************
 
-  BatchedParamPlots = new TH1D*[nDraw];
+  TH1D ** BatchedParamPlots = new TH1D*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
     TString Title = BranchNames[j];
     double Nominal = 1.0;
@@ -2575,6 +2585,11 @@ void MCMCProcessor::BatchedMeans() {
   }
   delete[] BatchedParamPlots;
 
+
+  //KS: Get the batched means variance estimation and variable indicating if number of batches is sensible
+  // We do this before deleting BatchedAverages
+  BatchedAnalysis();
+
   for (int i = 0; i < nBatches; ++i) {
     delete BatchedAverages[i];
   }
@@ -2583,18 +2598,139 @@ void MCMCProcessor::BatchedMeans() {
 }
 
 // **************************
+// Get the batched means variance estimation and variable indicating if number of batches is sensible
+void MCMCProcessor::BatchedAnalysis() {
+// **************************
+
+  if(BatchedAverages == NULL)
+  {
+    std::cerr<<"BatchedAverages haven't been initialises or have been deleted somehting is wrong"<<std::endl;
+    std::cerr<<"I need it and refuse to go further"<<std::endl;
+    throw;
+  }
+
+  // Calcualte variance estimator using batched means following https://arxiv.org/pdf/1911.00915.pdf see Eq. 1.2
+  TVectorD* BatchedVariance = new TVectorD(nDraw);
+  //KS: The hypothesis is rejected if C > z α for a given confidence level α. If the batch means do not pass the test, Correlated is reported for the half-width on the statistical reports following https://rossetti.github.io/RossettiArenaBook/ch5-BatchMeansMethod.html alternatively for more oldschhol see Alexopoulos and Seila 1998 section 3.4.3
+  TVectorD* C_Test_Statistics = new TVectorD(nDraw);
+ 
+  double* OverallBatchMean = new double[nDraw]();
+  double* C_Rho_Nominator = new double[nDraw]();
+  double* C_Rho_Denominator = new double[nDraw]();
+  double* C_Nominator = new double[nDraw]();
+  double* C_Denominator = new double[nDraw]();
+  const int BatchLength = nEntries/nBatches+1;
+//KS: Start parallel region
+#ifdef MULTITHREAD
+#pragma omp parallel
+{
+#endif
+  #ifdef MULTITHREAD
+  #pragma omp for
+  #endif
+  //KS: First calcuate mean of batched means for each param and Initialise everything to 0
+  for (int j = 0; j < nDraw; ++j)
+  {
+      OverallBatchMean[j] = 0.0;
+      C_Rho_Nominator[j] = 0.0;
+      C_Rho_Denominator[j] = 0.0;
+      C_Nominator[j] = 0.0;
+      C_Denominator[j] = 0.0;
+
+      (*BatchedVariance)(j) = 0.0;
+      (*C_Test_Statistics)(j) = 0.0;
+      for (int i = 0; i < nBatches; ++i)
+      {
+          OverallBatchMean[j] += BatchedAverages[i][j];
+      }
+      OverallBatchMean[j] /= nBatches;
+  }
+
+  #ifdef MULTITHREAD
+  #pragma omp for nowait
+  #endif
+  //KS: next loop is copletely idnepend thus nowait clause
+  for (int j = 0; j < nDraw; ++j)
+  {
+    for (int i = 0; i < nBatches; ++i)
+    {
+      (*BatchedVariance)(j) += (OverallBatchMean[j] - BatchedAverages[i][j])*(OverallBatchMean[j] - BatchedAverages[i][j]);
+    }
+    (*BatchedVariance)(j) = (BatchLength/(nBatches-1))* (*BatchedVariance)(j);
+  }
+  
+  //KS: Now we focus on C test statistic, again use nowait as next is calcualtion is independent
+  #ifdef MULTITHREAD
+  #pragma omp for nowait
+  #endif
+  for (int j = 0; j < nDraw; ++j)
+  {
+      C_Nominator[j] = (OverallBatchMean[j] - BatchedAverages[0][j])*(OverallBatchMean[j] - BatchedAverages[0][j]) + 
+                        (OverallBatchMean[j] - BatchedAverages[nBatches-1][j])*(OverallBatchMean[j] - BatchedAverages[nBatches-1][j]);
+      for (int i = 0; i < nBatches; ++i)
+      {
+        C_Denominator[j] += (OverallBatchMean[j] - BatchedAverages[i][j])*(OverallBatchMean[j] - BatchedAverages[i][j]);
+      }
+      C_Denominator[j] = 2*C_Denominator[j];
+  }
+  
+  //KS: We still calcualte C and for this we need rho wee need autocorealtion between bathces
+  #ifdef MULTITHREAD
+  #pragma omp for
+  #endif
+  for (int j = 0; j < nDraw; ++j)
+  {
+      for (int i = 0; i < nBatches-1; ++i)
+      {
+        C_Rho_Nominator[j] += (OverallBatchMean[j] - BatchedAverages[i][j])*(OverallBatchMean[j] - BatchedAverages[i+1][j]);
+      }
+      
+      for (int i = 0; i < nBatches; ++i)
+      {
+        C_Rho_Denominator[j] += (OverallBatchMean[j] - BatchedAverages[i][j])*(OverallBatchMean[j] - BatchedAverages[i][j]);
+      }
+  }
+  
+  //KS: Finall calcuations of C
+  #ifdef MULTITHREAD
+  #pragma omp for
+  #endif
+  for (int j = 0; j < nDraw; ++j)
+  {
+      (*C_Test_Statistics)(j) = sqrt((nBatches*nBatches - 1)/(nBatches-2)) * ( C_Rho_Nominator[j]/C_Rho_Denominator[j] + C_Nominator[j]/ C_Denominator[j]);
+  }
+#ifdef MULTITHREAD
+} //End parallel region
+#endif
+
+  //Save to file
+  OutputFile->cd();
+  BatchedVariance->Write("BatchedMeansVariance");
+  C_Test_Statistics->Write("C_Test_Statistics");
+
+  //Delete all variables
+  delete BatchedVariance;
+  delete C_Test_Statistics;
+  delete[] OverallBatchMean;
+  delete[] C_Rho_Nominator;
+  delete[] C_Rho_Denominator;
+  delete[] C_Nominator;
+  delete[] C_Denominator;
+}
+
+
+// **************************
 // Acceptance Probability
 void MCMCProcessor::AcceptanceProbabilities() {
 // **************************
     std::cout << "Making AccProb plots..." << std::endl;
 
-    // Set the titles and limits for TH2Ds
-
-    AcceptanceProbPlot = new TH1D("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
+    // Set the titles and limits for TH1Ds
+    TH1D* AcceptanceProbPlot = new TH1D("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
     AcceptanceProbPlot->GetXaxis()->SetTitle("Step");
     AcceptanceProbPlot->GetYaxis()->SetTitle("Acceptance Probability");
 
-    BatchedAcceptanceProblot = new TH1D("AcceptanceProbability_Batch", "AcceptanceProbability_Batch", nBatches, 0, nBatches);
+    TH1D* BatchedAcceptanceProblot = new TH1D("AcceptanceProbability_Batch", "AcceptanceProbability_Batch", nBatches, 0, nBatches);
     BatchedAcceptanceProblot->GetYaxis()->SetTitle("Acceptance Probability");
     
   for (int i = 0; i < nBatches; ++i) {

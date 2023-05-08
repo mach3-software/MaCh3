@@ -153,6 +153,7 @@ class MCMCProcessor {
     inline void ParamTraces();
     inline void AutoCorrelation();
     inline void CalculateESS(const int nLags);
+    inline void BatchedAnalysis();
     inline void BatchedMeans();
     inline void AcceptanceProbabilities();
     
@@ -274,20 +275,6 @@ class MCMCProcessor {
     double *AccProbValues;
     double *AccProbBatchedAverages;
     
-    // Trace plots
-    TH1D **TraceParamPlots;
-    TH1D **TraceSamplePlots;
-    TH1D **TraceSystsPlots;
-    TH1D **BatchedParamPlots;
-
-    // LagK autocorrelation plots
-    TH1D **LagKPlots;
-
-    // Acceptance Prob Plots
-    TH1D *AcceptanceProbPlot;
-    TH1D *BatchedAcceptanceProblot;
-
-
   //Only if GPU is enabled
   #ifdef CUDA
     void PrepareGPU_AutoCorr(const int nLags);
