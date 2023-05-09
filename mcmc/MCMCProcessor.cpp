@@ -1863,7 +1863,7 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
     CurrBin++;
     sum += hpost->GetBinContent(CurrBin);
   }
-  const double sigma_p = fabs(hpost->GetBinCenter(MaxBin)-hpost->GetBinCenter(CurrBin));
+  const double sigma_p = std::fabs(hpost->GetBinCenter(MaxBin)-hpost->GetXaxis()->GetBinUpEdge(CurrBin));
   // Reset the sum
   //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
   sum = hpost->GetBinContent(MaxBin)/2.0;
@@ -1875,7 +1875,7 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
     CurrBin--;
     sum += hpost->GetBinContent(CurrBin);
   }
-  const double sigma_m = fabs(hpost->GetBinCenter(CurrBin)-hpost->GetBinCenter(MaxBin));
+  const double sigma_m = std::fabs(hpost->GetBinCenter(CurrBin)-hpost->GetBinLowEdge(MaxBin));
 
   // Now do the double sided HPD
   //KS: Start sum from the HPD
@@ -1916,9 +1916,9 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
 
   double sigma_hpd = 0.0;
   if (LowCon > HighCon) {
-    sigma_hpd = fabs(hpost->GetBinCenter(LowBin)-hpost->GetBinCenter(MaxBin));
+    sigma_hpd = std::fabs(hpost->GetBinLowEdge(LowBin)-hpost->GetBinCenter(MaxBin));
   } else {
-    sigma_hpd = fabs(hpost->GetBinCenter(HighBin)-hpost->GetBinCenter(MaxBin));
+    sigma_hpd = std::fabs(hpost->GetXaxis()->GetBinUpEdge(HighBin)-hpost->GetBinCenter(MaxBin));
   }
 
   (*Means_HPD)(i) = peakval;
