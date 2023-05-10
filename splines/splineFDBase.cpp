@@ -21,7 +21,7 @@ splineFDBase::splineFDBase(const char *name, int ntype, int nevents, int DetID, 
   SampleDetID = DetID;
 
   FindUniqueModes();
-  xsec_cov->GetSplineParsNamesFromDetID(25);
+  xsec_cov->GetSplineParsNamesFromDetID(DetID);
   std::cout << "Creating Etrue-Erec splines" << std::endl;
 #if USE_SPLINE_FD == USE_TSpline3_FD
   std::cout << "Using normal TSpline3 splines" << std::endl;

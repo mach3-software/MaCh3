@@ -458,7 +458,7 @@ void covarianceXsec::scanParameters() {
         // Or a normalisation parameter
       } //End FarSplinePars
       else if (GetXSecParamID(i, 0) == -1) {//FarNormPars
-		std::cout << "Par " << i << " is a normalisation parameter" << std::endl;
+		std::cout << "Par " << i << " is a FD normalisation parameter" << std::endl;
 		XsecNorms4 tmp_xsec;
         tmp_xsec.name=GetParameterName(i);
 
@@ -524,10 +524,12 @@ void covarianceXsec::scanParameters() {
 
 	  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
 	  //a samplePDFFD daughter class
+	  single_selec.push_back(-999);
 	  single_selec.push_back((*xsec_kinematic_lb)(i));
 	  single_selec.push_back((*xsec_kinematic_ub)(i));
 	  tmp_xsec.Selection.push_back(single_selec);
 
+	  std::cout << "Found kinematic bound on " << ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString() << " from " << single_selec[1] << " to " << single_selec[2] << " for parameter " << i << std::endl;
 	}
 	else{
 	  std::cout << "~~~" << std::endl;
@@ -558,6 +560,7 @@ void covarianceXsec::scanParameters() {
     //Near affecting parameters
     if ((GetXSecParamID(i, 1) & 1)) {//Near affecting parameters
       if (GetXSecParamID(i, 0) == -1) {//Near affecting norm pars
+		std::cout << "Par " << i << " is a ND normalisation parameter" << std::endl;
 		XsecNorms4 tmp_xsec;
 
         tmp_xsec.name=GetParameterName(i);
@@ -634,8 +637,11 @@ void covarianceXsec::scanParameters() {
 
 	  std::cout << "Found kinematic bound on " << ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString() << " from " << single_selec[1] << " to " << single_selec[2] << " for parameter " << i << std::endl;
 	}
-	else{std::cout << "Did not find kinematic bound for param " << i << std::endl;}
-
+	else{
+	  std::cout << "~~~" << std::endl;
+	  std::cout << "Did not find kinematic bound for param " << i << std::endl;
+	  std::cout << "~~~" << std::endl;
+    }
 
 	//IF YOU HAVE NEW KINEMATIC BOUNDS TO LOAD IN PUT THEM HERE
 
@@ -925,7 +931,7 @@ void covarianceXsec::Print() {
   std::cout << std::endl;
 
   // Output the normalisation parameters as a sanity check!
-  std::cout << "Normalisation parameters:" << nNearNormParams << std::endl;
+  std::cout << "Near detector normalisation parameters:" << nNearNormParams << std::endl;
   std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "Type" << std::endl;
   for (int i = 0; i < nNearNormParams; ++i) {
     std::cout << std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << NearNormParams.at(i).index << std::setw(2) << "|" << std::setw(20) << NearNormParams.at(i).name << std::setw(2) << "|" << std::setw(10);
