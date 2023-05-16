@@ -1843,23 +1843,26 @@ void MCMCProcessor::GetGaussian(TH1D *& hpost , const int i) {
 
 // ***************
 // Get the highest posterior density from a TH1D
-void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
+void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage) {
 // ***************
   // Get the bin which has the largest posterior density
-  int MaxBin = hpost->GetMaximumBin();
+  const int MaxBin = hpost->GetMaximumBin();
   // And it's value
   const double peakval = hpost->GetBinCenter(MaxBin);
 
   // The total integral of the posterior
-  const double integral = hpost->Integral();
+  const long double Integral = hpost->Integral();
+  //KS: and integral of left handed and right handed parts
+  const long double LowIntegral = hpost->Integral(1, MaxBin-1) + hpost->GetBinContent(MaxBin)/2.0;
+  const long double HighIntegral = hpost->Integral(MaxBin+1, hpost->GetNbinsX()) + hpost->GetBinContent(MaxBin)/2.0;
 
   // Keep count of how much area we're covering
   //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
-  double sum = hpost->GetBinContent(MaxBin)/2.0;
+  long double sum = hpost->GetBinContent(MaxBin)/2.0;
 
   // Counter for current bin
   int CurrBin = MaxBin;
-  while (sum/integral < 0.6827/2.0 && CurrBin < hpost->GetNbinsX()) {
+  while (sum/HighIntegral < coverage && CurrBin < hpost->GetNbinsX()) {
     CurrBin++;
     sum += hpost->GetBinContent(CurrBin);
   }
@@ -1871,7 +1874,7 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
   // Reset the bin counter
   CurrBin = MaxBin;
   // Counter for current bin
-  while (sum/integral < 0.6827/2.0 && CurrBin > 1) {
+  while (sum/LowIntegral < coverage && CurrBin > 1) {
     CurrBin--;
     sum += hpost->GetBinContent(CurrBin);
   }
@@ -1882,10 +1885,10 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
   sum = hpost->GetBinContent(MaxBin);
   int LowBin = MaxBin;
   int HighBin = MaxBin;
-  double LowCon = 0.0;
-  double HighCon = 0.0;
+  long double LowCon = 0.0;
+  long double HighCon = 0.0;
 
-  while (sum/integral < 0.6827 && (LowBin > 0 || HighBin < hpost->GetNbinsX()+1)) 
+  while (sum/Integral < coverage && (LowBin > 0 || HighBin < hpost->GetNbinsX()+1))
   {
     LowCon = 0.0;
     HighCon = 0.0;
@@ -1902,11 +1905,11 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
     }
 
     // If we're on the last slice and the lower contour is larger than the upper
-    if ((sum+LowCon+HighCon)/integral > 0.6827 && LowCon > HighCon) {
+    if ((sum+LowCon+HighCon)/Integral > coverage && LowCon > HighCon) {
       sum += LowCon;
       break;
       // If we're on the last slice and the upper contour is larger than the lower
-    } else if ((sum+LowCon+HighCon)/integral > 0.6827 && HighCon >= LowCon) {
+    } else if ((sum+LowCon+HighCon)/Integral > coverage && HighCon >= LowCon) {
       sum += HighCon;
       break;
     } else {
@@ -1927,6 +1930,130 @@ void MCMCProcessor::GetHPD(TH1D * const hpost, const int i) {
   (*Errors_HPD_Negative)(i) = sigma_m;
 }
 
+// ***************
+//KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
+void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage) {
+// ***************
+
+  //KS: Reset first copy of histogram
+  hpost_copy->Reset("");
+  hpost_copy->Fill(0.0, 0.0);
+
+  //KS: Temporary structure to be thread save
+  double *hist_copy = new double[hpost->GetXaxis()->GetNbins()+1];
+  bool *hist_copy_fill = new bool[hpost->GetXaxis()->GetNbins()+1];
+  for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  {
+    hist_copy[i] = hpost->GetBinContent(i);
+    hist_copy_fill[i] = false;
+  }
+
+  /// Loop over histogram bins with highest number of entries until covered 90 or 68.3%
+  const long double Integral = hpost->Integral();
+  long double sum = 0;
+
+  while ((sum / Integral) < coverage)
+  {
+    /// Get bin of highest content and save the number of entries reached so far
+    int max_entry_bin = 0;
+    double max_entries = 0.;
+    for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+    {
+        if (hist_copy[i] > max_entries)
+        {
+          max_entries = hist_copy[i];
+          max_entry_bin = i;
+        }
+    }
+    /// Replace bin value by -1 so it is not looped over as being maximum bin again
+    hist_copy[max_entry_bin] = -1.;
+    hist_copy_fill[max_entry_bin] = true;
+
+    sum += max_entries;
+  }
+  //KS: Now fill our copy only for bins which got included in coverage region
+  for(int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  {
+    if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hpost->GetBinContent(i));
+  }
+
+  delete[] hist_copy;
+  delete[] hist_copy_fill;
+
+  return;
+}
+
+// ***************
+//KS: Get 2D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
+void MCMCProcessor::GetCredibleInterval(TH2D* const hpost, TH2D* hpost_copy, const double coverage) {
+// ***************
+
+  //KS: Reset first copy of histogram
+  hpost_copy->Reset("");
+  hpost_copy->Fill(0.0, 0.0, 0.0);
+
+  //KS: Temporary structure to be thread save
+  double **hist_copy = new double*[hpost->GetXaxis()->GetNbins()+1];
+  bool **hist_copy_fill = new bool*[hpost->GetXaxis()->GetNbins()+1];
+  for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  {
+    hist_copy[i] = new double[hpost->GetYaxis()->GetNbins()+1];
+    hist_copy_fill[i] = new bool[hpost->GetYaxis()->GetNbins()+1];
+    for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
+    {
+      hist_copy[i][j] = hpost->GetBinContent(i,j);
+      hist_copy_fill[i][j] = false;
+    }
+  }
+
+  /// Loop over histogram bins with highest number of entries until covered 90 or 68.3%
+  const long double Integral = hpost->Integral();
+  long double sum = 0;
+
+  while ((sum / Integral) < coverage)
+  {
+    /// Get bin of highest content and save the number of entries reached so far
+    int max_entry_bin_x = 0;
+    int max_entry_bin_y = 0;
+    double max_entries = 0.;
+    for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+    {
+      for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
+      {
+          if (hist_copy[i][j] > max_entries)
+          {
+            max_entries = hist_copy[i][j];
+            max_entry_bin_x = i;
+            max_entry_bin_y = j;
+          }
+      }
+    }
+    /// Replace bin value by -1 so it is not looped over as being maximum bin again
+    hist_copy[max_entry_bin_x][max_entry_bin_y] = -1.;
+    hist_copy_fill[max_entry_bin_x][max_entry_bin_y] = true;
+
+    sum += max_entries;
+  }
+  //KS: Now fill our copy only for bins which got included in coverage region
+  for(int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  {
+    for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
+    {
+      if(hist_copy_fill[i][j]) hpost_copy->SetBinContent(i,j, hpost->GetBinContent(i, j));
+    }
+  }
+
+  //Delete temporary arrays
+  for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  {
+    delete[] hist_copy[i];
+    delete[] hist_copy_fill[i];
+  }
+  delete[] hist_copy;
+  delete[] hist_copy_fill;
+
+  return;
+}
 
 // ***************
 // Pass central value
@@ -1944,6 +2071,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Nominal, double &No
             Title = ParamNames[ParameterEnum(i)][ParamNo];
         }
     }
+    return;
 }
 
 

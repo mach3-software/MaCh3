@@ -146,8 +146,10 @@ class MCMCProcessor {
     //Analyse posterior distribution
     inline void GetArithmetic(TH1D * const hpost, const int i);
     inline void GetGaussian(TH1D *& hpost, const int i);
-    inline void GetHPD(TH1D * const hpost, const int i);
-    
+    inline void GetHPD(TH1D * const hpost, const int i, const double coverage = 0.6827);
+    inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
+    inline void GetCredibleInterval(TH2D* const hpost, TH2D* hpost_copy, const double coverage = 0.6827);
+
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();
     inline void ParamTraces();
