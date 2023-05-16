@@ -21,7 +21,10 @@
 #include "TString.h"
 
 //Propagator includes
-#include "BargerPropagator.h"
+#ifdef USE_PROB3
+  #include "BargerPropagator.h"
+#endif
+
 #include "beamcudapropagator.cuh"
 #include "atmoscudapropagator.cuh"
 
