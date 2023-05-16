@@ -23,9 +23,15 @@ class covarianceOsc : public covarianceBase
       void setFlipBeta(bool flip){flipBeta=flip;}
       void useReactorPrior(bool reactor){reactorPrior = reactor;};
       void setExtraBranches(TTree &tree);
-      double GetDensity();
-      double GetPathLength();
-      
+
+      double GetPathLength() {
+        return L;
+      }
+
+      double GetDensity() {
+        return density;
+      }
+
       //KS: Print all usefull informations after initialization
       void Print();
       //KS: Currently prob3++/probgp requiers particular order so we need to check this is the case

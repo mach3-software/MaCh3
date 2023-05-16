@@ -571,12 +571,3 @@ void covarianceOsc::CheckOrderOfParams()
     }
 
 }
-
-double covarianceOsc::GetPathLength() {
-  return L;
-}
-
-
-double covarianceOsc::GetDensity() {
-  return density;
-}
