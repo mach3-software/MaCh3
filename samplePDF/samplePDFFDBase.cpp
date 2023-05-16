@@ -838,7 +838,10 @@ void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
   applyBetaDiag=false;
 
   for (int iSample=0; iSample < (int)MCSamples.size(); iSample++) {
-#if defined (USE_PROB3) && defined (CPU_ONLY) 
+
+#if defined (USE_PROB3) && defined (CPU_ONLY)
+// if we're using Prob3++ CPU then initialise BargerPropagator object
+// if we're using Prob3++ GPU then we don't need to do this since event information gets passed straight to ProbGpu.cu in CalcOscWeights
     MCSamples[iSample].Oscillator = new BargerPropagator();
     MCSamples[iSample].Oscillator->UseMassEigenstates(false);
     MCSamples[iSample].Oscillator->SetOneMassScaleMode(false);
@@ -846,21 +849,27 @@ void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 #endif
 
 #if not defined (USE_PROB3)
+//if we're using CUDAProb3 then make vector of energies and convert to CUDAProb3 structs
     std::vector<double> etruVector(*(MCSamples[iSample].rw_etru), *(MCSamples[iSample].rw_etru) + MCSamples[iSample].nEvents);
     MCSamples[iSample].ProbType = SwitchToCUDAProbType(GetCUDAProbFlavour(MCSamples[iSample].nutype, MCSamples[iSample].oscnutype));
+	// CUDAProb3 takes probType and antineutrino/neutrino separately
     if (MCSamples[iSample].nutype < 0) {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Antineutrino;}
     else {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Neutrino;}
 #if defined (CPU_ONLY)
+//if we just want to use CUDAProb3 CPU then setup BeamCpuPropagator object
 #if defined (MULTITHREAD)
+//if we want to multithread then get number of threads from OMP_NUM_THREADS env variable
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, std::atoi(std::getenv("OMP_NUM_THREADS")));
   MCSamples[iSample].Oscillator->setPathLength(PathLength);
   MCSamples[iSample].Oscillator->setDensity(Density);
 #else
+//if we're not mulithreading then just set it to 1
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
   MCSamples[iSample].Oscillator->setPathLength(PathLength);
   MCSamples[iSample].Oscillator->setDensity(Density);
 #endif //MULTITHREAD
 #else
+//if we want to use CUDAProb3 GPU then setup BeamCudaPropagator object
     MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, MCSamples[iSample].nEvents);
     MCSamples[iSample].Oscillator->setPathLength(PathLength);
     MCSamples[iSample].Oscillator->setDensity(Density);
