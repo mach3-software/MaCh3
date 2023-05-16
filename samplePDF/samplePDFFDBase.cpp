@@ -144,25 +144,8 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
   return true;
 }
 
+//CalcOsc for Prob3++ CPU
 #if defined (USE_PROB3) && defined (CPU_ONLY)
-
-void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
-{
-
-  for (int i=0; i< (int)MCSamples.size(); ++i) {
-    for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-      MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-    }
-  }
-
-  //KS: Reset the histograms before reweight 
-  ResetHistograms();
-  fillArray();
-
-  return;
-}
-
-
 double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar)
 {
   MCSamples[sample].Oscillator->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
@@ -170,25 +153,10 @@ double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, do
 
   return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
 }
-
 #endif
 
+//CalcOsc for Prob3++ GPU (ProbGpu)
 #if defined (USE_PROB3) && not defined (CPU_ONLY)
-
-void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
-{
-  for (int i=0; i< (int)MCSamples.size(); ++i) {
-    calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
-  }
-
-  //KS: Reset the histograms before reweight 
-  ResetHistograms();
-  
-  fillArray();
-
-  return;
-}
-
 extern "C" void setMNS(double x12, double x13, double x23, double m21, double m23, double Delta, bool kSquared);
 extern "C" void GetProb(int Alpha, int Beta, double Path, double Density, double *Energy, int n, double *oscw); 
 
@@ -200,29 +168,13 @@ void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, doub
 
   if (std::isnan(w[10]))
     {
-      std::cerr << "WARNING: GPU oscillation weight returned NaN! " << w[10] << std::endl;
+      std::cerr << "WARNING: ProbGPU oscillation weight returned NaN! " << w[10] << std::endl;
     }
 }
-
-
 #endif
 
+//CalcOsc for CUDAProb3 CPU/GPU
 #if not defined (USE_PROB3)
-
-void samplePDFFDBase::reweight(double *oscpar) // Reweight function (this should be different depending on whether you use one or 2 sets of oscpars)
-{
-  for (int i=0; i< (int)MCSamples.size(); ++i) {
-    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
-  }
-  
-  //KS: Reset the histograms before reweight 
-  ResetHistograms();
-
-  fillArray();
-
-  return;
-}
-
 void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *oscpar)
 {
 
@@ -231,8 +183,37 @@ void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *
   MCSamples[sample].Oscillator->calculateProbabilities(MCSamples[sample].NeutrinoType);
   MCSamples[sample].Oscillator->getProbabilityArr(w, MCSamples[sample].ProbType);
 }
-
 #endif 
+
+
+void samplePDFFDBase::reweight(double *oscpar) // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
+{
+
+  for (int i=0; i< (int)MCSamples.size(); ++i) {
+
+#if defined (USE_PROB3) && defined (CPU_ONLY)
+	//Prob3 CPU needs to loop through events too
+    for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+      MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+    } //event loop
+#endif
+
+#if defined (USE_PROB3) && not defined (CPU_ONLY)
+    calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
+#endif
+
+#if not defined (USE_PROB3)
+    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
+#endif
+  }// Sample loop
+
+  //KS: Reset the histograms before reweight 
+  ResetHistograms();
+
+  fillArray();
+
+  return;
+}
 
 
 //DB Function which does the core reweighting. This assumes that oscillation weights have already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]
