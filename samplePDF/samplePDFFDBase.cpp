@@ -801,13 +801,15 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
 		//Now check whether the norm has kinematic bounds
 		//i.e. does it only apply to events in a particular kinematic region?
+		//If event fails any kinematic cut, break out of kinematic cut loop
 		bool InBound = true;
 		if ((*it).hasKinBounds) {
 		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) < (*it).Selection[iKinematicParameter][0]) {InBound=false;}
-			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {InBound=false;}
+			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) < (*it).Selection[iKinematicParameter][0]) {InBound=false; continue;}
+			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {InBound=false; continue;}
 		  } 
 		}
+		//Break out of event loop too!
 		if (!InBound) {continue;}
 
 		// Now set 'index bin' for each normalisation parameter
