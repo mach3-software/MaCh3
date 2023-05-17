@@ -781,6 +781,11 @@ void MCMCProcessor::MakeCredibleIntervals() {
         legend->AddEntry(hpost_cl[i][j], Form("%.2f%% credible interval", CredibleRegions[j]), "f") ;
 
     legend->Draw("SAME");
+
+    // Write to file
+    Posterior->SetName(hpost[i]->GetName());
+    Posterior->SetTitle(hpost[i]->GetTitle());
+
     if(printToPDF) Posterior->Print(CanvasName);
     // cd into directory in root file
     CredibleDir->cd();
