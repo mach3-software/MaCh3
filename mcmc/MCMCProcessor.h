@@ -95,6 +95,8 @@ class MCMCProcessor {
     void DrawPostfit();
     // Make and Draw Violin
     void MakeViolin();
+    // Make and Draw Credible
+    void MakeCredibleIntervals();
     // Draw the post-fit covariances
     void DrawCovariance();
 
@@ -217,8 +219,6 @@ class MCMCProcessor {
     
     // The output file
     TFile *OutputFile;
-    // Directory for posteriors
-    TDirectory *PostDir;
 
     int nDraw;
     std::vector<int> nParam;

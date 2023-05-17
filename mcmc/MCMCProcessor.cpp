@@ -265,9 +265,9 @@ void MCMCProcessor::MakePostfit() {
   
   std::cout << "MCMCProcessor is making post-fit plots..." << std::endl;
 
-  PostDir = OutputFile->mkdir("Post");
+  // Directory for posteriors
+  TDirectory *PostDir = OutputFile->mkdir("Post");
 
-  
   // We fit with this Gaussian
   Gauss = new TF1("Gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",-5,5);
   Gauss->SetLineWidth(2);
@@ -287,7 +287,6 @@ void MCMCProcessor::MakePostfit() {
     
     GetNthParameter(i, Nominal, NominalError, Title);
 
-    OutputFile->cd();
     // This holds the posterior density
     const double maxi = Chain->GetMaximum(BranchNames[i]);
     const double mini = Chain->GetMinimum(BranchNames[i]);
@@ -703,6 +702,109 @@ void MCMCProcessor::DrawPostfit() {
 
   //KS: Return Margin to default one
   Posterior->SetBottomMargin(0.1);
+}
+
+// *********************
+// Make fancy violin plots
+void MCMCProcessor::MakeCredibleIntervals() {
+// *********************
+
+  if(hpost[0] == NULL) MakePostfit();
+  std::cout << "Making Credible Intervals "<< std::endl;
+
+  Posterior->SetLeftMargin(0.15);
+
+  //Should be easy way to set credible intervals via config keep it for now
+  const int nCredible = 3;
+  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
+  const Color_t CredibleRegionsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
+  TH1D** hpost_copy = new TH1D*[nDraw];
+  TH1D*** hpost_cl = new TH1D**[nDraw];
+
+  //KS: Copy all histograms to be thread safe
+  for (int i = 0; i < nDraw; ++i)
+  {
+    hpost_copy[i] = (TH1D*) hpost[i]->Clone(Form("hpost_copy_%i", i));
+    hpost_cl[i] = new TH1D*[nCredible];
+
+    for (int j = 0; j < nCredible; ++j)
+    {
+      hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleRegions[j]));
+      //KS: Reset to get rid to TF1 otherwise we run into segfault :(
+      hpost_cl[i][j]->Reset("");
+      hpost_cl[i][j]->Fill(0.0, 0.0);
+    }
+  }
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < nDraw; ++i)
+  {
+    /// Scale the histograms so it shows the posterior probability
+    hpost_copy[i] -> Scale(1. / hpost_copy[i]->Integral());
+    for (int j = 0; j < nCredible; ++j)
+    {
+      // Scale the histograms before gettindg credible intervals
+      hpost_cl[i][j] -> Scale(1. / hpost_cl[i][j]->Integral());
+
+      GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleRegions[j]);
+      hpost_cl[i][j]->SetFillColor(CredibleRegionsColours[j]);
+      hpost_cl[i][j]->SetLineWidth(1);
+    }
+    hpost_copy[i]->GetYaxis()->SetTitleOffset(1.8);
+    hpost_copy[i]->SetLineWidth(1);
+    hpost_copy[i]->SetMaximum(hpost_copy[i]->GetMaximum()*1.2);
+    hpost_copy[i]->SetLineWidth(2) ;
+    hpost_copy[i]->SetLineColor(kBlack) ;
+    hpost_copy[i]->GetYaxis()->SetTitle("Posterior probability density");
+  }
+
+  OutputFile->cd();
+  TDirectory *CredibleDir = OutputFile->mkdir("Credible");
+
+  for (int i = 0; i < nDraw; ++i)
+  {
+    if(!IamVaried[i]) continue;
+
+    TLegend* legend = new TLegend(0.20, 0.7, 0.4, 0.92);
+    legend->SetTextSize(0.03);
+    legend->SetFillColor(0);
+    legend->SetFillStyle(0);
+    legend->SetLineColor(0);
+    legend->SetLineStyle(0);
+    hpost_copy[i]->Draw("HIST");
+
+    for (int j = 0; j < nCredible; ++j)
+        hpost_cl[i][j]->Draw("HIST SAME");
+    for (int j = nCredible-1; j >= 0; --j)
+        legend->AddEntry(hpost_cl[i][j], Form("%.2f%% credible interval", CredibleRegions[j]), "f") ;
+
+    legend->Draw("SAME");
+    if(printToPDF) Posterior->Print(CanvasName);
+    // cd into directory in root file
+    CredibleDir->cd();
+    Posterior->Write();
+
+    delete legend;
+  }
+
+  OutputFile->cd();
+  //KS: Remove histogrms
+  for (int i = 0; i < nDraw; ++i)
+  {
+    delete hpost_copy[i];
+    for (int j = 0; j < nCredible; ++j)
+    {
+      delete hpost_cl[i][j];
+    }
+    delete[] hpost_cl[i];
+  }
+  delete[] hpost_copy;
+  delete[] hpost_cl;
+
+  //Set back to normal
+  Posterior->SetLeftMargin(0.10);
 }
 
 
