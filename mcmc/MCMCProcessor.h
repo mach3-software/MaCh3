@@ -95,10 +95,12 @@ class MCMCProcessor {
     void DrawPostfit();
     // Make and Draw Violin
     void MakeViolin();
-    // Make and Draw Credible
+    // Make and Draw Credible intervals
     void MakeCredibleIntervals();
     // Draw the post-fit covariances
     void DrawCovariance();
+    // Make and Draw Credible Regions
+    void MakeCredibleRegions();
 
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
@@ -150,7 +152,7 @@ class MCMCProcessor {
     inline void GetGaussian(TH1D *& hpost, const int i);
     inline void GetHPD(TH1D * const hpost, const int i, const double coverage = 0.6827);
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
-    inline void GetCredibleInterval(TH2D* const hpost, TH2D* hpost_copy, const double coverage = 0.6827);
+    inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
 
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();

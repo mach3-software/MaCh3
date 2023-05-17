@@ -705,7 +705,7 @@ void MCMCProcessor::DrawPostfit() {
 }
 
 // *********************
-// Make fancy violin plots
+// Make fancy Credible Intervals plots
 void MCMCProcessor::MakeCredibleIntervals() {
 // *********************
 
@@ -773,12 +773,13 @@ void MCMCProcessor::MakeCredibleIntervals() {
     legend->SetFillStyle(0);
     legend->SetLineColor(0);
     legend->SetLineStyle(0);
+    legend->SetBorderSize(0);
     hpost_copy[i]->Draw("HIST");
 
     for (int j = 0; j < nCredible; ++j)
         hpost_cl[i][j]->Draw("HIST SAME");
     for (int j = nCredible-1; j >= 0; --j)
-        legend->AddEntry(hpost_cl[i][j], Form("%.2f%% credible interval", CredibleRegions[j]), "f") ;
+        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f") ;
 
     legend->Draw("SAME");
 
@@ -1333,9 +1334,142 @@ void MCMCProcessor::DrawCovariance() {
   hCovSq->Write("Covariance_sq_plot");
   hCorr->Write("Correlation_plot");
   
+  //Back to normal
+  Posterior->SetRightMargin(0.03);
   delete hCov;
   delete hCovSq;
   delete hCorr;
+}
+
+
+// *********************
+// Make fancy Credible Intervals plots
+void MCMCProcessor::MakeCredibleRegions() {
+// *********************
+
+  if(hpost2D[0][0] == NULL) MakeCovariance_MP();
+  std::cout << "Making Credible Regions "<< std::endl;
+
+  //Should be easy way to set credible intervals via config keep it for now
+  const int nCredible = 3;
+  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
+  const Style_t CredibleRegionStyle[nCredible] = {kDashed, kSolid, kDotted};
+  const Color_t CredibleRegionColor[nCredible] = {kGreen-3, kGreen-10, kGreen};
+
+  TH2D*** hpost_2D_copy = new TH2D**[nDraw];
+  TH2D**** hpost_2D_cl = new TH2D***[nDraw];
+
+  //KS: Copy all histograms to be thread safe
+  for (int i = 0; i < nDraw; ++i)
+  {
+    hpost_2D_copy[i] = new TH2D*[nDraw];
+    hpost_2D_cl[i] = new TH2D**[nDraw];
+    for (int j = 0; j <= i; ++j)
+    {
+      hpost_2D_copy[i][j] = (TH2D*) hpost2D[i][j]->Clone( Form("hpost_copy_%i_%i", i, j));
+
+      hpost_2D_cl[i][j] = new TH2D*[nCredible];
+      for (int k = 0; k < nCredible; ++k)
+      {
+        hpost_2D_cl[i][j][k] = (TH2D*)hpost2D[i][j]->Clone( Form("hpost_copy_%i_%i_CL_%f", i, j, CredibleRegions[k]));;
+      }
+    }
+  }
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  //Calcualte creadible histogram
+  for (int i = 0; i < nDraw; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      for (int k = 0; k < nCredible; ++k)
+      {
+        GetCredibleRegion(hpost_2D_cl[i][j][k], CredibleRegions[k]);
+        hpost_2D_cl[i][j][k]->SetLineColor(CredibleRegionColor[k]);
+        hpost_2D_cl[i][j][k]->SetLineWidth(2);
+        hpost_2D_cl[i][j][k]->SetLineStyle(CredibleRegionStyle[k]);
+      }
+    }
+  }
+
+  gStyle->SetPalette(51);
+  for (int i = 0; i < nDraw; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      // Skip the diagonal elements which we've already done above
+      if (j == i) continue;
+      if (IamVaried[j] == false) continue;
+
+      TLegend* legend = new TLegend(0.20, 0.7, 0.4, 0.92);
+      legend->SetTextColor(kRed);
+      legend->SetTextSize(0.03);
+      legend->SetFillColor(0);
+      legend->SetFillStyle(0);
+      legend->SetLineColor(0);
+      legend->SetLineStyle(0);
+      legend->SetBorderSize(0);
+
+      //Get Best point
+      TGraph *bestfitM = new TGraph(1);
+      const int MaxBin = hpost_2D_copy[i][j]->GetMaximumBin();
+      int Mbx, Mby, Mbz;
+      hpost_2D_copy[i][j]->GetBinXYZ(MaxBin, Mbx, Mby, Mbz);
+      const double Mx = hpost_2D_copy[i][j]->GetXaxis()->GetBinCenter(Mbx);
+      const double My = hpost_2D_copy[i][j]->GetYaxis()->GetBinCenter(Mby);
+
+      bestfitM->SetPoint(0, Mx, My);
+      bestfitM->SetMarkerStyle(22);
+      bestfitM->SetMarkerSize(1);
+      bestfitM->SetMarkerColor(kMagenta);
+      legend->AddEntry(bestfitM,"Best Fit","p");
+
+      //Plot default 2D posterior
+      hpost_2D_copy[i][j]->Draw("COLZ");
+
+      //Now credible regions
+      for (int k = 0; k < nCredible; ++k)
+        hpost_2D_cl[i][j][k]->Draw("CONT3 SAME");
+      for (int k = nCredible-1; k >= 0; --k)
+        legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l") ;
+
+      legend->Draw("SAME");
+      bestfitM->Draw("SAME.P");
+
+      // Write to file
+      Posterior->SetName(hpost2D[i][j]->GetName());
+      Posterior->SetTitle(hpost2D[i][j]->GetTitle());
+
+      if(printToPDF) Posterior->Print(CanvasName);
+      // Write it to root file
+      //OutputFile->cd();
+      //Posterior->Write();
+
+      delete legend;
+      delete bestfitM;
+    }
+  }
+
+  OutputFile->cd();
+  //KS: Remove histogrms
+  for (int i = 0; i < nDraw; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      delete hpost_2D_copy[i][j];
+      for (int k = 0; k < nCredible; ++k)
+      {
+        delete hpost_2D_cl[i][j][k];
+      }
+      delete[] hpost_2D_cl[i][j];
+    }
+    delete[] hpost_2D_copy[i];
+    delete[] hpost_2D_cl[i];
+  }
+  delete[] hpost_2D_copy;
+  delete[] hpost_2D_cl;
 }
 
 // **************************
@@ -1409,7 +1543,6 @@ void MCMCProcessor::ScanInput() {
     }
   }
   nDraw = BranchNames.size();
-
   
   // Read the input Covariances
   ReadInputCov();
@@ -2091,25 +2224,18 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
 }
 
 // ***************
-//KS: Get 2D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
-void MCMCProcessor::GetCredibleInterval(TH2D* const hpost, TH2D* hpost_copy, const double coverage) {
+//KS: Set 2D contour within some coverage
+void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) {
 // ***************
-
-  //KS: Reset first copy of histogram
-  hpost_copy->Reset("");
-  hpost_copy->Fill(0.0, 0.0, 0.0);
 
   //KS: Temporary structure to be thread save
   double **hist_copy = new double*[hpost->GetXaxis()->GetNbins()+1];
-  bool **hist_copy_fill = new bool*[hpost->GetXaxis()->GetNbins()+1];
   for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
   {
     hist_copy[i] = new double[hpost->GetYaxis()->GetNbins()+1];
-    hist_copy_fill[i] = new bool[hpost->GetYaxis()->GetNbins()+1];
     for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
     {
       hist_copy[i][j] = hpost->GetBinContent(i,j);
-      hist_copy_fill[i][j] = false;
     }
   }
 
@@ -2117,6 +2243,8 @@ void MCMCProcessor::GetCredibleInterval(TH2D* const hpost, TH2D* hpost_copy, con
   const long double Integral = hpost->Integral();
   long double sum = 0;
 
+  //We need to as ROOT requiers array to set to contour
+  double Contour[1];
   while ((sum / Integral) < coverage)
   {
     /// Get bin of highest content and save the number of entries reached so far
@@ -2137,27 +2265,18 @@ void MCMCProcessor::GetCredibleInterval(TH2D* const hpost, TH2D* hpost_copy, con
     }
     /// Replace bin value by -1 so it is not looped over as being maximum bin again
     hist_copy[max_entry_bin_x][max_entry_bin_y] = -1.;
-    hist_copy_fill[max_entry_bin_x][max_entry_bin_y] = true;
 
     sum += max_entries;
+    Contour[0] = max_entries;
   }
-  //KS: Now fill our copy only for bins which got included in coverage region
-  for(int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
-  {
-    for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
-    {
-      if(hist_copy_fill[i][j]) hpost_copy->SetBinContent(i,j, hpost->GetBinContent(i, j));
-    }
-  }
+  hpost->SetContour(1, Contour);
 
   //Delete temporary arrays
   for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
   {
     delete[] hist_copy[i];
-    delete[] hist_copy_fill[i];
   }
   delete[] hist_copy;
-  delete[] hist_copy_fill;
 
   return;
 }
