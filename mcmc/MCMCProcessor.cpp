@@ -742,11 +742,11 @@ void MCMCProcessor::MakeCredibleIntervals() {
   for (int i = 0; i < nDraw; ++i)
   {
     /// Scale the histograms so it shows the posterior probability
-    hpost_copy[i] -> Scale(1. / hpost_copy[i]->Integral());
+    hpost_copy[i]->Scale(1. / hpost_copy[i]->Integral());
     for (int j = 0; j < nCredible; ++j)
     {
       // Scale the histograms before gettindg credible intervals
-      hpost_cl[i][j] -> Scale(1. / hpost_cl[i][j]->Integral());
+      hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
 
       GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleRegions[j]);
       hpost_cl[i][j]->SetFillColor(CredibleRegionsColours[j]);
@@ -755,9 +755,9 @@ void MCMCProcessor::MakeCredibleIntervals() {
     hpost_copy[i]->GetYaxis()->SetTitleOffset(1.8);
     hpost_copy[i]->SetLineWidth(1);
     hpost_copy[i]->SetMaximum(hpost_copy[i]->GetMaximum()*1.2);
-    hpost_copy[i]->SetLineWidth(2) ;
-    hpost_copy[i]->SetLineColor(kBlack) ;
-    hpost_copy[i]->GetYaxis()->SetTitle("Posterior probability density");
+    hpost_copy[i]->SetLineWidth(2);
+    hpost_copy[i]->SetLineColor(kBlack);
+    hpost_copy[i]->GetYaxis()->SetTitle("Posterior Probability");
   }
 
   OutputFile->cd();
@@ -2285,18 +2285,14 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) 
 // Pass central value
 void MCMCProcessor::GetNthParameter(const int param, double &Nominal, double &NominalError, TString &Title){
 // **************************
-    for(int i = 0; i < kNParameterEnum; i++)
-    {
-        if (ParamType[param] == ParameterEnum(i)) 
-        {
-            int ParamNo = __UNDEF__;
-            ParamNo = param - ParamTypeStartPos[ParameterEnum(i)];
-            
-            Nominal = ParamCentral[ParameterEnum(i)][ParamNo];
-            NominalError = ParamErrors[ParameterEnum(i)][ParamNo];
-            Title = ParamNames[ParameterEnum(i)][ParamNo];
-        }
-    }
+
+    ParameterEnum ParType = ParamType[param];
+    int ParamNo = __UNDEF__;
+    ParamNo = param - ParamTypeStartPos[ParType];
+
+    Nominal = ParamCentral[ParameterEnum()][ParamNo];
+    NominalError = ParamErrors[ParType][ParamNo];
+    Title = ParamNames[ParType][ParamNo];
     return;
 }
 
@@ -2319,6 +2315,71 @@ void MCMCProcessor::ResetHistograms() {
     }
 }
 
+// **************************
+// Get Bayes Factor for particualar parameter
+void MCMCProcessor::GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name){
+// **************************
+
+    if(hpost[0] == NULL) MakePostfit();
+    //KS: First we need to find parameter number based on name
+    int ParamNo = __UNDEF__;
+    for (int i = 0; i < nDraw; ++i)
+    {
+      TString Title = "";
+      double Nominal = 1.0;
+      double NominalError = 1.0;
+
+      GetNthParameter(i, Nominal, NominalError, Title);
+
+      if(ParName == Title) ParamNo = i;
+    }
+    if(ParamNo == __UNDEF__)
+    {
+      std::cout<<"Couldn't find param "<<ParName<<". Will not calculate Bayes factor"<<std::endl;
+      return;
+    }
+
+    long double IntegralMode1 = hpost[ParamNo]->Integral(hpost[ParamNo]->FindFixBin(M1_min), hpost[ParamNo]->FindFixBin(M1_max));
+    long double IntegralMode2 = hpost[ParamNo]->Integral(hpost[ParamNo]->FindFixBin(M2_min), hpost[ParamNo]->FindFixBin(M2_max));
+
+    double BayesFactor = 0.;
+    std::string Name = "";
+    std::string JeffreysScale = "";
+    //KS: Calc Bayes Factor
+    //If M1 is more likely
+    if(IntegralMode1 >= IntegralMode2)
+    {
+      BayesFactor = IntegralMode1/IntegralMode2;
+      Name = "\\mathfrak{B}(" + M1Name+ "/" + M2Name + ") = " + std::to_string(BayesFactor);
+    }
+    else //If M2 is more likely
+    {
+      BayesFactor = IntegralMode2/IntegralMode1;
+      Name = "\\mathfrak{B}(" + M2Name+ "/" + M1Name + ") = " + std::to_string(BayesFactor);
+    }
+    JeffreysScale = GetJeffreysScale(BayesFactor);
+
+    std::cout<<Name<<" for "<<ParName<<std::endl;
+    std::cout<<"Following Jeffreys Scale = "<<JeffreysScale<<std::endl;
+
+    return;
+}
+
+// **************************
+// KS: Following H. Jeffreys. The theory of probability. UOP Oxford, 1998. DOI: 10.2307/3619118.
+std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
+// **************************
+    std::string JeffreysScale = "";
+    //KS: Get fancy Jeffreys Scale as I am to lazy to look into table everytime
+    if(BayesFactor < 0)        JeffreysScale = "Negative";
+    else if( 5 > BayesFactor)  JeffreysScale = "Barely worth mentioning";
+    else if( 10 > BayesFactor) JeffreysScale = "Substantial";
+    else if( 15 > BayesFactor) JeffreysScale = "Strong";
+    else if( 20 > BayesFactor) JeffreysScale = "Very strong";
+    else JeffreysScale = "Decisive";
+
+    return JeffreysScale;
+}
 
 // **************************
 // Diagnose the MCMC
@@ -2492,7 +2553,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
   }
 
   clock.Stop();
-
   std::cout << "Took " << clock.RealTime() << "s to finish caching statistic for Diag MCMC with " << nEntries << " steps" << std::endl;
 
   // Make the sums into average
@@ -2516,6 +2576,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
 void MCMCProcessor::ParamTraces() {
 // *****************
 
+  if (ParStep == NULL) PrepareDiagMCMC();
   std::cout << "Making trace plots..." << std::endl;
 
   // Make the TH1Ds
@@ -2613,6 +2674,8 @@ void MCMCProcessor::ParamTraces() {
 //KS: Calculate autocoraetlions supports both OpenMP and CUDA :)
 void MCMCProcessor::AutoCorrelation() {
 // *********************************
+
+  if (ParStep == NULL) PrepareDiagMCMC();
 
   TStopwatch clock;
   clock.Start();
@@ -2843,6 +2906,8 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 
 // **************************
 // KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
+// Furthermore we calcualte Sampling efficiency follwing https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
+// Rule of thumb is to have efficiency above 25%
 void MCMCProcessor::CalculateESS(const int nLags) {
 // **************************
 
@@ -2852,33 +2917,18 @@ void MCMCProcessor::CalculateESS(const int nLags) {
     std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
-  double* EffectiveSampleSize = new double[nDraw];
-  OutputFile->cd();
-  TDirectory *ESSDir = OutputFile->mkdir("ESS");
-  ESSDir->cd();
-  TTree* ESSTree = new TTree("ESS_tree", "ESS_tree");
-
-  // Loop over the parameters of interest
-  for (int j = 0; j < nDraw; ++j)
-  {
-    TString Title = BranchNames[j];
-    double Nominal = 1.0;
-    double NominalError = 1.0;
-
-    GetNthParameter(j, Nominal, NominalError, Title);
-    std::string HistName = Form("%s_%s_ESS", Title.Data(), BranchNames[j].Data());
-
-    EffectiveSampleSize[j] = __UNDEF__;
-    ESSTree->Branch(HistName.c_str(), &EffectiveSampleSize[j]);
-  }
+  TVectorD* EffectiveSampleSize = new TVectorD(nDraw);
+  TVectorD* SamplingEfficiency = new TVectorD(nDraw);
 
   double *TempDenominator = new double[nDraw]();
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  //KS: Calculate ESS for each parameter
+  //KS: Calculate ESS and MCMC efficiency for each parameter
   for (int j = 0; j < nDraw; ++j)
   {
+    (*EffectiveSampleSize)(j) = __UNDEF__;
+    (*SamplingEfficiency)(j) = __UNDEF__;
     TempDenominator[j] = 0.;
     //KS: Firs sum over all Calculated autoceralations
     for (int k = 0; k < nLags; ++k)
@@ -2886,16 +2936,21 @@ void MCMCProcessor::CalculateESS(const int nLags) {
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
-    EffectiveSampleSize[j] = nEntries/TempDenominator[j];
+    (*EffectiveSampleSize)(j) = nEntries/TempDenominator[j];
+    // 100 becasue we convert to percentage
+    (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
   }
 
   //KS Write to the output tree
-  ESSTree->Fill();
-  ESSTree->Write();
+  //Save to file
+  OutputFile->cd();
+  EffectiveSampleSize->Write("EffectiveSampleSize");
+  SamplingEfficiency->Write("SamplingEfficiency");
 
-  delete ESSTree;
+  //Delete all variables
+  delete EffectiveSampleSize;
+  delete SamplingEfficiency;
   //KS Remove auxiliary arrays
-  delete[] EffectiveSampleSize;
   delete[] TempDenominator;
 }
 
@@ -2903,6 +2958,8 @@ void MCMCProcessor::CalculateESS(const int nLags) {
 // Batched means, literally read from an array and chuck into TH1D
 void MCMCProcessor::BatchedMeans() {
 // **************************
+
+  if (BatchedAverages == NULL) PrepareDiagMCMC();
 
   TH1D ** BatchedParamPlots = new TH1D*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
@@ -3077,6 +3134,8 @@ void MCMCProcessor::BatchedAnalysis() {
 // Acceptance Probability
 void MCMCProcessor::AcceptanceProbabilities() {
 // **************************
+    if (AccProbBatchedAverages == NULL) PrepareDiagMCMC();
+
     std::cout << "Making AccProb plots..." << std::endl;
 
     // Set the titles and limits for TH1Ds

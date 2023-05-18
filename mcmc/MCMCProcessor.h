@@ -106,7 +106,8 @@ class MCMCProcessor {
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
 
     void GetNthParameter(const int param, double &Nominal, double &NominalError, TString &Title);
-    
+    void GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name);
+
     int GetnEntries(){return nEntries;};
     int GetnSteps(){return nSteps;};
     //KS: Many setters which in future will be loaded via config
@@ -153,6 +154,8 @@ class MCMCProcessor {
     inline void GetHPD(TH1D * const hpost, const int i, const double coverage = 0.6827);
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
+    inline std::string GetJeffreysScale(const double BayesFactor);
+
 
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();
