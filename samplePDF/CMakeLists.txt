@@ -18,7 +18,7 @@ add_library(SamplePDF SHARED ${SamplePDF_implementation_files})
 target_include_directories(SamplePDF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if (USE_PROB3)
-  target_link_libraries(SamplePDF Splines Covariance Manager CUDAProb3Beam CUDAProb3Atmos Prob3plusplus)
+  target_link_libraries(SamplePDF Splines Covariance Manager Prob3plusplus)
 else()
   target_link_libraries(SamplePDF Splines Covariance Manager CUDAProb3Beam CUDAProb3Atmos)
 endif()

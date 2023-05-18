@@ -50,25 +50,6 @@ CPMFindPackage(
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
 
-if (${CPU_ONLY})
-
-  CPMFindPackage(
-      NAME CUDAProb3
-      GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-      GIT_TAG "main"
-  )
-
-else()
-  
-  CPMFindPackage(
-      NAME CUDAProb3
-      GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-      GIT_TAG "main"
-	  OPTIONS "GPU_ON ON"
-  )
-
-endif()
-
 if (${USE_PROB3})
 
   CPMFindPackage(
@@ -77,6 +58,27 @@ if (${USE_PROB3})
       GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
       GIT_TAG v3.10.3
   )
+
+else()
+
+  if (${CPU_ONLY})
+
+    CPMFindPackage(
+        NAME CUDAProb3
+        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+        GIT_TAG "main"
+    )
+
+  else()
+  
+    CPMFindPackage(
+        NAME CUDAProb3
+        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+        GIT_TAG "main"
+	    OPTIONS "GPU_ON ON"
+    )
+
+  endif()
 
 endif()
 

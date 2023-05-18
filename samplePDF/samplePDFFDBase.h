@@ -23,10 +23,10 @@
 //Propagator includes
 #ifdef USE_PROB3
   #include "BargerPropagator.h"
+#else
+  #include "beamcudapropagator.cuh"
+  #include "atmoscudapropagator.cuh"
 #endif
-
-#include "beamcudapropagator.cuh"
-#include "atmoscudapropagator.cuh"
 
 //MaCh3 includes
 #include "interfacePDFEbE.h"
@@ -203,7 +203,9 @@ public:
   // Helper function to reset histograms
   inline void ResetHistograms();
   
+#ifndef USE_PROB3
   inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
+#endif
   //===============================================================================
   //DB Variables required for GetLikelihood
   //
@@ -228,11 +230,6 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
-
-  // Propagator
-  // Will initialise either Prob3++ or CUDAProb3 depending on USE_PROB3 flag
-  // CUDA/CPU versions of CUDAProb3 set with CPU_ONLY flag
-  // If USEPROB3=true and CPU_ONLY=false, probGpu is setup in source code
 
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;

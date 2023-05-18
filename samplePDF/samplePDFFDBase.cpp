@@ -1372,7 +1372,7 @@ double samplePDFFDBase::GetLikelihood()
   return negLogL;
 }
  
- 
+#ifndef USE_PROB3 
 // ************************************************
 // Switch from MaCh3 CUDAProb flavour to CUDAProb Probtype
 inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu) {
@@ -1390,4 +1390,5 @@ inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUD
     case CUDAProb_nu::t_t : return cudaprob3::ProbType::t_t;
   }
 }
+#endif
 
