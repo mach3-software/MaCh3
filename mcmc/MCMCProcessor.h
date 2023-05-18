@@ -105,7 +105,7 @@ class MCMCProcessor {
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
 
-    void GetNthParameter(const int param, double &Nominal, double &NominalError, TString &Title);
+    void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
     void GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name);
 
     int GetnEntries(){return nEntries;};

@@ -114,7 +114,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
    ParamSums_gpu = NULL;
    DenomSum_gpu = NULL;
   #endif
-    
 }
 
 // ****************************
@@ -195,7 +194,7 @@ void MCMCProcessor::GetPostfit(TVectorD *&Central_PDF, TVectorD *&Errors_PDF, TV
 }
 
 // ***************
-// Get post-fits for the ParameterEnum type, e.g. xsec params, ND280 params or flux params
+// Get post-fits for the ParameterEnum type, e.g. xsec params, ND params or flux params etc
 void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors, TVectorD *&Peak_Values, ParameterEnum kParam) {
 // ***************
   // Make the post fit
@@ -281,11 +280,11 @@ void MCMCProcessor::MakePostfit() {
     }
 
     OutputFile->cd();
-    TString Title = BranchNames[i];
-    double Nominal = 1.0;
-    double NominalError = 1.0;
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
     
-    GetNthParameter(i, Nominal, NominalError, Title);
+    GetNthParameter(i, Prior, PriorError, Title);
 
     // This holds the posterior density
     const double maxi = Chain->GetMaximum(BranchNames[i]);
@@ -300,16 +299,7 @@ void MCMCProcessor::MakePostfit() {
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
-    for(int ik = 0; ik < kNParameterEnum; ++ik)
-    {
-        if (ParamType[i] == ParameterEnum(ik))
-        {
-            int ParamNo = __UNDEF__;
-            ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
-
-            (*Central_Value)(i)  = ParamCentral[ParameterEnum(ik)][ParamNo];
-        }
-    }
+    (*Central_Value)(i) = Prior;
 
     GetArithmetic(hpost[i], i);
     GetGaussian(hpost[i], i);
@@ -332,7 +322,7 @@ void MCMCProcessor::MakePostfit() {
     hpost[i]->GetXaxis()->SetTitle(hpost[i]->GetTitle());
     
     // Now make the TLine for the Asimov
-    TLine *Asimov = new TLine(Nominal, hpost[i]->GetMinimum(), Nominal, hpost[i]->GetMaximum());
+    TLine *Asimov = new TLine(Prior, hpost[i]->GetMinimum(), Prior, hpost[i]->GetMaximum());
     Asimov->SetLineColor(kRed-3);
     Asimov->SetLineWidth(2);
     Asimov->SetLineStyle(kDashed);
@@ -342,7 +332,7 @@ void MCMCProcessor::MakePostfit() {
     leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
     leg->AddEntry(Gauss, Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
     leg->AddEntry(hpd, Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
-    leg->AddEntry(Asimov, Form("#splitline{Asimov}{x = %.2f , #sigma = %.2f}", Nominal, NominalError), "l");
+    leg->AddEntry(Asimov, Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
     leg->SetLineColor(0);
     leg->SetLineStyle(0);
     leg->SetFillColor(0);
@@ -353,19 +343,10 @@ void MCMCProcessor::MakePostfit() {
     {
         std::cout << "Found fixed parameter, moving on" << std::endl;
         IamVaried[i] = false;
-        //KS:Set mean and error to prior for fixed parameters, this is mostly for comaprison with BANFF
-        //but it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
-        for(int ik = 0; ik < kNParameterEnum; ik++)
-        {
-            if (ParamType[i] == ParameterEnum(ik)) 
-            {
-                int ParamNo = __UNDEF__;
-                ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
-                
-                (*Means_HPD)(i)  = ParamCentral[ParameterEnum(ik)][ParamNo];
-                (*Errors_HPD)(i) = ParamErrors[ParameterEnum(ik)][ParamNo];
-            }
-        }
+        //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
+        (*Means_HPD)(i)  = Prior;
+        (*Errors_HPD)(i) = PriorError;
+
         delete Asimov;
         delete hpd;
         delete leg;
@@ -450,7 +431,7 @@ void MCMCProcessor::MakePostfit() {
 // Draw the postfit
 void MCMCProcessor::DrawPostfit() {
 // *******************
-//
+
   if (OutputFile == NULL) MakeOutputFile();
 
   // Make the prefit plot
@@ -494,17 +475,9 @@ void MCMCProcessor::DrawPostfit() {
   for (int i = 0; i < nDraw; ++i)
   {
     //Those keep which parameter type we run currently and realtive number  
-    int ParamNo = __UNDEF__;
-    int ParamEnu = __UNDEF__;
-    for(int ik = 0; ik < kNParameterEnum; ik++)
-    {
-        if (ParamType[i] == ParameterEnum(ik)) 
-        {
-            ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
-            ParamEnu = ParameterEnum(ik);
-        }
-    }
-      
+    int ParamEnu = ParamType[i];
+    int ParamNo = i - ParamTypeStartPos[ParameterEnum(ParamEnu)];
+
     //KS: Sliglthy hacky way to get realtive to prior or nominal as this is convention we use
     //This only applies for xsec for other systematic types doesn't matter
     double CentralValueTemp = 0;
@@ -767,6 +740,18 @@ void MCMCProcessor::MakeCredibleIntervals() {
   {
     if(!IamVaried[i]) continue;
 
+    // Now make the TLine for the Asimov
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+
+    GetNthParameter(i, Prior, PriorError, Title);
+
+    TLine *Asimov = new TLine(Prior, hpost_copy[i]->GetMinimum(), Prior, hpost_copy[i]->GetMaximum());
+    Asimov->SetLineColor(kRed-3);
+    Asimov->SetLineWidth(2);
+    Asimov->SetLineStyle(kDashed);
+
     TLegend* legend = new TLegend(0.20, 0.7, 0.4, 0.92);
     legend->SetTextSize(0.03);
     legend->SetFillColor(0);
@@ -780,8 +765,9 @@ void MCMCProcessor::MakeCredibleIntervals() {
         hpost_cl[i][j]->Draw("HIST SAME");
     for (int j = nCredible-1; j >= 0; --j)
         legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f") ;
-
+    legend->AddEntry(Asimov, Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
     legend->Draw("SAME");
+    Asimov->Draw("SAME");
 
     // Write to file
     Posterior->SetName(hpost[i]->GetName());
@@ -793,6 +779,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
     Posterior->Write();
 
     delete legend;
+    delete Asimov;
   }
 
   OutputFile->cd();
@@ -856,9 +843,9 @@ void MCMCProcessor::MakeViolin() {
             hviolin->SetBinContent(x+1, y,  hviolin->GetBinContent(x+1, y)+1);
         }
         TString Title;
-        double Nominal, NominalError;
+        double Prior, PriorError;
 
-        GetNthParameter(x, Nominal, NominalError, Title);
+        GetNthParameter(x, Prior, PriorError, Title);
         //Set fancy labels
         hviolin->GetXaxis()->SetBinLabel(x+1, Title);
     } // end the for loop over nDraw
@@ -940,10 +927,10 @@ void MCMCProcessor::MakeCovariance() {
       std::cout << "  " << i << "/" << covBinning << " (" << int((double(i)/double(covBinning)*100.0))+1 << "%)" << std::endl;
     }
       
-    TString Title_i = BranchNames[i];
-    double Nominal_i, NominalError;
+    TString Title_i = "";
+    double Prior_i, PriorError;
 
-    GetNthParameter(i, Nominal_i, NominalError, Title_i);
+    GetNthParameter(i, Prior_i, PriorError, Title_i);
     
     const double min_i = Chain->GetMinimum(BranchNames[i]);
     const double max_i = Chain->GetMaximum(BranchNames[i]);
@@ -963,9 +950,9 @@ void MCMCProcessor::MakeCovariance() {
         continue;
       }
 
-      TString Title_j = BranchNames[j];
-      double Nominal_j, NominalError_j;
-      GetNthParameter(j, Nominal_j, NominalError_j, Title_j);
+      TString Title_j = "";
+      double Prior_j, PriorError_j;
+      GetNthParameter(j, Prior_j, PriorError_j, Title_j);
 
       OutputFile->cd();
 
@@ -1099,9 +1086,9 @@ void MCMCProcessor::CacheSteps() {
         const double Min_Chain_i = Chain->GetMinimum(BranchNames[i]);
         const double Max_Chain_i = Chain->GetMaximum(BranchNames[i]);
         
-        TString Title_i = BranchNames[i];
-        double Nominal_i, NominalError_i;
-        GetNthParameter(i, Nominal_i, NominalError_i, Title_i);
+        TString Title_i = "";
+        double Prior_i, PriorError_i;
+        GetNthParameter(i, Prior_i, PriorError_i, Title_i);
         
         for (int j = 0; j <= i; ++j)
         {
@@ -1111,9 +1098,9 @@ void MCMCProcessor::CacheSteps() {
             // TH2D to hold the Correlation 
             hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain_i, Max_Chain_i, nBins, Min_Chain_j, Max_Chain_j);
             
-            TString Title_j = BranchNames[j];
-            double Nominal_j, NominalError_j;
-            GetNthParameter(j, Nominal_j, NominalError_j, Title_j);
+            TString Title_j = "";
+            double Prior_j, PriorError_j;
+            GetNthParameter(j, Prior_j, PriorError_j, Title_j);
         
             hpost2D[i][j]->SetMinimum(0);
             hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
@@ -1560,7 +1547,6 @@ void MCMCProcessor::ScanInput() {
   std::cout << "# Osc params:   " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   << std::endl;
   std::cout << "************************************************" << std::endl;
 
-  
   nSteps = Chain->GetMaximum("step")/5;
   // Set the step cut to be 20%
   int cut = nSteps/5;
@@ -1667,16 +1653,8 @@ TH1D* MCMCProcessor::MakePrefit() {
   for (int i = 0; i < nDraw; ++i)
   {
     //Those keep which parameter type we run currently and realtive number  
-    int ParamNo = __UNDEF__;
-    int ParamEnum = __UNDEF__;
-    for(int ik = 0; ik < kNParameterEnum; ik++)
-    {
-        if (ParamType[i] == ParameterEnum(ik)) 
-        {
-            ParamNo = i - ParamTypeStartPos[ParameterEnum(ik)];
-            ParamEnum = ParameterEnum(ik);
-        }
-    }
+    int ParamEnum = ParamType[i];
+    int ParamNo = i - ParamTypeStartPos[ParameterEnum(ParamEnum)];
     CentralValueTemp = ParamCentral[ParamEnum][ParamNo];
     if(plotRelativeToPrior) 
     {
@@ -2283,15 +2261,15 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) 
 
 // ***************
 // Pass central value
-void MCMCProcessor::GetNthParameter(const int param, double &Nominal, double &NominalError, TString &Title){
+void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title){
 // **************************
 
     ParameterEnum ParType = ParamType[param];
     int ParamNo = __UNDEF__;
     ParamNo = param - ParamTypeStartPos[ParType];
 
-    Nominal = ParamCentral[ParameterEnum()][ParamNo];
-    NominalError = ParamErrors[ParType][ParamNo];
+    Prior = ParamCentral[ParameterEnum()][ParamNo];
+    PriorError = ParamErrors[ParType][ParamNo];
     Title = ParamNames[ParType][ParamNo];
     return;
 }
@@ -2326,10 +2304,10 @@ void MCMCProcessor::GetBayesFactor(std::string ParName, double M1_min, double M1
     for (int i = 0; i < nDraw; ++i)
     {
       TString Title = "";
-      double Nominal = 1.0;
-      double NominalError = 1.0;
+      double Prior = 1.0;
+      double PriorError = 1.0;
 
-      GetNthParameter(i, Nominal, NominalError, Title);
+      GetNthParameter(i, Prior, PriorError, Title);
 
       if(ParName == Title) ParamNo = i;
     }
@@ -2587,11 +2565,11 @@ void MCMCProcessor::ParamTraces() {
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nDraw; ++j) {
 
-    TString Title = BranchNames[j];
-    double Nominal = 1.0;
-    double NominalError = 1.0;
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
     
-    GetNthParameter(j, Nominal, NominalError, Title);
+    GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Trace", Title.Data(), BranchNames[j].Data());
 
     TraceParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
@@ -2703,11 +2681,11 @@ void MCMCProcessor::AutoCorrelation() {
     }
 
     // Make TH1Ds for each parameter which hold the lag
-    TString Title = BranchNames[j];
-    double Nominal = 1.0;
-    double NominalError = 1.0;
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
     
-    GetNthParameter(j, Nominal, NominalError, Title);
+    GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
     LagKPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
     LagKPlots[j]->GetXaxis()->SetTitle("Lag");
@@ -2963,11 +2941,11 @@ void MCMCProcessor::BatchedMeans() {
 
   TH1D ** BatchedParamPlots = new TH1D*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
-    TString Title = BranchNames[j];
-    double Nominal = 1.0;
-    double NominalError = 1.0;
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
     
-    GetNthParameter(j, Nominal, NominalError, Title);
+    GetNthParameter(j, Prior, PriorError, Title);
     
     std::string HistName = Form("%s_%s_batch", Title.Data(), BranchNames[j].Data());
     BatchedParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nBatches, 0, nBatches);
