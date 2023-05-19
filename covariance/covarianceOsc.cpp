@@ -431,6 +431,12 @@ void covarianceOsc::proposeStep() {
     }
   }
 
+  if(random_number[0]->Uniform()<0.5){
+    // flip octant around point of maximal disappearance (0.5112)
+    // this ensures we move to a parameter value which has the same oscillation probability
+    fParProp[1] = 0.5112 - (fParProp[1] - 0.5112);
+  }
+
   // if flipdelM and parameter 4 is fixed, flip between fixed parameters for two hierarchies (Note: this will flip parameters 4 and 1 - dm23 *and* theta23).
   if (fParSigma[4] < 0.0 && flipdelM)
   {
