@@ -55,7 +55,6 @@ Oscillator::Oscillator(std::string ConfigName) {
   RebinMode = osc_manager->raw()["OscillatorObj"]["OscillatorRebinMode"].as<bool>(); //I do wonder whether I need this as making this work with production height averaging is going to be a pain
   std::cout << std::endl;
 
-  /*
   //####################################################################################
 
   TH2D* PrimaryHistTemplate;
@@ -214,10 +213,8 @@ Oscillator::Oscillator(std::string ConfigName) {
   DefineMiscValues();
   DefinePropagatorEnums();
   InitPropagator();
-  */
 }
 
-/*
 void Oscillator::RebinOscillogram(int Switcher, std::vector<double> NewBinning) {
   if (!RebinMode) {
     std::cout << "Rebin called when Oscillator not in rebin mode. Skipping.." << std::endl;
@@ -957,9 +954,11 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
     if (NeutrinoTypes[i]==Antineutrino) {
       // DB, Haven't really thought about it, but prob3++ sets dcp->-dcp here: https://github.com/rogerwendell/Prob3plusplus/blob/fd189e232e96e2c5ebb2f7bd3a5406b288228e41/BargerPropagator.cc#L235
       // Copying that behaviour gives same behaviour as prob3++/probGPU
-      propagator->setMNSMatrix(theta12, theta13, theta23, -dcp);
+
+      //DB Liban has now implemented a check to deal with the -1 factor inside CUDAProb3::setMNS
+      propagator->setMNSMatrix(theta12, theta13, theta23, dcp, -1);
     } else {
-      propagator->setMNSMatrix(theta12, theta13, theta23, dcp);
+      propagator->setMNSMatrix(theta12, theta13, theta23, dcp, 1);
     }
 
     propagator->calculateProbabilities(NeutrinoTypes[i]);
@@ -1268,7 +1267,7 @@ void Oscillator::InitPropagator() {
   int nCosine = nSecondaryBinsY;
 
 #ifdef USE_GPU
-  propagator = std::unique_ptr<Propagator<FLOAT_T>> ( new CudaPropagatorSingle<FLOAT_T>(0,nCosine, nEnergy)); // Single-GPU propagator
+  propagator = std::unique_ptr<AtmosCpuPropagator<FLOAT_T>> ( new AtmosCudaPropagatorSingle<FLOAT_T>(0,nCosine, nEnergy)); // Single-GPU propagator
 #else
   int nThreads = 1;
   #pragma omp parallel
@@ -1277,7 +1276,7 @@ void Oscillator::InitPropagator() {
     nThreads = omp_get_num_threads();
   }
 
-  propagator = std::unique_ptr<Propagator<FLOAT_T>> ( new CpuPropagator<FLOAT_T>(nCosine, nEnergy, nThreads)); // MultiThread CPU propagator
+  propagator = std::unique_ptr<AtmosCpuPropagator<FLOAT_T>> ( new AtmosCpuPropagator<FLOAT_T>(nCosine, nEnergy, nThreads)); // MultiThread CPU propagator
 #endif
 
   propagator->setEnergyList(SecondaryXBinEvalPoints);
@@ -1330,12 +1329,12 @@ void Oscillator::DefinePropagatorEnums() {
   for (int i=0;i<nInitialFlavours;i++) {
     OscChannels[i].resize(nFinalFlavours);
   }
-  OscChannels[0][0] = e_e;
-  OscChannels[0][1] = e_m;
-  OscChannels[0][2] = e_t;
-  OscChannels[1][0] = m_e;
-  OscChannels[1][1] = m_m;
-  OscChannels[1][2] = m_t;
+  OscChannels[0][0] = cudaprob3::e_e;
+  OscChannels[0][1] = cudaprob3::e_m;
+  OscChannels[0][2] = cudaprob3::e_t;
+  OscChannels[1][0] = cudaprob3::m_e;
+  OscChannels[1][1] = cudaprob3::m_m;
+  OscChannels[1][2] = cudaprob3::m_t;
 
   OscChannels_Names.resize(nInitialFlavours);
   for (int i=0;i<nInitialFlavours;i++) {
@@ -1650,4 +1649,3 @@ std::vector<double> Oscillator::ReturnFineBinningFromCoarseBinnnig(int nFine, st
 
   return ReturnVec;
 }
-*/

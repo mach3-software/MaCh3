@@ -40,7 +40,6 @@ class Oscillator {
  public:
   Oscillator(std::string ConfigName);
 
-  /*
   int GetOscillogramNBins(int Switcher);
 
   void FillOscillogram(double* oscpar, double prodH, double Yp_Val=0.468);
@@ -72,13 +71,11 @@ class Oscillator {
   void PrintOscillatorConfig();
 
   void SaveOscillogramsToFile(TString FileName);
-  */
 
  private:
   //########################################################################################################################
   //Functions
 
-  /*
   void isUsingGPU();
 
   void SetProductionHeightArray();
@@ -138,7 +135,6 @@ class Oscillator {
   std::vector<double> logspace(double Emin, double Emax, int nDiv);
 
   std::vector<double> ReturnFineBinningFromCoarseBinnnig(int nFine, std::vector<double> CoarseBinning);
-  */
 
   //########################################################################################################################
   //Variables
@@ -146,7 +142,7 @@ class Oscillator {
   TString EarthDensityFile;
   TString ProductionHeightFileName;
 
-  std::unique_ptr<Propagator<FLOAT_T>> propagator;
+  std::unique_ptr<AtmosCpuPropagator<FLOAT_T>> propagator;
 
   unsigned int nPrimaryHists;
   double** hPrimaryOscillogram_Arr;

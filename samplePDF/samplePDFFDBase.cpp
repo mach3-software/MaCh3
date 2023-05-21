@@ -189,23 +189,33 @@ void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
 {
 
-  for (int i=0; i< (int)MCSamples.size(); ++i) {
-
+  if (Osc) {
+    //DB Currently hardcoded to assume rho_electrons = rho_matter/2, 25km production height
+    Osc->FillOscillogram(oscpar,25.0,0.5);
+    for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
+      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+	MCSamples[iSample].osc_w[iEvent] = *(MCSamples[iSample].osc_w_pointer[iEvent]);
+      }
+    }
+  } else {
+    for (int i=0; i< (int)MCSamples.size(); ++i) {
+      
 #if defined (USE_PROB3) && defined (CPU_ONLY)
-	//Prob3 CPU needs to loop through events too
-    for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-      MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-    } //event loop
+      //Prob3 CPU needs to loop through events too
+      for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+	MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+      } //event loop
 #endif
-
+      
 #if defined (USE_PROB3) && not defined (CPU_ONLY)
-    calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
+      calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
 #endif
-
+      
 #if not defined (USE_PROB3)
-    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
+      calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
 #endif
-  }// Sample loop
+    }// Sample loop
+  }
 
   //KS: Reset the histograms before reweight 
   ResetHistograms();
@@ -631,6 +641,27 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
       #endif
   }
   return xsecw;
+}
+
+//DB Adding in Oscillator class support for smeared oscillation probabilities
+void samplePDFFDBase::SetOscillator(Oscillator* Osc_) {
+#if defined (USE_PROB3)
+  std::cerr << "Atmospheric Oscillator only defined using CUDAProb3 - USE_PROB3 is defined and indicates that Prob3++/probGPU is being used" << std::endl;
+  throw;
+#endif
+
+  Osc = Osc_;
+  std::cout << "Set Oscillator" << std::endl;
+
+  FindEventOscBin();
+}
+
+void samplePDFFDBase::FindEventOscBin() {
+  for(int i = 0; i < getNMCSamples(); i++) {
+    for (int j = 0;j < getNEventsInSample(i); j++) {
+      MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),MCSamples[i].rw_truecz[j]);
+    }
+  }
 }
 
 //ETA

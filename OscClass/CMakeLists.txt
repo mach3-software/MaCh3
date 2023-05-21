@@ -10,7 +10,7 @@ add_library(OscClass SHARED ${OscClass_implementation_files})
 target_include_directories(OscClass PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if (USE_PROB3)
-   target_link_libraries(OscClass Manager CUDAProb3Beam CUDAProb3Atmos)
+   message(FATAL_ERROR "OscClass only defined using CUDAProb3. USE_PROB3 is defined and indicates Prob3++/ProbGPU is being expected to be used.")
 else()
    target_link_libraries(OscClass Manager CUDAProb3Beam CUDAProb3Atmos)
 endif()

@@ -42,8 +42,7 @@
 #include "ShiftFunctors.h"
 
 #include "manager/manager.h"
-
-
+#include "OscClass/OscClass_CUDAProb3.h"
 
 #define USEBETA 0
 
@@ -132,10 +131,10 @@ public:
 
   // LW - Setup Osc 
   void virtual SetupOscCalc(double PathLength, double Density);
+  void SetOscillator(Oscillator* Osc_);
+  void FindEventOscBin();
 
  protected:
-
-
   //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
   //DB Function to determine which weights apply to which types of samples
   //pure virtual!!
@@ -230,6 +229,7 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
+  Oscillator *Osc;
 
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;

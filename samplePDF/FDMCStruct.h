@@ -54,7 +54,11 @@ struct fdmc_base {
   double *rw_upper_upper_xbinedge; // upper to check if Eb has moved the erec bin
 
   int **mode;
-
+  
+  // DB Atmospheric Parameters
+  const double **osc_w_pointer;
+  double *rw_truecz;
+  
   double *osc_w; // oscillation weight                                        
   double *flux_w; // not the same as beam systematics weight!                 
   double *xsec_w;
