@@ -30,6 +30,8 @@
 #include "TColor.h"
 #include "TStyle.h"
 #include "TStopwatch.h"
+#include "TText.h"
+#include "TGaxis.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -101,6 +103,8 @@ class MCMCProcessor {
     void DrawCovariance();
     // Make and Draw Credible Regions
     void MakeCredibleRegions();
+    //Make fancy triangle plot for selected parameters
+    void MakeTrianglePlot(std::vector<std::string> ParamNames);
 
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};

@@ -549,6 +549,7 @@ void MCMCProcessor::DrawPostfit() {
   CompLeg->SetLineStyle(0);
   CompLeg->SetBorderSize(0);
 
+  const double BottomMargin = Posterior->GetBottomMargin();
   Posterior->SetBottomMargin(0.2);
 
   OutputFile->cd();
@@ -674,7 +675,7 @@ void MCMCProcessor::DrawPostfit() {
   delete CompLeg;
 
   //KS: Return Margin to default one
-  Posterior->SetBottomMargin(0.1);
+  Posterior->SetBottomMargin(BottomMargin);
 }
 
 // *********************
@@ -685,6 +686,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
   if(hpost[0] == NULL) MakePostfit();
   std::cout << "Making Credible Intervals "<< std::endl;
 
+  const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
   //Should be easy way to set credible intervals via config keep it for now
@@ -797,7 +799,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
   delete[] hpost_cl;
 
   //Set back to normal
-  Posterior->SetLeftMargin(0.10);
+  Posterior->SetLeftMargin(LeftMargin);
 }
 
 
@@ -865,6 +867,7 @@ void MCMCProcessor::MakeViolin() {
     hviolin->SetMarkerStyle(20);
     hviolin->SetMarkerSize(0.5);
     
+    const double BottomMargin = Posterior->GetBottomMargin();
     Posterior->SetBottomMargin(0.2);
       
     OutputFile->cd();
@@ -883,7 +886,7 @@ void MCMCProcessor::MakeViolin() {
         if(printToPDF) Posterior->Print(CanvasName);
     }
   //KS: Return Margin to default one
-  Posterior->SetBottomMargin(0.1);
+  Posterior->SetBottomMargin(BottomMargin);
 }
 
 // *********************
@@ -1459,6 +1462,299 @@ void MCMCProcessor::MakeCredibleRegions() {
   delete[] hpost_2D_cl;
 }
 
+
+// *********************
+// Make fancy Credible Intervals plots
+void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
+// *********************
+
+  if(hpost2D[0][0] == NULL) MakeCovariance_MP();
+  std::cout << "Making Triangle Plot "<< std::endl;
+
+  const int nParamPlot = ParamNames.size();
+  std::vector<int> ParamNumber;
+  for(int j = 0; j < nParamPlot; j++)
+  {
+    //KS: First we need to find parameter number based on name
+    int ParamNo = __UNDEF__;
+    for (int i = 0; i < nDraw; ++i)
+    {
+      TString Title = "";
+      double Prior = 1.0;
+      double PriorError = 1.0;
+
+      GetNthParameter(i, Prior, PriorError, Title);
+
+      if(ParamNames[j] == Title) ParamNo = i;
+    }
+    if(ParamNo == __UNDEF__)
+    {
+      std::cout<<"Couldn't find param "<<ParamNames[j]<<". Will not plot Triangle plot"<<std::endl;
+      return;
+    }
+    ParamNumber.push_back(ParamNo);
+  }
+
+  //KS: Store it as we go back to them at the end
+  const double TopMargin    = Posterior->GetTopMargin();
+  const double BottomMargin = Posterior->GetBottomMargin();
+  const double LeftMargin   = Posterior->GetLeftMargin();
+  const double RighMargin   = Posterior->GetRightMargin();
+  Posterior->SetTopMargin(0.001);
+  Posterior->SetBottomMargin(0.001);
+  Posterior->SetLeftMargin(0.001);
+  Posterior->SetRightMargin(0.001);
+
+  Posterior->cd();
+  Posterior->Clear();
+  Posterior->Update();
+
+  //KS: We sort to have prmateters from highest to lowest, this is related to how we make 2D projections in MakeCovariance_MP
+  std::sort(ParamNumber.begin(), ParamNumber.end(),  std::greater<int>());
+
+  //KS: Calculate how many pads/plots we need
+  int Npad = 0;
+  for(int j = 1; j < nParamPlot+1; j++) Npad += j;
+  Posterior->cd();
+
+  //Should be easy way to set credible intervals via config keep it for now
+  const int nCredible = 3;
+  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
+  const Color_t CredibleRegionsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
+  const Style_t CredibleRegionStyle[nCredible] = {kDashed, kSolid, kDotted};
+  const Color_t CredibleRegionColor[nCredible] = {kGreen-3, kGreen-10, kGreen};
+
+  //KS: Initialise Tpad histograms etc we will need
+  TPad** TrianglePad = new TPad*[Npad];
+  //KS: 1D copy of psoterior, we need it as we modify them
+  TH1D** hpost_copy = new TH1D*[nParamPlot];
+  TH1D*** hpost_cl = new TH1D**[nParamPlot];
+  TText **TriangleText = new TText *[nParamPlot*2];
+  TH2D** hpost_2D_copy = new TH2D*[Npad-nParamPlot];
+  TH2D*** hpost_2D_cl = new TH2D**[Npad-nParamPlot];
+  gStyle->SetPalette(51);
+
+
+  //KS: Super convoluted way of calcuating ranges for our pads
+  double* X_Min = new double[nParamPlot];
+  double* X_Max = new double[nParamPlot];
+
+  X_Min[0] = 0.10;
+  double xScale = (0.95 - (X_Min[0]+0.05))/nParamPlot;
+  //KS: 0.05 is becasue we need additional offset for labels
+  X_Max[0] = X_Min[0]+xScale+0.05;
+  for(int i = 1; i < nParamPlot; i++)
+  {
+    X_Min[i] = X_Max[i-1];
+    X_Max[i] = X_Min[i]+xScale;
+  }
+  double* Y_Min = new double[nParamPlot];
+  double* Y_Max = new double[nParamPlot];
+  Y_Max[0] = 0.95;
+  double yScale = std::fabs(0.10 - (Y_Max[0]))/nParamPlot;
+  Y_Min[0] = Y_Max[0]-yScale;
+  for(int i = 1; i < nParamPlot; i++)
+  {
+    Y_Max[i] = Y_Min[i-1];
+    Y_Min[i] = Y_Max[i]-yScale;
+
+  }
+
+  //KS: We store as numbering of isn't straighforward
+  int counterPad = 0;
+  int counterText = 0;
+  int counterPost = 0;
+  int counter2DPost = 0;
+  //KS: We start from top of the plot
+  for(int y = 0; y < nParamPlot ; y++)
+  {
+    for(int x = 0; x <= y; x++)
+    {
+      Posterior->cd();
+      TrianglePad[counterPad] = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i", counterPad), X_Min[x], Y_Min[y], X_Max[x], Y_Max[y]);
+
+      TrianglePad[counterPad]->SetTopMargin(0);
+      TrianglePad[counterPad]->SetRightMargin(0);
+
+      TrianglePad[counterPad]->SetGrid();
+      TrianglePad[counterPad]->SetFrameBorderMode(0);
+      TrianglePad[counterPad]->SetBorderMode(0);
+      TrianglePad[counterPad]->SetBorderSize(0);
+
+      //KS: Corresponds to bottom part of the plot, need marings for lables
+      if(y == (nParamPlot-1)) TrianglePad[counterPad]->SetBottomMargin(0.1);
+      else TrianglePad[counterPad]->SetBottomMargin(0);
+
+      //KS: Corresponds to left part, need marings for lables
+      if(x == 0) TrianglePad[counterPad]->SetLeftMargin(0.15);
+      else TrianglePad[counterPad]->SetLeftMargin(0);
+
+      TrianglePad[counterPad]->Draw();
+      TrianglePad[counterPad]->cd();
+
+      //KS:if diagonal plot main posterior
+      if(x == y)
+      {
+        hpost_copy[counterPost] = (TH1D*) hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x]));
+        hpost_cl[counterPost] = new TH1D*[nCredible];
+        /// Scale the histograms so it shows the posterior probability
+        hpost_copy[counterPost]->Scale(1. / hpost_copy[counterPost]->Integral());
+        for (int j = 0; j < nCredible; ++j)
+        {
+            hpost_cl[counterPost][j] = (TH1D*) hpost[ParamNumber[x]]->Clone( Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleRegions[j]));
+            //KS: Reset to get rid to TF1 otherwise we run into segfault :(
+            hpost_cl[counterPost][j]->Reset("");
+            hpost_cl[counterPost][j]->Fill(0.0, 0.0);
+
+            // Scale the histograms before gettindg credible intervals
+            hpost_cl[counterPost][j]->Scale(1. / hpost_cl[counterPost][j]->Integral());
+
+            GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleRegions[j]);
+            hpost_cl[counterPost][j]->SetFillColor(CredibleRegionsColours[j]);
+            hpost_cl[counterPost][j]->SetLineWidth(1);
+        }
+
+        hpost_copy[counterPost]->SetMaximum(hpost_copy[counterPost]->GetMaximum()*1.2);
+        hpost_copy[counterPost]->SetLineWidth(2);
+        hpost_copy[counterPost]->SetLineColor(kBlack);
+
+        hpost_copy[counterPost]->GetXaxis()->SetTitle("");
+        hpost_copy[counterPost]->GetYaxis()->SetTitle("");
+        hpost_copy[counterPost]->SetTitle("");
+
+        hpost_copy[counterPost]->GetXaxis()->SetLabelSize(0.1);
+        hpost_copy[counterPost]->GetYaxis()->SetLabelSize(0.1);
+
+        hpost_copy[counterPost]->GetXaxis()->SetNdivisions(4);
+        hpost_copy[counterPost]->GetYaxis()->SetNdivisions(4);
+
+        hpost_copy[counterPost]->Draw("HIST");
+        for (int j = 0; j < nCredible; ++j)
+          hpost_cl[counterPost][j]->Draw("HIST SAME");
+        counterPost++;
+      }
+      //KS: Here we plot 2D credible regions
+      else
+      {
+        hpost_2D_copy[counter2DPost] = (TH2D*) hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y]));
+        hpost_2D_cl[counter2DPost] = new TH2D*[nCredible];
+        for (int k = 0; k < nCredible; ++k)
+        {
+          hpost_2D_cl[counter2DPost][k] = (TH2D*)hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k]));
+          GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredibleRegions[k]);
+          hpost_2D_cl[counter2DPost][k]->SetLineColor(CredibleRegionColor[k]);
+          hpost_2D_cl[counter2DPost][k]->SetLineWidth(2);
+          hpost_2D_cl[counter2DPost][k]->SetLineStyle(CredibleRegionStyle[k]);
+        }
+
+        hpost_2D_copy[counter2DPost]->GetXaxis()->SetTitle("");
+        hpost_2D_copy[counter2DPost]->GetYaxis()->SetTitle("");
+        hpost_2D_copy[counter2DPost]->SetTitle("");
+
+        hpost_2D_copy[counter2DPost]->GetXaxis()->SetLabelSize(0.1);
+        hpost_2D_copy[counter2DPost]->GetYaxis()->SetLabelSize(0.1);
+
+        hpost_2D_copy[counter2DPost]-> GetXaxis()->SetNdivisions(4);
+        hpost_2D_copy[counter2DPost]-> GetYaxis()->SetNdivisions(4);
+        hpost_2D_copy[counter2DPost]->Draw("COL");
+        //Now credible regions
+        for (int k = 0; k < nCredible; ++k)
+          hpost_2D_cl[counter2DPost][k]->Draw("CONT3 SAME");
+        counter2DPost++;
+      }
+      //KS: Corresponds to bottom part of the plot
+      if(y == (nParamPlot-1))
+      {
+        Posterior->cd();
+        TriangleText[counterText] = new TText(X_Min[x]+ (X_Max[x]-X_Min[x])/4, 0.04, hpost[ParamNumber[x]]->GetTitle());
+        TriangleText[counterText]->SetTextSize(0.015);
+        TriangleText[counterText]->SetNDC(true);
+        TriangleText[counterText]->Draw();
+
+        counterText++;
+      }
+      //KS: Corresponds to left part
+      if(x == 0)
+      {
+        Posterior->cd();
+        TriangleText[counterText] = new TText(0.04, Y_Min[y] + (Y_Max[y]-Y_Min[y])/4, hpost[ParamNumber[y]]->GetTitle());
+        TriangleText[counterText]->SetTextAngle(90);
+        TriangleText[counterText]->SetTextSize(0.015);
+        TriangleText[counterText]->SetNDC(true);
+        TriangleText[counterText]->Draw();
+        counterText++;
+      }
+      Posterior->Update();
+      counterPad++;
+    }
+  }
+
+  Posterior->cd();
+  TLegend* legend = new TLegend(0.60, 0.7, 0.9, 0.9);
+  legend->SetTextSize(0.03);
+  legend->SetFillColor(0);
+  legend->SetFillStyle(0);
+  legend->SetLineColor(0);
+  legend->SetLineStyle(0);
+  legend->SetBorderSize(0);
+  for (int j = nCredible-1; j >= 0; --j)
+    legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
+  for (int k = nCredible-1; k >= 0; --k)
+    legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l") ;
+  legend->Draw("SAME");
+  Posterior->Update();
+
+  // Write to file
+  Posterior->SetName("Triangle");
+  Posterior->SetTitle("Triangle");
+
+  if(printToPDF) Posterior->Print(CanvasName);
+  // Write it to root file
+  OutputFile->cd();
+  Posterior->Write();
+
+  //KS: Remove allocated structures
+  for(int i = 0; i < Npad; i++) delete TrianglePad[i];
+  for(int i = 0; i < nParamPlot*2; i++) delete TriangleText[i];
+  for(int i = 0; i < nParamPlot; i++)
+  {
+      delete hpost_copy[i];
+      for (int j = 0; j < nCredible; ++j)
+      {
+        delete hpost_cl[i][j];
+      }
+      delete[] hpost_cl[i];
+  }
+  for(int i = 0; i < Npad - nParamPlot; i++)
+  {
+      delete hpost_2D_copy[i];
+      for (int j = 0; j < nCredible; ++j)
+      {
+        delete hpost_2D_cl[i][j];
+      }
+      delete[] hpost_2D_cl[i];
+  }
+
+  delete[] hpost_copy;
+  delete[] hpost_cl;
+  delete[] hpost_2D_copy;
+  delete[] hpost_2D_cl;
+  delete[] TrianglePad;
+  delete[] TriangleText;
+  delete[] X_Min;
+  delete[] X_Max;
+  delete[] Y_Min;
+  delete[] Y_Max;
+  delete legend;
+
+  //KS: Restore margin
+  Posterior->SetTopMargin(TopMargin);
+  Posterior->SetLeftMargin(BottomMargin);
+  Posterior->SetLeftMargin(LeftMargin);
+  Posterior->SetRightMargin(RighMargin);
+}
+
+
 // **************************
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
@@ -1530,7 +1826,6 @@ void MCMCProcessor::ScanInput() {
     }
   }
   nDraw = BranchNames.size();
-  
   // Read the input Covariances
   ReadInputCov();
   
