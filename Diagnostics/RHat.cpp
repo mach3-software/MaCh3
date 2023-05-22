@@ -593,15 +593,23 @@ void CalcRhat() {
 void SaveResults() {
 // *******************    
     std::string NameTemp = "";
-    for (int i = 0; i < Nchains; i++)
+    //KS: If we run over many many chains there is danger that name will be so absurdly long we run over systmat limit and job will be killed :(
+    if(Nchains < 5)
     {
-        std::string temp = MCMCFile[i];
-        
-        while (temp.find(".root") != std::string::npos) {
-            temp = temp.substr(0, temp.find(".root"));
+        for (int i = 0; i < Nchains; i++)
+        {
+            std::string temp = MCMCFile[i];
+
+            while (temp.find(".root") != std::string::npos) {
+                temp = temp.substr(0, temp.find(".root"));
+            }
+
+            NameTemp = NameTemp + temp + "_";
         }
-  
-        NameTemp = NameTemp + temp + "_";
+    }
+    else
+    {
+        NameTemp = std::to_string(Nchains) + "Chains" + "_";
     }
     NameTemp += "diag.root";
     

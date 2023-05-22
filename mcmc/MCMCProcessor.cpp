@@ -1464,7 +1464,7 @@ void MCMCProcessor::MakeCredibleRegions() {
 
 
 // *********************
-// Make fancy Credible Intervals plots
+// Make fancy triangle plot for selected parameters
 void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 // *********************
 
@@ -1535,7 +1535,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   gStyle->SetPalette(51);
 
 
-  //KS: Super convoluted way of calcuating ranges for our pads
+  //KS: Super convoluted way of calcuating ranges for our pads, trust me it works...
   double* X_Min = new double[nParamPlot];
   double* X_Max = new double[nParamPlot];
 
@@ -1557,7 +1557,6 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   {
     Y_Max[i] = Y_Min[i-1];
     Y_Min[i] = Y_Max[i]-yScale;
-
   }
 
   //KS: We store as numbering of isn't straighforward
@@ -1565,11 +1564,13 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   int counterText = 0;
   int counterPost = 0;
   int counter2DPost = 0;
-  //KS: We start from top of the plot
-  for(int y = 0; y < nParamPlot ; y++)
+  //KS: We start from top of the plot, might be confusing but works very well
+  for(int y = 0; y < nParamPlot; y++)
   {
+    //KS: start from left and go right, depedning on y
     for(int x = 0; x <= y; x++)
     {
+      //KS: Need to go to canvas everytime to have our pads in the same canvas, not pads in the pads
       Posterior->cd();
       TrianglePad[counterPad] = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i", counterPad), X_Min[x], Y_Min[y], X_Max[x], Y_Max[y]);
 
@@ -1618,6 +1619,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
         hpost_copy[counterPost]->SetLineWidth(2);
         hpost_copy[counterPost]->SetLineColor(kBlack);
 
+        //KS: Don't want any titles
         hpost_copy[counterPost]->GetXaxis()->SetTitle("");
         hpost_copy[counterPost]->GetYaxis()->SetTitle("");
         hpost_copy[counterPost]->SetTitle("");
@@ -1638,6 +1640,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       {
         hpost_2D_copy[counter2DPost] = (TH2D*) hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y]));
         hpost_2D_cl[counter2DPost] = new TH2D*[nCredible];
+        //KS: Now copy for every credible region
         for (int k = 0; k < nCredible; ++k)
         {
           hpost_2D_cl[counter2DPost][k] = (TH2D*)hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k]));
@@ -1647,6 +1650,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
           hpost_2D_cl[counter2DPost][k]->SetLineStyle(CredibleRegionStyle[k]);
         }
 
+        //KS: Don't want any titles
         hpost_2D_copy[counter2DPost]->GetXaxis()->SetTitle("");
         hpost_2D_copy[counter2DPost]->GetYaxis()->SetTitle("");
         hpost_2D_copy[counter2DPost]->SetTitle("");
@@ -1667,6 +1671,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       {
         Posterior->cd();
         TriangleText[counterText] = new TText(X_Min[x]+ (X_Max[x]-X_Min[x])/4, 0.04, hpost[ParamNumber[x]]->GetTitle());
+        //KS: Unfortunately for many plots or long names this can go out of bounds :(
         TriangleText[counterText]->SetTextSize(0.015);
         TriangleText[counterText]->SetNDC(true);
         TriangleText[counterText]->Draw();
@@ -1678,7 +1683,9 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       {
         Posterior->cd();
         TriangleText[counterText] = new TText(0.04, Y_Min[y] + (Y_Max[y]-Y_Min[y])/4, hpost[ParamNumber[y]]->GetTitle());
+        //KS: Rotate as this is y axis
         TriangleText[counterText]->SetTextAngle(90);
+        //KS: Unfortunately for many plots or long names this can go out of bounds :(
         TriangleText[counterText]->SetTextSize(0.015);
         TriangleText[counterText]->SetNDC(true);
         TriangleText[counterText]->Draw();
@@ -1697,6 +1704,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   legend->SetLineColor(0);
   legend->SetLineStyle(0);
   legend->SetBorderSize(0);
+  //KS: Legend is shared so just take first histograms
   for (int j = nCredible-1; j >= 0; --j)
     legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
   for (int k = nCredible-1; k >= 0; --k)
@@ -1705,8 +1713,8 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   Posterior->Update();
 
   // Write to file
-  Posterior->SetName("Triangle");
-  Posterior->SetTitle("Triangle");
+  Posterior->SetName("TrianglePlot");
+  Posterior->SetTitle("TrianglePlot");
 
   if(printToPDF) Posterior->Print(CanvasName);
   // Write it to root file
