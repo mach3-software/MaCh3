@@ -74,6 +74,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   FancyPlotNames = true;
   doDiagMCMC = false;
   OutputSuffix = "_Process";
+  Post2DPlotThreshold = 1.e-5;
 
   nDraw = 0;
   nFlux = 0;
@@ -989,7 +990,7 @@ void MCMCProcessor::MakeCovariance() {
           //KS: Skip Flux Params
           if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
           {
-          if(IsXsec[j] && IsXsec[i])
+          if(IsXsec[j] && IsXsec[i] && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
           {
               Posterior->cd();
               hpost_2D->Draw("colz");
@@ -1001,7 +1002,7 @@ void MCMCProcessor::MakeCovariance() {
       }
       // Write it to root file
       //OutputFile->cd();
-      //hpost_2D->Write();
+      //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) hpost_2D->Write();
 
       delete hpost_2D;
     } // End j loop
@@ -1212,7 +1213,7 @@ std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for "
                 if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
                 {
                     //KS: Skip Flux Params
-                    if(IsXsec[j] && IsXsec[i])
+                    if(IsXsec[j] && IsXsec[i] && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
                     {
                         hpost2D[i][j]->Draw("colz");
                         Posterior->SetName(hpost2D[i][j]->GetName());
@@ -1220,7 +1221,7 @@ std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for "
                         Posterior->Print(CanvasName);
                     }
                 }
-                //hpost2D[i][j]->Write();
+                //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) hpost2D[i][j]->Write();
             }// End j loop
         }// End i loop
     } //end if pdf
@@ -1432,10 +1433,10 @@ void MCMCProcessor::MakeCredibleRegions() {
       Posterior->SetName(hpost2D[i][j]->GetName());
       Posterior->SetTitle(hpost2D[i][j]->GetTitle());
 
-      if(printToPDF) Posterior->Print(CanvasName);
+      if(printToPDF && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) Posterior->Print(CanvasName);
       // Write it to root file
       //OutputFile->cd();
-      //Posterior->Write();
+      //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) Posterior->Write();
 
       delete legend;
       delete bestfitM;

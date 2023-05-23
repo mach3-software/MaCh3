@@ -131,7 +131,8 @@ class MCMCProcessor {
     void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
     void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
     void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
-    
+    void SetPost2DPlotThreshold(double Threshold){Post2DPlotThreshold = Threshold; };
+
     void SetnBatches(int Batches){nBatches = Batches; };
     void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
     
@@ -225,7 +226,9 @@ class MCMCProcessor {
     bool printToPDF;
     bool FancyPlotNames;
     bool plotBinValue; //If true it will print value on each bin of covariance matrix
-    
+    //KS: Set Threshold when to plot 2D posterior as by default we get a LOT of plots
+    double Post2DPlotThreshold;
+
     // The output file
     TFile *OutputFile;
 
