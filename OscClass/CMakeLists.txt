@@ -15,7 +15,7 @@ else()
    target_link_libraries(OscClass Manager CUDAProb3Beam CUDAProb3Atmos)
 endif()
 
-set_target_properties(OscClass PROPERTIES 
+set_target_properties(OscClass PROPERTIES
   PUBLIC_HEADER "${OscClass_header_files}"
   EXPORT_NAME OscClass)
 

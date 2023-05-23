@@ -662,6 +662,7 @@ void samplePDFFDBase::FindEventOscBin() {
       MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),MCSamples[i].rw_truecz[j]);
     }
   }
+  std::cout << "Set all oscillation pointers to Oscillator" << std::endl;
 }
 
 //ETA

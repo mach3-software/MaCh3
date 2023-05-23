@@ -121,7 +121,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_compile_options(-g -O3 -Wextra)
+add_compile_options(-g -Wextra)
 add_compile_options(-fopenmp)
 add_link_options(-fopenmp)
 
