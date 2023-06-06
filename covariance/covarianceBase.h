@@ -27,7 +27,7 @@
 #endif
 
 #ifndef __LARGE_LOGL__
-#define __LARGE_LOGL__ 1234567890
+#define __LARGE_LOGL__ 1234567890.0
 #endif
 
 class covarianceBase {
@@ -114,6 +114,8 @@ class covarianceBase {
   double getParInit(int i) { 
     return fParInit[i];
   };
+  const double GetLowerBound(const int i) { return fParLoLimit[i];};
+  const double GetUpperBound(const int i) { return fParHiLimit[i];};
   double getParProp_PCA(int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
