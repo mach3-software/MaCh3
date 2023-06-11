@@ -35,8 +35,6 @@ class SMonolith {
     SMonolith(std::vector< std::vector<TSpline3_red*> > &MasterSpline);
     SMonolith(std::vector< std::vector<TF1*> > &MasterSpline);
     SMonolith(std::vector< std::vector<TF1_red*> > &MasterSpline);
-    SMonolith(std::vector< std::vector<Akima_Spline*> > &MasterSpline);
-    SMonolith(std::vector< std::vector<Monotone_Spline*> > &MasterSpline);
     ~SMonolith();
 
     void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
@@ -65,10 +63,6 @@ class SMonolith {
     void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &nParams);
     // Prepare the TSpline3_red objects for the GPU
     void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
-    // Prepare the Monotone Spline objects for the GPU
-    void PrepareForGPU(std::vector<std::vector<Monotone_Spline*> > &MasterSpline);
-    // Prepare the Akima_Spline objects for the GPU
-    void PrepareForGPU(std::vector<std::vector<Akima_Spline*> > &MasterSpline);
     inline void PrepareForGPU_TSpline3();
 
     // Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
@@ -84,10 +78,6 @@ class SMonolith {
     void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
     // Reduced the TSpline3 to TSpline3_red
     std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline);
-    // Reduced the Akima spline to TSpline3_red
-    std::vector<std::vector<TSpline3_red*> > ReduceAkima(std::vector<std::vector<Akima_Spline*> > &MasterSpline);
-    // Reduced the monotone spline to TSpline3_red
-    std::vector<std::vector<TSpline3_red*> > ReduceMonotone(std::vector<std::vector<Monotone_Spline*> > &MasterSpline);        
     // Reduced the TF1 to TF1_red
     std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline);
     inline void PrepareForGPU_TF1();

@@ -29,6 +29,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file, double thresh
   if(!(xsec_kinematic_type = (TObjArray*)(infile->Get("xsec_norm_kinematic_type")))){xsec_kinematic_type = new TObjArray();}
   if(!(xsec_param_nd_spline_names = (TObjArray*)(infile->Get("nd_spline_names")))){xsec_param_nd_spline_names= new TObjArray();}
 
+  if(!(xsec_spline_interpolation = (TObjArray*)(infile->Get("xsec_spline_interpolation")))){std::cerr<<"Can't find xsec_spline_interpolation in xseccov"<<std::endl;throw;}
 
   // Check that the size of all the arrays are good
   if (xsec_param_norm_modes->GetEntries() != xsec_param_norm_elem->GetEntries() || 
@@ -672,7 +673,17 @@ void covarianceXsec::scanParameters() {
         NearsplineParsNames.push_back(GetParameterName(i));
         NearsplineParsIndex.push_back(i);
         nNearSplineParams++;
-	
+
+        for(int il = 0; il < kSplineInterpolations; ++il)
+        {
+          if (std::string(((TObjString*)xsec_spline_interpolation->At(i))->GetString()) == SplineInterpolation_ToString(SplineInterpolation(il)))
+            SplineInterpolationType.push_back(SplineInterpolation(il));
+        }
+        if (SplineInterpolationType.size() != static_cast<unsigned int>(nND280SplineParams))
+        {
+          std::cerr<<" "<<"Couldn't find interpoaltion for paramter " <<nPars<< " it has interpoaltion "<<std::string(((TObjString*)xsec_spline_interpolation->At(i))->GetString())<<std::endl;
+          throw;
+        }
 	//Fill the name of the Far spline objects in the spline files
 	//NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
       }//End Near affecting spline pars

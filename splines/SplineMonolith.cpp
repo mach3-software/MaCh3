@@ -226,28 +226,6 @@ SMonolith::SMonolith(std::vector<std::vector<TF1*> > &MasterSpline) {
 }
 
 // *****************************************
-// constructor for monotone spline 
-SMonolith::SMonolith(std::vector<std::vector<Monotone_Spline*> > &MasterSpline) {
-// *****************************************
-  Initialise();
-  std::cout << "Using Monotone spline, about to convert it to TSpline3_red and send to GPU" << std::endl;
-  // Convert the Monotone pointers to the reduced form and call the reduced constructor
-  std::vector<std::vector<TSpline3_red*> > ReducedSpline = ReduceMonotone(MasterSpline);
-  PrepareForGPU(ReducedSpline);
-}
-
-// *****************************************
-// constructor for akima spline vector
-SMonolith::SMonolith(std::vector<std::vector<Akima_Spline*> > &MasterSpline) {
-// *****************************************
-  Initialise();
-  std::cout << "Using Akima spline, about to convert it to TSpline3_red and send to GPU" << std::endl;
-  // Convert the Akima pointers to the reduced form and call the reduced constructor
-  std::vector<std::vector<TSpline3_red*> > ReducedSpline = ReduceAkima(MasterSpline);
-  PrepareForGPU(ReducedSpline);
-}
-
-// *****************************************
 // Uses a fifth order polynomial for most shape except 2p2h shape C/O which are two superimposed linear eq
 // Reduce first
 SMonolith::SMonolith(std::vector<std::vector<TF1_red*> > &MasterSpline) {
@@ -1060,83 +1038,6 @@ std::vector<std::vector<TSpline3_red*> > SMonolith::ReduceTSpline3(std::vector<s
   // Now have the reduced vector
   return ReducedVector;
 }
-
-// *********************************
-// convert Monotone_Spline vector to TSpline3_red
-std::vector<std::vector<TSpline3_red*> > SMonolith::ReduceMonotone(std::vector<std::vector<Monotone_Spline*> > &MasterSpline) {
-// *********************************
-  std::vector<std::vector<Monotone_Spline*> >::iterator OuterIt;
-  std::vector<Monotone_Spline*>::iterator InnerIt;
-
-  // The return vector
-  std::vector<std::vector<TSpline3_red*> > ReducedVector;
-  ReducedVector.reserve(MasterSpline.size());
-
-  // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
-    // Make the temp vector
-    std::vector<TSpline3_red*> TempVector;
-    TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
-    // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
-      // Here's our delicious TSpline3 object
-      Monotone_Spline *spline = (*InnerIt);
-      // Now make the reduced TSpline3 pointer
-      TSpline3_red *red = NULL;
-      if (spline != NULL) {
-        red = spline->ConstructTSpline3_red();
-        (*InnerIt) = spline; 
-      }
-      // Push back onto new vector
-      TempVector.push_back(red);
-    } // End inner for loop
-    ReducedVector.push_back(TempVector);
-  } // End outer for loop
-  // Now have the reduced vector
-  return ReducedVector;
-}
-
-
-// *********************************
-// convert Akima_Spline vector to TSpline3_red
-std::vector<std::vector<TSpline3_red*> > SMonolith::ReduceAkima(std::vector<std::vector<Akima_Spline*> > &MasterSpline) {
-// *********************************
-  std::vector<std::vector<Akima_Spline*> >::iterator OuterIt;
-  std::vector<Akima_Spline*>::iterator InnerIt;
-
-  // The return vector
-  std::vector<std::vector<TSpline3_red*> > ReducedVector;
-  ReducedVector.reserve(MasterSpline.size());
-
-  // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
-    // Make the temp vector
-    std::vector<TSpline3_red*> TempVector;
-    TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
-    // Loop over each TSpline3 pointer 
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
-      // Here's our delicious TSpline3 object
-      Akima_Spline *spline = (*InnerIt);
-      // Now make the reduced TSpline3 pointer (which deleted TSpline3)
-      TSpline3_red *red = NULL;
-
-      if (spline != NULL) {
-        red = spline->ConstructTSpline3_red(); 
-        (*InnerIt) = spline;
-      }
-      // Push back onto new vector
-      TempVector.push_back(red);
-    } // End inner for loop
-    ReducedVector.push_back(TempVector);
-  } // End outer for loop
-  // Now have the reduced vector
-  return ReducedVector;
-}
-
 
 // *********************************
 // Reduce the large TF1 vector to a TF1_red
