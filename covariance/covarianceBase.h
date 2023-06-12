@@ -273,6 +273,9 @@ class covarianceBase {
   void TransferToPCA();
   void TransferToParam();
 
+  //Handy function to return 1 for any systs
+  const double* ReturnUnity(){return &Unity;}
+
   // The input root file we read in
   const std::string inputFile;
 
@@ -310,6 +313,9 @@ class covarianceBase {
   Double_t currLogL;
   Double_t propLogL;
   Double_t *corr_throw;
+
+  //Unity for null systs to point back to
+  const double Unity = 1.0;
 
   // PCA
   bool pca;
