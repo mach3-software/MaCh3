@@ -294,7 +294,7 @@ class TF1_red {
 
 // Make an enum of the spline interpolation type
 enum SplineInterpolation {
-  kCubic,
+  kTSpline3,
   kLinear,
   kMonotonic,
   kAkima,
@@ -308,8 +308,8 @@ inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
     std::string name = "";
     switch(i) {
         //  TSpline3 (third order spline in ROOT)
-        case kCubic:
-        name = "Cubic";
+        case kTSpline3:
+        name = "TSpline3";
         break;
         case kLinear:
         name = "Linear";
@@ -345,7 +345,7 @@ class TSpline3_red {
     }
 
     // The constructor that takes a TSpline3 pointer and copies in to memory
-    TSpline3_red(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kCubic) {
+    TSpline3_red(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
       Par = NULL;
       XPos = NULL;
       YResp = NULL;
@@ -380,7 +380,7 @@ class TSpline3_red {
       }
     }
 
-    inline void SetFunc(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kCubic) {
+    inline void SetFunc(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
       nPoints = spline->GetNp();
       ParamNo = Param;
       if (Par != NULL) {
@@ -401,7 +401,7 @@ class TSpline3_red {
       YResp = new __float__[nPoints];
 
       //KS: Default TSpline3 ROOT implementation
-      if(InterPolation == kCubic)
+      if(InterPolation == kTSpline3)
       {
         for (int i = 0; i < nPoints; ++i) {
           // 3 is the size of the TSpline3 coefficients
