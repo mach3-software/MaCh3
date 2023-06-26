@@ -175,6 +175,26 @@ class covarianceBase {
     TransferToParam();
   }
 
+  inline void setParameters_PCA(std::vector<double> pars)
+  {
+    if (!pca)
+    {
+      std::cerr<<" PCA disabled"<<std::endl;
+      throw;
+    }
+    if (pars.size() != size_t(npars)) {
+      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
+      throw;
+    }
+    unsigned int parsSize = pars.size();
+    for (unsigned int i = 0; i < parsSize; i++)
+    {
+      fParProp_PCA(i) = pars[i];
+    }
+    //KS: Transfer to normal base
+    TransferToParam();
+  }
+
   int getSize() { return size; };
   int getNpars() { 
     if (pca) return npars;
