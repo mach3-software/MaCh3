@@ -131,6 +131,14 @@ class covarianceBase {
     return fParCurr_PCA(i);
   };
 
+  bool isParameterFixedPCA(const int i) {
+    if (fParSigma_PCA[i] < 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   const TMatrixD getTransferMatrix() {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
@@ -153,6 +161,14 @@ class covarianceBase {
       throw;
     }
     return eigen_values;
+  }
+
+  inline const std::vector<double> getEigenValuesMaster() {
+    if (!pca) {
+      std::cerr << "Am not running in PCA mode" << std::endl;
+      throw;
+    }
+    return eigen_values_master;
   }
 
   void setParProp_PCA(const int i, const double value) {
