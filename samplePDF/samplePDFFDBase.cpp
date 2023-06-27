@@ -303,7 +303,6 @@ void samplePDFFDBase::fillArray() {
       }
       if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
-	  	continue;
       }
 
       //DB Total weight
@@ -493,7 +492,6 @@ void samplePDFFDBase::fillArray_MP()
       }
       if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
-	  	continue;
       }
 
 		//DB Total weight
