@@ -842,7 +842,13 @@ void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 //if we just want to use CUDAProb3 CPU then setup BeamCpuPropagator object
 #if defined (MULTITHREAD)
 //if we want to multithread then get number of threads from OMP_NUM_THREADS env variable
-    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, std::atoi(std::getenv("OMP_NUM_THREADS")));
+  int nThreads = 1;
+  #pragma omp parallel
+  {
+#pragma omp single
+    nThreads = omp_get_num_threads();
+  }
+    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, nThreads);
   MCSamples[iSample].Oscillator->setPathLength(PathLength);
   MCSamples[iSample].Oscillator->setDensity(Density);
 #else
