@@ -10,7 +10,7 @@ set(SamplePDF_header_files
 	interfacePDFEbE.h
 	Structs.h )
 
-if(NOT ${CPU_ONLY})
+if(NOT CPU_ONLY AND USE_PROB3)
   list(APPEND SamplePDF_implementation_files probGpu.cu)
 endif()
 
@@ -24,12 +24,15 @@ else()
 endif()
 
 
-if(NOT ${CPU_ONLY})
-  add_library(probGpu probGpu.cu)
-  set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-  set_property(TARGET probGpu SamplePDF PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-  target_link_libraries(SamplePDF probGpu)
+if(NOT CPU_ONLY)
+  set_property(TARGET SamplePDF PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
   target_compile_options(SamplePDF PUBLIC -DGPU_ON)
+  set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+  if(USE_PROB3)
+    add_library(probGpu probGpu.cu)
+    set_property(TARGET probGpu PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+    target_link_libraries(SamplePDF probGpu)
+  endif()
 endif()
 
 set_target_properties(SamplePDF PROPERTIES 
