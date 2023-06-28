@@ -681,7 +681,7 @@ void covarianceXsec::scanParameters() {
             if (std::string(((TObjString*)xsec_spline_interpolation->At(i))->GetString()) == SplineInterpolation_ToString(SplineInterpolation(il)))
               SplineInterpolationType.push_back(SplineInterpolation(il));
           }
-          if (SplineInterpolationType.size() != static_cast<unsigned int>(nND280SplineParams))
+          if (SplineInterpolationType.size() != static_cast<unsigned int>(nNearSplineParams))
           {
             std::cerr<<" "<<"Couldn't find interpoaltion for paramter " <<nPars<< " it has interpoaltion "<<std::string(((TObjString*)xsec_spline_interpolation->At(i))->GetString())<<std::endl;
             throw;
