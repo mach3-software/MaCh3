@@ -161,9 +161,10 @@ MCMCProcessor::~MCMCProcessor() {
         delete[] hpost2D[i];
     }
     delete[] ParStep;
-    
     delete[] hpost2D;
   }
+  if(StepNumber != NULL) delete[] StepNumber;
+
   if(hviolin != NULL) delete hviolin;
   if (OutputFile != NULL) OutputFile->Close();
   if (OutputFile != NULL) delete OutputFile;
@@ -1773,7 +1774,6 @@ void MCMCProcessor::ScanInput() {
   Chain->Add(MCMCFile.c_str());
 
   nEntries = Chain->GetEntries();
-
   // Get the list of branches
   TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
 
@@ -1851,7 +1851,7 @@ void MCMCProcessor::ScanInput() {
   std::cout << "# Osc params:   " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   << std::endl;
   std::cout << "************************************************" << std::endl;
 
-  nSteps = Chain->GetMaximum("step")/5;
+  nSteps = Chain->GetMaximum("step");
   // Set the step cut to be 20%
   int cut = nSteps/5;
   SetStepCut(cut);
@@ -2687,6 +2687,9 @@ void MCMCProcessor::DiagMCMC() {
   // Draw the auto-correlations
   AutoCorrelation();
 
+  // Get Geweke Z score helping select burn-in
+  GewekeDiagnostic();
+
   // Draw acceptance Probability
   AcceptanceProbabilities();
 }
@@ -2718,6 +2721,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   SampleValues = new double*[nEntries]();
   SystValues = new double*[nEntries]();
   AccProbValues = new double[nEntries]();
+  StepNumber = new int[nEntries]();
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -2735,6 +2739,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
       SystValues[i][j] = -999.99;
     }
     AccProbValues[i] = -999.99;
+
+    StepNumber[i] = -999.99;
   }
 
   // Initialise the sums
@@ -2768,6 +2774,9 @@ void MCMCProcessor::PrepareDiagMCMC() {
   // Turn on the branches which we want for acc prob
   Chain->SetBranchStatus("accProb", true);
   
+  // Only needed for Geweke right now
+  Chain->SetBranchStatus("step", true);
+
   // 10 entries output
   const int countwidth = nEntries/10;
 
@@ -2810,7 +2819,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
     // Set the branch addresses for Acceptance Probability
     Chain->SetBranchAddress("accProb", &AccProbValues[i]);
 
-    
+    Chain->SetBranchAddress("step", &StepNumber[i]);
+
     // Fill up the arrays
     Chain->GetEntry(i);
 
@@ -2850,7 +2860,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
   // And make our sweet output file
   if (OutputFile == NULL) MakeOutputFile();
 }
-
 
 // *****************
 // Draw trace plots of the parameters
@@ -3095,10 +3104,6 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] NumeratorSum;
   delete[] DenomSum;
   delete[] LagL;
-  for (int i = 0; i < nEntries; ++i) {
-    delete[] ParStep[i];
-  }
-  delete[] ParStep;
   delete[] ParamSums;
 
   clock.Stop();
@@ -3411,6 +3416,165 @@ void MCMCProcessor::BatchedAnalysis() {
   delete[] C_Denominator;
 }
 
+
+// **************************
+// Geweke Diagnostic based on
+// https://www.math.arizona.edu/~piegorsch/675/GewekeDiagnostics.pdf
+// https://www2.math.su.se/matstat/reports/master/2011/rep2/report.pdf Chapter 3.1
+void MCMCProcessor::GewekeDiagnostic() {
+// **************************
+
+    std::cout << "Making Geweke Diagnostic "<< std::endl;
+
+    //KS: Up refers to upper limit we check, it stays constnt, in literature it is moslty 50% thus using 0.5 for threshold
+    double* MeanUp = new double[nDraw]();
+    double* SpectralVarianceUp = new double[nDraw]();
+    int* DenomCounterUp = new int[nDraw]();
+    const double Threshold = 0.5 * nSteps;
+
+    //KS: Select values betwen which you want to scan, for example 0 means 0% burn in and 1 100% burn in.
+    const double LowerThreshold = 0;
+    const double UpperThreshold = 1.0;
+    // Tells how many intervals between thresholds we want to check
+    const int NChecks = 100;
+    const double Division = (UpperThreshold - LowerThreshold)/NChecks;
+
+    TH1D** GewekePlots = new TH1D*[nDraw];
+    for (int j = 0; j < nDraw; ++j)
+    {
+      MeanUp[j] = 0;
+      SpectralVarianceUp[j] = 0;
+      DenomCounterUp[j] = 0;
+
+      TString Title = "";
+      double Prior = 1.0;
+      double PriorError = 1.0;
+      GetNthParameter(j, Prior, PriorError, Title);
+      std::string HistName = Form("%s_%s_Geweke", Title.Data(), BranchNames[j].Data());
+      GewekePlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100*UpperThreshold);
+      GewekePlots[j]->GetXaxis()->SetTitle("Burn-In (%)");
+      GewekePlots[j]->GetYaxis()->SetTitle("Geweke T score");
+    }
+
+//KS: Start parallel region
+#ifdef MULTITHREAD
+#pragma omp parallel
+{
+#endif
+    //KS: First we calcualte mean and spectral variance for the upper limit, this doesn't change and in literature is most often 50%
+    #ifdef MULTITHREAD
+    #pragma omp for
+    #endif
+    for (int j = 0; j < nDraw; ++j)
+    {
+      for(int i = 0; i < nEntries; i++)
+      {
+        if(StepNumber[i] > Threshold)
+        {
+          MeanUp[j] += ParStep[i][j];
+          DenomCounterUp[j]++;
+        }
+      }
+      MeanUp[j] = MeanUp[j]/DenomCounterUp[j];
+    }
+
+    //KS: now Spectral variance which in this case is sample variance
+    #ifdef MULTITHREAD
+    #pragma omp for collapse(2)
+    #endif
+    for (int j = 0; j < nDraw; ++j)
+    {
+      for(int i = 0; i < nEntries; i++)
+      {
+        if(StepNumber[i] > Threshold)
+        {
+          SpectralVarianceUp[j] += (ParStep[i][j] - MeanUp[j])*(ParStep[i][j] - MeanUp[j]);
+        }
+      }
+    }
+
+    //Loop over how many intervals we calucate
+    #ifdef MULTITHREAD
+    #pragma omp for
+    #endif
+    for (int k = 1; k < NChecks+1; ++k)
+    {
+      //KS each thread has it't own
+      double* MeanDown = new double[nDraw]();
+      double* SpectralVarianceDown = new double[nDraw]();
+      int* DenomCounterDown = new int[nDraw]();
+
+      //set to 0
+      for (int j = 0; j < nDraw; ++j)
+      {
+        MeanDown[j] = 0;
+        SpectralVarianceDown[j] = 0;
+        DenomCounterDown[j] = 0;
+      }
+
+      const int ThresholsCheck = Division*k*nSteps;
+      //KS: First mean
+      for (int j = 0; j < nDraw; ++j)
+      {
+        for(int i = 0; i < nEntries; i++)
+        {
+            if(StepNumber[i] < ThresholsCheck)
+            {
+              MeanDown[j] += ParStep[i][j];
+              DenomCounterDown[j]++;
+            }
+        }
+        MeanDown[j] = MeanDown[j]/DenomCounterDown[j];
+      }
+
+      //Now spectral variance
+      for (int j = 0; j < nDraw; ++j)
+      {
+        for(int i = 0; i < nEntries; i++)
+        {
+            if(StepNumber[i] < ThresholsCheck)
+            {
+              SpectralVarianceDown[j] += (ParStep[i][j] - MeanDown[j])*(ParStep[i][j] - MeanDown[j]);
+            }
+        }
+      }
+      //Lasly calc T score and fill histogram entry
+      for (int j = 0; j < nDraw; ++j)
+      {
+          double T_score = std::fabs((MeanDown[j] - MeanUp[j])/std::sqrt(SpectralVarianceDown[j]/DenomCounterDown[j] + SpectralVarianceUp[j]/DenomCounterUp[j]));
+
+          GewekePlots[j]->SetBinContent(k, T_score);
+      }
+      //KS: delete for each thread
+      delete[] MeanDown;
+      delete[] SpectralVarianceDown;
+      delete[] DenomCounterDown;
+    } //end loop over intervals
+#ifdef MULTITHREAD
+} //End parallel region
+#endif
+
+    //Finally save it to TFile
+    OutputFile->cd();
+    TDirectory *GewekeDir = OutputFile->mkdir("Geweke");
+    for (int j = 0; j < nDraw; ++j)
+    {
+      GewekeDir->cd();
+      GewekePlots[j]->Write();
+      delete GewekePlots[j];
+    }
+    delete[] GewekePlots;
+
+    //Free memory
+    delete[] MeanUp;
+    delete[] DenomCounterUp;
+    delete[] SpectralVarianceUp;
+
+    for (int i = 0; i < nEntries; ++i) {
+      delete[] ParStep[i];
+    }
+    delete[] ParStep;
+}
 
 // **************************
 // Acceptance Probability

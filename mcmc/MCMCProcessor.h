@@ -169,6 +169,7 @@ class MCMCProcessor {
     inline void CalculateESS(const int nLags);
     inline void BatchedAnalysis();
     inline void BatchedMeans();
+    inline void GewekeDiagnostic();
     inline void AcceptanceProbabilities();
     
     std::string MCMCFile;
