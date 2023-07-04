@@ -1,712 +1,1008 @@
-#include <iostream>
-#include <stdlib.h>
 #include "splineFDBase.h"
-#include "TF1.h"
 
-//#define DEBUG_WEIGHTS
-
-
-// ----- Constructor (first: original erec version, then 2d version) ---- //
-
-splineFDBase::splineFDBase(const char *name, int ntype, int nevents, int DetID, covarianceXsec* xsec_cov) // constructor for erec spline binning
-  : splineBase(name, ntype)
-{
-
-  if(xsec_cov == NULL){
-    std::cout << "[ERROR:] " << __FILE__ << ":" << __LINE__ << " xsec_cov is null!!" << std::endl;
-  }
-  //DB Need DetID to be before assigned before SetupSplineInfoArray
-  nutype = ntype;
-  BinningOpt = 0;
-  SampleDetID = DetID;
-
-  FindUniqueModes();
-  xsec_cov->GetSplineParsNamesFromDetID(25);
-  std::cout << "Creating Etrue-Erec splines" << std::endl;
-#if USE_SPLINE_FD == USE_TSpline3_FD
-  std::cout << "Using normal TSpline3 splines" << std::endl;
-#elif USE_SPLINE_FD == USE_TSpline3_red
-  std::cout << "Using reduced TSpline3 splines!" << std::endl;
-#endif
-
-  std::cout << "About to call SetupSplineInfoArray" << std::endl;
-  // ETA - we've passed a xsec_cov to splineFDBase then let's use it!
-  // Now we want to try to be smarter and use info in the xsec covariance to 
-  // automate the spline Setup
-  SetupSplineInfoArray(xsec_cov);
-
-  std::cout << "Number of spline params Set to " << number_parms << std::endl;
-  std::cout << "Number of events is " << nevents << std::endl;
-
-  TString name_again = TString(name);
-  splinefile = new TFile(name_again, "READ");
-
-}
-
-
-/// ~~~ check if OK
-splineFDBase::splineFDBase(const char *name, int ntype, int nevents, double opt_binning, int DetID, covarianceXsec* xsec_cov) // constructor for 2d spline binning
-  : splineBase(name, ntype)
-{
-  if (opt_binning==0.0) std::cout << std::endl << "Error: 2D constructor for splineFDBase called with BinningOpt = 0.0" << std::endl << std::endl;
-
-  BinningOpt = (int)opt_binning;
-  if (BinningOpt==2) {
-    std::cout << "Creating Etrue-Erec-theta splines" << std::endl;
-  }
-  else if (BinningOpt==4) {
-    std::cout << "Creating Etrue-Cosz-LepMom atmospheric splines" << std::endl;
-  }
-
-  SampleDetID = DetID;
-  FindUniqueModes();
-
-#if USE_SPLINE_FD == USE_TSpline3_FD
-  std::cout << "Using normal TSpline3 splines" << std::endl;
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-  std::cout << "Using reduced TSpline3 splines!" << std::endl;
-#endif
-
-  // ETA - we've passed a xsec_cov to splineFDBase then let's use it!
-  // Now we want to try to be smarter and use info in the xsec covariance to 
-  // automate the spline Setup
-  SetupSplineInfoArray(xsec_cov);
-
-  std::cout << "Number of spline params Set to " << number_parms << std::endl;
-  std::cout << "Setup splinefile to be " << name << std::endl; 
-  splinefile = new TFile(name, "READ");
-  nutype = ntype;
-
-}
-
-// ---- Destructor ---- //
-splineFDBase::~splineFDBase()
-{
-
-}
-
-// ---- SetSplineBinning (first: original erec version, then 2d version) ---- //
-void splineFDBase::SetSplineBinning() // erec version
-{
-  // Get binning from first histogram saved in spline file automatically 
-  // (x axis = etrue, y axis = erec)
-  if(!splinefile){std::cout << "Couldn't find spline file...." << std::endl;}
-
-  TH2F *hist0 = (TH2F*)splinefile->Get("dev_tmp_0_0");
-  if (!hist0){
-    std::cout << "[ERROR]: " << __FILE__ << ":" << __LINE__ << " could not find dev_tmp_0_0 in spline file. Spline binning will not be Set!" << std::endl;
+//****************************************
+splineFDBase::splineFDBase(covarianceXsec *xsec_) {
+//****************************************
+//
+  if (xsec_ == NULL) {
+    std::cerr << "Trying to create splineSKBase with NULL covariance object" << std::endl;
     throw;
   }
-  else{
-	std::cout << "Found dev_tmp_0_0 in 1D version" << std::endl;
-	std::cout << "Setting spline binning from this" << std::endl;
-  }
+  xsec = xsec_;
 
-  const int netrue = hist0->GetXaxis()->GetNbins(); 
-  const double *etruerange = hist0->GetXaxis()->GetXbins()->GetArray();
-  enu_spline = new TAxis(netrue, etruerange);
-
-  const int nvar1 = hist0->GetYaxis()->GetNbins();
-  const double *var1_range = hist0->GetYaxis()->GetXbins()->GetArray();
-  var1_spline = new TAxis(nvar1, var1_range);
-
+  // Keep these in class scope, important for using 1 monolith/sample!
+  MonolithIndex=0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
+  CoeffIndex=0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
 }
 
-
-void splineFDBase::SetSplineBinning(int opt_binning) // enu-var1-var2 version
+//****************************************
+bool splineFDBase::AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames)
+//Adds samples to the large array
+//****************************************
 {
-  TH3D *hist0 = (TH3D*)splinefile->Get("dev_tmp_0_0");
-  if (!hist0){
-    std::cout << "[ERROR]: " << __FILE__ << ":" << __LINE__ << " could not find dev_tmp_0_0 in spline file. Spline binning will not be Set!" << std::endl;
-	throw;
-  }
-  else{
-	std::cout << "Found dev_tmp_0_0 in 2D version " << std::endl;
-	std::cout << "Setting spline spline binning!!" << std::endl;
-  }
+  SampleNames.push_back(SampleName);
+  BinningOpts.push_back(BinningOpt);
+  Dimensions.push_back(getNDim(BinningOpt));
+  DetIDs.push_back(DetID);
 
-  const int netrue = hist0->GetXaxis()->GetNbins(); 
-  const double *etruerange = hist0->GetXaxis()->GetXbins()->GetArray();
-  enu_spline = new TAxis(netrue, etruerange);
- 
-  const int nvar1 = hist0->GetYaxis()->GetNbins();
-  const double *var1_range = hist0->GetYaxis()->GetXbins()->GetArray();
+  int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
+  nSplineParams.push_back(nSplineParam);
 
-  const int nvar2 =  hist0->GetZaxis()->GetNbins();
-  const double *var2_range =  hist0->GetZaxis()->GetXbins()->GetArray();
+  std::vector<int> SplineParsIndex_Sample = xsec->GetSplineParsIndexFromDetID(DetID);
+  SplineParsIndex.push_back(SplineParsIndex_Sample);
 
-  if((netrue <= 1 || nvar1 <= 1 || nvar2 <= 1)){
-	std::cerr << "[ERROR]: " << __FILE__ << ":" << __LINE__ << " You're Setting up a 2D spline but one of the axes has only one bin or less..." << std::endl;
-	std::cerr << "netrue is " << netrue << std::endl;
-	std::cerr << "nvar1 is " << nvar1 << std::endl;
-	std::cerr << "nvar2 is " << nvar2 << std::endl;
-	std::cerr << "I think you've Set up the wrong spline! Maybe you've used 1D splines by mistake?! " << std::endl;
-    throw;	
-  }
+  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineFileParsNamesFromDetID(DetID);
+  SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
-  var1_spline = new TAxis(nvar1, var1_range);
-  var2_spline = new TAxis(nvar2, var2_range);
+  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  SplineModeVecs.push_back(SplineModeVecs_Sample);
 
-  return;
-}
+  int nOscChan = OscChanFileNames.size();
+  nOscChans.push_back(nOscChan);
 
-//ETA spline weight dev
-// Calc weight for each event using eventSplines array
-// saves having to find the splines which apply to each
-// event as we've pre-caclulated this!
-void splineFDBase::calcWeights(){
+  PrintSampleDetails(SampleName);
 
-  //ETA - switch based on binning opt in this case we just care if it's 1D or 2D
-  switch(BinningOpt){
-    //1D i.e. Etrue + one other variable
-  case 0:
-    //Loop over number of params
-    for(unsigned int param_i = 0 ; param_i < dev_1D_w.size() ; ++param_i){
-      //Loop over number of modes
-      for(unsigned int mode_i = 0 ; mode_i < dev_1D_w[0].size() ; ++mode_i){
-	//Loop over number of etrue bins
-	for(unsigned int etrue_i = 0 ; etrue_i < dev_1D_w[0][0].size() ; ++etrue_i){
-	  //Loop over number of var1 bins
-	  for(unsigned int var1_i = 0 ; var1_i < dev_1D_w[0][0][0].size() ; ++var1_i){
-	    if(dev_1D_vec[param_i][mode_i][etrue_i][var1_i] == NULL){continue;}
-	    dev_1D_w[param_i][mode_i][etrue_i][var1_i] = FastSplineEval(dev_1D_vec[param_i][mode_i][etrue_i][var1_i], param_i);
-	    if(dev_1D_w[param_i][mode_i][etrue_i][var1_i]<0){dev_1D_w[param_i][mode_i][etrue_i][var1_i]=0;}
-	  }
-	}
-      }
-    }
-    break;
-    
-    //2D i.e. Etrue + two other variables
-  default: 
-    //Loop over number of params
-    for(unsigned int param_i = 0 ; param_i < dev_2D_w.size() ; ++param_i){
-      //Loop over number of modes
-      for(unsigned int mode_i = 0 ; mode_i < dev_2D_w[0].size() ; ++mode_i){
-	//Loop over number of etrue bins
-	for(unsigned int etrue_i = 0 ; etrue_i < dev_2D_w[0][0].size() ; ++etrue_i){
-	  //Loop over number of var1 bins
-	  for(unsigned int var1_i = 0 ; var1_i < dev_2D_w[0][0][0].size() ; ++var1_i){
-	    //Loop over number of var2 bins
-	    for(unsigned int var2_i = 0 ; var2_i < dev_2D_w[0][0][0][0].size() ; ++var2_i){
-	      if(dev_2D_vec[param_i][mode_i][etrue_i][var1_i][var2_i] == NULL){continue;}
-	      dev_2D_w[param_i][mode_i][etrue_i][var1_i][var2_i] = FastSplineEval(dev_2D_vec[param_i][mode_i][etrue_i][var1_i][var2_i], param_i);
-	      if(dev_2D_w[param_i][mode_i][etrue_i][var1_i][var2_i]<0){dev_2D_w[param_i][mode_i][etrue_i][var1_i][var2_i]=0;}
-	    }
-	  }
-	}
-      }
-    }
-    break;
-  }
-
-  return;
-}
-
-// ---- GetSplineBins (first: original erec version, then var1-var2 version) ---- //
-
-void splineFDBase::GetSplineBins(int &nutype, bool &sig, double &enu, double &var1, unsigned int &enu_bin, unsigned int &var1_bin) // get bins for etrue-erec splines
-{
-
-  enu_bin = enu_spline->FindBin(enu)-1;
-  var1_bin = var1_spline->FindBin(var1)-1;
-
-  return;
-}
-
-void splineFDBase::GetSplineBins(int &nutype, bool &sig, double &enu, double &var1, double &var2, unsigned int &enu_bin, unsigned int &bin1, unsigned int &bin2) // get bins for etrue-var1-var2 splines
-{
-
-  enu_bin = enu_spline->FindBin(enu)-1;
-  bin1 = var1_spline->FindBin(var1)-1;
-  bin2 = var2_spline->FindBin(var2)-1;
-
-  return;
-}
-
-std::vector< std::vector<int> > splineFDBase::getEventSplines(int &event_i, int eventmode, unsigned int &enu_bin, unsigned int &var1_bin){
- 
-  std::vector< std::vector<int> > returnVec;
-  int mode = MaCh3Mode_SplineMode_Map[eventmode];
-
-  //DB Now use detid to determine number of spline systematics, names and corresponding modes
-  int numSplineParams = covxsec->GetNumSplineParamsFromDetID(SampleDetID);
-  std::vector<std::string> SplineFileParsNames = covxsec->GetSplineFileParsNamesFromDetID(SampleDetID);
-  std::vector< std::vector<int> > SplineModeVecs = StripDuplicatedModes(covxsec->GetSplineModeVecFromDetID(SampleDetID));
-  std::vector<int> SplineParsIndex = covxsec->GetSplineParsIndexFromDetID(SampleDetID);
-
-  int ebin = enu_bin;
-  if(ebin<0 || ebin>=enu_spline->GetNbins()) 
+  std::vector<std::vector<TAxis *>> SampleBinning(nOscChan);
+  for (int iOscChan = 0; iOscChan < nOscChan; iOscChan++)
   {
-    return returnVec;  
+    std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+    SampleBinning[iOscChan] = FindSplineBinning(OscChanFileNames[iOscChan], SampleName);
   }
-  
-  int vbin = var1_bin;
-  if(vbin<0 || vbin>=var1_spline->GetNbins())
-  {
-    return returnVec;
-  }
+  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+  SplineBinning.push_back(SampleBinning);
 
-  for(unsigned param_i = 0 ; param_i < (unsigned)numSplineParams ; param_i++){
-    std::vector<int> spline_modes = SplineModeVecs[param_i];
-    for(int mode_i = 0 ; (unsigned)mode_i < spline_modes.size() ; mode_i++){
-      if(mode == spline_modes[mode_i]){
-	std::vector<int> vecBin(4);
+  BuildSampleIndexingArray(SampleName);
+  PrintArrayDetails(SampleName);
+  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
 
-	vecBin[0] = param_i;
-	vecBin[1] = mode;
-	vecBin[2] = ebin;
-	vecBin[3] = vbin;
-	returnVec.push_back(vecBin);
-      } 
-    }
-  }
+  FillSampleArray(SampleName, OscChanFileNames);
+  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
 
-  return returnVec;
+  return true;
 }
 
-//Now the 2D version of the function above
-std::vector< std::vector<int> > splineFDBase::getEventSplines(int &event_i, int eventmode, unsigned int &enu_bin, unsigned int &var1_bin, unsigned int &var2_bin){
-
-  //ETA - only support binning option 2 at the moment, should be easy to add in other though - 18/09/2020: DB We have atmospheric xsec splines now :P
-  if((BinningOpt != 2)&&(BinningOpt != 4)){std::cerr << "[ERROR:splineFDBase::getEventSplines() - only binning option 2 and 4 are currently implemented here" << std::endl;}
-
-  //DB Now use detid to determine number of spline systematics, names and corresponding modes
-  int numSplineParams = covxsec->GetNumSplineParamsFromDetID(SampleDetID);
-  std::vector<std::string> SplineFileParsNames = covxsec->GetSplineFileParsNamesFromDetID(SampleDetID);
-  std::vector< std::vector<int> > SplineModeVecs = StripDuplicatedModes(covxsec->GetSplineModeVecFromDetID(SampleDetID));
-  std::vector<int> SplineParsIndex = covxsec->GetSplineParsIndexFromDetID(SampleDetID);
-
-  std::vector< std::vector<int> > returnVec;
-  int mode = MaCh3Mode_SplineMode_Map[eventmode];
-
-  int ebin = enu_bin;  
-  int enuBinLimit = enu_spline->GetNbins();
-  int v1BinLimit = -1;
-  int v2BinLimit = -1;
-
-  v1BinLimit = var1_spline->GetNbins();
-  v2BinLimit = var2_spline->GetNbins();
-
-  if (v1BinLimit==-1 || v2BinLimit==-1) {
-    std::cerr << "[ERROR:splineFDBase::getEventSplines() - binning limits not Set correctly" << std::endl;
+//****************************************
+void splineFDBase::TransferToMonolith()
+//****************************************
+{
+//  FindUniqueModes();
+  PrepForReweight(); 
+  MonolithSize = CountNumberOfLoadedSplines();
+  if(MonolithSize!=MonolithIndex){
+    std::cerr<<"Something's gone wrong when we tried to get the size of your monolith"<<std::endl;
+    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
     throw;
   }
-
-  if(ebin<0 || ebin>=enuBinLimit) {
-    return returnVec;  
-  }
-
-  int vbin = var1_bin;
-  if(vbin<0 || vbin>=v1BinLimit) {
-    return returnVec;
-  }
-
-  int v2bin = var2_bin;
-  if(v2bin<0 || v2bin>=v2BinLimit) {
-    return returnVec; 
-  }
-
-  for(unsigned param_i = 0 ; param_i < (unsigned)numSplineParams ; param_i++){
-    std::vector<int> spline_modes = SplineModeVecs[param_i];
-    for(int mode_i = 0 ; (unsigned)mode_i < spline_modes.size() ; mode_i++){
-      if(mode == spline_modes[mode_i]) {
-	std::vector<int> vecBin(5);
-   
-	vecBin[0] = param_i;
-	vecBin[1] = mode;
-	vecBin[2] = ebin;
-	vecBin[3] = vbin;
-	vecBin[4] = v2bin;
-	returnVec.push_back(vecBin);
-      }
-    } 
-  }
+  uniquesplinevec_Monolith.reserve(MonolithSize);
+  weightvec_Monolith.reserve(MonolithSize);
+  isflatarray = new bool[MonolithSize];
   
-  return returnVec;
+
+  xcoeff_arr = new __float__[CoeffIndex];
+  manycoeff_arr = new __float__[CoeffIndex*4];
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  { // Loop over sample
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+    { // Loop over oscillation channels
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
+      { // Loop over systematics
+        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+        { // Loop over modes
+          for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
+          { // Loop over first dimension
+            for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
+            { // Loop over second dimension
+              for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
+              {
+                int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
+                weightvec_Monolith[splineindex] = 1.0;
+
+                bool foundUniqueSpline = false;
+                for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+                {
+                  if (SplineFileParPrefixNames[iSample][iSyst] == UniqueSystNames[iUniqueSyst])
+                  {
+                    uniquesplinevec_Monolith[splineindex] = iUniqueSyst;
+                    foundUniqueSpline = true;
+                  }
+                }//unique syst loop end
+
+                if (!foundUniqueSpline)
+                {
+                  std::cerr << "Unique spline index not found" << std::endl;
+                  std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+                  throw;
+                }
+                int splineKnots;
+                if(splinevec_Monolith[splineindex]!=NULL){
+                  isflatarray[splineindex]=false;
+                  splineKnots=splinevec_Monolith[splineindex]->GetNp();
+
+                  //Now to fill up our coefficient arrayss
+                  __float__* tmpXCoeffArr = new __float__[splineKnots];
+                  __float__* tmpManyCoeffArr = new __float__[splineKnots*4];
+
+                  int iCoeff=coeffindexvec[splineindex];
+                  getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
+
+                  #ifdef MULTITHREAD
+                  #pragma omp parallel for
+                  #endif
+                  for(int i=0; i<splineKnots; i++){
+
+                    if(tmpXCoeffArr[i]==-999){
+                      std::cerr<<"ERROR : looks like we've got a bad X, index = "<<i<<std::endl;
+                      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+                      throw;
+                    }
+                    xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
+
+                    for(int j=0; j<4; j++){
+                      if(tmpManyCoeffArr[i*4+j]==-999){
+                        std::cerr<<"Bad ybcd, index : "<<i<<", "<<j<<std::endl;
+                        std::cerr<<"Param Values : "<<tmpManyCoeffArr[i*4]<<", "<<tmpManyCoeffArr[i*4+1]<<", "<<tmpManyCoeffArr[i*4+2]<<", "<<tmpManyCoeffArr[i*4+3]<<std::endl;
+                        std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+                        throw;
+                      }
+                    manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+                    }
+                  }
+                  delete tmpXCoeffArr;
+                  delete tmpManyCoeffArr;
+                }
+                else {
+                    isflatarray[splineindex]=true;
+                }
+              }//3d loop end
+            }//2d loop end
+          }//1d loop end
+        }//mode loop end
+      }//syst2 loop end
+    }//osc loop end
+  }//syst1 loop end
 }
 
-//Needed for FastSplineEval
-void splineFDBase::SetupSplineInfoArray(covarianceXsec * xsec){
 
-  if (!xsec) {
-	std::cout << "[ERROR]:: " << __FILE__ << ":" << __LINE__ << " xsec cov is NULL" << std::endl;
-	throw;
-  }
 
-  covxsec = xsec;
+//****************************************
+void splineFDBase::FindSplineSegment()
+//****************************************
+{
+  //HI okay let's try this, we delete+refill a new array which we'll fill with x-s for our segment
+  #ifdef MULTITHREAD
+  #pragma omp parallel //for schedule(dynamic)
+  #endif
+  for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++)
+  {
+    int nPoints = UniqueSystNKnots[iSyst];
+    std::vector<__float__> xArray = UniqueSystXPts[iSyst];
 
-  std::cout << "Now in SetupSplineInfoArray!!" << std::endl;
+    // Get the variation for this reconfigure for the ith parameter
+    int GlobalIndex = UniqueSystIndices[iSyst];
 
-  //DB Now use detid to determine number of spline systematics, names and corresponding modes 
-  std::vector<std::string> splinenames = covxsec->GetSplineParsNamesFromDetID(SampleDetID);
-  int numSplineParams = covxsec->GetNumSplineParamsFromDetID(SampleDetID);
-  std::vector<std::string> SplineFileParsNames = covxsec->GetSplineFileParsNamesFromDetID(SampleDetID);
-  std::vector< std::vector<int> > SplineModeVecs = StripDuplicatedModes(covxsec->GetSplineModeVecFromDetID(SampleDetID));
-  std::vector<int> SplineParsIndex = covxsec->GetSplineParsIndexFromDetID(SampleDetID);
-
-  std::cout << "Found " << splinenames.size() << " spline names" << std::endl;
-  std::cout << "Found " << numSplineParams << std::endl;
-
-  // Total XSec params might not be the same as far detector params  
-  // So we have to select by hand which ones we want    
-  int xsecnParams = numSplineParams;
-  number_parms = xsecnParams;
-  //std::cout << "xsecnParams: " << xsecnParams << std::endl;
-  std::vector<std::string> xsecParnames = SplineFileParsNames;
-  std::vector<int> xsecParsIndex = SplineParsIndex;
-
-  //ETA - ADD NUMBER OF SPLINES
-  unsigned int n_far_splines = numSplineParams;
-
-  //for(unsigned int i = 0; i < xsecParnames.size(); i++){
-  //std::cout << " Xsec parname: \t" <<  xsecParnames[i] << ", index: " << xsecParsIndex[i] << std::endl;
-  //}
-
-  // ETA - replacing old hard coded array of spline parameter names
-  // we can just get these from the xsec covariance.
-  std::string FarXsecPars[n_far_splines];
-  for(unsigned int splinePar_i = 0 ; splinePar_i < n_far_splines ; splinePar_i++){
-	FarXsecPars[splinePar_i] = xsecParnames[splinePar_i];
-  }
-  unsigned int nPars = (sizeof(FarXsecPars)/sizeof(*FarXsecPars));
-
-  // Check if an unexpected parameter is loaded
-  // ETA - only fill splineParsNames if we haven't done this already
-  // this assumes you're not trying to change xsec covariance but 
-  // I don't think you'd ever want to?
-  if(splineParsNames.size() == 0){
-	for(unsigned int i = 0; i < xsecParnames.size(); i++){
-	  std::string * p = std::find(FarXsecPars, FarXsecPars+nPars, xsecParnames[i]);
-	  if(p != FarXsecPars+nPars){
-	    splineParsNames.push_back(xsecParnames[i]);
-	    splineParsIndex.push_back(xsecParsIndex[i]);
-	  }
-	}
-  }
-  //else{std::cout << "splineParsNames and splineParsIndex have already been filled" << std::endl;}
-
-  // Also check that each of the above expected parameters are actually picked up
-  // and unique
-  for(unsigned int i = 0; i < nPars; i++){
-    std::vector<std::string>::iterator it = std::find(splineParsNames.begin(), splineParsNames.end(), FarXsecPars[i]);
-    if(it == splineParsNames.end()){
-      std::cerr << "Error: Far detector xsec par " << FarXsecPars[i] << " not loaded!" << std::endl;
-      throw;
-    }
-  }
+    __float__ xvar=__float__(xsec->calcReWeight(GlobalIndex));
+    xVarArray[iSyst]=xvar;
     
-  nSplineParams = splineParsNames.size();
-
-  SplineInfoArray = new FastSplineInfo[nSplineParams];
-  for (int i = 0; i < nSplineParams; ++i) {
-    SplineInfoArray[i].nPts = -999;
-    SplineInfoArray[i].xPts = NULL;
-    SplineInfoArray[i].CurrSegment = -999;
-	//ETA Set flat member of FastSplineInfo
-	SplineInfoArray[i].flat = 0;
-  }
-  
-  return;
-}
-
-
-void splineFDBase::SetSplineInfoArrays(){
-  // Here we try to find a non-empty (or larger than 3 knot) Spline object to record the knots
-  // ETA - now we Set any flat splines or splines we can't find to NULL
-  // so here we now need to loop through the spines until we find one that isn't NULL to Set 
-  // the SplineInfoArray. If all the splines are flat for a parameter we Set the flat member
-  // of FastSplineInfoArray to be 1 (i.e true). This is then checked later when finding the
-  // segment so we don't get a seg fault. NULL splines return 1 in FastSplineEval
-
-  //DB Now use detid to determine number of spline systematics, names and corresponding modes
-  int numSplineParams = covxsec->GetNumSplineParamsFromDetID(SampleDetID);
-  std::vector<std::string> SplineFileParsNames = covxsec->GetSplineFileParsNamesFromDetID(SampleDetID);
-  std::vector< std::vector<int> > SplineModeVecs = StripDuplicatedModes(covxsec->GetSplineModeVecFromDetID(SampleDetID));
-  std::vector<int> SplineParsIndex = covxsec->GetSplineParsIndexFromDetID(SampleDetID);
-
-
-  //ETA - new way of Setting up splines
-  bool is_null = true;
-  switch (BinningOpt)
-    {
-	  //for 1D spline (i.e. splines binned in etrue-var1)
-	  case 0:
-	  case 1:
-	for(unsigned spline_i = 0 ; spline_i < (unsigned)numSplineParams ; spline_i++){
-	  is_null = true;
-	  //std::cout << "Filled SplineInfoArray at " << spline_i << " for spline " << SplineFileParsNames[spline_i] << std::endl;
-	  for(unsigned mode_i = 0 ; mode_i < (unsigned)nUniqueModes; mode_i++){
-		for(unsigned enu_i = 0 ; enu_i < (unsigned)enu_spline->GetNbins() ; enu_i++){
-		  for(unsigned var1_i = 0 ; var1_i < (unsigned)var1_spline->GetNbins() ; var1_i++){
-			if(SetSplineInfoArray(dev_1D_vec[spline_i][mode_i][enu_i][var1_i], spline_i)){		  
-			  is_null = false; break;
-			}
-		  }
-		  if(!is_null){break;}
-		}
-		if(!is_null){break;}
-	  }	  
-	  if(is_null){SplineInfoArray[spline_i].flat = 1;}
-	}
-      break;
-    //for 2D spline (i.e. splines binned in etrue-var1-var2)
-    case 2:
-      //std::cout << "BinningOpt: " << BinningOpt << std::endl;                               
-	  for(unsigned spline_i = 0 ; spline_i < (unsigned)numSplineParams ; spline_i++){
-		is_null = true;
-		//std::cout << "Filled SplineInfoArray at " << spline_i << " for spline " << SplineFileParsNames[spline_i] << std::endl;
-		for(unsigned mode_i = 0 ; mode_i < (unsigned)nUniqueModes; mode_i++){
-		  for(unsigned enu_i = 0 ; enu_i < (unsigned)enu_spline->GetNbins() ; enu_i++){
-			for(unsigned var1_i = 0 ; var1_i < (unsigned)var1_spline->GetNbins() ; var1_i++){
-			  for(unsigned var2_i = 0 ; var2_i < (unsigned)var2_spline->GetNbins() ; var2_i++){
-				if(SetSplineInfoArray(dev_2D_vec[spline_i][mode_i][enu_i][var1_i][var2_i], spline_i)){		  
-				  is_null = false; break;
-				}
-			  }
-			  if(!is_null){break;}
-			}
-			if(!is_null){break;}
-		  }	  
-		  if(!is_null){break;}
-		}
-		if(is_null){SplineInfoArray[spline_i].flat = 1;}
-	  } 
-	  break;
-    default:
-      std::cout << "Something went wrong in splineFDBase::SetSplineInfoArrays()! BinningOpt: " << BinningOpt << std::endl;
-    }
-
-}
-
-
-// *************************
-// Only need to do the binary search once per parameter, not once per bin!
-void splineFDBase::FindSplineSegment() {
-
-  // Loop over the splines
-  for (int i = 0; i < nSplineParams; i++) {
-
-	//If the spline is always flat then move onto next param
-	//You don't need this info for flat splines as they're
-	//Set to NULL which gets caught in FastSplineEval
-	if(SplineInfoArray[i].flat == 1){continue;}
-
-    const int nPoints = SplineInfoArray[i].nPts;
-    const double* xArray = SplineInfoArray[i].xPts;
-
-	// && here is just being too cautious, flat should always be 0
-	if ( (nPoints == -999 || xArray == NULL) && SplineInfoArray[i].flat == 0) {
-      std::cerr << "ERROR" << std::endl;
-      std::cerr << "SplineInfoArray[" << i << "] isn't Set yet" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-
-    // Get the variation for this reconfigure for the ith parameter 
-    const int GlobalIndex = splineParsIndex[i];
-    double xvar_tmp;
-    if(covxsec!=NULL){
-      xvar_tmp=covxsec->calcReWeight(GlobalIndex);
-    }
-    else{
-      std::cout << "Null Xsec - Quitting" << std::endl;
-      throw;
-    }
-    const double xvar=xvar_tmp;
-
-    // The segment we're interested in (klow in ROOT code)   
-    int segment = 0;
-    int kHigh = nPoints-1;
-
+    //Rather than starting from 0 everytime, let's use what we know!    
+    int segment = UniqueSystCurrSegment[iSyst];
+    int kHigh = nPoints - 1;
     // If the variation is below the lowest saved spline point
-    if (xvar <= xArray[0]) {
-      segment = 0;
-      // If the variation is above the highest saved spline point
-    } else if (xvar >= xArray[nPoints-1]) {
+    if(segment<nPoints-1 && segment>=0 && xvar>=xArray[segment] && xvar<xArray[segment+1]) //We're still in the same place!
+      {
+	      continue;
+      }
+    //Now check to see if it's the segment below it
+    else if(segment >= 1  && segment<=nPoints && xvar>=xArray[segment-1] && xvar<xArray[segment])
+      {
+	      segment--;
+      }
+    //Okay what if we're above it
+    else if(segment <= nPoints-2 && segment>=0 && xvar>=xArray[segment+1] && xvar<xArray[segment+2])
+      {
+	      segment++;
+      }
+    else if (xvar <= xArray[0])
+      {
+	      segment=0;
+	// If the variation is above the highest saved spline point
+      }
+    else if (xvar >= xArray[nPoints - 1])
+    {
       // Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
       segment = kHigh;
-      // If the variation is between the maximum and minimum, perform a binary search     
-    } else {
-      // The top point we've got                 
+      // If the variation is between the maximum and minimum, perform a binary search
+    }
+    //Now we resort to binary search!
+    else
+    {
+      segment=0;
+      // The top point we've got
       int kHalf = 0;
       // While there is still a difference in the points (we haven't yet found the segment)
-      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment  
-      while (kHigh - segment > 1) {
+      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
+      while (kHigh - segment > 1)
+      {
         // Increment the half-step
-        kHalf = (segment + kHigh)/2;
-        // If our variation is above the kHalf, Set the segment to kHalf   
-        if (xvar > xArray[kHalf]) {
+        kHalf = (segment + kHigh) / 2;
+        // If our variation is above the kHalf, set the segment to kHalf
+        if (xvar > xArray[kHalf])
+        {
           segment = kHalf;
-          // Else move kHigh down 
-        } else {
+          // Else move kHigh down
+        }
+        else
+        {
           kHigh = kHalf;
         }
       } // End the while: we've now done our binary search
-    } // End the else: we've now found our point
-    if (segment >= nPoints-1 && nPoints > 1) segment = nPoints-2;
+    }   // End the else: we've now found our point
+    if (segment >= nPoints - 1 && nPoints > 1){
+      segment = nPoints - 2;}
     // Save the segment for the ith parameter
-    SplineInfoArray[i].CurrSegment = segment;
-#ifdef DEBUG_WEIGHTS
-    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
-      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
-      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
-      std::cerr << splineParsNames[i] << std::endl;
-
-      std::cerr << "Found segment   = " << segment << std::endl;
-      std::cerr << "Doing variation = " << xvar << std::endl;
-      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
-      for (int j = 0; j < SplineInfoArray[j].nPts; ++j) {
-	std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
-      }
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-#endif
+    UniqueSystCurrSegment[iSyst] = segment;
   }
-
+  // std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
 }
 
-// This does what it says on the tin, if there are any underlying interaction modes which are being grouped together for the splines then we don't need to keep them both
-std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
-  
-  int InputVectorSize = InputVector.size();
-  std::vector< std::vector<int> > ReturnVec(InputVectorSize);
+//****************************************
+void splineFDBase::calcWeights()
+//****************************************
+{
+  #ifdef MULTITHREAD
+  #pragma omp parallel for// schedule(dynamic)
+  #endif
+  for (unsigned int iCoeff = 0; iCoeff < uniquecoeffindices.size(); iCoeff++)
+  {
 
-  for (int iVec=0;iVec<InputVectorSize;iVec++) {
-    std::vector<int> TmpVec;
+    int iSpline = uniquecoeffindices[iCoeff];
+    short int uniqueIndex=uniquesplinevec_Monolith[iSpline];
+    short int currentsegment=UniqueSystCurrSegment[uniqueIndex];
 
-    for (unsigned int iMode=0;iMode<InputVector[iVec].size();iMode++) {
-      int Mode = InputVector[iVec][iMode];
-      bool IncludeMode = true;
+    int segCoeff = coeffindexvec[iSpline]+currentsegment;
 
-      for (unsigned int iDuplicatedMode=0;iDuplicatedMode<DuplicatedFDModes.size();iDuplicatedMode++) {
-	if (Mode == DuplicatedFDModes[iDuplicatedMode]) {
-	  IncludeMode = false;
-	}
-      }
+    // These are what we can extract from the TSpline3
+    __float__ x = xcoeff_arr[segCoeff];
+    __float__ y = manycoeff_arr[(segCoeff)*4+kCoeffY];
+    __float__ b = manycoeff_arr[(segCoeff)*4+kCoeffB];
+    __float__ c = manycoeff_arr[(segCoeff)*4+kCoeffC];
+    __float__ d = manycoeff_arr[(segCoeff)*4+kCoeffD];
 
-      if (IncludeMode) {
-	TmpVec.push_back(Mode);
-      }
-    }
-    
-    ReturnVec[iVec] = TmpVec;
+    // Get the variation for this reconfigure for the ith parameter
+    __float__ xvar = xVarArray[uniqueIndex];
+    // The Delta(x)
+    __float__ dx = xvar - x;
+
+    //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
+    __float__ weight = fmaf(dx, fmaf(dx, fmaf(dx, d, c), b), y); 
+    //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
+
+
+    if(weight<0){weight=0;}  //Stops is getting negative weights
+
+    weightvec_Monolith[iSpline]=double(weight);
+  }
+}
+
+//****************************************
+void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
+//Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector)
+//Only need 1 indexing array everything else interfaces with this to get binning properties
+//****************************************
+{  
+  int iSample = getSampleIndex(SampleName);
+  int nSplineSysts = nSplineParams[iSample];
+  int nOscChannels = nOscChans[iSample];
+  std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>>> indexvec_OscChan;
+  for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
+  { // Loop over oscillation channels
+    std::vector<std::vector<std::vector<std::vector<std::vector<int >>>>> indexvec_Syst;
+    for (int iSyst = 0; iSyst < nSplineSysts; iSyst++)
+    { // Loop over systematics
+      std::vector<std::vector<std::vector<std::vector<int >>>> indexvec_Mode;
+      int nModesInSyst = SplineModeVecs[iSample][iSyst].size();
+      for (int iMode = 0; iMode < nModesInSyst; iMode++)
+      { // Loop over modes
+        std::vector<std::vector<std::vector<int >>> indexvec_Var1;
+        for (int iVar1 = 0; iVar1 < (SplineBinning[iSample][iOscChan][0])->GetNbins(); iVar1++)
+        { // Loop over first dimension
+          std::vector<std::vector<int >> indexvec_Var2;
+          for (int iVar2 = 0; iVar2 < (SplineBinning[iSample][iOscChan][1])->GetNbins(); iVar2++)
+          { // Loop over second dimension
+            std::vector<int> indexvec_Var3;
+            for (int iVar3 = 0; iVar3 < (SplineBinning[iSample][iOscChan][2])->GetNbins(); iVar3++)
+            { // Loop over third dimension
+	            indexvec_Var3.push_back(0); //Don't start counting yet!
+            } // end iVar3 loop
+            indexvec_Var2.push_back(indexvec_Var3);
+          } // end iVar2 loop
+          indexvec_Var1.push_back(indexvec_Var2);
+        } // end iVar1 loop
+        indexvec_Mode.push_back(indexvec_Var1);
+      } // end of iMode loop
+      indexvec_Syst.push_back(indexvec_Mode);
+    } // end of iOscChan loop
+    indexvec_OscChan.push_back(indexvec_Syst);
+  } // end of iSyst loop
+  indexvec.push_back(indexvec_OscChan);
+}
+
+//****************************************
+std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::string SampleName)
+//****************************************
+{
+  std::vector<TAxis *> ReturnVec;
+  int iSample=getSampleIndex(SampleName);
+
+  TFile *File = new TFile(FileName.c_str());
+  if (!File || File->IsZombie())
+  {
+    std::cerr << "File " << FileName << " not found" << std::endl;
+    std::cerr << "This is caused by something here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
   }
 
+  std::cout << "Finding binning for:" << std::endl;
+  std::cout << FileName << std::endl;
+
+  bool isHist2D = false;
+  bool isHist3D = false;
+
+  TH2F *Hist2D = NULL;
+  TH3F *Hist3D = NULL;
+
+  TObject *Obj = File->Get("dev_tmp_0_0");
+  if (!Obj)
+  {
+    std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
+    std::cerr << "FileName: " << FileName << std::endl;
+    std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
+  }
+
+  if (Obj->IsA() == TH2F::Class())
+  {
+    isHist2D = true;
+  }
+  if (Obj->IsA() == TH3F::Class())
+  {
+    isHist3D = true;
+  }
+
+  if (isHist2D && isHist3D)
+  {
+    std::cerr << "Object inherits from both TH2D and TH3D - Odd" << std::endl;
+    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
+  }
+  if (!isHist2D && !isHist3D)
+  {
+    std::cerr << "Object doesn't inherit from either TH2D and TH3D - Odd A" << std::endl;
+    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
+  }
+
+  if (isHist2D)
+  {
+    if (Dimensions[iSample] != 2)
+    {
+      std::cerr << "Trying to load a 2D spline template when nDim=" << Dimensions[iSample] << std::endl;
+      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+      throw;
+    }
+    Hist2D = (TH2F *)File->Get("dev_tmp_0_0");
+  }
+  if (isHist3D)
+  {
+    if (Dimensions[iSample] != 3)
+    {
+      std::cerr << "Trying to load a 3D spline template when nDim=" << Dimensions[iSample] << std::endl;
+      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+      throw;
+    }
+    Hist3D = (TH3F *)File->Get("dev_tmp_0_0");
+  }
+
+  int nDummyBins = 1;
+  double *DummyEdges = new double[2];
+  DummyEdges[0] = -1e15;
+  DummyEdges[1] = 1e15;
+  TAxis *DummyAxis = new TAxis(nDummyBins, DummyEdges);
+
+  if (Dimensions[iSample] == 2)
+  {
+    ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
+    ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
+    ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
+  }
+  else if (Dimensions[iSample] == 3)
+  {
+    ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
+    ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
+    ReturnVec.push_back((TAxis *)(Hist3D->GetZaxis())->Clone());
+  }
+  else
+  {
+    std::cerr << "Number of dimensions not valid! Given:" << Dimensions[iSample] << std::endl;
+    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
+  }
+
+  for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); iAxis++)
+  {
+    std::cout << "Stored Var " << iAxis << " (" << getDimLabel(BinningOpts[iSample], iAxis) << ") Spline Binning for sample " << SampleNames[iSample] << ":" << std::endl;
+    PrintBinning(ReturnVec[iAxis]);
+  }
+  delete Hist3D;
+  delete Hist2D;
+  File->Close();
+  delete DummyAxis;
   return ReturnVec;
 }
 
-// ***************************************************************************
-// Fast spline evaluation
-// Inspired by TSpline3::Eval, which we can speed up considerably
-// Main reason is that we know that for one parameter (e.g. MAQE) we will have the same number of points, x min, xmax, etc for all MAQE splines, so we can signficantly reduce number of operations
-// The curious can find very similar GPU code in splines/gpuSplineUtils.cu and CPU code in spline/SplineMonolith.cpp::Eval
-// I've included it here for more transparency: this kind of eval should be possible for binned splines too
-template <class T>
-double splineFDBase::FastSplineEval(T* spline, const int SplineNumber) {
-  // ***************************************************************************  
-
-  // Check if the  coveriance is NULL 
-  if (covxsec == NULL) return 1.0;
-  // The segment has already been found in FindSplineSegment()
-  int segment = SplineInfoArray[SplineNumber].CurrSegment;
-
-  // These are what we can extract from the TSpline3  
-  double x = -999.99;
-  double y = -999.99;
-  double b = -999.99;
-  double c = -999.99;
-  double d = -999.99;
-
-  // Now write the coefficients  
-  spline->GetCoeff(segment, x, y, b, c, d);
-  // Get the variation for this reconfigure for the ith parameter   
-  int GlobalIndex = splineParsIndex[SplineNumber];
-  double xvar;
-  xvar=covxsec->calcReWeight(GlobalIndex);
-
-  // The Delta(x)   
-  double dx = xvar - x;
-
-  // The spline weight to return           
-  double weight = y+dx*(b+dx*(c+d*dx));
 
 
-  // Check that eval on the TSpline3 is the same as our weight    
-#ifdef DEBUG_WEIGHTS
+//****************************************
+int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
+//****************************************
+{
+  int SampleCounter_NonFlat = 0;
+  int SampleCounter_All = 0;
+  int FullCounter_NonFlat = 0;
+  int FullCounter_All = 0;
 
-  // Difference between eval and weight   
-  double diff =fabs(spline->Eval(xvar) - weight);
-
-  if (diff > 1.E-7) {
-
-    std::cerr << "TSpline3->Eval() != custom eval: Something is wrong with FastSplineEval!" << std::endl;
-    std::cerr << "Difference in spline evaluation > 1.E-5!" << std::endl;
-
-    std::cerr << "Eval      = " << spline->Eval(xvar) << std::endl;
-    std::cerr << "Cust      = " << weight << std::endl;
-    std::cerr << "diff      = " << diff << std::endl;
-    std::cerr << "param     = " << splineParsNames[SplineNumber] << std::endl;
-    if(covxsec){
-      std::cerr << "variation = " << covxsec->calcReWeight(GlobalIndex) << std::endl;
-      std::cerr << "paramVal  = " << covxsec->GetParProp(GlobalIndex) << std::endl;
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  { // Loop over systematics
+    SampleCounter_NonFlat = 0;
+    SampleCounter_All = 0;
+    std::string SampleName = SampleNames[iSample];
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+    { // Loop over oscillation channels
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
+      { // Loop over systematics
+        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+        { // Loop over modes
+          for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
+          { // Loop over first dimension
+            for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
+            { // Loop over second dimension
+              for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
+              { // Loop over third dimension
+                if (isValidSplineIndex(SampleName, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
+                {
+                  int splineindex = indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
+                  if (splinevec_Monolith[splineindex] != NULL)
+                  {
+                    SampleCounter_NonFlat += 1;
+                  }
+                  SampleCounter_All += 1;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (Verbosity > 0)
+    {
+      std::cout << std::setw(10) << SampleNames[iSample] << " has " << std::setw(10) << SampleCounter_All << " splines, of which " << std::setw(10) << SampleCounter_NonFlat << " are not flat" << std::endl;
     }
 
-    // Check we've found the right segment    
-    int klow = spline->FindX(xvar);
-    if (klow >= spline->GetNp()-1 && spline->GetNp() > 1) klow = spline->GetNp()-2;
-
-    std::cerr << "segment   = " << segment << std::endl;
-    std::cerr << "spl segm  = " << klow << std::endl;
-    std::cerr << "nPoints   = " << SplineInfoArray[SplineNumber].nPts << std::endl;
-    std::cerr << "nPoints sp= " << spline->GetNp() << std::endl;
-
-
-    std::cerr << "Printing x information:" << std::endl;
-    for (int i = 0; i < SplineInfoArray[SplineNumber].nPts; ++i) {
-      std::cerr << "   " << i << " = " << SplineInfoArray[SplineNumber].xPts[i] << std::endl;
-    }
-    std::cerr << "From spline: " << std::endl;
-    for (int i = 0; i < spline->GetNp(); ++i) {
-      double xtmp, ytmp;
-      spline->GetKnot(i, xtmp, ytmp);
-      std::cerr << "   " << i << " = " << xtmp << std::endl;
-    }
-
-    if (klow != segment) {
-      std::cerr << "Have found wrong segment in FindSplineSegment!" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    FullCounter_NonFlat += SampleCounter_NonFlat;
+    FullCounter_All += SampleCounter_All;
   }
-#endif // DEBUG_WEIGHTS
-  return weight;
+
+  if (Verbosity > 0)
+  {
+    std::cout << "Total number of splines loaded:" << FullCounter_All << std::endl;
+    std::cout << "Total number of non-flat splines loaded:" << FullCounter_NonFlat << std::endl;
+  }
+
+  if (NonFlat)
+  {
+    return FullCounter_NonFlat;
+  }
+  else
+  {
+    return FullCounter_All;
+  }
 }
-//ETA testing this out
-template<class T>
-bool splineFDBase::SetSplineInfoArray(T* spline, int isyst){
-  // Fill the SplineInfoArray entries with information on each splinified parameter                                                                                                                             
-  if (spline == NULL){return false;}
-  if (SplineInfoArray[isyst].xPts == NULL) {
-    // Fill the number of points 
-	SplineInfoArray[isyst].nPts = spline->GetNp();
-    if(SplineInfoArray[isyst].nPts == 3){
-      return false;
-    }else{
-      // Fill the x points         
-      SplineInfoArray[isyst].xPts = new double[SplineInfoArray[isyst].nPts];
-      for (int k = 0; k < SplineInfoArray[isyst].nPts; ++k) {
-        double xtemp = -999.99;
-        double ytemp = -999.99;
-        spline->GetKnot(k, xtemp, ytemp);
-        SplineInfoArray[isyst].xPts[k] = xtemp;
+
+//****************************************
+void splineFDBase::PrepForReweight()
+//****************************************
+{
+
+  std::vector<TSpline3_red *> UniqueSystSplines;
+
+  // DB Find all the Unique systs across each sample and oscillation channel
+  //    This assumes that each occurence of the same systematic spline has the same knot spacing
+  //    Which is a reasonable assumption for the current implementation of spline evaluations
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  { // Loop over systematics
+    for (unsigned int iSyst = 0; iSyst < indexvec[iSample][0].size(); iSyst++)
+    { // Loop over systematics
+      std::string SystName = SplineFileParPrefixNames[iSample][iSyst];
+      bool FoundSyst = false;
+      for (unsigned int iFoundSyst = 0; iFoundSyst < UniqueSystNames.size(); iFoundSyst++)
+      {
+        if (SystName == UniqueSystNames[iFoundSyst])
+        {
+          FoundSyst = true;
+        }
+      }
+      if (!FoundSyst)
+      {
+        UniqueSystNames.push_back(SystName);
+
+        bool FoundNonFlatSpline = false;
+        for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+        { // Loop over oscillation channels
+          for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+          { // Loop over modes
+            for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
+            { // Loop over first dimension
+              for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
+              { // Loop over second dimension
+                for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
+                { // Loop over third dimension
+                  int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
+                  if (splinevec_Monolith[splineindex] != NULL)
+                  {
+                    UniqueSystSplines.push_back(splinevec_Monolith[splineindex]);
+                    UniqueSystIndices.push_back(SplineParsIndex[iSample][iSyst]);
+                    FoundNonFlatSpline = true;
+                  }
+                  if (FoundNonFlatSpline)
+                  {
+                    break;
+                  }
+                }//3D loop end
+                if (FoundNonFlatSpline)
+                {
+                  break;
+                }
+              }//2D loop end
+              if (FoundNonFlatSpline)
+              {
+                break;
+              }
+            }//1D loop end
+            if (FoundNonFlatSpline)
+            {
+              break;
+            }
+          }//mode loop end
+          if (FoundNonFlatSpline)
+          {
+            break;
+          }
+        }//osc loop end
+        if (!FoundNonFlatSpline)
+        {
+          std::cerr << SystName << " syst has no response in sample " << iSample << std::endl;
+          std::cerr << "Whilst this isn't neccessarily a problem, it seems odd" << std::endl;
+          std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+          continue;
+        }
+      }
+    }//Syst loop end
+  }
+  
+
+  nUniqueSysts = UniqueSystSplines.size();
+
+  // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
+  UniqueSystNKnots.resize(nUniqueSysts);
+  UniqueSystCurrSegment.resize(nUniqueSysts);
+  UniqueSystXPts.resize(nUniqueSysts);
+  xVarArray=new __float__[nUniqueSysts];
+
+  for (int iSpline = 0; iSpline < nUniqueSysts; iSpline++)
+  {
+    UniqueSystNKnots[iSpline] = UniqueSystSplines[iSpline]->GetNp();
+    UniqueSystXPts[iSpline].resize(UniqueSystNKnots[iSpline]);
+    for (int iKnot = 0; iKnot < UniqueSystNKnots[iSpline]; iKnot++)
+    {
+      double xPoint = -999;
+      double yPoint = -999;
+      UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
+      if (xPoint == -999 || yPoint == -999)
+      {
+        std::cerr << "Something has gone wrong in the knot finding" << std::endl;
+        std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+        throw;
+      }
+      UniqueSystXPts[iSpline][iKnot] = xPoint;
+    }
+    UniqueSystCurrSegment[iSpline] = -999;
+    xVarArray[iSpline]=0;
+  }
+  
+
+  std::cout << "nUniqueSysts:" << nUniqueSysts << " -----------------" << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::setw(15) << "Spline Index"
+            << " | " << std::setw(20) << "Syst Name"
+            << " | " << std::setw(6) << "nKnots" << std::endl;
+  std::cout << "-----------------------------------------------------" << std::endl;
+  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+  {
+    std::cout << std::setw(15) << iUniqueSyst << " | " << std::setw(20) << UniqueSystNames[iUniqueSyst] << " | " << std::setw(6) << UniqueSystNKnots[iUniqueSyst] << std::endl;
+  }
+  std::cout << std::endl;
+
+
+  int nCombinations_FlatSplines = 0;
+  int nCombinations_All = 0;
+  // DB Now actually loop over splines to determine which are all NULL
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  { // Loop over systematics
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+    { // Loop over oscillation channels
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
+      { // Loop over systematics
+        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+        { // Loop over modes
+          bool isFlat = false;
+          for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
+          { // Loop over first dimension
+            for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
+            { // Loop over second dimension
+              for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
+              { // Loop over third dimension
+                int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
+                if (splinevec_Monolith[splineindex] != NULL)
+                {
+                  isFlat = true;
+                }
+                if (isFlat)
+                {
+                  break;
+                }
+              }
+              if (isFlat)
+              {
+                break;
+              }
+            }
+            if (isFlat)
+            {
+              break;
+            }
+          }
+          if (isFlat)
+            nCombinations_FlatSplines += 1;
+          nCombinations_All += 1;
+        }
       }
     }
   }
+  // We need to grab the maximum number of knots
+
+  std::cout << "Number of combinations of Sample, OscChan, Syst and Mode which have entirely flat response:" << nCombinations_FlatSplines << " / " << nCombinations_All << std::endl;
+}
+
+// Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
+void splineFDBase::getSplineCoeff_SepMany(int splineindex, __float__* &xArray, __float__* &manyArray){
+
+  // Initialise all arrays to 1.0
+  int nPoints;
+  //No point evalutating a flat spline
+
+  nPoints = splinevec_Monolith[splineindex]->GetNp();
+
+  for (int i = 0; i < nPoints; i++) {
+    xArray[i] = 1.0;
+    for (int j = 0; j < 4; j++) {
+      manyArray[i*4+j] = 1.0;
+    }
+  }
+
+  for(int i=0; i<nPoints; i++){
+    // Spline coefficients to be
+    __float__ x = -999.99;
+    __float__ y = -999.99;
+    __float__ b = -999.99;
+    __float__ c = -999.99;
+    __float__ d = -999.99;
+    splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
+    //Let's save some memory and store them as floats! (It's a surprise tool that will help with GPU later)
+    xArray[i]=__float__(x); 
+
+    //Might as well copy ND here and 
+    xArray[i] = __float__(x);
+    manyArray[i*4] = __float__(y); // 4 because manyArray stores y,b,c,d
+    manyArray[i*4+1] = __float__(b);
+    manyArray[i*4+2] = __float__(c);
+    manyArray[i*4+3] = __float__(d);
+    
+    if((xArray[i] == -999) | (manyArray[i*4] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*4+2] == -999) | (manyArray[i*4+3] == -999)){
+      std::cerr << "*********** Bad params in getSplineCoeff_SepMany() ************"<<std::endl;
+      std::cerr << "pre cast to __float__ (x, y, b, c, d) = "<<x<<", "<<y<<", "<<b<<", "<<c<<", "<<d<<std::endl;
+      std::cerr << "post cast to float (x, y, b, c, d) = "<<xArray[i]<<", "<<manyArray[i*4]<<", "<<manyArray[i*4+1]<<", "<<manyArray[i*4+2]<<", "<<manyArray[i*4+3]<<std::endl;
+      std::cerr<<__FILE__<<"::"<<__LINE__<<std::endl;
+      std::cerr << "***************************************************************"<<std::endl;
+     throw;
+      }
+    }
+  //We now clean up the splines!
+  delete splinevec_Monolith[splineindex];
+  splinevec_Monolith[splineindex] = NULL;
+}
+
+//****************************************
+int splineFDBase::getNDim(int BinningOpt)
+//****************************************
+{
+  int ReturnVal = -1;
+
+  switch (BinningOpt)
+  {
+  case 0:
+    ReturnVal = 2;
+    break;
+  case 1:
+  case 2:
+  case 3:
+  case 4:
+    ReturnVal = 3;
+    break;
+  default:
+    std::cout << "Unrecognised BinningOpt = " << BinningOpt << std::endl;
+    throw;
+  }
+
+  return ReturnVal;
+}
+
+//ETA - this may need to be virtual and then we can define this in the experiment.
+//Equally though could just use KinematicVariable to map back
+//****************************************
+TString splineFDBase::getDimLabel(int BinningOpt, int Axis)
+//****************************************
+{
+  if (Axis < 0 || Axis >= 3)
+  {
+    std::cerr << "Invalid axis:" << Axis << std::endl;
+    throw;
+  }
+
+  std::string ReturnVal;
+  switch (BinningOpt)
+  {
+  case 0:
+    if (Axis == 0)
+      ReturnVal = "ETrue";
+    if (Axis == 1)
+      ReturnVal = "Erec";
+    if (Axis == 2)
+      ReturnVal = "Dummy";
+    break;
+  case 1:
+    if (Axis == 0)
+      ReturnVal = "ETrue";
+    if (Axis == 1)
+      ReturnVal = "Momentum";
+    if (Axis == 2)
+      ReturnVal = "Theta";
+    break;
+  case 2:
+    if (Axis == 0)
+      ReturnVal = "ETrue";
+    if (Axis == 1)
+      ReturnVal = "Erec";
+    if (Axis == 2)
+      ReturnVal = "Theta";
+    break;
+  case 3:
+    if (Axis == 0)
+      ReturnVal = "ETrue";
+    if (Axis == 1)
+      ReturnVal = "Erec";
+    if (Axis == 2)
+      ReturnVal = "Q2";
+    break;
+  case 4:
+    if (Axis == 0)
+      ReturnVal = "ETrue";
+    if (Axis == 1)
+      ReturnVal = "Momentum";
+    if (Axis == 2)
+      ReturnVal = "CosineZenith";
+    break;
+  default:
+    std::cout << "Unrecognised BinningOpt = " << BinningOpt << std::endl;
+    throw;
+  }
+
+  return ReturnVal;
+}
+
+//Returns sample index in 
+int splineFDBase::getSampleIndex(std::string SampleName){
+  int SampleIndex = -1;
+  for (unsigned int iSample = 0; iSample < SampleNames.size(); iSample++)
+  {
+    if (SampleName == SampleNames[iSample])
+    {
+      SampleIndex = iSample;
+    }
+  }
+  if (SampleIndex == -1)
+  {
+    std::cerr << "Sample name not found : "<<SampleName << std::endl;
+    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
+  }
+  return SampleIndex;
+}
+
+//****************************************
+void splineFDBase::PrintSampleDetails(std::string SampleName)
+//****************************************
+{
+
+  int iSample = getSampleIndex(SampleName);
+
+  std::cout << "Details about sample: " << std::setw(20) << SampleNames[iSample] << std::endl;
+  std::cout << "\t" << std::setw(35) << "Binning Option"
+            << ":" << BinningOpts[iSample] << std::endl;
+  std::cout << "\t" << std::setw(35) << "Dimension"
+            << ":" << Dimensions[iSample] << std::endl;
+  std::cout << "\t" << std::setw(35) << "DetID"
+            << ":" << DetIDs[iSample] << std::endl;
+  std::cout << "\t" << std::setw(35) << "Number of Spline Params"
+            << ":" << nSplineParams[iSample] << std::endl;
+  std::cout << "\t" << std::setw(35) << "Number of Oscillation Channels"
+            << ":" << nOscChans[iSample] << std::endl;
+}
+
+//****************************************
+void splineFDBase::PrintArrayDetails(std::string SampleName)
+//****************************************
+{
+  int iSample = getSampleIndex(SampleName);
+  int nOscChans = indexvec[iSample].size();
+  std::cout << "Sample " << iSample << " has " << nOscChans << " oscillation channels" << std::endl;
+
+  for (int iOscChan = 0; iOscChan < nOscChans; iOscChan++)
+  {
+    int nSysts = indexvec[iSample][iOscChan].size();
+    std::cout << "Oscillation channel " << iOscChan << " has " << nSysts << " systematics" << std::endl;
+  }
+}
+
+//****************************************
+void splineFDBase::PrintArrayDimension()
+//****************************************
+{
+  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+  std::cout << "Array dimensions.." << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::setw(20) << "nSamples:" << indexvec.size() << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::setw(20) << "nOscChans:";
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  {
+    std::cout << indexvec[iSample].size() << " ";
+  }
+  std::cout << std::endl;
+  std::cout << std::endl;
+
+  std::cout << std::setw(20) << "nSysts:" << std::endl;
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  {
+    std::cout << "\t"
+              << "Sample:" << iSample << "\t";
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+    {
+      std::cout << indexvec[iSample][iOscChan].size() << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  std::cout << std::setw(20) << "nModes:" << std::endl;
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
+  {
+    std::cout << "\t"
+              << "Sample:" << iSample << "\t"
+              << "--------------------------" << std::endl;
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+    {
+      std::cout << "\t\t"
+                << "OscChan:" << iOscChan << "\t";
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
+      {
+        std::cout << indexvec[iSample][iOscChan][iSyst].size() << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+}
+
+//****************************************
+bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
+//****************************************
+{
+
+  int iSample=getSampleIndex(SampleName);
+  bool isValid = true;
+
+  if (iSample < 0 || iSample >= (int)indexvec.size())
+  {
+    std::cerr << "Sample index is invalid! 0 <= Index < " << indexvec.size() << std::endl;
+    isValid = false;
+  }
+
+  if (iOscChan < 0 || iOscChan >= (int)indexvec[iSample].size())
+  {
+    std::cerr << "OscChan index is invalid! 0 <= Index < " << indexvec[iSample].size() << std::endl;
+    isValid = false;
+  }
+
+  if (iSyst < 0 || iSyst >= (int)indexvec[iSample][iOscChan].size())
+  {
+    std::cerr << "Syst index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan].size() << std::endl;
+    isValid = false;
+  }
+
+  if (iMode < 0 || iMode >= (int)indexvec[iSample][iOscChan][iSyst].size())
+  {
+    std::cerr << "Mode index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst].size() << std::endl;
+    isValid = false;
+  }
+
+  if (iVar1 < 0 || iVar1 >= (int)indexvec[iSample][iOscChan][iSyst][iMode].size())
+  {
+    std::cerr << "Var1 index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst][iMode].size() << std::endl;
+    isValid = false;
+  }
+
+  if (iVar2 < 0 || iVar2 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size())
+  {
+    std::cerr << "Var2 index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size() << std::endl;
+    isValid = false;
+  }
+
+  if (iVar3 < 0 || iVar3 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size())
+  {
+    std::cerr << "Var3 index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size() << std::endl;
+    isValid = false;
+  }
+
+  if (!isValid)
+  {
+    std::cerr << "Given iSample:" << iSample << std::endl;
+    std::cerr << "Given iOscChan:" << iOscChan << std::endl;
+    std::cerr << "Given iSyst:" << iSyst << std::endl;
+    std::cerr << "Given iMode:" << iMode << std::endl;
+    std::cerr << "Given iVar1:" << iVar1 << std::endl;
+    std::cerr << "Given iVar2:" << iVar2 << std::endl;
+    std::cerr << "Given iVar3:" << iVar3 << std::endl;
+    std::cerr << "Come visit me at : "<<__FILE__<<" : "<<__LINE__<<std::endl;
+    throw;
+  }
 
   return true;
+}
+
+//****************************************
+void splineFDBase::PrintBinning(TAxis *Axis)
+//****************************************
+{
+  const int NBins = Axis->GetNbins();
+  const double *BinEdges = Axis->GetXbins()->GetArray();
+
+  std::cout << "\t";
+  for (int iBin = 0; iBin < (NBins + 1); iBin++)
+  {
+    std::cout << BinEdges[iBin] << " ";
+  }
+  std::cout << std::endl;
 }
