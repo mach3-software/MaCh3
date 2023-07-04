@@ -12,7 +12,7 @@ set(mcmc_header_files
 
 add_library(MCMC SHARED ${mcmc_implementation_files})
 target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(MCMC Manager)
+target_link_libraries(MCMC Manager ROOT::ROOT)
 
 set_target_properties(MCMC PROPERTIES 
   PUBLIC_HEADER "${mcmc_header_files}"
