@@ -26,10 +26,8 @@ if(NOT ${CPU_ONLY})
   target_link_libraries(gpuSpline)
 
 else()
-
   add_library(Splines SHARED ${Splines_implementation_files_CPU})
   target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-
 endif()
 
 target_link_libraries(Splines ThrowParms)
