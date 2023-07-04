@@ -30,6 +30,7 @@
 #include "TColor.h"
 #include "TStyle.h"
 #include "TStopwatch.h"
+#include "TObjString.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
