@@ -18,7 +18,6 @@ class samplePDFInterface
 {
  public:
   virtual void reweight(double *oscpar)=0;
-  virtual void reweight(double *oscpar, double *oscpar2)=0;
 
   virtual double getEventRate()=0;
  
@@ -41,9 +40,6 @@ class samplePDFInterface
   virtual double getLikelihood_kernel(std::vector<double> &data)=0;
   virtual void fill1DHist()=0;
   virtual void fill2DHist()=0;
-
-//  virtual TH1D *nominalSpectrum1D=0;
-//  virtual TH2D *nominalSpectrum2D=0;
 };
 
 #endif
