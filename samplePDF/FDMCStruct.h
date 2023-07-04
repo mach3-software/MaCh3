@@ -16,11 +16,6 @@ struct fdmc_base {
   double** y_var;
   double **rw_etru;
 
-  // spline bins                                                               
-  unsigned int *xvar_s_bin;
-  unsigned int *yvar_s_bin;
-  unsigned int *enu_s_bin;
-
   // xsec bins  
   std::list< int > *xsec_norms_bins;
 
@@ -58,6 +53,4 @@ struct fdmc_base {
   double *osc_w; // oscillation weight                                        
   double *flux_w; // not the same as beam systematics weight!                 
   double *xsec_w;
-
-  splineFDBase *splineFile; 
 };
