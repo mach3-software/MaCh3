@@ -844,8 +844,7 @@ void covarianceBase::printNominal() {
 // Function to print the nominal, current and proposed values
 void covarianceBase::printNominalCurrProp() {
 
-
-std::cout << "Printing parameters for " << getName() << std::endl;
+  std::cout << "Printing parameters for " << getName() << std::endl;
   // Dump out the PCA parameters too
   if (pca) {
     std::cout << "PCA:" << "\n";
@@ -921,6 +920,7 @@ void covarianceBase::printPars() {
     std::cout << std::fixed << std::setprecision(5) << fParNames[i] << " current: \t" << fParCurr[i] << "   \tproposed: \t" << fParProp[i] << std::endl;
   }
 
+  return;
 }
 
 // Sets the proposed parameters to the nominal values
@@ -935,14 +935,20 @@ void covarianceBase::setParameters(std::vector<double> pars) {
     // If not empty, set the parameters to the specified
   } else {
 
-    if (pars.size() != size_t(size)) {
+	if (pars.size() != size_t(size)) {
       std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
       throw;
     }
 
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
-      fParProp[i] = pars[i];
+	  //Make sure that you are actually passing a number to set the parameter to
+	  if(isnan(pars[i])) {
+		std::cerr << "Error: trying to set parameter value to a nan for parameter " << getParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
+		throw;
+	  } else {
+		fParProp[i] = pars[i];
+	  }
     }
   }
 
@@ -951,6 +957,8 @@ void covarianceBase::setParameters(std::vector<double> pars) {
     TransferToPCA();
     TransferToParam();
   }
+
+  return;
 }
 
 void covarianceBase::setBranches(TTree &tree) {
