@@ -261,6 +261,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   vals = new float[nParams]();
 #endif
 
+  for (__int__ j = 0; j < nParams; j++)
+  {
+    segments[j] = 0;
+    vals[j] = -999;
+  }
   // Total number of events in our Spline, read from TSpline3 entries
   // Number of TSpline3 we have in total if each event had the maximal number of splines (nSplines written by ScanMasterSpline)
   NSplines_total = NEvents * nSplines;
@@ -564,7 +569,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline)
 #else
   vals = new float[nParams]();
 #endif
-  
+  for (__int__ j = 0; j < nParams; j++)
+  {
+    vals[j] = -999;
+  }
+
   // Every event maximally has nParams TF1s which we've saved
   NSplines_total = NEvents * nParams;
 
@@ -1247,6 +1256,7 @@ void SMonolith::FindSplineSegment() {
     const __int__ nPoints = SplineInfoArray[i].nPts;
     const __float__* xArray = SplineInfoArray[i].xPts;
 
+    if(xArray == NULL) continue;
     // Get the variation for this reconfigure for the ith parameter
     const __float__ xvar = *SplineInfoArray[i].splineParsPointer;
     vals[i] = xvar;
