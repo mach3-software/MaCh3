@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 
 SET(MaCh3_VERSION 0.0.2)
 project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
 
+# Would be good to have a check on CMAKE_CXX_STANDARD here
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
 if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
@@ -22,7 +22,8 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
-include(CPM)
+#include(CPM)
+include(${CPM_DOWNLOAD_LOCATION})
 
 #Luke's handing cmake modules which Neutrino hep experiments might want
 CPMFindPackage(
@@ -68,9 +69,19 @@ endif()
 include(NuHepMCUtils)
 dump_cmake_variables(Prob3plusplus)
 
+#Nice coloured messaged from cmake
 include(CMessage)
 
 include(ROOT)
+#Check to see if you successfully found ROOT or not
+if(NOT ROOT_FOUND)
+  cmessage(FATAL_ERROR " couldn't find ROOT dependency...")
+endif()
+
+# Would be good to have a check on CMAKE_CXX_STANDARD here
+if(${ROOT_CXX_STANDARD} LESS 14)
+  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
+endif()
 
 # Check the where to install 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
@@ -78,12 +89,10 @@ cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 # add cmake script files
 if(NOT ${CMAKE_SCRIPT_SETUP})  #Check if setup by Experiment MaCh3
   set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
   #CUDA
   if(NOT ${CPU_ONLY})
     include(${CMAKE_SOURCE_DIR}/cmake/CUDASetup.cmake)
   endif()
-
 endif()
 
 # Custom commands
@@ -99,18 +108,18 @@ if(NOT ${SINGLE_THREAD_ONLY})
   add_link_options(-fopenmp -DMULTITHREAD)
 endif()
 
-
 # Build components
-# add_subdirectory(Diagnostics)
-# add_subdirectory(CUDAProb3)
 add_subdirectory(manager)
 add_subdirectory(throwParms)
 add_subdirectory(covariance)
 add_subdirectory(splines)
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
-add_subdirectory(yaml_test)
+#ETA - commenting out as not c++11 compatible...
+#add_subdirectory(yaml_test)
 
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 if(NOT TARGET MaCh3)
   add_library(MaCh3 INTERFACE)
   set_target_properties(MaCh3 PROPERTIES

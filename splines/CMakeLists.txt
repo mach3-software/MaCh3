@@ -2,7 +2,7 @@ set(Splines_header_files
 	splineBase.h 
 	splineInterface.h 
 	splineFDBase.h 
-        splineMonolith.h)
+        SplineMonolith.h)
 
 set(Splines_implementation_files 
 	splineBase.cpp 
