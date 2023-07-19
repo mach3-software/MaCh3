@@ -3245,7 +3245,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
-    (*EffectiveSampleSize)(j) = nSteps/TempDenominator[j];
+    (*EffectiveSampleSize)(j) = nEntries/TempDenominator[j];
     // 100 becasue we convert to percentage
     (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
 
@@ -3254,7 +3254,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
       EffectiveSampleSizeHist[i]->SetBinContent(j+1, 0);
       EffectiveSampleSizeHist[i]->SetBinError(j+1, 0);
 
-      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / nSteps;
+      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / nEntries;
       if(Thresholds[i] >= TempEntry && TempEntry > Thresholds[i+1])
       {
         if( std::isnan((*EffectiveSampleSize)(j)) ) continue;
