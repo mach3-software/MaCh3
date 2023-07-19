@@ -3206,8 +3206,30 @@ void MCMCProcessor::CalculateESS(const int nLags) {
   }
   TVectorD* EffectiveSampleSize = new TVectorD(nDraw);
   TVectorD* SamplingEfficiency = new TVectorD(nDraw);
-
   double *TempDenominator = new double[nDraw]();
+
+  const int Nhists = 5;
+  const double Thresholds[Nhists+1] = {1, 0.02, 0.005, 0.001, 0.0001, 0.0};
+  const Color_t ESSColours[Nhists] = {kGreen, kGreen+2, kYellow, kOrange, kRed};
+
+  //KS: This histogram is inspired by the following: https://mc-stan.org/bayesplot/articles/visual-mcmc-diagnostics.html
+  TH1D **EffectiveSampleSizeHist = new TH1D*[Nhists]();
+  for(int i = 0; i < Nhists; i++)
+  {
+    EffectiveSampleSizeHist[i] = new TH1D(Form("EffectiveSampleSizeHist_%i",i), Form("EffectiveSampleSizeHist_%i",i), nDraw, 0, nDraw);
+    EffectiveSampleSizeHist[i]->GetYaxis()->SetTitle("N_{eff}/N");
+    EffectiveSampleSizeHist[i]->SetFillColor(ESSColours[i]);
+    EffectiveSampleSizeHist[i]->SetLineColor(ESSColours[i]);
+    for (int j = 0; j < nDraw; ++j)
+    {
+      TString Title = "";
+      double Prior = 1.0;
+      double PriorError = 1.0;
+      GetNthParameter(j, Prior, PriorError, Title);
+      EffectiveSampleSizeHist[i]->GetXaxis()->SetBinLabel(j+1, Title.Data());
+    }
+  }
+
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -3223,9 +3245,22 @@ void MCMCProcessor::CalculateESS(const int nLags) {
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
-    (*EffectiveSampleSize)(j) = nEntries/TempDenominator[j];
+    (*EffectiveSampleSize)(j) = nSteps/TempDenominator[j];
     // 100 becasue we convert to percentage
     (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
+
+    for(int i = 0; i < Nhists; i++)
+    {
+      EffectiveSampleSizeHist[i]->SetBinContent(j+1, 0);
+      EffectiveSampleSizeHist[i]->SetBinError(j+1, 0);
+
+      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / nSteps;
+      if(Thresholds[i] >= TempEntry && TempEntry > Thresholds[i+1])
+      {
+        if( std::isnan((*EffectiveSampleSize)(j)) ) continue;
+        EffectiveSampleSizeHist[i]->SetBinContent(j+1, TempEntry);
+      }
+    }
   }
 
   //KS Write to the output tree
@@ -3234,9 +3269,36 @@ void MCMCProcessor::CalculateESS(const int nLags) {
   EffectiveSampleSize->Write("EffectiveSampleSize");
   SamplingEfficiency->Write("SamplingEfficiency");
 
+  EffectiveSampleSizeHist[0]->SetTitle("Effective Sample Size");
+  EffectiveSampleSizeHist[0]->Draw();
+  for(int i = 1; i < Nhists; i++)
+  {
+    EffectiveSampleSizeHist[i]->Draw("SAME");
+  }
+
+  TLegend *leg = new TLegend(0.2, 0.7, 0.6, 0.95);
+  leg->SetTextSize(0.03);
+  for(int i = 0; i < Nhists; i++)
+  {
+    leg->AddEntry(EffectiveSampleSizeHist[i], Form("%.4f >= N_{eff}/N > %.4f", Thresholds[i], Thresholds[i+1]), "f");
+  }
+  leg->SetLineColor(0);
+  leg->SetLineStyle(0);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(0);
+  leg->Draw("SAME");
+
+  Posterior->Write("EffectiveSampleSizeCanvas");
+
   //Delete all variables
   delete EffectiveSampleSize;
   delete SamplingEfficiency;
+  for(int i = 0; i < Nhists; i++)
+  {
+    delete EffectiveSampleSizeHist[i];
+  }
+  delete leg;
+  delete[] EffectiveSampleSizeHist;
   //KS Remove auxiliary arrays
   delete[] TempDenominator;
 }
