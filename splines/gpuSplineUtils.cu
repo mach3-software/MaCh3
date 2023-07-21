@@ -892,5 +892,3 @@ __host__ void CleanupGPU_TF1(
   
   return;
 }
-
-

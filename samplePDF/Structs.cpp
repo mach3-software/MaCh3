@@ -138,45 +138,45 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
 
   //loop over bins in the poly
   for(int i = 0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
-    {
+  {
       //get bin and its edges
-      TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
+      TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
       xlow = bin->GetXMin();
       xup = bin->GetXMax();
 
       //Loop over projected bins, find fraction of poly bin in each
       for(int dx=0; dx<int(xbins.size()); dx++)
-        {
+      {
           if(xbins[dx+1]<=xlow || xbins[dx]>=xup)
-            {
+          {
               frac=0;
-            }
+          }
           else if(xbins[dx]<=xlow && xbins[dx+1]>=xup)
-            {
+          {
               frac=1;
-            }
+          }
           else if(xbins[dx]<=xlow && xbins[dx+1]<=xup)
-            {
+          {
               frac=(xbins[dx+1]-xlow)/(xup-xlow);
-            }
+          }
           else if(xbins[dx]>=xlow && xbins[dx+1]>=xup)
-            {
+          {
               frac=(xup-xbins[dx])/(xup-xlow);
-            }
+          }
           else if(xbins[dx]>=xlow && xbins[dx+1]<=xup)
-            {
+          {
               frac=(xbins[dx+1]-xbins[dx])/(xup-xlow);
-            }
+          }
           else
-            {
+          {
               frac=0;
-            }
+          }
           hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
-          //KS: Follow ROOT implementation and sum up the variance
+          //KS: Follow ROOT implementation and sum up the variance 
           if(computeErrors)
           {
-              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
-              //but numbering of GetBinError is differnt than GetBins...
+             //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+             //but numbering of GetBinError is differnt than GetBins...
              double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
              hProjX_Error[dx+1] += Temp_Err;
           }
@@ -189,7 +189,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
         {
             double Error = TMath::Sqrt(hProjX_Error[i]);
             hProjX->SetBinError(i, Error);
-        }
+        }   
     }
   delete[] hProjX_Error;
   return hProjX;
@@ -209,45 +209,45 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
 
   //loop over bins in the poly
   for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
-    {
+  {
       //get bin and its edges
-      TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i)->Clone();
+      TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
       ylow = bin->GetYMin();
       yup = bin->GetYMax();
 
       //Loop over projected bins, find fraction of poly bin in each
       for(int dy=0; dy<int(ybins.size()); dy++)
-        {
+      {
           if(ybins[dy+1]<=ylow || ybins[dy]>=yup)
-            {
+          {
               frac=0;
-            }
+          }
           else if(ybins[dy]<=ylow && ybins[dy+1]>=yup)
-            {
+          {
               frac=1;
-            }
+          }
           else if(ybins[dy]<=ylow && ybins[dy+1]<=yup)
-            {
+          {
               frac=(ybins[dy+1]-ylow)/(yup-ylow);
-            }
+          }
           else if(ybins[dy]>=ylow && ybins[dy+1]>=yup)
-            {
+          {
               frac=(yup-ybins[dy])/(yup-ylow);
-            }
+          }
           else if(ybins[dy]>=ylow && ybins[dy+1]<=yup)
-            {
+          {
               frac=(ybins[dy+1]-ybins[dy])/(yup-ylow);
-            }
+          }
           else
-            {
+          {
               frac=0;
-            }
+          }
           hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
-          //KS: Follow ROOT implementation and sum up the variance
+          //KS: Follow ROOT implementation and sum up the variance 
           if(computeErrors)
           {
-              //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
-              //but numbering of GetBinError is differnt than GetBins...
+             //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
+             //but numbering of GetBinError is differnt than GetBins... 
              double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
              hProjY_Error[dy+1] += Temp_Err;
           }
@@ -260,7 +260,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
         {
             double Error = TMath::Sqrt(hProjY_Error[i]);
             hProjY->SetBinError(i, Error);
-        }
+        }   
     }
   delete[] hProjY_Error;
   return hProjY;
@@ -325,6 +325,32 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
 
   return integral;
 }
+
+//KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
+// However if you use ROOT6 and have ROOT6 file exactly the same code will work. Somethingm ust have changed with how TH2Poly bins are stored in TFile
+void CheckTH2PolyFileVersion(TFile *file)
+{
+    int FileROOTVersion = file->GetVersion();
+    int MainFileROOTVersion = FileROOTVersion;
+
+    // Remove last digit from number
+    // till only one digit is left
+    while (MainFileROOTVersion >= 10)
+        MainFileROOTVersion /= 10;
+
+    std::string SystemROOTVersion = std::string(ROOT_RELEASE);
+    int MainSystemROOTVersion = SystemROOTVersion.at(0)  - '0';
+
+    if(MainFileROOTVersion != MainSystemROOTVersion)
+    {
+        std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
+        std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
+        std::cerr<<"For some docuemntation please visit me"<<std::endl;
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        throw;
+    }
+}
+
 // ****************
 //DB Get the Cernekov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {

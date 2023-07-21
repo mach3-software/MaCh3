@@ -83,7 +83,7 @@ class samplePDFBase : public samplePDFInterface
   //bool gpu_rw; 
 
   double getLikelihood_kernel(std::vector<double> &data);
-  double getTestStatLLH(const double data, const double mc);
+  double getTestStatLLH(double data, double mc);
   double getTestStatLLH(const double data, const double mc, const double w2);
   // Provide a setter for the test-statistic
   void SetTestStatistic(TestStatistic test_stat);

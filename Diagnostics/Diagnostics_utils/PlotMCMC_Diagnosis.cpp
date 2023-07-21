@@ -57,11 +57,11 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
     TKey *key;
     TFile *infile = TFile::Open(fname1.Data());
     
-    TFile *infile2;
+    TFile *infile2 = NULL;
     if(fname2 != DUMMYFILE)infile2 = TFile::Open(fname2.Data());
-    TFile *infile3;
+    TFile *infile3 = NULL;
     if(fname3 != DUMMYFILE) infile3 = TFile::Open(fname3.Data());
-    TFile *infile4;
+    TFile *infile4 = NULL;
     if(fname4 != DUMMYFILE) infile4 = TFile::Open(fname4.Data());
             
         
@@ -148,7 +148,7 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
     Color_t PlotColor[4]={kRed, kBlue, kGreen, kOrange};
     
     TFile *infile[4];
-    TFile *infile[0] = TFile::Open(fname[0].Data());
+    infile[0] = TFile::Open(fname[0].Data());
     //KS" We need to check number of files to loop over in very lazy way
     int Nfiles = 1;
     
@@ -164,6 +164,7 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
     {
         TIter next(infile[ik]->GetListOfKeys());
 
+        TKey* key;
         while ((key = (TKey*)next())) 
         { 
             std::string dirname = std::string(key->GetName());  
