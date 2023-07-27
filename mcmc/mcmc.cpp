@@ -6,7 +6,7 @@
 mcmc::mcmc(manager * const man) : fitMan(man) {
 // *************************
 
-  random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());  
+  random = new TRandom3(fitMan->raw()["MCMC"]["Seed"].as<int>());  
   //ETA - currently don't have this in manager as it needs some love 
   //AnnealTemp = fitMan->GetTemp();
   AnnealTemp = -999;
@@ -17,7 +17,7 @@ mcmc::mcmc(manager * const man) : fitMan(man) {
     anneal = true;
   }
   // Fit summary and debug info
-  debug =  fitMan->raw()["General"]["Debug"].as<bool>();
+  debug =  fitMan->raw()["MCMC"]["Debug"].as<bool>();
   init(fitMan->raw()["General"]["Output"]["FileName"].as<std::string>().c_str());
 
 }
@@ -32,7 +32,7 @@ void mcmc::init(std::string outfile) {
   // Counter of the accepted # of steps
   accCount = 0;
   //KS: you don't want to do this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = fitMan->raw()["General"]["AutoSave"].as<int>();//GetAutoSave();
+  auto_save = fitMan->raw()["MCMC"]["AutoSave"].as<int>();//GetAutoSave();
   // Do we want to save the nominal parameters to output
   save_nominal = true;
   // Starting parameters should be thrown 
@@ -336,7 +336,7 @@ void mcmc::ProcessMCMC() {
   }
 
   // Process the MCMC
-  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
+  if (fitMan->raw()["MCMC"]["ProcessMCMC"].as<bool>()) {
 
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()), false);
