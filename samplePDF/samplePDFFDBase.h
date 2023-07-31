@@ -21,9 +21,12 @@
 #include "TString.h"
 
 //Propagator includes
-#include "BargerPropagator.h"
-#include "beamcudapropagator.cuh"
-#include "atmoscudapropagator.cuh"
+#ifdef USE_PROB3
+  #include "BargerPropagator.h"
+#else
+  #include "beamcudapropagator.cuh"
+  #include "atmoscudapropagator.cuh"
+#endif
 
 //MaCh3 includes
 #include "interfacePDFEbE.h"
@@ -201,8 +204,10 @@ public:
 
   // Helper function to reset histograms
   inline void ResetHistograms();
-  
+ 
+#ifndef USE_PROB3 
   inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
+#endif
   //===============================================================================
   //DB Variables required for GetLikelihood
   //
