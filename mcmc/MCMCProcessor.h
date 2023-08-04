@@ -121,20 +121,20 @@ class MCMCProcessor {
     // Or by int
     void SetStepCut(const int Cuts);
 
-    void SetMakeOnlyXsecCorr(bool PlotOrNot){MakeOnlyXsecCorr = PlotOrNot; };
-    void SetMakeOnlyXsecCorrFlux(bool PlotOrNot){MakeOnlyXsecCorrFlux = PlotOrNot; };
+    inline void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
+    inline void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
+    inline void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
+    inline void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
+    inline void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
+    inline void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
+    inline void SetPost2DPlotThreshold(double Threshold){Post2DPlotThreshold = Threshold; };
 
-    void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
-    void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
-    void SetPlotDet(bool PlotOrNot){PlotDet = PlotOrNot; };
-    void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
-    void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
-    void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
-    void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
-    void SetPost2DPlotThreshold(double Threshold){Post2DPlotThreshold = Threshold; };
+    inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
+    inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
 
-    void SetnBatches(int Batches){nBatches = Batches; };
-    void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
+    inline void SetnBatches(int Batches){nBatches = Batches; };
+    inline void SetnLags(int nLags){AutoCorrLag = nLags; };
+    inline void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
     
   private:
     inline TH1D* MakePrefit();
@@ -147,6 +147,7 @@ class MCMCProcessor {
     inline void ReadND280File();
     inline void ReadFDFile();
     inline void ReadOSCFile();
+    inline void RemoveParameters();
    
     // Scan Input etc.
     inline void ScanInput();
@@ -192,6 +193,9 @@ class MCMCProcessor {
     int nSysts;
 
     std::vector<TString> BranchNames;
+    std::vector<std::string> ExcludedTypes;
+    std::vector<std::string> ExcludedNames;
+
     // Is the ith parameter varied
     std::vector<bool> IamVaried;
     std::vector<std::vector<TString>> ParamNames;
@@ -220,8 +224,6 @@ class MCMCProcessor {
     bool PlotFlatPrior;
 
     bool MakeCorr;
-    bool MakeOnlyXsecCorr;
-    bool MakeOnlyXsecCorrFlux; //Makes only the cov matrix w/ flux
     bool plotRelativeToPrior;
     bool MadePostfit;
     bool printToPDF;
@@ -275,6 +277,7 @@ class MCMCProcessor {
     double DrawRange;
     
     int nBatches;
+    int AutoCorrLag;
     
     // Holds all the parameter variations
     double *ParamSums;

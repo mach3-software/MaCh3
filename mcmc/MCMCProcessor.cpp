@@ -62,9 +62,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   AccProbBatchedAverages = NULL;
     
   //KS:Hardcoded should be a way to get it via config or something
-  PlotDet = false;
-  MakeOnlyXsecCorr = false;
-  MakeOnlyXsecCorrFlux = false;
   plotRelativeToPrior = false;
   printToPDF = false;
   plotBinValue = false;
@@ -81,6 +78,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nEntries = 0;
   nSteps = 0;
   nBatches = 0;
+  AutoCorrLag = 0;
   nSysts = 0;
   nSamples = 0;
   
@@ -218,9 +216,6 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
 // ***************
 void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 // ***************
-  if(MakeOnlyXsecCorr) std::cout<<"Will plot only xsec covariance"<<std::endl;
-  if(MakeOnlyXsecCorrFlux) std::cout<<"Will plot only xsec covariances and flux"<<std::endl;
-
   if (CacheMCMC) MakeCovariance_MP();
   else MakeCovariance();
   Cov = (TMatrixDSym*)Covariance->Clone();
@@ -556,8 +551,8 @@ void MCMCProcessor::DrawPostfit() {
 
   OutputFile->cd();
   //KS: Plot Xsec and Flux
-  if (PlotXSec == true) {
-      
+  if (PlotXSec == true)
+  {
     const int Start = ParamTypeStartPos[kXSecPar];
     // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
     // Have already looked through the branches earlier
@@ -615,7 +610,6 @@ void MCMCProcessor::DrawPostfit() {
     if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
-  
   if(PlotDet)
   {
     int Start = ParamTypeStartPos[kND280Par];
@@ -918,13 +912,6 @@ void MCMCProcessor::MakeCovariance() {
   }
 
   int covBinning = nDraw;
-  //If we only plot correlation/covariance between xsec (without flux)
-  if(MakeOnlyXsecCorr)
-  {
-     covBinning = nParam[kXSecPar] - nFlux; 
-  }
-    
-    
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
   for (int i = 0; i < covBinning; ++i) {
 
@@ -1129,11 +1116,6 @@ void MCMCProcessor::MakeCovariance_MP() {
   if(!CacheMCMC) CacheSteps();
   
   int covBinning = nDraw;
-  //If we only plot correlation/covariance between xsec (without flux)
-  if(MakeOnlyXsecCorr)
-  {
-     covBinning = nParam[kXSecPar] - nFlux; 
-  }
 
   bool HaveMadeDiagonal = false;    
   // Check that the diagonal entries have been filled
@@ -1236,12 +1218,6 @@ void MCMCProcessor::DrawCovariance() {
 // *********************
     
   int covBinning = nDraw;
-  //If we only plot correlation/covariance between xsec (without flux)
-  if(MakeOnlyXsecCorr)
-  {
-     covBinning = nParam[kXSecPar] - nFlux; 
-  }
-  
   // The Covariance matrix from the fit
   TH2D* hCov = new TH2D("hCov", "hCov", covBinning, 0, covBinning, covBinning, 0, covBinning);
   hCov->GetZaxis()->SetTitle("Covariance");
@@ -1786,44 +1762,53 @@ void MCMCProcessor::ScanInput() {
 
   // Loop over the number of branches
   // Find the name and how many of each systematic we have
-  for (int i = 0; i < nBranches; i++) {
-
+  for (int i = 0; i < nBranches; i++)
+  {
     // Get the TBranch and its name
     TBranch* br = (TBranch*)brlis->At(i);
     TString bname = br->GetName();
 
+    //KS: Exclude paramer types
+    bool rejected = false;
+    for(unsigned int ik = 0; ik < ExcludedTypes.size(); ++ik )
+    {
+        if(bname.BeginsWith(ExcludedTypes[ik]))
+        {
+          rejected = true;
+          break;
+        }
+    }
+    if(rejected) continue;
     // If we're on beam systematics
     if(bname.BeginsWith("xsec_")) 
     {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kXSecPar);
-        PlotXSec = true;
-        nParam[kXSecPar]++;
+      BranchNames.push_back(bname);
+      ParamType.push_back(kXSecPar);
+      PlotXSec = true;
+      nParam[kXSecPar]++;
+    }
+    else if (bname.BeginsWith("ndd_"))
+    {
+      BranchNames.push_back(bname);
+      ParamType.push_back(kND280Par);
+      PlotDet = true;
+      nParam[kND280Par]++;
+    }
+    else if (bname.BeginsWith("skd_joint_"))
+    {
+      BranchNames.push_back(bname);
+      ParamType.push_back(kFDDetPar);
+      nParam[kFDDetPar]++;
+    }
+    else if (bname.BeginsWith("sin2th_") ||
+          bname.BeginsWith("delm2_")  ||
+          bname.BeginsWith("delta_")    )
+    {
+      BranchNames.push_back(bname);
+      ParamType.push_back(kOSCPar);
+      nParam[kOSCPar]++;
     }
 
-    if(!MakeOnlyXsecCorrFlux) //HI a bit of a dodgy way to do this, for now just want to get the work flow sorted
-    {
-      if (bname.BeginsWith("ndd_") && PlotDet) 
-      {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kND280Par);
-        nParam[kND280Par]++;
-      }
-        else if (bname.BeginsWith("skd_joint_") && PlotDet)
-      {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kFDDetPar);
-        nParam[kFDDetPar]++;
-      }
-        else if (bname.BeginsWith("sin2th_") ||
-            bname.BeginsWith("delm2_")  ||
-            bname.BeginsWith("delta_")    )
-      {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kOSCPar);
-        nParam[kOSCPar]++;
-      }
-    }
     //KS: as a bonus get LogL systeamtic
     if (bname.BeginsWith("LogL_sample_")) {
       SampleName_v.push_back(bname);
@@ -2012,6 +1997,8 @@ void MCMCProcessor::ReadInputCov() {
   if(nParam[kND280Par] > 0) ReadND280File();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
   if(nParam[kOSCPar] > 0)   ReadOSCFile();
+  //KS: Remove parameters which were removed
+  RemoveParameters();
 }
 
 // **************************
@@ -2132,16 +2119,26 @@ void MCMCProcessor::ReadXSecFile() {
   TObjArray* xsec_param_names = (TObjArray*)(XSecFile->Get("xsec_param_names"));
   //Flat prior
   TVectorD* flat_prior = (TVectorD*)(XSecFile->Get("xsec_flat_prior"));
-  // Now make a TH1D of it
-  ParamNames[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamCentral[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamNom[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamErrors[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamFlat[kXSecPar].reserve(nParam[kXSecPar]);
-  for (int i = 0; i < nParam[kXSecPar]; ++i) {
 
+  for (int i = 0; i < XSecPrior->GetNrows(); ++i)
+  {
     // Push back the name
     std::string TempString = std::string(((TObjString*)xsec_param_names->At(i))->GetString());
+
+    //KS:Reject particular parameter names, noticed that sometimes string comparison doesn't work becasue of some weird casting of TObjString into std::string. This is rare and sooner or later we move away from TObjString so this is fine
+    bool rejected = false;
+    for (unsigned int ik = 0; ik < ExcludedNames.size(); ++ik)
+    {
+      if (TempString.rfind(ExcludedNames.at(ik), 0) == 0)
+      {
+        const int Tracker = ParamTypeStartPos[kXSecPar] + i;
+        BranchNames[Tracker] = "delete";
+        nParam[kXSecPar]--;
+        rejected = true;
+        break;
+      }
+    }
+    if(rejected) continue;
     ParamNames[kXSecPar].push_back(TempString);
     if(ParamNames[kXSecPar][i].BeginsWith("b_"))
     {
@@ -2186,12 +2183,7 @@ void MCMCProcessor::ReadND280File() {
     TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
     TObjArray* det_poly = (TObjArray*)(NDdetFile->Get("det_polys")->Clone());
 
-    ParamNames[kND280Par].reserve(nParam[kND280Par]);
-    ParamCentral[kND280Par].reserve(nParam[kND280Par]);
-    ParamNom[kND280Par].reserve(nParam[kND280Par]);
-    ParamErrors[kND280Par].reserve(nParam[kND280Par]);
-    ParamFlat[kND280Par].reserve(nParam[kND280Par]);
-    for (int i = 0; i < nParam[kND280Par]; ++i) 
+    for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
     {
         ParamNom[kND280Par].push_back( (*NDdetNominal)(i) );
         ParamCentral[kND280Par].push_back( (*NDdetNominal)(i) );
@@ -2240,12 +2232,7 @@ void MCMCProcessor::ReadFDFile() {
     
     TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
 
-    ParamNames[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamCentral[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamNom[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamErrors[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamFlat[kFDDetPar].reserve(nParam[kFDDetPar]);
-    for (int i = 0; i < nParam[kFDDetPar]; ++i) 
+    for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
     {
         //KS: FD parameters start at 1. in contrary to ND280
         ParamNom[kFDDetPar].push_back(1.);
@@ -2289,12 +2276,7 @@ void MCMCProcessor::ReadOSCFile() {
     TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
     TVectorD* osc_flat_prior = (TVectorD*)OscFile->Get("osc_flat_prior");
 
-    ParamNom[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamCentral[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamErrors[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamNames[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamFlat[kOSCPar].reserve(nParam[kOSCPar]);
-    for (int i = 0; i < nParam[kOSCPar]; ++i) 
+    for (int i = 0; i < osc_flat_prior->GetNrows(); ++i)
     {
         ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
         ParamCentral[kOSCPar].push_back( (*OscNominal)(i) );
@@ -2312,6 +2294,26 @@ void MCMCProcessor::ReadOSCFile() {
     delete OscMatrix;
     delete OscNominal;
 }
+
+// ***************
+//This is bit messy as currently BranchNames is taken from actual Chain.root file while proper parameter name from matrix.root and right now we don't access them at the same time.
+void MCMCProcessor::RemoveParameters() {
+// ***************
+
+  for(int i = 0; i < nDraw; i++)
+  {
+    if(BranchNames[i] == "delete")
+    {
+      BranchNames.erase(BranchNames.begin() + i);
+      ParamType.erase(ParamType.begin() + i);
+      nDraw--;
+      i = 0;
+    }
+  }
+}
+
+
+
 
 // ***************
 // Make the step cut from a string
@@ -2970,7 +2972,7 @@ void MCMCProcessor::AutoCorrelation() {
 
   TStopwatch clock;
   clock.Start();
-  const int nLags = 25000;
+  const int nLags = AutoCorrLag;
   std::cout << "Making auto-correlations for nLags = "<< nLags << std::endl;
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter
