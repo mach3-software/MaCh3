@@ -5,7 +5,6 @@
 #define __BAD_SPLINE__ 123456789
 #endif
 
-
 //ROOT
 #include "TH3F.h"
 
@@ -116,6 +115,7 @@ class splineFDBase
 	int MonolithIndex;
 	int CoeffIndex;
 
+	//Probably need to clear these arrays up at some point
 	__float__ *xVarArray;
 	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
 	__float__ *xcoeff_arr;    //x coefficients for each spline
@@ -128,112 +128,3 @@ class splineFDBase
 	enum SplineSegmentCoeffs{kCoeffY=0, kCoeffB=1, kCoeffC=2, kCoeffD=3};
 };
 #endif
-
-
-/*
-#include "splines/splineFDBase.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include "TKey.h"
-#include "TROOT.h"
-#include "TClass.h"
-#include "../samplePDF/Structs.h"
-#include "../covariance/covarianceXsec.h"
-
-class splineFDBase
-{
- public:
-  splineFDBase(covarianceXsec* xsec = NULL);
-  virtual ~splineFDBase();
-
-  //Essential methods used externally
-  bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames);
-  void TransferToMonolith();
-
-
-
-
-  void BuildSampleIndexingArray(std::string SampleName);
-  void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
-  std::vector<TAxis*> findSplineBinning(std::string FileName, std::string SampleName);
-  int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
-  void PrepForReweight();
-
-  void getSplineCoeff_SepMany(int splineindex, __float__ *& xArray, __float__ *&manyArray);
-
-  int getNDim(int BinningOpt);
-  TString getDimLabel(int BinningOpt, int Axis);
-  int getSampleIndex(std::string SampleName);
-  void PrintBinning(TAxis* Axis);
-  bool isValidSplineIndex(std::string SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
-  void PrintSampleDetails(std::string SampleName);
-  void PrintArrayDetails(std::string SampleName);
-  void PrintArrayDimension();
-
-
-  void cleanUpMemory(){
-    //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
-    //Not a huge saving but it's better than leaving everything up to the compiler
-    std::cout<<"Cleaning up spline memory"<<std::endl;
-    
-    indexvec.clear();
-    indexvec.shrink_to_fit();
-    SplineFileParPrefixNames.clear();
-    SplineFileParPrefixNames.shrink_to_fit();
-    SplineBinning.clear();
-    SplineBinning.shrink_to_fit();
-    SplineParsIndex.clear();
-    SplineParsIndex.shrink_to_fit();
-    UniqueSystNames.clear();
-    UniqueSystNames.shrink_to_fit();
-    splinevec_Monolith.clear();
-    splinevec_Monolith.shrink_to_fit();
-    delete isflatarray;
-  }
- protected:
-  covarianceXsec* xsec;
-
-  std::vector<std::string> SampleNames;
-  std::vector<int> BinningOpts;
-  std::vector<int> Dimensions;
-  std::vector<int> DetIDs;
-  std::vector<int> nSplineParams;
-  std::vector<int> nOscChans;
-
-  std::vector< std::vector<int> > SplineParsIndex;
-  std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
-  std::vector< std::vector<std::string> > SplineFileParPrefixNames;
-  std::vector< std::vector< std::vector<int> > > SplineModeVecs;
-
-  int nUniqueSysts;
-  std::vector<std::string> UniqueSystNames;
-  std::vector<int> UniqueSystIndices;
-  std::vector<int> UniqueSystNKnots;
-  std::vector<int> UniqueSystCurrSegment;
-  std::vector< std::vector<__float__> > UniqueSystXPts;
-
-  // //DB Variables related to determined which modes have splines and which piggy-back of other modes
-  std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
-  std::vector<int > coeffindexvec;
-  std::vector<int>uniquecoeffindices; //Unique coefficient indices
-
-  std::vector< TSpline3_red* > splinevec_Monolith;
-
-  int MonolithSize;
-  int MonolithIndex;
-  int CoeffIndex;
-
-  __float__ *xVarArray;
-  bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
-  __float__ *xcoeff_arr;    //x coefficients for each spline
-  __float__ *manycoeff_arr; //ybcd coefficients for each spline
-
-  std::vector<double> weightvec_Monolith;
-  std::vector<int> uniquesplinevec_Monolith;
-
-  //Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
-  enum SplineSegmentCoeffs{kCoeffY=0, kCoeffB=1, kCoeffC=2, kCoeffD=3};
-};
-*/
-
-

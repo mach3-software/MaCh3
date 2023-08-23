@@ -26,11 +26,14 @@ bool splineFDBase::AddSample(std::string SampleName, int BinningOpt, int DetID, 
   DetIDs.push_back(DetID);
 
   int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
+  std::cout << "FOund " << nSplineParam << " spline parameters" << std::endl;
   nSplineParams.push_back(nSplineParam);
 
+  std::cout << "Filling with GetSplineParsIndexFromDetID" << std::endl;
   std::vector<int> SplineParsIndex_Sample = xsec->GetSplineParsIndexFromDetID(DetID);
   SplineParsIndex.push_back(SplineParsIndex_Sample);
 
+  std::cout << "Filling with GetSplineFileParsNamesFromDetID" << std::endl;
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineFileParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
@@ -65,7 +68,8 @@ bool splineFDBase::AddSample(std::string SampleName, int BinningOpt, int DetID, 
 void splineFDBase::TransferToMonolith()
 //****************************************
 {
-//  FindUniqueModes();
+  std::cout << "TRANSFERING TO MONOLITH!!" << std::endl;
+  //FindUniqueModes();
   PrepForReweight(); 
   MonolithSize = CountNumberOfLoadedSplines();
   if(MonolithSize!=MonolithIndex){
@@ -115,6 +119,7 @@ void splineFDBase::TransferToMonolith()
                 }
                 int splineKnots;
                 if(splinevec_Monolith[splineindex]!=NULL){
+				  //std::cout << "Looking at splineindex " << splineindex << "and found a non-flat spline (wahoo!)" << std::endl;
                   isflatarray[splineindex]=false;
                   splineKnots=splinevec_Monolith[splineindex]->GetNp();
 
@@ -160,6 +165,8 @@ void splineFDBase::TransferToMonolith()
       }//syst2 loop end
     }//osc loop end
   }//syst1 loop end
+
+  return;
 }
 
 
@@ -432,8 +439,14 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     std::cout << "Stored Var " << iAxis << " (" << getDimLabel(BinningOpts[iSample], iAxis) << ") Spline Binning for sample " << SampleNames[iSample] << ":" << std::endl;
     PrintBinning(ReturnVec[iAxis]);
   }
-  delete Hist3D;
-  delete Hist2D;
+
+  //This could be NULL if 2D
+  if(isHist2D){
+	delete Hist2D;
+  } else {
+    delete Hist3D;
+  }
+
   File->Close();
   delete DummyAxis;
   return ReturnVec;
@@ -535,6 +548,8 @@ void splineFDBase::PrepForReweight()
         UniqueSystNames.push_back(SystName);
 
         bool FoundNonFlatSpline = false;
+		//This is all basically to check that you have some resposne from a spline
+		//systematic somewhere
         for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
         { // Loop over oscillation channels
           for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
@@ -633,50 +648,41 @@ void splineFDBase::PrepForReweight()
   std::cout << std::endl;
 
 
+
+  //ETA
+  //Isn't this just doing what CountNumberOfLoadedSplines() does?
   int nCombinations_FlatSplines = 0;
   int nCombinations_All = 0;
   // DB Now actually loop over splines to determine which are all NULL
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over systematics
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
-    { // Loop over oscillation channels
-      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
-      { // Loop over systematics
-        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
-        { // Loop over modes
-          bool isFlat = false;
-          for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
-          { // Loop over first dimension
-            for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
-            { // Loop over second dimension
-              for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
-              { // Loop over third dimension
-                int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
-                if (splinevec_Monolith[splineindex] != NULL)
-                {
-                  isFlat = true;
-                }
-                if (isFlat)
-                {
-                  break;
-                }
-              }
-              if (isFlat)
-              {
-                break;
-              }
-            }
-            if (isFlat)
-            {
-              break;
-            }
-          }
-          if (isFlat)
-            nCombinations_FlatSplines += 1;
-          nCombinations_All += 1;
-        }
-      }
-    }
+	for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
+	{ // Loop over oscillation channels
+	  for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
+	  { // Loop over systematics
+		for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+		{ // Loop over modes
+		  bool isFlat = false;
+		  for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
+		  { // Loop over first dimension
+			for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
+			{ // Loop over second dimension
+			  for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
+			  { // Loop over third dimension
+				int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
+				if (splinevec_Monolith[splineindex] != NULL)
+				{
+				  nCombinations_All += 1;
+				} else{
+				  nCombinations_FlatSplines += 1;
+				  nCombinations_All += 1;
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
   }
   // We need to grab the maximum number of knots
 
