@@ -13,13 +13,13 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
 
-  init(pot, mc_version, xsec_cov);          
-
+  /*
   bNu = new BargerPropagator();
   bNu->UseMassEigenstates(false);
   bNu->SetOneMassScaleMode(false);
   bNu->SetWarningSuppression(true);
-  
+  */
+    
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
   
@@ -36,14 +36,19 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-	for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
-		delete[] samplePDFFD_array[yBin];
-		delete[] samplePDFFD_array_w2[yBin];
-		delete[] samplePDFFD_data[yBin]; 
-	}
-    delete[] samplePDFFD_array;
-    delete[] samplePDFFD_array_w2;
-    delete[] samplePDFFD_data;
+  std::cout << "I'm deleting samplePDFFDBase" << std::endl;
+
+  for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
+	if(samplePDFFD_array != NULL){delete[] samplePDFFD_array[yBin];}
+	delete[] samplePDFFD_array_w2[yBin];
+	//ETA - there is a chance that you haven't added any data...
+	if(samplePDFFD_data != NULL){delete[] samplePDFFD_data[yBin];}
+  }
+
+  if(samplePDFFD_array != NULL){delete[] samplePDFFD_array;}
+  delete[] samplePDFFD_array_w2;
+  //ETA - there is a chance that you haven't added any data...
+  if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -598,6 +603,8 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
+  //std::cout << "Found " << xsec_norms << " normalisation parameters" << std::endl;
+
   return;
 }
 
@@ -653,6 +660,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 		
 		//Check whether the normalisation parameter applies to the target the event was on
+		/*
 		bool TargetMatch = false;
 		//If no target(s) specified then the syst applies to all targets
 		if ((*it).targets.size() == 0) {TargetMatch = true;}
@@ -712,12 +720,13 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		}
 		if (!ProdFlavMatch) {continue;}	
 
+		*/
 		//Now check that the mode of an interaction matches with the normalisation parameters
 		bool ModeMatch=false;
 		//If no mode specified then apply to all modes
 		if ((*it).modes.size()==0) {
-		  ModeMatch=true;}
-		else {
+		  ModeMatch=true;
+		} else {
 		  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
 			if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
 			  ModeMatch=true;
@@ -732,19 +741,27 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		bool IsSelected = true;
 		if ((*it).hasKinBounds) {
 		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) < (*it).Selection[iKinematicParameter][0]) {IsSelected = false; continue;}
-			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {IsSelected = false; continue;}
+			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) < (*it).Selection[iKinematicParameter][0]) { 
+			  IsSelected = false;
+			  continue;
+			}
+			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+			  IsSelected = false;
+			  continue;
+			}
 		  } 
 		}
 		//Need to then break the event loop 
-		if(!IsSelected){continue;}
+		if(!IsSelected){
+		  continue;
+		}
 
 		// Now set 'index bin' for each normalisation parameter
 		// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
 		int bin = (*it).index;
 
 		//If syst on applies to a particular detector
-		if ((XsecCov->GetXSecParamID(bin,1)&SampleDetID)==SampleDetID) {
+		if ((XsecCov->GetXsecParamDetID(bin) & SampleDetID)==SampleDetID) {
 		  XsecBins.push_back(bin);
 		}
 	  } // end iteration over xsec_norms
@@ -1128,6 +1145,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
       samplePDFFD_data[yBin][xBin] = dathist->GetBinContent(xBin+1);
     }
   }
+
+  return;
 }
 
 void samplePDFFDBase::addData(std::vector< vector <double> > &data) {
@@ -1152,6 +1171,8 @@ void samplePDFFDBase::addData(std::vector< vector <double> > &data) {
       samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
   }
+
+  return;
 }
 
 void samplePDFFDBase::addData(TH1D* Data) {
@@ -1173,6 +1194,8 @@ void samplePDFFDBase::addData(TH1D* Data) {
       samplePDFFD_data[yBin][xBin] = Data->GetBinContent(xBin+1);
     }
   }
+
+  return;
 }
 
 void samplePDFFDBase::addData(TH2D* Data) {
@@ -1218,7 +1241,6 @@ void samplePDFFDBase::fillSplineBins() {
 	  switch (BinningOpt) {
 		case 0: // splines binned in erec
 		case 1:
-
 		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
 		  break;
 		case 2:
@@ -1234,6 +1256,7 @@ void samplePDFFDBase::fillSplineBins() {
 	  }
 
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
+	  if(EventSplines.size() > 0 ){std::cout << "FOUND AT LEAST A SPLINE FOR EVENT" << j << std::endl;}
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
 
 	  //

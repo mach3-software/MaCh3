@@ -48,7 +48,7 @@ public:
 
   samplePDFFDBase(){};
   samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
-  ~samplePDFFDBase();
+  virtual ~samplePDFFDBase();
 
   int GetNDim(); //DB Function to differentiate 1D or 2D binning
 
@@ -114,7 +114,7 @@ public:
   //DB Functions relating to sample and exec setup  
   //ETA - abstracting these core functions
   //init will setup all the specific variables 
-  void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
+  //void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
   //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
   //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
 
