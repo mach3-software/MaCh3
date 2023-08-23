@@ -13,10 +13,13 @@
 #include "covarianceBase.h"
 #include "samplePDF/Structs.h"
 
+#include "yaml-cpp/yaml.h"
+
 class covarianceXsec : public covarianceBase {
 
   public:
   covarianceXsec(const char *name, const char *file, double threshold=-1,int FirstPCAdpar=-999,int LastPCAdpar=-999);
+  covarianceXsec(const char *YAMLFile);
     ~covarianceXsec();
 
     // Print information about the whole object once it is set
@@ -28,9 +31,17 @@ class covarianceXsec : public covarianceBase {
     const double GetParamLowerBound(const int i) {return xsec_param_lb_a[i];}
     const double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
     const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
+	//ETA - just return the int of the DetID, this can be removed to do a string comp
+	//at some point.
+    const int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
+	//ETA - just return a string of "spline", "norm" or "functional"
+    const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
     const std::string & GetParameterName(const int i) const {return xsec_param_names[i];}
     const int    GetNumParams()               {return nPars;}
     const char* GetParName(const int i) const {return xsec_param_names[i].c_str();}
+
+	//ETA - trying out the yaml parsing
+	void ParseYAML(const char* FileName);
 
     const bool IsParFlux(const int i){
       return isFlux[i];
@@ -100,14 +111,14 @@ class covarianceXsec : public covarianceBase {
       std::vector<double> nominal;
       for (int i = 0; i < size; i++)
       {
-        nominal.push_back((*xsec_param_nom)(i));
+        nominal.push_back(_fPreFitValue.at(i));
       }
       return nominal;
     }
 
     const double getNominal(const int i)
     {
-      return (*xsec_param_nom)(i);
+      return _fPreFitValue.at(i);
     };
 
     // Get nominal and prior for saving to the output file
@@ -246,6 +257,37 @@ class covarianceXsec : public covarianceBase {
     int nFarFuncParams;
     std::vector<std::string> FarFuncParsNames;
     std::vector<int> FarFuncParsIndex;
+
+  private:
+	//std::vector<std::string> _fNames;
+	std::vector<std::string> _fFancyNames;
+	//int _fNumPar;
+	//YAML::Node _fYAMLDoc;
+
+	std::vector<std::vector<int>> _fNormModes;
+	std::vector<std::string> _fNDSplineNames;
+	std::vector<std::string> _fFDSplineNames;
+	std::vector<std::vector<int>> _fFDSplineModes;
+	int _nNormPars;
+
+	//std::vector<double> _fPreFitValue;
+	//std::vector<double> _fGenerated;
+	//std::vector<double> _fError;
+	//std::vector<double> _fLB;
+	//std::vector<double> _fUB;
+	//std::vector<int> _fDetID;
+	//std::vector<double> _fStepScale;
+	//std::vector<bool> _fFlatPrior;
+	//TMatrixT<double> *_fCovMatrix;
+	//std::vector<int> _fNormModes;
+	//std::vector<std::string> _fParameterGroup;
+
+	//std::vector<std::string> _fNDSplineNames;
+	//std::vector<std::string> _fFDSplineNames;
+	//std::vector<std::vector<int>> _fFDSplineModes;
+
+	//std::vector<std::vector<std::string>> _fKinematicPars;
+	//std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 
 };
 

@@ -24,6 +24,9 @@
 #include "samplePDF/Structs.h"
 #include "throwParms/ThrowParms.h"
 
+// Don't forget yaml!
+#include "yaml-cpp/yaml.h"
+
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
@@ -53,6 +56,9 @@ class covarianceBase {
  public:
   // The constructors
   covarianceBase(){};
+  //ETA - construcotr for a YAML file
+  covarianceBase(const char *YAMLFile);
+  //"Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
   // For Eigen Value decomp
@@ -266,6 +272,8 @@ class covarianceBase {
 
  protected:
   void init(const char *name, const char *file);
+  //YAML init
+  void init(const char *YAMLFile);
   void init(TMatrixDSym* covMat);
 
   void MakePosDef(TMatrixDSym *cov = NULL);
@@ -313,6 +321,36 @@ class covarianceBase {
   Double_t currLogL;
   Double_t propLogL;
   Double_t *corr_throw;
+
+  //ETA - duplication of some of these
+  //ideally these should all be private and we have setters be protected 
+  //setters and public getters
+  std::vector<std::string> _fNames;
+  int _fNumPar;
+  YAML::Node _fYAMLDoc;
+
+  std::vector<double> _fPreFitValue;
+  std::vector<double> _fGenerated;
+  std::vector<double> _fError;
+  std::vector<double> _fLB;
+  std::vector<double> _fUB;
+  std::vector<int> _fDetID;
+  std::vector<std::string> _fDetString;
+  std::vector<std::string> _fParamType;
+  std::vector<double> _fStepScale;
+  std::vector<bool> _fFlatPrior;
+  TMatrixDSym *_fCovMatrix;
+  //TMatrixT<double> *_fCovMatrix;
+
+  std::vector<int> _fNormModes;
+  std::vector<std::string> _fNDSplineNames;
+  std::vector<std::string> _fFDSplineNames;
+  std::vector<std::vector<int>> _fFDSplineModes;
+//  std::vector<std::string> _fKinematicPars;
+//  std::vector<std::vector<int>> _fKinematicBounds;
+
+  std::vector<std::vector<std::string>> _fKinematicPars;
+  std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 
   //Unity for null systs to point back to
   const double Unity = 1.0;

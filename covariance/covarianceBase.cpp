@@ -13,7 +13,31 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   for (int iThread=0;iThread<nThreads;iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
+
+  std::cout << "Constructing instance of covarianceBase" << std::endl;
   init(name, file);
+  FirstPCAdpar = -999;
+  LastPCAdpar = -999;
+
+  PrintLength = 35;
+}
+
+covarianceBase::covarianceBase(const char *YAMLFile) : inputFile(std::string(YAMLFile)), pca(false) {
+// ********************************************
+#ifdef MULTITHREAD
+  int nThreads = omp_get_max_threads();
+#else
+  int nThreads = 1;
+#endif
+  //KS: set Random numbers for each thread so each thread has differnt seed
+  //or for one thread if without MULTITHREAD 
+  random_number = new TRandom3*[(const int)nThreads]();
+  for (int iThread=0;iThread<nThreads;iThread++) {
+    random_number[iThread] = new TRandom3(0);
+  }
+
+  std::cout << "Constructing instance of covarianceBase using " << YAMLFile << " as an input" << std::endl;
+  init(YAMLFile);
   FirstPCAdpar = -999;
   LastPCAdpar = -999;
 
@@ -75,6 +99,7 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed, dou
   for (int iThread=0;iThread<nThreads;iThread++) {
     random_number[iThread] = new TRandom3(seed);
   }
+  std::cout << "Constructing instance of covarianceBase" << std::endl;
   init(name, file);
   // Call the innocent helper function
   if (pca) ConstructPCA();
@@ -273,13 +298,15 @@ void covarianceBase::init(const char *name, const char *file)
     std::cerr << "Are you really sure " << name << " exists in the file?" << std::endl;
     std::cerr << __FILE__ << ":" << __LINE__  << std::endl;
     throw;
-  }
+  } 
 
   // Not using adaptive by default
   use_adaptive=false;
   
   // Set the covariance matrix
   size = covMatrix->GetNrows();
+  _fNumPar = size;
+    
   InvertCovMatrix = new double*[size]();
   throwMatrixCholDecomp = new double*[size]();
   // Set the defaults to true
@@ -343,6 +370,101 @@ void covarianceBase::init(const char *name, const char *file)
   std::cout << "from file: " << file << std::endl;
 
   delete infile;
+}
+
+// ETA
+// An init function for the YAML constructor
+// All you really need from the YAML file is the number of Systematics
+// Then get all the info from the YAML file in the covarianceXsec::ParseYAML function
+void covarianceBase::init(const char *YAMLFile)
+{
+  // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
+  /*TFile *infile = new TFile(file, "READ");
+  if (infile->IsZombie()) {
+    std::cerr << "ERROR: Could not open input covariance ROOT file " << file << " !!!" << std::endl;
+    std::cerr << "Was about to retrieve matrix with name " << name << std::endl;
+    throw;
+  }
+
+  // Should put in a 
+  TMatrixDSym *covMatrix = (TMatrixDSym*)(infile->Get(name));
+  if (covMatrix == NULL) {
+    std::cerr << "Could not find covariance matrix name " << name << " in file " << file << std::endl;
+    std::cerr << "Are you really sure " << name << " exists in the file?" << std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__  << std::endl;
+    throw;
+  }
+  */
+
+  _fYAMLDoc = YAML::LoadFile(YAMLFile);
+
+  // Not using adaptive by default
+  use_adaptive=false;
+  
+  // Set the covariance matrix
+  _fNumPar = _fYAMLDoc["Systematics"].size();
+  size = _fNumPar;
+    
+  _fCovMatrix = new TMatrixDSym(size);
+  InvertCovMatrix = new double*[size]();
+  throwMatrixCholDecomp = new double*[size]();
+  // Set the defaults to true
+  for(int i = 0; i < size; i++)
+  {
+    InvertCovMatrix[i] = new double[size]();
+    throwMatrixCholDecomp[i] = new double[size]();
+    for (int j = 0; j < size; j++)
+    {
+        InvertCovMatrix[i][j] = 0.;
+        throwMatrixCholDecomp[i][j] = 0.;
+    }
+  }
+
+  setName(YAMLFile);
+  //size = covMatrix->GetNrows();
+  //MakePosDef(covMatrix);
+  //setCovMatrix(covMatrix);
+
+  if (size <= 0) {
+    std::cerr << "Covariance matrix " << getName() << " has " << size << " entries!" << std::endl;
+    throw;
+  }
+  npars = size;
+
+  fParNames = new Char_t*[size]();
+  fParInit = new Double_t[size]();
+  fParSigma = new Double_t[size]();
+  fParCurr = new Double_t[size]();
+  fParProp = new Double_t[size]();
+  fParLoLimit = new Double_t[size]();
+  fParHiLimit = new Double_t[size]();
+  fIndivStepScale = new Double_t[size];
+  fParEvalLikelihood =  new bool[size]();
+  corr_throw = new Double_t[size]();
+  // Set the defaults to true
+  for(int i = 0; i < size; i++) {
+    fParInit[i] = 1.;
+    fParSigma[i] = 0.;
+    fParCurr[i] = 0.;
+    fParProp[i] = 0.;
+    fParLoLimit[i] = -999.99;
+    fParHiLimit[i] = 999.99;
+    fParEvalLikelihood[i] = true;
+    fIndivStepScale[i] = 1.;
+    corr_throw[i] = 0.0;
+  }
+
+  // Set the logLs to very large so next step is accepted
+  currLogL = __LARGE_LOGL__;
+  propLogL = __LARGE_LOGL__;
+
+  // Set random parameter vector (for correlated steps)
+  randParams = new double[size];
+
+  fStepScale = 1.0;
+
+  std::cout << "Created covariance matrix named: " << getName() << std::endl;
+  std::cout << "from file: " << YAMLFile << std::endl;
 }
 
 void covarianceBase::init(TMatrixDSym* covMat) {
@@ -894,7 +1016,7 @@ int covarianceBase::CheckBounds(){
 #endif
   for (int i = 0; i < size; i++) {
     // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
-    if (fParProp[i] < 0) NOutside++;
+    if (fParProp[i] < 0) {std::cout << "fParProp at " << i << " is " << fParProp[i] << std::endl; NOutside++;}
   }
   return NOutside;
 }
@@ -905,6 +1027,13 @@ double covarianceBase::getLikelihood(){
   const int NOutside = CheckBounds();
   
   if(NOutside>0){
+
+	for (int i = 0; i < size; i++) {
+	  // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
+	  if (fParProp[i] < 0) {std::cout << "fParProp at " << i << " is " << fParProp[i] << std::endl;}
+	}
+	std::cout << "Parameters outside of bounds!" << std::endl;
+	std::cout << "NOutside is " << NOutside << std::endl;
     return NOutside*__LARGE_LOGL__;
   }
 

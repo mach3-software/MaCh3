@@ -7,6 +7,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   : covarianceBase(name, file,0,threshold,FirstPCAdpar,LastPCAdpar) {
 // ********************************************
 
+  /*
   TFile *infile = new TFile(file, "READ");
 
   xsec_param_norm_modes = NULL;
@@ -41,8 +42,8 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   if (xsec_param_norm_modes->GetEntries() != xsec_param_norm_elem->GetEntries() || 
       xsec_param_norm_modes->GetEntries() != xsec_param_norm_nupdg->GetEntries() ||
       xsec_param_norm_modes->GetEntries() != xsec_param_norm_horncurrents->GetEntries() ||
-      xsec_param_norm_modes->GetEntries() != xsec_param_norm_preoscnupdg->GetEntries() /* ||
-	   xsec_param_norm_modes->GetEntries() != xsec_kinematic_type->GetEntries() */ ){	
+      xsec_param_norm_modes->GetEntries() != xsec_param_norm_preoscnupdg->GetEntries() *//* ||
+	   xsec_param_norm_modes->GetEntries() != xsec_kinematic_type->GetEntries() *//* ){	
     std::cerr << "Number of entries in input matrix normalisation parameters is wrong!" << std::endl;
     std::cerr << "Element GetEntries =    " << xsec_param_norm_elem->GetEntries() << std::endl;
     std::cerr << "Modes GetEntries =      " << xsec_param_norm_modes->GetEntries() << std::endl;
@@ -87,10 +88,14 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
+  */
 
+  int ncols = _fNumPar;
+  //ParseYAML(name);
+
+  nPars = _fNumPar;
   // Leave these as arrays for backwards compatibility
   // Probably should be made into vectors but at least size isn't hard-coded ^,^
-
   // Load up the parameters id (nPars x nCols big, contains information about if these parameters are spline, normalisation or some other parameter)
   xsec_param_id_a   = new int*[nPars];
   for (int i = 0; i < nPars; ++i) {
@@ -106,21 +111,29 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
 
   for (int i = 0; i < nPars; i++) {
     // Fill the nominal
-    xsec_param_nom_a[i] = (*xsec_param_nom)(i);
+    //xsec_param_nom_a[i] = (*xsec_param_nom)(i);
+	xsec_param_nom_a[i] = _fPreFitValue[i];
     // Fill the lower bound
-    xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
+    //xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
+    xsec_param_lb_a[i]  = _fLB[i];
+
     // Fill the upper bound
-    xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
+    //xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
+    xsec_param_ub_a[i]  = _fUB[i];
     // Fill the prior
-    xsec_param_prior_a[i]=(*xsec_param_prior)(i);
+    //xsec_param_prior_a[i]=(*xsec_param_prior)(i);
+	xsec_param_prior_a[i]= _fError[i];
     // Fill the names
-    xsec_param_names.push_back(std::string(((TObjString*)objarr_name->At(i))->GetString()));
+    //xsec_param_names.push_back(std::string(((TObjString*)objarr_name->At(i))->GetString()));
+    xsec_param_names.push_back(_fNames[i]);
 
     if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
     // DB Fill the stepscales vector
-    xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
+    //xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
+    xsec_stepscale_vec[i] = _fStepScale[i];
 
-    if((*flat_prior)(i)) setEvalLikelihood(i, false);
+    //if((*flat_prior)(i)) setEvalLikelihood(i, false);
+    if(_fFlatPrior[i]){setEvalLikelihood(i, false);}
     
     for (int j = 0; j < ncols; j++) {
       xsec_param_id_a[i][j] = (*xsec_param_id)(i,j);
@@ -133,11 +146,12 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   } // end the for loop
 
 
-  infile->Close();
-  delete infile;
+  //infile->Close();
+  //delete infile;
   // Scan through the input parameters and find which are normalisation, which are splines, and so on
   ScanParameters();
 
+  std::cout << "Constructing instance of covarianceXsec" << std::endl;
   initParams(0.001);
   // Print
   Print();
@@ -145,6 +159,333 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   // Set the parameters
   // setParameters; why is this done in testFGD2 and not here?
 }
+
+// ********************************************
+// ETA - YAML constructor
+// this will replace the root file constructor but let's keep it in
+// to do some validations
+covarianceXsec::covarianceXsec(const char *YAMLFile)
+  : covarianceBase(YAMLFile) {
+
+  //int ncols = _fNumPar;
+  ParseYAML(YAMLFile);
+
+  int ncols = _fNumPar;
+  nPars = _fNumPar;
+  // Leave these as arrays for backwards compatibility
+  // Probably should be made into vectors but at least size isn't hard-coded ^,^
+  // Load up the parameters id (nPars x nCols big, contains information about if these parameters are spline, normalisation or some other parameter)
+  xsec_param_id_a   = new int*[nPars];
+  for (int i = 0; i < nPars; ++i) {
+    xsec_param_id_a[i] = new int[ncols];
+  }
+  xsec_param_nom_a  = new double[nPars];
+  xsec_param_lb_a   = new double[nPars];
+  xsec_param_ub_a   = new double[nPars];
+  xsec_param_prior_a = new double[nPars];
+
+  //DB Resize step scale vector to expected size
+  xsec_stepscale_vec.resize(nPars);
+
+  for (int i = 0; i < nPars; i++) {
+    // Fill the nominal
+    //xsec_param_nom_a[i] = (*xsec_param_nom)(i);
+	xsec_param_nom_a[i] = _fPreFitValue[i];
+    // Fill the lower bound
+    //xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
+    xsec_param_lb_a[i]  = _fLB[i];
+
+    // Fill the upper bound
+    //xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
+    xsec_param_ub_a[i]  = _fUB[i];
+    // Fill the prior
+    //xsec_param_prior_a[i]=(*xsec_param_prior)(i);
+	xsec_param_prior_a[i]= _fError[i];
+    // Fill the names
+    //xsec_param_names.push_back(std::string(((TObjString*)objarr_name->At(i))->GetString()));
+    xsec_param_names.push_back(_fNames[i]);
+
+    if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
+    // DB Fill the stepscales vector
+    //xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
+    xsec_stepscale_vec[i] = _fStepScale[i];
+
+    //if((*flat_prior)(i)) setEvalLikelihood(i, false);
+    if(_fFlatPrior[i]){setEvalLikelihood(i, false);}
+    
+	//xsec_param_id_a[i][0] is the "type" of systematic, spline or otherwise
+	//xsec_param_id_a[i][1] is the DetId
+    //for (int j = 0; j < ncols; j++) {
+    //  xsec_param_id_a[i][j] = (*xsec_param_id)(i,j);
+    //}	
+
+    // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
+    fParHiLimit[i] = xsec_param_ub_a[i];
+    // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
+    fParLoLimit[i] = xsec_param_lb_a[i];
+  } // end the for loop
+
+
+  //infile->Close();
+  //delete infile;
+  // Scan through the input parameters and find which are normalisation, which are splines, and so on
+  ScanParameters();
+
+  std::cout << "Constructing instance of covarianceXsec" << std::endl;
+  initParams(0.001);
+  // Print
+  Print();
+
+  // Set the parameters
+  // setParameters; why is this done in testFGD2 and not here?
+}
+
+
+void covarianceXsec::ParseYAML(const char* FileName)
+{
+  std::cout << "Let's read some YAML!" << std::endl;
+
+  _fYAMLDoc = YAML::LoadFile(FileName);
+  _fNumPar = _fYAMLDoc["Systematics"].size();
+  _fNames = std::vector<std::string>(_fNumPar);
+  _fGenerated = std::vector<double>(_fNumPar);
+  _fPreFitValue = std::vector<double>(_fNumPar);
+  _fError = std::vector<double>(_fNumPar);
+  _fLB = std::vector<double>(_fNumPar);
+  _fUB = std::vector<double>(_fNumPar);
+  _fStepScale = std::vector<double>(_fNumPar);
+  _fFlatPrior = std::vector<bool>(_fNumPar);
+  _fDetID = std::vector<int>(_fNumPar);
+  _fCovMatrix = new TMatrixDSym(_fNumPar);
+  _fParamType = std::vector<std::string>(_fNumPar);
+  _fDetString = std::vector<std::string>(_fNumPar);
+
+
+  std::cout << "Found " << _fNumPar << " systematics in yaml" << std::endl;
+  //These are not size _fNumPar
+  //_fNormModes = std::vector<std::vector<double> >;
+  //_fFDSplineNames = std::vector<std::string>(_fNumPar);
+  //_fFDSplineModes = std::vector<std::string>(_fNumPar);
+  //_fNDSplineNames = std::vector<std::string>(_fNumPar);
+
+  //Vector of vectors of strings to contain potentially multiple variables that
+  //might be cut on
+  _fKinematicPars = std::vector<std::vector<std::string>>(_fNumPar);
+  //Vector of vector of ints to contain the lower and upper bounds of a cut
+  //for a particular kinematic variables
+  _fKinematicBounds = std::vector<std::vector<std::vector<double>>>(_fNumPar);
+
+  int i=0;
+
+  std::vector<std::map<std::string,double>> Correlations(_fNumPar);
+  std::map<std::string, int> CorrNamesMap;
+
+  for (auto const &param : _fYAMLDoc["Systematics"]) {
+     std::cout << param["Systematic"]["Names"]["ParameterName"].as<std::string>() << std::endl;
+
+     _fNames[i] = (param["Systematic"]["Names"]["ParameterName"].as<std::string>());
+     _fPreFitValue[i] = (param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
+     _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
+
+	 //ETA - a bit of a fudge but works
+	 std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
+     _fLB[i] = TempBoundsVec[0];//(param"lowerbound"].as<double>());
+     _fUB[i] = TempBoundsVec[1];//.push_back(param["upperbound"].as<double>());
+
+	 std::cout << "Upper bounds is " << _fUB[i] << std::endl;
+
+     _fStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
+     _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
+	 std::cout << "Setting error to be " << param["Systematic"]["Error"].as<double>() << std::endl;
+     _fError[i] = (param["Systematic"]["Error"].as<double>());
+	 std::cout << "_fError[i] is " << _fError[i] << std::endl;
+	 _fParamType[i] = (param["Systematic"]["Type"].as<std::string>());
+
+	 if (param["Systematic"]["FlatPrior"]) {
+	   _fFlatPrior[i] = param["Systematic"]["FlatPrior"].as<bool>();
+	 } else {
+	   _fFlatPrior[i] = false;
+	 }
+
+	 //Fill the map to get the correlations later as well
+     CorrNamesMap[param["Systematic"]["Names"]["ParameterName"].as<std::string>()]=i;
+
+	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
+	 int nFDSplines;
+	 //Now load in varaibles for spline systematics only
+	 if (ParamType.find("Spline") != std::string::npos) {
+	   std::cout << "Reading in a Spline Parameter" << std::endl;
+
+	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
+		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
+		 nFDSplines++;
+	   }
+
+	   if (param["Systematic"]["SplineInformation"]["FDMode"]) {
+		 std::cout << "Pushing back _fFDSplineModes for param " << i << std::endl;
+		 _fFDSplineModes.push_back(param["Systematic"]["SplineInformation"]["FDMode"].as<std::vector<int>>());
+		 std::cout << "_fFDSplineModes is of size " << _fFDSplineModes.size() << std::endl;
+		 std::cout << "_fFDSplineModes[0] is of size " << _fFDSplineModes[0].size() << std::endl;
+	   }
+
+	   if (param["Systematic"]["NDSplineName"]) {
+		 _fNDSplineNames.push_back(param["Systematic"]["NDSplineName"].as<std::string>());
+	   }
+
+	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
+	   std::cout << "Norm parameter" << std::endl;
+
+	   //First check to see if we have specified a mode
+	   std::vector<int> DummyModeVec;
+	   if(param["Systematic"]["Mode"]){
+		 _fNormModes.push_back(param["Systematic"]["Mode"].as<std::vector<int>>());
+	   } else{
+		 //Has to be of size 0 to mean apply to all
+		 _fNormModes.push_back(DummyModeVec);
+	   }
+
+	 }
+
+	 int NumKinematicCuts = 0;
+	 if(param["Systematic"]["KinematicCuts"]){
+
+	   NumKinematicCuts = param["Systematic"]["KinematicCuts"].size();
+	   std::cout << "Number of Kinematic cuts is " << NumKinematicCuts << std::endl;
+
+	   std::vector<std::string> TempKinematicStrings;
+	   std::vector<std::vector<double>> TempKinematicBounds;
+	   //First element of TempKinematicBounds is always -999, and size is then 3
+
+	   for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){ 
+		 //ETA
+		 //This is a bit messy, Kinematic cuts is a list of maps
+		 //The for loop h
+		 for (YAML::const_iterator it=param["Systematic"]["KinematicCuts"][KinVar_i].begin();it!=param["Systematic"]["KinematicCuts"][KinVar_i].end();++it) {
+		   TempKinematicStrings.push_back(it->first.as<std::string>());
+		   TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+		   std::vector<double> bounds = it->second.as<std::vector<double>>();
+		 }
+	   }
+
+	   _fKinematicPars.at(i) = TempKinematicStrings;
+	   _fKinematicBounds.at(i) = TempKinematicBounds;
+
+	   
+	 }
+
+	   //for(YAML::const_iterator it=.begin();it!=lineup.end();++it) {
+	   //  std::cout << "Playing at " << it->first.as<std::string>() << " is " << it->second.as<std::string>() << "\n";
+	   //}
+	   //std::cout << "---- pretty please: " << param["Systematic"]["KinematicCuts"][0][0] << std::endl;
+	   //std::cout << ".... pretty please: " << param["Systematic"]["KinematicCuts"]["TrueNeutrinoEnergy"] << std::endl;
+	   //std::cout << ".... pretty please: " << param["Systematic"]["KinematicCuts"]["TrueNeutrinoEnergy"][0] << std::endl;
+	   //std::cout << "Found a cut on " << KinematicCut << std::endl;
+
+	   //std::string KinematicCut = param["Systematic"]["KinematicCuts"][KinVar_i][0].as<std::string>();
+	   //std::cout << "Kinematic cut itself is of length " << param["Systematic"]["KinematicCuts"][KinVar_i].size() << std::endl;  
+	   //std::string KinematicCut = param["Systematic"]["KinematicCuts"][0].as<std::string>();
+	   //std::cout << "Anything please:    " << param["Systematic"]["KinematicCuts"][0] << std::endl;
+
+	   //std::cout << "Anything please:    " << param["Systematic"]["KinematicCuts"][0].first.as<std::string>() << std::endl;
+	 
+	 // ETA 
+	 // Now look for kinematic cuts that are applied for this parameter
+	 /*if (param["Systematic"]["KinematicCuts"]) {
+		for(auto const &KinVar : param["Systematic"]["KinematicCuts"]){
+		  std::string KinematicCut = KinVar.first.as<std::string>();
+		  std::cout << "Found a cut on " << KinematicCut << std::endl;
+		}
+		  //std::cout << "Kinematic cut is " << param["Systematic"]["KinematicCuts"].first.as<std::string>() << std::endl;
+		  //std::vector<std::string> kinpar_vec = param["kinematicpars"].as<std::vector<std::string>>();
+		  //kinematicpar->ResizeTo(kinpar_vec.size());
+		  //for(std::size_t k = 0; k < kinpar_vec.size(); k++){
+			//(*kinematicpar)(k)=StringToKinematicVar(kinpar_vec[k]);
+		//	(*kinematicpar)(k) = -999;
+	  // }	
+		  
+	  }
+	  else{std::cout << "No Kinematic cut found" << std::endl;}
+	  */
+      //_fKinematicPars.push_back(kinematicpar->Clone());
+
+	  /*
+	  _fKinematicBounds->ResizeTo(0,0);
+	  if(param["kinematicbounds"]) {
+		if(!param["kinematicbounds"].IsNull()) {
+		  std::vector<std::vector<double>> kinbound_vec = param["kinematicbounds"].as<std::vector<std::vector<double>>>();
+		  //_fKinematicBounds->ResizeTo(kinbound_vec.size(),2);
+		  for(std::size_t k = 0; k < kinbound_vec.size(); k++) {
+			if(kinbound_vec[k].size()!=2) {
+			  exit(5);
+			}
+			(*kinematicbound)(k,0)=kinbound_vec[k][0];
+			(*kinematicbound)(k,1)=kinbound_vec[k][1];
+		  }
+		}
+	  }
+	  _fKinematicBounds.push_back(kinematicbound->Clone());
+	  */
+       
+	 //Also loop through the correlations
+	 if(param["Systematic"]["Correlations"]) {
+	   std::cout << "FOUND " << param["Systematic"]["Correlations"].size() << " CORRELATIONS!" << std::endl;
+	   for(int Corr_i = 0 ; Corr_i < param["Systematic"]["Correlations"].size()  ; ++Corr_i){
+		 for (YAML::const_iterator it=param["Systematic"]["Correlations"][Corr_i].begin();it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
+		   std::cout << "Correlation with " << it->first.as<std::string>() << " of " << it->second.as<double>() << std::endl;
+           Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
+		 }
+	   }
+	 }
+	 i++;
+  }
+  
+	 
+  //ETA
+  //Now that we've been through all systematic let's fill the covmatrix
+  //This makes the root TCov from YAML
+  for(int i=0; i < _fNumPar; i++) {
+	(*_fCovMatrix)(i,i)=_fError[i]*_fError[i];
+	//Get the map of parameter name to correlation fomr the Correlations object
+	for (auto const& [key, val] : Correlations[i]) {
+	  int index = -1;
+
+	  //If you found the parameter name then get the index
+	  if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
+		index=CorrNamesMap[key];
+	  }
+	  else {
+		std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
+		exit(5);
+	  }
+
+	  //
+	  double Corr1 = val;
+	  double Corr2 = 0;
+	  if(Correlations[index].find(_fNames[i]) != Correlations[index].end()) {
+		Corr2 = Correlations[index][_fNames[i]];
+		//Do they agree to better than float precision?
+		if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
+		  std::cout << "Correlations are not equal between " << _fNames[i] << " and " << key << std::endl;
+		  std::cout << "Got : " << Corr2  << " and " << Corr1 << std::endl;
+		  exit(5);
+		}
+	  } else {
+		std::cout << "Correlation does not appear reciprocally between " << _fNames[i] << " and " << key << std::endl;
+		exit(5);
+	  }
+	  (*_fCovMatrix)(i,index)= (*_fCovMatrix)(index,i) = Corr1*_fError[i]*_fError[index];
+	}
+  } 
+
+  //Now make positive definite
+  MakePosDef(_fCovMatrix);
+
+  setCovMatrix(_fCovMatrix);
+   
+   return;
+}
+
+
 
 // ********************************************
 covarianceXsec::~covarianceXsec() {
@@ -156,9 +497,9 @@ covarianceXsec::~covarianceXsec() {
 const int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
   int returnVal = 0; 
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
-      if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
-	returnVal += 1;
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
+      if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+		returnVal += 1;
       }
     }
   }
@@ -175,8 +516,8 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int D
   std::cout << "nPars is " << nPars << std::endl;
   std::vector<std::string> returnVec;
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
-      if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
+      if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
         returnVec.push_back(GetParameterName(i));
       }
     }
@@ -191,10 +532,14 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int D
 const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(int DetID) {
   std::vector<std::string> returnVec;
 
+  int FDSplineCounter = 0;
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
-      if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
-        returnVec.push_back(std::string(((TObjString*)xsec_param_fd_spline_names->At(i))->GetString())); //Append spline name
+	std::cout << "checking par " << i << " in GetSplineFileParsNamesFromDetID" << std::endl;
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
+      if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+		std::cout << "Pushing back SplineFileParsNames with " << _fFDSplineNames[FDSplineCounter] << std::endl;
+        returnVec.push_back(_fFDSplineNames[FDSplineCounter]); //Append spline name
+		FDSplineCounter++;
       }
     }
   }
@@ -208,17 +553,24 @@ const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(i
 const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(int DetID) {
   std::vector< std::vector<int> > returnVec;
 
+  //Need a counter or something to correctly get the index in _fFDSplineModes since it's not of length nPars
+  //Should probably just make a std::map<std::string, int> for param name to FD spline index
+  int nFDSplineCounter = 0;
   for (int i = 0; i < nPars; ++i) {
-	if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
-	  if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
+	if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
+	  if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
 
-		TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
+		/*TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
 		std::vector<int> temp;
 		for (int j = 0; j < tempVector->GetNrows(); ++j) {
 		  temp.push_back(tempVector[0][j]);
 		}
-          returnVec.push_back(temp);	
+		*/
+		std::cout << "pushing back SplineModeVec for parameter " << i << std::endl;
+		returnVec.push_back(_fFDSplineModes[nFDSplineCounter]);	
+		nFDSplineCounter++;
 	  }
+	  else{std::cout << "Didn't find a spline parameter at param" << i << std::endl;}
 	}
   }
 
@@ -232,9 +584,10 @@ const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
   std::vector<int> returnVec;
 
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
-      if (GetXSecParamID(i, 0) >= 0) { //If parameter is implemented as a spline
-	returnVec.push_back(i);
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
+      if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+		std::cout << "PUSHING BACK WITH PAR INDEX OF " << i << std::endl;
+		returnVec.push_back(i);
       }
     }
   }
@@ -254,22 +607,28 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
   std::cout << "IN covarianceXsec::GetNormParsFromDetID()" << std::endl;
 
   for (int i = 0; i < nPars; ++i) {
-	if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID   
-	  if (GetXSecParamID(i, 0) == -1) { //If parameter is implemented as a normalisation
+	if (strcmp(GetXsecParamType(i), "Norm") == 0) { //If parameter is implemented as a normalisation
+
+	  if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID   
+
 		std::vector<int> temp;
 
 		XsecNorms4 norm;
 		norm.name=GetParameterName(i);
 
 		// Set the mode of the normalisation parameter
-		TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		norm.modes=temp;
-		temp.clear();
+		//TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
+		//for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		//  temp.push_back(tempVector[0][j]);
+		//}
+		//norm.modes=temp;
+		//temp.clear();
+
+		//Copy the mode information into an XsecNorms4 struct
+		norm.modes = _fNormModes[norm_counter];
 
 		// Set the target of the normalisation parameter
+		/*
 		tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
 		for (int j = 0; j < tempVector->GetNrows(); ++j) {
 		  temp.push_back(tempVector[0][j]);
@@ -300,6 +659,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		}
 		norm.preoscpdgs=temp;
 		temp.clear();
+		*/
 
 		//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
 		//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
@@ -309,8 +669,24 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		//New generic cuts things 
 		////////////////////
 
+		///
+		if(_fKinematicPars.at(i).size() > 0){
+		  std::cout << "Found Kinematic bound for parameter " << i << std::endl;
+		  HasKinBounds = true;
+		}
+
+		for(int KinematicCut_i = 0 ; KinematicCut_i < _fKinematicPars[i].size() ; ++KinematicCut_i){
+		  //Push back with the string for the kinematic cut
+		  std::cout << "----------------------" << std::endl;
+		  std::cout << "Will apply a cut on " << _fKinematicPars.at(i).at(KinematicCut_i) << std::endl;
+		  norm.KinematicVarStr.push_back(_fKinematicPars.at(i).at(KinematicCut_i));
+		  std::cout << "With bounds " << _fKinematicBounds.at(i).at(KinematicCut_i).at(0) << " to " << _fKinematicBounds.at(i).at(KinematicCut_i).at(1) << std::endl;
+		  //Push back with the bounds for the kinematic cut
+          norm.Selection.push_back(_fKinematicBounds.at(i).at(KinematicCut_i));
+		}
+
 		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
-		if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0 ){
+		/*if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0 ){
 		  std::cout << "Found Kinematic bound for parameter " << i << std::endl;
 		  std::cout << "Will apply a cut on " << std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()) << std::endl;
 		  std::cout << "With lower bound " << (*xsec_kinematic_lb)(i) << " and upper bound " << (*xsec_kinematic_ub)(i) << std::endl; 
@@ -328,6 +704,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		  single_selec.push_back((*xsec_kinematic_ub)(i));
 		  norm.Selection.push_back(single_selec);
 		}
+		*/
 
 		norm.hasKinBounds=HasKinBounds;
 		//End of kinematic bound checking
@@ -336,8 +713,8 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		norm.index=i;
 		//Add this parameter to the vector of parameters
 		returnVec.push_back(norm);
-		norm_counter++;
 	  }
+	  norm_counter++;
 	}
   }
 
@@ -351,7 +728,7 @@ const int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
   int returnVal = 0;
 
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (GetXSecParamID(i, 0) == -2) { //If parameter is implemented as a functional parameter
 	returnVal += 1;
       }
@@ -368,7 +745,7 @@ const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(int Det
   std::vector<std::string> returnVec;
 
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (GetXSecParamID(i, 0) == -2) { //If parameter is implemented as a functional parameter
 		returnVec.push_back(GetParameterName(i));
       }
@@ -385,7 +762,7 @@ const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(int DetID) {
   std::vector<int> returnVec;
 
   for (int i = 0; i < nPars; ++i) {
-    if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID
+    if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (GetXSecParamID(i, 0) == -2) { //If parameter is implemented as a functional parameter
 	returnVec.push_back(i);
       }
@@ -417,14 +794,15 @@ void covarianceXsec::ScanParameters() {
 
   for (int i = 0; i < nPars; ++i) {
 
-    bool isValidDetID = false;
+    //ETA - need to rethink this and just check against strings
+    /*bool isValidDetID = false;
     int DetIDCounter = 0;
     int ParamaDetID = GetXSecParamID(i,1);
     //DB Loop over all supported DetIDs to ensure Root/XML inputs are familiar
     for (int iKnownDetID=0;iKnownDetID<MaCh3Utils::nKnownDetIDs;iKnownDetID++) {
       if ((ParamaDetID & MaCh3Utils::KnownDetIDsMap[iKnownDetID]) == MaCh3Utils::KnownDetIDsMap[iKnownDetID]) {
-	isValidDetID = true;
-	DetIDCounter += MaCh3Utils::KnownDetIDsMap[iKnownDetID];
+	    isValidDetID = true;
+	    //DetIDCounter += MaCh3Utils::KnownDetIDsMap[iKnownDetID];
       }
     }
     //DB Throw if Param DetID is unsupported. Also check that only supported DetIDs are contained in the param DetID
@@ -434,144 +812,69 @@ void covarianceXsec::ScanParameters() {
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
     }
+	*/
     
     if(GetParameterName(i).find("b_")==0)isFlux.push_back(true);
     else isFlux.push_back(false);
 
 	//ETA - adding in a counter for the number of norms as xsec_norm_kinematic_type is only of length of the number of norm parameters
 	//Not sure how this wasn't broken already??
-	if(GetXSecParamID(i, 0) == -1){norm_counter++;} 
+	//This needs to be updated to check against a string
+	if(strcmp(GetXsecParamType(i), "Norm") == 0){norm_counter++;} 
 
     // Also make some helper arrays with all the Far parameters, so we have Near parameters, Far parameters, and all parameters
     // These are parameters that have 24 or 25 in ID(i,1), so can be fancy and do a bitwise comparison to 01000
-    if ((GetXSecParamID(i, 1) & 24) == 24) {//Far pars
-      
-      // Now check if it's a spline parameter or not
-      if (GetXSecParamID(i, 0) >= 0) {//FarSplinePars
-        FarSplineParsNames.push_back(GetParameterName(i));
-	
-	//Fill the name of the Far spline objects in the spline files
-	FarSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_fd_spline_names->At(i))->GetString()));
+	if ((GetXsecParamDetID(i) & 24) == 24) {//Far pars
+
+	  // Now check if it's a spline parameter or not
+	  //This needs to be updated to check against a string
+	  if (strcmp(GetXsecParamType(i), "Spline") == 0) {//FarSplinePars
+		std::cout << "Found a spline for far params at index " << i << std::endl;
+		std::cout << GetXsecParamType(i) << std::endl;
+		std::cout << "Strcmp of paramtype with spline is " << strcmp(GetXsecParamType(i), "Spline") << std::endl;
+		std::cout << "Strcmp of paramtype with Norm is " << strcmp(GetXsecParamType(i), "Norm") << std::endl;
+		FarSplineParsNames.push_back(GetParameterName(i));
+
+		//Fill the name of the Far spline objects in the spline files
+		//FarSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_fd_spline_names->At(i))->GetString()));
 
 
-        FarSplineParsIndex.push_back(i);
-        TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
-        std::vector<int> temp;
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-	  temp.push_back(tempVector[0][j]);
-	}
-	FarSplineModes.push_back(temp);
-	temp.clear();
-	
-        nFarSplineParams++;
+		FarSplineParsIndex.push_back(i);
 
-        // Or a normalisation parameter
-      } //End FarSplinePars
-      else if (GetXSecParamID(i, 0) == -1) {//FarNormPars
+
+		/*TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
+		std::vector<int> temp;
+		for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		}
+		*/
+		for(int Mode_i = 0 ; Mode_i < _fFDSplineModes[nFarSplineParams].size() ; ++Mode_i){
+		  std::cout << "Mode to apply to is " << _fFDSplineModes[nFarSplineParams][Mode_i] << std::endl;
+		}
+
+		FarSplineModes.push_back(_fFDSplineModes[nFarSplineParams]);
+
+		nFarSplineParams++;
+
+		// Or a normalisation parameter
+	  } //End FarSplinePars
+	  else if (strcmp(GetXsecParamType(i), "Norm") == 0) {//FarNormPars
 		std::cout << "Par " << i << " is a normalisation parameter" << std::endl;
 		XsecNorms4 tmp_xsec;
-        tmp_xsec.name=GetParameterName(i);
-
-        // Set the mode of the normalisation parameter
-        TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
-        std::vector<int> temp;
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-	  temp.push_back(tempVector[0][j]);
-	}
-        tmp_xsec.modes=temp;
-	temp.clear();
-
-        // Set the target of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.horncurrents=temp;
-        temp.clear();
-
-        // Set the target of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_elem->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.targets=temp;
-        temp.clear();
-
-	
-        // Set the pdg of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_nupdg->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.pdgs=temp;
-	temp.clear();
+		tmp_xsec.name=GetParameterName(i);
 
 
-        // Set the preoscillation neutrino pdg of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_preoscnupdg->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.preoscpdgs=temp;
-	temp.clear();
+		// Set the mode of the normalisation parameter
+		/*TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
+		  std::vector<int> temp;
+		  for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		  }
+		  */
 
-	//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
-	//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
-	bool haskinbounds=false;
+		tmp_xsec.modes=_fNormModes[i];
 
-	////////////////////
-	//New generic cuts things 
-	////////////////////
-	
-	//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
-	if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0){ 
-	  haskinbounds = true;
-	  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-	  tmp_xsec.KinematicVarStr.push_back(std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()));
-
-	  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-	  std::vector<double> single_selec;
-
-	  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
-	  //a samplePDFFD daughter class
-	  single_selec.push_back((*xsec_kinematic_lb)(i));
-	  single_selec.push_back((*xsec_kinematic_ub)(i));
-	  tmp_xsec.Selection.push_back(single_selec);
-
-	}
-	else{
-	  std::cout << "~~~" << std::endl;
-	  std::cout << "Did not find kinematic bound for param " << i << std::endl;
-	  std::cout << "~~~" << std::endl;
-	}
-
-	tmp_xsec.hasKinBounds=haskinbounds;
-	//End of kinematic bound checking	
-
-	// Set the global parameter index of the normalisation parameter
-	tmp_xsec.index=i;
-	//Add this parameter to the vector of parameters
-	FarNormParams.push_back(tmp_xsec);
-	nFarNormParams++;
-
-	if (!(GetXSecParamID(i, 1) & 1)) {//non-Near affecting Far affecting norm parameters
-	  nFaronlyNormParams++;
-	}
-      }//End FarNormPars
-      else if (GetXSecParamID(i, 0) == -2) {//Far functional parameter
-        nFarFuncParams++;
-        FarFuncParsNames.push_back(GetParameterName(i));
-        FarFuncParsIndex.push_back(i);
-      }//End Far funcpars
-    }//End Far pars
-
-    //Near affecting parameters
-    if ((GetXSecParamID(i, 1) & 1)) {//Near affecting parameters
-      if (GetXSecParamID(i, 0) == -1) {//Near affecting norm pars
-		XsecNorms4 tmp_xsec;
-
-        tmp_xsec.name=GetParameterName(i);
-
+		/*
 		// Set the mode of the normalisation parameter
 		TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
 		std::vector<int> temp;
@@ -581,119 +884,250 @@ void covarianceXsec::ScanParameters() {
 		tmp_xsec.modes=temp;
 		temp.clear();
 
-        // Set the target of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.horncurrents=temp;
-        temp.clear();
+		// Set the target of the normalisation parameter
+		tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
+		for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		}
+		tmp_xsec.horncurrents=temp;
+		temp.clear();
 
-        // Set the target of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_elem->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.targets=temp;
-        temp.clear();
-
-	
-        // Set the pdg of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_nupdg->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.pdgs=temp;
-	temp.clear();
+		// Set the target of the normalisation parameter
+		tempVector = (TVectorD*)(xsec_param_norm_elem->At(i));
+		for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		}
+		tmp_xsec.targets=temp;
+		temp.clear();
 
 
-        // Set the preoscillation neutrino pdg of the normalisation parameter
-        tempVector = (TVectorD*)(xsec_param_norm_preoscnupdg->At(i));
-        for (int j = 0; j < tempVector->GetNrows(); ++j) {
-          temp.push_back(tempVector[0][j]);
-        }
-        tmp_xsec.preoscpdgs=temp;
-	temp.clear();
+		// Set the pdg of the normalisation parameter
+		tempVector = (TVectorD*)(xsec_param_norm_nupdg->At(i));
+		for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		}
+		tmp_xsec.pdgs=temp;
+		temp.clear();
 
 
-	//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
-	//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
-	bool haskinbounds=false;
+		// Set the preoscillation neutrino pdg of the normalisation parameter
+		tempVector = (TVectorD*)(xsec_param_norm_preoscnupdg->At(i));
+		for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		}
+		tmp_xsec.preoscpdgs=temp;
+		temp.clear();
+		*/
 
-	////////////////////
-	//New generic cuts things 
-	// just the same as for the Far affecting params above
-	////////////////////
-	
-	//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
-	if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0 ){
-	  haskinbounds = true;
-	  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-	  tmp_xsec.KinematicVarStr.push_back(std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()));
+		//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
+		//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
+		bool haskinbounds=false;
 
-	  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-	  std::vector<double> single_selec;
+		////////////////////
+		//New generic cuts things 
+		////////////////////
 
-	  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
-	  //a samplePDFFD daughter class
-	  single_selec.push_back(-999);
-	  single_selec.push_back((*xsec_kinematic_lb)(i));
-	  single_selec.push_back((*xsec_kinematic_ub)(i));
+		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
+		if( _fKinematicPars[i].size() > 0 ){
+		  std::cout << "Found " << _fKinematicPars[i].size() << " kinematic cuts for " << GetParameterName(i) << std::endl;
+		  haskinbounds = true;
 
-	  tmp_xsec.Selection.push_back(single_selec);
+		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
+		  tmp_xsec.KinematicVarStr = _fKinematicPars[i];
 
-	  std::cout << "Found kinematic bound on " << ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString() << " from " << single_selec[1] << " to " << single_selec[2] << " for parameter " << i << std::endl;
-	}
-	else{std::cout << "Did not find kinematic bound for param " << i << std::endl;}
+		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
+		  std::vector< std::vector<double> > Selections(_fKinematicPars[i].size());
+
+		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
+		  //a samplePDFFD daughter class
+		  std::cout << "Found kinematic bounds on " << GetParameterName(i) << std::endl;
+		  for(int KinVar_i = 0 ; KinVar_i < _fKinematicPars[i].size() ; ++KinVar_i) {
+			Selections[KinVar_i].push_back(-999.9);
+			Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][0]);
+			Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][1]);
+			std::cout << "  - " << _fKinematicPars[i][KinVar_i] << " from " << Selections[KinVar_i][1] << " to " << Selections[KinVar_i][2] << std::endl;
+		  }
+
+		  tmp_xsec.Selection = Selections;
+		}
+
+		/*
+		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
+		if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0){ 
+		  haskinbounds = true;
+		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
+		  tmp_xsec.KinematicVarStr.push_back(std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()));
+
+		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
+		  std::vector<double> single_selec;
+
+		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
+		  //a samplePDFFD daughter class
+		  single_selec.push_back((*xsec_kinematic_lb)(i));
+		  single_selec.push_back((*xsec_kinematic_ub)(i));
+		  tmp_xsec.Selection.push_back(single_selec);
+
+		}
+		else{
+		  std::cout << "~~~" << std::endl;
+		  std::cout << "Did not find kinematic bound for param " << i << std::endl;
+		  std::cout << "~~~" << std::endl;
+		}
+		*/
+
+		tmp_xsec.hasKinBounds=haskinbounds;
+		//End of kinematic bound checking	
+
+		// Set the global parameter index of the normalisation parameter
+		tmp_xsec.index=i;
+		//Add this parameter to the vector of parameters
+		FarNormParams.push_back(tmp_xsec);
+		nFarNormParams++;
+
+		if (!(GetXsecParamDetID(i) & 1)) {//non-Near affecting Far affecting norm parameters
+		  nFaronlyNormParams++;
+		}
+	  }//End FarNormPars
+	  else if (strcmp(GetXsecParamType(i), "functional") != 0){//Far functional parameter
+		nFarFuncParams++;
+		FarFuncParsNames.push_back(GetParameterName(i));
+		FarFuncParsIndex.push_back(i);
+	  }//End Far funcpars
+	}//End Far pars
+
+    //Near affecting parameters
+	if ((GetXsecParamDetID(i) & 1)) {//Near affecting parameters
+	  //Check if the parameter is normalisation parameter
+	  if (strcmp(GetXsecParamType(i), "Norm") == 0){//Near affecting norm pars
+		XsecNorms4 tmp_xsec;
+
+		tmp_xsec.name=GetParameterName(i);
+
+		// Set the mode of the normalisation parameter
+		/*TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
+		  std::vector<int> temp;
+		  for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		  temp.push_back(tempVector[0][j]);
+		  }
+		  */
+
+		tmp_xsec.modes=_fNormModes[i];
+		//temp.clear();
+
+		//ETA - these are no longer needed as stored as kinematic cuts
+		// need to think about how to add these into XsecNorms4 though.
+		// We could do it here as we have the kinematic cut information
+		// already stored.
+		// Set the target of the normalisation parameter
+		//tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
+		//for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		//  temp.push_back(tempVector[0][j]);
+		//}
+		//tmp_xsec.horncurrents=temp;
+		//temp.clear();
+
+		// Set the target of the normalisation parameter
+		//tempVector = (TVectorD*)(xsec_param_norm_elem->At(i));
+		//for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		//  temp.push_back(tempVector[0][j]);
+		//}
+		//tmp_xsec.targets=temp;
+		//temp.clear();
+
+		// Set the pdg of the normalisation parameter
+		//tempVector = (TVectorD*)(xsec_param_norm_nupdg->At(i));
+		//for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		//  temp.push_back(tempVector[0][j]);
+		//}
+		//tmp_xsec.pdgs=temp;
+		//temp.clear();
 
 
-	//IF YOU HAVE NEW KINEMATIC BOUNDS TO LOAD IN PUT THEM HERE
+		//// Set the preoscillation neutrino pdg of the normalisation parameter
+		//tempVector = (TVectorD*)(xsec_param_norm_preoscnupdg->At(i));
+		//for (int j = 0; j < tempVector->GetNrows(); ++j) {
+		//  temp.push_back(tempVector[0][j]);
+		//}
+		//tmp_xsec.preoscpdgs=temp;
+		//temp.clear();
 
-	tmp_xsec.hasKinBounds=haskinbounds;
-	//End of kinematic bound checking
-	
+		//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
+		//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
+		bool haskinbounds=false;
 
-	// Set the global parameter index of the normalisation parameter
-	tmp_xsec.index=i;
-		
-	//IF YOU HAVE NEW KINEMATIC BOUNDS TO LOAD IN PUT THEM HERE
+		////////////////////
+		//New generic cuts things 
+		// just the same as for the Far affecting params above
+		////////////////////
 
-	
+		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
+		if( _fKinematicPars[i].size() > 0 ){
+		  std::cout << "Found " << _fKinematicPars[i].size() << " kinematic cuts for " << GetParameterName(i) << std::endl;
+		  haskinbounds = true;
 
-	// Set the global parameter index of the normalisation parameter
-	tmp_xsec.index=i;
-	//Add this parameter to the vector of parameters
-	NearNormParams.push_back(tmp_xsec);
+		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
+		  tmp_xsec.KinematicVarStr = _fKinematicPars[i];
 
-        // Count how many normalisation parameters we have
-        nNearNormParams++;
-	
-        // Function parameters, such as BeRPA
-      }//End Near affecting normpars
-      else if (GetXSecParamID(i, 0) == -2) {//Near affecting func pars
-	
-        NearfuncParsNames.push_back(GetParameterName(i));
-        NearfuncParsIndex.push_back(i);
-        nNearFuncParams++;
-	
-        // If they are greater >= 0 it's a spline parameter
-      }//End Near affecting func pars
-      else if (GetXSecParamID(i, 0) >= 0) {
-        NearsplineParsNames.push_back(GetParameterName(i));
-        NearsplineParsIndex.push_back(i);
-        nNearSplineParams++;
-	
-	//Fill the name of the Far spline objects in the spline files
-	//NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
-      }//End Near affecting spline pars
-      else {
-	std::cerr << "Found a parameter in covarianceXsec which wasn't -2, -1 or above 0!" << std::endl;
-	std::cerr << "This is undefined behaviour currently, and implementation should change" << std::endl;
-	std::cerr << "Param " << GetParameterName(i) << " (param " << i << ") = " << GetXSecParamID(i, 0) << std::endl;
-	std::cerr << __LINE__ << ":" << __LINE__ << std::endl;
-	throw;
-      }
-    }//End Near affecting parameters
+		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
+		  std::vector< std::vector<double> > Selections(_fKinematicPars[i].size());
+
+		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
+		  //a samplePDFFD daughter class
+		  std::cout << "Found kinematic bounds on " << GetParameterName(i) << std::endl;
+		  for(int KinVar_i = 0 ; KinVar_i < _fKinematicPars[i].size() ; ++KinVar_i) {
+			  Selections[KinVar_i].push_back(-999.9);
+			  Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][0]);
+			  Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][1]);
+			  std::cout << "  - " << _fKinematicPars[i][KinVar_i] << " from " << Selections[KinVar_i][1] << " to " << Selections[KinVar_i][2] << std::endl;	
+		  }
+		  tmp_xsec.Selection = Selections;
+		}
+		else{std::cout << "Did not find kinematic bound for param " << i << std::endl;}
+
+		//IF YOU HAVE NEW KINEMATIC BOUNDS TO LOAD IN PUT THEM HERE
+
+		tmp_xsec.hasKinBounds=haskinbounds;
+		//End of kinematic bound checking
+
+		// Set the global parameter index of the normalisation parameter
+		tmp_xsec.index=i;
+
+		//IF YOU HAVE NEW KINEMATIC BOUNDS TO LOAD IN PUT THEM HERE
+
+		// Set the global parameter index of the normalisation parameter
+		tmp_xsec.index=i;
+		//Add this parameter to the vector of parameters
+		NearNormParams.push_back(tmp_xsec);
+
+		// Count how many normalisation parameters we have
+		nNearNormParams++;
+
+		// Function parameters, such as BeRPA
+	  }//End Near affecting normpars
+	  else if (strcmp(GetXsecParamType(i), "functional") != 0) {//Near affecting func pars
+
+		NearfuncParsNames.push_back(GetParameterName(i));
+		NearfuncParsIndex.push_back(i);
+		nNearFuncParams++;
+
+		// If they are greater >= 0 it's a spline parameter
+	  }//End Near affecting func pars
+	  else if (strcmp(GetXsecParamType(i), "Spline") != 0) {
+		NearsplineParsNames.push_back(GetParameterName(i));
+		NearsplineParsIndex.push_back(i);
+		nNearSplineParams++;
+
+		//Fill the name of the Far spline objects in the spline files
+		//NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
+	  }//End Near affecting spline pars
+	  else {
+		std::cerr << "Found a parameter in covarianceXsec which wasn't -2, -1 or above 0!" << std::endl;
+		std::cerr << "This is undefined behaviour currently, and implementation should change" << std::endl;
+		std::cerr << "Param " << GetParameterName(i) << " (param " << i << ") = " << GetXsecParamType(i) << std::endl;
+		std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+		//throw;
+	  }
+	}//End Near affecting parameters
   }
   
   // Now count the repeated parameters and save their indices and names
@@ -753,11 +1187,11 @@ void covarianceXsec::initParams(double fScale) {
     strcpy(fParNames[i], pname);
 
     // This just assign the initial parameters to the prior
-    fParInit[i] = (*xsec_param_prior)[i];
+    fParInit[i] = _fPreFitValue[i];//(*xsec_param_prior)[i];
     //fParInit[i] = (*xsec_param_nom)[i];
 
     // Any param with nom == 1 should be > 0
-    if ((*xsec_param_nom)(i) == 1) {
+    if (_fPreFitValue[i] == 1) {
       // If the fParInit is negative we should try to throw it above this
       // We don't really do this ever...
       while (fParInit[i] <= 0) {
@@ -792,7 +1226,9 @@ int covarianceXsec::CheckBounds(){
   #pragma omp parallel for reduction(+:NOutside)
   #endif
   for (int i = 0; i < nPars; i++){
-      if(fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]){
+      //if(fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]){
+      if(fParProp[i] > _fUB[i] || fParProp[i] < _fLB[i]){
+		std::cout << "fParProp at param " << i << " is " << fParProp[i] << " and UB is " << _fUB[i] << " and LB is " << _fLB[i] << std::endl;
         NOutside++;
       }
   }
@@ -876,7 +1312,7 @@ void covarianceXsec::Print() {
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << std::endl;;
 
   for (int i = 0; i < GetNumParams(); i++) {
-    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParameterName(i) << std::setw(2) << "|" << std::setw(10) << (*xsec_param_nom)(i) << std::setw(2) << "|" << std::setw(10) << (*xsec_param_prior)(i) << std::setw(2) << "|" << "+/- " << std::setw(11) << sqrt((*covMatrix)(i,i)) << std::setw(2) << "|" << std::setw(10) << (*xsec_param_lb)(i) << std::setw(2) << "|" << std::setw(10) << (*xsec_param_ub)(i) << "|" << std::setw(15) << fIndivStepScale[i] << std::endl;
+    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParameterName(i) << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLB[i] << std::setw(2) << "|" << std::setw(10) << _fUB[i] << "|" << std::setw(15) << fIndivStepScale[i] << std::endl;
   }
 
   std::cout << std::endl;
