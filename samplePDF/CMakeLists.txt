@@ -14,8 +14,8 @@ set(SamplePDF_header_files
 
 add_library(SamplePDF SHARED ${SamplePDF_implementation_files})
 
-target_include_directories(SamplePDF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(SamplePDF Splines Covariance Manager Prob3plusplus ROOT::ROOT)
+target_include_directories(SamplePDF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. )
+target_link_libraries(SamplePDF Splines Prob3plusplus)
 
 if(NOT ${CPU_ONLY})
   add_library(probGpu probGpu.cu)

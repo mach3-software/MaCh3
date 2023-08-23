@@ -27,10 +27,10 @@ if(NOT ${CPU_ONLY})
 
 else()
   add_library(Splines SHARED ${Splines_implementation_files_CPU})
-  target_include_directories(Splines PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+  target_include_directories(Splines INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 endif()
 
-target_link_libraries(Splines ThrowParms)
+target_link_libraries(Splines Covariance)
 
 set_target_properties(Splines PROPERTIES 
   PUBLIC_HEADER "${Splines_header_files}"
