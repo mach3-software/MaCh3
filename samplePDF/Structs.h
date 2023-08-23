@@ -1122,6 +1122,37 @@ inline int PDGToProbs(NuPDG pdg){
   return ReturnProbNu;
 }
 
+inline int ProbsToPDG(ProbNu NuType){
+
+  int ReturnNuPDG = -999;
+
+  switch (NuType){
+	case kProbNue:
+	  ReturnNuPDG = kNue;
+	  break;
+	case kProbNumu:
+	  ReturnNuPDG = kNumu;
+	  break;
+	case kProbNutau:
+	  ReturnNuPDG = kNutau;
+	  break;
+	case kProbNueBar:
+	  ReturnNuPDG = kNueBar;
+	  break;
+	case kProbNumuBar:
+	  ReturnNuPDG = kNumuBar;
+	  break;
+	case kProbNutauBar:
+	  ReturnNuPDG = kNutauBar;
+	  break;
+	default:
+	  std::cout << "Unrecognised NuType for the neutrino so can't map this to a PDG code" << std::endl;
+	  break;
+  }
+
+  return ReturnNuPDG;
+}
+
 // Make an enum of the test statistic that we're using
 enum TestStatistic {
   kPoisson,
