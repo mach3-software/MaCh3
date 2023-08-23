@@ -262,11 +262,6 @@ void covarianceXsec::ParseYAML(const char* FileName)
 
 
   std::cout << "Found " << _fNumPar << " systematics in yaml" << std::endl;
-  //These are not size _fNumPar
-  //_fNormModes = std::vector<std::vector<double> >;
-  //_fFDSplineNames = std::vector<std::string>(_fNumPar);
-  //_fFDSplineModes = std::vector<std::string>(_fNumPar);
-  //_fNDSplineNames = std::vector<std::string>(_fNumPar);
 
   //Vector of vectors of strings to contain potentially multiple variables that
   //might be cut on
@@ -372,59 +367,6 @@ void covarianceXsec::ParseYAML(const char* FileName)
 
 	   
 	 }
-
-	   //for(YAML::const_iterator it=.begin();it!=lineup.end();++it) {
-	   //  std::cout << "Playing at " << it->first.as<std::string>() << " is " << it->second.as<std::string>() << "\n";
-	   //}
-	   //std::cout << "---- pretty please: " << param["Systematic"]["KinematicCuts"][0][0] << std::endl;
-	   //std::cout << ".... pretty please: " << param["Systematic"]["KinematicCuts"]["TrueNeutrinoEnergy"] << std::endl;
-	   //std::cout << ".... pretty please: " << param["Systematic"]["KinematicCuts"]["TrueNeutrinoEnergy"][0] << std::endl;
-	   //std::cout << "Found a cut on " << KinematicCut << std::endl;
-
-	   //std::string KinematicCut = param["Systematic"]["KinematicCuts"][KinVar_i][0].as<std::string>();
-	   //std::cout << "Kinematic cut itself is of length " << param["Systematic"]["KinematicCuts"][KinVar_i].size() << std::endl;  
-	   //std::string KinematicCut = param["Systematic"]["KinematicCuts"][0].as<std::string>();
-	   //std::cout << "Anything please:    " << param["Systematic"]["KinematicCuts"][0] << std::endl;
-
-	   //std::cout << "Anything please:    " << param["Systematic"]["KinematicCuts"][0].first.as<std::string>() << std::endl;
-	 
-	 // ETA 
-	 // Now look for kinematic cuts that are applied for this parameter
-	 /*if (param["Systematic"]["KinematicCuts"]) {
-		for(auto const &KinVar : param["Systematic"]["KinematicCuts"]){
-		  std::string KinematicCut = KinVar.first.as<std::string>();
-		  std::cout << "Found a cut on " << KinematicCut << std::endl;
-		}
-		  //std::cout << "Kinematic cut is " << param["Systematic"]["KinematicCuts"].first.as<std::string>() << std::endl;
-		  //std::vector<std::string> kinpar_vec = param["kinematicpars"].as<std::vector<std::string>>();
-		  //kinematicpar->ResizeTo(kinpar_vec.size());
-		  //for(std::size_t k = 0; k < kinpar_vec.size(); k++){
-			//(*kinematicpar)(k)=StringToKinematicVar(kinpar_vec[k]);
-		//	(*kinematicpar)(k) = -999;
-	  // }	
-		  
-	  }
-	  else{std::cout << "No Kinematic cut found" << std::endl;}
-	  */
-      //_fKinematicPars.push_back(kinematicpar->Clone());
-
-	  /*
-	  _fKinematicBounds->ResizeTo(0,0);
-	  if(param["kinematicbounds"]) {
-		if(!param["kinematicbounds"].IsNull()) {
-		  std::vector<std::vector<double>> kinbound_vec = param["kinematicbounds"].as<std::vector<std::vector<double>>>();
-		  //_fKinematicBounds->ResizeTo(kinbound_vec.size(),2);
-		  for(std::size_t k = 0; k < kinbound_vec.size(); k++) {
-			if(kinbound_vec[k].size()!=2) {
-			  exit(5);
-			}
-			(*kinematicbound)(k,0)=kinbound_vec[k][0];
-			(*kinematicbound)(k,1)=kinbound_vec[k][1];
-		  }
-		}
-	  }
-	  _fKinematicBounds.push_back(kinematicbound->Clone());
-	  */
        
 	 //Also loop through the correlations
 	 if(param["Systematic"]["Correlations"]) {
@@ -485,8 +427,6 @@ void covarianceXsec::ParseYAML(const char* FileName)
    return;
 }
 
-
-
 // ********************************************
 covarianceXsec::~covarianceXsec() {
 // ********************************************
@@ -512,8 +452,6 @@ const int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
 // DB Grab the Spline Names for the relevant DetID
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int DetID) {
 
-  std::cout << "Given DetID of " << DetID << std::endl;
-  std::cout << "nPars is " << nPars << std::endl;
   std::vector<std::string> returnVec;
   for (int i = 0; i < nPars; ++i) {
     if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
@@ -534,10 +472,8 @@ const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(i
 
   int FDSplineCounter = 0;
   for (int i = 0; i < nPars; ++i) {
-	std::cout << "checking par " << i << " in GetSplineFileParsNamesFromDetID" << std::endl;
     if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		std::cout << "Pushing back SplineFileParsNames with " << _fFDSplineNames[FDSplineCounter] << std::endl;
         returnVec.push_back(_fFDSplineNames[FDSplineCounter]); //Append spline name
 		FDSplineCounter++;
       }
@@ -559,18 +495,9 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   for (int i = 0; i < nPars; ++i) {
 	if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
 	  if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-
-		/*TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
-		std::vector<int> temp;
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		*/
-		std::cout << "pushing back SplineModeVec for parameter " << i << std::endl;
 		returnVec.push_back(_fFDSplineModes[nFDSplineCounter]);	
 		nFDSplineCounter++;
 	  }
-	  else{std::cout << "Didn't find a spline parameter at param" << i << std::endl;}
 	}
   }
 
@@ -586,7 +513,6 @@ const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
   for (int i = 0; i < nPars; ++i) {
     if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		std::cout << "PUSHING BACK WITH PAR INDEX OF " << i << std::endl;
 		returnVec.push_back(i);
       }
     }
@@ -602,9 +528,6 @@ const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
 const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
   std::vector<XsecNorms4> returnVec;
   int norm_counter = 0;
-
-  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-  std::cout << "IN covarianceXsec::GetNormParsFromDetID()" << std::endl;
 
   for (int i = 0; i < nPars; ++i) {
 	if (strcmp(GetXsecParamType(i), "Norm") == 0) { //If parameter is implemented as a normalisation
@@ -628,6 +551,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		norm.modes = _fNormModes[norm_counter];
 
 		// Set the target of the normalisation parameter
+		// ETA - we can remove these from XsecNorms4 now I think
 		/*
 		tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
 		for (int j = 0; j < tempVector->GetNrows(); ++j) {
@@ -671,40 +595,18 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 
 		///
 		if(_fKinematicPars.at(i).size() > 0){
-		  std::cout << "Found Kinematic bound for parameter " << i << std::endl;
 		  HasKinBounds = true;
 		}
 
 		for(int KinematicCut_i = 0 ; KinematicCut_i < _fKinematicPars[i].size() ; ++KinematicCut_i){
 		  //Push back with the string for the kinematic cut
-		  std::cout << "----------------------" << std::endl;
-		  std::cout << "Will apply a cut on " << _fKinematicPars.at(i).at(KinematicCut_i) << std::endl;
+		  //std::cout << "----------------------" << std::endl;
+		  //std::cout << "Will apply a cut on " << _fKinematicPars.at(i).at(KinematicCut_i) << std::endl;
 		  norm.KinematicVarStr.push_back(_fKinematicPars.at(i).at(KinematicCut_i));
-		  std::cout << "With bounds " << _fKinematicBounds.at(i).at(KinematicCut_i).at(0) << " to " << _fKinematicBounds.at(i).at(KinematicCut_i).at(1) << std::endl;
+		  //std::cout << "With bounds " << _fKinematicBounds.at(i).at(KinematicCut_i).at(0) << " to " << _fKinematicBounds.at(i).at(KinematicCut_i).at(1) << std::endl;
 		  //Push back with the bounds for the kinematic cut
           norm.Selection.push_back(_fKinematicBounds.at(i).at(KinematicCut_i));
 		}
-
-		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
-		/*if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0 ){
-		  std::cout << "Found Kinematic bound for parameter " << i << std::endl;
-		  std::cout << "Will apply a cut on " << std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()) << std::endl;
-		  std::cout << "With lower bound " << (*xsec_kinematic_lb)(i) << " and upper bound " << (*xsec_kinematic_ub)(i) << std::endl; 
-		  HasKinBounds = true;
-		  std::cout << "PUSHED BACK KinematicVarStr with " << std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()) << std::endl;
-		  std::cout << "Setting HasKinBounds to be " << HasKinBounds << std::endl;
-		  norm.KinematicVarStr.push_back(std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()));
-
-		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-		  std::vector<double> single_selec;
-
-		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
-		  //a samplePDFFD daughter class
-		  single_selec.push_back((*xsec_kinematic_lb)(i));
-		  single_selec.push_back((*xsec_kinematic_ub)(i));
-		  norm.Selection.push_back(single_selec);
-		}
-		*/
 
 		norm.hasKinBounds=HasKinBounds;
 		//End of kinematic bound checking
@@ -829,10 +731,7 @@ void covarianceXsec::ScanParameters() {
 	  // Now check if it's a spline parameter or not
 	  //This needs to be updated to check against a string
 	  if (strcmp(GetXsecParamType(i), "Spline") == 0) {//FarSplinePars
-		std::cout << "Found a spline for far params at index " << i << std::endl;
 		std::cout << GetXsecParamType(i) << std::endl;
-		std::cout << "Strcmp of paramtype with spline is " << strcmp(GetXsecParamType(i), "Spline") << std::endl;
-		std::cout << "Strcmp of paramtype with Norm is " << strcmp(GetXsecParamType(i), "Norm") << std::endl;
 		FarSplineParsNames.push_back(GetParameterName(i));
 
 		//Fill the name of the Far spline objects in the spline files
@@ -841,13 +740,6 @@ void covarianceXsec::ScanParameters() {
 
 		FarSplineParsIndex.push_back(i);
 
-
-		/*TVectorD* tempVector = (TVectorD*)(xsec_param_fd_spline_modes->At(i));
-		std::vector<int> temp;
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		*/
 		for(int Mode_i = 0 ; Mode_i < _fFDSplineModes[nFarSplineParams].size() ; ++Mode_i){
 		  std::cout << "Mode to apply to is " << _fFDSplineModes[nFarSplineParams][Mode_i] << std::endl;
 		}
@@ -859,18 +751,8 @@ void covarianceXsec::ScanParameters() {
 		// Or a normalisation parameter
 	  } //End FarSplinePars
 	  else if (strcmp(GetXsecParamType(i), "Norm") == 0) {//FarNormPars
-		std::cout << "Par " << i << " is a normalisation parameter" << std::endl;
 		XsecNorms4 tmp_xsec;
 		tmp_xsec.name=GetParameterName(i);
-
-
-		// Set the mode of the normalisation parameter
-		/*TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
-		  std::vector<int> temp;
-		  for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		  }
-		  */
 
 		tmp_xsec.modes=_fNormModes[i];
 
@@ -929,7 +811,6 @@ void covarianceXsec::ScanParameters() {
 
 		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
 		if( _fKinematicPars[i].size() > 0 ){
-		  std::cout << "Found " << _fKinematicPars[i].size() << " kinematic cuts for " << GetParameterName(i) << std::endl;
 		  haskinbounds = true;
 
 		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
@@ -940,7 +821,6 @@ void covarianceXsec::ScanParameters() {
 
 		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
 		  //a samplePDFFD daughter class
-		  std::cout << "Found kinematic bounds on " << GetParameterName(i) << std::endl;
 		  for(int KinVar_i = 0 ; KinVar_i < _fKinematicPars[i].size() ; ++KinVar_i) {
 			Selections[KinVar_i].push_back(-999.9);
 			Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][0]);
@@ -950,30 +830,6 @@ void covarianceXsec::ScanParameters() {
 
 		  tmp_xsec.Selection = Selections;
 		}
-
-		/*
-		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
-		if( ((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString().Length() > 0){ 
-		  haskinbounds = true;
-		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-		  tmp_xsec.KinematicVarStr.push_back(std::string(((TObjString*)xsec_kinematic_type->At(norm_counter))->GetString()));
-
-		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
-		  std::vector<double> single_selec;
-
-		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
-		  //a samplePDFFD daughter class
-		  single_selec.push_back((*xsec_kinematic_lb)(i));
-		  single_selec.push_back((*xsec_kinematic_ub)(i));
-		  tmp_xsec.Selection.push_back(single_selec);
-
-		}
-		else{
-		  std::cout << "~~~" << std::endl;
-		  std::cout << "Did not find kinematic bound for param " << i << std::endl;
-		  std::cout << "~~~" << std::endl;
-		}
-		*/
 
 		tmp_xsec.hasKinBounds=haskinbounds;
 		//End of kinematic bound checking	
@@ -1002,14 +858,6 @@ void covarianceXsec::ScanParameters() {
 		XsecNorms4 tmp_xsec;
 
 		tmp_xsec.name=GetParameterName(i);
-
-		// Set the mode of the normalisation parameter
-		/*TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
-		  std::vector<int> temp;
-		  for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		  }
-		  */
 
 		tmp_xsec.modes=_fNormModes[i];
 		//temp.clear();
@@ -1062,7 +910,6 @@ void covarianceXsec::ScanParameters() {
 
 		//Only consider the kinematic string and the boundaries if you've actually given it a string to use...
 		if( _fKinematicPars[i].size() > 0 ){
-		  std::cout << "Found " << _fKinematicPars[i].size() << " kinematic cuts for " << GetParameterName(i) << std::endl;
 		  haskinbounds = true;
 
 		  //ETA - This can be a vector :) can provide different kinematic variables to cut on
@@ -1073,12 +920,10 @@ void covarianceXsec::ScanParameters() {
 
 		  //ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
 		  //a samplePDFFD daughter class
-		  std::cout << "Found kinematic bounds on " << GetParameterName(i) << std::endl;
 		  for(int KinVar_i = 0 ; KinVar_i < _fKinematicPars[i].size() ; ++KinVar_i) {
 			  Selections[KinVar_i].push_back(-999.9);
 			  Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][0]);
 			  Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][1]);
-			  std::cout << "  - " << _fKinematicPars[i][KinVar_i] << " from " << Selections[KinVar_i][1] << " to " << Selections[KinVar_i][2] << std::endl;	
 		  }
 		  tmp_xsec.Selection = Selections;
 		}
@@ -1228,7 +1073,7 @@ int covarianceXsec::CheckBounds(){
   for (int i = 0; i < nPars; i++){
       //if(fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]){
       if(fParProp[i] > _fUB[i] || fParProp[i] < _fLB[i]){
-		std::cout << "fParProp at param " << i << " is " << fParProp[i] << " and UB is " << _fUB[i] << " and LB is " << _fLB[i] << std::endl;
+		std::cout << "fParProp at param " << i << " is out of bounds, param is at " << fParProp[i] << " and UB is " << _fUB[i] << " and LB is " << _fLB[i] << std::endl;
         NOutside++;
       }
   }
