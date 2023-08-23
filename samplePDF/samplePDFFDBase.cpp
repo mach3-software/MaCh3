@@ -1256,7 +1256,7 @@ void samplePDFFDBase::fillSplineBins() {
 	  }
 
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
-	  if(EventSplines.size() > 0 ){std::cout << "FOUND AT LEAST A SPLINE FOR EVENT" << j << std::endl;}
+
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
 
 	  //
