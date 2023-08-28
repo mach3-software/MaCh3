@@ -687,8 +687,8 @@ void MCMCProcessor::MakeCredibleIntervals() {
 
   //Should be easy way to set credible intervals via config keep it for now
   const int nCredible = 3;
-  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
-  const Color_t CredibleRegionsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
+  const double CredibleIntervals[nCredible] = {0.99, 0.90, 0.68};
+  const Color_t CredibleIntervalsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
   TH1D** hpost_copy = new TH1D*[nDraw];
   TH1D*** hpost_cl = new TH1D**[nDraw];
 
@@ -700,7 +700,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
 
     for (int j = 0; j < nCredible; ++j)
     {
-      hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleRegions[j]));
+      hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j]));
       //KS: Reset to get rid to TF1 otherwise we run into segfault :(
       hpost_cl[i][j]->Reset("");
       hpost_cl[i][j]->Fill(0.0, 0.0);
@@ -719,8 +719,8 @@ void MCMCProcessor::MakeCredibleIntervals() {
       // Scale the histograms before gettindg credible intervals
       hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
 
-      GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleRegions[j]);
-      hpost_cl[i][j]->SetFillColor(CredibleRegionsColours[j]);
+      GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleIntervals[j]);
+      hpost_cl[i][j]->SetFillColor(CredibleIntervalsColours[j]);
       hpost_cl[i][j]->SetLineWidth(1);
     }
     hpost_copy[i]->GetYaxis()->SetTitleOffset(1.8);
@@ -762,7 +762,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
     for (int j = 0; j < nCredible; ++j)
         hpost_cl[i][j]->Draw("HIST SAME");
     for (int j = nCredible-1; j >= 0; --j)
-        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f") ;
+        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f") ;
     legend->AddEntry(Asimov, Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
     legend->Draw("SAME");
     Asimov->Draw("SAME");
@@ -1307,8 +1307,127 @@ void MCMCProcessor::DrawCovariance() {
   delete hCov;
   delete hCovSq;
   delete hCorr;
+
+  DrawCorrelations1D();
 }
 
+
+// *********************
+//KS: Make the 1D projections of Correlations inspired by Henry's slides (page 28) https://www.t2k.org/asg/oagroup/meeting/2023/2023-07-10-oa-pre-meeting/MaCh3FDUpdate
+void MCMCProcessor::DrawCorrelations1D() {
+// *********************
+
+  //KS: Store it as we go back to them at the end
+  const double TopMargin  = Posterior->GetTopMargin();
+  const double BottomMargin  = Posterior->GetBottomMargin();
+  const int OptTitle = gStyle->GetOptTitle();
+
+  Posterior->SetTopMargin(0.1);
+  Posterior->SetBottomMargin(0.2);
+  gStyle->SetOptTitle(1);
+
+  const int Nhists = 3;
+  //KS: Highest value is just meant bo be sliglhy higher than 1 to catch >,
+  const double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
+  const Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
+
+  TH1D ***Corr1DHist = new TH1D**[nDraw]();
+  //KS: Initialising ROOT objects is never is in MP loop
+  for(int i = 0; i < nDraw; i++)
+  {
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+    GetNthParameter(i, Prior, PriorError, Title);
+
+    Corr1DHist[i] = new TH1D*[Nhists]();
+    for(int j = 0; j < Nhists; j++)
+    {
+      Corr1DHist[i][j] = new TH1D(Form("Corr1DHist_%i_%i", i, j), Form("Corr1DHist_%i_%i", i, j), nDraw, 0, nDraw);
+      Corr1DHist[i][j]->SetTitle(Form("%s",Title.Data()));
+      Corr1DHist[i][j]->GetYaxis()->SetTitle("Correlation");
+      Corr1DHist[i][j]->SetFillColor(CorrColours[j]);
+      Corr1DHist[i][j]->SetLineColor(kBlack);
+
+      for (int k = 0; k < nDraw; ++k)
+      {
+        TString Title_y = "";
+        double Prior_y = 1.0;
+        double PriorError_y = 1.0;
+        GetNthParameter(k, Prior_y, PriorError_y, Title_y);
+        Corr1DHist[i][j]->GetXaxis()->SetBinLabel(k+1, Title_y.Data());
+      }
+
+    }
+  }
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for(int i = 0; i < nDraw; i++)
+  {
+    for(int j = 0; j < nDraw; j++)
+    {
+      for(int k = 0; k < Nhists; k++)
+      {
+        const double TempEntry = std::fabs((*Correlation)(i,j));
+        if(Thresholds[k+1] > TempEntry && TempEntry >= Thresholds[k])
+        {
+          Corr1DHist[i][k]->SetBinContent(j+1, (*Correlation)(i,j));
+        }
+      }
+    }
+  }
+
+  TDirectory *CorrDir = OutputFile->mkdir("Corr1D");
+  CorrDir->cd();
+
+  for(int i = 0; i < nDraw; i++)
+  {
+    if (IamVaried[i] == false) continue;
+
+    Corr1DHist[i][0]->SetMaximum(+1.);
+    Corr1DHist[i][0]->SetMinimum(-1.);
+    Corr1DHist[i][0]->Draw();
+    for(int k = 1; k < Nhists; k++)
+    {
+      Corr1DHist[i][k]->Draw("SAME");
+    }
+
+    TLegend *leg = new TLegend(0.3, 0.75, 0.6, 0.90);
+    leg->SetTextSize(0.02);
+    for(int k = 0; k < Nhists; k++)
+    {
+      leg->AddEntry(Corr1DHist[i][k], Form("%.2f > |Corr| >= %.2f", Thresholds[k+1], Thresholds[k]), "f");
+    }
+    leg->SetLineColor(0);
+    leg->SetLineStyle(0);
+    leg->SetFillColor(0);
+    leg->SetFillStyle(0);
+    leg->Draw("SAME");
+
+    Posterior->Write(Corr1DHist[i][0]->GetTitle());
+    if(printToPDF) Posterior->Print(CanvasName);
+
+    delete leg;
+  }
+
+  for(int i = 0; i < nDraw; i++)
+  {
+    for(int k = 1; k < Nhists; k++)
+    {
+      delete Corr1DHist[i][k];
+    }
+    delete[] Corr1DHist[i];
+  }
+  delete[] Corr1DHist;
+  OutputFile->cd();
+
+  Posterior->SetTopMargin(TopMargin);
+  Posterior->SetBottomMargin(BottomMargin);
+  gStyle->SetOptTitle(OptTitle);
+
+}
 
 // *********************
 // Make fancy Credible Intervals plots

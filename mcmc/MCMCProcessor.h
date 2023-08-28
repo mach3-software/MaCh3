@@ -77,21 +77,21 @@ class MCMCProcessor {
     void ResetHistograms();
     
     // Get the number of parameters
-    int GetNParams() { return nDraw; };
-    int GetNFlux() { return nFlux; };
-    int GetNXSec() { return nParam[kXSecPar]; };
-    int GetNND() { return nParam[kND280Par]; };
-    int GetNFD() { return nParam[kFDDetPar]; };
-    int GetOSC() { return nParam[kOSCPar]; };
+    inline int GetNParams() { return nDraw; };
+    inline int GetNFlux() { return nFlux; };
+    inline int GetNXSec() { return nParam[kXSecPar]; };
+    inline int GetNND() { return nParam[kND280Par]; };
+    inline int GetNFD() { return nParam[kFDDetPar]; };
+    inline int GetOSC() { return nParam[kOSCPar]; };
         
     inline TH1D* const GetHpost(int i) { return hpost[i]; };
 
-    std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
-    std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
-    std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
-    std::string const & GetNDruns()   const { return NDruns; };
-    std::vector<std::string> const & GetNDsel() const {return NDsel;};
+    inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
+    inline std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
+    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
+    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
+    inline std::string const & GetNDruns()   const { return NDruns; };
+    inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
     // Draw the post-fit comparisons
     void DrawPostfit();
@@ -139,6 +139,7 @@ class MCMCProcessor {
   private:
     inline TH1D* MakePrefit();
     inline void MakeOutputFile();
+    inline void DrawCorrelations1D();
 
     // Read Matrices
     inline void ReadInputCov();
