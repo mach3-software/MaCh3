@@ -1331,6 +1331,12 @@ void MCMCProcessor::DrawCorrelations1D() {
   const double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
   const Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
 
+  //KS: This strore neccesary entires for stripped covariance which strore only "menaingfull correlations
+  std::vector<std::vector<double>> CorrOfInterest;
+  CorrOfInterest.resize(nDraw);
+  std::vector<std::vector<std::string>> NameCorrOfInterest;
+  NameCorrOfInterest.resize(nDraw);
+
   TH1D ***Corr1DHist = new TH1D**[nDraw]();
   //KS: Initialising ROOT objects is never is in MP loop
   for(int i = 0; i < nDraw; i++)
@@ -1376,6 +1382,11 @@ void MCMCProcessor::DrawCorrelations1D() {
           Corr1DHist[i][k]->SetBinContent(j+1, (*Correlation)(i,j));
         }
       }
+      if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold && i != j)
+      {
+        CorrOfInterest[i].push_back((*Correlation)(i,j));
+        NameCorrOfInterest[i].push_back(Corr1DHist[i][0]->GetXaxis()->GetBinLabel(j+1));
+      }
     }
   }
 
@@ -1410,6 +1421,36 @@ void MCMCProcessor::DrawCorrelations1D() {
     if(printToPDF) Posterior->Print(CanvasName);
 
     delete leg;
+  }
+
+  //KS: Plot only meaninfull correlations
+  for(int i = 0; i < nDraw; i++)
+  {
+    const int size = CorrOfInterest[i].size();
+
+    if(size == 0) continue;
+    TH1D* Corr1DHist_Reduced = new TH1D("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
+
+    Corr1DHist_Reduced->SetTitle(Corr1DHist[i][0]->GetTitle());
+    Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
+    Corr1DHist_Reduced->SetFillColor(kBlue);
+    Corr1DHist_Reduced->SetLineColor(kBlue);
+    Corr1DHist_Reduced->GetXaxis()->LabelsOption("v");
+
+    for (int j = 0; j < size; ++j)
+    {
+      Corr1DHist_Reduced->GetXaxis()->SetBinLabel(j+1, NameCorrOfInterest[i][j].c_str());
+      Corr1DHist_Reduced->SetBinContent(j+1, CorrOfInterest[i][j]);
+    }
+
+    Corr1DHist_Reduced->SetMaximum(+1.);
+    Corr1DHist_Reduced->SetMinimum(-1.);
+    Corr1DHist_Reduced->Draw();
+
+    Posterior->Write(Form("%s_Red", Corr1DHist_Reduced->GetTitle()));
+    if(printToPDF) Posterior->Print(CanvasName);
+
+    delete Corr1DHist_Reduced;
   }
 
   for(int i = 0; i < nDraw; i++)
