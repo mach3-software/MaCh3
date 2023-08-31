@@ -135,7 +135,50 @@ class MCMCProcessor {
     inline void SetnBatches(int Batches){nBatches = Batches; };
     inline void SetnLags(int nLags){AutoCorrLag = nLags; };
     inline void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
-    
+    inline void SetPosterior1DCut(std::string Cut){Posterior1DCut = Cut; };
+
+    inline void SetCredibleIntervals(std::vector<double> Intervals)
+    {
+      if(Intervals.size() > 1)
+      {
+        for(unsigned int i = 1; i < Intervals.size(); i++ )
+        {
+          if(Intervals[i] > Intervals[i-1])
+          {
+            std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+            std::cerr<<Intervals[i] <<" "<<Intervals[i-1]<<std::endl;
+            std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+            std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+            throw;
+          }
+        }
+      }
+      Credible_Intervals = Intervals;
+    };
+    inline void SetCredibleIntervalsColours(std::vector<Color_t> Intervals){Credible_IntervalsColours = Intervals; };
+
+    inline void SetCredibleRegions(std::vector<double> Intervals)
+    {
+      if(Intervals.size() > 1)
+      {
+        for(unsigned int i = 1; i < Intervals.size(); i++ )
+        {
+          if(Intervals[i] > Intervals[i-1])
+          {
+            std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+            std::cerr<<Intervals[i] <<" "<<Intervals[i-1]<<std::endl;
+            std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+            std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+            throw;
+          }
+        }
+      }
+      Credible_Regions = Intervals;
+    };
+    inline void SetCredibleRegionStyle(std::vector<Style_t> Intervals){Credible_RegionStyle = Intervals; };
+    inline void SetCredibleRegionColor(std::vector<Color_t> Intervals){Credible_RegionColor = Intervals; };
+    inline void SetCredibleInSigmas(bool Intervals){CredibleInSigmas = Intervals; };
+
   private:
     inline TH1D* MakePrefit();
     inline void MakeOutputFile();
@@ -162,7 +205,7 @@ class MCMCProcessor {
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
     inline std::string GetJeffreysScale(const double BayesFactor);
-
+    inline double GetSigmaValue(int sigma);
 
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();
@@ -185,6 +228,7 @@ class MCMCProcessor {
 
     TChain *Chain;
     std::string StepCut;
+    std::string Posterior1DCut;
     int BurnInCut;
     int nBranches;
     //KS: For merged chains number of entires will be different fron nSteps
@@ -308,6 +352,16 @@ class MCMCProcessor {
     float* ParamSums_gpu;
     float* DenomSum_gpu;
   #endif
+
+  //KS: Credible Intervals/Regions related
+  std::vector<double> Credible_Intervals;
+  std::vector<Color_t> Credible_IntervalsColours;
+
+  std::vector<double> Credible_Regions;
+  std::vector<Style_t> Credible_RegionStyle;
+  std::vector<Color_t> Credible_RegionColor;
+  //KS: If true credible stuff is done in sigmas not %
+  bool CredibleInSigmas;
 };
 
 #endif

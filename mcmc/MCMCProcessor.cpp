@@ -85,6 +85,8 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nBins = 70;
   DrawRange = 1.5;
   
+  Posterior1DCut = "";
+  CredibleInSigmas = false;
   //KS:Those keep basic information for ParameterEnum
   ParamNames.resize(kNParameterEnum);
   ParamCentral.resize(kNParameterEnum);
@@ -291,8 +293,17 @@ void MCMCProcessor::MakePostfit() {
     hpost[i]->SetMinimum(0);
     hpost[i]->GetYaxis()->SetTitle("Steps");
     hpost[i]->GetYaxis()->SetNoExponent(false);
+
+    //KS: Apply additional Cuts, like mass ordering
+    std::string CutPosterior1D = "";
+    if(Posterior1DCut != "")
+    {
+      CutPosterior1D = StepCut +" && " + Posterior1DCut;
+    }
+    else CutPosterior1D = StepCut;
+
     // Project BranchNames[i] onto hpost, applying stepcut
-    Chain->Project(BranchNames[i], BranchNames[i], StepCut.c_str());
+    Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -437,10 +448,17 @@ void MCMCProcessor::DrawPostfit() {
   // cd into the output file
   OutputFile->cd();
  
+  std::string CutPosterior1D = "";
+  if(Posterior1DCut != "")
+  {
+    CutPosterior1D = StepCut +" && " + Posterior1DCut;
+  }
+  else CutPosterior1D = StepCut;
+
   // Make a TH1D of the central values and the errors
   TH1D *paramPlot = new TH1D("paramPlot", "paramPlot", nDraw, 0, nDraw);
   paramPlot->SetName("mach3params");
-  paramPlot->SetTitle(StepCut.c_str());
+  paramPlot->SetTitle(CutPosterior1D.c_str());
   paramPlot->SetFillStyle(3001);
   paramPlot->SetFillColor(kBlue-1);
   paramPlot->SetMarkerColor(paramPlot->GetFillColor());
@@ -630,21 +648,21 @@ void MCMCProcessor::DrawPostfit() {
       paramPlot->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot->GetXaxis()->SetRangeUser(Start, NDbinCounter);
       paramPlot->GetXaxis()->SetTitle("");
-      paramPlot->SetTitle(StepCut.c_str());
+      paramPlot->SetTitle(CutPosterior1D.c_str());
       paramPlot->GetXaxis()->LabelsOption("v");
 
       paramPlot_Gauss->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot_Gauss->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot_Gauss->GetXaxis()->SetRangeUser(Start, NDbinCounter);
       paramPlot_Gauss->GetXaxis()->SetTitle("");
-      paramPlot_Gauss->SetTitle(StepCut.c_str());
+      paramPlot_Gauss->SetTitle(CutPosterior1D.c_str());
       paramPlot_Gauss->GetXaxis()->LabelsOption("v");
 
       paramPlot_HPD->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot_HPD->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot_HPD->GetXaxis()->SetRangeUser(Start, NDbinCounter);
       paramPlot_HPD->GetXaxis()->SetTitle("");
-      paramPlot_HPD->SetTitle(StepCut.c_str());
+      paramPlot_HPD->SetTitle(CutPosterior1D.c_str());
       paramPlot_HPD->GetXaxis()->LabelsOption("v");
 
       prefit->Write(("param_"+NDname+"_prefit").c_str());
@@ -685,10 +703,22 @@ void MCMCProcessor::MakeCredibleIntervals() {
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
-  //Should be easy way to set credible intervals via config keep it for now
-  const int nCredible = 3;
-  const double CredibleIntervals[nCredible] = {0.99, 0.90, 0.68};
-  const Color_t CredibleIntervalsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
+  //Load values set via config or executable
+  std::vector<double> CredibleIntervals = Credible_Intervals;
+  std::vector<Color_t> CredibleIntervalsColours = Credible_IntervalsColours;
+  //Nothing was passed via config so use default values which are fancy ;)
+  if(CredibleIntervals.size() == 0 && CredibleIntervalsColours.size() == 0)
+  {
+    CredibleIntervals.insert(CredibleIntervals.end(), { 0.99, 0.90, 0.68 });
+    CredibleIntervalsColours.insert(CredibleIntervalsColours.end(), { kCyan+4, kCyan-2, kCyan-10 });
+  }
+  if(CredibleIntervals.size() != CredibleIntervalsColours.size())
+  {
+    std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  const int nCredible = CredibleIntervals.size();
   TH1D** hpost_copy = new TH1D*[nDraw];
   TH1D*** hpost_cl = new TH1D**[nDraw];
 
@@ -701,6 +731,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
     for (int j = 0; j < nCredible; ++j)
     {
       hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j]));
+
       //KS: Reset to get rid to TF1 otherwise we run into segfault :(
       hpost_cl[i][j]->Reset("");
       hpost_cl[i][j]->Fill(0.0, 0.0);
@@ -719,7 +750,18 @@ void MCMCProcessor::MakeCredibleIntervals() {
       // Scale the histograms before gettindg credible intervals
       hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
 
-      GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleIntervals[j]);
+      //KS: We have sliglhy different approach depdening if you passed percentage or sigmas
+      if(CredibleInSigmas)
+      {
+        //KS: Convert sigmas into percentage
+        double CredInter = GetSigmaValue((int)std::round(CredibleIntervals[j]));
+        GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredInter);
+      }
+      else
+      {
+        GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleIntervals[j]);
+      }
+
       hpost_cl[i][j]->SetFillColor(CredibleIntervalsColours[j]);
       hpost_cl[i][j]->SetLineWidth(1);
     }
@@ -762,7 +804,12 @@ void MCMCProcessor::MakeCredibleIntervals() {
     for (int j = 0; j < nCredible; ++j)
         hpost_cl[i][j]->Draw("HIST SAME");
     for (int j = nCredible-1; j >= 0; --j)
-        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f") ;
+    {
+      if(CredibleInSigmas)
+        legend->AddEntry(hpost_cl[i][j], Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
+      else
+        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f");
+    }
     legend->AddEntry(Asimov, Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
     legend->Draw("SAME");
     Asimov->Draw("SAME");
@@ -1435,13 +1482,13 @@ void MCMCProcessor::DrawCorrelations1D() {
     Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
     Corr1DHist_Reduced->SetFillColor(kBlue);
     Corr1DHist_Reduced->SetLineColor(kBlue);
-    Corr1DHist_Reduced->GetXaxis()->LabelsOption("v");
 
     for (int j = 0; j < size; ++j)
     {
       Corr1DHist_Reduced->GetXaxis()->SetBinLabel(j+1, NameCorrOfInterest[i][j].c_str());
       Corr1DHist_Reduced->SetBinContent(j+1, CorrOfInterest[i][j]);
     }
+    Corr1DHist_Reduced->GetXaxis()->LabelsOption("v");
 
     Corr1DHist_Reduced->SetMaximum(+1.);
     Corr1DHist_Reduced->SetMinimum(-1.);
@@ -1478,12 +1525,25 @@ void MCMCProcessor::MakeCredibleRegions() {
   if(hpost2D[0][0] == NULL) MakeCovariance_MP();
   std::cout << "Making Credible Regions "<< std::endl;
 
-  //Should be easy way to set credible intervals via config keep it for now
-  const int nCredible = 3;
-  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
-  const Style_t CredibleRegionStyle[nCredible] = {kDashed, kSolid, kDotted};
-  const Color_t CredibleRegionColor[nCredible] = {kGreen-3, kGreen-10, kGreen};
+  //Load values set via config or executable
+  std::vector<double> CredibleRegions = Credible_Regions;
+  std::vector<Style_t> CredibleRegionStyle = Credible_RegionStyle;
+  std::vector<Color_t> CredibleRegionColor = Credible_RegionColor;
 
+  //Nothing was passed via config so use default values which are still fancy
+  if(CredibleRegions.size() == 0 && CredibleRegionStyle.size() == 0 && CredibleRegionColor.size() == 0)
+  {
+    CredibleRegions.insert(CredibleRegions.end(), { 0.99, 0.90, 0.68 });
+    CredibleRegionStyle.insert(CredibleRegionStyle.end(), { kDashed, kSolid, kDotted });
+    CredibleRegionColor.insert(CredibleRegionColor.end(), { kGreen-3, kGreen-10, kGreen });
+  }
+  if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
+  {
+    std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  const int nCredible = CredibleRegions.size();
   TH2D*** hpost_2D_copy = new TH2D**[nDraw];
   TH2D**** hpost_2D_cl = new TH2D***[nDraw];
 
@@ -1514,7 +1574,16 @@ void MCMCProcessor::MakeCredibleRegions() {
     {
       for (int k = 0; k < nCredible; ++k)
       {
-        GetCredibleRegion(hpost_2D_cl[i][j][k], CredibleRegions[k]);
+        if(CredibleInSigmas)
+        {
+          //KS: Convert sigmas into percentage
+          double CredReg = GetSigmaValue((int)std::round(CredibleRegions[k]));
+          GetCredibleRegion(hpost_2D_cl[i][j][k], CredReg);
+        }
+        else
+        {
+          GetCredibleRegion(hpost_2D_cl[i][j][k], CredibleRegions[k]);
+        }
         hpost_2D_cl[i][j][k]->SetLineColor(CredibleRegionColor[k]);
         hpost_2D_cl[i][j][k]->SetLineWidth(2);
         hpost_2D_cl[i][j][k]->SetLineStyle(CredibleRegionStyle[k]);
@@ -1561,7 +1630,12 @@ void MCMCProcessor::MakeCredibleRegions() {
       for (int k = 0; k < nCredible; ++k)
         hpost_2D_cl[i][j][k]->Draw("CONT3 SAME");
       for (int k = nCredible-1; k >= 0; --k)
-        legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l") ;
+      {
+        if(CredibleInSigmas)
+          legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f#sigma Credible Interval", CredibleRegions[k]), "l");
+        else
+          legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
+      }
 
       legend->Draw("SAME");
       bestfitM->Draw("SAME.P");
@@ -1570,6 +1644,7 @@ void MCMCProcessor::MakeCredibleRegions() {
       Posterior->SetName(hpost2D[i][j]->GetName());
       Posterior->SetTitle(hpost2D[i][j]->GetTitle());
 
+      //KS: Print only regions with correlation greater than specified value, by defualt 0.2. This is done to avoid dumping thousands of plots
       if(printToPDF && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) Posterior->Print(CanvasName);
       // Write it to root file
       //OutputFile->cd();
@@ -1655,12 +1730,41 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int j = 1; j < nParamPlot+1; j++) Npad += j;
   Posterior->cd();
 
-  //Should be easy way to set credible intervals via config keep it for now
-  const int nCredible = 3;
-  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
-  const Color_t CredibleRegionsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
-  const Style_t CredibleRegionStyle[nCredible] = {kDashed, kSolid, kDotted};
-  const Color_t CredibleRegionColor[nCredible] = {kGreen-3, kGreen-10, kGreen};
+  //Load values set via config or executable
+  std::vector<double> CredibleIntervals = Credible_Intervals;
+  std::vector<Color_t> CredibleIntervalsColours = Credible_IntervalsColours;
+  //Nothing was passed via config so use default values which are still fancy
+  if(CredibleIntervals.size() == 0 && CredibleIntervalsColours.size() == 0)
+  {
+    CredibleIntervals.insert(CredibleIntervals.end(), { 0.99, 0.90, 0.68 });
+    CredibleIntervalsColours.insert(CredibleIntervalsColours.end(), { kCyan+4, kCyan-2, kCyan-10 });
+  }
+  if(CredibleIntervals.size() != CredibleIntervalsColours.size())
+  {
+    std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  //Load values set via config or executable
+  std::vector<double> CredibleRegions = Credible_Regions;
+  std::vector<Style_t> CredibleRegionStyle = Credible_RegionStyle;
+  std::vector<Color_t> CredibleRegionColor = Credible_RegionColor;
+
+  //Nothing was passed via config so use default values which are still fancy
+  if(CredibleRegions.size() == 0 && CredibleRegionStyle.size() == 0 && CredibleRegionColor.size() == 0)
+  {
+    CredibleRegions.insert(CredibleRegions.end(), { 0.99, 0.90, 0.68 });
+    CredibleRegionStyle.insert(CredibleRegionStyle.end(), { kDashed, kSolid, kDotted });
+    CredibleRegionColor.insert(CredibleRegionColor.end(), { kGreen-3, kGreen-10, kGreen });
+  }
+  if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
+  {
+    std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  const int nCredibleIntervals = CredibleIntervals.size();
+  const int nCredibleRegions = CredibleRegions.size();
 
   //KS: Initialise Tpad histograms etc we will need
   TPad** TrianglePad = new TPad*[Npad];
@@ -1671,7 +1775,6 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   TH2D** hpost_2D_copy = new TH2D*[Npad-nParamPlot];
   TH2D*** hpost_2D_cl = new TH2D**[Npad-nParamPlot];
   gStyle->SetPalette(51);
-
 
   //KS: Super convoluted way of calcuating ranges for our pads, trust me it works...
   double* X_Min = new double[nParamPlot];
@@ -1735,21 +1838,31 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       if(x == y)
       {
         hpost_copy[counterPost] = (TH1D*) hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x]));
-        hpost_cl[counterPost] = new TH1D*[nCredible];
+        hpost_cl[counterPost] = new TH1D*[nCredibleIntervals];
         /// Scale the histograms so it shows the posterior probability
         hpost_copy[counterPost]->Scale(1. / hpost_copy[counterPost]->Integral());
-        for (int j = 0; j < nCredible; ++j)
+        for (int j = 0; j < nCredibleIntervals; ++j)
         {
-            hpost_cl[counterPost][j] = (TH1D*) hpost[ParamNumber[x]]->Clone( Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleRegions[j]));
+            hpost_cl[counterPost][j] = (TH1D*) hpost[ParamNumber[x]]->Clone( Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleIntervals[j]));
             //KS: Reset to get rid to TF1 otherwise we run into segfault :(
             hpost_cl[counterPost][j]->Reset("");
             hpost_cl[counterPost][j]->Fill(0.0, 0.0);
 
             // Scale the histograms before gettindg credible intervals
             hpost_cl[counterPost][j]->Scale(1. / hpost_cl[counterPost][j]->Integral());
+            //KS: Slightly different approach depending if interavls are in pecentage or sigmas
+            if(CredibleInSigmas)
+            {
+              //KS: Convert sigmas into percentage
+              double CredReg = GetSigmaValue((int)std::round(CredibleIntervals[j]));
+              GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredReg);
+            }
+            else
+            {
+              GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleIntervals[j]);
+            }
 
-            GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleRegions[j]);
-            hpost_cl[counterPost][j]->SetFillColor(CredibleRegionsColours[j]);
+            hpost_cl[counterPost][j]->SetFillColor(CredibleIntervalsColours[j]);
             hpost_cl[counterPost][j]->SetLineWidth(1);
         }
 
@@ -1769,7 +1882,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
         hpost_copy[counterPost]->GetYaxis()->SetNdivisions(4);
 
         hpost_copy[counterPost]->Draw("HIST");
-        for (int j = 0; j < nCredible; ++j)
+        for (int j = 0; j < nCredibleIntervals; ++j)
           hpost_cl[counterPost][j]->Draw("HIST SAME");
         counterPost++;
       }
@@ -1777,12 +1890,23 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       else
       {
         hpost_2D_copy[counter2DPost] = (TH2D*) hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y]));
-        hpost_2D_cl[counter2DPost] = new TH2D*[nCredible];
+        hpost_2D_cl[counter2DPost] = new TH2D*[nCredibleRegions];
         //KS: Now copy for every credible region
-        for (int k = 0; k < nCredible; ++k)
+        for (int k = 0; k < nCredibleRegions; ++k)
         {
           hpost_2D_cl[counter2DPost][k] = (TH2D*)hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k]));
-          GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredibleRegions[k]);
+
+          if(CredibleInSigmas)
+          {
+            //KS: Convert sigmas into percentage
+            double CredReg = GetSigmaValue((int)std::round(CredibleRegions[k]));
+            GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredReg);
+          }
+          else
+          {
+            GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredibleRegions[k]);
+          }
+
           hpost_2D_cl[counter2DPost][k]->SetLineColor(CredibleRegionColor[k]);
           hpost_2D_cl[counter2DPost][k]->SetLineWidth(2);
           hpost_2D_cl[counter2DPost][k]->SetLineStyle(CredibleRegionStyle[k]);
@@ -1800,7 +1924,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
         hpost_2D_copy[counter2DPost]-> GetYaxis()->SetNdivisions(4);
         hpost_2D_copy[counter2DPost]->Draw("COL");
         //Now credible regions
-        for (int k = 0; k < nCredible; ++k)
+        for (int k = 0; k < nCredibleRegions; ++k)
           hpost_2D_cl[counter2DPost][k]->Draw("CONT3 SAME");
         counter2DPost++;
       }
@@ -1843,10 +1967,20 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   legend->SetLineStyle(0);
   legend->SetBorderSize(0);
   //KS: Legend is shared so just take first histograms
-  for (int j = nCredible-1; j >= 0; --j)
-    legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
-  for (int k = nCredible-1; k >= 0; --k)
-    legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l") ;
+  for (int j = nCredibleIntervals-1; j >= 0; --j)
+  {
+    if(CredibleInSigmas)
+      legend->AddEntry(hpost_cl[0][j], Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
+    else
+      legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
+  }
+  for (int k = nCredibleRegions-1; k >= 0; --k)
+  {
+    if(CredibleInSigmas)
+      legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f#sigma Credible Region", CredibleRegions[k]), "l");
+    else
+      legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
+  }
   legend->Draw("SAME");
   Posterior->Update();
 
@@ -1865,7 +1999,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int i = 0; i < nParamPlot; i++)
   {
       delete hpost_copy[i];
-      for (int j = 0; j < nCredible; ++j)
+      for (int j = 0; j < nCredibleIntervals; ++j)
       {
         delete hpost_cl[i][j];
       }
@@ -1874,7 +2008,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int i = 0; i < Npad - nParamPlot; i++)
   {
       delete hpost_2D_copy[i];
-      for (int j = 0; j < nCredible; ++j)
+      for (int j = 0; j < nCredibleRegions; ++j)
       {
         delete hpost_2D_cl[i][j];
       }
@@ -1900,6 +2034,39 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   Posterior->SetRightMargin(RighMargin);
 }
 
+
+// *********************
+// Convert sigma from normal distribution into percentage
+double MCMCProcessor::GetSigmaValue(int sigma) {
+// *********************
+  double width = 0;
+  switch (std::abs(sigma))
+  {
+    case 1:
+      width = 0.682689492137;
+      break;
+    case 2:
+      width = 0.954499736104;
+      break;
+    case 3:
+      width = 0.997300203937;
+      break;
+    case 4:
+      width = 0.999936657516;
+      break;
+    case 5:
+      width = 0.999999426697;
+      break;
+    case 6:
+      width = 0.999999998027;
+      break;
+    default:
+      std::cerr<<sigma<<" is unsuported value of sigma"<<std::endl;
+      throw;
+      break;
+    }
+  return width;
+}
 
 // **************************
 // Scan the input trees
@@ -2473,8 +2640,6 @@ void MCMCProcessor::RemoveParameters() {
 }
 
 
-
-
 // ***************
 // Make the step cut from a string
 void MCMCProcessor::SetStepCut(std::string Cuts) {
@@ -2492,7 +2657,6 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
   StepCut = TempStream.str();
   BurnInCut = Cuts;
 }
-
 
 // **************************
 // Get the mean and RMS of a 1D posterior
@@ -2619,6 +2783,11 @@ void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage
 void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage) {
 // ***************
 
+  if(coverage > 1)
+  {
+    std::cerr<<"Specified Credible Interval is greater that 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
+    throw;
+  }
   //KS: Reset first copy of histogram
   hpost_copy->Reset("");
   hpost_copy->Fill(0.0, 0.0);
@@ -2671,6 +2840,12 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
 //KS: Set 2D contour within some coverage
 void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) {
 // ***************
+
+  if(coverage > 1)
+  {
+    std::cerr<<"Specified Credible Region is greater that 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
+    throw;
+  }
 
   //KS: Temporary structure to be thread save
   double **hist_copy = new double*[hpost->GetXaxis()->GetNbins()+1];
