@@ -32,6 +32,9 @@
 #include "TStopwatch.h"
 #include "TText.h"
 #include "TGaxis.h"
+#include "TObjString.h"
+#include "TTree.h"
+#include "TROOT.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -111,6 +114,7 @@ class MCMCProcessor {
 
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
     void GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name);
+    void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
 
     int GetnEntries(){return nEntries;};
     int GetnSteps(){return nSteps;};

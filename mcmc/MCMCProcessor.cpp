@@ -1079,7 +1079,7 @@ void MCMCProcessor::CacheSteps() {
         ParStep[i] = new double[nEntries];
         hpost2D[i] = new TH2D*[nDraw]();
 
-        for (int j = 0; j < nEntries; ++j) 
+        for (int j = 0; j < nEntries; ++j)
         {
             ParStep[i][j] = -999.99;
             //KS: Set this only once
@@ -1204,7 +1204,7 @@ for (int i = 0; i < covBinning; ++i)
         }
         hpost2D[i][j]->SetMinimum(0);
             
-        for (int k = 0; k < nEntries; ++k) 
+        for (int k = 0; k < nEntries; ++k)
         {
             //KS: Burn in cut
             if(StepNumber[k] < BurnInCut) continue;
@@ -2909,7 +2909,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
     int ParamNo = __UNDEF__;
     ParamNo = param - ParamTypeStartPos[ParType];
 
-    Prior = ParamCentral[ParameterEnum()][ParamNo];
+    Prior = ParamCentral[ParType][ParamNo];
     PriorError = ParamErrors[ParType][ParamNo];
     Title = ParamNames[ParType][ParamNo];
     return;
@@ -2998,6 +2998,114 @@ std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
     else JeffreysScale = "Decisive";
 
     return JeffreysScale;
+}
+
+
+// **************************
+// KS: Reweight prior of MCMC chain to another
+void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError){
+// **************************
+
+    if(Names.size() != NewCentral.size() && NewCentral.size() != NewError.size())
+    {
+      std::cerr<<" size of passed vectors doesn't match in ReweightPrior"<<std::endl;
+      throw;
+    }
+    std::vector<int> Param;
+    std::vector<double> OldCentral;
+    std::vector<double> OldError;
+    std::vector<bool> FlatPrior;
+
+    //KS: First we need to find parameter number based on name
+    for(unsigned int k = 0; k < Names.size(); k++)
+    {
+      int ParamNo = __UNDEF__;
+      for (int i = 0; i < nDraw; ++i)
+      {
+        TString Title = "";
+        double Prior = 1.0;
+        double PriorError = 1.0;
+
+        GetNthParameter(i, Prior, PriorError, Title);
+
+        if(Names[k] == Title)
+        {
+          ParamNo = i;
+
+          Param.push_back(ParamNo);
+          OldCentral.push_back(Prior);
+          OldError.push_back(PriorError);
+
+          ParameterEnum ParType = ParamType[ParamNo];
+          int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
+
+          FlatPrior.push_back(ParamFlat[ParType][ParamTemp]);
+          break;
+        }
+      }
+      if(ParamNo == __UNDEF__)
+      {
+        std::cout<<"Couldn't find param "<<Names[k]<<". Can't reweight Prior"<<std::endl;
+        return;
+      }
+    }
+
+    double* ParameterPos = new double[Names.size()];
+
+    std::string InputFile = MCMCFile+".root";
+    std::string OutputFilename = MCMCFile + "_reweighted.root";
+
+    //KS: Simply create copy of file and add there new branch
+    system(("cp "+InputFile+" "+OutputFilename).c_str());
+
+    TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+    OutputChain->cd();
+    TTree *post = (TTree *)OutputChain->Get("posteriors");
+
+    double Weight = 1.;
+    TBranch *bpt = post->Branch("Weight", &Weight, "Weight/D");
+
+    post->SetBranchStatus("*",false);
+    post->SetBranchStatus("Weight", true);
+    // Set the branch addresses for params
+    for (unsigned int j = 0; j < Names.size(); ++j) {
+      post->SetBranchStatus(BranchNames[Param[j]].Data(), true);
+      post->SetBranchAddress(BranchNames[Param[j]].Data(), &ParameterPos[j]);
+    }
+    for (int i = 0; i < nEntries; ++i)
+    {
+      post->GetEntry(i);
+      Weight = 1.;
+
+      //KS: Calcualte reweight weight. Weights are multiplicative so we can do several reweights at once. FIXME Big limitation is that code only works for uncorelated paramters :(
+      for (unsigned int j = 0; j < Names.size(); ++j)
+      {
+        double new_chi = (ParameterPos[j] - NewCentral[j])/NewError[j];
+        double new_prior = std::exp(-0.5 * new_chi * new_chi);
+
+        double old_chi = -1;
+        double old_prior = -1;
+        if(FlatPrior[j])
+        {
+          old_prior = 1.0;
+        }
+        else
+        {
+          old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
+          old_prior = std::exp(-0.5 * old_chi * old_chi);
+        }
+        Weight *= new_prior/old_prior;
+      }
+      bpt->Fill();
+    }
+    OutputChain->cd();
+    post->Write("posteriors", TObject::kOverwrite);
+
+    OutputChain->Close();
+    delete OutputChain;
+    delete[] ParameterPos;
+
+    OutputFile->cd();
 }
 
 // **************************
