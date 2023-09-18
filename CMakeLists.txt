@@ -47,7 +47,7 @@ CPMFindPackage(
 # In the future which osc calc we use might be set with a flag
 CPMFindPackage(
     NAME Prob3plusplus
-    VERSION 3.10.3
+    VERSION 3.10.4
     GITHUB_REPOSITORY rogerwendell/Prob3plusplus
     GIT_TAG main
 )
