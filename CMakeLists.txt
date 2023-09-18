@@ -48,8 +48,8 @@ CPMFindPackage(
 CPMFindPackage(
     NAME Prob3plusplus
     VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
+    GITHUB_REPOSITORY rogerwendell/Prob3plusplus
+    GIT_TAG main
 )
 
 CPMAddPackage(
