@@ -115,11 +115,11 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
 	xsec_param_nom_a[i] = _fPreFitValue[i];
     // Fill the lower bound
     //xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
-    xsec_param_lb_a[i]  = _fLB[i];
+    xsec_param_lb_a[i]  = _fLowBound[i];
 
     // Fill the upper bound
     //xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
-    xsec_param_ub_a[i]  = _fUB[i];
+    xsec_param_ub_a[i]  = _fUpBound[i];
     // Fill the prior
     //xsec_param_prior_a[i]=(*xsec_param_prior)(i);
 	xsec_param_prior_a[i]= _fError[i];
@@ -130,7 +130,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
     // DB Fill the stepscales vector
     //xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
-    xsec_stepscale_vec[i] = _fStepScale[i];
+    xsec_stepscale_vec[i] = _fIndivStepScale[i];
 
     //if((*flat_prior)(i)) setEvalLikelihood(i, false);
     if(_fFlatPrior[i]){setEvalLikelihood(i, false);}
@@ -140,9 +140,9 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     }
 
     // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
-    fParHiLimit[i] = xsec_param_ub_a[i];
+    _fUpBound[i] = xsec_param_ub_a[i];
     // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
-    fParLoLimit[i] = xsec_param_lb_a[i];
+    _fLowBound[i] = xsec_param_lb_a[i];
   } // end the for loop
 
 
@@ -193,11 +193,11 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
 	xsec_param_nom_a[i] = _fPreFitValue[i];
     // Fill the lower bound
     //xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
-    xsec_param_lb_a[i]  = _fLB[i];
+    xsec_param_lb_a[i]  = _fLowBound[i];
 
     // Fill the upper bound
     //xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
-    xsec_param_ub_a[i]  = _fUB[i];
+    xsec_param_ub_a[i]  = _fUpBound[i];
     // Fill the prior
     //xsec_param_prior_a[i]=(*xsec_param_prior)(i);
 	xsec_param_prior_a[i]= _fError[i];
@@ -208,10 +208,10 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
     if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
     // DB Fill the stepscales vector
     //xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
-    xsec_stepscale_vec[i] = _fStepScale[i];
+    xsec_stepscale_vec[i] = _fIndivStepScale[i];
 
     //if((*flat_prior)(i)) setEvalLikelihood(i, false);
-    if(_fFlatPrior[i]){setEvalLikelihood(i, false);}
+    if(!_fFlatPrior[i]){setEvalLikelihood(i, false);}
     
 	//xsec_param_id_a[i][0] is the "type" of systematic, spline or otherwise
 	//xsec_param_id_a[i][1] is the DetId
@@ -219,10 +219,11 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
     //  xsec_param_id_a[i][j] = (*xsec_param_id)(i,j);
     //}	
 
+	//ETA - does this need to be here still?
     // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
-    fParHiLimit[i] = xsec_param_ub_a[i];
+    _fUpBound[i] = xsec_param_ub_a[i];
     // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
-    fParLoLimit[i] = xsec_param_lb_a[i];
+    _fLowBound[i] = xsec_param_lb_a[i];
   } // end the for loop
 
 
@@ -251,9 +252,9 @@ void covarianceXsec::ParseYAML(const char* FileName)
   _fGenerated = std::vector<double>(_fNumPar);
   _fPreFitValue = std::vector<double>(_fNumPar);
   _fError = std::vector<double>(_fNumPar);
-  _fLB = std::vector<double>(_fNumPar);
-  _fUB = std::vector<double>(_fNumPar);
-  _fStepScale = std::vector<double>(_fNumPar);
+  _fLowBound = std::vector<double>(_fNumPar);
+  _fUpBound = std::vector<double>(_fNumPar);
+  _fIndivStepScale = std::vector<double>(_fNumPar);
   _fFlatPrior = std::vector<bool>(_fNumPar);
   _fDetID = std::vector<int>(_fNumPar);
   _fCovMatrix = new TMatrixDSym(_fNumPar);
@@ -284,12 +285,12 @@ void covarianceXsec::ParseYAML(const char* FileName)
 
 	 //ETA - a bit of a fudge but works
 	 std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
-     _fLB[i] = TempBoundsVec[0];//(param"lowerbound"].as<double>());
-     _fUB[i] = TempBoundsVec[1];//.push_back(param["upperbound"].as<double>());
+     _fLowBound[i] = TempBoundsVec[0];//(param"lowerbound"].as<double>());
+     _fUpBound[i] = TempBoundsVec[1];//.push_back(param["upperbound"].as<double>());
 
-	 std::cout << "Upper bounds is " << _fUB[i] << std::endl;
+	 std::cout << "Upper bounds is " << _fUpBound[i] << std::endl;
 
-     _fStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
+     _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
      _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
 	 std::cout << "Setting error to be " << param["Systematic"]["Error"].as<double>() << std::endl;
      _fError[i] = (param["Systematic"]["Error"].as<double>());
@@ -1027,27 +1028,26 @@ void covarianceXsec::initParams(double fScale) {
 
   for (int i = 0; i < size; ++i) {
     char pname[10];
-    fParNames[i] = new Char_t[9];
     sprintf(pname, "xsec_%i", i);
-    strcpy(fParNames[i], pname);
+	_fNames[i] = std::string(pname);
 
     // This just assign the initial parameters to the prior
-    fParInit[i] = _fPreFitValue[i];//(*xsec_param_prior)[i];
-    //fParInit[i] = (*xsec_param_nom)[i];
+    _fPreFitValue[i] = _fPreFitValue[i];//(*xsec_param_prior)[i];
+    //_fPreFitValue[i] = (*xsec_param_nom)[i];
 
     // Any param with nom == 1 should be > 0
     if (_fPreFitValue[i] == 1) {
-      // If the fParInit is negative we should try to throw it above this
+      // If the _fPreFitValue is negative we should try to throw it above this
       // We don't really do this ever...
-      while (fParInit[i] <= 0) {
-        fParInit[i] = random_number[0]->Gaus((*xsec_param_prior)[i], 0.1*fScale*TMath::Sqrt( (*covMatrix)(i,i) ));
+      while (_fPreFitValue[i] <= 0) {
+        _fPreFitValue[i] = random_number[0]->Gaus((*xsec_param_prior)[i], 0.1*fScale*TMath::Sqrt( (*covMatrix)(i,i) ));
       }
     }
 
     // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
-    fParCurr[i] = fParInit[i];
-    fParProp[i] = fParCurr[i];
-    fParSigma[i] = fScale;
+    _fCurrVal[i] = _fPreFitValue[i];
+    _fPropVal[i] = _fCurrVal[i];
+    _fError[i] = fScale;
   }
 
   //DB Set Individual Step scale for PCA parameters to the lastpcadpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
@@ -1071,9 +1071,9 @@ int covarianceXsec::CheckBounds(){
   #pragma omp parallel for reduction(+:NOutside)
   #endif
   for (int i = 0; i < nPars; i++){
-      //if(fParProp[i] > xsec_param_ub_a[i] || fParProp[i] < xsec_param_lb_a[i]){
-      if(fParProp[i] > _fUB[i] || fParProp[i] < _fLB[i]){
-		std::cout << "fParProp at param " << i << " is out of bounds, param is at " << fParProp[i] << " and UB is " << _fUB[i] << " and LB is " << _fLB[i] << std::endl;
+      //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
+      if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
+		std::cout << "_fPropVal at param " << i << " is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
         NOutside++;
       }
   }
@@ -1090,7 +1090,7 @@ void covarianceXsec::setEvalLikelihood(int i, bool eL) {
     throw;
   } else {
     std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to flat prior" << std::endl;
-    fParEvalLikelihood[i] = eL;
+    _fFlatPrior[i] = eL;
   }
 }
 
@@ -1104,8 +1104,8 @@ void covarianceXsec::toggleFixParameter(int i) {
 	  std::cerr << "Fix this in your config file please!" << std::endl;
 	  exit(-1);
 	} else {
-	  fParSigma[i] *= -1.0;
-	  std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to fixed at " << fParCurr[i] << std::endl;
+	  _fError[i] *= -1.0;
+	  std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
 
 	}
   } else
@@ -1121,7 +1121,7 @@ void covarianceXsec::toggleFixParameter(int i) {
 	else
 	{
 	  fParSigma_PCA[isDecom] *= -1.0;
-	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << fParCurr[i] << std::endl;
+	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
 	}
   }
   return;
@@ -1134,7 +1134,8 @@ void covarianceXsec::setXsecParNames() {
   // Shouldn't really be called because a lot of post-processing depends on having name xsec_i
   // Have made covarianceXsec->GetParameterName(i) which returns the cross-section parameter name which is read from the ROOT input file (e.g. xsec_covariance_2015v0.root)
   for (int i = 0; i < size; ++i) {
-    fParNames[i] = const_cast<char*>(xsec_param_names[i].c_str());
+    //fParNames[i] = const_cast<char*>(xsec_param_names[i].c_str());
+	_fNames[i] = xsec_param_names[i]; 
   }
 }
 
@@ -1157,7 +1158,7 @@ void covarianceXsec::Print() {
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << std::endl;;
 
   for (int i = 0; i < GetNumParams(); i++) {
-    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParameterName(i) << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLB[i] << std::setw(2) << "|" << std::setw(10) << _fUB[i] << "|" << std::setw(15) << fIndivStepScale[i] << std::endl;
+    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParameterName(i) << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << std::endl;
   }
 
   std::cout << std::endl;
@@ -1275,7 +1276,7 @@ void covarianceXsec::setFluxOnlyParameters() {
 // ********************************************
     for (int i = 0; i < size; i++) 
     {
-      if(isFlux[i]) fParProp[i] = fParInit[i];
+      if(isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
     }
 }
 // ********************************************
@@ -1284,6 +1285,6 @@ void covarianceXsec::setXsecOnlyParameters() {
 // ********************************************
     for (int i = 0; i < size; i++) 
     {
-      if(!isFlux[i]) fParProp[i] = fParInit[i];
+      if(!isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
     }
 }

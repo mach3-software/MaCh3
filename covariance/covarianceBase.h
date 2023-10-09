@@ -67,15 +67,16 @@ class covarianceBase {
   
   // Setters
   // need virtual for eRPA parameter over-ride
+  // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   void setCovMatrix(TMatrixDSym *cov);
   void setName(const char *name) { matrixName = name; }
-  virtual void setParName(int i, char *name) { fParNames[i] = name; }
+  virtual void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   void setPar(const int i, const double val);
   void setParCurrProp(int i, double val);
   void setParProp(int i, double val) {
     std::cout << "Setting " << getParName(i) << " to " << val << std::endl; 
-    fParProp[i] = val;
+    _fPropVal[i] = val;
     if (pca) TransferToPCA();
   };
   void setParameters(std::vector<double> pars = std::vector<double>());    
@@ -105,15 +106,16 @@ class covarianceBase {
   // Getters
   TMatrixDSym *getCovMatrix() { return covMatrix; };
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
-  bool getEvalLikelihood(const int i) { return fParEvalLikelihood[i]; };
+  bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
 
   virtual double getLikelihood();
   virtual int CheckBounds();
   double calcLikelihood();
 
   const char *getName() { return matrixName; };
+  // ETA - Why is this virtual?
   virtual const char* getParName(const int i) const {
-    return fParNames[i];
+    return _fNames[i].c_str();
   };
   std::string const getInputFile() const { return inputFile; };
 
@@ -146,18 +148,18 @@ class covarianceBase {
   //========
   //DB Pointer return
   //========
-  const double* retPointer(int iParam) {return &fParProp[iParam];}
+  const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
   virtual std::vector<double> getNominalArray();
   const std::vector<double> getProposed() const;
   const double getParProp(const int i) {
-    return fParProp[i]; 
+    return _fPropVal[i]; 
   };
   const double getParCurr(const int i) {
-    return fParCurr[i];
+    return _fCurrVal[i];
   };
   const double getParInit(const int i) {
-    return fParInit[i];
+    return _fPreFitValue[i];
   };
   virtual const double getNominal(const int i) {
     return getParInit(i);
@@ -241,7 +243,7 @@ class covarianceBase {
   void toggleFixAllParameters();
   virtual void toggleFixParameter(const int i);
   bool isParameterFixed(const int i) {
-    if (fParSigma[i] < 0) {
+    if (_fError[i] < 0) {
       return true;
     } else {
       return false;
@@ -303,13 +305,13 @@ class covarianceBase {
   // For Cholesky decomposed parameter throw
   double* randParams;
   //  TMatrixD *chel;
-  double fStepScale;
+  double _fGlobalStepScale;
 
   //KS: This is used when printing parameters, sometimes we have super long parmaeters name, we want to flexibly adjust couts
   unsigned int PrintLength;
 
   // state info (arrays of each parameter)
-  Char_t  **fParNames;
+  /*Char_t  **fParNames;
   Double_t *fParInit;
   Double_t *fParCurr;
   Double_t *fParProp;
@@ -318,6 +320,7 @@ class covarianceBase {
   Double_t *fParHiLimit;
   Double_t *fIndivStepScale;
   bool     *fParEvalLikelihood;
+  */
   Double_t currLogL;
   Double_t propLogL;
   Double_t *corr_throw;
@@ -330,14 +333,16 @@ class covarianceBase {
   YAML::Node _fYAMLDoc;
 
   std::vector<double> _fPreFitValue;
+  std::vector<double> _fCurrVal;
+  std::vector<double> _fPropVal;
   std::vector<double> _fGenerated;
   std::vector<double> _fError;
-  std::vector<double> _fLB;
-  std::vector<double> _fUB;
+  std::vector<double> _fLowBound;
+  std::vector<double> _fUpBound;
   std::vector<int> _fDetID;
   std::vector<std::string> _fDetString;
   std::vector<std::string> _fParamType;
-  std::vector<double> _fStepScale;
+  std::vector<double> _fIndivStepScale;
   std::vector<bool> _fFlatPrior;
   TMatrixDSym *_fCovMatrix;
   //TMatrixT<double> *_fCovMatrix;

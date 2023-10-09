@@ -137,7 +137,7 @@ class covarianceXsec : public covarianceBase {
     // What parameter Gets reweighted by what amount according to MCMC
     inline double calcReWeight(const int bin){
 	  if (bin >= 0 && bin < nPars) {
-		return fParProp[bin];
+		return _fPropVal[bin];
 	  } else {
 		std::cerr << "Specified bin is <= 0 OR bin > npar!" << std::endl;
 		std::cerr << "bin = " << bin << ", npar = " << nPars << std::endl;
@@ -193,6 +193,7 @@ class covarianceXsec : public covarianceBase {
     double *xsec_param_prior_a;
 
     // Contains the parameter names
+	// ETA - don't think we need this anymore tbh
     std::vector<std::string> xsec_param_names;
     
     //Contains the names of the Far spline objects in the spline files
