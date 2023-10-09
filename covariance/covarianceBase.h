@@ -144,9 +144,12 @@ class covarianceBase {
   TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   std::vector<double> getParameterMeans(){return par_means;}
 
-
   //========
   //DB Pointer return
+  //ETA - This might be a bit squiffy? If the vector gots moved from say a
+  //push_back then the pointer is no longer valid... maybe need a better 
+  //way to deal with this? It was fine before when the return was to an 
+  //element of a new array. There must be a clever C++ way to be careful
   //========
   const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
@@ -310,28 +313,17 @@ class covarianceBase {
   //KS: This is used when printing parameters, sometimes we have super long parmaeters name, we want to flexibly adjust couts
   unsigned int PrintLength;
 
-  // state info (arrays of each parameter)
-  /*Char_t  **fParNames;
-  Double_t *fParInit;
-  Double_t *fParCurr;
-  Double_t *fParProp;
-  Double_t *fParSigma;
-  Double_t *fParLoLimit;
-  Double_t *fParHiLimit;
-  Double_t *fIndivStepScale;
-  bool     *fParEvalLikelihood;
-  */
   Double_t currLogL;
   Double_t propLogL;
   Double_t *corr_throw;
 
+  // state info (now mostly vectors)
   //ETA - duplication of some of these
   //ideally these should all be private and we have setters be protected 
   //setters and public getters
   std::vector<std::string> _fNames;
   int _fNumPar;
   YAML::Node _fYAMLDoc;
-
   std::vector<double> _fPreFitValue;
   std::vector<double> _fCurrVal;
   std::vector<double> _fPropVal;
@@ -347,13 +339,13 @@ class covarianceBase {
   TMatrixDSym *_fCovMatrix;
   //TMatrixT<double> *_fCovMatrix;
 
+  //Some "usual" variables. Don't think we really need the ND/FD split
   std::vector<int> _fNormModes;
   std::vector<std::string> _fNDSplineNames;
   std::vector<std::string> _fFDSplineNames;
   std::vector<std::vector<int>> _fFDSplineModes;
-//  std::vector<std::string> _fKinematicPars;
-//  std::vector<std::vector<int>> _fKinematicBounds;
 
+  //Information to be able to apply generic cuts
   std::vector<std::vector<std::string>> _fKinematicPars;
   std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 
