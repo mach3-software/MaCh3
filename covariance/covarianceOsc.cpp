@@ -49,8 +49,11 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
     _fPreFitValue[io]  = (*osc_prior)(io);
     _fCurrVal[io] = _fPropVal[io] = _fPreFitValue[io];
     _fError[io] = (*osc_sigma)(io);
+ 
     _fIndivStepScale[io] = fScale * (*osc_stepscale)(io);
     
+	std::cout << "Setting step scale to " << _fIndivStepScale[io] << std::endl; 
+
     //KS: Set flat prior
     if( (bool)((*osc_flat_prior)(io)) ) setEvalLikelihood(io,false);
   }
@@ -88,34 +91,6 @@ covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpt
 
 covarianceOsc::~covarianceOsc()
 {
-}
-
-int covarianceOsc::CheckBounds() {
-  int NOutside = 0;
-  // wrap delta cp 
-  // NB: previous to ~summer 2016 steps outside of this range were instead rejected
-  if(_fPropVal[5] > TMath::Pi()) {
-    _fPropVal[5] = (-2.*TMath::Pi() + _fPropVal[5]);
-
-  } else if (_fPropVal[5] < -TMath::Pi()) {
-    _fPropVal[5] = (2.*TMath::Pi() + _fPropVal[5]);
-  }
-
-  // ensure osc params dont go unphysical
-  if (_fPropVal[0] > 1.0 || _fPropVal[0] < 0 ||
-      _fPropVal[1] > 1.0 || _fPropVal[1] < 0 ||
-      _fPropVal[2] > 1.0 || _fPropVal[2] < 0 )
-  {
-     NOutside++;
-  }
-
-  if(size==7) {
-    if(_fPropVal[6]<0) { // Don't let beta be less than 0 (no upper limit)
-      NOutside++;
-    }
-  }
-
-  return NOutside;
 }
 
 double covarianceOsc::calcLikelihood() {
@@ -329,6 +304,19 @@ void covarianceOsc::proposeStep() {
   randomize();
   CorrelateSteps();
 
+  //ETA
+  //this won't work if abs(_fPropVal) > 2pi so we should consider
+  //plonking a while here
+  if(_fPropVal[5] > TMath::Pi()) {
+	//std::cout << "PROPOSE STEP:_fPropVal[5] was " << _fPropVal[5] << std::endl;
+    _fPropVal[5] = (-2.*TMath::Pi() + _fPropVal[5]);
+	//std::cout << "Wrapping delta-CP: _fPropVal[5] is now " << _fPropVal[5] << std::endl;
+  } else if (_fPropVal[5] < -TMath::Pi()) {
+	//std::cout << "PROPOSE STEP:_fPropVal[5] was " << _fPropVal[5] << std::endl;
+    _fPropVal[5] = (2.*TMath::Pi() + _fPropVal[5]);
+	//std::cout << "Wrapping delta-CP: _fPropVal[5] is now " << _fPropVal[5] << std::endl;
+  }
+  
   // Okay now we've done the standard steps, we can add in our nice flips
   // hierarchy flip first
   if(random_number[0]->Uniform()<0.5 && flipdelM){

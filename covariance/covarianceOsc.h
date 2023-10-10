@@ -12,7 +12,7 @@ class covarianceOsc : public covarianceBase
       virtual ~covarianceOsc();
 
       double calcLikelihood();
-      inline int CheckBounds();
+      //inline int CheckBounds();
       double *getPropPars();//double *retrn);
       void proposeStep();
       std::vector<double> defaultPars(bool doubled);

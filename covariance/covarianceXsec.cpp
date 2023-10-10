@@ -8,6 +8,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
 // ********************************************
 
   /*
+   * ETA - this is all redundent now
   TFile *infile = new TFile(file, "READ");
 
   xsec_param_norm_modes = NULL;
@@ -110,29 +111,23 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   xsec_stepscale_vec.resize(nPars);
 
   for (int i = 0; i < nPars; i++) {
-    // Fill the nominal
-    //xsec_param_nom_a[i] = (*xsec_param_nom)(i);
+    // Fill the prior central value
 	xsec_param_nom_a[i] = _fPreFitValue[i];
+
     // Fill the lower bound
-    //xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
     xsec_param_lb_a[i]  = _fLowBound[i];
 
     // Fill the upper bound
-    //xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
     xsec_param_ub_a[i]  = _fUpBound[i];
-    // Fill the prior
-    //xsec_param_prior_a[i]=(*xsec_param_prior)(i);
+    // Fill the prior uncertainty
 	xsec_param_prior_a[i]= _fError[i];
     // Fill the names
-    //xsec_param_names.push_back(std::string(((TObjString*)objarr_name->At(i))->GetString()));
     xsec_param_names.push_back(_fNames[i]);
 
     if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
     // DB Fill the stepscales vector
-    //xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
 
-    //if((*flat_prior)(i)) setEvalLikelihood(i, false);
     if(_fFlatPrior[i]){setEvalLikelihood(i, false);}
     
     for (int j = 0; j < ncols; j++) {
@@ -144,7 +139,6 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     // Also write the covarianceBase ones (grr, this is a bit of mess, try to clean it up)
     _fLowBound[i] = xsec_param_lb_a[i];
   } // end the for loop
-
 
   //infile->Close();
   //delete infile;
@@ -189,25 +183,23 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
 
   for (int i = 0; i < nPars; i++) {
     // Fill the nominal
-    //xsec_param_nom_a[i] = (*xsec_param_nom)(i);
 	xsec_param_nom_a[i] = _fPreFitValue[i];
+
     // Fill the lower bound
-    //xsec_param_lb_a[i]  = (*xsec_param_lb)(i);
     xsec_param_lb_a[i]  = _fLowBound[i];
 
     // Fill the upper bound
-    //xsec_param_ub_a[i]  = (*xsec_param_ub)(i);
     xsec_param_ub_a[i]  = _fUpBound[i];
+
     // Fill the prior
-    //xsec_param_prior_a[i]=(*xsec_param_prior)(i);
 	xsec_param_prior_a[i]= _fError[i];
+
     // Fill the names
-    //xsec_param_names.push_back(std::string(((TObjString*)objarr_name->At(i))->GetString()));
     xsec_param_names.push_back(_fNames[i]);
 
     if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
+
     // DB Fill the stepscales vector
-    //xsec_stepscale_vec[i] = (*xsec_stepscale)(i);    
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
 
     //if((*flat_prior)(i)) setEvalLikelihood(i, false);
@@ -261,7 +253,6 @@ void covarianceXsec::ParseYAML(const char* FileName)
   _fParamType = std::vector<std::string>(_fNumPar);
   _fDetString = std::vector<std::string>(_fNumPar);
 
-
   std::cout << "Found " << _fNumPar << " systematics in yaml" << std::endl;
 
   //Vector of vectors of strings to contain potentially multiple variables that
@@ -285,8 +276,8 @@ void covarianceXsec::ParseYAML(const char* FileName)
 
 	 //ETA - a bit of a fudge but works
 	 std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
-     _fLowBound[i] = TempBoundsVec[0];//(param"lowerbound"].as<double>());
-     _fUpBound[i] = TempBoundsVec[1];//.push_back(param["upperbound"].as<double>());
+     _fLowBound[i] = TempBoundsVec[0];
+     _fUpBound[i] = TempBoundsVec[1];
 
 	 std::cout << "Upper bounds is " << _fUpBound[i] << std::endl;
 
@@ -339,7 +330,6 @@ void covarianceXsec::ParseYAML(const char* FileName)
 		 //Has to be of size 0 to mean apply to all
 		 _fNormModes.push_back(DummyModeVec);
 	   }
-
 	 }
 
 	 int NumKinematicCuts = 0;
@@ -364,9 +354,7 @@ void covarianceXsec::ParseYAML(const char* FileName)
 	   }
 
 	   _fKinematicPars.at(i) = TempKinematicStrings;
-	   _fKinematicBounds.at(i) = TempKinematicBounds;
-
-	   
+	   _fKinematicBounds.at(i) = TempKinematicBounds;	   
 	 }
        
 	 //Also loop through the correlations
@@ -734,11 +722,6 @@ void covarianceXsec::ScanParameters() {
 	  if (strcmp(GetXsecParamType(i), "Spline") == 0) {//FarSplinePars
 		std::cout << GetXsecParamType(i) << std::endl;
 		FarSplineParsNames.push_back(GetParameterName(i));
-
-		//Fill the name of the Far spline objects in the spline files
-		//FarSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_fd_spline_names->At(i))->GetString()));
-
-
 		FarSplineParsIndex.push_back(i);
 
 		for(int Mode_i = 0 ; Mode_i < _fFDSplineModes[nFarSplineParams].size() ; ++Mode_i){
@@ -746,7 +729,6 @@ void covarianceXsec::ScanParameters() {
 		}
 
 		FarSplineModes.push_back(_fFDSplineModes[nFarSplineParams]);
-
 		nFarSplineParams++;
 
 		// Or a normalisation parameter
@@ -890,7 +872,6 @@ void covarianceXsec::ScanParameters() {
 		//}
 		//tmp_xsec.pdgs=temp;
 		//temp.clear();
-
 
 		//// Set the preoscillation neutrino pdg of the normalisation parameter
 		//tempVector = (TVectorD*)(xsec_param_norm_preoscnupdg->At(i));
@@ -1065,21 +1046,6 @@ void covarianceXsec::initParams(double fScale) {
   CorrelateSteps();
 }
 
-int covarianceXsec::CheckBounds(){
-  int NOutside=0;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:NOutside)
-  #endif
-  for (int i = 0; i < nPars; i++){
-      //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
-      if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-		std::cout << "_fPropVal at param " << i << " is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
-        NOutside++;
-      }
-  }
-  return NOutside;
-}
-
 // ********************************************
 void covarianceXsec::setEvalLikelihood(int i, bool eL) {
   // ********************************************
@@ -1108,18 +1074,15 @@ void covarianceXsec::toggleFixParameter(int i) {
 	  std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
 
 	}
-  } else
-  {
+  } else {
 	//KS: Find xsec parameter  in PCA base
 	int isDecom = -1;
 	for (int im = 0; im < npars; ++im) { if(isDecomposed_PCA[im] == i) isDecom = im; }
-	if(isDecom < 0)
-	{
+
+	if(isDecom < 0) {
 	  std::cerr << "Parameter " << GetParameterName(i) << " is PCA decomposed can't fix this" << std::endl;
 	  //throw; 
-	}
-	else
-	{
+	} else {
 	  fParSigma_PCA[isDecom] *= -1.0;
 	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
 	}
@@ -1134,7 +1097,6 @@ void covarianceXsec::setXsecParNames() {
   // Shouldn't really be called because a lot of post-processing depends on having name xsec_i
   // Have made covarianceXsec->GetParameterName(i) which returns the cross-section parameter name which is read from the ROOT input file (e.g. xsec_covariance_2015v0.root)
   for (int i = 0; i < size; ++i) {
-    //fParNames[i] = const_cast<char*>(xsec_param_names[i].c_str());
 	_fNames[i] = xsec_param_names[i]; 
   }
 }
@@ -1188,7 +1150,6 @@ void covarianceXsec::Print() {
   std::cout << std::endl;
 
   // Start Far printing
-
 
   std::cout << std::endl;
 

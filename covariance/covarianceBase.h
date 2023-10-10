@@ -87,6 +87,10 @@ class covarianceBase {
   void setStepScale(double scale);
 
   //DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  void setIndivStepScale(int ParameterIndex, double StepScale){
+	_fIndivStepScale.at(ParameterIndex) = StepScale;
+  };
+
   void setIndivStepScale(std::vector<double> stepscale);
   //KS: In case someone really want to change this
   void setPrintLength(unsigned int PriLen) { PrintLength = PriLen; };
