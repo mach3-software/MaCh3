@@ -866,11 +866,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 {
 
-  Beta=1;
-  useBeta=false;
-  applyBetaNue=false;
-  applyBetaDiag=false;
-
   for (int iSample=0; iSample < (int)MCSamples.size(); iSample++) {
 
 #if defined (USE_PROB3) && defined (CPU_ONLY)

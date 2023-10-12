@@ -1004,7 +1004,7 @@ void covarianceBase::printNominalCurrProp() {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::GetLikelihood() {
+double covarianceBase::CalcLikelihood() {
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
@@ -1035,14 +1035,14 @@ int covarianceBase::CheckBounds(){
   for (int i = 0; i < _fNumPar; i++){
       //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
       if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-		std::cout << "_fPropVal at param " << i << " is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
+		std::cout << "_fPropVal at param " << i << "( " << getParName(i) << ") is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
         NOutside++;
       }
   }
   return NOutside;
 }
 
-double covarianceBase::getLikelihood(){
+double covarianceBase::GetLikelihood(){
   // Checkbounds and calclikelihood are virtual
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
@@ -1060,7 +1060,7 @@ double covarianceBase::getLikelihood(){
     return NOutside*__LARGE_LOGL__;
   }
 
-  return calcLikelihood();
+  return CalcLikelihood();
 }
 
 

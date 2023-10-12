@@ -32,11 +32,7 @@ void mcmc::init(std::string outfile) {
   // Counter of the accepted # of steps
   accCount = 0;
   //KS: you don't want to do this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-<<<<<<< HEAD
   auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();//GetAutoSave();
-=======
-  auto_save = fitMan->raw()["General"]["AutoSave"].as<int>();//GetAutoSave();
->>>>>>> 85142b6c96dbcccb25af69f367fa4bf64ef852dd
   // Do we want to save the nominal parameters to output
   save_nominal = true;
   // Starting parameters should be thrown 

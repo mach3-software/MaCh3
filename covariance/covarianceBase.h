@@ -113,6 +113,7 @@ class covarianceBase {
   bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
 
   virtual int CheckBounds();
+  double CalcLikelihood();
   virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
