@@ -3,69 +3,35 @@
 // *************************
 // Initialise the manager and make it an object of mcmc class
 // Now we can dump manager settings to the output file
-mcmc::mcmc(manager * const man) : fitMan(man) {
+mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
 
-  random = new TRandom3(fitMan->raw()["General.Seed"].as<int>());  
-  //ETA - currently don't have this in manager as it needs some love 
+  // Beginning step number
+  stepStart = 0;
+
+  // Starting parameters should be thrown
+  init_pos = false;
+  reject = false;
+  chainLength = fitMan->raw()["General.NSteps"].as<double>();
+
+  //ETA - currently don't have this in manager as it needs some love
   //AnnealTemp = fitMan->GetTemp();
   AnnealTemp = -999;
   if(AnnealTemp < 0) anneal = false;
-  else 
+  else
   {
     std::cout << "- Enabling simulated annealing with T = " << AnnealTemp << std::endl;
     anneal = true;
   }
-  // Fit summary and debug info
-  debug =  fitMan->raw()["General.Debug"].as<bool>();
-  init(fitMan->raw()["General.Output"].as<std::string>().c_str());
-
 }
 
-// *************************
-// Initialise the MCMC, called from constructor
-void mcmc::init(std::string outfile) {
-// *************************
 
-  // Could set these from manager which is passed!
-  osc_only = false;
-  // Counter of the accepted # of steps
-  accCount = 0;
-  //KS: you don't want to do this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = fitMan->raw()["General.AutoSave"].as<int>();//GetAutoSave();
-  // Do we want to save the nominal parameters to output
-  save_nominal = true;
-  // Starting parameters should be thrown 
-  init_pos = false;
-  // Beginning step number
-  stepStart = 0;
-
-  // Set the output file
-  outputFile = new TFile(outfile.c_str(), "RECREATE");
-  outputFile->cd();
-  // Set output tree
-  outTree = new TTree("posteriors", "Posterior_Distributions");
-  // Auto-save every 100MB
-  outTree->SetAutoSave(-100E6);
-
-  // Prepare the output log file
-  if (debug) debugFile.open((outfile+".log").c_str());
-
-  // Clear the samples and systematics
-  samples.clear();
-  systematics.clear();
-  osc = NULL;
-  osc2 = NULL;
-}
 
 // *************************
 // Destructor: close the logger and output file
 mcmc::~mcmc() {
 // *************************
-  delete random;
-  delete[] sample_llh;
-  delete[] syst_llh;
-  std::cout << "Done!" << std::endl;
+
 }
 
 
@@ -120,109 +86,6 @@ double mcmc::FindStartingValue(std::string par_name) {
   return it->second;
 }
 
-
-// *************************
-// Add samplePDF object to the Markov Chain
-void mcmc::addSamplePDF(samplePDFBase * const sample) {
-// *************************
-  std::cout << "Adding samplePDF object " << std::endl;
-  samples.push_back(sample);
-}
-
-// *************************
-// Add flux systematics, cross-section systematics, ND280 systematics to the chain
-void mcmc::addSystObj(covarianceBase * const cov) {
-// *************************
-
-  std::cout << "Adding systematic object " << cov->getName() << std::endl;
-  systematics.push_back(cov);
-
-  // Save an array of nominal
-  if (save_nominal) {
-    std::vector<double> vec = cov->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(cov->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
-    delete[] n_vec;
-  }
-
-}
-
-// *************************
-// Add an oscillation handler
-// Similar to systematic really, but handles the oscillation weights
-void mcmc::addOscHandler(covarianceOsc * const oscf) {
-// *************************
-
-  osc = oscf;
-  osc2 = NULL;
-
-  if (save_nominal) {
-
-    std::vector<double> vec = oscf->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(oscf->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
-    delete[] n_vec;
-  }
-}
-
-// *************************
-// When using separate oscillations for neutrino and anti-neutrino
-void mcmc::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
-// *************************
-
-  osc = oscf;
-  osc2 = oscf2;
-
-  if (save_nominal) {
-    std::vector<double> vec = oscf->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(oscf->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
-
-    std::vector<double> vec2 = oscf2->getNominalArray();
-    size_t n2 = vec2.size();
-    double *n_vec2 = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec2[i] = vec2[i];
-    }
-    TVectorT<double> t_vec2(n2, n_vec2);
-    TString nameof2 = TString(oscf2->getName());
-    nameof2 = nameof2.Append("_2_nom");
-    t_vec2.Write(nameof2);
-    delete[] n_vec;
-    delete[] n_vec2;
-  }
-
-  // Set whether osc and osc2 should be equal (default: no for all parameters)
-  for (int i=0; i<osc->getSize(); i++) {
-    equalOscPar.push_back(0);
-  }
-
-  // Set whether to force osc and osc2 to use the same mass hierarchy (default: no)
-  equalMH = false;
-}
-
-
 // **********************
 // Do we accept the proposed step for all the parameters?
 void mcmc::CheckStep() {
@@ -248,7 +111,7 @@ void mcmc::CheckStep() {
     accept = false;
   }
 
-  if(debug) debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
+  if (debug) debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
 
   // Update all the handlers to accept the step
   if (accept && !reject) {
@@ -267,8 +130,8 @@ void mcmc::CheckStep() {
     }
   }
 
-  stepClock.Stop();
-  stepTime = stepClock.RealTime();
+  stepClock->Stop();
+  stepTime = stepClock->RealTime();
 
   // Write step to output tree
   outTree->Fill();
@@ -293,12 +156,10 @@ void mcmc::runMCMC() {
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
 
-  // Time the progress
-  clock.Start();
   // Begin MCMC
   for (step = stepStart; step < stepStart+chainLength; step++) {
 
-    stepClock.Start();
+    stepClock->Start();
     // Set the initial rejection to false
     reject = false;
 
@@ -317,10 +178,9 @@ void mcmc::runMCMC() {
     // Auto save the output
     if (step % auto_save == 0) outTree->AutoSave();
   }
-  clock.Stop();
 
   // Save all the MCMC output
-  SaveChain();
+  SaveOutput();
 
   // Process MCMC
   ProcessMCMC();
@@ -331,16 +191,14 @@ void mcmc::runMCMC() {
 void mcmc::ProcessMCMC() {
 // *******************
 
-  if (fitMan == NULL) {
-    return;
-  }
+  if (fitMan == NULL) return;
 
   // Process the MCMC
   if (fitMan->raw()["General.ProcessMCMC"].as<bool>()) {
 
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()), false);
-
+    
     Processor.Initialise();
     // Make the TVectorD pointers which hold the processed output
     TVectorD *Central = NULL;
@@ -348,7 +206,7 @@ void mcmc::ProcessMCMC() {
     TVectorD *Central_Gauss = NULL;
     TVectorD *Errors_Gauss = NULL;
     TVectorD *Peaks = NULL;
-
+    
     // Make the postfit
     Processor.GetPostfit(Central, Errors, Central_Gauss, Errors_Gauss, Peaks);
     Processor.DrawPostfit();
@@ -363,12 +221,14 @@ void mcmc::ProcessMCMC() {
 
     std::vector<TString> BranchNames = Processor.GetBranchNames();
 
+    
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       std::cout << "Opening output again to update with means..." << std::endl;
       outputFile = new TFile(fitMan->raw()["General.Output.Filename"].as<std::string>().c_str(), "UPDATE");
     }
 
+    
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
     Central_Gauss->Write("Gauss_Means");
@@ -376,73 +236,12 @@ void mcmc::ProcessMCMC() {
     Covariance->Write("Covariance");
     Correlation->Write("Correlation");
   }
-
-}
-
-// *******************
-// Prepare the output tree
-void mcmc::PrepareOutput() {
-  // *******************
-
-  // Check that we have added samples
-  if (!samples.size()) {
-    std::cerr << "No samples! Stopping MCMC" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
-  }
-
-  // Prepare the output trees
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
-    (*it)->setBranches(*outTree);
-  }
-
-  if (osc) {
-    osc->setBranches(*outTree);
-    outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
-  }
-  if (osc2) {
-    osc2->setBranches(*outTree);
-  }
-
-  outTree->Branch("LogL", &logLCurr, "LogL/D");
-  outTree->Branch("accProb", &accProb, "accProb/D");
-  outTree->Branch("step", &step, "step/I");
-  outTree->Branch("stepTime", &stepTime, "stepTime/D");
-
-  // Store individual likelihood components
-  // Using double means double as large output file!
-  sample_llh = new double[samples.size()];
-  syst_llh = new double[systematics.size()];
-
-  for (size_t i = 0; i < samples.size(); ++i) {
-    std::stringstream oss, oss2;
-    oss << "LogL_sample_" << i;
-    oss2 << oss.str() << "/D";
-    outTree->Branch(oss.str().c_str(), &sample_llh[i], oss2.str().c_str());
-
-    // For adding sample dependent branches to the posteriors tree
-    samples[i]->setMCMCBranches(outTree);
-  }
-
-  for (size_t i = 0; i < systematics.size(); ++i) {
-    std::stringstream oss, oss2;
-    oss << "LogL_systematic_" << systematics[i]->getName();
-    oss2 << oss.str() << "/D";
-    outTree->Branch(oss.str().c_str(), &syst_llh[i], oss2.str().c_str());
-  }
-
-  std::cout << "\n-------------------- Starting MCMC --------------------" << std::endl;
-
-  if (debug) {
-    PrintInitialState();
-    debugFile << "----- Starting MCMC -----" << std::endl;
-  }
 }
 
 // *******************
 // Do the initial reconfigure of the MCMC
 void mcmc::ProposeStep() {
-  // *******************
+// *******************
 
   // Initial likelihood
   double llh = 0.0;
@@ -596,9 +395,9 @@ void mcmc::ProposeStep() {
 // *******************
 // Print the fit output progress
 void mcmc::PrintProgress() {
-  // *******************
+// *******************
 
-  std::cout << "Step:\t" << step-stepStart << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl; 
+  std::cout << "Step:\t" << step-stepStart << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
   std::cout << "Accepted/Total steps: " << accCount << "/" << step-stepStart << " = " << double(accCount)/double(step - stepStart) << std::endl;
 
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
@@ -613,63 +412,3 @@ void mcmc::PrintProgress() {
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
   }
 }
-
-// **********************
-// Print our initial state for the chain
-void mcmc::PrintInitialState() {
-  // **********************
-  if (debug) {
-    for (size_t i = 0; i < systematics.size(); ++i) {
-      debugFile << "\nnominal values for " << systematics[i]->getName() << std::endl;
-      std::vector<double> noms = systematics[i]->getNominalArray();
-      for (size_t j = 0; j < noms.size(); ++j) {
-        debugFile << noms[j] << " ";
-      }
-    }
-    debugFile << std::endl;
-  }
-}
-
-// **********************
-// Save the settings that the MCMC was run with
-void mcmc::SaveSettings() {
-  // If we're using the new mcmc constructor which knows about settings
-// **********************
-  if (fitMan == NULL) {
-    std::cout << "************************" << std::endl;
-    std::cout << "************************" << std::endl;
-    std::cout << "WARNING WILL NOT SAVE MANAGER OUTPUT TO FILE BECAUSE YOU USED A DEPRECATED CONSTRUCTOR" << std::endl;
-    std::cout << "************************" << std::endl;
-    std::cout << "************************" << std::endl;
-  } else {
-    // Save the settings we have in the manager
-    //fitMan->SaveSettings(outputFile);
-    // Warn if we're running a deprecated constructor (again)
-  }
-
-}
-
-// *************************
-// Save the settings that the MCMC was run with
-void mcmc::SaveChain() {
-  // *************************
-
-  // Warn if the MCMC has accepted no steps
-  if (accCount == 0 && chainLength > 0) {
-    std::cout << "WARNING: no steps were accepted in MCMC!" << std::endl;
-  } else {
-    std::cout << "\n" << chainLength << " steps took " << clock.RealTime() << " seconds to complete. (" << clock.RealTime() / chainLength << "s / step).\n" << accCount << " steps were accepted." << std::endl;
-
-    if (debug) {
-      debugFile << "\n\n" << chainLength << " steps took " << clock.RealTime() << " seconds to complete. (" << clock.RealTime() / chainLength << "s / step).\n" << accCount<< " steps were accepted." << std::endl;
-    }
-
-    outputFile->cd();
-    outTree->Write();
-  }
-
-  if(debug) debugFile.close();
-
-  outputFile->Close();
-}
-

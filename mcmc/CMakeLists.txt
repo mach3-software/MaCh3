@@ -1,21 +1,30 @@
 set(mcmc_implementation_files
-	mcmc.cpp
-	tune.cpp 
-	stretch.cpp 
-	MCMCProcessor.cpp
-	gpuMCMCProcessorUtils.cu)
+    FitterBase.cpp
+    mcmc.cpp
+    LikelihoodFit.cpp
+    MinuitFit.cpp
+    tune.cpp
+    stretch.cpp
+    MCMCProcessor.cpp
+    gpuMCMCProcessorUtils.cu)
 
 set(mcmc_implementation_files_CPU 
-	mcmc.cpp
-	tune.cpp 
-	stretch.cpp 
-	MCMCProcessor.cpp)
+    FitterBase.cpp
+    mcmc.cpp
+    LikelihoodFit.cpp
+    MinuitFit.cpp
+    tune.cpp
+    stretch.cpp
+    MCMCProcessor.cpp)
 
 set(mcmc_header_files
-	mcmc.h
-	tune.h 
-	stretch.h 
-	MCMCProcessor.h)
+    FitterBase.h
+    mcmc.h
+    LikelihoodFit.h
+    MinuitFit.h
+    tune.h
+    stretch.h
+    MCMCProcessor.h)
 
 
 if(NOT ${CPU_ONLY})
