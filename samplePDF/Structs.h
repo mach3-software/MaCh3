@@ -1241,4 +1241,64 @@ double returnCherenkovThresholdMomentum(int PDG);
 
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
 double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
+
+
+enum CUDAProb_nu {
+  e_e = 0,
+  e_m = 1,
+  e_t = 2,
+  m_e = 3,
+  m_m = 4,
+  m_t = 5,
+  t_e = 6,
+  t_m = 7,
+  t_t = 8
+};
+ 
+
+// ************************************************
+// Get CUDAProb3 flavour from intital and final states
+inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
+//*************************************************  
+    
+  switch (abs(nu_i)) {
+  case 1:
+    switch (abs(nu_f)) {
+    case 1:
+      return CUDAProb_nu::e_e;
+      break;
+    case 2:
+      return CUDAProb_nu::e_m;
+      break;
+    case 3:
+      return CUDAProb_nu::e_t;
+      break;
+    } 
+  case 2:
+    switch (abs(nu_f)) {
+    case 1:
+      return CUDAProb_nu::m_e;
+      break;
+    case 2:
+      return CUDAProb_nu::m_m;
+      break;
+    case 3:
+      return CUDAProb_nu::m_t;
+      break;
+    } 
+  case 3:
+    switch (abs(nu_f)) {
+    case 1:
+      return CUDAProb_nu::t_e;
+      break;
+    case 2:
+      return CUDAProb_nu::t_m;
+      break;
+    case 3:
+      return CUDAProb_nu::t_t;
+      break;
+    }
+  }
+
+}
 #endif

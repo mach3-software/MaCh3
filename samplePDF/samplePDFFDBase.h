@@ -20,6 +20,14 @@
 #include "TRandom.h"
 #include "TString.h"
 
+//Propagator includes
+#ifdef USE_PROB3
+  #include "BargerPropagator.h"
+#else
+  #include "beamcudapropagator.cuh"
+  #include "atmoscudapropagator.cuh"
+#endif
+
 //MaCh3 includes
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
@@ -34,10 +42,7 @@
 #include "ShiftFunctors.h"
 
 #include "manager/manager.h"
-
-//Other
-#include "BargerPropagator.h"
-
+#include "OscClass/OscClass_CUDAProb3.h"
 
 #define USEBETA 0
 
@@ -56,13 +61,13 @@ public:
   // DB Reweighting and Likelihood functions
 
   //ETA - abstract these to samplePDFFDBase
-  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded getLikelihood
+  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
   void addData(TH1D* Data);
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
   void addData(std::vector< vector <double> > &data);
-  //DB Multi-threaded getLikelihood
-  double getLikelihood();
+  //DB Multi-threaded GetLikelihood
+  double GetLikelihood();
   //===============================================================================
 
   void reweight(double *oscpar);
@@ -73,8 +78,17 @@ public:
   void UseBinnedOscReweighting(bool ans);
   void UseBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
   
-  inline double CalcOscWeights(int nutype, int oscnutype, double en, double *oscpar);
-  //inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
+#if defined (USE_PROB3) && defined (CPU_ONLY)
+  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
+#endif
+
+#if defined (USE_PROB3) && not defined (CPU_ONLY)
+  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar);
+#endif
+
+#if not defined (USE_PROB3)
+  void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
+#endif
 
   std::string GetSampleName(){return samplename;}
 
@@ -102,9 +116,13 @@ public:
   //================================================================================
 
   virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
+  // LW - Setup Osc 
+  void virtual SetupOscCalc(double PathLength, double Density);
+  void SetOscillator(Oscillator* Osc_);
+  void FindEventOscBin();
 
  protected:
-  //fdmc_base contains pointers to the appropriate weights, so set these up
+  //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
   //DB Function to determine which weights apply to which types of samples
   //pure virtual!!
   virtual void SetupWeightPointers() = 0;
@@ -180,9 +198,12 @@ public:
 
   // Helper function to reset histograms
   inline void ResetHistograms();
-      
+  
+#ifndef USE_PROB3
+  inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
+#endif
   //===============================================================================
-  //DB Variables required for getLikelihood
+  //DB Variables required for GetLikelihood
   //
   //DB Vectors to hold bin edges
   std::vector<double> XBinEdges;
@@ -205,8 +226,7 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
-  // Propagator
-  BargerPropagator *bNu;
+  Oscillator *Osc;
 
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;

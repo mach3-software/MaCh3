@@ -32,7 +32,11 @@ void mcmc::init(std::string outfile) {
   // Counter of the accepted # of steps
   accCount = 0;
   //KS: you don't want to do this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
+<<<<<<< HEAD
   auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();//GetAutoSave();
+=======
+  auto_save = fitMan->raw()["General"]["AutoSave"].as<int>();//GetAutoSave();
+>>>>>>> 85142b6c96dbcccb25af69f367fa4bf64ef852dd
   // Do we want to save the nominal parameters to output
   save_nominal = true;
   // Starting parameters should be thrown 
@@ -517,9 +521,9 @@ void mcmc::ProposeStep() {
     }
 
     // Now get the likelihoods for the oscillation
-    osc_llh = osc->getLikelihood();
+    osc_llh = osc->GetLikelihood();
     if (osc2) {
-      osc_llh += osc2->getLikelihood();
+      osc_llh += osc2->GetLikelihood();
     }
 
     // Add the oscillation likelihoods to the reconfigure likelihoods
@@ -539,7 +543,7 @@ void mcmc::ProposeStep() {
     }
 
     // Get the likelihood from the systematics
-    syst_llh[stdIt] = (*it)->getLikelihood();
+    syst_llh[stdIt] = (*it)->GetLikelihood();
     llh += syst_llh[stdIt];
 
     if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
@@ -573,7 +577,7 @@ void mcmc::ProposeStep() {
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
     for (size_t i = 0; i < samples.size(); i++) {
       // Get the sample likelihoods and add them
-      sample_llh[i] = samples[i]->getLikelihood();
+      sample_llh[i] = samples[i]->GetLikelihood();
       llh += sample_llh[i];
       if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
     }

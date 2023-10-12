@@ -93,8 +93,7 @@ covarianceOsc::~covarianceOsc()
 {
 }
 
-double covarianceOsc::calcLikelihood() {
-
+double covarianceOsc::GetLikelihood() {
   double logL = 0.0;
   if(size==6) {
     #ifdef MULTITHREAD

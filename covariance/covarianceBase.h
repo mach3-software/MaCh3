@@ -112,9 +112,8 @@ class covarianceBase {
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
   bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
 
-  virtual double getLikelihood();
   virtual int CheckBounds();
-  double calcLikelihood();
+  virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
   // ETA - Why is this virtual?

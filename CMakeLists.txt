@@ -4,7 +4,12 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)  
 
 SET(MaCh3_VERSION 0.0.2)
-project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
+if(${CPU_ONLY})
+  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
+else()
+  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
+endif()
+set(CMAKE_CXX_STANDARD 17)
 
 # Would be good to have a check on CMAKE_CXX_STANDARD here
 # Changes default install path to be a subdirectory of the build dir.
@@ -46,12 +51,38 @@ CPMFindPackage(
 
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
-CPMFindPackage(
-    NAME Prob3plusplus
-    VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
-)
+
+if (${USE_PROB3})
+
+  CPMFindPackage(
+      NAME Prob3plusplus
+      VERSION 3.10.3
+      GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
+      GIT_TAG v3.10.3
+  )
+
+else()
+
+  if (${CPU_ONLY})
+
+    CPMFindPackage(
+        NAME CUDAProb3
+        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+        GIT_TAG "feature_cleanup"
+    )
+
+  else()
+  
+    CPMFindPackage(
+        NAME CUDAProb3
+        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+        GIT_TAG "feature_cleanup"
+	    OPTIONS "GPU_ON ON"
+    )
+
+  endif()
+
+endif()
 
 CPMAddPackage(
   NAME Eigen
@@ -102,17 +133,35 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 add_compile_options(-I${CUDA_SAMPLES}/common/inc)
 add_compile_options(-g -O3 -Wextra)
 
-#Add MultiThread flags
+#Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
+add_compile_options(-g -Wextra)
+add_compile_options(-fopenmp)
+add_link_options(-fopenmp)
+
+#If Single thread is chosen MultiThread flags are omitted
 if(NOT ${SINGLE_THREAD_ONLY})
-  add_compile_options(-fopenmp -DMULTITHREAD)
-  add_link_options(-fopenmp -DMULTITHREAD)
+  add_compile_options(-DMULTITHREAD)
+  add_link_options(-DMULTITHREAD)
+endif()
+
+if(${CPU_ONLY})
+  add_compile_options(-DCPU_ONLY)
+else()
+  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
+  add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
+endif()
+
+if(${USE_PROB3})
+  add_compile_options(-DUSE_PROB3)
 endif()
 
 # Build components
+# add_subdirectory(Diagnostics)
 add_subdirectory(manager)
 add_subdirectory(throwParms)
 add_subdirectory(covariance)
 add_subdirectory(splines)
+add_subdirectory(OscClass)
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 #ETA - commenting out as not c++11 compatible...
@@ -124,7 +173,7 @@ if(NOT TARGET MaCh3)
   add_library(MaCh3 INTERFACE)
   set_target_properties(MaCh3 PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}"
-      INTERFACE_LINK_LIBRARIES "MCMC;SamplePDF;Covariance;Splines;ThrowParms;Manager"
+      INTERFACE_LINK_LIBRARIES "MCMC;OscClass;SamplePDF;Covariance;Splines;ThrowParms;Manager"
       EXPORT_NAME MaCh3
   )
   cmessage(STATUS "Added target MaCh3")

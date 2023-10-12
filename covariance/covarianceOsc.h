@@ -10,9 +10,8 @@ class covarianceOsc : public covarianceBase
       
   covarianceOsc(const char* name, const char *file, TH2D *hist_dcpNH=NULL, TH2D *hist_dcpIH=NULL, TH2D *hist_23=NULL);//TMatrixDSym *cov);
       virtual ~covarianceOsc();
-
-      double calcLikelihood();
-      //inline int CheckBounds();
+      void throwNominal(bool nomValues=true);
+      double GetLikelihood();
       double *getPropPars();//double *retrn);
       void proposeStep();
       std::vector<double> defaultPars(bool doubled);
@@ -21,7 +20,15 @@ class covarianceOsc : public covarianceBase
       void setFlipBeta(bool flip){flipBeta=flip;}
       void useReactorPrior(bool reactor){reactorPrior = reactor;};
       void setExtraBranches(TTree &tree);
-      
+
+      double GetPathLength() {
+        return L;
+      }
+
+      double GetDensity() {
+        return density;
+      }
+
       //KS: Print all usefull informations after initialization
       void Print();
       //KS: Currently prob3++/probgp requiers particular order so we need to check this is the case

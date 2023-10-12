@@ -1004,7 +1004,7 @@ void covarianceBase::printNominalCurrProp() {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::calcLikelihood() {
+double covarianceBase::GetLikelihood() {
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
@@ -1022,7 +1022,7 @@ double covarianceBase::calcLikelihood() {
     }
   }
   //clock.Stop();
-  //std::cout << __FILE__ << "::getLikelihood took " << clock.RealTime() << "s" << std::endl;
+  //std::cout << __FILE__ << "::GetLikelihood took " << clock.RealTime() << "s" << std::endl;
 
   return logL;
 }

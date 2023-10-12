@@ -56,10 +56,10 @@ class samplePDFBase : public samplePDFInterface
   // generate fake dataset based on rejection sampling    
   vector< vector <double> > generate2D(TH2D* pdf = 0);
   vector<double> generate();
-  virtual double getLikelihood();
+  virtual double GetLikelihood();
   virtual std::vector<double>* getDataSample() {return dataSample;};
   // nominal spectrum things
-  //  double getLikelihoodNominal(); // computes the likelihood against a nominal spectra
+  //  double GetLikelihoodNominal(); // computes the likelihood against a nominal spectra
   /*  TH1D *generateNominal1D();
   TH2D *generateNominal2D();
   TH1D *nominalSpectrum1D; 
@@ -82,7 +82,7 @@ class samplePDFBase : public samplePDFInterface
   
   //bool gpu_rw; 
 
-  double getLikelihood_kernel(std::vector<double> &data);
+  double GetLikelihood_kernel(std::vector<double> &data);
   double getTestStatLLH(double data, double mc);
   double getTestStatLLH(double data, double mc, double w2);
   // Provide a setter for the test-statistic

@@ -748,40 +748,6 @@ void covarianceXsec::ScanParameters() {
 		}
 		tmp_xsec.modes=temp;
 		temp.clear();
-
-		// Set the target of the normalisation parameter
-		tempVector = (TVectorD*)(xsec_param_norm_horncurrents->At(i));
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		tmp_xsec.horncurrents=temp;
-		temp.clear();
-
-		// Set the target of the normalisation parameter
-		tempVector = (TVectorD*)(xsec_param_norm_elem->At(i));
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		tmp_xsec.targets=temp;
-		temp.clear();
-
-
-		// Set the pdg of the normalisation parameter
-		tempVector = (TVectorD*)(xsec_param_norm_nupdg->At(i));
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		tmp_xsec.pdgs=temp;
-		temp.clear();
-
-
-		// Set the preoscillation neutrino pdg of the normalisation parameter
-		tempVector = (TVectorD*)(xsec_param_norm_preoscnupdg->At(i));
-		for (int j = 0; j < tempVector->GetNrows(); ++j) {
-		  temp.push_back(tempVector[0][j]);
-		}
-		tmp_xsec.preoscpdgs=temp;
-		temp.clear();
 		*/
 
 		//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
@@ -1126,7 +1092,7 @@ void covarianceXsec::Print() {
   std::cout << std::endl;
 
   // Output the normalisation parameters as a sanity check!
-  std::cout << "Normalisation parameters:" << nNearNormParams << std::endl;
+  std::cout << "Near detector normalisation parameters:" << nNearNormParams << std::endl;
   std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "Type" << std::endl;
   for (int i = 0; i < nNearNormParams; ++i) {
     std::cout << std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << NearNormParams.at(i).index << std::setw(2) << "|" << std::setw(20) << NearNormParams.at(i).name << std::setw(2) << "|" << std::setw(10);
