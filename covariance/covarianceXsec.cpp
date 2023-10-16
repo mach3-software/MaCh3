@@ -128,7 +128,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
 
-    if(_fFlatPrior[i]){setEvalLikelihood(i, false);}
+    if(_fFlatPrior[i]){setEvalLikelihood(i, true);}
     
     for (int j = 0; j < ncols; j++) {
       xsec_param_id_a[i][j] = (*xsec_param_id)(i,j);
@@ -279,13 +279,10 @@ void covarianceXsec::ParseYAML(const char* FileName)
      _fLowBound[i] = TempBoundsVec[0];
      _fUpBound[i] = TempBoundsVec[1];
 
-	 std::cout << "Upper bounds is " << _fUpBound[i] << std::endl;
 
      _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
      _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
-	 std::cout << "Setting error to be " << param["Systematic"]["Error"].as<double>() << std::endl;
      _fError[i] = (param["Systematic"]["Error"].as<double>());
-	 std::cout << "_fError[i] is " << _fError[i] << std::endl;
 	 _fParamType[i] = (param["Systematic"]["Type"].as<std::string>());
 
 	 if (param["Systematic"]["FlatPrior"]) {
@@ -362,7 +359,7 @@ void covarianceXsec::ParseYAML(const char* FileName)
 	   std::cout << "FOUND " << param["Systematic"]["Correlations"].size() << " CORRELATIONS!" << std::endl;
 	   for(int Corr_i = 0 ; Corr_i < param["Systematic"]["Correlations"].size()  ; ++Corr_i){
 		 for (YAML::const_iterator it=param["Systematic"]["Correlations"][Corr_i].begin();it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
-		   std::cout << "Correlation with " << it->first.as<std::string>() << " of " << it->second.as<double>() << std::endl;
+		   //std::cout << "Correlation with " << it->first.as<std::string>() << " of " << it->second.as<double>() << std::endl;
            Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
 		 }
 	   }
