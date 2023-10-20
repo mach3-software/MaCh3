@@ -1,7 +1,7 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # CMake version check
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)  
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)  
 
 SET(MaCh3_VERSION 0.0.2)
 if(${CPU_ONLY})

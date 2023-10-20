@@ -31,7 +31,8 @@
 #include "TColor.h"
 #include "TStyle.h"
 #include "TStopwatch.h"
-#include "TObjString.h"
+#include "TText.h"
+#include "TGaxis.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -69,10 +70,6 @@ class MCMCProcessor {
     void MakeCovariance_MP();
     
     void DiagMCMC();
-        
-    void GetArithmetic(TH1D * const hpost, int i);
-    void GetGaussian(TH1D *& hpost, int i);
-    void GetHPD(TH1D * const hpost, int i);
     
     void MakePostfit();
     
@@ -88,7 +85,7 @@ class MCMCProcessor {
     int GetNFD() { return nParam[kFDDetPar]; };
     int GetOSC() { return nParam[kOSCPar]; };
         
-    TH1D* const GetHpost(int i) { return hpost[i]; };
+    inline TH1D* const GetHpost(int i) { return hpost[i]; };
 
     std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
     std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
@@ -99,19 +96,31 @@ class MCMCProcessor {
 
     // Draw the post-fit comparisons
     void DrawPostfit();
+    // Make and Draw Violin
+    void MakeViolin();
+    // Make and Draw Credible intervals
+    void MakeCredibleIntervals();
     // Draw the post-fit covariances
     void DrawCovariance();
+    // Make and Draw Credible Regions
+    void MakeCredibleRegions();
+    //Make fancy triangle plot for selected parameters
+    void MakeTrianglePlot(std::vector<std::string> ParamNames);
 
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
 
-    void GetNthParameter(int param, double &Nominal, double &NominalError, TString &Title);
-    
+    void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
+    void GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name);
+
+    int GetnEntries(){return nEntries;};
+    int GetnSteps(){return nSteps;};
+    //KS: Many setters which in future will be loaded via config
     // Set the step cutting
     // Either by string
     void SetStepCut(std::string Cuts);
     // Or by int
-    void SetStepCut(int Cuts);
+    void SetStepCut(const int Cuts);
 
     void SetMakeOnlyXsecCorr(bool PlotOrNot){MakeOnlyXsecCorr = PlotOrNot; };
     void SetMakeOnlyXsecCorrFlux(bool PlotOrNot){MakeOnlyXsecCorrFlux = PlotOrNot; };
@@ -119,8 +128,12 @@ class MCMCProcessor {
     void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
     void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
     void SetPlotDet(bool PlotOrNot){PlotDet = PlotOrNot; };
+    void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
     void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
-      
+    void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
+    void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
+    void SetPost2DPlotThreshold(double Threshold){Post2DPlotThreshold = Threshold; };
+
     void SetnBatches(int Batches){nBatches = Batches; };
     void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
     
@@ -141,11 +154,23 @@ class MCMCProcessor {
     inline void ScanParameterOrder();
     inline void SetupOutput();
 
+    //Analyse posterior distribution
+    inline void GetArithmetic(TH1D * const hpost, const int i);
+    inline void GetGaussian(TH1D *& hpost, const int i);
+    inline void GetHPD(TH1D * const hpost, const int i, const double coverage = 0.6827);
+    inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
+    inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
+    inline std::string GetJeffreysScale(const double BayesFactor);
+
+
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();
     inline void ParamTraces();
     inline void AutoCorrelation();
+    inline void CalculateESS(const int nLags);
+    inline void BatchedAnalysis();
     inline void BatchedMeans();
+    inline void GewekeDiagnostic();
     inline void AcceptanceProbabilities();
     
     std::string MCMCFile;
@@ -161,7 +186,9 @@ class MCMCProcessor {
     std::string StepCut;
     int BurnInCut;
     int nBranches;
+    //KS: For merged chains number of entires will be different fron nSteps
     int nEntries;
+    int nSteps;
     int nSamples;
     int nSysts;
 
@@ -172,6 +199,7 @@ class MCMCProcessor {
     std::vector<std::vector<double>>  ParamCentral;
     std::vector<std::vector<double>>  ParamNom;
     std::vector<std::vector<double>>  ParamErrors;
+    std::vector<std::vector<bool>>    ParamFlat;
     // Make an enum for which class this parameter belongs to so we don't have to keep string comparing
     std::vector<ParameterEnum> ParamType;
     //KS: in MCMC output there is order of parameters so for example first goes xsec then nd det etc.
@@ -190,6 +218,7 @@ class MCMCProcessor {
 
     bool PlotXSec;
     bool PlotDet;
+    bool PlotFlatPrior;
 
     bool MakeCorr;
     bool MakeOnlyXsecCorr;
@@ -199,11 +228,11 @@ class MCMCProcessor {
     bool printToPDF;
     bool FancyPlotNames;
     bool plotBinValue; //If true it will print value on each bin of covariance matrix
-    
+    //KS: Set Threshold when to plot 2D posterior as by default we get a LOT of plots
+    double Post2DPlotThreshold;
+
     // The output file
     TFile *OutputFile;
-    // Directory for posteriors
-    TDirectory *PostDir;
 
     int nDraw;
     std::vector<int> nParam;
@@ -230,17 +259,17 @@ class MCMCProcessor {
     TMatrixDSym *Covariance;
     TMatrixDSym *Correlation;
 
-    bool CacheMCMCM;
+    bool CacheMCMC;
     bool doDiagMCMC;
+    bool ApplySmoothing;
     // Holds Posterior Distributions
     TH1D **hpost;
     TH2D ***hpost2D;
+    TH2D *hviolin;
     
-    double** ParStep = NULL;
-    int* StepNumber = NULL;
-    
-    double* Min_Chain;
-    double* Max_Chain;
+    double** ParStep;
+    int* StepNumber;
+
     // Number of bins
     int nBins;
     // Drawrange for SetMaximum
@@ -249,9 +278,9 @@ class MCMCProcessor {
     int nBatches;
     
     // Holds all the parameter variations
-    double **ParamValues;
     double *ParamSums;
     double **BatchedAverages;
+    double **LagL;
 
     // Holds the sample values
     double **SampleValues;
@@ -262,18 +291,20 @@ class MCMCProcessor {
     double *AccProbValues;
     double *AccProbBatchedAverages;
     
-    // Trace plots
-    TH1D **TraceParamPlots;
-    TH1D **TraceSamplePlots;
-    TH1D **TraceSystsPlots;
-    TH1D **BatchedParamPlots;
+  //Only if GPU is enabled
+  #ifdef CUDA
+    void PrepareGPU_AutoCorr(const int nLags);
 
-    // LagK autocorrelation plots
-    TH1D **LagKPlots;
+    float* ParStep_cpu;
+    float* NumeratorSum_cpu;
+    float* ParamSums_cpu;
+    float* DenomSum_cpu;
 
-    // Acceptance Prob Plots
-    TH1D *AcceptanceProbPlot;
-    TH1D *BatchedAcceptanceProblot;
+    float* ParStep_gpu;
+    float* NumeratorSum_gpu;
+    float* ParamSums_gpu;
+    float* DenomSum_gpu;
+  #endif
 };
 
 #endif

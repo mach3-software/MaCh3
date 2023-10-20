@@ -102,10 +102,10 @@ static int h_n_events     = -1;
 // TEXTURES
 // ******************************************
 //KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for variables you often acces but rarely overwrite. There are limits on texture memory so don't use huge arrays
-texture<float, 1, cudaReadModeElementType> text_coeff_x;
+cudaTextureObject_t text_coeff_x = 0;
 #ifndef Weight_On_SplineBySpline_Basis
 //KS: Map keeping track how many parmaeters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
-texture<unsigned int, 1, cudaReadModeElementType> text_nParamPerEvent;
+cudaTextureObject_t text_nParamPerEvent = 0;
 #endif
 
 
@@ -335,7 +335,20 @@ __host__ void CopyToGPU_SepMany(
 
   //KS: Bind our texture with the GPU variable
   //KS: Tried also moving gpu_many_array to texture memory it only worked with restricted number of MC runs, most likely hit texture memory limit :(
-  cudaBindTexture(NULL, text_coeff_x, gpu_x_array,  sizeof(float)*spline_size*n_params);
+  struct cudaResourceDesc resDesc_coeff_x;
+  memset(&resDesc_coeff_x, 0, sizeof(resDesc_coeff_x));
+  resDesc_coeff_x.resType = cudaResourceTypeLinear;
+  resDesc_coeff_x.res.linear.devPtr = gpu_x_array;
+  resDesc_coeff_x.res.linear.desc = cudaCreateChannelDesc<float>();
+  resDesc_coeff_x.res.linear.sizeInBytes = sizeof(float)*spline_size*n_params;
+
+  // Specify texture object parameters
+  struct cudaTextureDesc texDesc_coeff_x;
+  memset(&texDesc_coeff_x, 0, sizeof(texDesc_coeff_x));
+  texDesc_coeff_x.readMode = cudaReadModeElementType;
+
+  // Create texture object
+  cudaCreateTextureObject(&text_coeff_x, &resDesc_coeff_x, &texDesc_coeff_x, NULL);
   CudaCheckError();
 
   // Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now
@@ -352,7 +365,21 @@ __host__ void CopyToGPU_SepMany(
   CudaCheckError();
   
   //KS: Bind our texture with the GPU variable
-  cudaBindTexture(NULL, text_nParamPerEvent, gpu_nParamPerEvent,  2*n_events*sizeof(unsigned int));
+  // create a ressource descriptor based on device pointers
+  struct cudaResourceDesc resDesc_nParamPerEvent;
+  memset(&resDesc_nParamPerEvent, 0, sizeof(resDesc_nParamPerEvent));
+  resDesc_nParamPerEvent.resType = cudaResourceTypeLinear;
+  resDesc_nParamPerEvent.res.linear.devPtr = gpu_nParamPerEvent;
+  resDesc_nParamPerEvent.res.linear.desc = cudaCreateChannelDesc<unsigned int>();
+  resDesc_nParamPerEvent.res.linear.sizeInBytes = 2*n_events*sizeof(unsigned int);
+
+  // Specify texture object parameters
+  struct cudaTextureDesc texDesc_nParamPerEvent;
+  memset(&texDesc_nParamPerEvent, 0, sizeof(texDesc_nParamPerEvent));
+  texDesc_nParamPerEvent.readMode = cudaReadModeElementType;
+
+  //Finnaly create texture object
+  cudaCreateTextureObject(&text_nParamPerEvent, &resDesc_nParamPerEvent, &texDesc_nParamPerEvent, NULL);
   CudaCheckError();
   #endif
 }
@@ -420,9 +447,23 @@ __host__ void CopyToGPU_TF1(
   //KS: Keep track how much splines each event has  
   cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent, 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
-  
+
   //KS: Bind our texture with the GPU variable
-  cudaBindTexture(NULL, text_nParamPerEvent, gpu_nParamPerEvent,  2*n_events*sizeof(unsigned int));
+  // create a ressource descriptor based on device pointers
+  struct cudaResourceDesc resDesc_nParamPerEvent;
+  memset(&resDesc_nParamPerEvent, 0, sizeof(resDesc_nParamPerEvent));
+  resDesc_nParamPerEvent.resType = cudaResourceTypeLinear;
+  resDesc_nParamPerEvent.res.linear.devPtr = gpu_nParamPerEvent;
+  resDesc_nParamPerEvent.res.linear.desc = cudaCreateChannelDesc<float>();
+  resDesc_nParamPerEvent.res.linear.sizeInBytes = 2*n_events*sizeof(unsigned int);
+
+  // Specify texture object parameters
+  struct cudaTextureDesc texDesc_nParamPerEvent;
+  memset(&texDesc_nParamPerEvent, 0, sizeof(texDesc_nParamPerEvent));
+  texDesc_nParamPerEvent.readMode = cudaReadModeElementType;
+
+  //Lastly create texture object
+  cudaCreateTextureObject(&text_nParamPerEvent, &resDesc_nParamPerEvent, &texDesc_nParamPerEvent, NULL);
   CudaCheckError();
   #endif
 }
@@ -444,7 +485,8 @@ __global__ void EvalOnGPU_SepMany(
     const short int* __restrict__ gpu_paramNo_arr,
     const unsigned int* __restrict__ gpu_nKnots_arr,
     const float* __restrict__ gpu_coeff_many,
-    float *gpu_weights) {
+    float *gpu_weights,
+    cudaTextureObject_t text_coeff_x) {
 //*********************************************************
 
   // points per spline is the offset to skip in the index to move between splines
@@ -482,7 +524,7 @@ __global__ void EvalOnGPU_SepMany(
     const float fC = gpu_coeff_many[CurrentKnotPos+2];
     const float fD = gpu_coeff_many[CurrentKnotPos+3];
     // The is the variation itself (needed to evaluate variation - stored spline point = dx)
-    const float dx = val_gpu[Param] - tex1Dfetch(text_coeff_x, segment_X);
+    const float dx = val_gpu[Param] - tex1Dfetch<float>(text_coeff_x, segment_X);
 
     // Wooow, let's use some fancy intrinsics and pull down the processing time by <1% from normal multiplication! HURRAY
     gpu_weights[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
@@ -490,7 +532,7 @@ __global__ void EvalOnGPU_SepMany(
     //gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
 
 #ifdef DEBUG
-  printf("splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, d_n_splines = %i, d_spline_size = %i, weight = %f \n", splineNum, d_n_splines, gpu_paramNo_arr[splineNum], val_gpu[Param], segment, tex1Dfetch(text_coeff_x, segment_X), tex1Dfetch(text_coeff_x, segment_X+1), dx, d_n_splines, d_spline_size, gpu_weights[splineNum]);
+  printf("splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, d_n_splines = %i, d_spline_size = %i, weight = %f \n", splineNum, d_n_splines, gpu_paramNo_arr[splineNum], val_gpu[Param], segment, tex1Dfetch<float>(text_coeff_x, segment_X), tex1Dfetch<float>(text_coeff_x, segment_X+1), dx, d_n_splines, d_spline_size, gpu_weights[splineNum]);
 #endif
   }
 }
@@ -550,7 +592,8 @@ __global__ void EvalOnGPU_TF1(
 //KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
    const float* __restrict__ gpu_weights,
-   float *gpu_total_weights) {
+   float *gpu_total_weights,
+  cudaTextureObject_t text_nParamPerEvent) {
 //*********************************************************
     const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
     //KS: Accesing shared memory is much much faster than global memory hence we use shared memory for calcualtion and then write to global memory
@@ -558,13 +601,13 @@ __global__ void EvalOnGPU_TotWeight(
     if(EventNum < d_n_events) //stopping condition
     {
         shared_total_weights[threadIdx.x] = 1.;
-        for (unsigned int id = 0; id < tex1Dfetch(text_nParamPerEvent, 2*EventNum); ++id)
+        for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum); ++id)
         {
-            shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch(text_nParamPerEvent, 2*EventNum+1) + id];
+            shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
 
             #ifdef DEBUG
             printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
-                   EventNum, tex1Dfetch(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch(text_nParamPerEvent, 2*EventNum+1) + id];
+                   EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
             #endif
         }
         //KS: Make sure threads are synchorised before moving to global memory
@@ -631,7 +674,8 @@ __host__ void RunGPU_SepMany(
 
       gpu_coeff_many,
 
-      gpu_weights
+      gpu_weights,
+      text_coeff_x
       );
   CudaCheckError();
 
@@ -663,7 +707,8 @@ __host__ void RunGPU_SepMany(
   #endif
   EvalOnGPU_TotWeight<<<grid_size, block_size>>>(
       gpu_weights,
-      gpu_total_weights
+      gpu_total_weights,
+      text_nParamPerEvent
       );
   #ifdef DEBUG
   CudaCheckError();
@@ -721,7 +766,7 @@ __host__ void RunGPU_TF1(
 #endif
 
   // Set the cache config to prefer L1 for the kernel
-  //cudaFuncSetCacheConfig(EvalOnGPU_SepMany, cudaFuncCachePreferL1);
+  //cudaFuncSetCacheConfig(EvalOnGPU_TF1, cudaFuncCachePreferL1);
   EvalOnGPU_TF1<<<grid_size, block_size>>>(
       gpu_coeffs,
       gpu_paramNo_arr,
@@ -760,7 +805,8 @@ __host__ void RunGPU_TF1(
   #endif
   EvalOnGPU_TotWeight<<<grid_size, block_size>>>(
       gpu_weights,
-      gpu_total_weights
+      gpu_total_weights,
+      text_nParamPerEvent
       );
   #ifdef DEBUG
   CudaCheckError();
@@ -800,7 +846,7 @@ __host__ void CleanupGPU_SepMany(
   cudaFree(gpu_nKnots_arr);
 
   // free the coefficient arrays
-  cudaUnbindTexture(text_coeff_x);
+  cudaDestroyTextureObject(text_coeff_x);
   cudaFree(gpu_x_array);
   cudaFree(gpu_many_array);
 
@@ -808,8 +854,8 @@ __host__ void CleanupGPU_SepMany(
   cudaFree(gpu_weights);
 #ifndef Weight_On_SplineBySpline_Basis
   cudaFree(gpu_total_weights);
-  //KS: Before removing variable let's unbind texture
-  cudaUnbindTexture(text_nParamPerEvent);
+  //KS: Before removing variable let's destroy texture
+  cudaDestroyTextureObject(text_nParamPerEvent);
   cudaFree(gpu_nParamPerEvent);
   cudaFreeHost(cpu_total_weights);
 #endif
@@ -850,5 +896,3 @@ __host__ void CleanupGPU_TF1(
   
   return;
 }
-
-

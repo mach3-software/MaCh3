@@ -3,7 +3,8 @@
 
 // Run low or high memory versions of structs
 // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
-#define __LOW__MEMORY_STRUCTS__
+//KS: Need more testing on FD
+//#define __LOW_MEMORY_STRUCTS__
 
 #ifdef __LOW_MEMORY_STRUCTS__
 #define __float__ float
@@ -23,6 +24,8 @@
 #define __BAD_INT__ -999
 
 #define __LARGE_WEIGHT__ 100
+
+#define __TH2PolyOverflowBins__ 9
 
 #define __DEFAULT_RETURN_VAL__ -999999.123456
 
@@ -96,17 +99,17 @@ class XsecNorms4 {
 struct FastSplineInfo {
 // *******************
   // Number of points in spline
-  int nPts;
+  __int__ nPts;
 
   // Array of the knots positions
-  double *xPts;
+  __float__ *xPts;
 
   // Array of what segment of spline we're currently interested in
   // Gets updated once per MCMC iteration
-  int CurrSegment;
-
-  //ETA trying to change things so we don't read in all flat splines
-  int flat;
+  __int__ CurrSegment;
+  
+  // Array of the knots positions
+  const double* splineParsPointer;
 };
 
 // ********************************************
@@ -117,7 +120,7 @@ class XSecStruct{
   // ********************************************
   public:
     // The light constructor
-    XSecStruct(__int__ NumberOfSplines) {
+    XSecStruct(__int__ NumberOfSplines) { 
       nParams = NumberOfSplines;
       Func.reserve(nParams);
       for (int i = 0; i < nParams; ++i) {
@@ -161,7 +164,7 @@ class XSecStruct{
     // Set the function for the nth spline
     inline void SetFunc(__int__ nSpline, T Function) { Func[nSpline] = Function; }
     // Eval the current variation
-    inline double Eval(__int__ nSpline, __float__ variation) {
+    inline double Eval(__int__ nSpline, __float__ variation) { 
       // Some will be NULL, check this
       if (Func[nSpline]) {
         return Func[nSpline]->Eval(variation);
@@ -292,6 +295,45 @@ class TF1_red {
     __int__ ParamNo;
 };
 
+// Make an enum of the spline interpolation type
+enum SplineInterpolation {
+  kTSpline3,
+  kLinear,
+  kMonotonic,
+  kAkima,
+  kSplineInterpolations  //This only enumarates
+};
+
+// **************************************************
+// Convert a LLH type to a string
+inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
+// **************************************************
+    std::string name = "";
+    switch(i) {
+        //  TSpline3 (third order spline in ROOT)
+        case kTSpline3:
+        name = "TSpline3";
+        break;
+        case kLinear:
+        name = "Linear";
+        break;
+        case kMonotonic:
+        name = "Monotonic";
+        break;
+        //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
+        case kAkima:
+        name = "Akima";
+        break;
+        default:
+            std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
+            std::cerr << "You gave  " << i << std::endl;
+            std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+            throw;
+    }
+    return name;
+}
+
+
 // ************************
 // Reduced TSpline3 class
 class TSpline3_red {
@@ -306,19 +348,11 @@ class TSpline3_red {
     }
 
     // The constructor that takes a TSpline3 pointer and copies in to memory
-    TSpline3_red(TSpline3* &spline, int Param = -1) {
+    TSpline3_red(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
       Par = NULL;
       XPos = NULL;
       YResp = NULL;
-      SetFunc<TSpline3>(spline, Param);
-    }
-
-    // Copy constructor, should also accept and copy derived classes, i.e.  akima and monotone splinese
-    TSpline3_red(TSpline3_red* &spline, int Param = -1) {
-      Par = NULL;
-      XPos = NULL;
-      YResp = NULL;
-      SetFunc<TSpline3_red>(spline, Param);
+      SetFunc(spline, Param, InterPolation);
     }
 
     // constructor taking parameters
@@ -349,9 +383,7 @@ class TSpline3_red {
       }
     }
 
-    // Set a function
-    template <typename T>
-    inline void SetFunc(T* &spline, int Param = -1) {
+    inline void SetFunc(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
       nPoints = spline->GetNp();
       ParamNo = Param;
       if (Par != NULL) {
@@ -370,17 +402,240 @@ class TSpline3_red {
       XPos = new __float__[nPoints];
       // Save the y response at each knot
       YResp = new __float__[nPoints];
-      for (int i = 0; i < nPoints; ++i) {
-        // 3 is the size of the TSpline3 coefficients
-        Par[i] = new __float__[3];
-        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-        spline->GetCoeff(i, x, y, b, c, d);
-        XPos[i]   = x;
-        YResp[i]  = y;
-        Par[i][0] = b;
-        Par[i][1] = c;
-        Par[i][2] = d;
+
+      //KS: Default TSpline3 ROOT implementation
+      if(InterPolation == kTSpline3)
+      {
+        for (int i = 0; i < nPoints; ++i) {
+          // 3 is the size of the TSpline3 coefficients
+          Par[i] = new __float__[3];
+          double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+          spline->GetCoeff(i, x, y, b, c, d);
+          XPos[i]   = x;
+          YResp[i]  = y;
+          Par[i][0] = b;
+          Par[i][1] = c;
+          Par[i][2] = d;
+        }
       }
+      //CWRET Reduce to use linear spline interpolation for certain parameters
+      // Not the most elegant way: use TSpline3 object but set coefficients to zero and recalculate spline points; the smart way (but more human intensive) would be to save memory here and simply not store the zeros at all
+      // Get which parameters should be linear from the fit manager
+      // Convert the spline number to global xsec parameter
+      // Loop over the splines points
+      else if(InterPolation == kLinear)
+      {
+        for (int k = 0; k < nPoints; ++k) {
+          // 3 is the size of the TSpline3 coefficients
+          Par[k] = new __float__[3];
+          Double_t x1, y1, b1, c1, d1, x2, y2, b2, c2, d2 = 0;
+          spline->GetCoeff(k, x1, y1, b1, c1, d1);
+          spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
+          double tempb = (y2-y1)/(x2-x1);
+
+          XPos[k]   = x1;
+          YResp[k]  = y1;
+          Par[k][0] = tempb;
+          Par[k][1] = 0;
+          Par[k][2] = 0;
+        }
+      }
+      //Ewan: Akima spline is similar to regular cubic spline but is allowed to be discontinuous in 2nd derivative and coefficients in any segment
+      // only depend on th 2 nearest points on either side
+      else if(InterPolation == kAkima)
+      {
+        // get the knot values for the spline
+        for (int i = 0; i < nPoints; ++i) {
+          // 3 is the size of the TSpline3 coefficients
+          Par[i] = new __float__[3];
+
+          double x = -999.99, y = -999.99;
+          spline->GetKnot(i, x, y);
+
+          XPos[i]   = x;
+          YResp[i]  = y;
+        }
+
+        __float__ mvals[nPoints + 2];
+        __float__ svals[nPoints];
+
+        for (int i = -2; i <= nPoints; ++i) {
+          // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
+          // need to estimate the values for additinal points which would lie outside of the spline
+          if(i ==-2){
+            mvals[i+2] = 3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
+          }
+          else if(i==-1){
+            mvals[i+2] = 2.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - (YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
+          }
+          else if(i==nPoints){
+            mvals[i+2] = 3.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - 2.0*(YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
+          }
+          else if(i == nPoints - 1){
+            mvals[i+2] = 2.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - (YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
+          }
+          //standard internal segment
+          else{
+            mvals[i+2] = (YResp[i+1] - YResp[i])/ (XPos[i+1] - XPos[i]);
+          }
+        }
+
+        for(int i =2; i<=nPoints+2; i++){
+          if (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]) != 0.0){
+            svals[i-2] = (abs(mvals[i+1] - mvals[i]) * mvals[i-1] + abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]));
+            }
+          else{svals[i-2] = mvals[i];}
+        }
+
+        // calculate the coefficients for the spline
+        for(int i = 0; i <nPoints; i++){
+          __float__ b, c, d = -999.999;
+
+          b = svals[i];
+          c = (3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
+          d = ((svals[i + 1] +svals[i]) - 2.0*(YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i])) / ((XPos[i+1] - XPos[i]) * (XPos[i+1] - XPos[i]));
+
+          Par[i][0] = b;
+          Par[i][1] = c;
+          Par[i][2] = d;
+        }
+
+        // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
+        // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+        for(int i = 0; i <nPoints-1; i++){
+          double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+          spline->GetCoeff(i, x, y, b, c, d);
+
+          if((c == 0.0 && d == 0.0)){
+            Par[i][0] = b;
+            Par[i][1] = 0.0;
+            Par[i][2] = 0.0;
+          }
+        }
+      }
+      //Ewan: Monotone spline is similar to regular cubic spline but enforce the condition that the interpolated value at any point
+      // must be between its two nearest knots, DOES NOT make the entire spline monotonic, only the segments
+      else if(InterPolation == kMonotonic)
+      {
+        // values of the secants at each point (for calculating monotone spline)
+        __float__ * Secants = new __float__[nPoints -1];
+        // values of the tangens at each point (for calculating monotone spline)
+       __float__ *  Tangents = new __float__[nPoints];
+
+        // get the knot values for the spline
+        for (int i = 0; i < nPoints; ++i) {
+          // 3 is the size of the TSpline3 coefficients
+          Par[i] = new __float__[3];
+
+          double x = -999.99, y = -999.99;
+          spline->GetKnot(i, x, y);
+
+          XPos[i]   = x;
+          YResp[i]  = y;
+
+          Tangents[i] = 0.0;
+        }
+
+        // deal with the case of two points (just do linear interpolation between them)
+        if (nPoints ==2){
+            Par[0][0] = (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]);
+            Par[0][1] = 0.0;
+            Par[0][2] = 0.0;
+            // extra "virtual" segment at end to make Par array shape fit with knot arrays shapes
+            Par[1][1] = 0.0;
+            Par[1][2] = 0.0;
+
+            return;
+        } // if nPoints !=2 do full monotonic spline treatment:
+
+        // first pass over knots to calculate the secants
+        for (int i = 0; i < nPoints-1; ++i) {
+          Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
+          //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
+        }
+
+        Tangents[0] = Secants[0];
+        Tangents[nPoints-1] = Secants[nPoints -2];
+
+        __float__ alpha;
+        __float__ beta;
+
+        // second pass over knots to calculate tangents
+        for (int i = 1; i < nPoints-1; ++i) {
+          if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
+            Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
+          }
+        }
+
+        // third pass over knots to rescale tangents
+        for (int i = 0; i < nPoints-1; ++i) {
+          if (Secants[i] == 0.0){
+            Tangents[i] = 0.0;
+            Tangents[i+1] = 0.0;
+          }
+
+          else{
+            alpha = Tangents[i]  / Secants[i];
+            beta = Tangents[i+1] / Secants[i];
+
+            if (alpha <0.0){
+              Tangents[i] = 0.0;
+            }
+            if (beta < 0.0){
+              Tangents[i+1] = 0.0;
+            }
+
+            if (alpha * alpha + beta * beta >9.0){
+              __float__ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
+              Tangents[i]   = tau * alpha * Secants[i];
+              Tangents[i+1] = tau * beta  * Secants[i];
+            }
+          }
+        } // finished rescaling tangents
+        // fourth pass over knots to calculate the coefficients for the spline
+        __float__ dx;
+        for(int i = 0; i <nPoints-1; i++){
+          __float__ b, c, d = -999.999;
+          dx = XPos[i+1] - XPos[i];
+
+          b = Tangents[i] * dx;
+          c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
+          d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
+
+          Par[i][0] = b /  dx;
+          Par[i][1] = c / (dx * dx);
+          Par[i][2] = d / (dx * dx * dx);
+
+          if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
+              std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
+          }
+          //std::cout<<"b : "<<b<<std::endl;
+          //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
+          //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
+        }
+
+        // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
+        // should never actually get used but if not set then the GPU code gets very angry
+        Par[nPoints-1][0] = 0.0;
+        Par[nPoints-1][1] = 0.0;
+        Par[nPoints-1][2] = 0.0;
+
+        // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
+        // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+        for(int i = 0; i <nPoints-1; i++){
+          double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+          spline->GetCoeff(i, x, y, b, c, d);
+
+          if((c == 0.0 && d == 0.0)){
+            Par[i][0] = b;
+            Par[i][1] = 0.0;
+            Par[i][2] = 0.0;
+          }
+        }
+        delete[] Secants;
+        delete[] Tangents;
+      }
+
       delete spline;
       spline = NULL;
     }
@@ -439,7 +694,7 @@ class TSpline3_red {
       // Get the segment for this variation
       int segment = FindX(var);
       // The get the coefficients for this variation
-      double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+      __float__ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
       GetCoeff(segment, x, y, b, c, d);
       double dx = var - x;
       // Evaluate the third order polynomial
@@ -450,13 +705,13 @@ class TSpline3_red {
     // Get the number of points
     inline int GetNp() { return nPoints; }
     // Get the ith knot's x and y position
-    inline void GetKnot(int i, double &xtmp, double &ytmp) {
+    inline void GetKnot(int i, __float__ &xtmp, __float__ &ytmp) {
       xtmp = XPos[i];
       ytmp = YResp[i];
     }
 
     // Get the coefficient of a given segment
-    inline void GetCoeff(int segment, double &x, double &y, double &b, double &c, double &d) {
+    inline void GetCoeff(int segment, __float__ &x, __float__ &y, __float__ &b, __float__ &c, __float__ &d) {
       b = Par[segment][0];
       c = Par[segment][1];
       d = Par[segment][2];
@@ -471,18 +726,6 @@ class TSpline3_red {
       return ss.str();
     }
 
-    // Make a TSpline3 from the reduced splines
-    inline TSpline3* ConstructTSpline3() {
-      TSpline3 *spline = new TSpline3(GetName().c_str(), XPos, YResp, nPoints);
-      return spline;
-    }
-
-    // Make a TSpline3_red
-    inline TSpline3_red* ConstructTSpline3_red() {
-      TSpline3_red *spline = new TSpline3_red(XPos, YResp, nPoints, Par, ParamNo);
-      return spline;
-    }
-
   protected: //changed to protected from private so can be accessed by derived classes
     // Number of points/knot in TSpline3
     __int__ nPoints;
@@ -495,321 +738,6 @@ class TSpline3_red {
     // Parameter number (which parameter is this spline for)
     __int__ ParamNo;
 };
-
-
-// ************************
-// Akima Spline class
-class Akima_Spline: public TSpline3_red {
-// ************************
-// closely follows TSpline3_red class to fit in easily with existing machinery
-// Akima spline is similar to regular cubic spline but is allowed to be discontinuous in 2nd derivative and coefficients in any segment
-// only depend on th 2 nearest points on either side
-
-  public:
-    // Empty constructor
-    Akima_Spline()
-    :TSpline3_red()
-    {
-    }
-
-    // The constructor that takes a TSpline3 pointer and copies in to memory
-    Akima_Spline(TSpline3* &spline, int Param = -1)
-    { // need to override this so that daughter class SetFunc Gets called instead of TSpline3_red's version
-      Par = NULL;
-      XPos = NULL;
-      YResp = NULL;
-      SetFunc(spline, Param);
-    }
-
-    // Empty destructor
-    ~Akima_Spline() {
-      // this should call base class destructor automatically
-    }
-
-    // Set a function
-    inline void SetFunc(TSpline3* &spline, int Param = -1) {
-      nPoints = spline->GetNp();
-      ParamNo = Param;
-      if (Par != NULL) {
-        for (int i = 0; i < nPoints; ++i) {
-          delete[] Par[i];
-          Par[i] = NULL;
-        }
-        delete[] Par;
-        Par = NULL;
-      }
-      if (XPos != NULL) delete[] XPos;
-      if (YResp != NULL) delete[] YResp;
-      // Save the parameters for each knot
-      Par = new __float__*[nPoints];
-      // Save the positions of the knots
-      XPos = new __float__[nPoints];
-      // Save the y response at each knot
-      YResp = new __float__[nPoints];
-
-      // get the knot values for the spline
-      for (int i = 0; i < nPoints; ++i) {
-        // 3 is the size of the TSpline3 coefficients
-        Par[i] = new __float__[3];
-
-        double x = -999.99, y = -999.99;
-        spline->GetKnot(i, x, y);
-
-        XPos[i]   = x;
-        YResp[i]  = y;
-      }
-
-      __float__ mvals[nPoints + 2];
-      __float__ svals[nPoints];
-
-      for (int i = -2; i <= nPoints; ++i) {
-        // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
-        // need to estimate the values for additinal points which would lie outside of the spline
-        if(i ==-2){
-          mvals[i+2] = 3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
-        }
-        else if(i==-1){
-          mvals[i+2] = 2.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - (YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
-        }
-        else if(i==nPoints){
-          mvals[i+2] = 3.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - 2.0*(YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
-        }
-        else if(i == nPoints - 1){
-          mvals[i+2] = 2.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - (YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
-        }
-        //standard internal segment
-        else{
-          mvals[i+2] = (YResp[i+1] - YResp[i])/ (XPos[i+1] - XPos[i]);
-        }
-      }
-
-      for(int i =2; i<=nPoints+2; i++){
-        if (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]) != 0.0){
-          svals[i-2] = (abs(mvals[i+1] - mvals[i]) * mvals[i-1] + abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]));
-          }
-        else{svals[i-2] = mvals[i];}
-      }
-
-      // calculate the coefficients for the spline
-      for(int i = 0; i <nPoints; i++){
-        __float__ b, c, d = -999.999;
-
-        b = svals[i];
-        c = (3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
-        d = ((svals[i + 1] +svals[i]) - 2.0*(YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i])) / ((XPos[i+1] - XPos[i]) * (XPos[i+1] - XPos[i]));
-
-        Par[i][0] = b;
-        Par[i][1] = c;
-        Par[i][2] = d;
-      }
-
-      // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
-      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
-      for(int i = 0; i <nPoints-1; i++){
-        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-        spline->GetCoeff(i, x, y, b, c, d);
-
-        if((c == 0.0 && d == 0.0)){
-          Par[i][0] = b;
-          Par[i][1] = 0.0;
-          Par[i][2] = 0.0;
-        }
-      }
-
-      delete spline;
-      spline = NULL;
-    }
-    // finished calculating coeffs
-};
-
-
-
-
-// ************************
-// Monotone Spline class
-class Monotone_Spline: public TSpline3_red {
-// ************************
-// closely follows TSpline3_red class to fit in easily with existing machinery
-// Monotone spline is similar to regular cubic spline but enforce the condition that the interpolated value at any point
-// must be between its two nearest knots, DOES NOT make the entire spline monotonic, only the segments
-
-  public:
-    // Empty constructor
-    Monotone_Spline()
-    :TSpline3_red()
-    {
-    }
-
-    // The constructor that takes a TSpline3 pointer and copies in to memory
-    Monotone_Spline(TSpline3* &spline, int Param = -1)
-    { // need to override this so that daughter class SetFunc Gets called instead of TSpline3_red's version
-      Par = NULL;
-      XPos = NULL;
-      YResp = NULL;
-      SetFunc(spline, Param);
-    }
-
-    // Empty destructor
-    ~Monotone_Spline() {
-      delete[] Secants;
-      delete[] Tangents;
-      // this should also call base class destructor automatically
-    }
-
-    // Set a function
-    inline void SetFunc(TSpline3* &spline, int Param = -1) {
-      nPoints = spline->GetNp();
-      ParamNo = Param;
-      if (Par != NULL) {
-        for (int i = 0; i < nPoints; ++i) {
-          delete[] Par[i];
-          Par[i] = NULL;
-        }
-        delete[] Par;
-        Par = NULL;
-      }
-      if (XPos != NULL) delete[] XPos;
-      if (YResp != NULL) delete[] YResp;
-      // Save the parameters for each knot
-      Par = new __float__*[nPoints];
-      // Save the positions of the knots
-      XPos = new __float__[nPoints];
-      // Save the y response at each knot
-      YResp = new __float__[nPoints];
-      // values of the secants at each point (for calculating monotone spline)
-      Secants = new __float__[nPoints -1];
-      // values of the tangens at each point (for calculating monotone spline)
-      Tangents = new __float__[nPoints];
-
-      // get the knot values for the spline
-      for (int i = 0; i < nPoints; ++i) {
-        // 3 is the size of the TSpline3 coefficients
-        Par[i] = new __float__[3];
-
-        double x = -999.99, y = -999.99;
-        spline->GetKnot(i, x, y);
-
-        XPos[i]   = x;
-        YResp[i]  = y;
-
-        Tangents[i] = 0.0;
-      }
-
-      // deal with the case of two points (just do linear interpolation between them)
-      if (nPoints ==2){
-          Par[0][0] = (YResp[1] - YResp[0]) / ((XPos[1] - XPos[0]) * (XPos[1] - XPos[0]));
-          Par[0][1] = 0.0;
-          Par[0][2] = 0.0;
-          // extra "virtual" segment at end to make Par array shape fit with knot arrays shapes
-          Par[1][1] = 0.0;
-          Par[1][2] = 0.0;
-
-          return;
-      } // if nPoints !=2 do full monotonic spline treatment:
-
-      // first pass over knots to calculate the secants
-      for (int i = 0; i < nPoints-1; ++i) {
-        Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
-        //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
-      }
-
-      Tangents[0] = Secants[0];
-      Tangents[nPoints-1] = Secants[nPoints -2];
-
-      __float__ alpha;
-      __float__ beta;
-
-      // second pass over knots to calculate tangents
-      for (int i = 1; i < nPoints-1; ++i) {
-        if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
-          Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
-        }
-      }
-
-      // third pass over knots to rescale tangents
-      for (int i = 0; i < nPoints-1; ++i) {
-        if (Secants[i] == 0.0){
-          Tangents[i] = 0.0;
-          Tangents[i+1] = 0.0;
-        }
-
-        else{
-          alpha = Tangents[i]  / Secants[i];
-          beta = Tangents[i+1] / Secants[i];
-
-          if (alpha <0.0){
-            Tangents[i] = 0.0;
-          }
-          if (beta < 0.0){
-            Tangents[i+1] = 0.0;
-          }
-
-          if (alpha * alpha + beta * beta >9.0){
-            __float__ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
-            Tangents[i]   = tau * alpha * Secants[i];
-            Tangents[i+1] = tau * beta  * Secants[i];
-          }
-        }
-        //std::cout<<"alpha, beta : "<<alpha<<", "<<beta<<std::endl;
-        //std::cout<<"tangent "<<i<<": "<<Tangents[i]<<std::endl;
-
-      } // finished rescaling tangents
-
-      //std::cout<<"tangent "<<nPoints-1<<": "<<Tangents[nPoints-1]<<std::endl;
-
-      // fourth pass over knots to calculate the coefficients for the spline
-      __float__ dx;
-      for(int i = 0; i <nPoints-1; i++){
-        double b, c, d = -999.999;
-        dx = XPos[i+1] - XPos[i];
-
-        b = Tangents[i] * dx;
-        c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
-        d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
-
-        Par[i][0] = b /  dx;
-        Par[i][1] = c / (dx * dx);
-        Par[i][2] = d / (dx * dx * dx);
-
-        if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
-            std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
-        }
-        //std::cout<<"b : "<<b<<std::endl;
-        //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
-        //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
-      }
-
-      // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
-      // should never actually get used but if not set then the GPU code gets very angry
-      Par[nPoints-1][0] = 0.0;
-      Par[nPoints-1][1] = 0.0;
-      Par[nPoints-1][2] = 0.0;
-
-      // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
-      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
-      for(int i = 0; i <nPoints-1; i++){
-        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-        spline->GetCoeff(i, x, y, b, c, d);
-
-        if((c == 0.0 && d == 0.0)){
-          Par[i][0] = b;
-          Par[i][1] = 0.0;
-          Par[i][2] = 0.0;
-        }
-      }
-
-      delete spline;
-      spline = NULL;
-    }
-    // finished calculating coeffs
-
-    protected: //changed to protected from private so can be accessed by derived classes
-    // values of the secants at each point (for calculating monotone spline)
-    __float__ *Secants;
-    // values of the tangents at each point (for calculating monotone spline)
-    __float__ *Tangents;
-};
-
 
 // ************************
 // Truncated spline class
@@ -873,102 +801,7 @@ class Truncated_Spline: public TSpline3_red {
       // Get the segment for this variation
       int segment = FindX(var);
       // The get the coefficients for this variation
-      double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-
-      if(segment >=0){
-        GetCoeff(segment, x, y, b, c, d);
-      }
-
-      // if var is outside of the defined range, set the coefficients to 0 so that Eval just returns the value at the end point of the spline
-      else if(segment == -1){
-        GetKnot(0, x, y);
-        b = 0.0;
-        c = 0.0;
-        d = 0.0;
-      }
-      else if(segment == -2){
-        GetKnot(nPoints-1, x, y);
-        b = 0.0;
-        c = 0.0;
-        d = 0.0;
-      }
-
-      double dx = var - x;
-      // Evaluate the third order polynomial
-      double weight = y+dx*(b+dx*(c+d*dx));
-      return weight;
-    }
-};
-
-
-
-
-// ************************
-// Truncated Akima Spline class
-class Truncated_Akima_Spline :public Akima_Spline {
-// ************************
-// Spline with Akima Spline coefficients which is flat outside of the defined knots
-
-  public:
-
-    // Empty constructor
-    Truncated_Akima_Spline()
-    :Akima_Spline()
-    {
-    }
-
-    // The constructor that takes a TSpline3 pointer and copies in to memory
-    Truncated_Akima_Spline(TSpline3* &spline, int Param = -1)
-    :Akima_Spline(spline, Param)
-    {
-    }
-
-    // Empty destructor
-    ~Truncated_Akima_Spline()
-    {
-    }
-
-
-    // See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
-    inline int FindX(double x) {
-      // The segment we're interested in (klow in ROOT code)
-      int segment = 0;
-      int kHigh = nPoints-1;
-      // If the variation is below the lowest saved spline point
-      if (x <= XPos[0]){
-        segment = -1;
-        // If the variation is above the highest saved spline point
-      } else if (x >= XPos[nPoints-1]) {
-        segment = -2;
-        // If the variation is between the maximum and minimum, perform a binary search
-      } else {
-        // The top point we've got
-        int kHalf = 0;
-        // While there is still a difference in the points (we haven't yet found the segment)
-        // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-        while (kHigh - segment > 1) {
-          // Increment the half-step
-          kHalf = (segment + kHigh)/2;
-          // If our variation is above the kHalf, set the segment to kHalf
-          if (x > XPos[kHalf]) {
-            segment = kHalf;
-            // Else move kHigh down
-          } else {
-            kHigh = kHalf;
-          }
-        } // End the while: we've now done our binary search
-      } // End the else: we've now found our point
-      if (segment >= nPoints-1 && nPoints > 1) segment = nPoints-2;
-      return segment;
-    }
-
-
-    // Evaluate the weight from a variation
-    inline double Eval(double var) {
-      // Get the segment for this variation
-      int segment = FindX(var);
-      // The get the coefficients for this variation
-      double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+      __float__ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
 
       if(segment >=0){
         GetCoeff(segment, x, y, b, c, d);
@@ -1159,6 +992,7 @@ enum TestStatistic {
   kBarlowBeeston,
   kIceCube,
   kPearson,
+  kDembinskiAbdelmottele,
   kNTestStatistics //This only enumarates statistic
 };
 
@@ -1180,6 +1014,9 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
         break;
         case kPearson:
         name = "Pearson";
+        break;
+        case kDembinskiAbdelmottele:
+        name = "DembinskiAbdelmottele";
         break;
         default:
             std::cerr << "UNKNOWN LIKELHOOD SPECIFIED TO ND280!" << std::endl;

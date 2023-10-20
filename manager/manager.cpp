@@ -112,10 +112,11 @@ n_steps << std::endl;
     // Use Barlow Beeston likelihood in ND280?
     if (cfg.exists("MCSTAT")) {
       std::string likelihood = cfg.lookup("MCSTAT");
-      if (likelihood == "Barlow-Beeston") mc_stat_llh = TestStatistic(kBarlowBeeston);
-      else if (likelihood == "IceCube")   mc_stat_llh = TestStatistic(kIceCube);
-      else if (likelihood == "Poisson")   mc_stat_llh = TestStatistic(kPoisson);
-      else if (likelihood == "Pearson")   mc_stat_llh = TestStatistic(kPearson);
+      if (likelihood == "Barlow-Beeston")                mc_stat_llh = TestStatistic(kBarlowBeeston);
+      else if (likelihood == "IceCube")                  mc_stat_llh = TestStatistic(kIceCube);
+      else if (likelihood == "Poisson")                  mc_stat_llh = TestStatistic(kPoisson);
+      else if (likelihood == "Pearson")                  mc_stat_llh = TestStatistic(kPearson);
+      else if (likelihood == "Dembinski-Abdelmottele")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
       else { 
         std::cerr << "Wrong form of test-statistic specified!" << std::endl;
         std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;

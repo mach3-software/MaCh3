@@ -32,7 +32,7 @@
 #endif
 
 #ifndef __LARGE_LOGL__
-#define __LARGE_LOGL__ 1234567890
+#define __LARGE_LOGL__ 1234567890.0
 #endif
 
 //#define DEBUG_PCA
@@ -168,9 +168,11 @@ class covarianceBase {
   const double getParInit(const int i) {
     return _fPreFitValue[i];
   };
+
   virtual const double getNominal(const int i) {
     return getParInit(i);
   };
+
   const double getParProp_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
@@ -185,6 +187,14 @@ class covarianceBase {
     }
     return fParCurr_PCA(i);
   };
+
+  bool isParameterFixedPCA(const int i) {
+    if (fParSigma_PCA[i] < 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   const TMatrixD getTransferMatrix() {
     if (!pca) {
@@ -210,6 +220,14 @@ class covarianceBase {
     return eigen_values;
   }
 
+  inline const std::vector<double> getEigenValuesMaster() {
+    if (!pca) {
+      std::cerr << "Am not running in PCA mode" << std::endl;
+      throw;
+    }
+    return eigen_values_master;
+  }
+
   void setParProp_PCA(const int i, const double value) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
@@ -230,8 +248,28 @@ class covarianceBase {
     TransferToParam();
   }
 
-  const int getSize() { return size; };
-  const int getNpars() { 
+  inline void setParameters_PCA(std::vector<double> pars)
+  {
+    if (!pca)
+    {
+      std::cerr<<" PCA disabled"<<std::endl;
+      throw;
+    }
+    if (pars.size() != size_t(npars)) {
+      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
+      throw;
+    }
+    unsigned int parsSize = pars.size();
+    for (unsigned int i = 0; i < parsSize; i++)
+    {
+      fParProp_PCA(i) = pars[i];
+    }
+    //KS: Transfer to normal base
+    TransferToParam();
+  }
+
+  int getSize() { return size; };
+  int getNpars() { 
     if (pca) return npars;
     else return size;
   }

@@ -61,6 +61,7 @@ class covarianceXsec : public covarianceBase {
     const std::vector<std::string>& GetNearSplineParsNames() const  {return NearsplineParsNames;}
     const std::vector<std::string>& GetNearSplineFileParsNames() const  {return NearSplineFileParsNames;}
     const std::vector<int>&         GetNearSplineParsIndex() const  {return NearsplineParsIndex;}
+    const std::vector<SplineInterpolation>& GetSplineInterpolation() const  {return SplineInterpolationType;}
 
     //DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
@@ -226,6 +227,9 @@ class covarianceXsec : public covarianceBase {
     std::vector<int> NearsplineParsIndex;
 
     TObjArray* xsec_param_nd_spline_names;
+
+    TObjArray* xsec_spline_interpolation;
+    std::vector<SplineInterpolation> SplineInterpolationType;
 
     int nFarSplineParams;
     std::vector<std::string> FarSplineParsNames;

@@ -327,7 +327,7 @@ double samplePDFBase::GetLikelihood_kernel(std::vector<double> &dataSet)
 // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
 // Essentially solves equation 11
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) {
 // *************************
 
   // Need some MC
@@ -341,12 +341,12 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
   // Assume the MC has a Gaussian distribution around generated
   // As in https://arxiv.org/abs/1103.0354 eq 10, 11
 
-  // The penalty from MC statistics using Barlow-Beeston
+  // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
   double penalty = 0;
   if (fTestStatistic == kBarlowBeeston) {
     // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
     const double fractional = sqrt(w2)/mc;
-    // -b/2a in quadratic equation
+    // b in quadratic equation
     const double temp = mc*fractional*fractional-1;
     // b^2 - 4ac in quadratic equation
     const double temp2 = temp*temp + 4*data*fractional*fractional;
@@ -361,6 +361,21 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
     // And penalise the movement in beta relative the mc uncertainty
     if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
     else penalty = 0;
+  }
+  //KS: Alterantive calcaution of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
+  if (fTestStatistic == kDembinskiAbdelmottele)
+  {
+    //KS: code follows authors implementation from:
+    //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
+
+    //the so-called effective count
+    const double k = mc*mc / w2;
+    //Calculate beta which is scaling factor between true and generated MC
+    const double beta = (data + k) / (mc + k);
+
+    newmc = mc*beta;
+    // And penalise the movement in beta relative the mc uncertainty
+    penalty = k*beta-k+k*TMath::Log(k/(k*beta));
   }
 
   // Calculate the new Poisson likelihood
@@ -397,7 +412,8 @@ double samplePDFBase::getTestStatLLH(double data, double mc, double w2) {
    if (fTestStatistic == kPearson)
    {
       stat = 0;
-      stat = (data-mc)*(data-mc)/mc;
+      //KS: 2 is beacuese this function returns -LLH not -2LLH
+      stat = (data-mc)*(data-mc)/(2*mc);
    }
 
    // Return the statistical contribution and penalty
