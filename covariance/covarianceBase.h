@@ -173,6 +173,14 @@ class covarianceBase {
     return getParInit(i);
   };
 
+  double GetUpperBound(const int i){
+    return _fUpBound[i];
+  }
+
+  double GetLowerBound(const int i){
+    return _fLowBound[i];
+  }
+
   const double getParProp_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;

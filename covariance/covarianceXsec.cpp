@@ -849,7 +849,6 @@ void covarianceXsec::ScanParameters() {
 		//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
 		bool haskinbounds=false;
 
-<<<<<<< HEAD
 		////////////////////
 		//New generic cuts things 
 		// just the same as for the Far affecting params above
