@@ -85,10 +85,6 @@ void FitterBase::PrepareOutput() {
     osc->setBranches(*outTree);
     outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
   }
-  /*if (osc2) {
-    osc2->setBranches(*outTree);
-  }
-  */
 
   outTree->Branch("LogL", &logLCurr, "LogL/D");
   outTree->Branch("accProb", &accProb, "accProb/D");

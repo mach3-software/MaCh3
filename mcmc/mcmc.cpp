@@ -120,11 +120,7 @@ void mcmc::CheckStep() {
     if (osc) {
       osc->acceptStep();
     }
-    /*if (osc2) {
-      osc2->acceptStep();
-    }
-	*/
-
+    
     // Loop over systematics and accept
     for (size_t s = 0; s < systematics.size(); ++s) {
       systematics[s]->acceptStep();
@@ -254,76 +250,9 @@ void mcmc::ProposeStep() {
   if (osc) {
     osc->proposeStep();
 
-    // If we have separate neutrino and anti-neutrino oscillation parameters
-    /*if (osc2) {
-      osc2->proposeStep();
-
-      // Fix some parameters in osc equal to osc2 (if it's set in equalOscPar)
-
-      // double* returned by getPropPars() has oscpar[0-5] as you would expect (theta12, 
-      // theta23, theta13, dm21, dm32, dcp), oscpar[6] = 2, oscpar[7] = L, 
-      // and oscpar[8] = density. If beta is present it has oscpar[9] = beta. 
-      // We don't want this - the vector<double> given to setParameters() should have
-      // only the oscillation parametes (so size = 6 if no beta, or 7 if using beta).
-      // Construct the correct vector in the loop (at the same time as setting some
-      // parameters equal between osc and osc2 if desired)
-
-      double* osc_proppars = osc->getPropPars();
-      double* osc2_proppars = osc2->getPropPars();
-      std::vector<double> oscpars;
-      std::vector<double> oscpars2;
-
-      for (int par = 0; par < int(osc->getSize()+3); par++) {
-        // skip the extra entries
-        if (par==6 || par==7 || par==8) {
-          continue;
-
-          // normal osc pars
-        } else if (par<6) {
-          // Set correct parameter values for osc = osc2
-          if (equalOscPar[par]==1) {
-            osc_proppars[par] = osc2_proppars[par];
-          }
-
-          // Set same mass hierarchy if desired
-          // dm2
-          if (equalMH && par==4) {
-            double sign = osc_proppars[par]*osc2_proppars[par]; // +ve if both are same MH, -ve if not
-            if (sign<0) {
-              osc_proppars[par]*=(-1.0);
-            }
-          }
-
-          // Now make vectors
-          oscpars.push_back(osc_proppars[par]);
-          oscpars2.push_back(osc2_proppars[par]);
-          // beta
-        } else if (par==9) {
-
-          // Set correct parameter values for osc = osc2
-          if (equalOscPar[par]==1) {
-            osc_proppars[par] = osc2_proppars[par];
-          }
-
-          // Now make vectors
-          oscpars.push_back(osc_proppars[par]);
-          oscpars2.push_back(osc2_proppars[par]);
-        }
-      }
-
-      // Now set the correct parameters
-      osc->setParameters(oscpars);
-      osc2->setParameters(oscpars2);
-    }
-	*/
-
     // Now get the likelihoods for the oscillation
     osc_llh = osc->GetLikelihood();
-    /*if (osc2) {
-      osc_llh += osc2->GetLikelihood();
-    }
-	*/
-
+    
     // Add the oscillation likelihoods to the reconfigure likelihoods
     llh += osc_llh;
 
