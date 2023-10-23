@@ -1256,7 +1256,11 @@ void SMonolith::FindSplineSegment() {
     const __int__ nPoints = SplineInfoArray[i].nPts;
     const __float__* xArray = SplineInfoArray[i].xPts;
 
+    // EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here
+    //     In principle, such parameters shouldn't really be included in the first place, but with new det syst splines this
+    //     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.
     if(xArray == NULL) continue;
+    
     // Get the variation for this reconfigure for the ith parameter
     const __float__ xvar = *SplineInfoArray[i].splineParsPointer;
     vals[i] = xvar;
