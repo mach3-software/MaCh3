@@ -166,27 +166,29 @@ void PrepareChains() {
     TStopwatch clock;
     clock.Start();
     
-    TChain **Chain = new TChain*[Nchains];
-    
     int *BurnIn = new int[Nchains]();
     int *nEntries = new int[Nchains]();
     int *nBranches = new int[Nchains]();
     
     int step[Nchains];
+
+    Draws = new double**[Nchains]();
+    DrawsFolded = new double**[Nchains]();
+
     // Open the Chain
     //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
     for (int m = 0; m < Nchains; m++) 
     {
-        Chain[m] = new TChain("posteriors");
-        Chain[m]->Add(MCMCFile[m].c_str());
+        TChain* Chain = new TChain("posteriors");
+        Chain->Add(MCMCFile[m].c_str());
 
-        nEntries[m] = Chain[m]->GetEntries();
+        nEntries[m] = Chain->GetEntries();
 
         // Set the step cut to be 20%
         BurnIn[m] = nEntries[m]/5;
     
         // Get the list of branches
-        TObjArray* brlis = (TObjArray*)(Chain[m]->GetListOfBranches());
+        TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
 
         // Get the number of branches
         nBranches[m] = brlis->GetEntries();
@@ -194,7 +196,7 @@ void PrepareChains() {
         if(m == 0) BranchNames.reserve(nBranches[m]);
 
         // Set all the branches to off
-        Chain[m]->SetBranchStatus("*", false);
+        Chain->SetBranchStatus("*", false);
         
         // Loop over the number of branches
         // Find the name and how many of each systematic we have
@@ -206,8 +208,8 @@ void PrepareChains() {
 
             // Read in the step
             if (bname == "step") {
-                Chain[m]->SetBranchStatus(bname, true);
-                Chain[m]->SetBranchAddress(bname, &step[m]);
+                Chain->SetBranchStatus(bname, true);
+                Chain->SetBranchAddress(bname, &step[m]);
             }
             //Count all branches
             else if (bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
@@ -230,31 +232,26 @@ void PrepareChains() {
                         ValidPar.push_back(true);
                     }
                 }
-                Chain[m]->SetBranchStatus(bname, true);
+                Chain->SetBranchStatus(bname, true);
                 if (VERBOSE) std::cout<<bname<<std::endl;
             }
         } 
-    }
-    nDraw = BranchNames.size();
 
-    //KS: Sanity check that there is the same number of branches in all considered chains
-    for (int m = 0; m < Nchains; m++) 
-    {
-      for (int mi = 0; mi < Nchains; mi++) 
-      {
-        if(nBranches[m] != nBranches[mi])
+        if(m == 0) nDraw = BranchNames.size();
+
+        //TN: Qualitatively faster sanity check, with the very same outcome (all chains have the same #branches)
+        if(m > 0)
         {
-            std::cerr<<"Ups, something went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while "<<mi<<" called "<<MCMCFile[mi]<<" has "<<nBranches[mi]<<" branches"<<std::endl;
-            std::cerr<<"All chains should have the same number of branches"<<std::endl;
-            throw;
+            if(nBranches[m] != nBranches[0])
+            {
+                std::cerr<<"Ups, something went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while 0 called "<<MCMCFile[0]<<" has "<<nBranches[0]<<" branches"<<std::endl;
+                std::cerr<<"All chains should have the same number of branches"<<std::endl;
+                throw;
+            }
         }
-      }
-    }
-    
-    Draws = new double**[Nchains]();
-    DrawsFolded = new double**[Nchains]();
-    for(int m = 0; m < Nchains; m++)
-    {
+
+
+        //TN: move the Draws here, so we need to iterate over every chain only once
         Draws[m] = new double*[Ntoys]();
         DrawsFolded[m] = new double*[Ntoys]();
         for(int i = 0; i < Ntoys; i++)
@@ -265,55 +262,52 @@ void PrepareChains() {
             {
                Draws[m][i][j] = 0.;
                DrawsFolded[m][i][j] = 0.;
-            } 
+            }
         }
-    }
-  
-  
-    //KS: Now we will sample through MCMC posteriors distributions
-    //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
-    for (int m = 0; m < Nchains; m++) 
-    {
+
+        //TN: move looping over toys here, so we don't need to loop over chains more than once
         if(BurnIn[m] >= nEntries[m])
         {
-            std::cerr<<"You are running on a chain shorter than BurnIn cut"<<std::endl; 
+            std::cerr<<"You are running on a chain shorter than BurnIn cut"<<std::endl;
             std::cerr<<"Number of entries "<<nEntries[m]<<" BurnIn cut "<<BurnIn<<std::endl;
             std::cerr<<"You will run into the infinite loop"<<std::endl;
             std::cerr<<"You can make a new chain or modify BurnIn cut"<<std::endl;
             std::cerr<<"Find me here: "<<__FILE__ << ":" << __LINE__ << std::endl;
             throw;
         }
-            
-        for (int i = 0; i < Ntoys; i++) 
+
+        for (int i = 0; i < Ntoys; i++)
         {
             // Get a random entry after burn in
             int entry = (int)(nEntries[m]*rnd->Rndm());
-            
-            Chain[m]->GetEntry(entry);
-    
+
+            Chain->GetEntry(entry);
+
             // If we have combined chains by hadd need to check the step in the chain
             // Note, entry is not necessarily the same as the step due to merged ROOT files, so can't choose an entry in the range BurnIn - nEntries :(
-            if (step[m] < BurnIn[m]) 
+            if (step[m] < BurnIn[m])
             {
                 i--;
                 continue;
             }
-            
+
             // Output some info for the user
             if (Ntoys > 10 && i % (Ntoys/10) == 0) {
                 std::cout << "On toy " << i << "/" << Ntoys << " (" << int(double(i)/double(Ntoys)*100.0) << "%)" << std::endl;
                 std::cout << "   Getting random entry " << entry << std::endl;
             }
-        
+
             // Set the branch addresses for params
-            for (int j = 0; j < nDraw; ++j) 
+            for (int j = 0; j < nDraw; ++j)
             {
-                Chain[m]->SetBranchAddress(BranchNames[j].Data(), &Draws[m][i][j]);
+                Chain->SetBranchAddress(BranchNames[j].Data(), &Draws[m][i][j]);
             }
-            
-            Chain[m]->GetEntry(entry);
+            Chain->GetEntry(entry);
 
         }//end loop over toys
+
+        //TN: There, we now don't need to keep the chain in memory anymore
+        delete Chain;
     }
     
     //KS: Now prepare folded draws, quoting Gelman
@@ -356,12 +350,6 @@ void PrepareChains() {
     delete[] BurnIn;
     delete[] nEntries;
     delete[] nBranches;
-    
-    for (int m = 0; m < Nchains; m++) 
-    {
-        delete Chain[m];
-    }
-    delete[] Chain;
     
     clock.Stop();
     std::cout << "Finsihed producing Toys, it took " << clock.RealTime() << "s to finish" << std::endl;

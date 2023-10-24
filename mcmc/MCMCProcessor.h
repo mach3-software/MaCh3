@@ -32,6 +32,9 @@
 #include "TStopwatch.h"
 #include "TText.h"
 #include "TGaxis.h"
+#include "TObjString.h"
+#include "TTree.h"
+#include "TROOT.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -77,21 +80,21 @@ class MCMCProcessor {
     void ResetHistograms();
     
     // Get the number of parameters
-    int GetNParams() { return nDraw; };
-    int GetNFlux() { return nFlux; };
-    int GetNXSec() { return nParam[kXSecPar]; };
-    int GetNND() { return nParam[kND280Par]; };
-    int GetNFD() { return nParam[kFDDetPar]; };
-    int GetOSC() { return nParam[kOSCPar]; };
+    inline int GetNParams() { return nDraw; };
+    inline int GetNFlux() { return nFlux; };
+    inline int GetNXSec() { return nParam[kXSecPar]; };
+    inline int GetNND() { return nParam[kND280Par]; };
+    inline int GetNFD() { return nParam[kFDDetPar]; };
+    inline int GetOSC() { return nParam[kOSCPar]; };
         
     inline TH1D* const GetHpost(int i) { return hpost[i]; };
 
-    std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
-    std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
-    std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
-    std::string const & GetNDruns()   const { return NDruns; };
-    std::vector<std::string> const & GetNDsel() const {return NDsel;};
+    inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
+    inline std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
+    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
+    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
+    inline std::string const & GetNDruns()   const { return NDruns; };
+    inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
     // Draw the post-fit comparisons
     void DrawPostfit();
@@ -111,6 +114,7 @@ class MCMCProcessor {
 
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
     void GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name);
+    void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
 
     int GetnEntries(){return nEntries;};
     int GetnSteps(){return nSteps;};
@@ -121,24 +125,68 @@ class MCMCProcessor {
     // Or by int
     void SetStepCut(const int Cuts);
 
-    void SetMakeOnlyXsecCorr(bool PlotOrNot){MakeOnlyXsecCorr = PlotOrNot; };
-    void SetMakeOnlyXsecCorrFlux(bool PlotOrNot){MakeOnlyXsecCorrFlux = PlotOrNot; };
+    inline void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
+    inline void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
+    inline void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
+    inline void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
+    inline void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
+    inline void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
+    inline void SetPost2DPlotThreshold(double Threshold){Post2DPlotThreshold = Threshold; };
 
-    void SetPlotRelativeToPrior(bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
-    void SetPrintToPDF(bool PlotOrNot){printToPDF = PlotOrNot; };
-    void SetPlotDet(bool PlotOrNot){PlotDet = PlotOrNot; };
-    void SetPlotErrorForFlatPrior(bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
-    void SetPlotBinValue(bool PlotOrNot){plotBinValue = PlotOrNot; };
-    void SetFancyNames(bool PlotOrNot){FancyPlotNames = PlotOrNot; };
-    void SetSmoothing(bool PlotOrNot){ApplySmoothing = PlotOrNot; };
-    void SetPost2DPlotThreshold(double Threshold){Post2DPlotThreshold = Threshold; };
+    inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
+    inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
 
-    void SetnBatches(int Batches){nBatches = Batches; };
-    void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
-    
+    inline void SetnBatches(int Batches){nBatches = Batches; };
+    inline void SetnLags(int nLags){AutoCorrLag = nLags; };
+    inline void SetOutputSuffix(std::string Suffix){OutputSuffix = Suffix; };
+    inline void SetPosterior1DCut(std::string Cut){Posterior1DCut = Cut; };
+
+    inline void SetCredibleIntervals(std::vector<double> Intervals)
+    {
+      if(Intervals.size() > 1)
+      {
+        for(unsigned int i = 1; i < Intervals.size(); i++ )
+        {
+          if(Intervals[i] > Intervals[i-1])
+          {
+            std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+            std::cerr<<Intervals[i] <<" "<<Intervals[i-1]<<std::endl;
+            std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+            std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+            throw;
+          }
+        }
+      }
+      Credible_Intervals = Intervals;
+    };
+    inline void SetCredibleIntervalsColours(std::vector<Color_t> Intervals){Credible_IntervalsColours = Intervals; };
+
+    inline void SetCredibleRegions(std::vector<double> Intervals)
+    {
+      if(Intervals.size() > 1)
+      {
+        for(unsigned int i = 1; i < Intervals.size(); i++ )
+        {
+          if(Intervals[i] > Intervals[i-1])
+          {
+            std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+            std::cerr<<Intervals[i] <<" "<<Intervals[i-1]<<std::endl;
+            std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+            std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+            throw;
+          }
+        }
+      }
+      Credible_Regions = Intervals;
+    };
+    inline void SetCredibleRegionStyle(std::vector<Style_t> Intervals){Credible_RegionStyle = Intervals; };
+    inline void SetCredibleRegionColor(std::vector<Color_t> Intervals){Credible_RegionColor = Intervals; };
+    inline void SetCredibleInSigmas(bool Intervals){CredibleInSigmas = Intervals; };
+
   private:
     inline TH1D* MakePrefit();
     inline void MakeOutputFile();
+    inline void DrawCorrelations1D();
 
     // Read Matrices
     inline void ReadInputCov();
@@ -147,6 +195,7 @@ class MCMCProcessor {
     inline void ReadND280File();
     inline void ReadFDFile();
     inline void ReadOSCFile();
+    inline void RemoveParameters();
    
     // Scan Input etc.
     inline void ScanInput();
@@ -160,7 +209,7 @@ class MCMCProcessor {
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
     inline std::string GetJeffreysScale(const double BayesFactor);
-
+    inline double GetSigmaValue(int sigma);
 
     // MCMC Diagnsotic
     inline void PrepareDiagMCMC();
@@ -183,6 +232,7 @@ class MCMCProcessor {
 
     TChain *Chain;
     std::string StepCut;
+    std::string Posterior1DCut;
     int BurnInCut;
     int nBranches;
     //KS: For merged chains number of entires will be different fron nSteps
@@ -192,6 +242,9 @@ class MCMCProcessor {
     int nSysts;
 
     std::vector<TString> BranchNames;
+    std::vector<std::string> ExcludedTypes;
+    std::vector<std::string> ExcludedNames;
+
     // Is the ith parameter varied
     std::vector<bool> IamVaried;
     std::vector<std::vector<TString>> ParamNames;
@@ -220,8 +273,6 @@ class MCMCProcessor {
     bool PlotFlatPrior;
 
     bool MakeCorr;
-    bool MakeOnlyXsecCorr;
-    bool MakeOnlyXsecCorrFlux; //Makes only the cov matrix w/ flux
     bool plotRelativeToPrior;
     bool MadePostfit;
     bool printToPDF;
@@ -275,6 +326,7 @@ class MCMCProcessor {
     double DrawRange;
     
     int nBatches;
+    int AutoCorrLag;
     
     // Holds all the parameter variations
     double *ParamSums;
@@ -304,6 +356,16 @@ class MCMCProcessor {
     float* ParamSums_gpu;
     float* DenomSum_gpu;
   #endif
+
+  //KS: Credible Intervals/Regions related
+  std::vector<double> Credible_Intervals;
+  std::vector<Color_t> Credible_IntervalsColours;
+
+  std::vector<double> Credible_Regions;
+  std::vector<Style_t> Credible_RegionStyle;
+  std::vector<Color_t> Credible_RegionColor;
+  //KS: If true credible stuff is done in sigmas not %
+  bool CredibleInSigmas;
 };
 
 #endif
