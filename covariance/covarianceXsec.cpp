@@ -37,6 +37,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   if(!(xsec_kinematic_type = (TObjArray*)(infile->Get("xsec_norm_kinematic_type")))){xsec_kinematic_type = new TObjArray();}
   if(!(xsec_param_nd_spline_names = (TObjArray*)(infile->Get("nd_spline_names")))){xsec_param_nd_spline_names= new TObjArray();}
 
+  if(!(xsec_spline_interpolation = (TObjArray*)(infile->Get("xsec_spline_interpolation")))){xsec_spline_interpolation = NULL;}
 
   // Check that the size of all the arrays are good
   if (xsec_param_norm_modes->GetEntries() != xsec_param_norm_elem->GetEntries() || 
@@ -944,35 +945,48 @@ void covarianceXsec::ScanParameters() {
 		//Add this parameter to the vector of parameters
 		NearNormParams.push_back(tmp_xsec);
 
-		// Count how many normalisation parameters we have
-		nNearNormParams++;
+        // Count how many normalisation parameters we have
+        nNearNormParams++;
+	
+        // Function parameters, such as BeRPA
+      }//End Near affecting normpars
+      else if (GetXSecParamID(i, 0) == -2) {//Near affecting func pars
+	
+        NearfuncParsNames.push_back(GetParameterName(i));
+        NearfuncParsIndex.push_back(i);
+        nNearFuncParams++;
+	
+        // If they are greater >= 0 it's a spline parameter
+      }//End Near affecting func pars
+      else if (GetXSecParamID(i, 0) >= 0) {
+        NearsplineParsNames.push_back(GetParameterName(i));
+        NearsplineParsIndex.push_back(i);
+        nNearSplineParams++;
 
-		// Function parameters, such as BeRPA
-	  }//End Near affecting normpars
-	  else if (strcmp(GetXsecParamType(i), "functional") != 0) {//Near affecting func pars
-
-		NearfuncParsNames.push_back(GetParameterName(i));
-		NearfuncParsIndex.push_back(i);
-		nNearFuncParams++;
-
-		// If they are greater >= 0 it's a spline parameter
-	  }//End Near affecting func pars
-	  else if (strcmp(GetXsecParamType(i), "Spline") != 0) {
-		NearsplineParsNames.push_back(GetParameterName(i));
-		NearsplineParsIndex.push_back(i);
-		nNearSplineParams++;
-
-		//Fill the name of the Far spline objects in the spline files
-		//NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
-	  }//End Near affecting spline pars
-	  else {
-		std::cerr << "Found a parameter in covarianceXsec which wasn't -2, -1 or above 0!" << std::endl;
-		std::cerr << "This is undefined behaviour currently, and implementation should change" << std::endl;
-		std::cerr << "Param " << GetParameterName(i) << " (param " << i << ") = " << GetXsecParamType(i) << std::endl;
-		std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-		//throw;
-	  }
-	}//End Near affecting parameters
+        if(xsec_spline_interpolation != NULL)
+        {
+          for(int il = 0; il < kSplineInterpolations; ++il)
+          {
+            if (std::string(((TObjString*)xsec_spline_interpolation->At(i))->GetString()) == SplineInterpolation_ToString(SplineInterpolation(il)))
+              SplineInterpolationType.push_back(SplineInterpolation(il));
+          }
+          if (SplineInterpolationType.size() != static_cast<unsigned int>(nNearSplineParams))
+          {
+            std::cerr<<" "<<"Couldn't find interpoaltion for paramter " <<nPars<< " it has interpoaltion "<<std::string(((TObjString*)xsec_spline_interpolation->At(i))->GetString())<<std::endl;
+            throw;
+          }
+        }
+	//Fill the name of the Far spline objects in the spline files
+	//NearSplineFileParsNames.push_back(std::string(((TObjString*)xsec_param_nd_spline_names->At(i))->GetString()));
+      }//End Near affecting spline pars
+      else {
+	std::cerr << "Found a parameter in covarianceXsec which wasn't -2, -1 or above 0!" << std::endl;
+	std::cerr << "This is undefined behaviour currently, and implementation should change" << std::endl;
+	std::cerr << "Param " << GetParameterName(i) << " (param " << i << ") = " << GetXSecParamID(i, 0) << std::endl;
+	std::cerr << __LINE__ << ":" << __LINE__ << std::endl;
+	throw;
+      }
+    }//End Near affecting parameters
   }
   
   // Now count the repeated parameters and save their indices and names

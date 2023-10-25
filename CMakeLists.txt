@@ -1,7 +1,7 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # CMake version check
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)  
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)  
 
 SET(MaCh3_VERSION 0.0.2)
 project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
@@ -48,9 +48,9 @@ CPMFindPackage(
 # In the future which osc calc we use might be set with a flag
 CPMFindPackage(
     NAME Prob3plusplus
-    VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
+    VERSION 3.10.4
+    GITHUB_REPOSITORY rogerwendell/Prob3plusplus
+    GIT_TAG main
 )
 
 CPMAddPackage(
