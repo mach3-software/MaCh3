@@ -50,15 +50,16 @@ class covarianceBase {
   
   // Setters
   // need virtual for eRPA parameter over-ride
+  // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   void setCovMatrix(TMatrixDSym *cov);
   void setName(const char *name) { matrixName = name; }
-  virtual void setParName(int i, char *name) { fParNames[i] = name; }
+  virtual void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   void setPar(const int i, const double val);
   void setParCurrProp(int i, double val);
   void setParProp(int i, double val) {
     std::cout << "Setting " << getParName(i) << " to " << val << std::endl; 
-    fParProp[i] = val;
+    _fPropVal[i] = val;
     if (pca) TransferToPCA();
   };
   void setParameters(std::vector<double> pars = std::vector<double>());    
@@ -69,6 +70,10 @@ class covarianceBase {
   void setStepScale(double scale);
 
   //DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  void setIndivStepScale(int ParameterIndex, double StepScale){
+	_fIndivStepScale.at(ParameterIndex) = StepScale;
+  };
+
   void setIndivStepScale(std::vector<double> stepscale);
   //KS: In case someone really want to change this
   void setPrintLength(unsigned int PriLen) { PrintLength = PriLen; };
@@ -88,15 +93,16 @@ class covarianceBase {
   // Getters
   TMatrixDSym *getCovMatrix() { return covMatrix; };
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
-  bool getEvalLikelihood(const int i) { return fParEvalLikelihood[i]; };
+  bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
 
-  virtual double getLikelihood();
   virtual int CheckBounds();
-  double calcLikelihood();
+  double CalcLikelihood();
+  virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
+  // ETA - Why is this virtual?
   virtual const char* getParName(const int i) const {
-    return fParNames[i];
+    return _fNames[i].c_str();
   };
   std::string const getInputFile() const { return inputFile; };
 
@@ -125,26 +131,40 @@ class covarianceBase {
   TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   std::vector<double> getParameterMeans(){return par_means;}
 
-
   //========
   //DB Pointer return
+  //ETA - This might be a bit squiffy? If the vector gots moved from say a
+  //push_back then the pointer is no longer valid... maybe need a better 
+  //way to deal with this? It was fine before when the return was to an 
+  //element of a new array. There must be a clever C++ way to be careful
   //========
-  const double* retPointer(int iParam) {return &fParProp[iParam];}
+  const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
   virtual std::vector<double> getNominalArray();
   const std::vector<double> getProposed() const;
   const double getParProp(const int i) {
-    return fParProp[i]; 
+    return _fPropVal[i]; 
   };
   const double getParCurr(const int i) {
-    return fParCurr[i];
+    return _fCurrVal[i];
   };
   const double getParInit(const int i) {
-    return fParInit[i];
+    return _fPreFitValue[i];
   };
-  const double GetLowerBound(const int i) { return fParLoLimit[i];};
-  const double GetUpperBound(const int i) { return fParHiLimit[i];};
-  double getParProp_PCA(int i) {
+
+  virtual const double getNominal(const int i) {
+    return getParInit(i);
+  };
+
+  double GetUpperBound(const int i){
+    return _fUpBound[i];
+  }
+
+  double GetLowerBound(const int i){
+    return _fLowBound[i];
+  }
+
+  const double getParProp_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;
@@ -259,7 +279,7 @@ class covarianceBase {
   void toggleFixAllParameters();
   virtual void toggleFixParameter(const int i);
   bool isParameterFixed(const int i) {
-    if (fParSigma[i] < 0) {
+    if (_fError[i] < 0) {
       return true;
     } else {
       return false;
@@ -321,52 +341,44 @@ class covarianceBase {
   // For Cholesky decomposed parameter throw
   double* randParams;
   //  TMatrixD *chel;
-  double fStepScale;
+  double _fGlobalStepScale;
 
   //KS: This is used when printing parameters, sometimes we have super long parmaeters name, we want to flexibly adjust couts
   unsigned int PrintLength;
 
-  // state info (arrays of each parameter)
-  Char_t  **fParNames;
-  Double_t *fParInit;
-  Double_t *fParCurr;
-  Double_t *fParProp;
-  Double_t *fParSigma;
-  Double_t *fParLoLimit;
-  Double_t *fParHiLimit;
-  Double_t *fIndivStepScale;
-  bool     *fParEvalLikelihood;
   Double_t currLogL;
   Double_t propLogL;
   Double_t *corr_throw;
 
+  // state info (now mostly vectors)
   //ETA - duplication of some of these
   //ideally these should all be private and we have setters be protected 
   //setters and public getters
   std::vector<std::string> _fNames;
   int _fNumPar;
   YAML::Node _fYAMLDoc;
-
   std::vector<double> _fPreFitValue;
+  std::vector<double> _fCurrVal;
+  std::vector<double> _fPropVal;
   std::vector<double> _fGenerated;
   std::vector<double> _fError;
-  std::vector<double> _fLB;
-  std::vector<double> _fUB;
+  std::vector<double> _fLowBound;
+  std::vector<double> _fUpBound;
   std::vector<int> _fDetID;
   std::vector<std::string> _fDetString;
   std::vector<std::string> _fParamType;
-  std::vector<double> _fStepScale;
+  std::vector<double> _fIndivStepScale;
   std::vector<bool> _fFlatPrior;
   TMatrixDSym *_fCovMatrix;
   //TMatrixT<double> *_fCovMatrix;
 
+  //Some "usual" variables. Don't think we really need the ND/FD split
   std::vector<int> _fNormModes;
   std::vector<std::string> _fNDSplineNames;
   std::vector<std::string> _fFDSplineNames;
   std::vector<std::vector<int>> _fFDSplineModes;
-//  std::vector<std::string> _fKinematicPars;
-//  std::vector<std::vector<int>> _fKinematicBounds;
 
+  //Information to be able to apply generic cuts
   std::vector<std::vector<std::string>> _fKinematicPars;
   std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 

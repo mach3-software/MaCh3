@@ -111,7 +111,7 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed, dou
 //Desctructor
 covarianceBase::~covarianceBase(){
 // ********************************************
-  delete[] fParInit;
+  /*delete[] fParInit;
   delete[] fParSigma;
   delete[] fParCurr;
   delete[] fParProp;
@@ -119,6 +119,17 @@ covarianceBase::~covarianceBase(){
   delete[] fParHiLimit;
   delete[] fIndivStepScale;
   delete[] fParEvalLikelihood;
+  */
+
+  _fPreFitValue.clear();
+  _fError.clear();
+  _fCurrVal.clear();
+  _fPropVal.clear();
+  _fLowBound.clear();
+  _fUpBound.clear();
+  _fIndivStepScale.clear();
+  _fFlatPrior.clear();
+
   delete[] randParams;
 
   if (covMatrix != NULL) delete covMatrix;
@@ -332,27 +343,28 @@ void covarianceBase::init(const char *name, const char *file)
   }
   npars = size;
 
-  fParNames = new Char_t*[size]();
-  fParInit = new Double_t[size]();
-  fParSigma = new Double_t[size]();
-  fParCurr = new Double_t[size]();
-  fParProp = new Double_t[size]();
-  fParLoLimit = new Double_t[size]();
-  fParHiLimit = new Double_t[size]();
-  fIndivStepScale = new Double_t[size];
-  fParEvalLikelihood =  new bool[size]();
+  _fNames = std::vector<std::string>(size);
+  _fPreFitValue = std::vector<double>(size);
+  _fError = std::vector<double>(size);
+  _fCurrVal = std::vector<double>(size);
+  _fPropVal = std::vector<double>(size);
+  _fLowBound = std::vector<double>(size);
+  _fUpBound = std::vector<double>(size);
+  _fFlatPrior = std::vector<bool>(size);
+  _fIndivStepScale = std::vector<double>(size);
+
   corr_throw = new Double_t[size]();
   // Set the defaults to true
   for(int i = 0; i < size; i++) {
-    fParInit[i] = 1.;
-    fParSigma[i] = 0.;
-    fParCurr[i] = 0.;
-    fParProp[i] = 0.;
-    fParLoLimit[i] = -999.99;
-    fParHiLimit[i] = 999.99;
-    fParEvalLikelihood[i] = true;
-    fIndivStepScale[i] = 1.;
-    corr_throw[i] = 0.0;
+	_fPreFitValue.at(i) = 1.;
+	_fError.at(i) = 0.;
+	_fCurrVal.at(i) = 0.;
+	_fPropVal.at(i) = 0.;
+	_fLowBound.at(i) = -999.99;
+	_fUpBound.at(i) = 999.99;
+	_fFlatPrior.at(i) = true;
+	_fIndivStepScale.at(i) = 1.;
+	corr_throw[i] = 0.0;
   }
 
   // Set the logLs to very large so next step is accepted
@@ -364,7 +376,7 @@ void covarianceBase::init(const char *name, const char *file)
 
   infile->Close();
 
-  fStepScale = 1.0;
+  _fGlobalStepScale = 1.0;
 
   std::cout << "Created covariance matrix named: " << getName() << std::endl;
   std::cout << "from file: " << file << std::endl;
@@ -431,27 +443,28 @@ void covarianceBase::init(const char *YAMLFile)
   }
   npars = size;
 
-  fParNames = new Char_t*[size]();
-  fParInit = new Double_t[size]();
-  fParSigma = new Double_t[size]();
-  fParCurr = new Double_t[size]();
-  fParProp = new Double_t[size]();
-  fParLoLimit = new Double_t[size]();
-  fParHiLimit = new Double_t[size]();
-  fIndivStepScale = new Double_t[size];
-  fParEvalLikelihood =  new bool[size]();
+  _fNames = std::vector<std::string>(size);
+  _fPreFitValue = std::vector<double>(size);
+  _fError = std::vector<double>(size);
+  _fCurrVal = std::vector<double>(size);
+  _fPropVal = std::vector<double>(size);
+  _fLowBound = std::vector<double>(size);
+  _fUpBound = std::vector<double>(size);
+  _fFlatPrior = std::vector<bool>(size);
+  _fIndivStepScale = std::vector<double>(size);
+
   corr_throw = new Double_t[size]();
   // Set the defaults to true
   for(int i = 0; i < size; i++) {
-    fParInit[i] = 1.;
-    fParSigma[i] = 0.;
-    fParCurr[i] = 0.;
-    fParProp[i] = 0.;
-    fParLoLimit[i] = -999.99;
-    fParHiLimit[i] = 999.99;
-    fParEvalLikelihood[i] = true;
-    fIndivStepScale[i] = 1.;
-    corr_throw[i] = 0.0;
+	_fPreFitValue.at(i) = 1.;
+	_fError.at(i) = 0.;
+	_fCurrVal.at(i) = 0.;
+	_fPropVal.at(i) = 0.;
+	_fLowBound.at(i) = -999.99;
+	_fUpBound.at(i) = 999.99;
+	_fFlatPrior.at(i) = true;
+	_fIndivStepScale.at(i) = 1.;
+	corr_throw[i] = 0.0;
   }
 
   // Set the logLs to very large so next step is accepted
@@ -461,7 +474,7 @@ void covarianceBase::init(const char *YAMLFile)
   // Set random parameter vector (for correlated steps)
   randParams = new double[size];
 
-  fStepScale = 1.0;
+  _fGlobalStepScale = 1.0;
 
   std::cout << "Created covariance matrix named: " << getName() << std::endl;
   std::cout << "from file: " << YAMLFile << std::endl;
@@ -486,26 +499,28 @@ void covarianceBase::init(TMatrixDSym* covMat) {
   
   setCovMatrix(covMat);
 
-  fParNames = new Char_t*[size];
-  fParInit = new Double_t[size];
-  fParSigma = new Double_t[size];
-  fParCurr = new Double_t[size];
-  fParProp = new Double_t[size];
-  fParLoLimit = new Double_t[size]();
-  fParHiLimit = new Double_t[size]();
-  fIndivStepScale = new Double_t[size];
-  fParEvalLikelihood =  new bool[size];
+  _fNames = std::vector<std::string>(size);
+  _fPreFitValue = std::vector<double>(size);
+  _fError = std::vector<double>(size);
+  _fCurrVal = std::vector<double>(size);
+  _fPropVal = std::vector<double>(size);
+  _fLowBound = std::vector<double>(size);
+  _fUpBound = std::vector<double>(size);
+  _fFlatPrior = std::vector<bool>(size);
+  _fIndivStepScale = std::vector<double>(size);
+
   corr_throw = new Double_t[size]();
-  for (int i = 0; i < size; i++) {
-    fParInit[i] = 1.;
-    fParSigma[i] = 0.;
-    fParCurr[i] = 0.;
-    fParProp[i] = 0.;
-    fParLoLimit[i] = -999.99;
-    fParHiLimit[i] = 999.99;
-    fParEvalLikelihood[i] = true;
-    fIndivStepScale[i] = 1.;
-    corr_throw[i] = 0.0;
+  // Set the defaults to true
+  for(int i = 0; i < size; i++) {
+	_fPreFitValue.at(i) = 1.;
+	_fError.at(i) = 0.;
+	_fCurrVal.at(i) = 0.;
+	_fPropVal.at(i) = 0.;
+	_fLowBound.at(i) = -999.99;
+	_fUpBound.at(i) = 999.99;
+	_fFlatPrior.at(i) = true;
+	_fIndivStepScale.at(i) = 1.;
+	corr_throw[i] = 0.0;
   }
 
   // dont need these 2 i tihnk
@@ -515,7 +530,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
   // set random parameter vector (for correlated steps)
   randParams = new double[size];
 
-  fStepScale = 1.0;
+  _fGlobalStepScale = 1.0;
 
   std::cout << "Created covariance matrix named: " << getName() << std::endl;
 }
@@ -538,20 +553,23 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
         InvertCovMatrix[i][j] = (*invCovMatrix)(i,j);
     }
   }
+
+  setThrowMatrix(cov);
 }
 
 // Set all the covariance matrix parameters to a user-defined value
+// Might want to split this
 void covarianceBase::setPar(int i , double val) {
 
   std::cout << "Over-riding " << getParName(i) << ": " << std::endl;
-  std::cout << "fParProp (" << fParProp[i];
-  std::cout << "), fParCurr (" << fParCurr[i];
-  std::cout << "), fParInit (" << fParInit[i]; 
+  std::cout << "_fPropVal (" << _fPropVal[i];
+  std::cout << "), _fCurrVal (" << _fCurrVal[i];
+  std::cout << "), _fPreFitValue (" << _fPreFitValue[i]; 
   std::cout << ") to " << val << std::endl;
 
-  fParProp[i] = val;
-  fParCurr[i] = val;
-  fParInit[i] = val;
+  _fPropVal[i] = val;
+  _fCurrVal[i] = val;
+  _fPreFitValue[i] = val;
 
   // Transfer the parameter values to the PCA basis
   if (pca) TransferToPCA();
@@ -568,8 +586,8 @@ void covarianceBase::TransferToPCA() {
   TVectorD fParCurr_vec(size);
   TVectorD fParProp_vec(size);
   for (int i = 0; i < size; ++i) {
-    fParCurr_vec(i) = fParCurr[i];
-    fParProp_vec(i) = fParProp[i];
+    fParCurr_vec(i) = _fCurrVal[i];
+    fParProp_vec(i) = _fPropVal[i];
   }
 
   fParCurr_PCA = TransferMatT*fParCurr_vec;
@@ -591,14 +609,14 @@ void covarianceBase::TransferToParam() {
 #pragma omp parallel for
 #endif
   for (int i = 0; i < size; ++i) {
-    fParProp[i] = fParProp_vec(i);
-    fParCurr[i] = fParCurr_vec(i);
+    _fPropVal[i] = fParProp_vec(i);
+    _fCurrVal[i] = fParCurr_vec(i);
   }
 }
 
 const std::vector<double> covarianceBase::getProposed() const {
   std::vector<double> props;
-  for (int i = 0; i < size; ++i) props.push_back(fParProp[i]);
+  for (int i = 0; i < size; ++i) props.push_back(_fPropVal[i]);
   return props;
 }
 
@@ -632,7 +650,7 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
       for (int i = 0; i < size; i++)
       {
       // if parameter is fixed, dont throw
-        if (fParSigma[i] < 0) {
+        if (_fError[i] < 0) {
           nominal[i] = 1.0;
           continue;
         }
@@ -674,17 +692,17 @@ void covarianceBase::throwParameters() {
       // Check if parameter is fixed first: if so don't randomly throw
       if (isParameterFixed(i)) continue;
 
-      fParProp[i] = fParInit[i] + corr_throw[i];
+      _fPropVal[i] = _fPreFitValue[i] + corr_throw[i];
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
-      while (fParProp[i] > fParHiLimit[i] || fParProp[i] < fParLoLimit[i]) {
+      while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
 #ifdef MULTITHREAD
         randParams[i] = random_number[omp_get_thread_num()]->Gaus(0, 1);
 #else
         randParams[i] = random_number[0]->Gaus(0,1);
 #endif
         const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, size, i);
-        fParProp[i] = fParInit[i] + corr_throw_single;
+        _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
         {
           //KS: Since we are mulithreading there is danger that those messages
@@ -692,15 +710,15 @@ void covarianceBase::throwParameters() {
           std::cerr << "Tried " << throws << " times to throw parameter "; 
 		  std::cerr << i << " but failed" << std::endl;
           std::cerr << "Matrix: " << matrixName << std::endl;
-          std::cerr << "Param:  " << fParNames[i] << std::endl;
-          std::cerr << "Setting fParProp:  " << fParProp[i] <<" to "<<fParInit[i]<<std::endl;
+          std::cerr << "Param:  " << _fNames[i] << std::endl;
+          std::cerr << "Setting _fPropVal:  " << _fPropVal[i] <<" to "<< _fPreFitValue[i]<<std::endl;
           std::cerr << "I live at " << __FILE__ << ":" << __LINE__ << std::endl;
-          fParProp[i] = fParInit[i];
+          _fPropVal[i] = _fPreFitValue[i];
           //throw;
         }
         throws++;
       }
-      fParCurr[i] = fParProp[i];
+      _fCurrVal[i] = _fPropVal[i];
     }
   }
   else
@@ -726,27 +744,27 @@ void covarianceBase::RandomConfiguration() {
     if (isParameterFixed(i)) continue;
     // Check that the sigma range is larger than the parameter range
     // If not, throw in the valid parameter range instead
-    const double paramrange = fParHiLimit[i] - fParLoLimit[i];
+    const double paramrange = _fUpBound[i] - _fLowBound[i];
     const double sigma = sqrt((*covMatrix)(i,i));
     double throwrange = sigma;
     if (paramrange < sigma) throwrange = paramrange;
 
-    fParProp[i] = fParInit[i] + random_number[0]->Gaus(0, 1)*throwrange;
+    _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
     // Try again if we the initial parameter proposal falls outside of the range of the parameter
     // Really only relevant for the xsec parameters; the flux and ND280 have -999 and 999 set to the limits!
     int throws = 0;
-    while (fParProp[i] > fParHiLimit[i] || fParProp[i] < fParLoLimit[i]) {
+    while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
       if (throws > 1000) {
         std::cerr << "Tried " << throws << " times to throw parameter " << i << " but failed" << std::endl;
         std::cerr << "Matrix: " << matrixName << std::endl;
-        std::cerr << "Param:  " << fParNames[i] << std::endl;
+        std::cerr << "Param:  " << _fNames[i].c_str() << std::endl;
         throw;
       }
-      fParProp[i] = fParInit[i] + random_number[0]->Gaus(0, 1)*throwrange;
+      _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
       throws++;
     }
-    std::cout << "Setting current step in " << matrixName << " param " << i << " = " << fParProp[i] << " from " << fParCurr[i] << std::endl;
-    fParCurr[i] = fParProp[i];
+    std::cout << "Setting current step in " << matrixName << " param " << i << " = " << _fPropVal[i] << " from " << _fCurrVal[i] << std::endl;
+    _fCurrVal[i] = _fPropVal[i];
   }
   if (pca) TransferToPCA();
 
@@ -756,16 +774,16 @@ void covarianceBase::RandomConfiguration() {
 // Set a single parameter
 void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
   // *************************************
-  fParProp[parNo] = parVal;
-  fParCurr[parNo] = parVal;
+  _fPropVal[parNo] = parVal;
+  _fCurrVal[parNo] = parVal;
   std::cout << "Setting " << getParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
 
   if (pca) TransferToPCA();
 }
 
 void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
-  fParProp[parNo] = parVal;
-  fParCurr[parNo] = parVal;
+  _fPropVal[parNo] = parVal;
+  _fCurrVal[parNo] = parVal;
   std::cout << "Setting " << getParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
   if (pca) TransferToPCA();
 }
@@ -791,7 +809,7 @@ void covarianceBase::randomize() {
 #endif
     for (int i = 0; i < size; i++) {
       // If parameter isn't fixed
-      if (fParSigma[i] > 0.0) {
+      if (_fError[i] > 0.0) {
 #ifdef MULTITHREAD
         randParams[i] = random_number[omp_get_thread_num()]->Gaus(0, 1);
 #else
@@ -838,8 +856,8 @@ void covarianceBase::CorrelateSteps() {
 #pragma omp parallel for
 #endif
     for (int i = 0; i < size; i++) {
-      if (fParSigma[i] > 0.) {
-        fParProp[i] = fParCurr[i] + corr_throw[i]*fStepScale*fIndivStepScale[i];
+      if (_fError[i] > 0.) {
+        _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
       }
     }
     // If doing PCA throw uncorrelated in PCA basis (orthogonal basis by definition)
@@ -856,7 +874,7 @@ void covarianceBase::CorrelateSteps() {
         //KS: If undecomposed parameter apply individual step scale and cholesky for better acceptance rate
         if(isDecomposed_PCA[i] >= 0)
         {
-            IndStepScale *= fIndivStepScale[isDecomposed_PCA[i]];
+            IndStepScale *= _fIndivStepScale[isDecomposed_PCA[i]];
             IndStepScale *= corr_throw[isDecomposed_PCA[i]];
         }
         //If decomposed apply only random number
@@ -864,9 +882,9 @@ void covarianceBase::CorrelateSteps() {
         {
          IndStepScale *= randParams[i];
          //KS: All PCA-ed parameters have the same step scale
-         IndStepScale *= fIndivStepScale[FirstPCAdpar];
+         IndStepScale *= _fIndivStepScale[FirstPCAdpar];
         }
-        fParProp_PCA(i) = fParCurr_PCA(i)+fStepScale*IndStepScale*eigen_values_master[i];
+        fParProp_PCA(i) = fParCurr_PCA(i)+_fGlobalStepScale*IndStepScale*eigen_values_master[i];
       }
     }
     // Then update the parameter basis
@@ -882,7 +900,7 @@ void covarianceBase::acceptStep() {
 #endif
     for (int i = 0; i < size; i++) {
       // Update state so that current state is proposed state
-      fParCurr[i] = fParProp[i];
+      _fCurrVal[i] = _fPropVal[i];
     }
   } else {
   // Update the book-keeping for the output
@@ -906,8 +924,8 @@ void covarianceBase::throwParProp(const double mag) {
     MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, size);
     // Number of sigmas we throw
     for (int i = 0; i < size; i++) {
-      if (fParSigma[i] > 0.)
-        fParProp[i] = fParCurr[i] + corr_throw[i]*mag;
+      if (_fError[i] > 0.)
+        _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*mag;
     }
   } else {
     for (int i = 0; i < size; i++) {
@@ -918,7 +936,7 @@ void covarianceBase::throwParProp(const double mag) {
     TVectorD proposed = TransferMat*fParProp_PCA;
     for (int i = 0; i < size; ++i) {
       if (fParSigma_PCA[i] > 0.) {
-        fParProp[i] = proposed(i);
+        _fPropVal[i] = proposed(i);
       }
     }
   }
@@ -935,8 +953,8 @@ void covarianceBase::throwParCurr(const double mag)
     // The number of sigmas to throw
     // Should probably have this as a default parameter input to the function instead
     for (int i = 0; i < size; i++) {
-      if (fParSigma[i] > 0.){
-        fParCurr[i] = corr_throw[i]*mag;
+      if (_fError[i] > 0.){
+        _fCurrVal[i] = corr_throw[i]*mag;
       }
     }
   } else {
@@ -948,7 +966,7 @@ void covarianceBase::throwParCurr(const double mag)
     TVectorD current = TransferMat*fParCurr_PCA;
     for (int i = 0; i < size; ++i) {
       if (fParSigma_PCA[i] > 0.) {
-        fParCurr[i] = current(i);
+        _fCurrVal[i] = current(i);
       }
     }
   }
@@ -976,7 +994,7 @@ void covarianceBase::printNominalCurrProp() {
   }
   std::cout << std::setw(PrintLength) << std::left << "Name" << std::setw(PrintLength) << "Prior" << std::setw(PrintLength) << "Current" << std::setw(35) << "Proposed" << "\n";
   for (int i = 0; i < size; ++i) {
-    std::cout << std::setw(PrintLength) << std::left << getParName(i) << std::setw(PrintLength) << fParInit[i] << std::setw(PrintLength) << fParCurr[i] << std::setw(PrintLength) << fParProp[i] << "\n";
+    std::cout << std::setw(PrintLength) << std::left << getParName(i) << std::setw(PrintLength) << _fPreFitValue[i] << std::setw(PrintLength) << _fCurrVal[i] << std::setw(PrintLength) << _fPropVal[i] << "\n";
   }
    //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
   std::cout << std::endl;
@@ -986,7 +1004,7 @@ void covarianceBase::printNominalCurrProp() {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::calcLikelihood() {
+double covarianceBase::CalcLikelihood() {
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
@@ -995,49 +1013,54 @@ double covarianceBase::calcLikelihood() {
 #endif
   for(int i = 0; i < size; i++){
     for (int j = 0; j <= i; ++j) {
-      if (fParEvalLikelihood[i] && fParEvalLikelihood[j]) {
+      if (_fFlatPrior[i] && _fFlatPrior[j]) {
         //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
         int scale = 1;
         if(i != j) scale = 2;
-        logL += scale * 0.5*(fParProp[i] - fParInit[i])*(fParProp[j] - fParInit[j])*InvertCovMatrix[i][j];
+        logL += scale * 0.5*(_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
       }
     }
   }
   //clock.Stop();
-  //std::cout << __FILE__ << "::getLikelihood took " << clock.RealTime() << "s" << std::endl;
+  //std::cout << __FILE__ << "::GetLikelihood took " << clock.RealTime() << "s" << std::endl;
 
   return logL;
 }
 
 int covarianceBase::CheckBounds(){
   int NOutside=0;
-#ifdef MULTITHREAD
-#pragma omp parallel for reduction(+:NOutside)
-#endif
-  for (int i = 0; i < size; i++) {
-    // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
-    if (fParProp[i] < 0) {std::cout << "fParProp at " << i << " is " << fParProp[i] << std::endl; NOutside++;}
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:NOutside)
+  #endif
+  for (int i = 0; i < _fNumPar; i++){
+      //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
+      if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
+		std::cout << "_fPropVal at param " << i << "( " << getParName(i) << ") is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
+        NOutside++;
+      }
   }
   return NOutside;
 }
 
-double covarianceBase::getLikelihood(){
+double covarianceBase::GetLikelihood(){
   // Checkbounds and calclikelihood are virtual
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
   
   if(NOutside>0){
 
-	for (int i = 0; i < size; i++) {
+	//ETA - don't need to check here. CheckBounds actually checks _fLowBound
+	// and _fUpBound rather than 0 all the time
+	//for (int i = 0; i < size; i++) {
 	  // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
-	  if (fParProp[i] < 0) {std::cout << "fParProp at " << i << " is " << fParProp[i] << std::endl;}
-	}
+	  //if (_fPropVal[i] < 0) {std::cout << "_fPropVal at " << i << " is " << _fPropVal[i] << std::endl;}
+	//}
 	std::cout << "Parameters outside of bounds!" << std::endl;
 	std::cout << "NOutside is " << NOutside << std::endl;
     return NOutside*__LARGE_LOGL__;
   }
 
-  return calcLikelihood();
+  return CalcLikelihood();
 }
 
 
@@ -1046,7 +1069,7 @@ void covarianceBase::printPars() {
   std::cout << "Number of pars: " << size << std::endl;
   std::cout << "current " << matrixName << " parameters:" << std::endl;
   for(int i = 0; i < size; i++) {
-    std::cout << std::fixed << std::setprecision(5) << fParNames[i] << " current: \t" << fParCurr[i] << "   \tproposed: \t" << fParProp[i] << std::endl;
+    std::cout << std::fixed << std::setprecision(5) << _fNames[i].c_str() << " current: \t" << _fCurrVal[i] << "   \tproposed: \t" << _fPropVal[i] << std::endl;
   }
 
   return;
@@ -1059,7 +1082,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
   if (pars.empty()) {
     // For xsec this means setting to the prior (because nominal is the prior)
     for (int i = 0; i < size; i++) {
-      fParProp[i] = fParInit[i];
+      _fPropVal[i] = _fPreFitValue[i];
     }
     // If not empty, set the parameters to the specified
   } else {
@@ -1076,7 +1099,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
 		std::cerr << "Error: trying to set parameter value to a nan for parameter " << getParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
 		throw;
 	  } else {
-		fParProp[i] = pars[i];
+		_fPropVal[i] = pars[i];
 	  }
     }
   }
@@ -1093,12 +1116,12 @@ void covarianceBase::setParameters(std::vector<double> pars) {
 void covarianceBase::setBranches(TTree &tree) {
   // loop over parameters and set a branch
   for (int i = 0; i < size; ++i) {
-    tree.Branch(fParNames[i], (double*)&fParCurr[i], Form("%s/D", fParNames[i]));
+    tree.Branch(_fNames[i].c_str(), &_fCurrVal[i], Form("%s/D", _fNames[i].c_str()));
   }
   // When running PCA, also save PCA parameters
   if (pca) {
     for (int i = 0; i < npars; ++i) { 
-      tree.Branch(Form("%s_PCA", fParNames[i]), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", fParNames[i]));
+      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
 }
@@ -1110,16 +1133,16 @@ void covarianceBase::setStepScale(double scale) {
         throw;   
     }
   std::cout << getName() << " setStepScale() = " << scale << std::endl;
-  fStepScale = scale;
+  _fGlobalStepScale = scale;
 }
 
 void covarianceBase::toggleFixAllParameters() {
   // fix or unfix all parameters by multiplying by -1
   if(!pca)
   {
-    for (int i = 0; i < size; i++) fParSigma[i] *= -1.0;
+    for (int i = 0; i < size; i++) _fError[i] *= -1.0;
   } else{
-     for (int i = 0; i < npars; i++) fParSigma_PCA[i] *= -1.0; 
+     for (int i = 0; i < npars; i++) fParSigma_PCA[i] *= -1.0;
   }
   return;
 }
@@ -1131,8 +1154,8 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  std::cerr << "Fix this in your config file please!" << std::endl;
 	  throw;
 	} else {
-	  fParSigma[i] *= -1.0;
-	  std::cout << "Setting " << getParName(i) << "(parameter " << i << ") to fixed at " << fParCurr[i] << std::endl;
+	  _fError[i] *= -1.0;
+	  std::cout << "Setting " << getParName(i) << "(parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
 	} 
   } else {
 	int isDecom = -1;
@@ -1144,7 +1167,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  //throw; 
 	} else {
 	  fParSigma_PCA[isDecom] *= -1.0;
-	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << fParCurr[i] << std::endl;
+	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
 	}
   }
   
@@ -1159,7 +1182,7 @@ void covarianceBase::setEvalLikelihood(int i, bool eL) {
     throw;
   } else {
     std::cout << "Setting " << getParName(i) << " (parameter " << i << ") to flat prior? " << eL << std::endl;
-    fParEvalLikelihood[i] = eL;
+    _fFlatPrior[i] = eL;
   }
 }
 
@@ -1270,7 +1293,7 @@ void covarianceBase::setIndivStepScale(std::vector<double> stepscale) {
   }
 
   for (int iParam=0;iParam<size;iParam++) {
-    fIndivStepScale[iParam] = stepscale[iParam];
+    _fIndivStepScale[iParam] = stepscale[iParam];
   }
 
   printIndivStepScale();
@@ -1283,7 +1306,7 @@ void covarianceBase::printIndivStepScale() {
   std::cout << "============================================================" << std::endl;
   std::cout << std::setw(PrintLength) << "Parameter:" << " | " << std::setw(11) << "Step scale:" << std::endl;
   for (int iParam=0;iParam<size;iParam++) {
-    std::cout << std::setw(PrintLength) << fParNames[iParam] << " | " << std::setw(11) << fIndivStepScale[iParam] << std::endl;
+    std::cout << std::setw(PrintLength) << _fNames[iParam].c_str() << " | " << std::setw(11) << _fIndivStepScale[iParam] << std::endl;
   }
   std::cout << "============================================================" << std::endl;
 }
@@ -1340,7 +1363,7 @@ void covarianceBase::resetIndivStepScale() {
   for (int i=0;i<size;i++) {
     stepScales[i] = 1.;
   }
-  fStepScale=1.0;
+  _fGlobalStepScale=1.0;
   setIndivStepScale(stepScales);
 }
 
@@ -1759,7 +1782,7 @@ void covarianceBase::updateAdaptiveCovariance(){
 #endif
   for(int iRow=0; iRow<size; iRow++){
     par_means_prev[iRow]=par_means[iRow];
-    par_means[iRow]=(fParCurr[iRow]+par_means[iRow]*total_steps)/(total_steps+1);  
+    par_means[iRow]=(_fCurrVal[iRow]+par_means[iRow]*total_steps)/(total_steps+1);  
   }
 
   //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
@@ -1771,7 +1794,7 @@ void covarianceBase::updateAdaptiveCovariance(){
 
       double cov_val = (*adaptiveCovariance)(iRow, iCol)*size/5.6644;
       cov_val += par_means_prev[iRow]*par_means_prev[iCol]; //First we remove the current means
-      cov_val = (cov_val*total_steps+fParCurr[iRow]*fParCurr[iCol])/(total_steps+1); //Now get mean(iRow*iCol)
+      cov_val = (cov_val*total_steps+_fCurrVal[iRow]*_fCurrVal[iCol])/(total_steps+1); //Now get mean(iRow*iCol)
       cov_val -= par_means[iCol]*par_means[iRow];
       cov_val*=5.6644/size;
       (*adaptiveCovariance)(iRow, iCol) = cov_val;
@@ -1879,7 +1902,7 @@ std::vector<double> covarianceBase::getNominalArray()
  std::vector<double> nominal;
   for (int i = 0; i < size; i++)
   {
-    nominal.push_back(fParInit[i]);
+    nominal.push_back(_fPreFitValue[i]);
   }
 
  return nominal;

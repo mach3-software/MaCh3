@@ -9,9 +9,13 @@
 #include <stdio.h>
 
 // CUDA specifics
+
 #include <cuda_runtime.h>
+
+#ifdef CUDA_ERROR_CHECK
 #include <helper_functions.h>
 #include <helper_cuda.h>
+#endif
 
 // Define the macros
 #define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)

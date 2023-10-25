@@ -26,7 +26,8 @@ class covarianceXsec : public covarianceBase {
     void Print();
 
     // General Getter functions not split by detector
-    inline int CheckBounds();
+	// ETA - a lot of these can go... they're just duplications from the base
+	// class.
     const double GetParamUpperBound(const int i) {return xsec_param_ub_a[i];}
     const double GetParamLowerBound(const int i) {return xsec_param_lb_a[i];}
     const double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
@@ -138,7 +139,7 @@ class covarianceXsec : public covarianceBase {
     // What parameter Gets reweighted by what amount according to MCMC
     inline double calcReWeight(const int bin){
 	  if (bin >= 0 && bin < nPars) {
-		return fParProp[bin];
+		return _fPropVal[bin];
 	  } else {
 		std::cerr << "Specified bin is <= 0 OR bin > npar!" << std::endl;
 		std::cerr << "bin = " << bin << ", npar = " << nPars << std::endl;
@@ -194,6 +195,7 @@ class covarianceXsec : public covarianceBase {
     double *xsec_param_prior_a;
 
     // Contains the parameter names
+	// ETA - don't think we need this anymore tbh
     std::vector<std::string> xsec_param_names;
     
     //Contains the names of the Far spline objects in the spline files
@@ -265,34 +267,13 @@ class covarianceXsec : public covarianceBase {
   private:
 	//std::vector<std::string> _fNames;
 	std::vector<std::string> _fFancyNames;
-	//int _fNumPar;
-	//YAML::Node _fYAMLDoc;
 
+	//ETA - do we need these now?
 	std::vector<std::vector<int>> _fNormModes;
 	std::vector<std::string> _fNDSplineNames;
 	std::vector<std::string> _fFDSplineNames;
 	std::vector<std::vector<int>> _fFDSplineModes;
 	int _nNormPars;
-
-	//std::vector<double> _fPreFitValue;
-	//std::vector<double> _fGenerated;
-	//std::vector<double> _fError;
-	//std::vector<double> _fLB;
-	//std::vector<double> _fUB;
-	//std::vector<int> _fDetID;
-	//std::vector<double> _fStepScale;
-	//std::vector<bool> _fFlatPrior;
-	//TMatrixT<double> *_fCovMatrix;
-	//std::vector<int> _fNormModes;
-	//std::vector<std::string> _fParameterGroup;
-
-	//std::vector<std::string> _fNDSplineNames;
-	//std::vector<std::string> _fFDSplineNames;
-	//std::vector<std::vector<int>> _fFDSplineModes;
-
-	//std::vector<std::vector<std::string>> _fKinematicPars;
-	//std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
-
 };
 
 #endif

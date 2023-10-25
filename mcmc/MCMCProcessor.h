@@ -14,6 +14,7 @@
 
 // ROOT includes
 #include "TObjArray.h"
+#include "TObjString.h"
 #include "TChain.h"
 #include "TFile.h"
 #include "TBranch.h"
@@ -32,9 +33,6 @@
 #include "TStopwatch.h"
 #include "TText.h"
 #include "TGaxis.h"
-#include "TObjString.h"
-#include "TTree.h"
-#include "TROOT.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
