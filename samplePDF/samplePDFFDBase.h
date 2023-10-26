@@ -226,7 +226,7 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
-  Oscillator *Osc;
+  Oscillator *Osc = NULL;
 
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;

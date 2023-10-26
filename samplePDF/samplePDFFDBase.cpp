@@ -19,6 +19,9 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //KS: For now FD support only one sample
   nSamples = 1;
   SampleName.push_back("FDsample");
+
+  //ETA - make sure osc is NULL!!
+  //Osc = NULL; 
   
   //ETA - leave this out for now, need to fix and make things nice and configurable
   //EnergyScale *energy_first = new EnergyScale();
@@ -219,12 +222,13 @@ void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
 {
 
-  if (Osc) {
+  if (Osc!=NULL) {
+	std::cout << "Osc is not NULL!! i.e. doing atm oscillations " << std::endl;
     //DB Currently hardcoded to assume rho_electrons = rho_matter/2, 25km production height
     Osc->FillOscillogram(oscpar,25.0,0.5);
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-	MCSamples[iSample].osc_w[iEvent] = *(MCSamples[iSample].osc_w_pointer[iEvent]);
+		MCSamples[iSample].osc_w[iEvent] = *(MCSamples[iSample].osc_w_pointer[iEvent]);
       }
     }
   } else {
@@ -863,6 +867,8 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 //Setup chosen oscillation calculator for each subsample
 //Default Baseline Implementation
 //Add your own implementation in experiment specific SamplePDF Class if necessary!!
+// ETA - pass the yaml config used in the executable. This will include the cov osc
+// and other information. Need to double check that this is sensible
 void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 {
 
