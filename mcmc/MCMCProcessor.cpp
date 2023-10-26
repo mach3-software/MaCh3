@@ -3683,5 +3683,3 @@ void MCMCProcessor::AcceptanceProbabilities() {
   delete[] AccProbValues;
   delete[] AccProbBatchedAverages;
 }
-
-
