@@ -62,9 +62,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   AccProbBatchedAverages = NULL;
     
   //KS:Hardcoded should be a way to get it via config or something
-  PlotDet = false;
-  MakeOnlyXsecCorr = false;
-  MakeOnlyXsecCorrFlux = false;
   plotRelativeToPrior = false;
   printToPDF = false;
   plotBinValue = false;
@@ -81,12 +78,15 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nEntries = 0;
   nSteps = 0;
   nBatches = 0;
+  AutoCorrLag = 0;
   nSysts = 0;
   nSamples = 0;
   
   nBins = 70;
   DrawRange = 1.5;
   
+  Posterior1DCut = "";
+  CredibleInSigmas = false;
   //KS:Those keep basic information for ParameterEnum
   ParamNames.resize(kNParameterEnum);
   ParamCentral.resize(kNParameterEnum);
@@ -218,9 +218,6 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
 // ***************
 void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 // ***************
-  if(MakeOnlyXsecCorr) std::cout<<"Will plot only xsec covariance"<<std::endl;
-  if(MakeOnlyXsecCorrFlux) std::cout<<"Will plot only xsec covariances and flux"<<std::endl;
-
   if (CacheMCMC) MakeCovariance_MP();
   else MakeCovariance();
   Cov = (TMatrixDSym*)Covariance->Clone();
@@ -296,8 +293,17 @@ void MCMCProcessor::MakePostfit() {
     hpost[i]->SetMinimum(0);
     hpost[i]->GetYaxis()->SetTitle("Steps");
     hpost[i]->GetYaxis()->SetNoExponent(false);
+
+    //KS: Apply additional Cuts, like mass ordering
+    std::string CutPosterior1D = "";
+    if(Posterior1DCut != "")
+    {
+      CutPosterior1D = StepCut +" && " + Posterior1DCut;
+    }
+    else CutPosterior1D = StepCut;
+
     // Project BranchNames[i] onto hpost, applying stepcut
-    Chain->Project(BranchNames[i], BranchNames[i], StepCut.c_str());
+    Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -442,10 +448,17 @@ void MCMCProcessor::DrawPostfit() {
   // cd into the output file
   OutputFile->cd();
  
+  std::string CutPosterior1D = "";
+  if(Posterior1DCut != "")
+  {
+    CutPosterior1D = StepCut +" && " + Posterior1DCut;
+  }
+  else CutPosterior1D = StepCut;
+
   // Make a TH1D of the central values and the errors
   TH1D *paramPlot = new TH1D("paramPlot", "paramPlot", nDraw, 0, nDraw);
   paramPlot->SetName("mach3params");
-  paramPlot->SetTitle(StepCut.c_str());
+  paramPlot->SetTitle(CutPosterior1D.c_str());
   paramPlot->SetFillStyle(3001);
   paramPlot->SetFillColor(kBlue-1);
   paramPlot->SetMarkerColor(paramPlot->GetFillColor());
@@ -556,8 +569,8 @@ void MCMCProcessor::DrawPostfit() {
 
   OutputFile->cd();
   //KS: Plot Xsec and Flux
-  if (PlotXSec == true) {
-      
+  if (PlotXSec == true)
+  {
     const int Start = ParamTypeStartPos[kXSecPar];
     // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
     // Have already looked through the branches earlier
@@ -615,7 +628,6 @@ void MCMCProcessor::DrawPostfit() {
     if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
-  
   if(PlotDet)
   {
     int Start = ParamTypeStartPos[kND280Par];
@@ -636,21 +648,21 @@ void MCMCProcessor::DrawPostfit() {
       paramPlot->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot->GetXaxis()->SetRangeUser(Start, NDbinCounter);
       paramPlot->GetXaxis()->SetTitle("");
-      paramPlot->SetTitle(StepCut.c_str());
+      paramPlot->SetTitle(CutPosterior1D.c_str());
       paramPlot->GetXaxis()->LabelsOption("v");
 
       paramPlot_Gauss->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot_Gauss->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot_Gauss->GetXaxis()->SetRangeUser(Start, NDbinCounter);
       paramPlot_Gauss->GetXaxis()->SetTitle("");
-      paramPlot_Gauss->SetTitle(StepCut.c_str());
+      paramPlot_Gauss->SetTitle(CutPosterior1D.c_str());
       paramPlot_Gauss->GetXaxis()->LabelsOption("v");
 
       paramPlot_HPD->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot_HPD->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot_HPD->GetXaxis()->SetRangeUser(Start, NDbinCounter);
       paramPlot_HPD->GetXaxis()->SetTitle("");
-      paramPlot_HPD->SetTitle(StepCut.c_str());
+      paramPlot_HPD->SetTitle(CutPosterior1D.c_str());
       paramPlot_HPD->GetXaxis()->LabelsOption("v");
 
       prefit->Write(("param_"+NDname+"_prefit").c_str());
@@ -691,10 +703,22 @@ void MCMCProcessor::MakeCredibleIntervals() {
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
-  //Should be easy way to set credible intervals via config keep it for now
-  const int nCredible = 3;
-  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
-  const Color_t CredibleRegionsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
+  //Load values set via config or executable
+  std::vector<double> CredibleIntervals = Credible_Intervals;
+  std::vector<Color_t> CredibleIntervalsColours = Credible_IntervalsColours;
+  //Nothing was passed via config so use default values which are fancy ;)
+  if(CredibleIntervals.size() == 0 && CredibleIntervalsColours.size() == 0)
+  {
+    CredibleIntervals.insert(CredibleIntervals.end(), { 0.99, 0.90, 0.68 });
+    CredibleIntervalsColours.insert(CredibleIntervalsColours.end(), { kCyan+4, kCyan-2, kCyan-10 });
+  }
+  if(CredibleIntervals.size() != CredibleIntervalsColours.size())
+  {
+    std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  const int nCredible = CredibleIntervals.size();
   TH1D** hpost_copy = new TH1D*[nDraw];
   TH1D*** hpost_cl = new TH1D**[nDraw];
 
@@ -706,7 +730,8 @@ void MCMCProcessor::MakeCredibleIntervals() {
 
     for (int j = 0; j < nCredible; ++j)
     {
-      hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleRegions[j]));
+      hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j]));
+
       //KS: Reset to get rid to TF1 otherwise we run into segfault :(
       hpost_cl[i][j]->Reset("");
       hpost_cl[i][j]->Fill(0.0, 0.0);
@@ -725,8 +750,19 @@ void MCMCProcessor::MakeCredibleIntervals() {
       // Scale the histograms before gettindg credible intervals
       hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
 
-      GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleRegions[j]);
-      hpost_cl[i][j]->SetFillColor(CredibleRegionsColours[j]);
+      //KS: We have sliglhy different approach depdening if you passed percentage or sigmas
+      if(CredibleInSigmas)
+      {
+        //KS: Convert sigmas into percentage
+        double CredInter = GetSigmaValue((int)std::round(CredibleIntervals[j]));
+        GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredInter);
+      }
+      else
+      {
+        GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleIntervals[j]);
+      }
+
+      hpost_cl[i][j]->SetFillColor(CredibleIntervalsColours[j]);
       hpost_cl[i][j]->SetLineWidth(1);
     }
     hpost_copy[i]->GetYaxis()->SetTitleOffset(1.8);
@@ -768,7 +804,12 @@ void MCMCProcessor::MakeCredibleIntervals() {
     for (int j = 0; j < nCredible; ++j)
         hpost_cl[i][j]->Draw("HIST SAME");
     for (int j = nCredible-1; j >= 0; --j)
-        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f") ;
+    {
+      if(CredibleInSigmas)
+        legend->AddEntry(hpost_cl[i][j], Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
+      else
+        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f");
+    }
     legend->AddEntry(Asimov, Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
     legend->Draw("SAME");
     Asimov->Draw("SAME");
@@ -918,13 +959,6 @@ void MCMCProcessor::MakeCovariance() {
   }
 
   int covBinning = nDraw;
-  //If we only plot correlation/covariance between xsec (without flux)
-  if(MakeOnlyXsecCorr)
-  {
-     covBinning = nParam[kXSecPar] - nFlux; 
-  }
-    
-    
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
   for (int i = 0; i < covBinning; ++i) {
 
@@ -1045,7 +1079,7 @@ void MCMCProcessor::CacheSteps() {
         ParStep[i] = new double[nEntries];
         hpost2D[i] = new TH2D*[nDraw]();
 
-        for (int j = 0; j < nEntries; ++j) 
+        for (int j = 0; j < nEntries; ++j)
         {
             ParStep[i][j] = -999.99;
             //KS: Set this only once
@@ -1129,11 +1163,6 @@ void MCMCProcessor::MakeCovariance_MP() {
   if(!CacheMCMC) CacheSteps();
   
   int covBinning = nDraw;
-  //If we only plot correlation/covariance between xsec (without flux)
-  if(MakeOnlyXsecCorr)
-  {
-     covBinning = nParam[kXSecPar] - nFlux; 
-  }
 
   bool HaveMadeDiagonal = false;    
   // Check that the diagonal entries have been filled
@@ -1175,7 +1204,7 @@ for (int i = 0; i < covBinning; ++i)
         }
         hpost2D[i][j]->SetMinimum(0);
             
-        for (int k = 0; k < nEntries; ++k) 
+        for (int k = 0; k < nEntries; ++k)
         {
             //KS: Burn in cut
             if(StepNumber[k] < BurnInCut) continue;
@@ -1236,12 +1265,6 @@ void MCMCProcessor::DrawCovariance() {
 // *********************
     
   int covBinning = nDraw;
-  //If we only plot correlation/covariance between xsec (without flux)
-  if(MakeOnlyXsecCorr)
-  {
-     covBinning = nParam[kXSecPar] - nFlux; 
-  }
-  
   // The Covariance matrix from the fit
   TH2D* hCov = new TH2D("hCov", "hCov", covBinning, 0, covBinning, covBinning, 0, covBinning);
   hCov->GetZaxis()->SetTitle("Covariance");
@@ -1331,8 +1354,168 @@ void MCMCProcessor::DrawCovariance() {
   delete hCov;
   delete hCovSq;
   delete hCorr;
+
+  DrawCorrelations1D();
 }
 
+
+// *********************
+//KS: Make the 1D projections of Correlations inspired by Henry's slides (page 28) https://www.t2k.org/asg/oagroup/meeting/2023/2023-07-10-oa-pre-meeting/MaCh3FDUpdate
+void MCMCProcessor::DrawCorrelations1D() {
+// *********************
+
+  //KS: Store it as we go back to them at the end
+  const double TopMargin  = Posterior->GetTopMargin();
+  const double BottomMargin  = Posterior->GetBottomMargin();
+  const int OptTitle = gStyle->GetOptTitle();
+
+  Posterior->SetTopMargin(0.1);
+  Posterior->SetBottomMargin(0.2);
+  gStyle->SetOptTitle(1);
+
+  const int Nhists = 3;
+  //KS: Highest value is just meant bo be sliglhy higher than 1 to catch >,
+  const double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
+  const Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
+
+  //KS: This strore neccesary entires for stripped covariance which strore only "menaingfull correlations
+  std::vector<std::vector<double>> CorrOfInterest;
+  CorrOfInterest.resize(nDraw);
+  std::vector<std::vector<std::string>> NameCorrOfInterest;
+  NameCorrOfInterest.resize(nDraw);
+
+  TH1D ***Corr1DHist = new TH1D**[nDraw]();
+  //KS: Initialising ROOT objects is never is in MP loop
+  for(int i = 0; i < nDraw; i++)
+  {
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+    GetNthParameter(i, Prior, PriorError, Title);
+
+    Corr1DHist[i] = new TH1D*[Nhists]();
+    for(int j = 0; j < Nhists; j++)
+    {
+      Corr1DHist[i][j] = new TH1D(Form("Corr1DHist_%i_%i", i, j), Form("Corr1DHist_%i_%i", i, j), nDraw, 0, nDraw);
+      Corr1DHist[i][j]->SetTitle(Form("%s",Title.Data()));
+      Corr1DHist[i][j]->GetYaxis()->SetTitle("Correlation");
+      Corr1DHist[i][j]->SetFillColor(CorrColours[j]);
+      Corr1DHist[i][j]->SetLineColor(kBlack);
+
+      for (int k = 0; k < nDraw; ++k)
+      {
+        TString Title_y = "";
+        double Prior_y = 1.0;
+        double PriorError_y = 1.0;
+        GetNthParameter(k, Prior_y, PriorError_y, Title_y);
+        Corr1DHist[i][j]->GetXaxis()->SetBinLabel(k+1, Title_y.Data());
+      }
+
+    }
+  }
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for(int i = 0; i < nDraw; i++)
+  {
+    for(int j = 0; j < nDraw; j++)
+    {
+      for(int k = 0; k < Nhists; k++)
+      {
+        const double TempEntry = std::fabs((*Correlation)(i,j));
+        if(Thresholds[k+1] > TempEntry && TempEntry >= Thresholds[k])
+        {
+          Corr1DHist[i][k]->SetBinContent(j+1, (*Correlation)(i,j));
+        }
+      }
+      if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold && i != j)
+      {
+        CorrOfInterest[i].push_back((*Correlation)(i,j));
+        NameCorrOfInterest[i].push_back(Corr1DHist[i][0]->GetXaxis()->GetBinLabel(j+1));
+      }
+    }
+  }
+
+  TDirectory *CorrDir = OutputFile->mkdir("Corr1D");
+  CorrDir->cd();
+
+  for(int i = 0; i < nDraw; i++)
+  {
+    if (IamVaried[i] == false) continue;
+
+    Corr1DHist[i][0]->SetMaximum(+1.);
+    Corr1DHist[i][0]->SetMinimum(-1.);
+    Corr1DHist[i][0]->Draw();
+    for(int k = 1; k < Nhists; k++)
+    {
+      Corr1DHist[i][k]->Draw("SAME");
+    }
+
+    TLegend *leg = new TLegend(0.3, 0.75, 0.6, 0.90);
+    leg->SetTextSize(0.02);
+    for(int k = 0; k < Nhists; k++)
+    {
+      leg->AddEntry(Corr1DHist[i][k], Form("%.2f > |Corr| >= %.2f", Thresholds[k+1], Thresholds[k]), "f");
+    }
+    leg->SetLineColor(0);
+    leg->SetLineStyle(0);
+    leg->SetFillColor(0);
+    leg->SetFillStyle(0);
+    leg->Draw("SAME");
+
+    Posterior->Write(Corr1DHist[i][0]->GetTitle());
+    if(printToPDF) Posterior->Print(CanvasName);
+
+    delete leg;
+  }
+
+  //KS: Plot only meaninfull correlations
+  for(int i = 0; i < nDraw; i++)
+  {
+    const int size = CorrOfInterest[i].size();
+
+    if(size == 0) continue;
+    TH1D* Corr1DHist_Reduced = new TH1D("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
+
+    Corr1DHist_Reduced->SetTitle(Corr1DHist[i][0]->GetTitle());
+    Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
+    Corr1DHist_Reduced->SetFillColor(kBlue);
+    Corr1DHist_Reduced->SetLineColor(kBlue);
+
+    for (int j = 0; j < size; ++j)
+    {
+      Corr1DHist_Reduced->GetXaxis()->SetBinLabel(j+1, NameCorrOfInterest[i][j].c_str());
+      Corr1DHist_Reduced->SetBinContent(j+1, CorrOfInterest[i][j]);
+    }
+    Corr1DHist_Reduced->GetXaxis()->LabelsOption("v");
+
+    Corr1DHist_Reduced->SetMaximum(+1.);
+    Corr1DHist_Reduced->SetMinimum(-1.);
+    Corr1DHist_Reduced->Draw();
+
+    Posterior->Write(Form("%s_Red", Corr1DHist_Reduced->GetTitle()));
+    if(printToPDF) Posterior->Print(CanvasName);
+
+    delete Corr1DHist_Reduced;
+  }
+
+  for(int i = 0; i < nDraw; i++)
+  {
+    for(int k = 1; k < Nhists; k++)
+    {
+      delete Corr1DHist[i][k];
+    }
+    delete[] Corr1DHist[i];
+  }
+  delete[] Corr1DHist;
+  OutputFile->cd();
+
+  Posterior->SetTopMargin(TopMargin);
+  Posterior->SetBottomMargin(BottomMargin);
+  gStyle->SetOptTitle(OptTitle);
+
+}
 
 // *********************
 // Make fancy Credible Intervals plots
@@ -1342,12 +1525,25 @@ void MCMCProcessor::MakeCredibleRegions() {
   if(hpost2D[0][0] == NULL) MakeCovariance_MP();
   std::cout << "Making Credible Regions "<< std::endl;
 
-  //Should be easy way to set credible intervals via config keep it for now
-  const int nCredible = 3;
-  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
-  const Style_t CredibleRegionStyle[nCredible] = {kDashed, kSolid, kDotted};
-  const Color_t CredibleRegionColor[nCredible] = {kGreen-3, kGreen-10, kGreen};
+  //Load values set via config or executable
+  std::vector<double> CredibleRegions = Credible_Regions;
+  std::vector<Style_t> CredibleRegionStyle = Credible_RegionStyle;
+  std::vector<Color_t> CredibleRegionColor = Credible_RegionColor;
 
+  //Nothing was passed via config so use default values which are still fancy
+  if(CredibleRegions.size() == 0 && CredibleRegionStyle.size() == 0 && CredibleRegionColor.size() == 0)
+  {
+    CredibleRegions.insert(CredibleRegions.end(), { 0.99, 0.90, 0.68 });
+    CredibleRegionStyle.insert(CredibleRegionStyle.end(), { kDashed, kSolid, kDotted });
+    CredibleRegionColor.insert(CredibleRegionColor.end(), { kGreen-3, kGreen-10, kGreen });
+  }
+  if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
+  {
+    std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  const int nCredible = CredibleRegions.size();
   TH2D*** hpost_2D_copy = new TH2D**[nDraw];
   TH2D**** hpost_2D_cl = new TH2D***[nDraw];
 
@@ -1378,7 +1574,16 @@ void MCMCProcessor::MakeCredibleRegions() {
     {
       for (int k = 0; k < nCredible; ++k)
       {
-        GetCredibleRegion(hpost_2D_cl[i][j][k], CredibleRegions[k]);
+        if(CredibleInSigmas)
+        {
+          //KS: Convert sigmas into percentage
+          double CredReg = GetSigmaValue((int)std::round(CredibleRegions[k]));
+          GetCredibleRegion(hpost_2D_cl[i][j][k], CredReg);
+        }
+        else
+        {
+          GetCredibleRegion(hpost_2D_cl[i][j][k], CredibleRegions[k]);
+        }
         hpost_2D_cl[i][j][k]->SetLineColor(CredibleRegionColor[k]);
         hpost_2D_cl[i][j][k]->SetLineWidth(2);
         hpost_2D_cl[i][j][k]->SetLineStyle(CredibleRegionStyle[k]);
@@ -1425,7 +1630,12 @@ void MCMCProcessor::MakeCredibleRegions() {
       for (int k = 0; k < nCredible; ++k)
         hpost_2D_cl[i][j][k]->Draw("CONT3 SAME");
       for (int k = nCredible-1; k >= 0; --k)
-        legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l") ;
+      {
+        if(CredibleInSigmas)
+          legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f#sigma Credible Interval", CredibleRegions[k]), "l");
+        else
+          legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
+      }
 
       legend->Draw("SAME");
       bestfitM->Draw("SAME.P");
@@ -1434,6 +1644,7 @@ void MCMCProcessor::MakeCredibleRegions() {
       Posterior->SetName(hpost2D[i][j]->GetName());
       Posterior->SetTitle(hpost2D[i][j]->GetTitle());
 
+      //KS: Print only regions with correlation greater than specified value, by defualt 0.2. This is done to avoid dumping thousands of plots
       if(printToPDF && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) Posterior->Print(CanvasName);
       // Write it to root file
       //OutputFile->cd();
@@ -1519,12 +1730,41 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int j = 1; j < nParamPlot+1; j++) Npad += j;
   Posterior->cd();
 
-  //Should be easy way to set credible intervals via config keep it for now
-  const int nCredible = 3;
-  const double CredibleRegions[nCredible] = {0.99, 0.90, 0.68};
-  const Color_t CredibleRegionsColours[nCredible] = {kCyan+4, kCyan-2, kCyan-10};
-  const Style_t CredibleRegionStyle[nCredible] = {kDashed, kSolid, kDotted};
-  const Color_t CredibleRegionColor[nCredible] = {kGreen-3, kGreen-10, kGreen};
+  //Load values set via config or executable
+  std::vector<double> CredibleIntervals = Credible_Intervals;
+  std::vector<Color_t> CredibleIntervalsColours = Credible_IntervalsColours;
+  //Nothing was passed via config so use default values which are still fancy
+  if(CredibleIntervals.size() == 0 && CredibleIntervalsColours.size() == 0)
+  {
+    CredibleIntervals.insert(CredibleIntervals.end(), { 0.99, 0.90, 0.68 });
+    CredibleIntervalsColours.insert(CredibleIntervalsColours.end(), { kCyan+4, kCyan-2, kCyan-10 });
+  }
+  if(CredibleIntervals.size() != CredibleIntervalsColours.size())
+  {
+    std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  //Load values set via config or executable
+  std::vector<double> CredibleRegions = Credible_Regions;
+  std::vector<Style_t> CredibleRegionStyle = Credible_RegionStyle;
+  std::vector<Color_t> CredibleRegionColor = Credible_RegionColor;
+
+  //Nothing was passed via config so use default values which are still fancy
+  if(CredibleRegions.size() == 0 && CredibleRegionStyle.size() == 0 && CredibleRegionColor.size() == 0)
+  {
+    CredibleRegions.insert(CredibleRegions.end(), { 0.99, 0.90, 0.68 });
+    CredibleRegionStyle.insert(CredibleRegionStyle.end(), { kDashed, kSolid, kDotted });
+    CredibleRegionColor.insert(CredibleRegionColor.end(), { kGreen-3, kGreen-10, kGreen });
+  }
+  if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
+  {
+    std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  const int nCredibleIntervals = CredibleIntervals.size();
+  const int nCredibleRegions = CredibleRegions.size();
 
   //KS: Initialise Tpad histograms etc we will need
   TPad** TrianglePad = new TPad*[Npad];
@@ -1535,7 +1775,6 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   TH2D** hpost_2D_copy = new TH2D*[Npad-nParamPlot];
   TH2D*** hpost_2D_cl = new TH2D**[Npad-nParamPlot];
   gStyle->SetPalette(51);
-
 
   //KS: Super convoluted way of calcuating ranges for our pads, trust me it works...
   double* X_Min = new double[nParamPlot];
@@ -1599,21 +1838,31 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       if(x == y)
       {
         hpost_copy[counterPost] = (TH1D*) hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x]));
-        hpost_cl[counterPost] = new TH1D*[nCredible];
+        hpost_cl[counterPost] = new TH1D*[nCredibleIntervals];
         /// Scale the histograms so it shows the posterior probability
         hpost_copy[counterPost]->Scale(1. / hpost_copy[counterPost]->Integral());
-        for (int j = 0; j < nCredible; ++j)
+        for (int j = 0; j < nCredibleIntervals; ++j)
         {
-            hpost_cl[counterPost][j] = (TH1D*) hpost[ParamNumber[x]]->Clone( Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleRegions[j]));
+            hpost_cl[counterPost][j] = (TH1D*) hpost[ParamNumber[x]]->Clone( Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleIntervals[j]));
             //KS: Reset to get rid to TF1 otherwise we run into segfault :(
             hpost_cl[counterPost][j]->Reset("");
             hpost_cl[counterPost][j]->Fill(0.0, 0.0);
 
             // Scale the histograms before gettindg credible intervals
             hpost_cl[counterPost][j]->Scale(1. / hpost_cl[counterPost][j]->Integral());
+            //KS: Slightly different approach depending if interavls are in pecentage or sigmas
+            if(CredibleInSigmas)
+            {
+              //KS: Convert sigmas into percentage
+              double CredReg = GetSigmaValue((int)std::round(CredibleIntervals[j]));
+              GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredReg);
+            }
+            else
+            {
+              GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleIntervals[j]);
+            }
 
-            GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleRegions[j]);
-            hpost_cl[counterPost][j]->SetFillColor(CredibleRegionsColours[j]);
+            hpost_cl[counterPost][j]->SetFillColor(CredibleIntervalsColours[j]);
             hpost_cl[counterPost][j]->SetLineWidth(1);
         }
 
@@ -1633,7 +1882,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
         hpost_copy[counterPost]->GetYaxis()->SetNdivisions(4);
 
         hpost_copy[counterPost]->Draw("HIST");
-        for (int j = 0; j < nCredible; ++j)
+        for (int j = 0; j < nCredibleIntervals; ++j)
           hpost_cl[counterPost][j]->Draw("HIST SAME");
         counterPost++;
       }
@@ -1641,12 +1890,23 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
       else
       {
         hpost_2D_copy[counter2DPost] = (TH2D*) hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y]));
-        hpost_2D_cl[counter2DPost] = new TH2D*[nCredible];
+        hpost_2D_cl[counter2DPost] = new TH2D*[nCredibleRegions];
         //KS: Now copy for every credible region
-        for (int k = 0; k < nCredible; ++k)
+        for (int k = 0; k < nCredibleRegions; ++k)
         {
           hpost_2D_cl[counter2DPost][k] = (TH2D*)hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k]));
-          GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredibleRegions[k]);
+
+          if(CredibleInSigmas)
+          {
+            //KS: Convert sigmas into percentage
+            double CredReg = GetSigmaValue((int)std::round(CredibleRegions[k]));
+            GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredReg);
+          }
+          else
+          {
+            GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredibleRegions[k]);
+          }
+
           hpost_2D_cl[counter2DPost][k]->SetLineColor(CredibleRegionColor[k]);
           hpost_2D_cl[counter2DPost][k]->SetLineWidth(2);
           hpost_2D_cl[counter2DPost][k]->SetLineStyle(CredibleRegionStyle[k]);
@@ -1664,7 +1924,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
         hpost_2D_copy[counter2DPost]-> GetYaxis()->SetNdivisions(4);
         hpost_2D_copy[counter2DPost]->Draw("COL");
         //Now credible regions
-        for (int k = 0; k < nCredible; ++k)
+        for (int k = 0; k < nCredibleRegions; ++k)
           hpost_2D_cl[counter2DPost][k]->Draw("CONT3 SAME");
         counter2DPost++;
       }
@@ -1707,10 +1967,20 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   legend->SetLineStyle(0);
   legend->SetBorderSize(0);
   //KS: Legend is shared so just take first histograms
-  for (int j = nCredible-1; j >= 0; --j)
-    legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
-  for (int k = nCredible-1; k >= 0; --k)
-    legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l") ;
+  for (int j = nCredibleIntervals-1; j >= 0; --j)
+  {
+    if(CredibleInSigmas)
+      legend->AddEntry(hpost_cl[0][j], Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
+    else
+      legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
+  }
+  for (int k = nCredibleRegions-1; k >= 0; --k)
+  {
+    if(CredibleInSigmas)
+      legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f#sigma Credible Region", CredibleRegions[k]), "l");
+    else
+      legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
+  }
   legend->Draw("SAME");
   Posterior->Update();
 
@@ -1729,7 +1999,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int i = 0; i < nParamPlot; i++)
   {
       delete hpost_copy[i];
-      for (int j = 0; j < nCredible; ++j)
+      for (int j = 0; j < nCredibleIntervals; ++j)
       {
         delete hpost_cl[i][j];
       }
@@ -1738,7 +2008,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int i = 0; i < Npad - nParamPlot; i++)
   {
       delete hpost_2D_copy[i];
-      for (int j = 0; j < nCredible; ++j)
+      for (int j = 0; j < nCredibleRegions; ++j)
       {
         delete hpost_2D_cl[i][j];
       }
@@ -1765,6 +2035,39 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 }
 
 
+// *********************
+// Convert sigma from normal distribution into percentage
+double MCMCProcessor::GetSigmaValue(int sigma) {
+// *********************
+  double width = 0;
+  switch (std::abs(sigma))
+  {
+    case 1:
+      width = 0.682689492137;
+      break;
+    case 2:
+      width = 0.954499736104;
+      break;
+    case 3:
+      width = 0.997300203937;
+      break;
+    case 4:
+      width = 0.999936657516;
+      break;
+    case 5:
+      width = 0.999999426697;
+      break;
+    case 6:
+      width = 0.999999998027;
+      break;
+    default:
+      std::cerr<<sigma<<" is unsuported value of sigma"<<std::endl;
+      throw;
+      break;
+    }
+  return width;
+}
+
 // **************************
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
@@ -1786,44 +2089,53 @@ void MCMCProcessor::ScanInput() {
 
   // Loop over the number of branches
   // Find the name and how many of each systematic we have
-  for (int i = 0; i < nBranches; i++) {
-
+  for (int i = 0; i < nBranches; i++)
+  {
     // Get the TBranch and its name
     TBranch* br = (TBranch*)brlis->At(i);
     TString bname = br->GetName();
 
+    //KS: Exclude paramer types
+    bool rejected = false;
+    for(unsigned int ik = 0; ik < ExcludedTypes.size(); ++ik )
+    {
+        if(bname.BeginsWith(ExcludedTypes[ik]))
+        {
+          rejected = true;
+          break;
+        }
+    }
+    if(rejected) continue;
     // If we're on beam systematics
     if(bname.BeginsWith("xsec_")) 
     {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kXSecPar);
-        PlotXSec = true;
-        nParam[kXSecPar]++;
+      BranchNames.push_back(bname);
+      ParamType.push_back(kXSecPar);
+      PlotXSec = true;
+      nParam[kXSecPar]++;
+    }
+    else if (bname.BeginsWith("ndd_"))
+    {
+      BranchNames.push_back(bname);
+      ParamType.push_back(kND280Par);
+      PlotDet = true;
+      nParam[kND280Par]++;
+    }
+    else if (bname.BeginsWith("skd_joint_"))
+    {
+      BranchNames.push_back(bname);
+      ParamType.push_back(kFDDetPar);
+      nParam[kFDDetPar]++;
+    }
+    else if (bname.BeginsWith("sin2th_") ||
+          bname.BeginsWith("delm2_")  ||
+          bname.BeginsWith("delta_")    )
+    {
+      BranchNames.push_back(bname);
+      ParamType.push_back(kOSCPar);
+      nParam[kOSCPar]++;
     }
 
-    if(!MakeOnlyXsecCorrFlux) //HI a bit of a dodgy way to do this, for now just want to get the work flow sorted
-    {
-      if (bname.BeginsWith("ndd_") && PlotDet) 
-      {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kND280Par);
-        nParam[kND280Par]++;
-      }
-        else if (bname.BeginsWith("skd_joint_") && PlotDet)
-      {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kFDDetPar);
-        nParam[kFDDetPar]++;
-      }
-        else if (bname.BeginsWith("sin2th_") ||
-            bname.BeginsWith("delm2_")  ||
-            bname.BeginsWith("delta_")    )
-      {
-        BranchNames.push_back(bname);
-        ParamType.push_back(kOSCPar);
-        nParam[kOSCPar]++;
-      }
-    }
     //KS: as a bonus get LogL systeamtic
     if (bname.BeginsWith("LogL_sample_")) {
       SampleName_v.push_back(bname);
@@ -2012,6 +2324,8 @@ void MCMCProcessor::ReadInputCov() {
   if(nParam[kND280Par] > 0) ReadND280File();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
   if(nParam[kOSCPar] > 0)   ReadOSCFile();
+  //KS: Remove parameters which were removed
+  RemoveParameters();
 }
 
 // **************************
@@ -2132,16 +2446,26 @@ void MCMCProcessor::ReadXSecFile() {
   TObjArray* xsec_param_names = (TObjArray*)(XSecFile->Get("xsec_param_names"));
   //Flat prior
   TVectorD* flat_prior = (TVectorD*)(XSecFile->Get("xsec_flat_prior"));
-  // Now make a TH1D of it
-  ParamNames[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamCentral[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamNom[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamErrors[kXSecPar].reserve(nParam[kXSecPar]);
-  ParamFlat[kXSecPar].reserve(nParam[kXSecPar]);
-  for (int i = 0; i < nParam[kXSecPar]; ++i) {
 
+  for (int i = 0; i < XSecPrior->GetNrows(); ++i)
+  {
     // Push back the name
     std::string TempString = std::string(((TObjString*)xsec_param_names->At(i))->GetString());
+
+    //KS:Reject particular parameter names, noticed that sometimes string comparison doesn't work becasue of some weird casting of TObjString into std::string. This is rare and sooner or later we move away from TObjString so this is fine
+    bool rejected = false;
+    for (unsigned int ik = 0; ik < ExcludedNames.size(); ++ik)
+    {
+      if (TempString.rfind(ExcludedNames.at(ik), 0) == 0)
+      {
+        const int Tracker = ParamTypeStartPos[kXSecPar] + i;
+        BranchNames[Tracker] = "delete";
+        nParam[kXSecPar]--;
+        rejected = true;
+        break;
+      }
+    }
+    if(rejected) continue;
     ParamNames[kXSecPar].push_back(TempString);
     if(ParamNames[kXSecPar][i].BeginsWith("b_"))
     {
@@ -2186,12 +2510,7 @@ void MCMCProcessor::ReadND280File() {
     TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
     TObjArray* det_poly = (TObjArray*)(NDdetFile->Get("det_polys")->Clone());
 
-    ParamNames[kND280Par].reserve(nParam[kND280Par]);
-    ParamCentral[kND280Par].reserve(nParam[kND280Par]);
-    ParamNom[kND280Par].reserve(nParam[kND280Par]);
-    ParamErrors[kND280Par].reserve(nParam[kND280Par]);
-    ParamFlat[kND280Par].reserve(nParam[kND280Par]);
-    for (int i = 0; i < nParam[kND280Par]; ++i) 
+    for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
     {
         ParamNom[kND280Par].push_back( (*NDdetNominal)(i) );
         ParamCentral[kND280Par].push_back( (*NDdetNominal)(i) );
@@ -2240,12 +2559,7 @@ void MCMCProcessor::ReadFDFile() {
     
     TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
 
-    ParamNames[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamCentral[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamNom[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamErrors[kFDDetPar].reserve(nParam[kFDDetPar]);
-    ParamFlat[kFDDetPar].reserve(nParam[kFDDetPar]);
-    for (int i = 0; i < nParam[kFDDetPar]; ++i) 
+    for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
     {
         //KS: FD parameters start at 1. in contrary to ND280
         ParamNom[kFDDetPar].push_back(1.);
@@ -2289,12 +2603,7 @@ void MCMCProcessor::ReadOSCFile() {
     TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
     TVectorD* osc_flat_prior = (TVectorD*)OscFile->Get("osc_flat_prior");
 
-    ParamNom[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamCentral[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamErrors[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamNames[kOSCPar].reserve(nParam[kOSCPar]);
-    ParamFlat[kOSCPar].reserve(nParam[kOSCPar]);
-    for (int i = 0; i < nParam[kOSCPar]; ++i) 
+    for (int i = 0; i < osc_flat_prior->GetNrows(); ++i)
     {
         ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
         ParamCentral[kOSCPar].push_back( (*OscNominal)(i) );
@@ -2314,6 +2623,24 @@ void MCMCProcessor::ReadOSCFile() {
 }
 
 // ***************
+//This is bit messy as currently BranchNames is taken from actual Chain.root file while proper parameter name from matrix.root and right now we don't access them at the same time.
+void MCMCProcessor::RemoveParameters() {
+// ***************
+
+  for(int i = 0; i < nDraw; i++)
+  {
+    if(BranchNames[i] == "delete")
+    {
+      BranchNames.erase(BranchNames.begin() + i);
+      ParamType.erase(ParamType.begin() + i);
+      nDraw--;
+      i = 0;
+    }
+  }
+}
+
+
+// ***************
 // Make the step cut from a string
 void MCMCProcessor::SetStepCut(std::string Cuts) {
 // ***************
@@ -2330,7 +2657,6 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
   StepCut = TempStream.str();
   BurnInCut = Cuts;
 }
-
 
 // **************************
 // Get the mean and RMS of a 1D posterior
@@ -2457,6 +2783,11 @@ void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage
 void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage) {
 // ***************
 
+  if(coverage > 1)
+  {
+    std::cerr<<"Specified Credible Interval is greater that 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
+    throw;
+  }
   //KS: Reset first copy of histogram
   hpost_copy->Reset("");
   hpost_copy->Fill(0.0, 0.0);
@@ -2509,6 +2840,12 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
 //KS: Set 2D contour within some coverage
 void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) {
 // ***************
+
+  if(coverage > 1)
+  {
+    std::cerr<<"Specified Credible Region is greater that 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
+    throw;
+  }
 
   //KS: Temporary structure to be thread save
   double **hist_copy = new double*[hpost->GetXaxis()->GetNbins()+1];
@@ -2572,7 +2909,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
     int ParamNo = __UNDEF__;
     ParamNo = param - ParamTypeStartPos[ParType];
 
-    Prior = ParamCentral[ParameterEnum()][ParamNo];
+    Prior = ParamCentral[ParType][ParamNo];
     PriorError = ParamErrors[ParType][ParamNo];
     Title = ParamNames[ParType][ParamNo];
     return;
@@ -2661,6 +2998,114 @@ std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
     else JeffreysScale = "Decisive";
 
     return JeffreysScale;
+}
+
+
+// **************************
+// KS: Reweight prior of MCMC chain to another
+void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError){
+// **************************
+
+    if(Names.size() != NewCentral.size() && NewCentral.size() != NewError.size())
+    {
+      std::cerr<<" size of passed vectors doesn't match in ReweightPrior"<<std::endl;
+      throw;
+    }
+    std::vector<int> Param;
+    std::vector<double> OldCentral;
+    std::vector<double> OldError;
+    std::vector<bool> FlatPrior;
+
+    //KS: First we need to find parameter number based on name
+    for(unsigned int k = 0; k < Names.size(); k++)
+    {
+      int ParamNo = __UNDEF__;
+      for (int i = 0; i < nDraw; ++i)
+      {
+        TString Title = "";
+        double Prior = 1.0;
+        double PriorError = 1.0;
+
+        GetNthParameter(i, Prior, PriorError, Title);
+
+        if(Names[k] == Title)
+        {
+          ParamNo = i;
+
+          Param.push_back(ParamNo);
+          OldCentral.push_back(Prior);
+          OldError.push_back(PriorError);
+
+          ParameterEnum ParType = ParamType[ParamNo];
+          int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
+
+          FlatPrior.push_back(ParamFlat[ParType][ParamTemp]);
+          break;
+        }
+      }
+      if(ParamNo == __UNDEF__)
+      {
+        std::cout<<"Couldn't find param "<<Names[k]<<". Can't reweight Prior"<<std::endl;
+        return;
+      }
+    }
+
+    double* ParameterPos = new double[Names.size()];
+
+    std::string InputFile = MCMCFile+".root";
+    std::string OutputFilename = MCMCFile + "_reweighted.root";
+
+    //KS: Simply create copy of file and add there new branch
+    system(("cp "+InputFile+" "+OutputFilename).c_str());
+
+    TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+    OutputChain->cd();
+    TTree *post = (TTree *)OutputChain->Get("posteriors");
+
+    double Weight = 1.;
+    TBranch *bpt = post->Branch("Weight", &Weight, "Weight/D");
+
+    post->SetBranchStatus("*",false);
+    post->SetBranchStatus("Weight", true);
+    // Set the branch addresses for params
+    for (unsigned int j = 0; j < Names.size(); ++j) {
+      post->SetBranchStatus(BranchNames[Param[j]].Data(), true);
+      post->SetBranchAddress(BranchNames[Param[j]].Data(), &ParameterPos[j]);
+    }
+    for (int i = 0; i < nEntries; ++i)
+    {
+      post->GetEntry(i);
+      Weight = 1.;
+
+      //KS: Calcualte reweight weight. Weights are multiplicative so we can do several reweights at once. FIXME Big limitation is that code only works for uncorelated paramters :(
+      for (unsigned int j = 0; j < Names.size(); ++j)
+      {
+        double new_chi = (ParameterPos[j] - NewCentral[j])/NewError[j];
+        double new_prior = std::exp(-0.5 * new_chi * new_chi);
+
+        double old_chi = -1;
+        double old_prior = -1;
+        if(FlatPrior[j])
+        {
+          old_prior = 1.0;
+        }
+        else
+        {
+          old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
+          old_prior = std::exp(-0.5 * old_chi * old_chi);
+        }
+        Weight *= new_prior/old_prior;
+      }
+      bpt->Fill();
+    }
+    OutputChain->cd();
+    post->Write("posteriors", TObject::kOverwrite);
+
+    OutputChain->Close();
+    delete OutputChain;
+    delete[] ParameterPos;
+
+    OutputFile->cd();
 }
 
 // **************************
@@ -2970,7 +3415,7 @@ void MCMCProcessor::AutoCorrelation() {
 
   TStopwatch clock;
   clock.Start();
-  const int nLags = 25000;
+  const int nLags = AutoCorrLag;
   std::cout << "Making auto-correlations for nLags = "<< nLags << std::endl;
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter

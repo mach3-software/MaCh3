@@ -23,7 +23,10 @@
 
 // Hard code the number of splines
 // Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
-#define __N_SPLINES__ 48
+// EM: for OA2022:
+// #define __N_SPLINES__ 48
+// EM: for OA2024:
+#define __N_SPLINES__ 200
 
 //KS: We store coefficeints {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4
@@ -610,8 +613,6 @@ __global__ void EvalOnGPU_TotWeight(
                    EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
             #endif
         }
-        //KS: Make sure threads are synchorised before moving to global memory
-        __syncthreads();
         gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
     }
 }

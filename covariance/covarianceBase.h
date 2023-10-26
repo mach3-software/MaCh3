@@ -35,23 +35,6 @@
 #define __LARGE_LOGL__ 1234567890.0
 #endif
 
-//#define DEBUG_PCA
-#ifdef DEBUG_PCA
-//KS: When debuging we produce some fancy plots, but we don't need it during normal work flow
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TColor.h"
-#include "TLine.h"
-#include "TText.h"
-#include "TLegend.h"
-
-#if DEBUG_PCA == 2
-#include "Eigen/Eigenvalues"
-#endif
-
-#endif
-
-
 class covarianceBase {
  public:
   // The constructors
