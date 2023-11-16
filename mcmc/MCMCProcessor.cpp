@@ -1022,18 +1022,18 @@ void MCMCProcessor::MakeCovariance() {
 
       if(printToPDF)
       {
-          //KS: Skip Flux Params
-          if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
-          {
+        //KS: Skip Flux Params
+        if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
+        {
           if(IsXsec[j] && IsXsec[i] && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
           {
-              Posterior->cd();
-              hpost_2D->Draw("colz");
-              Posterior->SetName(hpost_2D->GetName());
-              Posterior->SetTitle(hpost_2D->GetTitle());
-              Posterior->Print(CanvasName);
+            Posterior->cd();
+            hpost_2D->Draw("colz");
+            Posterior->SetName(hpost_2D->GetName());
+            Posterior->SetTitle(hpost_2D->GetTitle());
+            Posterior->Print(CanvasName);
           }
-          }
+        }
       }
       // Write it to root file
       //OutputFile->cd();
@@ -2235,18 +2235,17 @@ void MCMCProcessor::ScanParameterOrder() {
 // *****************************
   for(int i = 0; i < kNParameterEnum; i++)
   {
-      for(unsigned int j = 0; j < ParamType.size(); j++)
+    for(unsigned int j = 0; j < ParamType.size(); j++)
+    {
+      if(ParamType[j] == ParameterEnum(i)) 
       {
-          if(ParamType[j] == ParameterEnum(i)) 
-          {
-            //KS: When we find that i-th parameter types start at j, save and move to the next parameter.
-            ParamTypeStartPos[i] = j;
-            break;
-          }
+        //KS: When we find that i-th parameter types start at j, save and move to the next parameter.
+        ParamTypeStartPos[i] = j;
+        break;
       }
+    }
   }
 }
-    
     
 // *****************************
 // Make the prefit plots
@@ -2508,7 +2507,7 @@ void MCMCProcessor::ReadND280File() {
     
     TMatrixDSym *NDdetMatrix = (TMatrixDSym*)(NDdetFile->Get("nddet_cov"));
     TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
-    TObjArray* det_poly = (TObjArray*)(NDdetFile->Get("det_polys")->Clone());
+    TDirectory *BinningDirectory = (TDirectory*)NDdetFile->Get("Binning")->Clone();
 
     for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
     {
@@ -2521,15 +2520,17 @@ void MCMCProcessor::ReadND280File() {
         ParamFlat[kND280Par].push_back( false );
     }  
 
-    for (int j = 0; j <det_poly->GetLast()+1; ++j)
+    TIter next(BinningDirectory->GetListOfKeys());
+    TKey *key = NULL;
+    
+    // Loop through all entries
+    while ((key = (TKey*)next())) 
     {
-        if( det_poly->At(j) != NULL)
-        {
-            TH2Poly *RefPoly = (TH2Poly*)det_poly->At(j);
-            int size = RefPoly->GetNumberOfBins();
-            NDSamplesBins.push_back(size);
-            NDSamplesNames.push_back(RefPoly->GetTitle());
-        }
+      std::string name = std::string(key->GetName());
+      TH2Poly* RefPoly = (TH2Poly*)BinningDirectory->Get((name).c_str())->Clone();
+      int size = RefPoly->GetNumberOfBins();
+      NDSamplesBins.push_back(size);
+      NDSamplesNames.push_back(RefPoly->GetTitle());
     }
 
     NDdetFile->Close();
@@ -2915,6 +2916,28 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
     return;
 }
 
+// ***************
+// Find Param Index based on name
+int MCMCProcessor::GetParamIndexFromName(std::string Name){
+// **************************
+
+  int ParamNo = __UNDEF__;
+  for (int i = 0; i < nDraw; ++i)
+  {
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+
+    GetNthParameter(i, Prior, PriorError, Title);
+
+    if(Name == Title)
+    {
+      ParamNo = i;
+      break;
+    }
+  }
+  return ParamNo;
+}
 
 // **************************************************
 // Helper function to reset histograms
@@ -2941,17 +2964,7 @@ void MCMCProcessor::GetBayesFactor(std::string ParName, double M1_min, double M1
 
     if(hpost[0] == NULL) MakePostfit();
     //KS: First we need to find parameter number based on name
-    int ParamNo = __UNDEF__;
-    for (int i = 0; i < nDraw; ++i)
-    {
-      TString Title = "";
-      double Prior = 1.0;
-      double PriorError = 1.0;
-
-      GetNthParameter(i, Prior, PriorError, Title);
-
-      if(ParName == Title) ParamNo = i;
-    }
+    int ParamNo = GetParamIndexFromName(ParName);
     if(ParamNo == __UNDEF__)
     {
       std::cout<<"Couldn't find param "<<ParName<<". Will not calculate Bayes factor"<<std::endl;
@@ -3000,6 +3013,146 @@ std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
     return JeffreysScale;
 }
 
+// **************************
+// KS: Reweight prior of MCMC chain to another
+void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds){
+// **************************
+
+  if((ParNames.size() != EvaluationPoint.size()) && (Bounds.size() != EvaluationPoint.size()))
+  {
+    std::cerr<<" Size doesn't match"<<std::endl; 
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  
+  if(hpost[0] == NULL) MakePostfit();
+
+  std::cout << "Calculating Savage Dickey "<< std::endl;
+  TDirectory *SavageDickeyDir = OutputFile->mkdir("SavageDickey");
+  SavageDickeyDir->cd();
+  
+  for(unsigned int k = 0; k < ParNames.size(); k++)
+  {
+    //KS: First we need to find parameter number based on name
+    int ParamNo = GetParamIndexFromName(ParNames[k]);
+    if(ParamNo == __UNDEF__)
+    {
+      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate SavageDickey"<<std::endl;
+      return;
+    }
+    
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+    bool FlatPrior = false;
+    GetNthParameter(ParamNo, Prior, PriorError, Title);
+    
+    ParameterEnum ParType = ParamType[ParamNo];
+    int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
+    FlatPrior = ParamFlat[ParType][ParamTemp];
+    
+    TH1D* PosteriorHist = (TH1D*) hpost[ParamNo]->Clone(Title);
+    TF1 *fun = PosteriorHist->GetFunction("Gauss");
+    delete fun;
+            
+    TH1D* PriorHist = NULL;
+    //KS: If flat prior we need to have well defined bounds otherwise Prior distriution will not make sense
+    if(FlatPrior)
+    {
+      int NBins = PosteriorHist->GetNbinsX();
+      if(Bounds[k][0] > Bounds[k][1])
+      {
+        std::cerr<<" Lower bound is higher than upper bound"<<std::endl;
+        throw;
+      }
+      PriorHist = new TH1D("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
+      
+      double FlatProb = ( Bounds[k][1] - Bounds[k][0]) / NBins;
+      for (int g = 0; g < NBins + 1; ++g) 
+      {
+        PriorHist->SetBinContent(g+1, FlatProb);
+      }
+    }
+    else //KS: Otherwise throw from Gaussian
+    {
+      PriorHist = (TH1D*) PosteriorHist->Clone("Prior");
+      PriorHist->Reset("");
+      PriorHist->Fill(0.0, 0.0);
+      
+      TRandom3* rand = new TRandom3();
+      //KS: Throw nice gaussian, just need big number to have smooth distribution
+      for(int g = 0; g < 1000000; ++g)
+      {
+        PriorHist->Fill(rand->Gaus(Prior, PriorError));
+      }
+      delete rand;
+    }
+    // Area normalise the distributions
+    PriorHist->Scale(1./PriorHist->Integral(), "width");
+    PosteriorHist->Scale(1./PosteriorHist->Integral(), "width");
+      
+    PriorHist->SetLineColor(kRed);
+    PriorHist->SetMarkerColor(kRed);
+    PriorHist->SetFillColorAlpha(kRed, 0.35);
+    PriorHist->SetFillStyle(1001);
+    PriorHist->GetXaxis()->SetTitle(Title);
+    PriorHist->GetYaxis()->SetTitle("Posterior Probability");
+    PriorHist->SetMaximum(PosteriorHist->GetMaximum()*1.5);
+    PriorHist->GetYaxis()->SetLabelOffset(999);
+    PriorHist->GetYaxis()->SetLabelSize(0);
+    PriorHist->SetLineWidth(2);
+    PriorHist->SetLineStyle(kSolid);
+    
+    PosteriorHist->SetLineColor(kBlue);
+    PosteriorHist->SetMarkerColor(kBlue);
+    PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
+    PosteriorHist->SetFillStyle(1001);
+   
+    PriorHist->Draw();
+    PosteriorHist->Draw("same");
+
+    double ProbPrior = PriorHist->GetBinContent(PriorHist->FindBin(EvaluationPoint[k]));
+    //KS: In case we go so far away that prior is 0, set this to small value to avoid dividing by 0
+    if(ProbPrior < 0) ProbPrior = 0.00001;
+    double ProbPosterior = PosteriorHist->GetBinContent(PosteriorHist->FindBin(EvaluationPoint[k]));
+    double SavageDickey = ProbPosterior/ProbPrior;
+    
+    //Get Best point
+    TGraph *PostPoint = new TGraph(1);
+    PostPoint->SetPoint(0, EvaluationPoint[k], ProbPosterior);
+    PostPoint->SetMarkerStyle(20);
+    PostPoint->SetMarkerSize(1);
+    PostPoint->Draw("P same");
+    
+    TGraph *PriorPoint = new TGraph(1);
+    PriorPoint->SetPoint(0, EvaluationPoint[k], ProbPrior);
+    PriorPoint->SetMarkerStyle(20);
+    PriorPoint->SetMarkerSize(1);
+    PriorPoint->Draw("P same");
+    
+    TLegend *legend = new TLegend(0.12, 0.6, 0.6, 0.97);
+    legend->SetTextSize(0.04);
+    legend->AddEntry(PriorHist, "Prior", "l");
+    legend->AddEntry(PosteriorHist, "Posterior", "l");
+    legend->AddEntry(PostPoint, Form("SavageDickey = %.2f", SavageDickey),"");
+    legend->SetLineColor(0);
+    legend->SetLineStyle(0);
+    legend->SetFillColor(0);
+    legend->SetFillStyle(0);
+    legend->SetBorderSize(0);
+    legend->Draw("same");
+  
+    Posterior->Print(CanvasName);
+    Posterior->Write(Title);
+    
+    delete PosteriorHist;
+    delete PriorHist;
+    delete PostPoint;
+    delete PriorPoint;
+    delete legend;
+  }
+  OutputFile->cd();
+}
 
 // **************************
 // KS: Reweight prior of MCMC chain to another

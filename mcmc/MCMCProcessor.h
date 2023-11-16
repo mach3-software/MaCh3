@@ -35,6 +35,8 @@
 #include "TObjString.h"
 #include "TTree.h"
 #include "TROOT.h"
+#include "TKey.h"
+#include "TRandom3.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -111,13 +113,16 @@ class MCMCProcessor {
 
     // Get the vector of branch names
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
-
+    //Getters
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
+    int GetParamIndexFromName(std::string Name);
+    inline int GetnEntries(){return nEntries;};
+    inline int GetnSteps(){return nSteps;};
+    //Bayesian statistic
     void GetBayesFactor(std::string ParName, double M1_min, double M1_max, std::string M1Name, double M2_min, double M2_max, std::string M2Name);
+    void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
 
-    int GetnEntries(){return nEntries;};
-    int GetnSteps(){return nSteps;};
     //KS: Many setters which in future will be loaded via config
     // Set the step cutting
     // Either by string
