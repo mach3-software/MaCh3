@@ -84,7 +84,7 @@ __device__ __constant__ short int d_spline_size;
 #ifndef Weight_On_SplineBySpline_Basis
 __device__ __constant__ int d_n_events;
 #endif
-// Constant memory needs to be hard-coded on compile time
+//CW: Constant memory needs to be hard-coded on compile time
 // Could make this texture memory instead, but don't care enough right now...
 __device__ __constant__ float val_gpu[__N_SPLINES__];
 __device__ __constant__ short int segment_gpu[__N_SPLINES__];
@@ -525,7 +525,7 @@ __global__ void EvalOnGPU_SepMany(
     // The is the variation itself (needed to evaluate variation - stored spline point = dx)
     const float dx = val_gpu[Param] - tex1Dfetch<float>(text_coeff_x, segment_X);
 
-    // Wooow, let's use some fancy intrinsics and pull down the processing time by <1% from normal multiplication! HURRAY
+    //CW: Wooow, let's use some fancy intrinsics and pull down the processing time by <1% from normal multiplication! HURRAY
     gpu_weights[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
     // Or for the more "easy to read" version:
     //gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
@@ -594,23 +594,23 @@ __global__ void EvalOnGPU_TotWeight(
    float *gpu_total_weights,
   cudaTextureObject_t text_nParamPerEvent) {
 //*********************************************************
-    const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
-    //KS: Accesing shared memory is much much faster than global memory hence we use shared memory for calcualtion and then write to global memory
-    __shared__ float shared_total_weights[__BlockSize__];
-    if(EventNum < d_n_events) //stopping condition
+  const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
+  //KS: Accesing shared memory is much much faster than global memory hence we use shared memory for calcualtion and then write to global memory
+  __shared__ float shared_total_weights[__BlockSize__];
+  if(EventNum < d_n_events) //stopping condition
+  {
+    shared_total_weights[threadIdx.x] = 1.;
+    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum); ++id)
     {
-        shared_total_weights[threadIdx.x] = 1.;
-        for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum); ++id)
-        {
-            shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
+      shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
 
-            #ifdef DEBUG
-            printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
-                   EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
-            #endif
-        }
-        gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
+      #ifdef DEBUG
+      printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
+              EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
+      #endif
     }
+    gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
+  }
 }
 #endif
 
@@ -737,7 +737,7 @@ __host__ void RunGPU_TF1(
     float* cpu_total_weights,
 #endif
 
-    // Holds the changes in parameters
+  // Holds the changes in parameters
     float *vals) {
 // *****************************************
 

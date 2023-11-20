@@ -189,8 +189,6 @@ void SMonolith::Initialise() {
   return;
 }
 
-
-
 // *****************************************
 // Uses an x array and one combined yabd array
 // This should optimise cache hitting because we use the same yabd points once we've found the x point
@@ -202,7 +200,6 @@ SMonolith::SMonolith(std::vector<std::vector<TSpline3*> > &MasterSpline) {
   std::vector<std::vector<TSpline3_red*> > ReducedSpline = ReduceTSpline3(MasterSpline);
   PrepareForGPU(ReducedSpline);
 }
-
 
 // *****************************************
 // Constructor for the reduced TSpline3 object
@@ -439,17 +436,21 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   delete[] paramNo_big;
   delete[] knotNo_big;
 
+  int BadXCounter = 0;
   for (unsigned int j = 0; j < event_size_max; j++) {
+    if (cpu_coeff_x[j] == -999) BadXCounter++;
     // Perform checks that all entries have been modified from intial values
-    if (cpu_coeff_x[j] == -999) {
+    if (cpu_coeff_x[j] == -999 && BadXCounter < 5) {
       std::cerr << "***** BAD X !! ***** \n" << std::endl;
       std::cerr << "Indicates some parameter doesn't have a single spline" << std::endl;
       std::cerr << "j = " << j << std::endl;
       std::cerr << __FILE__ << "::" << __LINE__ << std::endl;
       //throw;
     }
+    if(BadXCounter == 5) std::cout<<" There is more unitilised knots although I will stop spamming"<<std::endl;
   }
 
+  std::cout<<"Found in total "<<BadXCounter<<" BAD X" << std::endl;
 #ifdef Weight_On_SplineBySpline_Basis
   // Make the array that holds all the returned weights from the GPU to pass to the CPU
   cpu_weights_var = new float[NSplines_valid]();
@@ -851,6 +852,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
     SplineInfoArray[i].nPts = -999;
     SplineInfoArray[i].xPts = NULL;
     SplineInfoArray[i].CurrSegment = 0;
+    SplineInfoArray[i].splineParsPointer = NULL;
   }
 
   unsigned int EventCounter = 0;
@@ -881,22 +883,22 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
       nKnots += nPoints;
       nSplines_SingleEvent++;
       
-        // Fill the SplineInfoArray entries with information on each splinified parameter
-        if (SplineInfoArray[ij].xPts == NULL)
-        {
-            // Fill the number of points
-            SplineInfoArray[ij].nPts = (*InnerIt)->GetNp();
+      // Fill the SplineInfoArray entries with information on each splinified parameter
+      if (SplineInfoArray[ij].xPts == NULL)
+      {
+        // Fill the number of points
+        SplineInfoArray[ij].nPts = (*InnerIt)->GetNp();
 
-            // Fill the x points
-            SplineInfoArray[ij].xPts = new __float__[SplineInfoArray[ij].nPts];
-            for (__int__ k = 0; k < SplineInfoArray[ij].nPts; ++k)
-            {
-                __float__ xtemp = -999.99;
-                __float__ ytemp = -999.99;
-                (*InnerIt)->GetKnot(k, xtemp, ytemp);
-                SplineInfoArray[ij].xPts[k] = xtemp;
-            }
+        // Fill the x points
+        SplineInfoArray[ij].xPts = new __float__[SplineInfoArray[ij].nPts];
+        for (__int__ k = 0; k < SplineInfoArray[ij].nPts; ++k)
+        {
+          __float__ xtemp = -999.99;
+          __float__ ytemp = -999.99;
+          (*InnerIt)->GetKnot(k, xtemp, ytemp);
+          SplineInfoArray[ij].xPts[k] = xtemp;
         }
+      }
     }
 
     if (nSplines_SingleEvent > nMaxSplines_PerEvent) nMaxSplines_PerEvent = nSplines_SingleEvent;
@@ -904,20 +906,25 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   }
   nSplines = nMaxSplines_PerEvent;
   
+  int Counter = 0;
   //KS: Sanity check that everything was set correctly
   for (__int__ i = 0; i < nParams; ++i)
   {
     const __int__ nPoints = SplineInfoArray[i].nPts;
     const __float__* xArray = SplineInfoArray[i].xPts;
-
     if (nPoints == -999 || xArray == NULL) {
-      std::cerr << "ERROR" << std::endl;
-      std::cerr << "SplineInfoArray[" << i << "] isn't set yet" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      Counter++;
+      if(Counter < 5)
+      {
+        std::cerr << "ERROR" << std::endl;
+        std::cerr << "SplineInfoArray[" << i << "] isn't set yet" << std::endl;
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      }
       continue;
       //throw;
     }
   }
+  std::cout<<"In total SplineInfoArray for "<<Counter<<" hasn't been initialised"<<std::endl;
 }
 
 // Need to specify template functions in header
@@ -1243,7 +1250,7 @@ void SMonolith::Evaluate() {
 #endif
 
 // *************************
-// Only need to do the binary search once per parameter, not once per event!
+// CW: Only need to do the binary search once per parameter, not once per event!
 // Takes down the number of binary searches from 1.2M to 17, ha!
 // For ROOT version see root/hist/hist/src/TSpline3.cxx TSpline3::FindX(double)
 void SMonolith::FindSplineSegment() {
@@ -1323,7 +1330,7 @@ void SMonolith::FindSplineSegment() {
       throw;
     }
 #endif
-  }
+  } //end loop over params
 }
 
 //*********************************************************
@@ -1355,7 +1362,7 @@ void SMonolith::CalcSplineWeights() {
     // The is the variation itself (needed to evaluate variation - stored spline point = dx)
     const float dx = vals[Param] - cpu_coeff_x[segment_X];
 
-    // Wooow, let's use some fancy intrinsics and pull down the processing time by <1% from normal multiplication! HURRAY
+    //CW: Wooow, let's use some fancy intrinsics and pull down the processing time by <1% from normal multiplication! HURRAY
     cpu_weights_var[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
     // Or for the more "easy to read" version:
     //cpu_weights_var[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
@@ -1458,11 +1465,11 @@ void SMonolith::ModifyWeights(){
   #endif
   for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum)
   {
-        cpu_total_weights[EventNum] = 1.;
-        for (unsigned int id = 0; id < cpu_nParamPerEvent[2*EventNum]; ++id)
-        {
-            cpu_total_weights[EventNum] *= cpu_weights_var[cpu_nParamPerEvent[2*EventNum+1] + id];
-        }
+    cpu_total_weights[EventNum] = 1.;
+    for (unsigned int id = 0; id < cpu_nParamPerEvent[2*EventNum]; ++id)
+    {
+      cpu_total_weights[EventNum] *= cpu_weights_var[cpu_nParamPerEvent[2*EventNum+1] + id];
+    }
   }
 #else
     //KS: Name is confusing but what it does it make a nice mapping used for debuging
