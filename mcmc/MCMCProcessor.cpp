@@ -63,7 +63,8 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   AccProbValues = NULL;
   AccProbBatchedAverages = NULL;
     
-  PlotJarlskog = true;
+  //KS: Warning this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
+  PlotJarlskog = false;
   
   //KS:Hardcoded should be a way to get it via config or something
   plotRelativeToPrior = false;
@@ -1527,7 +1528,7 @@ void MCMCProcessor::DrawCorrelations1D() {
 void MCMCProcessor::MakeCredibleRegions() {
 // *********************
 
-  if(hpost2D[0][0] == NULL) MakeCovariance_MP();
+  if(hpost2D == NULL) MakeCovariance_MP();
   std::cout << "Making Credible Regions "<< std::endl;
 
   //Load values set via config or executable
@@ -1686,7 +1687,7 @@ void MCMCProcessor::MakeCredibleRegions() {
 void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 // *********************
 
-  if(hpost2D[0][0] == NULL) MakeCovariance_MP();
+  if(hpost2D == NULL) MakeCovariance_MP();
   std::cout << "Making Triangle Plot "<< std::endl;
 
   const int nParamPlot = ParamNames.size();
@@ -2621,7 +2622,6 @@ void MCMCProcessor::ReadOSCFile() {
     if(PlotJarlskog)
     {
       Chain->SetAlias("J_cp", "TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)");
-      Chain->SetBranchStatus("J_cp", "true");
       BranchNames.push_back("J_cp");
       ParamType.push_back(kOSCPar);
       nParam[kOSCPar]++;
