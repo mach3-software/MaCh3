@@ -39,29 +39,29 @@ extern void CleanupGPU_AutoCorr(
 
 // ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
-  Chain(NULL), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
+  Chain(nullptr), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
 // ****************************
   MCMCFile = InputFile;
 
   std::cout << "Making post-fit processor for " << MCMCFile << std::endl;
 
-  ParStep = NULL;
-  StepNumber = NULL;
+  ParStep = nullptr;
+  StepNumber = nullptr;
     
-  Posterior = NULL;
-  hpost = NULL;
-  hpost2D = NULL;
-  hviolin = NULL;
+  Posterior = nullptr;
+  hpost = nullptr;
+  hpost2D = nullptr;
+  hviolin = nullptr;
   
-  OutputFile = NULL;
+  OutputFile = nullptr;
   
-  ParamSums = NULL;
-  BatchedAverages = NULL;
-  LagL = NULL;
-  SampleValues = NULL;
-  SystValues = NULL;
-  AccProbValues = NULL;
-  AccProbBatchedAverages = NULL;
+  ParamSums = nullptr;
+  BatchedAverages = nullptr;
+  LagL = nullptr;
+  SampleValues = nullptr;
+  SystValues = nullptr;
+  AccProbValues = nullptr;
+  AccProbBatchedAverages = nullptr;
     
   //KS: Warning this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
   PlotJarlskog = false;
@@ -110,15 +110,15 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   }
   //Only if GPU is enabled
   #ifdef CUDA
-   ParStep_cpu = NULL;
-   NumeratorSum_cpu = NULL;
-   ParamSums_cpu = NULL;
-   DenomSum_cpu = NULL;
+   ParStep_cpu = nullptr;
+   NumeratorSum_cpu = nullptr;
+   ParamSums_cpu = nullptr;
+   DenomSum_cpu = nullptr;
 
-   ParStep_gpu = NULL;
-   NumeratorSum_gpu = NULL;
-   ParamSums_gpu = NULL;
-   DenomSum_gpu = NULL;
+   ParStep_gpu = nullptr;
+   NumeratorSum_gpu = nullptr;
+   ParamSums_gpu = nullptr;
+   DenomSum_gpu = nullptr;
   #endif
 }
 
@@ -131,7 +131,7 @@ MCMCProcessor::~MCMCProcessor() {
   std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
-  if (Posterior != NULL)  delete Posterior;
+  if (Posterior != nullptr)  delete Posterior;
 
   delete Gauss;
   delete Covariance;
@@ -146,7 +146,7 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive; 
   delete Errors_HPD_Negative; 
   
-  if(hpost != NULL)
+  if(hpost != nullptr)
   {
     for (int i = 0; i < nDraw; ++i) 
     {
@@ -168,11 +168,11 @@ MCMCProcessor::~MCMCProcessor() {
     delete[] ParStep;
     delete[] hpost2D;
   }
-  if(StepNumber != NULL) delete[] StepNumber;
+  if(StepNumber != nullptr) delete[] StepNumber;
 
-  if(hviolin != NULL) delete hviolin;
-  if (OutputFile != NULL) OutputFile->Close();
-  if (OutputFile != NULL) delete OutputFile;
+  if(hviolin != nullptr) delete hviolin;
+  if (OutputFile != nullptr) OutputFile->Close();
+  if (OutputFile != nullptr) delete OutputFile;
   delete Chain;
 }
 
@@ -267,7 +267,7 @@ void MCMCProcessor::MakePostfit() {
   MadePostfit = true;
 
   // Check if the output file is ready
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
   
   std::cout << "MCMCProcessor is making post-fit plots..." << std::endl;
 
@@ -447,7 +447,7 @@ void MCMCProcessor::MakePostfit() {
 void MCMCProcessor::DrawPostfit() {
 // *******************
 
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
 
   // Make the prefit plot
   TH1D* prefit = MakePrefit();
@@ -704,7 +704,7 @@ void MCMCProcessor::DrawPostfit() {
 void MCMCProcessor::MakeCredibleIntervals() {
 // *********************
 
-  if(hpost[0] == NULL) MakePostfit();
+  if(hpost[0] == nullptr) MakePostfit();
   std::cout << "Making Credible Intervals "<< std::endl;
 
   const double LeftMargin = Posterior->GetLeftMargin();
@@ -945,7 +945,7 @@ void MCMCProcessor::MakeViolin() {
 void MCMCProcessor::MakeCovariance() {
 // *********************
 
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
 
   bool HaveMadeDiagonal = false;
   std::cout << "Making post-fit covariances..." << std::endl;
@@ -1063,7 +1063,7 @@ void MCMCProcessor::CacheSteps() {
   
   CacheMCMC = true;
   
-  if(ParStep != NULL)
+  if(ParStep != nullptr)
   {
       std::cout<<"It look like ParStep was already filled "<<std::endl;
       std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
@@ -1165,7 +1165,7 @@ void MCMCProcessor::CacheSteps() {
 void MCMCProcessor::MakeCovariance_MP() {
 // *********************
     
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
     
   if(!CacheMCMC) CacheSteps();
   
@@ -1528,7 +1528,7 @@ void MCMCProcessor::DrawCorrelations1D() {
 void MCMCProcessor::MakeCredibleRegions() {
 // *********************
 
-  if(hpost2D == NULL) MakeCovariance_MP();
+  if(hpost2D == nullptr) MakeCovariance_MP();
   std::cout << "Making Credible Regions "<< std::endl;
 
   //Load values set via config or executable
@@ -1687,7 +1687,7 @@ void MCMCProcessor::MakeCredibleRegions() {
 void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 // *********************
 
-  if(hpost2D == NULL) MakeCovariance_MP();
+  if(hpost2D == nullptr) MakeCovariance_MP();
   std::cout << "Making Triangle Plot "<< std::endl;
 
   const int nParamPlot = ParamNames.size();
@@ -2162,12 +2162,12 @@ void MCMCProcessor::ScanInput() {
   
   std::cout << "************************************************" << std::endl;
   std::cout << "Scanning output branches..." << std::endl;
-  std::cout << "# useful entries in tree: " << nDraw  << std::endl;
-  std::cout << "# XSec params:  " << nParam[kXSecPar] - nFlux <<" starting at "<<ParamTypeStartPos[kXSecPar] << std::endl;
-  std::cout << "# Flux params:  " << nFlux << std::endl;
-  std::cout << "# ND280 params: " << nParam[kND280Par] <<" starting at  "<<ParamTypeStartPos[kND280Par] << std::endl;
-  std::cout << "# FD params:    " << nParam[kFDDetPar] <<" starting at  "<<ParamTypeStartPos[kFDDetPar] << std::endl;
-  std::cout << "# Osc params:   " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   << std::endl;
+  std::cout << "# useful entries in tree: \033[1;32m " << nDraw  <<" \033[0m "<< std::endl;
+  std::cout << "# XSec params:  \033[1;32m " << nParam[kXSecPar] - nFlux <<" starting at "<<ParamTypeStartPos[kXSecPar] <<" \033[0m "<< std::endl;
+  std::cout << "# Flux params:   " << nFlux << std::endl;
+  std::cout << "# ND280 params: \033[1;32m " << nParam[kND280Par] <<" starting at  "<<ParamTypeStartPos[kND280Par] <<" \033[0m "<< std::endl;
+  std::cout << "# FD params:    \033[1;32m " << nParam[kFDDetPar] <<" starting at  "<<ParamTypeStartPos[kFDDetPar] <<" \033[0m "<< std::endl;
+  std::cout << "# Osc params:   \033[1;32m " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   <<" \033[0m "<< std::endl;
   std::cout << "************************************************" << std::endl;
 
   nSteps = Chain->GetMaximum("step");
@@ -2185,7 +2185,7 @@ void MCMCProcessor::SetupOutput() {
   MCMCFile = MCMCFile.substr(0, MCMCFile.find(".root"));
 
   // Check if the output file is ready
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
   
   CanvasName = MCMCFile + OutputSuffix + ".pdf[";
   if(printToPDF) Posterior->Print(CanvasName);
@@ -2257,7 +2257,7 @@ void MCMCProcessor::ScanParameterOrder() {
 TH1D* MCMCProcessor::MakePrefit() {
 // *****************************
   
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
 
   TH1D *PreFitPlot = new TH1D("Prefit", "Prefit", nDraw, 0, nDraw);
   for (int i = 0; i < PreFitPlot->GetNbinsX() + 1; ++i) {
@@ -2342,12 +2342,12 @@ void MCMCProcessor::FindInputFiles() {
 
   // Get the settings for the MCMC
   TTree *Settings = (TTree*)(TempFile->Get("Settings"));
-  if (Settings == NULL) {
+  if (Settings == nullptr) {
     std::cerr << "Didn't find Settings tree in MCMC file " << MCMCFile << std::endl;
     std::cerr << "Will try lowercase" << std::endl;
     TempFile->ls();
     Settings = (TTree*)(TempFile->Get("settings"));
-    if (Settings == NULL) throw;
+    if (Settings == nullptr) throw;
   }
 
   // Get the xsec Covariance matrix
@@ -2425,7 +2425,7 @@ void MCMCProcessor::ReadXSecFile() {
 // ***************
 
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != NULL) {
+  if (std::getenv("MACH3") != nullptr) {
      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
       CovPos[kXSecPar].insert(0, std::string(std::getenv("MACH3"))+"/");
    }
@@ -2497,7 +2497,7 @@ void MCMCProcessor::ReadXSecFile() {
 void MCMCProcessor::ReadND280File() {
 // ***************
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != NULL) {
+  if (std::getenv("MACH3") != nullptr) {
       std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
       CovPos[kND280Par].insert(0, std::string(std::getenv("MACH3"))+"/");
    }
@@ -2526,7 +2526,7 @@ void MCMCProcessor::ReadND280File() {
     }  
 
     TIter next(BinningDirectory->GetListOfKeys());
-    TKey *key = NULL;
+    TKey *key = nullptr;
     
     // Loop through all entries
     while ((key = (TKey*)next())) 
@@ -2548,7 +2548,7 @@ void MCMCProcessor::ReadND280File() {
 void MCMCProcessor::ReadFDFile() {
 // ***************
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != NULL) {
+  if (std::getenv("MACH3") != nullptr) {
       std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
       CovPos[kFDDetPar].insert(0, std::string(std::getenv("MACH3"))+"/");
    }
@@ -2588,7 +2588,7 @@ void MCMCProcessor::ReadFDFile() {
 void MCMCProcessor::ReadOSCFile() {
 // ***************
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != NULL) {
+  if (std::getenv("MACH3") != nullptr) {
       std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
       CovPos[kOSCPar].insert(0, std::string(std::getenv("MACH3"))+"/");
    }
@@ -2978,7 +2978,7 @@ void MCMCProcessor::ResetHistograms() {
 void MCMCProcessor::GetBayesFactor(const std::string ParName, const double M1_min, const double M1_max, const std::string M1Name, const double M2_min, const double M2_max, const std::string M2Name){
 // **************************
 
-    if(hpost[0] == NULL) MakePostfit();
+    if(hpost[0] == nullptr) MakePostfit();
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParName);
     if(ParamNo == __UNDEF__)
@@ -3041,7 +3041,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     throw;
   }
   
-  if(hpost[0] == NULL) MakePostfit();
+  if(hpost[0] == nullptr) MakePostfit();
 
   std::cout << "Calculating Savage Dickey "<< std::endl;
   TDirectory *SavageDickeyDir = OutputFile->mkdir("SavageDickey");
@@ -3071,7 +3071,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     TF1 *fun = PosteriorHist->GetFunction("Gauss");
     delete fun;
             
-    TH1D* PriorHist = NULL;
+    TH1D* PriorHist = nullptr;
     //KS: If flat prior we need to have well defined bounds otherwise Prior distriution will not make sense
     if(FlatPrior)
     {
@@ -3309,7 +3309,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   
   doDiagMCMC = true;
     
-  if(ParStep != NULL)
+  if(ParStep != nullptr)
   {
     std::cout<<"It look like ParStep was already filled "<<std::endl;
     std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
@@ -3468,7 +3468,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   }
 
   // And make our sweet output file
-  if (OutputFile == NULL) MakeOutputFile();
+  if (OutputFile == nullptr) MakeOutputFile();
 }
 
 // *****************
@@ -3477,7 +3477,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
 void MCMCProcessor::ParamTraces() {
 // *****************
 
-  if (ParStep == NULL) PrepareDiagMCMC();
+  if (ParStep == nullptr) PrepareDiagMCMC();
   std::cout << "Making trace plots..." << std::endl;
 
   // Make the TH1Ds
@@ -3576,7 +3576,7 @@ void MCMCProcessor::ParamTraces() {
 void MCMCProcessor::AutoCorrelation() {
 // *********************************
 
-  if (ParStep == NULL) PrepareDiagMCMC();
+  if (ParStep == nullptr) PrepareDiagMCMC();
 
   TStopwatch clock;
   clock.Start();
@@ -3805,7 +3805,7 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 void MCMCProcessor::CalculateESS(const int nLags) {
 // **************************
 
-  if(LagL == NULL)
+  if(LagL == nullptr)
   {
     std::cerr<<"Trying to call CalculateESS before LagL was calcauted, this will not work"<<std::endl;
     std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
@@ -3917,7 +3917,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
 void MCMCProcessor::BatchedMeans() {
 // **************************
 
-  if (BatchedAverages == NULL) PrepareDiagMCMC();
+  if (BatchedAverages == nullptr) PrepareDiagMCMC();
 
   std::cout << "Making BatchedMeans plots..." << std::endl;
   
@@ -3975,7 +3975,7 @@ void MCMCProcessor::BatchedMeans() {
 void MCMCProcessor::BatchedAnalysis() {
 // **************************
 
-  if(BatchedAverages == NULL)
+  if(BatchedAverages == nullptr)
   {
     std::cerr<<"BatchedAverages haven't been initialises or have been deleted somehting is wrong"<<std::endl;
     std::cerr<<"I need it and refuse to go further"<<std::endl;
@@ -4254,7 +4254,7 @@ void MCMCProcessor::GewekeDiagnostic() {
 // Acceptance Probability
 void MCMCProcessor::AcceptanceProbabilities() {
 // **************************
-  if (AccProbBatchedAverages == NULL) PrepareDiagMCMC();
+  if (AccProbBatchedAverages == nullptr) PrepareDiagMCMC();
 
   std::cout << "Making AccProb plots..." << std::endl;
 
