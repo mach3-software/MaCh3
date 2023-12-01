@@ -107,6 +107,7 @@ class MCMCProcessor {
     inline TH1D* const GetHpost(const int i) { return hpost[i]; };
     inline TH2D* const GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
     inline TH2D* const GetViolin() { return hviolin; };
+    inline TH2D* const GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
     inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
@@ -346,7 +347,8 @@ class MCMCProcessor {
     TH1D **hpost;
     TH2D ***hpost2D;
     TH2D *hviolin;
-    
+    TH2D *hviolin_prior;
+
     double** ParStep;
     int* StepNumber;
 

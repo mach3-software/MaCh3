@@ -52,7 +52,8 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   hpost = nullptr;
   hpost2D = nullptr;
   hviolin = nullptr;
-  
+  hviolin_prior = nullptr;
+
   OutputFile = nullptr;
   
   ParamSums = nullptr;
@@ -131,7 +132,7 @@ MCMCProcessor::~MCMCProcessor() {
   std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
-  if (Posterior != nullptr)  delete Posterior;
+  if (Posterior != nullptr) delete Posterior;
 
   delete Gauss;
   delete Covariance;
@@ -171,6 +172,7 @@ MCMCProcessor::~MCMCProcessor() {
   if(StepNumber != nullptr) delete[] StepNumber;
 
   if(hviolin != nullptr) delete hviolin;
+  if(hviolin_prior != nullptr) delete hviolin_prior;
   if (OutputFile != nullptr) OutputFile->Close();
   if (OutputFile != nullptr) delete OutputFile;
   delete Chain;
@@ -873,8 +875,35 @@ void MCMCProcessor::MakeViolin() {
 
   const int vBins = (maxi_y-mini_y)*25;
 
-  hviolin = new TH2D("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y); 
-  
+  hviolin = new TH2D("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y);
+
+  //KS: Prior has larger errors so we increase range and number of bins
+  const int PriorFactor = 4;
+  hviolin_prior = new TH2D("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
+
+  TRandom3* rand = new TRandom3();
+
+  std::vector<double> PriorVec(nDraw);
+  std::vector<double> PriorErrorVec(nDraw);
+  std::vector<bool> PriorFlatVec(nDraw);
+
+  for (int x = 0; x < nDraw; ++x)
+  {
+    TString Title;
+    double Prior, PriorError;
+
+    GetNthParameter(x, Prior, PriorError, Title);
+    //Set fancy labels
+    hviolin->GetXaxis()->SetBinLabel(x+1, Title);
+    hviolin_prior->GetXaxis()->SetBinLabel(x+1, Title);
+    PriorVec[x] = Prior;
+    PriorErrorVec[x] = PriorError;
+
+    ParameterEnum ParType = ParamType[x];
+    int ParamTemp = x - ParamTypeStartPos[ParType];
+    PriorFlatVec[x] = ParamFlat[ParType][ParamTemp];
+  }
+
   TStopwatch clock;
   clock.Start();
 
@@ -884,23 +913,27 @@ void MCMCProcessor::MakeViolin() {
   #endif
   for (int x = 0; x < nDraw; ++x)
   {
+    //KS: Consider another treatment for fixed params
+    //if (IamVaried[x] == false) continue;
     for (int k = 0; k < nEntries; ++k)
     {
-      //KS: Consider another treatment for fixed params
-      //if (IamVaried[j] == false) continue;
-      
       //KS: Burn in cut
       if(StepNumber[k] < BurnInCut) continue;
       //KS: We know exaclty which x bin we will end up, find y bin. This allow to avoid coslty Fill() and enable multithreading becasue I am master of faster
       const double y = hviolin->GetYaxis()->FindBin(ParStep[x][k]);
       hviolin->SetBinContent(x+1, y,  hviolin->GetBinContent(x+1, y)+1);
     }
-    TString Title;
-    double Prior, PriorError;
 
-    GetNthParameter(x, Prior, PriorError, Title);
-    //Set fancy labels
-    hviolin->GetXaxis()->SetBinLabel(x+1, Title);
+    //KS: If we set option to not plot flat prior and param has flat prior then we skip this step
+    if(!(!PlotFlatPrior && PriorFlatVec[x]))
+    {
+      for (int k = 0; k < nEntries; ++k)
+      {
+        const double Entry = rand->Gaus(PriorVec[x], PriorErrorVec[x]);
+        const double y = hviolin_prior->GetYaxis()->FindBin(Entry);
+        hviolin_prior->SetBinContent(x+1, y,  hviolin_prior->GetBinContent(x+1, y)+1);
+      }
+    }
   } // end the for loop over nDraw
   clock.Stop();
   std::cout << "Making Violin plot took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
@@ -913,8 +946,19 @@ void MCMCProcessor::MakeViolin() {
   hviolin->GetXaxis()->SetTitle();
   hviolin->GetXaxis()->LabelsOption("v");
   
-  hviolin->SetFillColor(kBlue);
-  hviolin->SetMarkerColor(kRed);
+  hviolin_prior->GetYaxis()->SetTitle("Parameter Value");
+  hviolin_prior->GetXaxis()->SetTitle();
+  hviolin_prior->GetXaxis()->LabelsOption("v");
+
+  hviolin_prior->SetLineColor(kRed);
+  hviolin_prior->SetMarkerColor(kRed);
+  hviolin_prior->SetFillColorAlpha(kRed, 0.35);
+  hviolin_prior->SetMarkerStyle(20);
+  hviolin_prior->SetMarkerSize(0.5);
+
+  hviolin->SetLineColor(kBlue);
+  hviolin->SetMarkerColor(kBlue);
+  hviolin->SetFillColorAlpha(kBlue, 0.35);
   hviolin->SetMarkerStyle(20);
   hviolin->SetMarkerSize(0.5);
   
@@ -923,19 +967,25 @@ void MCMCProcessor::MakeViolin() {
     
   OutputFile->cd();
   hviolin->Write("param_violin");
+  hviolin_prior->Write("param_violin_prior");
   //KS: This is moslty for example plots, we have full file in the ROOT file so can do much better plot later
   hviolin->GetYaxis()->SetRangeUser(-1, +2);
+  hviolin_prior->GetYaxis()->SetRangeUser(-1, +2);
   for (int i = 0; i < NIntervals+1; ++i)
   {
     hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, i*IntervalsSize+IntervalsSize);
+    hviolin_prior->GetXaxis()->SetRangeUser(i*IntervalsSize, i*IntervalsSize+IntervalsSize);
     if(i == NIntervals+1)
     {
       hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw); 
+      hviolin_prior->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw);
     }
     //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-    hviolin->Draw("VIOLIN");
+    hviolin_prior->Draw("VIOLIN");
+    hviolin->Draw("VIOLIN SAME");
     if(printToPDF) Posterior->Print(CanvasName);
   }
+  delete rand;
   //KS: Return Margin to default one
   Posterior->SetBottomMargin(BottomMargin);
 }
@@ -3617,7 +3667,7 @@ void MCMCProcessor::AutoCorrelation() {
 //KS: If CUDA is not enabled do calcualtions on CPU
 #ifndef CUDA
   // Loop over the lags
-  // Each lag is indepdent so might as well multi-thread them!
+  //CW: Each lag is indepdent so might as well multi-thread them!
   #ifdef MULTITHREAD
   std::cout << "Using multi-threading..." << std::endl;
   #pragma omp parallel for
