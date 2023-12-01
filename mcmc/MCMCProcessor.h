@@ -88,7 +88,7 @@ class MCMCProcessor {
     void MakeTrianglePlot(std::vector<std::string> ParamNames);
     
     //Bayesian statistic hypotheis testing
-    void GetBayesFactor(const std::string ParName, const double M1_min, const double M1_max, const std::string M1Name, const double M2_min, const double M2_max, const std::string M2Name);
+    void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
     
@@ -229,6 +229,7 @@ class MCMCProcessor {
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
     inline std::string GetJeffreysScale(const double BayesFactor);
+    inline std::string GetDunneKaboth(const double BayesFactor);
     inline double GetSigmaValue(int sigma);
 
     // MCMC Diagnsotic

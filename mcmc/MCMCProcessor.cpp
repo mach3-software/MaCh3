@@ -3025,59 +3025,62 @@ void MCMCProcessor::ResetHistograms() {
 
 // **************************
 // Get Bayes Factor for particualar parameter
-void MCMCProcessor::GetBayesFactor(const std::string ParName, const double M1_min, const double M1_max, const std::string M1Name, const double M2_min, const double M2_max, const std::string M2Name){
+void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames){
 // **************************
 
-    if(hpost[0] == nullptr) MakePostfit();
+  if(hpost[0] == nullptr) MakePostfit();
+
+  std::cout<<"Calculating Bayes Factor"<<std::endl;
+
+  if((ParNames.size() != Model1Bounds.size()) || (Model2Bounds.size() != Model1Bounds.size())  || (Model2Bounds.size() != ModelNames.size()))
+  {
+    std::cerr<<" Size doesn't match"<<std::endl;
+    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
+  for(unsigned int k = 0; k < ParNames.size(); ++k)
+  {
     //KS: First we need to find parameter number based on name
-    int ParamNo = GetParamIndexFromName(ParName);
+    int ParamNo = GetParamIndexFromName(ParNames[k]);
     if(ParamNo == __UNDEF__)
     {
-      std::cout<<"Couldn't find param "<<ParName<<". Will not calculate Bayes factor"<<std::endl;
+      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate Bayes factor"<<std::endl;
       return;
     }
+
+    const double M1_min = Model1Bounds[k][0];
+    const double M2_min = Model2Bounds[k][0];
+    const double M1_max = Model1Bounds[k][1];
+    const double M2_max = Model2Bounds[k][1];
 
     long double IntegralMode1 = hpost[ParamNo]->Integral(hpost[ParamNo]->FindFixBin(M1_min), hpost[ParamNo]->FindFixBin(M1_max));
     long double IntegralMode2 = hpost[ParamNo]->Integral(hpost[ParamNo]->FindFixBin(M2_min), hpost[ParamNo]->FindFixBin(M2_max));
 
     double BayesFactor = 0.;
     std::string Name = "";
-    std::string JeffreysScale = "";
     //KS: Calc Bayes Factor
     //If M1 is more likely
     if(IntegralMode1 >= IntegralMode2)
     {
       BayesFactor = IntegralMode1/IntegralMode2;
-      Name = "\\mathfrak{B}(" + M1Name+ "/" + M2Name + ") = " + std::to_string(BayesFactor);
+      Name = "\\mathfrak{B}(" + ModelNames[k][0]+ "/" + ModelNames[k][1] + ") = " + std::to_string(BayesFactor);
     }
     else //If M2 is more likely
     {
       BayesFactor = IntegralMode2/IntegralMode1;
-      Name = "\\mathfrak{B}(" + M2Name+ "/" + M1Name + ") = " + std::to_string(BayesFactor);
+      Name = "\\mathfrak{B}(" + ModelNames[k][1]+ "/" + ModelNames[k][0] + ") = " + std::to_string(BayesFactor);
     }
-    JeffreysScale = GetJeffreysScale(BayesFactor);
+    std::string JeffreysScale = GetJeffreysScale(BayesFactor);
+    std::string DunneKabothScale = GetDunneKaboth(BayesFactor);
 
-    std::cout<<Name<<" for "<<ParName<<std::endl;
+    std::cout<<Name<<" for "<<ParNames[k]<<std::endl;
     std::cout<<"Following Jeffreys Scale = "<<JeffreysScale<<std::endl;
-
-    return;
+    std::cout<<"Following Dunne-Kaboth Scale = "<<DunneKabothScale<<std::endl;
+    std::cout<<std::endl;
+  }
+  return;
 }
 
-// **************************
-// KS: Following H. Jeffreys. The theory of probability. UOP Oxford, 1998. DOI: 10.2307/3619118.
-std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
-// **************************
-    std::string JeffreysScale = "";
-    //KS: Get fancy Jeffreys Scale as I am to lazy to look into table everytime
-    if(BayesFactor < 0)        JeffreysScale = "Negative";
-    else if( 5 > BayesFactor)  JeffreysScale = "Barely worth mentioning";
-    else if( 10 > BayesFactor) JeffreysScale = "Substantial";
-    else if( 15 > BayesFactor) JeffreysScale = "Strong";
-    else if( 20 > BayesFactor) JeffreysScale = "Very strong";
-    else JeffreysScale = "Decisive";
-
-    return JeffreysScale;
-}
 
 // **************************
 // KS: Get Savage Dockey point hypothesis test
@@ -3183,6 +3186,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     double ProbPosterior = PosteriorHist->GetBinContent(PosteriorHist->FindBin(EvaluationPoint[k]));
     double SavageDickey = ProbPosterior/ProbPrior;
     
+    std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
     //Get Best point
     TGraph *PostPoint = new TGraph(1);
     PostPoint->SetPoint(0, EvaluationPoint[k], ProbPosterior);
@@ -3200,7 +3204,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     legend->SetTextSize(0.04);
     legend->AddEntry(PriorHist, "Prior", "l");
     legend->AddEntry(PosteriorHist, "Posterior", "l");
-    legend->AddEntry(PostPoint, Form("SavageDickey = %.2f", SavageDickey),"");
+    legend->AddEntry(PostPoint, Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
     legend->SetLineColor(0);
     legend->SetLineStyle(0);
     legend->SetFillColor(0);
@@ -3218,6 +3222,42 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     delete legend;
   } //End loop over parameters
   OutputFile->cd();
+}
+
+
+// **************************
+// KS: Following H. Jeffreys. The theory of probability. UOP Oxford, 1998. DOI: 10.2307/3619118.
+std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
+// **************************
+    std::string JeffreysScale = "";
+    //KS: Get fancy Jeffreys Scale as I am to lazy to look into table everytime
+    if(BayesFactor < 0)        JeffreysScale = "Negative";
+    else if( 5 > BayesFactor)  JeffreysScale = "Barely worth mentioning";
+    else if( 10 > BayesFactor) JeffreysScale = "Substantial";
+    else if( 15 > BayesFactor) JeffreysScale = "Strong";
+    else if( 20 > BayesFactor) JeffreysScale = "Very strong";
+    else JeffreysScale = "Decisive";
+
+    std::cout<<"Following Jeffreys Scale = "<<JeffreysScale<<std::endl;
+    return JeffreysScale;
+}
+
+
+// **************************
+// KS: Based on Table 1 in https://www.t2k.org/docs/technotes/435
+std::string MCMCProcessor::GetDunneKaboth(const double BayesFactor){
+// **************************
+    std::string DunneKaboth = "";
+    //KS: Get fancy DunneKaboth Scale as I am to lazy to look into table everytime
+
+    if(2.125 > BayesFactor)    DunneKaboth = "< 1 #sigma";
+    else if( 20.74 > BayesFactor)  DunneKaboth = "> 1 #sigma";
+    else if( 369.4 > BayesFactor) DunneKaboth = "> 2 #sigma";
+    else if( 15800 > BayesFactor) DunneKaboth = "> 3 #sigma";
+    else if( 1745000 > BayesFactor) DunneKaboth = "> 4 #sigma";
+    else DunneKaboth = "> 5 #sigma";
+
+    return DunneKaboth;
 }
 
 // **************************
