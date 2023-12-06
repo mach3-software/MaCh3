@@ -3,6 +3,10 @@ MaCh3 is ...
 
 # How to Compile
 
+```
+mkdir build; cd build;
+cmake ../ [-DMaCh3_MULTITHREAD_ENABLED=<ON,OFF>] [-DMaCh3_DEBUG_ENABLED=<ON,OFF>]]
+```
 
 ## System Requirements
 ```
