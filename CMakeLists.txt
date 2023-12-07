@@ -38,6 +38,7 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
+################################## Dependencies ################################
 include(CPM)
 
 #Luke's handing cmake modules which Neutrino hep experiments might want
@@ -64,11 +65,30 @@ CPMFindPackage(
       "YAML_BUILD_SHARED_LIBS ON"
 )
 
+CPMAddPackage(
+  NAME Eigen
+  VERSION 3.2.8
+  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
+  # Eigen's CMakelists are not intended for library use
+  DOWNLOAD_ONLY YES
+)
+
+if(Eigen_ADDED)
+  add_library(Eigen INTERFACE IMPORTED)
+  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
+endif()
+
+################################## Oscillation ################################
+
+#If USE_PROB3 not defined turn it off by default
+if(NOT DEFINED USE_PROB3)
+  SET(USE_PROB3 FALSE)
+endif()
+
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
 
-if (${USE_PROB3})
-
+if (USE_PROB3)
   CPMFindPackage(
       NAME Prob3plusplus
       VERSION 3.10.3
@@ -92,26 +112,9 @@ else()
   endif()
 endif()
 
-CPMAddPackage(
-  NAME Eigen
-  VERSION 3.2.8
-  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
-  # Eigen's CMakelists are not intended for library use
-  DOWNLOAD_ONLY YES 
-)
-
-if(Eigen_ADDED)
-  add_library(Eigen INTERFACE IMPORTED)
-  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
-endif()
-
 dump_cmake_variables(Prob3plusplus)
 
-# Would be good to have a check on CMAKE_CXX_STANDARD here
-if(${ROOT_CXX_STANDARD} LESS 14)
-  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
-endif()
-
+############################  Setting Flags  ####################################
 # Check the where to install 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 
@@ -137,7 +140,7 @@ endif()
 
 #KS: If Debug enable add debugging options if not add optimisation flags
 if(MaCh3_DEBUG_ENABLED)
-  add_compile_options(-DDEBUG)
+  add_compile_definitions(DEBUG)
 else()
   add_compile_options(-O3)
 endif()
@@ -149,23 +152,22 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  add_compile_options(-fopenmp -DMULTITHREAD)
-  add_link_options(-fopenmp -DMULTITHREAD)
+  add_compile_options(-fopenmp)
+  add_compile_definitions(MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  add_compile_options(-DCPU_ONLY)
+  add_compile_definitions(CPU_ONLY)
 else()
   add_compile_options(-I${CUDA_SAMPLES}/common/inc)
   add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
 endif()
 
-if(${USE_PROB3})
-  add_compile_options(-DUSE_PROB3)
+if(USE_PROB3)
+  add_compile_definitions(USE_PROB3)
 endif()
 
-
-############################  c++ Compiler  ####################################
+############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   SET(CMAKE_CXX_STANDARD 11)
 endif()
@@ -174,6 +176,12 @@ if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
 endif()
 cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
+
+if(${ROOT_CXX_STANDARD} LESS 14)
+  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
+endif()
+
+################################# Features ##################################
 
 LIST(APPEND ALL_FEATURES
   DEBUG
@@ -185,13 +193,17 @@ foreach(f ${ALL_FEATURES})
   cmessage(STATUS "     ${f}: ${MaCh3_${f}_ENABLED}")
 endforeach()
 
+################################# Build MaCh3 ##################################
+
 # Build components
 # add_subdirectory(Diagnostics)
 add_subdirectory(manager)
 add_subdirectory(throwParms)
 add_subdirectory(covariance)
 add_subdirectory(splines)
-add_subdirectory(OscClass)
+if (NOT USE_PROB3)
+  add_subdirectory(OscClass)
+endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 #ETA - commenting out as not c++11 compatible...
