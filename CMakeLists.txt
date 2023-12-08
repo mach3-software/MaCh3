@@ -138,9 +138,20 @@ if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)
 endif()
 
-#KS: If Debug enable add debugging options if not add optimisation flags
+#If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
+if(DEFINED DEBUG_LEVEL)
+  SET(MaCh3_DEBUG_ENABLED TRUE)
+else()
+  #If MaCh debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
+  if(MaCh3_DEBUG_ENABLED)
+    SET(DEBUG_LEVEL 1)
+  endif()
+endif()
+
+#KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
-  add_compile_definitions(DEBUG)
+  add_compile_definitions(DEBUG=${DEBUG_LEVEL})
+  cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   add_compile_options(-O3)
 endif()
@@ -209,6 +220,7 @@ add_subdirectory(mcmc)
 #ETA - commenting out as not c++11 compatible...
 #add_subdirectory(yaml_test)
 
+
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 if(NOT TARGET MaCh3)
@@ -220,3 +232,22 @@ if(NOT TARGET MaCh3)
   )
   cmessage(STATUS "Added target MaCh3")
 endif()
+
+############################  Install  ####################################
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/MaCh3Config.cmake.in ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
+  INSTALL_DESTINATION
+    /this/is/ignored/for/some/reason/thanks/kitware
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+
+  write_basic_package_version_file(${CMAKE_BINARY_DIR}/MaCh3ConfigVersion.cmake
+  VERSION ${MaCh3_VERSION}
+  COMPATIBILITY AnyNewerVersion)
+
+install(FILES
+    ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
+    ${CMAKE_BINARY_DIR}/MaCh3ConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/MaCh3)

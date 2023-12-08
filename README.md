@@ -5,7 +5,7 @@ MaCh3 is ...
 
 ```
 mkdir build; cd build;
-cmake ../ [-DMaCh3_MULTITHREAD_ENABLED=<ON,OFF>] [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DUSE_PROB3=<ON,OFF>]
+cmake ../ [-DMaCh3_MULTITHREAD_ENABLED=<ON,OFF>] [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DUSE_PROB3=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
 ```
 
 ## System Requirements
