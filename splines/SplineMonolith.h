@@ -1,5 +1,4 @@
-#ifndef SPLINEMONOLITH_H
-#define SPLINEMONOLITH_H
+#pragma once
 
 // C++ includes
 #include <cstdlib>
@@ -152,4 +151,3 @@ class SMonolith {
     float *cpu_coeff_many;
     float *gpu_coeff_many;
 };
-#endif

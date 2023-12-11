@@ -1,5 +1,4 @@
-#ifndef __MCMCPROCESSOR_H_
-#define __MCMCPROCESSOR_H_
+#pragma once
 
 #ifndef __UNDEF__
 #define __UNDEF__ 1234567890
@@ -403,5 +402,3 @@ class MCMCProcessor {
   std::vector<Style_t> Credible_RegionStyle;
   std::vector<Color_t> Credible_RegionColor;
 };
-
-#endif
