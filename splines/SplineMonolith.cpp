@@ -19,7 +19,7 @@ extern void InitGPU_SepMany(
     unsigned int** gpu_nParamPerEvent,
 #endif    
     unsigned int coeff_array_size,
-    int n_splines,
+    unsigned int n_splines,
     int Eve_size);
 
 extern void InitGPU_TF1(
@@ -35,7 +35,7 @@ extern void InitGPU_TF1(
     unsigned int** gpu_nParamPerEvent,
 #endif 
 
-    int n_splines);
+    unsigned int n_splines);
 
 extern void CopyToGPU_SepMany(
     short int *gpu_paramNo_arr,
@@ -53,7 +53,7 @@ extern void CopyToGPU_SepMany(
     unsigned int *gpu_nParamPerEvent,
  #endif   
     int n_params, 
-    int n_splines,
+    unsigned int n_splines,
     short int _max_knots,
     unsigned int coeff_array_size);
 
@@ -71,14 +71,14 @@ extern void CopyToGPU_TF1(
     unsigned int *gpu_nParamPerEvent,
 #endif  
     int nParams,
-    int n_splines,
+    unsigned int n_splines,
     short int _max_knots);
 
 extern void RunGPU_SepMany(
-    short int* gpu_paramNo_arr,
-    unsigned int* gpu_nKnots_arr,
+    const short int* gpu_paramNo_arr,
+    const unsigned int* gpu_nKnots_arr,
 
-    float *gpu_coeff_many, 
+    const float *gpu_coeff_many,
 
     float* gpu_weights, 
 #ifdef Weight_On_SplineBySpline_Basis
@@ -89,12 +89,13 @@ extern void RunGPU_SepMany(
 #endif
 
     float *vals,
-    short int *segment);
+    short int *segment,
+    const unsigned int h_n_splines);
 
 extern void RunGPU_TF1(
-    float *gpu_coeff_many, 
-    short int* gpu_paramNo_arr,
-    short int* gpu_nPoints_arr,
+    const float *gpu_coeff_many,
+    const short int* gpu_paramNo_arr,
+    const short int* gpu_nPoints_arr,
 
     float* gpu_weights, 
 #ifdef Weight_On_SplineBySpline_Basis
@@ -104,7 +105,8 @@ extern void RunGPU_TF1(
     float* cpu_total_weights,
 #endif
 
-    float *vals);
+    float *vals,
+    const unsigned int h_n_splines);
 
 
 extern void CleanupGPU_SepMany(
@@ -1224,7 +1226,8 @@ void SMonolith::Evaluate() {
     cpu_total_weights,
 #endif
       vals,
-      segments);
+      segments,
+      NSplines_valid);
 
   //KS: Normaly it does nothing, in case you want to have weight for each spline it does the mapping, used mostly for debuging
   ModifyWeights_GPU();
@@ -1393,10 +1396,11 @@ void SMonolith::Evaluate_TF1() {
 #ifdef Weight_On_SplineBySpline_Basis
       cpu_weights_var,
 #else
-    gpu_total_weights,
-    cpu_total_weights,
+      gpu_total_weights,
+      cpu_total_weights,
 #endif
-      vals);
+      vals,
+      NSplines_valid);
 
   //KS: Normaly it does nothing, in case you want to have weight for each spline it does the mapping, used mostly for debuging
   ModifyWeights_GPU();

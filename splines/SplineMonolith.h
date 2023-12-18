@@ -26,6 +26,11 @@
 //KS: For TF1 we store at most 5 coefficeints, we could make it more flexible but for now define it here to make future changes easier to track
 #define _nTF1Coeff_ 5
 
+
+#ifdef CUDA
+extern void SynchroniseSplines();
+#endif
+
 // Make template class so we can use TF1 and TSpline3
 class SMonolith {
   public:
@@ -42,6 +47,14 @@ class SMonolith {
 
     // Evaluate weights on the CPU/GPU
     void Evaluate_TF1();
+
+    inline void SynchroniseMemTransfer()
+    {
+      #ifdef CUDA
+      SynchroniseSplines();
+      #endif
+      return;
+    };
 
     //KS: Get pointer to total weight to make fit faster wrooom!   
     inline const float* retPointer(const int event) {return &cpu_total_weights[event];}
