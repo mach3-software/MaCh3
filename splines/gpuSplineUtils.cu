@@ -129,6 +129,17 @@ inline void checkGpuMem() {
 }
 
 // *******************************************
+//KS: Get some fancy info about GPU
+inline void PrintNdevices() {
+// *******************************************
+
+  int nDevices;
+  cudaGetDeviceCount(&nDevices);
+
+  printf("  Found %i GPUs, currenlty I only support one GPU\n", nDevices);
+}
+
+// *******************************************
 //              INITIALISE GPU
 // *******************************************
 
@@ -191,6 +202,7 @@ __host__ void InitGPU_SepMany(
 
   //KS: Ask CUDA about memory usage
   checkGpuMem();
+  PrintNdevices();
 }
 
 // *******************************************
@@ -247,6 +259,7 @@ __host__ void InitGPU_TF1(
 
   //KS: Ask CUDA about memory usage
   checkGpuMem();
+  PrintNdevices();
 }
 
 

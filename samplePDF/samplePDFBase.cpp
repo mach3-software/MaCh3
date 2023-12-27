@@ -322,10 +322,6 @@ double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
 
 
 // *************************
-// Calculate the Barlow-Beeston likelhood contribution from MC statistics
-// Assumes the beta scaling parameters are Gaussian distributed
-// Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
-// Essentially solves equation 11
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
 double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) {
 // *************************
@@ -337,87 +333,136 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
   // Is allowed to be changed by Barlow Beeston beta parameters
   double newmc = mc;
 
-  // Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
-  // Assume the MC has a Gaussian distribution around generated
-  // As in https://arxiv.org/abs/1103.0354 eq 10, 11
-
-  // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
-  double penalty = 0;
-  if (fTestStatistic == kBarlowBeeston) {
-    // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
-    const double fractional = sqrt(w2)/mc;
-    // b in quadratic equation
-    const double temp = mc*fractional*fractional-1;
-    // b^2 - 4ac in quadratic equation
-    const double temp2 = temp*temp + 4*data*fractional*fractional;
-    if (temp2 < 0) {
-      std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-    // Solve for the positive beta
-    const double beta = (-1*temp+sqrt(temp2))/2.;
-    newmc = mc*beta;
-    // And penalise the movement in beta relative the mc uncertainty
-    if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
-    else penalty = 0;
-  }
-  //KS: Alterantive calcaution of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
-  if (fTestStatistic == kDembinskiAbdelmottele)
+  switch (fTestStatistic)
   {
-    //KS: code follows authors implementation from:
-    //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
+    //CW: Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
+    // Assume the MC has a Gaussian distribution around generated
+    // As in https://arxiv.org/abs/1103.0354 eq 10, 11
+    //CW: Calculate the Barlow-Beeston likelhood contribution from MC statistics
+    // Assumes the beta scaling parameters are Gaussian distributed
+    // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
+    // Essentially solves equation 11
+    case (kBarlowBeeston):
+    {
+      // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
+      double penalty = 0;
+      // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
+      const double fractional = std::sqrt(w2)/mc;
+      // b in quadratic equation
+      const double temp = mc*fractional*fractional-1;
+      // b^2 - 4ac in quadratic equation
+      const double temp2 = temp*temp + 4*data*fractional*fractional;
+      if (temp2 < 0) {
+        std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        throw;
+      }
+      // Solve for the positive beta
+      const double beta = (-1*temp+sqrt(temp2))/2.;
+      newmc = mc*beta;
+      // And penalise the movement in beta relative the mc uncertainty
+      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+      else penalty = 0;
 
-    //the so-called effective count
-    const double k = mc*mc / w2;
-    //Calculate beta which is scaling factor between true and generated MC
-    const double beta = (data + k) / (mc + k);
+      // Calculate the new Poisson likelihood
+      // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
+      // For the Poisson likelihood, this is just the usual calculation
+      // For IceCube likelihood, we calculate it later
+      double stat = 0;
+      // All likelihood calculations may use the bare Poisson likelihood, so calculate here
+      if (data == 0) stat = newmc;
+      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
 
-    newmc = mc*beta;
-    // And penalise the movement in beta relative the mc uncertainty
-    penalty = k*beta-k+k*TMath::Log(k/(k*beta));
-  }
+      // Return the statistical contribution and penalty
+      return stat+penalty;
+    }
+    break;
+    //KS: Alterantive calcaution of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
+    case (kDembinskiAbdelmottele):
+    {
 
-  // Calculate the new Poisson likelihood
-  // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
-  // For the Poisson likelihood, this is just the usual calculation
-  // For IceCube likelihood, we calculate it later
-  double stat = 0;
-  // All likelihood calculations may use the bare Poisson likelihood, so calculate here
-  if (data == 0) stat = newmc;
-  else if (newmc > 0) stat = newmc-data+data*TMath::Log(data/newmc);
+      //KS: code follows authors implementation from:
+      //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
 
-  // Also try the IceCube likelihood
-  // It does not modify the MC content
-  // https://arxiv.org/abs/1901.04645
-  // Argüelles, C.A., Schneider, A. & Yuan, T. J. High Energ. Phys. (2019) 2019: 30. https://doi.org/10.1007/JHEP06(2019)030
-  // We essentially construct eq 3.16 and take the logarithm
-  // in eq 3.16, mu is MC, sigma2 is w2, k is data
-  if (fTestStatistic == kIceCube) {
-    // If there for some reason is 0 mc uncertainty, return the Poisson LLH
-    if (w2 == 0) return stat;
+      //the so-called effective count
+      const double k = mc*mc / w2;
+      //Calculate beta which is scaling factor between true and generated MC
+      const double beta = (data + k) / (mc + k);
 
-    // Reset the penalties if there is mc uncertainty
-     stat = 0.0;
-     penalty = 0.0;
-     // Auxillary variables
-     const long double b = mc/w2;
-     const long double a = mc*b+1;
-     const long double k = data;
-     // Use C99's implementation of log of gamma function to not be C++11 dependent
-     stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
-   }
+      newmc = mc*beta;
+      // And penalise the movement in beta relative the mc uncertainty
+      const double penalty = k*beta-k+k*std::log(k/(k*beta));
 
-   //KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk
-   if (fTestStatistic == kPearson)
-   {
-      stat = 0;
+      // Calculate the new Poisson likelihood
+      // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
+      // For the Poisson likelihood, this is just the usual calculation
+      // For IceCube likelihood, we calculate it later
+      double stat = 0;
+      // All likelihood calculations may use the bare Poisson likelihood, so calculate here
+      if (data == 0) stat = newmc;
+      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
+
+      // Return the statistical contribution and penalty
+      return stat+penalty;
+    }
+    break;
+    //CW: Also try the IceCube likelihood
+    // It does not modify the MC content
+    // https://arxiv.org/abs/1901.04645
+    // Argüelles, C.A., Schneider, A. & Yuan, T. J. High Energ. Phys. (2019) 2019: 30. https://doi.org/10.1007/JHEP06(2019)030
+    // We essentially construct eq 3.16 and take the logarithm
+    // in eq 3.16, mu is MC, sigma2 is w2, k is data
+    case (kIceCube):
+    {
+      double stat = 0.0;
+
+      // If there for some reason is 0 mc uncertainty, return the Poisson LLH
+      if (w2 == 0)
+      {
+        // Calculate the new Poisson likelihood
+        if (data == 0) stat = newmc;
+        else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
+
+        return stat;
+      }
+      // Auxillary variables
+      const long double b = mc/w2;
+      const long double a = mc*b+1;
+      const long double k = data;
+      // Use C99's implementation of log of gamma function to not be C++11 dependent
+      stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
+
+      // Return the statistical contribution and penalty
+      return stat;
+    }
+    break;
+    //KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk
+    case (kPearson):
+    {
       //KS: 2 is beacuese this function returns -LLH not -2LLH
-      stat = (data-mc)*(data-mc)/(2*mc);
-   }
+      const double stat = (data-mc)*(data-mc)/(2*mc);
 
-   // Return the statistical contribution and penalty
-   return stat+penalty;
+      // Return the statistical
+      return stat;
+    }
+    break;
+    case (kPoisson):
+    {
+      double stat = 0.0;
+      // All likelihood calculations may use the bare Poisson likelihood, so calculate here
+      if (data == 0) stat = newmc;
+      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
+
+      // Return the statistical contribution and penalty
+      return stat;
+    }
+    break;
+
+    default:
+    std::cerr << "Couldn't find TestStatistic " << fTestStatistic << " exiting!" << std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  } // end switch
 }
 
 // **************************************************
