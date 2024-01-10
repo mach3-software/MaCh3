@@ -288,17 +288,16 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
   TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
   double xlow, xup, ylow, yup, area;
 
-  for(int i=1; i<HistCopy->GetNumberOfBins()+1; i++)
-    {
-      TH2PolyBin* bin = (TH2PolyBin*)HistCopy->GetBins()->At(i-1)->Clone();
-      xlow=bin->GetXMin();
-      xup=bin->GetXMax();
-      ylow=bin->GetYMin();
-      yup=bin->GetYMax();
-      area = (xup-xlow)*(yup-ylow);
-      HistCopy->SetBinContent(i, Histogram->GetBinContent(i)/(area*scale));
-      delete bin;
-    }
+  for(int i = 1; i < HistCopy->GetNumberOfBins()+1; i++)
+  {
+    TH2PolyBin* bin = (TH2PolyBin*)HistCopy->GetBins()->At(i-1);
+    xlow = bin->GetXMin();
+    xup = bin->GetXMax();
+    ylow = bin->GetYMin();
+    yup = bin->GetYMax();
+    area = (xup-xlow)*(yup-ylow);
+    HistCopy->SetBinContent(i, Histogram->GetBinContent(i)/(area*scale));
+  }
 
   return HistCopy;
 }
@@ -308,20 +307,19 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 double PolyIntegralWidth(TH2Poly *Histogram) {
 // ****************
 
-  double integral=0;
+  double integral = 0;
   double xlow, xup, ylow, yup, area;
 
-  for(int i=1; i<Histogram->GetNumberOfBins()+1; i++)
-    {
-      TH2PolyBin* bin = (TH2PolyBin*)Histogram->GetBins()->At(i-1)->Clone();
-      xlow=bin->GetXMin();
-      xup=bin->GetXMax();
-      ylow=bin->GetYMin();
-      yup=bin->GetYMax();
-      area = (xup-xlow)*(yup-ylow);
-      integral += Histogram->GetBinContent(i)*area;
-      delete bin;
-    }
+  for(int i = 1; i < Histogram->GetNumberOfBins()+1; i++)
+  {
+    TH2PolyBin* bin = (TH2PolyBin*)Histogram->GetBins()->At(i-1);
+    xlow = bin->GetXMin();
+    xup = bin->GetXMax();
+    ylow = bin->GetYMin();
+    yup = bin->GetYMax();
+    area = (xup-xlow)*(yup-ylow);
+    integral += Histogram->GetBinContent(i)*area;
+  }
 
   return integral;
 }
