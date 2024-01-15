@@ -112,6 +112,7 @@ covarianceBase::~covarianceBase(){
 #endif
   for (int iThread=0;iThread < nThreads; iThread++)  delete random_number[iThread];
   delete[] random_number;
+  if (throwMatrix != NULL) delete throwMatrix;
 }
 
 void covarianceBase::ConstructPCA() {
