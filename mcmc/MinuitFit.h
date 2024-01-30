@@ -1,5 +1,4 @@
-#ifndef __MINUITFIT_H__
-#define __MINUITFIT_H__
+#pragma once
 
 #include "LikelihoodFit.h"
 #include "Math/Minimizer.h"
@@ -18,5 +17,3 @@ class MinuitFit : public LikelihoodFit {
     ROOT::Math::Minimizer* minuit;
 };
 
-
-#endif

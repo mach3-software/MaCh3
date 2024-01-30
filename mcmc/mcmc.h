@@ -1,5 +1,4 @@
-#ifndef __MCMC_H__
-#define __MCMC_H__
+#pragma once
 
 #include "FitterBase.h"
 
@@ -51,4 +50,3 @@ class mcmc : public FitterBase {
   int stepStart;
 };
 
-#endif
