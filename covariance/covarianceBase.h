@@ -58,7 +58,6 @@ class covarianceBase {
   void setPar(const int i, const double val);
   void setParCurrProp(int i, double val);
   void setParProp(int i, double val) {
-    std::cout << "Setting " << getParName(i) << " to " << val << std::endl; 
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
   };
@@ -111,7 +110,6 @@ class covarianceBase {
     return sqrt((*covMatrix)(i,i));
   }
 
-
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
   void useSeparateThrowMatrix(TString throwMatrixName, TString throwMatrixFile, TString parameterMeansName="");
@@ -140,7 +138,10 @@ class covarianceBase {
   //========
   const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
+  //Some Getters
+  const int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
+  const std::vector<double>& getGeneratedValues(){return _fGenerated;};
   const std::vector<double> getProposed() const;
   const double getParProp(const int i) {
     return _fPropVal[i]; 
@@ -155,6 +156,10 @@ class covarianceBase {
   virtual const double getNominal(const int i) {
     return getParInit(i);
   };
+
+  double GetGenerated(const int i) {
+    return _fGenerated[i];
+  }
 
   double GetUpperBound(const int i){
     return _fUpBound[i];
@@ -355,6 +360,7 @@ class covarianceBase {
   //ideally these should all be private and we have setters be protected 
   //setters and public getters
   std::vector<std::string> _fNames;
+  std::vector<std::string> _fFancyNames;
   int _fNumPar;
   YAML::Node _fYAMLDoc;
   std::vector<double> _fPreFitValue;
@@ -373,7 +379,12 @@ class covarianceBase {
   //TMatrixT<double> *_fCovMatrix;
 
   //Some "usual" variables. Don't think we really need the ND/FD split
-  std::vector<int> _fNormModes;
+  std::vector<std::vector<int>> _fNormModes;
+  std::vector<std::vector<int>> _fTargetNuclei;
+  std::vector<std::vector<int>> _fNeutrinoFlavour;
+  std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
+
+  //Variables related to spline systematics
   std::vector<std::string> _fNDSplineNames;
   std::vector<std::string> _fFDSplineNames;
   std::vector<std::vector<int>> _fFDSplineModes;

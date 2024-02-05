@@ -1035,7 +1035,6 @@ int covarianceBase::CheckBounds(){
   for (int i = 0; i < _fNumPar; i++){
       //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
       if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-		std::cout << "_fPropVal at param " << i << "( " << getParName(i) << ") is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
         NOutside++;
       }
   }
@@ -1055,9 +1054,7 @@ double covarianceBase::GetLikelihood(){
 	  // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
 	  //if (_fPropVal[i] < 0) {std::cout << "_fPropVal at " << i << " is " << _fPropVal[i] << std::endl;}
 	//}
-	std::cout << "Parameters outside of bounds!" << std::endl;
-	std::cout << "NOutside is " << NOutside << std::endl;
-    return NOutside*__LARGE_LOGL__;
+	return NOutside*__LARGE_LOGL__;
   }
 
   return CalcLikelihood();
