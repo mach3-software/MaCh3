@@ -961,22 +961,22 @@ inline int ProbsToPDG(ProbNu NuType){
 
   switch (NuType){
 	case kProbNue:
-	  ReturnNuPDG = kNue;
+	  ReturnNuPDG = static_cast<int>(kNue);
 	  break;
 	case kProbNumu:
-	  ReturnNuPDG = kNumu;
+	  ReturnNuPDG = static_cast<int>(kNumu);
 	  break;
 	case kProbNutau:
-	  ReturnNuPDG = kNutau;
+	  ReturnNuPDG = static_cast<int>(kNutau);
 	  break;
 	case kProbNueBar:
-	  ReturnNuPDG = kNueBar;
+	  ReturnNuPDG = static_cast<int>(kNueBar);
 	  break;
 	case kProbNumuBar:
-	  ReturnNuPDG = kNumuBar;
+	  ReturnNuPDG = static_cast<int>(kNumuBar);
 	  break;
 	case kProbNutauBar:
-	  ReturnNuPDG = kNutauBar;
+	  ReturnNuPDG = static_cast<int>(kNutauBar);
 	  break;
 	default:
 	  std::cout << "Unrecognised NuType for the neutrino so can't map this to a PDG code" << std::endl;
