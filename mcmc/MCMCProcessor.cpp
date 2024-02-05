@@ -442,6 +442,8 @@ void MCMCProcessor::MakePostfit() {
   Errors_HPD_Positive->Write("Errors_HPD_Positive");
   Errors_HPD_Negative->Write("Errors_HPD_Negative");
 
+  PostDir->Close();
+  delete PostDir;
 } // Have now written the postfit projections
 
 // *******************
@@ -836,7 +838,6 @@ void MCMCProcessor::MakeCredibleIntervals() {
     delete Asimov;
   }
 
-  OutputFile->cd();
   //KS: Remove histogrms
   for (int i = 0; i < nDraw; ++i)
   {
@@ -849,6 +850,11 @@ void MCMCProcessor::MakeCredibleIntervals() {
   }
   delete[] hpost_copy;
   delete[] hpost_cl;
+
+  CredibleDir->Close();
+  delete CredibleDir;
+
+  OutputFile->cd();
 
   //Set back to normal
   Posterior->SetLeftMargin(LeftMargin);
@@ -1565,6 +1571,10 @@ void MCMCProcessor::DrawCorrelations1D() {
     delete[] Corr1DHist[i];
   }
   delete[] Corr1DHist;
+
+  CorrDir->Close();
+  delete CorrDir;
+
   OutputFile->cd();
 
   Posterior->SetTopMargin(TopMargin);
@@ -3221,6 +3231,10 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     delete PriorPoint;
     delete legend;
   } //End loop over parameters
+
+  SavageDickeyDir->Close();
+  delete SavageDickeyDir;
+
   OutputFile->cd();
 }
 
@@ -3658,6 +3672,11 @@ void MCMCProcessor::ParamTraces() {
   }
   delete[] TraceSystsPlots;
   delete[] SystValues;
+
+  TraceDir->Close();
+  delete TraceDir;
+
+  OutputFile->cd();
 }
 
 
@@ -3789,7 +3808,6 @@ void MCMCProcessor::AutoCorrelation() {
   }
   delete[] LagKPlots;
 
-
   //KS: This is different diagnostic however it relies on calucated Lag, thus we call it before we delete LagKPlots
   CalculateESS(nLags);
 
@@ -3802,6 +3820,11 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] DenomSum;
   delete[] LagL;
   delete[] ParamSums;
+
+  AutoCorrDir->Close();
+  delete AutoCorrDir;
+
+  OutputFile->cd();
 
   clock.Stop();
   std::cout << "It took " << clock.RealTime() << std::endl;
@@ -4049,7 +4072,6 @@ void MCMCProcessor::BatchedMeans() {
   }
   delete[] BatchedParamPlots;
 
-
   //KS: Get the batched means variance estimation and variable indicating if number of batches is sensible
   // We do this before deleting BatchedAverages
   BatchedAnalysis();
@@ -4058,6 +4080,11 @@ void MCMCProcessor::BatchedMeans() {
     delete BatchedAverages[i];
   }
   delete[] BatchedAverages;
+
+  BatchDir->Close();
+  delete BatchDir;
+
+  OutputFile->cd();
 }
 
 // **************************
@@ -4338,6 +4365,11 @@ void MCMCProcessor::GewekeDiagnostic() {
     delete[] ParStep[i];
   }
   delete[] ParStep;
+
+  GewekeDir->Close();
+  delete GewekeDir;
+
+  OutputFile->cd();
 }
 
 // **************************
@@ -4383,4 +4415,10 @@ void MCMCProcessor::AcceptanceProbabilities() {
   delete BatchedAcceptanceProblot; 
   delete[] AccProbValues;
   delete[] AccProbBatchedAverages;
+
+  probDir->Close();
+  delete probDir;
+
+  OutputFile->cd();
+
 }
