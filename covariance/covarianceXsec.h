@@ -37,9 +37,6 @@ class covarianceXsec : public covarianceBase {
     const int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
 	//ETA - just return a string of "spline", "norm" or "functional"
     const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
-    const std::string & GetParameterName(const int i) const {return xsec_param_names[i];}
-
-    const char* GetParName(const int i) const {return xsec_param_names[i].c_str();}
 
 	//ETA - trying out the yaml parsing
 	void ParseYAML(const char* FileName);
@@ -192,10 +189,6 @@ class covarianceXsec : public covarianceBase {
     double *xsec_param_ub_a;
     // priors from external data fit
     double *xsec_param_prior_a;
-
-    // Contains the parameter names
-	// ETA - don't think we need this anymore tbh
-    std::vector<std::string> xsec_param_names;
     
     //Contains the names of the Far spline objects in the spline files
     TObjArray* xsec_param_fd_spline_names;

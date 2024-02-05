@@ -99,9 +99,13 @@ class covarianceBase {
   virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
-  // ETA - Why is this virtual?
-  virtual const char* getParName(const int i) const {
+  std::string GetParName(const int i) const {return _fNames[i]};
+  const char* GetParName(const int i) const {
     return _fNames[i].c_str();
+  };
+  std::string GetParFancyName(const int i) const {return _fFancyNames[i]};
+  const char* GetParFancyName(const int i) const {
+    return _fFancyNames[i].c_str();
   };
   std::string const getInputFile() const { return inputFile; };
 
