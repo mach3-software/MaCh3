@@ -135,13 +135,11 @@ add_compile_options(-g -O3 -Wextra)
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
 add_compile_options(-g -Wextra)
-add_compile_options(-fopenmp)
-add_link_options(-fopenmp)
 
 #If Single thread is chosen MultiThread flags are omitted
 if(NOT ${SINGLE_THREAD_ONLY})
-  add_compile_options(-DMULTITHREAD)
-  add_link_options(-DMULTITHREAD)
+  add_compile_options(-DMULTITHREAD -fopenmp)
+  add_link_options(-DMULTITHREAD -fopenmp)
 endif()
 
 if(${CPU_ONLY})
