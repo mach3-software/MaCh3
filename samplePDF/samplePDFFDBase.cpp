@@ -74,7 +74,6 @@ void samplePDFFDBase::UseBinnedOscReweighting(bool ans)
     std::cout << "WARNING: you are using binned oscillation weight without specifying the binning. It will use E_reco binning to set the energy (recommended to use set1Dbinning first !). If you want another binning use : \n useBinnedOscReweighting(true, int, double*) \nwhere int is the number of bins and double* is an array with the bins boundaries." << std::endl ;
 
     /// Get the binning from the MC histogram
-
     const int nb_bins = _hPDF1D -> GetXaxis() -> GetNbins() ;      
     const double* osc_bins = _hPDF1D -> GetXaxis() -> GetXbins() -> GetArray();
     osc_binned_axis = new TAxis(nb_bins, osc_bins) ;
@@ -129,13 +128,9 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, i
     //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
-    
-    //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
-	//std::cout << "Comparing " << Val << " against " << SelectionBounds[iSelection][0] << std::endl;
-	//std::cout << "Comparing " << Val << " against " << SelectionBounds[iSelection][1] << std::endl;
-	//std::cout << "~~~~~" << std::endl;
+	//DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
+
     if ((Val<SelectionBounds[iSelection][0])||(Val>=SelectionBounds[iSelection][1])) {
-	  //std::cout << "Event failed selection" << std::endl;
 	  return false;
     }
   }
@@ -150,7 +145,6 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
   double Val;
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-
     
     Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
     //DB If multiple return values, it will consider each value seperately
@@ -204,7 +198,6 @@ void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, doub
 #if not defined (USE_PROB3)
 void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *oscpar)
 {
-
   MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar[0])),asin(sqrt(oscpar[2])), asin(sqrt(oscpar[1])), oscpar[5], nutype);
   MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar[3], oscpar[4]);
   MCSamples[sample].Oscillator->calculateProbabilities(MCSamples[sample].NeutrinoType);
@@ -290,7 +283,6 @@ void samplePDFFDBase::fillArray() {
 	  if (!IsEventSelected(iSample, iEvent)) { 
 		continue;
 	  } 
-	  //else{std::cout << "Event passed selection! " << std::endl;}
 
       double splineweight = 1.0;
       double normweight = 1.0;
@@ -460,7 +452,7 @@ void samplePDFFDBase::fillArray_MP()
 	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 
         //ETA - generic functions to apply shifts to kinematic variables
-		// this should probably happen 
+        // Apply this before IsEventSelected is called.
 		applyShifts(iSample, iEvent);
 
         //ETA - generic functions to apply shifts to kinematic variable
@@ -506,21 +498,16 @@ void samplePDFFDBase::fillArray_MP()
 
 		//DB Set oscillation weights for NC events to 1.0
 		//DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
-	  //LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
-      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  	MCSamples[iSample].osc_w[iEvent] = 0.0;
-	  	continue;
-      }
-      if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
-      }
+		//LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
+		if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+		  MCSamples[iSample].osc_w[iEvent] = 0.0;
+		  continue;
+		}
+		if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+		  MCSamples[iSample].osc_w[iEvent] = 1.0;
+		}
 
 		totalweight = GetEventWeight(iSample, iEvent);
-		//DB Total weight
-		//for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEvent];iParam++) {
-		//  totalweight *= *(MCSamples[iSample].total_weight_pointers[iEvent][iParam]);
-		//}
-		//std::cout << "Oscillation weight is " << MCSamples[iSample].osc_w[iEvent] << std::endl;
 
 		//DB Catch negative weights and skip any event with a negative event
 		if (totalweight <= 0.){
@@ -674,7 +661,6 @@ void samplePDFFDBase::FindEventOscBin() {
   std::cout << "Set all oscillation pointers to Oscillator" << std::endl;
 }
 
-//ETA
 void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   std::cout << "SETTING UP XSEC COV!!" << std::endl;
@@ -690,6 +676,7 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
   std::cout << "Found " << xsec_norms.size() << " normalisation parameters" << std::endl;
+  std::cout << "Found " << funcParsNames.size() << " functional parameters" << std::endl;
 
   return;
 }
@@ -774,7 +761,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		  }
 		}
 		if (!FlavourMatch){continue;}
-		//else{std::cout << "FOUND A VALID FLAVOUR" << std::endl;}	
 
 		//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
 		bool FlavourUnoscMatch=false;
@@ -806,41 +792,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		}
 		if (!ModeMatch) {continue;}
 
-		//std::cout << "Event passed cuts for systematic " << (*it).name << std::endl;
-		//std::cout << "About to try kinematic cuts" << std::endl;	
-
-		/*if( strcmp((*it).name.c_str(), "2p2h_norm_nu") == 0){
-		  std::cout << "---------" << std::endl;
-		  std::cout << "2p2h_norm_nu!!! FlavourMatch: " << FlavourMatch << ", TargetMatch: " << TargetMatch << ", ModeMatch: " << ModeMatch << std::endl;
-		  if(!FlavourMatch){
-			std::cout << "Flavour matching failed because I was looking for " << fdobj->nupdg << std::endl;
-			std::cout << "From : [";
-			for (unsigned iTarget=0;iTarget<(*it).pdgs.size();iTarget++) {
-			  std::cout << (*it).pdgs.at(iTarget) << ","; 
-			}
-			std::cout << "]" << std::endl;
-		  }
-
-		  if(!TargetMatch){
-			std::cout << "Target matching failed because event was on " << *(fdobj->Target[iEvent]) << std::endl;
-			std::cout << "From : [";
-			for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
-			  std::cout << (*it).targets.at(iTarget) << ", ";	
-			}
-			std::cout << "]" << std::endl; 
-		  }
-
-		  if(!ModeMatch){
-			std::cout << "Mode matching failed because I was looking for " << *(fdobj->mode[iEvent]) << std::endl;
-			std::cout << "From : [";
-			for (unsigned imode=0;imode<(*it).modes.size();imode++) {
-			  std::cout << (*it).modes.at(imode) << ", ";	
-			}
-			std::cout << "]" << std::endl; 
-		  }
-		}
-		*/
-		//if(!TargetMatch || !FlavourMatch || !ModeMatch){continue;}
 		//Now check whether the norm has kinematic bounds
 		//i.e. does it only apply to events in a particular kinematic region?
 		bool IsSelected = true;
@@ -854,9 +805,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 			  continue;
 			}
 			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
-			  //if((*it).name.find("b_") != std::string::npos){
-			  //  std::cout << "Failed because " << ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) << " is gt than " << (*it).Selection[iKinematicParameter][1] << std::endl;
-			  //}
 			  IsSelected = false;
 			  continue;
 			}
@@ -864,14 +812,9 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		}
 		//Need to then break the event loop 
 		if(!IsSelected){
-		  //if((*it).name.find("b_") != std::string::npos){std::cout << "Flux par " << (*it).name << " failed because of kinematic cut " << std::endl;}
 		  continue;
 		}
 	
-		//for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-		  //std::cout << "Found an event with " << (*it).KinematicVarStr[iKinematicParameter] << " of " << ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) << std::endl;
-		//}	
-
 		// Now set 'index bin' for each normalisation parameter
 		// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
 		int bin = (*it).index;
@@ -1458,7 +1401,10 @@ double samplePDFFDBase::GetLikelihood()
         double MCPred = samplePDFFD_array[yBin][xBin];
         double w2 = samplePDFFD_array_w2[yBin][xBin];
         //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
-        negLogL += getTestStatLLH(DataVal, MCPred, w2);
+		//ETA: there seems to be some bug in here which needs to be fixed. I
+		//see differences even when kPoisson is set?
+        //negLogL += getTestStatLLH(DataVal, MCPred, w2);
+        negLogL += getTestStatLLH(DataVal, MCPred);
     }
   }
   return negLogL;
