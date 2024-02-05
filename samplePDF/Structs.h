@@ -1110,6 +1110,9 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
     case 3:
       return CUDAProb_nu::e_t;
       break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
     } 
   case 2:
     switch (abs(nu_f)) {
@@ -1122,6 +1125,9 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
     case 3:
       return CUDAProb_nu::m_t;
       break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
     } 
   case 3:
     switch (abs(nu_f)) {
@@ -1134,7 +1140,13 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
     case 3:
       return CUDAProb_nu::t_t;
       break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
     }
+  default:
+	std::cout << "Unknow flavour " << nu_i << std::endl;
+	throw;
   }
 
 }
