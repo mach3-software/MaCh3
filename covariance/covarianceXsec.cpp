@@ -122,9 +122,8 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     // Fill the prior uncertainty
 	xsec_param_prior_a[i]= _fError[i];
     // Fill the names
-    xsec_param_names.push_back(_fNames[i]);
-
-    if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
+    //xsec_param_names.push_back(_fNames[i]);
+    //if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
 
@@ -192,10 +191,8 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
     // Fill the prior
 	xsec_param_prior_a[i]= _fError[i];
 
-    // Fill the names
-    xsec_param_names.push_back(_fNames[i]);
-
-    if(xsec_param_names[i].length() > PrintLength) PrintLength = xsec_param_names.back().length();
+	// Sort out the print length
+    if(_fNames[i].length() > PrintLength) PrintLength = _fNames[i].length();
 
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
@@ -451,7 +448,7 @@ covarianceXsec::~covarianceXsec() {
 
 // ********************************************
 // DB Grab the Number of splines for the relevant DetID
-const int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
+int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
   int returnVal = 0; 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
@@ -473,7 +470,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int D
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (strcmp(GetXsecParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-        returnVec.push_back(GetParameterName(i));
+        returnVec.push_back(GetParName(i));
       }
     }
   }
@@ -611,7 +608,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		std::vector<int> temp;
 
 		XsecNorms4 norm;
-		norm.name=GetParameterName(i);
+		norm.name=GetParName(i);
 
 		// Set the mode of the normalisation parameter
 		//TVectorD* tempVector = (TVectorD*)(xsec_param_norm_modes->At(i));
@@ -703,7 +700,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 
 // ********************************************
 // DB Grab the number of Normalisation parameters for the relevant DetID
-const int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
+int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
   int returnVal = 0;
 
   for (int i = 0; i < _fNumPar; ++i) {
@@ -726,7 +723,7 @@ const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(int Det
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetXsecParamDetID(i) & DetID) == DetID) { //If parameter applies to required DetID
       if (strcmp(GetXsecParamType(i), "Functional") == 0) { //If parameter is implemented as a functional param
-		returnVec.push_back(GetParameterName(i));
+		returnVec.push_back(GetParName(i));
       }
     }
   }
@@ -795,7 +792,7 @@ void covarianceXsec::ScanParameters() {
     }
 	*/
     
-    if(GetParameterName(i).find("b_")==0)isFlux.push_back(true);
+    if(GetParName(i).find("b_")==0)isFlux.push_back(true);
     else isFlux.push_back(false);
 
 	///////////////
@@ -810,7 +807,7 @@ void covarianceXsec::ScanParameters() {
 	if(strcmp(GetXsecParamType(i), "Norm") == 0){
 	  
 	  XsecNorms4 tmp_xsec;
-	  tmp_xsec.name=GetParameterName(i);
+	  tmp_xsec.name=GetParName(i);
 
 	  tmp_xsec.modes=_fNormModes[nFarNormParams];
 
@@ -870,7 +867,7 @@ void covarianceXsec::ScanParameters() {
 	  // Now check if it's a spline parameter or not
 	  //This needs to be updated to check against a string
 	  if (strcmp(GetXsecParamType(i), "Spline") == 0) {//FarSplinePars
-		FarSplineParsNames.push_back(GetParameterName(i));
+		FarSplineParsNames.push_back(GetParName(i));
 		FarSplineParsIndex.push_back(i);
 
 		FarSplineModes.push_back(_fFDSplineModes[nFarSplineParams]);
@@ -880,7 +877,7 @@ void covarianceXsec::ScanParameters() {
 	  } //End FarSplinePars
 	  else if (strcmp(GetXsecParamType(i), "functional") != 0){//Far functional parameter
 		nFarFuncParams++;
-		FarFuncParsNames.push_back(GetParameterName(i));
+		FarFuncParsNames.push_back(GetParName(i));
 		FarFuncParsIndex.push_back(i);
 	  }//End Far funcpars
 	}//End Far pars
@@ -890,14 +887,14 @@ void covarianceXsec::ScanParameters() {
 
 	  if (strcmp(GetXsecParamType(i), "functional") != 0) {//Near affecting func pars
 
-		NearfuncParsNames.push_back(GetParameterName(i));
+		NearfuncParsNames.push_back(GetParName(i));
 		NearfuncParsIndex.push_back(i);
 		nNearFuncParams++;
 
 		// If they are greater >= 0 it's a spline parameter
 	  }//End Near affecting func pars
 	  else if (strcmp(GetXsecParamType(i), "Spline") != 0) {
-		NearsplineParsNames.push_back(GetParameterName(i));
+		NearsplineParsNames.push_back(GetParName(i));
 		NearsplineParsIndex.push_back(i);
 		nNearSplineParams++;
 
@@ -907,7 +904,7 @@ void covarianceXsec::ScanParameters() {
 	  else {
 		std::cerr << "Found a parameter in covarianceXsec which wasn't -2, -1 or above 0!" << std::endl;
 		std::cerr << "This is undefined behaviour currently, and implementation should change" << std::endl;
-		std::cerr << "Param " << GetParameterName(i) << " (param " << i << ") = " << GetXsecParamType(i) << std::endl;
+		std::cerr << "Param " << GetParName(i) << " (param " << i << ") = " << GetXsecParamType(i) << std::endl;
 		std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 		//throw;
 	  }
@@ -1008,11 +1005,11 @@ void covarianceXsec::setEvalLikelihood(int i, bool eL) {
   // ********************************************
 
   if (i > size) {
-    std::cerr << "Can't setEvalLikelihood for xsec_" << i << " (" << GetParameterName(i) << ")" << " because size of covarianceXsec = " << size << std::endl;
+    std::cerr << "Can't setEvalLikelihood for xsec_" << i << " (" << GetParName(i) << ")" << " because size of covarianceXsec = " << size << std::endl;
     std::cerr << "Fix this in your config file please!" << std::endl;
     throw;
   } else {
-    std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to flat prior" << std::endl;
+    std::cout << "Setting " << GetParName(i) << " (parameter " << i << ") to flat prior" << std::endl;
     _fFlatPrior[i] = eL;
   }
 }
@@ -1028,7 +1025,7 @@ void covarianceXsec::toggleFixParameter(int i) {
 	  exit(-1);
 	} else {
 	  _fError[i] *= -1.0;
-	  std::cout << "Setting " << GetParameterName(i) << " (parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
+	  std::cout << "Setting " << GetParName(i) << " (parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
 
 	}
   } else {
@@ -1037,26 +1034,26 @@ void covarianceXsec::toggleFixParameter(int i) {
 	for (int im = 0; im < npars; ++im) { if(isDecomposed_PCA[im] == i) isDecom = im; }
 
 	if(isDecom < 0) {
-	  std::cerr << "Parameter " << GetParameterName(i) << " is PCA decomposed can't fix this" << std::endl;
+	  std::cerr << "Parameter " << GetParName(i) << " is PCA decomposed can't fix this" << std::endl;
 	  //throw; 
 	} else {
 	  fParSigma_PCA[isDecom] *= -1.0;
-	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
+	  std::cout << "Setting un-decomposed " << GetParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
 	}
   }
   return;
 }
 
-// ********************************************
-void covarianceXsec::setXsecParNames() {
-  // ********************************************
-  // This feels sort of silly but fine...
-  // Shouldn't really be called because a lot of post-processing depends on having name xsec_i
-  // Have made covarianceXsec->GetParameterName(i) which returns the cross-section parameter name which is read from the ROOT input file (e.g. xsec_covariance_2015v0.root)
-  for (int i = 0; i < size; ++i) {
-	_fNames[i] = xsec_param_names[i]; 
-  }
-}
+//// ********************************************
+//void covarianceXsec::setXsecParNames() {
+//  // ********************************************
+//  // This feels sort of silly but fine...
+//  // Shouldn't really be called because a lot of post-processing depends on having name xsec_i
+//  // Have made covarianceXsec->GetParName(i) which returns the cross-section parameter name which is read from the ROOT input file (e.g. xsec_covariance_2015v0.root)
+//  for (int i = 0; i < size; ++i) {
+//	_fNames[i] = xsec_param_names[i]; 
+//  }
+//}
 
 
 // ********************************************
@@ -1077,7 +1074,7 @@ void covarianceXsec::Print() {
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << std::endl;;
 
   for (int i = 0; i < GetNumParams(); i++) {
-    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParameterName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << std::endl;
+    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << std::endl;
   }
 
   std::cout << std::endl;

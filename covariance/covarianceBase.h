@@ -99,18 +99,18 @@ class covarianceBase {
   virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
-  std::string GetParName(const int i) const {return _fNames[i]};
+  std::string GetParName(const int i) {return _fNames[i];};
   const char* GetParName(const int i) const {
     return _fNames[i].c_str();
   };
-  std::string GetParFancyName(const int i) const {return _fFancyNames[i]};
+  std::string GetParFancyName(const int i) {return _fFancyNames[i];};
   const char* GetParFancyName(const int i) const {
     return _fFancyNames[i].c_str();
   };
   std::string const getInputFile() const { return inputFile; };
 
   // Get diagonal error for ith parameter
-  const double getDiagonalError(const int i) { 
+  double getDiagonalError(const int i) { 
     return sqrt((*covMatrix)(i,i));
   }
 
@@ -143,17 +143,17 @@ class covarianceBase {
   const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
-  const int    GetNumParams()               {return _fNumPar;}
+  int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
   const std::vector<double>& getGeneratedValues(){return _fGenerated;};
   const std::vector<double> getProposed() const;
-  const double getParProp(const int i) {
+  double getParProp(const int i) {
     return _fPropVal[i]; 
   };
-  const double getParCurr(const int i) {
+  double getParCurr(const int i) {
     return _fCurrVal[i];
   };
-  const double getParInit(const int i) {
+  double getParInit(const int i) {
     return _fPreFitValue[i];
   };
 
@@ -173,14 +173,15 @@ class covarianceBase {
     return _fLowBound[i];
   }
 
-  const double getParProp_PCA(const int i) {
+  double getParProp_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;
     }
     return fParProp_PCA(i);
   };
-  const double getParCurr_PCA(const int i) {
+  
+  double getParCurr_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;

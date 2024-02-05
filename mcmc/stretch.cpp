@@ -135,7 +135,7 @@ void stretch::runStretch()
    {
       for(size_t j=0; j<currentpar[i].size(); j++)
       {
-	 outTree->Branch(systematics[i]->getParName(j),"std::vector<double>",&currentpar[i][j]);
+	 outTree->Branch(systematics[i]->GetParName(j).c_str(),"std::vector<double>",&currentpar[i][j]);
       }
    }
    
