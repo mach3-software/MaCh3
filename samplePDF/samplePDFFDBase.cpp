@@ -8,7 +8,6 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
 {
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
-  std::cout << "- Using SK sample config in this file " << mc_version << std::endl;
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
@@ -20,13 +19,8 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   nSamples = 1;
   SampleName.push_back("FDsample");
 
-  //ETA - make sure osc is NULL!!
-  //Osc = NULL; 
-  
-  //ETA - leave this out for now, need to fix and make things nice and configurable
-  //EnergyScale *energy_first = new EnergyScale();
-  //energy_first->SetUncertainty(1.2);
-  //ShiftFunctors.push_back(energy_first);
+  //Default TestStatistic is kPoisson
+  fTestStatistic = kPoisson;
 }
 
 
@@ -105,7 +99,6 @@ bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
 
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
     
-
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
 	//std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
     //DB If multiple return values, it will consider each value seperately
@@ -285,8 +278,7 @@ void samplePDFFDBase::fillArray() {
     }
   }
 
-  reconfigureFuncPars();
-
+  PrepFunctionalParameters();
   splineFile->FindSplineSegment();
   splineFile->calcWeights();
 
@@ -338,11 +330,11 @@ void samplePDFFDBase::fillArray() {
 	  	MCSamples[iSample].osc_w[iEvent] = 0.0;
 	  	continue;
       }
+
+	  //ETA - I need to check that this doesn't cause a problem for atmospherics and or tau samples
       if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
-	  	continue;
       }
-
 	  //DB Set oscillation weights for NC events to 1.0
 	  //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
 	  if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
@@ -370,6 +362,7 @@ void samplePDFFDBase::fillArray() {
 		XBinToFill = MCSamples[iSample].NomXBin[iEvent];
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
+	  //ETA- note that nXBins is XBinEdges.size() - 1
       else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
 		continue;
       }
@@ -397,10 +390,6 @@ void samplePDFFDBase::fillArray() {
 		samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
 		samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
-	  else{
-		//std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill <<  " || X var  = " << XVar << std::endl;
-	  }
-
     }
   }
 
@@ -418,11 +407,11 @@ void samplePDFFDBase::fillArray_MP()
   for (int yBin=0;yBin<nYBins;yBin++) {
 	  for (int xBin=0;xBin<nXBins;xBin++) {
 	    samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+		samplePDFFD_array_w2[yBin][xBin] = 0.;
 	  }
   }
 
-  reconfigureFuncPars();
+  //reconfigureFuncPars();
 
   //This is stored as [y][x] due to shifts only occuring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses 
   double** samplePDFFD_array_private = NULL;
@@ -432,6 +421,7 @@ void samplePDFFDBase::fillArray_MP()
 #pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
   {
 	// private to each thread
+	// ETA - maybe we can use parallel firstprivate to initialise these?
 	samplePDFFD_array_private = new double*[nYBins];
     samplePDFFD_array_private_w2 = new double*[nYBins];
 	for (int yBin=0;yBin<nYBins;yBin++) {
@@ -457,6 +447,9 @@ void samplePDFFDBase::fillArray_MP()
 	//
 	// We will hit <0.1 s/step eventually! :D
 
+	//ETA - does these three calls need to be inside the omp parrallel region? 
+	//I don't think this will affect anything but maybe should check.
+	PrepFunctionalParameters();
 	//==================================================
 	//Calc Weights and fill Array
 	splineFile->FindSplineSegment();
@@ -467,6 +460,7 @@ void samplePDFFDBase::fillArray_MP()
 	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 
         //ETA - generic functions to apply shifts to kinematic variables
+		// this should probably happen 
 		applyShifts(iSample, iEvent);
 
         //ETA - generic functions to apply shifts to kinematic variable
@@ -519,7 +513,6 @@ void samplePDFFDBase::fillArray_MP()
       }
       if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
-	  	continue;
       }
 
 		totalweight = GetEventWeight(iSample, iEvent);
@@ -696,7 +689,7 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
-  //std::cout << "Found " << xsec_norms << " normalisation parameters" << std::endl;
+  std::cout << "Found " << xsec_norms.size() << " normalisation parameters" << std::endl;
 
   return;
 }
@@ -745,75 +738,60 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
 	if (XsecCov) {
+	  //std::cout << "Xsec norms is of size " << xsec_norms.size() << std::endl;
 	  for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
+		//std::cout << "Looping over systematic " << (*it).name << std::endl;
 		// Skip oscillated NC events
 		// Not strictly needed, but these events don't get included in oscillated predictions, so
 		// no need to waste our time calculating and storing information about xsec parameters
 		// that will never be used.
 		if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		
-		//Check whether the normalisation parameter applies to the target the event was on
-		/*
-		bool TargetMatch = false;
-		//If no target(s) specified then the syst applies to all targets
-		if ((*it).targets.size() == 0) {TargetMatch = true;}
-		else {
-		  for (unsigned iTarget = 0 ; iTarget < (*it).targets.size() ; ++iTarget) {
-			//ETA - this assumes no weird convention of specifying target exists in MC
-			//i.e. this assumes atomic mass is always used to specify target nucleus
-            if ((*it).targets.at(iTarget) == *(fdobj->Target[iEvent])) {TargetMatch = true;}
+
+		//Now check that the target of an interaction matches with the normalisation parameters
+		bool TargetMatch=false;
+		//If no target specified then apply to all modes
+		if ((*it).targets.size()==0) {
+		  TargetMatch=true;
+		} else {
+		  for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
+			if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
+			  TargetMatch=true;
+			}
 		  }
 		}
 		if (!TargetMatch) {continue;}
 
-		// If the parameter *should* apply to this event, it will get through to setting 'start bin' below. If it shouldn't,
-		// it will hit a 'continue' statement, break out of the loop over (*it), and move on to the next
-		// xsec parameter in (*it).
-		bool HornCurrentMatch=false;
-		if ((*it).horncurrents.size()==0) {HornCurrentMatch=true;}
-		else {
-		  for(unsigned ihorncurrent=0;ihorncurrent<(*it).horncurrents.size();ihorncurrent++){//Check if is right horncurrent
-			if ((*it).horncurrents.at(ihorncurrent)==1 && !GetIsRHC()) {HornCurrentMatch=true;}
-			if ((*it).horncurrents.at(ihorncurrent)==-1 && GetIsRHC()) {HornCurrentMatch=true;}
+		//Now check that the neutrino flavour in an interaction matches with the normalisation parameters
+		bool FlavourMatch=false;
+		//If no mode specified then apply to all modes
+		if ((*it).pdgs.size()==0) {
+		  FlavourMatch=true;
+		} else {
+		  for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
+			if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
+			  FlavourMatch=true;
+			}
 		  }
 		}
-		if (!HornCurrentMatch) {continue;}
+		if (!FlavourMatch){continue;}
+		//else{std::cout << "FOUND A VALID FLAVOUR" << std::endl;}	
 
-		//Check on the oscillated neutrino flavour
-		bool FlavMatch = false;
-		if ((*it).pdgs.size()==0) {FlavMatch=true;}
-		else {
-		  for(unsigned ipdg=0;ipdg<(*it).pdgs.size();ipdg++){	    //Check if is right neutrino flavour
-			if ((*it).pdgs.at(ipdg) == kNue && fdobj->oscnutype == kProbNue) {FlavMatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNumu && fdobj->oscnutype == kProbNumu) {FlavMatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNutau && fdobj->oscnutype == kProbNutau) {FlavMatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNueBar && fdobj->oscnutype == kProbNueBar) {FlavMatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNumuBar && fdobj->oscnutype == kProbNumuBar) {FlavMatch=true;}
-			if ((*it).pdgs.at(ipdg) == kNutauBar && fdobj->oscnutype == kProbNutauBar) {FlavMatch=true;}
+		//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
+		bool FlavourUnoscMatch=false;
+		//If no mode specified then apply to all modes
+		if ((*it).preoscpdgs.size()==0) {
+		  FlavourUnoscMatch=true;
+		} else {
+		  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
+			if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
+			  FlavourUnoscMatch=true;
+			  //std::cout << "DID MATCH " << fdobj->nupdgUnosc << " with " << (*it).preoscpdgs.at(iPDG) << std::endl;
+			}
+			//else{std::cout << "Didn't match " << fdobj->nupdgUnosc << " with " << (*it).preoscpdgs.at(iPDG) << std::endl;}
 		  }
 		}
-        if (!FlavMatch) {continue;}
-
-		//Check on the flavour that the neutrino was produced as
-		//i.e. before oscillations
-		bool ProdFlavMatch=false;
-		if ((*it).preoscpdgs.size()==0) {ProdFlavMatch=true;}
-		else {
-		  for (unsigned ipdg=0;ipdg<(*it).preoscpdgs.size();ipdg++) {
-			//Check if is right neutrino flavour
-			if ((*it).preoscpdgs.at(ipdg) == fdobj->nutype) {ProdFlavMatch=true;}
-			if ((*it).preoscpdgs.at(ipdg) == kNue && fdobj->nutype == kProbNue) {ProdFlavMatch=true;}
-			if ((*it).preoscpdgs.at(ipdg) == kNumu && fdobj->nutype == kProbNumu) {ProdFlavMatch=true;}
-			if ((*it).preoscpdgs.at(ipdg) == kNutau && fdobj->nutype == kProbNutau) {ProdFlavMatch=true;}
-			if ((*it).preoscpdgs.at(ipdg) == kNueBar && fdobj->nutype == kProbNueBar) {ProdFlavMatch=true;}
-			if ((*it).preoscpdgs.at(ipdg) == kNumuBar && fdobj->nutype == kProbNumuBar) {ProdFlavMatch=true;}
-			if ((*it).preoscpdgs.at(ipdg) == kNutauBar && fdobj->nutype == kProbNutauBar) {ProdFlavMatch=true;}
-
-		  }
-		}
-		if (!ProdFlavMatch) {continue;}	
-
-		*/
+		if (!FlavourUnoscMatch){continue;}
+		
 		//Now check that the mode of an interaction matches with the normalisation parameters
 		bool ModeMatch=false;
 		//If no mode specified then apply to all modes
@@ -828,16 +806,57 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		}
 		if (!ModeMatch) {continue;}
 
+		//std::cout << "Event passed cuts for systematic " << (*it).name << std::endl;
+		//std::cout << "About to try kinematic cuts" << std::endl;	
+
+		/*if( strcmp((*it).name.c_str(), "2p2h_norm_nu") == 0){
+		  std::cout << "---------" << std::endl;
+		  std::cout << "2p2h_norm_nu!!! FlavourMatch: " << FlavourMatch << ", TargetMatch: " << TargetMatch << ", ModeMatch: " << ModeMatch << std::endl;
+		  if(!FlavourMatch){
+			std::cout << "Flavour matching failed because I was looking for " << fdobj->nupdg << std::endl;
+			std::cout << "From : [";
+			for (unsigned iTarget=0;iTarget<(*it).pdgs.size();iTarget++) {
+			  std::cout << (*it).pdgs.at(iTarget) << ","; 
+			}
+			std::cout << "]" << std::endl;
+		  }
+
+		  if(!TargetMatch){
+			std::cout << "Target matching failed because event was on " << *(fdobj->Target[iEvent]) << std::endl;
+			std::cout << "From : [";
+			for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
+			  std::cout << (*it).targets.at(iTarget) << ", ";	
+			}
+			std::cout << "]" << std::endl; 
+		  }
+
+		  if(!ModeMatch){
+			std::cout << "Mode matching failed because I was looking for " << *(fdobj->mode[iEvent]) << std::endl;
+			std::cout << "From : [";
+			for (unsigned imode=0;imode<(*it).modes.size();imode++) {
+			  std::cout << (*it).modes.at(imode) << ", ";	
+			}
+			std::cout << "]" << std::endl; 
+		  }
+		}
+		*/
+		//if(!TargetMatch || !FlavourMatch || !ModeMatch){continue;}
 		//Now check whether the norm has kinematic bounds
 		//i.e. does it only apply to events in a particular kinematic region?
 		bool IsSelected = true;
 		if ((*it).hasKinBounds) {
 		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) < (*it).Selection[iKinematicParameter][0]) { 
+			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
+			  //if((*it).name.find("b_") != std::string::npos){
+			  //  std::cout << "Failed because " << ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) << " is less than " << (*it).Selection[iKinematicParameter][0] << std::endl; 
+			  //}
 			  IsSelected = false;
 			  continue;
 			}
 			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+			  //if((*it).name.find("b_") != std::string::npos){
+			  //  std::cout << "Failed because " << ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) << " is gt than " << (*it).Selection[iKinematicParameter][1] << std::endl;
+			  //}
 			  IsSelected = false;
 			  continue;
 			}
@@ -845,8 +864,13 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		}
 		//Need to then break the event loop 
 		if(!IsSelected){
+		  //if((*it).name.find("b_") != std::string::npos){std::cout << "Flux par " << (*it).name << " failed because of kinematic cut " << std::endl;}
 		  continue;
 		}
+	
+		//for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
+		  //std::cout << "Found an event with " << (*it).KinematicVarStr[iKinematicParameter] << " of " << ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) << std::endl;
+		//}	
 
 		// Now set 'index bin' for each normalisation parameter
 		// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
@@ -923,7 +947,7 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   dathist->SetBins(XVec.size()-1, XVec.data());
 
   XBinEdges = XVec;
-//  for (int i=0;i<nbins+1;i++) {
+  //for (int i=0;i<nbins+1;i++) {
 //	XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(i+1);
 //  }
   YBinEdges = std::vector<double>(2);
@@ -972,9 +996,6 @@ void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double
   //ETA - maybe need to be careful here
   int nXBins = XVec.size()-1;
   int nYBins = YVec.size()-1;
-
-  std::cout << "In samplePDFFDBase::set2DBinning()" << std::endl;
-  std::cout << "nYBins is " << nYBins << std::endl;
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1074,8 +1095,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
 	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
-	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));//ETA - TODO get rid of 0.001... this is only for SK
-	  //std::cout << "FOUND XNOMBIN AT " << bin << " from " << *(MCSamples[mc_i].x_var[event_i]) << std::endl;
+	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
 	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
 	  if (bin==0) {
@@ -1097,7 +1117,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 		upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
 	  }
 
-	  if ((bin-1) > 0 && (bin-1) < int(XBinEdges.size()-1)) {
+	  if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
 		MCSamples[mc_i].NomXBin[event_i] = bin-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
@@ -1108,12 +1128,6 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = 0;
 
-	  /*std::cout << "FOUND EDGES TO BE " << std::endl;
-		std::cout << "Low edges " << low_edge << std::endl;
-		std::cout << "Upper edges " << upper_edge << std::endl;
-		std::cout << "Lower lower edge " << low_lower_edge << std::endl;
-		std::cout << "Upper uper edge " << upper_upper_edge << std::endl;
-		*/
 	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
 	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
 	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
@@ -1228,7 +1242,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
 	  }
 
-	  if ((bin_x-1) > 0 && (bin_x-1) < int(XBinEdges.size()-1)) {
+	  if ((bin_x-1) >= 0 && (bin_x-1) < int(XBinEdges.size()-1)) {
 		MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
@@ -1238,7 +1252,6 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		upper_upper_edge = __DEFAULT_RETURN_VAL__;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
-	  //std::cout << "Found Nominal YBin to be " << MCSamples[mc_i].NomYBin[event_i] << std::endl;  
 	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
 	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
 	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
@@ -1248,6 +1261,8 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
   return;
 }
 
+//ETA - this can be changed quite easily to check the number of XBins and YBins.
+//We can slowly but surely remove any trace of BinningOpt
 int samplePDFFDBase::GetNDim() {
   switch(BinningOpt) {
   case 0: 
@@ -1261,8 +1276,7 @@ int samplePDFFDBase::GetNDim() {
 	std::cerr << "Error, unrecognsied BinningOpt!!" << std::endl;
 	throw;
     return 0;
-  } 
-  
+  }  
 }
 
 void samplePDFFDBase::addData(std::vector<double> &data) {
@@ -1387,7 +1401,7 @@ void samplePDFFDBase::fillSplineBins() {
 		  break;
 		case 2:
 		  //Straight out of SKBase
-		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j])*0.001, *(MCSamples[i].y_var[j]));
 
 		  //FD base
 		  //EventSplines = MCSamples[i].splineFile->GetEventSplines(SampleName, j, *(MCSamples[i].mode[j]), MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j], MCSamples[i].yvar_s_bin[j]); 
@@ -1400,8 +1414,7 @@ void samplePDFFDBase::fillSplineBins() {
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
 
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
-
-	  //
+ 
 	  for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
 		//Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
 		MCSamples[i].xsec_spline_pointers[j][spline] = splineFile->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
@@ -1425,6 +1438,7 @@ double samplePDFFDBase::GetLikelihood()
       return -1;
   }
 
+  //This can be done only once and stored
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
