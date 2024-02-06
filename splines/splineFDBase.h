@@ -5,173 +5,126 @@
 #define __BAD_SPLINE__ 123456789
 #endif
 
-//ETA adding the option to use reduced TSpline3. Hopefully this aves us some memory!
-// Do we use TF1 or TSpline3* for spline evaluations
-#define USE_TSpline3_FD 1
-#define USE_TSpline3_red_FD 2
+//ROOT
+#include "TH3F.h"
 
-// Can use:
-//  TSpline3 (third order spline in ROOT)
-//  TSpline3_red (reduced class third order spline in ROOT)
+//MaCh3
+#include "covariance/covarianceXsec.h"
 
-#define USE_SPLINE_FD USE_TSpline3_red_FD
-// Set the __SPLINE_TYPE__ accordingly
-#if USE_SPLINE_FD == USE_TSpline3_FD
-#define __SPLINE_TYPE_FD__ TSpline3_FD
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-#define __SPLINE_TYPE_FD__ TSpline3_red_FD
-#endif
-
-#include "splineBase.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include "TKey.h"
-#include "TROOT.h"
-#include "TClass.h"
-//ETA - need Structs.h because this is where TSpline3 and FastSplineEval are defined but maybe we should move them to a new header?
-#include "../samplePDF/Structs.h"
-//ETA - covariance xsec need to get the number of splines which apply to each det for example
-#include "../covariance/covarianceXsec.h"
-
-
-class splineFDBase : public splineBase
+class splineFDBase
 {
-
- public:
-  splineFDBase(const char *spline, int nutype, int nevents, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1 splines
-  splineFDBase(const char *spline, int nutype, int nevents, double BinningOpt, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1-var2 splines
-  virtual ~splineFDBase();
-  //TODO (ETA) - should we make these pure virutal functions? That way each experiment can read in their own spline files in a nice way?
-  virtual void SetupSplines(){};
-  virtual void SetupSplines(int BinningOpt){};//~~~
-  void SetSplineBinning();
-  void SetSplineBinning(int BinningOpt);//~~~
-  void GetSplineBins(int &nutype, bool &sig, double &enu, double &var1, unsigned int &enu_bin, unsigned int &var1_bin);
-  void GetSplineBins(int &nutype, bool &sig, double &enu, double &var1, double &var2, unsigned int &enu_bin, unsigned int &bin_var1, unsigned int &bin_var2);//~~~
-  //ETA it's nice to be able to know how many spline bins there are in samplePDFFDBase so adding these.
-  //This way we can check that spline and sample binning is the same.
-  int getNSplineBinsEnu() {return enu_spline->GetNbins();}
-  int getNSplineBinsVar1() {return var1_spline->GetNbins();}
-  int getNSplineBinsVar2() {return var2_spline->GetNbins();}
-
-  //DB Function which interregates MaCh3Mode_to_SplineMode to determine which MaCh3Modes have splines and which modes piggy-back of the splines of other modes
-  //TODO (ETA) - reimplement this in a generic way for all experiments.
-  //This is to become pure virtual and defined in experiment specific implementation of splines
-  virtual void FindUniqueModes(){};
-  //DB Function which removes any modes which piggy-back off other modes out of the vector given by covarianceXsec::GetSplineModeVecFromDetID() so they can be added in the XML but won't throw exception when trying to load up splines
-  std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
-
-  template <class T>
-    double FastSplineEval(T* spline, const int SplineNumber);
-  template <class T>
-    bool SetSplineInfoArray(T* spline, int isyst);
-  void FindSplineSegment();
-  void SetSplineInfoArrays();
-  void SetupSplineInfoArray(covarianceXsec * xsec);
-
-  FastSplineInfo* SplineInfoArray;
-  covarianceXsec* covxsec;
-  int nSplineParams;
-  std::vector<int> splineParsIndex;
-  std::vector<std::string> splineParsNames;
-  // ETA - new function to fill eventSplines 2D vec with splines for each event
-  // pass it an array of modes, var1 bins and etrue bins from a samplePDF
-  std::vector< std::vector<int> > getEventSplines(int &event, int mode, unsigned int &enu_bin, unsigned int &var1_bin);
-  std::vector< std::vector<int> > getEventSplines(int &event, int mode, unsigned int &enu_bin, unsigned int &var1_bin, unsigned int &var2_bin);
-  void calcWeights();
-
-  const double* retPointer(int parambin,int modebin,int etruebin,int var1bin) {
-	return &dev_1D_w[parambin][modebin][etruebin][var1bin];
-  }
-  const double* retPointer(int parambin,int modebin,int etruebin,int var1bin,int var2bin) {return &dev_2D_w[parambin][modebin][etruebin][var1bin][var2bin];}
-
-  //TODO (ETA) - have a nice print function giving the modes to spline mode mapping etc.
-
- protected:
-  int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb
-  TFile *splinefile;
-  
-  // spline contents
-  TAxis *enu_spline;
-  TAxis *var1_spline;
-  TAxis *var2_spline;
-  
-  int number_parms;
-  int BinningOpt;
-  int SampleDetID;
-
-  //DB Variables related to determined which modes have splines and which piggy-back of other modes
-  int nUniqueModes;
-  std::vector<std::string> UniqueModeFarSplineNames;
-  std::vector<int> DuplicatedFDModes;
-  std::vector<int> MaCh3Mode_SplineMode_Map;
-
-#if USE_SPLINE_FD == USE_TSpline3_FD
-
-  std::vector< std::vector< std::vector< std::vector< TSpline3* > > > > dev_1D_vec;
-  std::vector< std::vector< std::vector< std::vector< std::vector< TSpline3* > > > > > dev_2D_vec;
-
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-
-  std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > > dev_1D_vec;
-  std::vector< std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > > > dev_2D_vec;
-
-#endif
-
-  //Store weights for each eval spline
-  std::vector< std::vector< std::vector< std::vector< double > > > > dev_1D_w;
-  std::vector< std::vector< std::vector< std::vector< std::vector< double > > > > > dev_2D_w;
-
-  //This basically just keeps a collection of one spline parameter
-  //together with the name of the spline and is used to get the
-  //splines out of the spline root file
-  //There are two implementations depending on whether you're using
-  //reduced TSpline3s or not.
-#if USE_SPLINE_FD == USE_TSpline3_FD
-  //First a struct to hold Enu-Var1 splines
-  struct syst{
-	std::string name;
-	std::vector< std::vector< std::vector< TSpline3* > > > * spline;
+  //ETA - do all of these functions and members actually need to be public?
   public:
-    syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3* > > >* splinein){
-      name=namein;
-      spline=splinein;
-    };
-  };
+	//splineFDBase(const char *spline, int nutype, int nevents, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1 splines
+	//splineFDBase(const char *spline, int nutype, int nevents, double BinningOpt, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1-var2 splines
+	splineFDBase(covarianceXsec *xsec_ = NULL);
+	virtual ~splineFDBase(){};
+	void SetupSplines();
+	void SetupSplines(int BinningOpt);
 
-  //First a struct to hold Enu-Var1-Var-2 splines
-  struct syst2D{
-    std::string name;
-    std::vector< std::vector< std::vector< std::vector< TSpline3* > > > >* spline;
-	public:
-    syst2D(std::string namein,    std::vector<std::vector< std::vector< std::vector< TSpline3* > > > >* splinein){
-      name=namein;
-      spline=splinein;
-    };
-  };
+	void FindUniqueModes();
 
-#elif USE_SPLINE_FD == USE_TSpline3_red_FD
-  //First a struct to hold Enu-Var1 splines
-  struct syst{
-	std::string name;
-	std::vector< std::vector< std::vector< TSpline3_red* > > > * spline;
-  public:
-    syst(std::string namein,    std::vector< std::vector< std::vector< TSpline3_red* > > >* splinein){
-      name=namein;
-      spline=splinein;
-    };
-  };
+    //Spline Monolith things
+	//Essential methods used externally
+	//Move these to splineFDBase in core
+	bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames);
+	void TransferToMonolith();	
+	void cleanUpMemory(){
+	  //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
+	  //Not a huge saving but it's better than leaving everything up to the compiler
+	  std::cout<<"Cleaning up spline memory"<<std::endl;
 
-  //First a struct to hold Enu-Var1-Var-2 splines
-  struct syst2D{
-    std::string name;
-    std::vector< std::vector< std::vector< std::vector< TSpline3_red* > > > >* spline;
-	public:
-    syst2D(std::string namein,    std::vector<std::vector< std::vector< std::vector< TSpline3_red* > > > >* splinein){
-      name=namein;
-      spline=splinein;
-    };
-  };
-#endif
+	  indexvec.clear();
+	  indexvec.shrink_to_fit();
+	  SplineFileParPrefixNames.clear();
+	  SplineFileParPrefixNames.shrink_to_fit();
+	  SplineBinning.clear();
+	  SplineBinning.shrink_to_fit();
+	  SplineParsIndex.clear();
+	  SplineParsIndex.shrink_to_fit();
+	  UniqueSystNames.clear();
+	  UniqueSystNames.shrink_to_fit();
+	  splinevec_Monolith.clear();
+	  splinevec_Monolith.shrink_to_fit();
+	  delete isflatarray;
+	}
+
+	//Have to define this in your own class 
+	virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)=0;
+	virtual std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector)=0;
+	virtual std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)=0;
+
+	std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
+
+	int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
+	int getNDim(int BinningOpt);
+	TString getDimLabel(int BinningOpt, int Axis);
+	int getSampleIndex(std::string SampleName);
+	bool isValidSplineIndex(std::string SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
+
+	void BuildSampleIndexingArray(std::string SampleName);
+	void PrepForReweight();
+	void getSplineCoeff_SepMany(int splineindex, __float__ *& xArray, __float__ *&manyArray);
+	void PrintBinning(TAxis* Axis);
+	void PrintSampleDetails(std::string SampleName);
+	void PrintArrayDetails(std::string SampleName);
+	void PrintArrayDimension();
+	void FindSplineSegment();
+	void calcWeights();
+
+	const double* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
+	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
+	  return &weightvec_Monolith[index];
+	}
+
+
+  protected:
+	covarianceXsec* xsec;
+
+	//And now the actual member variables	
+	std::vector<std::string> SampleNames;
+	std::vector<int> BinningOpts;
+	std::vector<int> Dimensions;
+	std::vector<int> DetIDs;
+	std::vector<int> nSplineParams;
+	std::vector<int> nOscChans;
+
+	std::vector< std::vector<int> > SplineParsIndex;
+	std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
+	std::vector< std::vector<std::string> > SplineFileParPrefixNames;
+	//A vector of vectors of the spline modes that a systematic applies to
+	//This gets compared against the event mode to figure out if a syst should 
+	//apply to an event or not
+	std::vector< std::vector< std::vector<int> > > SplineModeVecs;
+
+	int nUniqueSysts;
+	std::vector<std::string> UniqueSystNames;
+	std::vector<int> UniqueSystIndices;
+	std::vector<int> UniqueSystNKnots;
+	std::vector<int> UniqueSystCurrSegment;
+	std::vector< std::vector<__float__> > UniqueSystXPts;
+
+	// //DB Variables related to determined which modes have splines and which piggy-back of other modes
+	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
+	std::vector<int > coeffindexvec;
+	std::vector<int>uniquecoeffindices; //Unique coefficient indices
+
+	std::vector< TSpline3_red* > splinevec_Monolith;
+
+	int MonolithSize;
+	int MonolithIndex;
+	int CoeffIndex;
+
+	//Probably need to clear these arrays up at some point
+	__float__ *xVarArray;
+	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
+	__float__ *xcoeff_arr;    //x coefficients for each spline
+	__float__ *manycoeff_arr; //ybcd coefficients for each spline
+
+	std::vector<double> weightvec_Monolith;
+	std::vector<int> uniquesplinevec_Monolith;
+
+	//Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
+	enum SplineSegmentCoeffs{kCoeffY=0, kCoeffB=1, kCoeffC=2, kCoeffD=3};
 };
 #endif

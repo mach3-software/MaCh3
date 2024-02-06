@@ -13,6 +13,7 @@
 
 // ROOT includes
 #include "TObjArray.h"
+#include "TObjString.h"
 #include "TChain.h"
 #include "TFile.h"
 #include "TBranch.h"

@@ -26,9 +26,8 @@ set(mcmc_header_files
     stretch.h
     MCMCProcessor.h)
 
-
 if(NOT ${CPU_ONLY})
-  add_library(Splines SHARED ${mcmc_implementation_files})
+  add_library(MCMC SHARED ${mcmc_implementation_files})
   target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
   add_library(gpuMCMC gpuMCMCProcessorUtils.cu)
   set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
@@ -37,7 +36,7 @@ if(NOT ${CPU_ONLY})
 else()
     add_library(MCMC SHARED ${mcmc_implementation_files_CPU})
     target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-    target_link_libraries(MCMC Manager)
+	target_link_libraries(MCMC Manager ROOT::ROOT)
 endif()
 
 set_target_properties(MCMC PROPERTIES 

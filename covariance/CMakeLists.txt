@@ -10,8 +10,8 @@ set(Covariance_header_files
 	covarianceXsec.cpp)
 
 add_library(Covariance SHARED ${Covariance_implementation_files})
-target_include_directories(Covariance PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(Covariance ThrowParms ROOT::ROOT)
+target_include_directories(Covariance INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(Covariance ThrowParms ROOT::ROOT Manager)
 
 set_target_properties(Covariance PROPERTIES 
   PUBLIC_HEADER "${Covariance_header_files}"

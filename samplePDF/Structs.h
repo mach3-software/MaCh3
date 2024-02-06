@@ -16,6 +16,9 @@
 #define __unsigned_int__ unsigned int
 #endif
 
+//
+#define __TH2PolyOverflowBins__ 9
+
 // Include some healthy defines for constructors
 #define __BAD_DOUBLE__ -999.99
 #define __BAD_INT__ -999
@@ -952,6 +955,37 @@ inline int PDGToProbs(NuPDG pdg){
   return ReturnProbNu;
 }
 
+inline int ProbsToPDG(ProbNu NuType){
+
+  int ReturnNuPDG = -999;
+
+  switch (NuType){
+	case kProbNue:
+	  ReturnNuPDG = static_cast<int>(kNue);
+	  break;
+	case kProbNumu:
+	  ReturnNuPDG = static_cast<int>(kNumu);
+	  break;
+	case kProbNutau:
+	  ReturnNuPDG = static_cast<int>(kNutau);
+	  break;
+	case kProbNueBar:
+	  ReturnNuPDG = static_cast<int>(kNueBar);
+	  break;
+	case kProbNumuBar:
+	  ReturnNuPDG = static_cast<int>(kNumuBar);
+	  break;
+	case kProbNutauBar:
+	  ReturnNuPDG = static_cast<int>(kNutauBar);
+	  break;
+	default:
+	  std::cout << "Unrecognised NuType for the neutrino so can't map this to a PDG code" << std::endl;
+	  break;
+  }
+
+  return ReturnNuPDG;
+}
+
 // Make an enum of the test statistic that we're using
 enum TestStatistic {
   kPoisson,
@@ -1044,4 +1078,76 @@ double returnCherenkovThresholdMomentum(int PDG);
 
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
 double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
+
+
+enum CUDAProb_nu {
+  e_e = 0,
+  e_m = 1,
+  e_t = 2,
+  m_e = 3,
+  m_m = 4,
+  m_t = 5,
+  t_e = 6,
+  t_m = 7,
+  t_t = 8
+};
+ 
+
+// ************************************************
+// Get CUDAProb3 flavour from intital and final states
+inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
+//*************************************************  
+    
+  switch (abs(nu_i)) {
+  case 1:
+    switch (abs(nu_f)) {
+    case 1:
+      return CUDAProb_nu::e_e;
+      break;
+    case 2:
+      return CUDAProb_nu::e_m;
+      break;
+    case 3:
+      return CUDAProb_nu::e_t;
+      break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
+    } 
+  case 2:
+    switch (abs(nu_f)) {
+    case 1:
+      return CUDAProb_nu::m_e;
+      break;
+    case 2:
+      return CUDAProb_nu::m_m;
+      break;
+    case 3:
+      return CUDAProb_nu::m_t;
+      break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
+    } 
+  case 3:
+    switch (abs(nu_f)) {
+    case 1:
+      return CUDAProb_nu::t_e;
+      break;
+    case 2:
+      return CUDAProb_nu::t_m;
+      break;
+    case 3:
+      return CUDAProb_nu::t_t;
+      break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
+    }
+  default:
+	std::cout << "Unknow flavour " << nu_i << std::endl;
+	throw;
+  }
+
+}
 #endif

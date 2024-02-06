@@ -21,14 +21,6 @@
 #include "TTree.h"
 #include "TBranch.h"
 
-// MaCh3 samplePDF includes
-#include "samplePDF/Structs.h"
-
-// Only needed to Get number of threads
-// Could alternatively set-up by setting a static global?
-#ifdef MULTITHREAD
-#include <omp.h>
-#endif
 
 //******************************************************
 // This class reads the configuration file config.cfg
@@ -48,6 +40,8 @@ private:
   YAML::Node config;
 
 /*
+ * Keeping this all here as we should start adding in functions here to do reading
+ * of different options
  public:
   manager(char *config, bool print = true);
   virtual ~manager();

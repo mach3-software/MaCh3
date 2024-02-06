@@ -91,6 +91,31 @@ namespace MaCh3Utils {
 
 }
 
+//KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
+// However if you use ROOT6 and have ROOT6 file exactly the same code will work. Somethingm ust have changed with how TH2Poly bins are stored in TFile
+void CheckTH2PolyFileVersion(TFile *file)
+{
+    int FileROOTVersion = file->GetVersion();
+    int MainFileROOTVersion = FileROOTVersion;
+
+    // Remove last digit from number
+    // till only one digit is left
+    while (MainFileROOTVersion >= 10)
+        MainFileROOTVersion /= 10;
+
+    std::string SystemROOTVersion = std::string(ROOT_RELEASE);
+    int MainSystemROOTVersion = SystemROOTVersion.at(0)  - '0';
+
+    if(MainFileROOTVersion != MainSystemROOTVersion)
+    {
+        std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
+        std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
+        std::cerr<<"For some docuemntation please visit me"<<std::endl;
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        throw;
+    }
+}
+
 // **************************************************
 // Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly) {
@@ -322,31 +347,6 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
   }
 
   return integral;
-}
-
-//KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
-// However if you use ROOT6 and have ROOT6 file exactly the same code will work. Somethingm ust have changed with how TH2Poly bins are stored in TFile
-void CheckTH2PolyFileVersion(TFile *file)
-{
-    int FileROOTVersion = file->GetVersion();
-    int MainFileROOTVersion = FileROOTVersion;
-
-    // Remove last digit from number
-    // till only one digit is left
-    while (MainFileROOTVersion >= 10)
-        MainFileROOTVersion /= 10;
-
-    std::string SystemROOTVersion = std::string(ROOT_RELEASE);
-    int MainSystemROOTVersion = SystemROOTVersion.at(0)  - '0';
-
-    if(MainFileROOTVersion != MainSystemROOTVersion)
-    {
-        std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
-        std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
-        std::cerr<<"For some docuemntation please visit me"<<std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
-    }
 }
 
 // ****************

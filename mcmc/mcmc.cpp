@@ -6,13 +6,15 @@
 mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
 
+  //random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());  
+  //ETA - currently don't have this in manager as it needs some love 
   // Beginning step number
   stepStart = 0;
 
   // Starting parameters should be thrown
   init_pos = false;
   reject = false;
-  chainLength = fitMan->raw()["General.NSteps"].as<double>();
+  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<double>();
 
   //ETA - currently don't have this in manager as it needs some love
   //AnnealTemp = fitMan->GetTemp();
@@ -24,8 +26,6 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
     anneal = true;
   }
 }
-
-
 
 // *************************
 // Destructor: close the logger and output file
@@ -120,10 +120,7 @@ void mcmc::CheckStep() {
     if (osc) {
       osc->acceptStep();
     }
-    if (osc2) {
-      osc2->acceptStep();
-    }
-
+    
     // Loop over systematics and accept
     for (size_t s = 0; s < systematics.size(); ++s) {
       systematics[s]->acceptStep();
@@ -194,7 +191,7 @@ void mcmc::ProcessMCMC() {
   if (fitMan == NULL) return;
 
   // Process the MCMC
-  if (fitMan->raw()["General.ProcessMCMC"].as<bool>()) {
+  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
 
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()), false);
@@ -225,7 +222,7 @@ void mcmc::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       std::cout << "Opening output again to update with means..." << std::endl;
-      outputFile = new TFile(fitMan->raw()["General.Output.Filename"].as<std::string>().c_str(), "UPDATE");
+      outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
     }
 
     
@@ -253,74 +250,9 @@ void mcmc::ProposeStep() {
   if (osc) {
     osc->proposeStep();
 
-    // If we have separate neutrino and anti-neutrino oscillation parameters
-    if (osc2) {
-      osc2->proposeStep();
-
-      // Fix some parameters in osc equal to osc2 (if it's set in equalOscPar)
-
-      // double* returned by getPropPars() has oscpar[0-5] as you would expect (theta12, 
-      // theta23, theta13, dm21, dm32, dcp), oscpar[6] = 2, oscpar[7] = L, 
-      // and oscpar[8] = density. If beta is present it has oscpar[9] = beta. 
-      // We don't want this - the vector<double> given to setParameters() should have
-      // only the oscillation parametes (so size = 6 if no beta, or 7 if using beta).
-      // Construct the correct vector in the loop (at the same time as setting some
-      // parameters equal between osc and osc2 if desired)
-
-      double* osc_proppars = osc->getPropPars();
-      double* osc2_proppars = osc2->getPropPars();
-      std::vector<double> oscpars;
-      std::vector<double> oscpars2;
-
-      for (int par = 0; par < int(osc->getSize()+3); par++) {
-        // skip the extra entries
-        if (par==6 || par==7 || par==8) {
-          continue;
-
-          // normal osc pars
-        } else if (par<6) {
-          // Set correct parameter values for osc = osc2
-          if (equalOscPar[par]==1) {
-            osc_proppars[par] = osc2_proppars[par];
-          }
-
-          // Set same mass hierarchy if desired
-          // dm2
-          if (equalMH && par==4) {
-            double sign = osc_proppars[par]*osc2_proppars[par]; // +ve if both are same MH, -ve if not
-            if (sign<0) {
-              osc_proppars[par]*=(-1.0);
-            }
-          }
-
-          // Now make vectors
-          oscpars.push_back(osc_proppars[par]);
-          oscpars2.push_back(osc2_proppars[par]);
-          // beta
-        } else if (par==9) {
-
-          // Set correct parameter values for osc = osc2
-          if (equalOscPar[par]==1) {
-            osc_proppars[par] = osc2_proppars[par];
-          }
-
-          // Now make vectors
-          oscpars.push_back(osc_proppars[par]);
-          oscpars2.push_back(osc2_proppars[par]);
-        }
-      }
-
-      // Now set the correct parameters
-      osc->setParameters(oscpars);
-      osc2->setParameters(oscpars2);
-    }
-
     // Now get the likelihoods for the oscillation
-    osc_llh = osc->getLikelihood();
-    if (osc2) {
-      osc_llh += osc2->getLikelihood();
-    }
-
+    osc_llh = osc->GetLikelihood();
+    
     // Add the oscillation likelihoods to the reconfigure likelihoods
     llh += osc_llh;
 
@@ -338,7 +270,7 @@ void mcmc::ProposeStep() {
     }
 
     // Get the likelihood from the systematics
-    syst_llh[stdIt] = (*it)->getLikelihood();
+    syst_llh[stdIt] = (*it)->GetLikelihood();
     llh += syst_llh[stdIt];
 
     if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
@@ -360,9 +292,7 @@ void mcmc::ProposeStep() {
     for (size_t i = 0; i < samples.size(); i++) {
 
       // If we're running with different oscillation parameters for neutrino and anti-neutrino
-      if (osc && osc2) {
-        samples[i]->reweight(osc->getPropPars(), osc2->getPropPars());
-      } else if (osc) {
+      if (osc ){ 
         samples[i]->reweight(osc->getPropPars());
         // If we aren't using any oscillation
       } else {
@@ -374,7 +304,7 @@ void mcmc::ProposeStep() {
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
     for (size_t i = 0; i < samples.size(); i++) {
       // Get the sample likelihoods and add them
-      sample_llh[i] = samples[i]->getLikelihood();
+      sample_llh[i] = samples[i]->GetLikelihood();
       llh += sample_llh[i];
       if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
     }
