@@ -29,7 +29,7 @@ set(mcmc_header_files
 if(NOT ${CPU_ONLY})
   add_library(MCMC SHARED ${mcmc_implementation_files})
   target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-  add_library(gpuMCMC gpuMCMCProcessorUtils.cu)
+  add_library(gpuMCMCProcessorUtils gpuMCMCProcessorUtils.cu)
   set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
   set_property(TARGET gpuMCMCProcessorUtils MCMC PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
   target_link_libraries(gpuMCMCProcessorUtils)
