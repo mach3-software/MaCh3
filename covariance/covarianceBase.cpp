@@ -561,7 +561,7 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 // Might want to split this
 void covarianceBase::setPar(int i , double val) {
 
-  std::cout << "Over-riding " << getParName(i) << ": " << std::endl;
+  std::cout << "Over-riding " << GetParName(i) << ": " << std::endl;
   std::cout << "_fPropVal (" << _fPropVal[i];
   std::cout << "), _fCurrVal (" << _fCurrVal[i];
   std::cout << "), _fPreFitValue (" << _fPreFitValue[i]; 
@@ -776,7 +776,7 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
   // *************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  std::cout << "Setting " << getParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
+  std::cout << "Setting " << GetParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
 
   if (pca) TransferToPCA();
 }
@@ -784,7 +784,7 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
 void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  std::cout << "Setting " << getParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
+  std::cout << "Setting " << GetParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
   if (pca) TransferToPCA();
 }
 
@@ -976,7 +976,7 @@ void covarianceBase::throwParCurr(const double mag)
 void covarianceBase::printNominal() {
   std::cout << "Prior values for " << getName() << " covarianceBase: " << std::endl;
   for (int i = 0; i < size; i++) {
-    std::cout << "    " << getParName(i) << "   " << getParInit(i) << "\n";
+    std::cout << "    " << GetParName(i) << "   " << getParInit(i) << "\n";
   }
   std::cout << std::endl;
 }
@@ -994,7 +994,7 @@ void covarianceBase::printNominalCurrProp() {
   }
   std::cout << std::setw(PrintLength) << std::left << "Name" << std::setw(PrintLength) << "Prior" << std::setw(PrintLength) << "Current" << std::setw(35) << "Proposed" << "\n";
   for (int i = 0; i < size; ++i) {
-    std::cout << std::setw(PrintLength) << std::left << getParName(i) << std::setw(PrintLength) << _fPreFitValue[i] << std::setw(PrintLength) << _fCurrVal[i] << std::setw(PrintLength) << _fPropVal[i] << "\n";
+    std::cout << std::setw(PrintLength) << std::left << GetParName(i) << std::setw(PrintLength) << _fPreFitValue[i] << std::setw(PrintLength) << _fCurrVal[i] << std::setw(PrintLength) << _fPropVal[i] << "\n";
   }
    //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
   std::cout << std::endl;
@@ -1035,7 +1035,6 @@ int covarianceBase::CheckBounds(){
   for (int i = 0; i < _fNumPar; i++){
       //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
       if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-		std::cout << "_fPropVal at param " << i << "( " << getParName(i) << ") is out of bounds, param is at " << _fPropVal[i] << " and UB is " << _fUpBound[i] << " and LB is " << _fLowBound[i] << std::endl;
         NOutside++;
       }
   }
@@ -1055,9 +1054,7 @@ double covarianceBase::GetLikelihood(){
 	  // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
 	  //if (_fPropVal[i] < 0) {std::cout << "_fPropVal at " << i << " is " << _fPropVal[i] << std::endl;}
 	//}
-	std::cout << "Parameters outside of bounds!" << std::endl;
-	std::cout << "NOutside is " << NOutside << std::endl;
-    return NOutside*__LARGE_LOGL__;
+	return NOutside*__LARGE_LOGL__;
   }
 
   return CalcLikelihood();
@@ -1096,7 +1093,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
     for (unsigned int i = 0; i < parsSize; i++) {
 	  //Make sure that you are actually passing a number to set the parameter to
 	  if(isnan(pars[i])) {
-		std::cerr << "Error: trying to set parameter value to a nan for parameter " << getParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
+		std::cerr << "Error: trying to set parameter value to a nan for parameter " << GetParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
 		throw;
 	  } else {
 		_fPropVal[i] = pars[i];
@@ -1155,7 +1152,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  throw;
 	} else {
 	  _fError[i] *= -1.0;
-	  std::cout << "Setting " << getParName(i) << "(parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
+	  std::cout << "Setting " << GetParName(i) << "(parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
 	} 
   } else {
 	int isDecom = -1;
@@ -1163,11 +1160,11 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  if(isDecomposed_PCA[im] == i) {isDecom = im;}
 	}
 	if(isDecom < 0) {
-	  std::cerr << "Parameter " << getParName(i) << " is PCA decomposed can't fix this" << std::endl;
+	  std::cerr << "Parameter " << GetParName(i) << " is PCA decomposed can't fix this" << std::endl;
 	  //throw; 
 	} else {
 	  fParSigma_PCA[isDecom] *= -1.0;
-	  std::cout << "Setting un-decomposed " << getParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
+	  std::cout << "Setting un-decomposed " << GetParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
 	}
   }
   
@@ -1181,7 +1178,7 @@ void covarianceBase::setEvalLikelihood(int i, bool eL) {
     std::cerr << "Fix this in your config file please!" << std::endl;
     throw;
   } else {
-    std::cout << "Setting " << getParName(i) << " (parameter " << i << ") to flat prior? " << eL << std::endl;
+    std::cout << "Setting " << GetParName(i) << " (parameter " << i << ") to flat prior? " << eL << std::endl;
     _fFlatPrior[i] = eL;
   }
 }

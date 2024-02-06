@@ -33,8 +33,8 @@ bool splineFDBase::AddSample(std::string SampleName, int BinningOpt, int DetID, 
   std::vector<int> SplineParsIndex_Sample = xsec->GetSplineParsIndexFromDetID(DetID);
   SplineParsIndex.push_back(SplineParsIndex_Sample);
 
-  std::cout << "Filling with GetSplineFileParsNamesFromDetID" << std::endl;
-  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineFileParsNamesFromDetID(DetID);
+  std::cout << "Filling with GetFDSplineFileParsNamesFromDetID" << std::endl;
+  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetFDSplineFileParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
@@ -72,8 +72,11 @@ void splineFDBase::TransferToMonolith()
   //FindUniqueModes();
   PrepForReweight(); 
   MonolithSize = CountNumberOfLoadedSplines();
+
   if(MonolithSize!=MonolithIndex){
     std::cerr<<"Something's gone wrong when we tried to get the size of your monolith"<<std::endl;
+	std::cout << "MonolishSize is " << MonolithSize << std::endl;
+	std::cout << "MonolithIndex is " << MonolithIndex << std::endl;
     std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
     throw;
   }
@@ -536,6 +539,9 @@ void splineFDBase::PrepForReweight()
     { // Loop over systematics
       std::string SystName = SplineFileParPrefixNames[iSample][iSyst];
       bool FoundSyst = false;
+
+	  //ETA - this always seems to be empty to begin with??
+	  //so this loop never gets used?
       for (unsigned int iFoundSyst = 0; iFoundSyst < UniqueSystNames.size(); iFoundSyst++)
       {
         if (SystName == UniqueSystNames[iFoundSyst])
@@ -592,6 +598,7 @@ void splineFDBase::PrepForReweight()
             break;
           }
         }//osc loop end
+
         if (!FoundNonFlatSpline)
         {
           std::cerr << SystName << " syst has no response in sample " << iSample << std::endl;

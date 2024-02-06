@@ -58,7 +58,6 @@ class covarianceBase {
   void setPar(const int i, const double val);
   void setParCurrProp(int i, double val);
   void setParProp(int i, double val) {
-    std::cout << "Setting " << getParName(i) << " to " << val << std::endl; 
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
   };
@@ -100,17 +99,20 @@ class covarianceBase {
   virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
-  // ETA - Why is this virtual?
-  virtual const char* getParName(const int i) const {
+  std::string GetParName(const int i) {return _fNames[i];};
+  const char* GetParName(const int i) const {
     return _fNames[i].c_str();
+  };
+  std::string GetParFancyName(const int i) {return _fFancyNames[i];};
+  const char* GetParFancyName(const int i) const {
+    return _fFancyNames[i].c_str();
   };
   std::string const getInputFile() const { return inputFile; };
 
   // Get diagonal error for ith parameter
-  const double getDiagonalError(const int i) { 
+  double getDiagonalError(const int i) { 
     return sqrt((*covMatrix)(i,i));
   }
-
 
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -140,21 +142,28 @@ class covarianceBase {
   //========
   const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
+  //Some Getters
+  int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
+  const std::vector<double>& getGeneratedValues(){return _fGenerated;};
   const std::vector<double> getProposed() const;
-  const double getParProp(const int i) {
+  double getParProp(const int i) {
     return _fPropVal[i]; 
   };
-  const double getParCurr(const int i) {
+  double getParCurr(const int i) {
     return _fCurrVal[i];
   };
-  const double getParInit(const int i) {
+  double getParInit(const int i) {
     return _fPreFitValue[i];
   };
 
   virtual const double getNominal(const int i) {
     return getParInit(i);
   };
+
+  double GetGenerated(const int i) {
+    return _fGenerated[i];
+  }
 
   double GetUpperBound(const int i){
     return _fUpBound[i];
@@ -164,14 +173,15 @@ class covarianceBase {
     return _fLowBound[i];
   }
 
-  const double getParProp_PCA(const int i) {
+  double getParProp_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;
     }
     return fParProp_PCA(i);
   };
-  const double getParCurr_PCA(const int i) {
+  
+  double getParCurr_PCA(const int i) {
     if (!pca) {
       std::cerr << "Am not running in PCA mode" << std::endl;
       throw;
@@ -355,6 +365,7 @@ class covarianceBase {
   //ideally these should all be private and we have setters be protected 
   //setters and public getters
   std::vector<std::string> _fNames;
+  std::vector<std::string> _fFancyNames;
   int _fNumPar;
   YAML::Node _fYAMLDoc;
   std::vector<double> _fPreFitValue;
@@ -373,7 +384,12 @@ class covarianceBase {
   //TMatrixT<double> *_fCovMatrix;
 
   //Some "usual" variables. Don't think we really need the ND/FD split
-  std::vector<int> _fNormModes;
+  std::vector<std::vector<int>> _fNormModes;
+  std::vector<std::vector<int>> _fTargetNuclei;
+  std::vector<std::vector<int>> _fNeutrinoFlavour;
+  std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
+
+  //Variables related to spline systematics
   std::vector<std::string> _fNDSplineNames;
   std::vector<std::string> _fFDSplineNames;
   std::vector<std::vector<int>> _fFDSplineModes;

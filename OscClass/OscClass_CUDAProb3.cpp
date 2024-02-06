@@ -901,6 +901,7 @@ void Oscillator::Reset(int NeutrinoSignIndex, int InitialNeutrinoIndex, int Fina
 }
 
 bool Oscillator::isAlreadyCalculated(double* oscpar, double prodH, double Yp_Val) {
+
   bool fAlreadyCalculated = true;
   for (int i=0;i<nOscpars;i++) {
     if (oscpar[i]!=foscpar[i]) {

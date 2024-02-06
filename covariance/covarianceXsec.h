@@ -28,36 +28,33 @@ class covarianceXsec : public covarianceBase {
     // General Getter functions not split by detector
 	// ETA - a lot of these can go... they're just duplications from the base
 	// class.
-    const double GetParamUpperBound(const int i) {return xsec_param_ub_a[i];}
-    const double GetParamLowerBound(const int i) {return xsec_param_lb_a[i];}
-    const double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
+    double GetParamUpperBound(const int i) {return _fUpBound[i];}
+    double GetParamLowerBound(const int i) {return _fLowBound[i];}
+    double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
     const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
 	//ETA - just return the int of the DetID, this can be removed to do a string comp
 	//at some point.
-    const int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
+    int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
 	//ETA - just return a string of "spline", "norm" or "functional"
     const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
-    const std::string & GetParameterName(const int i) const {return xsec_param_names[i];}
-    const int    GetNumParams()               {return nPars;}
-    const char* GetParName(const int i) const {return xsec_param_names[i].c_str();}
 
 	//ETA - trying out the yaml parsing
 	void ParseYAML(const char* FileName);
 
-    const bool IsParFlux(const int i){
+    bool IsParFlux(const int i){
       return isFlux[i];
     }
 
 	//ETA - these can be removed as Near params will be given by DetID so this is defunct.
     // Get functions for Near normalisation parameters
     const std::vector<XsecNorms4> GetNearNormPars() const{return NearNormParams;}
-    const int                     GetNumNearNormParams() const  {return nNearNormParams;}
+    int                     GetNumNearNormParams() const  {return nNearNormParams;}
 
     // Get functions for Far normalisation parameters
     const std::vector<XsecNorms4> GetFarNormPars() const{return FarNormParams;}
 
     // Get functions for Near spline parameters
-    const int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
+    int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
     const std::vector<std::string>& GetNearSplineParsNames() const  {return NearsplineParsNames;}
     const std::vector<std::string>& GetNearSplineFileParsNames() const  {return NearSplineFileParsNames;}
     const std::vector<int>&         GetNearSplineParsIndex() const  {return NearsplineParsIndex;}
@@ -66,13 +63,15 @@ class covarianceXsec : public covarianceBase {
     //DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
+    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
+    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
-    const int GetNumSplineParamsFromDetID(int DetID);
+    int GetNumSplineParamsFromDetID(int DetID);
 
     //DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
-    const int GetNumFuncParamsFromDetID(int DetID);
+    int GetNumFuncParamsFromDetID(int DetID);
     const std::vector<std::string> GetFuncParsNamesFromDetID(int DetID);
     const std::vector<int> GetFuncParsIndexFromDetID(int DetID);
 
@@ -138,20 +137,17 @@ class covarianceXsec : public covarianceBase {
     
     // What parameter Gets reweighted by what amount according to MCMC
     inline double calcReWeight(const int bin){
-	  if (bin >= 0 && bin < nPars) {
+	  if (bin >= 0 && bin < _fNumPar) {
 		return _fPropVal[bin];
 	  } else {
 		std::cerr << "Specified bin is <= 0 OR bin > npar!" << std::endl;
-		std::cerr << "bin = " << bin << ", npar = " << nPars << std::endl;
+		std::cerr << "bin = " << bin << ", npar = " << _fNumPar << std::endl;
 		std::cerr << "This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!" << std::endl;
 		return 1.0;
 	  }
 
 	  return 1.0;  
 	}; 
-
-    //int *BoundaryHits;
-
 
   protected:
     // Helper functions to decide on what setup we're running
@@ -193,10 +189,6 @@ class covarianceXsec : public covarianceBase {
     double *xsec_param_ub_a;
     // priors from external data fit
     double *xsec_param_prior_a;
-
-    // Contains the parameter names
-	// ETA - don't think we need this anymore tbh
-    std::vector<std::string> xsec_param_names;
     
     //Contains the names of the Far spline objects in the spline files
     TObjArray* xsec_param_fd_spline_names;
@@ -205,12 +197,11 @@ class covarianceXsec : public covarianceBase {
     std::vector<bool> isFlux;
 
     // Number of total parameters, just scanned from input root file
-    int nPars;
-
+    //int nPars;
 
     int nTotalNormParams;
-
     int nFaronlyNormParams;//Needed for consistency check
+	//ETA - we can maybe remove these for now
     int nLowEnergyAtmOnlyNormParams;//DB Needed for consistency check
     int nHighEnergyAtmOnlyNormParams;//DB Needed for consistency check
 
@@ -240,7 +231,6 @@ class covarianceXsec : public covarianceBase {
     //mode=12 (which is kMaCh3_nModes for NIWG2020 model) means it applies to all modes
     //TVectorT<double> *FarSplineParsModes;
     std::vector<std::vector<int> > FarSplineModes;
-    //double *xsec_fd_spline_mode_a;
 
     // Number of spline parameters that aren't repeated
     int nSplineParamsUniq;
@@ -265,11 +255,8 @@ class covarianceXsec : public covarianceBase {
     std::vector<int> FarFuncParsIndex;
 
   private:
-	//std::vector<std::string> _fNames;
-	std::vector<std::string> _fFancyNames;
-
 	//ETA - do we need these now?
-	std::vector<std::vector<int>> _fNormModes;
+	// it would be nice if we could get rid of these
 	std::vector<std::string> _fNDSplineNames;
 	std::vector<std::string> _fFDSplineNames;
 	std::vector<std::vector<int>> _fFDSplineModes;

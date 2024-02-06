@@ -152,13 +152,15 @@ public:
   void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
   //===============================================================================
 
+  //ETA - a function to setup and pass values to functional parameters where
+  //you need to pass a value to some custom reweight calc or engine
+  virtual void PrepFunctionalParameters(){};
   //ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){};
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(int iSample, int iEvent); 
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
-  virtual void reconfigureFuncPars(){};
 
   void CalcXsecNormsBins(int iSample);
   //This just gets read in from a yaml file
@@ -264,7 +266,6 @@ public:
   // like in XsecNorms but for events in sample. Read in from sample yaml file
   // in samplePDFExperimentBase.cpp
   std::vector< std::vector<double> > SelectionBounds;
-
 
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection

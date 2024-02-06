@@ -961,22 +961,22 @@ inline int ProbsToPDG(ProbNu NuType){
 
   switch (NuType){
 	case kProbNue:
-	  ReturnNuPDG = kNue;
+	  ReturnNuPDG = static_cast<int>(kNue);
 	  break;
 	case kProbNumu:
-	  ReturnNuPDG = kNumu;
+	  ReturnNuPDG = static_cast<int>(kNumu);
 	  break;
 	case kProbNutau:
-	  ReturnNuPDG = kNutau;
+	  ReturnNuPDG = static_cast<int>(kNutau);
 	  break;
 	case kProbNueBar:
-	  ReturnNuPDG = kNueBar;
+	  ReturnNuPDG = static_cast<int>(kNueBar);
 	  break;
 	case kProbNumuBar:
-	  ReturnNuPDG = kNumuBar;
+	  ReturnNuPDG = static_cast<int>(kNumuBar);
 	  break;
 	case kProbNutauBar:
-	  ReturnNuPDG = kNutauBar;
+	  ReturnNuPDG = static_cast<int>(kNutauBar);
 	  break;
 	default:
 	  std::cout << "Unrecognised NuType for the neutrino so can't map this to a PDG code" << std::endl;
@@ -1110,6 +1110,9 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
     case 3:
       return CUDAProb_nu::e_t;
       break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
     } 
   case 2:
     switch (abs(nu_f)) {
@@ -1122,6 +1125,9 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
     case 3:
       return CUDAProb_nu::m_t;
       break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
     } 
   case 3:
     switch (abs(nu_f)) {
@@ -1134,7 +1140,13 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
     case 3:
       return CUDAProb_nu::t_t;
       break;
+	default:
+	  std::cout << "Unknow flavour " << nu_f << std::endl;
+	  throw;
     }
+  default:
+	std::cout << "Unknow flavour " << nu_i << std::endl;
+	throw;
   }
 
 }
