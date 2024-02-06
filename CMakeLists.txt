@@ -78,6 +78,23 @@ if(Eigen_ADDED)
   target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
 endif()
 
+
+# If we're doing GPU stuff, we need the CUDA helper module
+if(MaCh3_GPU_ENABLED)
+    CPMAddPackage(
+        NAME cuda-samples
+        GITHUB_REPOSITORY "NVIDIA/cuda-samples"
+        GIT_TAG v12.3
+	DOWNLOAD_ONLY YES
+    )
+# Now we add the library
+    if(cuda-samples_ADDED)
+         add_library(cuda-samples INTERFACE IMPORTED)
+         target_include_directories(cuda-samples INTERFACE ${cuda-samples_SOURCE_DIR})
+    endif()
+endif()
+
+
 ################################## Oscillation ################################
 
 #If USE_PROB3 not defined turn it off by default
