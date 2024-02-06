@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 # Try to find CUDA
 find_package(CUDAToolkit)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND)
+if(CUDAToolkit_FOUND AND NOT(USE_CPU))
     message(STATUS "CUDA found. Adding CUDA support.")
     SET(MaCh3_GPU_ENABLED TRUE)
     SET(CPU_ONLY FALSE)
@@ -36,9 +36,9 @@ endif()
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
-
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 ################################## Dependencies ################################
+
 include(CPM)
 
 #Luke's handing cmake modules which Neutrino hep experiments might want
