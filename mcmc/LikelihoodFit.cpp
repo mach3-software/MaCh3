@@ -33,8 +33,7 @@ void LikelihoodFit::PrepereFit() {
     NParsPCA += (*it)->getNpars();
   }
 
-  if (osc || osc2)
-  {
+  if (osc) {
     std::cerr<<" Osc not supported "<<std::endl;
     throw;
   }
@@ -104,7 +103,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it, ++stdIt)
   {
     //GetLikelihood will return LargeL if out of bounds, for minimizers this is not the problem, while calcLikelihood will return actual likelihood
-    syst_llh[stdIt] = (*it)->calcLikelihood();
+    syst_llh[stdIt] = (*it)->CalcLikelihood();
     llh += syst_llh[stdIt];
 
     if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
@@ -114,21 +113,19 @@ double LikelihoodFit::CalcChi2(const double* x) {
   for (size_t i = 0; i < samples.size(); i++)
   {
       // If we're running with different oscillation parameters for neutrino and anti-neutrino
-      if (osc && osc2) {
-      samples[i]->reweight(osc->getPropPars(), osc2->getPropPars());
-      } else if (osc) {
-      samples[i]->reweight(osc->getPropPars());
+      if (osc) {
+		samples[i]->reweight(osc->getPropPars());
       // If we aren't using any oscillation
-      } else {
-      double* fake = NULL;
-      samples[i]->reweight(fake);
-      }
+	  } else {
+		double* fake = NULL;
+		samples[i]->reweight(fake);
+	  }
   }
 
   //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
   for (size_t i = 0; i < samples.size(); i++) {
     // Get the sample likelihoods and add them
-    sample_llh[i] = samples[i]->getLikelihood();
+    sample_llh[i] = samples[i]->GetLikelihood();
     llh += sample_llh[i];
     if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
   }

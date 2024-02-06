@@ -46,7 +46,7 @@ void MinuitFit::runFit() {
       for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
       {
           //KS: Index, name, prior, step scale [differrent to MCMC],
-          minuit->SetVariable(ParCounter, ((*it)->getParName(i)), (*it)->getParInit(i), (*it)->getDiagonalError(i)/10);
+          minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->getParInit(i), (*it)->getDiagonalError(i)/10);
           minuit->SetVariableValue(ParCounter, (*it)->getParInit(i));
           //KS: lower bound, upper bound, if Mirroring eneabled then ignore
           if(!fMirroring) minuit->SetVariableLimits(ParCounter, (*it)->GetLowerBound(i), (*it)->GetUpperBound(i));

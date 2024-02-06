@@ -6,7 +6,11 @@
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-  random = new TRandom3(fitMan->raw()["General.Seed"].as<int>());
+  
+  std::cout << "Trying to get information from fitMan" << std::endl;
+  std::cout << "Seed is " << fitMan->raw()["General"]["Seed"].as<int>() << std::endl;
+
+  random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
   accCount = 0;
@@ -15,15 +19,15 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   clock = new TStopwatch;
   stepClock = new TStopwatch;
   // Fit summary and debug info
-  debug = fitMan->raw()["General.Debug"].as<bool>();
-  std::string outfile = fitMan->raw()["General.Output"].as<std::string>().c_str();
+  debug = fitMan->raw()["General"]["Debug"].as<bool>();
+  std::string outfile = fitMan->raw()["General"]["Output"]["FileName"].as<std::string>();
 
   // Could set these from manager which is passed!
   osc_only = false;
 
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = fitMan->raw()["General.AutoSave"].as<int>();
+  auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
   // Do we want to save the nominal parameters to output
   save_nominal = true;
 
@@ -42,7 +46,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   samples.clear();
   systematics.clear();
   osc = NULL;
-  osc2 = NULL;
 
   sample_llh = NULL;
   syst_llh = NULL;
@@ -81,9 +84,6 @@ void FitterBase::PrepareOutput() {
   if (osc) {
     osc->setBranches(*outTree);
     outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
-  }
-  if (osc2) {
-    osc2->setBranches(*outTree);
   }
 
   outTree->Branch("LogL", &logLCurr, "LogL/D");
@@ -153,6 +153,8 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // *************************
   std::cout << "Adding samplePDF object " << std::endl;
   samples.push_back(sample);
+
+  return;
 }
 
 
@@ -179,6 +181,7 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
     delete[] n_vec;
   }
 
+  return;
 }
 
 // *************************
@@ -188,7 +191,6 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
 // *************************
 
   osc = oscf;
-  osc2 = NULL;
 
   if (save_nominal) {
 
@@ -204,6 +206,8 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
     t_vec.Write(nameof);
     delete[] n_vec;
   }
+
+  return;
 }
 
 // *************************
@@ -247,6 +251,8 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
 
   // Set whether to force osc and osc2 to use the same mass hierarchy (default: no)
   equalMH = false;
+
+  return;
 }
 
 

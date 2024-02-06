@@ -3,7 +3,6 @@
 
 // MaCh3 includes
 #include "covarianceBase.h"
-#include "throwParms/ThrowParms.h"
 
 class covarianceOsc : public covarianceBase
 {
@@ -11,10 +10,8 @@ class covarianceOsc : public covarianceBase
       
   covarianceOsc(const char* name, const char *file, TH2D *hist_dcpNH=NULL, TH2D *hist_dcpIH=NULL, TH2D *hist_23=NULL);//TMatrixDSym *cov);
       virtual ~covarianceOsc();
-  
       void throwNominal(bool nomValues=true);
-      double getLikelihood();
-      bool checkBounds();
+      double GetLikelihood();
       double *getPropPars();//double *retrn);
       void proposeStep();
       std::vector<double> defaultPars(bool doubled);
@@ -23,7 +20,15 @@ class covarianceOsc : public covarianceBase
       void setFlipBeta(bool flip){flipBeta=flip;}
       void useReactorPrior(bool reactor){reactorPrior = reactor;};
       void setExtraBranches(TTree &tree);
-      
+
+      double GetPathLength() {
+        return L;
+      }
+
+      double GetDensity() {
+        return density;
+      }
+
       //KS: Print all usefull informations after initialization
       void Print();
       //KS: Currently prob3++/probgp requiers particular order so we need to check this is the case

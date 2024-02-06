@@ -135,7 +135,7 @@ void stretch::runStretch()
    {
       for(size_t j=0; j<currentpar[i].size(); j++)
       {
-	 outTree->Branch(systematics[i]->getParName(j),"std::vector<double>",&currentpar[i][j]);
+	 outTree->Branch(systematics[i]->GetParName(j).c_str(),"std::vector<double>",&currentpar[i][j]);
       }
    }
    
@@ -196,18 +196,14 @@ void stretch::runStretch()
 	systematics[i]->throwNominal();
 //	systematics[i]->printPars();
 
-	llh_init[k] += systematics[i]->getLikelihood();
+	llh_init[k] += systematics[i]->GetLikelihood();
 	if(debug)
 	   debugFile << "LLH after " << systematics[i]->getName() << " " << llh_init[k] << std::endl;
      }
      
      for (size_t i = 0; i < samples.size(); i++)
      {
-	if(osc!=-1 && oscbar!=-1)
-	{
-	   samples[i]->reweight(((covarianceOsc*)systematics[oscbar])->getPropPars(), ((covarianceOsc*)systematics[osc])->getPropPars());
-	}
-	else if (osc!=-1)
+	if (osc!=-1)
 	{
 	   samples[i]->reweight(((covarianceOsc*)systematics[osc])->getPropPars());
 	}
@@ -217,7 +213,7 @@ void stretch::runStretch()
 	   samples[i]->reweight(fake);
 	}
 	
-	llh_init[k] += samples[i]->getLikelihood();
+	llh_init[k] += samples[i]->GetLikelihood();
 	
 	if(debug)
 	   debugFile << "LLH after sample " << i << " " << llh_init[k] << std::endl;
@@ -261,15 +257,11 @@ void stretch::runStretch()
 	   }
 	   systematics[i]->setParameters(pars);
 //	   systematics[i]->printPars();
-	   logLProp[nw] += systematics[i]->getLikelihood();
+	   logLProp[nw] += systematics[i]->GetLikelihood();
 	}
 	for (size_t i = 0; i < samples.size(); i++)
 	{
-	   if(osc!=-1 && oscbar!=-1)
-	   {
-	      samples[i]->reweight(((covarianceOsc*)systematics[oscbar])->getPropPars(), ((covarianceOsc*)systematics[osc])->getPropPars());
-	   }
-	   else if (osc!=-1)
+	   if (osc!=-1)
 	   {
 	      samples[i]->reweight(((covarianceOsc*)systematics[osc])->getPropPars());
 	   }
@@ -279,7 +271,7 @@ void stretch::runStretch()
 	      samples[i]->reweight(fake);
 	   }
 	   
-	   logLProp[nw] += samples[i]->getLikelihood();
+	   logLProp[nw] += samples[i]->GetLikelihood();
 	}
 	double q = pow(z,N-1)*exp(logLCurr[nw]-logLProp[nw]);
 //	std::cout << nw << "," << ow << ": " << logLCurr[nw] << "," << logLProp[nw] << "," << z << "," << q << std::endl;

@@ -20,6 +20,14 @@
 #include "TRandom.h"
 #include "TString.h"
 
+//Propagator includes
+#ifdef USE_PROB3
+  #include "BargerPropagator.h"
+#else
+  #include "beamcudapropagator.cuh"
+  #include "atmoscudapropagator.cuh"
+#endif
+
 //MaCh3 includes
 #include "interfacePDFEbE.h"
 #include "samplePDFBase.h"
@@ -34,10 +42,7 @@
 #include "ShiftFunctors.h"
 
 #include "manager/manager.h"
-
-//Other
-#include "BargerPropagator.h"
-
+#include "OscClass/OscClass_CUDAProb3.h"
 
 #define USEBETA 0
 
@@ -48,57 +53,54 @@ public:
 
   samplePDFFDBase(){};
   samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
-  ~samplePDFFDBase();
+  virtual ~samplePDFFDBase();
 
-  int getNDim(); //DB Function to differentiate 1D or 2D binning
+  int GetNDim(); //DB Function to differentiate 1D or 2D binning
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
   //ETA - abstract these to samplePDFFDBase
-  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded getLikelihood
+  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
   void addData(TH1D* Data);
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
   void addData(std::vector< vector <double> > &data);
-  //DB Multi-threaded getLikelihood
-  double getLikelihood();
+  //DB Multi-threaded GetLikelihood
+  double GetLikelihood();
   //===============================================================================
 
   void reweight(double *oscpar);
-  void reweight(double *oscpar_nub, double *oscpar_nu);
-  double getEventWeight(int iSample, int iEntry);
+  inline double GetEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
-  void useNonDoubledAngles(bool ans) {doubled_angle = ans;};
-  void useBinnedOscReweighting(bool ans);
-  void useBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
+  void UseNonDoubledAngles(bool ans) {doubled_angle = ans;};
+  void UseBinnedOscReweighting(bool ans);
+  void UseBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
   
-  void setUseBeta(bool ub) { // Apply beta to nuebar
-    useBeta = ub; 
-    if (useBeta){std::cout << "useBeta implementation hidden behind '#ifdef USEBETA' in samplePDFSKBase - Check USEBETA is true, recompile and remove this comment" << std::endl; throw;}
-  };
-  void setApplyBetaNue(bool nueb) { // Apply beta to nue instead of nuebar
-    applyBetaNue = nueb;
-    if (applyBetaNue){std::cout << "useBeta implementation hidden behind '#ifdef USEBETA' in samplePDFSKBase - Check USEBETA is true, recompile and remove this comment" << std::endl; throw;}
-  };
-  void setApplyBetaDiag(bool diagb){ // Apply 1/beta to nue and beta to nuebar
-    applyBetaDiag = diagb;
-    if (applyBetaDiag){std::cout << "useBeta implementation hidden behind '#ifdef USEBETA' in samplePDFSKBase - Check USEBETA is true, recompile and remove this comment" << std::endl; throw;}
-  }; 
+#if defined (USE_PROB3) && defined (CPU_ONLY)
+  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
+#endif
 
-  inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar);
-  inline double calcOscWeights(int nutype, int oscnutype, double en, double *oscpar_nub, double *oscpar_nu);
+#if defined (USE_PROB3) && not defined (CPU_ONLY)
+  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar);
+#endif
+
+#if not defined (USE_PROB3)
+  void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
+#endif
 
   std::string GetSampleName(){return samplename;}
+
+  void SetXsecCov(covarianceXsec* xsec_cov);
 
   //============================= Should be deprecated =============================
   // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
   // DB 27/08/2020 The following functions shouldn't be used (Currently included for backwards compatibility)
 
   //DB Incredibly hardcoded - Could probably make 'LetsPrintSomeWeights' do the same functionality and remove this?
-  //void DumpWeights(std::string outname);
 
+  virtual void DumpWeights(std::string outname){return;};
   // ETA - in the future it would be nice to have some generic getHIst functions
   // although, this introduces a root dependence into the core code?
   //TH1D *getModeHist1D(int s, int m, int style = 0);
@@ -114,26 +116,27 @@ public:
   //================================================================================
 
   virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
+  // LW - Setup Osc 
+  void virtual SetupOscCalc(double PathLength, double Density);
+  void SetOscillator(Oscillator* Osc_);
+  void FindEventOscBin();
 
  protected:
-
-
   //TODO - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
   //DB Function to determine which weights apply to which types of samples
   //pure virtual!!
-  virtual void setupWeightPointers() = 0;
+  virtual void SetupWeightPointers() = 0;
 
-
+  splineFDBase *splineFile;
   //===============================================================================
   //DB Functions relating to sample and exec setup  
   //ETA - abstracting these core functions
   //init will setup all the specific variables 
-  void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
+  //void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
   //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
   //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
 
   void fillSplineBins();
-
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();
@@ -145,14 +148,19 @@ public:
   void set1DBinning(int nbins, double low, double high);
   void set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
   void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
+  void set1DBinning(std::vector<double> &XVec);
+  void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
   //===============================================================================
 
+  //ETA - a function to setup and pass values to functional parameters where
+  //you need to pass a value to some custom reweight calc or engine
+  virtual void PrepFunctionalParameters(){};
   //ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){};
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
+  bool IsEventSelected(int iSample, int iEvent); 
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
-  virtual void reconfigureFuncPars(){};
 
   void CalcXsecNormsBins(int iSample);
   //This just gets read in from a yaml file
@@ -163,13 +171,20 @@ public:
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
   virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
 
+  int GetBinningOpt(){return BinningOpt;}
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
-  virtual void setXsecCov(covarianceXsec* xsec_cov);
+
+  // Function to setup Functional and shift parameters. This isn't idea but
+  // do this in your experiment specific code for now as we don't have a 
+  // generic treatment for func and shift pars yet
+  virtual void SetupFuncParameters(){return;};
+  void SetupNormParameters();
 
   //===============================================================================
   //DB Functions required for reweighting functions  
@@ -185,9 +200,12 @@ public:
 
   // Helper function to reset histograms
   inline void ResetHistograms();
-      
+  
+#ifndef USE_PROB3
+  inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
+#endif
   //===============================================================================
-  //DB Variables required for getLikelihood
+  //DB Variables required for GetLikelihood
   //
   //DB Vectors to hold bin edges
   std::vector<double> XBinEdges;
@@ -210,30 +228,21 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
-  // Propagator
-  BargerPropagator *bNu;
+  Oscillator *Osc = NULL;
 
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;
   //===============================================================================
   
-  //Variables controlling nuebar appearance
-  double Beta;
-  bool useBeta;
-  bool applyBetaNue;
-  bool applyBetaDiag;
-
   //Variables controlling oscillation parameters
   bool doubled_angle;
   bool osc_binned;
 
   //===============================================================================
   //DB Covariance Objects
-  //covarianceSkDet_joint *skdet_joint;
-  //ETA -  need to think about this? All experiments will need an xsec, det and osc cov
-  covarianceXsec *xsecCov;
-  //===============================================================================
-  //
+  //ETA - All experiments will need an xsec, det and osc cov
+  covarianceXsec *XsecCov;
+  //=============================================================================== 
 
   //ETA - binning opt can probably go soon...
   int BinningOpt;
@@ -248,24 +257,28 @@ public:
   std::vector<std::string> funcParsNames;
   std::vector<int> funcParsIndex;
 
-  //===============================================================================
+  //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
-  std::vector< std::string > SelectionStr; //like in XsecNorms but for events in sample. Read in from sample yaml file 
-  std::vector< std::vector<double> > SelectionBounds; // like in XsecNorms but for events in sample. Read in from sample yaml file in samplePDFExperimentBase.cpp
+  //like in XsecNorms but for events in sample. Read in from sample yaml file 
+  std::vector< std::string > SelectionStr; 
+  std::vector< std::vector<double> > Selection; //The enum, then the bounds corresponding to the string
 
-  std::vector< std::vector<double> > Selection; //What gets used in IsEventSelected, which gets set equal to user input plus all the vectors in StoreSelection
+  // like in XsecNorms but for events in sample. Read in from sample yaml file
+  // in samplePDFExperimentBase.cpp
+  std::vector< std::vector<double> > SelectionBounds;
+
+  //What gets used in IsEventSelected, which gets set equal to user input plus 
+  //all the vectors in StoreSelection
+  //std::vector< std::vector<double> > Selection;
   int NSelections;
-  std::vector< std::vector<double> > StoredSelection; //What gets pulled from config options
-  //===============================================================================
+  //What gets pulled from config options
+  std::vector< std::vector<double> > StoredSelection; 
+  //===========================================================================
   //
 
   //ETA - trying new way of doing shift parameters
   // leave this for now but coming soon!
   //std::vector< EnergyScale* > ShiftFunctors;
   //std::vector< BaseFuncPar* > ShiftFunctors;
-
- private:
-  int blah;
-
 };
 #endif

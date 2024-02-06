@@ -200,7 +200,7 @@ double samplePDFBase::getEventRate()
   return _hPDF1D->Integral();
 }
 
-double samplePDFBase::getLikelihood()
+double samplePDFBase::GetLikelihood()
 {
   if(nDims == 0)    
   {
@@ -279,7 +279,7 @@ double samplePDFBase::getTestStatLLH(double data, double mc) {
 }
 
 // this function will compute the likelihood against a nominal dataset (histogram)
-/*double samplePDFBase::getLikelihoodNominal()
+/*double samplePDFBase::GetLikelihoodNominal()
   {
   TH1D* pdf = get1DHist();
   double mc = pdf->GetBinContent(i,j);
@@ -293,7 +293,7 @@ double samplePDFBase::getTestStatLLH(double data, double mc) {
 
   }*/
 
-double samplePDFBase::getLikelihood_kernel(std::vector<double> &dataSet)
+double samplePDFBase::GetLikelihood_kernel(std::vector<double> &dataSet)
 {
   // this doesnt work
   /*  std::cout << "kernel estimation likelihood" << std::endl;
