@@ -1,33 +1,31 @@
 set(Splines_header_files 
-	splineBase.h 
-	splineInterface.h 
-	splineFDBase.h 
-        SplineMonolith.h)
+    splineBase.h
+    splineInterface.h
+    splineFDBase.h
+    SplineMonolith.h)
 
 set(Splines_implementation_files 
-	splineBase.cpp 
-	splineFDBase.cpp
-	SplineMonolith.cpp
-        gpuSplineUtils.cu)
+    splineBase.cpp
+    splineFDBase.cpp
+    SplineMonolith.cpp
+    gpuSplineUtils.cu)
 
 
 set(Splines_implementation_files_CPU 
-	splineBase.cpp 
-	splineFDBase.cpp
-	SplineMonolith.cpp)
+    splineBase.cpp
+    splineFDBase.cpp
+    SplineMonolith.cpp)
 
-if(NOT ${CPU_ONLY})
-
+if(NOT CPU_ONLY)
   add_library(Splines SHARED ${Splines_implementation_files})
   target_include_directories(Splines PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
   add_library(gpuSpline gpuSplineUtils.cu)
   set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-  if(${CUDA_ERROR_CHECK})
-	target_compile_options(Splines PUBLIC -DCUDA_ERROR_CHECK)
+  if(MaCh3_DEBUG_ENABLED)
+    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
   endif()
   set_property(TARGET gpuSpline Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
   target_link_libraries(gpuSpline)
-
 else()
   add_library(Splines SHARED ${Splines_implementation_files_CPU})
   target_include_directories(Splines INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)

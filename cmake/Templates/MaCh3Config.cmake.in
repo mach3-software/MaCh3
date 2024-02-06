@@ -1,0 +1,46 @@
+@PACKAGE_INIT@
+
+set(MaCh3_VERSION MaCh3_VERSION)
+
+
+set(USE_PROB3 @USE_PROB3@)
+set(CPU_ONLY @CPU_ONLY@)
+set(DEBUG_LEVEL @DEBUG_LEVEL@)
+set(MaCh3_DEBUG_ENABLED @MaCh3_DEBUG_ENABLED@)
+set(MaCh3_MULTITHREAD_ENABLED @MaCh3_MULTITHREAD_ENABLED@)
+set(MaCh3_GPU_ENABLED @MaCh3_GPU_ENABLED@)
+
+get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+message(STATUS "Adding ${MaCh3_CMAKE_DIR} to Module search path")
+message(STATUS "Adding ${MaCh3_CMAKE_DIR}/../../../cmake to Module search path")
+list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}/../../../cmake")
+
+set(MaCh3_FOUND TRUE)
+
+include(ROOT)
+
+if(NOT TARGET ROOT::ROOT)
+  cmessage(WARNING "Expected MaCh3 to set up dependency target: ROOT::ROOT")
+  set(MaCh3_FOUND FALSE)
+  return()
+endif()
+
+
+include(${MaCh3_CMAKE_DIR}/MaCh3Targets.cmake)
+
+find_path(MaCh3_PREFIX
+NAMES bin/setup.MaCh3.sh
+PATHS ${MaCh3_CMAKE_DIR}/../
+)
+
+cmessage(STATUS "MaCh3_PREFIX: ${MaCh3_PREFIX}")
+cmessage(STATUS "MaCh3_VERSION: ${MaCh3_VERSION}")
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(MaCh3
+  REQUIRED_VARS
+    MaCh3_PREFIX
+  VERSION_VAR
+    MaCh3_VERSION
+)
