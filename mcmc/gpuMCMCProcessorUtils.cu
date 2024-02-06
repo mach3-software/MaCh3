@@ -12,8 +12,8 @@
 
 // CUDA specifics
 #include <cuda_runtime.h>
-#include <Common/helper_functions.h>
-#include <Common/helper_cuda.h>
+#include <helper_functions.h>
+#include <helper_cuda.h>
 
 // Define the macros
 #define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)

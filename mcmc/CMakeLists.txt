@@ -28,11 +28,15 @@ set(mcmc_header_files
 
 if(NOT ${CPU_ONLY})
   add_library(MCMC SHARED ${mcmc_implementation_files})
-  target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+  target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. ${cuda-samples_SOURCE_DIR}/Common)
   add_library(gpuMCMCProcessorUtils gpuMCMCProcessorUtils.cu)
+
+  # Needs to work with CUDA samples
+  target_include_directories(gpuMCMCProcessorUtils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. ${cuda-samples_SOURCE_DIR}/Common)
+
   set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
   set_property(TARGET gpuMCMCProcessorUtils MCMC PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-  target_link_libraries(MCMC Manager ROOT::ROOT cuda-samples)
+  target_link_libraries(MCMC Manager ROOT::ROOT)
 else()
     add_library(MCMC SHARED ${mcmc_implementation_files_CPU})
     target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

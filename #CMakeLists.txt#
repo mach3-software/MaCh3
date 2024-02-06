@@ -81,12 +81,11 @@ endif()
 
 # If we're doing GPU stuff, we need the CUDA helper module
 if(MaCh3_GPU_ENABLED)
-    message("Adding Sample Library")
+
     CPMAddPackage(
         NAME cuda-samples
         GITHUB_REPOSITORY "NVIDIA/cuda-samples"
         GIT_TAG v12.3
-	SOURCE_SUBDIR Common
 	DOWNLOAD_ONLY YES
     )
 # Now we add the library
