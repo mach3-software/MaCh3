@@ -13,6 +13,7 @@
 #include "TStopwatch.h"
 #include "TCanvas.h"
 #include "TStyle.h"
+#include "TTree.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
@@ -39,6 +40,7 @@ class SMonolith {
     SMonolith(std::vector< std::vector<TSpline3_red*> > &MasterSpline);
     SMonolith(std::vector< std::vector<TF1*> > &MasterSpline);
     SMonolith(std::vector< std::vector<TF1_red*> > &MasterSpline);
+    SMonolith(std::string FileName);
     ~SMonolith();
 
     // This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here!
@@ -79,6 +81,7 @@ class SMonolith {
     // Prepare the TSpline3_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
     inline void PrepareForGPU_TSpline3();
+
     // Prepare the TF1_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
     inline void PrepareForGPU_TF1();
@@ -108,6 +111,9 @@ class SMonolith {
     //Conversion from valid splines to all
     inline void ModifyWeights_GPU();
     
+    inline void PrepareSplineFile();
+    inline void LoadSplineFile(std::string FileName);
+
     // Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
     // Method identical to TSpline3::Eval(double) but faster because less operations
     FastSplineInfo *SplineInfoArray;
@@ -163,4 +169,7 @@ class SMonolith {
     // GPU arrays to hold other coefficients
     float *cpu_coeff_many;
     float *gpu_coeff_many;
+
+
+    bool SaveSplineFile;
 };
