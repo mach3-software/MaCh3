@@ -35,9 +35,12 @@ class manager {
 public:
   manager(std::string const &);
   YAML::Node const &raw();
+  std::string GetFileName();
 
 private:
   YAML::Node config;
+  std::string FileName;
+
 
 /*
  * Keeping this all here as we should start adding in functions here to do reading

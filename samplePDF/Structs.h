@@ -23,8 +23,6 @@
 #define __BAD_DOUBLE__ -999.99
 #define __BAD_INT__ -999
 
-#define __LARGE_WEIGHT__ 100
-
 #define __TH2PolyOverflowBins__ 9
 
 #define __DEFAULT_RETURN_VAL__ -999999.123456
