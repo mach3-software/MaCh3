@@ -1,5 +1,4 @@
-#ifndef __FITTERBASE_H__
-#define __FITTERBASE_H__
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -117,4 +116,3 @@ class FitterBase {
   bool save_nominal;
 };
 
-#endif

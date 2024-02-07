@@ -1,5 +1,4 @@
-#ifndef __LIKELIHOODFIT_H__
-#define __LIKELIHOODFIT_H__
+#pragma once
 
 #include "FitterBase.h"
 
@@ -18,4 +17,3 @@ class LikelihoodFit : public FitterBase {
     bool fMirroring;
 };
 
-#endif
