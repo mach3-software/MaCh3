@@ -23,9 +23,9 @@
 #include "manager/manager.h"
 
 //MaCh3 includes
-#include "samplePDFInterface.h"
+#include "samplePDF/samplePDFInterface.h"
 #include "splines/splineBase.h"
-#include "Structs.h"
+#include "samplePDF/Structs.h"
 
 
 class samplePDFBase : public samplePDFInterface 

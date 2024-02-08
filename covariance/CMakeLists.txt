@@ -5,9 +5,9 @@ set(Covariance_implementation_files
 
 
 set(Covariance_header_files
-	covarianceBase.cpp 
-	covarianceOsc.cpp 
-	covarianceXsec.cpp)
+	covarianceBase.h
+	covarianceOsc.h
+	covarianceXsec.h)
 
 add_library(Covariance SHARED ${Covariance_implementation_files})
 target_include_directories(Covariance INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)

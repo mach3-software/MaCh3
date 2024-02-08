@@ -1,0 +1,72 @@
+#!/bin/bash
+
+#Modify this if moving install from original prefix
+INSTALL_ROOT="@CMAKE_INSTALL_PREFIX@"
+SCRIPTNAME=$0
+
+if [ ${#} -eq 0 ]; then
+  echo "${SCRIPTNAME} [--features] [--has-feature <feature name>] [--incdir] [--cflags] [--libdir] [--libs] [--version]"
+  exit 0
+fi
+
+while [[ ${#} -gt 0 ]]; do
+
+  key="$1"
+  case $key in
+      --incdir)
+      echo -n "${INSTALL_ROOT}/include "
+      ;;
+
+      --cflags)
+      echo -n "-I${INSTALL_ROOT}/include @ROOT_INCLUDE_DIRS_SEP@ @ROOT_DEFINITIONS_SEP@"
+      ;;
+
+      --libdir)
+      echo -n "${INSTALL_ROOT}/lib "
+      ;;
+
+      --libs)
+      echo -n "-L${INSTALL_ROOT}/lib @MACH3_LIB_LIST@"
+      ;;
+
+      --features)
+      echo -n "@MACH3_FEATURES@ "
+      ;;
+
+      --has-feature)
+      shift
+      TEST_FEATURE=$1
+        if [[ "@MACH3_FEATURES@" =~ (^|[[:space:]])${TEST_FEATURE}($|[[:space:]]) ]]; then
+          exit 0
+        else
+          exit 1
+        fi
+      ;;
+
+      --version)
+      echo -n "@MaCh3_VERSION@ "
+      ;;
+
+      -?|--help)
+
+      echo "[RUNLIKE] ${SCRIPTNAME}"
+      echo -e "\t--incdir                   : Print location of installed header files."
+      echo -e "\t--cflags                   : Print compiler include flag for installed header files."
+      echo -e "\t--libdir                   : Print location of installed libraries."
+      echo -e "\t--libs                     : Print list of MaCh3 library names."
+      echo -e "\t--features                 : Print list of features."
+      echo -e "\t--has-feature <feature>    : Returns 0 if has feature, 1 if not."
+      echo -e "\t--version                  : Print MaCh3 version."
+      echo -e "\t-?|--help                  : Print this message."
+      exit 0
+      ;;
+
+      *)
+              # unknown option
+      echo "Unknown option $1"
+      exit 1
+      ;;
+  esac
+  shift # past argument or value
+done
+echo ""

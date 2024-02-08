@@ -29,8 +29,8 @@
 #endif
 
 //MaCh3 includes
-#include "interfacePDFEbE.h"
-#include "samplePDFBase.h"
+#include "samplePDF/interfacePDFEbE.h"
+#include "samplePDF/samplePDFBase.h"
 
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
@@ -38,8 +38,8 @@
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
-#include "FDMCStruct.h"
-#include "ShiftFunctors.h"
+#include "samplePDF/FDMCStruct.h"
+#include "samplePDF/ShiftFunctors.h"
 
 #include "manager/manager.h"
 #include "OscClass/OscClass_CUDAProb3.h"

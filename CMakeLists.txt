@@ -65,6 +65,10 @@ CPMFindPackage(
       "YAML_BUILD_SHARED_LIBS ON"
 )
 
+if(NOT TARGET yaml-cpp::yaml-cpp)
+  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
+endif()
+
 CPMAddPackage(
   NAME Eigen
   VERSION 3.2.8
@@ -72,6 +76,7 @@ CPMAddPackage(
   # Eigen's CMakelists are not intended for library use
   DOWNLOAD_ONLY YES
 )
+
 
 if(Eigen_ADDED)
   add_library(Eigen INTERFACE IMPORTED)
@@ -112,7 +117,7 @@ else()
   endif()
 endif()
 
-dump_cmake_variables(Prob3plusplus)
+#dump_cmake_variables(Prob3plusplus)
 
 ############################  Setting Flags  ####################################
 # Check the where to install 
@@ -131,7 +136,7 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_compile_options(-g -Wextra)
+add_link_options(-g -Wextra)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -153,7 +158,7 @@ if(MaCh3_DEBUG_ENABLED)
   add_compile_definitions(DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  add_compile_options(-O3)
+  add_link_options(-O3)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -163,15 +168,15 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  add_compile_options(-fopenmp)
+  add_link_options(-fopenmp)
   add_compile_definitions(MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
   add_compile_definitions(CPU_ONLY)
 else()
-  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
+  add_link_options(-I${CUDA_SAMPLES}/common/inc)
+  add_link_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
 endif()
 
 if(USE_PROB3)
@@ -233,6 +238,10 @@ if(NOT TARGET MaCh3)
   cmessage(STATUS "Added target MaCh3")
 endif()
 
+configure_file(cmake/Templates/setup.MaCh3.sh.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 ############################  Install  ####################################
 
 include(CMakePackageConfigHelpers)
@@ -251,3 +260,5 @@ install(FILES
     ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
     ${CMAKE_BINARY_DIR}/MaCh3ConfigVersion.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/MaCh3)
+
+include(mach3-config)

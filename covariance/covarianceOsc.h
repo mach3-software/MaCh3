@@ -2,7 +2,7 @@
 #define _covarianceOsc_h_
 
 // MaCh3 includes
-#include "covarianceBase.h"
+#include "covariance/covarianceBase.h"
 
 class covarianceOsc : public covarianceBase
 {

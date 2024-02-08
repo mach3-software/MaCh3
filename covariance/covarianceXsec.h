@@ -10,7 +10,7 @@
 #include "TList.h"
 
 // MaCh3 includes
-#include "covarianceBase.h"
+#include "covariance/covarianceBase.h"
 #include "samplePDF/Structs.h"
 
 #include "yaml-cpp/yaml.h"
