@@ -13,8 +13,8 @@
 #include <cuda_runtime.h>
 
 #ifdef CUDA_ERROR_CHECK
-#include <helper_functions.h>
-#include <helper_cuda.h>
+  #include <Common/helper_functions.h>
+  #include <Common/helper_cuda.h>
 #endif
 
 // Define the macros

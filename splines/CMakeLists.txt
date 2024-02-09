@@ -18,12 +18,18 @@ if(NOT ${CPU_ONLY})
     set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
 endif()
 
+  if(MaCh3_DEBUG_ENABLED)
+    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
+  endif()
 
 set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
 
-target_link_libraries(Splines Covariance)
+target_link_libraries(Splines Covariance
+#$<$<NOT:$<BOOL:${CPU_ONLY}>>:cuda-samples>
+)
+
 target_include_directories(Splines PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)

@@ -4,6 +4,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)  
 
 # Try to find CUDA
+enable_language(CXX)
 find_package(CUDAToolkit)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
@@ -83,6 +84,25 @@ if(Eigen_ADDED)
   add_library(Eigen INTERFACE IMPORTED)
   target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
 endif()
+
+
+# If we're doing GPU stuff, we need the CUDA helper module
+if(MaCh3_GPU_ENABLED AND MaCh3_DEBUG_ENABLED)
+    message("Adding Sample Library")
+    CPMAddPackage(
+        NAME cuda-samples
+        GITHUB_REPOSITORY "NVIDIA/cuda-samples"
+        GIT_TAG v12.3
+	SOURCE_SUBDIR Common
+	DOWNLOAD_ONLY YES
+    )
+# Now we add the library
+    if(cuda-samples_ADDED)
+         add_library(cuda-samples INTERFACE IMPORTED)
+         target_include_directories(cuda-samples INTERFACE ${cuda-samples_SOURCE_DIR})
+    endif()
+endif()
+
 
 ################################## Oscillation ################################
 
@@ -196,8 +216,12 @@ endif()
 if(CPU_ONLY)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 else()
-  add_link_options(-I${CUDA_SAMPLES}/common/inc)
+  #add_link_options(-I${CUDA_SAMPLES}/common/inc)
   add_link_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
+    if(NOT DEFINED ENV{CUDAPATH})
+    message(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
+  endif()
+
 endif()
 
 if(USE_PROB3)

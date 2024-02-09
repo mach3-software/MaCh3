@@ -17,6 +17,8 @@ message(STATUS "Adding ${MaCh3_CMAKE_DIR}/cmake to Module search path")
 list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}/cmake")
 
+enable_language(CXX)
+
 set(MaCh3_FOUND TRUE)
 
 include(ROOT)
@@ -33,6 +35,7 @@ if (USE_PROB3)
 endif()
 
 if (MaCh3_GPU_ENABLED)
+  enable_language(CUDA)
   find_package(CUDAToolkit)
 endif()
 

@@ -22,13 +22,11 @@ target_include_directories(OscClass PUBLIC
 install(TARGETS CUDAProb3Atmos
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/CUDAProb3Atmos
         )
 
 install(TARGETS CUDAProb3Beam
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/CUDAProb3Beam
         )
 
 install(TARGETS OscClass
