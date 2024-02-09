@@ -18,21 +18,24 @@ if(NOT ${CPU_ONLY})
     set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
 endif()
 
-  if(MaCh3_DEBUG_ENABLED)
+if(MaCh3_DEBUG_ENABLED)
     target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
-  endif()
+endif()
 
 set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
 
-target_link_libraries(Splines Covariance
-#$<$<NOT:$<BOOL:${CPU_ONLY}>>:cuda-samples>
-)
+target_link_libraries(Splines Covariance)
 
 target_include_directories(Splines PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
-  $<INSTALL_INTERFACE:include>)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<INSTALL_INTERFACE:include>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/common/inc>>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
+)
 
 install(TARGETS Splines
         EXPORT MaCh3-targets
@@ -40,18 +43,4 @@ install(TARGETS Splines
         PUBLIC_HEADER DESTINATION include/splines)
 
 add_library(MaCh3::Splines ALIAS Splines)
-
-
-#############################
-# For testing purposes...
-#cuda_compile_ptx(
-#  cuda_ptx_files
-#  ${Splines_cuda_files}
-#  OPTIONS -Xptxas -dlcm=ca,-allow-expensive-optimizations=true,-fmad=true,-O3,-warn-lmem-usage,-warn-spills -Xcompiler -fpic,-Wall,-Wextra,-Werror,-c -lcudart -L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -I${CUDA_TOOLKIT_ROOT_DIR}/include -I${CUDA_TOOLKIT_ROOT_DIR}/common/inc -lcudart -I${CUDA_TOOLKIT_ROOT_DIR}/#samples/common/inc
-#)
-# later options: -DCMAKE_CUDA_FLAGS
-
-#add_custom_target(ptx ALL
-#    DEPENDS ${cuda_ptx_files} 
-#    SOURCES ${Splines_cuda_files} )
 

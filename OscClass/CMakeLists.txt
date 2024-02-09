@@ -32,6 +32,7 @@ install(TARGETS CUDAProb3Beam
 install(TARGETS OscClass
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/OscClass)
+        PUBLIC_HEADER DESTINATION include/OscClass
+        )
 
 add_library(MaCh3::OscClass ALIAS OscClass)

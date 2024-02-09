@@ -1,6 +1,6 @@
 #include "OscClass_CUDAProb3.h"
 
-#define DEBUG=1
+//#define DEBUG 1
 
 Oscillator::Oscillator(std::string ConfigName) {
   std::cout << std::setprecision(10);

@@ -1,17 +1,21 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # CMake version check
-cmake_minimum_required(VERSION 3.14 FATAL_ERROR)  
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+
+#KS: Enable langauge, neccesary when using CUDA
+enable_language(CXX)
 
 # Try to find CUDA
-enable_language(CXX)
 find_package(CUDAToolkit)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
     message(STATUS "CUDA found. Adding CUDA support.")
     SET(MaCh3_GPU_ENABLED TRUE)
-    enable_language(CUDA)
     SET(CPU_ONLY FALSE)
+
+    include(${CMAKE_SOURCE_DIR}/cmake/Modules/CUDASetup.cmake)
+
 else()
     message(STATUS "CUDA not found. Proceeding without CUDA support.")
     SET(MaCh3_GPU_ENABLED FALSE)
@@ -86,24 +90,6 @@ if(Eigen_ADDED)
 endif()
 
 
-# If we're doing GPU stuff, we need the CUDA helper module
-if(MaCh3_GPU_ENABLED AND MaCh3_DEBUG_ENABLED)
-    message("Adding Sample Library")
-    CPMAddPackage(
-        NAME cuda-samples
-        GITHUB_REPOSITORY "NVIDIA/cuda-samples"
-        GIT_TAG v12.3
-	SOURCE_SUBDIR Common
-	DOWNLOAD_ONLY YES
-    )
-# Now we add the library
-    if(cuda-samples_ADDED)
-         add_library(cuda-samples INTERFACE IMPORTED)
-         target_include_directories(cuda-samples INTERFACE ${cuda-samples_SOURCE_DIR})
-    endif()
-endif()
-
-
 ################################## Oscillation ################################
 
 #If USE_PROB3 not defined turn it off by default
@@ -167,10 +153,6 @@ cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 # add cmake script files
 if(NOT ${CMAKE_SCRIPT_SETUP})  #Check if setup by Experiment MaCh3
   set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-  #CUDA
-  if(NOT CPU_ONLY)
-    include(${CMAKE_SOURCE_DIR}/cmake/CUDASetup.cmake)
-  endif()
 endif()
 
 # Custom commands
@@ -215,19 +197,11 @@ endif()
 
 if(CPU_ONLY)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
-else()
-  #add_link_options(-I${CUDA_SAMPLES}/common/inc)
-  add_link_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
-    if(NOT DEFINED ENV{CUDAPATH})
-    message(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
-  endif()
-
 endif()
 
 if(USE_PROB3)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
 endif()
-
 
 ################################# Features ##################################
 

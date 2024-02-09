@@ -18,9 +18,11 @@ target_link_libraries(SamplePDF Splines Covariance Manager OscClass
     $<$<NOT:$<BOOL:${USE_PROB3}>>:CUDAProb3Beam CUDAProb3Atmos>
 )
 target_include_directories(SamplePDF PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
-  $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:$ENV{CUDAPATH}/targets/x86_64-linux/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<INSTALL_INTERFACE:include>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/common/inc>>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
 if(NOT ${CPU_ONLY})

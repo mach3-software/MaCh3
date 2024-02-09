@@ -13,8 +13,8 @@
 #include <cuda_runtime.h>
 
 #ifdef CUDA_ERROR_CHECK
-  #include <Common/helper_functions.h>
-  #include <Common/helper_cuda.h>
+#include <helper_functions.h>
+#include <helper_cuda.h>
 #endif
 
 // Define the macros
@@ -29,8 +29,8 @@
 #define __N_SPLINES__ NSPLINES_ND280
 // EM: for OA2024:
 #else
-#pragma message("using default N splines")
 #define __N_SPLINES__ 186
+#pragma message("using default N splines")
 #endif
 
 
