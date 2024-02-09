@@ -32,6 +32,10 @@ if (USE_PROB3)
   find_package(Prob3plusplus @Prob3plusplus_VERSION@ REQUIRED)
 endif()
 
+if (MaCh3_GPU_ENABLED)
+  find_package(CUDAToolkit)
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/MaCh3Targets.cmake)
 
 get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)

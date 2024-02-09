@@ -21,7 +21,7 @@ EXECUTE_PROCESS( COMMAND ${CMAKE_SOURCE_DIR}/cmake/cudaver.sh --major OUTPUT_VAR
 cmessage(STATUS "CUDA_MAJOR_VERSION: ${CUDAToolkit_VERSION}")
 
 
-  add_compile_definitions(CUDA)
+add_compile_definitions(CUDA)
 
 
 #  add_compile_definitions(DEBUG_DUMP DEBUG_CUDA_ND280 DEBUG)

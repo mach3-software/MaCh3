@@ -21,8 +21,7 @@ add_library(MCMC SHARED
 
 if(NOT ${CPU_ONLY})
     set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET gpuMCMCProcessorUtils MCMC PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-    target_link_libraries(gpuMCMCProcessorUtils)
+    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
 endif()
 
 set_target_properties(MCMC PROPERTIES
