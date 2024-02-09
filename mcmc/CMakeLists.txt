@@ -35,8 +35,8 @@ target_include_directories(MCMC PUBLIC
   $<INSTALL_INTERFACE:include>)
 
 install(TARGETS MCMC
-        EXPORT mach3-targets
+        EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/mcmc)
 
-add_library(MACH3::MCMC ALIAS MCMC)
+add_library(MaCh3::MCMC ALIAS MCMC)

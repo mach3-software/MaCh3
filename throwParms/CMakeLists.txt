@@ -16,8 +16,8 @@ target_include_directories(ThrowParms PUBLIC
   $<INSTALL_INTERFACE:include>)
 
 install(TARGETS ThrowParms
-        EXPORT mach3-targets
+        EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/throwParms)
 
-add_library(MACH3::ThrowParms ALIAS ThrowParms)
+add_library(MaCh3::ThrowParms ALIAS ThrowParms)

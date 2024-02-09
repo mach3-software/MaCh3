@@ -33,10 +33,10 @@ set_target_properties(SamplePDF PROPERTIES
     EXPORT_NAME SamplePDF)
 
 install(TARGETS SamplePDF
-        EXPORT mach3-targets
+        EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/samplePDF)
 
-add_library(MACH3::SamplePDF ALIAS SamplePDF)
+add_library(MaCh3::SamplePDF ALIAS SamplePDF)
 
 

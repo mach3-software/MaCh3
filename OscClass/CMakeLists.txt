@@ -20,20 +20,20 @@ target_include_directories(OscClass PUBLIC
   $<INSTALL_INTERFACE:include>)
 
 install(TARGETS CUDAProb3Atmos
-        EXPORT mach3-targets
+        EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/CUDAProb3Atmos
         )
 
 install(TARGETS CUDAProb3Beam
-        EXPORT mach3-targets
+        EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/CUDAProb3Beam
         )
 
 install(TARGETS OscClass
-        EXPORT mach3-targets
+        EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/OscClass)
 
-add_library(MACH3::OscClass ALIAS OscClass)
+add_library(MaCh3::OscClass ALIAS OscClass)

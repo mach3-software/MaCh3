@@ -136,7 +136,7 @@ endif()
 add_library(MaCh3CompilerOptions INTERFACE)
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 install(TARGETS MaCh3CompilerOptions
-    EXPORT mach3-targets
+    EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
 ############################  Setting Flags  ####################################
@@ -156,7 +156,7 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra)
+add_link_options(-g -Wextra)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -178,7 +178,7 @@ if(MaCh3_DEBUG_ENABLED)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  target_compile_options(MaCh3CompilerOptions INTERFACE -O3)
+  add_link_options(-O3)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -188,15 +188,15 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  add_link_options(-fopenmp)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 else()
-  target_compile_options(MaCh3CompilerOptions INTERFACE -I${CUDA_SAMPLES}/common/inc)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -I$ENV{CUDAPATH}/targets/x86_64-linux/include)
+  add_link_options(-I${CUDA_SAMPLES}/common/inc)
+  add_link_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
 endif()
 
 if(USE_PROB3)
@@ -232,7 +232,8 @@ add_subdirectory(mcmc)
 #ETA - commenting out as not c++11 compatible...
 #add_subdirectory(yaml_test)
 
-
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 if(NOT TARGET MaCh3)
@@ -242,20 +243,26 @@ if(NOT TARGET MaCh3)
       INTERFACE_LINK_LIBRARIES "MCMC;OscClass;SamplePDF;Covariance;Splines;ThrowParms;Manager"
       EXPORT_NAME MaCh3
   )
+  add_library(MaCh3::All ALIAS MaCh3)
   cmessage(STATUS "Added target MaCh3")
 endif()
 
-configure_file(cmake/Templates/setup.MaCh3.sh.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
-install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 
-install(EXPORT mach3-targets
-  FILE MaCh3Targets.cmake
-  NAMESPACE MaCh3::
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/
+set(export_destinations
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake/
+    ${CMAKE_INSTALL_PREFIX}/
 )
+
+foreach(dest ${export_destinations})
+  install(EXPORT MaCh3-targets
+          FILE MaCh3Targets.cmake
+          NAMESPACE MaCh3::
+          DESTINATION ${dest}
+  )
+endforeach()
 
 ############################  Install  ####################################
 
