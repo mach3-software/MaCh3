@@ -1,46 +1,40 @@
-set(Splines_header_files 
+set(HEADERS
     splineBase.h
     splineInterface.h
     splineFDBase.h
-    SplineMonolith.h)
+    SplineMonolith.h
+)
 
-set(Splines_implementation_files 
+add_library(Splines SHARED
     splineBase.cpp
     splineFDBase.cpp
     SplineMonolith.cpp
-    gpuSplineUtils.cu)
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>
+)
 
 
-set(Splines_implementation_files_CPU 
-    splineBase.cpp
-    splineFDBase.cpp
-    SplineMonolith.cpp)
-
-if(NOT CPU_ONLY)
-  add_library(Splines SHARED ${Splines_implementation_files})
-  target_include_directories(Splines PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-  add_library(gpuSpline gpuSplineUtils.cu)
-  set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-  if(MaCh3_DEBUG_ENABLED)
-    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
-  endif()
-  set_property(TARGET gpuSpline Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-  target_link_libraries(gpuSpline)
-else()
-  add_library(Splines SHARED ${Splines_implementation_files_CPU})
-  target_include_directories(Splines INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+if(NOT ${CPU_ONLY})
+    set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
 endif()
 
-target_link_libraries(Splines Covariance)
 
-set_target_properties(Splines PROPERTIES 
-  PUBLIC_HEADER "${Splines_header_files}"
-  EXPORT_NAME Splines)
+set_target_properties(Splines PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME Splines)
+
+target_link_libraries(Splines Covariance)
+target_include_directories(Splines PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+  $<INSTALL_INTERFACE:include>)
 
 install(TARGETS Splines
-    EXPORT MaCh3-target
-    LIBRARY DESTINATION lib/
-    PUBLIC_HEADER DESTINATION include/splines)
+        EXPORT mach3-targets
+        LIBRARY DESTINATION lib/
+        PUBLIC_HEADER DESTINATION include/splines)
+
+add_library(MACH3::Splines ALIAS Splines)
+
 
 #############################
 # For testing purposes...

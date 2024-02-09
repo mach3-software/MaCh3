@@ -119,6 +119,26 @@ endif()
 
 #dump_cmake_variables(Prob3plusplus)
 
+############################  C++ Compiler  ####################################
+if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
+  SET(CMAKE_CXX_STANDARD 11)
+endif()
+
+if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+endif()
+cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
+
+if(${ROOT_CXX_STANDARD} LESS 14)
+  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
+endif()
+
+add_library(MaCh3CompilerOptions INTERFACE)
+set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
+install(TARGETS MaCh3CompilerOptions
+    EXPORT mach3-targets
+    LIBRARY DESTINATION lib/)
+
 ############################  Setting Flags  ####################################
 # Check the where to install 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
@@ -136,7 +156,7 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_link_options(-g -Wextra)
+target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -155,10 +175,10 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
-  add_compile_definitions(DEBUG=${DEBUG_LEVEL})
+  add_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  add_link_options(-O3)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -O3)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -168,34 +188,21 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  add_link_options(-fopenmp)
-  add_compile_definitions(MULTITHREAD)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  add_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  add_compile_definitions(CPU_ONLY)
+  add_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 else()
-  add_link_options(-I${CUDA_SAMPLES}/common/inc)
-  add_link_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -I${CUDA_SAMPLES}/common/inc)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -I$ENV{CUDAPATH}/targets/x86_64-linux/include)
 endif()
 
 if(USE_PROB3)
-  add_compile_definitions(USE_PROB3)
+  add_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
 endif()
 
-############################  C++ Compiler  ####################################
-if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  SET(CMAKE_CXX_STANDARD 11)
-endif()
-
-if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
-endif()
-cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
-
-if(${ROOT_CXX_STANDARD} LESS 14)
-  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
-endif()
 
 ################################# Features ##################################
 
@@ -242,6 +249,14 @@ configure_file(cmake/Templates/setup.MaCh3.sh.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
 install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+
+install(EXPORT mach3-targets
+  FILE MaCh3Targets.cmake
+  NAMESPACE MaCh3::
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/
+)
+
 ############################  Install  ####################################
 
 include(CMakePackageConfigHelpers)
