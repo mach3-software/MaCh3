@@ -27,7 +27,7 @@ target_include_directories(SamplePDF PUBLIC
 
 if(NOT ${CPU_ONLY})
     set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET SamplePDF PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+    set_property(TARGET SamplePDF PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
     target_compile_definitions(SamplePDF PUBLIC GPU_ON)
 endif()
 

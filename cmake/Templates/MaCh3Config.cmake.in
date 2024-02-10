@@ -36,7 +36,9 @@ endif()
 
 if (MaCh3_GPU_ENABLED)
   enable_language(CUDA)
+  add_compile_definitions(CUDA)
   find_package(CUDAToolkit)
+  set(CUDA_ARCHITECTURES @CUDA_ARCHITECTURES@)
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/MaCh3Targets.cmake)

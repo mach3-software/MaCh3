@@ -14,7 +14,7 @@ if(CUDAToolkit_FOUND AND NOT(USE_CPU))
     SET(MaCh3_GPU_ENABLED TRUE)
     SET(CPU_ONLY FALSE)
 
-    include(${CMAKE_SOURCE_DIR}/cmake/Modules/CUDASetup.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
 
 else()
     message(STATUS "CUDA not found. Proceeding without CUDA support.")
@@ -159,7 +159,7 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_link_options(-g -Wextra)
+add_compile_options(-g -Wextra)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -181,7 +181,7 @@ if(MaCh3_DEBUG_ENABLED)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  add_link_options(-O3)
+  add_compile_options(-O3)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -191,6 +191,7 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
+  add_compile_options(-fopenmp)
   add_link_options(-fopenmp)
   add_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
