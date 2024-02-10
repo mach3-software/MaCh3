@@ -6,10 +6,10 @@ set(HEADERS
 )
 
 add_library(SamplePDF SHARED
-	samplePDFBase.cpp
-	samplePDFFDBase.cpp
-	interfacePDFEbE.cpp
-	Structs.cpp
+    samplePDFBase.cpp
+    samplePDFFDBase.cpp
+    interfacePDFEbE.cpp
+    Structs.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
 )
 

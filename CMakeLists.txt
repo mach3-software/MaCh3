@@ -141,10 +141,6 @@ if(${ROOT_CXX_STANDARD} LESS 14)
 endif()
 
 add_library(MaCh3CompilerOptions INTERFACE)
-set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
-install(TARGETS MaCh3CompilerOptions
-    EXPORT MaCh3-targets
-    LIBRARY DESTINATION lib/)
 
 ############################  Setting Flags  ####################################
 # Check the where to install 
@@ -160,6 +156,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
 add_compile_options(-g -Wextra --param=max-vartrack-size=100000000)
+target_compile_definitions(MaCh3CompilerOptions INTERFACE -g -Wextra --param=max-vartrack-size=100000000)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -178,10 +175,12 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
-  add_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
+  add_compile_definitions(DEBUG=${DEBUG_LEVEL})
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   add_compile_options(-O3)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE -O3)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -192,17 +191,28 @@ endif()
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   add_compile_options(-fopenmp)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   add_link_options(-fopenmp)
-  add_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
+  add_compile_definitions(MULTITHREAD)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  add_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
+  add_compile_definitions(CPU_ONLY)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
 if(USE_PROB3)
-  add_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
+  add_compile_definitions(USE_PROB3)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
 endif()
+
+
+set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
+install(TARGETS MaCh3CompilerOptions
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/)
 
 ################################# Features ##################################
 
@@ -234,18 +244,14 @@ add_subdirectory(mcmc)
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
-#This is to export the target properties of MaCh3
-#Anything that links to "MaCh3" will get all of these target properties
-if(NOT TARGET MaCh3)
-  add_library(MaCh3 INTERFACE)
-  set_target_properties(MaCh3 PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}"
-      INTERFACE_LINK_LIBRARIES "MCMC;OscClass;SamplePDF;Covariance;Splines;ThrowParms;Manager"
-      EXPORT_NAME MaCh3
-  )
-  add_library(MaCh3::All ALIAS MaCh3)
-  cmessage(STATUS "Added target MaCh3")
-endif()
+add_library(MaCh3 INTERFACE)
+set_target_properties(MaCh3 PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}"
+    INTERFACE_LINK_LIBRARIES "MCMC;OscClass;SamplePDF;Covariance;Splines;ThrowParms;Manager"
+    EXPORT_NAME MaCh3
+)
+
+add_library(MaCh3::All ALIAS MaCh3)
 
 configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
