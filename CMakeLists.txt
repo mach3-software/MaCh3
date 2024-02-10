@@ -159,7 +159,7 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_compile_options(-g -Wextra)
+add_compile_options(-g -Wextra --param=max-vartrack-size=100000000)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
