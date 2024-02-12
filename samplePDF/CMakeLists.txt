@@ -3,6 +3,9 @@ set(HEADERS
     samplePDFFDBase.h
     interfacePDFEbE.h
     Structs.h
+    samplePDFInterface.h
+    ShiftFunctors.h
+    FDMCStruct.h
 )
 
 add_library(SamplePDF SHARED

@@ -43,6 +43,10 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/MaCh3Targets.cmake)
 
+if(NOT TARGET MaCh3::All)
+  cmessage(FATAL_ERROR "Didn't set up MaCh3::All")
+endif()
+
 get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 
