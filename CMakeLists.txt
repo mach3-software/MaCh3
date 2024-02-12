@@ -5,29 +5,27 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable langauge, neccesary when using CUDA
 enable_language(CXX)
+SET(MaCh3_VERSION 0.0.2)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
-    message(STATUS "CUDA found. Adding CUDA support.")
-    SET(MaCh3_GPU_ENABLED TRUE)
-    SET(CPU_ONLY FALSE)
-
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
-
+  message(STATUS "CUDA found. Adding CUDA support.")
+  SET(MaCh3_GPU_ENABLED TRUE)
+  SET(CPU_ONLY FALSE)
 else()
-    message(STATUS "CUDA not found. Proceeding without CUDA support.")
-    SET(MaCh3_GPU_ENABLED FALSE)
-    SET(CPU_ONLY TRUE)
+  message(STATUS "CUDA not found. Proceeding without CUDA support.")
+  SET(MaCh3_GPU_ENABLED FALSE)
+  SET(CPU_ONLY TRUE)
 endif()
 
-SET(MaCh3_VERSION 0.0.2)
 if(CPU_ONLY)
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
 else()
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 endif()
+
 
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -56,6 +54,12 @@ CPMFindPackage(
   )
 include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
 include(NuHepMCUtils)
+
+# Check if CUDA was found
+if(MaCh3_GPU_ENABLED)
+  include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
+endif()
+
 include(ROOT)
 if(NOT TARGET ROOT::ROOT)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
@@ -155,8 +159,7 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_compile_options(-g -Wextra --param=max-vartrack-size=100000000)
-target_compile_definitions(MaCh3CompilerOptions INTERFACE -g -Wextra --param=max-vartrack-size=100000000)
+target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall --param=max-vartrack-size=100000000)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -175,12 +178,10 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
-  add_compile_definitions(DEBUG=${DEBUG_LEVEL})
   target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  add_compile_options(-O3)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE -O3)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -O3)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -190,21 +191,16 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  add_compile_options(-fopenmp)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
-  add_link_options(-fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
-  add_compile_definitions(MULTITHREAD)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  add_compile_definitions(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
 if(USE_PROB3)
-  add_compile_definitions(USE_PROB3)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
 endif()
 
@@ -245,11 +241,12 @@ add_subdirectory(mcmc)
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-set_target_properties(MaCh3 PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}"
-    INTERFACE_LINK_LIBRARIES "MCMC;OscClass;SamplePDF;Covariance;Splines;ThrowParms;Manager"
-    EXPORT_NAME MaCh3
-)
+target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines ThrowParms Manager MaCh3CompilerOptions)
+set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
+
+install(TARGETS MaCh3
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/)
 
 add_library(MaCh3::All ALIAS MaCh3)
 

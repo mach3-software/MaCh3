@@ -30,11 +30,12 @@ if(NOT TARGET ROOT::ROOT)
 endif()
 
 
-if (USE_PROB3)
+if(USE_PROB3)
   find_package(Prob3plusplus @Prob3plusplus_VERSION@ REQUIRED)
 endif()
 
-if (MaCh3_GPU_ENABLED)
+
+if(MaCh3_GPU_ENABLED)
   enable_language(CUDA)
   add_compile_definitions(CUDA)
   find_package(CUDAToolkit)
@@ -79,5 +80,3 @@ find_package_handle_standard_args(MaCh3
     VERSION_VAR
       MaCh3_VERSION
 )
-
-include_directories(${MaCh3_INCLUDE_DIR})

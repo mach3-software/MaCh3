@@ -9,12 +9,12 @@ endif()
 EXECUTE_PROCESS( COMMAND uname -m OUTPUT_VARIABLE OS_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(NOT "x86_64 " STREQUAL "${OS_ARCH} ")
-	message(FATAL_ERROR "This build currently only support x86_64 target arches, determined the arch to be: ${OS_ARCH}")
+    cmessage(FATAL_ERROR "This build currently only support x86_64 target arches, determined the arch to be: ${OS_ARCH}")
 endif()
 
 EXECUTE_PROCESS( COMMAND ${CMAKE_SOURCE_DIR}/cmake/cudaver.sh --major OUTPUT_VARIABLE CUDA_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message(STATUS "CUDA_MAJOR_VERSION: ${CUDAToolkit_VERSION}")
+cmessage(STATUS "CUDA_MAJOR_VERSION: ${CUDAToolkit_VERSION}")
 
 # Call nvidia-smi using execute_process
 execute_process(
@@ -24,9 +24,9 @@ execute_process(
 
 # Check the result of nvidia-smi command
 if(NVSMI_RESULT EQUAL 0)
-    message(STATUS "nvidia-smi command executed successfully.")
+    cmessage(STATUS "nvidia-smi command executed successfully.")
 else()
-    message(WARNING "Failed to execute nvidia-smi command.")
+    cmessage(WARNING "Failed to execute nvidia-smi command.")
 endif()
 
 #KS: Apparently with newer cmake and GPU
@@ -35,7 +35,7 @@ set(CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
 string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CUDA_ARCHITECTURES}")
 
 # Output the message with spaces between numbers
-message(STATUS "Using following CUDA archetectures: ${CUDA_ARCHITECTURES_STR}")
+cmessage(STATUS "Using following CUDA archetectures: ${CUDA_ARCHITECTURES_STR}")
 
 if(NOT MaCh3_DEBUG_ENABLED)
 	add_compile_options(
@@ -56,16 +56,16 @@ endif()
 
 add_link_options(-I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 if(NOT DEFINED ENV{CUDAPATH})
-    message(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
+    cmessage(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
 endif()
 
 #if(NOT DEFINED CUDA_SAMPLES)
-#  message(FATAL_ERROR "When using CUDA, CUDA_SAMPLES must be defined to point to the CUDAToolkit samples directory (should contain common/helper_functions.h).")
+#  cmessage(FATAL_ERROR "When using CUDA, CUDA_SAMPLES must be defined to point to the CUDAToolkit samples directory (should contain common/helper_functions.h).")
 #endif()
 
 #HI: If we're doing GPU stuff, we need the CUDA helper module
 if(BUILTIN_CUDASAMPLES_ENABLED )
-    message("Adding Builtin CUDA Sample Library")
+    cmessage("Adding Builtin CUDA Sample Library")
     CPMAddPackage(
         NAME cuda-samples
         GITHUB_REPOSITORY "NVIDIA/cuda-samples"

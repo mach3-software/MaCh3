@@ -10,7 +10,7 @@ set_target_properties(ThrowParms PROPERTIES
     EXPORT_NAME ThrowParms)
 
 
-target_link_libraries(ThrowParms ROOT::ROOT)
+target_link_libraries(ThrowParms ROOT::ROOT MaCh3CompilerOptions)
 target_include_directories(ThrowParms PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)

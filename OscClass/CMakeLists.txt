@@ -13,7 +13,7 @@ set_target_properties(OscClass PROPERTIES
 if (USE_PROB3)
    message(FATAL_ERROR "OscClass only defined using CUDAProb3. USE_PROB3 is defined and indicates Prob3++/ProbGPU is being expected to be used.")
 else()
-   target_link_libraries(OscClass Manager CUDAProb3Beam CUDAProb3Atmos)
+   target_link_libraries(OscClass Manager CUDAProb3Beam CUDAProb3Atmos MaCh3CompilerOptions)
 endif()
 target_include_directories(OscClass PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
