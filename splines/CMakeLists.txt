@@ -12,8 +12,7 @@ add_library(Splines SHARED
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>
 )
 
-
-if(NOT ${CPU_ONLY})
+if(NOT CPU_ONLY)
     set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
 endif()
@@ -33,7 +32,6 @@ target_include_directories(Splines PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/common/inc>>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 

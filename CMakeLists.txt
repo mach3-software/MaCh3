@@ -117,6 +117,7 @@ else()
         NAME CUDAProb3
         GITHUB_REPOSITORY "mach3-software/CUDAProb3"
         GIT_TAG "feature_cleanup"
+        DOWNLOAD_ONLY YES
     )
   else()
     CPMFindPackage(
@@ -124,6 +125,7 @@ else()
         GITHUB_REPOSITORY "mach3-software/CUDAProb3"
         GIT_TAG "feature_cleanup"
         OPTIONS "GPU_ON ON"
+        DOWNLOAD_ONLY YES
     )
   endif()
 endif()
@@ -204,6 +206,9 @@ if(USE_PROB3)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
 endif()
 
+if(MaCh3_GPU_ENABLED)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
+endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 install(TARGETS MaCh3CompilerOptions

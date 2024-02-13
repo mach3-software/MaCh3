@@ -16,15 +16,14 @@ add_library(SamplePDF SHARED
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
 )
 
-target_link_libraries(SamplePDF Splines Covariance Manager OscClass MaCh3CompilerOptions
+target_link_libraries(SamplePDF Splines Covariance Manager  MaCh3CompilerOptions
     $<$<BOOL:${USE_PROB3}>:Prob3plusplus>
-    $<$<NOT:$<BOOL:${USE_PROB3}>>:CUDAProb3Beam CUDAProb3Atmos>
+    $<$<NOT:$<BOOL:${USE_PROB3}>>:OscClass>
 )
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/common/inc>>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
