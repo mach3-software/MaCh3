@@ -7,40 +7,40 @@ endif()
 
 ######################Atmos######################
 if (NOT CPU_ONLY)
-set(HEADERS
-    ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cuh
-)
+  set(HEADERS
+      ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cuh
+  )
 
-add_library(Atmos SHARED
-    ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cu
-)
+  add_library(Atmos SHARED
+      ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cu
+  )
 
-set_target_properties(Atmos PROPERTIES
-    PUBLIC_HEADER "${HEADERS}"
-    EXPORT_NAME Atmos)
+  set_target_properties(Atmos PROPERTIES
+      PUBLIC_HEADER "${HEADERS}"
+      EXPORT_NAME Atmos)
 
-target_link_libraries(Atmos Manager MaCh3CompilerOptions)
+  target_link_libraries(Atmos Manager MaCh3CompilerOptions)
 
-target_include_directories(Atmos PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
-    $<BUILD_INTERFACE:${CUDAProb3_SOURCE_DIR}/>
-    $<INSTALL_INTERFACE:include>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
-)
+  target_include_directories(Atmos PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+      $<BUILD_INTERFACE:${CUDAProb3_SOURCE_DIR}/>
+      $<INSTALL_INTERFACE:include>
+      $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
+      $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
+  )
 
-if(NOT CPU_ONLY)
-    set_target_properties(Atmos PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET Atmos PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
-endif()
+  if(NOT CPU_ONLY)
+      set_target_properties(Atmos PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+      set_property(TARGET Atmos PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+  endif()
 
-install(TARGETS Atmos
-        EXPORT MaCh3-targets
-        LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/OscClass
-        )
+  install(TARGETS Atmos
+          EXPORT MaCh3-targets
+          LIBRARY DESTINATION lib/
+          PUBLIC_HEADER DESTINATION include/OscClass
+          )
 
-add_library(MaCh3::Atmos ALIAS Atmos)
+  add_library(MaCh3::Atmos ALIAS Atmos)
 endif()
 ######################OscClass######################
 
@@ -60,10 +60,10 @@ set_target_properties(OscClass PROPERTIES
     EXPORT_NAME OscClass)
 
 
-target_link_libraries(OscClass Manager MaCh3CompilerOptions
-                              $<$<NOT:$<BOOL:${CPU_ONLY}>>:Atmos>
-                              )
-
+target_link_libraries(OscClass Manager MaCh3CompilerOptions)
+if (NOT CPU_ONLY)
+  target_link_libraries(OscClass Atmos)
+endif()
 
 target_include_directories(OscClass PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

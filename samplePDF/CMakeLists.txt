@@ -16,10 +16,14 @@ add_library(SamplePDF SHARED
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
 )
 
-target_link_libraries(SamplePDF Splines Covariance Manager  MaCh3CompilerOptions
-    $<$<BOOL:${USE_PROB3}>:Prob3plusplus>
-    $<$<NOT:$<BOOL:${USE_PROB3}>>:OscClass>
-)
+target_link_libraries(SamplePDF Splines Covariance Manager  MaCh3CompilerOptions)
+
+if(USE_PROB3)
+    target_link_libraries(SamplePDF Prob3plusplus)
+else()
+    target_link_libraries(SamplePDF OscClass)
+endif()
+
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
@@ -27,7 +31,7 @@ target_include_directories(SamplePDF PUBLIC
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
-if(NOT ${CPU_ONLY})
+if(NOT CPU_ONLY)
     set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     set_property(TARGET SamplePDF PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
     target_compile_definitions(SamplePDF PUBLIC GPU_ON)
