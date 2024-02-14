@@ -1,5 +1,4 @@
-#ifndef _covarianceBase_h_
-#define _covarianceBase_h_
+#pragma once
 
 // ROOT includes
 #include "TMatrixT.h"
@@ -441,4 +440,3 @@ class covarianceBase {
 };
 
 TH2D* TMatrixIntoTH2D(const TMatrix &Matrix, std::string title);
-#endif

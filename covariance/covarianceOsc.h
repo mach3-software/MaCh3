@@ -1,5 +1,4 @@
-#ifndef _covarianceOsc_h_
-#define _covarianceOsc_h_
+#pragma once
 
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
@@ -49,4 +48,3 @@ class covarianceOsc : public covarianceBase
       double *oscpars1;
 };
 
-#endif

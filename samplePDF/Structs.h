@@ -1,5 +1,4 @@
-#ifndef _Structs_h_
-#define _Structs_h_
+#pragma once
 
 // Run low or high memory versions of structs
 // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
@@ -44,6 +43,10 @@
 #include "TH2Poly.h"
 #include "list"
 #include "TFile.h"
+
+#ifdef MULTITHREAD
+#include "omp.h"
+#endif
 
 // *******************
 // Template to make vector out of an array of any length
@@ -1148,4 +1151,3 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
   }
 
 }
-#endif

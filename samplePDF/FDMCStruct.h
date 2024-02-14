@@ -1,3 +1,6 @@
+#pragma once
+
+
 //constructors are same for all three so put in here
 struct fdmc_base {
   int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           

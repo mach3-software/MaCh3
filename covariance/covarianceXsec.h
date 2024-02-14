@@ -1,6 +1,4 @@
-#ifndef _covarianceXsec_h_
-
-#define _covarianceXsec_h_
+#pragma once
 
 // C++ includes
 #include <math.h>
@@ -263,4 +261,3 @@ class covarianceXsec : public covarianceBase {
 	int _nNormPars;
 };
 
-#endif

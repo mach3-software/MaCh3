@@ -207,6 +207,7 @@ if(USE_PROB3)
 endif()
 
 if(MaCh3_GPU_ENABLED)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
 endif()
 

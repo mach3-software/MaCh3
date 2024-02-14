@@ -1,5 +1,4 @@
-#ifndef __OSCCLASS_CUDAPROB3_H__
-#define __OSCCLASS_CUDAPROB3_H__
+#pragma once
 
 #include "TH2D.h"
 #include "TH3D.h"
@@ -247,5 +246,3 @@ class Oscillator {
   std::vector<FLOAT_T> ProductionHeightBinEdges;
   std::vector<FLOAT_T> chemicalComposition_Nom;
 };
-
-#endif
