@@ -42,11 +42,24 @@ MaCh3 supports quite a high range of CUDA architectures if something doesn't wor
 
 
 ## Oscialtor
-MaCh3 uses several neutrino calcualtors. By default, CUDAProb3 is used. If you would like to use Prob3++
+MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
 
 ```
 cmake ../ [-DUSE_PROB3=<ON,OFF>]
 ```
+Following neutrino oscillation calculators are available:
+<ol>
+<li> CUDAProb3 [CPU/GPU][Beam/Atm]  </li>
+<li> Prob3++ [CPU][Beam] </li>
+<li> probGPU [GPU][Beam] </li>
+</ol>
+
+## Fitting algorithms
+Following fitting algorithms are available:
+<ol>
+<li> MR2T2  </li>
+<li> MINUIT2  </li>
+</ol>
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
