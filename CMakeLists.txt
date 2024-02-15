@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable langauge, neccesary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 0.0.2)
+SET(MaCh3_VERSION 1.0.0)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
@@ -103,31 +103,21 @@ endif()
 
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
-
 if (USE_PROB3)
   CPMFindPackage(
-      NAME Prob3plusplus
-      VERSION 3.10.3
-      GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-      GIT_TAG v3.10.3
+    NAME Prob3plusplus
+    VERSION 3.10.3
+    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
+    GIT_TAG v3.10.3
   )
 else()
-  if (CPU_ONLY)
-    CPMFindPackage(
-        NAME CUDAProb3
-        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-        GIT_TAG "feature_cleanup"
-        DOWNLOAD_ONLY YES
-    )
-  else()
-    CPMFindPackage(
-        NAME CUDAProb3
-        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-        GIT_TAG "feature_cleanup"
-        OPTIONS "GPU_ON ON"
-        DOWNLOAD_ONLY YES
-    )
-  endif()
+  CPMFindPackage(
+    NAME CUDAProb3
+    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+    GIT_TAG "feature_cleanup"
+    OPTIONS "GPU_ON ON"
+    DOWNLOAD_ONLY YES
+  )
 endif()
 
 #dump_cmake_variables(Prob3plusplus)
@@ -160,7 +150,8 @@ endif()
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-#Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
+#Compile and link options
+#Add -Werror in the future
 target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall --param=max-vartrack-size=100000000)
 
 #KS: If Debug is not defined disable it by default

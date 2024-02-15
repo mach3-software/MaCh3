@@ -442,12 +442,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
     }
-    if (cpu_nKnots_arr[i] < 0) {
-      std::cerr << "***** NEGATIVE Knot NUMBER!!! ***** \n" << "On spline " << i << " " << cpu_nKnots_arr[i] << std::endl;
-      std::cerr << "Indicates bad reading and stripping back of splines pre-GPU" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
   }
   delete[] paramNo_big;
   delete[] knotNo_big;

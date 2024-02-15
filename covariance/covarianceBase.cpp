@@ -9,8 +9,8 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
 #endif
   //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
 
@@ -31,8 +31,8 @@ covarianceBase::covarianceBase(const char *YAMLFile) : inputFile(std::string(YAM
 #endif
   //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
 
@@ -59,8 +59,8 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed) : i
 #endif
    //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(seed);
   }
 
@@ -95,8 +95,8 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed, dou
 #endif
   //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(seed);
   }
   std::cout << "Constructing instance of covarianceBase" << std::endl;

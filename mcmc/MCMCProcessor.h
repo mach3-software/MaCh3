@@ -104,10 +104,10 @@ class MCMCProcessor {
     inline int GetOSC() { return nParam[kOSCPar]; };
         
     //Posterior getters
-    inline TH1D* const GetHpost(const int i) { return hpost[i]; };
-    inline TH2D* const GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
-    inline TH2D* const GetViolin() { return hviolin; };
-    inline TH2D* const GetViolinPrior() { return hviolin_prior; };
+    inline TH1D* GetHpost(const int i) { return hpost[i]; };
+    inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
+    inline TH2D* GetViolin() { return hviolin; };
+    inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
     inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
