@@ -115,7 +115,6 @@ else()
     NAME CUDAProb3
     GITHUB_REPOSITORY "mach3-software/CUDAProb3"
     GIT_TAG "feature_cleanup"
-    OPTIONS "GPU_ON ON"
     DOWNLOAD_ONLY YES
   )
 endif()
