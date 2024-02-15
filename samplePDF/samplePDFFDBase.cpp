@@ -189,22 +189,34 @@ void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *
 void samplePDFFDBase::reweight(double *oscpar) // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
 {
 
+  // LW - Skip oscillation for ND events
+  // This is only temporary, the new oscillator class will have a less hacky method for doing this
   for (int i=0; i< (int)MCSamples.size(); ++i) {
 
+    if (MCSamples[i].SampleDetID == 1) {
+      for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+	    MCSamples[i].osc_w[j] = 1.0;
+	  }
+    }
+
+
+    else {
 #if defined (USE_PROB3) && defined (CPU_ONLY)
 	//Prob3 CPU needs to loop through events too
-    for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-      MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
-    } //event loop
+      for(int j = 0; j < MCSamples[i].nEvents; ++j) {
+        MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+      } //event loop
 #endif
 
 #if defined (USE_PROB3) && not defined (CPU_ONLY)
-    calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
+      calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
 #endif
 
 #if not defined (USE_PROB3)
-    calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
+      calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
 #endif
+    }
+
   }// Sample loop
 
   //KS: Reset the histograms before reweight 
