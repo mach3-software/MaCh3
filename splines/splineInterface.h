@@ -1,5 +1,4 @@
-#ifndef _splineInterface_h_
-#define _splineInterface_h_
+#pragma once
 
 #include <TFile.h>
 #include <TSpline.h>
@@ -16,5 +15,3 @@ class splineInterface
  protected:
   
 };
-
-#endif

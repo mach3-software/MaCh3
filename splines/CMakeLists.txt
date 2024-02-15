@@ -3,6 +3,7 @@ set(HEADERS
     splineInterface.h
     splineFDBase.h
     SplineMonolith.h
+    spline.h
 )
 
 add_library(Splines SHARED

@@ -1,5 +1,4 @@
-#ifndef __THROWPARAM_HH__
-#define __THROWPARAM_HH__
+#pragma once
 
 #include <iostream>
 #include <assert.h>
@@ -35,4 +34,3 @@ class ThrowParms {
   void ThrowSet(std::vector<double> &parms);
 
 };
-#endif
