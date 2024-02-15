@@ -242,8 +242,8 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
   std::cout << "IN covarianceXsec::GetNormParsFromDetID()" << std::endl;
 
   for (int i = 0; i < nPars; ++i) {
-	if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID   
-	  if (GetXSecParamID(i, 0) == -1) { //If parameter is implemented as a normalisation
+	if (GetXSecParamID(i, 0) == -1) { //If parameter is implemented as a normalisation
+	  if ((GetXSecParamID(i, 1) & DetID) == DetID) { //If parameter applies to required DetID   
 		std::vector<int> temp;
 
 		XsecNorms4 norm;
@@ -324,8 +324,8 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		norm.index=i;
 		//Add this parameter to the vector of parameters
 		returnVec.push_back(norm);
-		norm_counter++;
 	  }
+      norm_counter++;
 	}
   }
 

@@ -3,6 +3,8 @@
 covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpth13NH, TH2D *hist_dcpth13IH, TH2D *hist_23)
 : covarianceBase(name, file) {
 
+  gRandom->SetSeed(0);
+
   if (hist_dcpth13NH) {
     h_dcpth13NH = hist_dcpth13NH;
     std::cout << "Using delta cp and th13 correlated prior from histogram" << std::endl;
