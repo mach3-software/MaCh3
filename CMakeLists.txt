@@ -111,7 +111,7 @@ if (USE_PROB3)
     GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
     GIT_TAG v3.10.3
   )
-  SET(MaCh3_Oscillator_ENABLED "Prob3++")
+  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
 else()
   CPMFindPackage(
     NAME CUDAProb3
@@ -119,7 +119,7 @@ else()
     GIT_TAG "feature_cleanup"
     DOWNLOAD_ONLY YES
   )
-  SET(MaCh3_Oscillator_ENABLED "CUDAProb3")
+  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
 endif()
 
 #dump_cmake_variables(Prob3plusplus)
@@ -212,7 +212,7 @@ install(TARGETS MaCh3CompilerOptions
 #KS: Consider moving it somewhere else
 SET(MaCh3_Fitter_ENABLED "MR2T2")
 if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
-  string(APPEND MaCh3_Fitter_ENABLED " Minuit2")
+  LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
 endif()
 ################################# Features ##################################
 
