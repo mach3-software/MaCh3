@@ -59,6 +59,7 @@ fi
 
 export MaCh3_ROOT=${SETUPDIR}
 export MaCh3_VERSION=@MaCh3_VERSION@
+export CUDAProb3_DIR=@CUDAProb3_SOURCE_DIR@
 
 add_to_PATH ${MaCh3_ROOT}/bin
 add_to_LD_LIBRARY_PATH ${MaCh3_ROOT}/lib

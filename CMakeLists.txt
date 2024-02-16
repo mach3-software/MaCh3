@@ -103,6 +103,7 @@ endif()
 
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
+SET(MaCh3_Oscillator_ENABLED "")
 if (USE_PROB3)
   CPMFindPackage(
     NAME Prob3plusplus
@@ -110,6 +111,7 @@ if (USE_PROB3)
     GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
     GIT_TAG v3.10.3
   )
+  SET(MaCh3_Oscillator_ENABLED "Prob3++")
 else()
   CPMFindPackage(
     NAME CUDAProb3
@@ -117,6 +119,7 @@ else()
     GIT_TAG "feature_cleanup"
     DOWNLOAD_ONLY YES
   )
+  SET(MaCh3_Oscillator_ENABLED "CUDAProb3")
 endif()
 
 #dump_cmake_variables(Prob3plusplus)
@@ -206,12 +209,19 @@ install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
+#KS: Consider moving it somewhere else
+SET(MaCh3_Fitter_ENABLED "MR2T2")
+if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
+  string(APPEND MaCh3_Fitter_ENABLED " Minuit2")
+endif()
 ################################# Features ##################################
 
 LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  Oscillator
+  Fitter
   )
 cmessage(STATUS "MaCh3 Features: ")
 foreach(f ${ALL_FEATURES})

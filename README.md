@@ -11,6 +11,7 @@ cmake ../
 Don't forget to
 ```
 source bin/setup.MaCh3.sh
+
 ```
 ## Building against MaCh3
 If you compiled MaCh3 and sourced it you can simply call
@@ -25,6 +26,9 @@ CPMFindPackage(
   GITHUB_REPOSITORY mach3-software/MaCh3
 )
 ```
+
+Some fucnitonalities relies on setting `Env{MACH3}` which should point to path experiment specyfic MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
+
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
 

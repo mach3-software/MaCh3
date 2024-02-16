@@ -2,6 +2,7 @@ set(HEADERS
     FitterBase.h
     mcmc.h
     LikelihoodFit.h
+    MinuitFit.h
     tune.h
     stretch.h
     MCMCProcessor.h
@@ -17,7 +18,6 @@ add_library(MCMC SHARED
     MCMCProcessor.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
 )
-
 
 if(NOT CPU_ONLY)
     set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
