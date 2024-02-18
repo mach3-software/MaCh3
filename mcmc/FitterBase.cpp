@@ -56,9 +56,9 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // Destructor: close the logger and output file
 FitterBase::~FitterBase() {
 // *************************
-  delete random;
-  delete[] sample_llh;
-  delete[] syst_llh;
+  if(random != NULL) delete random;
+  if(sample_llh != NULL) delete[] sample_llh;
+  if(syst_llh != NULL) delete[] syst_llh;
   delete clock;
   delete stepClock;
   std::cout << "Done!" << std::endl;
@@ -270,4 +270,351 @@ void FitterBase::PrintInitialState() {
     }
     debugFile << std::endl;
   }
+}
+
+
+// *************************
+// Run LLH scan
+void FitterBase::RunLLHScan() {
+// *************************
+
+  // Save the settings into the output file
+  SaveSettings();
+
+  int TotalNSamples = 0;
+  for(unsigned int i = 0; i < samples.size(); i++ )
+  {
+    TotalNSamples += samples[i]->GetNsamples();
+  }
+
+  //KS: Turn it on if you want LLH scan for each ND sample separetaly, which increase time signficantly but can be usefull for validating new samples or dials.
+  bool PlotAllNDsamplesLLH = false;
+  if(fitMan->raw()["General"]["LLHScanBySample"])
+    PlotAllNDsamplesLLH = fitMan->raw()["General"]["LLHScanBySample"].as<bool>();
+
+  // Now finally get onto the LLH scan stuff
+  // Very similar code to MCMC but never start MCMC; just scan over the parameter space
+
+  std::vector<TDirectory *> Cov_LLH(systematics.size());
+  for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+  {
+    std::string NameTemp = systematics[ivc]->getName();
+    NameTemp = NameTemp.substr(0, NameTemp.find("_cov")) + "_LLH";
+    Cov_LLH[ivc] = outputFile->mkdir(NameTemp.c_str());
+  }
+
+  std::vector<TDirectory *> SampleClass_LLH(samples.size());
+  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  {
+    std::string NameTemp = samples[ivs]->GetName();
+    SampleClass_LLH[ivs] = outputFile->mkdir(NameTemp.c_str());
+  }
+
+  TDirectory *Sample_LLH = outputFile->mkdir("Sample_LLH");
+  TDirectory *Total_LLH = outputFile->mkdir("Total_LLH");
+
+  TDirectory **SampleSplit_LLH = nullptr;
+  if(PlotAllNDsamplesLLH)
+  {
+    SampleSplit_LLH = new TDirectory*[TotalNSamples];
+    int iterator = 0;
+    for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+    {
+      for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      {
+        SampleSplit_LLH[iterator] = outputFile->mkdir((samples[ivs]->GetSampleName(is)+ "_LLH").c_str());
+        iterator++;
+      }
+    }
+  }
+  // Number of points we do for each LLH scan
+  const int n_points = 100;
+  // We print 5 reweights
+  const int countwidth = double(n_points)/double(5);
+
+  bool isxsec = false;
+  covarianceXsec *TempClass = nullptr;
+
+  // Loop over the covariance classes
+  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  {
+    //  Get the xsec class when we're dealing with xsec so we can set names properly
+    //  Also we need to identify when we have lower and upper bounds so we don't scan in invalid regions
+    //  in 2016 this was only applied to xsec params
+    if (std::string((*it)->getName()) == "xsec_cov") {
+      isxsec = true;
+      TempClass = dynamic_cast<covarianceXsec*>(*it);
+    } else {
+      isxsec = false;
+      TempClass = nullptr;
+    }
+
+    // Scan over all the parameters
+    // Get the number of parameters
+    int npars = (*it)->getSize();
+    bool IsPCA = (*it)->IsPCA();
+    if (IsPCA) npars = (*it)->getNpars();
+    for (int i = 0; i < npars; ++i) {
+      // Get the parameter name
+      std::string name = (*it)->GetParName(i);
+      if (IsPCA) name += "_PCA";
+      bool isflux = false;
+      // For xsec we can get the actual name, hurray for being informative
+      if (isxsec) {
+        name = TempClass->GetParName(i);
+        isflux = TempClass->IsParFlux(i);
+      }
+      // Skip flux parameters for now
+      if (isflux) continue;
+
+      // Get the parameter priors and bounds
+      double prior = (*it)->getParInit(i);
+      if (IsPCA) prior = (*it)->getParCurr_PCA(i);
+
+      // Get the covariance matrix and do the +/- nSigma
+      double nSigma = 1;
+      if (IsPCA) nSigma = 0.5;
+      // Set lower and upper bounds relative the prior
+      double lower = prior - nSigma*(*it)->getDiagonalError(i);
+      double upper = prior + nSigma*(*it)->getDiagonalError(i);
+      // If PCA, transform these parameter values to the PCA basis
+      if (IsPCA) {
+        lower = prior - nSigma*sqrt(((*it)->getEigenValues())(i));
+        upper = prior + nSigma*sqrt(((*it)->getEigenValues())(i));
+
+        std::cout << "eval " << i << " = " << (*it)->getEigenValues()(i) << std::endl;
+        std::cout << "prior " << i << " = " << prior << std::endl;
+        std::cout << "lower " << i << " = " << lower << std::endl;
+        std::cout << "upper " << i << " = " << upper << std::endl;
+        std::cout << "nSigma " << nSigma << std::endl;
+      }
+
+      // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
+      if (isxsec) {
+        if (lower < TempClass->GetLowerBound(i)) {
+          lower = TempClass->GetLowerBound(i);
+        }
+        if (upper > TempClass->GetUpperBound(i)) {
+          upper = TempClass->GetUpperBound(i);
+        }
+      }
+
+      std::cout << "Scanning " << name << " with " << n_points << " steps, \nfrom " << lower << " - " << upper << ", prior = " << prior << std::endl;
+
+      // Make the TH1D
+      TH1D *hScan = new TH1D((name+"_full").c_str(), (name+"_full").c_str(), n_points, lower, upper);
+      hScan->SetTitle(std::string(std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
+
+      TH1D *hScanSam = new TH1D((name+"_sam").c_str(), (name+"_sam").c_str(), n_points, lower, upper);
+      hScanSam->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
+
+
+      TH1D **hScanSample = new TH1D*[samples.size()];
+      double *nSamLLH = new double[samples.size()];
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      {
+        std::string NameTemp = samples[ivs]->GetName();
+        hScanSample[ivs] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
+        hScanSample[ivs]->SetTitle(std::string(std::string("2LLH_" + NameTemp + ", ") + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
+        nSamLLH[ivs] = 0.;
+      }
+
+      TH1D **hScanCov = new TH1D*[systematics.size()];
+      double *nCovLLH = new double[systematics.size()];
+      for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+      {
+        std::string NameTemp = systematics[ivc]->getName();
+        NameTemp = NameTemp.substr(0, NameTemp.find("_cov"));
+
+        hScanCov[ivc] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
+        hScanCov[ivc]->SetTitle(std::string(std::string("2LLH_" + NameTemp + ", ") + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
+        nCovLLH[ivc] = 0.;
+      }
+
+      TH1D **hScanSamSplit = nullptr;
+      double *sampleSplitllh = nullptr;
+      if(PlotAllNDsamplesLLH)
+      {
+        int iterator = 0;
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          hScanSamSplit = new TH1D*[TotalNSamples];
+          sampleSplitllh = new double[TotalNSamples];
+          for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+          {
+            hScanSamSplit[iterator] = new TH1D( (name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper );
+            hScanSamSplit[iterator]->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
+            iterator++;
+          }
+        }
+      }
+
+      // Scan over the parameter space
+      for (int j = 0; j < n_points; j++) {
+
+        if (j % countwidth == 0) {
+          std::cout << j << "/" << n_points << " (" << double(j)/double(n_points) * 100 << "%)" << std::endl;
+        }
+
+        // For PCA we have to do it differently
+        if (IsPCA) {
+          (*it)->setParProp_PCA(i, hScan->GetBinCenter(j+1));
+        } else {
+          // Set the parameter
+          (*it)->setParProp(i, hScan->GetBinCenter(j+1));
+        }
+
+        // Reweight the MC
+        double *fake = 0;
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          samples[ivs]->reweight(fake);
+        }
+        //Total LLH
+        double totalllh = 0;
+
+        // Get the -log L likelihoods
+        double samplellh = 0;
+
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          nSamLLH[ivs] = samples[ivs]->GetLikelihood();;
+          samplellh += nSamLLH[ivs];
+        }
+        for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+        {
+          nCovLLH[ivc] = systematics[ivc]->GetLikelihood();
+          totalllh += nCovLLH[ivc];
+        }
+
+        totalllh += samplellh;
+
+        if(PlotAllNDsamplesLLH)
+        {
+          int iterator = 0;
+          for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+          {
+            for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+            {
+              sampleSplitllh[iterator] = samples[ivs]->getSampleLikelihood(is);
+              iterator++;
+            }
+          }
+        }
+
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          hScanSample[ivs]->SetBinContent(j+1, 2*nSamLLH[ivs]);
+        }
+        for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+        {
+          hScanCov[ivc]->SetBinContent(j+1, 2*nCovLLH[ivc]);
+        }
+
+        hScanSam->SetBinContent(j+1, 2*samplellh);
+        hScan->SetBinContent(j+1, 2*totalllh);
+
+        if(PlotAllNDsamplesLLH)
+        {
+          int iterator = 0;
+          for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+          {
+            for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+            {
+              hScanSamSplit[is]->SetBinContent(j+1, 2*sampleSplitllh[is]);
+              iterator++;
+            }
+          }
+        }
+      }
+      for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+      {
+        Cov_LLH[ivc]->cd();
+        hScanCov[ivc]->Write();
+        delete hScanCov[ivc];
+      }
+
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      {
+        SampleClass_LLH[ivs]->cd();
+        hScanSample[ivs]->Write();
+        delete hScanSample[ivs];
+      }
+
+      Sample_LLH->cd();
+      hScanSam->Write();
+      Total_LLH->cd();
+      hScan->Write();
+
+      delete[] hScanCov;
+      delete[] nCovLLH;
+      delete[] hScanSample;
+      delete[] nSamLLH;
+      delete hScanSam;
+      delete hScan;
+
+      hScanCov = nullptr;
+      nCovLLH = nullptr;
+      hScanSample = nullptr;
+      nSamLLH = nullptr;
+      hScanSam = nullptr;
+      hScan = nullptr;
+
+      if(PlotAllNDsamplesLLH)
+      {
+        int iterator = 0;
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+          {
+            SampleSplit_LLH[iterator]->cd();
+            hScanSamSplit[iterator]->Write();
+            delete hScanSamSplit[iterator];
+            iterator++;
+          }
+        }
+        delete[] hScanSamSplit;
+      }
+
+      // Reset the parameters to their prior central values
+      if (IsPCA) {
+        (*it)->setParProp_PCA(i, prior);
+      } else {
+        (*it)->setParProp(i, prior);
+      }
+    }//end loop over systematics
+  }//end loop covariance classes
+
+  for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+  {
+    Cov_LLH[ivc]->Write();
+    delete Cov_LLH[ivc];
+  }
+
+  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  {
+    SampleClass_LLH[ivs]->Write();
+    delete SampleClass_LLH[ivs];
+  }
+
+  Sample_LLH->Write();
+  delete Sample_LLH;
+
+  Total_LLH->Write();
+  delete Total_LLH;
+
+  if(PlotAllNDsamplesLLH)
+  {
+    int iterator = 0;
+    for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+    {
+      for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      {
+        SampleSplit_LLH[iterator]->Write();
+        delete SampleSplit_LLH[iterator];
+        iterator++;
+      }
+    }
+  }
+  SaveOutput();
 }

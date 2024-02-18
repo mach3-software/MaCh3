@@ -36,8 +36,10 @@ class samplePDFBase : public samplePDFInterface
 
   virtual ~samplePDFBase();
 
-  __int__ GetNsamples(){ return nSamples; };
+  inline __int__ GetNsamples(){ return nSamples; };
+  virtual inline std::string GetName(){return "samplePDF";};
   std::string GetSampleName(int Sample);
+  virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
   MaCh3_Modes* const GetModeStruct() const { return ModeStruct;};

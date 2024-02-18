@@ -15,6 +15,7 @@
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
 #include "covariance/covarianceOsc.h"
+#include "covariance/covarianceXsec.h"
 
 #include "manager/manager.h"
 #include "MCMCProcessor.h"
@@ -40,6 +41,8 @@ class FitterBase {
 
   void PrintInitialState();
 
+  virtual void runMCMC() = 0;
+  void RunLLHScan();
  protected:
   // Prepare the output file
   void PrepareOutput();

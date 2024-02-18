@@ -5,7 +5,7 @@
 class mcmc : public FitterBase {
  public:
   mcmc(manager * const fitMan);
-  ~mcmc();
+  virtual ~mcmc();
 
   void runMCMC();
 
