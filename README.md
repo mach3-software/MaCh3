@@ -75,8 +75,6 @@ There are several debug modes, to enable more detailed but very heavy specific d
 ```
 cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
 ```
-
-
 ## System Requirements
 ```
   GCC: ...
@@ -84,3 +82,22 @@ cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
   ROOT: ...
 ```
 
+# How To Use
+This is example how your exectuable can look like using MaCh3:
+```
+  manager *fitMan = nullptr; //Manager is responsible for reading from config
+
+  std::vector<samplePDFBase*> sample; //vector storing infomation about sample for different detector
+  std::vector<covarianceBase*> Cov; // vector with systematic implementation
+  mcmc *markovChain = nullptr; // MCMC class, can be repalced with other fitting method
+  MakeMaCh3Instance(fitMan, sample, Cov, markovChain); //Factory like function whihc initialsies everything
+
+  //Adding samles and covariances to Fitter class, could be in factory
+  for(unsigned int i = 0; sample.size(); i++)
+    markovChain->addSamplePDF(sample[i]);
+  for(unsigned int i = 0; Cov.size(); i++)
+    markovChain->addSystObj(Cov[i]);
+
+  markovChain->RunLLHScan(); // can run LLH scan
+  markovChain->runMCMC(); //or run actual fit
+```
