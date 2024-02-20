@@ -20,7 +20,7 @@ MinuitFit::~MinuitFit() {
 void MinuitFit::runMCMC() {
 // *******************
 
-  PrepereFit();
+  PrepareFit();
 
   //KS: For none PCA this will be eqaul to normal parameters
   const int NparsMinuitFull = NPars;

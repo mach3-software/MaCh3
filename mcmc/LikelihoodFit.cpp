@@ -18,7 +18,7 @@ LikelihoodFit::~LikelihoodFit() {
 }
 
 // *******************
-void LikelihoodFit::PrepereFit() {
+void LikelihoodFit::PrepareFit() {
 // *******************
 
   // Save the settings into the output file

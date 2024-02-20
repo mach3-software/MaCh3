@@ -49,6 +49,14 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 
   sample_llh = NULL;
   syst_llh = NULL;
+
+
+  fTestLikelihood = false;
+  if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"])
+  {
+    fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
+  }
+
 }
 
 
@@ -69,50 +77,60 @@ FitterBase::~FitterBase() {
 void FitterBase::PrepareOutput() {
 // *******************
 
-  // Check that we have added samples
-  if (!samples.size()) {
-    std::cerr << "No samples! Stopping MCMC" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+  //MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not
+  if(!fTestLikelihood)
+  {
+    // Check that we have added samples
+    if (!samples.size()) {
+      std::cerr << "No samples! Stopping MCMC" << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }
+
+    // Prepare the output trees
+    for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
+      (*it)->setBranches(*outTree);
+    }
+
+    if (osc) {
+      osc->setBranches(*outTree);
+      outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
+    }
+
+    outTree->Branch("LogL", &logLCurr, "LogL/D");
+    outTree->Branch("accProb", &accProb, "accProb/D");
+    outTree->Branch("step", &step, "step/I");
+    outTree->Branch("stepTime", &stepTime, "stepTime/D");
+
+    // Store individual likelihood components
+    // Using double means double as large output file!
+    sample_llh = new double[samples.size()];
+    syst_llh = new double[systematics.size()];
+
+    for (size_t i = 0; i < samples.size(); ++i) {
+      std::stringstream oss, oss2;
+      oss << "LogL_sample_" << i;
+      oss2 << oss.str() << "/D";
+      outTree->Branch(oss.str().c_str(), &sample_llh[i], oss2.str().c_str());
+
+      // For adding sample dependent branches to the posteriors tree
+      samples[i]->setMCMCBranches(outTree);
+    }
+
+    for (size_t i = 0; i < systematics.size(); ++i) {
+      std::stringstream oss, oss2;
+      oss << "LogL_systematic_" << systematics[i]->getName();
+      oss2 << oss.str() << "/D";
+      outTree->Branch(oss.str().c_str(), &syst_llh[i], oss2.str().c_str());
+    }
   }
-
-  // Prepare the output trees
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
-    (*it)->setBranches(*outTree);
+  else
+  {
+    outTree->Branch("LogL", &logLCurr, "LogL/D");
+    outTree->Branch("accProb", &accProb, "accProb/D");
+    outTree->Branch("step", &step, "step/I");
+    outTree->Branch("stepTime", &stepTime, "stepTime/D");
   }
-
-  if (osc) {
-    osc->setBranches(*outTree);
-    outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
-  }
-
-  outTree->Branch("LogL", &logLCurr, "LogL/D");
-  outTree->Branch("accProb", &accProb, "accProb/D");
-  outTree->Branch("step", &step, "step/I");
-  outTree->Branch("stepTime", &stepTime, "stepTime/D");
-
-  // Store individual likelihood components
-  // Using double means double as large output file!
-  sample_llh = new double[samples.size()];
-  syst_llh = new double[systematics.size()];
-
-  for (size_t i = 0; i < samples.size(); ++i) {
-    std::stringstream oss, oss2;
-    oss << "LogL_sample_" << i;
-    oss2 << oss.str() << "/D";
-    outTree->Branch(oss.str().c_str(), &sample_llh[i], oss2.str().c_str());
-
-    // For adding sample dependent branches to the posteriors tree
-    samples[i]->setMCMCBranches(outTree);
-  }
-
-  for (size_t i = 0; i < systematics.size(); ++i) {
-    std::stringstream oss, oss2;
-    oss << "LogL_systematic_" << systematics[i]->getName();
-    oss2 << oss.str() << "/D";
-    outTree->Branch(oss.str().c_str(), &syst_llh[i], oss2.str().c_str());
-  }
-
   std::cout << "\n-------------------- Starting MCMC --------------------" << std::endl;
 
   if (debug) {

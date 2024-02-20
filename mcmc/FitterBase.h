@@ -103,5 +103,7 @@ class FitterBase {
   double stepTime;
 
   bool save_nominal;
+
+  bool fTestLikelihood;
 };
 

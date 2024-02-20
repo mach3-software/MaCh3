@@ -3,6 +3,7 @@ set(HEADERS
     mcmc.h
     LikelihoodFit.h
     MinuitFit.h
+    PSO.h
     tune.h
     stretch.h
     MCMCProcessor.h
@@ -13,6 +14,7 @@ add_library(MCMC SHARED
     mcmc.cpp
     LikelihoodFit.cpp
     MinuitFit.cpp
+    PSO.cpp
     tune.cpp
     stretch.cpp
     MCMCProcessor.cpp

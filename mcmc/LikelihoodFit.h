@@ -7,13 +7,13 @@ class LikelihoodFit : public FitterBase {
     LikelihoodFit(manager * const fitMan);
     virtual ~LikelihoodFit();
 
-    double CalcChi2(const double* x);
+    virtual double CalcChi2(const double* x);
     inline int GetNPars(){return NPars;};
 
     virtual void runMCMC() = 0;
 
   protected:
-    void PrepereFit();
+    void PrepareFit();
     int NPars;
     int NParsPCA;
     bool fMirroring;
