@@ -20,7 +20,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   stepClock = new TStopwatch;
   // Fit summary and debug info
   debug = fitMan->raw()["General"]["Debug"].as<bool>();
-  std::string outfile = fitMan->raw()["General"]["Output"]["FileName"].as<std::string>();
+  std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
 
   // Could set these from manager which is passed!
   osc_only = false;

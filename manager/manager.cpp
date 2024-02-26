@@ -82,11 +82,27 @@ void manager::SaveSettings(TFile * const OutputFile) {
   SaveBranch->Branch("AsimovFit",   &asimov_fit);
   SaveBranch->Branch("FakeDataFit", &fake_data);
 
+  std::string XSEC_cov_file, ND_cov_file, FD_cov_file, OSC_cov_file = std::string("none");
+ 
   //KS: This is needed by MCMC Processor, will be fixed in the future
-  std::string XSEC_cov_file = config["General"]["Systematics"]["XsecCovFile"].as<std::string>();
-  std::string ND_cov_file  = config["General"]["Systematics"]["ND280CovFile"].as<std::string>();
-  std::string FD_cov_file = config["General"]["Systematics"]["SKCovFile"].as<std::string>();
-  std::string OSC_cov_file = config["General"]["Systematics"]["OscCovFile"].as<std::string>();
+  //ETA: Adding a check on whether the covariance file is specified in the YAML
+  // as you might be running a fit without one of these covariance objects.
+  // If it doesn't exist then the string is set to "none"
+  if(config["General"]["Systematics"]["XsecCovFile"]){ 
+	XSEC_cov_file = config["General"]["Systematics"]["XsecCovFile"].as<std::string>();
+  }
+
+  if(config["General"]["Systematics"]["ND280CovFile"]){
+	ND_cov_file  = config["General"]["Systematics"]["ND280CovFile"].as<std::string>();
+  }
+
+  if(config["General"]["Systematics"]["SKCovFile"]){
+	FD_cov_file = config["General"]["Systematics"]["SKCovFile"].as<std::string>();
+  }
+
+  if(config["General"]["Systematics"]["OscCovFile"]){
+	OSC_cov_file = config["General"]["Systematics"]["OscCovFile"].as<std::string>();
+  }
 
   SaveBranch->Branch("XsecCov", &XSEC_cov_file);
   SaveBranch->Branch("NDCov",   &ND_cov_file);
