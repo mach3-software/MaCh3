@@ -61,7 +61,7 @@ class covarianceBase {
     if (pca) TransferToPCA();
   };
   void setParameters(std::vector<double> pars = std::vector<double>());    
-  virtual void setEvalLikelihood(int i, bool eL);
+  void setEvalLikelihood(int i, bool eL);
   
   // set branches for output file
   void setBranches(TTree &tree);
@@ -92,6 +92,7 @@ class covarianceBase {
   TMatrixDSym *getCovMatrix() { return covMatrix; };
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
   bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
+  int GetParDetID(const int i) { return _fDetID[i];};
 
   virtual int CheckBounds();
   double CalcLikelihood();
@@ -286,7 +287,7 @@ class covarianceBase {
 
   // fix parameters at nominal values
   void toggleFixAllParameters();
-  virtual void toggleFixParameter(const int i);
+  void toggleFixParameter(const int i);
   bool isParameterFixed(const int i) {
     if (_fError[i] < 0) {
       return true;

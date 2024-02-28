@@ -29,7 +29,7 @@ class covarianceXsec : public covarianceBase {
     double GetParamUpperBound(const int i) {return _fUpBound[i];}
     double GetParamLowerBound(const int i) {return _fLowBound[i];}
     double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
-    const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
+    //const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
 	//ETA - just return the int of the DetID, this can be removed to do a string comp
 	//at some point.
     int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
@@ -54,9 +54,10 @@ class covarianceXsec : public covarianceBase {
     // Get functions for Near spline parameters
     int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
     const std::vector<std::string>& GetNearSplineParsNames() const  {return NearsplineParsNames;}
-    const std::vector<std::string>& GetNearSplineFileParsNames() const  {return NearSplineFileParsNames;}
+    const std::vector<std::string>& GetNearSplineFileParsNames() const  {return _fNDSplineNames;}
     const std::vector<int>&         GetNearSplineParsIndex() const  {return NearsplineParsIndex;}
-    const std::vector<SplineInterpolation>& GetSplineInterpolation() const  {return SplineInterpolationType;}
+    const std::vector<SplineInterpolation> GetSplineInterpolation() const{return _fSplineInterpolationType;}
+    SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType[i];}
 
     //DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
@@ -121,13 +122,8 @@ class covarianceXsec : public covarianceBase {
     };
 
     // Get nominal and prior for saving to the output file
-    TVectorT<double> *GetNominal_TVec() {return xsec_param_nom;}
-    TVectorT<double> *GetPrior_TVec()   {return xsec_param_prior;}
-
-
-    // If we want to over-ride the default of running with a Gaussian prior on parameter i
-    void setEvalLikelihood(int i, bool eL);
-    void toggleFixParameter(int i);
+    //TVectorT<double> *GetNominal_TVec() {return xsec_param_nom;}
+    //TVectorT<double> *GetPrior_TVec()   {return xsec_param_prior;}
     
     //KS Function to set to nominal either flux or xsec parmeters
     void setXsecOnlyParameters();
@@ -154,31 +150,11 @@ class covarianceXsec : public covarianceBase {
     void initParams(double fScale);
     void setXsecParNames();
 
-    // Vectors of the input root file
-    TVectorT<double> *xsec_param_prior;
-    TVectorT<double> *xsec_param_nom;
-    TVectorT<double> *xsec_param_lb;
-    TVectorT<double> *xsec_param_ub;
-    TMatrixT<double> *xsec_param_id;
-
     //DB StepScaleReading
     TVectorT<double> *xsec_stepscale;
     std::vector<double> xsec_stepscale_vec;
 
-    // TObjArrays from the input root file
-	// ETA - a lot of these can go soon. Just a string for each of these can be
-	// checked via a kinematic variable so we just need to pass a string
-    TObjArray* xsec_param_norm_modes;
-    TObjArray* xsec_param_norm_horncurrents;
-    TObjArray* xsec_param_norm_elem;
-    TObjArray* xsec_param_norm_nupdg;
-    TObjArray* xsec_param_norm_preoscnupdg;
-	TObjArray* xsec_kinematic_type;
-	TVectorT<double> *xsec_kinematic_ub;
-	TVectorT<double> *xsec_kinematic_lb;
-
     // Here are some array equivalents (actually used in MCMC)
-    int **xsec_param_id_a;
     // nominal values in MC
     double *xsec_param_nom_a;
     // lower bound
@@ -188,14 +164,7 @@ class covarianceXsec : public covarianceBase {
     // priors from external data fit
     double *xsec_param_prior_a;
     
-    //Contains the names of the Far spline objects in the spline files
-    TObjArray* xsec_param_fd_spline_names;
-    TObjArray* xsec_param_fd_spline_modes;
-
     std::vector<bool> isFlux;
-
-    // Number of total parameters, just scanned from input root file
-    //int nPars;
 
     int nTotalNormParams;
     int nFaronlyNormParams;//Needed for consistency check
@@ -214,11 +183,7 @@ class covarianceXsec : public covarianceBase {
     std::vector<std::string> NearsplineParsNames;
     std::vector<std::string> NearSplineFileParsNames;
     std::vector<int> NearsplineParsIndex;
-
-    TObjArray* xsec_param_nd_spline_names;
-
-    TObjArray* xsec_spline_interpolation;
-    std::vector<SplineInterpolation> SplineInterpolationType;
+    std::vector<SplineInterpolation> _fSplineInterpolationType;
 
     int nFarSplineParams;
     std::vector<std::string> FarSplineParsNames;
@@ -258,6 +223,8 @@ class covarianceXsec : public covarianceBase {
 	std::vector<std::string> _fNDSplineNames;
 	std::vector<std::string> _fFDSplineNames;
 	std::vector<std::vector<int>> _fFDSplineModes;
+	//A vector to store the type of interpolation used for each systematic
+
 	int _nNormPars;
 };
 

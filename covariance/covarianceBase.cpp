@@ -363,7 +363,7 @@ void covarianceBase::init(const char *name, const char *file)
 	_fPropVal.at(i) = 0.;
 	_fLowBound.at(i) = -999.99;
 	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = true;
+	_fFlatPrior.at(i) = false;
 	_fIndivStepScale.at(i) = 1.;
 	corr_throw[i] = 0.0;
   }
@@ -463,7 +463,7 @@ void covarianceBase::init(const char *YAMLFile)
 	_fPropVal.at(i) = 0.;
 	_fLowBound.at(i) = -999.99;
 	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = true;
+	_fFlatPrior.at(i) = false;
 	_fIndivStepScale.at(i) = 1.;
 	corr_throw[i] = 0.0;
   }
@@ -519,7 +519,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
 	_fPropVal.at(i) = 0.;
 	_fLowBound.at(i) = -999.99;
 	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = true;
+	_fFlatPrior.at(i) = false;
 	_fIndivStepScale.at(i) = 1.;
 	corr_throw[i] = 0.0;
   }
@@ -1014,7 +1014,7 @@ double covarianceBase::CalcLikelihood() {
 #endif
   for(int i = 0; i < size; i++){
     for (int j = 0; j <= i; ++j) {
-      if (_fFlatPrior[i] && _fFlatPrior[j]) {
+      if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
         //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
         int scale = 1;
         if(i != j) scale = 2;
@@ -1134,7 +1134,9 @@ void covarianceBase::setStepScale(double scale) {
   _fGlobalStepScale = scale;
 }
 
+// ********************************************
 void covarianceBase::toggleFixAllParameters() {
+// ********************************************
   // fix or unfix all parameters by multiplying by -1
   if(!pca)
   {
@@ -1145,7 +1147,9 @@ void covarianceBase::toggleFixAllParameters() {
   return;
 }
 
+// ********************************************
 void covarianceBase::toggleFixParameter(const int i) {
+// ********************************************
   if(!pca) {
 	if (i > size) {
 	  std::cerr << "Can't toggleFixParameter for parameter " << i << " because size of covariance =" << size << std::endl;
@@ -1174,6 +1178,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 
 void covarianceBase::setEvalLikelihood(int i, bool eL) {
 
+  std::cout << "covarianceBase::setEvalLikelihood set to " << eL << std::endl;
   if (i > size) {
     std::cerr << "Can't setEvalLikelihood for " << getName() << "_" << i << " because size of covarianceXsec2015 = " << size << std::endl;
     std::cerr << "Fix this in your config file please!" << std::endl;
