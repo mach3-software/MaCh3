@@ -200,68 +200,6 @@ double samplePDFBase::getEventRate()
   return _hPDF1D->Integral();
 }
 
-double samplePDFBase::GetLikelihood()
-{
-  if(nDims == 0)    
-  {
-    std::cerr << "data sample is empty!" << std::endl;
-    return -1;
-  }
-  double negLogL = 0;
-
-  // for now, bin up dataset and do a binned fit
-  // mc
-  if(nDims == 1)
-  {
-    TH1D* pdf = (TH1D*)get1DHist();
-    // data
-    if (!dathist)
-      std::cerr << "***Data histogram empty!***" << std::endl;
-
-    /*      if(dataSample)
-            {
-            dathist->Reset();
-
-            for (int i = 0; i < int(dataSample->size()); i++)
-            dathist->Fill(dataSample->at(i));
-            }*/
-
-    // get likelihood
-    //      std::cout << pdf->Integral() << " " << dathist->Integral() << std::endl;
-    for (int i = 1; i <= pdf->GetNbinsX(); i++)
-    {
-      double mc = pdf->GetBinContent(i);
-      double dat = dathist->GetBinContent(i);
-      negLogL += getTestStatLLH(dat, mc);
-    }
-  }
-  if(nDims == 2)
-  {
-    TH2D* pdf = (TH2D*)get2DHist();
-    // data
-    if(dataSample2D && !dathist2d)
-      std::cerr << "***data histogram empty!***" << std::endl;
-    /*if(dataSample2D)
-      {
-      dathist2d->Reset();
-      for (int i = 0; i < int(dataSample2D->size()); i++)
-      dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
-      }*/
-
-    // get likelihood
-    for (int i = 1; i <= pdf->GetNbinsX(); i++)
-    {
-      for(int j = 1; j <= pdf->GetNbinsY(); j++)
-      {
-        double dat = dathist2d->GetBinContent(i,j); 
-        double mc = pdf->GetBinContent(i,j);
-        negLogL += getTestStatLLH(dat, mc);
-      }
-    }
-  }
-  return negLogL;
-}
-
 // ***************************************************************************
 //KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
 double samplePDFBase::getTestStatLLH(double data, double mc) {
