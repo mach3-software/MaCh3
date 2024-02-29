@@ -310,6 +310,13 @@ void FitterBase::RunLLHScan() {
   if(fitMan->raw()["General"]["LLHScanBySample"])
     PlotAllNDsamplesLLH = fitMan->raw()["General"]["LLHScanBySample"].as<bool>();
 
+  std::vector<std::string> SkipVector;
+  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  {
+    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    std::cout<<" Found skip vector with "<<SkipVector.size()<<" entries "<<std::endl;
+  }
+
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
 
@@ -351,20 +358,15 @@ void FitterBase::RunLLHScan() {
   const int countwidth = double(n_points)/double(5);
 
   bool isxsec = false;
-  covarianceXsec *TempClass = nullptr;
-
   // Loop over the covariance classes
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
-    //  Get the xsec class when we're dealing with xsec so we can set names properly
-    //  Also we need to identify when we have lower and upper bounds so we don't scan in invalid regions
-    //  in 2016 this was only applied to xsec params
-    if (std::string((*it)->getName()) == "xsec_cov") {
+
+    if (std::string((*it)->getName()) == "xsec_cov")
+    {
       isxsec = true;
-      TempClass = dynamic_cast<covarianceXsec*>(*it);
     } else {
       isxsec = false;
-      TempClass = nullptr;
     }
 
     // Scan over all the parameters
@@ -372,19 +374,23 @@ void FitterBase::RunLLHScan() {
     int npars = (*it)->getSize();
     bool IsPCA = (*it)->IsPCA();
     if (IsPCA) npars = (*it)->getNpars();
-    for (int i = 0; i < npars; ++i) {
+    for (int i = 0; i < npars; ++i)
+    {
       // Get the parameter name
       std::string name = (*it)->GetParName(i);
       if (IsPCA) name += "_PCA";
-      bool isflux = false;
       // For xsec we can get the actual name, hurray for being informative
-      if (isxsec) {
-        name = TempClass->GetParName(i);
-        isflux = TempClass->IsParFlux(i);
+      if (isxsec) name = (*it)->GetParFancyName(i);
+      bool skip = false;
+      for(int is = 0; is < SkipVector.size(); is++)
+      {
+        if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
+        {
+          skip = true;
+          break;
+        }
       }
-      // Skip flux parameters for now
-      if (isflux) continue;
-
+      if(skip) continue;
       // Get the parameter priors and bounds
       double prior = (*it)->getParInit(i);
       if (IsPCA) prior = (*it)->getParCurr_PCA(i);
@@ -408,15 +414,12 @@ void FitterBase::RunLLHScan() {
       }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-      if (isxsec) {
-        if (lower < TempClass->GetLowerBound(i)) {
-          lower = TempClass->GetLowerBound(i);
-        }
-        if (upper > TempClass->GetUpperBound(i)) {
-          upper = TempClass->GetUpperBound(i);
-        }
+      if (lower < (*it)->GetLowerBound(i)) {
+        lower = (*it)->GetLowerBound(i);
       }
-
+      if (upper > (*it)->GetUpperBound(i)) {
+        upper = (*it)->GetUpperBound(i);
+      }
       std::cout << "Scanning " << name << " with " << n_points << " steps, \nfrom " << lower << " - " << upper << ", prior = " << prior << std::endl;
 
       // Make the TH1D

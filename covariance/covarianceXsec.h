@@ -26,8 +26,6 @@ class covarianceXsec : public covarianceBase {
     // General Getter functions not split by detector
 	// ETA - a lot of these can go... they're just duplications from the base
 	// class.
-    double GetParamUpperBound(const int i) {return _fUpBound[i];}
-    double GetParamLowerBound(const int i) {return _fLowBound[i];}
     double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
     //const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
 	//ETA - just return the int of the DetID, this can be removed to do a string comp

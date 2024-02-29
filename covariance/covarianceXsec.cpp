@@ -111,7 +111,7 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
   ScanParameters();
 
   std::cout << "Constructing instance of covarianceXsec" << std::endl;
-  //initParams(0.001);
+  initParams(0.001);
   // Print
   Print();
 
@@ -127,6 +127,7 @@ void covarianceXsec::ParseYAML(const char* FileName)
   _fYAMLDoc = YAML::LoadFile(FileName);
   _fNumPar = _fYAMLDoc["Systematics"].size();
   _fNames = std::vector<std::string>(_fNumPar);
+  _fFancyNames = std::vector<std::string>(_fNumPar);
   _fGenerated = std::vector<double>(_fNumPar);
   _fPreFitValue = std::vector<double>(_fNumPar);
   _fError = std::vector<double>(_fNumPar);
@@ -160,6 +161,7 @@ void covarianceXsec::ParseYAML(const char* FileName)
      //std::cout << param["Systematic"]["Names"]["ParameterName"].as<std::string>() << std::endl;
 
      _fNames[i] = (param["Systematic"]["Names"]["ParameterName"].as<std::string>());
+     _fFancyNames[i] = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
      _fPreFitValue[i] = (param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
      _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
      _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
@@ -199,19 +201,24 @@ void covarianceXsec::ParseYAML(const char* FileName)
 		 std::cout << "_fFDSplineModes[0] is of size " << _fFDSplineModes[0].size() << std::endl;
 	   }
 
-	   if (param["Systematic"]["SplineInformation"]["NDSplineName"]) {
-		 _fNDSplineNames.push_back(param["Systematic"]["SplineInformation"]["NDSplineName"].as<std::string>());
-		 //MASSIVE HACKK!!! This only works because we only need the interpolation type at the ND
-		 //Now get the Spline interpolation type
-		 if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
-		   for(int InterpType = 0; InterpType < kSplineInterpolations ; InterpType++){
-			 if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
-			 {
-			   _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
-			 }
-		   }
-		 }
-	   }
+      if (param["Systematic"]["SplineInformation"]["NDSplineName"]) {
+        _fNDSplineNames.push_back(param["Systematic"]["SplineInformation"]["NDSplineName"].as<std::string>());
+        //MASSIVE HACKK!!! This only works because we only need the interpolation type at the ND
+        //Now get the Spline interpolation type
+        if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
+          for(int InterpType = 0; InterpType < kSplineInterpolations ; InterpType++){
+            if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
+            {
+              _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
+            }
+          }
+        }
+        //KS: By default use TSpline3
+        else
+        {
+          _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
+        }
+      }
 
 	   else{std::cout << "PROBLEM!!! No SPLINEINFORMATION FOR " << param["Systematic"]["Names"]["ParameterName"].as<std::string>().c_str() << std::endl;}
 
@@ -692,7 +699,6 @@ void covarianceXsec::ScanParameters() {
 		//ETA - push back kinematic type with dummy -999 since this needs to be converted into an enum for a kinematic type within
 		//a samplePDFFD daughter class
 		for(unsigned int KinVar_i = 0 ; KinVar_i < _fKinematicPars[i].size() ; ++KinVar_i) {
-		  Selections[KinVar_i].push_back(-999.9);
 		  Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][0]);
 		  Selections[KinVar_i].push_back(_fKinematicBounds[i][KinVar_i][1]);
 		  //std::cout << "  - " << _fKinematicPars[i][KinVar_i] << " from " << Selections[KinVar_i][1] << " to " << Selections[KinVar_i][2] << std::endl;
