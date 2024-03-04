@@ -154,7 +154,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options
 #Add -Werror in the future
-target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall --param=max-vartrack-size=100000000)
+target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -176,7 +176,11 @@ if(MaCh3_DEBUG_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  target_compile_options(MaCh3CompilerOptions INTERFACE -O3)
+  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
+  #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
+  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops  --param=max-vartrack-size=100000000 -finline-limit=100000000)
+  #KS: addomg Link-Time Optimization (LTO)
+  target_link_options(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
 #KS: If multithreading is not defined enable it by default

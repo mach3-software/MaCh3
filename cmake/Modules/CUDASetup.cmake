@@ -38,11 +38,11 @@ string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CUDA_ARCHITECTURES}")
 cmessage(STATUS "Using following CUDA archetectures: ${CUDA_ARCHITECTURES_STR}")
 
 if(NOT MaCh3_DEBUG_ENABLED)
-	add_compile_options(
-		"$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-O3;-Werror;cross-execution-space-call;-w>"
-		"$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
-		"$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
-	)
+    add_compile_options(
+        "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-O3;-Werror;cross-execution-space-call;-w>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
+    )
 else()
 #CWret: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
 #-pxtas-options=-v, -maxregcount=N
