@@ -235,8 +235,12 @@ void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 void MCMCProcessor::MakeOutputFile() {
 // ***************
 
+  //KS: ROOT hates me... but we can create several instances of MCMC Processor, each with own TCanvas ROOT is mad and will delete if there is more than one canvas with the same name, so we add random number to avoid issue
+  TRandom3* rand = new TRandom3(0);
+  const int uniform = int(rand->Uniform(0, 10000));
   // Open a TCanvas to write the posterior onto
-  Posterior = new TCanvas("Posterior", "Posterior", 0, 0, 1024, 1024);
+  Posterior = new TCanvas(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
+
   Posterior->SetGrid();
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
@@ -887,7 +891,7 @@ void MCMCProcessor::MakeViolin() {
   const int PriorFactor = 4;
   hviolin_prior = new TH2D("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
 
-  TRandom3* rand = new TRandom3();
+  TRandom3* rand = new TRandom3(0);
 
   std::vector<double> PriorVec(nDraw);
   std::vector<double> PriorErrorVec(nDraw);
@@ -3158,7 +3162,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
       PriorHist->Reset("");
       PriorHist->Fill(0.0, 0.0);
       
-      TRandom3* rand = new TRandom3();
+      TRandom3* rand = new TRandom3(0);
       //KS: Throw nice gaussian, just need big number to have smooth distribution
       for(int g = 0; g < 1000000; ++g)
       {
