@@ -353,7 +353,12 @@ void FitterBase::RunLLHScan() {
     }
   }
   // Number of points we do for each LLH scan
-  const int n_points = 100;
+  int n_points = 50;
+  //If option exists in yaml config then set the number of points to this
+  if(fitMan->raw()["General"]["LLHScanPoints"]){
+	n_points = fitMan->raw()["General"]["LLHScanPoints"].as<int>();
+  }
+
   // We print 5 reweights
   const int countwidth = double(n_points)/double(5);
 
@@ -391,6 +396,7 @@ void FitterBase::RunLLHScan() {
         }
       }
       if(skip) continue;
+
       // Get the parameter priors and bounds
       double prior = (*it)->getParInit(i);
       if (IsPCA) prior = (*it)->getParCurr_PCA(i);
@@ -499,9 +505,10 @@ void FitterBase::RunLLHScan() {
 
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          nSamLLH[ivs] = samples[ivs]->GetLikelihood();;
+          nSamLLH[ivs] = samples[ivs]->GetLikelihood();
           samplellh += nSamLLH[ivs];
         }
+
         for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
         {
           nCovLLH[ivc] = systematics[ivc]->GetLikelihood();

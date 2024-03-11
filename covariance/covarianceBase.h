@@ -158,7 +158,7 @@ class covarianceBase {
     return _fPreFitValue[i];
   };
 
-  virtual const double getNominal(const int i) {
+  virtual double getNominal(const int i) {
     return getParInit(i);
   };
 
