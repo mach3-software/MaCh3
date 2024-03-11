@@ -145,6 +145,7 @@ class covarianceBase {
   //Some Getters
   int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
+  const std::vector<double>& getPreFitValues(){return _fPreFitValue;};
   const std::vector<double>& getGeneratedValues(){return _fGenerated;};
   const std::vector<double> getProposed() const;
   double getParProp(const int i) {
