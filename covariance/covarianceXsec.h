@@ -43,25 +43,13 @@ class covarianceXsec : public covarianceBase {
       return isFlux[i];
     }
 
-	//ETA - these can be removed as Near params will be given by DetID so this is defunct.
-    // Get functions for Near normalisation parameters
-    const std::vector<XsecNorms4> GetNearNormPars() const{return NearNormParams;}
-    int                     GetNumNearNormParams() const  {return nNearNormParams;}
-
-    // Get functions for Far normalisation parameters
-    const std::vector<XsecNorms4> GetFarNormPars() const{return FarNormParams;}
-
-    // Get functions for Near spline parameters
-    int                       GetNumNearSplineParams() const  {return nNearSplineParams;}
-    const std::vector<std::string>& GetNearSplineParsNames() const  {return NearsplineParsNames;}
-    const std::vector<std::string>& GetNearSplineFileParsNames() const  {return _fNDSplineNames;}
-    const std::vector<int>&         GetNearSplineParsIndex() const  {return NearsplineParsIndex;}
-    const std::vector<SplineInterpolation> GetSplineInterpolation() const{return _fSplineInterpolationType;}
-    SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType[i];}
+    const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
+    SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType.at(i);}
 
     //DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
+	//ETA - what does this even do?
     const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
@@ -70,17 +58,12 @@ class covarianceXsec : public covarianceBase {
 
     //DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
+	void SetupNormPars();
     int GetNumFuncParamsFromDetID(int DetID);
     const std::vector<std::string> GetFuncParsNamesFromDetID(int DetID);
     const std::vector<int> GetFuncParsIndexFromDetID(int DetID);
 
-    // Get functions for Far spline parameters
-    int                       GetNumFarSplineParams() const  {return nFarSplineParams;}
-    const std::vector<std::string>& GetFarSplineParsNames() const  {return FarSplineParsNames;}
-    const std::vector<std::string>& GetFarSplineFileParsNames() const  {return FarSplineFileParsNames;}
-    //TVectorT<double> *GetFarSplineParsModes_TVec() {return FarSplineParsModes;}
-    //const double GetFarSplineParsModes(int i) {return xsec_fd_spline_mode_a[i];}
-    const std::vector<int>&         GetFarSplineParsIndex() const  {return FarSplineParsIndex;}
+	//ETA - FarSplineModes can be replaced with a BinnedSplineModes or something eventually
     const std::vector<int>&         GetFarSplineModeVec(int i) const {return FarSplineModes[i];}
 	
     // Get functions for uniq spline parameters //!!decide what to do about these
@@ -92,17 +75,7 @@ class covarianceXsec : public covarianceBase {
     int                       GetNumSplineParamsShare() const  {return nSplineParamsShare;}
     const std::vector<std::string>& GetSplineParsShareNames() const  {return splineParsShareNames;}
     const std::vector<int>&         GetSplineParsShareIndex() const  {return splineParsShareIndex;}
-    const std::vector<int>&         GetSplineParsShareToUniq() const {return splineParsShareToUniq;}
-    
-    // Get functions for Near functional parameter (e.g. BeRPA)
-    int                       GetNumNearFuncParams() const     {return nNearFuncParams;}
-    const std::vector<std::string>& GetNearFuncParsNames() const  {return NearfuncParsNames;}
-    const std::vector<int>&         GetNearFuncParsIndex() const  {return NearfuncParsIndex;}
-
-    // Get functions for Far functional parameter (e.g. BeRPA)
-    int                       GetNumFarFuncParams() const     {return nFarFuncParams;}
-    const std::vector<std::string>& GetFarFuncParsNames() const  {return FarFuncParsNames;}
-    const std::vector<int>&         GetFarFuncParsIndex() const  {return FarFuncParsIndex;}
+    const std::vector<int>&         GetSplineParsShareToUniq() const {return splineParsShareToUniq;} 
 
     //KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be differrent
     // For example Sigma Var are done around nominal in ND280, no idea why though...
@@ -116,15 +89,11 @@ class covarianceXsec : public covarianceBase {
       return nominal;
     }
 
-    const double getNominal(const int i)
+    double getNominal(const int i)
     {
       return _fPreFitValue.at(i);
     };
-
-    // Get nominal and prior for saving to the output file
-    //TVectorT<double> *GetNominal_TVec() {return xsec_param_nom;}
-    //TVectorT<double> *GetPrior_TVec()   {return xsec_param_prior;}
-    
+   
     //KS Function to set to nominal either flux or xsec parmeters
     void setXsecOnlyParameters();
     void setFluxOnlyParameters();
@@ -145,7 +114,7 @@ class covarianceXsec : public covarianceBase {
 
   protected:
     // Helper functions to decide on what setup we're running
-    void ScanParameters();
+    //void ScanParameters();
 
     void initParams(double fScale);
     void setXsecParNames();
@@ -166,33 +135,14 @@ class covarianceXsec : public covarianceBase {
     
     std::vector<bool> isFlux;
 
+	//Vector containing info for normalisation systematics 
+	std::vector<XsecNorms4> NormParams;
     int nTotalNormParams;
-    int nFaronlyNormParams;//Needed for consistency check
-	//ETA - we can maybe remove these for now
-    int nLowEnergyAtmOnlyNormParams;//DB Needed for consistency check
-    int nHighEnergyAtmOnlyNormParams;//DB Needed for consistency check
 
-    std::vector<XsecNorms4> FarNormParams;
-    int nFarNormParams;
-
-    std::vector<XsecNorms4> NearNormParams;
-    int nNearNormParams;
-
-    // Number of Near spline parameters
-    int nNearSplineParams;
-    std::vector<std::string> NearsplineParsNames;
-    std::vector<std::string> NearSplineFileParsNames;
-    std::vector<int> NearsplineParsIndex;
     std::vector<SplineInterpolation> _fSplineInterpolationType;
 
-    int nFarSplineParams;
-    std::vector<std::string> FarSplineParsNames;
-    std::vector<int> FarSplineParsIndex;
-    //ETA - new object for storing spline name in File
+    //ETA - for storing spline name in File
     std::vector<std::string> FarSplineFileParsNames;
-    //Mode which spline applies to
-    //mode=12 (which is kMaCh3_nModes for NIWG2020 model) means it applies to all modes
-    //TVectorT<double> *FarSplineParsModes;
     std::vector<std::vector<int> > FarSplineModes;
 
     // Number of spline parameters that aren't repeated
@@ -206,20 +156,9 @@ class covarianceXsec : public covarianceBase {
     std::vector<int> splineParsShareIndex;
     std::vector<int> splineParsShareToUniq;
 
-	// ETA - again, these can be removed soon as we get this info from a check
-	// against DetID
-    // Number of functional parameter
-    int nNearFuncParams;
-    std::vector<std::string> NearfuncParsNames;
-    std::vector<int> NearfuncParsIndex;
-
-    int nFarFuncParams;
-    std::vector<std::string> FarFuncParsNames;
-    std::vector<int> FarFuncParsIndex;
-
   private:
 	//ETA - do we need these now?
-	// it would be nice if we could get rid of these
+	// it would be nice if we could get rid of these by chceking against DetID
 	std::vector<std::string> _fNDSplineNames;
 	std::vector<std::string> _fFDSplineNames;
 	std::vector<std::vector<int>> _fFDSplineModes;
