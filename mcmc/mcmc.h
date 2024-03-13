@@ -7,7 +7,7 @@ class mcmc : public FitterBase {
   mcmc(manager * const fitMan);
   virtual ~mcmc();
 
-  void runMCMC();
+  void runMCMC() override;
 
   void setChainLength(int L) { chainLength = L; };
 

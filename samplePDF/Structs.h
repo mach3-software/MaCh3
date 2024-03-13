@@ -57,6 +57,13 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
 }
 
 // *******************
+//KS: This is mad way of covnerting string to int. Why? To be able to use string with switch
+constexpr unsigned int str2int(const char* str, int h = 0) {
+// *******************
+  return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
+}
+
+// *******************
 // ETA - new version of this for refactor
 // Normalisations for cross-section parameters
 // Carrier for whether you want to apply a systematic to an event or not

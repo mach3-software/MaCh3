@@ -6,8 +6,7 @@
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-  
-  std::cout << "Trying to get information from fitMan" << std::endl;
+
   std::cout << "Seed is " << fitMan->raw()["General"]["Seed"].as<int>() << std::endl;
 
   random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
