@@ -82,14 +82,15 @@ void manager::SaveSettings(TFile * const OutputFile) {
   SaveBranch->Branch("AsimovFit",   &asimov_fit);
   SaveBranch->Branch("FakeDataFit", &fake_data);
 
-  std::string XSEC_cov_file, ND_cov_file, FD_cov_file, OSC_cov_file = std::string("none");
- 
+  std::string ND_cov_file, FD_cov_file, OSC_cov_file = std::string("none");
+  std::vector<std::string> XSEC_cov_file;
+
   //KS: This is needed by MCMC Processor, will be fixed in the future
   //ETA: Adding a check on whether the covariance file is specified in the YAML
   // as you might be running a fit without one of these covariance objects.
   // If it doesn't exist then the string is set to "none"
   if(config["General"]["Systematics"]["XsecCovFile"]){ 
-	XSEC_cov_file = config["General"]["Systematics"]["XsecCovFile"].as<std::string>();
+	XSEC_cov_file = config["General"]["Systematics"]["XsecCovFile"].as<std::vector<std::string>>();
   }
 
   if(config["General"]["Systematics"]["ND280CovFile"]){

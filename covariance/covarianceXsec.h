@@ -17,7 +17,7 @@ class covarianceXsec : public covarianceBase {
 
   public:
   covarianceXsec(const char *name, const char *file, double threshold=-1,int FirstPCAdpar=-999,int LastPCAdpar=-999);
-  covarianceXsec(const char *YAMLFile);
+  covarianceXsec(std::vector<std::string> FileNames);
     ~covarianceXsec();
 
     // Print information about the whole object once it is set
@@ -35,7 +35,7 @@ class covarianceXsec : public covarianceBase {
     const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
 
 	//ETA - trying out the yaml parsing
-	void ParseYAML(const char* FileName);
+	void ParseYAML(std::vector<std::string> FileName);
 
     bool IsParFlux(const int i){
       return isFlux[i];

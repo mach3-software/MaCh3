@@ -61,7 +61,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
-covarianceXsec::covarianceXsec(const char *YAMLFile)
+covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile)
   : covarianceBase(YAMLFile) {
 
   std::cout << "About to ParseYaml" << std::endl;
@@ -121,11 +121,18 @@ covarianceXsec::covarianceXsec(const char *YAMLFile)
 }
 
 
-void covarianceXsec::ParseYAML(const char* FileName)
+void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 {
-  std::cout << "Let's read some YAML!" << std::endl;
+  //KS: We can pass several yaml config files. Here we merge them into one. For example you can have yaml for xsec and flux.
+  _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < FileNames.size(); i++)
+  {
+    YAML::Node YAMLDocTemp = YAML::LoadFile(FileNames[i]);
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      _fYAMLDoc["Systematics"].push_back(item);
+    }
+  }
 
-  _fYAMLDoc = YAML::LoadFile(FileName);
   _fNumPar = _fYAMLDoc["Systematics"].size();
   _fNames = std::vector<std::string>(_fNumPar);
   _fFancyNames = std::vector<std::string>(_fNumPar);
@@ -261,7 +268,7 @@ void covarianceXsec::ParseYAML(const char* FileName)
 	   }
 	 }
      else if(param["Systematic"]["Type"].as<std::string>() == "Functional"){
-	   std::cout << "Found a functional parameter!!" << std::endl;
+	   //std::cout << "Found a functional parameter!!" << std::endl;
 	    
 	 }
      else{

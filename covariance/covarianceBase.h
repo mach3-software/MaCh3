@@ -39,7 +39,7 @@ class covarianceBase {
   // The constructors
   covarianceBase(){};
   //ETA - construcotr for a YAML file
-  covarianceBase(const char *YAMLFile);
+  covarianceBase(std::vector<std::string> YAMLFile);
   //"Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);

@@ -22,7 +22,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   PrintLength = 35;
 }
 
-covarianceBase::covarianceBase(const char *YAMLFile) : inputFile(std::string(YAMLFile)), pca(false) {
+covarianceBase::covarianceBase(std::vector<std::string> YAMLFile) : inputFile(YAMLFile[0].c_str()), pca(false) {
 // ********************************************
 #ifdef MULTITHREAD
   int nThreads = omp_get_max_threads();
@@ -36,8 +36,11 @@ covarianceBase::covarianceBase(const char *YAMLFile) : inputFile(std::string(YAM
     random_number[iThread] = new TRandom3(0);
   }
 
-  std::cout << "Constructing instance of covarianceBase using " << YAMLFile << " as an input" << std::endl;
-  init(YAMLFile);
+  std::cout << "Constructing instance of covarianceBase using ";
+  for(unsigned int i = 0; i < YAMLFile.size(); i++)
+    std::cout << YAMLFile[i]<< ", ";
+  std::cout<< " as an input" << std::endl;
+  init(YAMLFile[0].c_str());
   FirstPCAdpar = -999;
   LastPCAdpar = -999;
 
