@@ -18,9 +18,9 @@ manager::manager(std::string const &filename)
   FileName = filename;
   std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
 
-  if (config["LikelihoodOptions"] && config["LikelihoodOptions"]["TestStatistic"])
+  if (config["LikelihoodOptions"])
   {
-    std::string likelihood = config["LikelihoodOptions"]["TestStatistic"].as<std::string>();
+    std::string likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
     if (likelihood == "Barlow-Beeston")                 mc_stat_llh = TestStatistic(kBarlowBeeston);
     else if (likelihood == "IceCube")                   mc_stat_llh = TestStatistic(kIceCube);
     else if (likelihood == "Poisson")                   mc_stat_llh = TestStatistic(kPoisson);
@@ -85,24 +85,10 @@ void manager::SaveSettings(TFile * const OutputFile) {
   std::vector<std::string> XSEC_cov_file;
 
   //KS: This is needed by MCMC Processor, will be fixed in the future
-  //ETA: Adding a check on whether the covariance file is specified in the YAML
-  // as you might be running a fit without one of these covariance objects.
-  // If it doesn't exist then the string is set to "none"
-  if(config["General"]["Systematics"]["XsecCovFile"]){
-	XSEC_cov_file = config["General"]["Systematics"]["XsecCovFile"].as<std::vector<std::string>>();
-  }
-
-  if(config["General"]["Systematics"]["ND280CovFile"]){
-	ND_cov_file  = config["General"]["Systematics"]["ND280CovFile"].as<std::string>();
-  }
-
-  if(config["General"]["Systematics"]["SKCovFile"]){
-	FD_cov_file = config["General"]["Systematics"]["SKCovFile"].as<std::string>();
-  }
-
-  if(config["General"]["Systematics"]["OscCovFile"]){
-	OSC_cov_file = config["General"]["Systematics"]["OscCovFile"].as<std::string>();
-  }
+  XSEC_cov_file = GetFromManager<std::vector<std::string>>(config["General"]["Systematics"]["XsecCovFile"], {"none"});
+  ND_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["ND280CovFile"], {"none"});
+  FD_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["SKCovFile"], {"none"});
+  OSC_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["OscCovFile"], {"none"});
 
   SaveBranch->Branch("XsecCov", &XSEC_cov_file);
   SaveBranch->Branch("NDCov",   &ND_cov_file);

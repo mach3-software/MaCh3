@@ -5,6 +5,17 @@
 
 #include "yaml-cpp/yaml.h"
 
+template<typename Type>
+Type GetFromManager(const YAML::Node& node, Type defval)
+{
+  YAML::Node tmpNode = node;
+
+  if(!tmpNode){
+    return defval;
+  }
+  return tmpNode.as<Type>();
+}
+
 //KS: Base case for recursion
 template<typename T>
 bool checkPathExistsHelper(const T& node) {
