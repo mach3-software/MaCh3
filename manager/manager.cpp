@@ -18,9 +18,6 @@ manager::manager(std::string const &filename)
   FileName = filename;
   std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
 
-  //KS: Purely example how to use fancy yaml helper
-  checkPathExists(config, "General", "Systematics");
-
   if (config["LikelihoodOptions"] && config["LikelihoodOptions"]["TestStatistic"])
   {
     std::string likelihood = config["LikelihoodOptions"]["TestStatistic"].as<std::string>();
@@ -91,7 +88,7 @@ void manager::SaveSettings(TFile * const OutputFile) {
   //ETA: Adding a check on whether the covariance file is specified in the YAML
   // as you might be running a fit without one of these covariance objects.
   // If it doesn't exist then the string is set to "none"
-  if(config["General"]["Systematics"]["XsecCovFile"]){ 
+  if(config["General"]["Systematics"]["XsecCovFile"]){
 	XSEC_cov_file = config["General"]["Systematics"]["XsecCovFile"].as<std::vector<std::string>>();
   }
 

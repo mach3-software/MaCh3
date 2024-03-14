@@ -12,7 +12,6 @@
 #include "TTree.h"
 #include "TBranch.h"
 
-#include "yaml-cpp/yaml.h"
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
 
