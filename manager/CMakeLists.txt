@@ -1,4 +1,6 @@
-set(HEADERS manager.h
+set(HEADERS
+    manager.h
+    YamlHelper.h
 )
 
 add_library(Manager SHARED

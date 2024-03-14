@@ -14,7 +14,7 @@
 
 #include "yaml-cpp/yaml.h"
 #include "samplePDF/Structs.h"
-
+#include "manager/YamlHelper.h"
 
 class manager {
 

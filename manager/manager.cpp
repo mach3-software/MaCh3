@@ -18,6 +18,8 @@ manager::manager(std::string const &filename)
   FileName = filename;
   std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
 
+  //KS: Purely example how to use fancy yaml helper
+  checkPathExists(config, "General", "Systematics");
 
   if (config["LikelihoodOptions"] && config["LikelihoodOptions"]["TestStatistic"])
   {
