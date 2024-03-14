@@ -352,11 +352,7 @@ void FitterBase::RunLLHScan() {
     }
   }
   // Number of points we do for each LLH scan
-  int n_points = 50;
-  //If option exists in yaml config then set the number of points to this
-  if(fitMan->raw()["General"]["LLHScanPoints"]){
-	n_points = fitMan->raw()["General"]["LLHScanPoints"].as<int>();
-  }
+  const int n_points = GetFromManager<int>(fitMan->raw()["General"]["LLHScanPoints"], 100);
 
   // We print 5 reweights
   const int countwidth = double(n_points)/double(5);
