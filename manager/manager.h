@@ -27,6 +27,8 @@ public:
 
   void SaveSettings(TFile * const OutputFile);
 
+  void Print();
+
 private:
   YAML::Node config;
   std::string FileName;
@@ -49,7 +51,7 @@ private:
   int readConfig(char *config);
 
 // Print and checks
-  void Print();
+
   //bool checkSettings();
 
 

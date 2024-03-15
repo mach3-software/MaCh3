@@ -1,19 +1,9 @@
-//******************************************************
-// This class reads the configuration file config.cfg
-// More documentation is available in the header.
-//
-// A brief description of each parameter is available
-// in doc/executables_description/run_executable
-// and the README of this folder
-// look also at example_config in the main dir.
-//******************************************************
-
 #include "manager.h"
-#include <iostream>
 
+// *************************
 manager::manager(std::string const &filename)
-    : config(YAML::LoadFile(filename))
-{
+    : config(YAML::LoadFile(filename)) {
+// *************************
 
   FileName = filename;
   std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
@@ -86,9 +76,9 @@ void manager::SaveSettings(TFile * const OutputFile) {
 
   //KS: This is needed by MCMC Processor, will be fixed in the future
   XSEC_cov_file = GetFromManager<std::vector<std::string>>(config["General"]["Systematics"]["XsecCovFile"], {"none"});
-  ND_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["ND280CovFile"], {"none"});
-  FD_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["SKCovFile"], {"none"});
-  OSC_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["OscCovFile"], {"none"});
+  ND_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["ND280CovFile"], "none");
+  FD_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["SKCovFile"], "none");
+  OSC_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["OscCovFile"], "none");
 
   SaveBranch->Branch("XsecCov", &XSEC_cov_file);
   SaveBranch->Branch("NDCov",   &ND_cov_file);
@@ -105,6 +95,17 @@ void manager::SaveSettings(TFile * const OutputFile) {
   delete SaveBranch;
 }
 
+// *************************
+void manager::Print() {
+// *************************
+
+  std::cout << "--------------------------------- " << "\n";
+  std::cout << config << "\n";
+  std::cout << "---------------------------------" << "\n";
+
+  //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
+  std::cout << std::endl;
+}
 
 /* Old Mananger that needs translation
  * we're moving to YAML BABY!
@@ -796,38 +797,6 @@ FLUXCOVFILE=-1 or suttin catch (const libconfig::SettingTypeException &tyex) {
   //}
 
   return(EXIT_SUCCESS);
-}
-
-void manager::Print() {
-
-  std::cout << "---------------------------------" << std::endl;
-  std::cout << "General settings      " << std::endl;
-  std::cout << "    Output file:      " << GetOutputFilename() << std::endl;
-  std::cout << "    Seed:             " << GetSeed() << std::endl;
-  std::cout << "    Debug:            " << GetDebug() << std::endl;
-  std::cout << "    GPU fit:          " << GetGPU() << std::endl;
-  std::cout << "    CPU MP fit:       " << GetCPUMP() << std::endl;
-  std::cout << "       N cores:       " << GetNCPU() << std::endl;
-
-  std::cout << "---------------------------------" << std::endl;
-  std::cout << "MCMC settings         "    << std::endl;
-  std::cout << "    N steps:          " << GetNSteps() << std::endl;
-  std::cout << "    AutoSave:         " << GetAutoSave() << std::endl;
-  std::cout << "    Xsec step scale:  " << GetXsecStepScale() << std::endl;
-  std::cout << "    ND det step scale:" << GetNearDetStepScale() << std::endl;
-  std::cout << "    Far det step scale:" << GetFarDetStepScale() << std::endl;
-  std::cout << "    Osc step scale:   " << GetOscStepScale() << std::endl;
-  std::cout << "    Anneal. temp:     " << GetTemp() << std::endl;
-  std::cout << "    Random start:     " << GetRandomStart() << std::endl;
-  std::cout << "    Process MCMC:     " << GetProcessMCMC() << std::endl;
-  std::cout << "    Posterior start:  " << GetStartFromPosterior() << std::endl;
-  std::cout << "    Posterior chain:  " << GetPosteriorFiles() << std::endl;
-
-  std::cout << "---------------------------------" << std::endl;
-  std::cout << "Run settings      " << std::endl;
-  std::cout << "    Nnu POT:        " << GetPOT() << std::endl;
-  std::cout << "    Antinu POT:    " << GetNubarPOT() << std::endl;
-  std::cout << "    Save nominal:     " << GetSaveNom() << std::endl;
 }
 
 */
