@@ -20,15 +20,9 @@
 #include "TRandom.h"
 #include "TString.h"
 
-//Propagator includes
-#ifdef USE_PROB3
-  #include "BargerPropagator.h"
-#else
-  #include "beamcudapropagator.cuh"
-  #include "atmoscudapropagator.cuh"
-#endif
-
 //MaCh3 includes
+#include "OscClass/OscClass_CUDAProb3.h"
+
 #include "samplePDF/interfacePDFEbE.h"
 #include "samplePDF/samplePDFBase.h"
 
@@ -42,7 +36,7 @@
 #include "samplePDF/ShiftFunctors.h"
 
 #include "manager/manager.h"
-#include "OscClass/OscClass_CUDAProb3.h"
+
 
 #define USEBETA 0
 
