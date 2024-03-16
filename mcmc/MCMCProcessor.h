@@ -37,6 +37,8 @@
 #include "TROOT.h"
 #include "TKey.h"
 #include "TRandom3.h"
+#include "TGraphPolar.h"
+#include "TMath.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -87,6 +89,8 @@ class MCMCProcessor {
     //Make fancy triangle plot for selected parameters
     void MakeTrianglePlot(std::vector<std::string> ParamNames);
     
+    void GetPolarPlot(std::vector<std::string> ParNames);
+
     //Bayesian statistic hypotheis testing
     void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
