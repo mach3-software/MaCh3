@@ -94,6 +94,21 @@ void samplePDFFDBase::useBinnedOscReweighting(bool ans, int nbins, double *osc_b
   }
 }
 
+bool* samplePDFFDBase::AreEventsSelected(std::vector< std::string > SelectionStr){
+  bool *selected = new bool[MCSamples[iSample].nEvents](true);
+
+  for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
+ 
+	  double* KineArr = ReturnKinematicParameter(SelectionStr[iSelection], iSample, iEvent);
+    for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+      double Val = KineArr[iEvent];
+      selected &= ((Val>=SelectionBounds[iSelection][0])&&(Val<SelectionBounds[iSelection][1]))
+    }
+  }
+
+  return selected;
+}
+
 bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iSample, int iEvent) {
   
   double Val;
@@ -262,18 +277,15 @@ void samplePDFFDBase::fillArray() {
   }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
-    for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+    // for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       
-	  applyShifts(iSample, iEvent);
+	  applyShifts();
 
-	  if (!IsEventSelected(SelectionStr, iSample, iEvent)) { 
-		continue;
-	  } 
+    bool* selected = AreEventsSelected(SelectionStr);
 
-
-#if USEBETA == 1
-      MCSamples[iSample].osc_w[iEvent] = ApplyBetaWeights(MCSamples[iSample].osc_w[iEvent],iSample);
-#endif
+// #if USEBETA == 1
+//       MCSamples[iSample].osc_w[iEvent] = ApplyBetaWeights(MCSamples[iSample].osc_w[iEvent],iSample);
+// #endif
 
       double splineweight = 1.0;
       double normweight = 1.0;
@@ -376,7 +388,9 @@ void samplePDFFDBase::fillArray() {
 		//std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill <<  " || X var  = " << XVar << std::endl;
 	  }
 
-    }
+    // }
+
+  delete selected;
   }
 
 #endif // end the else in openMP

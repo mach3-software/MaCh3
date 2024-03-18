@@ -167,10 +167,11 @@ public:
   //===============================================================================
 
   //ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){};
+  virtual void applyShifts(){};
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
+  bool* samplePDFFDBase::AreEventsSelected(std::vector< std::string > SelectionStr);
   virtual void reconfigureFuncPars(){};
 
   void CalcXsecNormsBins(int iSample);
@@ -275,7 +276,8 @@ public:
 
   //===============================================================================
   //DB Vectors to store which kinematic cuts we apply
-  std::vector< std::string > SelectionStr; //like in XsecNorms but for events in sample. Read in from sample yaml file 
+  std::vector< std::string > SelectionStr; //like in XsecNorms but for events in sample. Read in from sample yaml file
+  std::vector<double *> SelectionPointers;
   std::vector< std::vector<double> > SelectionBounds; // like in XsecNorms but for events in sample. Read in from sample yaml file in samplePDFExperimentBase.cpp
 
   std::vector< std::vector<double> > Selection; //What gets used in IsEventSelected, which gets set equal to user input plus all the vectors in StoreSelection
