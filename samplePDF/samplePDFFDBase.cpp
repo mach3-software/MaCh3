@@ -94,15 +94,13 @@ void samplePDFFDBase::useBinnedOscReweighting(bool ans, int nbins, double *osc_b
   }
 }
 
-bool* samplePDFFDBase::AreEventsSelected(std::vector< std::string > SelectionStr){
-  bool *selected = new bool[MCSamples[iSample].nEvents](true);
-
+void samplePDFFDBase::ApplyEventSelections(std::vector< std::string > SelectionStr, int iSample){
   for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
- 
-	  double* KineArr = ReturnKinematicParameter(SelectionStr[iSelection], iSample, iEvent);
+	  double* KineArr = ReturnKinematicParameter(SelectionStr[iSelection], iSample);
+    double* xsec_weights = MCSamples[iSample].xsec_w;
     for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
       double Val = KineArr[iEvent];
-      selected &= ((Val>=SelectionBounds[iSelection][0])&&(Val<SelectionBounds[iSelection][1]))
+      xsec_weights[iEvent] *= ((Val>=SelectionBounds[iSelection][0])&&(Val<SelectionBounds[iSelection][1]))
     }
   }
 
@@ -279,44 +277,26 @@ void samplePDFFDBase::fillArray() {
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     // for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       
-	  applyShifts();
+    //Reset xsec_weights
+    memset(MCSamples[iSample].xsec_w, 1, MCSamples[iSample].nEvents*sizeof(*(MCSamples[iSample].xsec_w)));
 
-    bool* selected = AreEventsSelected(SelectionStr);
+	  applyShifts();
+    ApplyEventSelections(SelectionStr, iSample);
 
 // #if USEBETA == 1
 //       MCSamples[iSample].osc_w[iEvent] = ApplyBetaWeights(MCSamples[iSample].osc_w[iEvent],iSample);
 // #endif
-
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double funcweight = 1.0;
-      double totalweight = 1.0;
       
-      splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-      //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
-      if (splineweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
+    ApplyXsecWeightSpline(iSample);
 
       //Loop over stored normalisation and function pointers 
-      normweight *= CalcXsecWeightNorm(iSample, iEvent);
+    ApplyXsecWeightNorm(iSample, iEvent);
 
-      //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-      if (normweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
-
-      funcweight = CalcXsecWeightFunc(iSample,iEvent);
-      //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-      if (funcweight <= 0.){          
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
-
-      MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
+      //TODO: implement XsecWeightFunc parameters
+      // funcweight = CalcXsecWeightFunc(iSample,iEvent);
       
+
+    for(uint iEvent = 0; iEvent<MCSamples[iSample].nEvents;iEvent++){
       //DB Set oscillation weights for NC events to 1.0
       //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupMC
 	  //
@@ -328,17 +308,19 @@ void samplePDFFDBase::fillArray() {
       if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
       }
+    }
 
+
+    for(uint iEvent = 0; iEvent<MCSamples[iSample].nEvents;iEvent++){
       //DB Total weight
+      double totalweight = 1.;
       for (int iParam=0; iParam<MCSamples[iSample].ntotal_weight_pointers[iEvent] ; ++iParam) {
-		totalweight *= *(MCSamples[iSample].total_weight_pointers[iEvent][iParam]);
+		    totalweight *= *(MCSamples[iSample].total_weight_pointers[iEvent][iParam]);
       }
-      //DB Catch negative weights and skip any event with a negative event
-      if (totalweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
-      
+      if(totalweight <= 0){
+        continue;
+      }
+
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
       double XVar = *(MCSamples[iSample].x_var[iEvent]);
@@ -387,6 +369,8 @@ void samplePDFFDBase::fillArray() {
 	  else{
 		//std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill <<  " || X var  = " << XVar << std::endl;
 	  }
+
+    }
 
     // }
 
@@ -640,6 +624,23 @@ double samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent
   return xsecw;
 }
 
+void samplePDFFDBase::ApplyXsecWeightSpline(int iSample) {
+// ***************************************************************************
+  //DB Xsec syst
+  //Loop over stored spline pointers
+
+  double* xsec_weights = MCSamples[iSample].xsec_w;
+
+  for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+    for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
+      //TODO try to see if it is possible to invert the loop order
+      xsec_weights[iEvent] *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
+    }
+
+    xsec_weights[iEvent] = max(0, xsec_weights[iEvent]);
+  }
+}
+
 // ***************************************************************************
 // Calculate the normalisation weight for one event
 double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) {
@@ -655,6 +656,23 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
       #endif
   }
   return xsecw;
+}
+
+void samplePDFFDBase::ApplyXsecWeightNorm(int iSample) {
+// ***************************************************************************
+  //DB Xsec syst
+  //Loop over stored spline pointers
+
+  double* xsec_weights = MCSamples[iSample].xsec_w;
+
+  for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+    for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent];iParam++) {
+      //TODO try to see if it is possible to invert the loop order
+      xsec_weights[iEvent] *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+    }
+
+    xsec_weights[iEvent] = max(0, xsec_weights[iEvent]);
+  }
 }
 
 //ETA

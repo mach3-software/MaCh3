@@ -171,7 +171,7 @@ public:
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
-  bool* samplePDFFDBase::AreEventsSelected(std::vector< std::string > SelectionStr);
+  void samplePDFFDBase::ApplyEventSelections(std::vector< std::string > SelectionStr, int iSample);
   virtual void reconfigureFuncPars(){};
 
   void CalcXsecNormsBins(int iSample);
@@ -179,6 +179,8 @@ public:
   bool GetIsRHC() {return IsRHC;}
   // Calculate the spline weight for a given event
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
+  void ApplyXsecWeightSpline(int iSample);
+  void ApplyXsecWeightNorm(int iSample);
   // Calculate the norm weight for a given event
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
   virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
