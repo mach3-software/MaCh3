@@ -3,7 +3,7 @@
 samplePDFBase::samplePDFBase(double pot) 
 {
   nDims = 0;
-  rnd = new TRandom3(0);
+  rnd = new TRandom3(42);
   MCthrow = false;
   dathist = NULL;
   dathist2d = NULL;

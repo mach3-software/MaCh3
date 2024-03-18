@@ -5,7 +5,7 @@
 
 stretch::stretch(bool verbose)
 {
-  random = new TRandom3(0);
+  random = new TRandom3(42);
 
   init("output.root", verbose);
   nwalk=100;
@@ -14,7 +14,7 @@ stretch::stretch(bool verbose)
 
 stretch::stretch(const char *outfile, int nwalkers, bool verbose)
 {
-   random = new TRandom3(0);
+   random = new TRandom3(42);
    nwalk=nwalkers;
    
    init(outfile, verbose);

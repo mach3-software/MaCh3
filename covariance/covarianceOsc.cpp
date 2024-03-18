@@ -3,7 +3,7 @@
 covarianceOsc::covarianceOsc(const char* name, const char *file, TH2D *hist_dcpth13NH, TH2D *hist_dcpth13IH, TH2D *hist_23)
 : covarianceBase(name, file) {
 
-  gRandom->SetSeed(0);
+  gRandom->SetSeed(42);
 
   if (hist_dcpth13NH) {
     h_dcpth13NH = hist_dcpth13NH;
@@ -357,7 +357,7 @@ void covarianceOsc::throwNominal(bool nomValues)
   CholeskyDecomp(size, *chel);
 
   ThrowParms* nom_throws = new ThrowParms(/**vec*/(*osc_prior), (*covMatrix));
-  nom_throws->SetSeed(0);
+  nom_throws->SetSeed(42);
   nominal.clear();
   nominal.resize(size);
   if(!nomValues)

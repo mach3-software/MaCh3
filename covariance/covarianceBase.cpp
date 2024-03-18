@@ -11,7 +11,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   //or for one thread if without MULTITHREAD 
   random_number = new TRandom3*[(const int)nThreads]();
   for (int iThread=0;iThread<nThreads;iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number[iThread] = new TRandom3(42);
   }
   
   init(name, file);
