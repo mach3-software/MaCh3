@@ -100,11 +100,9 @@ void samplePDFFDBase::ApplyEventSelections(std::vector< std::string > SelectionS
     double* xsec_weights = MCSamples[iSample].xsec_w;
     for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
       double Val = KineArr[iEvent];
-      xsec_weights[iEvent] *= ((Val>=SelectionBounds[iSelection][0])&&(Val<SelectionBounds[iSelection][1]))
+      xsec_weights[iEvent] *= ((Val>=SelectionBounds[iSelection][0])&&(Val<SelectionBounds[iSelection][1]));
     }
   }
-
-  return selected;
 }
 
 bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iSample, int iEvent) {
@@ -278,8 +276,7 @@ void samplePDFFDBase::fillArray() {
     // for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       
     //Reset xsec_weights
-    memset(MCSamples[iSample].xsec_w, 1, MCSamples[iSample].nEvents*sizeof(*(MCSamples[iSample].xsec_w)));
-
+    std::fill(MCSamples[iSample].xsec_w, MCSamples[iSample].xsec_w + MCSamples[iSample].nEvents, 1.0);
 	  applyShifts();
     ApplyEventSelections(SelectionStr, iSample);
 
@@ -290,7 +287,7 @@ void samplePDFFDBase::fillArray() {
     ApplyXsecWeightSpline(iSample);
 
       //Loop over stored normalisation and function pointers 
-    ApplyXsecWeightNorm(iSample, iEvent);
+    ApplyXsecWeightNorm(iSample);
 
       //TODO: implement XsecWeightFunc parameters
       // funcweight = CalcXsecWeightFunc(iSample,iEvent);
@@ -373,8 +370,6 @@ void samplePDFFDBase::fillArray() {
     }
 
     // }
-
-  delete selected;
   }
 
 #endif // end the else in openMP
@@ -637,7 +632,7 @@ void samplePDFFDBase::ApplyXsecWeightSpline(int iSample) {
       xsec_weights[iEvent] *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
     }
 
-    xsec_weights[iEvent] = max(0, xsec_weights[iEvent]);
+    xsec_weights[iEvent] = max(0.d, xsec_weights[iEvent]);
   }
 }
 
@@ -671,7 +666,7 @@ void samplePDFFDBase::ApplyXsecWeightNorm(int iSample) {
       xsec_weights[iEvent] *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
     }
 
-    xsec_weights[iEvent] = max(0, xsec_weights[iEvent]);
+    xsec_weights[iEvent] = max(0.d, xsec_weights[iEvent]);
   }
 }
 

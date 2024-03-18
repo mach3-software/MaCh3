@@ -171,7 +171,7 @@ public:
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
-  void samplePDFFDBase::ApplyEventSelections(std::vector< std::string > SelectionStr, int iSample);
+  void ApplyEventSelections(std::vector< std::string > SelectionStr, int iSample);
   virtual void reconfigureFuncPars(){};
 
   void CalcXsecNormsBins(int iSample);
@@ -188,6 +188,7 @@ public:
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  virtual double* ReturnKinematicParameter(std::string KinematicParamter, int iSample) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
