@@ -126,10 +126,10 @@ add_compile_options(-fopenmp)
 add_link_options(-fopenmp)
 
 #If Single thread is chosen MultiThread flags are omitted
-if(NOT ${SINGLE_THREAD_ONLY})
+#if(NOT ${SINGLE_THREAD_ONLY})
   add_compile_options(-DMULTITHREAD)
   add_link_options(-DMULTITHREAD)
-endif()
+  #endif()
 
 if(${CPU_ONLY})
   add_compile_options(-DCPU_ONLY)
