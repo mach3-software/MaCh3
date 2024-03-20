@@ -48,6 +48,15 @@ set(HEADERS
     OscClass_CUDAProb3.h
     ${CUDAProb3_SOURCE_DIR}/beamcudapropagator.cuh
     ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cuh
+	${CUDAProb3_SOURCE_DIR}/constants.hpp
+	${CUDAProb3_SOURCE_DIR}/hpc_helpers.cuh
+    ${CUDAProb3_SOURCE_DIR}/beamcpupropagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/atmoscpupropagator.hpp
+	${CUDAProb3_SOURCE_DIR}/propagator.hpp
+	${CUDAProb3_SOURCE_DIR}/types.hpp
+	${CUDAProb3_SOURCE_DIR}/math.hpp
+	${CUDAProb3_SOURCE_DIR}/physics.hpp
+	${CUDAProb3_SOURCE_DIR}/cpupropagator.hpp
 )
 
 add_library(OscClass SHARED
