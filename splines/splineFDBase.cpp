@@ -161,6 +161,8 @@ void splineFDBase::calcWeights(){
     //1D i.e. Etrue + one other variable
   case 0:
     //Loop over number of params
+    #pragma omp for
+    #pragma omp simd
     for(unsigned int param_i = 0 ; param_i < dev_1D_w.size() ; ++param_i){
       //Loop over number of modes
       for(unsigned int mode_i = 0 ; mode_i < dev_1D_w[0].size() ; ++mode_i){
@@ -180,6 +182,8 @@ void splineFDBase::calcWeights(){
     //2D i.e. Etrue + two other variables
   default: 
     //Loop over number of params
+    #pragma omp for
+    #pragma omp simd
     for(unsigned int param_i = 0 ; param_i < dev_2D_w.size() ; ++param_i){
       //Loop over number of modes
       for(unsigned int mode_i = 0 ; mode_i < dev_2D_w[0].size() ; ++mode_i){
@@ -485,6 +489,8 @@ void splineFDBase::SetSplineInfoArrays(){
 void splineFDBase::FindSplineSegment() {
 
   // Loop over the splines
+  #pragma omp for
+  #pragma omp simd
   for (int i = 0; i < nSplineParams; i++) {
 
 	//If the spline is always flat then move onto next param
