@@ -9,8 +9,8 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
 #endif
   //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
 
@@ -22,7 +22,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   PrintLength = 35;
 }
 
-covarianceBase::covarianceBase(const char *YAMLFile) : inputFile(std::string(YAMLFile)), pca(false) {
+covarianceBase::covarianceBase(std::vector<std::string> YAMLFile) : inputFile(YAMLFile[0].c_str()), pca(false) {
 // ********************************************
 #ifdef MULTITHREAD
   int nThreads = omp_get_max_threads();
@@ -31,13 +31,16 @@ covarianceBase::covarianceBase(const char *YAMLFile) : inputFile(std::string(YAM
 #endif
   //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
 
-  std::cout << "Constructing instance of covarianceBase using " << YAMLFile << " as an input" << std::endl;
-  init(YAMLFile);
+  std::cout << "Constructing instance of covarianceBase using ";
+  for(unsigned int i = 0; i < YAMLFile.size(); i++)
+    std::cout << YAMLFile[i]<< ", ";
+  std::cout<< " as an input" << std::endl;
+  init(YAMLFile[0].c_str());
   FirstPCAdpar = -999;
   LastPCAdpar = -999;
 
@@ -59,8 +62,8 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed) : i
 #endif
    //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(seed);
   }
 
@@ -95,8 +98,8 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed, dou
 #endif
   //KS: set Random numbers for each thread so each thread has differnt seed
   //or for one thread if without MULTITHREAD 
-  random_number = new TRandom3*[(const int)nThreads]();
-  for (int iThread=0;iThread<nThreads;iThread++) {
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(seed);
   }
   std::cout << "Constructing instance of covarianceBase" << std::endl;
@@ -363,7 +366,7 @@ void covarianceBase::init(const char *name, const char *file)
 	_fPropVal.at(i) = 0.;
 	_fLowBound.at(i) = -999.99;
 	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = true;
+	_fFlatPrior.at(i) = false;
 	_fIndivStepScale.at(i) = 1.;
 	corr_throw[i] = 0.0;
   }
@@ -463,7 +466,7 @@ void covarianceBase::init(const char *YAMLFile)
 	_fPropVal.at(i) = 0.;
 	_fLowBound.at(i) = -999.99;
 	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = true;
+	_fFlatPrior.at(i) = false;
 	_fIndivStepScale.at(i) = 1.;
 	corr_throw[i] = 0.0;
   }
@@ -519,7 +522,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
 	_fPropVal.at(i) = 0.;
 	_fLowBound.at(i) = -999.99;
 	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = true;
+	_fFlatPrior.at(i) = false;
 	_fIndivStepScale.at(i) = 1.;
 	corr_throw[i] = 0.0;
   }
@@ -1014,7 +1017,7 @@ double covarianceBase::CalcLikelihood() {
 #endif
   for(int i = 0; i < size; i++){
     for (int j = 0; j <= i; ++j) {
-      if (_fFlatPrior[i] && _fFlatPrior[j]) {
+      if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
         //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
         int scale = 1;
         if(i != j) scale = 2;
@@ -1134,7 +1137,9 @@ void covarianceBase::setStepScale(double scale) {
   _fGlobalStepScale = scale;
 }
 
+// ********************************************
 void covarianceBase::toggleFixAllParameters() {
+// ********************************************
   // fix or unfix all parameters by multiplying by -1
   if(!pca)
   {
@@ -1145,7 +1150,9 @@ void covarianceBase::toggleFixAllParameters() {
   return;
 }
 
+// ********************************************
 void covarianceBase::toggleFixParameter(const int i) {
+// ********************************************
   if(!pca) {
 	if (i > size) {
 	  std::cerr << "Can't toggleFixParameter for parameter " << i << " because size of covariance =" << size << std::endl;
@@ -1174,6 +1181,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 
 void covarianceBase::setEvalLikelihood(int i, bool eL) {
 
+  std::cout << "covarianceBase::setEvalLikelihood set to " << eL << std::endl;
   if (i > size) {
     std::cerr << "Can't setEvalLikelihood for " << getName() << "_" << i << " because size of covarianceXsec2015 = " << size << std::endl;
     std::cerr << "Fix this in your config file please!" << std::endl;

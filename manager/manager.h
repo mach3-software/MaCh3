@@ -1,13 +1,4 @@
-#ifndef __MANAGER_H__
-#define __MANAGER_H__
-
-#ifndef EXIT_FAILURE
-#define EXIT_FAILURE -1
-#endif
-
-#ifndef EXIT_SUCCESS
-#define EXIT_SUCCESS 0
-#endif
+#pragma once
 
 // C++ includes
 #include <iostream>
@@ -21,25 +12,33 @@
 #include "TTree.h"
 #include "TBranch.h"
 
-
-//******************************************************
-// This class reads the configuration file config.cfg
-// More documentation is available in the README
-//******************************************************
-
-
-#include "yaml-cpp/yaml.h"
+#include "samplePDF/Structs.h"
+#include "manager/YamlHelper.h"
 
 class manager {
 
 public:
   manager(std::string const &);
-  YAML::Node const &raw();
-  std::string GetFileName();
+
+  inline int GetMCStatLLH(){return mc_stat_llh;}
+  inline std::string GetFileName(){return FileName;}
+
+  inline YAML::Node const &raw(){return config;}
+
+  void SaveSettings(TFile * const OutputFile);
+
+  void Print();
 
 private:
   YAML::Node config;
   std::string FileName;
+  int mc_stat_llh;
+
+  // GPU and CPU settings
+  bool gpu_on;
+  bool cpu_mp_on;
+  int n_cpus;
+
 
 
 /*
@@ -52,15 +51,13 @@ private:
   int readConfig(char *config);
 
 // Print and checks
-  void Print();
+
   //bool checkSettings();
 
-  //void SaveSettings(TFile * const OutputFile);
 
 // Lots of yummy Get functions
   const char *GetOutputFilename() { return (const char*)output_file.c_str(); }
 
-  int GetMCStatLLH() { return mc_stat_llh; }
   int GetUpdateW2() { return UpdateW2; }
   
   double GetPOT()       { return protons_on_target; }
@@ -232,10 +229,6 @@ private:
   // random seed
   int random_seed;
 
-  // GPU and CPU settings
-  bool gpu_on;
-  bool cpu_mp_on;
-  int n_cpus;
 
   // toy data fit
   bool fake_data;
@@ -370,8 +363,6 @@ private:
   // What PCA threshold we apply for ND280
   double pca_threshold;
 
-  // Apply Barlow Beeston
-  int mc_stat_llh;
 
   //Whether you want to update W2 in Likelihood calcaution
   int UpdateW2;
@@ -389,5 +380,3 @@ private:
 
   */
 };
-
-#endif

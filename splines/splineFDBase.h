@@ -1,5 +1,4 @@
-#ifndef _splineFDBase_h_
-#define _splineFDBase_h_
+#pragma once
 
 #ifndef __BAD_SPLINE__
 #define __BAD_SPLINE__ 123456789
@@ -127,4 +126,3 @@ class splineFDBase
 	//Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
 	enum SplineSegmentCoeffs{kCoeffY=0, kCoeffB=1, kCoeffC=2, kCoeffD=3};
 };
-#endif

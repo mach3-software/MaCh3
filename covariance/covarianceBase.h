@@ -1,5 +1,4 @@
-#ifndef _covarianceBase_h_
-#define _covarianceBase_h_
+#pragma once
 
 // ROOT includes
 #include "TMatrixT.h"
@@ -40,7 +39,7 @@ class covarianceBase {
   // The constructors
   covarianceBase(){};
   //ETA - construcotr for a YAML file
-  covarianceBase(const char *YAMLFile);
+  covarianceBase(std::vector<std::string> YAMLFile);
   //"Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
@@ -62,7 +61,7 @@ class covarianceBase {
     if (pca) TransferToPCA();
   };
   void setParameters(std::vector<double> pars = std::vector<double>());    
-  virtual void setEvalLikelihood(int i, bool eL);
+  void setEvalLikelihood(int i, bool eL);
   
   // set branches for output file
   void setBranches(TTree &tree);
@@ -79,7 +78,7 @@ class covarianceBase {
 
   // set a custom proposal function
   //DEPRECATED
-  void setPropFunct(int i, TF1 *func) {};
+  void setPropFunct(int i, TF1 *func) {(void)i; (void)func;};
 
   // Throwers
   void throwParProp(const double mag = 1.);
@@ -93,6 +92,7 @@ class covarianceBase {
   TMatrixDSym *getCovMatrix() { return covMatrix; };
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
   bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
+  int GetParDetID(const int i) { return _fDetID[i];};
 
   virtual int CheckBounds();
   double CalcLikelihood();
@@ -145,6 +145,7 @@ class covarianceBase {
   //Some Getters
   int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
+  const std::vector<double>& getPreFitValues(){return _fPreFitValue;};
   const std::vector<double>& getGeneratedValues(){return _fGenerated;};
   const std::vector<double> getProposed() const;
   double getParProp(const int i) {
@@ -157,7 +158,7 @@ class covarianceBase {
     return _fPreFitValue[i];
   };
 
-  virtual const double getNominal(const int i) {
+  virtual double getNominal(const int i) {
     return getParInit(i);
   };
 
@@ -287,7 +288,7 @@ class covarianceBase {
 
   // fix parameters at nominal values
   void toggleFixAllParameters();
-  virtual void toggleFixParameter(const int i);
+  void toggleFixParameter(const int i);
   bool isParameterFixed(const int i) {
     if (_fError[i] < 0) {
       return true;
@@ -441,4 +442,3 @@ class covarianceBase {
 };
 
 TH2D* TMatrixIntoTH2D(const TMatrix &Matrix, std::string title);
-#endif

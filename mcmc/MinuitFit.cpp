@@ -17,10 +17,10 @@ MinuitFit::~MinuitFit() {
 
 // *******************
 // Run the Minuit with all the systematic objects added
-void MinuitFit::runFit() {
+void MinuitFit::runMCMC() {
 // *******************
 
-  PrepereFit();
+  PrepareFit();
 
   //KS: For none PCA this will be eqaul to normal parameters
   const int NparsMinuitFull = NPars;

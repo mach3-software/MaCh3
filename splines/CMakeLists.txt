@@ -1,57 +1,45 @@
-set(Splines_header_files 
+set(HEADERS
     splineBase.h
     splineInterface.h
     splineFDBase.h
-    SplineMonolith.h)
+    SplineMonolith.h
+    spline.h
+)
 
-set(Splines_implementation_files 
+add_library(Splines SHARED
     splineBase.cpp
     splineFDBase.cpp
     SplineMonolith.cpp
-    gpuSplineUtils.cu)
-
-
-set(Splines_implementation_files_CPU 
-    splineBase.cpp
-    splineFDBase.cpp
-    SplineMonolith.cpp)
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>
+)
 
 if(NOT CPU_ONLY)
-  add_library(Splines SHARED ${Splines_implementation_files})
-  target_include_directories(Splines PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-  add_library(gpuSpline gpuSplineUtils.cu)
-  set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-  if(MaCh3_DEBUG_ENABLED)
-    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
-  endif()
-  set_property(TARGET gpuSpline Splines PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-  target_link_libraries(gpuSpline)
-else()
-  add_library(Splines SHARED ${Splines_implementation_files_CPU})
-  target_include_directories(Splines INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+    set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
 endif()
 
-target_link_libraries(Splines Covariance)
+if(MaCh3_DEBUG_ENABLED)
+    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
+endif()
 
-set_target_properties(Splines PROPERTIES 
-  PUBLIC_HEADER "${Splines_header_files}"
-  EXPORT_NAME Splines)
+set_target_properties(Splines PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME Splines)
+
+target_link_libraries(Splines Covariance MaCh3CompilerOptions)
+
+target_include_directories(Splines PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<INSTALL_INTERFACE:include>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
+)
 
 install(TARGETS Splines
-    EXPORT MaCh3-target
-    LIBRARY DESTINATION lib/
-    PUBLIC_HEADER DESTINATION include/splines)
+        EXPORT MaCh3-targets
+        LIBRARY DESTINATION lib/
+        PUBLIC_HEADER DESTINATION include/splines)
 
-#############################
-# For testing purposes...
-#cuda_compile_ptx(
-#  cuda_ptx_files
-#  ${Splines_cuda_files}
-#  OPTIONS -Xptxas -dlcm=ca,-allow-expensive-optimizations=true,-fmad=true,-O3,-warn-lmem-usage,-warn-spills -Xcompiler -fpic,-Wall,-Wextra,-Werror,-c -lcudart -L${CUDA_TOOLKIT_ROOT_DIR}/lib64 -I${CUDA_TOOLKIT_ROOT_DIR}/include -I${CUDA_TOOLKIT_ROOT_DIR}/common/inc -lcudart -I${CUDA_TOOLKIT_ROOT_DIR}/#samples/common/inc
-#)
-# later options: -DCMAKE_CUDA_FLAGS
-
-#add_custom_target(ptx ALL
-#    DEPENDS ${cuda_ptx_files} 
-#    SOURCES ${Splines_cuda_files} )
+add_library(MaCh3::Splines ALIAS Splines)
 

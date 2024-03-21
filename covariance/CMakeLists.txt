@@ -1,23 +1,29 @@
-set(Covariance_implementation_files
-	covarianceBase.cpp 
-	covarianceOsc.cpp 
-	covarianceXsec.cpp)
+set(HEADERS
+    covarianceBase.h
+    covarianceOsc.h
+    covarianceXsec.h
+)
+
+add_library(Covariance SHARED
+    covarianceBase.cpp
+    covarianceOsc.cpp
+    covarianceXsec.cpp
+)
+
+set_target_properties(Covariance PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME Covariance)
 
 
-set(Covariance_header_files
-	covarianceBase.cpp 
-	covarianceOsc.cpp 
-	covarianceXsec.cpp)
-
-add_library(Covariance SHARED ${Covariance_implementation_files})
-target_include_directories(Covariance INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(Covariance ThrowParms ROOT::ROOT Manager)
-
-set_target_properties(Covariance PROPERTIES 
-  PUBLIC_HEADER "${Covariance_header_files}"
-  EXPORT_NAME Covariance)
+target_link_libraries(Covariance ThrowParms ROOT::ROOT Manager MaCh3CompilerOptions)
+target_include_directories(Covariance PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+  $<INSTALL_INTERFACE:include>)
 
 install(TARGETS Covariance
-    EXPORT MaCh3-target
-    LIBRARY DESTINATION lib/
-    PUBLIC_HEADER DESTINATION include/covariance)
+        EXPORT MaCh3-targets
+        LIBRARY DESTINATION lib/
+        PUBLIC_HEADER DESTINATION include/covariance)
+
+add_library(MaCh3::Covariance ALIAS Covariance)
+

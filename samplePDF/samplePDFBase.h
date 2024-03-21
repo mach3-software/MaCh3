@@ -23,9 +23,9 @@
 #include "manager/manager.h"
 
 //MaCh3 includes
-#include "samplePDFInterface.h"
+#include "samplePDF/samplePDFInterface.h"
 #include "splines/splineBase.h"
-#include "Structs.h"
+#include "samplePDF/Structs.h"
 
 
 class samplePDFBase : public samplePDFInterface 
@@ -36,8 +36,10 @@ class samplePDFBase : public samplePDFInterface
 
   virtual ~samplePDFBase();
 
-  __int__ GetNsamples(){ return nSamples; };
-  std::string GetSampleName(int Sample);
+  virtual inline __int__ GetNsamples(){ return nSamples; };
+  virtual inline std::string GetName(){return "samplePDF";};
+  virtual std::string GetSampleName(int Sample);
+  virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
   MaCh3_Modes* const GetModeStruct() const { return ModeStruct;};
@@ -56,7 +58,7 @@ class samplePDFBase : public samplePDFInterface
   // generate fake dataset based on rejection sampling    
   vector< vector <double> > generate2D(TH2D* pdf = 0);
   vector<double> generate();
-  virtual double GetLikelihood();
+  virtual double GetLikelihood() = 0;
   virtual std::vector<double>* getDataSample() {return dataSample;};
   // nominal spectrum things
   //  double GetLikelihoodNominal(); // computes the likelihood against a nominal spectra

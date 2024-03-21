@@ -235,8 +235,12 @@ void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 void MCMCProcessor::MakeOutputFile() {
 // ***************
 
+  //KS: ROOT hates me... but we can create several instances of MCMC Processor, each with own TCanvas ROOT is mad and will delete if there is more than one canvas with the same name, so we add random number to avoid issue
+  TRandom3* rand = new TRandom3(0);
+  const int uniform = int(rand->Uniform(0, 10000));
   // Open a TCanvas to write the posterior onto
-  Posterior = new TCanvas("Posterior", "Posterior", 0, 0, 1024, 1024);
+  Posterior = new TCanvas(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
+
   Posterior->SetGrid();
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
@@ -887,7 +891,7 @@ void MCMCProcessor::MakeViolin() {
   const int PriorFactor = 4;
   hviolin_prior = new TH2D("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
 
-  TRandom3* rand = new TRandom3();
+  TRandom3* rand = new TRandom3(0);
 
   std::vector<double> PriorVec(nDraw);
   std::vector<double> PriorErrorVec(nDraw);
@@ -3034,6 +3038,92 @@ void MCMCProcessor::ResetHistograms() {
 }
 
 // **************************
+// KS: Get Super Fancy Polar Plot
+void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
+// **************************
+
+  if(hpost[0] == nullptr) MakePostfit();
+
+
+  const double TopMargin = Posterior->GetTopMargin();
+  const double BottomMargin = Posterior->GetBottomMargin();
+  const double LeftMargin = Posterior->GetLeftMargin();
+  const double RightMargin = Posterior->GetRightMargin();
+
+  Posterior->SetTopMargin(0.1);
+  Posterior->SetBottomMargin(0.1);
+  Posterior->SetLeftMargin(0.1);
+  Posterior->SetRightMargin(0.1);
+  Posterior->Update();
+
+
+  std::cout << "Calculating Polar Plot "<< std::endl;
+  TDirectory *PolarDir = OutputFile->mkdir("PolarDir");
+  PolarDir->cd();
+
+  for(unsigned int k = 0; k < ParNames.size(); ++k)
+  {
+    //KS: First we need to find parameter number based on name
+    int ParamNo = GetParamIndexFromName(ParNames[k]);
+    bool skip = false;
+    if(ParamNo == __UNDEF__)
+    {
+      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate GetPolarPlot"<<std::endl;
+      skip = true;
+    }
+    if(skip) continue;
+
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+    GetNthParameter(ParamNo, Prior, PriorError, Title);
+
+    std::vector<double> x_val(nBins);
+    std::vector<double> y_val(nBins);
+
+    double xmin = 0;
+    double xmax = 2*TMath::Pi();
+
+    double Integral = hpost[ParamNo]->Integral();
+    for (Int_t ipt = 0; ipt < nBins; ipt++)
+    {
+      x_val[ipt] = ipt*(xmax-xmin)/nBins+xmin;
+      y_val[ipt] = hpost[ParamNo]->GetBinContent(ipt+1)/Integral;
+    }
+
+    TGraphPolar * PolarGraph = new TGraphPolar(nBins, x_val.data(), y_val.data());
+    PolarGraph->SetLineWidth(2);
+    PolarGraph->SetFillStyle(3001);
+    PolarGraph->SetLineColor(kRed);
+    PolarGraph->SetFillColor(kRed);
+    PolarGraph->Draw("AFL");
+
+    TText* Text = new TText(0.6, 0.1, Title);
+    Text->SetTextSize(0.04);
+    Text->SetNDC(true);
+    Text->Draw("");
+
+    Posterior->Print(CanvasName);
+    Posterior->Write(Title);
+
+    delete PolarGraph;
+    delete Text;
+  } //End loop over parameters
+
+  PolarDir->Close();
+  delete PolarDir;
+
+  OutputFile->cd();
+
+  Posterior->SetTopMargin(TopMargin);
+  Posterior->SetBottomMargin(BottomMargin);
+  Posterior->SetLeftMargin(LeftMargin);
+  Posterior->SetRightMargin(RightMargin);
+
+}
+
+
+// **************************
 // Get Bayes Factor for particualar parameter
 void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames){
 // **************************
@@ -3052,11 +3142,13 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
+    bool skip = false;
     if(ParamNo == __UNDEF__)
     {
-      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate Bayes factor"<<std::endl;
-      return;
+      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate Bayes Factor"<<std::endl;
+      skip = true;
     }
+    if(skip) continue;
 
     const double M1_min = Model1Bounds[k][0];
     const double M2_min = Model2Bounds[k][0];
@@ -3114,11 +3206,13 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
+    bool skip = false;
     if(ParamNo == __UNDEF__)
     {
       std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate SavageDickey"<<std::endl;
-      return;
+      skip = true;
     }
+    if(skip) continue;
     
     TString Title = "";
     double Prior = 1.0;
@@ -3158,7 +3252,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
       PriorHist->Reset("");
       PriorHist->Fill(0.0, 0.0);
       
-      TRandom3* rand = new TRandom3();
+      TRandom3* rand = new TRandom3(0);
       //KS: Throw nice gaussian, just need big number to have smooth distribution
       for(int g = 0; g < 1000000; ++g)
       {

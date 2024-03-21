@@ -15,6 +15,7 @@
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
 #include "covariance/covarianceOsc.h"
+#include "covariance/covarianceXsec.h"
 
 #include "manager/manager.h"
 #include "MCMCProcessor.h"
@@ -40,6 +41,8 @@ class FitterBase {
 
   void PrintInitialState();
 
+  virtual void runMCMC() = 0;
+  void RunLLHScan();
  protected:
   // Prepare the output file
   void PrepareOutput();
@@ -50,21 +53,7 @@ class FitterBase {
   // Save the output settings and MCMC
   // **********************
   // Save the settings that the MCMC was run with
-  inline void SaveSettings() {
-    // If we're using the new mcmc constructor which knows about settings
-  // **********************
-    if (fitMan == NULL) {
-      std::cout << "************************" << std::endl;
-      std::cout << "************************" << std::endl;
-      std::cout << "WARNING WILL NOT SAVE MANAGER OUTPUT TO FILE BECAUSE YOU USED A DEPRECATED CONSTRUCTOR" << std::endl;
-      std::cout << "************************" << std::endl;
-      std::cout << "************************" << std::endl;
-    } else {
-    // Save the settings we have in the manager
-    //fitMan->SaveSettings(outputFile);
-    // Warn if we're running a deprecated constructor (again)
-    }
-  }
+  inline void SaveSettings() { fitMan->SaveSettings(outputFile);}
 
   // The manager
   manager *fitMan;
@@ -114,5 +103,7 @@ class FitterBase {
   double stepTime;
 
   bool save_nominal;
+
+  bool fTestLikelihood;
 };
 

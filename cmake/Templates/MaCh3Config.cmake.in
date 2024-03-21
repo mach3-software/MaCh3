@@ -1,7 +1,8 @@
 @PACKAGE_INIT@
 
-set(MaCh3_VERSION MaCh3_VERSION)
+set(MaCh3_VERSION @PROJECT_VERSION@)
 
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../cmake)
 
 set(USE_PROB3 @USE_PROB3@)
 set(CPU_ONLY @CPU_ONLY@)
@@ -12,9 +13,11 @@ set(MaCh3_GPU_ENABLED @MaCh3_GPU_ENABLED@)
 
 get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 message(STATUS "Adding ${MaCh3_CMAKE_DIR} to Module search path")
-message(STATUS "Adding ${MaCh3_CMAKE_DIR}/../../../cmake to Module search path")
+message(STATUS "Adding ${MaCh3_CMAKE_DIR}/cmake to Module search path")
 list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}")
-list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}/../../../cmake")
+list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}/cmake")
+
+enable_language(CXX)
 
 set(MaCh3_FOUND TRUE)
 
@@ -27,20 +30,53 @@ if(NOT TARGET ROOT::ROOT)
 endif()
 
 
-include(${MaCh3_CMAKE_DIR}/MaCh3Targets.cmake)
+if(USE_PROB3)
+  find_package(Prob3plusplus @Prob3plusplus_VERSION@ REQUIRED)
+endif()
 
-find_path(MaCh3_PREFIX
-NAMES bin/setup.MaCh3.sh
-PATHS ${MaCh3_CMAKE_DIR}/../
+
+if(MaCh3_GPU_ENABLED)
+  enable_language(CUDA)
+  add_compile_definitions(CUDA)
+  find_package(CUDAToolkit)
+  set(CUDA_ARCHITECTURES @CUDA_ARCHITECTURES@)
+endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/MaCh3Targets.cmake)
+
+if(NOT TARGET MaCh3::All)
+  cmessage(FATAL_ERROR "Didn't set up MaCh3::All")
+endif()
+
+get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+
+find_path(MaCh3_INCLUDE_DIR
+  NAMES mcmc/FitterBase.h
+  PATHS ${MaCh3_CMAKE_DIR}/include/
 )
 
+find_path(MaCh3_LIB_DIR
+  NAMES libMCMC.so
+  PATHS ${MaCh3_CMAKE_DIR}/lib/
+)
+
+find_path(MaCh3_PREFIX
+  NAMES bin/setup.MaCh3.sh
+  PATHS ${MaCh3_CMAKE_DIR}/
+)
+
+cmessage(STATUS "MaCh3_LIB_DIR: ${MaCh3_LIB_DIR}")
+cmessage(STATUS "MaCh3_INCLUDE_DIR: ${MaCh3_INCLUDE_DIR}")
 cmessage(STATUS "MaCh3_PREFIX: ${MaCh3_PREFIX}")
 cmessage(STATUS "MaCh3_VERSION: ${MaCh3_VERSION}")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MaCh3
-  REQUIRED_VARS
-    MaCh3_PREFIX
-  VERSION_VAR
-    MaCh3_VERSION
+    REQUIRED_VARS
+      MaCh3_INCLUDE_DIR
+      MaCh3_LIB_DIR
+      MaCh3_PREFIX
+    VERSION_VAR
+      MaCh3_VERSION
 )

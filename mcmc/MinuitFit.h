@@ -9,9 +9,9 @@
 class MinuitFit : public LikelihoodFit {
  public:
   MinuitFit(manager * const fitMan);
-  ~MinuitFit();
+  virtual ~MinuitFit();
 
-  void runFit();
+  void runMCMC() override;
 
   private:
     ROOT::Math::Minimizer* minuit;

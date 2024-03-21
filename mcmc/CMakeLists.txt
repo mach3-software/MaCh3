@@ -1,49 +1,46 @@
-set(mcmc_implementation_files
-    FitterBase.cpp
-    mcmc.cpp
-    LikelihoodFit.cpp
-    MinuitFit.cpp
-    tune.cpp
-    stretch.cpp
-    MCMCProcessor.cpp
-    gpuMCMCProcessorUtils.cu)
-
-set(mcmc_implementation_files_CPU 
-    FitterBase.cpp
-    mcmc.cpp
-    LikelihoodFit.cpp
-    MinuitFit.cpp
-    tune.cpp
-    stretch.cpp
-    MCMCProcessor.cpp)
-
-set(mcmc_header_files
+set(HEADERS
     FitterBase.h
     mcmc.h
     LikelihoodFit.h
     MinuitFit.h
+    PSO.h
     tune.h
     stretch.h
-    MCMCProcessor.h)
+    MCMCProcessor.h
+)
 
-if(NOT ${CPU_ONLY})
-  add_library(MCMC SHARED ${mcmc_implementation_files})
-  target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-  add_library(gpuMCMCProcessorUtils gpuMCMCProcessorUtils.cu)
-  set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-  set_property(TARGET gpuMCMCProcessorUtils MCMC PROPERTY CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
-  target_link_libraries(gpuMCMCProcessorUtils)
-else()
-    add_library(MCMC SHARED ${mcmc_implementation_files_CPU})
-    target_include_directories(MCMC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-	target_link_libraries(MCMC Manager ROOT::ROOT)
+add_library(MCMC SHARED
+    FitterBase.cpp
+    mcmc.cpp
+    LikelihoodFit.cpp
+    MinuitFit.cpp
+    PSO.cpp
+    tune.cpp
+    stretch.cpp
+    MCMCProcessor.cpp
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
+)
+
+if(NOT CPU_ONLY)
+    set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
 endif()
 
-set_target_properties(MCMC PROPERTIES 
-  PUBLIC_HEADER "${mcmc_header_files}"
-  EXPORT_NAME MCMC)
+set_target_properties(MCMC PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME MCMC)
+
+target_link_libraries(MCMC Manager ROOT::ROOT MaCh3CompilerOptions)
+target_include_directories(MCMC PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<INSTALL_INTERFACE:include>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
+)
 
 install(TARGETS MCMC
-    EXPORT MaCh3-target
-    LIBRARY DESTINATION lib/
-    PUBLIC_HEADER DESTINATION include/mcmc)
+        EXPORT MaCh3-targets
+        LIBRARY DESTINATION lib/
+        PUBLIC_HEADER DESTINATION include/mcmc)
+
+add_library(MaCh3::MCMC ALIAS MCMC)

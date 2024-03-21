@@ -29,8 +29,8 @@
 #define __N_SPLINES__ NSPLINES_ND280
 // EM: for OA2024:
 #else
+#define __N_SPLINES__ 160
 #pragma message("using default N splines")
-#define __N_SPLINES__ 186
 #endif
 
 

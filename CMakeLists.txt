@@ -1,27 +1,31 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # CMake version check
-cmake_minimum_required(VERSION 3.14 FATAL_ERROR)  
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+
+#KS: Enable langauge, neccesary when using CUDA
+enable_language(CXX)
+SET(MaCh3_VERSION 1.0.0)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
-    message(STATUS "CUDA found. Adding CUDA support.")
-    SET(MaCh3_GPU_ENABLED TRUE)
-    SET(CPU_ONLY FALSE)
+  message(STATUS "CUDA found. Adding CUDA support.")
+  SET(MaCh3_GPU_ENABLED TRUE)
+  SET(CPU_ONLY FALSE)
 else()
-    message(STATUS "CUDA not found. Proceeding without CUDA support.")
-    SET(MaCh3_GPU_ENABLED FALSE)
-    SET(CPU_ONLY TRUE)
+  message(STATUS "CUDA not found. Proceeding without CUDA support.")
+  SET(MaCh3_GPU_ENABLED FALSE)
+  SET(CPU_ONLY TRUE)
 endif()
 
-SET(MaCh3_VERSION 0.0.2)
 if(CPU_ONLY)
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
 else()
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 endif()
+
 
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -50,6 +54,12 @@ CPMFindPackage(
   )
 include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
 include(NuHepMCUtils)
+
+# Check if CUDA was found
+if(MaCh3_GPU_ENABLED)
+  include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
+endif()
+
 include(ROOT)
 if(NOT TARGET ROOT::ROOT)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
@@ -65,6 +75,10 @@ CPMFindPackage(
       "YAML_BUILD_SHARED_LIBS ON"
 )
 
+if(NOT TARGET yaml-cpp::yaml-cpp)
+  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
+endif()
+
 CPMAddPackage(
   NAME Eigen
   VERSION 3.2.8
@@ -73,10 +87,12 @@ CPMAddPackage(
   DOWNLOAD_ONLY YES
 )
 
+
 if(Eigen_ADDED)
   add_library(Eigen INTERFACE IMPORTED)
   target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
 endif()
+
 
 ################################## Oscillation ################################
 
@@ -87,32 +103,42 @@ endif()
 
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
-
+SET(MaCh3_Oscillator_ENABLED "")
 if (USE_PROB3)
   CPMFindPackage(
-      NAME Prob3plusplus
-      VERSION 3.10.3
-      GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-      GIT_TAG v3.10.3
+    NAME Prob3plusplus
+    VERSION 3.10.3
+    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
+    GIT_TAG v3.10.3
   )
+  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
 else()
-  if (CPU_ONLY)
-    CPMFindPackage(
-        NAME CUDAProb3
-        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-        GIT_TAG "feature_cleanup"
-    )
-  else()
-    CPMFindPackage(
-        NAME CUDAProb3
-        GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-        GIT_TAG "feature_cleanup"
-        OPTIONS "GPU_ON ON"
-    )
-  endif()
+  CPMFindPackage(
+    NAME CUDAProb3
+    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+    GIT_TAG "feature_cleanup"
+    DOWNLOAD_ONLY YES
+  )
+  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
 endif()
 
-dump_cmake_variables(Prob3plusplus)
+#dump_cmake_variables(Prob3plusplus)
+
+############################  C++ Compiler  ####################################
+if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
+  SET(CMAKE_CXX_STANDARD 11)
+endif()
+
+if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+endif()
+cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
+
+if(${ROOT_CXX_STANDARD} LESS 14)
+  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
+endif()
+
+add_library(MaCh3CompilerOptions INTERFACE)
 
 ############################  Setting Flags  ####################################
 # Check the where to install 
@@ -121,17 +147,14 @@ cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 # add cmake script files
 if(NOT ${CMAKE_SCRIPT_SETUP})  #Check if setup by Experiment MaCh3
   set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-  #CUDA
-  if(NOT CPU_ONLY)
-    include(${CMAKE_SOURCE_DIR}/cmake/CUDASetup.cmake)
-  endif()
 endif()
 
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-#Compile and link options (Should be in experiment project but copied in case CORE is built alone) 
-add_compile_options(-g -Wextra)
+#Compile and link options
+#Add -Werror in the future
+target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
@@ -150,10 +173,14 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
-  add_compile_definitions(DEBUG=${DEBUG_LEVEL})
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  add_compile_options(-O3)
+  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
+  #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
+  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops  --param=max-vartrack-size=100000000 -finline-limit=100000000)
+  #KS: addomg Link-Time Optimization (LTO)
+  target_link_options(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
 #KS: If multithreading is not defined enable it by default
@@ -163,41 +190,54 @@ endif()
 
 #Add MultiThread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  add_compile_options(-fopenmp)
-  add_compile_definitions(MULTITHREAD)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  add_compile_definitions(CPU_ONLY)
-else()
-  add_compile_options(-I${CUDA_SAMPLES}/common/inc)
-  add_compile_options(-I$ENV{CUDAPATH}/targets/x86_64-linux/include)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
 if(USE_PROB3)
-  add_compile_definitions(USE_PROB3)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
 endif()
 
-############################  C++ Compiler  ####################################
-if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  SET(CMAKE_CXX_STANDARD 11)
+if(MaCh3_GPU_ENABLED)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
 endif()
 
-if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
-endif()
-cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
-
-if(${ROOT_CXX_STANDARD} LESS 14)
-  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
+if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
+  SET(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
 endif()
 
+if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE __LOW_MEMORY_STRUCTS__)
+endif()
+
+
+
+
+set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
+install(TARGETS MaCh3CompilerOptions
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/)
+
+#KS: Consider moving it somewhere else
+SET(MaCh3_Fitter_ENABLED "MR2T2")
+if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
+  LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
+endif()
 ################################# Features ##################################
 
 LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  LOW_MEMORY_STRUCTS
+  Oscillator
+  Fitter
   )
 cmessage(STATUS "MaCh3 Features: ")
 foreach(f ${ALL_FEATURES})
@@ -220,18 +260,34 @@ add_subdirectory(mcmc)
 #ETA - commenting out as not c++11 compatible...
 #add_subdirectory(yaml_test)
 
-
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
-if(NOT TARGET MaCh3)
-  add_library(MaCh3 INTERFACE)
-  set_target_properties(MaCh3 PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}"
-      INTERFACE_LINK_LIBRARIES "MCMC;OscClass;SamplePDF;Covariance;Splines;ThrowParms;Manager"
-      EXPORT_NAME MaCh3
+add_library(MaCh3 INTERFACE)
+target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines ThrowParms Manager MaCh3CompilerOptions)
+set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
+
+install(TARGETS MaCh3
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/)
+
+add_library(MaCh3::All ALIAS MaCh3)
+
+configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+
+set(export_destinations
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake/
+    ${CMAKE_INSTALL_PREFIX}/
+)
+
+foreach(dest ${export_destinations})
+  install(EXPORT MaCh3-targets
+          FILE MaCh3Targets.cmake
+          NAMESPACE MaCh3::
+          DESTINATION ${dest}
   )
-  cmessage(STATUS "Added target MaCh3")
-endif()
+endforeach()
 
 ############################  Install  ####################################
 
@@ -251,3 +307,5 @@ install(FILES
     ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
     ${CMAKE_BINARY_DIR}/MaCh3ConfigVersion.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/MaCh3)
+
+include(mach3-config)

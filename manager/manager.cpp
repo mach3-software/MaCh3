@@ -1,29 +1,111 @@
-//******************************************************
-// This class reads the configuration file config.cfg
-// More documentation is available in the header.
-//
-// A brief description of each parameter is available
-// in doc/executables_description/run_executable
-// and the README of this folder
-// look also at example_config in the main dir.
-//******************************************************
-
 #include "manager.h"
-#include <iostream>
 
+// *************************
 manager::manager(std::string const &filename)
-    : config(YAML::LoadFile(filename))
-{
+    : config(YAML::LoadFile(filename)) {
+// *************************
 
   FileName = filename;
   std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
 
+  if (config["LikelihoodOptions"])
+  {
+    std::string likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
+    if (likelihood == "Barlow-Beeston")                 mc_stat_llh = TestStatistic(kBarlowBeeston);
+    else if (likelihood == "IceCube")                   mc_stat_llh = TestStatistic(kIceCube);
+    else if (likelihood == "Poisson")                   mc_stat_llh = TestStatistic(kPoisson);
+    else if (likelihood == "Pearson")                   mc_stat_llh = TestStatistic(kPearson);
+    else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
+    else {
+      std::cerr << "Wrong form of test-statistic specified!" << std::endl;
+      std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
+      for(int i = 0; i < kNTestStatistics; i++)
+      {
+        std::cerr << TestStatistic_ToString(TestStatistic(i)) << std::endl;
+      }
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }
+  } else {
+    mc_stat_llh = kPoisson;
+  }
+
+// Get settings defined by pre-processor directives, e.g. CPU MP and GPU
+#ifdef MULTITHREAD
+  cpu_mp_on = true;
+  n_cpus = omp_get_max_threads();
+#else
+  cpu_mp_on = false;
+  n_cpus = 0;
+#endif
+
+#ifdef CUDA
+  gpu_on = true;
+#else
+  gpu_on = false;
+#endif
+
 }
 
-YAML::Node const & manager::raw(){ return config; }
+// *************************
+// Save all the settings of the class to an output file
+// Reflection in C++ is a bit of a pain :(
+// Outputfile is the TFile pointer we write to
+void manager::SaveSettings(TFile * const OutputFile) {
+// *************************
 
-std::string manager::GetFileName(){ return FileName; }
+  std::string OutputFilename = std::string(OutputFile->GetName());
+  OutputFile->cd();
+  // The Branch!
+  TTree *SaveBranch = new TTree("Settings", "Settings");
 
+  // Fill the doubles
+  SaveBranch->Branch("Output", &OutputFilename);
+  SaveBranch->Branch("TestStatistic", &mc_stat_llh);
+
+  bool real_data = config["General"]["RealData"].as<bool>();
+  bool asimov_fit = config["General"]["Asimov"].as<bool>();
+  bool fake_data = config["General"]["FakeData"].as<bool>();
+
+  SaveBranch->Branch("RealDataFit", &real_data);
+  SaveBranch->Branch("AsimovFit",   &asimov_fit);
+  SaveBranch->Branch("FakeDataFit", &fake_data);
+
+  std::string ND_cov_file, FD_cov_file, OSC_cov_file = std::string("none");
+  std::vector<std::string> XSEC_cov_file;
+
+  //KS: This is needed by MCMC Processor, will be fixed in the future
+  XSEC_cov_file = GetFromManager<std::vector<std::string>>(config["General"]["Systematics"]["XsecCovFile"], {"none"});
+  ND_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["ND280CovFile"], "none");
+  FD_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["SKCovFile"], "none");
+  OSC_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["OscCovFile"], "none");
+
+  SaveBranch->Branch("XsecCov", &XSEC_cov_file);
+  SaveBranch->Branch("NDCov",   &ND_cov_file);
+  SaveBranch->Branch("SKCov",   &FD_cov_file);
+  SaveBranch->Branch("oscCov",  &OSC_cov_file);
+
+  SaveBranch->Branch("GPU",   &gpu_on);
+  SaveBranch->Branch("CPUMP", &cpu_mp_on);
+  SaveBranch->Branch("nCPUs", &n_cpus);
+
+  SaveBranch->Fill();
+  SaveBranch->Write();
+
+  delete SaveBranch;
+}
+
+// *************************
+void manager::Print() {
+// *************************
+
+  std::cout << "--------------------------------- " << "\n";
+  std::cout << config << "\n";
+  std::cout << "---------------------------------" << "\n";
+
+  //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
+  std::cout << std::endl;
+}
 
 /* Old Mananger that needs translation
  * we're moving to YAML BABY!
@@ -116,30 +198,6 @@ n_steps << std::endl;
       n_burnin_steps = 1000;
       if (verbosity) std::cout << "Number of burn in steps not specified, using
 " << n_burnin_steps << std::endl;
-    }
-
-    // Use Barlow Beeston likelihood in ND280?
-    if (cfg.exists("MCSTAT")) {
-      std::string likelihood = cfg.lookup("MCSTAT");
-      if (likelihood == "Barlow-Beeston")                mc_stat_llh = TestStatistic(kBarlowBeeston);
-      else if (likelihood == "IceCube")                  mc_stat_llh = TestStatistic(kIceCube);
-      else if (likelihood == "Poisson")                  mc_stat_llh = TestStatistic(kPoisson);
-      else if (likelihood == "Pearson")                  mc_stat_llh = TestStatistic(kPearson);
-      else if (likelihood == "Dembinski-Abdelmottele")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
-      else { 
-        std::cerr << "Wrong form of test-statistic specified!" << std::endl;
-        std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
-        for(int i = 0; i < kNTestStatistics; i++)
-        {
-          std::cerr << TestStatistic_ToString(TestStatistic(i)) << std::endl;
-        }
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
-      }
-      if (verbosity) std::cout << "- MC stat test statistic specified, using " << TestStatistic_ToString(TestStatistic(mc_stat_llh)) << std::endl;
-    } else {
-      mc_stat_llh = kPoisson;
-      if (verbosity) std::cout << "- MC stat test statistic not specified," << TestStatistic_ToString(TestStatistic(mc_stat_llh)) << std::endl;
     }
     
     if (cfg.exists("USE_UpdateW2")) {
@@ -739,38 +797,6 @@ FLUXCOVFILE=-1 or suttin catch (const libconfig::SettingTypeException &tyex) {
   //}
 
   return(EXIT_SUCCESS);
-}
-
-void manager::Print() {
-
-  std::cout << "---------------------------------" << std::endl;
-  std::cout << "General settings      " << std::endl;
-  std::cout << "    Output file:      " << GetOutputFilename() << std::endl;
-  std::cout << "    Seed:             " << GetSeed() << std::endl;
-  std::cout << "    Debug:            " << GetDebug() << std::endl;
-  std::cout << "    GPU fit:          " << GetGPU() << std::endl;
-  std::cout << "    CPU MP fit:       " << GetCPUMP() << std::endl;
-  std::cout << "       N cores:       " << GetNCPU() << std::endl;
-
-  std::cout << "---------------------------------" << std::endl;
-  std::cout << "MCMC settings         "    << std::endl;
-  std::cout << "    N steps:          " << GetNSteps() << std::endl;
-  std::cout << "    AutoSave:         " << GetAutoSave() << std::endl;
-  std::cout << "    Xsec step scale:  " << GetXsecStepScale() << std::endl;
-  std::cout << "    ND det step scale:" << GetNearDetStepScale() << std::endl;
-  std::cout << "    Far det step scale:" << GetFarDetStepScale() << std::endl;
-  std::cout << "    Osc step scale:   " << GetOscStepScale() << std::endl;
-  std::cout << "    Anneal. temp:     " << GetTemp() << std::endl;
-  std::cout << "    Random start:     " << GetRandomStart() << std::endl;
-  std::cout << "    Process MCMC:     " << GetProcessMCMC() << std::endl;
-  std::cout << "    Posterior start:  " << GetStartFromPosterior() << std::endl;
-  std::cout << "    Posterior chain:  " << GetPosteriorFiles() << std::endl;
-
-  std::cout << "---------------------------------" << std::endl;
-  std::cout << "Run settings      " << std::endl;
-  std::cout << "    Nnu POT:        " << GetPOT() << std::endl;
-  std::cout << "    Antinu POT:    " << GetNubarPOT() << std::endl;
-  std::cout << "    Save nominal:     " << GetSaveNom() << std::endl;
 }
 
 */

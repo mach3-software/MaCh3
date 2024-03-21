@@ -20,17 +20,11 @@
 #include "TRandom.h"
 #include "TString.h"
 
-//Propagator includes
-#ifdef USE_PROB3
-  #include "BargerPropagator.h"
-#else
-  #include "beamcudapropagator.cuh"
-  #include "atmoscudapropagator.cuh"
-#endif
-
 //MaCh3 includes
-#include "interfacePDFEbE.h"
-#include "samplePDFBase.h"
+#include "OscClass/OscClass_CUDAProb3.h"
+
+#include "samplePDF/interfacePDFEbE.h"
+#include "samplePDF/samplePDFBase.h"
 
 #include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
@@ -38,11 +32,11 @@
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
-#include "FDMCStruct.h"
-#include "ShiftFunctors.h"
+#include "samplePDF/FDMCStruct.h"
+#include "samplePDF/ShiftFunctors.h"
 
 #include "manager/manager.h"
-#include "OscClass/OscClass_CUDAProb3.h"
+
 
 #define USEBETA 0
 

@@ -1,6 +1,6 @@
 #include "OscClass_CUDAProb3.h"
 
-#define DEBUG=1
+//#define DEBUG 1
 
 Oscillator::Oscillator(std::string ConfigName) {
   std::cout << std::setprecision(10);
@@ -30,7 +30,18 @@ Oscillator::Oscillator(std::string ConfigName) {
 
   mypropagator->setEnergyList(energyList);
   mypropagator->setCosineList(cosineList);
-  mypropagator->setDensityFromFile("/dune/app/users/barrowd/CUDAProb3/MaCh3_DUNE/build/_deps/cudaprob3-src/models/PREM_4layer.dat");
+
+  std::string InputLocation = "/models/PREM_4layer.dat";
+  if (std::getenv("CUDAProb3_DIR") != NULL)
+  {
+    InputLocation.insert(0, std::string(std::getenv("CUDAProb3_DIR"))+"/");
+   }
+  else
+  {
+    std::cerr<<" Envioremnt CUDAProb3_DIR is not defined, did you source setup.MaCh3.sh?"<<std::endl;
+    throw;
+  }
+  mypropagator->setDensityFromFile(InputLocation);
   mypropagator->setMNSMatrix(theta12, theta13, theta23, dcp, nu_flav);
   mypropagator->setNeutrinoMasses(dm12sq, dm23sq);
   mypropagator->setProductionHeight(22.0);
@@ -1410,18 +1421,24 @@ void Oscillator::DefinePropagatorEnums() {
   OscChannels_Names[1][2] = "m_t";
 }
 
-void Oscillator::CheckEarthDensityFile() {
+void Oscillator::CheckEarthDensityFile()
+{
   // If the earth density file is null, set the default
-  if (EarthDensityFile.Length() == 0) {
-    std::string mach3 = std::getenv("MACH3");
-    if (mach3.empty()) {
-      std::cerr << "MACH3 environment needs to be set" << std::endl;
+  if (EarthDensityFile.Length() == 0)
+  {
+    std::string InputLocation = "/models/PREM_4layer_cubic.dat";
+    if (std::getenv("CUDAProb3_DIR") != NULL)
+    {
+      InputLocation.insert(0, std::string(std::getenv("CUDAProb3_DIR"))+"/");
+    }
+    else
+    {
+      std::cerr<<" Envioremnt CUDAProb3_DIR is not defined, did you source setup.MaCh3.sh?"<<std::endl;
       throw;
     }
-    EarthDensityFile = mach3+std::string("/CUDAProb3/models/PREM_4layer_cubic.dat");
+    EarthDensityFile = InputLocation;
     std::cout << "No specified Earth density file - Defaulting to: " << EarthDensityFile << "\n" << std::endl;
   }
-
 }
 
 void Oscillator::SetProductionHeightArray() {

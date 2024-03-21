@@ -37,6 +37,8 @@
 #include "TROOT.h"
 #include "TKey.h"
 #include "TRandom3.h"
+#include "TGraphPolar.h"
+#include "TMath.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -87,6 +89,8 @@ class MCMCProcessor {
     //Make fancy triangle plot for selected parameters
     void MakeTrianglePlot(std::vector<std::string> ParamNames);
     
+    void GetPolarPlot(std::vector<std::string> ParNames);
+
     //Bayesian statistic hypotheis testing
     void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
@@ -104,10 +108,10 @@ class MCMCProcessor {
     inline int GetOSC() { return nParam[kOSCPar]; };
         
     //Posterior getters
-    inline TH1D* const GetHpost(const int i) { return hpost[i]; };
-    inline TH2D* const GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
-    inline TH2D* const GetViolin() { return hviolin; };
-    inline TH2D* const GetViolinPrior() { return hviolin_prior; };
+    inline TH1D* GetHpost(const int i) { return hpost[i]; };
+    inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
+    inline TH2D* GetViolin() { return hviolin; };
+    inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
     inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };

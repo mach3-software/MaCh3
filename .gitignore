@@ -8,3 +8,7 @@
 lib/*
 
 build/
+
+# Ignore emacs/vim stuff
+*#* 
+*~*

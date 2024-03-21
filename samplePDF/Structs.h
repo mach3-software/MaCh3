@@ -1,5 +1,4 @@
-#ifndef _Structs_h_
-#define _Structs_h_
+#pragma once
 
 // Run low or high memory versions of structs
 // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
@@ -45,12 +44,23 @@
 #include "list"
 #include "TFile.h"
 
+#ifdef MULTITHREAD
+#include "omp.h"
+#endif
+
 // *******************
 // Template to make vector out of an array of any length
 template< typename T, size_t N >
 std::vector<T> MakeVector( const T (&data)[N] ) {
 // *******************
   return std::vector<T>(data, data+N);
+}
+
+// *******************
+//KS: This is mad way of covnerting string to int. Why? To be able to use string with switch
+constexpr unsigned int str2int(const char* str, int h = 0) {
+// *******************
+  return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
 
 // *******************
@@ -1148,4 +1158,3 @@ inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
   }
 
 }
-#endif
