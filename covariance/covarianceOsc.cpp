@@ -97,7 +97,7 @@ int covarianceOsc::checkBounds() {
      ){ NOutside++;}
 
   if(PerformBetaStudy) {
-    if(_fPropVal[6] < 0) { // Don't let beta be less than 0 (no upper limit)
+    if(_fPropVal[kBeta] < 0) { // Don't let beta be less than 0 (no upper limit)
       NOutside++;
     }
   }
@@ -154,7 +154,7 @@ double *covarianceOsc::getPropPars() {
   //oscpars1[7] = L;
   //oscpars1[8] = density;
   if(PerformBetaStudy)
-    oscpars1[9] = _fPropVal[6];
+    oscpars1[9] = _fPropVal[kBeta];
   else
     oscpars1[9] = 1;
 
@@ -189,7 +189,7 @@ void covarianceOsc::proposeStep() {
   // And the beta flip (not sure if beta will still work...)
   if(flipBeta)
   {
-    if(random_number[0]->Uniform() < 0.5) _fPropVal[6] = 1-_fCurrVal[6];
+    if(random_number[0]->Uniform() < 0.5) _fPropVal[kBeta] = 1-_fCurrVal[kBeta];
   }
 }
 
