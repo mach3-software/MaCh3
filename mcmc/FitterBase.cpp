@@ -382,7 +382,7 @@ void FitterBase::RunLLHScan() {
       // For xsec we can get the actual name, hurray for being informative
       if (isxsec) name = (*it)->GetParFancyName(i);
       bool skip = false;
-      for(int is = 0; is < SkipVector.size(); is++)
+      for(unsigned int is = 0; is < SkipVector.size(); is++)
       {
         if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
         {

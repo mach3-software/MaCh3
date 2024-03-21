@@ -45,8 +45,8 @@ void PSO::init(){
     fBestValue = 1234567890.0;
 
     //KS: For none PCA this will be eqaul to normal parameters
-    const int NparsPSOFull = NPars;
-    const int NparsPSO = NParsPCA;
+    //const int NparsPSOFull = NPars;
+    //const int NparsPSO = NParsPCA;
 
     std::cout << "Preparing PSO" << std::endl;
 
@@ -294,7 +294,6 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
         std::vector<double> x(num);
         std::vector<double> y(num);
         double step = (stop - start) / (num - 1);
-        double number = start;
         double value = start;
         // std::cout << "result for fDim " << 1 << std::endl;
         for (int j =0;j< num; ++j){
@@ -386,7 +385,7 @@ void PSO::run() {
     int iter = 0;
     for(int i = 0; i < fIterations; ++i, ++iter){
         mean_dist_sq = swarmIterate();
-        double meanVel = std::accumulate(vel, vel + fParticles, 0) / fParticles;
+        //double meanVel = std::accumulate(vel, vel + fParticles, 0) / fParticles;
 
         // Weight inertia randomly but scaled by total distance of swarm from global minimum - proxy for total velocity
         // fWeight = ((random->Rndm()+1.0)*0.5)*(10.0/meanVel);
@@ -492,7 +491,7 @@ void PSO::WriteOutput(){
                 {
                     (*PSOParValue)(ParCounter) = ParVals(i);
                     (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));
-                    int ParCounterMatrix = StartVal;
+                    //int ParCounterMatrix = StartVal;
                     //If fixed take prior
                     if((*it)->isParameterFixedPCA(i))
                     {

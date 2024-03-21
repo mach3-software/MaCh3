@@ -208,6 +208,17 @@ if(MaCh3_GPU_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
 endif()
 
+if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
+  SET(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
+endif()
+
+if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE __LOW_MEMORY_STRUCTS__)
+endif()
+
+
+
+
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
@@ -224,6 +235,7 @@ LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  LOW_MEMORY_STRUCTS
   Oscillator
   Fitter
   )

@@ -982,7 +982,7 @@ void covarianceXsec::Print() {
   // Output the normalisation parameters as a sanity check!
   std::cout << "Normalisation parameters:" << NormParams.size() << std::endl;
   std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "Type" << std::endl;
-  for (int i = 0; i < NormParams.size(); ++i) {
+  for (unsigned int i = 0; i < NormParams.size(); ++i) {
     std::cout << std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "|" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "|" << std::setw(10);
     for(int j = 0; j < int((NormParams.at(i).modes).size()); j++){
       std::cout<< NormParams.at(i).modes.at(j) <<" ";

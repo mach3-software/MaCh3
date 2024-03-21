@@ -36,9 +36,9 @@ class samplePDFBase : public samplePDFInterface
 
   virtual ~samplePDFBase();
 
-  inline __int__ GetNsamples(){ return nSamples; };
+  virtual inline __int__ GetNsamples(){ return nSamples; };
   virtual inline std::string GetName(){return "samplePDF";};
-  std::string GetSampleName(int Sample);
+  virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
