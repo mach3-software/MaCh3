@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "manager/manager.h"
 
 // *************************
 manager::manager(std::string const &filename)

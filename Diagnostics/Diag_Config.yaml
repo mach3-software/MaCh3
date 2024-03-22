@@ -1,0 +1,11 @@
+#########################################
+DiagMCMC:
+  ExcludedTypes: ["ndd_", "skd_joint_"]
+  ExcludedNames: ["b_"]
+  nBatches: 20
+  nLags: 25000
+  PlotRelativeToPrior: "false"
+
+
+
+

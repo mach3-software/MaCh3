@@ -247,7 +247,6 @@ endforeach()
 ################################# Build MaCh3 ##################################
 
 # Build components
-# add_subdirectory(Diagnostics)
 add_subdirectory(manager)
 add_subdirectory(throwParms)
 add_subdirectory(covariance)
@@ -257,6 +256,7 @@ if (NOT USE_PROB3)
 endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
+add_subdirectory(Diagnostics)
 #ETA - commenting out as not c++11 compatible...
 #add_subdirectory(yaml_test)
 
