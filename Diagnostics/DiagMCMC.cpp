@@ -1,41 +1,47 @@
 #include "mcmc/MCMCProcessor.h"
 
-void DiagMCMC(std::string inputFile);
+#include "manager/manager.h"
+
+
+void DiagMCMC(std::string inputFile, std::string config);
 
 int main(int argc, char *argv[]) {
 
-  if (argc != 2) 
+  if (argc != 3)
   {
-    std::cerr << "How to use:   DiagMCMC MCMC_Output.root" << std::endl;
+    std::cerr << "How to use:   DiagMCMC MCMC_Output.root config" << std::endl;
     exit(-1);
   }
   
-    if (argc == 2) 
-    {
-        std::cout << "Producing single fit output" << std::endl;
-        std::string filename = argv[1];
-        DiagMCMC(filename);
-  }
+  std::cout << "Producing single fit output" << std::endl;
+  std::string filename = argv[1];
+  std::string config = argv[2];
+  DiagMCMC(filename, config);
     
   return 0;
 }
 
 
-void DiagMCMC(std::string inputFile)
+void DiagMCMC(std::string inputFile, std::string config)
 {
     std::cout << "File for study:       " << inputFile << std::endl;
       
+    YAML::Node Settings = YAML::LoadFile(config);
+
    // Make the processor
     MCMCProcessor* Processor = new MCMCProcessor(inputFile, false);
     
     Processor->SetOutputSuffix("_MCMC_Diag");
-    //KS:Turn off plotting detector and some other setting, should be via some config
-    Processor->SetPlotDet(false);
-    Processor->SetPlotRelativeToPrior(true);
-    Processor->Initialise();
+    //KS:Turn off plotting detector and some other setting
+    Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedTypes"], {""}));
+    Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedNames"], {""}));
+    Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["DiagMCMC"]["PlotRelativeToPrior"], false));
     //KS: Use 20 batches for batched means
-    Processor->SetnBatches(20);
-    
+    Processor->SetnBatches(GetFromManager<int>(Settings["DiagMCMC"]["nBatches"], 20));
+    Processor->SetnLags(GetFromManager<int>(Settings["DiagMCMC"]["nLags"], 25000));
+
+    Processor->Initialise();
+
     //KS: finally call main method
     Processor->DiagMCMC();
     
