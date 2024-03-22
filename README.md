@@ -111,5 +111,5 @@ This is an example how your executable can look like using MaCh3:
 
 
 ## Help and Guidelines
-- [How to contribute](https://github.com/mach3-software/MaCh3/develop/CONTRIBUTING.md)
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
