@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Doc/mach3logo.png" alt="Mach3 Logo" width="200"/>
+  <img src="Doc/mach3logo.png" alt="Mach3 Logo" width="100"/>
 </p>
 
 # MaCh3
@@ -109,4 +109,4 @@ This is example how your exectuable can look like using MaCh3:
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/develop/CONTRIBUTING.md)
-- [Wiki] (https://github.com/mach3-software/MaCh3/wiki)
+- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
