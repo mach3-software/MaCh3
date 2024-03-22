@@ -15,7 +15,6 @@ cmake ../
 Don't forget to
 ```
 source bin/setup.MaCh3.sh
-
 ```
 ## Building against MaCh3
 If you compiled MaCh3 and sourced it you can simply call
@@ -30,8 +29,12 @@ CPMFindPackage(
   GITHUB_REPOSITORY mach3-software/MaCh3
 )
 ```
+Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows:
+```
+target_link_libraries(blarb MaCh3::All)
+```
 
-Some fucnitonalities relies on setting `Env{MACH3}` which should point to path experiment specyfic MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
+Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specyfic MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
@@ -49,7 +52,7 @@ cmake ../ [-USE_CPU=ON]
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know.
 
 
-## Oscialtor
+## Oscilator
 MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
 
 ```
@@ -63,7 +66,7 @@ Following neutrino oscillation calculators are available:
 </ol>
 
 ## Fitting algorithms
-Following fitting algorithms are available:
+The following fitting algorithms are available:
 <ol>
 <li> MR2T2  </li>
 <li> MINUIT2  </li>
@@ -87,16 +90,16 @@ cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
 ```
 
 # How To Use
-This is example how your exectuable can look like using MaCh3:
+This is an example how your executable can look like using MaCh3:
 ```
   manager *fitMan = nullptr; //Manager is responsible for reading from config
 
-  std::vector<samplePDFBase*> sample; //vector storing infomation about sample for different detector
+  std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector
   std::vector<covarianceBase*> Cov; // vector with systematic implementation
-  mcmc *markovChain = nullptr; // MCMC class, can be repalced with other fitting method
-  MakeMaCh3Instance(fitMan, sample, Cov, markovChain); //Factory like function whihc initialsies everything
+  mcmc *markovChain = nullptr; // MCMC class, can be replaced with other fitting method
+  MakeMaCh3Instance(fitMan, sample, Cov, markovChain); //Factory like function which initialises everything
 
-  //Adding samles and covariances to Fitter class, could be in factory
+  //Adding samples and covariances to the Fitter class could be in the factory
   for(unsigned int i = 0; sample.size(); i++)
     markovChain->addSamplePDF(sample[i]);
   for(unsigned int i = 0; Cov.size(); i++)
