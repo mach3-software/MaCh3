@@ -66,11 +66,13 @@ if(NOT TARGET ROOT::ROOT)
 endif()
 
 #YAML for reading in config files
+set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
+set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
 CPMFindPackage(
     NAME yaml-cpp
-    VERSION 0.7.0
+    VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG "yaml-cpp-0.7.0"
+    GIT_TAG "${YAML_CPP_GIT_TAG}"
     OPTIONS
       "YAML_BUILD_SHARED_LIBS ON"
 )
@@ -217,8 +219,6 @@ if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
 endif()
 
 
-
-
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
@@ -309,3 +309,37 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/MaCh3)
 
 include(mach3-config)
+
+############################ Version Info ##########################
+## Based on Ewan Miller implementation in OAGenWeightsApp (T2K)
+## Make a custom file named version.h that has a
+## dump of the versions of the main dependencies of MaCh3
+## We also check the git hash of each of the dependencies and info
+## on whether or not they were using a tagged commit or not
+set(GENERATED_VERSION_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+
+if(EXISTS ${GENERATED_VERSION_HEADER_DIR}/_version.h)
+  message(FATAL_ERROR "File \"${GENERATED_VERSION_HEADER_DIR}/_version.h\" found, \
+  this should never be created, remove!")
+endif()
+
+add_custom_target(
+  version_header ALL
+  DEPENDS ${GENERATED_VERSION_HEADER_DIR}/_version.h
+)
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${GENERATED_VERSION_HEADER_DIR}/version.h
+         ${GENERATED_VERSION_HEADER_DIR}/_version.h
+
+  COMMAND ${CMAKE_COMMAND}
+          -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
+          -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
+          -DROOT_VERSION=${ROOT_VERSION}
+          -DMaCh3_VERSION=${MaCh3_VERSION}
+          -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
+          -P
+          ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
+)
+
+set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${GENERATED_VERSION_HEADER_DIR})

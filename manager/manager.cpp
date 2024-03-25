@@ -1,3 +1,5 @@
+#include "TFile.h"
+
 #include "manager/manager.h"
 
 // *************************
@@ -48,14 +50,58 @@ manager::manager(std::string const &filename)
 }
 
 // *************************
+// Empty destructor, for now...
+manager::~manager() {
+// *************************
+
+
+}
+
+// *************************
 // Save all the settings of the class to an output file
 // Reflection in C++ is a bit of a pain :(
 // Outputfile is the TFile pointer we write to
-void manager::SaveSettings(TFile * const OutputFile) {
+void manager::SaveSettings(TFile* const OutputFile) {
 // *************************
 
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
+
+  // EM: embed the config usef for this app
+  TMacro MaCh3Config("MaCh3_Config", "MaCh3_Config");
+  MaCh3Config.ReadFile(FileName.c_str());
+  MaCh3Config.Write();
+
+  if (std::getenv("MaCh3_ROOT") == NULL) {
+    std::cerr << "Need MaCh3_ROOT environment variable" << std::endl;
+    std::cerr << "Please remeber about source bin/setup.MaCh3.sh" << std::endl;
+    throw;
+  }
+
+  if (std::getenv("MACH3") == NULL) {
+    std::cerr << "Need MACH3 environment variable" << std::endl;
+    throw;
+  }
+
+  std::string header_path = std::string(std::getenv("MACH3"));
+  header_path += "/version.h";
+  FILE* file = fopen(header_path.c_str(), "r");
+  //KS: It is better to use experiment specyfic header file. If given experiemnt didn't provide it we gonna use one given by Core MaCh3.
+  if (!file)
+  {
+    header_path = std::string(std::getenv("MaCh3_ROOT"));
+    header_path += "/version.h";
+  }
+  else
+  {
+    fclose(file);
+  }
+
+  // EM: embed the cmake generated version.h file
+  TMacro versionHeader("version_header", "version_header");
+  versionHeader.ReadFile(header_path.c_str());
+  versionHeader.Write();
+
   // The Branch!
   TTree *SaveBranch = new TTree("Settings", "Settings");
 
@@ -63,9 +109,9 @@ void manager::SaveSettings(TFile * const OutputFile) {
   SaveBranch->Branch("Output", &OutputFilename);
   SaveBranch->Branch("TestStatistic", &mc_stat_llh);
 
-  bool real_data = config["General"]["RealData"].as<bool>();
-  bool asimov_fit = config["General"]["Asimov"].as<bool>();
-  bool fake_data = config["General"]["FakeData"].as<bool>();
+  bool real_data = GetFromManager<bool>(config["General"]["RealData"], false);
+  bool asimov_fit = GetFromManager<bool>(config["General"]["Asimov"], true);
+  bool fake_data = GetFromManager<bool>(config["General"]["FakeData"], false);
 
   SaveBranch->Branch("RealDataFit", &real_data);
   SaveBranch->Branch("AsimovFit",   &asimov_fit);
@@ -107,6 +153,8 @@ void manager::Print() {
   std::cout << std::endl;
 }
 
+
+
 /* Old Mananger that needs translation
  * we're moving to YAML BABY!
 
@@ -134,9 +182,7 @@ proceeding" << std::endl;
 
 }
 
-// Empty destructor
-manager::~manager() {
-}
+
 
 // Read the supplied config file
 // This is Getting pretty huge by now!

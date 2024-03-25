@@ -8,24 +8,28 @@
 #include <cstdlib>
 
 // ROOT include
-#include "TFile.h"
 #include "TTree.h"
 #include "TBranch.h"
+#include "TMacro.h"
 
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
+
+//KS: Joy of forward delcaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class TFile;
 
 class manager {
 
 public:
   manager(std::string const &);
+  virtual ~manager();
 
   inline int GetMCStatLLH(){return mc_stat_llh;}
   inline std::string GetFileName(){return FileName;}
 
   inline YAML::Node const &raw(){return config;}
 
-  void SaveSettings(TFile * const OutputFile);
+  void SaveSettings(TFile* const OutputFile);
 
   void Print();
 
@@ -39,14 +43,14 @@ private:
   bool cpu_mp_on;
   int n_cpus;
 
-
+};
 
 /*
  * Keeping this all here as we should start adding in functions here to do reading
  * of different options
  public:
   manager(char *config, bool print = true);
-  virtual ~manager();
+
 
   int readConfig(char *config);
 
@@ -379,4 +383,3 @@ private:
   std::vector<bool> signal;
 
   */
-};
