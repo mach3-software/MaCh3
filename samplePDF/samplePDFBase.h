@@ -1,5 +1,5 @@
-#ifndef _samplePDFBase_h_
-#define _samplePDFBase_h_
+#pragma once
+
 
 //C++ includes
 #include <iostream>
@@ -31,7 +31,6 @@
 class samplePDFBase : public samplePDFInterface 
 {
  public:
-  samplePDFBase(){};
   samplePDFBase(double pot);
 
   virtual ~samplePDFBase();
@@ -120,4 +119,3 @@ class samplePDFBase : public samplePDFInterface
   TestStatistic fTestStatistic;
 
 };
-#endif
