@@ -8,7 +8,10 @@ manager::manager(std::string const &filename)
 // *************************
 
   FileName = filename;
-  std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
+
+  LOG::INFOLOG("Setting config to be: %s", filename.c_str());
+
+  LOG::INFOLOG("Config is now: "); std::cout << config << std::endl;
 
   if (config["LikelihoodOptions"])
   {
@@ -19,11 +22,11 @@ manager::manager(std::string const &filename)
     else if (likelihood == "Pearson")                   mc_stat_llh = TestStatistic(kPearson);
     else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
     else {
-      std::cerr << "Wrong form of test-statistic specified!" << std::endl;
-      std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
+      LOG::ERRORLOG("Wrong form of test-statistic specified!");
+      LOG::ERRORLOG("You gave %s and I only support:", likelihood);
       for(int i = 0; i < kNTestStatistics; i++)
       {
-        std::cerr << TestStatistic_ToString(TestStatistic(i)) << std::endl;
+        LOG::ERRORLOG(TestStatistic_ToString(TestStatistic(i)).c_str());
       }
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
@@ -73,13 +76,13 @@ void manager::SaveSettings(TFile* const OutputFile) {
   MaCh3Config.Write();
 
   if (std::getenv("MaCh3_ROOT") == NULL) {
-    std::cerr << "Need MaCh3_ROOT environment variable" << std::endl;
-    std::cerr << "Please remeber about source bin/setup.MaCh3.sh" << std::endl;
+    LOG::ERRORLOG("Need MaCh3_ROOT environment variable");
+    LOG::ERRORLOG("Please remeber about source bin/setup.MaCh3.sh");
     throw;
   }
 
   if (std::getenv("MACH3") == NULL) {
-    std::cerr << "Need MACH3 environment variable" << std::endl;
+    LOG::ERRORLOG("Need MACH3 environment variable");
     throw;
   }
 

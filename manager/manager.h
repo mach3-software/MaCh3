@@ -14,6 +14,7 @@
 
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
+#include "manager/Logging.h"
 
 //KS: Joy of forward delcaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;

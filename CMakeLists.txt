@@ -218,7 +218,6 @@ if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE __LOW_MEMORY_STRUCTS__)
 endif()
 
-
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
@@ -229,6 +228,38 @@ SET(MaCh3_Fitter_ENABLED "MR2T2")
 if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
   LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
 endif()
+
+######################### Logging options #########################
+
+## EM: Allow user to set the log level used in Logging.h
+##     Can be any of the following, listed from least to most verbose
+##     Silent       <- Don't print developer messages, this wont include e.g. progress bars, summary tables etc.
+##     Error        <- Print errors
+##     Warning      <- Print warnings
+##     Info         <- Print high level information
+##     Debug        <- print standard debug information
+##     Trace        <- Print EVERYTHING
+
+option(LOG_LEVEL "LOG_LEVEL" Info)
+
+if(NOT LOG_LEVEL)
+  if(MaCh3_DEBUG_ENABLED)
+    set(LOG_LEVEL "Debug")
+  else()
+    set(LOG_LEVEL "Info")
+  endif()
+endif()
+
+## EM: Check the specified log level is valid
+set(VALID_LOG_OPTIONS Silent Error Warning Info Debug Trace)
+list(FIND VALID_LOG_OPTIONS ${LOG_LEVEL} index)
+if(${index} GREATER -1)
+  cmessage(STATUS "LOG LEVEL: ${LOG_LEVEL}")
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE MACH3_LOG_LEVEL=MACH3_LOG_k${LOG_LEVEL})
+else()
+  cmessage(FATAL_ERROR "Invalid log level specified: ${LOG_LEVEL} \n Should be one of: ${VALID_LOG_OPTIONS}")
+endif()
+
 ################################# Features ##################################
 
 LIST(APPEND ALL_FEATURES

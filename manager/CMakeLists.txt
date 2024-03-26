@@ -1,6 +1,7 @@
 set(HEADERS
     manager.h
     YamlHelper.h
+    Logging.h
 )
 
 add_library(Manager SHARED
