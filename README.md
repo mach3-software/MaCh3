@@ -1,8 +1,5 @@
-<p align="center">
-  <img src="Doc/mach3logo.png" alt="Mach3 Logo" width="100"/>
-</p>
+# MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
 
-# MaCh3
 MaCh3 is ...
 
 # How to Compile

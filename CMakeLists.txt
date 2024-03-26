@@ -157,7 +157,6 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 #Compile and link options
 #Add -Werror in the future
 target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall)
-
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)
@@ -231,31 +230,44 @@ endif()
 
 ######################### Logging options #########################
 
-## EM: Allow user to set the log level used in Logging.h
-##     Can be any of the following, listed from least to most verbose
-##     Silent       <- Don't print developer messages, this wont include e.g. progress bars, summary tables etc.
-##     Error        <- Print errors
-##     Warning      <- Print warnings
-##     Info         <- Print high level information
-##     Debug        <- print standard debug information
-##     Trace        <- Print EVERYTHING
+CPMAddPackage(
+    NAME spdlog
+    VERSION 1.11.0
+    GITHUB_REPOSITORY gabime/spdlog
+    OPTIONS
+      "SPDLOG_BUILD_PIC ON"
+      "SPDLOG_MASTER_PROJECT ON"
+)
+if(NOT TARGET spdlog::spdlog)
+  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: spdlog::spdlog")
+endif()
+
+#From: https://github.com/gabime/spdlog/blob/62302019babd8fdf63c1c6dc4c9faa48d441a7f0/include/spdlog/spdlog.h#L284C1-L291C20
+# define SPDLOG_ACTIVE_LEVEL to one of those (before including spdlog.h):
+# SPDLOG_LEVEL_TRACE,
+# SPDLOG_LEVEL_DEBUG,
+# SPDLOG_LEVEL_INFO,
+# SPDLOG_LEVEL_WARN,
+# SPDLOG_LEVEL_ERROR,
+# SPDLOG_LEVEL_CRITICAL,
+# SPDLOG_LEVEL_OFF
 
 option(LOG_LEVEL "LOG_LEVEL" Info)
 
 if(NOT LOG_LEVEL)
   if(MaCh3_DEBUG_ENABLED)
-    set(LOG_LEVEL "Debug")
+    set(LOG_LEVEL "DEBUG")
   else()
-    set(LOG_LEVEL "Info")
+    set(LOG_LEVEL "INFO")
   endif()
 endif()
 
 ## EM: Check the specified log level is valid
-set(VALID_LOG_OPTIONS Silent Error Warning Info Debug Trace)
+set(VALID_LOG_OPTIONS OFF CRITICAL ERROR WARN INFO DEBUG TRACE)
 list(FIND VALID_LOG_OPTIONS ${LOG_LEVEL} index)
 if(${index} GREATER -1)
   cmessage(STATUS "LOG LEVEL: ${LOG_LEVEL}")
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE MACH3_LOG_LEVEL=MACH3_LOG_k${LOG_LEVEL})
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
 else()
   cmessage(FATAL_ERROR "Invalid log level specified: ${LOG_LEVEL} \n Should be one of: ${VALID_LOG_OPTIONS}")
 endif()

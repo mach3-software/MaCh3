@@ -12,11 +12,13 @@
 #include "TBranch.h"
 #include "TMacro.h"
 
+#include "spdlog/spdlog.h"
+
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
 #include "manager/Logging.h"
 
-//KS: Joy of forward delcaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;
 
 class manager {
