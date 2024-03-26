@@ -322,7 +322,7 @@ class covarianceBase {
  protected:
   void init(const char *name, const char *file);
   //YAML init
-  void init(const char *YAMLFile);
+  void init(std::vector<std::string> YAMLFile);
   void init(TMatrixDSym* covMat);
 
   void MakePosDef(TMatrixDSym *cov = NULL);
