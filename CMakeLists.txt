@@ -229,10 +229,10 @@ if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
 endif()
 
 ######################### Logging options #########################
-
+set(SPDLOG_VERSION 1.11.0)
 CPMAddPackage(
     NAME spdlog
-    VERSION 1.11.0
+    VERSION ${SPDLOG_VERSION}
     GITHUB_REPOSITORY gabime/spdlog
     OPTIONS
       "SPDLOG_BUILD_PIC ON"
@@ -379,8 +379,9 @@ ADD_CUSTOM_COMMAND(
           -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
           -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
           -DROOT_VERSION=${ROOT_VERSION}
-          -DMaCh3_VERSION=${MaCh3_VERSION}
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
+          -DSPDLOG_VERSION=${SPDLOG_VERSION}
+          -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
           -P
           ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
 )

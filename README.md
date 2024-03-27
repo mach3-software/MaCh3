@@ -1,7 +1,7 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-Markov Chain 3 flavour is frameworks which was born in 2013 as T2K Bayesian MCMC fitter for oscillation analysis. It has been used for multiple T2K Oscillation analysis both at Near and Far detectors throughout years.
+Markov Chain 3 flavour is frameworks which was born in 2013 as [T2K](https://t2k-experiment.org/pl/) Bayesian MCMC fitter for oscillation analysis. It has been used for multiple T2K Oscillation analysis both at Near and Far detectors throughout years.
 
-TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA
+TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA and mention HK and DUNE
 
 It has been used to  Since then framework evolved and has non MCMC modules.
 
@@ -9,10 +9,13 @@ It has been used to  Since then framework evolved and has non MCMC modules.
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
 
 # How to Compile
-
+MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
 ```
-mkdir build; cd build;
+mkdir build;
+cd build;
 cmake ../
+make -jN [set number of threads]
+make install
 ```
 
 Don't forget to:
@@ -37,7 +40,7 @@ Once you found MaCh3 you might want to link your library against MaCh3. You can 
 target_link_libraries(blarb MaCh3::All)
 ```
 
-Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specyfic MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
+Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specific MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
@@ -63,9 +66,9 @@ cmake ../ [-DUSE_PROB3=<ON,OFF>]
 ```
 Following neutrino oscillation calculators are available:
 <ol>
-<li> CUDAProb3 [CPU/GPU][Beam/Atm]  </li>
-<li> Prob3++ [CPU][Beam] </li>
-<li> probGPU [GPU][Beam] </li>
+<li> CUDAProb3 [**CPU/GPU**][**Beam/Atm**]  </li>
+<li> Prob3++ [**CPU**][**Beam**] </li>
+<li> probGPU [**GPU**][**Beam**] </li>
 </ol>
 
 ## Fitting algorithms
@@ -117,8 +120,8 @@ This is an example how your executable can look like using MaCh3:
 ## Plotting and Diagnostic
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics).
 
-<p align="center">
-  <img src="Doc/delta.png" alt="deltao" width="200"/>
+<p align="left">
+  <img src="Doc/delta.png" alt="delta" width="200"/>
 </p>
 
 TODO this should be expanded
@@ -128,6 +131,5 @@ TODO this should be expanded
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
-
 
 
