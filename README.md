@@ -66,9 +66,9 @@ cmake ../ [-DUSE_PROB3=<ON,OFF>]
 ```
 Following neutrino oscillation calculators are available:
 <ol>
-<li> CUDAProb3 [**CPU/GPU**][**Beam/Atm**]  </li>
-<li> Prob3++ [**CPU**][**Beam**] </li>
-<li> probGPU [**GPU**][**Beam**] </li>
+<li> CUDAProb3 [CPU/GPU][Beam/Atm]  </li>
+<li> Prob3++ [CPU][Beam] </li>
+<li> probGPU [GPU][Beam] </li>
 </ol>
 
 ## Fitting algorithms
