@@ -6,9 +6,7 @@ TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA
 It has been used to  Since then framework evolved and has non MCMC modules.
 
 ## Cite
-
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
-
 
 # How to Compile
 
@@ -57,7 +55,7 @@ cmake ../ [-USE_CPU=ON]
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know.
 
 
-## Oscilator
+## Oscillator
 MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
 
 ```
@@ -75,6 +73,7 @@ The following fitting algorithms are available:
 <ol>
 <li> MR2T2  </li>
 <li> MINUIT2  </li>
+<li> PSO  </li>
 </ol>
 
 ## Debug
@@ -119,10 +118,16 @@ This is an example how your executable can look like using MaCh3:
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics).
 
 <p align="center">
-  <img src="Doc/delta.png" alt="deltao" width="100"/>
+  <img src="Doc/delta.png" alt="deltao" width="200"/>
 </p>
+
+TODO this should be expanded
+
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
+
+
 
