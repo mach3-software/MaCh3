@@ -538,7 +538,7 @@ void covarianceXsec::SetupNormPars(){
 	
 		std::vector<int> temp;
 		XsecNorms4 norm;
-		norm.name=GetParName(i);
+		norm.name=GetParFancyName(i);
 
 		//Copy the mode information into an XsecNorms4 struct
 		norm.modes = _fNormModes[norm_counter];	
@@ -594,7 +594,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		std::vector<int> temp;
 
 		XsecNorms4 norm;
-		norm.name=GetParName(i);
+		norm.name=GetParFancyName(i);
 
 		//Copy the mode information into an XsecNorms4 struct
 		norm.modes = _fNormModes[norm_counter];	
@@ -971,10 +971,10 @@ void covarianceXsec::Print() {
   std::cout << std::endl;
 
   std::cout << "Global parameter map:" << std::endl;
-  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << std::setw(5) << "DetID" << std::endl;;
+  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << "|" << std::setw(5) << "DetID" << std::endl;;
 
   for (int i = 0; i < GetNumParams(); i++) {
-    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
+    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParFancyName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
   }
 
   std::cout << std::endl;
