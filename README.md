@@ -1,5 +1,14 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-Markov Chain 3 flavour is frameworks which was born in 2013 as T2K Bayesian MCMC fitter for oscillation analysis. Since then framework evolved and has non MCMC modules.
+Markov Chain 3 flavour is frameworks which was born in 2013 as T2K Bayesian MCMC fitter for oscillation analysis. It has been used for multiple T2K Oscillation analysis both at Near and Far detectors throughout years.
+
+TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA
+
+It has been used to  Since then framework evolved and has non MCMC modules.
+
+## Cite
+
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/badge/latestdoi/10994345) [![DOI](https://zenodo.org/badge/10994345.svg)](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
+
 
 # How to Compile
 
@@ -8,7 +17,7 @@ mkdir build; cd build;
 cmake ../
 ```
 
-Don't forget to
+Don't forget to:
 ```
 source bin/setup.MaCh3.sh
 ```
@@ -107,9 +116,13 @@ This is an example how your executable can look like using MaCh3:
 ```
 
 ## Plotting and Diagnostic
-Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics)
-<img src="Doc/delta.png" alt="delta" align="center" width="100"/>
+Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics).
+
+<p align="center">
+  <img src="Doc/delta.png" alt="deltao" width="100"/>
+</p>
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+
