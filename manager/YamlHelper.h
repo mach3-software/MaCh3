@@ -73,11 +73,26 @@ T FindFromManager(const YAML::Node& node, Args... args) {
 // Function to convert a YAML string to a YAML node
 YAML::Node STRINGtoYAML(const std::string& yaml_string);
 
-// Function to convert a YAML node to a YAML string
+/**
+ * @brief KS: Convert a YAML node to a string representation.
+ *
+ * @param node The YAML node to convert to a string.
+ * @return std::string The string representation of the YAML node.
+ */
 std::string YAMLtoSTRING(const YAML::Node& node);
 
-//KS: Converts ROOT TMacro to string
+/**
+ * @brief KS: Convert a ROOT TMacro object to a string representation.
+ *
+ * @param macro The ROOT TMacro object to convert.
+ * @return std::string The string representation of the TMacro object.
+ */
 std::string TMacroToString(const TMacro& macro);
 
-//KS: Converts ROOT TMacro to yaml node
+/**
+ * @brief KS: Convert a ROOT TMacro object to a YAML node.
+ *
+ * @param macro The ROOT TMacro object to convert.
+ * @return YAML::Node The YAML node representing the TMacro object.
+ */
 YAML::Node TMacroToYAML(const TMacro& macro);

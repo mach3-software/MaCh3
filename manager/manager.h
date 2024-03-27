@@ -27,12 +27,17 @@ public:
   virtual ~manager();
 
   inline int GetMCStatLLH(){return mc_stat_llh;}
+
+  //Return name of config
   inline std::string GetFileName(){return FileName;}
 
+  // Return config
   inline YAML::Node const &raw(){return config;}
 
+  //Add manager useful infomrations to TFile, in most cases to Fitter
   void SaveSettings(TFile* const OutputFile);
 
+  // Print currently used config
   void Print();
 
 private:

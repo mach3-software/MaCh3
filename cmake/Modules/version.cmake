@@ -55,6 +55,12 @@ function(DUMP_GIT_SUMMARY PACKAGE_NAME PKG_GIT_REPO)
   file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/version.h "${VERSION_STR}")
 endfunction()
 
+function(DUMP_CPU_INFO)
+    execute_process(COMMAND lscpu OUTPUT_VARIABLE CPU_INFO)
+    string(REPLACE "\n" "\n// " CPU_INFO_COMMENTED "${CPU_INFO}")
+    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/version.h "\n/* ##### CPU INFO #####\n// ${CPU_INFO_COMMENTED}*/\n")
+endfunction()
+
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version.h "\n// Versions of dependencies used to build MaCh3\n")
 file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/version.h "\nconst char* VERSION_HEADER_LOC=\"${CMAKE_CURRENT_BINARY_DIR}/version.h\";\n")
 file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/version.h "const char* COMPILER=\"${CMAKE_CXX_COMPILER_ID}\";\n")
@@ -66,3 +72,5 @@ DUMP_VERSION_INFO(YAML_CPP "${YAML_CPP_VERSION}")
 
 DUMP_GIT_SUMMARY(MaCh3 "")
 #DUMP_GIT_SUMMARY(YAML_CPP "${MaCh3_ROOT}/_deps/yaml-cpp-src/.git")
+
+DUMP_CPU_INFO()
