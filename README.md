@@ -1,6 +1,5 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-
-MaCh3 is ...
+Markov Chain 3 flavour is frameworks which was born in 2013 as T2K Bayesian MCMC fitter for oscillation analysis. Since then framework evolved and has non MCMC modules.
 
 # How to Compile
 
@@ -80,6 +79,7 @@ There are several debug modes, to enable more detailed but very heavy specific d
 cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
 ```
 ## System Requirements
+Most of external libraries are being handled through CPM. The only external library that is not being handled through CPM and is required is [ROOT](https://root.cern/).
 ```
   GCC: ...
   CMake: ...
@@ -106,6 +106,9 @@ This is an example how your executable can look like using MaCh3:
   markovChain->runMCMC(); //or run actual fit
 ```
 
+## Plotting and Diagnostic
+Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics)
+<img src="Doc/delta.png" alt="delta" align="center" width="100"/>
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
