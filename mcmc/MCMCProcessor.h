@@ -216,7 +216,7 @@ class MCMCProcessor {
     inline void ReadInputCov();
     inline void FindInputFiles();
     inline void ReadXSecFile();
-    inline void ReadND280File();
+    inline void ReadNDFile();
     inline void ReadFDFile();
     inline void ReadOSCFile();
     inline void RemoveParameters();

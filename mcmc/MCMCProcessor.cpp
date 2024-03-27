@@ -2389,7 +2389,7 @@ void MCMCProcessor::ReadInputCov() {
 // **************************
   FindInputFiles();
   if(nParam[kXSecPar] > 0)  ReadXSecFile();
-  if(nParam[kNDPar] > 0) ReadND280File();
+  if(nParam[kNDPar] > 0) ReadNDFile();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
   if(nParam[kOSCPar] > 0)   ReadOSCFile();
   //KS: Remove parameters which were removed
@@ -2540,7 +2540,7 @@ void MCMCProcessor::ReadXSecFile() {
 
 // ***************
 // Read the ND cov file and get the input central values and errors
-void MCMCProcessor::ReadND280File() {
+void MCMCProcessor::ReadNDFile() {
 // ***************
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
   if (std::getenv("MACH3") != nullptr) {
