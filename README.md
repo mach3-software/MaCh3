@@ -7,7 +7,7 @@ It has been used to  Since then framework evolved and has non MCMC modules.
 
 ## Cite
 
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/badge/latestdoi/10994345) [![DOI](https://zenodo.org/badge/10994345.svg)](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
 
 
 # How to Compile
