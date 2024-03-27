@@ -407,9 +407,9 @@ void MCMCProcessor::MakePostfit() {
   int FluxParameters = nFlux;
   SettingsBranch->Branch("FluxParameters", &FluxParameters);
   
-  int NDParameters = nParam[kND280Par];
+  int NDParameters = nParam[kNDPar];
   SettingsBranch->Branch("NDParameters", &NDParameters);
-  int NDParametersStartingPos = ParamTypeStartPos[kND280Par];
+  int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
   SettingsBranch->Branch("NDParametersStartingPos", &NDParametersStartingPos);
 
   int FDParameters = nParam[kFDDetPar];
@@ -645,7 +645,7 @@ void MCMCProcessor::DrawPostfit() {
   }
   if(PlotDet)
   {
-    int Start = ParamTypeStartPos[kND280Par];
+    int Start = ParamTypeStartPos[kNDPar];
     int NDbinCounter = Start;
     //KS: Make prefit postfit for each ND sample, having all of them at the same plot is unreadable
     for(unsigned int i = 0; i < NDSamplesNames.size(); i++ )
@@ -2188,9 +2188,9 @@ void MCMCProcessor::ScanInput() {
     else if (bname.BeginsWith("ndd_"))
     {
       BranchNames.push_back(bname);
-      ParamType.push_back(kND280Par);
+      ParamType.push_back(kNDPar);
       PlotDet = true;
-      nParam[kND280Par]++;
+      nParam[kNDPar]++;
     }
     else if (bname.BeginsWith("skd_joint_"))
     {
@@ -2229,7 +2229,7 @@ void MCMCProcessor::ScanInput() {
   std::cout << "# useful entries in tree: \033[1;32m " << nDraw  <<" \033[0m "<< std::endl;
   std::cout << "# XSec params:  \033[1;32m " << nParam[kXSecPar] - nFlux <<" starting at "<<ParamTypeStartPos[kXSecPar] <<" \033[0m "<< std::endl;
   std::cout << "# Flux params:   " << nFlux << std::endl;
-  std::cout << "# ND280 params: \033[1;32m " << nParam[kND280Par] <<" starting at  "<<ParamTypeStartPos[kND280Par] <<" \033[0m "<< std::endl;
+  std::cout << "# ND280 params: \033[1;32m " << nParam[kNDPar] <<" starting at  "<<ParamTypeStartPos[kNDPar] <<" \033[0m "<< std::endl;
   std::cout << "# FD params:    \033[1;32m " << nParam[kFDDetPar] <<" starting at  "<<ParamTypeStartPos[kFDDetPar] <<" \033[0m "<< std::endl;
   std::cout << "# Osc params:   \033[1;32m " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   <<" \033[0m "<< std::endl;
   std::cout << "************************************************" << std::endl;
@@ -2389,7 +2389,7 @@ void MCMCProcessor::ReadInputCov() {
 // **************************
   FindInputFiles();
   if(nParam[kXSecPar] > 0)  ReadXSecFile();
-  if(nParam[kND280Par] > 0) ReadND280File();
+  if(nParam[kNDPar] > 0) ReadND280File();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
   if(nParam[kOSCPar] > 0)   ReadOSCFile();
   //KS: Remove parameters which were removed
@@ -2424,8 +2424,8 @@ void MCMCProcessor::FindInputFiles() {
   }
 
   // And the ND Covariance matrix
-  std::string *ND280Input = 0;
-  if (Settings->SetBranchAddress("NDCov", &ND280Input) < 0) {
+  std::string *NDInput = 0;
+  if (Settings->SetBranchAddress("NDCov", &NDInput) < 0) {
     std::cerr << "Couldn't find NDCov branch in output" << std::endl;
     Settings->Print();
     throw;
@@ -2433,8 +2433,8 @@ void MCMCProcessor::FindInputFiles() {
 
   // And the FD Covariance matrix
   std::string *FDInput = 0;
-  if (Settings->SetBranchAddress("SKCov", &FDInput) < 0) {
-    std::cerr << "Couldn't find SKCov branch in output" << std::endl;
+  if (Settings->SetBranchAddress("FDCov", &FDInput) < 0) {
+    std::cerr << "Couldn't find FDCov branch in output" << std::endl;
     Settings->Print();
     throw;
   }
@@ -2447,22 +2447,6 @@ void MCMCProcessor::FindInputFiles() {
     throw;
   }
   
-  // Get the ND runs (needed for post fit distributions)
-  std::string *NDrunsInput = 0;
-  if (Settings->SetBranchAddress("NDruns", &NDrunsInput) < 0) {
-    std::cerr << "Couldn't find NDruns branch in output" << std::endl;
-    Settings->Print();
-    throw;
-  }
-
-  // Get the vector of ND280 selections
-  std::vector<std::string> *NDselInput = 0;
-  if (Settings->SetBranchAddress("ND_Sel", &NDselInput) < 0) {
-    std::cerr << "Couldn't find ND_Sel branch in output" << std::endl;
-    Settings->Print();
-    throw;
-  }
-
   // Write the XSecCov and TempFile
   Settings->GetEntry(0);
 
@@ -2475,11 +2459,9 @@ void MCMCProcessor::FindInputFiles() {
 
   // Save the variables
   CovPos[kXSecPar]  = *XSecInput;
-  CovPos[kND280Par] = *ND280Input;
+  CovPos[kNDPar] = *NDInput;
   CovPos[kFDDetPar] = *FDInput;
   CovPos[kOSCPar]   = *OscInput;
-  NDruns = *NDrunsInput;
-  NDsel = *NDselInput;
 }
 
 
@@ -2563,13 +2545,13 @@ void MCMCProcessor::ReadND280File() {
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
   if (std::getenv("MACH3") != nullptr) {
       std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
-      CovPos[kND280Par].insert(0, std::string(std::getenv("MACH3"))+"/");
+      CovPos[kNDPar].insert(0, std::string(std::getenv("MACH3"))+"/");
    }
    
     // Do the same for the ND280
-    TFile *NDdetFile = new TFile(CovPos[kND280Par].c_str(), "open");
+    TFile *NDdetFile = new TFile(CovPos[kNDPar].c_str(), "open");
     if (NDdetFile->IsZombie()) {
-        std::cerr << "Couldn't find NDdetFile " << CovPos[kND280Par] << std::endl;
+        std::cerr << "Couldn't find NDdetFile " << CovPos[kNDPar] << std::endl;
         throw;
     }
     NDdetFile->cd();
@@ -2580,13 +2562,13 @@ void MCMCProcessor::ReadND280File() {
 
     for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
     {
-      ParamNom[kND280Par].push_back( (*NDdetNominal)(i) );
-      ParamCentral[kND280Par].push_back( (*NDdetNominal)(i) );
+      ParamNom[kNDPar].push_back( (*NDdetNominal)(i) );
+      ParamCentral[kNDPar].push_back( (*NDdetNominal)(i) );
       
-      ParamErrors[kND280Par].push_back( std::sqrt((*NDdetMatrix)(i,i)) );
-      ParamNames[kND280Par].push_back( Form("ND Det %i", i) );
+      ParamErrors[kNDPar].push_back( std::sqrt((*NDdetMatrix)(i,i)) );
+      ParamNames[kNDPar].push_back( Form("ND Det %i", i) );
       //KS: Currently we can only set it via config, change it in future
-      ParamFlat[kND280Par].push_back( false );
+      ParamFlat[kNDPar].push_back( false );
     }  
 
     TIter next(BinningDirectory->GetListOfKeys());
