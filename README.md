@@ -5,6 +5,8 @@ TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA and mention HK and
 
 It has been used to  Since then framework evolved and has non MCMC modules.
 
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
+
 ## Cite
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
 
