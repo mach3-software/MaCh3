@@ -365,6 +365,8 @@ class covarianceBase {
   //ETA - duplication of some of these
   //ideally these should all be private and we have setters be protected 
   //setters and public getters
+  //_fNames is set automatically in the covariance class to be something like xsec_i
+  //this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
   std::vector<std::string> _fFancyNames;
   int _fNumPar;
