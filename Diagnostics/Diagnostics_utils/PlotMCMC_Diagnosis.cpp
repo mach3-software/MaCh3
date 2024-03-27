@@ -69,6 +69,7 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
 
     while ((key = (TKey*)next())) { 
             std::string dirname = std::string(key->GetName());  
+			std::cout << "Found dirname of " << dirname << std::endl;
             //KS: Script will work with LogL and Batched_means, you can comment it if you are interested in it
             if( (dirname == "LogL") || (dirname == "Batched_means") ) continue;
             //KS: Trace wo longer chains is super big, the way to avoid is to plot as png but I don't like png,
@@ -88,16 +89,19 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
                     name = dirname + "/" + name;
                     std::cout<<name<<std::endl;
 
-                if (std::string(subkey->GetClassName()) != "TH1D") continue;
+                if (std::string(subkey->GetClassName()) != "TH1D"){continue;}
+				else{std::cout << "continuing along my way" << std::endl;}
 
+				
                     TH1D* blarb[4];
+					std::cout << "Looking for " << name.c_str() << " from file " << fname1.Data() << std::endl; 
                     blarb[0] = (TH1D*)infile->Get(name.c_str())->Clone();
                     //KS: Some fixe pramas can go crazy
                     if(TMath::IsNaN(blarb[0]->GetBinContent(1)) ) continue;
                     
                     //KS: This is unfortunately hardcoded, need to find better way to write this 
                     //blarb[0]->GetListOfFunctions()->ls();
-                    delete blarb[0]->GetListOfFunctions()->FindObject("Fitter");
+                    //delete blarb[0]->GetListOfFunctions()->FindObject("Fitter");
                     blarb[0]->SetLineStyle(kSolid);
                     blarb[0]->SetLineColor(kRed);
                     blarb[0]->Draw();

@@ -164,4 +164,3 @@ class covarianceXsec : public covarianceBase {
 
 	int _nNormPars;
 };
-

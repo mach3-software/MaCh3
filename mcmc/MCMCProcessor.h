@@ -52,7 +52,7 @@
 //KS: Enum for different covariance classes
 enum ParameterEnum {
   kXSecPar  = 0, //KS: This hold both xsec and flux
-  kND280Par = 1,
+  kNDPar = 1,
   kFDDetPar = 2,
   kOSCPar   = 3,
   
@@ -103,7 +103,7 @@ class MCMCProcessor {
     inline int GetNParams() { return nDraw; };
     inline int GetNFlux() { return nFlux; };
     inline int GetNXSec() { return nParam[kXSecPar]; };
-    inline int GetNND() { return nParam[kND280Par]; };
+    inline int GetNND() { return nParam[kNDPar]; };
     inline int GetNFD() { return nParam[kFDDetPar]; };
     inline int GetOSC() { return nParam[kOSCPar]; };
         
@@ -115,11 +115,11 @@ class MCMCProcessor {
 
     //Covariance getters
     inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    inline std::string const & GetND280Cov() const { return CovPos[kND280Par]; };
+    inline std::string const & GetNDCov() const { return CovPos[kNDPar]; };
     inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
     inline std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
-    inline std::string const & GetNDruns()   const { return NDruns; };
-    inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
+    //inline std::string const & GetNDruns()   const { return NDruns; };
+    //inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
     // Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
@@ -216,7 +216,7 @@ class MCMCProcessor {
     inline void ReadInputCov();
     inline void FindInputFiles();
     inline void ReadXSecFile();
-    inline void ReadND280File();
+    inline void ReadNDFile();
     inline void ReadFDFile();
     inline void ReadOSCFile();
     inline void RemoveParameters();
