@@ -5,6 +5,7 @@ set(HEADERS
 
 add_library(Manager SHARED
     manager.cpp
+    YamlHelper.cpp
 )
 
 set_target_properties(Manager PROPERTIES

@@ -2,6 +2,10 @@
 
 #include <iostream>
 #include <string>
+#include <TMacro.h>
+#include <TList.h>
+#include <TObjString.h>
+#include <fstream>
 
 #include "yaml-cpp/yaml.h"
 
@@ -40,10 +44,7 @@ bool CheckNodeExists(const YAML::Node& node, Args... args) {
   return CheckNodeExistsHelper(node, args...);
 }
 
-
-
 /// Use this like this FindFromManager<std::string>(config, "LikelihoodOptions", "TestStatistic");
-
 // Base case for recursion
 template<typename T>
 T FindFromManagerHelper(const YAML::Node& node) {
@@ -67,3 +68,15 @@ T FindFromManager(const YAML::Node& node, Args... args) {
   return FindFromManagerHelper<T>(node, args...);
 }
 
+
+// Function to convert a YAML string to a YAML node
+YAML::Node STRINGtoYAML(const std::string& yaml_string);
+
+// Function to convert a YAML node to a YAML string
+std::string YAMLtoSTRING(const YAML::Node& node);
+
+//KS: Converts ROOT TMacro to string
+std::string TMacroToString(const TMacro& macro);
+
+//KS: Converts ROOT TMacro to yaml node
+YAML::Node TMacroToYAML(const TMacro& macro);
