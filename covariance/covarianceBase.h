@@ -21,7 +21,7 @@
 
 // MaCh3 includes
 #include "samplePDF/Structs.h"
-#include "throwParms/ThrowParms.h"
+#include "covariance/ThrowParms.h"
 
 // Don't forget yaml!
 #include "yaml-cpp/yaml.h"
