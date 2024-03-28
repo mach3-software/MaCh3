@@ -95,10 +95,9 @@ cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
 ```
 ## System Requirements
 Most of external libraries are being handled through CPM. The only external library that is not being handled through CPM and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
-<ol>
-<li> [yaml-cpp](https://github.com/jbeder/yaml-cpp)  </li>
-<li> [spdlog](https://github.com/gabime/spdlog)  </li>
-</ol>
+
+1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+2. [spdlog](https://github.com/gabime/spdlog)
 
 Based on several test here are recommended version:
 ```
