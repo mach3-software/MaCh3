@@ -81,19 +81,19 @@ if(NOT TARGET yaml-cpp::yaml-cpp)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
 endif()
 
-CPMAddPackage(
-  NAME Eigen
-  VERSION 3.2.8
-  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
-  # Eigen's CMakelists are not intended for library use
-  DOWNLOAD_ONLY YES
-)
+#KS: Not being used right now so commenting it out.
+#CPMAddPackage(
+#  NAME Eigen
+#  VERSION 3.2.8
+#  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
+#  # Eigen's CMakelists are not intended for library use
+#  DOWNLOAD_ONLY YES
+#)
 
-
-if(Eigen_ADDED)
-  add_library(Eigen INTERFACE IMPORTED)
-  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
-endif()
+#if(Eigen_ADDED)
+#  add_library(Eigen INTERFACE IMPORTED)
+#  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
+#endif()
 
 
 ################################## Oscillation ################################
@@ -155,8 +155,8 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options
-#Add -Werror in the future
-target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall)
+#KS: Add -Werror  and maybe -Wconversion in the future
+target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall -pedantic)
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)
@@ -179,7 +179,7 @@ if(MaCh3_DEBUG_ENABLED)
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops  --param=max-vartrack-size=100000000 -finline-limit=100000000)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops --param=max-vartrack-size=100000000 -finline-limit=100000000)
   #KS: addomg Link-Time Optimization (LTO)
   target_link_options(MaCh3CompilerOptions INTERFACE -flto)
 endif()
@@ -291,7 +291,6 @@ endforeach()
 
 # Build components
 add_subdirectory(manager)
-add_subdirectory(throwParms)
 add_subdirectory(covariance)
 add_subdirectory(splines)
 if (NOT USE_PROB3)
@@ -306,7 +305,7 @@ add_subdirectory(Diagnostics)
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines ThrowParms Manager MaCh3CompilerOptions)
+target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
