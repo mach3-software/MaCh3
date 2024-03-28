@@ -1,5 +1,4 @@
-#ifndef __TUNE_H__
-#define __TUNE_H__
+#pragma once
 
 #include <iostream>
 
@@ -25,5 +24,3 @@ class tune
   std::string *par_names;
   int n_pars;
 };
-
-#endif

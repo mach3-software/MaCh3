@@ -1,10 +1,12 @@
 set(HEADERS
+    ThrowParms.h
     covarianceBase.h
     covarianceOsc.h
     covarianceXsec.h
 )
 
 add_library(Covariance SHARED
+    ThrowParms.cpp
     covarianceBase.cpp
     covarianceOsc.cpp
     covarianceXsec.cpp
@@ -15,7 +17,7 @@ set_target_properties(Covariance PROPERTIES
     EXPORT_NAME Covariance)
 
 
-target_link_libraries(Covariance ThrowParms ROOT::ROOT Manager MaCh3CompilerOptions)
+target_link_libraries(Covariance ROOT::ROOT Manager MaCh3CompilerOptions)
 target_include_directories(Covariance PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)

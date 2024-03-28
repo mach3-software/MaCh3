@@ -1,5 +1,4 @@
-#ifndef __STRETCH_H__
-#define __STRETCH_H__
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -90,5 +89,3 @@ class stretch
       
 
 };
-
-#endif

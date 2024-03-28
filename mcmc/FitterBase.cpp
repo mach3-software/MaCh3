@@ -7,8 +7,6 @@
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
 
-  std::cout << "Seed is " << fitMan->raw()["General"]["Seed"].as<int>() << std::endl;
-
   random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps

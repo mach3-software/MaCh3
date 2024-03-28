@@ -34,6 +34,12 @@ if(USE_PROB3)
   find_package(Prob3plusplus @Prob3plusplus_VERSION@ REQUIRED)
 endif()
 
+#We use spdlog so find all it's dependencies
+find_package(spdlog @spdlog_VERSION@ REQUIRED)
+
+if(NOT TARGET spdlog::spdlog)
+  cmessage(FATAL_ERROR "Didn't set up spdlog::spdlog")
+endif()
 
 if(MaCh3_GPU_ENABLED)
   enable_language(CUDA)

@@ -1,5 +1,5 @@
-#ifndef _interfacePDFEbE_h_
-#define _interfacePDFEbE_h_
+#pragma once
+
 #include <vector>
 
 class interfacePDFEbE 
@@ -11,4 +11,3 @@ class interfacePDFEbE
   virtual int getNEventsInSample(int sample)=0;
 };
 
-#endif
