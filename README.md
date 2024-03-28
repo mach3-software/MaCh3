@@ -3,7 +3,7 @@ Markov Chain 3 flavour is frameworks which was born in 2013 as [T2K](https://t2k
 
 TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA and mention HK and DUNE
 
-It has been used to  Since then framework evolved and has non MCMC modules.
+Since then framework evolved and has non MCMC modules.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
 
@@ -57,7 +57,7 @@ If the system has access to GPU, MaCh3 will enable GPU functionality automatical
 mkdir build; cd build;
 cmake ../ [-USE_CPU=ON]
 ```
-MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know.
+MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
 
 ## Oscillator
@@ -67,11 +67,13 @@ MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is us
 cmake ../ [-DUSE_PROB3=<ON,OFF>]
 ```
 Following neutrino oscillation calculators are available:
-<ol>
-<li> CUDAProb3 [CPU/GPU][Beam/Atm]  </li>
-<li> Prob3++ [CPU][Beam] </li>
-<li> probGPU [GPU][Beam] </li>
-</ol>
+
+
+|Oscillator  | Hardware   | Source     |
+|------------|------------|------------|
+| CUDAProb3  | CPU/GPU    | Beam/Atm   |
+| Prob3++    | CPU        | Beam       |
+| probGPU    | GPU        | Beam       |
 
 ## Fitting algorithms
 The following fitting algorithms are available:
