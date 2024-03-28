@@ -8,8 +8,10 @@ manager::manager(std::string const &filename)
 // *************************
 
   FileName = filename;
+  //KS: %H for hour, %M for minute, %S for second, [%!:%#] for class and line
+  spdlog::set_pattern("[%H:%M:%S][%!:%#][%^%l%$] %v");
 
-  SPDLOG_INFO(std::string("Setting config to be: " + filename));
+  SPDLOG_INFO("Setting config to be: {}", filename);
 
   SPDLOG_INFO("Config is now: "); std::cout << config << std::endl;
 
@@ -23,10 +25,10 @@ manager::manager(std::string const &filename)
     else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
     else {
       SPDLOG_ERROR("Wrong form of test-statistic specified!");
-      SPDLOG_ERROR("You gave %s and I only support:", likelihood);
+      SPDLOG_ERROR("You gave {} and I only support:", likelihood);
       for(int i = 0; i < kNTestStatistics; i++)
       {
-        SPDLOG_ERROR(TestStatistic_ToString(TestStatistic(i)).c_str());
+        SPDLOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
       }
       throw;
     }
