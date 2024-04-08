@@ -5,7 +5,16 @@ TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA and mention HK and
 
 Since then framework evolved and has non MCMC modules.
 
+
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
+[![Relase - v1.0.0](https://img.shields.io/badge/Relase-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+
+## MaCh3
+TODO this should be expanded
+
+<p align="left">
+  <img src="Doc/delta.png" alt="delta" width="200"/>
+</p>
 
 ## Cite
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
@@ -128,13 +137,6 @@ This is an example how your executable can look like using MaCh3:
 
 ## Plotting and Diagnostic
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics).
-
-<p align="left">
-  <img src="Doc/delta.png" alt="delta" width="200"/>
-</p>
-
-TODO this should be expanded
-
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
