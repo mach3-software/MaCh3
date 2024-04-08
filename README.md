@@ -76,7 +76,6 @@ cmake ../ [-DUSE_PROB3=<ON,OFF>]
 ```
 Following neutrino oscillation calculators are available:
 
-
 |Oscillator  | Hardware   | Source     |
 |------------|------------|------------|
 | CUDAProb3  | CPU/GPU    | Beam/Atm   |
@@ -85,11 +84,13 @@ Following neutrino oscillation calculators are available:
 
 ## Fitting algorithms
 The following fitting algorithms are available:
-<ol>
-<li> MR2T2  </li>
-<li> MINUIT2  </li>
-<li> PSO  </li>
-</ol>
+
+| Algorithm  | Need Ext Library |
+|------------|------------------|
+| MR2T2      | No               |
+| MINUIT2    | Yes              |
+| PSO        | No               |
+
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
