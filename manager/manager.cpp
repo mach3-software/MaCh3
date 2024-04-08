@@ -71,14 +71,14 @@ void manager::SaveSettings(TFile* const OutputFile) {
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
 
-  // EM: embed the config usef for this app
+  // EM: embed the config used for this app
   TMacro MaCh3Config("MaCh3_Config", "MaCh3_Config");
   MaCh3Config.ReadFile(FileName.c_str());
   MaCh3Config.Write();
 
   if (std::getenv("MaCh3_ROOT") == NULL) {
     SPDLOG_ERROR("Need MaCh3_ROOT environment variable");
-    SPDLOG_ERROR("Please remeber about source bin/setup.MaCh3.sh");
+    SPDLOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
     throw;
   }
 
@@ -90,7 +90,7 @@ void manager::SaveSettings(TFile* const OutputFile) {
   std::string header_path = std::string(std::getenv("MACH3"));
   header_path += "/version.h";
   FILE* file = fopen(header_path.c_str(), "r");
-  //KS: It is better to use experiment specyfic header file. If given experiemnt didn't provide it we gonna use one given by Core MaCh3.
+  //KS: It is better to use experiment specific header file. If given experiment didn't provide it we gonna use one given by Core MaCh3.
   if (!file)
   {
     header_path = std::string(std::getenv("MaCh3_ROOT"));

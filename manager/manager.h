@@ -34,7 +34,7 @@ public:
   // Return config
   inline YAML::Node const &raw(){return config;}
 
-  //Add manager useful infomrations to TFile, in most cases to Fitter
+  //Add manager useful information's to TFile, in most cases to Fitter
   void SaveSettings(TFile* const OutputFile);
 
   // Print currently used config
