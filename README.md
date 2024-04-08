@@ -8,8 +8,8 @@ Since then framework evolved and has non MCMC modules.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
 [![Relase - v1.0.0](https://img.shields.io/badge/Relase-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
-
-## MaCh3
+[![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
+## Famous Plots
 TODO this should be expanded
 
 <p align="left">
