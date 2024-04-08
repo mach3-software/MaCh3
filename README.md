@@ -12,8 +12,8 @@ Since then framework evolved and has non MCMC modules.
 ## Famous Plots
 TODO this should be expanded
 
-<img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="100"/>
-<img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="100"/>
+<img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
+<img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
