@@ -7,7 +7,7 @@ tune::tune(std::string name)
   delete ff;
 }
 
-tune::~tune(){};
+tune::~tune(){}
 
 void tune::init(TFile *file)
 {

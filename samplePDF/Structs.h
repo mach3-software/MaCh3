@@ -57,7 +57,7 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
 }
 
 // *******************
-//KS: This is mad way of covnerting string to int. Why? To be able to use string with switch
+//KS: This is mad way of converting string to int. Why? To be able to use string with switch
 constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
   return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
@@ -426,7 +426,7 @@ class TSpline3_red {
           Par[i][2] = d;
         }
       }
-      //CWRET Reduce to use linear spline interpolation for certain parameters
+      //CW: Reduce to use linear spline interpolation for certain parameters
       // Not the most elegant way: use TSpline3 object but set coefficients to zero and recalculate spline points; the smart way (but more human intensive) would be to save memory here and simply not store the zeros at all
       // Get which parameters should be linear from the fit manager
       // Convert the spline number to global xsec parameter
@@ -448,7 +448,7 @@ class TSpline3_red {
           Par[k][2] = 0;
         }
       }
-      //Ewan: Akima spline is similar to regular cubic spline but is allowed to be discontinuous in 2nd derivative and coefficients in any segment
+      //EM: Akima spline is similar to regular cubic spline but is allowed to be discontinuous in 2nd derivative and coefficients in any segment
       // only depend on th 2 nearest points on either side
       else if(InterPolation == kAkima)
       {
@@ -464,8 +464,8 @@ class TSpline3_red {
           YResp[i]  = y;
         }
 
-        __float__ mvals[nPoints + 2];
-        __float__ svals[nPoints];
+        __float__* mvals = new __float__[nPoints + 2];
+        __float__* svals = new __float__[nPoints];
 
         for (int i = -2; i <= nPoints; ++i) {
           // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
@@ -520,8 +520,10 @@ class TSpline3_red {
             Par[i][2] = 0.0;
           }
         }
+        delete[] mvals;
+        delete[] svals;
       }
-      //Ewan: Monotone spline is similar to regular cubic spline but enforce the condition that the interpolated value at any point
+      //EM: Monotone spline is similar to regular cubic spline but enforce the condition that the interpolated value at any point
       // must be between its two nearest knots, DOES NOT make the entire spline monotonic, only the segments
       else if(InterPolation == kMonotonic)
       {

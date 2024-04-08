@@ -41,7 +41,7 @@ class samplePDFBase : public samplePDFInterface
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
-  MaCh3_Modes* const GetModeStruct() const { return ModeStruct;};
+  MaCh3_Modes* GetModeStruct() const { return ModeStruct; }
   
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
@@ -75,7 +75,7 @@ class samplePDFBase : public samplePDFInterface
   //virtual void whatAmI(){std::cout << "__FILE__" << std::endl;};
 
   // For adding sample dependent branches to the posteriors tree
-  virtual void setMCMCBranches(TTree *outtree) {};
+  virtual void setMCMCBranches(TTree *outtree) {(void)outtree;};
 
   protected:
   void init(double pot);

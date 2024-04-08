@@ -45,8 +45,8 @@ void mcmc::ReadParsFromFile(std::string file) {
   TTree *posts = (TTree*)infile->Get("posteriors");
   TObjArray* brlis = (TObjArray*)posts->GetListOfBranches();
   int nbr = brlis->GetEntries();
-  TString branch_names[nbr];
-  double branch_vals[nbr];
+  TString* branch_names = new TString[nbr];
+  double* branch_vals = new double[nbr];
 
   for (int i = 0; i < nbr; ++i) {
     TBranch *br = (TBranch*)brlis->At(i);
@@ -61,6 +61,8 @@ void mcmc::ReadParsFromFile(std::string file) {
     init_pars.insert( std::pair<TString, double>(branch_names[i], branch_vals[i]));
   }
 
+  delete[] branch_names;
+  delete[] branch_vals;
   init_pos = true;
   infile->Close();
   delete infile;

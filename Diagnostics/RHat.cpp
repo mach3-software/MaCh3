@@ -170,7 +170,7 @@ void PrepareChains() {
     int *nEntries = new int[Nchains]();
     int *nBranches = new int[Nchains]();
     
-    int step[Nchains];
+    std::vector<int> step(Nchains);
 
     Draws = new double**[Nchains]();
     DrawsFolded = new double**[Nchains]();
