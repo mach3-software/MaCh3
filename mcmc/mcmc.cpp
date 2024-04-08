@@ -314,7 +314,7 @@ void mcmc::ProposeStep() {
   // For when we don't have to reweight, set sample to madness
   } else {
     for (size_t i = 0; i < samples.size(); i++) {
-      // Set the sample_llh[i] to be madly high also to signfiy a step out of bounds
+      // Set the sample_llh[i] to be madly high also to signify a step out of bounds
       sample_llh[i] = __LARGE_LOGL__;
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
     }

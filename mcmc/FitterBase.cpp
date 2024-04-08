@@ -47,7 +47,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   sample_llh = NULL;
   syst_llh = NULL;
 
-
   fTestLikelihood = false;
   if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"])
   {
@@ -302,7 +301,7 @@ void FitterBase::RunLLHScan() {
     TotalNSamples += samples[i]->GetNsamples();
   }
 
-  //KS: Turn it on if you want LLH scan for each ND sample separetaly, which increase time signficantly but can be usefull for validating new samples or dials.
+  //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotAllNDsamplesLLH = false;
   if(fitMan->raw()["General"]["LLHScanBySample"])
     PlotAllNDsamplesLLH = fitMan->raw()["General"]["LLHScanBySample"].as<bool>();
