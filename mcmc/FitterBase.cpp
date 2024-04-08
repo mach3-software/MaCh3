@@ -1,5 +1,7 @@
 #include "FitterBase.h"
 
+#include "TRandom.h"
+#include "TStopwatch.h"
 
 // *************************
 // Initialise the manager and make it an object of FitterBase class
@@ -159,8 +161,6 @@ void FitterBase::SaveOutput() {
   outputFile->Close();
 }
 
-
-
 // *************************
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
@@ -170,7 +170,6 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 
   return;
 }
-
 
 // *************************
 // Add flux systematics, cross-section systematics, ND systematics to the chain

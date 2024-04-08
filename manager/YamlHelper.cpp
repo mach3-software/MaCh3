@@ -1,8 +1,10 @@
 #include "manager/YamlHelper.h"
 
+// **********************
 // Function to convert a YAML string to a YAML node
-YAML::Node STRINGtoYAML(const std::string& yaml_string)
-{
+YAML::Node STRINGtoYAML(const std::string& yaml_string) {
+// **********************
+
   try {
     return YAML::Load(yaml_string);
   } catch (const YAML::ParserException& e) {
@@ -11,15 +13,21 @@ YAML::Node STRINGtoYAML(const std::string& yaml_string)
   }
 }
 
+// **********************
 // Function to convert a YAML node to a YAML string
 std::string YAMLtoSTRING(const YAML::Node& node) {
+// **********************
+
   YAML::Emitter emitter;
   emitter << node;
   return emitter.c_str();
 }
 
+// **********************
 //KS: Converts ROOT TMacro to string
 std::string TMacroToString(const TMacro& macro) {
+// **********************
+
   std::stringstream ss;
 
   // Retrieve lines from TMacro
@@ -43,9 +51,11 @@ std::string TMacroToString(const TMacro& macro) {
   return ss.str();
 }
 
+// **********************
 //KS: Converts ROOT TMacro to yaml node
-YAML::Node TMacroToYAML(const TMacro& macro)
-{
+YAML::Node TMacroToYAML(const TMacro& macro)  {
+// **********************
+
   std::string yaml_string = TMacroToString(macro);
 
   // Convert the YAML string to a YAML node

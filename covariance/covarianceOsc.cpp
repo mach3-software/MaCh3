@@ -1,4 +1,5 @@
 #include "covarianceOsc.h"
+
 // *************************************
 covarianceOsc::covarianceOsc(const char* name, const char *file)
 : covarianceBase(name, file) {
@@ -17,7 +18,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
   TVectorD* osc_density = (TVectorD*)infile->Get("osc_density");
   double fScale = 1.0;
 
-  //KS: Save all neccesary information from covariance
+  //KS: Save all necessary information from covariance
   for(int io = 0; io < size; io++)
   {
 

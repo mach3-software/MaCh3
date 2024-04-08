@@ -20,9 +20,9 @@ class covarianceOsc : public covarianceBase
   inline double GetPathLength() { return L;}
   inline double GetDensity() { return density;}
   inline bool GetPerformBetaStudy(){return PerformBetaStudy;}
-  //KS: Print all usefull informations after initialization
+  //KS: Print all useful information's after initialization
   void Print();
-  //KS: Currently prob3++/probgp requiers particular order so we need to check this is the case
+  //KS: Currently prob3++/probgp requires particular order so we need to check this is the case
   void CheckOrderOfParams();
 
  protected:

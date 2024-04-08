@@ -5,10 +5,8 @@
 #include <sstream>
 #include <map>
 
-#include "TStopwatch.h"
 #include "TTree.h"
 #include "TString.h"
-#include "TRandom.h"
 
 #include "TVectorT.h"
 
@@ -20,6 +18,9 @@
 #include "manager/manager.h"
 #include "MCMCProcessor.h"
 
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class TRandom3;
+class TStopwatch;
 
 class FitterBase {
 
