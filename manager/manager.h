@@ -12,7 +12,7 @@
 #include "TBranch.h"
 #include "TMacro.h"
 
-#include "spdlog/spdlog.h"
+#include "manager/MaCh3Logger.h"
 
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"

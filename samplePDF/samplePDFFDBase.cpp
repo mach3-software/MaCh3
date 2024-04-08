@@ -1427,7 +1427,7 @@ inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUD
     case CUDAProb_nu::t_m : return cudaprob3::ProbType::t_m;
     case CUDAProb_nu::t_t : return cudaprob3::ProbType::t_t;
     default:
-      SPDLOG_ERROR("Unknown CUDAProbType!");
+      MACH3LOG_ERROR("Unknown CUDAProbType!");
       throw;
   }
 }

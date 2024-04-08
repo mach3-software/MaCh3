@@ -16,11 +16,12 @@ clang-format --assume-filename=/path/to/your/.clang-format=${MaCh3_ROOT}/../.cla
 Please see [here](https://clang.llvm.org/docs/ClangFormat.html) and [here](https://root.cern/contribute/coding_conventions/) for more details.
 
 ## Logger
-MaCh3 is using spdlog logger see [here](https://github.com/gabime/spdlog/tree/master). It is advised to use it. For example rather than
+MaCh3 is using spdlog logger see [here](https://github.com/gabime/spdlog/tree/master). And wraps it around MaCh3 names [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/MaCh3Logger.h)
+It is advised to use it. For example rather than
 ```
 std::cout<< " Error: Something is wrong" <<std::endl;
 ```
 it is advised to used logger
 ```
-SPDLOG_ERROR("Something is wrong");
+MACH3LOG_ERROR("Something is wrong");
 ```

@@ -11,9 +11,9 @@ manager::manager(std::string const &filename)
   //KS: %H for hour, %M for minute, %S for second, [%!:%#] for class and line
   spdlog::set_pattern("[%H:%M:%S][%!:%#][%^%l%$] %v");
 
-  SPDLOG_INFO("Setting config to be: {}", filename);
+  MACH3LOG_INFO("Setting config to be: {}", filename);
 
-  SPDLOG_INFO("Config is now: "); std::cout << config << std::endl;
+  MACH3LOG_INFO("Config is now: "); std::cout << config << std::endl;
 
   if (config["LikelihoodOptions"])
   {
@@ -24,11 +24,11 @@ manager::manager(std::string const &filename)
     else if (likelihood == "Pearson")                   mc_stat_llh = TestStatistic(kPearson);
     else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
     else {
-      SPDLOG_ERROR("Wrong form of test-statistic specified!");
-      SPDLOG_ERROR("You gave {} and I only support:", likelihood);
+      MACH3LOG_ERROR("Wrong form of test-statistic specified!");
+      MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
       for(int i = 0; i < kNTestStatistics; i++)
       {
-        SPDLOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
+        MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
       }
       throw;
     }
@@ -77,13 +77,13 @@ void manager::SaveSettings(TFile* const OutputFile) {
   MaCh3Config.Write();
 
   if (std::getenv("MaCh3_ROOT") == NULL) {
-    SPDLOG_ERROR("Need MaCh3_ROOT environment variable");
-    SPDLOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
+    MACH3LOG_ERROR("Need MaCh3_ROOT environment variable");
+    MACH3LOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
     throw;
   }
 
   if (std::getenv("MACH3") == NULL) {
-    SPDLOG_ERROR("Need MACH3 environment variable");
+    MACH3LOG_ERROR("Need MACH3 environment variable");
     throw;
   }
 
