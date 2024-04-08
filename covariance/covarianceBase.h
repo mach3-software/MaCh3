@@ -36,8 +36,6 @@
 
 class covarianceBase {
  public:
-  // The constructors
-  covarianceBase(){};
   //ETA - construcotr for a YAML file
   covarianceBase(std::vector<std::string> YAMLFile);
   //"Usual" constructors from root file
