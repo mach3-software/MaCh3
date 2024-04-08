@@ -11,3 +11,10 @@
 #define MACH3LOG_ERROR SPDLOG_ERROR
 #define MACH3LOG_CRITICAL SPDLOG_CRITICAL
 #define MACH3LOG_OFF SPDLOG_OFF
+
+
+inline void SetMaCh3LoggerFormat()
+{
+  //KS: %H for hour, %M for minute, %S for second, [%!:%#] for class and line
+  spdlog::set_pattern("[%H:%M:%S][%!:%#][%^%l%$] %v");
+}

@@ -8,8 +8,7 @@ manager::manager(std::string const &filename)
 // *************************
 
   FileName = filename;
-  //KS: %H for hour, %M for minute, %S for second, [%!:%#] for class and line
-  spdlog::set_pattern("[%H:%M:%S][%!:%#][%^%l%$] %v");
+  SetMaCh3LoggerFormat();
 
   MACH3LOG_INFO("Setting config to be: {}", filename);
 
