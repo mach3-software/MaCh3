@@ -9,9 +9,9 @@ class covarianceOsc : public covarianceBase
   covarianceOsc(const char* name, const char *file);
   virtual ~covarianceOsc();
   double GetLikelihood();
-  inline int checkBounds();
+  inline int CheckBounds() override;
   double *getPropPars();
-  void proposeStep();
+  void proposeStep() override;
   void setFlipDeltaM23(bool flip){flipdelM = flip;}
   void setFlipBeta(bool flip){flipBeta = flip;}
   void useReactorPrior(bool reactor){reactorPrior = reactor;};
