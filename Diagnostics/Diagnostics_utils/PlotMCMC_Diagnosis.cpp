@@ -21,6 +21,15 @@ double GetMinimumInRange(TH1D *hist, double minRange, double maxRange);
 TString DUMMYFILE = "KillMePlease";
 bool PlotFlux = false;
 
+void RemoveFitter(TH1D* hist)
+{
+  TList *listOfFunctions = hist->GetListOfFunctions();
+  TF1 *fitter = dynamic_cast<TF1*>(listOfFunctions->FindObject("Fitter"));
+
+  listOfFunctions->Remove(fitter);
+  delete fitter;
+}
+
 void PlotMCMC_Diagnosis(TString fname1) 
 {
     MakePlot(fname1, DUMMYFILE, DUMMYFILE, DUMMYFILE); 
@@ -69,7 +78,6 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
 
     while ((key = (TKey*)next())) { 
             std::string dirname = std::string(key->GetName());  
-			std::cout << "Found dirname of " << dirname << std::endl;
             //KS: Script will work with LogL and Batched_means, you can comment it if you are interested in it
             if( (dirname == "LogL") || (dirname == "Batched_means") ) continue;
             //KS: Trace wo longer chains is super big, the way to avoid is to plot as png but I don't like png,
@@ -102,6 +110,7 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
                     //KS: This is unfortunately hardcoded, need to find better way to write this 
                     //blarb[0]->GetListOfFunctions()->ls();
                     //delete blarb[0]->GetListOfFunctions()->FindObject("Fitter");
+					RemoveFitter(blarb[0]);
                     blarb[0]->SetLineStyle(kSolid);
                     blarb[0]->SetLineColor(kRed);
                     blarb[0]->Draw();
