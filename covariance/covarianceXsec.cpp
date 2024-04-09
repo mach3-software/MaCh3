@@ -911,18 +911,18 @@ void covarianceXsec::Print() {
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
 
-  std::cout<<"=========================================================================="<<std::endl;
-  std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "pdg" << std::endl;
-  std::cout<<"--------------------------------------------------------------------------"<<std::endl;
+  std::cout<<"──────────────────────────────────────────────────────────────────────────"<<std::endl;
+  std::cout << std::setw(4) << "#" << std::setw(2) << "│" << std::setw(10) << "Global #" << std::setw(2) << "│" << std::setw(20) << "Name" << std::setw(2) << "│" << std::setw(10) << "Int. mode" << std::setw(2) << "│" << std::setw(10) << "Target" << std::setw(2) << "│" << std::setw(10) << "pdg" << std::endl;
+  std::cout<<"──────────────────────────────────────────────────────────────────────────"<<std::endl;
     for (unsigned int i = 0; i < NormParams.size(); ++i) {
-    std::cout << std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "|" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "|" << std::setw(10);
+    std::cout << std::setw(4) << i << std::setw(2) << "│" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "│" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "│" << std::setw(10);
     std::string TempSting = " ";
     for(int j = 0; j < int((NormParams.at(i).modes).size()); j++){
       TempSting += std::to_string(NormParams.at(i).modes.at(j));
       TempSting += " ";
     }
     if(int((NormParams.at(i).modes).size()) == 0) TempSting += "all";
-    std::cout<< TempSting << std::setw(2) << "|" << std::setw(10);
+    std::cout<< TempSting << std::setw(2) << "│" << std::setw(10);
     TempSting = " ";
 
     for (int j = 0; j < int((NormParams.at(i).targets).size()); j++) {
@@ -930,7 +930,7 @@ void covarianceXsec::Print() {
       TempSting += " ";
     }
     if(int((NormParams.at(i).targets).size()) == 0) TempSting += "all";
-    std::cout << TempSting<< std::setw(2) << "|" << std::setw(10);
+    std::cout << TempSting<< std::setw(2) << "│" << std::setw(10);
 
     TempSting = " ";
     for (int j = 0; j < int((NormParams.at(i).pdgs).size()); j++) {
@@ -942,7 +942,7 @@ void covarianceXsec::Print() {
 
     std::cout << std::endl;
   }
-  std::cout<<"=========================================================================="<<std::endl;
+  std::cout<<"──────────────────────────────────────────────────────────────────────────"<<std::endl;
   std::cout << std::endl;
 
   std::vector<int> SplineParsIndex;
