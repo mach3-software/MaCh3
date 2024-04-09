@@ -967,13 +967,6 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
     }
   }
 
-  FLOAT_T theta12 = asin(sqrt(oscpar[0]));
-  FLOAT_T theta23 = asin(sqrt(oscpar[1]));
-  FLOAT_T theta13 = asin(sqrt(oscpar[2]));
-  FLOAT_T dm12sq  = oscpar[3];
-  FLOAT_T dm23sq  = oscpar[4];
-  FLOAT_T dcp     = oscpar[5];
-
   /*
   // Get how many layers are in the propagator's earth file
   nLayers = propagator->getNlayerBoundaries();
@@ -1026,6 +1019,13 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
 	throw;
 
 #ifdef DEBUG
+    FLOAT_T theta12 = asin(sqrt(oscpar[0]));
+    FLOAT_T theta23 = asin(sqrt(oscpar[1]));
+    FLOAT_T theta13 = asin(sqrt(oscpar[2]));
+    FLOAT_T dm12sq  = oscpar[3];
+    FLOAT_T dm23sq  = oscpar[4];
+    FLOAT_T dcp     = oscpar[5];
+
 	//DB This part could be replaced with pointers
 	for (int iter=0;iter<nSecondaryBins;iter++) {
 	  int yBin = int(iter%nSecondaryBinsY);
@@ -1322,10 +1322,10 @@ void Oscillator::InitPropagator() {
   std::cout << " - nCoszBins   : " << nSecondaryBinsY << std::endl;
   std::cout << std::endl;
 
+  /*
   int nEnergy = nSecondaryBinsX;
   int nCosine = nSecondaryBinsY;
 
-  /*
 #ifdef USE_GPU
   propagator = std::unique_ptr<AtmosCpuPropagator<FLOAT_T>> ( new AtmosCudaPropagatorSingle<FLOAT_T>(0,nCosine, nEnergy)); // Single-GPU propagator
 #else

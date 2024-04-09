@@ -1,5 +1,4 @@
-#ifndef _samplePDFInterface_h_
-#define _samplePDFInterface_h_
+#pragma once
 
 #include <iostream>
 #include <TTree.h>
@@ -41,5 +40,3 @@ class samplePDFInterface
   virtual void fill1DHist()=0;
   virtual void fill2DHist()=0;
 };
-
-#endif

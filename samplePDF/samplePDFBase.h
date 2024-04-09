@@ -1,5 +1,5 @@
-#ifndef _samplePDFBase_h_
-#define _samplePDFBase_h_
+#pragma once
+
 
 //C++ includes
 #include <iostream>
@@ -31,18 +31,17 @@
 class samplePDFBase : public samplePDFInterface 
 {
  public:
-  samplePDFBase(){};
   samplePDFBase(double pot);
 
   virtual ~samplePDFBase();
 
   virtual inline __int__ GetNsamples(){ return nSamples; };
-  virtual inline std::string GetName(){return "samplePDF";};
+  virtual inline std::string GetName()const {return "samplePDF";};
   virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
-  MaCh3_Modes* const GetModeStruct() const { return ModeStruct;};
+  MaCh3_Modes* GetModeStruct() const { return ModeStruct; }
   
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
@@ -76,7 +75,7 @@ class samplePDFBase : public samplePDFInterface
   //virtual void whatAmI(){std::cout << "__FILE__" << std::endl;};
 
   // For adding sample dependent branches to the posteriors tree
-  virtual void setMCMCBranches(TTree *outtree) {};
+  virtual void setMCMCBranches(TTree *outtree) {(void)outtree;};
 
   protected:
   void init(double pot);
@@ -120,4 +119,3 @@ class samplePDFBase : public samplePDFInterface
   TestStatistic fTestStatistic;
 
 };
-#endif

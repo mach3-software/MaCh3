@@ -1,18 +1,34 @@
-<p align="center">
-  <img src="Doc/mach3logo.png" alt="Mach3 Logo" width="100"/>
-</p>
+# MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
+Markov Chain 3 flavour is frameworks which was born in 2013 as [T2K](https://t2k-experiment.org/pl/) Bayesian MCMC fitter for oscillation analysis. It has been used for multiple T2K Oscillation analysis both at Near and Far detectors throughout years.
 
-# MaCh3
-MaCh3 is ...
+TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA and mention HK and DUNE
+
+Since then framework evolved and has non MCMC modules.
+
+
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
+[![Relase - v1.0.0](https://img.shields.io/badge/Relase-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+[![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
+## Famous Plots
+TODO this should be expanded
+
+<img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
+<img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
+
+## Cite
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
 
 # How to Compile
-
+MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
 ```
-mkdir build; cd build;
+mkdir build;
+cd build;
 cmake ../
+make -jN [set number of threads]
+make install
 ```
 
-Don't forget to
+Don't forget to:
 ```
 source bin/setup.MaCh3.sh
 ```
@@ -34,7 +50,7 @@ Once you found MaCh3 you might want to link your library against MaCh3. You can 
 target_link_libraries(blarb MaCh3::All)
 ```
 
-Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specyfic MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
+Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specific MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
@@ -49,28 +65,32 @@ If the system has access to GPU, MaCh3 will enable GPU functionality automatical
 mkdir build; cd build;
 cmake ../ [-USE_CPU=ON]
 ```
-MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know.
+MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
 
-## Oscilator
+## Oscillator
 MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
 
 ```
 cmake ../ [-DUSE_PROB3=<ON,OFF>]
 ```
 Following neutrino oscillation calculators are available:
-<ol>
-<li> CUDAProb3 [CPU/GPU][Beam/Atm]  </li>
-<li> Prob3++ [CPU][Beam] </li>
-<li> probGPU [GPU][Beam] </li>
-</ol>
+
+|Oscillator  | Hardware   | Source     |
+|------------|------------|------------|
+| CUDAProb3  | CPU/GPU    | Beam/Atm   |
+| Prob3++    | CPU        | Beam       |
+| probGPU    | GPU        | Beam       |
 
 ## Fitting algorithms
 The following fitting algorithms are available:
-<ol>
-<li> MR2T2  </li>
-<li> MINUIT2  </li>
-</ol>
+
+| Algorithm  | Need Ext Library |
+|------------|------------------|
+| MR2T2      | No               |
+| MINUIT2    | Yes              |
+| PSO        | No               |
+
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
@@ -83,6 +103,12 @@ There are several debug modes, to enable more detailed but very heavy specific d
 cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
 ```
 ## System Requirements
+Most of external libraries are being handled through CPM. The only external library that is not being handled through CPM and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
+
+1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+2. [spdlog](https://github.com/gabime/spdlog)
+
+Based on several test here are recommended version:
 ```
   GCC: ...
   CMake: ...
@@ -109,7 +135,12 @@ This is an example how your executable can look like using MaCh3:
   markovChain->runMCMC(); //or run actual fit
 ```
 
+## Plotting and Diagnostic
+Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics).
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
+
+

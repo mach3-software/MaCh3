@@ -10,6 +10,7 @@ set(DEBUG_LEVEL @DEBUG_LEVEL@)
 set(MaCh3_DEBUG_ENABLED @MaCh3_DEBUG_ENABLED@)
 set(MaCh3_MULTITHREAD_ENABLED @MaCh3_MULTITHREAD_ENABLED@)
 set(MaCh3_GPU_ENABLED @MaCh3_GPU_ENABLED@)
+set(MaCh3_MINUIT2_ENABLED @MaCh3_MINUIT2_ENABLED@)
 
 get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 message(STATUS "Adding ${MaCh3_CMAKE_DIR} to Module search path")
@@ -34,6 +35,12 @@ if(USE_PROB3)
   find_package(Prob3plusplus @Prob3plusplus_VERSION@ REQUIRED)
 endif()
 
+#We use spdlog so find all it's dependencies
+find_package(spdlog @spdlog_VERSION@ REQUIRED)
+
+if(NOT TARGET spdlog::spdlog)
+  cmessage(FATAL_ERROR "Didn't set up spdlog::spdlog")
+endif()
 
 if(MaCh3_GPU_ENABLED)
   enable_language(CUDA)

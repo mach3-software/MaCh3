@@ -1,13 +1,13 @@
 #include "FitterBase.h"
 
+#include "TRandom.h"
+#include "TStopwatch.h"
 
 // *************************
 // Initialise the manager and make it an object of FitterBase class
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-
-  std::cout << "Seed is " << fitMan->raw()["General"]["Seed"].as<int>() << std::endl;
 
   random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
 
@@ -165,8 +165,6 @@ void FitterBase::SaveOutput() {
   outputFile->Close();
 }
 
-
-
 // *************************
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
@@ -176,7 +174,6 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 
   return;
 }
-
 
 // *************************
 // Add flux systematics, cross-section systematics, ND systematics to the chain
@@ -307,7 +304,7 @@ void FitterBase::RunLLHScan() {
     TotalNSamples += samples[i]->GetNsamples();
   }
 
-  //KS: Turn it on if you want LLH scan for each ND sample separetaly, which increase time signficantly but can be usefull for validating new samples or dials.
+  //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotAllNDsamplesLLH = false;
   if(fitMan->raw()["General"]["LLHScanBySample"])
     PlotAllNDsamplesLLH = fitMan->raw()["General"]["LLHScanBySample"].as<bool>();

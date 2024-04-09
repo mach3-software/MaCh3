@@ -1,7 +1,12 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <string>
+
+#include "TMacro.h"
+#include "TList.h"
+#include "TObjString.h"
 
 #include "yaml-cpp/yaml.h"
 
@@ -40,10 +45,7 @@ bool CheckNodeExists(const YAML::Node& node, Args... args) {
   return CheckNodeExistsHelper(node, args...);
 }
 
-
-
 /// Use this like this FindFromManager<std::string>(config, "LikelihoodOptions", "TestStatistic");
-
 // Base case for recursion
 template<typename T>
 T FindFromManagerHelper(const YAML::Node& node) {
@@ -67,3 +69,30 @@ T FindFromManager(const YAML::Node& node, Args... args) {
   return FindFromManagerHelper<T>(node, args...);
 }
 
+
+// Function to convert a YAML string to a YAML node
+YAML::Node STRINGtoYAML(const std::string& yaml_string);
+
+/**
+ * @brief KS: Convert a YAML node to a string representation.
+ *
+ * @param node The YAML node to convert to a string.
+ * @return std::string The string representation of the YAML node.
+ */
+std::string YAMLtoSTRING(const YAML::Node& node);
+
+/**
+ * @brief KS: Convert a ROOT TMacro object to a string representation.
+ *
+ * @param macro The ROOT TMacro object to convert.
+ * @return std::string The string representation of the TMacro object.
+ */
+std::string TMacroToString(const TMacro& macro);
+
+/**
+ * @brief KS: Convert a ROOT TMacro object to a YAML node.
+ *
+ * @param macro The ROOT TMacro object to convert.
+ * @return YAML::Node The YAML node representing the TMacro object.
+ */
+YAML::Node TMacroToYAML(const TMacro& macro);

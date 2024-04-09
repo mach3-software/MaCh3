@@ -1,4 +1,5 @@
 #include "covarianceOsc.h"
+
 // *************************************
 covarianceOsc::covarianceOsc(const char* name, const char *file)
 : covarianceBase(name, file) {
@@ -17,10 +18,9 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
   TVectorD* osc_density = (TVectorD*)infile->Get("osc_density");
   double fScale = 1.0;
 
-  //KS: Save all neccesary information from covariance
+  //KS: Save all necessary information from covariance
   for(int io = 0; io < size; io++)
   {
-
     _fNames[io] = std::string(((TObjString*)objarr_name->At(io))->GetString());
     
     _fPreFitValue[io]  = (*osc_prior)(io);
@@ -83,15 +83,15 @@ covarianceOsc::~covarianceOsc() {
 }
 
 // *************************************
-int covarianceOsc::checkBounds() {
+int covarianceOsc::CheckBounds() {
 // *************************************
   int NOutside = 0;
 
-  // ensure osc params dont go unphysical
+  // ensure osc params don't go unphysical
   if (_fPropVal[0] > 1.0 || _fPropVal[0] < 0 ||
       _fPropVal[kSinTheta23] > 1.0 || _fPropVal[kSinTheta23] < 0 ||
       _fPropVal[2] > 1.0 || _fPropVal[2] < 0
-      //|| _fPropVal[kDeltaM23] < 0.0 || _fPropVal[kDeltaM23] > 20E-3 // dont let dm32 go to IH
+      //|| _fPropVal[kDeltaM23] < 0.0 || _fPropVal[kDeltaM23] > 20E-3 // don't let dm32 go to IH
       //|| fabs(_fPropVal[kDeltaM23]) > 0.004 || fabs(_fPropVal[kDeltaM23]) < 0.001
       //|| _fPropVal[kDeltaCP] < -1*TMath::Pi() || _fPropVal[kDeltaCP] > TMath::Pi()
      ){ NOutside++;}
@@ -149,7 +149,7 @@ double *covarianceOsc::getPropPars() {
   for(int i = 0; i < 6; i++)
     oscpars1[i] = _fPropVal[i];
 
-  //Those are constant we initalised them already
+  //Those are constant we initialised them already
   //oscpars1[6] = 2;
   //oscpars1[7] = L;
   //oscpars1[8] = density;
@@ -236,7 +236,7 @@ void covarianceOsc::Print() {
 }
 
 // *************************************
-//KS: Currently prob3++/probgp requiers particular order so we need to check this is the case
+//KS: Currently prob3++/probgp requires particular order so we need to check this is the case
 void covarianceOsc::CheckOrderOfParams()  {
 // *************************************
 
@@ -256,7 +256,7 @@ void covarianceOsc::CheckOrderOfParams()  {
     {
         std::cerr << "Osc Patameter "<< _fNames[i].c_str() <<" isn't in good order"<<std::endl;
     }
-    std::cerr << "Currently prob3++/probgp requiers particular order"<< std::endl;
+    std::cerr << "Currently prob3++/probgp requires particular order"<< std::endl;
     std::cerr << "Please modify XML and make new matrix with good order"<< std::endl;
     std::cerr << "Find me here "<<__FILE__ << ":" << __LINE__ << std::endl;
     throw;

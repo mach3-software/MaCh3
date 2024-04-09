@@ -1,3 +1,5 @@
+#include "TFile.h"
+
 #include "manager/manager.h"
 
 // *************************
@@ -6,7 +8,11 @@ manager::manager(std::string const &filename)
 // *************************
 
   FileName = filename;
-  std::cout << "Setting config to be " << filename << std::endl; std::cout << "config is now " << config << std::endl;
+  SetMaCh3LoggerFormat();
+
+  MACH3LOG_INFO("Setting config to be: {}", filename);
+
+  MACH3LOG_INFO("Config is now: "); std::cout << config << std::endl;
 
   if (config["LikelihoodOptions"])
   {
@@ -17,13 +23,12 @@ manager::manager(std::string const &filename)
     else if (likelihood == "Pearson")                   mc_stat_llh = TestStatistic(kPearson);
     else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
     else {
-      std::cerr << "Wrong form of test-statistic specified!" << std::endl;
-      std::cerr << "You gave " << likelihood << " and I only support:" << std::endl;
+      MACH3LOG_ERROR("Wrong form of test-statistic specified!");
+      MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
       for(int i = 0; i < kNTestStatistics; i++)
       {
-        std::cerr << TestStatistic_ToString(TestStatistic(i)) << std::endl;
+        MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
       }
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
     }
   } else {
@@ -48,14 +53,58 @@ manager::manager(std::string const &filename)
 }
 
 // *************************
+// Empty destructor, for now...
+manager::~manager() {
+// *************************
+
+
+}
+
+// *************************
 // Save all the settings of the class to an output file
 // Reflection in C++ is a bit of a pain :(
 // Outputfile is the TFile pointer we write to
-void manager::SaveSettings(TFile * const OutputFile) {
+void manager::SaveSettings(TFile* const OutputFile) {
 // *************************
 
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
+
+  // EM: embed the config used for this app
+  TMacro MaCh3Config("MaCh3_Config", "MaCh3_Config");
+  MaCh3Config.ReadFile(FileName.c_str());
+  MaCh3Config.Write();
+
+  if (std::getenv("MaCh3_ROOT") == NULL) {
+    MACH3LOG_ERROR("Need MaCh3_ROOT environment variable");
+    MACH3LOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
+    throw;
+  }
+
+  if (std::getenv("MACH3") == NULL) {
+    MACH3LOG_ERROR("Need MACH3 environment variable");
+    throw;
+  }
+
+  std::string header_path = std::string(std::getenv("MACH3"));
+  header_path += "/version.h";
+  FILE* file = fopen(header_path.c_str(), "r");
+  //KS: It is better to use experiment specific header file. If given experiment didn't provide it we gonna use one given by Core MaCh3.
+  if (!file)
+  {
+    header_path = std::string(std::getenv("MaCh3_ROOT"));
+    header_path += "/version.h";
+  }
+  else
+  {
+    fclose(file);
+  }
+
+  // EM: embed the cmake generated version.h file
+  TMacro versionHeader("version_header", "version_header");
+  versionHeader.ReadFile(header_path.c_str());
+  versionHeader.Write();
+
   // The Branch!
   TTree *SaveBranch = new TTree("Settings", "Settings");
 
@@ -63,9 +112,9 @@ void manager::SaveSettings(TFile * const OutputFile) {
   SaveBranch->Branch("Output", &OutputFilename);
   SaveBranch->Branch("TestStatistic", &mc_stat_llh);
 
-  bool real_data = config["General"]["RealData"].as<bool>();
-  bool asimov_fit = config["General"]["Asimov"].as<bool>();
-  bool fake_data = config["General"]["FakeData"].as<bool>();
+  bool real_data = GetFromManager<bool>(config["General"]["RealData"], false);
+  bool asimov_fit = GetFromManager<bool>(config["General"]["Asimov"], true);
+  bool fake_data = GetFromManager<bool>(config["General"]["FakeData"], false);
 
   SaveBranch->Branch("RealDataFit", &real_data);
   SaveBranch->Branch("AsimovFit",   &asimov_fit);
@@ -107,6 +156,8 @@ void manager::Print() {
   std::cout << std::endl;
 }
 
+
+
 /* Old Mananger that needs translation
  * we're moving to YAML BABY!
 
@@ -134,9 +185,7 @@ proceeding" << std::endl;
 
 }
 
-// Empty destructor
-manager::~manager() {
-}
+
 
 // Read the supplied config file
 // This is Getting pretty huge by now!

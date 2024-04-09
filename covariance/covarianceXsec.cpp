@@ -10,10 +10,7 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   // Leave these as arrays for backwards compatibility
   // Probably should be made into vectors but at least size isn't hard-coded ^,^
   // Load up the parameters id (nPars x nCols big, contains information about if these parameters are spline, normalisation or some other parameter)
-  //xsec_param_id_a   = new int*[_fNumPar];
-  //for (int i = 0; i < _fNumPar; ++i) {
-  //  xsec_param_id_a[i] = new int[ncols];
-  //}
+
   xsec_param_nom_a  = new double[_fNumPar];
   xsec_param_lb_a   = new double[_fNumPar];
   xsec_param_ub_a   = new double[_fNumPar];
@@ -36,10 +33,6 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
 	xsec_param_prior_a[i]= _fError[i];
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
-
-	//for (int j = 0; j < ncols; j++) {
-    //  xsec_param_id_a[i][j] = (*xsec_param_id)(i,j);
-    //}
   } // end the for loop
 
   //infile->Close();
@@ -72,10 +65,6 @@ covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile)
   // Leave these as arrays for backwards compatibility
   // Probably should be made into vectors but at least size isn't hard-coded ^,^
   // Load up the parameters id (nPars x nCols big, contains information about if these parameters are spline, normalisation or some other parameter)
-  //xsec_param_id_a   = new int*[_fNumPar];
-  //for (int i = 0; i < _fNumPar; ++i) {
-  //  xsec_param_id_a[i] = new int[ncols];
-  //}
   xsec_param_nom_a  = new double[_fNumPar];
   xsec_param_lb_a   = new double[_fNumPar];
   xsec_param_ub_a   = new double[_fNumPar];
@@ -967,20 +956,26 @@ void covarianceXsec::Print() {
   std::cout << "#################################################" << std::endl;
   std::cout << "Printing covarianceXsec:" << std::endl;
 
-    std::cout << "Number of parameters: " << GetNumParams() << std::endl;
+  std::cout << "Number of parameters: " << GetNumParams() << std::endl;
   std::cout << std::endl;
 
+  std::cout<<"======================================================================================================================"<<std::endl;
   std::cout << "Global parameter map:" << std::endl;
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << "|" << std::setw(5) << "DetID" << std::endl;;
 
   for (int i = 0; i < GetNumParams(); i++) {
     std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParFancyName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
   }
+  std::cout<<"======================================================================================================================"<<std::endl;
 
   std::cout << std::endl;
 
   // Output the normalisation parameters as a sanity check!
-  std::cout << "Normalisation parameters:" << NormParams.size() << std::endl;
+  std::cout << "Normalisation parameters: " << NormParams.size() << std::endl;
+
+
+  std::cout<<"  ===================================================================="<<std::endl;
+
   std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "Type" << std::endl;
   for (unsigned int i = 0; i < NormParams.size(); ++i) {
     std::cout << std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "|" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "|" << std::setw(10);
@@ -1000,7 +995,7 @@ void covarianceXsec::Print() {
 
     std::cout << std::endl;
   }
-
+  std::cout<<"  ===================================================================="<<std::endl;
   std::cout << std::endl;
 
   // ETA - Could print out for each uniqued DetID or something here?

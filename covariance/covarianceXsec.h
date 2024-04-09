@@ -16,8 +16,8 @@
 class covarianceXsec : public covarianceBase {
 
   public:
-  covarianceXsec(const char *name, const char *file, double threshold=-1,int FirstPCAdpar=-999,int LastPCAdpar=-999);
-  covarianceXsec(std::vector<std::string> FileNames);
+    covarianceXsec(const char *name, const char *file, double threshold=-1,int FirstPCAdpar=-999,int LastPCAdpar=-999);
+    covarianceXsec(std::vector<std::string> FileNames);
     ~covarianceXsec();
 
     // Print information about the whole object once it is set
@@ -27,7 +27,6 @@ class covarianceXsec : public covarianceBase {
 	// ETA - a lot of these can go... they're just duplications from the base
 	// class.
     double GetParamPrior(const int i)      {return xsec_param_prior_a[i];}
-    //const int  GetXSecParamID(const int i, const int j) const {return xsec_param_id_a[i][j];}
 	//ETA - just return the int of the DetID, this can be removed to do a string comp
 	//at some point.
     int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
@@ -118,7 +117,6 @@ class covarianceXsec : public covarianceBase {
     void setXsecParNames();
 
     //DB StepScaleReading
-    TVectorT<double> *xsec_stepscale;
     std::vector<double> xsec_stepscale_vec;
 
     // Here are some array equivalents (actually used in MCMC)
@@ -156,7 +154,7 @@ class covarianceXsec : public covarianceBase {
 
   private:
 	//ETA - do we need these now?
-	// it would be nice if we could get rid of these by chceking against DetID
+	// it would be nice if we could get rid of these by checking against DetID
 	std::vector<std::string> _fNDSplineNames;
 	std::vector<std::string> _fFDSplineNames;
 	std::vector<std::vector<int>> _fFDSplineModes;

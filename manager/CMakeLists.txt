@@ -1,17 +1,19 @@
 set(HEADERS
     manager.h
     YamlHelper.h
+    MaCh3Logger.h
 )
 
 add_library(Manager SHARED
     manager.cpp
+    YamlHelper.cpp
 )
 
 set_target_properties(Manager PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Manager)
 
-target_link_libraries(Manager yaml-cpp MaCh3CompilerOptions)
+target_link_libraries(Manager yaml-cpp spdlog MaCh3CompilerOptions)
 target_include_directories(Manager PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)
@@ -31,5 +33,15 @@ install(TARGETS yaml-cpp
         )
 
 install(DIRECTORY ${yaml-cpp_SOURCE_DIR}/include/
+    DESTINATION include/
+)
+
+install(TARGETS spdlog
+        EXPORT MaCh3-targets
+        LIBRARY DESTINATION lib/
+        PUBLIC_HEADER DESTINATION include/spdlog
+        )
+
+install(DIRECTORY ${spdlog_SOURCE_DIR}/include/
     DESTINATION include/
 )

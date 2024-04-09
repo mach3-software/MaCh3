@@ -1,4 +1,4 @@
-SET(MACH3_LIB_LIST "-libCovariance -libManager -libMCMC -libOscClass -libSamplePDF -libSplines -libThrowParms")
+SET(MACH3_LIB_LIST "-libCovariance -libManager -libMCMC -libOscClass -libSamplePDF -libSplines")
 
 SET(MACH3_FEATURES_LIST)
 

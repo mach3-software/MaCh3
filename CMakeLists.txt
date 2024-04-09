@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-#KS: Enable langauge, neccesary when using CUDA
+#KS: Enable language, necessary when using CUDA
 enable_language(CXX)
 SET(MaCh3_VERSION 1.0.0)
 
@@ -66,11 +66,13 @@ if(NOT TARGET ROOT::ROOT)
 endif()
 
 #YAML for reading in config files
+set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
+set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
 CPMFindPackage(
     NAME yaml-cpp
-    VERSION 0.7.0
+    VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG "yaml-cpp-0.7.0"
+    GIT_TAG "${YAML_CPP_GIT_TAG}"
     OPTIONS
       "YAML_BUILD_SHARED_LIBS ON"
 )
@@ -79,19 +81,19 @@ if(NOT TARGET yaml-cpp::yaml-cpp)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
 endif()
 
-CPMAddPackage(
-  NAME Eigen
-  VERSION 3.2.8
-  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
-  # Eigen's CMakelists are not intended for library use
-  DOWNLOAD_ONLY YES
-)
+#KS: Not being used right now so commenting it out.
+#CPMAddPackage(
+#  NAME Eigen
+#  VERSION 3.2.8
+#  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
+#  # Eigen's CMakelists are not intended for library use
+#  DOWNLOAD_ONLY YES
+#)
 
-
-if(Eigen_ADDED)
-  add_library(Eigen INTERFACE IMPORTED)
-  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
-endif()
+#if(Eigen_ADDED)
+#  add_library(Eigen INTERFACE IMPORTED)
+#  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
+#endif()
 
 
 ################################## Oscillation ################################
@@ -153,9 +155,8 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options
-#Add -Werror in the future
-target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall)
-
+#KS: Add -Werror  and maybe -Wconversion in the future
+target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall -pedantic)
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)
@@ -178,7 +179,7 @@ if(MaCh3_DEBUG_ENABLED)
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops  --param=max-vartrack-size=100000000 -finline-limit=100000000)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops --param=max-vartrack-size=100000000 -finline-limit=100000000)
   #KS: addomg Link-Time Optimization (LTO)
   target_link_options(MaCh3CompilerOptions INTERFACE -flto)
 endif()
@@ -216,9 +217,6 @@ if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE __LOW_MEMORY_STRUCTS__)
 endif()
 
-
-
-
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
@@ -226,9 +224,14 @@ install(TARGETS MaCh3CompilerOptions
 
 #KS: Consider moving it somewhere else
 SET(MaCh3_Fitter_ENABLED "MR2T2")
+SET(MaCh3_MINUIT2_ENABLED FALSE)
 if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
   LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
+  SET(MaCh3_MINUIT2_ENABLED TRUE)
 endif()
+
+#Include logger
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)
 ################################# Features ##################################
 
 LIST(APPEND ALL_FEATURES
@@ -248,7 +251,6 @@ endforeach()
 
 # Build components
 add_subdirectory(manager)
-add_subdirectory(throwParms)
 add_subdirectory(covariance)
 add_subdirectory(splines)
 if (NOT USE_PROB3)
@@ -263,7 +265,7 @@ add_subdirectory(Diagnostics)
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines ThrowParms Manager MaCh3CompilerOptions)
+target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -309,3 +311,38 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/MaCh3)
 
 include(mach3-config)
+
+############################ Version Info ##########################
+## Based on Ewan Miller implementation in OAGenWeightsApp (T2K)
+## Make a custom file named version.h that has a
+## dump of the versions of the main dependencies of MaCh3
+## We also check the git hash of each of the dependencies and info
+## on whether or not they were using a tagged commit or not
+set(GENERATED_VERSION_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+
+if(EXISTS ${GENERATED_VERSION_HEADER_DIR}/_version.h)
+  message(FATAL_ERROR "File \"${GENERATED_VERSION_HEADER_DIR}/_version.h\" found, \
+  this should never be created, remove!")
+endif()
+
+add_custom_target(
+  version_header ALL
+  DEPENDS ${GENERATED_VERSION_HEADER_DIR}/_version.h
+)
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${GENERATED_VERSION_HEADER_DIR}/version.h
+         ${GENERATED_VERSION_HEADER_DIR}/_version.h
+
+  COMMAND ${CMAKE_COMMAND}
+          -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
+          -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
+          -DROOT_VERSION=${ROOT_VERSION}
+          -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
+          -DSPDLOG_VERSION=${SPDLOG_VERSION}
+          -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
+          -P
+          ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
+)
+
+set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${GENERATED_VERSION_HEADER_DIR})

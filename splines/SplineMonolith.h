@@ -22,9 +22,9 @@
 // MaCh3  includes
 #include "samplePDF/Structs.h"
 
-//KS:We store ccoefficeints {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
+//KS:We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4
-//KS: For TF1 we store at most 5 coefficeints, we could make it more flexible but for now define it here to make future changes easier to track
+//KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track
 #define _nTF1Coeff_ 5
 
 
@@ -96,7 +96,7 @@ class SMonolith {
     inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
     // Helper function used in the constructor, tests to see if the spline is flat
     inline bool isFlat(TSpline3_red* &spl);
-    // Gets the polynomial coefficeints for TF1
+    // Gets the polynomial coefficients for TF1
     inline void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
     
     //Code used in step by step reweighting
@@ -117,7 +117,7 @@ class SMonolith {
     // Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
     // Method identical to TSpline3::Eval(double) but faster because less operations
     FastSplineInfo *SplineInfoArray;
-    //Segments store currently found sehment while vals parmater values, they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
+    //Segments store currently found segment while vals parameter values, they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
     short int *segments;
     float *vals;
     //This holds pointer to parameter position which we later copy paste it to GPU
@@ -151,25 +151,24 @@ class SMonolith {
     float *cpu_weights_var;
     
     //KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+    std::vector<unsigned int> cpu_nParamPerEvent;
     unsigned int *gpu_nParamPerEvent;
-    unsigned int *cpu_nParamPerEvent;
 
     // GPU arrays to hold number of points
-    short int *cpu_nPoints_arr;
+    std::vector<short int> cpu_nPoints_arr;
     short int *gpu_nPoints_arr;
-    //KS: Consider merging paramNo and nKnots into one consequitive array
-    short int *cpu_paramNo_arr;
+    //KS: Consider merging paramNo and nKnots into one consecutive array
+    std::vector<short int> cpu_paramNo_arr;
     short int *gpu_paramNo_arr;
     //KS: Number of knots per spline
-    unsigned int *cpu_nKnots_arr;
+    std::vector<unsigned int> cpu_nKnots_arr;
     unsigned int *gpu_nKnots_arr;
     //KS: GPU arrays to hold X coefficient
-    float *cpu_coeff_x;
+    std::vector<float> cpu_coeff_x;
     float *gpu_coeff_x;
     // GPU arrays to hold other coefficients
-    float *cpu_coeff_many;
+    std::vector<float> cpu_coeff_many;
     float *gpu_coeff_many;
-
 
     bool SaveSplineFile;
 };

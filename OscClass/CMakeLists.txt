@@ -1,4 +1,4 @@
-#KS: CUDA Prob is terrible so you cannot compile both beam and atmos at the same time as you get nvlink error: Multiple definition. This leads to issues further down the line but can't be bothered right now. Solution would be to use exter rather then symbols.
+#KS: CUDA Prob is terrible so you cannot compile both beam and atmos at the same time as you get nvlink error: Multiple definition. This leads to issues further down the line but can't be bothered right now. Solution would be to use extern rather then symbols.
 
 if (USE_PROB3)
     cmessage(FATAL_ERROR "OscClass only defined using CUDAProb3. USE_PROB3 is defined and indicates Prob3++/ProbGPU is being expected to be used.")

@@ -34,7 +34,7 @@
 #endif
 
 
-//KS: We store coefficeints {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
+//KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4
 
 //KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
@@ -109,10 +109,10 @@ static int h_n_events     = -1;
 // ******************************************
 // TEXTURES
 // ******************************************
-//KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for variables you often acces but rarely overwrite. There are limits on texture memory so don't use huge arrays
+//KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for variables you often access but rarely overwrite. There are limits on texture memory so don't use huge arrays
 cudaTextureObject_t text_coeff_x = 0;
 #ifndef Weight_On_SplineBySpline_Basis
-//KS: Map keeping track how many parmaeters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+//KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
 cudaTextureObject_t text_nParamPerEvent = 0;
 #endif
 
@@ -307,14 +307,14 @@ __host__ void CopyToGPU_SepMany(
                             float *gpu_x_array,
                             float *gpu_many_array,
 
-                            short int *paramNo_arr,
-                            unsigned int *nKnots_arr,
-                            float *cpu_x_array, 
-                            float *cpu_many_array, 
+                            std::vector<short int> paramNo_arr,
+                            std::vector<unsigned int> nKnots_arr,
+                            std::vector<float> cpu_x_array,
+                            std::vector<float> cpu_many_array,
 
                     #ifndef Weight_On_SplineBySpline_Basis
                             int n_events,
-                            unsigned int *cpu_nParamPerEvent,
+                            std::vector<unsigned int> cpu_nParamPerEvent,
                             unsigned int *gpu_nParamPerEvent,
                     #endif
                             int n_params, 
@@ -347,10 +347,10 @@ __host__ void CopyToGPU_SepMany(
   CudaCheckError();
 #endif
   // Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies
-  cudaMemcpy(gpu_many_array, cpu_many_array, sizeof(float)*sizeof_array*_nCoeff_, cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_many_array, cpu_many_array.data(), sizeof(float)*sizeof_array*_nCoeff_, cudaMemcpyHostToDevice);
   CudaCheckError();
 
-  cudaMemcpy(gpu_x_array, cpu_x_array, sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_x_array, cpu_x_array.data(), sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
   CudaCheckError();
 
   //KS: Bind our texture with the GPU variable
@@ -372,20 +372,20 @@ __host__ void CopyToGPU_SepMany(
   CudaCheckError();
 
   // Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now
-  cudaMemcpy(gpu_paramNo_arr, paramNo_arr, n_splines*sizeof(short int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_paramNo_arr, paramNo_arr.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   // Also copy the knot map for each spline onto the GPU;
-  cudaMemcpy(gpu_nKnots_arr, nKnots_arr, n_splines*sizeof(unsigned int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_nKnots_arr, nKnots_arr.data(), n_splines*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   #ifndef Weight_On_SplineBySpline_Basis
   //KS: Keep track how much splines each event has  
-  cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent, 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent.data(), 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
   
   //KS: Bind our texture with the GPU variable
-  // create a ressource descriptor based on device pointers
+  // create a resource descriptor based on device pointers
   struct cudaResourceDesc resDesc_nParamPerEvent;
   memset(&resDesc_nParamPerEvent, 0, sizeof(resDesc_nParamPerEvent));
   resDesc_nParamPerEvent.resType = cudaResourceTypeLinear;
@@ -412,13 +412,13 @@ __host__ void CopyToGPU_TF1(
                             short int *gpu_paramNo_arr,
                             short int *gpu_nPoints_arr,
 
-                            float *cpu_coeffs,
-                            short int *paramNo_arr,
-                            short int *nPoints_arr,
+                            std::vector<float> cpu_coeffs,
+                            std::vector<short int> paramNo_arr,
+                            std::vector<short int> nPoints_arr,
 
                   #ifndef Weight_On_SplineBySpline_Basis
                             int n_events,
-                            unsigned int *cpu_nParamPerEvent,
+                            std::vector<unsigned int> cpu_nParamPerEvent,
                             unsigned int *gpu_nParamPerEvent,
                   #endif
                             int n_params,
@@ -452,23 +452,23 @@ __host__ void CopyToGPU_TF1(
   CudaCheckError();
 #endif
   // Move the coefficients
-  cudaMemcpy(gpu_coeffs, cpu_coeffs, n_splines*5*sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_coeffs, cpu_coeffs.data(), n_splines*5*sizeof(float), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   // Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now
-  cudaMemcpy(gpu_paramNo_arr, paramNo_arr, n_splines*sizeof(short int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_paramNo_arr, paramNo_arr.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
-  cudaMemcpy(gpu_nPoints_arr, nPoints_arr, n_splines*sizeof(short int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_nPoints_arr, nPoints_arr.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
   CudaCheckError();
   
   #ifndef Weight_On_SplineBySpline_Basis
   //KS: Keep track how much splines each event has  
-  cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent, 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent.data(), 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   //KS: Bind our texture with the GPU variable
-  // create a ressource descriptor based on device pointers
+  // create a resource descriptor based on device pointers
   struct cudaResourceDesc resDesc_nParamPerEvent;
   memset(&resDesc_nParamPerEvent, 0, sizeof(resDesc_nParamPerEvent));
   resDesc_nParamPerEvent.resType = cudaResourceTypeLinear;
@@ -498,7 +498,7 @@ __host__ void CopyToGPU_TF1(
 // Evaluate the spline on the GPU
 // Using one {y,b,c,d} array
 // And one {x} array
-// Should be most efficient at cache hitting and memory coalescense
+// Should be most efficient at cache hitting and memory coalescence
 // But using spline segments rather than the parameter value: avoids doing binary search on GPU
 __global__ void EvalOnGPU_SepMany(
     const short int* __restrict__ gpu_paramNo_arr,
@@ -530,7 +530,7 @@ __global__ void EvalOnGPU_SepMany(
     // Avoids doing costly binary search on GPU
     const short int segment = segment_gpu[Param];
 
-    //KS: Segment for coeff_x is simply parmeter*max knots + segment as each parmeters has the same spacing
+    //KS: Segment for coeff_x is simply parameter*max knots + segment as each parmeters has the same spacing
     const short int segment_X = Param*d_spline_size+segment;
 
     //KS: Find knot position in out monolitical structure
@@ -615,14 +615,15 @@ __global__ void EvalOnGPU_TotWeight(
   const cudaTextureObject_t __restrict__ text_nParamPerEvent) {
 //*********************************************************
   const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
-  //KS: Accesing shared memory is much much faster than global memory hence we use shared memory for calcualtion and then write to global memory
+  //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
   __shared__ float shared_total_weights[__BlockSize__];
   if(EventNum < d_n_events) //stopping condition
   {
     shared_total_weights[threadIdx.x] = 1.f;
-    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum); ++id)
+    const unsigned int EventOffset = 2*EventNum;
+    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id)
     {
-      shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
+      shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
       #ifdef DEBUG
       printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
               EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
@@ -700,13 +701,13 @@ __host__ void RunGPU_SepMany(
   printf("Evaluated kernel with SUCCESS (drink beer)\n");
 #endif
 
-//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calcualate total weight stall at GPU, which means less memory transfer  
+//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calculate total weight stall at GPU, which means less memory transfer
 #ifdef Weight_On_SplineBySpline_Basis
   // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
   cudaMemcpy(cpu_weights, gpu_weights, h_n_splines*sizeof(float), cudaMemcpyDeviceToHost);
   CudaCheckError();
   #ifdef DEBUG
-  printf("Copied GPU weights to CPU with SUCCESS (drink moar beer)\n");
+  printf("Copied GPU weights to CPU with SUCCESS (drink more beer)\n");
   printf("Released calculated response from GPU with SUCCESS (drink most beer)\n");
   #endif
 
@@ -732,8 +733,7 @@ __host__ void RunGPU_SepMany(
   printf("Evaluated kernel with SUCCESS (drink tea)\n");
   #endif
   //KS: Here we have to make a somewhat large GPU->CPU transfer because it is proportional to number of events
-  //KS: In the future it might be worth to calculate only weight for events which have splines, this should reduce memory transfer
-  //KS: Normally code wait for memory transfer to finish before moving furhter cudaMemcpyAsync means we wil continue to execute code and in a menatime keep copyin stuff.
+  //KS: Normally code wait for memory transfer to finish before moving further cudaMemcpyAsync means we will continue to execute code and in a meantime keep copying stuff.
   cudaMemcpyAsync(cpu_total_weights, gpu_total_weights, h_n_events * sizeof(float), cudaMemcpyDeviceToHost, 0);
 
   #ifdef DEBUG
@@ -800,7 +800,7 @@ __host__ void RunGPU_TF1(
   printf("Evaluated TF1 kernel with SUCCESS (drink beer)\n");
 #endif
   
-//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calcualate total weight stall at GPU, which means less memory transfer  
+//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calculate total weight stall at GPU, which means less memory transfer
 #ifdef Weight_On_SplineBySpline_Basis
   // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
   cudaMemcpy(cpu_weights, gpu_weights, h_n_splines*sizeof(float), cudaMemcpyDeviceToHost);

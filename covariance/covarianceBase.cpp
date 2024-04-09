@@ -824,7 +824,7 @@ void covarianceBase::randomize() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; ++i) {
       // If parameter isn't fixed
       if (_fError[i] > 0.0) {
 #ifdef MULTITHREAD
@@ -843,7 +843,7 @@ void covarianceBase::randomize() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; ++i)
     {
       if (fParSigma_PCA[i] > 0. && i < npars)
       {
@@ -872,7 +872,7 @@ void covarianceBase::CorrelateSteps() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; ++i) {
       if (_fError[i] > 0.) {
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
       }
@@ -883,7 +883,7 @@ void covarianceBase::CorrelateSteps() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < npars; i++) 
+    for (int i = 0; i < npars; ++i)
     {
       if (fParSigma_PCA[i] > 0.) 
       {
@@ -915,7 +915,7 @@ void covarianceBase::acceptStep() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; ++i) {
       // Update state so that current state is proposed state
       _fCurrVal[i] = _fPropVal[i];
     }
@@ -924,7 +924,7 @@ void covarianceBase::acceptStep() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < npars; i++) {
+    for (int i = 0; i < npars; ++i) {
       fParCurr_PCA(i) = fParProp_PCA(i);
     }
     // Then update the parameter basis
@@ -1025,13 +1025,13 @@ double covarianceBase::CalcLikelihood() {
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
-#ifdef MULTITHREAD
-#pragma omp parallel for reduction(+:logL)
-#endif
-  for(int i = 0; i < size; i++){
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:logL)
+  #endif
+  for(int i = 0; i < size; ++i){
     for (int j = 0; j <= i; ++j) {
       if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
-        //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.   
+        //KS: Since matrix is symmetric we can calcaute non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
         int scale = 1;
         if(i != j) scale = 2;
         logL += scale * 0.5*(_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
@@ -1045,15 +1045,14 @@ double covarianceBase::CalcLikelihood() {
 }
 
 int covarianceBase::CheckBounds(){
-  int NOutside=0;
+  int NOutside = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:NOutside)
   #endif
-  for (int i = 0; i < _fNumPar; i++){
-      //if(_fPropVal[i] > xsec_param_ub_a[i] || _fPropVal[i] < xsec_param_lb_a[i]){
-      if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-        NOutside++;
-      }
+  for (int i = 0; i < _fNumPar; ++i){
+    if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
+      NOutside++;
+    }
   }
   return NOutside;
 }
@@ -1281,24 +1280,25 @@ double* covarianceBase::MatrixMult(double *A, double *B, int n) {
 
 //KS: Custom function to perform multiplication of matrix and vector with mulithreadeing
 void covarianceBase::MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n) {
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
-  for (int i = 0; i < n; i++) {
-	VecMulti[i] = 0.0;
-	for (int j = 0; j < n; j++)
-	{
-	  VecMulti[i] += matrix[i][j]*vector[j];
-	}
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < n; ++i)
+  {
+    double result = 0.0;
+    for (int j = 0; j < n; ++j)
+    {
+      result += matrix[i][j]*vector[j];
+    }
+    VecMulti[i] = result;
   }
-  return;
 }
 
 double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i)
 {
   double Element = 0.0;
   for (int j = 0; j < Length; j++) {
-	Element += matrix[i][j]*vector[j];
+    Element += matrix[i][j]*vector[j];
   }
   return Element;
 }

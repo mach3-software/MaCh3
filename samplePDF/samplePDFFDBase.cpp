@@ -1416,7 +1416,7 @@ double samplePDFFDBase::GetLikelihood()
 inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu) {
 //*************************************************  
   switch(CUDAProb_nu)
-  {	
+  {
     case CUDAProb_nu::e_e : return cudaprob3::ProbType::e_e;
     case CUDAProb_nu::e_m : return cudaprob3::ProbType::e_m;
     case CUDAProb_nu::e_t : return cudaprob3::ProbType::e_m;
@@ -1426,6 +1426,9 @@ inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUD
     case CUDAProb_nu::t_e : return cudaprob3::ProbType::t_e;
     case CUDAProb_nu::t_m : return cudaprob3::ProbType::t_m;
     case CUDAProb_nu::t_t : return cudaprob3::ProbType::t_t;
+    default:
+      MACH3LOG_ERROR("Unknown CUDAProbType!");
+      throw;
   }
 }
 #endif
