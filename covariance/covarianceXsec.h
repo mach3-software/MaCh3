@@ -12,7 +12,7 @@
 #include "samplePDF/Structs.h"
 
 #include "yaml-cpp/yaml.h"
-
+#include "manager/MaCh3Logger.h"
 class covarianceXsec : public covarianceBase {
 
   public:

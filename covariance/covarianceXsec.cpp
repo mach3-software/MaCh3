@@ -973,7 +973,6 @@ void covarianceXsec::Print() {
   // Output the normalisation parameters as a sanity check!
   std::cout << "Normalisation parameters: " << NormParams.size() << std::endl;
 
-
   std::cout<<"  ===================================================================="<<std::endl;
 
   std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "Type" << std::endl;
@@ -997,6 +996,23 @@ void covarianceXsec::Print() {
   }
   std::cout<<"  ===================================================================="<<std::endl;
   std::cout << std::endl;
+
+  std::vector<int> SplineParsIndex;
+  for (int i = 0; i < _fNumPar; ++i)
+  {
+    if (strcmp(GetXsecParamType(i), "Spline") == 0)
+    {
+      SplineParsIndex.push_back(i);
+    }
+  }
+
+  std::cout<<"  ===================================================================="<<std::endl;
+  MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
+  for (unsigned int i = 0; i < SplineParsIndex.size(); ++i)
+  {
+    std::cout<< i << std::setw(2) <<GetParName(SplineParsIndex[i])<<std::endl;
+  }
+  std::cout<<"  ===================================================================="<<std::endl;
 
   // ETA - Could print out for each uniqued DetID or something here?
   //But I think it would be messy
