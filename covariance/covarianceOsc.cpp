@@ -256,7 +256,7 @@ void covarianceOsc::CheckOrderOfParams()  {
     {
         std::cerr << "Osc Patameter "<< _fNames[i].c_str() <<" isn't in good order"<<std::endl;
     }
-    std::cerr << "Currently prob3++/probgp requiers particular order"<< std::endl;
+    std::cerr << "Currently prob3++/probgp requires particular order"<< std::endl;
     std::cerr << "Please modify XML and make new matrix with good order"<< std::endl;
     std::cerr << "Find me here "<<__FILE__ << ":" << __LINE__ << std::endl;
     throw;
