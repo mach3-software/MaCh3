@@ -16,7 +16,7 @@ TODO this should be expanded
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/10949376) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10949376.svg)](https://doi.org/10.5281/zenodo.10949376).
 
 # How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
