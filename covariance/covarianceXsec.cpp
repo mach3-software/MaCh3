@@ -123,6 +123,7 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
   }
 
   _fNumPar = _fYAMLDoc["Systematics"].size();
+  std::cout << "Found " << _fNumPar << " systematics" << std::endl;
   _fNames = std::vector<std::string>(_fNumPar);
   _fFancyNames = std::vector<std::string>(_fNumPar);
   _fGenerated = std::vector<double>(_fNumPar);
@@ -157,7 +158,6 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
   for (auto const &param : _fYAMLDoc["Systematics"]) {
      //std::cout << param["Systematic"]["Names"]["ParameterName"].as<std::string>() << std::endl;
 
-     _fNames[i] = (param["Systematic"]["Names"]["ParameterName"].as<std::string>());
      _fFancyNames[i] = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
      _fPreFitValue[i] = (param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
      _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
@@ -179,7 +179,7 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 	 }
 
 	 //Fill the map to get the correlations later as well
-     CorrNamesMap[param["Systematic"]["Names"]["ParameterName"].as<std::string>()]=i;
+     CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
 	 int nFDSplines;
 	 //Now load in varaibles for spline systematics only
@@ -327,16 +327,16 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 	  //
 	  double Corr1 = val;
 	  double Corr2 = 0;
-	  if(Correlations[index].find(_fNames[i]) != Correlations[index].end()) {
-		Corr2 = Correlations[index][_fNames[i]];
+	  if(Correlations[index].find(_fFancyNames[i]) != Correlations[index].end()) {
+		Corr2 = Correlations[index][_fFancyNames[i]];
 		//Do they agree to better than float precision?
 		if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
-		  std::cout << "Correlations are not equal between " << _fNames[i] << " and " << key << std::endl;
+		  std::cout << "Correlations are not equal between " << _fFancyNames[i] << " and " << key << std::endl;
 		  std::cout << "Got : " << Corr2  << " and " << Corr1 << std::endl;
 		  exit(5);
 		}
 	  } else {
-		std::cout << "Correlation does not appear reciprocally between " << _fNames[i] << " and " << key << std::endl;
+		std::cout << "Correlation does not appear reciprocally between " << _fFancyNames[i] << " and " << key << std::endl;
 		exit(5);
 	  }
 	  (*_fCovMatrix)(i,index)= (*_fCovMatrix)(index,i) = Corr1*_fError[i]*_fError[index];
@@ -527,7 +527,7 @@ void covarianceXsec::SetupNormPars(){
 	
 		std::vector<int> temp;
 		XsecNorms4 norm;
-		norm.name=GetParName(i);
+		norm.name=GetParFancyName(i);
 
 		//Copy the mode information into an XsecNorms4 struct
 		norm.modes = _fNormModes[norm_counter];	
@@ -583,7 +583,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		std::vector<int> temp;
 
 		XsecNorms4 norm;
-		norm.name=GetParName(i);
+		norm.name=GetParFancyName(i);
 
 		//Copy the mode information into an XsecNorms4 struct
 		norm.modes = _fNormModes[norm_counter];	
@@ -653,7 +653,7 @@ const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(int Det
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetXsecParamDetID(i) & DetID)) { //If parameter applies to required DetID
       if (strcmp(GetXsecParamType(i), "Functional") == 0) { //If parameter is implemented as a functional param
-		returnVec.push_back(GetParName(i));
+		returnVec.push_back(GetParFancyName(i));
       }
     }
   }
@@ -909,9 +909,10 @@ void covarianceXsec::initParams(double fScale) {
   // ********************************************
 
   for (int i = 0; i < size; ++i) {
-    //char pname[10];
-    //sprintf(pname, "xsec_%i", i);
-	//_fNames[i] = std::string(pname);
+	//ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
+    char pname[10];
+    sprintf(pname, "xsec_%i", i);
+	_fNames[i] = std::string(pname);
 
     // This just assign the initial parameters to the prior 
     _fPreFitValue[i] = _fPreFitValue[i];
@@ -923,7 +924,6 @@ void covarianceXsec::initParams(double fScale) {
         _fPreFitValue[i] = random_number[0]->Gaus(_fPreFitValue[i], fScale*TMath::Sqrt( (*covMatrix)(i,i) ));
       }
     }
-
 
     // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[i] = _fPreFitValue[i];
@@ -961,10 +961,10 @@ void covarianceXsec::Print() {
 
   std::cout<<"======================================================================================================================"<<std::endl;
   std::cout << "Global parameter map:" << std::endl;
-  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << std::setw(5) << "DetID" << std::endl;;
+  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << "|" << std::setw(5) << "DetID" << std::endl;;
 
   for (int i = 0; i < GetNumParams(); i++) {
-    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
+    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParFancyName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
   }
   std::cout<<"======================================================================================================================"<<std::endl;
 

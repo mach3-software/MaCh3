@@ -40,7 +40,8 @@ covarianceBase::covarianceBase(std::vector<std::string> YAMLFile) : inputFile(YA
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
     std::cout << YAMLFile[i]<< ", ";
   std::cout<< " as an input" << std::endl;
-  init(YAMLFile[0].c_str());
+  init(YAMLFile);
+  std::cout << "Finished input of yaml files" << std::endl;
   FirstPCAdpar = -999;
   LastPCAdpar = -999;
 
@@ -392,7 +393,7 @@ void covarianceBase::init(const char *name, const char *file)
 // An init function for the YAML constructor
 // All you really need from the YAML file is the number of Systematics
 // Then get all the info from the YAML file in the covarianceXsec::ParseYAML function
-void covarianceBase::init(const char *YAMLFile)
+void covarianceBase::init(std::vector<std::string> YAMLFile)
 {
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   /*TFile *infile = new TFile(file, "READ");
@@ -412,7 +413,14 @@ void covarianceBase::init(const char *YAMLFile)
   }
   */
 
-  _fYAMLDoc = YAML::LoadFile(YAMLFile);
+  _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < YAMLFile.size(); i++)
+  {
+    YAML::Node YAMLDocTemp = YAML::LoadFile(YAMLFile[i]);
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      _fYAMLDoc["Systematics"].push_back(item);
+    }
+  }
 
   // Not using adaptive by default
   use_adaptive=false;
@@ -436,13 +444,13 @@ void covarianceBase::init(const char *YAMLFile)
     }
   }
 
-  setName(YAMLFile);
+  //setName(YAMLFile[0].c_str());
   //size = covMatrix->GetNrows();
   //MakePosDef(covMatrix);
   //setCovMatrix(covMatrix);
 
   if (size <= 0) {
-    std::cerr << "Covariance matrix " << getName() << " has " << size << " entries!" << std::endl;
+    std::cerr << "Covariance object has " << size << " systematics!" << std::endl;
     throw;
   }
   npars = size;
@@ -480,8 +488,13 @@ void covarianceBase::init(const char *YAMLFile)
 
   _fGlobalStepScale = 1.0;
 
-  std::cout << "Created covariance matrix named: " << getName() << std::endl;
-  std::cout << "from file: " << YAMLFile << std::endl;
+  std::cout << "Created covariance matrix from files: " << std::endl;
+  for(const auto &file : YAMLFile){
+	std::cout << file << std::endl; 
+  }
+  std::cout << "----------------" << std::endl;
+  std::cout << "Found " << size << " systematics parameters in total" << std::endl;
+  std::cout << "----------------" << std::endl;
 }
 
 void covarianceBase::init(TMatrixDSym* covMat) {

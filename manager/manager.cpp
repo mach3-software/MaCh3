@@ -125,13 +125,13 @@ void manager::SaveSettings(TFile* const OutputFile) {
 
   //KS: This is needed by MCMC Processor, will be fixed in the future
   XSEC_cov_file = GetFromManager<std::vector<std::string>>(config["General"]["Systematics"]["XsecCovFile"], {"none"});
-  ND_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["ND280CovFile"], "none");
-  FD_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["SKCovFile"], "none");
+  ND_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["NDCovFile"], "none");
+  FD_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["FDCovFile"], "none");
   OSC_cov_file = GetFromManager<std::string>(config["General"]["Systematics"]["OscCovFile"], "none");
 
   SaveBranch->Branch("XsecCov", &XSEC_cov_file);
   SaveBranch->Branch("NDCov",   &ND_cov_file);
-  SaveBranch->Branch("SKCov",   &FD_cov_file);
+  SaveBranch->Branch("FDCov",   &FD_cov_file);
   SaveBranch->Branch("oscCov",  &OSC_cov_file);
 
   SaveBranch->Branch("GPU",   &gpu_on);

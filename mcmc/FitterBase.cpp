@@ -50,9 +50,13 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   syst_llh = NULL;
 
   fTestLikelihood = false;
-  if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"])
+  //ETA - No guarantee that "Fitter" field exists so check this first before
+  //checking ["Fitter"]["FitTestLikelihood"]
+  if(fitMan->raw()["General"]["Fitter"])
   {
-    fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
+	if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"]){
+	  fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
+	}
   }
 
 }
