@@ -284,8 +284,8 @@ void covarianceBase::ConstructPCA() {
   fParSigma_PCA.resize(npars);
   for (int i = 0; i < npars; ++i)
   {
-      fParSigma_PCA[i] = 1;
-      isDecomposed_PCA[i] = -1;
+    fParSigma_PCA[i] = 1;
+    isDecomposed_PCA[i] = -1;
   }
   for (int i = 0; i < FirstPCAdpar; ++i) isDecomposed_PCA[i] = i;
   
@@ -993,7 +993,7 @@ void covarianceBase::throwParCurr(const double mag)
 void covarianceBase::printNominal() {
   std::cout << "Prior values for " << getName() << " covarianceBase: " << std::endl;
   for (int i = 0; i < size; i++) {
-    std::cout << "    " << GetParName(i) << "   " << getParInit(i) << "\n";
+    std::cout << "    " << GetParFancyName(i) << "   " << getParInit(i) << "\n";
   }
   std::cout << std::endl;
 }
@@ -1011,7 +1011,7 @@ void covarianceBase::printNominalCurrProp() {
   }
   std::cout << std::setw(PrintLength) << std::left << "Name" << std::setw(PrintLength) << "Prior" << std::setw(PrintLength) << "Current" << std::setw(35) << "Proposed" << "\n";
   for (int i = 0; i < size; ++i) {
-    std::cout << std::setw(PrintLength) << std::left << GetParName(i) << std::setw(PrintLength) << _fPreFitValue[i] << std::setw(PrintLength) << _fCurrVal[i] << std::setw(PrintLength) << _fPropVal[i] << "\n";
+    std::cout << std::setw(PrintLength) << std::left << GetParFancyName(i) << std::setw(PrintLength) << _fPreFitValue[i] << std::setw(PrintLength) << _fCurrVal[i] << std::setw(PrintLength) << _fPropVal[i] << "\n";
   }
    //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
   std::cout << std::endl;
@@ -1051,8 +1051,7 @@ int covarianceBase::CheckBounds(){
   #endif
   for (int i = 0; i < _fNumPar; ++i){
     if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-      NOutside++;
-    }
+      NOutside++;    }
   }
   return NOutside;
 }

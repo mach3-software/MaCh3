@@ -7,30 +7,11 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   : covarianceBase(name, file,0,threshold,FirstPCAdpar,LastPCAdpar) {
 // ********************************************
  
-  // Leave these as arrays for backwards compatibility
-  // Probably should be made into vectors but at least size isn't hard-coded ^,^
-  // Load up the parameters id (nPars x nCols big, contains information about if these parameters are spline, normalisation or some other parameter)
-
-  xsec_param_nom_a  = new double[_fNumPar];
-  xsec_param_lb_a   = new double[_fNumPar];
-  xsec_param_ub_a   = new double[_fNumPar];
-  xsec_param_prior_a = new double[_fNumPar];
-
   //DB Resize step scale vector to expected size
   xsec_stepscale_vec.resize(_fNumPar);
 
   //ETA - We really don't need this loop and can get rid of it shortly
   for (int i = 0; i < _fNumPar; i++) {
-    // Fill the prior central value
-	xsec_param_nom_a[i] = _fPreFitValue[i];
-
-    // Fill the lower bound
-    xsec_param_lb_a[i]  = _fLowBound[i];
-
-    // Fill the upper bound
-    xsec_param_ub_a[i]  = _fUpBound[i];
-    // Fill the prior uncertainty
-	xsec_param_prior_a[i]= _fError[i];
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
   } // end the for loop
@@ -41,7 +22,8 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
   // ETA - remove for now
   //ScanParameters();
 
-  std::cout << "Constructing instance of covarianceXsec" << std::endl;
+  MACH3LOG_INFO("Constructing instance of covarianceXsec");
+
   initParams(0.001);
   // Print
   Print();
@@ -57,35 +39,14 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
 covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile)
   : covarianceBase(YAMLFile) {
 
-  std::cout << "About to ParseYaml" << std::endl;
   ParseYAML(YAMLFile);
   SetupNormPars();
-
-  int ncols = _fNumPar;
-  // Leave these as arrays for backwards compatibility
-  // Probably should be made into vectors but at least size isn't hard-coded ^,^
-  // Load up the parameters id (nPars x nCols big, contains information about if these parameters are spline, normalisation or some other parameter)
-  xsec_param_nom_a  = new double[_fNumPar];
-  xsec_param_lb_a   = new double[_fNumPar];
-  xsec_param_ub_a   = new double[_fNumPar];
-  xsec_param_prior_a = new double[_fNumPar];
 
   //DB Resize step scale vector to expected size
   xsec_stepscale_vec.resize(_fNumPar);
 
   //ETA - again this really doesn't need to be hear...
   for (int i = 0; i < _fNumPar; i++) {
-    // Fill the nominal
-	xsec_param_nom_a[i] = _fPreFitValue[i];
-
-    // Fill the lower bound
-    xsec_param_lb_a[i]  = _fLowBound[i];
-
-    // Fill the upper bound
-    xsec_param_ub_a[i]  = _fUpBound[i];
-
-    // Fill the prior
-	xsec_param_prior_a[i]= _fError[i];
 
 	// Sort out the print length
     if(_fNames[i].length() > PrintLength) PrintLength = _fNames[i].length();
@@ -100,7 +61,7 @@ covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile)
   // ETA- remove for now
   //ScanParameters();
 
-  std::cout << "Constructing instance of covarianceXsec" << std::endl;
+  MACH3LOG_INFO("Constructing instance of covarianceXsec");
   initParams(0.001);
   // Print
   Print();
@@ -123,7 +84,6 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
   }
 
   _fNumPar = _fYAMLDoc["Systematics"].size();
-  std::cout << "Found " << _fNumPar << " systematics" << std::endl;
   _fNames = std::vector<std::string>(_fNumPar);
   _fFancyNames = std::vector<std::string>(_fNumPar);
   _fGenerated = std::vector<double>(_fNumPar);
@@ -137,9 +97,7 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
   _fCovMatrix = new TMatrixDSym(_fNumPar);
   _fParamType = std::vector<std::string>(_fNumPar);
   _fDetString = std::vector<std::string>(_fNumPar);
-
-  std::cout << "Found " << _fNumPar << " systematics in yaml" << std::endl;
-
+  isFlux.resize(_fNumPar);
   //Vector of vectors of strings to contain potentially multiple variables that
   //might be cut on
   _fKinematicPars = std::vector<std::vector<std::string>>(_fNumPar);
@@ -147,7 +105,7 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
   //for a particular kinematic variables
   _fKinematicBounds = std::vector<std::vector<std::vector<double>>>(_fNumPar);
 
-  int i=0;
+  int i = 0;
 
   std::vector<std::map<std::string,double>> Correlations(_fNumPar);
   std::map<std::string, int> CorrNamesMap;
@@ -302,6 +260,8 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 		 }
 	   }
 	 }
+	 if(_fFancyNames[i].find("b_")==0) isFlux[i] = true;
+	 else isFlux[i] = false;
 	 i++;
   }
   
@@ -722,8 +682,6 @@ const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(int DetID) {
 //    }
 //	*/
 //    
-//    if(GetParName(i).find("b_")==0)isFlux.push_back(true);
-//    else isFlux.push_back(false);
 //
 //	///////////////
 //	// ETA: for norm parameters the ND and FD treatment is the same so just need to check
@@ -875,23 +833,6 @@ const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(int DetID) {
 //    std::string nextName = *it;
 //    std::string nextName_cut = nextName.substr(0, nextName.find_last_of("_"));
 //
-//    //DEPRECATED
-//    //KS: Shared splines are no longer used and looking for "_nubar" leads to confusion
-//    //and even to seg faults, right now none of splines will be assgined as "shared"
-//    //we can easily revert this change
-//    //
-//    // Anti-neutrino parameters will share the same spline name with the neutrino counter-parts
-//    //if (nextName.find("_nubar") != std::string::npos) {
-//    if (false) { 
-//      splineParsShareIndex.push_back(NearsplineParsIndex[itCnt]);
-//      splineParsShareNames.push_back(*it);
-//      // Which uniq spline does the parameter share with
-//      splineParsShareToUniq.push_back(splineParsShareToUniq.back());
-//      nSplineParamsShare++;
-//
-//      itCnt++;
-//      continue;
-//    }
 //
 //    paramName = nextName_cut;
 //    splineParsUniqIndex.push_back(NearsplineParsIndex[itCnt]);
@@ -910,9 +851,7 @@ void covarianceXsec::initParams(double fScale) {
 
   for (int i = 0; i < size; ++i) {
 	//ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
-    char pname[10];
-    sprintf(pname, "xsec_%i", i);
-	_fNames[i] = std::string(pname);
+    _fNames[i] = "xsec_"+std::to_string(i);
 
     // This just assign the initial parameters to the prior 
     _fPreFitValue[i] = _fPreFitValue[i];
@@ -951,71 +890,92 @@ void covarianceXsec::Print() {
   // ********************************************
 
   // Get the precision so we can go back to normal for cout later
-  std::streamsize ss = std::cout.precision();
+  //std::streamsize ss = std::cout.precision();
 
   std::cout << "#################################################" << std::endl;
-  std::cout << "Printing covarianceXsec:" << std::endl;
+  MACH3LOG_INFO("Printing covarianceXsec:");
 
-  std::cout << "Number of parameters: " << GetNumParams() << std::endl;
   std::cout << std::endl;
 
   std::cout<<"======================================================================================================================"<<std::endl;
-  std::cout << "Global parameter map:" << std::endl;
-  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(15) << "IndivStepScale" << "|" << std::setw(5) << "DetID" << std::endl;;
+  std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(10) << "StepScale" << "|" << std::setw(5) << "DetID" << std::endl;;
+  std::cout<<"----------------------------------------------------------------------------------------------------------------------"<<std::endl;
 
   for (int i = 0; i < GetNumParams(); i++) {
-    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParFancyName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(15) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
+    std::cout << std::left << std::setprecision(3) << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << GetParFancyName(i) << std::setw(2) << "|" << std::setw(10) << _fGenerated[i] << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i] << std::setw(2) << "|" << "+/- " << std::setw(11) << _fError[i] << std::setw(2) << "|" << std::setw(10) << _fLowBound[i] << std::setw(2) << "|" << std::setw(10) << _fUpBound[i] << "|" << std::setw(10) << _fIndivStepScale[i] << "|" << _fDetID[i] << std::endl;
   }
   std::cout<<"======================================================================================================================"<<std::endl;
 
   std::cout << std::endl;
 
   // Output the normalisation parameters as a sanity check!
-  std::cout << "Normalisation parameters: " << NormParams.size() << std::endl;
+  MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
 
-  std::cout<<"  ===================================================================="<<std::endl;
-
-  std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "Type" << std::endl;
-  for (unsigned int i = 0; i < NormParams.size(); ++i) {
+  std::cout<<"=========================================================================="<<std::endl;
+  std::cout << std::setw(4) << "#" << std::setw(2) << "|" << std::setw(10) << "Global #" << std::setw(2) << "|" << std::setw(20) << "Name" << std::setw(2) << "|" << std::setw(10) << "Int. mode" << std::setw(2) << "|" << std::setw(10) << "Target" << std::setw(2) << "|" << std::setw(10) << "pdg" << std::endl;
+  std::cout<<"--------------------------------------------------------------------------"<<std::endl;
+    for (unsigned int i = 0; i < NormParams.size(); ++i) {
     std::cout << std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "|" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "|" << std::setw(10);
+    std::string TempSting = " ";
     for(int j = 0; j < int((NormParams.at(i).modes).size()); j++){
-      std::cout<< NormParams.at(i).modes.at(j) <<" ";
+      TempSting += std::to_string(NormParams.at(i).modes.at(j));
+      TempSting += " ";
     }
-    std::cout<< std::setw(2) << "|" << " ";
+    if(int((NormParams.at(i).modes).size()) == 0) TempSting += "all";
+    std::cout<< TempSting << std::setw(2) << "|" << std::setw(10);
+    TempSting = " ";
+
     for (int j = 0; j < int((NormParams.at(i).targets).size()); j++) {
-      std::cout << (NormParams.at(i).targets).at(j) << " ";
+      TempSting += std::to_string(NormParams.at(i).targets.at(j));
+      TempSting += " ";
     }
+    if(int((NormParams.at(i).targets).size()) == 0) TempSting += "all";
+    std::cout << TempSting<< std::setw(2) << "|" << std::setw(10);
 
-    std::cout << std::setw(2) << "|" << " ";
-
+    TempSting = " ";
     for (int j = 0; j < int((NormParams.at(i).pdgs).size()); j++) {
-      std::cout << (NormParams.at(i).pdgs).at(j) << " ";
+      TempSting += std::to_string(NormParams.at(i).pdgs.at(j));
+      TempSting += " ";
     }
+    if(int((NormParams.at(i).pdgs).size()) == 0) TempSting += "all";
+    std::cout << TempSting;
 
     std::cout << std::endl;
   }
-  std::cout<<"  ===================================================================="<<std::endl;
+  std::cout<<"=========================================================================="<<std::endl;
   std::cout << std::endl;
 
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
-    if (strcmp(GetXsecParamType(i), "Spline") == 0)
-    {
-      SplineParsIndex.push_back(i);
-    }
+    if (strcmp(GetXsecParamType(i), "Spline") == 0) { SplineParsIndex.push_back(i); }
   }
-
-  std::cout<<"  ===================================================================="<<std::endl;
   MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
+  std::cout<<"================================================="<<std::endl;
+  std::cout << std::setw(4) << "#" << std::setw(2) << "|"<< std::setw(10) << "Name " << std::setw(2) << "|" << std::setw(30) << "Spline Interpolation" << std::setw(2) << "|" << std::endl;
+  std::cout<<"-------------------------------------------------"<<std::endl;
   for (unsigned int i = 0; i < SplineParsIndex.size(); ++i)
   {
-    std::cout<< i << std::setw(2) <<GetParName(SplineParsIndex[i])<<std::endl;
+    std::cout<< std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << GetParFancyName(SplineParsIndex[i]) << std::setw(2) << "|" << std::setw(30) << SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])) << std::setw(2) << "|" << std::endl;
   }
-  std::cout<<"  ===================================================================="<<std::endl;
+  std::cout<<"================================================="<<std::endl;
 
-  // ETA - Could print out for each uniqued DetID or something here?
-  //But I think it would be messy
+  std::vector<int> FuncParsIndex;
+  for (int i = 0; i < _fNumPar; ++i)
+  {
+    if (strcmp(GetXsecParamType(i), "Functional") == 0) { FuncParsIndex.push_back(i); }
+  }
+
+  MACH3LOG_INFO("Functional parameters: {}", FuncParsIndex.size());
+  std::cout<<"================================="<<std::endl;
+  std::cout << std::setw(4) << "#" << std::setw(2) << "|"<< std::setw(10) << "Name " << std::endl;
+  std::cout<<"--------------------------------"<<std::endl;
+  for (unsigned int i = 0; i < FuncParsIndex.size(); ++i)
+  {
+    std::cout<< std::setw(4) << i << std::setw(2) << "|" << std::setw(10) << GetParFancyName(FuncParsIndex[i])  << std::endl;
+  }
+  std::cout<<"================================"<<std::endl;
+
 
 } // End
 
@@ -1023,17 +983,17 @@ void covarianceXsec::Print() {
 // Sets the proposed Flux parameters to the prior values
 void covarianceXsec::setFluxOnlyParameters() {
 // ********************************************
-    for (int i = 0; i < size; i++) 
-    {
-      if(isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
-    }
+  for (int i = 0; i < size; i++)
+  {
+    if(isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
+  }
 }
 // ********************************************
 // Sets the proposed Flux parameters to the prior values
 void covarianceXsec::setXsecOnlyParameters() {
 // ********************************************
-    for (int i = 0; i < size; i++) 
-    {
-      if(!isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
-    }
+  for (int i = 0; i < size; i++)
+  {
+    if(!isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
+  }
 }

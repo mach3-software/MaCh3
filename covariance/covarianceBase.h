@@ -66,9 +66,7 @@ class covarianceBase {
   void setStepScale(double scale);
 
   //DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
-  void setIndivStepScale(int ParameterIndex, double StepScale){
-	_fIndivStepScale.at(ParameterIndex) = StepScale;
-  };
+  void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; };
 
   void setIndivStepScale(std::vector<double> stepscale);
   //KS: In case someone really want to change this
@@ -98,19 +96,13 @@ class covarianceBase {
 
   const char *getName() { return matrixName; };
   std::string GetParName(const int i) {return _fNames[i];};
-  const char* GetParName(const int i) const {
-    return _fNames[i].c_str();
-  };
+  const char* GetParName(const int i) const { return _fNames[i].c_str(); };
   std::string GetParFancyName(const int i) {return _fFancyNames[i];};
-  const char* GetParFancyName(const int i) const {
-    return _fFancyNames[i].c_str();
-  };
+  const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); };
   std::string const getInputFile() const { return inputFile; };
 
   // Get diagonal error for ith parameter
-  double getDiagonalError(const int i) { 
-    return sqrt((*covMatrix)(i,i));
-  }
+  double getDiagonalError(const int i) { return sqrt((*covMatrix)(i,i)); }
 
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -121,16 +113,29 @@ class covarianceBase {
   void setThrowMatrix(TMatrixDSym *cov);
   void updateThrowMatrix(TMatrixDSym *cov);
   void setNumberOfSteps(const int nsteps){
-    total_steps=nsteps;
-    if(total_steps>=lower_adapt)resetIndivStepScale();
+    total_steps = nsteps;
+    if(total_steps >= lower_adapt)resetIndivStepScale();
   }
   // Set thresholds for MCMC steps
-  void setAdaptiveThresholds(int low_threshold=10000, int up_threshold=1000000){lower_adapt=low_threshold; upper_adapt=up_threshold;}
+  void setAdaptiveThresholds(int low_threshold = 10000, int up_threshold = 1000000){lower_adapt=low_threshold; upper_adapt = up_threshold;}
 
   TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   std::vector<double> getParameterMeans(){return par_means;}
 
+  // What parameter Gets reweighted by what amount according to MCMC
+  inline double calcReWeight(const int bin){
+    if (bin >= 0 && bin < _fNumPar) {
+      return _fPropVal[bin];
+    } else {
+      std::cerr << "Specified bin is <= 0 OR bin > npar!" << std::endl;
+      std::cerr << "bin = " << bin << ", npar = " << _fNumPar << std::endl;
+      std::cerr << "This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!" << std::endl;
+      return 1.0;
+    }
+
+    return 1.0;
+  };
   //========
   //DB Pointer return
   //ETA - This might be a bit squiffy? If the vector gots moved from say a
@@ -143,34 +148,17 @@ class covarianceBase {
   //Some Getters
   int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
-  const std::vector<double>& getPreFitValues(){return _fPreFitValue;};
-  const std::vector<double>& getGeneratedValues(){return _fGenerated;};
+  const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
+  const std::vector<double>& getGeneratedValues(){return _fGenerated;}
   const std::vector<double> getProposed() const;
-  double getParProp(const int i) {
-    return _fPropVal[i]; 
-  };
-  double getParCurr(const int i) {
-    return _fCurrVal[i];
-  };
-  double getParInit(const int i) {
-    return _fPreFitValue[i];
-  };
+  double getParProp(const int i) { return _fPropVal[i]; }
+  double getParCurr(const int i) { return _fCurrVal[i]; }
+  double getParInit(const int i) { return _fPreFitValue[i]; }
 
-  virtual double getNominal(const int i) {
-    return getParInit(i);
-  };
-
-  double GetGenerated(const int i) {
-    return _fGenerated[i];
-  }
-
-  double GetUpperBound(const int i){
-    return _fUpBound[i];
-  }
-
-  double GetLowerBound(const int i){
-    return _fLowBound[i];
-  }
+  virtual double getNominal(const int i) { return getParInit(i); }
+  inline double GetGenerated(const int i) { return _fGenerated[i];}
+  inline double GetUpperBound(const int i){ return _fUpBound[i];}
+  inline double GetLowerBound(const int i){ return _fLowBound[i]; }
 
   double getParProp_PCA(const int i) {
     if (!pca) {
@@ -268,8 +256,8 @@ class covarianceBase {
     TransferToParam();
   }
 
-  int getSize() { return size; };
-  int getNpars() { 
+  inline int getSize() { return size; };
+  inline int getNpars() {
     if (pca) return npars;
     else return size;
   }
@@ -311,9 +299,9 @@ class covarianceBase {
   //Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
   void enableAdaptiveMCMC(bool enable=true){
     use_adaptive=enable;
-    total_steps=0; //Set these to default values
-    lower_adapt=10000;
-    upper_adapt=10000000;
+    total_steps = 0; //Set these to default values
+    lower_adapt = 10000;
+    upper_adapt = 10000000;
   }
   void updateAdaptiveCovariance();
 
