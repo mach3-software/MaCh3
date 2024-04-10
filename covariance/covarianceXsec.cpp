@@ -1,37 +1,15 @@
 #include "covarianceXsec.h"
 
 // ********************************************
-covarianceXsec::covarianceXsec(const char *name, const char *file,
-                                double threshold,int FirstPCAdpar,
-                                int LastPCAdpar)
-  : covarianceBase(name, file,0,threshold,FirstPCAdpar,LastPCAdpar) {
-// ********************************************
- 
-  //DB Resize step scale vector to expected size
-  xsec_stepscale_vec.resize(_fNumPar);
-
-  //ETA - We really don't need this loop and can get rid of it shortly
-  for (int i = 0; i < _fNumPar; i++) {
-    // DB Fill the stepscales vector
-    xsec_stepscale_vec[i] = _fIndivStepScale[i];
-  } // end the for loop
-
-  MACH3LOG_INFO("Constructing instance of covarianceXsec");
-
-  initParams(0.001);
-  // Print
-  Print();
-}
-
-// ********************************************
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
 covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile, double threshold, int FirstPCAdpar, int LastPCAdpar)
                : covarianceBase(YAMLFile, threshold, FirstPCAdpar, LastPCAdpar){
+// ********************************************
 
   setName("xsec_cov");
-  ParseYAML(YAMLFile);
+  InitXsecFromConfig();
   SetupNormPars();
 
   //DB Resize step scale vector to expected size
@@ -53,9 +31,10 @@ covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile, double thresho
   Print();
 }
 
+// ********************************************
+void covarianceXsec::InitXsecFromConfig() {
+// ********************************************
 
-void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
-{
   _fDetID = std::vector<int>(_fNumPar);
   _fParamType = std::vector<std::string>(_fNumPar);
   //_fDetString = std::vector<std::string>(_fNumPar);
@@ -155,8 +134,8 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 	    
 	 }
      else{
-       std::cerr << "[ERROR] Given unrecognised systematic type: " << param["Systematic"]["Type"].as<std::string>().c_str() << std::endl; 
-       std::cerr << "[ERROR] Expecting \"Norm\", \"Spline\" or \"Functional\"" << std::endl;
+       MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
+       MACH3LOG_ERROR("Expecting \"Norm\", \"Spline\" or \"Functional\"");
        throw;
 	 }
 
@@ -197,6 +176,8 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 // ********************************************
 covarianceXsec::~covarianceXsec() {
 // ********************************************
+
+
 }
 
 // ********************************************
@@ -370,7 +351,7 @@ void covarianceXsec::SetupNormPars(){
 	
 		std::vector<int> temp;
 		XsecNorms4 norm;
-		norm.name=GetParFancyName(i);
+		norm.name = GetParFancyName(i);
 
 		//Copy the mode information into an XsecNorms4 struct
 		norm.modes = _fNormModes[norm_counter];	
@@ -379,7 +360,7 @@ void covarianceXsec::SetupNormPars(){
 		norm.targets = _fTargetNuclei[norm_counter];
 		
 		//Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
-		//We set a bool to see if any bounds exist so we can shortcircuit checking all of them every step
+		//We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
 		bool HasKinBounds=false;
 
 		////////////////////
@@ -778,8 +759,6 @@ void covarianceXsec::Print() {
   std::cout << "#################################################" << std::endl;
   MACH3LOG_INFO("Printing covarianceXsec:");
 
-  std::cout << std::endl;
-
   std::cout<<"======================================================================================================================"<<std::endl;
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(10) << "Prior" << std::setw(2) << "|" << std::setw(15) << "Error" << std::setw(2) << "|" << std::setw(10) << "Lower" << std::setw(2) << "|" << std::setw(10) << "Upper" << "|" << std::setw(10) << "StepScale" << "|" << std::setw(5) << "DetID" << std::endl;;
   std::cout<<"----------------------------------------------------------------------------------------------------------------------"<<std::endl;
@@ -789,16 +768,13 @@ void covarianceXsec::Print() {
   }
   std::cout<<"======================================================================================================================"<<std::endl;
 
-  std::cout << std::endl;
-
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
-
-  std::cout<<"──────────────────────────────────────────────────────────────────────────"<<std::endl;
-  std::cout << std::setw(4) << "#" << std::setw(2) << "│" << std::setw(10) << "Global #" << std::setw(2) << "│" << std::setw(20) << "Name" << std::setw(2) << "│" << std::setw(10) << "Int. mode" << std::setw(2) << "│" << std::setw(10) << "Target" << std::setw(2) << "│" << std::setw(10) << "pdg" << std::endl;
-  std::cout<<"──────────────────────────────────────────────────────────────────────────"<<std::endl;
+  std::cout<<"┌───┬──────────┬────────────────────┬──────────┬──────────┬──────────┐"<<std::endl;
+  std::cout << std::setw(6) << "│#" << std::setw(2) << "│" << std::setw(10) << "Global #" << std::setw(2) << "│" << std::setw(20) << "Name" << std::setw(2) << "│" << std::setw(10) << "Int. mode" << std::setw(2) << "│" << std::setw(10) << "Target" << std::setw(2) << "│" << std::setw(10) << "pdg" << std::setw(2) << "│" << std::endl;
+  std::cout<<"├───┼──────────┼────────────────────┼──────────┼──────────┼──────────┤"<<std::endl;
     for (unsigned int i = 0; i < NormParams.size(); ++i) {
-    std::cout << std::setw(4) << i << std::setw(2) << "│" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "│" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "│" << std::setw(10);
+    std::cout << std::setw(6) << std::string("│" + std::to_string(i)) << std::setw(2) << "│" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "│" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "│" << std::setw(10);
     std::string TempSting = " ";
     for(int j = 0; j < int((NormParams.at(i).modes).size()); j++){
       TempSting += std::to_string(NormParams.at(i).modes.at(j));
@@ -821,18 +797,15 @@ void covarianceXsec::Print() {
       TempSting += " ";
     }
     if(int((NormParams.at(i).pdgs).size()) == 0) TempSting += "all";
-    std::cout << TempSting;
-
-    std::cout << std::endl;
+    std::cout << TempSting << std::setw(2) << "│" << std::endl;
   }
-  std::cout<<"──────────────────────────────────────────────────────────────────────────"<<std::endl;
-  std::cout << std::endl;
-
+  std::cout<<"└───┴──────────┴────────────────────┴──────────┴──────────┴──────────┘"<<std::endl;
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
     if (strcmp(GetXsecParamType(i), "Spline") == 0) { SplineParsIndex.push_back(i); }
   }
+
   MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
   std::cout<<"================================================="<<std::endl;
   std::cout << std::setw(4) << "#" << std::setw(2) << "|"<< std::setw(10) << "Name " << std::setw(2) << "|" << std::setw(30) << "Spline Interpolation" << std::setw(2) << "|" << std::endl;

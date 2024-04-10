@@ -13,7 +13,7 @@
 #define __LARGE_LOGL__ 1234567890.0
 #endif
 
-#define DEBUG_PCA 1
+//#define DEBUG_PCA 1
 #ifdef DEBUG_PCA
 //KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
 #include "TROOT.h"
@@ -44,7 +44,7 @@ class covarianceBase {
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   void setCovMatrix(TMatrixDSym *cov);
   void setName(const char *name) { matrixName = name; }
-  virtual void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
+  void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   void setPar(const int i, const double val);
   void setParCurrProp(int i, double val);
@@ -58,10 +58,8 @@ class covarianceBase {
   // set branches for output file
   void setBranches(TTree &tree);
   void setStepScale(double scale);
-
   //DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; };
-
   void setIndivStepScale(std::vector<double> stepscale);
   //KS: In case someone really want to change this
   inline void setPrintLength(unsigned int PriLen) { PrintLength = PriLen; };
@@ -205,7 +203,6 @@ class covarianceBase {
   inline const std::vector<double> getEigenValuesMaster() {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");
-
       throw;
     }
     return eigen_values_master;
@@ -214,7 +211,6 @@ class covarianceBase {
   void setParProp_PCA(const int i, const double value) {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");
-
       throw;
     }
     fParProp_PCA(i) = value;
@@ -304,6 +300,7 @@ class covarianceBase {
   //YAML init
   void init(std::vector<std::string> YAMLFile);
   void init(TMatrixDSym* covMat);
+  void ReserveMemory(const int size);
 
   void randomize();
   void CorrelateSteps();
@@ -334,7 +331,7 @@ class covarianceBase {
 
   // For Cholesky decomposed parameter throw
   double* randParams;
-  Double_t *corr_throw;
+  double* corr_throw;
   double _fGlobalStepScale;
 
   //KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts

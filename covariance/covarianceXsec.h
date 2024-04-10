@@ -16,21 +16,18 @@
 class covarianceXsec : public covarianceBase {
 
   public:
-    covarianceXsec(const char *name, const char *file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     covarianceXsec(std::vector<std::string> FileNames, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     ~covarianceXsec();
 
     //ETA - trying out the yaml parsing
-    void ParseYAML(std::vector<std::string> FileName);
+    inline void InitXsecFromConfig();
 
     // Print information about the whole object once it is set
-    void Print();
+    inline void Print();
 
     // General Getter functions not split by detector
-    // ETA - a lot of these can go... they're just duplications from the base
-    // class.
-    //ETA - just return the int of the DetID, this can be removed to do a string comp
-    //at some point.
+    // ETA - a lot of these can go... they're just duplications from the base class.
+    //ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
     //ETA - just return a string of "spline", "norm" or "functional"
     const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
@@ -75,18 +72,15 @@ class covarianceXsec : public covarianceBase {
     void setFluxOnlyParameters();
     
   protected:
-    // Helper functions to decide on what setup we're running
-    //void ScanParameters();
-
-    void initParams(double fScale);
+    void initParams(const double fScale);
     void setXsecParNames();
 
     //DB StepScaleReading
     std::vector<double> xsec_stepscale_vec;
     std::vector<bool> isFlux;
 
-	//Vector containing info for normalisation systematics 
-	std::vector<XsecNorms4> NormParams;
+    //Vector containing info for normalisation systematics
+    std::vector<XsecNorms4> NormParams;
 
 
   private:

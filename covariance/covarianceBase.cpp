@@ -103,7 +103,7 @@ covarianceBase::~covarianceBase(){
   delete[] throwMatrixCholDecomp;
   
   const int nThreads = covutils::GetNThreads();
-  for (int iThread=0;iThread < nThreads; iThread++)  delete random_number[iThread];
+  for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
   delete[] random_number;
   if (throwMatrix != NULL) delete throwMatrix;
 }
@@ -114,9 +114,8 @@ void covarianceBase::ConstructPCA() {
 
   // Check that covariance matrix exists
   if (covMatrix == NULL) {
-    std::cerr << "Covariance matrix for " << matrixName << " has not yet been set" << std::endl;
-    std::cerr << "Can not construct PCA until it is set" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Covariance matrix for {} has not yet been set", matrixName);
+    MACH3LOG_ERROR("Can not construct PCA until it is set");
     throw;
   }
 
@@ -142,8 +141,7 @@ void covarianceBase::ConstructPCA() {
     throw;
   }
 
-  std::cout<<"PCAing parameters "<<FirstPCAdpar<<" through "<<LastPCAdpar<<" inclusive"<<std::endl;
-
+  MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
   int numunpcadpars = covMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
   TMatrixDSym submat(covMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
@@ -171,7 +169,7 @@ void covarianceBase::ConstructPCA() {
     }
   }
   npars = numunpcadpars+nKeptPCApars;
-  std::cout << "Threshold of " << eigen_threshold << " on eigen values relative sum of eigen value (" << sum << ") generates " << nKeptPCApars << " eigen vectors, plus we have "<<numunpcadpars<<" unpcad pars, for a total of "<<npars << std::endl;
+  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, npars);
 
   //DB Create array of correct size so eigen_values can be used in CorrelateSteps
   eigen_values_master = std::vector<double>(npars,1.0);
@@ -248,8 +246,8 @@ void covarianceBase::init(const char *name, const char *file)
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file, "READ");
   if (infile->IsZombie()) {
-    std::cerr << "ERROR: Could not open input covariance ROOT file " << file << " !!!" << std::endl;
-    std::cerr << "Was about to retrieve matrix with name " << name << std::endl;
+    MACH3LOG_ERROR("Could not open input covariance ROOT file {} !!!", file);
+    MACH3LOG_ERROR("Was about to retrieve matrix with name {}", name);
     throw;
   }
 
@@ -273,7 +271,7 @@ void covarianceBase::init(const char *name, const char *file)
   }
 
   // Not using adaptive by default
-  use_adaptive=false;
+  use_adaptive = false;
   
   // Set the covariance matrix
   size = covMatrix->GetNrows();
@@ -288,8 +286,8 @@ void covarianceBase::init(const char *name, const char *file)
     throwMatrixCholDecomp[i] = new double[size]();
     for (int j = 0; j < size; j++)
     {
-        InvertCovMatrix[i][j] = 0.;
-        throwMatrixCholDecomp[i][j] = 0.;
+      InvertCovMatrix[i][j] = 0.;
+      throwMatrixCholDecomp[i][j] = 0.;
     }
   }
 
@@ -304,41 +302,9 @@ void covarianceBase::init(const char *name, const char *file)
   }
   npars = size;
 
-  _fNames = std::vector<std::string>(size);
-  _fFancyNames = std::vector<std::string>(size);
-  _fPreFitValue = std::vector<double>(size);
-  _fError = std::vector<double>(size);
-  _fCurrVal = std::vector<double>(size);
-  _fPropVal = std::vector<double>(size);
-  _fLowBound = std::vector<double>(size);
-  _fUpBound = std::vector<double>(size);
-  _fFlatPrior = std::vector<bool>(size);
-  _fIndivStepScale = std::vector<double>(size);
-
-  corr_throw = new Double_t[size]();
-  // Set the defaults to true
-  for(int i = 0; i < size; i++) {
-	_fPreFitValue.at(i) = 1.;
-	_fError.at(i) = 0.;
-	_fCurrVal.at(i) = 0.;
-	_fPropVal.at(i) = 0.;
-	_fLowBound.at(i) = -999.99;
-	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = false;
-	_fIndivStepScale.at(i) = 1.;
-	corr_throw[i] = 0.0;
-  }
-
-  // Set the logLs to very large so next step is accepted
-  currLogL = __LARGE_LOGL__;
-  propLogL = __LARGE_LOGL__;
-
-  // Set random parameter vector (for correlated steps)
-  randParams = new double[size];
+  ReserveMemory(size);
 
   infile->Close();
-
-  _fGlobalStepScale = 1.0;
 
   std::cout << "Created covariance matrix named: " << getName() << std::endl;
   std::cout << "from file: " << file << std::endl;
@@ -392,44 +358,10 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
     }
   }
 
-  corr_throw = new Double_t[_fNumPar]();
+  ReserveMemory(size);
 
-  // Set the logLs to very large so next step is accepted
-  currLogL = __LARGE_LOGL__;
-  propLogL = __LARGE_LOGL__;
-
-  // Set random parameter vector (for correlated steps)
-  randParams = new double[_fNumPar];
-
-  _fGlobalStepScale = 1.0;
-
-  _fNames = std::vector<std::string>(_fNumPar);
-  _fFancyNames = std::vector<std::string>(_fNumPar);
-  _fGenerated = std::vector<double>(_fNumPar);
-  _fPreFitValue = std::vector<double>(_fNumPar);
-  _fError = std::vector<double>(_fNumPar);
-  _fLowBound = std::vector<double>(_fNumPar);
-  _fUpBound = std::vector<double>(_fNumPar);
-  _fIndivStepScale = std::vector<double>(_fNumPar);
-  _fFlatPrior = std::vector<bool>(_fNumPar);
   TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
   //_fDetString = std::vector<std::string>(_fNumPar);
-
-  _fCurrVal = std::vector<double>(size);
-  _fPropVal = std::vector<double>(size);
-
-  // Set the defaults to true
-  for(int i = 0; i < size; i++) {
-    _fPreFitValue.at(i) = 1.;
-    _fError.at(i) = 0.;
-    _fCurrVal.at(i) = 0.;
-    _fPropVal.at(i) = 0.;
-    _fLowBound.at(i) = -999.99;
-    _fUpBound.at(i) = 999.99;
-    _fFlatPrior.at(i) = false;
-    _fIndivStepScale.at(i) = 1.;
-    corr_throw[i] = 0.0;
-  }
 
   int i = 0;
   std::vector<std::map<std::string,double>> Correlations(_fNumPar);
@@ -549,39 +481,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
   
   setCovMatrix(covMat);
 
-  _fNames = std::vector<std::string>(size);
-  _fFancyNames = std::vector<std::string>(size);
-  _fPreFitValue = std::vector<double>(size);
-  _fError = std::vector<double>(size);
-  _fCurrVal = std::vector<double>(size);
-  _fPropVal = std::vector<double>(size);
-  _fLowBound = std::vector<double>(size);
-  _fUpBound = std::vector<double>(size);
-  _fFlatPrior = std::vector<bool>(size);
-  _fIndivStepScale = std::vector<double>(size);
-
-  corr_throw = new Double_t[size]();
-  // Set the defaults to true
-  for(int i = 0; i < size; i++) {
-	_fPreFitValue.at(i) = 1.;
-	_fError.at(i) = 0.;
-	_fCurrVal.at(i) = 0.;
-	_fPropVal.at(i) = 0.;
-	_fLowBound.at(i) = -999.99;
-	_fUpBound.at(i) = 999.99;
-	_fFlatPrior.at(i) = false;
-	_fIndivStepScale.at(i) = 1.;
-	corr_throw[i] = 0.0;
-  }
-
-  // dont need these 2 i tihnk
-  currLogL = __LARGE_LOGL__;
-  propLogL = __LARGE_LOGL__;
-
-  // set random parameter vector (for correlated steps)
-  randParams = new double[size];
-
-  _fGlobalStepScale = 1.0;
+  ReserveMemory(size);
 
   std::cout << "Created covariance matrix named: " << getName() << std::endl;
 }
@@ -606,6 +506,46 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
   }
 
   setThrowMatrix(cov);
+}
+
+
+void covarianceBase::ReserveMemory(const int SizeVec) {
+
+  _fNames = std::vector<std::string>(SizeVec);
+  _fFancyNames = std::vector<std::string>(SizeVec);
+  _fGenerated = std::vector<double>(SizeVec);
+  _fPreFitValue = std::vector<double>(SizeVec);
+  _fError = std::vector<double>(SizeVec);
+  _fCurrVal = std::vector<double>(SizeVec);
+  _fPropVal = std::vector<double>(SizeVec);
+  _fLowBound = std::vector<double>(SizeVec);
+  _fUpBound = std::vector<double>(SizeVec);
+  _fFlatPrior = std::vector<bool>(SizeVec);
+  _fIndivStepScale = std::vector<double>(SizeVec);
+
+  corr_throw = new double[SizeVec]();
+  // set random parameter vector (for correlated steps)
+  randParams = new double[size];
+
+  // Set the defaults to true
+  for(int i = 0; i < SizeVec; i++) {
+    _fGenerated.at(i) = 1.;
+    _fPreFitValue.at(i) = 1.;
+    _fError.at(i) = 0.;
+    _fCurrVal.at(i) = 0.;
+    _fPropVal.at(i) = 0.;
+    _fLowBound.at(i) = -999.99;
+    _fUpBound.at(i) = 999.99;
+    _fFlatPrior.at(i) = false;
+    _fIndivStepScale.at(i) = 1.;
+    corr_throw[i] = 0.0;
+  }
+
+  // don't need these 2 i think
+  currLogL = __LARGE_LOGL__;
+  propLogL = __LARGE_LOGL__;
+
+  _fGlobalStepScale = 1.0;
 }
 
 // Set all the covariance matrix parameters to a user-defined value
@@ -726,7 +666,7 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
 
 // *************************************
 // Throw the parameters according to the covariance matrix
-// This shoulnd't be used in MCMC code ase it can break Detailed Balance;
+// This shouldn't be used in MCMC code ase it can break Detailed Balance;
 void covarianceBase::throwParameters() {
 // *************************************
 
@@ -756,7 +696,7 @@ void covarianceBase::throwParameters() {
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
         {
-          //KS: Since we are mulithreading there is danger that those messages
+          //KS: Since we are multithreading there is danger that those messages
 		  //will be all over the place, small price to pay for faster code
           std::cerr << "Tried " << throws << " times to throw parameter "; 
 		  std::cerr << i << " but failed" << std::endl;
@@ -773,11 +713,10 @@ void covarianceBase::throwParameters() {
     }
   }
   else
-  {      
-      std::cerr << "Hold on, you are trying to run Prior Predicitve Code with PCA, which is wrong" << std::endl;
-      std::cerr << "Sorry I have to kill you, I mean your job" << std::endl;
-      std::cerr << "I live at " << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+  {
+    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predicitve Code with PCA, which is wrong");
+    MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
+    throw;
   }
 }
 
@@ -898,7 +837,7 @@ void covarianceBase::randomize() {
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
 void covarianceBase::CorrelateSteps() {
 // ************************************************
-  //KS: Using custom fucntion comapred to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
+  //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
   MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, size);
 
   // If not doing PCA
@@ -1025,7 +964,7 @@ void covarianceBase::throwParCurr(const double mag)
 
 // Function to print the nominal values
 void covarianceBase::printNominal() {
-  std::cout << "Prior values for " << getName() << " covarianceBase: " << std::endl;
+  MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
   for (int i = 0; i < size; i++) {
     std::cout << "    " << GetParFancyName(i) << "   " << getParInit(i) << "\n";
   }
@@ -1035,7 +974,7 @@ void covarianceBase::printNominal() {
 // Function to print the nominal, current and proposed values
 void covarianceBase::printNominalCurrProp() {
 
-  std::cout << "Printing parameters for " << getName() << std::endl;
+  MACH3LOG_INFO("Printing parameters for {}", getName());
   // Dump out the PCA parameters too
   if (pca) {
     std::cout << "PCA:" << "\n";
@@ -1096,16 +1035,8 @@ double covarianceBase::GetLikelihood(){
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
   
-  if(NOutside>0){
-
-	//ETA - don't need to check here. CheckBounds actually checks _fLowBound
-	// and _fUpBound rather than 0 all the time
-	//for (int i = 0; i < size; i++) {
-	  // If the proposed step is negative, set a incredibly unlikely likelihood (but don't return yet for openMP!)
-	  //if (_fPropVal[i] < 0) {std::cout << "_fPropVal at " << i << " is " << _fPropVal[i] << std::endl;}
-	//}
-	return NOutside*__LARGE_LOGL__;
-  }
+  if(NOutside > 0)
+    return NOutside*__LARGE_LOGL__;
 
   return CalcLikelihood();
 }
@@ -1363,7 +1294,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   }
 
   throwMatrix = (TMatrixDSym*)cov->Clone();
-  if(total_steps<=lower_adapt) makeClosestPosDef(throwMatrix);
+  if(total_steps <= lower_adapt) makeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
@@ -1378,7 +1309,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   throwMatrix_CholDecomp = new TMatrixD(TDecompChol_throwMatrix.GetU());
   throwMatrix_CholDecomp->T();
 
-  //KS: ROOT has bad memory managment, using standard double means we can decrease most operation by factor 2 simply due to cache hits
+  //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
@@ -1442,7 +1373,7 @@ void covarianceBase::useSeparateThrowMatrix(){
     updateThrowMatrix(covMatrix);
 }
 
-// Truely adaptive MCMC!
+//HI: Truly adaptive MCMC!
 void covarianceBase::updateAdaptiveCovariance(){
   // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
   // Updates adaptive matrix
