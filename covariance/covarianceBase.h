@@ -1,43 +1,38 @@
 #pragma once
 
-// ROOT includes
-#include "TMatrixT.h"
-#include "TMatrixDSym.h"
-#include "TVectorT.h"
-#include "TVectorD.h"
-#include "TCanvas.h"
-#include "TH1D.h"
-#include "TTree.h"
-#include "TFile.h"
-#include "TAxis.h"
-#include "TRandom3.h"
-#include "TMath.h"
-#include "math.h"
-#include "TDecompChol.h"
-#include "TStopwatch.h"
-#include "TMatrixDSymEigen.h"
-#include "TMatrixDEigen.h"
-#include "TDecompSVD.h"
-
 // MaCh3 includes
 #include "samplePDF/Structs.h"
+#include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
 
 // Don't forget yaml!
 #include "yaml-cpp/yaml.h"
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
+#include "manager/MaCh3Logger.h"
 
 #ifndef __LARGE_LOGL__
 #define __LARGE_LOGL__ 1234567890.0
 #endif
 
+#define DEBUG_PCA 1
+#ifdef DEBUG_PCA
+//KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
+#include "TROOT.h"
+#include "TStyle.h"
+#include "TColor.h"
+#include "TLine.h"
+#include "TText.h"
+#include "TLegend.h"
+
+#if DEBUG_PCA == 2
+#include "Eigen/Eigenvalues"
+#endif
+
+#endif
+
 class covarianceBase {
  public:
   //ETA - constructor for a YAML file
-  covarianceBase(std::vector<std::string> YAMLFile);
+  covarianceBase(std::vector<std::string> YAMLFile, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   //"Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
@@ -46,7 +41,6 @@ class covarianceBase {
   virtual ~covarianceBase();
   
   // Setters
-  // need virtual for eRPA parameter over-ride
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   void setCovMatrix(TMatrixDSym *cov);
   void setName(const char *name) { matrixName = name; }
@@ -70,7 +64,7 @@ class covarianceBase {
 
   void setIndivStepScale(std::vector<double> stepscale);
   //KS: In case someone really want to change this
-  void setPrintLength(unsigned int PriLen) { PrintLength = PriLen; };
+  inline void setPrintLength(unsigned int PriLen) { PrintLength = PriLen; };
 
   // set a custom proposal function
   //DEPRECATED
@@ -80,19 +74,20 @@ class covarianceBase {
   void throwParProp(const double mag = 1.);
   void throwParCurr(const double mag = 1.);
   void throwParameters();
-  void throwNominal(bool nomValues=false, int seed = 0);
+  void throwNominal(bool nomValues = false, int seed = 0);
   // Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
+  //LLH Related
+  virtual int CheckBounds();
+  double CalcLikelihood();
+  virtual double GetLikelihood();
+
   // Getters
   TMatrixDSym *getCovMatrix() { return covMatrix; };
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
   bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
   int GetParDetID(const int i) { return _fDetID[i];};
-
-  virtual int CheckBounds();
-  double CalcLikelihood();
-  virtual double GetLikelihood();
 
   const char *getName() { return matrixName; };
   std::string GetParName(const int i) {return _fNames[i];};
@@ -117,14 +112,14 @@ class covarianceBase {
     if(total_steps >= lower_adapt)resetIndivStepScale();
   }
   // Set thresholds for MCMC steps
-  void setAdaptiveThresholds(int low_threshold = 10000, int up_threshold = 1000000){lower_adapt=low_threshold; upper_adapt = up_threshold;}
+  inline void setAdaptiveThresholds(const int low_threshold = 10000, const int up_threshold = 1000000){lower_adapt=low_threshold; upper_adapt = up_threshold;}
 
-  TMatrixDSym *getThrowMatrix(){return throwMatrix;}
-  TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
-  std::vector<double> getParameterMeans(){return par_means;}
+  inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
+  inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
+  inline std::vector<double> getParameterMeans(){return par_means;}
 
   // What parameter Gets reweighted by what amount according to MCMC
-  inline double calcReWeight(const int bin){
+  inline double calcReWeight(const int bin) {
     if (bin >= 0 && bin < _fNumPar) {
       return _fPropVal[bin];
     } else {
@@ -133,7 +128,6 @@ class covarianceBase {
       std::cerr << "This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!" << std::endl;
       return 1.0;
     }
-
     return 1.0;
   };
   //========
@@ -151,9 +145,9 @@ class covarianceBase {
   const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
   const std::vector<double>& getGeneratedValues(){return _fGenerated;}
   const std::vector<double> getProposed() const;
-  double getParProp(const int i) { return _fPropVal[i]; }
-  double getParCurr(const int i) { return _fCurrVal[i]; }
-  double getParInit(const int i) { return _fPreFitValue[i]; }
+  inline double getParProp(const int i) { return _fPropVal[i]; }
+  inline double getParCurr(const int i) { return _fCurrVal[i]; }
+  inline double getParInit(const int i) { return _fPreFitValue[i]; }
 
   virtual double getNominal(const int i) { return getParInit(i); }
   inline double GetGenerated(const int i) { return _fGenerated[i];}
@@ -162,7 +156,7 @@ class covarianceBase {
 
   double getParProp_PCA(const int i) {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     return fParProp_PCA(i);
@@ -170,7 +164,7 @@ class covarianceBase {
   
   double getParCurr_PCA(const int i) {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     return fParCurr_PCA(i);
@@ -186,7 +180,7 @@ class covarianceBase {
 
   const TMatrixD getTransferMatrix() {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     return TransferMat;
@@ -194,7 +188,7 @@ class covarianceBase {
 
   const TMatrixD getEigenVectors() {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     return eigen_vectors;
@@ -202,7 +196,7 @@ class covarianceBase {
 
   const TVectorD getEigenValues() {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     return eigen_values;
@@ -210,7 +204,8 @@ class covarianceBase {
 
   inline const std::vector<double> getEigenValuesMaster() {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
+
       throw;
     }
     return eigen_values_master;
@@ -218,7 +213,8 @@ class covarianceBase {
 
   void setParProp_PCA(const int i, const double value) {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
+
       throw;
     }
     fParProp_PCA(i) = value;
@@ -228,7 +224,7 @@ class covarianceBase {
 
   void setParCurr_PCA(const int i, const double value) {
     if (!pca) {
-      std::cerr << "Am not running in PCA mode" << std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     fParCurr_PCA(i) = value;
@@ -240,7 +236,7 @@ class covarianceBase {
   {
     if (!pca)
     {
-      std::cerr<<" PCA disabled"<<std::endl;
+      MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
     if (pars.size() != size_t(npars)) {
@@ -283,22 +279,20 @@ class covarianceBase {
     }
   }
   void ConstructPCA();
-#ifdef DEBUG_PCA
+  #ifdef DEBUG_PCA
   void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat);
-#endif
+  #endif
+
   // is PCA, can use to query e.g. LLH scans
   bool IsPCA() { return pca; };
 
-  double* MatrixMult(double*, double*, int);
-  double** MatrixMult(double**, double**, int);
-  TMatrixD MatrixMult(TMatrixD, TMatrixD);
   inline void MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n);
   inline double MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i);
 
   //Turn on/off true adaptive MCMC
   //Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
   void enableAdaptiveMCMC(bool enable=true){
-    use_adaptive=enable;
+    use_adaptive = enable;
     total_steps = 0; //Set these to default values
     lower_adapt = 10000;
     upper_adapt = 10000000;
@@ -310,6 +304,9 @@ class covarianceBase {
   //YAML init
   void init(std::vector<std::string> YAMLFile);
   void init(TMatrixDSym* covMat);
+
+  void randomize();
+  void CorrelateSteps();
 
   void MakePosDef(TMatrixDSym *cov = NULL);
   void makeClosestPosDef(TMatrixDSym *cov);
@@ -332,20 +329,19 @@ class covarianceBase {
   //KS: Same as above but much faster as TMatrixDSym cache miss
   double **InvertCovMatrix;
     
-  //KS: set Random numbers for each thread so each thread has differnt seed
+  //KS: set Random numbers for each thread so each thread has different seed
   TRandom3 **random_number;
 
   // For Cholesky decomposed parameter throw
   double* randParams;
-  //  TMatrixD *chel;
+  Double_t *corr_throw;
   double _fGlobalStepScale;
 
-  //KS: This is used when printing parameters, sometimes we have super long parmaeters name, we want to flexibly adjust couts
+  //KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
   unsigned int PrintLength;
 
   Double_t currLogL;
   Double_t propLogL;
-  Double_t *corr_throw;
 
   // state info (now mostly vectors)
   //ETA - duplication of some of these
@@ -365,12 +361,10 @@ class covarianceBase {
   std::vector<double> _fLowBound;
   std::vector<double> _fUpBound;
   std::vector<int> _fDetID;
-  std::vector<std::string> _fDetString;
+  //std::vector<std::string> _fDetString;
   std::vector<std::string> _fParamType;
   std::vector<double> _fIndivStepScale;
   std::vector<bool> _fFlatPrior;
-  TMatrixDSym *_fCovMatrix;
-  //TMatrixT<double> *_fCovMatrix;
 
   //Some "usual" variables. Don't think we really need the ND/FD split
   std::vector<std::vector<int>> _fNormModes;
@@ -413,10 +407,7 @@ class covarianceBase {
   //Same as above but much faster as TMatrixDSym cache miss
   double **throwMatrixCholDecomp;
 
-  void randomize();
-  void CorrelateSteps();
-
-  // Truely Adaptive Stuff
+  // Truly Adaptive Stuff
   void initialiseNewAdaptiveChain();
   // TMatrixD* getMatrixSqrt(TMatrixDSym* inputMatrix);
   // double calculateSubmodality(TMatrixD* sqrtVectorCov, TMatrixDSym* throwCov);
@@ -428,5 +419,3 @@ class covarianceBase {
   std::vector<double> par_means_prev;
   TMatrixDSym* adaptiveCovariance;
 };
-
-TH2D* TMatrixIntoTH2D(const TMatrix &Matrix, std::string title);

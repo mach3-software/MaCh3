@@ -12,30 +12,28 @@
 #include "samplePDF/Structs.h"
 
 #include "yaml-cpp/yaml.h"
-#include "manager/MaCh3Logger.h"
+
 class covarianceXsec : public covarianceBase {
 
   public:
-    covarianceXsec(const char *name, const char *file, double threshold=-1,int FirstPCAdpar=-999,int LastPCAdpar=-999);
-    covarianceXsec(std::vector<std::string> FileNames);
+    covarianceXsec(const char *name, const char *file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+    covarianceXsec(std::vector<std::string> FileNames, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     ~covarianceXsec();
+
+    //ETA - trying out the yaml parsing
+    void ParseYAML(std::vector<std::string> FileName);
 
     // Print information about the whole object once it is set
     void Print();
 
     // General Getter functions not split by detector
-	// ETA - a lot of these can go... they're just duplications from the base
-	// class.
-	//ETA - just return the int of the DetID, this can be removed to do a string comp
-	//at some point.
+    // ETA - a lot of these can go... they're just duplications from the base
+    // class.
+    //ETA - just return the int of the DetID, this can be removed to do a string comp
+    //at some point.
     int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
-	//ETA - just return a string of "spline", "norm" or "functional"
+    //ETA - just return a string of "spline", "norm" or "functional"
     const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
-
-	//ETA - trying out the yaml parsing
-	void ParseYAML(std::vector<std::string> FileName);
-
-    bool IsParFlux(const int i){ return isFlux[i]; }
 
     const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
     SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType.at(i);}
@@ -43,7 +41,7 @@ class covarianceXsec : public covarianceBase {
     //DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
-	//ETA - what does this even do?
+    //ETA - what does this even do?
     const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
@@ -52,15 +50,14 @@ class covarianceXsec : public covarianceBase {
 
     //DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
-	void SetupNormPars();
+    void SetupNormPars();
     int GetNumFuncParamsFromDetID(int DetID);
     const std::vector<std::string> GetFuncParsNamesFromDetID(int DetID);
     const std::vector<int> GetFuncParsIndexFromDetID(int DetID);
 
-
     //KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
     // For example Sigma Var are done around nominal in ND280, no idea why though...
-    std::vector<double> getNominalArray()
+    std::vector<double> getNominalArray() override
     {
       std::vector<double> nominal;
       for (int i = 0; i < size; i++)
@@ -69,9 +66,10 @@ class covarianceXsec : public covarianceBase {
       }
       return nominal;
     }
-
-    inline double getNominal(const int i) { return _fPreFitValue.at(i); };
+    inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
    
+    bool IsParFlux(const int i){ return isFlux[i]; }
+
     //KS Function to set to nominal either flux or xsec parameters
     void setXsecOnlyParameters();
     void setFluxOnlyParameters();

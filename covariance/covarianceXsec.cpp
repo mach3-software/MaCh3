@@ -2,8 +2,8 @@
 
 // ********************************************
 covarianceXsec::covarianceXsec(const char *name, const char *file,
-   	                           double threshold,int FirstPCAdpar,
-							   int LastPCAdpar)
+                                double threshold,int FirstPCAdpar,
+                                int LastPCAdpar)
   : covarianceBase(name, file,0,threshold,FirstPCAdpar,LastPCAdpar) {
 // ********************************************
  
@@ -16,29 +16,21 @@ covarianceXsec::covarianceXsec(const char *name, const char *file,
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
   } // end the for loop
 
-  //infile->Close();
-  //delete infile;
-  // Scan through the input parameters and find which are normalisation, which are splines, and so on
-  // ETA - remove for now
-  //ScanParameters();
-
   MACH3LOG_INFO("Constructing instance of covarianceXsec");
 
   initParams(0.001);
   // Print
   Print();
-
-  // Set the parameters
-  // setParameters; why is this done in testFGD2 and not here?
 }
 
 // ********************************************
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
-covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile)
-  : covarianceBase(YAMLFile) {
+covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile, double threshold, int FirstPCAdpar, int LastPCAdpar)
+               : covarianceBase(YAMLFile, threshold, FirstPCAdpar, LastPCAdpar){
 
+  setName("xsec_cov");
   ParseYAML(YAMLFile);
   SetupNormPars();
 
@@ -46,57 +38,27 @@ covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile)
   xsec_stepscale_vec.resize(_fNumPar);
 
   //ETA - again this really doesn't need to be hear...
-  for (int i = 0; i < _fNumPar; i++) {
-
-	// Sort out the print length
+  for (int i = 0; i < _fNumPar; i++)
+  {
+    // Sort out the print length
     if(_fNames[i].length() > PrintLength) PrintLength = _fNames[i].length();
 
     // DB Fill the stepscales vector
     xsec_stepscale_vec[i] = _fIndivStepScale[i];
   } // end the for loop
 
-  //infile->Close();
-  //delete infile;
-  // Scan through the input parameters and find which are normalisation, which are splines, and so on
-  // ETA- remove for now
-  //ScanParameters();
-
   MACH3LOG_INFO("Constructing instance of covarianceXsec");
   initParams(0.001);
   // Print
   Print();
-
-  // Set the parameters
-  // setParameters; why is this done in testFGD2 and not here?
 }
 
 
 void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 {
-  //KS: We can pass several yaml config files. Here we merge them into one. For example you can have yaml for xsec and flux.
-  _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < FileNames.size(); i++)
-  {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(FileNames[i]);
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
-      _fYAMLDoc["Systematics"].push_back(item);
-    }
-  }
-
-  _fNumPar = _fYAMLDoc["Systematics"].size();
-  _fNames = std::vector<std::string>(_fNumPar);
-  _fFancyNames = std::vector<std::string>(_fNumPar);
-  _fGenerated = std::vector<double>(_fNumPar);
-  _fPreFitValue = std::vector<double>(_fNumPar);
-  _fError = std::vector<double>(_fNumPar);
-  _fLowBound = std::vector<double>(_fNumPar);
-  _fUpBound = std::vector<double>(_fNumPar);
-  _fIndivStepScale = std::vector<double>(_fNumPar);
-  _fFlatPrior = std::vector<bool>(_fNumPar);
   _fDetID = std::vector<int>(_fNumPar);
-  _fCovMatrix = new TMatrixDSym(_fNumPar);
   _fParamType = std::vector<std::string>(_fNumPar);
-  _fDetString = std::vector<std::string>(_fNumPar);
+  //_fDetString = std::vector<std::string>(_fNumPar);
   isFlux.resize(_fNumPar);
   //Vector of vectors of strings to contain potentially multiple variables that
   //might be cut on
@@ -107,43 +69,19 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 
   int i = 0;
 
-  std::vector<std::map<std::string,double>> Correlations(_fNumPar);
-  std::map<std::string, int> CorrNamesMap;
-
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPars for Names,
   //PreFitValues etc etc.
-  for (auto const &param : _fYAMLDoc["Systematics"]) {
-     //std::cout << param["Systematic"]["Names"]["ParameterName"].as<std::string>() << std::endl;
-
-     _fFancyNames[i] = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
-     _fPreFitValue[i] = (param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
-     _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
-     _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
-     _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
-     _fError[i] = (param["Systematic"]["Error"].as<double>());
-	 _fParamType[i] = (param["Systematic"]["Type"].as<std::string>());
-
-	 //ETA - a bit of a fudge but works
-	 std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
-     _fLowBound[i] = TempBoundsVec[0];
-     _fUpBound[i] = TempBoundsVec[1];
-
-	 //ETA - now for parameters which are optional and have default values
-	 if (param["Systematic"]["FlatPrior"]) {
-	   _fFlatPrior[i] = param["Systematic"]["FlatPrior"].as<bool>();
-	 } else {
-	   _fFlatPrior[i] = false;
-	 }
+  for (auto const &param : _fYAMLDoc["Systematics"])
+  {
+    _fParamType[i] = (param["Systematic"]["Type"].as<std::string>());
+    _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
 
 	 //Fill the map to get the correlations later as well
-     CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
 	 int nFDSplines;
 	 //Now load in varaibles for spline systematics only
 	 if (ParamType.find("Spline") != std::string::npos) {
-
-	   //std::cout << "Reading in a Spline Parameter" << std::endl;
 
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
 		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
@@ -151,7 +89,6 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 	   }
 
 	   if (param["Systematic"]["SplineInformation"]["FDMode"]) {
-		 //std::cout << "Pushing back _fFDSplineModes for param " << i << std::endl;
 		 _fFDSplineModes.push_back(param["Systematic"]["SplineInformation"]["FDMode"].as<std::vector<int>>());
 	   }
 
@@ -175,7 +112,6 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
       }
 
 	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
-	   //std::cout << "Norm parameter" << std::endl;
  
 	   //Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
 	   std::vector<int> DummyModeVec;
@@ -249,65 +185,12 @@ void covarianceXsec::ParseYAML(std::vector<std::string> FileNames)
 	   _fKinematicPars.at(i) = TempKinematicStrings;
 	   _fKinematicBounds.at(i) = TempKinematicBounds;	   
 	 }
-       
-	 //Also loop through the correlations
-	 if(param["Systematic"]["Correlations"]) {
-	   //std::cout << "FOUND " << param["Systematic"]["Correlations"].size() << " CORRELATIONS!" << std::endl;
-	   for(unsigned int Corr_i = 0 ; Corr_i < param["Systematic"]["Correlations"].size()  ; ++Corr_i){
-		 for (YAML::const_iterator it=param["Systematic"]["Correlations"][Corr_i].begin();it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
-		   //std::cout << "Correlation with " << it->first.as<std::string>() << " of " << it->second.as<double>() << std::endl;
-           Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
-		 }
-	   }
-	 }
+
 	 if(_fFancyNames[i].find("b_")==0) isFlux[i] = true;
 	 else isFlux[i] = false;
 	 i++;
   }
-  
-	 
-  //ETA
-  //Now that we've been through all systematic let's fill the covmatrix
-  //This makes the root TCov from YAML
-  for(int i=0; i < _fNumPar; i++) {
-	(*_fCovMatrix)(i,i)=_fError[i]*_fError[i];
-	//Get the map of parameter name to correlation fomr the Correlations object
-	for (auto const& [key, val] : Correlations[i]) {
-	  int index = -1;
 
-	  //If you found the parameter name then get the index
-	  if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
-		index=CorrNamesMap[key];
-	  }
-	  else {
-		std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
-		exit(5);
-	  }
-
-	  //
-	  double Corr1 = val;
-	  double Corr2 = 0;
-	  if(Correlations[index].find(_fFancyNames[i]) != Correlations[index].end()) {
-		Corr2 = Correlations[index][_fFancyNames[i]];
-		//Do they agree to better than float precision?
-		if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
-		  std::cout << "Correlations are not equal between " << _fFancyNames[i] << " and " << key << std::endl;
-		  std::cout << "Got : " << Corr2  << " and " << Corr1 << std::endl;
-		  exit(5);
-		}
-	  } else {
-		std::cout << "Correlation does not appear reciprocally between " << _fFancyNames[i] << " and " << key << std::endl;
-		exit(5);
-	  }
-	  (*_fCovMatrix)(i,index)= (*_fCovMatrix)(index,i) = Corr1*_fError[i]*_fError[index];
-	}
-  } 
-
-  //Now make positive definite
-  MakePosDef(_fCovMatrix);
-
-  setCovMatrix(_fCovMatrix);
-   
   return;
 }
 
