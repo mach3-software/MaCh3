@@ -6,7 +6,29 @@ New features should be developed on branches in this repository with the branch 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
 ## Doxygen
-TODO
+When making comments try following Doxygen type of comments
+
+```
+// I like comments
+void Foo(){}
+```
+try
+```
+/**
+ * @brief I like comments
+ */
+void Foo(){}
+```
+After making release or tag please
+```
+cd Doc
+doxygen Doxyfile
+```
+to produce both html and latex file. To produce book like pdf file:
+```
+cd latex
+pdflatex refman.tex
+```
 
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
