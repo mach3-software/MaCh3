@@ -26,6 +26,9 @@ public:
   manager(std::string const &);
   virtual ~manager();
 
+  /**
+   * @brief Get likelihood type defined in the config
+   */
   inline int GetMCStatLLH(){return mc_stat_llh;}
 
   //Return name of config
@@ -37,10 +40,17 @@ public:
   //Add manager useful information's to TFile, in most cases to Fitter
   void SaveSettings(TFile* const OutputFile);
 
-  // Print currently used config
+  /**
+  * @brief Print currently used config
+  */
   void Print();
 
 private:
+  /**
+   * @brief KS: Prints welcome message with MaCh3 logo
+   */
+  inline void MaCh3Welcome();
+
   YAML::Node config;
   std::string FileName;
   int mc_stat_llh;
@@ -55,16 +65,10 @@ private:
 /*
  * Keeping this all here as we should start adding in functions here to do reading
  * of different options
- public:
-  manager(char *config, bool print = true);
-
 
   int readConfig(char *config);
 
 // Print and checks
-
-  //bool checkSettings();
-
 
 // Lots of yummy Get functions
   const char *GetOutputFilename() { return (const char*)output_file.c_str(); }

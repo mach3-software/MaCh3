@@ -9,7 +9,7 @@ manager::manager(std::string const &filename)
 
   FileName = filename;
   SetMaCh3LoggerFormat();
-
+  MaCh3Welcome();
   MACH3LOG_INFO("Setting config to be: {}", filename);
 
   MACH3LOG_INFO("Config is now: "); std::cout << config << std::endl;
@@ -41,7 +41,7 @@ manager::manager(std::string const &filename)
   n_cpus = omp_get_max_threads();
 #else
   cpu_mp_on = false;
-  n_cpus = 0;
+  n_cpus = 1;
 #endif
 
 #ifdef CUDA
@@ -157,35 +157,22 @@ void manager::Print() {
 }
 
 
+// *************************
+void manager::MaCh3Welcome() {
+// *************************
 
-/* Old Mananger that needs translation
- * we're moving to YAML BABY!
-
-manager::manager(char *config, bool print) {
-
-  verbosity = print;
-  if (verbosity) std::cout << std::endl << "Reading configuration from " <<
-config << std::endl;
-
-  int success = readConfig(config);
-
-  // Print the manager settings
-  if(print){
-    Print();
-  }
-
-  if (success == EXIT_FAILURE) {
-    std::cerr << "Something went wrong in the manager, check above error message
-and your config file" << std::endl; is_good_config = false; exit(EXIT_FAILURE);
-  } else {
-    is_good_config = true;
-    if (verbosity) std::cout << "Succesfully read config " << config << ", now
-proceeding" << std::endl;
-  }
-
+  MACH3LOG_INFO("##################################");
+  MACH3LOG_INFO("Welcome to:  ");
+  MACH3LOG_INFO("  __  __        _____ _     ____  ");
+  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
+  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
+  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
+  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
+  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
+  MACH3LOG_INFO("##################################");
 }
 
-
+/* Old Mananger that needs translation
 
 // Read the supplied config file
 // This is Getting pretty huge by now!
