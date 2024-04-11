@@ -1,9 +1,7 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-Markov Chain 3 flavour is frameworks which was born in 2013 as [T2K](https://t2k-experiment.org/pl/) Bayesian MCMC fitter for oscillation analysis. It has been used for multiple T2K Oscillation analysis both at Near and Far detectors throughout years.
+The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the DUNE and HK oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
 
-TODO: Add more history: maybe stuff about T2K+SK and T2K+NOvA and mention HK and DUNE
-
-Since then framework evolved and has non MCMC modules.
+The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
 
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
@@ -16,7 +14,7 @@ TODO this should be expanded
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608419#.Y-BgaC8RrpA).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/10949376) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10949376.svg)](https://doi.org/10.5281/zenodo.10949376).
 
 # How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
