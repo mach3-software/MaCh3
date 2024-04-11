@@ -7,5 +7,29 @@ DiagMCMC:
   PlotRelativeToPrior: "false"
 
 
+#########################################
+GetPenaltyTerm:
+  PenaltySets: ["Flux", "ND_Syst", "Xsec", "CCQE_Eb"]
+
+  #KS: Goes as vector with names based on which we select, true or false whether we want to be inclusive or exclusive and fancy name
+  Flux:
+    - ["b_"]
+    - false
+    - "-logL_{Flux}"
+  ND_Syst:
+    - ["NDS_"]
+    - false
+    - "-logL_{ND_Syst}"
+  Xsec:
+    - ["b_", "NDS_"]
+    #KS: For Xsec we take parameter which isn't flux or detector this is what true means here
+    - true
+    - "-logL_{Cross-Section}"
+
+  CCQE_Eb:
+    - ["EB_dial_", "Alpha_q3"]
+    - false
+    - "-logL_{CCQE Eb}"
+
 
 

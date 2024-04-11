@@ -3,6 +3,7 @@ add_custom_target(DiagApps)
 foreach(app
     DiagMCMC
     RHat
+    GetPenaltyTerm
     )
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} MaCh3::All)
