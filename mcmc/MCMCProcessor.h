@@ -40,6 +40,8 @@
 #include "TGraphPolar.h"
 #include "TMath.h"
 
+#include "samplePDF/Structs.h"
+
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
 //  and want to send off another MCMC with those values, or perhaps to LLH scans at central values
@@ -236,7 +238,7 @@ class MCMCProcessor {
     inline std::string GetDunneKaboth(const double BayesFactor);
     inline double GetSigmaValue(int sigma);
 
-    // MCMC Diagnsotic
+    // MCMC Diagnostic
     inline void PrepareDiagMCMC();
     inline void ParamTraces();
     inline void AutoCorrelation();

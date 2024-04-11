@@ -32,4 +32,92 @@ GetPenaltyTerm:
     - "-logL_{CCQE Eb}"
 
 
+#########################################
+ProcessMCMC:
+  #Select which parameters blocks to reject for example ND and FD detector, look for starting string
+  ExcludedTypes: ["ndd_", "skd_joint_"]
+  #Select which parameter names to remove, for example all flux, look for starting string
+  ExcludedNames: ["b_"]
+  #AdditionalCuts
+  Posterior1DCut: ""
+  #Posterior1DCut: "delm2_23 > 0"
 
+  #Basic settings
+  PlotRelativeToPrior: false
+  PrintToPDF: true
+  #if false it will not plot error band for parameters with flat prior
+  PlotErrorForFlatPrior: true
+  FancyNames: true
+  PlotBinValue: false
+
+  #Correlation related
+  PlotCorr: false
+  Smoothing: true
+
+  #Functionality
+  MakeCredibleIntervals: true
+  CalcBayesFactor: true
+  CalcSavageDickey: true
+  CalcBipolarPlot: false
+  MakeViolin: true
+  MakeCredibleRegions: false
+  GetTrianglePlot: true
+  #Perform some covariance stability test
+  DiagnoseCovarianceMatrix: false
+  # Assign weight to each mcmc step according to new prior
+  ReweightPrior: false
+  #Perform Kolmogorov Smirnov test, only works when at least two files are being processed
+  PerformKStest: true
+
+  #KS: Credible Intervals/Regions Cosmetic, code has default values so even if you don't pass anything still code will produce fancy plots :)
+  CredibleIntervals: [0.99, 0.90, 0.68]
+  #In case of sigma, please set CredibleInSigmas to true first
+  #CredibleIntervals: [3, 2, 1]
+  #kCyan+4, kCyan-2, kCyan-10
+  CredibleIntervalsColours: [436, 430, 422]
+
+  #If true Credible intervals should be in percentage
+  CredibleInSigmas: false
+  CredibleRegions: [0.99, 0.90, 0.68]
+  #In case of sigma, please set CredibleInSigmas to true first
+  #CredibleRegions: [3, 2, 1]
+  # kDashed, kSolid, kDotted
+  CredibleRegionStyle: [2, 1, 3]
+  #kGreen-3, kGreen-10, kGreen
+  CredibleRegionColor: [413, 406, 416]
+
+  #KS: Plot only 2D posteriors with correlations greater than 0.2
+  Post2DPlotThreshold: 0.2
+
+  # Used for diagnostic covariance matrix
+  NIntervals: 5
+
+  BayesFactor:
+    # Goes as follows: ParamName Name[Model 1, Model 2], Model1[lower, upper ], Model2[lower, upper ]
+    - ["RS_Delta_Decay", ["Isotropic", "Delta Like"], [0, 0.5], [0.5, 1]]
+    - ["PNNN_Shape", ["NN Only", "PN Only"], [-1, 0], [0, 1]]
+    - ["delm2_23", ["NH", "IH"], [-0.01, 0], [0, 0.01]]
+    - ["sin2th_23", ["LO", "UO"], [0, 0.5], [0.5, 1]]
+
+  SavageDickey:
+    - ["RS_Delta_Decay", 0.9999, [0, 1]]
+    - ["Alpha_q3", 0.0001, [0, 1]]
+    - ["MAQE", 1.13, [0, 0]]  # Last array doesn't matter as parameter has Gaussian
+    - ["EB_dial_C_nu", 12, [0, 0]]
+
+  BipolarPlot:
+    - ["RS_Delta_Decay", [0, 1]]
+
+    #KS: Feel free to pass whatever combination you like
+  TrianglePlot:
+    - ["CCQE", ["MAQE", "Pauli_Blocking_C_nu", "Optical_Potential_C", "EB_dial_C_nu"]]
+    - ["SPP", ["CA5", "MARES", "ISO_BKG"]]
+    - ["PauliOptical", ["Pauli_Blocking_C_nu", "Pauli_Blocking_O_nu", "Pauli_Blocking_C_nubar", "Pauli_Blocking_O_nubar", "Optical_Potential_C", "Optical_Potential_O"]]
+    - ["CCQE_Eb", ["EB_dial_C_nu", "EB_dial_O_nu", "EB_dial_C_nubar", "EB_dial_O_nubar", "Alpha_q3"]]
+    - ["Oscillation", ["delta_cp", "delm2_23", "sin2th_13", "sin2th_23"]]
+
+  #First param name, then new prior and new prior error
+  # apply reactor constraints [vector of param names] [vector of new central value] [vector of new prior errors]
+  PriorReweighting: [ ["sin2th_13"], [0.0220], [0.0007] ]
+  #Fancy example, not physics motivated but to show funcionality
+  PriorReweighting: [ ["MAQE", "Pauli_Blocking_C_nu"], [1.05, 0.1], [ 0.04, 0.5] ]

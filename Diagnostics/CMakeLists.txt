@@ -4,6 +4,8 @@ foreach(app
     DiagMCMC
     RHat
     GetPenaltyTerm
+    ProcessMCMC
+    PlotLLH
     )
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} MaCh3::All)

@@ -136,7 +136,36 @@ This is an example how your executable can look like using MaCh3:
 ```
 
 ## Plotting and Diagnostic
-Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics).
+Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config. Currently available utils include:
+
+**ProcessMCMC** - The main app you want to use for analysing the ND280 chain. It prints posterior distribution after burn-in the cut. Moreover, you can compare two/three different chains. There are a few options you can modify easily inside the app like selection, burn-in cut, and whether to plot xse+flux or only flux. Other functionality
+<ol>
+<li> Produce a covariance matrix with multithreading (which requires lots of RAM due to caching) </li>
+<li> Violin plots </li>
+<li> Credible intervals and regions </li>
+<li> Calculate Bayes factor and give significance based on Jeffreys scale </li>
+<li> Produce triangle plots </li>
+<li> Study covariance matrix stability </li>
+</ol>
+
+**GetPenaltyTerm** - Since xsec and flux and ND spline systeamatic are treated as the same systematic object we cannot just take log_xsec, hence we need this script, use `GetFluxPenaltyTerm MCMCChain.root config`. Parameters of relevance are loaded via config, thus you can study any combination you want. Time needed increases with number of sets :(
+
+**DiagMCMC** - Perform MCMC diagnostic like autocorrelation or trace plots.
+
+**PlotLLH** - Plot LLH scans, flexible and configurable in command line. can take any number of LLH scans as input, will use the first one as a baseline when making e.g. ratio plots. The first file must be a MaCh3 scan.
+options:
+
+    -r overlay ratio plots
+
+    -s also make plots split by sample contribution, to use this option, the LLH scan must have been run with the option `LLH_SCAN_BY_SAMPLE = true` in the config file
+
+    -g draw a grid on the plots
+
+    -l a string specifying the labels for each scan to plot in the legent. this should be a string of labels separated by semi colons, e.g.: -`l "label1;label2;label3"`
+
+    -o the name of the output pdf
+
+    -d a string specifying additional drawing options to pass to the histogram draw calls, e.g. `-d "C"` will plot smooth curves through the histogram bins. See https://root.cern/doc/master/classTHistPainter.html#HP01a for possible options.
 
 ## Help and Guidelines
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)

@@ -1026,6 +1026,8 @@ void MCMCProcessor::MakeCovariance() {
     MakePostfit();
   }
 
+  gStyle->SetPalette(55);
+
   int covBinning = nDraw;
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
   for (int i = 0; i < covBinning; ++i) 
@@ -1250,6 +1252,7 @@ void MCMCProcessor::MakeCovariance_MP() {
   TStopwatch clock;
   clock.Start();
 
+  gStyle->SetPalette(55);
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -2137,6 +2140,7 @@ double MCMCProcessor::GetSigmaValue(int sigma) {
     }
   return width;
 }
+
 
 // **************************
 // Scan the input trees
@@ -3207,8 +3211,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     FlatPrior = ParamFlat[ParType][ParamTemp];
     
     TH1D* PosteriorHist = (TH1D*) hpost[ParamNo]->Clone(Title);
-    TF1 *fun = PosteriorHist->GetFunction("Gauss");
-    delete fun;
+    RemoveFitter(PosteriorHist, "Gauss");
             
     TH1D* PriorHist = nullptr;
     //KS: If flat prior we need to have well defined bounds otherwise Prior distriution will not make sense
@@ -3263,8 +3266,8 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
     PosteriorHist->SetFillStyle(1001);
    
-    PriorHist->Draw();
-    PosteriorHist->Draw("same");
+    PriorHist->Draw("hist");
+    PosteriorHist->Draw("hist same");
 
     double ProbPrior = PriorHist->GetBinContent(PriorHist->FindBin(EvaluationPoint[k]));
     //KS: In case we go so far away that prior is 0, set this to small value to avoid dividing by 0
