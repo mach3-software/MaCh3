@@ -7,6 +7,7 @@
 
 // C i/o  for printf and others
 #include <stdio.h>
+#include <vector>
 
 // CUDA specifics
 

@@ -68,7 +68,7 @@ endif()
 #YAML for reading in config files
 set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
 set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
-CPMFindPackage(
+CPMAddPackage(
     NAME yaml-cpp
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
