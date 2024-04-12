@@ -1277,7 +1277,7 @@ void covarianceBase::resetIndivStepScale() {
   setIndivStepScale(stepScales);
 }
 
-// HI : Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
+// HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
    if (cov == NULL) {
     std::cerr << "Could not find covariance matrix you provided to setThrowMatrix" << std::endl;
@@ -1373,7 +1373,7 @@ void covarianceBase::useSeparateThrowMatrix(){
     updateThrowMatrix(covMatrix);
 }
 
-//HI: Truly adaptive MCMC!
+//HW: Truly adaptive MCMC!
 void covarianceBase::updateAdaptiveCovariance(){
   // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
   // Updates adaptive matrix
@@ -1450,7 +1450,7 @@ void covarianceBase::saveAdaptiveToFile(TString outFileName, TString systematicN
 
 }
 
-//HI Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob
+//HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob
 // Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space
 // then does Euclidean norm)
 void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)

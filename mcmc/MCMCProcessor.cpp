@@ -43,7 +43,18 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
 // ****************************
   MCMCFile = InputFile;
 
-  std::cout << "Making post-fit processor for " << MCMCFile << std::endl;
+  SetMaCh3LoggerFormat();
+
+  MACH3LOG_INFO("##################################");
+  MACH3LOG_INFO("Welcome to:  ");
+  MACH3LOG_INFO("  __  __        _____ _     ____  ");
+  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
+  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
+  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
+  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
+  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
+  MACH3LOG_INFO("##################################");
+  MACH3LOG_INFO("Making post-fit processor for: {}", MCMCFile);
 
   ParStep = nullptr;
   StepNumber = nullptr;
@@ -103,11 +114,10 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
   
-  for(int i =0; i < kNParameterEnum; i++)
+  for(int i = 0; i < kNParameterEnum; i++)
   {
     ParamTypeStartPos[i] = 0;
     nParam[i] = 0;
-    CovPos[i] = "";
   }
   //Only if GPU is enabled
   #ifdef CUDA
@@ -129,7 +139,7 @@ MCMCProcessor::~MCMCProcessor() {
 // ****************************
 
   // Close the pdf file
-  std::cout << "Closing pdf in MCMCProcessor " << CanvasName << std::endl;
+  MACH3LOG_INFO("Closing pdf in MCMCProcessor: {}", CanvasName);
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
   if (Posterior != nullptr) delete Posterior;
@@ -173,8 +183,8 @@ MCMCProcessor::~MCMCProcessor() {
 
   if(hviolin != nullptr) delete hviolin;
   if(hviolin_prior != nullptr) delete hviolin_prior;
-  if (OutputFile != nullptr) OutputFile->Close();
-  if (OutputFile != nullptr) delete OutputFile;
+  if(OutputFile != nullptr) OutputFile->Close();
+  if(OutputFile != nullptr) delete OutputFile;
   delete Chain;
 }
 
@@ -249,7 +259,7 @@ void MCMCProcessor::MakeOutputFile() {
   Posterior->SetBottomMargin(0.1);
   Posterior->SetTopMargin(0.05);
   Posterior->SetRightMargin(0.03);
-  Posterior->SetLeftMargin(0.10);
+  Posterior->SetLeftMargin(0.15);
   
   //To avoid TCanvas::Print> messages
   gErrorIgnoreLevel = kWarning;
@@ -275,7 +285,7 @@ void MCMCProcessor::MakePostfit() {
   // Check if the output file is ready
   if (OutputFile == nullptr) MakeOutputFile();
   
-  std::cout << "MCMCProcessor is making post-fit plots..." << std::endl;
+  MACH3LOG_INFO("MCMCProcessor is making post-fit plots...");
 
   // Directory for posteriors
   TDirectory *PostDir = OutputFile->mkdir("Post");
@@ -289,7 +299,7 @@ void MCMCProcessor::MakePostfit() {
   for (int i = 0; i < nDraw; ++i)
   {
     if (i % (nDraw/5) == 0)
-      std::cout << "  " << i << "/" << nDraw << " (" << int((double(i)/double(nDraw)*100.0))+1 << "%)" << std::endl;
+      MACH3LOG_INFO("  {}/{} ({}%)", i, nDraw, int((double(i)/double(nDraw)*100.0))+1 );
 
     OutputFile->cd();
     TString Title = "";
@@ -713,7 +723,8 @@ void MCMCProcessor::MakeCredibleIntervals() {
 // *********************
 
   if(hpost[0] == nullptr) MakePostfit();
-  std::cout << "Making Credible Intervals "<< std::endl;
+
+  MACH3LOG_INFO("Making Credible Intervals ");
 
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
@@ -729,8 +740,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
   }
   if(CredibleIntervals.size() != CredibleIntervalsColours.size())
   {
-    std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Size of  CredibleIntervals is not equat to size of CredibleIntervalsColours");
     throw;
   }
   const int nCredible = CredibleIntervals.size();
@@ -970,7 +980,7 @@ void MCMCProcessor::MakeViolin() {
   hviolin->SetMarkerColor(kBlue);
   hviolin->SetFillColorAlpha(kBlue, 0.35);
   hviolin->SetMarkerStyle(20);
-  hviolin->SetMarkerSize(0.5);
+  hviolin->SetMarkerSize(1.0);
   
   const double BottomMargin = Posterior->GetBottomMargin();
   Posterior->SetBottomMargin(0.2);
@@ -1755,7 +1765,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
-  std::cout << "Making Triangle Plot "<< std::endl;
+  MACH3LOG_INFO("Making Triangle Plot");
 
   const int nParamPlot = ParamNames.size();
   std::vector<int> ParamNumber;
@@ -2227,16 +2237,16 @@ void MCMCProcessor::ScanInput() {
   
   // Check order of parameter types
   ScanParameterOrder();
-  
-  std::cout << "************************************************" << std::endl;
-  std::cout << "Scanning output branches..." << std::endl;
-  std::cout << "# useful entries in tree: \033[1;32m " << nDraw  <<" \033[0m "<< std::endl;
-  std::cout << "# XSec params:  \033[1;32m " << nParam[kXSecPar] - nFlux <<" starting at "<<ParamTypeStartPos[kXSecPar] <<" \033[0m "<< std::endl;
-  std::cout << "# Flux params:   " << nFlux << std::endl;
-  std::cout << "# ND280 params: \033[1;32m " << nParam[kNDPar] <<" starting at  "<<ParamTypeStartPos[kNDPar] <<" \033[0m "<< std::endl;
-  std::cout << "# FD params:    \033[1;32m " << nParam[kFDDetPar] <<" starting at  "<<ParamTypeStartPos[kFDDetPar] <<" \033[0m "<< std::endl;
-  std::cout << "# Osc params:   \033[1;32m " << nParam[kOSCPar]   <<" starting at  "<<ParamTypeStartPos[kOSCPar]   <<" \033[0m "<< std::endl;
-  std::cout << "************************************************" << std::endl;
+  MACH3LOG_INFO("************************************************");
+  MACH3LOG_INFO("Scanning output branches...");
+  MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
+  MACH3LOG_INFO("# XSec params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar] - nFlux, ParamTypeStartPos[kXSecPar]);
+  MACH3LOG_INFO("# Flux params:   {}", nFlux);
+  MACH3LOG_INFO("# Flux params:   {}", nFlux);
+  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar] - nFlux, ParamTypeStartPos[kNDPar]);
+  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar] - nFlux, ParamTypeStartPos[kFDDetPar]);
+  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar] - nFlux, ParamTypeStartPos[kOSCPar]);
+  MACH3LOG_INFO("************************************************");
 
   nSteps = Chain->GetMaximum("step");
   // Set the step cut to be 20%
@@ -2409,63 +2419,74 @@ void MCMCProcessor::FindInputFiles() {
   TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
 
   // Get the settings for the MCMC
-  TTree *Settings = (TTree*)(TempFile->Get("Settings"));
-  if (Settings == nullptr) {
-    std::cerr << "Didn't find Settings tree in MCMC file " << MCMCFile << std::endl;
-    std::cerr << "Will try lowercase" << std::endl;
+  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  if (Config == nullptr) {
+    MACH3LOG_ERROR("Wrong form of test-statistic specified! {}", MCMCFile);
     TempFile->ls();
-    Settings = (TTree*)(TempFile->Get("settings"));
-    if (Settings == nullptr) throw;
+    throw;
+  }
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != nullptr) {
+    MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
   }
 
-  // Get the xsec Covariance matrix
-  std::string *XSecInput = 0;
-  if (Settings->SetBranchAddress("XsecCov", &XSecInput) < 0) {
-    Settings->Print();
-    std::cerr << "Couldn't find XsecCov branch in output" << std::endl;
-    Settings->Print();
-    throw;
+  YAML::Node Settings = TMacroToYAML(*Config);
+
+  bool InputNotFound = false;
+  //CW: Get the xsec Covariance matrix
+  CovPos[kXSecPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
+  if(CovPos[kXSecPar].back() == "none")
+  {
+    MACH3LOG_WARN("Couldn't find XsecCov branch in output");
+    InputNotFound = true;
   }
 
-  // And the ND Covariance matrix
-  std::string *NDInput = 0;
-  if (Settings->SetBranchAddress("NDCov", &NDInput) < 0) {
-    std::cerr << "Couldn't find NDCov branch in output" << std::endl;
-    Settings->Print();
-    throw;
+  //CW: And the ND Covariance matrix
+  CovPos[kNDPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["NDCovFile"], {"none"});
+  if(CovPos[kNDPar].back() == "none")
+  {
+    MACH3LOG_WARN("Couldn't find NDCov branch in output");
+    InputNotFound = true;
   }
 
-  // And the FD Covariance matrix
-  std::string *FDInput = 0;
-  if (Settings->SetBranchAddress("FDCov", &FDInput) < 0) {
-    std::cerr << "Couldn't find FDCov branch in output" << std::endl;
-    Settings->Print();
-    throw;
+  //CW: And the FD Covariance matrix
+  CovPos[kFDDetPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["FDCovFile"], {"none"});
+  if(CovPos[kFDDetPar].back() == "none")
+  {
+    MACH3LOG_WARN("Couldn't find FDCov branch in output");
+    InputNotFound = true;
   }
-  
-  // And the Osc Covariance matrix
-  std::string *OscInput = 0;
-  if (Settings->SetBranchAddress("oscCov", &OscInput) < 0) {
-    std::cerr << "Couldn't find oscCov branch in output" << std::endl;
-    Settings->Print();
-    throw;
+
+  //CW: And the Osc Covariance matrix
+  CovPos[kOSCPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["OscCovFile"], {"none"});
+  if(CovPos[kOSCPar].back() == "none")
+  {
+    MACH3LOG_WARN("Couldn't find OscCov branch in output");
+    InputNotFound = true;
   }
-  
-  // Write the XSecCov and TempFile
-  Settings->GetEntry(0);
+  if(InputNotFound) std::cout<<Settings<<std::endl;
+
+  if (std::getenv("MACH3") != nullptr)
+  {
+    for(unsigned int i = 0; i < CovPos[kXSecPar].size(); i++)
+      CovPos[kXSecPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+
+    for(unsigned int i = 0; i < CovPos[kNDPar].size(); i++)
+      CovPos[kNDPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+
+    for(unsigned int i = 0; i < CovPos[kFDDetPar].size(); i++)
+      CovPos[kFDDetPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+
+    for(unsigned int i = 0; i < CovPos[kOSCPar].size(); i++)
+      CovPos[kOSCPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+  }
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
-  delete Settings;
+  delete Config;
 
   // Delete the MCMCFile pointer we're reading
   TempFile->Close();
   delete TempFile;
-
-  // Save the variables
-  CovPos[kXSecPar]  = *XSecInput;
-  CovPos[kNDPar] = *NDInput;
-  CovPos[kFDDetPar] = *FDInput;
-  CovPos[kOSCPar]   = *OscInput;
 }
 
 
@@ -2473,38 +2494,24 @@ void MCMCProcessor::FindInputFiles() {
 // Read the xsec file and get the input central values and errors
 void MCMCProcessor::ReadXSecFile() {
 // ***************
-
-  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != nullptr) {
-     std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
-      CovPos[kXSecPar].insert(0, std::string(std::getenv("MACH3"))+"/");
-   }
-   
-  // Do the same for the cross-section
-  TFile *XSecFile = new TFile(CovPos[kXSecPar].c_str(), "open");
-  if (XSecFile->IsZombie()) {
-    std::cerr << "Couldn't find XSecFile " << CovPos[kXSecPar] << std::endl;
-    throw;
-  }
-  XSecFile->cd();
-
-  // Get the matrix
-  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(XSecFile->Get("xsec_cov"));
-  // Central priors
-  TVectorD *XSecPrior = (TVectorD*)(XSecFile->Get("xsec_param_prior"));
-  // Nominal values
-  TVectorD *XSecNominal = (TVectorD*)(XSecFile->Get("xsec_param_nom"));
-  // IDs
-  TMatrixT<double> *XSecID = (TMatrixD*)(XSecFile->Get("xsec_param_id"));
-  // Names
-  TObjArray* xsec_param_names = (TObjArray*)(XSecFile->Get("xsec_param_names"));
-  //Flat prior
-  TVectorD* flat_prior = (TVectorD*)(XSecFile->Get("xsec_flat_prior"));
-
-  for (int i = 0; i < XSecPrior->GetNrows(); ++i)
+  YAML::Node XSecFile;
+  XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < CovPos[kXSecPar].size(); i++)
   {
+    YAML::Node YAMLDocTemp = YAML::LoadFile(CovPos[kXSecPar][i]);
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      XSecFile["Systematics"].push_back(item);
+    }
+  }
+
+  auto systematics = XSecFile["Systematics"];
+  int i = 0;
+  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
+  {
+    auto const &param = *it;
+
     // Push back the name
-    std::string TempString = std::string(((TObjString*)xsec_param_names->At(i))->GetString());
+    std::string TempString = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
 
     //KS:Reject particular parameter names, noticed that sometimes string comparison doesn't work becasue of some weird casting of TObjString into std::string. This is rare and sooner or later we move away from TObjString so this is fine
     bool rejected = false;
@@ -2528,34 +2535,25 @@ void MCMCProcessor::ReadXSecFile() {
     } 
     else IsXsec.push_back(true);  
     
-    ParamCentral[kXSecPar].push_back( ((*XSecPrior)(i)) );
-    ParamNom[kXSecPar].push_back( ((*XSecNominal)(i)) );
-    ParamErrors[kXSecPar].push_back( std::sqrt((*XSecMatrix)(i,i)) );
-    ParamFlat[kXSecPar].push_back( (bool)(*flat_prior)(i) );
-  }
+    ParamCentral[kXSecPar].push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
+    ParamNom[kXSecPar].push_back( param["Systematic"]["ParameterValues"]["Generated"].as<double>() );
+    ParamErrors[kXSecPar].push_back( param["Systematic"]["Error"].as<double>() );
 
-  XSecFile->Close();
-  delete XSecFile;
-  delete XSecMatrix;
-  delete XSecPrior;
-  delete XSecNominal;
-  delete XSecID;
+    bool flat = false;
+    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
+    ParamFlat[kXSecPar].push_back( flat );
+  }
 }
 
 // ***************
 // Read the ND cov file and get the input central values and errors
 void MCMCProcessor::ReadNDFile() {
 // ***************
-  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != nullptr) {
-      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
-      CovPos[kNDPar].insert(0, std::string(std::getenv("MACH3"))+"/");
-   }
-   
+
     // Do the same for the ND280
-    TFile *NDdetFile = new TFile(CovPos[kNDPar].c_str(), "open");
+    TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
     if (NDdetFile->IsZombie()) {
-        std::cerr << "Couldn't find NDdetFile " << CovPos[kNDPar] << std::endl;
+        std::cerr << "Couldn't find NDdetFile " << CovPos[kNDPar].back() << std::endl;
         throw;
     }
     NDdetFile->cd();
@@ -2597,16 +2595,11 @@ void MCMCProcessor::ReadNDFile() {
 // Read the FD cov file and get the input central values and errors
 void MCMCProcessor::ReadFDFile() {
 // ***************
-  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != nullptr) {
-      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
-      CovPos[kFDDetPar].insert(0, std::string(std::getenv("MACH3"))+"/");
-   }
-   
+
     // Do the same for the FD
-    TFile *FDdetFile = new TFile(CovPos[kFDDetPar].c_str(), "open");
+    TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
     if (FDdetFile->IsZombie()) {
-        std::cerr << "Couldn't find FDdetFile " << CovPos[kFDDetPar] << std::endl;
+        std::cerr << "Couldn't find FDdetFile " << CovPos[kFDDetPar].back() << std::endl;
         throw;
     }
     FDdetFile->cd();
@@ -2637,16 +2630,11 @@ void MCMCProcessor::ReadFDFile() {
 // Read the Osc cov file and get the input central values and errors
 void MCMCProcessor::ReadOSCFile() {
 // ***************
-  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != nullptr) {
-      std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
-      CovPos[kOSCPar].insert(0, std::string(std::getenv("MACH3"))+"/");
-   }
-   
+
     // Do the same for the ND280
-    TFile *OscFile = new TFile(CovPos[kOSCPar].c_str(), "open");
+    TFile *OscFile = new TFile(CovPos[kOSCPar].back().c_str(), "open");
     if (OscFile->IsZombie()) {
-        std::cerr << "Couldn't find OSCFile " << CovPos[kOSCPar] << std::endl;
+        std::cerr << "Couldn't find OSCFile " << CovPos[kOSCPar].back() << std::endl;
         throw;
     }
     OscFile->cd();
@@ -3116,12 +3104,10 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
 
   if(hpost[0] == nullptr) MakePostfit();
 
-  std::cout<<"Calculating Bayes Factor"<<std::endl;
-
+  MACH3LOG_INFO("Calculating Bayes Factor");
   if((ParNames.size() != Model1Bounds.size()) || (Model2Bounds.size() != Model1Bounds.size())  || (Model2Bounds.size() != ModelNames.size()))
   {
-    std::cerr<<" Size doesn't match"<<std::endl;
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Size doesn't match");
     throw;
   }
   for(unsigned int k = 0; k < ParNames.size(); ++k)
@@ -3131,7 +3117,7 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
     bool skip = false;
     if(ParamNo == __UNDEF__)
     {
-      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate Bayes Factor"<<std::endl;
+      MACH3LOG_WARN("Couldn't find param {}. Will not calculate Bayes Factor", ParNames[k]);
       skip = true;
     }
     if(skip) continue;
@@ -3161,9 +3147,9 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
     std::string JeffreysScale = GetJeffreysScale(BayesFactor);
     std::string DunneKabothScale = GetDunneKaboth(BayesFactor);
 
-    std::cout<<Name<<" for "<<ParNames[k]<<std::endl;
-    std::cout<<"Following Jeffreys Scale = "<<JeffreysScale<<std::endl;
-    std::cout<<"Following Dunne-Kaboth Scale = "<<DunneKabothScale<<std::endl;
+    MACH3LOG_INFO("{} for {}", Name, ParNames[k]);
+    MACH3LOG_INFO("Following Jeffreys Scale = ", JeffreysScale);
+    MACH3LOG_INFO("Following Dunne-Kaboth Scale = ", DunneKabothScale);
     std::cout<<std::endl;
   }
   return;
@@ -3177,14 +3163,13 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
 
   if((ParNames.size() != EvaluationPoint.size()) || (Bounds.size() != EvaluationPoint.size()))
   {
-    std::cerr<<" Size doesn't match"<<std::endl; 
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Size doesn't match");
     throw;
   }
   
   if(hpost[0] == nullptr) MakePostfit();
 
-  std::cout << "Calculating Savage Dickey "<< std::endl;
+  MACH3LOG_INFO("Calculating Savage Dickey");
   TDirectory *SavageDickeyDir = OutputFile->mkdir("SavageDickey");
   SavageDickeyDir->cd();
   
@@ -3220,7 +3205,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
       int NBins = PosteriorHist->GetNbinsX();
       if(Bounds[k][0] > Bounds[k][1])
       {
-        std::cerr<<" Lower bound is higher than upper bound"<<std::endl;
+        MACH3LOG_ERROR("Lower bound is higher than upper bound");
         throw;
       }
       PriorHist = new TH1D("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
@@ -3331,7 +3316,7 @@ std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
     else if( 20 > BayesFactor) JeffreysScale = "Very strong";
     else JeffreysScale = "Decisive";
 
-    std::cout<<"Following Jeffreys Scale = "<<JeffreysScale<<std::endl;
+    MACH3LOG_INFO("Following Jeffreys Scale = {}",JeffreysScale);
     return JeffreysScale;
 }
 
@@ -3360,7 +3345,7 @@ void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<do
 
     if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
     {
-      std::cerr<<" Size of passed vectors doesn't match in ReweightPrior"<<std::endl;
+      MACH3LOG_ERROR("Size of passed vectors doesn't match in ReweightPrior");
       throw;
     }
     std::vector<int> Param;
@@ -3375,7 +3360,7 @@ void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<do
       int ParamNo = GetParamIndexFromName(Names[k]);
       if(ParamNo == __UNDEF__)
       {
-        std::cout<<"Couldn't find param "<<Names[k]<<". Can't reweight Prior"<<std::endl;
+        MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
         continue;
       }
       
@@ -3494,15 +3479,15 @@ void MCMCProcessor::PrepareDiagMCMC() {
     
   if(ParStep != nullptr)
   {
-    std::cout<<"It look like ParStep was already filled "<<std::endl;
-    std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
-    std::cout<<"it has differnt structure in both for cache hits, sorry "<<std::endl;
+    MACH3LOG_ERROR("It look like ParStep was already filled ");
+    MACH3LOG_ERROR("Eventhough it is used for MakeCovariance_MP and for DiagMCMC");
+    MACH3LOG_ERROR("it has differnt structure in both for cache hits, sorry ");
     throw;
   }
   if(nBatches == 0)
   {
-    std::cout<<"nBatches is equal to 0 "<<std::endl;
-    std::cout<<"please use SetnBatches to set other value fore exampl 20 "<<std::endl; 
+    MACH3LOG_ERROR("nBatches is equal to 0");
+    MACH3LOG_ERROR("please use SetnBatches to set other value fore exampl 20");
     throw;      
   }
     

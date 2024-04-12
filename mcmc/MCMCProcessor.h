@@ -41,6 +41,9 @@
 #include "TMath.h"
 
 #include "samplePDF/Structs.h"
+#include "manager/MaCh3Logger.h"
+#include "manager/YamlHelper.h"
+
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -116,10 +119,10 @@ class MCMCProcessor {
     inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
-    inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    inline std::string const & GetNDCov() const { return CovPos[kNDPar]; };
-    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
-    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
+    inline std::vector<std::string> const & GetXSecCov()  const { return CovPos[kXSecPar]; };
+    inline std::string const & GetNDCov() const { return CovPos[kNDPar].back(); };
+    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar].back(); };
+    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar].back(); };
     //inline std::string const & GetNDruns()   const { return NDruns; };
     //inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
@@ -252,11 +255,11 @@ class MCMCProcessor {
     std::string MCMCFile;
     std::string OutputSuffix;
     // Covariance matrix name position
-    std::vector<std::string> CovPos;
+    std::vector<std::vector<std::string>> CovPos;
     // ND runs
-    std::string NDruns;
+    //std::string NDruns;
     // ND selections
-    std::vector<std::string> NDsel;
+    //std::vector<std::string> NDsel;
 
     //Main chain storing all steps etc
     TChain *Chain;

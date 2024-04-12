@@ -35,21 +35,6 @@ manager::manager(std::string const &filename)
     mc_stat_llh = kPoisson;
   }
 
-// Get settings defined by pre-processor directives, e.g. CPU MP and GPU
-#ifdef MULTITHREAD
-  cpu_mp_on = true;
-  n_cpus = omp_get_max_threads();
-#else
-  cpu_mp_on = false;
-  n_cpus = 1;
-#endif
-
-#ifdef CUDA
-  gpu_on = true;
-#else
-  gpu_on = false;
-#endif
-
 }
 
 // *************************
@@ -134,6 +119,22 @@ void manager::SaveSettings(TFile* const OutputFile) {
   SaveBranch->Branch("FDCov",   &FD_cov_file);
   SaveBranch->Branch("oscCov",  &OSC_cov_file);
 
+
+  // Get settings defined by pre-processor directives, e.g. CPU MP and GPU
+  #ifdef MULTITHREAD
+  bool cpu_mp_on = true;
+  int n_cpus = omp_get_max_threads();
+  #else
+  bool cpu_mp_on = false;
+  int n_cpus = 1;
+  #endif
+
+  #ifdef CUDA
+  bool gpu_on = true;
+  #else
+  bool gpu_on = false;
+  #endif
+
   SaveBranch->Branch("GPU",   &gpu_on);
   SaveBranch->Branch("CPUMP", &cpu_mp_on);
   SaveBranch->Branch("nCPUs", &n_cpus);
@@ -156,7 +157,6 @@ void manager::Print() {
   std::cout << std::endl;
 }
 
-
 // *************************
 void manager::MaCh3Welcome() {
 // *************************
@@ -171,6 +171,7 @@ void manager::MaCh3Welcome() {
   MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
   MACH3LOG_INFO("##################################");
 }
+
 
 /* Old Mananger that needs translation
 
