@@ -98,6 +98,7 @@ class FitterBase {
 
   // Output
   TFile *outputFile;
+  TDirectory *CovFolder;
   TTree *outTree;
   int auto_save; // auto save every N steps
 

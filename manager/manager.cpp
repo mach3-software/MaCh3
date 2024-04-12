@@ -12,7 +12,8 @@ manager::manager(std::string const &filename)
   MaCh3Welcome();
   MACH3LOG_INFO("Setting config to be: {}", filename);
 
-  MACH3LOG_INFO("Config is now: "); std::cout << config << std::endl;
+  MACH3LOG_INFO("Config is now: ");
+  std::cout << config << std::endl;
 
   if (config["LikelihoodOptions"])
   {

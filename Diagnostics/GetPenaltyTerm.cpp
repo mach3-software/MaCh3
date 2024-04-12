@@ -44,6 +44,7 @@ double** invCovMatrix;
 
 int main(int argc, char *argv[]) 
 {
+  SetMaCh3LoggerFormat();
   if (argc != 3 )
   {
     std::cerr<< " Something went wrong " << std::endl;
@@ -308,56 +309,60 @@ void ReadXSecFile(std::string inputFile)
   // Now read the MCMC file
   TFile *TempFile = new TFile(inputFile.c_str(), "open");
 
+  // Get the matrix
+  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(TempFile->Get("CovarianceFolder/xsec_cov"));
+
   // Get the settings for the MCMC
-  TTree *Settings = (TTree*)(TempFile->Get("Settings"));
-  if (Settings == nullptr) {
-    std::cerr << "Didn't find Settings tree in MCMC file " << inputFile << std::endl;
-    std::cerr << "Will try lowercase" << std::endl;
+  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  if (Config == nullptr) {
+    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
     TempFile->ls();
-    Settings = (TTree*)(TempFile->Get("settings"));
-    if (Settings == nullptr) throw;
-  }
-      
-      // Get the xsec Covariance matrix
-  std::string *XSecInput = 0;
-  if (Settings->SetBranchAddress("XsecCov", &XSecInput) < 0) {
-    Settings->Print();
-    std::cerr << "Couldn't find XsecCov branch in output" << std::endl;
-    Settings->Print();
     throw;
   }
-  
-  Settings->GetEntry(0);
-  std::string XsecCovPos = *XSecInput;
-  
+
+  YAML::Node Settings = TMacroToYAML(*Config);
+
+  //CW: Get the xsec Covariance matrix
+  std::vector<std::string> XsecCovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
+  if(XsecCovPos.back() == "none")
+  {
+    MACH3LOG_WARN("Couldn't find XsecCov branch in output");
+    std::cout<<Settings<<std::endl;
+    throw;
+  }
+
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
   if (std::getenv("MACH3") != nullptr) {
-    std::cout << "Found MACH3 environment variable: " << std::getenv("MACH3") << std::endl;
-    XsecCovPos.insert(0, std::string(std::getenv("MACH3"))+"/");
+    MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
+    for(unsigned int i = 0; i < XsecCovPos.size(); i++)
+      XsecCovPos[i].insert(0, std::string(std::getenv("MACH3"))+"/");
   }
-  
-  // Do the same for the cross-section
-  TFile *XSecFile = new TFile(XsecCovPos.c_str(), "open");
-  if (XSecFile->IsZombie()) {
-      std::cerr << "Couldn't find XSecFile " << XsecCovPos << std::endl;
-      throw;
+
+  YAML::Node XSecFile;
+  XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < XsecCovPos.size(); i++)
+  {
+    YAML::Node YAMLDocTemp = YAML::LoadFile(XsecCovPos[i]);
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      XSecFile["Systematics"].push_back(item);
+    }
   }
-  // Get the matrix
-  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(XSecFile->Get("xsec_cov"));
-  // Central priors
-  TVectorD *XSecPrior = (TVectorD*)(XSecFile->Get("xsec_param_prior"));
-    // Names
-  TObjArray* xsec_param_names = (TObjArray*)(XSecFile->Get("xsec_param_names")); 
-  //Flat prior
-  TVectorD* flat_prior = (TVectorD*)(XSecFile->Get("xsec_flat_prior"));
+
+
   size = XSecMatrix->GetNrows();
 
-  for (int i = 0; i < size; ++i)
+  auto systematics = XSecFile["Systematics"];
+  int i = 0;
+  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
   {
-    // Push back the name
-    std::string TempString = std::string(((TObjString*)xsec_param_names->At(i))->GetString());
-    ParamNames.push_back(TempString);
-    nominal.push_back( ((*XSecPrior)(i)) );
-    isFlat.push_back( (bool)(*flat_prior)(i) );
+    auto const &param = *it;
+
+    ParamNames.push_back(param["Systematic"]["Names"]["FancyName"].as<std::string>());
+    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
+
+    bool flat = false;
+    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
+    isFlat.push_back( flat );
   }
     
   XSecMatrix->Invert();

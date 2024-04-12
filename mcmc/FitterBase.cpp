@@ -38,6 +38,10 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Auto-save every 200MB, the bigger the better https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   outTree->SetAutoSave(-200E6);
 
+  //Create TDirectory
+  CovFolder = outputFile->mkdir("CovarianceFolder");
+  outputFile->cd();
+
   // Prepare the output log file
   if (debug) debugFile.open((outfile+".log").c_str());
 
@@ -185,17 +189,17 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
 
   // Save an array of nominal
   if (save_nominal) {
-    std::vector<double> vec = cov->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(cov->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
+    CovFolder->cd();
+    double *n_vec = new double[cov->getSize()];
+    for (int i = 0; i < cov->getSize(); ++i)
+      n_vec[i] = cov->getParInit(i);
+
+    TVectorT<double> t_vec(cov->getSize(), n_vec);
+    t_vec.Write((std::string(cov->getName()) + "_prior").c_str());
     delete[] n_vec;
+
+    cov->getCovMatrix()->Write(cov->getName());
+    outputFile->cd();
   }
 
   return;
@@ -210,7 +214,7 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
   osc = oscf;
 
   if (save_nominal) {
-
+    CovFolder->cd();
     std::vector<double> vec = oscf->getNominalArray();
     size_t n = vec.size();
     double *n_vec = new double[n];
@@ -222,6 +226,7 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
     nameof = nameof.Append("_nom");
     t_vec.Write(nameof);
     delete[] n_vec;
+    outputFile->cd();
   }
 
   return;
@@ -236,6 +241,7 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
   osc2 = oscf2;
 
   if (save_nominal) {
+    CovFolder->cd();
     std::vector<double> vec = oscf->getNominalArray();
     size_t n = vec.size();
     double *n_vec = new double[n];
@@ -259,10 +265,12 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
     t_vec2.Write(nameof2);
     delete[] n_vec;
     delete[] n_vec2;
+
+    outputFile->cd();
   }
 
   // Set whether osc and osc2 should be equal (default: no for all parameters)
-  for (int i=0; i<osc->getSize(); i++) {
+  for (int i = 0; i<osc->getSize(); i++) {
     equalOscPar.push_back(0);
   }
 

@@ -18,6 +18,8 @@
 #include "TLine.h"
 #include "TROOT.h"
 
+#include "manager/manager.h"
+
 std::vector<std::string> ExtraFileNames;
 std::vector<std::string> FileLabels;
 std::vector<std::string> FileLabels_default;
@@ -636,6 +638,8 @@ int PlotLLH(){
 
 int main(int argc, char **argv)
 {
+  SetMaCh3LoggerFormat();
+
   // parse the inputs
   int c;
   while ((c = getopt(argc, argv, "o:i:l:d:srg"))!= -1) {

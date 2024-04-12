@@ -372,7 +372,7 @@ void MCMCProcessor::MakePostfit() {
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
     {
-      std::cout << "Found fixed parameter, moving on" << std::endl;
+      MACH3LOG_WARN("Found fixed parameter, moving on");
       IamVaried[i] = false;
       //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
       (*Means_HPD)(i)  = Prior;
@@ -881,9 +881,9 @@ void MCMCProcessor::MakeViolin() {
 // *********************
   //KS: Make sure we have steps
   if(!CacheMCMC) CacheSteps();
-  
-  std::cout << "Producing Violin Plot" << std::endl;
-  
+
+  MACH3LOG_INFO("Producing Violin Plot");
+
   //KS: Find min and max to make histogram in range
   double maxi_y = Chain->GetMaximum(BranchNames[0]);
   double mini_y = Chain->GetMinimum(BranchNames[0]);
@@ -1018,14 +1018,13 @@ void MCMCProcessor::MakeCovariance() {
   if (OutputFile == nullptr) MakeOutputFile();
 
   bool HaveMadeDiagonal = false;
-  std::cout << "Making post-fit covariances..." << std::endl;
-
+  MACH3LOG_INFO("Making post-fit covariances...");
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
     if ((*Covariance)(i,i) == __UNDEF__) {
       HaveMadeDiagonal = false;
-      std::cout << "Have not run diagonal elements in covariance, will do so now by calling MakePostfit()" << std::endl;
+      MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
     } else {
       HaveMadeDiagonal = true;
@@ -1137,13 +1136,13 @@ void MCMCProcessor::CacheSteps() {
   
   if(ParStep != nullptr)
   {
-      std::cout<<"It look like ParStep was already filled "<<std::endl;
-      std::cout<<"Eventhough it is used for MakeCovariance_MP and for DiagMCMC "<<std::endl; 
-      std::cout<<"it has differnt structure in both for cache hits, sorry "<<std::endl;
-      throw;
+    MACH3LOG_ERROR("It look like ParStep was already filled ");
+    MACH3LOG_ERROR("Eventhough it is used for MakeCovariance_MP and for DiagMCMC ");
+    MACH3LOG_ERROR("it has differnt structure in both for cache hits, sorry ");
+    throw;
   }
 
-  std::cout << "Caching input tree..." << std::endl;    
+  MACH3LOG_INFO("Caching input tree...");
   std::cout << "Allocating " << (sizeof(double)*nDraw*nEntries)/1.E6 << " MB" << std::endl;
   TStopwatch clock;
   clock.Start();
@@ -2421,7 +2420,7 @@ void MCMCProcessor::FindInputFiles() {
   // Get the settings for the MCMC
   TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
   if (Config == nullptr) {
-    MACH3LOG_ERROR("Wrong form of test-statistic specified! {}", MCMCFile);
+    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
     TempFile->ls();
     throw;
   }
@@ -2442,7 +2441,7 @@ void MCMCProcessor::FindInputFiles() {
   }
 
   //CW: And the ND Covariance matrix
-  CovPos[kNDPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["NDCovFile"], {"none"});
+  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
   if(CovPos[kNDPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find NDCov branch in output");
@@ -2450,7 +2449,7 @@ void MCMCProcessor::FindInputFiles() {
   }
 
   //CW: And the FD Covariance matrix
-  CovPos[kFDDetPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["FDCovFile"], {"none"});
+  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
   if(CovPos[kFDDetPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find FDCov branch in output");
@@ -2458,7 +2457,7 @@ void MCMCProcessor::FindInputFiles() {
   }
 
   //CW: And the Osc Covariance matrix
-  CovPos[kOSCPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["OscCovFile"], {"none"});
+  CovPos[kOSCPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["OscCovFile"], "none"));
   if(CovPos[kOSCPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find OscCov branch in output");
@@ -2714,7 +2713,7 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 }
 
 // **************************
-// Get the mean and RMS of a 1D posterior
+//CW: Get the mean and RMS of a 1D posterior
 void MCMCProcessor::GetArithmetic(TH1D * const hpost, const int i) {
 // **************************
   (*Means)(i) = hpost->GetMean();
@@ -2722,7 +2721,7 @@ void MCMCProcessor::GetArithmetic(TH1D * const hpost, const int i) {
 }
 
 // **************************
-// Get Gaussian characteristics
+//CW: Get Gaussian characteristics
 void MCMCProcessor::GetGaussian(TH1D *& hpost , const int i) {
 // **************************
 
@@ -2745,7 +2744,7 @@ void MCMCProcessor::GetGaussian(TH1D *& hpost , const int i) {
 
 
 // ***************
-// Get the highest posterior density from a TH1D
+//CW: Get the highest posterior density from a TH1D
 void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage) {
 // ***************
   // Get the bin which has the largest posterior density
@@ -3018,7 +3017,6 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
 
   if(hpost[0] == nullptr) MakePostfit();
 
-
   const double TopMargin = Posterior->GetTopMargin();
   const double BottomMargin = Posterior->GetBottomMargin();
   const double LeftMargin = Posterior->GetLeftMargin();
@@ -3029,7 +3027,6 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
   Posterior->SetLeftMargin(0.1);
   Posterior->SetRightMargin(0.1);
   Posterior->Update();
-
 
   std::cout << "Calculating Polar Plot "<< std::endl;
   TDirectory *PolarDir = OutputFile->mkdir("PolarDir");
@@ -3093,9 +3090,7 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
   Posterior->SetBottomMargin(BottomMargin);
   Posterior->SetLeftMargin(LeftMargin);
   Posterior->SetRightMargin(RightMargin);
-
 }
-
 
 // **************************
 // Get Bayes Factor for particualar parameter
@@ -3180,7 +3175,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     bool skip = false;
     if(ParamNo == __UNDEF__)
     {
-      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate SavageDickey"<<std::endl;
+      MACH3LOG_WARN("Couldn't find param {}. Will not calculate SavageDickey", ParNames[k]);
       skip = true;
     }
     if(skip) continue;
@@ -3471,7 +3466,7 @@ void MCMCProcessor::DiagMCMC() {
 
 
 // **************************
-// Prepare branches etc. for DiagMCMC
+//CW: Prepare branches etc. for DiagMCMC
 void MCMCProcessor::PrepareDiagMCMC() {
 // **************************
   
@@ -3523,8 +3518,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   for (int i = 0; i < nDraw; ++i) {
     ParamSums[i] = 0.0;
   }
-  
-  std::cout << "Reading input tree..." << std::endl;
+  MACH3LOG_INFO("Reading input tree...");
   TStopwatch clock;
   clock.Start();
 
@@ -3640,14 +3634,12 @@ void MCMCProcessor::PrepareDiagMCMC() {
 }
 
 // *****************
-// Draw trace plots of the parameters
-// i.e. parameter vs step
+//CW: Draw trace plots of the parameters i.e. parameter vs step
 void MCMCProcessor::ParamTraces() {
 // *****************
 
   if (ParStep == nullptr) PrepareDiagMCMC();
-  std::cout << "Making trace plots..." << std::endl;
-
+  MACH3LOG_INFO("Making trace plots...");
   // Make the TH1Ds
   TH1D** TraceParamPlots = new TH1D*[nDraw];
   TH1D** TraceSamplePlots = new TH1D*[nSamples];
@@ -3687,8 +3679,8 @@ void MCMCProcessor::ParamTraces() {
   // Loop over the number of parameters to draw their traces
   // Each histogram
 #ifdef MULTITHREAD
-  std::cout << "Using multi-threading..." << std::endl;
-#pragma omp parallel for
+  MACH3LOG_INFO("Using multi-threading...");
+  #pragma omp parallel for
 #endif
   for (int i = 0; i < nEntries; ++i) {
     // Set bin content for the ith bin to the parameter values
@@ -3754,7 +3746,7 @@ void MCMCProcessor::AutoCorrelation() {
   TStopwatch clock;
   clock.Start();
   const int nLags = AutoCorrLag;
-  std::cout << "Making auto-correlations for nLags = "<< nLags << std::endl;
+  MACH3LOG_INFO("Making auto-correlations for nLags = {}", nLags);
 
   // The sum of (Y-Ymean)^2 over all steps for each parameter
   double **DenomSum = new double*[nDraw]();
@@ -3787,10 +3779,10 @@ void MCMCProcessor::AutoCorrelation() {
     LagKPlots[j]->GetXaxis()->SetTitle("Lag");
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
-//KS: If CUDA is not enabled do calcualtions on CPU
+//KS: If CUDA is not enabled do calculations on CPU
 #ifndef CUDA
   // Loop over the lags
-  //CW: Each lag is indepdent so might as well multi-thread them!
+  //CW: Each lag is independent so might as well multi-thread them!
   #ifdef MULTITHREAD
   std::cout << "Using multi-threading..." << std::endl;
   #pragma omp parallel for
@@ -3832,7 +3824,7 @@ void MCMCProcessor::AutoCorrelation() {
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2)
   #endif
-  //KS: Now that that we recieved data from GPU convert it to CPU-like format
+  //KS: Now that that we received data from GPU convert it to CPU-like format
   for (int j = 0; j < nDraw; ++j)
   {
     for (int k = 0; k < nLags; ++k)
@@ -3977,7 +3969,7 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 
 // **************************
 // KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
-// Furthermore we calcualte Sampling efficiency follwing https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
+// Furthermore we calculate Sampling efficiency follwing https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
 // Rule of thumb is to have efficiency above 25%
 void MCMCProcessor::CalculateESS(const int nLags) {
 // **************************
@@ -4090,7 +4082,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
 }
 
 // **************************
-// Batched means, literally read from an array and chuck into TH1D
+//CW: Batched means, literally read from an array and chuck into TH1D
 void MCMCProcessor::BatchedMeans() {
 // **************************
 

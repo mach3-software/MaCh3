@@ -6,8 +6,6 @@
 mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
 
-  //random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());  
-  //ETA - currently don't have this in manager as it needs some love 
   // Beginning step number
   stepStart = 0;
 
@@ -16,9 +14,7 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
   reject = false;
   chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<double>();
 
-  //ETA - currently don't have this in manager as it needs some love
-  //AnnealTemp = fitMan->GetTemp();
-  AnnealTemp = -999;
+  AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
   if(AnnealTemp < 0) anneal = false;
   else
   {
@@ -220,13 +216,11 @@ void mcmc::ProcessMCMC() {
 
     std::vector<TString> BranchNames = Processor.GetBranchNames();
 
-    
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       std::cout << "Opening output again to update with means..." << std::endl;
       outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
     }
-
     
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
@@ -334,7 +328,7 @@ void mcmc::PrintProgress() {
 
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
     if (std::string((*it)->getName()) == "xsec_cov") {
-      std::cout << "Cross-section parameters: " << std::endl;
+      MACH3LOG_INFO("Cross-section parameters: ");
       (*it)->printNominalCurrProp();
     }
   }
