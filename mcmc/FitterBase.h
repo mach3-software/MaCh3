@@ -54,7 +54,7 @@ class FitterBase {
   // Save the output settings and MCMC
   // **********************
   // Save the settings that the MCMC was run with
-  inline void SaveSettings() { fitMan->SaveSettings(outputFile);}
+  void SaveSettings();
 
   // The manager
   manager *fitMan;

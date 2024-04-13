@@ -2,11 +2,13 @@ set(HEADERS
     manager.h
     YamlHelper.h
     MaCh3Logger.h
+    Monitor.h
 )
 
 add_library(Manager SHARED
     manager.cpp
     YamlHelper.cpp
+    Monitor.cpp
 )
 
 set_target_properties(Manager PROPERTIES

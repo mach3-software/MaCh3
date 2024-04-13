@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 1.0.0)
+SET(MaCh3_VERSION 1.1.0)
 
 # Try to find CUDA
 find_package(CUDAToolkit)

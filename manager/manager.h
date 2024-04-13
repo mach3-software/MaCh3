@@ -16,6 +16,7 @@
 
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
+#include "manager/Monitor.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;
@@ -46,11 +47,6 @@ public:
   void Print();
 
 private:
-  /**
-   * @brief KS: Prints welcome message with MaCh3 logo
-   */
-  inline void MaCh3Welcome();
-
   YAML::Node config;
   std::string FileName;
   int mc_stat_llh;
@@ -61,6 +57,11 @@ private:
   int n_cpus;
 
 };
+
+/**
+ * @brief KS: Prints welcome message with MaCh3 logo
+ */
+void MaCh3Welcome();
 
 /*
  * Keeping this all here as we should start adding in functions here to do reading

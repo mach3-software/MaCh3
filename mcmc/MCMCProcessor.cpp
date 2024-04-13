@@ -44,16 +44,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   MCMCFile = InputFile;
 
   SetMaCh3LoggerFormat();
-
-  MACH3LOG_INFO("##################################");
-  MACH3LOG_INFO("Welcome to:  ");
-  MACH3LOG_INFO("  __  __        _____ _     ____  ");
-  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
-  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
-  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
-  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
-  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
-  MACH3LOG_INFO("##################################");
+  MaCh3Welcome();
   MACH3LOG_INFO("Making post-fit processor for: {}", MCMCFile);
 
   ParStep = nullptr;
@@ -299,8 +290,10 @@ void MCMCProcessor::MakePostfit() {
   for (int i = 0; i < nDraw; ++i)
   {
     if (i % (nDraw/5) == 0)
+    {
       MACH3LOG_INFO("  {}/{} ({}%)", i, nDraw, int((double(i)/double(nDraw)*100.0))+1 );
-
+      MaCh3Utils::PrintProgressBar((double(i)/double((nDraw))));
+    }
     OutputFile->cd();
     TString Title = "";
     double Prior = 1.0;

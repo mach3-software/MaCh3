@@ -41,8 +41,7 @@
 #include "TMath.h"
 
 #include "samplePDF/Structs.h"
-#include "manager/MaCh3Logger.h"
-#include "manager/YamlHelper.h"
+#include "manager/manager.h"
 
 
 // Class to process MCMC output produced by mcmc::runMCMC

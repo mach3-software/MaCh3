@@ -78,6 +78,17 @@ FitterBase::~FitterBase() {
   std::cout << "Done!" << std::endl;
 }
 
+
+// *******************
+// Prepare the output tree
+void FitterBase::SaveSettings() {
+// *******************
+
+  fitMan->SaveSettings(outputFile);
+  std::cout << " \033[0;31m Current Total RAM usage is  " << MaCh3Utils::getValue("VmRSS")/1048576.0 << " GB \033[0m" << std::endl;
+  std::cout << " \033[0;31m Out of Total available RAM " << MaCh3Utils::getValue("MemTotal")/1048576.0 << " GB \033[0m" << std::endl;
+}
+
 // *******************
 // Prepare the output tree
 void FitterBase::PrepareOutput() {
