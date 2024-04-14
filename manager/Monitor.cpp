@@ -1,32 +1,49 @@
 #include "manager/Monitor.h"
 
-
-
 namespace MaCh3Utils {
-
 
 // ************************
 //KS: Simple function retrieving CPU info
 void GetCPUInfo(){
 // ************************
-  //KS: Use -m 1 to limit to only one grep becasue in one computing node there is a lot of CPU which are the same
-  std::cout << "================" << std::endl;
-  std::cout << "Using following CPU: " << std::endl;
-  system("cat /proc/cpuinfo | grep -m 1 name");
-  system("cat /proc/cpuinfo | grep -m 1 MHz");
-  //KS: Below code is convoluted because I moslty work on Enlgish based linux but sometiems on Polish based Linux, this ensures it works on both. We can add support for othre langauges if needed
-  std::system("lscpu | grep -i Archit");
-  std::system("lscpu | grep -i cache");
-  std::system("lscpu | grep -m 1 -E 'Thread.* per core:|Wątków na rdzeń:'");
-  std::system("lscpu | grep -m 1 -E '^CPU(:|\\(s\\)):?\\s+[0-9]+'");
-  std::cout << "================" << std::endl;
+
+  //KS: Use -m 1 to limit to only one grep because in one computing node there is a lot of CPU which are the same
+  MACH3LOG_INFO("Using following CPU:");
+
+  MACH3LOG_INFO("{}", TerminalToString("cat /proc/cpuinfo | grep -m 1 name"));
+  MACH3LOG_INFO("{}", TerminalToString("cat /proc/cpuinfo | grep -m 1 MHz"));
+  //KS: Below code is convoluted because I mostly work on English based Linux but sometimes on Polish based Linux, this ensures it works on both. We can add support for other languages if needed
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i Archit"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L1d'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L1i'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L2'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L3'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'Thread.* per core:|Wątków na rdzeń:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E '^CPU(:|\\(s\\)):?\\s+[0-9]+'"));
 
   //KS: /proc/cpuinfo and lscpu holds much more info I have limited it but one can expand it if needed
 }
 
+// ************************
+std::string TerminalToString(const char* cmd) {
+// ************************
+
+  std::array<char, 128> buffer;
+  std::string result;
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+  if (!pipe) {
+    throw std::runtime_error("popen() failed!");
+  }
+  while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+    result += buffer.data();
+  }
+  // Remove trailing newline characters
+  result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+  return result;
+}
 
 // ************************
-//KS: Simple to rtrieve speed of get entry inspired by
+//KS: Simple to retrieve speed of get entry inspired by
 void EstimateDataTransferRate(TChain* chain, const int entry){
 // ************************
 
@@ -40,15 +57,17 @@ void EstimateDataTransferRate(TChain* chain, const int entry){
   Double_t timeInSeconds = timer.RealTime();
   Double_t dataRateMBps = (double(bytesProcessed) / (1024.0 * 1024.0)) / timeInSeconds;
 
-  std::cout << "Data transfer: " << bytesProcessed << " B, rate: " << dataRateMBps << " MB/s"<<std::endl;
+  MACH3LOG_INFO("Data transfer: {} B, rate: {:.2f} MB/s", bytesProcessed, dataRateMBps);
 }
 
 
 
 // ************************
 //KS: Simply print progress bar
-void PrintProgressBar(const double progress){
+void PrintProgressBar(const int Done, const int All){
 // ************************
+
+  double progress = double((double(Done)/double(All)));
   const int barWidth = 20;
   std::ostringstream progressBar;
 
@@ -63,8 +82,7 @@ void PrintProgressBar(const double progress){
       progressBar << " ";
   }
 
-  progressBar << "] " << std::setw(3) << static_cast<int>(progress * 100.0) << "%\r";
-
+  progressBar << "] " << std::setw(3) << Done <<"/"<< All<<" ("<<static_cast<int>(progress * 100.0)<<"%)\r";
   MACH3LOG_INFO("{}", progressBar.str());
 }
 

@@ -21,6 +21,7 @@
 
 // MaCh3  includes
 #include "samplePDF/Structs.h"
+#include "manager/MaCh3Logger.h"
 
 //KS:We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4

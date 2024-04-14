@@ -291,8 +291,7 @@ void MCMCProcessor::MakePostfit() {
   {
     if (i % (nDraw/5) == 0)
     {
-      MACH3LOG_INFO("  {}/{} ({}%)", i, nDraw, int((double(i)/double(nDraw)*100.0))+1 );
-      MaCh3Utils::PrintProgressBar((double(i)/double((nDraw))));
+      MaCh3Utils::PrintProgressBar(i, nDraw);
     }
     OutputFile->cd();
     TString Title = "";
@@ -1136,7 +1135,7 @@ void MCMCProcessor::CacheSteps() {
   }
 
   MACH3LOG_INFO("Caching input tree...");
-  std::cout << "Allocating " << (sizeof(double)*nDraw*nEntries)/1.E6 << " MB" << std::endl;
+  MACH3LOG_INFO("Allocating {:.2f} MB", (sizeof(double)*nDraw*nEntries)/1.E6);
   TStopwatch clock;
   clock.Start();
   
@@ -1174,7 +1173,7 @@ void MCMCProcessor::CacheSteps() {
   for (int j = 0; j < nEntries; ++j) 
   {
     if (j % countwidth == 0)
-      std::cout << j << "/" << nEntries << " (" << double(j)/double(nEntries)*100. << "%)" << std::endl;
+        MaCh3Utils::PrintProgressBar(j, nEntries);
 
     Chain->SetBranchAddress("step", &StepNumber[j]);
     // Set the branch addresses for params
@@ -1183,8 +1182,13 @@ void MCMCProcessor::CacheSteps() {
       Chain->SetBranchAddress(BranchNames[i].Data(), &ParStep[i][j]);
     }
     
-    // Fill up the ParStep array
-    Chain->GetEntry(j);
+    if (j % countwidth == 0) {
+      MaCh3Utils::EstimateDataTransferRate(Chain, j);
+    } else {
+      // Fill up the ParStep array
+      Chain->GetEntry(j);
+    }
+
   }
   
   // Set all the branches to on
@@ -1220,7 +1224,7 @@ void MCMCProcessor::CacheSteps() {
   }
       
   clock.Stop();
-  std::cout << "Caching steps took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
+  MACH3LOG_INFO("Caching steps took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries );
 }
 
 
@@ -1248,9 +1252,8 @@ void MCMCProcessor::MakeCovariance_MP() {
     }
   }
     
- if (HaveMadeDiagonal == false) MakePostfit();
-  
-  std::cout << "Calculating covaraince matrix" << std::endl;
+  if (HaveMadeDiagonal == false) MakePostfit();
+  MACH3LOG_INFO("Calculating covaraince matrix");
   TStopwatch clock;
   clock.Start();
 
@@ -1777,7 +1780,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
     }
     if(ParamNo == __UNDEF__)
     {
-      std::cout<<"Couldn't find param "<<ParamNames[j]<<". Will not plot Triangle plot"<<std::endl;
+      MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParamNames[j]);
       return;
     }
     ParamNumber.push_back(ParamNo);
@@ -3032,7 +3035,7 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
     bool skip = false;
     if(ParamNo == __UNDEF__)
     {
-      std::cout<<"Couldn't find param "<<ParNames[k]<<". Will not calculate GetPolarPlot"<<std::endl;
+      MACH3LOG_WARN("Couldn't find param {}. Will not calculate Polar Plot", ParNames[k]);
       skip = true;
     }
     if(skip) continue;

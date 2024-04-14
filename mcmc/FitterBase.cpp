@@ -73,6 +73,7 @@ FitterBase::~FitterBase() {
   if(random != NULL) delete random;
   if(sample_llh != NULL) delete[] sample_llh;
   if(syst_llh != NULL) delete[] syst_llh;
+  if(outputFile != nullptr) delete outputFile;
   delete clock;
   delete stepClock;
   std::cout << "Done!" << std::endl;
@@ -85,8 +86,8 @@ void FitterBase::SaveSettings() {
 // *******************
 
   fitMan->SaveSettings(outputFile);
-  std::cout << " \033[0;31m Current Total RAM usage is  " << MaCh3Utils::getValue("VmRSS")/1048576.0 << " GB \033[0m" << std::endl;
-  std::cout << " \033[0;31m Out of Total available RAM " << MaCh3Utils::getValue("MemTotal")/1048576.0 << " GB \033[0m" << std::endl;
+  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
 }
 
 // *******************
@@ -148,7 +149,8 @@ void FitterBase::PrepareOutput() {
     outTree->Branch("step", &step, "step/I");
     outTree->Branch("stepTime", &stepTime, "stepTime/D");
   }
-  std::cout << "\n-------------------- Starting MCMC --------------------" << std::endl;
+
+  MACH3LOG_INFO("-------------------- Starting MCMC --------------------");
 
   if (debug) {
     PrintInitialState();
@@ -168,14 +170,15 @@ void FitterBase::SaveOutput() {
   outputFile->cd();
   outTree->Write();
 
-  std::cout << "\n" << step << " steps took " << clock->RealTime() << " seconds to complete. (" << clock->RealTime() / step << "s / step).\n" << accCount<< " steps were accepted." << std::endl;
+
+  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step, clock->RealTime(), clock->RealTime() / step);
+  MACH3LOG_INFO("{} steps were accepted.", accCount);
 
   if (debug)
   {
-      debugFile << "\n\n" << step << " steps took " << clock->RealTime() << " seconds to complete. (" << clock->RealTime() / step << "s / step).\n" << accCount<< " steps were accepted." << std::endl;
+    debugFile << "\n\n" << step << " steps took " << clock->RealTime() << " seconds to complete. (" << clock->RealTime() / step << "s / step).\n" << accCount<< " steps were accepted." << std::endl;
+    debugFile.close();
   }
-
-  if(debug) debugFile.close();
 
   outputFile->Close();
 }
@@ -184,7 +187,7 @@ void FitterBase::SaveOutput() {
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // *************************
-  std::cout << "Adding samplePDF object " << std::endl;
+  MACH3LOG_INFO("Adding {} object ", sample->GetName());
   samples.push_back(sample);
 
   return;
@@ -195,7 +198,7 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 void FitterBase::addSystObj(covarianceBase * const cov) {
 // *************************
 
-  std::cout << "Adding systematic object " << cov->getName() << std::endl;
+  MACH3LOG_INFO("Adding systematic object {}", cov->getName());
   systematics.push_back(cov);
 
   // Save an array of nominal
@@ -317,6 +320,7 @@ void FitterBase::RunLLHScan() {
   // Save the settings into the output file
   SaveSettings();
 
+  MACH3LOG_INFO("Starting LLH Scan");
   int TotalNSamples = 0;
   for(unsigned int i = 0; i < samples.size(); i++ )
   {

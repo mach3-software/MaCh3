@@ -323,8 +323,8 @@ void mcmc::ProposeStep() {
 void mcmc::PrintProgress() {
 // *******************
 
-  std::cout << "Step:\t" << step-stepStart << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
-  std::cout << "Accepted/Total steps: " << accCount << "/" << step-stepStart << " = " << double(accCount)/double(step - stepStart) << std::endl;
+  MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
+  MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
     if (std::string((*it)->getName()) == "xsec_cov") {
