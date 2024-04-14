@@ -820,7 +820,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		int bin = (*it).index;
 
 		//If syst on applies to a particular detector
-		if ((XsecCov->GetXsecParamDetID(bin) & SampleDetID)==SampleDetID) {
+		if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
 		  XsecBins.push_back(bin);
 		}
 	  } // end iteration over xsec_norms

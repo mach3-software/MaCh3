@@ -28,9 +28,9 @@ class covarianceXsec : public covarianceBase {
     // General Getter functions not split by detector
     // ETA - a lot of these can go... they're just duplications from the base class.
     //ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
-    int  GetXsecParamDetID(const int i) const {return _fDetID[i];}
+    int GetParDetID(const int i) const { return _fDetID[i];};
     //ETA - just return a string of "spline", "norm" or "functional"
-    const char*  GetXsecParamType(const int i) const {return _fParamType[i].c_str();}
+    const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
 
     const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
     SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType.at(i);}
@@ -74,22 +74,28 @@ class covarianceXsec : public covarianceBase {
   protected:
     void initParams(const double fScale);
     void setXsecParNames();
-
-    //DB StepScaleReading
-    std::vector<double> xsec_stepscale_vec;
     std::vector<bool> isFlux;
+
+    std::vector<int> _fDetID;
+    //std::vector<std::string> _fDetString;
+    std::vector<std::string> _fParamType;
+
+    //Some "usual" variables. Don't think we really need the ND/FD split
+    std::vector<std::vector<int>> _fNormModes;
+    std::vector<std::vector<int>> _fTargetNuclei;
+    std::vector<std::vector<int>> _fNeutrinoFlavour;
+    std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
+
+    //Variables related to spline systematics
+    std::vector<std::string> _fNDSplineNames;
+    std::vector<std::string> _fFDSplineNames;
+    std::vector<std::vector<int>> _fFDSplineModes;
+    std::vector<SplineInterpolation> _fSplineInterpolationType;
+
+    //Information to be able to apply generic cuts
+    std::vector<std::vector<std::string>> _fKinematicPars;
+    std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 
     //Vector containing info for normalisation systematics
     std::vector<XsecNorms4> NormParams;
-
-
-  private:
-	//ETA - do we need these now?
-	// it would be nice if we could get rid of these by checking against DetID
-	std::vector<std::string> _fNDSplineNames;
-	std::vector<std::string> _fFDSplineNames;
-	std::vector<std::vector<int>> _fFDSplineModes;
-    //A vector to store the type of interpolation used for each systematic
-    std::vector<SplineInterpolation> _fSplineInterpolationType;
-
 };

@@ -85,7 +85,6 @@ class covarianceBase {
   TMatrixDSym *getCovMatrix() { return covMatrix; };
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
   bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
-  int GetParDetID(const int i) { return _fDetID[i];};
 
   const char *getName() { return matrixName; };
   std::string GetParName(const int i) {return _fNames[i];};
@@ -357,26 +356,8 @@ class covarianceBase {
   std::vector<double> _fError;
   std::vector<double> _fLowBound;
   std::vector<double> _fUpBound;
-  std::vector<int> _fDetID;
-  //std::vector<std::string> _fDetString;
-  std::vector<std::string> _fParamType;
   std::vector<double> _fIndivStepScale;
   std::vector<bool> _fFlatPrior;
-
-  //Some "usual" variables. Don't think we really need the ND/FD split
-  std::vector<std::vector<int>> _fNormModes;
-  std::vector<std::vector<int>> _fTargetNuclei;
-  std::vector<std::vector<int>> _fNeutrinoFlavour;
-  std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
-
-  //Variables related to spline systematics
-  std::vector<std::string> _fNDSplineNames;
-  std::vector<std::string> _fFDSplineNames;
-  std::vector<std::vector<int>> _fFDSplineModes;
-
-  //Information to be able to apply generic cuts
-  std::vector<std::vector<std::string>> _fKinematicPars;
-  std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 
   //Unity for null systs to point back to
   const double Unity = 1.0;
@@ -399,6 +380,7 @@ class covarianceBase {
   std::vector<double> fParSigma_PCA;
   std::vector<int> isDecomposed_PCA;
 
+  //Adaptive MCMC
   TMatrixDSym* throwMatrix;
   TMatrixD* throwMatrix_CholDecomp;
   //Same as above but much faster as TMatrixDSym cache miss

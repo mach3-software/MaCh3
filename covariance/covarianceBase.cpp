@@ -20,10 +20,10 @@ covarianceBase::covarianceBase(std::vector<std::string> YAMLFile, double thresho
   MACH3LOG_INFO("as an input");
 
   if (threshold < 0 || threshold >= 1) {
-    MACH3LOG_INFO("    Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
-    MACH3LOG_INFO("    Please specify a number between 0 and 1");
-    MACH3LOG_INFO("    You specified: ");
-    MACH3LOG_INFO("    Am instead calling the usual non-PCA constructor...");
+    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
+    MACH3LOG_INFO("Please specify a number between 0 and 1");
+    MACH3LOG_INFO("You specified: ");
+    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
     pca = false;
   }
 
@@ -32,7 +32,10 @@ covarianceBase::covarianceBase(std::vector<std::string> YAMLFile, double thresho
   if (pca) ConstructPCA();
 }
 
+// ********************************************
 covarianceBase::covarianceBase(const char *name, const char *file, int seed) : inputFile(std::string(file)), pca(false) {
+// ********************************************
+
   #ifdef MULTITHREAD
   if(seed != 0)
   {
@@ -48,15 +51,16 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed) : i
   LastPCAdpar = -999;
 
 }
-
+// ********************************************
 covarianceBase::covarianceBase(const char *name, const char *file, int seed, double threshold, int firstpcapar, int lastpcapar) : inputFile(std::string(file)), pca(true), eigen_threshold(threshold), FirstPCAdpar(firstpcapar), LastPCAdpar(lastpcapar) {
+// ********************************************
 
   if (threshold < 0 || threshold >= 1) {
-    MACH3LOG_INFO("*** NOTE: {} {}", name, file);
-    MACH3LOG_INFO("    Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
-    MACH3LOG_INFO("    Please specify a number between 0 and 1");
-    MACH3LOG_INFO("    You specified: ");
-    MACH3LOG_INFO("    Am instead calling the usual non-PCA constructor...");
+    MACH3LOG_INFO("NOTE: {} {}", name, file);
+    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
+    MACH3LOG_INFO("Please specify a number between 0 and 1");
+    MACH3LOG_INFO("You specified: ");
+    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
     pca = false;
   }
 #ifdef MULTITHREAD
@@ -188,15 +192,15 @@ void covarianceBase::ConstructPCA() {
   temp2.ResizeTo(covMatrix->GetNrows(), npars);
 
   //First set the whole thing to 0
-  for(int iRow=0;iRow<covMatrix->GetNrows();iRow++){
-    for(int iCol=0;iCol<npars;iCol++){
-      temp2[iRow][iCol]=0;
+  for(int iRow = 0; iRow < covMatrix->GetNrows(); iRow++){
+    for(int iCol = 0; iCol < npars; iCol++){
+      temp2[iRow][iCol] = 0;
     }
   }
   //Set the first identity block
-  if(FirstPCAdpar!=0){
-    for(int iRow=0;iRow<FirstPCAdpar;iRow++){
-      temp2[iRow][iRow]=1;
+  if(FirstPCAdpar != 0){
+    for(int iRow = 0; iRow < FirstPCAdpar; iRow++){
+      temp2[iRow][iRow] = 1;
     }
   }
 
@@ -204,9 +208,9 @@ void covarianceBase::ConstructPCA() {
   temp2.SetSub(FirstPCAdpar,FirstPCAdpar,temp);
 
   //Set the second identity block
-  if(LastPCAdpar!=covMatrix->GetNrows()-1){
-    for(int iRow=0;iRow<(covMatrix->GetNrows()-1)-LastPCAdpar;iRow++){
-      temp2[LastPCAdpar+1+iRow][FirstPCAdpar+nKeptPCApars+iRow]=1;
+  if(LastPCAdpar != covMatrix->GetNrows()-1){
+    for(int iRow = 0;iRow < (covMatrix->GetNrows()-1)-LastPCAdpar; iRow++){
+      temp2[LastPCAdpar+1+iRow][FirstPCAdpar+nKeptPCApars+iRow] = 1;
     }
   }
    
@@ -277,14 +281,14 @@ void covarianceBase::init(const char *name, const char *file)
   size = covMatrix->GetNrows();
   _fNumPar = size;
     
-  InvertCovMatrix = new double*[size]();
-  throwMatrixCholDecomp = new double*[size]();
+  InvertCovMatrix = new double*[_fNumPar]();
+  throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
-  for(int i = 0; i < size; i++)
+  for(int i = 0; i < _fNumPar; i++)
   {
-    InvertCovMatrix[i] = new double[size]();
-    throwMatrixCholDecomp[i] = new double[size]();
-    for (int j = 0; j < size; j++)
+    InvertCovMatrix[i] = new double[_fNumPar]();
+    throwMatrixCholDecomp[i] = new double[_fNumPar]();
+    for (int j = 0; j < _fNumPar; j++)
     {
       InvertCovMatrix[i][j] = 0.;
       throwMatrixCholDecomp[i][j] = 0.;
@@ -453,7 +457,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
 
   MACH3LOG_INFO("Created covariance matrix from files: ");
   for(const auto &file : YAMLFile){
-    MACH3LOG_INFO(" {}", file);
+    MACH3LOG_INFO("{} ", file);
   }
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total", size);
@@ -465,14 +469,15 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
 void covarianceBase::init(TMatrixDSym* covMat) {
 
   size = covMat->GetNrows();
-  InvertCovMatrix = new double*[size]();
-  throwMatrixCholDecomp = new double*[size]();
+  _fNumPar = size;
+  InvertCovMatrix = new double*[_fNumPar]();
+  throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
-  for(int i = 0; i < size; i++) 
+  for(int i = 0; i < _fNumPar; i++)
   {
-    InvertCovMatrix[i] = new double[size]();
-    throwMatrixCholDecomp[i] = new double[size]();
-    for (int j = 0; j < size; j++) 
+    InvertCovMatrix[i] = new double[_fNumPar]();
+    throwMatrixCholDecomp[i] = new double[_fNumPar]();
+    for (int j = 0; j < _fNumPar; j++)
     {
       InvertCovMatrix[i][j] = 0.;
       throwMatrixCholDecomp[i][j] = 0.;
@@ -481,7 +486,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
   
   setCovMatrix(covMat);
 
-  ReserveMemory(size);
+  ReserveMemory(_fNumPar);
 
   std::cout << "Created covariance matrix named: " << getName() << std::endl;
 }
@@ -507,7 +512,6 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 
   setThrowMatrix(cov);
 }
-
 
 void covarianceBase::ReserveMemory(const int SizeVec) {
 
@@ -860,12 +864,12 @@ void covarianceBase::CorrelateSteps() {
     {
       if (fParSigma_PCA[i] > 0.) 
       {
-        double IndStepScale = 1;
+        double IndStepScale = 1.;
         //KS: If undecomposed parameter apply individual step scale and cholesky for better acceptance rate
         if(isDecomposed_PCA[i] >= 0)
         {
-            IndStepScale *= _fIndivStepScale[isDecomposed_PCA[i]];
-            IndStepScale *= corr_throw[isDecomposed_PCA[i]];
+          IndStepScale *= _fIndivStepScale[isDecomposed_PCA[i]];
+          IndStepScale *= corr_throw[isDecomposed_PCA[i]];
         }
         //If decomposed apply only random number
         else
@@ -977,14 +981,14 @@ void covarianceBase::printNominalCurrProp() {
   MACH3LOG_INFO("Printing parameters for {}", getName());
   // Dump out the PCA parameters too
   if (pca) {
-    std::cout << "PCA:" << "\n";
+    MACH3LOG_INFO("PCA:");
     for (int i = 0; i < npars; ++i) {
       std::cout << std::setw(PrintLength) << std::left << "PCA " << i << " Current: " << fParCurr_PCA(i) << " Proposed: " << fParProp_PCA(i) << std::endl;
     }
   }
-  std::cout << std::setw(PrintLength) << std::left << "Name" << std::setw(PrintLength) << "Prior" << std::setw(PrintLength) << "Current" << std::setw(35) << "Proposed" << "\n";
+  MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
   for (int i = 0; i < size; ++i) {
-    std::cout << std::setw(PrintLength) << std::left << GetParFancyName(i) << std::setw(PrintLength) << _fPreFitValue[i] << std::setw(PrintLength) << _fCurrVal[i] << std::setw(PrintLength) << _fPropVal[i] << "\n";
+    MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
    //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
   std::cout << std::endl;
@@ -1259,8 +1263,8 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
     std::cerr << "This indicates that something is wrong with the input matrix" << std::endl;
     throw;
   }
-  if(total_steps<2) {
-    std::cout << "Had to shift diagonal " << iAttempt << " time(s) to allow the covariance matrix to be decomposed" << std::endl;
+  if(total_steps < 2) {
+    MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
   //DB Reseting warning level
   gErrorIgnoreLevel = originalErrorWarning;
@@ -1332,7 +1336,7 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 
 // The setter
 void covarianceBase::useSeparateThrowMatrix(TString throwMatrixFileName, TString throwMatrixName, TString meansVectorName){
-  // Firstly let's check if the file exists
+// Firstly let's check if the file exists
   TFile* throwMatrixFile = new TFile(throwMatrixFileName);
   resetIndivStepScale();
   if(throwMatrixFile->IsZombie()) {
