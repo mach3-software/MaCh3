@@ -297,7 +297,7 @@ if(NOT DEFINED MaCh3_DependancyGraph)
   set(MaCh3_DependancyGraph FALSE)
 endif()
 
-if(MaCh3_DependancyGraph TRUE)
+if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL
                     COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
                     COMMAND dot -Tpng foo.dot -o foo.png
