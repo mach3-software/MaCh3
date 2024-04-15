@@ -302,6 +302,7 @@ if(MaCh3_DependancyGraph)
                     COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
                     COMMAND dot -Tpng foo.dot -o foo.png
                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                    COMMENT "Generating dependency graph"
   )
 endif()
 

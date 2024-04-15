@@ -15,7 +15,7 @@ set_target_properties(Manager PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Manager)
 
-target_link_libraries(Manager yaml-cpp spdlog MaCh3CompilerOptions)
+target_link_libraries(Manager yaml-cpp spdlog ROOT::ROOT MaCh3CompilerOptions)
 target_include_directories(Manager PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)

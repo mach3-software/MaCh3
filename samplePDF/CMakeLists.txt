@@ -16,7 +16,7 @@ add_library(SamplePDF SHARED
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
 )
 
-target_link_libraries(SamplePDF Splines Covariance Manager  MaCh3CompilerOptions)
+target_link_libraries(SamplePDF Splines Covariance MaCh3CompilerOptions)
 
 if(USE_PROB3)
     target_link_libraries(SamplePDF Prob3plusplus)

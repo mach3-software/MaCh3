@@ -310,8 +310,8 @@ void covarianceBase::init(const char *name, const char *file)
 
   infile->Close();
 
-  std::cout << "Created covariance matrix named: " << getName() << std::endl;
-  std::cout << "from file: " << file << std::endl;
+  MACH3LOG_INFO("Created covariance matrix named: {}", getName());
+  MACH3LOG_INFO("from file: {}", file);
 
   delete infile;
 }

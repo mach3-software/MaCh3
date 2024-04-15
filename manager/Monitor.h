@@ -21,6 +21,11 @@
 
 
 namespace MaCh3Utils {
+
+  /**
+   * @brief KS: Prints welcome message with MaCh3 logo
+   */
+  void MaCh3Welcome();
   //KS: Check what CPU you are using
   void GetCPUInfo();
   //KS: Convoluted code to grab output from terminal to string

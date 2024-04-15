@@ -459,11 +459,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   #endif
 #endif
   // Print some info; could probably make this to a separate function
-  MACH3LOG_INFO("--- INITIALISED {X}, {YBCD} ARRAYS ---");
+  MACH3LOG_INFO("--- INITIALISED (X), (YBCD) ARRAYS ---");
   MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
   MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
-  MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
-  MACH3LOG_INFO("Size of coefficient {y,b,c,d} array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
+  MACH3LOG_INFO("Size of x array = {:.8f} MB", double(sizeof(float)*event_size_max)/1.E6);
+  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
   MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
 
   if(SaveSplineFile) PrepareSplineFile();
@@ -601,11 +601,11 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   delete SplineFile;
 
   // Print some info; could probably make this to a separate function
-  MACH3LOG_INFO("--- INITIALISED {X}, {YBCD} ARRAYS ---");
+  MACH3LOG_INFO("--- INITIALISED (X), (YBCD) ARRAYS ---");
   MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
   MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
   MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
-  MACH3LOG_INFO("Size of coefficient {y,b,c,d} array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
+  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
   MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
 
   PrepareForGPU_TSpline3();

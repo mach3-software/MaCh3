@@ -44,7 +44,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   MCMCFile = InputFile;
 
   SetMaCh3LoggerFormat();
-  MaCh3Welcome();
+  MaCh3Utils::MaCh3Welcome();
   MACH3LOG_INFO("Making post-fit processor for: {}", MCMCFile);
 
   ParStep = nullptr;

@@ -2,6 +2,52 @@
 
 namespace MaCh3Utils {
 
+// *************************
+void MaCh3Welcome() {
+// *************************
+
+  //KS: Find MaCh3 version based on header file. There could be better way to just include version.h but as long as we don't have to hardcode version I am content
+  std::string MaCh3_VERSION = "";
+  std::string file = std::string(std::getenv("MaCh3_ROOT")) + "/version.h";
+  // Open the version.h file
+  std::ifstream versionFile(file);
+
+  // Check if the file is opened successfully
+  if (!versionFile.is_open()) {
+    MACH3LOG_ERROR("Error: Couldn't open version.h {}", file);
+    throw;
+  }
+
+  std::string line;
+  const std::string searchKey = "MaCh3_VERSION=";
+
+  // Read each line from the file
+  while (std::getline(versionFile, line)) {
+    // Search for the line containing MaCh3_VERSION
+    auto pos = line.find(searchKey);
+    if (pos != std::string::npos) {
+      // Extract the version string
+      MaCh3_VERSION = line.substr(pos + searchKey.length());
+      MaCh3_VERSION.erase(0, MaCh3_VERSION.find_first_not_of("\"")); // Remove leading quote
+      MaCh3_VERSION.erase(MaCh3_VERSION.find_last_not_of("\";") + 1); // Remove trailing quote and semicolon
+      break; // Stop searching once found
+    }
+  }
+  // Close the file
+  versionFile.close();
+
+  MACH3LOG_INFO("##################################");
+  MACH3LOG_INFO("Welcome to:  ");
+  MACH3LOG_INFO("  __  __        _____ _     ____  ");
+  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
+  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
+  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
+  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
+  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
+  MACH3LOG_INFO("Version: {}", MaCh3_VERSION);
+  MACH3LOG_INFO("##################################");
+}
+
 // ************************
 //KS: Simple function retrieving CPU info
 void GetCPUInfo(){
@@ -85,9 +131,6 @@ void PrintProgressBar(const int Done, const int All){
   progressBar << "] " << std::setw(3) << Done <<"/"<< All<<" ("<<static_cast<int>(progress * 100.0)<<"%)\r";
   MACH3LOG_INFO("{}", progressBar.str());
 }
-
-
-
 
 // ***************************************************************************
 //CW: Get memory, which is probably silly

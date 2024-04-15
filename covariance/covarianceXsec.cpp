@@ -760,36 +760,39 @@ void covarianceXsec::Print() {
 
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
-  std::cout<<"┌───┬──────────┬────────────────────┬──────────┬──────────┬──────────┐"<<std::endl;
-  std::cout << std::setw(6) << "│#" << std::setw(2) << "│" << std::setw(10) << "Global #" << std::setw(2) << "│" << std::setw(20) << "Name" << std::setw(2) << "│" << std::setw(10) << "Int. mode" << std::setw(2) << "│" << std::setw(10) << "Target" << std::setw(2) << "│" << std::setw(10) << "pdg" << std::setw(2) << "│" << std::endl;
-  std::cout<<"├───┼──────────┼────────────────────┼──────────┼──────────┼──────────┤"<<std::endl;
-    for (unsigned int i = 0; i < NormParams.size(); ++i) {
-    std::cout << std::setw(6) << std::string("│" + std::to_string(i)) << std::setw(2) << "│" << std::setw(10) << NormParams.at(i).index << std::setw(2) << "│" << std::setw(20) << NormParams.at(i).name << std::setw(2) << "│" << std::setw(10);
-    std::string TempSting = " ";
-    for(int j = 0; j < int((NormParams.at(i).modes).size()); j++){
-      TempSting += std::to_string(NormParams.at(i).modes.at(j));
-      TempSting += " ";
-    }
-    if(int((NormParams.at(i).modes).size()) == 0) TempSting += "all";
-    std::cout<< TempSting << std::setw(2) << "│" << std::setw(10);
-    TempSting = " ";
 
-    for (int j = 0; j < int((NormParams.at(i).targets).size()); j++) {
-      TempSting += std::to_string(NormParams.at(i).targets.at(j));
-      TempSting += " ";
-    }
-    if(int((NormParams.at(i).targets).size()) == 0) TempSting += "all";
-    std::cout << TempSting<< std::setw(2) << "│" << std::setw(10);
+  //KS: Consider making some class producing table..
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────┬──────────┬──────────┬──────────┐");
+  MACH3LOG_INFO("│#   │Global #  │Name                │Int. mode │Target    │pdg       │");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────┼──────────┼──────────┼──────────┤");
 
-    TempSting = " ";
-    for (int j = 0; j < int((NormParams.at(i).pdgs).size()); j++) {
-      TempSting += std::to_string(NormParams.at(i).pdgs.at(j));
-      TempSting += " ";
+  for (unsigned int i = 0; i < NormParams.size(); ++i)
+  {
+    std::string intModeString;
+    for (unsigned int j = 0; j < NormParams[i].modes.size(); j++) {
+      intModeString += std::to_string(NormParams[i].modes[j]);
+      intModeString += " ";
     }
-    if(int((NormParams.at(i).pdgs).size()) == 0) TempSting += "all";
-    std::cout << TempSting << std::setw(2) << "│" << std::endl;
+    if (NormParams[i].modes.empty()) intModeString += "all";
+
+    std::string targetString;
+    for (unsigned int j = 0; j < NormParams[i].targets.size(); j++) {
+      targetString += std::to_string(NormParams[i].targets[j]);
+      targetString += " ";
+    }
+    if (NormParams[i].targets.empty()) targetString += "all";
+
+    std::string pdgString;
+    for (unsigned int j = 0; j < NormParams[i].pdgs.size(); j++) {
+      pdgString += std::to_string(NormParams[i].pdgs[j]);
+      pdgString += " ";
+    }
+    if (NormParams[i].pdgs.empty()) pdgString += "all";
+
+    MACH3LOG_INFO("│{: <4}│{: <10}│{: <20}│{: <10}│{: <10}│{: <10}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
   }
-  std::cout<<"└───┴──────────┴────────────────────┴──────────┴──────────┴──────────┘"<<std::endl;
+  MACH3LOG_INFO("└────┴──────────┴────────────────────┴──────────┴──────────┴──────────┘");
+
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
