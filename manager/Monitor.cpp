@@ -70,6 +70,27 @@ void GetCPUInfo(){
   //KS: /proc/cpuinfo and lscpu holds much more info I have limited it but one can expand it if needed
 }
 
+
+// ************************
+//KS: Simple function retrieving GPU info
+void GetGPUInfo(){
+// ************************
+
+#ifdef CUDA
+  MACH3LOG_INFO("Using following GPU:");
+  // Print GPU name
+  MACH3LOG_INFO("GPU Name: {}", TerminalToString("nvidia-smi --query-gpu=name --format=csv,noheader"));
+  // Print number of GPUs
+  MACH3LOG_INFO("Number of GPUs: {}", TerminalToString("nvidia-smi --query-gpu=count --format=csv,noheader"));
+  // Print total VRAM
+  MACH3LOG_INFO("Total VRAM: {} MB", TerminalToString("nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits"));
+  // Print Driver Version
+  MACH3LOG_INFO("Driver Version: {}", TerminalToString("nvidia-smi --query-gpu=driver_version --format=csv,noheader"));
+#endif
+  return;
+}
+
+
 // ************************
 std::string TerminalToString(const char* cmd) {
 // ************************

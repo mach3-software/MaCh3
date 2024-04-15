@@ -28,6 +28,8 @@ namespace MaCh3Utils {
   void MaCh3Welcome();
   //KS: Check what CPU you are using
   void GetCPUInfo();
+  //KS: Check what GPU you are using
+  void GetGPUInfo();
   //KS: Convoluted code to grab output from terminal to string
   std::string TerminalToString(const char* cmd);
   //KS: Check what CPU you are using

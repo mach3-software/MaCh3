@@ -26,7 +26,7 @@
 #include "omp.h"
 #endif
 
-namespace covutils
+namespace MaCh3Utils
 {
   TH2D* TMatrixIntoTH2D(const TMatrix &Matrix, std::string title);
 

@@ -106,7 +106,7 @@ covarianceBase::~covarianceBase(){
   delete[] InvertCovMatrix;
   delete[] throwMatrixCholDecomp;
   
-  const int nThreads = covutils::GetNThreads();
+  const int nThreads = MaCh3Utils::GetNThreads();
   for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
   delete[] random_number;
   if (throwMatrix != NULL) delete throwMatrix;
@@ -266,7 +266,7 @@ void covarianceBase::init(const char *name, const char *file)
 
   PrintLength = 35;
 
-  const int nThreads = covutils::GetNThreads();
+  const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
   random_number = new TRandom3*[nThreads]();
@@ -331,7 +331,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
     }
   }
 
-  const int nThreads = covutils::GetNThreads();
+  const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
   random_number = new TRandom3*[nThreads]();
@@ -1545,22 +1545,22 @@ void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym subma
   heigen_cumulative->Write("heigen_values_cumulative");
   heigen_frac->Write("heigen_values_frac");
 
-  TH2D* heigen_vectors = covutils::TMatrixIntoTH2D(eigen_vectors, "eigen_vectors");
+  TH2D* heigen_vectors = MaCh3Utils::TMatrixIntoTH2D(eigen_vectors, "eigen_vectors");
   heigen_vectors->GetXaxis()->SetTitle("Parameter in Normal Base");
   heigen_vectors->GetYaxis()->SetTitle("Parameter in Decomposed Base");
   heigen_vectors->Write("heigen_vectors");
   eigen_vectors.Write("eigen_vectors");
 
-  TH2D* SubsetPCA = covutils::TMatrixIntoTH2D(temp, "SubsetPCA");
+  TH2D* SubsetPCA = MaCh3Utils::TMatrixIntoTH2D(temp, "SubsetPCA");
   SubsetPCA->GetXaxis()->SetTitle("Parameter in Normal Base");
   SubsetPCA->GetYaxis()->SetTitle("Parameter in Decomposed Base");
 
   SubsetPCA->Write("hSubsetPCA");
   temp.Write("SubsetPCA");
-  TH2D* hTransferMat = covutils::TMatrixIntoTH2D(TransferMat, "hTransferMat");
+  TH2D* hTransferMat = MaCh3Utils::TMatrixIntoTH2D(TransferMat, "hTransferMat");
   hTransferMat->GetXaxis()->SetTitle("Parameter in Normal Base");
   hTransferMat->GetYaxis()->SetTitle("Parameter in Decomposed Base");
-  TH2D* hTransferMatT = covutils::TMatrixIntoTH2D(TransferMatT, "hTransferMatT");
+  TH2D* hTransferMatT = MaCh3Utils::TMatrixIntoTH2D(TransferMatT, "hTransferMatT");
 
   hTransferMatT->GetXaxis()->SetTitle("Parameter in Decomposed Base");
   hTransferMatT->GetYaxis()->SetTitle("Parameter in Normal Base");

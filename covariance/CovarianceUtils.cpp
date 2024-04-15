@@ -1,8 +1,7 @@
 #include "covariance/CovarianceUtils.h"
 
-namespace covutils
+namespace MaCh3Utils
 {
-
   int GetNThreads()
   {
     #ifdef MULTITHREAD

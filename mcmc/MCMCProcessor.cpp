@@ -45,6 +45,8 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
 
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
+  MaCh3Utils::GetCPUInfo();
+  MaCh3Utils::GetGPUInfo();
   MACH3LOG_INFO("Making post-fit processor for: {}", MCMCFile);
 
   ParStep = nullptr;
