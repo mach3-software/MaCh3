@@ -260,12 +260,12 @@ void mcmc::ProposeStep() {
 
   // Only reweight when we have a good parameter configuration
   // This speeds things up considerably because for every bad parameter configuration we don't have to reweight the MC
-  if (!reject) {
-
+  if (!reject)
+  {
     // Could multi-thread this
     // But since sample reweight is multi-threaded it's probably better to do that
-    for (size_t i = 0; i < samples.size(); i++) {
-
+    for (size_t i = 0; i < samples.size(); ++i)
+    {
       // If we're running with different oscillation parameters for neutrino and anti-neutrino
       if (osc ){ 
         samples[i]->reweight(osc->getPropPars());
@@ -277,7 +277,7 @@ void mcmc::ProposeStep() {
     }
 
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
-    for (size_t i = 0; i < samples.size(); i++) {
+    for (size_t i = 0; i < samples.size(); ++i) {
       // Get the sample likelihoods and add them
       sample_llh[i] = samples[i]->GetLikelihood();
       llh += sample_llh[i];
@@ -288,7 +288,7 @@ void mcmc::ProposeStep() {
 
   // For when we don't have to reweight, set sample to madness
   } else {
-    for (size_t i = 0; i < samples.size(); i++) {
+    for (size_t i = 0; i < samples.size(); ++i) {
       // Set the sample_llh[i] to be madly high also to signify a step out of bounds
       sample_llh[i] = __LARGE_LOGL__;
       #ifdef DEBUG

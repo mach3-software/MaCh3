@@ -9,9 +9,9 @@ class mcmc : public FitterBase {
 
   void runMCMC() override;
 
-  inline void setChainLength(int L) { chainLength = L; };
+  inline void setChainLength(unsigned int L) { chainLength = L; };
 
-  inline void setInitialStepNumber(const int stepNum = 0){stepStart = stepNum;};
+  inline void setInitialStepNumber(const unsigned int stepNum = 0){stepStart = stepNum;};
   
  private:
 
@@ -32,7 +32,7 @@ class mcmc : public FitterBase {
 
   bool reject; // Do we reject based on hitting boundaries in systs
 
-  int chainLength; // number of steps in chain
+  unsigned int chainLength; // number of steps in chain
 
   // simulated annealing
   bool anneal; 

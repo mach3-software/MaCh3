@@ -47,7 +47,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
 
   if (step % 10000 == 0)
   {
-      std::cout << "Iteration " << step << std::endl;
+    MACH3LOG_INFO("Iteration {}", step);
   }
 
   stepClock->Start();
