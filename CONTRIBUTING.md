@@ -25,3 +25,7 @@ it is advised to used logger
 ```
 MACH3LOG_ERROR("Something is wrong");
 ```
+spdlog by default will print whole float. Achieve what `std::precision(2)` you can do
+```
+MACH3LOG_INFO("Here is full LLH but I only show 2 significant figues {:.2f} GB\033[0m", LLH);
+```
