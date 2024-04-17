@@ -38,6 +38,10 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Auto-save every 200MB, the bigger the better https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   outTree->SetAutoSave(-200E6);
 
+  FileSaved = false;
+  SettingsSaved = false;
+  OutputPrepared = false;
+
   //Create TDirectory
   CovFolder = outputFile->mkdir("CovarianceFolder");
   outputFile->cd();
@@ -58,9 +62,9 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   //checking ["Fitter"]["FitTestLikelihood"]
   if(fitMan->raw()["General"]["Fitter"])
   {
-	if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"]){
-	  fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
-	}
+    if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"]){
+      fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
+    }
   }
 
 }
@@ -70,13 +74,14 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // Destructor: close the logger and output file
 FitterBase::~FitterBase() {
 // *************************
+  SaveOutput();
   if(random != NULL) delete random;
   if(sample_llh != NULL) delete[] sample_llh;
   if(syst_llh != NULL) delete[] syst_llh;
   if(outputFile != nullptr) delete outputFile;
   delete clock;
   delete stepClock;
-  std::cout << "Done!" << std::endl;
+  MACH3LOG_INFO("Closing MaCh3 Fitter Engine");
 }
 
 
@@ -85,9 +90,20 @@ FitterBase::~FitterBase() {
 void FitterBase::SaveSettings() {
 // *******************
 
+  if(SettingsSaved) return;
   fitMan->SaveSettings(outputFile);
   MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
   MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
+
+  MACH3LOG_INFO("#####Current Setup#####");
+  MACH3LOG_INFO("Number of covariances: {}", systematics.size());
+  for(unsigned int i = 0; i < systematics.size(); i++)
+    MACH3LOG_INFO("{}: Cov name: {}",i,  systematics[i]->getName());
+  MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
+  for(unsigned int i = 0; i < systematics.size(); i++)
+    MACH3LOG_INFO("{}: SamplePDF name: {}",i , samples[i]->GetName());
+
+  SettingsSaved = true;
 }
 
 // *******************
@@ -95,6 +111,7 @@ void FitterBase::SaveSettings() {
 void FitterBase::PrepareOutput() {
 // *******************
 
+  if(OutputPrepared) return;
   //MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not
   if(!fTestLikelihood)
   {
@@ -158,18 +175,20 @@ void FitterBase::PrepareOutput() {
   }
   // Time the progress
   clock->Start();
+
+  OutputPrepared = true;
 }
 
 // *******************
 void FitterBase::SaveOutput() {
 // *******************
 
+  if(FileSaved) return;
   //Stop Clock
   clock->Stop();
 
   outputFile->cd();
   outTree->Write();
-
 
   MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step, clock->RealTime(), clock->RealTime() / step);
   MACH3LOG_INFO("{} steps were accepted.", accCount);
@@ -181,6 +200,7 @@ void FitterBase::SaveOutput() {
   }
 
   outputFile->Close();
+  FileSaved = true;
 }
 
 // *************************
@@ -311,7 +331,6 @@ void FitterBase::PrintInitialState() {
   }
 }
 
-
 // *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
@@ -384,7 +403,6 @@ void FitterBase::RunLLHScan() {
   // Loop over the covariance classes
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
-
     if (std::string((*it)->getName()) == "xsec_cov")
     {
       isxsec = true;
@@ -444,7 +462,7 @@ void FitterBase::RunLLHScan() {
       if (upper > (*it)->GetUpperBound(i)) {
         upper = (*it)->GetUpperBound(i);
       }
-      std::cout << "Scanning " << name << " with " << n_points << " steps, \nfrom " << lower << " - " << upper << ", prior = " << prior << std::endl;
+      MACH3LOG_INFO("Scanning {} with {} steps, from {} - {}, prior = {}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
       TH1D *hScan = new TH1D((name+"_full").c_str(), (name+"_full").c_str(), n_points, lower, upper);
@@ -495,11 +513,10 @@ void FitterBase::RunLLHScan() {
       }
 
       // Scan over the parameter space
-      for (int j = 0; j < n_points; j++) {
-
-        if (j % countwidth == 0) {
-          std::cout << j << "/" << n_points << " (" << double(j)/double(n_points) * 100 << "%)" << std::endl;
-        }
+      for (int j = 0; j < n_points; j++)
+      {
+        if (j % countwidth == 0)
+          MaCh3Utils::PrintProgressBar(j, n_points);
 
         // For PCA we have to do it differently
         if (IsPCA) {
@@ -662,5 +679,201 @@ void FitterBase::RunLLHScan() {
       }
     }
   }
+  SaveOutput();
+}
+
+
+// *************************
+// Run 2D LLH scan
+void FitterBase::Run2DLLHScan() {
+// *************************
+
+  // Save the settings into the output file
+  SaveSettings();
+
+  TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
+  std::vector<std::string> SkipVector;
+  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  {
+    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    std::cout<<" Found skip vector with "<<SkipVector.size()<<" entries "<<std::endl;
+  }
+
+  // Number of points we do for each LLH scan
+  const int n_points = 20;
+  // We print 5 reweights
+  const int countwidth = double(n_points)/double(5);
+
+  bool isxsec = false;
+  // Loop over the covariance classes
+  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  {
+    if (std::string((*it)->getName()) == "xsec_cov")
+    {
+      isxsec = true;
+    } else {
+      isxsec = false;
+    }
+    // Scan over all the parameters
+    // Get the number of parameters
+    int npars = (*it)->getSize();
+    bool IsPCA = (*it)->IsPCA();
+    if (IsPCA) npars = (*it)->getNpars();
+
+    for (int i = 0; i < npars; ++i)
+    {
+
+      std::string name_x = (*it)->GetParName(i);
+      if (IsPCA) name_x += "_PCA";
+      // For xsec we can get the actual name, hurray for being informative
+      if (isxsec) name_x = (*it)->GetParFancyName(i);
+
+      // Get the parameter priors and bounds
+      double prior_x = (*it)->getParInit(i);
+      if (IsPCA) prior_x = (*it)->getParCurr_PCA(i);
+
+      // Get the covariance matrix and do the +/- nSigma
+      double nSigma = 1;
+      if (IsPCA) nSigma = 0.5;
+      // Set lower and upper bounds relative the prior
+      double lower_x = prior_x - nSigma*(*it)->getDiagonalError(i);
+      double upper_x = prior_x + nSigma*(*it)->getDiagonalError(i);
+      // If PCA, transform these parameter values to the PCA basis
+      if (IsPCA) {
+        lower_x = prior_x - nSigma*sqrt(((*it)->getEigenValues())(i));
+        upper_x = prior_x + nSigma*sqrt(((*it)->getEigenValues())(i));
+
+        std::cout << "eval " << i << " = " << (*it)->getEigenValues()(i) << std::endl;
+        std::cout << "prior " << i << " = " << prior_x << std::endl;
+        std::cout << "lower " << i << " = " << lower_x << std::endl;
+        std::cout << "upper " << i << " = " << upper_x << std::endl;
+        std::cout << "nSigma " << nSigma << std::endl;
+      }
+
+      // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
+      if (lower_x < (*it)->GetLowerBound(i)) {
+        lower_x = (*it)->GetLowerBound(i);
+      }
+      if (upper_x > (*it)->GetUpperBound(i)) {
+        upper_x = (*it)->GetUpperBound(i);
+      }
+
+      bool skip = false;
+      for(unsigned int is = 0; is < SkipVector.size(); is++)
+      {
+        if(name_x.substr(0, SkipVector[is].length()) == SkipVector[is])
+        {
+          skip = true;
+          break;
+        }
+      }
+      if(skip) continue;
+
+      for (int j = 0; j < i; ++j)
+      {
+        std::string name_y = (*it)->GetParName(j);
+        if (IsPCA) name_y += "_PCA";
+        // For xsec we can get the actual name, hurray for being informative
+        if (isxsec) name_y = (*it)->GetParFancyName(j);
+
+        bool skip = false;
+        for(unsigned int is = 0; is < SkipVector.size(); is++)
+        {
+          if(name_y.substr(0, SkipVector[is].length()) == SkipVector[is])
+          {
+            skip = true;
+            break;
+          }
+        }
+        if(skip) continue;
+
+        // Get the parameter priors and bounds
+        double prior_y = (*it)->getParInit(j);
+        if (IsPCA) prior_y = (*it)->getParCurr_PCA(j);
+
+        // Set lower and upper bounds relative the prior
+        double lower_y = prior_y - nSigma*(*it)->getDiagonalError(j);
+        double upper_y = prior_y + nSigma*(*it)->getDiagonalError(j);
+        // If PCA, transform these parameter values to the PCA basis
+        if (IsPCA) {
+          lower_y = prior_y - nSigma*sqrt(((*it)->getEigenValues())(j));
+          upper_y = prior_y + nSigma*sqrt(((*it)->getEigenValues())(j));
+
+          std::cout << "eval " << j << " = " << (*it)->getEigenValues()(j) << std::endl;
+          std::cout << "prior " << j << " = " << prior_y << std::endl;
+          std::cout << "lower " << j << " = " << lower_y << std::endl;
+          std::cout << "upper " << j << " = " << upper_y << std::endl;
+          std::cout << "nSigma " << nSigma << std::endl;
+        }
+
+        // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
+        if (lower_y < (*it)->GetLowerBound(j)) {
+          lower_y = (*it)->GetLowerBound(j);
+        }
+        if (upper_y > (*it)->GetUpperBound(j)) {
+          upper_y = (*it)->GetUpperBound(j);
+        }
+        MACH3LOG_INFO("Scanning X {} with {} steps, from {} - {}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
+        MACH3LOG_INFO("Scanning Y {} with {} steps, from {} - {}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
+
+        TH2D *hScanSam = new TH2D((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+        hScanSam->GetXaxis()->SetTitle(name_x.c_str());
+        hScanSam->GetYaxis()->SetTitle(name_y.c_str());
+        hScanSam->GetZaxis()->SetTitle("2LLH_sam");
+
+        // Scan over the parameter space
+        for (int x = 0; x < n_points; x++)
+        {
+          if (x % countwidth == 0)
+            MaCh3Utils::PrintProgressBar(x, n_points);
+
+          for (int y = 0; y < n_points; y++)
+          {
+            // For PCA we have to do it differently
+            if (IsPCA) {
+              (*it)->setParProp_PCA(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
+              (*it)->setParProp_PCA(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
+            } else {
+              // Set the parameter
+              (*it)->setParProp(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
+              (*it)->setParProp(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
+            }
+
+            // Reweight the MC
+            double *fake = 0;
+            for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
+              samples[ivs]->reweight(fake);
+            }
+
+            // Get the -log L likelihoods
+            double samplellh = 0;
+            for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
+              samplellh += samples[ivs]->GetLikelihood();
+            }
+            hScanSam->SetBinContent(x+1, y+1, 2*samplellh);
+          }// end loop over y points
+        } // end loop over x points
+
+        Sample_2DLLH->cd();
+        hScanSam->Write();
+
+        delete hScanSam;
+        hScanSam = nullptr;
+
+        // Reset the parameters to their prior central values
+        if (IsPCA) {
+          (*it)->setParProp_PCA(i, prior_x);
+          (*it)->setParProp_PCA(j, prior_y);
+        } else {
+          (*it)->setParProp(i, prior_x);
+          (*it)->setParProp(j, prior_y);
+        }
+      } //end loop over systematics y
+    }//end loop over systematics X
+  }//end loop covariance classes
+
+  Sample_2DLLH->Write();
+  delete Sample_2DLLH;
+
   SaveOutput();
 }

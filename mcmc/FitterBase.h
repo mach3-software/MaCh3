@@ -44,6 +44,7 @@ class FitterBase {
 
   virtual void runMCMC() = 0;
   void RunLLHScan();
+  void Run2DLLHScan();
  protected:
   // Prepare the output file
   void PrepareOutput();
@@ -107,5 +108,9 @@ class FitterBase {
   bool save_nominal;
 
   bool fTestLikelihood;
+
+  bool FileSaved;
+  bool SettingsSaved;
+  bool OutputPrepared;
 };
 
