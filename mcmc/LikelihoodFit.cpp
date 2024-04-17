@@ -105,21 +105,22 @@ double LikelihoodFit::CalcChi2(const double* x) {
     //GetLikelihood will return LargeL if out of bounds, for minimizers this is not the problem, while calcLikelihood will return actual likelihood
     syst_llh[stdIt] = (*it)->CalcLikelihood();
     llh += syst_llh[stdIt];
-
+    #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
+    #endif
   }
   // Could multi-thread this
   // But since sample reweight is multi-threaded it's probably better to do that
   for (size_t i = 0; i < samples.size(); i++)
   {
-      // If we're running with different oscillation parameters for neutrino and anti-neutrino
-      if (osc) {
-		samples[i]->reweight(osc->getPropPars());
+    // If we're running with different oscillation parameters for neutrino and anti-neutrino
+    if (osc) {
+      samples[i]->reweight(osc->getPropPars());
       // If we aren't using any oscillation
-	  } else {
-		double* fake = NULL;
-		samples[i]->reweight(fake);
-	  }
+      } else {
+        double* fake = NULL;
+        samples[i]->reweight(fake);
+    }
   }
 
   //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
@@ -127,7 +128,9 @@ double LikelihoodFit::CalcChi2(const double* x) {
     // Get the sample likelihoods and add them
     sample_llh[i] = samples[i]->GetLikelihood();
     llh += sample_llh[i];
+    #ifdef DEBUG
     if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
+    #endif
   }
 
   // Save the proposed likelihood (class member)

@@ -10,7 +10,6 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
   stepStart = 0;
 
   // Starting parameters should be thrown
-  init_pos = false;
   reject = false;
   chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<double>();
 
@@ -29,7 +28,6 @@ mcmc::~mcmc() {
 // *************************
 
 }
-
 
 // *************************
 // Load starting positions from the end of a previous chain
@@ -53,35 +51,11 @@ void mcmc::ReadParsFromFile(std::string file) {
   }
 
   posts->GetEntry(posts->GetEntries()-1);
-  for (int i = 0; i < nbr; ++i) {
-    init_pars.insert( std::pair<TString, double>(branch_names[i], branch_vals[i]));
-  }
 
   delete[] branch_names;
   delete[] branch_vals;
-  init_pos = true;
   infile->Close();
   delete infile;
-}
-
-// *************************
-// When we've passed a previous MCMC chain, now find the starting value
-double mcmc::FindStartingValue(std::string par_name) {
-// *************************
-
-  if (!init_pos) {
-    std::cout << "- Can't find starting value, file not specified!" << std::endl;
-    throw;
-  }
-
-  std::map<TString, double>::const_iterator it = init_pars.find(par_name);
-
-  if (it == init_pars.end()) {
-    std::cout << "- Can't find parameter of name " << par_name << std::endl;
-    throw;
-  }
-
-  return it->second;
 }
 
 // **********************
@@ -109,7 +83,9 @@ void mcmc::CheckStep() {
     accept = false;
   }
 
+  #ifdef DEBUG
   if (debug) debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
+  #endif
 
   // Update all the handlers to accept the step
   if (accept && !reject) {
@@ -132,7 +108,6 @@ void mcmc::CheckStep() {
   outTree->Fill();
 }
 
-
 // *******************
 // Run the Markov chain with all the systematic objects added
 void mcmc::runMCMC() {
@@ -152,8 +127,8 @@ void mcmc::runMCMC() {
   logLCurr = logLProp;
 
   // Begin MCMC
-  for (step = stepStart; step < stepStart+chainLength; step++) {
-
+  for (step = stepStart; step < stepStart+chainLength; ++step)
+  {
     stepClock->Start();
     // Set the initial rejection to false
     reject = false;
@@ -252,7 +227,9 @@ void mcmc::ProposeStep() {
     // Add the oscillation likelihoods to the reconfigure likelihoods
     llh += osc_llh;
 
+    #ifdef DEBUG
     if (debug) debugFile << "LLH for oscillation handler: " << llh << std::endl;
+    #endif
   }
 
   int stdIt = 0;
@@ -261,22 +238,24 @@ void mcmc::ProposeStep() {
 
     // Could throw the initial value here to do MCMC stability studies
     // Propose the steps for the systematics
-    if (!osc_only) {
-      (*it)->proposeStep();
-    }
+    (*it)->proposeStep();
 
     // Get the likelihood from the systematics
     syst_llh[stdIt] = (*it)->GetLikelihood();
     llh += syst_llh[stdIt];
 
+    #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
+    #endif
   }
 
   // Check if we've hit a boundary in the systematics
   // In this case we can save time by not having to reconfigure the simulation
   if (llh >= __LARGE_LOGL__) {
     reject = true;
+    #ifdef DEBUG
     if (debug) debugFile << "Rejecting based on boundary" << std::endl;
+    #endif
   }
 
   // Only reweight when we have a good parameter configuration
@@ -302,7 +281,9 @@ void mcmc::ProposeStep() {
       // Get the sample likelihoods and add them
       sample_llh[i] = samples[i]->GetLikelihood();
       llh += sample_llh[i];
+      #ifdef DEBUG
       if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
+      #endif
     }
 
   // For when we don't have to reweight, set sample to madness
@@ -310,7 +291,9 @@ void mcmc::ProposeStep() {
     for (size_t i = 0; i < samples.size(); i++) {
       // Set the sample_llh[i] to be madly high also to signify a step out of bounds
       sample_llh[i] = __LARGE_LOGL__;
+      #ifdef DEBUG
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
+      #endif
     }
   }
 
@@ -332,9 +315,10 @@ void mcmc::PrintProgress() {
       (*it)->printNominalCurrProp();
     }
   }
-
+  #ifdef DEBUF
   if (debug) {
     debugFile << "\n-------------------------------------------------------" << std::endl;
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
   }
+  #endif
 }

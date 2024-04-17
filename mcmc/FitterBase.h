@@ -26,19 +26,12 @@ class FitterBase {
 
  public:
   FitterBase(manager * const fitMan);
-  ~FitterBase();
+  virtual ~FitterBase();
 
   void addSamplePDF(samplePDFBase* sample);
   void addSystObj(covarianceBase* cov);
   void addOscHandler(covarianceOsc* oscf); // change this as covOsc now belongs to covBase
   void addOscHandler(covarianceOsc* osca, covarianceOsc *oscb);
-
-  void setOscOnly(bool yes) { osc_only = yes; };
-  // determines whether to force osc1 and osc2 to use same mass hierarchy
-  void setEqualMH(bool eq) { equalMH = eq; };
-  void setEqualOscPar(int par) { equalOscPar[par] = 1; };
-
-  bool getOscOnly() { return osc_only; };
 
   void PrintInitialState();
 
@@ -60,15 +53,8 @@ class FitterBase {
   // The manager
   manager *fitMan;
 
-  // fit types
-  bool osc_only; // don't fit nuisance parameters
-  // Determines whether oscillation parameters are equal (ie. osc2[i] = osc[i])
-  std::vector<int> equalOscPar;
-  // determines whether to force osc1 and osc2 to use same mass hierarchy
-  bool equalMH;
-
   // current state
-  int step; // current step
+  unsigned int step; // current step
   double logLCurr; // current likelihood
   double logLProp; // proposed likelihood
   double accProb; // current acceptance prob
@@ -91,8 +77,7 @@ class FitterBase {
   // benchmarking, file IO, debugging  etc
   TStopwatch* clock;
   TStopwatch* stepClock;
-  bool debug;
-  ofstream debugFile; // Output file
+  double stepTime;
 
   // Random number
   TRandom3* random;
@@ -103,14 +88,16 @@ class FitterBase {
   TTree *outTree;
   int auto_save; // auto save every N steps
 
-  double stepTime;
-
   bool save_nominal;
-
   bool fTestLikelihood;
-
+  //Checks to not repeat some operations
   bool FileSaved;
   bool SettingsSaved;
   bool OutputPrepared;
+
+  #ifdef DEBUG
+  bool debug;
+  std::ofstream debugFile; // Output file
+  #endif
 };
 

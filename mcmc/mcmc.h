@@ -9,12 +9,9 @@ class mcmc : public FitterBase {
 
   void runMCMC() override;
 
-  void setChainLength(int L) { chainLength = L; };
+  inline void setChainLength(int L) { chainLength = L; };
 
-  // initial parameters
-  bool StartingParsLoaded(){return init_pos;};
-
-  void setInitialStepNumber(int stepNum = 0){stepStart = stepNum;};
+  inline void setInitialStepNumber(const int stepNum = 0){stepStart = stepNum;};
   
  private:
 
@@ -32,8 +29,6 @@ class mcmc : public FitterBase {
 
   // Load starting positions from the end of a previous chain
   inline void ReadParsFromFile(std::string file);
-  // Find starting positions from the end of a previous chain
-  inline double FindStartingValue(std::string par_file);
 
   bool reject; // Do we reject based on hitting boundaries in systs
 
@@ -42,10 +37,6 @@ class mcmc : public FitterBase {
   // simulated annealing
   bool anneal; 
   double AnnealTemp;
-
-  // starting positions
-  bool init_pos; // have the starting parameters been set manually?
-  std::map< TString, double > init_pars;
 
   int stepStart;
 };

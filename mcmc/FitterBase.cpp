@@ -17,12 +17,12 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 
   clock = new TStopwatch;
   stepClock = new TStopwatch;
+  #ifdef DEBUG
   // Fit summary and debug info
   debug = fitMan->raw()["General"]["Debug"].as<bool>();
-  std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
+  #endif
 
-  // Could set these from manager which is passed!
-  osc_only = false;
+  std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
 
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
@@ -46,16 +46,18 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   CovFolder = outputFile->mkdir("CovarianceFolder");
   outputFile->cd();
 
+  #ifdef DEBUG
   // Prepare the output log file
   if (debug) debugFile.open((outfile+".log").c_str());
+  #endif
 
   // Clear the samples and systematics
   samples.clear();
   systematics.clear();
   osc = NULL;
 
-  sample_llh = NULL;
-  syst_llh = NULL;
+  sample_llh = nullptr;
+  syst_llh = nullptr;
 
   fTestLikelihood = false;
   //ETA - No guarantee that "Fitter" field exists so check this first before
@@ -75,9 +77,9 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 FitterBase::~FitterBase() {
 // *************************
   SaveOutput();
-  if(random != NULL) delete random;
-  if(sample_llh != NULL) delete[] sample_llh;
-  if(syst_llh != NULL) delete[] syst_llh;
+  if(random != nullptr) delete random;
+  if(sample_llh != nullptr) delete[] sample_llh;
+  if(syst_llh != nullptr) delete[] syst_llh;
   if(outputFile != nullptr) delete outputFile;
   delete clock;
   delete stepClock;
@@ -168,11 +170,12 @@ void FitterBase::PrepareOutput() {
   }
 
   MACH3LOG_INFO("-------------------- Starting MCMC --------------------");
-
+  #ifdef DEBUG
   if (debug) {
     PrintInitialState();
     debugFile << "----- Starting MCMC -----" << std::endl;
   }
+  #endif
   // Time the progress
   clock->Start();
 
@@ -192,12 +195,13 @@ void FitterBase::SaveOutput() {
 
   MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step, clock->RealTime(), clock->RealTime() / step);
   MACH3LOG_INFO("{} steps were accepted.", accCount);
-
+  #ifdef DEBUG
   if (debug)
   {
     debugFile << "\n\n" << step << " steps took " << clock->RealTime() << " seconds to complete. (" << clock->RealTime() / step << "s / step).\n" << accCount<< " steps were accepted." << std::endl;
     debugFile.close();
   }
+  #endif
 
   outputFile->Close();
   FileSaved = true;
@@ -303,14 +307,6 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
     outputFile->cd();
   }
 
-  // Set whether osc and osc2 should be equal (default: no for all parameters)
-  for (int i = 0; i<osc->getSize(); i++) {
-    equalOscPar.push_back(0);
-  }
-
-  // Set whether to force osc and osc2 to use the same mass hierarchy (default: no)
-  equalMH = false;
-
   return;
 }
 
@@ -319,6 +315,8 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
 // Print our initial state for the chain
 void FitterBase::PrintInitialState() {
 // **********************
+
+  #ifdef DEBUG
   if (debug) {
     for (size_t i = 0; i < systematics.size(); ++i) {
       debugFile << "\nnominal values for " << systematics[i]->getName() << std::endl;
@@ -329,6 +327,7 @@ void FitterBase::PrintInitialState() {
     }
     debugFile << std::endl;
   }
+  #endif
 }
 
 // *************************
