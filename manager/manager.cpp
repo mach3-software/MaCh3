@@ -64,36 +64,6 @@ void manager::SaveSettings(TFile* const OutputFile) {
   MaCh3Config.ReadFile(FileName.c_str());
   MaCh3Config.Write();
 
-  if (std::getenv("MaCh3_ROOT") == NULL) {
-    MACH3LOG_ERROR("Need MaCh3_ROOT environment variable");
-    MACH3LOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
-    throw;
-  }
-
-  if (std::getenv("MACH3") == NULL) {
-    MACH3LOG_ERROR("Need MACH3 environment variable");
-    throw;
-  }
-
-  std::string header_path = std::string(std::getenv("MACH3"));
-  header_path += "/version.h";
-  FILE* file = fopen(header_path.c_str(), "r");
-  //KS: It is better to use experiment specific header file. If given experiment didn't provide it we gonna use one given by Core MaCh3.
-  if (!file)
-  {
-    header_path = std::string(std::getenv("MaCh3_ROOT"));
-    header_path += "/version.h";
-  }
-  else
-  {
-    fclose(file);
-  }
-
-  // EM: embed the cmake generated version.h file
-  TMacro versionHeader("version_header", "version_header");
-  versionHeader.ReadFile(header_path.c_str());
-  versionHeader.Write();
-
   // The Branch!
   TTree *SaveBranch = new TTree("Settings", "Settings");
 

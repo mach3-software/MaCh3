@@ -12,6 +12,7 @@ class LikelihoodFit : public FitterBase {
 
     virtual void runMCMC() = 0;
 
+    virtual inline std::string GetName()const {return "LikelihoodFit";};
   protected:
     void PrepareFit();
     int NPars;

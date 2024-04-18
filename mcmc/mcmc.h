@@ -13,6 +13,7 @@ class mcmc : public FitterBase {
 
   inline void setInitialStepNumber(const unsigned int stepNum = 0){stepStart = stepNum;};
   
+  inline std::string GetName()const {return "MCMC";};
  private:
 
   // Process MCMC output

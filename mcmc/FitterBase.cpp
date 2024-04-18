@@ -92,7 +92,52 @@ void FitterBase::SaveSettings() {
 // *******************
 
   if(SettingsSaved) return;
+
+  outputFile->cd();
+
+  TDirectory* MaCh3Version = outputFile->mkdir("MaCh3Engine");
+  MaCh3Version->cd();
+
+  if (std::getenv("MaCh3_ROOT") == NULL) {
+    MACH3LOG_ERROR("Need MaCh3_ROOT environment variable");
+    MACH3LOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
+    throw;
+  }
+
+  if (std::getenv("MACH3") == NULL) {
+    MACH3LOG_ERROR("Need MACH3 environment variable");
+    throw;
+  }
+
+  std::string header_path = std::string(std::getenv("MACH3"));
+  header_path += "/version.h";
+  FILE* file = fopen(header_path.c_str(), "r");
+  //KS: It is better to use experiment specific header file. If given experiment didn't provide it we gonna use one given by Core MaCh3.
+  if (!file)
+  {
+    header_path = std::string(std::getenv("MaCh3_ROOT"));
+    header_path += "/version.h";
+  }
+  else
+  {
+    fclose(file);
+  }
+
+  // EM: embed the cmake generated version.h file
+  TMacro versionHeader("version_header", "version_header");
+  versionHeader.ReadFile(header_path.c_str());
+  versionHeader.Write();
+
+  TNamed Engine(GetName(), GetName());
+  Engine.Write(GetName().c_str());
+
+  MaCh3Version->Write();
+  delete MaCh3Version;
+
+  outputFile->cd();
+
   fitMan->SaveSettings(outputFile);
+
   MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
   MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
 

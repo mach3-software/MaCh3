@@ -13,6 +13,8 @@ class MinuitFit : public LikelihoodFit {
 
   void runMCMC() override;
 
+  inline std::string GetName()const {return "MinuitFit";};
+
   private:
     ROOT::Math::Minimizer* minuit;
 };

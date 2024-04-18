@@ -53,6 +53,7 @@ class FitterBase {
    */
   void Run2DLLHScan();
 
+  virtual inline std::string GetName()const {return "FitterBase";};
 protected:
   /**
    * @brief Prepare the output file.
