@@ -3,24 +3,18 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <map>
-
-#include "TTree.h"
-#include "TString.h"
-
-#include "TVectorT.h"
 
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
 #include "covariance/covarianceOsc.h"
-#include "covariance/covarianceXsec.h"
 
 #include "manager/manager.h"
-#include "MCMCProcessor.h"
+#include "mcmc/MCMCProcessor.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TRandom3;
 class TStopwatch;
+class TTree;
 
 class FitterBase {
 
@@ -28,41 +22,74 @@ class FitterBase {
   FitterBase(manager * const fitMan);
   virtual ~FitterBase();
 
+  /**
+   * @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
+   *
+   * @param sample A pointer to a sample PDF object derived from samplePDFBase.
+   */
   void addSamplePDF(samplePDFBase* sample);
+  /**
+   * @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
+   *
+   * @param cov A pointer to a Covariance object derived from covarianceBase.
+   */
   void addSystObj(covarianceBase* cov);
-  void addOscHandler(covarianceOsc* oscf); // change this as covOsc now belongs to covBase
+
+  void addOscHandler(covarianceOsc* oscf);
   void addOscHandler(covarianceOsc* osca, covarianceOsc *oscb);
 
-  void PrintInitialState();
-
+  /**
+   * @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
+   */
   virtual void runMCMC() = 0;
+  /**
+   * @brief Perform a 1D likelihood scan.
+   */
   void RunLLHScan();
+  /**
+   * @brief Perform a 2D likelihood scan.
+   *
+   * @warning This operation may take a significant amount of time, especially for complex models.
+   */
   void Run2DLLHScan();
- protected:
-  // Prepare the output file
+
+protected:
+  /**
+   * @brief Prepare the output file.
+   */
   void PrepareOutput();
 
-  // Save output and close files
+  /**
+   * @brief Save output and close files.
+   */
   void SaveOutput();
 
-  // Save the output settings and MCMC
-  // **********************
-  // Save the settings that the MCMC was run with
+  /**
+   * @brief Save the settings that the MCMC was run with.
+   */
   void SaveSettings();
 
   // The manager
   manager *fitMan;
 
   // current state
-  unsigned int step; // current step
-  double logLCurr; // current likelihood
-  double logLProp; // proposed likelihood
-  double accProb; // current acceptance prob
-  int accCount; // counts accepted steps
+  unsigned int step;
+  // current likelihood
+  double logLCurr;
+  // proposed likelihood
+  double logLProp;
+  // current acceptance prob
+  double accProb;
+  // counts accepted steps
+  int accCount;
 
-  double osc_llh; // oscillation covariance llh
-  double *sample_llh; // store the llh breakdowns
-  double *syst_llh; // systematic llh breakdowns
+  //LLH for samples/syst objects
+  // oscillation covariance llh
+  double osc_llh;
+  // store the llh breakdowns
+  double *sample_llh;
+  // systematic llh breakdowns
+  double *syst_llh;
 
   // Sample holder
   std::vector<samplePDFBase*> samples;
@@ -88,14 +115,17 @@ class FitterBase {
   TTree *outTree;
   int auto_save; // auto save every N steps
 
-  bool save_nominal;
+  //Necessary for some fitting algorithms like PSO
   bool fTestLikelihood;
+  bool save_nominal;
+
   //Checks to not repeat some operations
   bool FileSaved;
   bool SettingsSaved;
   bool OutputPrepared;
 
   #ifdef DEBUG
+  //For debugging
   bool debug;
   std::ofstream debugFile; // Output file
   #endif

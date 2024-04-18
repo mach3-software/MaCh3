@@ -669,7 +669,7 @@ void splineFDBase::PrepForReweight()
 	  { // Loop over systematics
 		for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
 		{ // Loop over modes
-		  bool isFlat = false;
+		  //bool isFlat = false;
 		  for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
 		  { // Loop over first dimension
 			for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)

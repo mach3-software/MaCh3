@@ -446,8 +446,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
     }
     if(BadXCounter == 5) MACH3LOG_WARN("There is more unutilised knots although I will stop spamming");
   }
-
-  std::cout<<"Found in total "<<BadXCounter<<" BAD X" << std::endl;
+  MACH3LOG_WARN("Found in total {} BAD X", BadXCounter);
 #ifdef Weight_On_SplineBySpline_Basis
   // Make the array that holds all the returned weights from the GPU to pass to the CPU
   cpu_weights_var = new float[NSplines_valid]();
@@ -477,8 +476,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 // *****************************************
 
   #ifdef Weight_On_SplineBySpline_Basis
-    std::cerr<<" Trying to load Monolith from file using weight by weight base, this is not supported right now, sorry"<<std::endl;
-    throw;
+  MACH3LOG_ERROR("Trying to load Monolith from file using weight by weight base, this is not supported right now, sorry");
+  throw;
   #endif
 
   if (std::getenv("MACH3") != NULL) {

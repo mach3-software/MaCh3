@@ -2,6 +2,7 @@
 
 #include "TRandom.h"
 #include "TStopwatch.h"
+#include "TTree.h"
 
 // *************************
 // Initialise the manager and make it an object of FitterBase class
@@ -54,7 +55,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Clear the samples and systematics
   samples.clear();
   systematics.clear();
-  osc = NULL;
+  osc = nullptr;
 
   sample_llh = nullptr;
   syst_llh = nullptr;
@@ -68,9 +69,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
       fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
     }
   }
-
 }
-
 
 // *************************
 // Destructor: close the logger and output file
@@ -119,8 +118,8 @@ void FitterBase::PrepareOutput() {
   {
     // Check that we have added samples
     if (!samples.size()) {
-      std::cerr << "No samples! Stopping MCMC" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      MACH3LOG_CRITICAL("No samples Found! If this is what you want find me here");
+      MACH3LOG_CRITICAL("{}:{}", __FILE__, __LINE__);
       throw;
     }
 
@@ -312,26 +311,6 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
   return;
 }
 
-
-// **********************
-// Print our initial state for the chain
-void FitterBase::PrintInitialState() {
-// **********************
-
-  #ifdef DEBUG
-  if (debug) {
-    for (size_t i = 0; i < systematics.size(); ++i) {
-      debugFile << "\nnominal values for " << systematics[i]->getName() << std::endl;
-      std::vector<double> noms = systematics[i]->getNominalArray();
-      for (size_t j = 0; j < noms.size(); ++j) {
-        debugFile << noms[j] << " ";
-      }
-    }
-    debugFile << std::endl;
-  }
-  #endif
-}
-
 // *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
@@ -356,7 +335,7 @@ void FitterBase::RunLLHScan() {
   if(fitMan->raw()["General"]["LLHScanSkipVector"])
   {
     SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
-    std::cout<<" Found skip vector with "<<SkipVector.size()<<" entries "<<std::endl;
+    MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
   // Now finally get onto the LLH scan stuff
@@ -463,7 +442,7 @@ void FitterBase::RunLLHScan() {
       if (upper > (*it)->GetUpperBound(i)) {
         upper = (*it)->GetUpperBound(i);
       }
-      MACH3LOG_INFO("Scanning {} with {} steps, from {} - {}, prior = {}", name, n_points, lower, upper, prior);
+      MACH3LOG_INFO("Scanning {} with {} steps, from {:.2f} - {:.2f}, prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
       TH1D *hScan = new TH1D((name+"_full").c_str(), (name+"_full").c_str(), n_points, lower, upper);
@@ -680,7 +659,6 @@ void FitterBase::RunLLHScan() {
       }
     }
   }
-  SaveOutput();
 }
 
 
@@ -697,7 +675,7 @@ void FitterBase::Run2DLLHScan() {
   if(fitMan->raw()["General"]["LLHScanSkipVector"])
   {
     SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
-    std::cout<<" Found skip vector with "<<SkipVector.size()<<" entries "<<std::endl;
+    MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
   // Number of points we do for each LLH scan
@@ -876,5 +854,4 @@ void FitterBase::Run2DLLHScan() {
   Sample_2DLLH->Write();
   delete Sample_2DLLH;
 
-  SaveOutput();
 }

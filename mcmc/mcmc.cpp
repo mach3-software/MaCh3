@@ -17,7 +17,7 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
   if(AnnealTemp < 0) anneal = false;
   else
   {
-    std::cout << "- Enabling simulated annealing with T = " << AnnealTemp << std::endl;
+    MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
     anneal = true;
   }
 }
@@ -33,7 +33,7 @@ mcmc::~mcmc() {
 // Load starting positions from the end of a previous chain
 void mcmc::ReadParsFromFile(std::string file) {
 // *************************
-  std::cout << "MCMC getting starting position from " << file << std::endl;
+  MACH3LOG_INFO("MCMC getting starting position from {}", file);
 
   TFile *infile = new TFile(file.c_str(), "READ");
   TTree *posts = (TTree*)infile->Get("posteriors");
@@ -193,7 +193,7 @@ void mcmc::ProcessMCMC() {
 
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
-      std::cout << "Opening output again to update with means..." << std::endl;
+      MACH3LOG_INFO("Opening output again to update with means..");
       outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
     }
     
