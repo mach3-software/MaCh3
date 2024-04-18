@@ -140,5 +140,5 @@ Example of chain diagnostic utils can be found [here](https://github.com/mach3-s
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
-
+- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
 
