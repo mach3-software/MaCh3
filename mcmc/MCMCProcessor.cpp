@@ -267,7 +267,7 @@ void MCMCProcessor::MakeOutputFile() {
 
 
 // ****************************
-// Function to make the post-fit
+//CW: Function to make the post-fit
 void MCMCProcessor::MakePostfit() {
 // ****************************
 
@@ -363,7 +363,7 @@ void MCMCProcessor::MakePostfit() {
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
 
-    // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
+    //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
     {
       MACH3LOG_WARN("Found fixed parameter, moving on");
@@ -455,7 +455,7 @@ void MCMCProcessor::MakePostfit() {
 } // Have now written the postfit projections
 
 // *******************
-// Draw the postfit
+//CW: Draw the postfit
 void MCMCProcessor::DrawPostfit() {
 // *******************
 
@@ -544,7 +544,7 @@ void MCMCProcessor::DrawPostfit() {
         Err_HPD = (*Errors_HPD)(i);
       }
     }
-    //KS: Just get value of each parmeter without dividing by prior
+    //KS: Just get value of each parameter without dividing by prior
     else
     {
       Central = (*Means)(i);
@@ -846,7 +846,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
     delete Asimov;
   }
 
-  //KS: Remove histogrms
+  //KS: Remove histograms
   for (int i = 0; i < nDraw; ++i)
   {
     delete hpost_copy[i];
@@ -1736,7 +1736,7 @@ void MCMCProcessor::MakeCredibleRegions() {
   }
 
   OutputFile->cd();
-  //KS: Remove histogrms
+  //KS: Remove histograms
   for (int i = 0; i < nDraw; ++i)
   {
     for (int j = 0; j <= i; ++j)
@@ -1802,7 +1802,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   Posterior->Clear();
   Posterior->Update();
 
-  //KS: We sort to have prmateters from highest to lowest, this is related to how we make 2D projections in MakeCovariance_MP
+  //KS: We sort to have parameters from highest to lowest, this is related to how we make 2D projections in MakeCovariance_MP
   std::sort(ParamNumber.begin(), ParamNumber.end(),  std::greater<int>());
 
   //KS: Calculate how many pads/plots we need
@@ -1848,7 +1848,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 
   //KS: Initialise Tpad histograms etc we will need
   TPad** TrianglePad = new TPad*[Npad];
-  //KS: 1D copy of psoterior, we need it as we modify them
+  //KS: 1D copy of posterior, we need it as we modify them
   TH1D** hpost_copy = new TH1D*[nParamPlot];
   TH1D*** hpost_cl = new TH1D**[nParamPlot];
   TText **TriangleText = new TText *[nParamPlot*2];
@@ -1856,7 +1856,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   TH2D*** hpost_2D_cl = new TH2D**[Npad-nParamPlot];
   gStyle->SetPalette(51);
 
-  //KS: Super convoluted way of calcuating ranges for our pads, trust me it works...
+  //KS: Super convoluted way of calculating ranges for our pads, trust me it works...
   double* X_Min = new double[nParamPlot];
   double* X_Max = new double[nParamPlot];
 
@@ -1881,7 +1881,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
     Y_Min[i] = Y_Max[i]-yScale;
   }
 
-  //KS: We store as numbering of isn't straighforward
+  //KS: We store as numbering of isn't straightforward
   int counterPad = 0;
   int counterText = 0;
   int counterPost = 0;
@@ -1889,10 +1889,10 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   //KS: We start from top of the plot, might be confusing but works very well
   for(int y = 0; y < nParamPlot; y++)
   {
-    //KS: start from left and go right, depedning on y
+    //KS: start from left and go right, depending on y
     for(int x = 0; x <= y; x++)
     {
-      //KS: Need to go to canvas everytime to have our pads in the same canvas, not pads in the pads
+      //KS: Need to go to canvas every time to have our pads in the same canvas, not pads in the pads
       Posterior->cd();
       TrianglePad[counterPad] = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i", counterPad), X_Min[x], Y_Min[y], X_Max[x], Y_Max[y]);
 
@@ -2340,14 +2340,14 @@ TH1D* MCMCProcessor::MakePrefit() {
     PreFitPlot->SetBinError(i+1, 0);
   }
 
-  //KS: Sliglthy hacky way to get realtive to prior or nominal as this is convention we use,
+  //KS: Slightly hacky way to get relative to prior or nominal as this is convention we use,
   //Only applies for xsec, for other systematic it make no difference
   double CentralValueTemp, Central, Error;
 
   // Set labels and data
   for (int i = 0; i < nDraw; ++i)
   {
-    //Those keep which parameter type we run currently and realtive number  
+    //Those keep which parameter type we run currently and relative number
     int ParamEnum = ParamType[i];
     int ParamNo = i - ParamTypeStartPos[ParameterEnum(ParamEnum)];
     CentralValueTemp = ParamCentral[ParamEnum][ParamNo];
@@ -2369,7 +2369,7 @@ TH1D* MCMCProcessor::MakePrefit() {
       Central = CentralValueTemp;
       Error = ParamErrors[ParamEnum][ParamNo];
     }
-    //KS: If plotting error for param with flatp prior is turned off and given param really has flat prior set error to 0
+    //KS: If plotting error for param with flat prior is turned off and given param really has flat prior set error to 0
     if(!PlotFlatPrior && ParamFlat[ParamEnum][ParamNo])
     {
       Error = 0.;
@@ -2394,7 +2394,7 @@ TH1D* MCMCProcessor::MakePrefit() {
 
 
 // **************************
-// Read the input Covariance matrix entries
+//CW: Read the input Covariance matrix entries
 // Get stuff like parameter input errors, names, and so on
 void MCMCProcessor::ReadInputCov() {
 // **************************

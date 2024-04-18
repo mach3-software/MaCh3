@@ -94,7 +94,7 @@ class covarianceBase {
   std::string const getInputFile() const { return inputFile; };
 
   // Get diagonal error for ith parameter
-  double getDiagonalError(const int i) { return sqrt((*covMatrix)(i,i)); }
+  inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
 
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -114,6 +114,7 @@ class covarianceBase {
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   inline std::vector<double> getParameterMeans(){return par_means;}
+  TH2D* GetCorrelationMatrix();
 
   // What parameter Gets reweighted by what amount according to MCMC
   inline double calcReWeight(const int bin) {

@@ -1514,6 +1514,28 @@ std::vector<double> covarianceBase::getNominalArray()
 
 }
 
+// ********************************************
+TH2D* covarianceBase::GetCorrelationMatrix() {
+// ********************************************
+
+  TH2D* hMatrix = new TH2D(getName(), getName(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
+  for(int i = 0; i < _fNumPar; i++)
+  {
+    for(int j = 0; j < _fNumPar; j++)
+    {
+      if(i == j) hMatrix->SetBinContent(i+1, j+1, 1.);
+      else
+      {
+        const double Corr = (*covMatrix)(i,j) / ( getDiagonalError(i) * getDiagonalError(j));
+        hMatrix->SetBinContent(i+1, j+1, Corr);
+      }
+      hMatrix->GetXaxis()->SetBinLabel(i+1, GetParFancyName(i).c_str());
+      hMatrix->GetYaxis()->SetBinLabel(j+1, GetParFancyName(j).c_str());
+    }
+  }
+  return hMatrix;
+}
+
 #ifdef DEBUG_PCA
 //KS: Let's dump all useful matrices to properly validate PCA
 void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat)

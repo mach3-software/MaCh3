@@ -68,16 +68,16 @@ class MCMCProcessor {
     MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
     ~MCMCProcessor();
 
-    // Scan chain, what paramters we have and load information from covariance matrices
+    // Scan chain, what parameters we have and load information from covariance matrices
     void Initialise();
     //Make 1D projection for each parameter and prepare structure
     void MakePostfit();
-    //Calcuate covariance by making 2D projection of each combination of parameters
+    //Calculate covariance by making 2D projection of each combination of parameters
     void MakeCovariance();
     //KS:By caching each step we use multithreading
     void CacheSteps();
     void MakeCovariance_MP();
-    //Reset 2D posteriors, in case we would like to calcualte in again with different BurnInCut
+    //Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
     void ResetHistograms();
         
     // Draw the post-fit comparisons
@@ -95,7 +95,7 @@ class MCMCProcessor {
     
     void GetPolarPlot(std::vector<std::string> ParNames);
 
-    //Bayesian statistic hypotheis testing
+    //Bayesian statistic hypothesis testing
     void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
@@ -250,7 +250,7 @@ class MCMCProcessor {
     inline void GewekeDiagnostic();
     inline void AcceptanceProbabilities();
     
-    //Usefull strings teling us about output etc
+    //Useful strings telling us about output etc
     std::string MCMCFile;
     std::string OutputSuffix;
     // Covariance matrix name position
@@ -267,7 +267,7 @@ class MCMCProcessor {
     std::string Posterior1DCut;
     int BurnInCut;
     int nBranches;
-    //KS: For merged chains number of entires will be different fron nSteps
+    //KS: For merged chains number of entries will be different from nSteps
     int nEntries;
     int nSteps;
     int nSamples;
@@ -313,7 +313,7 @@ class MCMCProcessor {
     bool PlotFlatPrior;
     bool PlotJarlskog;
     
-    //Even more falgse
+    //Even more flags
     bool MakeCorr;
     bool plotRelativeToPrior;
     bool MadePostfit;
@@ -335,7 +335,7 @@ class MCMCProcessor {
     // The output file
     TFile *OutputFile;
     
-    //Fancy canvas used for our beatufull plots
+    //Fancy canvas used for our beautiful plots
     TCanvas *Posterior;
 
     //Vector of best fit points and errors obtained with different methods

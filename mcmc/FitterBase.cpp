@@ -225,20 +225,22 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   MACH3LOG_INFO("Adding systematic object {}", cov->getName());
   systematics.push_back(cov);
 
-  // Save an array of nominal
-  if (save_nominal) {
-    CovFolder->cd();
-    double *n_vec = new double[cov->getSize()];
-    for (int i = 0; i < cov->getSize(); ++i)
-      n_vec[i] = cov->getParInit(i);
+  CovFolder->cd();
+  double *n_vec = new double[cov->getSize()];
+  for (int i = 0; i < cov->getSize(); ++i)
+    n_vec[i] = cov->getParInit(i);
 
-    TVectorT<double> t_vec(cov->getSize(), n_vec);
-    t_vec.Write((std::string(cov->getName()) + "_prior").c_str());
-    delete[] n_vec;
+  TVectorT<double> t_vec(cov->getSize(), n_vec);
+  t_vec.Write((std::string(cov->getName()) + "_prior").c_str());
+  delete[] n_vec;
 
-    cov->getCovMatrix()->Write(cov->getName());
-    outputFile->cd();
-  }
+  cov->getCovMatrix()->Write(cov->getName());
+
+  TH2D* CorrMatrix = cov->GetCorrelationMatrix();
+  CorrMatrix->Write((cov->getName() + std::string("_Corr")).c_str());
+  delete CorrMatrix;
+
+  outputFile->cd();
 
   return;
 }
