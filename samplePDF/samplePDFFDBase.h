@@ -50,6 +50,7 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(); //DB Function to differentiate 1D or 2D binning
+  int GetBinningOpt(){return BinningOpt;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -150,27 +151,29 @@ public:
   //you need to pass a value to some custom reweight calc or engine
   virtual void PrepFunctionalParameters(){};
   //ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){};
+  virtual void applyShifts(){};
+  virtual void applyShifts(int iSample){};
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(int iSample, int iEvent); 
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
   bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
+  void ApplyEventSelections(std::vector< std::string > SelectionStr, int iSample);
 
   void CalcXsecNormsBins(int iSample);
   //This just gets read in from a yaml file
   bool GetIsRHC() {return IsRHC;}
-  // Calculate the spline weight for a given event
-  double CalcXsecWeightSpline(const int iSample, const int iEvent);
-  // Calculate the norm weight for a given event
-  double CalcXsecWeightNorm(const int iSample, const int iEvent);
+  // Calculate the spline weights
+  void ApplyXsecWeightSpline(int iSample);
+  // Calculate the norm weights
+  void ApplyXsecWeightNorm(int iSample);
   virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
-
-  int GetBinningOpt(){return BinningOpt;}
+  void ApplyXsecWeightFunc(int iSample);
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
+  virtual double* ReturnKinematicParameter(std::string KinematicParamter, int iSample) = 0;
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
 
@@ -186,10 +189,6 @@ public:
   void fill1DHist();
   void fill2DHist();
 
-  //DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
-#ifdef MULTITHREAD
-  void fillArray_MP();
-#endif
   void fillArray();
 
   // Helper function to reset histograms

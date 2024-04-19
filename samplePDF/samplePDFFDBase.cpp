@@ -165,6 +165,27 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
   return true;
 }
 
+//Similar to the above functions but applies to the whole sample
+void samplePDFFDBase::ApplyEventSelections(std::vector< std::string > SelectionStr, int iSample){
+  for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
+	  double* KineArr = ReturnKinematicParameter(SelectionStr[iSelection], iSample);
+    double* xsec_weights = MCSamples[iSample].xsec_w;
+    #pragma omp for simd nowait
+    for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+      double Val = KineArr[iEvent];
+      xsec_weights[iEvent] *= ((Val>=SelectionBounds[iSelection][0])&&(Val<SelectionBounds[iSelection][1]));
+    }
+  }
+}
+
+void samplePDFFDBase::ApplyXsecWeightFunc(int iSample){
+  double* xsec_weights = MCSamples[iSample].xsec_w;
+  #pragma omp for simd nowait
+  for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+    xsec_weights[iEvent] *= CalcXsecWeightFunc(iSample, iEvent);
+  }
+}
+
 //CalcOsc for Prob3++ CPU
 #if defined (USE_PROB3) && defined (CPU_ONLY)
 double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar)
@@ -254,11 +275,6 @@ void samplePDFFDBase::fillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
-  // Call entirely different routine if we're running with openMP
-#ifdef MULTITHREAD
-  fillArray_MP();
-#else
-
   //ETA we should probably store this in samplePDFFDBase
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
@@ -275,71 +291,57 @@ void samplePDFFDBase::fillArray() {
   splineFile->FindSplineSegment();
   splineFile->calcWeights();
 
+  double *local_samplePDFFD_array, *local_samplePDFFD_array_w2;
+  
+  #pragma omp parallel private(local_samplePDFFD_array, local_samplePDFFD_array_w2)
+  {
+    local_samplePDFFD_array = new double[nYBins*nXBins];
+    local_samplePDFFD_array_w2 = new double[nYBins*nXBins];
+    std::fill(local_samplePDFFD_array, local_samplePDFFD_array + nYBins*nXBins, 0.0);
+    std::fill(local_samplePDFFD_array_w2, local_samplePDFFD_array_w2 + nYBins*nXBins, 0.0);
+  
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
-    for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-      
-	  applyShifts(iSample, iEvent);
 
-	  if (!IsEventSelected(iSample, iEvent)) { 
-		continue;
-	  } 
+    //Reset xsec_weights
+    std::fill(MCSamples[iSample].xsec_w, MCSamples[iSample].xsec_w + MCSamples[iSample].nEvents, 1.0);
 
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double funcweight = 1.0;
-      double totalweight = 1.0;
-      
-      splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-      //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
-      if (splineweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
+    applyShifts(iSample);
+    ApplyEventSelections(SelectionStr, iSample);
 
-      //Loop over stored normalisation and function pointers 
-      normweight *= CalcXsecWeightNorm(iSample, iEvent);
+    ApplyXsecWeightSpline(iSample);
+    ApplyXsecWeightNorm(iSample);
+    ApplyXsecWeightFunc(iSample);
 
-      //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-      if (normweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
-
-      funcweight = CalcXsecWeightFunc(iSample,iEvent);
-      //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-      if (funcweight <= 0.){          
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
-
-      MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
-      
+    #pragma omp barrier //All the previous operations have nowait as they are independant, but we now need to synchronize.
+    #pragma omp for
+    for(uint iEvent = 0; iEvent<MCSamples[iSample].nEvents;iEvent++){
       //DB Set oscillation weights for NC events to 1.0
       //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupMC
-	  //
-	  //LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
-      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  	MCSamples[iSample].osc_w[iEvent] = 0.0;
-	  	continue;
-      }
+      //
+      //LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
 
-	  //ETA - I need to check that this doesn't cause a problem for atmospherics and or tau samples
-      if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
+        if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+        MCSamples[iSample].osc_w[iEvent] = 0.0;
+        continue;
+        }
+
+      //ETA - I need to check that this doesn't cause a problem for atmospherics and or tau samples
+        if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+        MCSamples[iSample].osc_w[iEvent] = 1.0;
+        }
+      //DB Set oscillation weights for NC events to 1.0
+      //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
+      if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+      MCSamples[iSample].osc_w[iEvent] = 1.0;	
       }
-	  //DB Set oscillation weights for NC events to 1.0
-	  //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
-	  if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		MCSamples[iSample].osc_w[iEvent] = 1.0;	
-	  }
       
       //DB Total weight
-	  totalweight = GetEventWeight(iSample,iEvent);
+	    double totalweight = GetEventWeight(iSample,iEvent);
       //DB Catch negative weights and skip any event with a negative event
       if (totalweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
+      MCSamples[iSample].xsec_w[iEvent] = 0.;
+        continue;
+      }
  
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
@@ -379,217 +381,27 @@ void samplePDFFDBase::fillArray() {
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
 		//std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-		samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-		samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        local_samplePDFFD_array[YBinToFill*nXBins + XBinToFill] += totalweight;
+        local_samplePDFFD_array_w2[YBinToFill*nXBins + XBinToFill] += totalweight*totalweight;
       }
+    }
+  } //Sample loop
+
+  for (int yBin=0;yBin<nYBins;yBin++) {
+    for (int xBin=0;xBin<nXBins;xBin++) {
+      #pragma omp atomic
+      samplePDFFD_array[yBin][xBin] += local_samplePDFFD_array[yBin*nXBins + xBin];
+      #pragma omp atomic
+      samplePDFFD_array_w2[yBin][xBin] += local_samplePDFFD_array_w2[yBin*nXBins + xBin];
     }
   }
 
-#endif // end the else in openMP
+  delete local_samplePDFFD_array;
+  delete local_samplePDFFD_array_w2;
+
+  }
   return;
 }
-
-#ifdef MULTITHREAD
-void samplePDFFDBase::fillArray_MP() 
-{
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
-
-  //DB Reset values stored in PDF array to 0.
-  for (int yBin=0;yBin<nYBins;yBin++) {
-	  for (int xBin=0;xBin<nXBins;xBin++) {
-	    samplePDFFD_array[yBin][xBin] = 0.;
-		samplePDFFD_array_w2[yBin][xBin] = 0.;
-	  }
-  }
-
-  //reconfigureFuncPars();
-
-  //This is stored as [y][x] due to shifts only occuring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses 
-  double** samplePDFFD_array_private = NULL;
-  double** samplePDFFD_array_private_w2 = NULL;
-  // Declare the omp parallel region
-  // The parallel region needs to stretch beyond the for loop!
-#pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
-  {
-	// private to each thread
-	// ETA - maybe we can use parallel firstprivate to initialise these?
-	samplePDFFD_array_private = new double*[nYBins];
-    samplePDFFD_array_private_w2 = new double*[nYBins];
-	for (int yBin=0;yBin<nYBins;yBin++) {
-	  samplePDFFD_array_private[yBin] = new double[nXBins];
-      samplePDFFD_array_private_w2[yBin] = new double[nXBins];
-	  for (int xBin=0;xBin<nXBins;xBin++) {
-		samplePDFFD_array_private[yBin][xBin] = 0.;
-        samplePDFFD_array_private_w2[yBin][xBin] = 0.;
-	  }
-	}
-
-	//DB - Brain dump of speedup ideas
-	//
-	//Those relevant to reweighting
-	// 1. Don't bother storing and calculating NC signal events - Implemented and saves marginal s/step
-	// 2. Loop over spline event weight calculation in the following event loop - Currently done in splineSKBase->calcWeight() where multi-threading won't be optmised - Implemented and saves 0.3s/step
-	// 3. Inline getDiscVar or somehow include that calculation inside the multi-threading - Implemented and saves about 0.01s/step
-	// 4. Include isCC inside SKMCStruct so don't have to have several 'if' statements determine if oscillation weight needs to be set to 1.0 for NC events - Implemented and saves marginal s/step
-	// 5. Do explict check on adjacent bins when finding event XBin instead of looping over all BinEdge indicies - Implemented but doesn't significantly affect s/step
-	//
-	//Other aspects
-	// 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside samplePDFFD_array_class[yBin][xBin]
-	//
-	// We will hit <0.1 s/step eventually! :D
-
-	//ETA - does these three calls need to be inside the omp parrallel region? 
-	//I don't think this will affect anything but maybe should check.
-	PrepFunctionalParameters();
-	//==================================================
-	//Calc Weights and fill Array
-	splineFile->FindSplineSegment();
-	splineFile->calcWeights();
-
-	for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
-#pragma omp for
-	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-
-        //ETA - generic functions to apply shifts to kinematic variables
-        // Apply this before IsEventSelected is called.
-		applyShifts(iSample, iEvent);
-
-        //ETA - generic functions to apply shifts to kinematic variable
-		//this is going to be slow right now due to string comps under the hood.
-		//Need to implement a more efficient version of event-by-event cut checks
-		if(!IsEventSelected(iSample, iEvent)){
-		  continue;
-		}
-
-		double splineweight = 1.0;
-		double normweight = 1.0;
-		double funcweight = 1.0;
-		double totalweight = 1.0;
-
-		//DB SKDet Syst
-		//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-
-        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-		//std::cout << "Spline weight is " << splineweight << std::endl;
-		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-		if (splineweight <= 0.){
-		  MCSamples[iSample].xsec_w[iEvent] = 0.;
-		  continue;
-		}
-
-        normweight *= CalcXsecWeightNorm(iSample, iEvent);
-		//DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-		//std::cout << "norm weight is " << normweight << std::endl;
-		if (normweight <= 0.){
-		  MCSamples[iSample].xsec_w[iEvent] = 0.;
-		  continue;
-		}
-
-		funcweight = CalcXsecWeightFunc(iSample,iEvent);
-		//DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-		//std::cout << "Func weight is " << funcweight << std::endl;
-		if (funcweight <= 0.){
-		  MCSamples[iSample].xsec_w[iEvent] = 0.;
-		  continue;
-		}
-
-		MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
-
-		//DB Set oscillation weights for NC events to 1.0
-		//DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
-		//LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
-		if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		  MCSamples[iSample].osc_w[iEvent] = 0.0;
-		  continue;
-		}
-		if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		  MCSamples[iSample].osc_w[iEvent] = 1.0;
-		}
-
-		totalweight = GetEventWeight(iSample, iEvent);
-
-		//DB Catch negative weights and skip any event with a negative event
-		if (totalweight <= 0.){
-		  MCSamples[iSample].xsec_w[iEvent] = 0.;
-		  continue;
-		}
-
-		//DB Switch on BinningOpt to allow different binning options to be implemented
-		//The alternative would be to have inheritance based on BinningOpt
-		double XVar = (*(MCSamples[iSample].x_var[iEvent]));
-
-		//DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-		//double YVar = MCSamples[iSample].rw_theta[iEvent];
-
-		//DB Find the relevant bin in the PDF for each event
-		int XBinToFill = -1;
-		int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
-
-		//std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-		//std::cout << "XVar is " << XVar << " and rw_upper_bin_edge is " << MCSamples[iSample].rw_upper_xbinedge[iEvent] << " and rw_lower_xbinedge is " << MCSamples[iSample].rw_lower_xbinedge[iEvent] << std::endl;
-		//DB Check to see if momentum shift has moved bins
-		//DB - First, check to see if the event is still in the nominal bin	
-		if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
-		  XBinToFill = MCSamples[iSample].NomXBin[iEvent];
-		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-		}
-		//DB - Second, check to see if the event is outside of the binning range and skip event if it is
-		else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-		  continue;
-		}
-		//DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-		//Shifted down one bin from the event bin at nominal
-		else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
-		  XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
-		}
-		//Shifted up one bin from the event bin at nominal
-		else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
-		  XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
-		}
-		//DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-		else {
-		  for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-			if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-			  XBinToFill = iBin;
-			}
-		  }
-		}
-
-		//DB Fill relevant part of thread array
-		if (XBinToFill != -1 && YBinToFill != -1) {
-		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-          samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
-          samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
-		}
-		else{
-		  //std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
-		}
-
-	  }
-	}    
-
-	//End of Calc Weights and fill Array
-	//==================================================
-  // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in GetLikelihood
-	  for (int yBin=0;yBin<nYBins;yBin++) {
-		for (int xBin=0;xBin<nXBins;xBin++) {
-#pragma omp atomic
-		  samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
-#pragma omp atomic    
-          samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
-		}
-	  }
-
-	for (int yBin=0;yBin<nYBins;yBin++) {
-	  delete[] samplePDFFD_array_private[yBin];
-      delete[] samplePDFFD_array_private_w2[yBin];
-	}
-	delete[] samplePDFFD_array_private;
-    delete[] samplePDFFD_array_private_w2;
-  } //end of parallel region
-}
-#endif
 
 
 // **************************************************
@@ -608,35 +420,48 @@ void samplePDFFDBase::ResetHistograms() {
   }
 } // end function
 
-// ***************************************************************************
-// Calculate the spline weight for one event
-double samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) {
-// ***************************************************************************
 
-  double xsecw = 1.0;
+void samplePDFFDBase::ApplyXsecWeightSpline(int iSample) {
+// ***************************************************************************
   //DB Xsec syst
   //Loop over stored spline pointers
-  for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
-    xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
+
+  double* xsec_weights = MCSamples[iSample].xsec_w;
+  #pragma omp for nowait
+  // #pragma omp single
+  for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+    for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
+      //TODO try to see if it is possible to invert the loop order
+      xsec_weights[iEvent] *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
+    }
+
+    xsec_weights[iEvent] = max(0.d, xsec_weights[iEvent]);
   }
-  return xsecw;
 }
 
+void samplePDFFDBase::ApplyXsecWeightNorm(int iSample) {
 // ***************************************************************************
-// Calculate the normalisation weight for one event
-double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) {
-// ***************************************************************************
+  //DB Xsec syst
+  //Loop over stored spline pointers
 
-  double xsecw = 1.0;
-  //Loop over stored normalisation and function pointers
-  for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
-  {
-      xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-      #ifdef DEBUG
-      if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
-      #endif
+  double* xsec_weights = MCSamples[iSample].xsec_w;
+  #pragma omp for nowait
+  // #pragma omp single
+  for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+    for (int iParam=0;iParam<MCSamples[iSample].nxsec_norm_pointers[iEvent];iParam++) {
+      //TODO try to see if it is possible to invert the loop order
+      xsec_weights[iEvent] *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+    }
+
+    xsec_weights[iEvent] = max(0.d, xsec_weights[iEvent]);
   }
-  return xsecw;
+}
+
+void samplePDFFDBase::applyShifts(int iSample) {
+  #pragma omp for
+  for(uint iEvent = 0; iEvent < MCSamples[iSample].nEvents; iEvent++){
+    applyShifts(iSample, iEvent);
+  }
 }
 
 //DB Adding in Oscillator class support for smeared oscillation probabilities
@@ -1321,6 +1146,7 @@ void samplePDFFDBase::addData(TH2D* Data) {
 inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   //HI : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
+  #pragma omp simd reduction(*:totalweight)
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
 	//std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
