@@ -444,7 +444,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
     }
   }
 
-  //setName(YAMLFile[0].c_str());
+  setName("yaml_systs");
   //size = covMatrix->GetNrows();
   //MakePosDef(covMatrix);
   //setCovMatrix(covMatrix);
