@@ -396,8 +396,8 @@ void samplePDFFDBase::fillArray() {
     }
   }
 
-  delete local_samplePDFFD_array;
-  delete local_samplePDFFD_array_w2;
+  delete[] local_samplePDFFD_array;
+  delete[] local_samplePDFFD_array_w2;
 
   }
   return;
