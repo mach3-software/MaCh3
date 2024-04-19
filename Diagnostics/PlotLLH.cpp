@@ -267,7 +267,7 @@ void getSplitSampleStack(TFile *file, std::vector<std::string> sampleVector, std
 
 int PlotLLH(){
     // open the additional files
-    TFile *ExtraCompFiles[ExtraFileNames.size()];
+    std::vector<TFile *> ExtraCompFiles(ExtraFileNames.size());
     for(uint extraFileId = 0; extraFileId < ExtraFileNames.size(); extraFileId ++){
       ExtraCompFiles[extraFileId] = new TFile(ExtraFileNames[extraFileId].c_str());
     }

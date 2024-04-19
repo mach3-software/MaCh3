@@ -464,8 +464,8 @@ class TSpline3_red {
           YResp[i]  = y;
         }
 
-        __float__* mvals = new __float__[nPoints + 2];
-        __float__* svals = new __float__[nPoints];
+        __float__* mvals = new __float__[nPoints + 3];
+        __float__* svals = new __float__[nPoints + 1];
 
         for (int i = -2; i <= nPoints; ++i) {
           // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
