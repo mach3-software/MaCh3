@@ -146,7 +146,7 @@ void FitterBase::SaveSettings() {
   for(unsigned int i = 0; i < systematics.size(); i++)
     MACH3LOG_INFO("{}: Cov name: {}",i,  systematics[i]->getName());
   MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
-  for(unsigned int i = 0; i < systematics.size(); i++)
+  for(unsigned int i = 0; i < samples.size(); i++)
     MACH3LOG_INFO("{}: SamplePDF name: {}",i , samples[i]->GetName());
 
   SettingsSaved = true;

@@ -22,52 +22,43 @@ class FitterBase {
   FitterBase(manager * const fitMan);
   virtual ~FitterBase();
 
-  /**
-   * @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
-   *
-   * @param sample A pointer to a sample PDF object derived from samplePDFBase.
-   */
+  /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
+  /// @param sample A pointer to a sample PDF object derived from samplePDFBase.
   void addSamplePDF(samplePDFBase* sample);
-  /**
-   * @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
-   *
-   * @param cov A pointer to a Covariance object derived from covarianceBase.
-   */
+
+  /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
+  /// @param cov A pointer to a Covariance object derived from covarianceBase.
   void addSystObj(covarianceBase* cov);
 
+  /// @brief Adds an oscillation handler for covariance objects.
+  /// @param oscf A pointer to a covarianceOsc object for forward oscillations.
   void addOscHandler(covarianceOsc* oscf);
-  void addOscHandler(covarianceOsc* osca, covarianceOsc *oscb);
 
-  /**
-   * @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
-   */
+  /// @brief Adds two oscillation handlers for covariance objects.
+  /// @param osca A pointer to a covarianceOsc object for the first oscillation.
+  /// @param oscb A pointer to a covarianceOsc object for the second oscillation.
+  void addOscHandler(covarianceOsc* osca, covarianceOsc* oscb);
+
+  /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
-  /**
-   * @brief Perform a 1D likelihood scan.
-   */
+
+  /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
-  /**
-   * @brief Perform a 2D likelihood scan.
-   *
-   * @warning This operation may take a significant amount of time, especially for complex models.
-   */
+
+  /// @brief Perform a 2D likelihood scan.
+  /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
   virtual inline std::string GetName()const {return "FitterBase";};
 protected:
-  /**
-   * @brief Prepare the output file.
-   */
+
+  /// @brief Prepare the output file.
   void PrepareOutput();
 
-  /**
-   * @brief Save output and close files.
-   */
+  /// @brief Save output and close files.
   void SaveOutput();
 
-  /**
-   * @brief Save the settings that the MCMC was run with.
-   */
+  /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
 
   // The manager

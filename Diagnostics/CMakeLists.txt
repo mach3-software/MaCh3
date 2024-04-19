@@ -6,6 +6,7 @@ foreach(app
     GetPenaltyTerm
     ProcessMCMC
     PlotLLH
+    CombineMaCh3Chains
     )
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} MaCh3::All)

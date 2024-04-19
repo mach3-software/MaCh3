@@ -14,9 +14,7 @@ void Foo(){}
 ```
 try
 ```
-/**
- * @brief I like comments
- */
+/// @brief I like comments
 void Foo(){}
 ```
 After making release or tag please

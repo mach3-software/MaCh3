@@ -133,7 +133,14 @@ This is an example how your executable can look like using MaCh3:
   markovChain->runMCMC(); //or run actual fit
 ```
 
-## Plotting and Diagnostic
+## Help and Guidelines
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
+- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
+- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
+
+
+### Plotting and Diagnostic
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config. Currently available utils include:
 
 **ProcessMCMC** - The main app you want to use for analysing the ND280 chain. It prints posterior distribution after burn-in the cut. Moreover, you can compare two/three different chains. There are a few options you can modify easily inside the app like selection, burn-in cut, and whether to plot xse+flux or only flux. Other functionality
@@ -165,9 +172,17 @@ options:
 
     -d a string specifying additional drawing options to pass to the histogram draw calls, e.g. `-d "C"` will plot smooth curves through the histogram bins. See https://root.cern/doc/master/classTHistPainter.html#HP01a for possible options.
 
-## Help and Guidelines
-- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
-- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
-- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
-- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
 
+**CombineMaCh3Chains** - will combine chains files produced by **MCMC**, enforcing the condition that all the files to combine were made using the exact same software versions and config files
+```
+CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o <output file>] file1.root [file2.root, file3.root ...]
+```
+*fileX.root* are the individual spline files to combine, can specify any number, need at least one
+
+-c target compression level for the combined file, default is 1, in line with hadd
+
+-f force overwrite of the combined file if it exists already
+
+-h print usage message and exit
+
+*Output file* (optional) name of the combined file. If not specified, will just use *file1.root*, the first in the list of files, same as *hadd*.

@@ -1519,18 +1519,24 @@ TH2D* covarianceBase::GetCorrelationMatrix() {
 // ********************************************
 
   TH2D* hMatrix = new TH2D(getName(), getName(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
+
   for(int i = 0; i < _fNumPar; i++)
   {
-    for(int j = 0; j < _fNumPar; j++)
+    hMatrix->SetBinContent(i+1, i+1, 1.);
+    hMatrix->GetXaxis()->SetBinLabel(i+1, GetParFancyName(i).c_str());
+    hMatrix->GetYaxis()->SetBinLabel(i+1, GetParFancyName(i).c_str());
+  }
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for(int i = 0; i < _fNumPar; i++)
+  {
+    for(int j = 0; j <= i; j++)
     {
-      if(i == j) hMatrix->SetBinContent(i+1, j+1, 1.);
-      else
-      {
-        const double Corr = (*covMatrix)(i,j) / ( getDiagonalError(i) * getDiagonalError(j));
-        hMatrix->SetBinContent(i+1, j+1, Corr);
-      }
-      hMatrix->GetXaxis()->SetBinLabel(i+1, GetParFancyName(i).c_str());
-      hMatrix->GetYaxis()->SetBinLabel(j+1, GetParFancyName(j).c_str());
+      const double Corr = (*covMatrix)(i,j) / ( getDiagonalError(i) * getDiagonalError(j));
+      hMatrix->SetBinContent(i+1, j+1, Corr);
+      hMatrix->SetBinContent(j+1, i+1, Corr);
     }
   }
   return hMatrix;

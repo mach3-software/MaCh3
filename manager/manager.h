@@ -27,23 +27,19 @@ public:
   manager(std::string const &);
   virtual ~manager();
 
-  /**
-   * @brief Get likelihood type defined in the config
-   */
+  /// @brief Get likelihood type defined in the config
   inline int GetMCStatLLH(){return mc_stat_llh;}
 
-  //Return name of config
+  /// @brief Return name of config
   inline std::string GetFileName(){return FileName;}
 
-  // Return config
+  /// @brief Return config
   inline YAML::Node const &raw(){return config;}
 
-  //Add manager useful information's to TFile, in most cases to Fitter
+  /// @brief Add manager useful information's to TFile, in most cases to Fitter
   void SaveSettings(TFile* const OutputFile);
 
-  /**
-  * @brief Print currently used config
-  */
+  /// @brief Print currently used config
   void Print();
 
 private:
