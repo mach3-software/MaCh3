@@ -80,7 +80,7 @@ void CopyDir(TDirectory *source) {
       source->cd();
       TObject *obj = key->ReadObj();
       adir->cd();
-      obj->Write(obj->GetName(), TObject::kOverwrite);
+      obj->Write();
       delete obj;
     }
   }
