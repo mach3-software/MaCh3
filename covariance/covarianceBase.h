@@ -62,11 +62,7 @@ class covarianceBase {
   void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; };
   void setIndivStepScale(std::vector<double> stepscale);
   //KS: In case someone really want to change this
-  inline void setPrintLength(unsigned int PriLen) { PrintLength = PriLen; };
-
-  // set a custom proposal function
-  //DEPRECATED
-  void setPropFunct(int i, TF1 *func) {(void)i; (void)func;};
+  inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; };
 
   // Throwers
   void throwParProp(const double mag = 1.);
@@ -287,7 +283,7 @@ class covarianceBase {
 
   //Turn on/off true adaptive MCMC
   //Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
-  void enableAdaptiveMCMC(bool enable=true){
+  void enableAdaptiveMCMC(bool enable = true){
     use_adaptive = enable;
     total_steps = 0; //Set these to default values
     lower_adapt = 10000;
@@ -336,9 +332,6 @@ class covarianceBase {
 
   //KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
   unsigned int PrintLength;
-
-  Double_t currLogL;
-  Double_t propLogL;
 
   // state info (now mostly vectors)
   //ETA - duplication of some of these

@@ -276,7 +276,10 @@ void covarianceBase::init(const char *name, const char *file)
 
   // Not using adaptive by default
   use_adaptive = false;
-  
+  total_steps = 0;
+  lower_adapt = 0;
+  upper_adapt = 0;
+
   // Set the covariance matrix
   size = covMatrix->GetNrows();
   _fNumPar = size;
@@ -343,7 +346,10 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
 
   // Not using adaptive by default
   use_adaptive = false;
-  
+  total_steps = 0;
+  lower_adapt = 0;
+  upper_adapt = 0;
+
   // Set the covariance matrix
   _fNumPar = _fYAMLDoc["Systematics"].size();
   size = _fNumPar;
@@ -544,10 +550,6 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
     _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
   }
-
-  // don't need these 2 i think
-  currLogL = __LARGE_LOGL__;
-  propLogL = __LARGE_LOGL__;
 
   _fGlobalStepScale = 1.0;
 }
@@ -787,7 +789,7 @@ void covarianceBase::proposeStep() {
   // Make the random numbers for the step proposal
   randomize();
   CorrelateSteps();
-  if(use_adaptive && total_steps<upper_adapt) updateAdaptiveCovariance();
+  if(use_adaptive && total_steps < upper_adapt) updateAdaptiveCovariance();
 }
 
 // ************************************************
