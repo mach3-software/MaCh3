@@ -277,8 +277,8 @@ void covarianceBase::init(const char *name, const char *file)
   // Not using adaptive by default
   use_adaptive = false;
   total_steps = 0;
-  lower_adapt = 0;
-  upper_adapt = 0;
+  lower_adapt = -999;
+  upper_adapt = -999;
 
   // Set the covariance matrix
   size = covMatrix->GetNrows();
@@ -347,8 +347,8 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
   // Not using adaptive by default
   use_adaptive = false;
   total_steps = 0;
-  lower_adapt = 0;
-  upper_adapt = 0;
+  lower_adapt = -999;
+  upper_adapt = -999;
 
   // Set the covariance matrix
   _fNumPar = _fYAMLDoc["Systematics"].size();
