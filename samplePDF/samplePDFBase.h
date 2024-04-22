@@ -31,7 +31,7 @@
 class samplePDFBase : public samplePDFInterface 
 {
  public:
-  samplePDFBase(double pot);
+  samplePDFBase();
 
   virtual ~samplePDFBase();
 

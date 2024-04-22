@@ -1,6 +1,6 @@
 #include "samplePDFBase.h"
 
-samplePDFBase::samplePDFBase(double pot) 
+samplePDFBase::samplePDFBase() 
 {
   nDims = 0;
   rnd = new TRandom3(0);
