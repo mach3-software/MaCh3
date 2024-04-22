@@ -153,9 +153,16 @@ Example of chain diagnostic utils can be found [here](https://github.com/mach3-s
 <li> Study covariance matrix stability </li>
 </ol>
 
+**GetPostfitParamPlots** - This will plot output from ProcessMCMC for nice plots which can go to TN. Bits are hardcoded to make plots nicer users should be careful when using the non-conventional xsec model. If you used `ProcessMCMC` with `PlotDet` you will also get an overlay of detector parameters (ND or ND+FD depending on chain type). If Violin plot was produced in `ProcessMCMC` you will get fancy plots here as well.
+
 **GetPenaltyTerm** - Since xsec and flux and ND spline systeamatic are treated as the same systematic object we cannot just take log_xsec, hence we need this script, use `GetFluxPenaltyTerm MCMCChain.root config`. Parameters of relevance are loaded via config, thus you can study any combination you want. Time needed increases with number of sets :(
 
 **DiagMCMC** - Perform MCMC diagnostic like autocorrelation or trace plots.
+
+**RHat** - Performs RHat diagnostic to study if all used chains converged to the same stationary distribution.
+```
+./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]
+```
 
 **PlotLLH** - Plot LLH scans, flexible and configurable in command line. can take any number of LLH scans as input, will use the first one as a baseline when making e.g. ratio plots. The first file must be a MaCh3 scan.
 options:
