@@ -4,6 +4,10 @@
 // Run the Markov chain with all the systematic objects added
 MinuitFit::MinuitFit(manager *man) : LikelihoodFit(man) {
 // *******************
+
+  MACH3LOG_INFO("Creating instance of Minimizer with Minuit2 and Migrad");
+
+  //Other then Migrad available are Simplex,Combined,Scan
   minuit = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
 }
 
@@ -22,7 +26,7 @@ void MinuitFit::runMCMC() {
 
   PrepareFit();
 
-  //KS: For none PCA this will be eqaul to normal parameters
+  //KS: For none PCA this will be equal to normal parameters
   const int NparsMinuitFull = NPars;
   const int NparsMinuit = NParsPCA;
 
@@ -36,7 +40,7 @@ void MinuitFit::runMCMC() {
   minuit->SetMaxFunctionCalls(fitMan->raw()["General.NSteps"].as<double>());
   minuit->SetMaxIterations(10000);
 
-  std::cout << "Preparing Minuit" << std::endl;
+  MACH3LOG_INFO("Preparing Minuit");
   int ParCounter = 0;
 
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
@@ -45,15 +49,15 @@ void MinuitFit::runMCMC() {
     {
       for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
       {
-          //KS: Index, name, prior, step scale [differrent to MCMC],
-          minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->getParInit(i), (*it)->getDiagonalError(i)/10);
-          minuit->SetVariableValue(ParCounter, (*it)->getParInit(i));
-          //KS: lower bound, upper bound, if Mirroring eneabled then ignore
-          if(!fMirroring) minuit->SetVariableLimits(ParCounter, (*it)->GetLowerBound(i), (*it)->GetUpperBound(i));
-          if((*it)->isParameterFixed(i))
-          {
-            minuit->FixVariable(ParCounter);
-          }
+        //KS: Index, name, prior, step scale [differrent to MCMC],
+        minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->getParInit(i), (*it)->getDiagonalError(i)/10);
+        minuit->SetVariableValue(ParCounter, (*it)->getParInit(i));
+        //KS: lower bound, upper bound, if Mirroring eneabled then ignore
+        if(!fMirroring) minuit->SetVariableLimits(ParCounter, (*it)->GetLowerBound(i), (*it)->GetUpperBound(i));
+        if((*it)->isParameterFixed(i))
+        {
+          minuit->FixVariable(ParCounter);
+        }
       }
     }
     else
@@ -71,10 +75,10 @@ void MinuitFit::runMCMC() {
 
   minuit->SetPrintLevel(2);
 
-  std::cout << "Starting MIGRAD" << std::endl;
+  MACH3LOG_INFO("Starting MIGRAD");
   minuit->Minimize();
 
-  std::cout << "Starting HESSE" << std::endl;
+  MACH3LOG_INFO("Starting HESSE");
   minuit->Hesse();
   outputFile->cd();
   

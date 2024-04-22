@@ -20,9 +20,13 @@ class LikelihoodFit : public FitterBase {
     /// @brief Get name of class
     virtual inline std::string GetName()const {return "LikelihoodFit";};
   protected:
+    /// @brief prepare output and perform sanity checks
     void PrepareFit();
+    /// Number of all parameters from all covariances
     int NPars;
+    /// Number of all parameters from all covariances in PCA base
     int NParsPCA;
+    /// Flag telling if mirroring is used or not
     bool fMirroring;
 };
 

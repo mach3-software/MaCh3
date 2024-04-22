@@ -38,7 +38,7 @@ void LikelihoodFit::PrepareFit() {
     throw;
   }
   //KS: If PCA is note enabled NParsPCA == NPars
-  std::cout<< "Total number of parameters "<<NParsPCA<<std::endl;
+  MACH3LOG_INFO("Total number of parameters {}", NParsPCA);
 }
 
 // *******************

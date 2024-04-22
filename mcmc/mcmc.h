@@ -37,14 +37,17 @@ class mcmc : public FitterBase {
   /// @brief Load starting positions from the end of a previous chain
   inline void ReadParsFromFile(std::string file);
 
-  bool reject; // Do we reject based on hitting boundaries in systs
+  /// Do we reject based on hitting boundaries in systs
+  bool reject;
+  /// number of steps in chain
+  unsigned int chainLength;
 
-  unsigned int chainLength; // number of steps in chain
-
-  // simulated annealing
-  bool anneal; 
+  /// simulated annealing
+  bool anneal;
+  /// simulated annealing temperature
   double AnnealTemp;
 
+  /// starting value of a chain, usually 0, unless starting from previous chain
   int stepStart;
 };
 

@@ -5,7 +5,6 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 
-
 class MinuitFit : public LikelihoodFit {
  public:
   /// @brief Constructor
@@ -19,7 +18,8 @@ class MinuitFit : public LikelihoodFit {
   /// @brief Get name of class
   inline std::string GetName()const {return "MinuitFit";};
 
-  private:
-    ROOT::Math::Minimizer* minuit;
+ private:
+  /// Pointer to minimizer, which most often is Minuit
+  ROOT::Math::Minimizer* minuit;
 };
 
