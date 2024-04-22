@@ -64,65 +64,75 @@ protected:
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
 
-  // The manager
+  /// The manager
   manager *fitMan;
 
-  // current state
+  /// current state
   unsigned int step;
-  // current likelihood
+  /// current likelihood
   double logLCurr;
-  // proposed likelihood
+  /// proposed likelihood
   double logLProp;
-  // current acceptance prob
+  /// current acceptance prob
   double accProb;
-  // counts accepted steps
+  /// counts accepted steps
   int accCount;
 
-  //LLH for samples/syst objects
-  // oscillation covariance llh
+  /// LLH for samples/syst objects
+  /// oscillation covariance llh
   double osc_llh;
-  // store the llh breakdowns
+  /// store the llh breakdowns
   double *sample_llh;
-  // systematic llh breakdowns
+  /// systematic llh breakdowns
   double *syst_llh;
 
-  // Sample holder
+  /// Sample holder
   std::vector<samplePDFBase*> samples;
 
-  // Systematic holder
+  /// Systematic holder
   std::vector<covarianceBase*> systematics;
 
-  // handles oscillation parameters
+  /// handles oscillation parameters
   covarianceOsc *osc;
+  /// handles oscillation parameters
   covarianceOsc *osc2;
 
-  // benchmarking, file IO, debugging  etc
+  /// tells global time how long fit took
   TStopwatch* clock;
+  /// tells how long single step/fit iteration took
   TStopwatch* stepClock;
+  /// Time of single step
   double stepTime;
 
-  // Random number
+  /// Random number
   TRandom3* random;
 
-  // Output
+  /// Output
   TFile *outputFile;
+  /// Output cov folder
   TDirectory *CovFolder;
+  /// Output tree with posteriors
   TTree *outTree;
-  int auto_save; // auto save every N steps
+  /// auto save every N steps
+  int auto_save;
 
-  //Necessary for some fitting algorithms like PSO
+  /// Necessary for some fitting algorithms like PSO
   bool fTestLikelihood;
+  /// save nominal matrix info or not
   bool save_nominal;
 
-  //Checks to not repeat some operations
+  /// Checks if file saved not repeat some operations
   bool FileSaved;
+  /// Checks if setting saved not repeat some operations
   bool SettingsSaved;
+  /// Checks if output prepared not repeat some operations
   bool OutputPrepared;
 
   #ifdef DEBUG
-  //For debugging
+  /// Debugging flag
   bool debug;
-  std::ofstream debugFile; // Output file
+  /// Debugging Output file
+  std::ofstream debugFile;
   #endif
 };
 

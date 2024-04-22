@@ -92,7 +92,7 @@ class MCMCProcessor {
     void MakeCredibleRegions();
     /// @brief Make fancy triangle plot for selected parameters
     void MakeTrianglePlot(std::vector<std::string> ParamNames);
-    
+    /// @brief Make funny polar plot
     void GetPolarPlot(std::vector<std::string> ParNames);
 
     //Bayesian statistic hypothesis testing
@@ -100,7 +100,7 @@ class MCMCProcessor {
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
     
-    //KS: Perform MCMC diagnostic including AutoCorrelation, Trace etc.
+    /// @brief KS: Perform MCMC diagnostic including AutoCorrelation, Trace etc.
     void DiagMCMC();
     
     // Get the number of parameters
@@ -125,11 +125,11 @@ class MCMCProcessor {
     //inline std::string const & GetNDruns()   const { return NDruns; };
     //inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
-    // Get the post-fit results (arithmetic and Gaussian)
+    /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
-    // Get the post-fit covariances and correlations
+    /// @brief Get the post-fit covariances and correlations
     void GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr);
-    // Or the individual post-fits
+    /// @brief Or the individual post-fits
     void GetPostfit_Ind(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Peaks, ParameterEnum kParam);
     
     // Get the vector of branch names

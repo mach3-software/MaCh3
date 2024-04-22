@@ -81,9 +81,9 @@ class SMonolith {
       for (__int__ i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
-    // The returned gpu weights, read by the GPU
+    /// The returned gpu weights, read by the GPU
     float* cpu_weights;
-    //KS: This holds the total CPU weights that gets read in samplePDFND
+    /// KS: This holds the total CPU weights that gets read in samplePDFND
     float *cpu_total_weights;
 
   private:
@@ -130,33 +130,33 @@ class SMonolith {
     /// @brief KS: Load preprocessed spline file
     inline void LoadSplineFile(std::string FileName);
 
-    // Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
-    // Method identical to TSpline3::Eval(double) but faster because less operations
+    /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
+    /// Method identical to TSpline3::Eval(double) but faster because less operations
     FastSplineInfo *SplineInfoArray;
-    //Segments store currently found segment while vals parameter values, they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
+    // Segments store currently found segment while vals parameter values, they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
     short int *segments;
     float *vals;
-    //This holds pointer to parameter position which we later copy paste it to GPU
+    /// This holds pointer to parameter position which we later copy paste it to GPU
     std::vector< const double* > splineParsPointer;
 
-    //Number of events
+    /// Number of events
     unsigned int NEvents;
-    // Number of NIWG parameters that have splines
+    /// Number of NIWG parameters that have splines
     short int nParams;
-    // Max knots for production
+    /// Max knots for production
     int _max_knots;
-    // holds the index for good splines; don't do unsigned since starts with negative value!
+    /// holds the index for good splines; don't do unsigned since starts with negative value!
     int *index_cpu;
 
-    // Number of valid splines
+    /// Number of valid splines
     unsigned int NSplines_valid;
-    // Number of total splines we can maximally have, if each event had the maximum number of splines found across all events
+    /// Number of total splines we can maximally have, if each event had the maximum number of splines found across all events
     unsigned int NSplines_total;
 
-    // Number of total splines if each event had every parameter's spline
+    /// Number of total splines if each event had every parameter's spline
     unsigned int NSplines_total_large;
 
-    //Sum of all knots over all splines
+    /// Sum of all knots over all splines
     unsigned int nKnots;
     
     // Just some pointers to memory that doesn't get allocated so we can access the GPU
@@ -166,7 +166,7 @@ class SMonolith {
     // CPU arrays to hold monolith and weights
     float *cpu_weights_var;
     
-    //KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+    /// KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent;
     unsigned int *gpu_nParamPerEvent;
 

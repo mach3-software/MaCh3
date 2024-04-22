@@ -1606,10 +1606,10 @@ void SMonolith::CalcSplineWeights() {
   #endif
   for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
   {
-    //Which Parameter we are accessing
+    //CW: Which Parameter we are accessing
     const short int Param = cpu_paramNo_arr[splineNum];
 
-    // Avoids doing costly binary search on GPU
+    //CW: Avoids doing costly binary search on GPU
     const short int segment = segments[Param];
 
     //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing

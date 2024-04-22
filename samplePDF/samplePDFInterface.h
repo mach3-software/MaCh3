@@ -9,7 +9,8 @@
 #include <TSpline.h>
 #include <TRandom3.h>
 #include <vector>
-#include "Structs.h"
+
+#include "samplePDF/Structs.h"
 
 using namespace std;
 
