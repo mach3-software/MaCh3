@@ -144,6 +144,11 @@ public:
   void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
   void set1DBinning(std::vector<double> &XVec);
   void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
+  void SetupSampleBinning();
+  std::string XVarStr, YVarStr;
+  unsigned int SampleNXBins, SampleNYBins;
+  std::vector<double> SampleXBins;
+  std::vector<double> SampleYBins;
   //===============================================================================
 
   //ETA - a function to setup and pass values to functional parameters where
@@ -163,7 +168,8 @@ public:
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
   // Calculate the norm weight for a given event
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
-  virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
+  //Virtual so this can be over-riden in an experiment derived class
+  virtual double CalcXsecWeightFunc(int iSample, int iEvent){return 1.0;};
 
   int GetBinningOpt(){return BinningOpt;}
 
@@ -171,6 +177,8 @@ public:
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
+  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
 
@@ -204,6 +212,9 @@ public:
   //DB Vectors to hold bin edges
   std::vector<double> XBinEdges;
   std::vector<double> YBinEdges;
+  //std::vector<std::string> XVarStr;
+  //std::vector<std::string> YVarStr;
+
 
   //DB Array to be filled after reweighting
   double** samplePDFFD_array;
@@ -229,8 +240,8 @@ public:
   //===============================================================================
   
   //Variables controlling oscillation parameters
-  bool doubled_angle;
-  bool osc_binned;
+  bool doubled_angle = true;
+  bool osc_binned = false;
 
   //===============================================================================
   //DB Covariance Objects

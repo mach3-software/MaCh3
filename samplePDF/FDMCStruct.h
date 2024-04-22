@@ -16,9 +16,9 @@ struct fdmc_base {
   int SampleDetID;
 
   //THe x_var and y_vars that you're binning in
-  double** x_var;
-  double** y_var;
-  double **rw_etru;
+  const double** x_var;
+  const double** y_var;
+  const double **rw_etru;
 
   // xsec bins  
   std::list< int > *xsec_norms_bins;

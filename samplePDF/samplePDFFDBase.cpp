@@ -3,7 +3,7 @@
 // Constructors for erec-binned errors
 
 samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov)
-  : samplePDFBase(pot)
+  : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
   std::cout << "-------------------------------------------------------------------" <<std::endl;
@@ -65,6 +65,54 @@ void samplePDFFDBase::fill2DHist()
     }
   }
   return;
+}
+
+/*! \function samplePDFFDBase::SetupSampleBinning()
+ *  \brief Function to setup the binning of your sample histograms and the underlying 
+ *  arrays that get handled in fillArray() and fillArray_MP().
+ *  The SampleXBins are filled in the daughter class from the sample config file.
+ *  This "passing" can be removed. 
+ */
+void samplePDFFDBase::SetupSampleBinning(){
+
+  TString histname1d = (XVarStr).c_str();
+  TString histname2d = (XVarStr+YVarStr).c_str();
+  TString histtitle = "";
+
+  //The binning here is arbitrary, now we get info from cfg so the
+  //set1DBinning and set2Dbinning calls below will make the binning
+  //to be what we actually want
+  _hPDF1D   = new TH1D("h"+histname1d+samplename,histtitle, 1, 0, 1);
+  dathist   = new TH1D("d"+histname1d+samplename,histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
+
+  //Make some arrays so we can initialise _hPDF1D and _hPDF2D with these
+  XBinEdges.reserve(SampleNXBins);
+  YBinEdges.reserve(SampleNYBins);
+  std::cout << "XBinning: " << std::endl;
+  for(unsigned XBin_i = 0 ; XBin_i < SampleNXBins ; XBin_i++){
+	XBinEdges.push_back(SampleXBins[XBin_i]);
+	std::cout << SampleXBins[XBin_i] << ", ";
+  }
+  std::cout << "\n" << std::endl;
+
+  //And now the YBin Edges
+  std::cout << "YBinning: " << std::endl;
+  for(unsigned YBin_i = 0 ; YBin_i < SampleNYBins ; YBin_i++){
+	YBinEdges.push_back(SampleYBins[YBin_i]);
+	std::cout << SampleYBins[YBin_i] << ", ";
+  }
+  std::cout << "\n" << std::endl;
+ 
+  if(XVarStr.length() > 0 && YVarStr.length() == 0){
+	set1DBinning(SampleXBins);  
+  }
+  else if(XVarStr.length() > 0 && YVarStr.length() > 0){
+	std::cout << "Setting Up 2D binning" << std::endl;
+	std::cout << XVarStr << " : " << YVarStr << std::endl;
+	set2DBinning(SampleXBins, SampleYBins);
+  }
 }
 
 void samplePDFFDBase::UseBinnedOscReweighting(bool ans) 
@@ -395,6 +443,12 @@ void samplePDFFDBase::fillArray_MP()
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
+//  std::cout << "~~~~~~~~~~" << std::endl;
+//  std::cout << "In samplePDFFDBase::fillArray_MP " << std::endl; 
+//  std::cout << "nXBins is " << nXBins << std::endl;
+//  std::cout << "nYBins is " << nYBins << std::endl;
+//  std::cout << "~~~~~~~~~~" << std::endl;
+
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
 	  for (int xBin=0;xBin<nXBins;xBin++) {
@@ -521,6 +575,8 @@ void samplePDFFDBase::fillArray_MP()
 
 		//DB Commented out by default but if we ever want to consider shifts in theta this will be needed
 		//double YVar = MCSamples[iSample].rw_theta[iEvent];
+		//ETA - this would actually be with (*(MCSamples[iSample].y_var[iEvent])) and done extremely
+		//similarly to XVar now
 
 		//DB Find the relevant bin in the PDF for each event
 		int XBinToFill = -1;
@@ -556,9 +612,11 @@ void samplePDFFDBase::fillArray_MP()
 		  }
 		}
 
+		//ETA - we can probably remove this final if check on the -1? 
+		//Maybe we can add an overflow bin to the array and assign any events to this bin?
+		//Might save us an extra if call?
 		//DB Fill relevant part of thread array
 		if (XBinToFill != -1 && YBinToFill != -1) {
-		  //std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
           samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
           samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
 		}
@@ -933,8 +991,8 @@ void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double
   _hPDF2D->SetBins(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());
   dathist2d->SetBins(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());
 
-  XBinEdges = XVec;
-  YBinEdges = YVec;
+  //XBinEdges = XVec;
+  //YBinEdges = YVec;
 
   //ETA - maybe need to be careful here
   int nXBins = XVec.size()-1;
@@ -1038,6 +1096,10 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
 	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
+
+	  //Set x_var and y_var values based on XVarStr and YVarStr
+      MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
+
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
 	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
@@ -1049,9 +1111,6 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
 	  double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
 	  double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
-	  //std::cout << "FINDING EDGES" << std::endl; 
-	  //std::cout << "Low edge is " << low_edge << std::endl;
-	  //std::cout << "Upper edge is " << upper_edge << std::endl;
 
 	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
 	  if (bin<(_hPDF1D->GetNbinsX()-2)) {
@@ -1075,7 +1134,6 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
 	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
 	  MCSamples[mc_i].rw_upper_upper_xbinedge[event_i] = upper_upper_edge;
-
 	}
   }
 
@@ -1158,8 +1216,12 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
 	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
-	  //Global bin number
 
+   	  //Set x_var and y_var values based on XVarStr and YVarStr   
+      MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
+      MCSamples[mc_i].y_var[event_i] = ReturnKinematicParameterByReference(YVarStr, mc_i, event_i);
+
+	  //Global bin number
 	  int bin = _hPDF2D->FindBin(*(MCSamples[mc_i].x_var[event_i]), *(MCSamples[mc_i].y_var[event_i]));
 
 	  int bin_x = -999;
@@ -1195,6 +1257,9 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		upper_upper_edge = __DEFAULT_RETURN_VAL__;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
+	  if(MCSamples[mc_i].NomYBin[event_i] < 0){ 
+		std::cout << "Nominal YBin PROBLEM, y-bin is " << MCSamples[mc_i].NomYBin[event_i] << std::endl;
+	  }
 	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
 	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
 	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
