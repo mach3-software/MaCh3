@@ -68,29 +68,29 @@ class MCMCProcessor {
     MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
     ~MCMCProcessor();
 
-    // Scan chain, what parameters we have and load information from covariance matrices
+    /// @brief Scan chain, what parameters we have and load information from covariance matrices
     void Initialise();
-    //Make 1D projection for each parameter and prepare structure
+    /// @brief Make 1D projection for each parameter and prepare structure
     void MakePostfit();
-    //Calculate covariance by making 2D projection of each combination of parameters
+    /// @brief Calculate covariance by making 2D projection of each combination of parameters
     void MakeCovariance();
-    //KS:By caching each step we use multithreading
+    /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
     void MakeCovariance_MP();
-    //Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
+    /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
     void ResetHistograms();
         
-    // Draw the post-fit comparisons
+    /// @brief Draw the post-fit comparisons
     void DrawPostfit();
-    // Make and Draw Violin
+    /// @brief Make and Draw Violin
     void MakeViolin();
-    // Make and Draw Credible intervals
+    /// @brief Make and Draw Credible intervals
     void MakeCredibleIntervals();
-    // Draw the post-fit covariances
+    /// @brief Draw the post-fit covariances
     void DrawCovariance();
-    // Make and Draw Credible Regions
+    /// @brief Make and Draw Credible Regions
     void MakeCredibleRegions();
-    //Make fancy triangle plot for selected parameters
+    /// @brief Make fancy triangle plot for selected parameters
     void MakeTrianglePlot(std::vector<std::string> ParamNames);
     
     void GetPolarPlot(std::vector<std::string> ParNames);

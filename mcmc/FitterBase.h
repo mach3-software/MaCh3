@@ -19,7 +19,9 @@ class TTree;
 class FitterBase {
 
  public:
+  /// @brief Constructor
   FitterBase(manager * const fitMan);
+  /// @brief Destructor
   virtual ~FitterBase();
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
@@ -49,6 +51,7 @@ class FitterBase {
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
+  /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
 protected:
 

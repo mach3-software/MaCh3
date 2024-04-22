@@ -23,7 +23,7 @@
 #include "samplePDF/Structs.h"
 #include "manager/MaCh3Logger.h"
 
-//KS:We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
+//KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4
 //KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track
 #define _nTF1Coeff_ 5
@@ -36,21 +36,31 @@ extern void SynchroniseSplines();
 // Make template class so we can use TF1 and TSpline3
 class SMonolith {
   public:
-    // Vector of TSpline3 pointers which we strip back
+    /// @brief Constructor
+    /// @param MasterSpline Vector of TSpline3 pointers which we strip back
     SMonolith(std::vector< std::vector<TSpline3*> > &MasterSpline);
+    /// @brief Constructor
+    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
     SMonolith(std::vector< std::vector<TSpline3_red*> > &MasterSpline);
+    /// @brief Constructor
+    /// @param MasterSpline Vector of TF1 pointers which we strip back
     SMonolith(std::vector< std::vector<TF1*> > &MasterSpline);
+    /// @brief Constructor
+    /// @param MasterSpline Vector of TF1_red pointers which we strip back
     SMonolith(std::vector< std::vector<TF1_red*> > &MasterSpline);
+    /// @brief Constructor where you pass path to preprocessed root FileName
+    /// @param FileName path to pre-processed root file containing stripped monolith info
     SMonolith(std::string FileName);
+    /// @brief Destructor for SMonolith class.
     ~SMonolith();
 
-    // This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here!
-    // Same thing but pass parameter spline segments instead of variations
+    /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
     void Evaluate();
 
-    // Evaluate weights on the CPU/GPU
+    /// @brief CW: Evaluate weights on the CPU/GPU
     void Evaluate_TF1();
 
+    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     inline void SynchroniseMemTransfer()
     {
       #ifdef CUDA
@@ -59,9 +69,13 @@ class SMonolith {
       return;
     };
 
-    //KS: Get pointer to total weight to make fit faster wrooom!   
+    /// @brief KS: Get pointer to total weight to make fit faster wrooom!
+    /// @param event Name event number in used MC
+    /// @return Pointer to the total weight
     inline const float* retPointer(const int event) {return &cpu_total_weights[event];}
     
+    /// @brief KS: Set pointers to spline params
+    /// @param spline_ParsPointers Vector of pointers to spline params
     inline void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
       splineParsPointer = spline_ParsPointers;
       for (__int__ i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
@@ -73,46 +87,47 @@ class SMonolith {
     float *cpu_total_weights;
 
   private:
-    //KS: Set everything to null etc.
+    /// @brief KS: Set everything to null etc.
     inline void Initialise();
-    // Function to scan through the MasterSpline of TSpline3
+    /// @brief CW: Function to scan through the MasterSpline of TSpline3
     inline void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &nParams, int &nSplines, unsigned int &nKnots);
-    // Function to scan through the MasterSpline of TF1
+    /// @brief CW: Function to scan through the MasterSpline of TF1
     inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &nParams);
-    // Prepare the TSpline3_red objects for the GPU
+    /// @brief CW: Prepare the TSpline3_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
     inline void PrepareForGPU_TSpline3();
 
-    // Prepare the TF1_red objects for the GPU
+    /// @brief CW: Prepare the TF1_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
     inline void PrepareForGPU_TF1();
         
-    // Reduced the TSpline3 to TSpline3_red
+    /// @brief CW: Reduced the TSpline3 to TSpline3_red
     inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline);
-    // Reduced the TF1 to TF1_red
+    /// @brief CW: Reduced the TF1 to TF1_red
     inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline);
     
-    // This loads up coefficients into two arrays: one x array and one yabcd array 
-    // This should maximize our cache hits!
+    /// @brief CW: This loads up coefficients into two arrays: one x array and one yabcd array
+    /// @brief CW: This should maximize our cache hits!
     inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
-    // Helper function used in the constructor, tests to see if the spline is flat
+    /// @brief CW: Helper function used in the constructor, tests to see if the spline is flat
     inline bool isFlat(TSpline3_red* &spl);
-    // Gets the polynomial coefficients for TF1
+    /// @brief CW: Gets the polynomial coefficients for TF1
     inline void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
     
-    //Code used in step by step reweighting
-    //Find Spline Segment for each param
+    /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     inline void FindSplineSegment();
-    //CPU based code which eval each spline
+    /// @brief CPU based code which eval weight for each spline
     inline void CalcSplineWeights();
-    //Same but TF1
+    /// @brief Same but TF1
     inline void CalcSplineWeights_TF1();
-    //Calc total weight
+    /// @brief Calc total event weight
     inline void ModifyWeights();
-    //Conversion from valid splines to all
+    /// @brief Conversion from valid splines to all
     inline void ModifyWeights_GPU();
     
+    /// @brief KS: Prepare spline file that can be used for fast loading
     inline void PrepareSplineFile();
+    /// @brief KS: Load preprocessed spline file
     inline void LoadSplineFile(std::string FileName);
 
     // Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
