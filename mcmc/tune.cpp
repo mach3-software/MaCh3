@@ -37,7 +37,7 @@ void tune::tuneParameters(covarianceBase& cov, char *prefix)
 	    {
 	      TF1 *p = new TF1(name,"TMath::Gaus(x,[0],[1])",-10,10);
 	      p->SetParameters(0, tune_pars[j]);
-	      cov.setPropFunct(i, p);
+	      //cov.setPropFunct(i, p);
 	      std::cout << "- Set " << name << " tuning" << std::endl;
 	      break;
 	    }

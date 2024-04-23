@@ -820,7 +820,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		int bin = (*it).index;
 
 		//If syst on applies to a particular detector
-		if ((XsecCov->GetXsecParamDetID(bin) & SampleDetID)==SampleDetID) {
+		if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
 		  XsecBins.push_back(bin);
 		}
 	  } // end iteration over xsec_norms
@@ -897,9 +897,9 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   YBinEdges[0] = -1e8;
   YBinEdges[1] = 1e8;
 
-  double YBinEdges_Arr[2];
-  YBinEdges_Arr[0] = YBinEdges[0];
-  YBinEdges_Arr[1] = YBinEdges[1];
+  //double YBinEdges_Arr[2];
+  //YBinEdges_Arr[0] = YBinEdges[0];
+  //YBinEdges_Arr[1] = YBinEdges[1];
 
   _hPDF2D->Reset();
   _hPDF2D  ->SetBins(XVec.size()-1, XVec.data(), YBinEdges.size()-1, YBinEdges.data());

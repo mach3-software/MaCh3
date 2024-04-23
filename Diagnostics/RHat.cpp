@@ -26,6 +26,8 @@
 #include "omp.h"
 #endif
 
+#include "manager/manager.h"
+
 //KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one. 
 //Based on Gelman et. al. arXiv:1903.08008v5
 
@@ -83,6 +85,9 @@ void CapVariable(double var, double cap);
 // *******************
 int main(int argc, char *argv[]) {
 // *******************    
+
+  SetMaCh3LoggerFormat();
+
     Draws = NULL;
     Mean = NULL;
     StandardDeviation = NULL;

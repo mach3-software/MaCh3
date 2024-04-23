@@ -30,7 +30,7 @@ set_target_properties(MCMC PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME MCMC)
 
-target_link_libraries(MCMC Manager ROOT::ROOT MaCh3CompilerOptions)
+target_link_libraries(MCMC SamplePDF MaCh3CompilerOptions)
 target_include_directories(MCMC PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>

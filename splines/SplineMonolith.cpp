@@ -148,7 +148,7 @@ void SMonolith::Initialise() {
 // *****************************************
 
 #ifdef CUDA
-  std::cout << "- Using GPU version event by event monolith" << std::endl;
+  MACH3LOG_INFO("Using GPU version event by event monolith");
 #endif
   //KS: If true it will save spline monolith into huge ROOT file
   SaveSplineFile = false;
@@ -188,7 +188,7 @@ void SMonolith::Initialise() {
 // So make these yabd points lay right next to each other in memory
 SMonolith::SMonolith(std::vector<std::vector<TSpline3*> > &MasterSpline) {
   Initialise();
-  std::cout << "Using full TSpline3, about to reduce it and send to GPU" << std::endl;
+  MACH3LOG_INFO("Using full TSpline3, about to reduce it and send to GPU");
   // Convert the TSpline3 pointers to the reduced form and call the reduced constructor
   std::vector<std::vector<TSpline3_red*> > ReducedSpline = ReduceTSpline3(MasterSpline);
   PrepareForGPU(ReducedSpline);
@@ -199,7 +199,7 @@ SMonolith::SMonolith(std::vector<std::vector<TSpline3*> > &MasterSpline) {
 SMonolith::SMonolith(std::vector<std::vector<TSpline3_red*> > &MasterSpline) {
 // *****************************************
   Initialise();
-  std::cout << "-- GPUING WITH {X} and {Y,B,C,D} arrays and master spline containing TSpline3_red" << std::endl;
+  MACH3LOG_INFO("-- GPUING WITH {X} and {Y,B,C,D} arrays and master spline containing TSpline3_red");
   PrepareForGPU(MasterSpline);
 }
 
@@ -209,7 +209,7 @@ SMonolith::SMonolith(std::vector<std::vector<TSpline3_red*> > &MasterSpline) {
 SMonolith::SMonolith(std::vector<std::vector<TF1*> > &MasterSpline) {
 // *****************************************
   Initialise();
-  std::cout << "Using full TF1, about to reduce it and send to GPU" << std::endl;
+  MACH3LOG_INFO("Using full TF1, about to reduce it and send to GPU");
   // Convert the TSpline3 pointers to the reduced form and call the reduced constructor
   std::vector<std::vector<TF1_red*> > ReducedSpline = ReduceTF1(MasterSpline);
   PrepareForGPU(ReducedSpline);
@@ -221,7 +221,7 @@ SMonolith::SMonolith(std::vector<std::vector<TF1*> > &MasterSpline) {
 SMonolith::SMonolith(std::vector<std::vector<TF1_red*> > &MasterSpline) {
 // *****************************************
   Initialise();
-  std::cout << "-- GPUING WITH TF1_red" << std::endl;
+  MACH3LOG_INFO("-- GPUING WITH TF1_red");
   // Convert the TSpline3 pointers to the reduced form and call the reduced constructor
   PrepareForGPU(MasterSpline);
 }
@@ -232,7 +232,7 @@ SMonolith::SMonolith(std::vector<std::vector<TF1_red*> > &MasterSpline) {
 SMonolith::SMonolith(std::string FileName) {
 // *****************************************
   Initialise();
-  std::cout << "-- GPUING WITH {X} and {Y,B,C,D} arrays and master spline containing TSpline3_red" << std::endl;
+  MACH3LOG_INFO("-- GPUING WITH {X} and {Y,B,C,D} arrays and master spline containing TSpline3_red");
   // Convert the TSpline3 pointers to the reduced form and call the reduced constructor
   LoadSplineFile(FileName);
 }
@@ -245,11 +245,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
   int nSplines = 0;
   ScanMasterSpline(MasterSpline, NEvents, _max_knots, nParams, nSplines, nKnots);
-  std::cout << "Found " << NEvents << " events" << std::endl;
-  std::cout << "Found " << _max_knots << " knots at max" << std::endl;
-  std::cout << "Found " << nParams << " parameters" << std::endl;
-  std::cout << "Found " << nSplines << " maximum number of splines in an event" << std::endl;
-  std::cout << "Found total " << nKnots << " knots in all splines" << std::endl;
+  MACH3LOG_INFO("Found {} events", NEvents);
+  MACH3LOG_INFO("Found {} knots at max", _max_knots);
+  MACH3LOG_INFO("Found {} parameters", nParams);
+  MACH3LOG_INFO("Found {} maximum number of splines in an event", nSplines);
+  MACH3LOG_INFO("Found total {} knots in all splines", nKnots);
 
   // Can pass the spline segments to the GPU instead of the values
   // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
@@ -393,7 +393,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
       #ifndef Weight_On_SplineBySpline_Basis
       ParamCounter++;
       #endif
-      // Incremement the counter for the number of good splines we have
+      // Increment the counter for the number of good splines we have
       ++NSplines_valid;
     } // End the loop over the parameters in the MasterSpline
       #ifndef Weight_On_SplineBySpline_Basis
@@ -409,7 +409,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   // Now that we have looped through all events we can make the number of splines smaller
   // Going from number of events * number of points per spline * number of NIWG params to spln_counter (=valid splines)
 
-  std::cout << "  Number of splines = " << NSplines_valid << std::endl;
+  MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
 
   // Make array with the number of points per spline (not per spline point!)
   cpu_paramNo_arr.resize(NSplines_valid);
@@ -439,16 +439,14 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
     if (cpu_coeff_x[j] == -999) BadXCounter++;
     // Perform checks that all entries have been modified from initial values
     if (cpu_coeff_x[j] == -999 && BadXCounter < 5) {
-      std::cerr << "***** BAD X !! ***** \n" << std::endl;
-      std::cerr << "Indicates some parameter doesn't have a single spline" << std::endl;
-      std::cerr << "j = " << j << std::endl;
-      std::cerr << __FILE__ << "::" << __LINE__ << std::endl;
+      MACH3LOG_WARN("***** BAD X !! *****");
+      MACH3LOG_WARN("Indicates some parameter doesn't have a single spline");
+      MACH3LOG_WARN("j = {}");
       //throw;
     }
-    if(BadXCounter == 5) std::cout<<" There is more unutilised knots although I will stop spamming"<<std::endl;
+    if(BadXCounter == 5) MACH3LOG_WARN("There is more unutilised knots although I will stop spamming");
   }
-
-  std::cout<<"Found in total "<<BadXCounter<<" BAD X" << std::endl;
+  MACH3LOG_WARN("Found in total {} BAD X", BadXCounter);
 #ifdef Weight_On_SplineBySpline_Basis
   // Make the array that holds all the returned weights from the GPU to pass to the CPU
   cpu_weights_var = new float[NSplines_valid]();
@@ -460,15 +458,12 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   #endif
 #endif
   // Print some info; could probably make this to a separate function
-  std::cout << "--- INITIALISED {X}, {YBCD} ARRAYS ---" << std::endl;
-  std::cout << "  " << NEvents << " events with " << NSplines_valid << " splines" << std::endl;
-
-  std::cout << "  On average " << float(NSplines_valid)/float(NEvents) << " splines per event (" << NSplines_valid << "/" << NEvents << ")" << std::endl;
-
-  std::cout << "  Size of x array = " << double(sizeof(float)*event_size_max)/1.E6 << " MB" << std::endl;
-  std::cout << "  Size of coefficient {y,b,c,d} array = " << double(sizeof(float)*nKnots*_nCoeff_)/1.E6 << " MB" << std::endl;
-
-  std::cout << "  Size of parameter # array = " << double(sizeof(short int)*NSplines_valid)/1.E6 << " MB" << std::endl;
+  MACH3LOG_INFO("--- INITIALISED (X), (YBCD) ARRAYS ---");
+  MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
+  MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
+  MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
+  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
+  MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
 
   if(SaveSplineFile) PrepareSplineFile();
 
@@ -481,8 +476,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 // *****************************************
 
   #ifdef Weight_On_SplineBySpline_Basis
-    std::cerr<<" Trying to load Monolith from file using weight by weight base, this is not supported right now, sorry"<<std::endl;
-    throw;
+  MACH3LOG_ERROR("Trying to load Monolith from file using weight by weight base, this is not supported right now, sorry");
+  throw;
   #endif
 
   if (std::getenv("MACH3") != NULL) {
@@ -604,14 +599,13 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   SplineFile->Close();
   delete SplineFile;
 
-
   // Print some info; could probably make this to a separate function
-  std::cout << "--- INITIALISED {X}, {YBCD} ARRAYS ---" << std::endl;
-  std::cout << "  " << NEvents << " events with " << NSplines_valid << " splines" << std::endl;
-  std::cout << "  On average " << float(NSplines_valid)/float(NEvents) << " splines per event (" << NSplines_valid << "/" << NEvents << ")" << std::endl;
-  std::cout << "  Size of x array = " << double(sizeof(float)*event_size_max)/1.E6 << " MB" << std::endl;
-  std::cout << "  Size of coefficient {y,b,c,d} array = " << double(sizeof(float)*nKnots*_nCoeff_)/1.E6 << " MB" << std::endl;
-  std::cout << "  Size of parameter # array = " << double(sizeof(short int)*NSplines_valid)/1.E6 << " MB" << std::endl;
+  MACH3LOG_INFO("--- INITIALISED (X), (YBCD) ARRAYS ---");
+  MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
+  MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
+  MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
+  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
+  MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
 
   PrepareForGPU_TSpline3();
 }
@@ -732,14 +726,18 @@ void SMonolith::PrepareSplineFile() {
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
 void SMonolith::PrepareForGPU_TSpline3() {
 // *****************************************
-#ifdef CUDA
-    unsigned int event_size_max = _max_knots * nParams;
-    std::cout << "  Total size = " << (double(sizeof(float)*nKnots*_nCoeff_)+ double(sizeof(float)*event_size_max)/1.E6+double(sizeof(short int)*NSplines_valid))/1.E6 << " MB memory on CPU to move to GPU" << std::endl;
-    std::cout << "  GPU weight array (GPU->CPU every step) = " << double(sizeof(float)*NSplines_valid)/1.E6 << " MB" << std::endl;
-#ifndef Weight_On_SplineBySpline_Basis
-  std::cout << "  Since you are runing Total event weight mode then GPU weight array (GPU->CPU every step) = " << double(sizeof(float)*NEvents)/1.E6 << " MB" << std::endl;
-#endif
-  std::cout << "  Parameter value array (CPU->GPU every step) = " << double(sizeof(float)*nParams)/1.E6 << " MB" << std::endl;
+  #ifdef CUDA
+  unsigned int event_size_max = _max_knots * nParams;
+  MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
+              (double(sizeof(float) * nKnots * _nCoeff_) + double(sizeof(float) * event_size_max) / 1.E6 +
+              double(sizeof(short int) * NSplines_valid)) / 1.E6);
+  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * NSplines_valid) / 1.E6);
+  #ifndef Weight_On_SplineBySpline_Basis
+  MACH3LOG_INFO("Since you are running Total event weight mode then GPU weight array (GPU->CPU every step) = {:.2f} MB",
+              double(sizeof(float) * NEvents) / 1.E6);
+  #endif
+  MACH3LOG_INFO("Parameter value array (CPU->GPU every step) = {:.4f} MB", double(sizeof(float) * nParams) / 1.E6);
+
 
   //CW: With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
   //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
@@ -764,7 +762,7 @@ void SMonolith::PrepareForGPU_TSpline3() {
 #endif
       nKnots, // How many entries in coefficient array (*4 for the "many" array)
       NSplines_valid, // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
-      event_size_max //Knots times event number of uniqe splines
+      event_size_max //Knots times event number of unique splines
 );
 
   // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
@@ -804,7 +802,7 @@ void SMonolith::PrepareForGPU_TSpline3() {
   cpu_nParamPerEvent.clear();
   cpu_nParamPerEvent.shrink_to_fit();
   #endif
-  std::cout << "Good GPU loading" << std::endl;
+  MACH3LOG_INFO("Good GPU loading");
 #endif
   return;
 }
@@ -816,9 +814,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline)
 
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
   ScanMasterSpline(MasterSpline, NEvents, _max_knots, nParams);
-  std::cout << "Found " << NEvents << " events" << std::endl;
-  std::cout << "Found " << _max_knots << " polynomial at max" << std::endl;
-  std::cout << "Found " << nParams << " parameters" << std::endl;
+  MACH3LOG_INFO("Found {} events", NEvents);
+  MACH3LOG_INFO("Found {} polynomial at max", _max_knots);
+  MACH3LOG_INFO("Found {} parameters", nParams);
 
   // Can pass the spline segments to the GPU instead of the values
   // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
@@ -940,12 +938,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline)
 
   // Now that we have looped through all events we can make the number of splines smaller
   // Going from number of events * number of points per spline * number of NIWG params to spln_counter (=valid splines)
-
-  std::cout << "  Number of splines = " << NSplines_valid << std::endl;
+  MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
 
   // Now declare the arrays for each point in the valid splines which the event actually has (i.e. include the splines that the event undergoes)
   // Also make array with the number of points per spline (not per spline point!)
-  // float because GPU precision (could change to double, but will incur signficant speed reduction on GPU unless you're very rich!)
+  // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
   cpu_nPoints_arr.resize(NSplines_valid);
   cpu_coeff_many.resize(NSplines_valid*_nTF1Coeff_); // *5 because this array holds  a,b,c,d,e parameters
   cpu_paramNo_arr.resize(NSplines_valid);
@@ -988,13 +985,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline)
   delete[] coeffs_big;
 
   // Print some info; could probably make this to a separate function
-  std::cout << "--- INITIALISED TF1 ARRAYS ---" << std::endl;
+  MACH3LOG_INFO("--- INITIALISED TF1 ARRAYS ---");
   std::cout << "  " << NEvents << " events with " << NSplines_valid << " splines" << std::endl;
 
   std::cout << "  On average " << float(NSplines_valid)/float(NEvents) << " splines per event (" << NSplines_valid << "/" << NEvents << ")" << std::endl;
-
   std::cout << "  Size of coefficient {a,b,c,d,e} array = " << double(sizeof(float)*NSplines_valid*_nTF1Coeff_)/1.E6 << " MB" << std::endl;
-
   std::cout << "  Size of parameter # array = " << double(sizeof(short int)*NSplines_valid)/1.E6 << " MB" << std::endl;
   std::cout << "  Size of polynomial type array = " << double(sizeof(short int)*NSplines_valid)/1.E6 << " MB" << std::endl;
 
@@ -1020,7 +1015,6 @@ void SMonolith::PrepareForGPU_TF1() {
 
 #ifdef CUDA
   std::cout << "  Total size = " << (double(sizeof(float)*NSplines_valid*_nTF1Coeff_)+double(2.0*sizeof(short int)*NSplines_valid))/1.E6 << " MB memory on CPU to move to GPU" << std::endl;
-
   std::cout << "  GPU weight array (GPU->CPU every step) = " << double(sizeof(float)*NSplines_valid)/1.E6 << " MB" << std::endl;
   std::cout << "  Parameter value array (CPU->GPU every step) = " << double(sizeof(float)*nParams)/1.E6 << " MB" << std::endl;
   // With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
@@ -1077,7 +1071,7 @@ void SMonolith::PrepareForGPU_TF1() {
   cpu_nParamPerEvent.clear();
   cpu_nParamPerEvent.shrink_to_fit();
   #endif
-  std::cout << "Good TF1 GPU loading" << std::endl;
+  MACH3LOG_INFO("Good TF1 GPU loading");
 #endif
 
   return;
@@ -1124,10 +1118,9 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
     if (nParams > 0) {
       int TempSize = (*OuterIt).size();
       if (TempSize != nParams) {
-        std::cerr << "Found " << TempSize << " parameters for event " << EventCounter << std::endl;
-        std::cerr << "but was expecting " << nParams << " since that's what I found for the previous event" << std::endl;
-        std::cerr << "Somehow this event has a different number of spline parameters... Please study further!" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
+        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", nParams);
+        MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
         throw;
       }
     }
@@ -1178,15 +1171,13 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
       Counter++;
       if(Counter < 5)
       {
-        std::cerr << "ERROR" << std::endl;
-        std::cerr << "SplineInfoArray[" << i << "] isn't set yet" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
       }
       continue;
       //throw;
     }
   }
-  std::cout<<"In total SplineInfoArray for "<<Counter<<" hasn't been initialised"<<std::endl;
+  MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);
 }
 
 // Need to specify template functions in header
@@ -1215,10 +1206,9 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TF1_red*> > & MasterSpl
     if (nParams > 0) {
       int TempSize = (*OuterIt).size();
       if (TempSize != nParams) {
-        std::cerr << "Found " << TempSize << " parameters for event " << EventCounter << std::endl;
-        std::cerr << "but was expecting " << nParams << " since that's what I found for the previous event" << std::endl;
-        std::cerr << "Somehow this event has a different number of spline parameters... Please study further!" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
+        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", nParams);
+        MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
         throw;
       }
     }
@@ -1388,10 +1378,9 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
   } else {
     nPoints = Np;
     if (Np > _max_knots) {
-      std::cerr << "Error, number of points is greater than saved " << _max_knots << std::endl;
-      std::cerr << "This _WILL_ cause problems with GPU splines and _SHOULD_ be fixed!" << std::endl;
-      std::cerr << "nPoints = " << nPoints << ", _max_knots = " << _max_knots << std::endl;
-      std::cerr << __FILE__ << "::" << __LINE__ << std::endl;
+      MACH3LOG_ERROR("Error, number of points is greater than saved {}", _max_knots);
+      MACH3LOG_ERROR("This _WILL_ cause problems with GPU splines and _SHOULD_ be fixed!");
+      MACH3LOG_ERROR("nPoints = {}, _max_knots = {}", nPoints, _max_knots);
       throw;
     }
   }
@@ -1502,7 +1491,7 @@ void SMonolith::Evaluate() {
       segments,
       NSplines_valid);
 
-  //KS: Normaly it does nothing, in case you want to have weight for each spline it does the mapping, used mostly for debuging
+  //KS: Normally it does nothing, in case you want to have weight for each spline it does the mapping, used mostly for debugging
   ModifyWeights_GPU();
 }
 #else
@@ -1617,10 +1606,10 @@ void SMonolith::CalcSplineWeights() {
   #endif
   for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
   {
-    //Which Parameter we are accessing
+    //CW: Which Parameter we are accessing
     const short int Param = cpu_paramNo_arr[splineNum];
 
-    // Avoids doing costly binary search on GPU
+    //CW: Avoids doing costly binary search on GPU
     const short int segment = segments[Param];
 
     //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing

@@ -14,9 +14,7 @@ void Foo(){}
 ```
 try
 ```
-/**
- * @brief I like comments
- */
+/// @brief I like comments
 void Foo(){}
 ```
 After making release or tag please
@@ -46,4 +44,12 @@ std::cout<< " Error: Something is wrong" <<std::endl;
 it is advised to used logger
 ```
 MACH3LOG_ERROR("Something is wrong");
+```
+To pass argument to logger use following syntax:
+```
+MACH3LOG_INFO("I like {}, do you like {}", FirsString, SecondString);
+```
+Logger by default will print whole float. Normally to show only several significant figures you would use `std::precision(2)`. To obtain same thing with logger please use `{:.2f}` like this:
+```
+MACH3LOG_INFO("Here is full LLH but I only show 2 significant figures {:.2f}", LLH);
 ```
