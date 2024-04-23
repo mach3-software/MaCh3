@@ -12,8 +12,6 @@ if(NOT "x86_64 " STREQUAL "${OS_ARCH} ")
     cmessage(FATAL_ERROR "This build currently only support x86_64 target arches, determined the arch to be: ${OS_ARCH}")
 endif()
 
-EXECUTE_PROCESS( COMMAND ${CMAKE_SOURCE_DIR}/cmake/cudaver.sh --major OUTPUT_VARIABLE CUDA_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-
 cmessage(STATUS "CUDA_MAJOR_VERSION: ${CUDAToolkit_VERSION}")
 
 # Call nvidia-smi using execute_process
@@ -35,7 +33,7 @@ set(CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
 string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CUDA_ARCHITECTURES}")
 
 # Output the message with spaces between numbers
-cmessage(STATUS "Using following CUDA archetectures: ${CUDA_ARCHITECTURES_STR}")
+cmessage(STATUS "Using following CUDA architectures: ${CUDA_ARCHITECTURES_STR}")
 
 if(NOT MaCh3_DEBUG_ENABLED)
     add_compile_options(
@@ -53,7 +51,6 @@ else()
 	)
 endif()
 
-
 add_link_options(-I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 if(NOT DEFINED ENV{CUDAPATH})
     cmessage(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
@@ -63,15 +60,15 @@ endif()
 #  cmessage(FATAL_ERROR "When using CUDA, CUDA_SAMPLES must be defined to point to the CUDAToolkit samples directory (should contain common/helper_functions.h).")
 #endif()
 
-#HI: If we're doing GPU stuff, we need the CUDA helper module
+#HW: If we're doing GPU stuff, we need the CUDA helper module
 if(BUILTIN_CUDASAMPLES_ENABLED )
     cmessage("Adding Builtin CUDA Sample Library")
     CPMAddPackage(
         NAME cuda-samples
         GITHUB_REPOSITORY "NVIDIA/cuda-samples"
         GIT_TAG v12.3
-	SOURCE_SUBDIR Common
-	DOWNLOAD_ONLY YES
+    SOURCE_SUBDIR Common
+    DOWNLOAD_ONLY YES
     )
 # Now we add the library
     if(cuda-samples_ADDED)
@@ -81,7 +78,6 @@ if(BUILTIN_CUDASAMPLES_ENABLED )
 endif()
 
 #KS: Keep this for backward compatibility\
-
 
 #-Xptxas "-dlcm=ca -v --allow-expensive-optimizations=true -fmad=true"
 #-Xcompiler "-fpic" -c

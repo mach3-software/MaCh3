@@ -14,6 +14,8 @@ add_library(SamplePDF SHARED
     interfacePDFEbE.cpp
     Structs.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu.cu>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu2.cu>
 )
 
 target_link_libraries(SamplePDF Splines Covariance MaCh3CompilerOptions)
