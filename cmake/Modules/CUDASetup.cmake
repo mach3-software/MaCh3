@@ -36,7 +36,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
     #set(CMAKE_CUDA_ARCHITECTURES native )
   else()
     #KS: Apparently with newer cmake and GPU
-    #set(CMAKE_CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+    set(CMAKE_CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
   endif()
 endif()
 
