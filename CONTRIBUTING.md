@@ -65,7 +65,7 @@ bool AsimovFit = GetFromManager<bool>(config[AsimovFit], false);
 ```
 
 ## double vs float?
-Some fits require lot's of RAM. Easiest and fastest solution to reduce RAM is use floats instead of doubles. MaCh3 has custom type like __float__  defined [here](https://github.com/mach3-software/MaCh3/blob/761cdc168663a6cfe659e4e3bab0d939bf715273/samplePDF/Structs.h#L9). __float__ is usually double unless __LOW_MEMORY_STRUCTS__ is defined at compilation level. Then __float__ will be actual float. By using __float__ one can flexibly change from one type to another. When developing it is advised to used these data types unless some data types are necessary due to desired precision code safety etc.
+Some fits require lot's of RAM. Easiest and fastest solution to reduce RAM is use floats instead of doubles. MaCh3 has custom type like \_\_float\_\_  defined [here](https://github.com/mach3-software/MaCh3/blob/761cdc168663a6cfe659e4e3bab0d939bf715273/samplePDF/Structs.h#L9). \_\_float\_\_ is usually double unless \_\_LOW_MEMORY_STRUCTS\_\_ is defined at compilation level. Then \_\_float\_\_ will be actual float. By using \_\_float\_\_ one can flexibly change from one type to another. When developing it is advised to used these data types unless some data types are necessary due to desired precision code safety etc.
 
 
 ## Formatting
