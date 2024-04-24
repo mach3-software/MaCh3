@@ -299,17 +299,16 @@ void covarianceBase::init(const char *name, const char *file)
   }
 
   setName(name);
-  size = covMatrix->GetNrows();
   MakePosDef(covMatrix);
   setCovMatrix(covMatrix);
 
-  if (size <= 0) {
-    std::cerr << "Covariance matrix " << getName() << " has " << size << " entries!" << std::endl;
+  if (_fNumPar <= 0) {
+    MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", getName(), _fNumPar);
     throw;
   }
-  npars = size;
+  npars = _fNumPar;
 
-  ReserveMemory(size);
+  ReserveMemory(_fNumPar);
 
   infile->Close();
 
@@ -378,7 +377,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
   std::map<std::string, int> CorrNamesMap;
 
   //ETA - read in the systematics. Would be good to add in some checks to make sure
-  //that there are the correct number of entries i.e. are the _fNumPars for Names,
+  //that there are the correct number of entries i.e. are the _fNumPar for Names,
   //PreFitValues etc etc.
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
@@ -535,7 +534,7 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
 
   corr_throw = new double[SizeVec]();
   // set random parameter vector (for correlated steps)
-  randParams = new double[size];
+  randParams = new double[SizeVec];
 
   // Set the defaults to true
   for(int i = 0; i < SizeVec; i++) {
@@ -575,8 +574,8 @@ void covarianceBase::setPar(int i , double val) {
 // Transfer a parameter variation in the parameter basis to the eigen basis
 void covarianceBase::TransferToPCA() {
   if (!pca) {
-    std::cerr << "Can not transfer to PCA if PCA isn't enabled" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
+    MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
     throw;
   }
   // Make the temporary vectors
@@ -594,8 +593,8 @@ void covarianceBase::TransferToPCA() {
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void covarianceBase::TransferToParam() {
   if (!pca) {
-    std::cerr << "Can not transfer to PCA if PCA isn't enabled" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
+    MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
     throw;
   }
 
@@ -612,8 +611,8 @@ void covarianceBase::TransferToParam() {
 }
 
 const std::vector<double> covarianceBase::getProposed() const {
-  std::vector<double> props;
-  for (int i = 0; i < size; ++i) props.push_back(_fPropVal[i]);
+  std::vector<double> props(size);
+  for (int i = 0; i < size; ++i) props[i] = _fPropVal[i];
   return props;
 }
 
@@ -1194,7 +1193,7 @@ void covarianceBase::MatrixVectorMulti(double* VecMulti, double** matrix, const 
 double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i)
 {
   double Element = 0.0;
-  for (int j = 0; j < Length; j++) {
+  for (int j = 0; j < Length; ++j) {
     Element += matrix[i][j]*vector[j];
   }
   return Element;
@@ -1319,7 +1318,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < size; ++i)
   {
     for (int j = 0; j < size; ++j)
     {
@@ -1388,7 +1387,7 @@ void covarianceBase::updateAdaptiveCovariance(){
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-  for(int iRow=0; iRow<size; iRow++){
+  for(int iRow = 0; iRow < _fNumPar; ++iRow){
     par_means_prev[iRow]=par_means[iRow];
     par_means[iRow]=(_fCurrVal[iRow]+par_means[iRow]*total_steps)/(total_steps+1);  
   }
@@ -1397,14 +1396,14 @@ void covarianceBase::updateAdaptiveCovariance(){
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-  for(int iRow=0; iRow<size; iRow++){
-    for(int iCol=0; iCol<=iRow; iCol++){
+  for(int iRow = 0; iRow < _fNumPar; ++iRow){
+    for(int iCol = 0; iCol <= iRow; ++iCol){
 
-      double cov_val = (*adaptiveCovariance)(iRow, iCol)*size/5.6644;
+      double cov_val = (*adaptiveCovariance)(iRow, iCol)*_fNumPar/5.6644;
       cov_val += par_means_prev[iRow]*par_means_prev[iCol]; //First we remove the current means
       cov_val = (cov_val*total_steps+_fCurrVal[iRow]*_fCurrVal[iCol])/(total_steps+1); //Now get mean(iRow*iCol)
       cov_val -= par_means[iCol]*par_means[iRow];
-      cov_val*=5.6644/size;
+      cov_val*=5.6644/_fNumPar;
       (*adaptiveCovariance)(iRow, iCol) = cov_val;
       (*adaptiveCovariance)(iCol, iRow) = cov_val;
     }
@@ -1416,7 +1415,7 @@ void covarianceBase::updateAdaptiveCovariance(){
     resetIndivStepScale();
   }
 
-  if(total_steps>=lower_adapt) {
+  if(total_steps >= lower_adapt) {
     updateThrowMatrix(adaptiveCovariance); //Now we update and continue!
   }
   // if(total_steps%1000==0 && total_steps>1000){
@@ -1426,14 +1425,15 @@ void covarianceBase::updateAdaptiveCovariance(){
 
 void covarianceBase::initialiseNewAdaptiveChain(){
   // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
-  adaptiveCovariance = new TMatrixDSym(size);
-  //  par_means.reserve(size);
-  for(int i=0; i<size; i++){
-    par_means.push_back(0);
-    par_means_prev.push_back(0);
-    for(int j=0; j<=i; j++){
-      (*adaptiveCovariance)(i,j)=0.0; // Just make an empty matrix
-      (*adaptiveCovariance)(j,i)=0.0; // Just make an empty matrix
+  adaptiveCovariance = new TMatrixDSym(_fNumPar);
+  par_means.resize(_fNumPar);
+  par_means_prev.resize(_fNumPar);
+  for(int i = 0; i < _fNumPar; ++i){
+    par_means[i] = 0.;
+    par_means_prev[i] = 0.;
+    for(int j = 0; j <= i; ++j){
+      (*adaptiveCovariance)(i,j) = 0.0; // Just make an empty matrix
+      (*adaptiveCovariance)(j,i) = 0.0; // Just make an empty matrix
     }
   }
 }
@@ -1441,7 +1441,7 @@ void covarianceBase::initialiseNewAdaptiveChain(){
 void covarianceBase::saveAdaptiveToFile(TString outFileName, TString systematicName){
   TFile* outFile = new TFile(outFileName, "UPDATE");
   if(outFile->IsZombie()){
-    std::cerr<<"ERROR : Couldn't find "<<outFileName<<std::endl;
+    MACH3LOG_ERROR("Couldn't find {}", outFileName);
     throw;
   }
   TVectorD* outMeanVec = new TVectorD((int)par_means.size());
@@ -1475,7 +1475,7 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)
   //Do SVD to get polar form
   TDecompSVD cov_sym_svd=TDecompSVD(cov_sym);
   if(!cov_sym_svd.Decompose()){
-    std::cerr<<"Cannot do SVD on input matrix!"<<std::endl;
+    MACH3LOG_ERROR("Cannot do SVD on input matrix!");
     throw;
   }
   
@@ -1507,13 +1507,12 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)
 
 std::vector<double> covarianceBase::getNominalArray()
 {
- std::vector<double> nominal;
-  for (int i = 0; i < size; i++)
-  {
-    nominal.push_back(_fPreFitValue[i]);
+  std::vector<double> nominal(_fNumPar);
+  for (int i = 0; i < _fNumPar; ++i)
+    {
+    nominal[i] = _fPreFitValue[i];
   }
  return nominal;
-
 }
 
 // ********************************************
