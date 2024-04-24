@@ -1509,7 +1509,7 @@ std::vector<double> covarianceBase::getNominalArray()
 {
   std::vector<double> nominal(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i)
-    {
+  {
     nominal[i] = _fPreFitValue[i];
   }
  return nominal;
