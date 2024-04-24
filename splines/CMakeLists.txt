@@ -15,7 +15,8 @@ add_library(Splines SHARED
 
 if(NOT CPU_ONLY)
     set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
 if(MaCh3_DEBUG_ENABLED)

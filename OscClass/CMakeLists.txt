@@ -31,7 +31,8 @@ if (NOT CPU_ONLY)
 
   if(NOT CPU_ONLY)
       set_target_properties(Atmos PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-      set_property(TARGET Atmos PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+      #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+      set_property(TARGET Atmos PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
   endif()
 
   install(TARGETS Atmos
@@ -84,7 +85,8 @@ target_include_directories(OscClass PUBLIC
 
 if(NOT CPU_ONLY)
     set_target_properties(OscClass PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET OscClass PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET OscClass PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
 install(TARGETS OscClass

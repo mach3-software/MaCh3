@@ -23,7 +23,8 @@ add_library(MCMC SHARED
 
 if(NOT CPU_ONLY)
     set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
 set_target_properties(MCMC PROPERTIES

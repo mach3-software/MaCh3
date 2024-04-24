@@ -189,7 +189,7 @@ if(NOT DEFINED MaCh3_MULTITHREAD_ENABLED)
   SET(MaCh3_MULTITHREAD_ENABLED TRUE)
 endif()
 
-#Add MultiThread flags
+#Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)

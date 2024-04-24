@@ -27,10 +27,21 @@ else()
     cmessage(WARNING "Failed to execute nvidia-smi command.")
 endif()
 
-#KS: Apparently with newer cmake and GPU
-set(CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+#KS: Allow user to define CMAKE_CUDA_ARCHITECTURES
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+  #KS: See this for more info https://cmake.org/cmake/help/latest/prop_tgt/CUDA_ARCHITECTURES.html
+  if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.23 )
+    set(CMAKE_CUDA_ARCHITECTURES all )
+    #KS: Consider using native, requires cmake 3.24... will be terrible for containters but should results in more optimised code
+    #set(CMAKE_CUDA_ARCHITECTURES native )
+  else()
+    #KS: Apparently with newer cmake and GPU
+    #set(CMAKE_CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+  endif()
+endif()
+
 # Join elements of the list with spaces
-string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CUDA_ARCHITECTURES}")
+string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CMAKE_CUDA_ARCHITECTURES}")
 
 # Output the message with spaces between numbers
 cmessage(STATUS "Using following CUDA architectures: ${CUDA_ARCHITECTURES_STR}")
@@ -77,7 +88,7 @@ if(BUILTIN_CUDASAMPLES_ENABLED )
     endif()
 endif()
 
-#KS: Keep this for backward compatibility\
+#KS: Keep this for backward compatibility
 
 #-Xptxas "-dlcm=ca -v --allow-expensive-optimizations=true -fmad=true"
 #-Xcompiler "-fpic" -c
