@@ -49,7 +49,7 @@ public:
   samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
   virtual ~samplePDFFDBase();
 
-  int GetNDim(); //DB Function to differentiate 1D or 2D binning
+  const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -251,8 +251,14 @@ public:
 
   //ETA - binning opt can probably go soon...
   int BinningOpt;
+  /// @var const int nDimensions
+  /// @brief keep track of the dimensions of the sample binning
+  int nDimensions = {};
   int SampleDetID;
   bool IsRHC;
+  /// @var std::vector<std::string> SplineBinnedVars
+  /// @brief  holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
+  std::vector<std::string> SplineBinnedVars;
 
   std::string samplename;
 
@@ -280,6 +286,7 @@ public:
   std::vector< std::vector<double> > StoredSelection; 
   //===========================================================================
   //
+
 
   //ETA - trying new way of doing shift parameters
   // leave this for now but coming soon!

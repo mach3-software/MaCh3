@@ -67,12 +67,11 @@ void samplePDFFDBase::fill2DHist()
   return;
 }
 
-/*! \function samplePDFFDBase::SetupSampleBinning()
- *  \brief Function to setup the binning of your sample histograms and the underlying 
- *  arrays that get handled in fillArray() and fillArray_MP().
- *  The SampleXBins are filled in the daughter class from the sample config file.
- *  This "passing" can be removed. 
- */
+/// @function samplePDFFDBase::SetupSampleBinning()
+/// @brief Function to setup the binning of your sample histograms and the underlying 
+/// arrays that get handled in fillArray() and fillArray_MP().
+/// The SampleXBins are filled in the daughter class from the sample config file.
+/// This "passing" can be removed. 
 void samplePDFFDBase::SetupSampleBinning(){
 
   TString histname1d = (XVarStr).c_str();
@@ -940,24 +939,18 @@ void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
   return;
 }
 
-//ETA - this is all a bit stupid
+//ETA - this is all a bit (less) stupid
 void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
 
   _hPDF1D->Reset();
   _hPDF1D->SetBins(XVec.size()-1, XVec.data());
   dathist->SetBins(XVec.size()-1, XVec.data());
 
+  //This will overwrite XBinEdges with whatever you pass this function
   XBinEdges = XVec;
-  //for (int i=0;i<nbins+1;i++) {
-//	XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(i+1);
-//  }
   YBinEdges = std::vector<double>(2);
   YBinEdges[0] = -1e8;
   YBinEdges[1] = 1e8;
-
-  double YBinEdges_Arr[2];
-  YBinEdges_Arr[0] = YBinEdges[0];
-  YBinEdges_Arr[1] = YBinEdges[1];
 
   _hPDF2D->Reset();
   _hPDF2D  ->SetBins(XVec.size()-1, XVec.data(), YBinEdges.size()-1, YBinEdges.data());
@@ -1271,7 +1264,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 
 //ETA - this can be changed quite easily to check the number of XBins and YBins.
 //We can slowly but surely remove any trace of BinningOpt
-int samplePDFFDBase::GetNDim() {
+/*int samplePDFFDBase::GetNDim() {
   switch(BinningOpt) {
   case 0: 
   case 1:
@@ -1286,6 +1279,7 @@ int samplePDFFDBase::GetNDim() {
     return 0;
   }  
 }
+*/
 
 void samplePDFFDBase::addData(std::vector<double> &data) {
   dataSample = new std::vector<double>(data);
@@ -1393,6 +1387,9 @@ inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   return totalweight;
 }
 
+/// @func fillSplineBins()
+/// @brief Finds the binned spline that an event should apply to and stored them in a
+/// a vector for easy evaluation in the fillArray() function.
 void samplePDFFDBase::fillSplineBins() {
 
   std::cout << "Now in fillSplineBins" << std::endl;
@@ -1402,6 +1399,20 @@ void samplePDFFDBase::fillSplineBins() {
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
 
       std::vector< std::vector<int> > EventSplines;
+	  switch(nDimensions){
+		case 1:
+		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+		  break;
+		case 2:
+		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+		  break;
+		default:
+		MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
+		MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
+		MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+		break;
+	  }
+	  /*
 	  switch (BinningOpt) {
 		case 0: // splines binned in erec
 		case 1:
@@ -1410,7 +1421,6 @@ void samplePDFFDBase::fillSplineBins() {
 		case 2:
 		  //Straight out of SKBase
 		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j])*0.001, *(MCSamples[i].y_var[j]));
-
 		  //FD base
 		  //EventSplines = MCSamples[i].splineFile->GetEventSplines(SampleName, j, *(MCSamples[i].mode[j]), MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j], MCSamples[i].yvar_s_bin[j]); 
 		  break;
@@ -1418,6 +1428,7 @@ void samplePDFFDBase::fillSplineBins() {
 		  std::cout << "Error in assigning spline bins because BinningOpt = " << BinningOpt << std::endl;
 		  break;
 	  }
+	  */
 
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
 
