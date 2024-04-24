@@ -9,6 +9,7 @@
 
 //MaCh3
 #include "covariance/covarianceXsec.h"
+#include "manager/manager.h"
 
 class splineFDBase
 {
@@ -26,7 +27,7 @@ class splineFDBase
     //Spline Monolith things
 	//Essential methods used externally
 	//Move these to splineFDBase in core
-	bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames);
+	bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
 	void TransferToMonolith();	
 	void cleanUpMemory(){
 	  //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
@@ -56,8 +57,10 @@ class splineFDBase
 	std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
 
 	int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
-	int getNDim(int BinningOpt);
-	TString getDimLabel(int BinningOpt, int Axis);
+	//int getNDim(int BinningOpt);
+	std::string getDimLabel(int iSample, unsigned int Axis);
+	std::vector<std::vector<std::string>> DimensionLabels;
+    
 	int getSampleIndex(std::string SampleName);
 	bool isValidSplineIndex(std::string SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
 

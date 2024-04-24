@@ -16,13 +16,13 @@ splineFDBase::splineFDBase(covarianceXsec *xsec_) {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames)
+bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  BinningOpts.push_back(BinningOpt);
-  Dimensions.push_back(getNDim(BinningOpt));
+  Dimensions.push_back(NSplineDimensions);
+  DimensionLabels.push_back(SplineVarNames);
   DetIDs.push_back(DetID);
 
   int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
@@ -84,7 +84,6 @@ void splineFDBase::TransferToMonolith()
   weightvec_Monolith.reserve(MonolithSize);
   isflatarray = new bool[MonolithSize];
   
-
   xcoeff_arr = new __float__[CoeffIndex];
   manycoeff_arr = new __float__[CoeffIndex*4];
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
@@ -363,10 +362,14 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   TObject *Obj = File->Get("dev_tmp_0_0");
   if (!Obj)
   {
-    std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
-    std::cerr << "FileName: " << FileName << std::endl;
-    std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+	Obj = File->Get("dev_tmp.0.0");
+	if (!Obj)
+	{
+	  std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
+	  std::cerr << "FileName: " << FileName << std::endl;
+	  std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
+	  throw;
+	}
   }
 
   if (Obj->IsA() == TH2F::Class())
@@ -401,15 +404,17 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     }
     Hist2D = (TH2F *)File->Get("dev_tmp_0_0");
   }
+
   if (isHist3D)
   {
-    if (Dimensions[iSample] != 3)
+    Hist3D = (TH3F *)Obj->Clone();
+    if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
       std::cerr << "Trying to load a 3D spline template when nDim=" << Dimensions[iSample] << std::endl;
       std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
       throw;
     }
-    Hist3D = (TH3F *)File->Get("dev_tmp_0_0");
+	//File->Get("dev_tmp_0_0");
   }
 
   int nDummyBins = 1;
@@ -420,9 +425,16 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (Dimensions[iSample] == 2)
   {
-    ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
-    ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
-    ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
+	if(isHist2D){
+	  ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
+	  ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
+	  ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
+	}
+	else if(isHist3D){
+	  ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
+	  ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
+	  ReturnVec.push_back((TAxis *)(Hist3D->GetZaxis())->Clone());
+	}
   }
   else if (Dimensions[iSample] == 3)
   {
@@ -439,7 +451,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); iAxis++)
   {
-    std::cout << "Stored Var " << iAxis << " (" << getDimLabel(BinningOpts[iSample], iAxis) << ") Spline Binning for sample " << SampleNames[iSample] << ":" << std::endl;
+    std::cout << "Stored Var " << iAxis << " (" << getDimLabel(iSample, iAxis) << ") Spline Binning for sample " << SampleNames[iSample] << ":" << std::endl;
     PrintBinning(ReturnVec[iAxis]);
   }
 
@@ -744,10 +756,11 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, __float__* &xArray, _
   splinevec_Monolith[splineindex] = NULL;
 }
 
+
 //****************************************
-int splineFDBase::getNDim(int BinningOpt)
+//int splineFDBase::getNDim(int BinningOpt)
 //****************************************
-{
+/*{
   int ReturnVal = -1;
 
   switch (BinningOpt)
@@ -768,69 +781,70 @@ int splineFDBase::getNDim(int BinningOpt)
 
   return ReturnVal;
 }
+*/
 
 //ETA - this may need to be virtual and then we can define this in the experiment.
 //Equally though could just use KinematicVariable to map back
 //****************************************
-TString splineFDBase::getDimLabel(int BinningOpt, int Axis)
+std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 //****************************************
 {
-  if (Axis < 0 || Axis >= 3)
-  {
-    std::cerr << "Invalid axis:" << Axis << std::endl;
-    throw;
+  if(Axis > DimensionLabels[iSample].size()){
+	MACH3LOG_ERROR("The spline Axis you are trying to get the label of is larger than the number of dimensions"); 
+	MACH3LOG_ERROR("You are trying to get axis {} but have only got {}", Axis, Dimensions[iSample]);
+	throw;
   }
+//  std::string ReturnVal;
+//  switch (BinningOpt)
+//  {
+//  case 0:
+//    if (Axis == 0)
+//      ReturnVal = "ETrue";
+//    if (Axis == 1)
+//      ReturnVal = "Erec";
+//    if (Axis == 2)
+//      ReturnVal = "Dummy";
+//    break;
+//  case 1:
+//    if (Axis == 0)
+//      ReturnVal = "ETrue";
+//    if (Axis == 1)
+//      ReturnVal = "Momentum";
+//    if (Axis == 2)
+//      ReturnVal = "Theta";
+//    break;
+//  case 2:
+//    if (Axis == 0)
+//      ReturnVal = "ETrue";
+//    if (Axis == 1)
+//      ReturnVal = "Erec";
+//    if (Axis == 2)
+//      ReturnVal = "Theta";
+//    break;
+//  case 3:
+//    if (Axis == 0)
+//      ReturnVal = "ETrue";
+//    if (Axis == 1)
+//      ReturnVal = "Erec";
+//    if (Axis == 2)
+//      ReturnVal = "Q2";
+//    break;
+//  case 4:
+//    if (Axis == 0)
+//      ReturnVal = "ETrue";
+//    if (Axis == 1)
+//      ReturnVal = "Momentum";
+//    if (Axis == 2)
+//      ReturnVal = "CosineZenith";
+//    break;
+//  default:
+//    std::cout << "Unrecognised BinningOpt = " << BinningOpt << std::endl;
+//    throw;
+//  }
 
-  std::string ReturnVal;
-  switch (BinningOpt)
-  {
-  case 0:
-    if (Axis == 0)
-      ReturnVal = "ETrue";
-    if (Axis == 1)
-      ReturnVal = "Erec";
-    if (Axis == 2)
-      ReturnVal = "Dummy";
-    break;
-  case 1:
-    if (Axis == 0)
-      ReturnVal = "ETrue";
-    if (Axis == 1)
-      ReturnVal = "Momentum";
-    if (Axis == 2)
-      ReturnVal = "Theta";
-    break;
-  case 2:
-    if (Axis == 0)
-      ReturnVal = "ETrue";
-    if (Axis == 1)
-      ReturnVal = "Erec";
-    if (Axis == 2)
-      ReturnVal = "Theta";
-    break;
-  case 3:
-    if (Axis == 0)
-      ReturnVal = "ETrue";
-    if (Axis == 1)
-      ReturnVal = "Erec";
-    if (Axis == 2)
-      ReturnVal = "Q2";
-    break;
-  case 4:
-    if (Axis == 0)
-      ReturnVal = "ETrue";
-    if (Axis == 1)
-      ReturnVal = "Momentum";
-    if (Axis == 2)
-      ReturnVal = "CosineZenith";
-    break;
-  default:
-    std::cout << "Unrecognised BinningOpt = " << BinningOpt << std::endl;
-    throw;
-  }
-
-  return ReturnVal;
+  return DimensionLabels[iSample][Axis];
 }
+
 
 //Returns sample index in 
 int splineFDBase::getSampleIndex(std::string SampleName){
@@ -858,7 +872,9 @@ void splineFDBase::PrintSampleDetails(std::string SampleName)
 
   int iSample = getSampleIndex(SampleName);
 
-  std::cout << "Details about sample: " << std::setw(20) << SampleNames[iSample] << std::endl;
+  MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
+//  MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample])
+/*  std::cout << "Details about sample: " << std::setw(20) << SampleNames[iSample] << std::endl;
   std::cout << "\t" << std::setw(35) << "Binning Option"
             << ":" << BinningOpts[iSample] << std::endl;
   std::cout << "\t" << std::setw(35) << "Dimension"
@@ -869,6 +885,7 @@ void splineFDBase::PrintSampleDetails(std::string SampleName)
             << ":" << nSplineParams[iSample] << std::endl;
   std::cout << "\t" << std::setw(35) << "Number of Oscillation Channels"
             << ":" << nOscChans[iSample] << std::endl;
+			*/
 }
 
 //****************************************
