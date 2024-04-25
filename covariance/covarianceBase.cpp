@@ -1,9 +1,10 @@
 #include "covarianceBase.h"
+
 // ********************************************
 covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {
 // ********************************************
 
-  std::cout << "Constructing instance of covarianceBase" << std::endl;
+  MACH3LOG_INFO("Constructing instance of covarianceBase");
   init(name, file);
   FirstPCAdpar = -999;
   LastPCAdpar = -999;
@@ -39,10 +40,10 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed) : i
   #ifdef MULTITHREAD
   if(seed != 0)
   {
-     std::cerr<<"You have set seed to "<<seed<<std::endl;
-     std::cerr<<"And you are running with MULTITHREAD"<<std::endl;
-     std::cerr<<"TRandom for each thread will have same seed"<<std::endl;
-     std::cerr<<"This is fine if this was your intention"<<std::endl;
+    MACH3LOG_WARN("You have set seed to {}", seed);
+    MACH3LOG_WARN("And you are running with MULTITHREAD");
+    MACH3LOG_WARN("TRandom for each thread will have same seed");
+    MACH3LOG_WARN("This is fine if this was your intention");
   }
   #endif
 
@@ -66,10 +67,10 @@ covarianceBase::covarianceBase(const char *name, const char *file, int seed, dou
 #ifdef MULTITHREAD
   if(seed != 0)
   {
-    std::cerr<<"You have set seed to "<<seed<<std::endl;
-    std::cerr<<"And you are running with MULTITHREAD"<<std::endl;
-    std::cerr<<"TRandom for each thread will have same seed"<<std::endl;
-    std::cerr<<"This is fine if this was your intention"<<std::endl;
+    MACH3LOG_WARN("You have set seed to {}", seed);
+    MACH3LOG_WARN("And you are running with MULTITHREAD");
+    MACH3LOG_WARN("TRandom for each thread will have same seed");
+    MACH3LOG_WARN("This is fine if this was your intention");
   }
 #endif
   MACH3LOG_INFO("Constructing instance of covarianceBase");
@@ -172,28 +173,28 @@ void covarianceBase::ConstructPCA() {
       break;
     }
   }
-  npars = numunpcadpars+nKeptPCApars;
-  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, npars);
+  _fNumParPCA = numunpcadpars+nKeptPCApars;
+  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, _fNumParPCA);
 
   //DB Create array of correct size so eigen_values can be used in CorrelateSteps
-  eigen_values_master = std::vector<double>(npars,1.0);
+  eigen_values_master = std::vector<double>(_fNumParPCA, 1.0);
   for (int i = FirstPCAdpar; i < FirstPCAdpar+nKeptPCApars; ++i) {eigen_values_master[i] = eigen_values(i-FirstPCAdpar);}
 
   // Now construct the transfer matrices
   //These matrices will be as big as number of unPCAd pars plus number of eigenvalues kept
-  TransferMat.ResizeTo(covMatrix->GetNrows(), npars);
-  TransferMatT.ResizeTo(covMatrix->GetNrows(), npars);
+  TransferMat.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
+  TransferMatT.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
 
   // Get a subset of the eigen vector matrix
   TMatrixD temp(eigen_vectors.GetSub(0, eigen_vectors.GetNrows()-1, 0, nKeptPCApars-1));
   
   //Make transfer matrix which is two blocks of identity with a block of the PCA transfer matrix in between
   TMatrixD temp2;
-  temp2.ResizeTo(covMatrix->GetNrows(), npars);
+  temp2.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
 
   //First set the whole thing to 0
   for(int iRow = 0; iRow < covMatrix->GetNrows(); iRow++){
-    for(int iCol = 0; iCol < npars; iCol++){
+    for(int iCol = 0; iCol < _fNumParPCA; iCol++){
       temp2[iRow][iCol] = 0;
     }
   }
@@ -224,20 +225,20 @@ void covarianceBase::ConstructPCA() {
   pca = true;
 
   // Make the PCA parameter arrays
-  fParCurr_PCA.ResizeTo(npars);
-  fParProp_PCA.ResizeTo(npars);
+  fParCurr_PCA.ResizeTo(_fNumParPCA);
+  fParProp_PCA.ResizeTo(_fNumParPCA);
   
   //KS: make easy map so we could easily find un-decomposed parameters
-  isDecomposed_PCA.resize(npars);
-  fParSigma_PCA.resize(npars);
-  for (int i = 0; i < npars; ++i)
+  isDecomposed_PCA.resize(_fNumParPCA);
+  fParSigma_PCA.resize(_fNumParPCA);
+  for (int i = 0; i < _fNumParPCA; ++i)
   {
     fParSigma_PCA[i] = 1;
     isDecomposed_PCA[i] = -1;
   }
   for (int i = 0; i < FirstPCAdpar; ++i) isDecomposed_PCA[i] = i;
   
-  for (int i = FirstPCAdpar+nKeptPCApars+1; i < npars; ++i) isDecomposed_PCA[i] = i+(size-npars);
+  for (int i = FirstPCAdpar+nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposed_PCA[i] = i+(size-_fNumParPCA);
 
   #ifdef DEBUG_PCA
   //KS: Let's dump all useful matrices to properly validate PCA
@@ -306,7 +307,7 @@ void covarianceBase::init(const char *name, const char *file)
     MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", getName(), _fNumPar);
     throw;
   }
-  npars = _fNumPar;
+  _fNumParPCA = _fNumPar;
 
   ReserveMemory(_fNumPar);
 
@@ -367,7 +368,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
     }
   }
 
-  ReserveMemory(size);
+  ReserveMemory(_fNumPar);
 
   TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
   //_fDetString = std::vector<std::string>(_fNumPar);
@@ -424,10 +425,10 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
 
       //If you found the parameter name then get the index
       if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
-        index=CorrNamesMap[key];
+        index = CorrNamesMap[key];
       }
       else {
-        std::cout << "Parameter " << key << " not in list! Check your spelling?" << std::endl;
+        MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
         exit(5);
       }
 
@@ -438,12 +439,12 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
         Corr2 = Correlations[index][_fFancyNames[i]];
         //Do they agree to better than float precision?
         if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
-          std::cout << "Correlations are not equal between " << _fFancyNames[i] << " and " << key << std::endl;
-          std::cout << "Got : " << Corr2  << " and " << Corr1 << std::endl;
+          MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[i], key);
+          MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
           exit(5);
         }
       } else {
-        std::cout << "Correlation does not appear reciprocally between " << _fFancyNames[i] << " and " << key << std::endl;
+        MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[i], key);
         exit(5);
       }
       (*_fCovMatrix)(i,index)= (*_fCovMatrix)(index,i) = Corr1*_fError[i]*_fError[index];
@@ -454,18 +455,18 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
   MakePosDef(_fCovMatrix);
   setCovMatrix(_fCovMatrix);
 
-  if (size <= 0) {
-    std::cerr << "Covariance object has " << size << " systematics!" << std::endl;
+  if (_fNumPar <= 0) {
+    MACH3LOG_ERROR("Covariance object has {} systematics!", _fNumPar);
     throw;
   }
-  npars = size;
+  _fNumParPCA = _fNumPar;
 
   MACH3LOG_INFO("Created covariance matrix from files: ");
   for(const auto &file : YAMLFile){
     MACH3LOG_INFO("{} ", file);
   }
   MACH3LOG_INFO("----------------");
-  MACH3LOG_INFO("Found {} systematics parameters in total", size);
+  MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
   MACH3LOG_INFO("----------------");
 
   return;
@@ -493,23 +494,23 @@ void covarianceBase::init(TMatrixDSym* covMat) {
 
   ReserveMemory(_fNumPar);
 
-  std::cout << "Created covariance matrix named: " << getName() << std::endl;
+  MACH3LOG_INFO("Created covariance matrix named: {}", getName());
 }
 
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
   if (cov == NULL) {
-    std::cerr << "Could not find covariance matrix you provided to setCovMatrix" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("Could not find covariance matrix you provided to setCovMatrix");
+    MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
     throw;
   }
   covMatrix = cov;
   invCovMatrix = (TMatrixDSym*)cov->Clone();
   invCovMatrix->Invert();
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < _fNumPar; i++)
   {
-    for (int j = 0; j < size; ++j)
+    for (int j = 0; j < _fNumPar; ++j)
     {
       InvertCovMatrix[i][j] = (*invCovMatrix)(i,j);
     }
@@ -557,11 +558,8 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
 // Might want to split this
 void covarianceBase::setPar(int i , double val) {
 
-  std::cout << "Over-riding " << GetParName(i) << ": " << std::endl;
-  std::cout << "_fPropVal (" << _fPropVal[i];
-  std::cout << "), _fCurrVal (" << _fCurrVal[i];
-  std::cout << "), _fPreFitValue (" << _fPreFitValue[i]; 
-  std::cout << ") to " << val << std::endl;
+  MACH3LOG_INFO("Over-riding {}: ", GetParName(i));
+  MACH3LOG_INFO("_fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})", _fPropVal[i], _fCurrVal[i], _fPreFitValue[i], val);
 
   _fPropVal[i] = val;
   _fCurrVal[i] = val;
@@ -702,13 +700,12 @@ void covarianceBase::throwParameters() {
         if (throws > 10000) 
         {
           //KS: Since we are multithreading there is danger that those messages
-		  //will be all over the place, small price to pay for faster code
-          std::cerr << "Tried " << throws << " times to throw parameter "; 
-		  std::cerr << i << " but failed" << std::endl;
-          std::cerr << "Matrix: " << matrixName << std::endl;
-          std::cerr << "Param:  " << _fNames[i] << std::endl;
-          std::cerr << "Setting _fPropVal:  " << _fPropVal[i] <<" to "<< _fPreFitValue[i]<<std::endl;
-          std::cerr << "I live at " << __FILE__ << ":" << __LINE__ << std::endl;
+          //will be all over the place, small price to pay for faster code
+          MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
+          MACH3LOG_WARN("Matrix: {}", matrixName);
+          MACH3LOG_WARN("Param: {}", _fNames[i]);
+          MACH3LOG_WARN("Setting _fPropVal:  {} to {}", _fPropVal[i], _fPreFitValue[i]);
+          MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
           _fPropVal[i] = _fPreFitValue[i];
           //throw;
         }
@@ -815,7 +812,7 @@ void covarianceBase::randomize() {
         randParams[i] = 0.0;
       }
     } // end for
-  // If we're in the PCA basis we instead throw parameters there (only npars parameter)
+  // If we're in the PCA basis we instead throw parameters there (only _fNumParPCA parameter)
   } else {
     // Scale the random parameters by the sqrt of eigen values for the throw
 #ifdef MULTITHREAD
@@ -823,7 +820,7 @@ void covarianceBase::randomize() {
 #endif
     for (int i = 0; i < size; ++i)
     {
-      if (fParSigma_PCA[i] > 0. && i < npars)
+      if (fParSigma_PCA[i] > 0. && i < _fNumParPCA)
       {
 #ifdef MULTITHREAD        
         randParams[i] = random_number[omp_get_thread_num()]->Gaus(0,1);
@@ -861,12 +858,12 @@ void covarianceBase::CorrelateSteps() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < npars; ++i)
+    for (int i = 0; i < _fNumParPCA; ++i)
     {
       if (fParSigma_PCA[i] > 0.) 
       {
         double IndStepScale = 1.;
-        //KS: If undecomposed parameter apply individual step scale and cholesky for better acceptance rate
+        //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
         if(isDecomposed_PCA[i] >= 0)
         {
           IndStepScale *= _fIndivStepScale[isDecomposed_PCA[i]];
@@ -902,7 +899,7 @@ void covarianceBase::acceptStep() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < npars; ++i) {
+    for (int i = 0; i < _fNumParPCA; ++i) {
       fParCurr_PCA(i) = fParProp_PCA(i);
     }
     // Then update the parameter basis
@@ -983,7 +980,7 @@ void covarianceBase::printNominalCurrProp() {
   // Dump out the PCA parameters too
   if (pca) {
     MACH3LOG_INFO("PCA:");
-    for (int i = 0; i < npars; ++i) {
+    for (int i = 0; i < _fNumParPCA; ++i) {
       std::cout << std::setw(PrintLength) << std::left << "PCA " << i << " Current: " << fParCurr_PCA(i) << " Proposed: " << fParProp_PCA(i) << std::endl;
     }
   }
@@ -1049,9 +1046,9 @@ double covarianceBase::GetLikelihood(){
 
 void covarianceBase::printPars() {
 
-  std::cout << "Number of pars: " << size << std::endl;
-  std::cout << "current " << matrixName << " parameters:" << std::endl;
-  for(int i = 0; i < size; i++) {
+  MACH3LOG_INFO("Number of pars: {}", _fNumPar);
+  MACH3LOG_INFO("Current {} parameters:", matrixName);
+  for(int i = 0; i < _fNumPar; i++) {
     std::cout << std::fixed << std::setprecision(5) << _fNames[i].c_str() << " current: \t" << _fCurrVal[i] << "   \tproposed: \t" << _fPropVal[i] << std::endl;
   }
 
@@ -1103,7 +1100,7 @@ void covarianceBase::setBranches(TTree &tree) {
   }
   // When running PCA, also save PCA parameters
   if (pca) {
-    for (int i = 0; i < npars; ++i) { 
+    for (int i = 0; i < _fNumParPCA; ++i) {
       tree.Branch(Form("%s_PCA", _fNames[i].c_str()), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
@@ -1127,7 +1124,7 @@ void covarianceBase::toggleFixAllParameters() {
   {
     for (int i = 0; i < size; i++) _fError[i] *= -1.0;
   } else{
-     for (int i = 0; i < npars; i++) fParSigma_PCA[i] *= -1.0;
+     for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
   }
   return;
 }
@@ -1146,7 +1143,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 	} 
   } else {
 	int isDecom = -1;
-	for (int im = 0; im < npars; ++im) { 
+	for (int im = 0; im < _fNumParPCA; ++im) {
 	  if(isDecomposed_PCA[im] == i) {isDecom = im;}
 	}
 	if(isDecom < 0) {

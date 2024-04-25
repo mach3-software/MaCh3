@@ -19,7 +19,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
   double fScale = 1.0;
 
   //KS: Save all necessary information from covariance
-  for(int io = 0; io < size; io++)
+  for(int io = 0; io < _fNumPar; io++)
   {
     _fNames[io] = std::string(((TObjString*)objarr_name->At(io))->GetString());
     
@@ -30,7 +30,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
     _fIndivStepScale[io] = fScale * (*osc_stepscale)(io);
     
     //KS: Set flat prior
-    if( (bool)((*osc_flat_prior)(io)) ) setEvalLikelihood(io,false);
+    if( (bool)((*osc_flat_prior)(io)) ) setEvalLikelihood(io, false);
   }
 
   kDeltaCP = -999;
@@ -38,7 +38,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
   kSinTheta23 = -999;
   kBeta = -999;
   PerformBetaStudy = false;
-  for(int io = 0; io < size; io++)
+  for(int io = 0; io < _fNumPar; io++)
   {
     if(_fNames[io] == "delta_cp")  kDeltaCP = io;
     if(_fNames[io] == "delm2_23")  kDeltaM23 = io;
@@ -72,7 +72,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
   infile->Close();
   delete infile;
   
-  std::cout << "created oscillation parameter handler" << std::endl;
+  MACH3LOG_INFO("created oscillation parameter handler");
 }
 
 // *************************************
@@ -200,7 +200,7 @@ void covarianceOsc::setExtraBranches(TTree &tree) {
   // set branches to save current and proposed osc pars for dm_32 and th_23
   // Is this any different for any of the other parameters?
   // Or can this SetExtraBranches just be in the base class?
-  for (int i = 0; i < size; ++i)
+  for (int i = 0; i < _fNumPar; ++i)
   {
     if (!(i==1 || i==4)) continue;
 
@@ -224,15 +224,15 @@ void covarianceOsc::setExtraBranches(TTree &tree) {
 void covarianceOsc::Print() {
 // *************************************
 
-  std::cout << "Number of pars: " << size << std::endl;
+  std::cout << "Number of pars: " << _fNumPar << std::endl;
   std::cout << "current " << matrixName << " parameters:" << std::endl;
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(15) << "IndivStepScale" << std::setw(2) << "|" <<std::setw(15) << "_fError"  << std::endl;
-  for(int i = 0; i < size; i++) {
+  for(int i = 0; i < _fNumPar; i++) {
     std::cout << std::fixed << std::setprecision(5) << std::left << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << _fNames[i].c_str() << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i]<< std::setw(2) << "|" << std::setw(15) << _fIndivStepScale[i] << std::setw(2) << "|" << std::setw(15)<< _fError[i]<< std::endl;
   }
   
-  std::cout<<"Baseline: "<< L <<std::endl;
-  std::cout<<"Earth Density: "<< density <<std::endl;
+  MACH3LOG_INFO("Baseline: {}", L);
+  MACH3LOG_INFO("Earth Density: {}", density);
 }
 
 // *************************************

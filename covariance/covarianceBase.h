@@ -231,7 +231,7 @@ class covarianceBase {
       MACH3LOG_ERROR("Am not running in PCA mode");
       throw;
     }
-    if (pars.size() != size_t(npars)) {
+    if (pars.size() != size_t(_fNumParPCA)) {
       std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
       throw;
     }
@@ -246,8 +246,8 @@ class covarianceBase {
 
   inline int getSize() { return size; };
   inline int getNpars() {
-    if (pca) return npars;
-    else return size;
+    if (pca) return _fNumParPCA;
+    else return _fNumPar;
   }
 
   // Printers
@@ -359,7 +359,7 @@ class covarianceBase {
   // PCA
   bool pca;
   double eigen_threshold;
-  int npars;
+  int _fNumParPCA;
   int FirstPCAdpar;
   int LastPCAdpar;
   int nKeptPCApars;
