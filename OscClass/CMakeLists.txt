@@ -25,8 +25,6 @@ if (NOT CPU_ONLY)
       $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
       $<BUILD_INTERFACE:${CUDAProb3_SOURCE_DIR}/>
       $<INSTALL_INTERFACE:include>
-      $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-      $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
   )
 
   if(NOT CPU_ONLY)
@@ -49,15 +47,15 @@ set(HEADERS
     OscClass_CUDAProb3.h
     ${CUDAProb3_SOURCE_DIR}/beamcudapropagator.cuh
     ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cuh
-	${CUDAProb3_SOURCE_DIR}/constants.hpp
-	${CUDAProb3_SOURCE_DIR}/hpc_helpers.cuh
+    ${CUDAProb3_SOURCE_DIR}/constants.hpp
+    ${CUDAProb3_SOURCE_DIR}/hpc_helpers.cuh
     ${CUDAProb3_SOURCE_DIR}/beamcpupropagator.hpp
     ${CUDAProb3_SOURCE_DIR}/atmoscpupropagator.hpp
-	${CUDAProb3_SOURCE_DIR}/propagator.hpp
-	${CUDAProb3_SOURCE_DIR}/types.hpp
-	${CUDAProb3_SOURCE_DIR}/math.hpp
-	${CUDAProb3_SOURCE_DIR}/physics.hpp
-	${CUDAProb3_SOURCE_DIR}/cpupropagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/propagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/types.hpp
+    ${CUDAProb3_SOURCE_DIR}/math.hpp
+    ${CUDAProb3_SOURCE_DIR}/physics.hpp
+    ${CUDAProb3_SOURCE_DIR}/cpupropagator.hpp
 )
 
 add_library(OscClass SHARED
@@ -79,8 +77,6 @@ target_include_directories(OscClass PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<BUILD_INTERFACE:${CUDAProb3_SOURCE_DIR}/>
     $<INSTALL_INTERFACE:include>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
 if(NOT CPU_ONLY)

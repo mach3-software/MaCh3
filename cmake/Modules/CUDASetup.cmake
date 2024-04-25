@@ -62,6 +62,11 @@ else()
 	)
 endif()
 
+include_directories(
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$ENV{CUDAPATH}/include>
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$ENV{CUDAPATH}/samples/common/inc>
+)
+
 add_link_options(-I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 if(NOT DEFINED ENV{CUDAPATH})
     cmessage(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
