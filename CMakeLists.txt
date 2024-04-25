@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 1.0.0)
+SET(MaCh3_VERSION 1.1.0)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
@@ -68,7 +68,7 @@ endif()
 #YAML for reading in config files
 set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
 set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
-CPMFindPackage(
+CPMAddPackage(
     NAME yaml-cpp
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
@@ -290,6 +290,21 @@ foreach(dest ${export_destinations})
           DESTINATION ${dest}
   )
 endforeach()
+
+
+#KS: Options to print dependency graph
+if(NOT DEFINED MaCh3_DependancyGraph)
+  set(MaCh3_DependancyGraph FALSE)
+endif()
+
+if(MaCh3_DependancyGraph)
+  add_custom_target(graphviz ALL
+                    COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
+                    COMMAND dot -Tpng foo.dot -o foo.png
+                    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                    COMMENT "Generating dependency graph"
+  )
+endif()
 
 ############################  Install  ####################################
 

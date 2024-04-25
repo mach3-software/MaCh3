@@ -1,13 +1,15 @@
 #ignore any object files
 *.o
 
-#ingore some stuff in libconfig
+#ignore some stuff in libconfig
 *.lo
 *.la
 *.Plo
 lib/*
 
 build/
+Doc/latex/
+Doc/html/
 
 # Ignore emacs/vim stuff
 *#* 

@@ -1,5 +1,4 @@
-#ifndef _covarianceParserYAML_h_
-#define _covarianceParserYAML_h_
+#pragma once
 
 #include "yaml-cpp/yaml.h"
 #include <iostream>
@@ -79,6 +78,3 @@ private:
 
 };
 
-
-
-#endif

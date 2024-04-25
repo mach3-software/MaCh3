@@ -40,6 +40,10 @@
 #include "TGraphPolar.h"
 #include "TMath.h"
 
+#include "samplePDF/Structs.h"
+#include "manager/manager.h"
+
+
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
 //  and want to send off another MCMC with those values, or perhaps to LLH scans at central values
@@ -64,39 +68,39 @@ class MCMCProcessor {
     MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
     ~MCMCProcessor();
 
-    // Scan chain, what paramters we have and load information from covariance matrices
+    /// @brief Scan chain, what parameters we have and load information from covariance matrices
     void Initialise();
-    //Make 1D projection for each parameter and prepare structure
+    /// @brief Make 1D projection for each parameter and prepare structure
     void MakePostfit();
-    //Calcuate covariance by making 2D projection of each combination of parameters
+    /// @brief Calculate covariance by making 2D projection of each combination of parameters
     void MakeCovariance();
-    //KS:By caching each step we use multithreading
+    /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
     void MakeCovariance_MP();
-    //Reset 2D posteriors, in case we would like to calcualte in again with different BurnInCut
+    /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
     void ResetHistograms();
         
-    // Draw the post-fit comparisons
+    /// @brief Draw the post-fit comparisons
     void DrawPostfit();
-    // Make and Draw Violin
+    /// @brief Make and Draw Violin
     void MakeViolin();
-    // Make and Draw Credible intervals
+    /// @brief Make and Draw Credible intervals
     void MakeCredibleIntervals();
-    // Draw the post-fit covariances
+    /// @brief Draw the post-fit covariances
     void DrawCovariance();
-    // Make and Draw Credible Regions
+    /// @brief Make and Draw Credible Regions
     void MakeCredibleRegions();
-    //Make fancy triangle plot for selected parameters
+    /// @brief Make fancy triangle plot for selected parameters
     void MakeTrianglePlot(std::vector<std::string> ParamNames);
-    
+    /// @brief Make funny polar plot
     void GetPolarPlot(std::vector<std::string> ParNames);
 
-    //Bayesian statistic hypotheis testing
+    //Bayesian statistic hypothesis testing
     void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
     
-    //KS: Perform MCMC diagnostic including AutoCorrelation, Trace etc.
+    /// @brief KS: Perform MCMC diagnostic including AutoCorrelation, Trace etc.
     void DiagMCMC();
     
     // Get the number of parameters
@@ -114,18 +118,18 @@ class MCMCProcessor {
     inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
-    inline std::string const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    inline std::string const & GetNDCov() const { return CovPos[kNDPar]; };
-    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar]; };
-    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar]; };
+    inline std::vector<std::string> const & GetXSecCov()  const { return CovPos[kXSecPar]; };
+    inline std::string const & GetNDCov() const { return CovPos[kNDPar].back(); };
+    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar].back(); };
+    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar].back(); };
     //inline std::string const & GetNDruns()   const { return NDruns; };
     //inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
-    // Get the post-fit results (arithmetic and Gaussian)
+    /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
-    // Get the post-fit covariances and correlations
+    /// @brief Get the post-fit covariances and correlations
     void GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr);
-    // Or the individual post-fits
+    /// @brief Or the individual post-fits
     void GetPostfit_Ind(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Peaks, ParameterEnum kParam);
     
     // Get the vector of branch names
@@ -236,7 +240,7 @@ class MCMCProcessor {
     inline std::string GetDunneKaboth(const double BayesFactor);
     inline double GetSigmaValue(int sigma);
 
-    // MCMC Diagnsotic
+    // MCMC Diagnostic
     inline void PrepareDiagMCMC();
     inline void ParamTraces();
     inline void AutoCorrelation();
@@ -246,15 +250,15 @@ class MCMCProcessor {
     inline void GewekeDiagnostic();
     inline void AcceptanceProbabilities();
     
-    //Usefull strings teling us about output etc
+    //Useful strings telling us about output etc
     std::string MCMCFile;
     std::string OutputSuffix;
     // Covariance matrix name position
-    std::vector<std::string> CovPos;
+    std::vector<std::vector<std::string>> CovPos;
     // ND runs
-    std::string NDruns;
+    //std::string NDruns;
     // ND selections
-    std::vector<std::string> NDsel;
+    //std::vector<std::string> NDsel;
 
     //Main chain storing all steps etc
     TChain *Chain;
@@ -263,7 +267,7 @@ class MCMCProcessor {
     std::string Posterior1DCut;
     int BurnInCut;
     int nBranches;
-    //KS: For merged chains number of entires will be different fron nSteps
+    //KS: For merged chains number of entries will be different from nSteps
     int nEntries;
     int nSteps;
     int nSamples;
@@ -309,7 +313,7 @@ class MCMCProcessor {
     bool PlotFlatPrior;
     bool PlotJarlskog;
     
-    //Even more falgse
+    //Even more flags
     bool MakeCorr;
     bool plotRelativeToPrior;
     bool MadePostfit;
@@ -331,7 +335,7 @@ class MCMCProcessor {
     // The output file
     TFile *OutputFile;
     
-    //Fancy canvas used for our beatufull plots
+    //Fancy canvas used for our beautiful plots
     TCanvas *Posterior;
 
     //Vector of best fit points and errors obtained with different methods

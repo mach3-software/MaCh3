@@ -1,5 +1,5 @@
-#ifndef _samplePDFFDBase_h_
-#define _samplePDFFDBase_h_
+#pragma once
+
 //C++ includes
 #include <iostream>
 #include <assert.h>
@@ -293,4 +293,3 @@ public:
   //std::vector< EnergyScale* > ShiftFunctors;
   //std::vector< BaseFuncPar* > ShiftFunctors;
 };
-#endif

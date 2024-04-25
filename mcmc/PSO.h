@@ -130,6 +130,8 @@ class PSO : public LikelihoodFit {
             return CalcChi2(a);
         };
 
+    inline std::string GetName()const {return "PSO";};
+
     private:
         particle* best_particle;
         double fBestValue;

@@ -7,6 +7,7 @@
 
 // C i/o  for printf and others
 #include <stdio.h>
+#include <vector>
 
 // CUDA specifics
 
@@ -154,7 +155,7 @@ inline void PrintNdevices() {
 // *******************************************
 
 // *******************************************
-// Initaliser when using the x array and combined y,b,c,d array
+// Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_SepMany(
 // *******************************************
                           float **gpu_x_array,
@@ -191,7 +192,7 @@ __host__ void InitGPU_SepMany(
   cudaMalloc((void **) gpu_weights, n_splines*sizeof(float));
   CudaCheckError();
 #ifndef Weight_On_SplineBySpline_Basis
-  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host meory which make memory trnasfer faster
+  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(float));
   CudaCheckError();
 
@@ -199,7 +200,7 @@ __host__ void InitGPU_SepMany(
   cudaMalloc((void **) gpu_total_weights, n_events*sizeof(float));
   CudaCheckError();
   
-  //KS: Allocate memory for the map keeping track how many splines each pamreter has
+  //KS: Allocate memory for the map keeping track how many splines each parameter has
   cudaMalloc((void **) gpu_nParamPerEvent, 2*n_events*sizeof(unsigned int));
   CudaCheckError();
   
@@ -216,7 +217,7 @@ __host__ void InitGPU_SepMany(
 }
 
 // *******************************************
-// Initaliser when using the x array and combined y,b,c,d array
+// Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_TF1(
 // *******************************************
                           float **gpu_coeffs,
@@ -250,7 +251,7 @@ __host__ void InitGPU_TF1(
   CudaCheckError();
 
 #ifndef Weight_On_SplineBySpline_Basis
-  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host meory which make memory trnasfer faster
+  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(float));
   CudaCheckError();
   
@@ -258,7 +259,7 @@ __host__ void InitGPU_TF1(
   cudaMalloc((void **) gpu_total_weights, n_events*sizeof(float));
   CudaCheckError();
   
-  //KS: Allocate memory for the map keeping track how many splines each pamreter has
+  //KS: Allocate memory for the map keeping track how many splines each parameter has
   cudaMalloc((void **) gpu_nParamPerEvent, 2*n_events*sizeof(unsigned int));
   CudaCheckError();
 #endif
@@ -278,7 +279,7 @@ __host__ void InitGPU_TF1(
 __host__ void InitGPU_Segments(short int **segment) {
 // *******************************************
 
-  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host meory which make memory trnasfer faster
+  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) segment, __N_SPLINES__*sizeof(short int));
   CudaCheckError();
 }
@@ -288,7 +289,7 @@ __host__ void InitGPU_Segments(short int **segment) {
 __host__ void InitGPU_Vals(float **vals) {
 // *******************************************
 
-  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host meory which make memory trnasfer faster
+  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) vals, __N_SPLINES__*sizeof(float));
   CudaCheckError();
 }
@@ -398,7 +399,7 @@ __host__ void CopyToGPU_SepMany(
   memset(&texDesc_nParamPerEvent, 0, sizeof(texDesc_nParamPerEvent));
   texDesc_nParamPerEvent.readMode = cudaReadModeElementType;
 
-  //Finnaly create texture object
+  //Finally create texture object
   cudaCreateTextureObject(&text_nParamPerEvent, &resDesc_nParamPerEvent, &texDesc_nParamPerEvent, NULL);
   CudaCheckError();
   #endif
@@ -524,10 +525,10 @@ __global__ void EvalOnGPU_SepMany(
     // This is the segment we want for this parameter variation
     // for this particular splineNum; 0 = MACCQE, 1 = pFC, 2 = EBC, etc
 
-    //Which Parameter we are accesing
+    //CW: Which Parameter we are accesing
     const short int Param = gpu_paramNo_arr[splineNum];
 
-    // Avoids doing costly binary search on GPU
+    //CW: Avoids doing costly binary search on GPU
     const short int segment = segment_gpu[Param];
 
     //KS: Segment for coeff_x is simply parameter*max knots + segment as each parmeters has the same spacing

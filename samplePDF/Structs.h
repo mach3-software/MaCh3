@@ -464,8 +464,8 @@ class TSpline3_red {
           YResp[i]  = y;
         }
 
-        __float__* mvals = new __float__[nPoints + 2];
-        __float__* svals = new __float__[nPoints];
+        __float__* mvals = new __float__[nPoints + 3];
+        __float__* svals = new __float__[nPoints + 1];
 
         for (int i = -2; i <= nPoints; ++i) {
           // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
@@ -1038,37 +1038,40 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
 }
 
 // *******************
-// Class containig information about interaction modes
+// Class containing information about interaction modes
 class MaCh3_Modes {
   // *******************
   public:
-    //KS: Getter for Modes, each experiemnt has to define it
+    //KS: Getter for Modes, each experiment has to define it
     virtual int GetNModes();
     virtual std::string Mode_ToString(int i);
     virtual std::string Mode_ToFancyString(int i);
     virtual int Mode_ToSplineMode(int i);
 };
 
-// Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
+//WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly*);
 
-// Helper function for calculating binned Integral of TH2Poly i.e not including overflow
+//WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly*);
 
-// Poly Projectors
+//WP: Poly Projectors
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
 
-// Helper to Normalise histograms
+//WP: Helper to Normalise histograms
 TH2Poly* NormalisePoly(TH2Poly* Histogram);
 
-// Helper to scale th2poly analogous to th2d scale with option "width"
+//WP: Helper to scale th2poly analogous to th2d scale with option "width"
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
-// Helper to calc integral of th2poly analogous to th2d integra; with option "width"
+//WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
 
 //KS: Sanity check for TH2Poly
 void CheckTH2PolyFileVersion(TFile *file);
+
+//KS: Remove fitted TF1 from hist to make comparison easier
+void RemoveFitter(TH1D* hist, std::string name);
 
 // Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {

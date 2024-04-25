@@ -6,7 +6,27 @@ New features should be developed on branches in this repository with the branch 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
 ## Doxygen
-TODO
+When making comments try following Doxygen type of comments
+
+```
+// I like comments
+void Foo(){}
+```
+try
+```
+/// @brief I like comments
+void Foo(){}
+```
+After making release or tag please
+```
+cd Doc
+doxygen Doxyfile
+```
+to produce both html and latex file. To produce book like pdf file:
+```
+cd latex
+pdflatex refman.tex
+```
 
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
@@ -24,4 +44,12 @@ std::cout<< " Error: Something is wrong" <<std::endl;
 it is advised to used logger
 ```
 MACH3LOG_ERROR("Something is wrong");
+```
+To pass argument to logger use following syntax:
+```
+MACH3LOG_INFO("I like {}, do you like {}", FirsString, SecondString);
+```
+Logger by default will print whole float. Normally to show only several significant figures you would use `std::precision(2)`. To obtain same thing with logger please use `{:.2f}` like this:
+```
+MACH3LOG_INFO("Here is full LLH but I only show 2 significant figures {:.2f}", LLH);
 ```

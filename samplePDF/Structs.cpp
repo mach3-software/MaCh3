@@ -91,10 +91,12 @@ namespace MaCh3Utils {
 
 }
 
+// **************************************************
 //KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
-// However if you use ROOT6 and have ROOT6 file exactly the same code will work. Somethingm ust have changed with how TH2Poly bins are stored in TFile
-void CheckTH2PolyFileVersion(TFile *file)
-{
+// However if you use ROOT6 and have ROOT6 file exactly the same code will work. Something have changed with how TH2Poly bins are stored in TFile
+void CheckTH2PolyFileVersion(TFile *file) {
+// **************************************************
+
     int FileROOTVersion = file->GetVersion();
     int MainFileROOTVersion = FileROOTVersion;
 
@@ -117,7 +119,7 @@ void CheckTH2PolyFileVersion(TFile *file)
 }
 
 // **************************************************
-// Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
+//WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly) {
 // **************************************************
 
@@ -134,23 +136,23 @@ double OverflowIntegral(TH2Poly* poly) {
 } // end function
 
 // **************************************************
-// Helper function for calculating binned Integral of TH2Poly i.e not including overflow
+//WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly* poly) {
 // **************************************************
 
-  double integral=0;
+  double integral = 0;
 
   for(int i=1; i < poly->GetNumberOfBins()+1; i++)
-    {
-      integral += poly->GetBinContent(i);
-    }
+  {
+    integral += poly->GetBinContent(i);
+  }
 
   return integral;
 
 } // end function
 
 // **************************************************
-// Helper function for projecting TH2Poly onto the X axis
+//WP: Helper function for projecting TH2Poly onto the X axis
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors) {
 // **************************************************
 
@@ -164,64 +166,64 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
   //loop over bins in the poly
   for(int i = 0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
   {
-      //get bin and its edges
-      TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
-      xlow = bin->GetXMin();
-      xup = bin->GetXMax();
+    //get bin and its edges
+    TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
+    xlow = bin->GetXMin();
+    xup = bin->GetXMax();
 
-      //Loop over projected bins, find fraction of poly bin in each
-      for(int dx=0; dx<int(xbins.size()); dx++)
-      {
-          if(xbins[dx+1]<=xlow || xbins[dx]>=xup)
-          {
-              frac=0;
-          }
-          else if(xbins[dx]<=xlow && xbins[dx+1]>=xup)
-          {
-              frac=1;
-          }
-          else if(xbins[dx]<=xlow && xbins[dx+1]<=xup)
-          {
-              frac=(xbins[dx+1]-xlow)/(xup-xlow);
-          }
-          else if(xbins[dx]>=xlow && xbins[dx+1]>=xup)
-          {
-              frac=(xup-xbins[dx])/(xup-xlow);
-          }
-          else if(xbins[dx]>=xlow && xbins[dx+1]<=xup)
-          {
-              frac=(xbins[dx+1]-xbins[dx])/(xup-xlow);
-          }
-          else
-          {
-              frac=0;
-          }
-          hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
-          //KS: Follow ROOT implementation and sum up the variance 
-          if(computeErrors)
-          {
-             //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
-             //but numbering of GetBinError is differnt than GetBins...
-             double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
-             hProjX_Error[dx+1] += Temp_Err;
-          }
-        }
-    }
-    //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
-    if(computeErrors)
+    //Loop over projected bins, find fraction of poly bin in each
+    for(int dx = 0; dx < int(xbins.size()); dx++)
     {
-        for (int i = 1; i <= hProjX->GetXaxis()->GetNbins(); ++i)
-        {
-            double Error = TMath::Sqrt(hProjX_Error[i]);
-            hProjX->SetBinError(i, Error);
-        }   
+      if(xbins[dx+1] <= xlow || xbins[dx] >= xup)
+      {
+        frac = 0;
+      }
+      else if(xbins[dx]<=xlow && xbins[dx+1] >= xup)
+      {
+        frac = 1;
+      }
+      else if(xbins[dx]<=xlow && xbins[dx+1] <= xup)
+      {
+        frac = (xbins[dx+1]-xlow)/(xup-xlow);
+      }
+      else if(xbins[dx]>=xlow && xbins[dx+1] >= xup)
+      {
+        frac = (xup-xbins[dx])/(xup-xlow);
+      }
+      else if(xbins[dx]>=xlow && xbins[dx+1] <= xup)
+      {
+        frac = (xbins[dx+1]-xbins[dx])/(xup-xlow);
+      }
+      else
+      {
+        frac=0;
+      }
+      hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
+      //KS: Follow ROOT implementation and sum up the variance
+      if(computeErrors)
+      {
+          //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
+          //but numbering of GetBinError is differnt than GetBins...
+          double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+          hProjX_Error[dx+1] += Temp_Err;
+      }
     }
+  }
+  //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
+  if(computeErrors)
+  {
+    for (int i = 1; i <= hProjX->GetXaxis()->GetNbins(); ++i)
+    {
+      double Error = TMath::Sqrt(hProjX_Error[i]);
+      hProjX->SetBinError(i, Error);
+    }
+  }
   delete[] hProjX_Error;
   return hProjX;
 } // end project poly X function
 
 // **************************************************
-// Helper function for projecting TH2Poly onto the Y axis
+//WP: Helper function for projecting TH2Poly onto the Y axis
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors) {
 // **************************************************
 
@@ -235,64 +237,64 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
   //loop over bins in the poly
   for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
   {
-      //get bin and its edges
-      TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
-      ylow = bin->GetYMin();
-      yup = bin->GetYMax();
+    //get bin and its edges
+    TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
+    ylow = bin->GetYMin();
+    yup = bin->GetYMax();
 
-      //Loop over projected bins, find fraction of poly bin in each
-      for(int dy=0; dy<int(ybins.size()); dy++)
-      {
-          if(ybins[dy+1]<=ylow || ybins[dy]>=yup)
-          {
-              frac=0;
-          }
-          else if(ybins[dy]<=ylow && ybins[dy+1]>=yup)
-          {
-              frac=1;
-          }
-          else if(ybins[dy]<=ylow && ybins[dy+1]<=yup)
-          {
-              frac=(ybins[dy+1]-ylow)/(yup-ylow);
-          }
-          else if(ybins[dy]>=ylow && ybins[dy+1]>=yup)
-          {
-              frac=(yup-ybins[dy])/(yup-ylow);
-          }
-          else if(ybins[dy]>=ylow && ybins[dy+1]<=yup)
-          {
-              frac=(ybins[dy+1]-ybins[dy])/(yup-ylow);
-          }
-          else
-          {
-              frac=0;
-          }
-          hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
-          //KS: Follow ROOT implementation and sum up the variance 
-          if(computeErrors)
-          {
-             //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly, 
-             //but numbering of GetBinError is differnt than GetBins... 
-             double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
-             hProjY_Error[dy+1] += Temp_Err;
-          }
-        }
-    }
-    //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
-    if(computeErrors)
+    //Loop over projected bins, find fraction of poly bin in each
+    for(int dy = 0; dy < int(ybins.size()); dy++)
     {
-        for (int i = 1; i <= hProjY->GetXaxis()->GetNbins(); ++i)
-        {
-            double Error = TMath::Sqrt(hProjY_Error[i]);
-            hProjY->SetBinError(i, Error);
-        }   
+      if(ybins[dy+1]<=ylow || ybins[dy] >= yup)
+      {
+        frac = 0;
+      }
+      else if(ybins[dy] <= ylow && ybins[dy+1] >= yup)
+      {
+        frac = 1;
+      }
+      else if(ybins[dy] <= ylow && ybins[dy+1] <= yup)
+      {
+        frac = (ybins[dy+1]-ylow)/(yup-ylow);
+      }
+      else if(ybins[dy] >= ylow && ybins[dy+1] >= yup)
+      {
+        frac = (yup-ybins[dy])/(yup-ylow);
+      }
+      else if(ybins[dy] >= ylow && ybins[dy+1] <= yup)
+      {
+        frac = (ybins[dy+1]-ybins[dy])/(yup-ylow);
+      }
+      else
+      {
+        frac=0;
+      }
+      hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
+      //KS: Follow ROOT implementation and sum up the variance
+      if(computeErrors)
+      {
+        //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
+        //but numbering of GetBinError is differnt than GetBins...
+        double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+        hProjY_Error[dy+1] += Temp_Err;
+      }
     }
+  }
+  //KS: The error is sqrt(summed variance)) https://root.cern.ch/doc/master/TH2_8cxx_source.html#l02266
+  if(computeErrors)
+  {
+    for (int i = 1; i <= hProjY->GetXaxis()->GetNbins(); ++i)
+    {
+      double Error = TMath::Sqrt(hProjY_Error[i]);
+      hProjY->SetBinError(i, Error);
+    }
+  }
   delete[] hProjY_Error;
   return hProjY;
 } // end project poly Y function
 
 // ****************
-// Normalise a th2poly
+//WP: Normalise a th2poly
 TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 // ****************
 
@@ -306,7 +308,7 @@ TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 }
 
 // ****************
-// Scale a TH2Poly and divide by bin width
+//WP: Scale a TH2Poly and divide by bin width
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 // ****************
 
@@ -328,7 +330,7 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 }
 
 // ****************
-// Integral of TH2Poly multiplied by bin width
+//WP: Integral of TH2Poly multiplied by bin width
 double PolyIntegralWidth(TH2Poly *Histogram) {
 // ****************
 
@@ -347,6 +349,18 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
   }
 
   return integral;
+}
+
+// *********************
+//KS: Remove fitted TF1 from hist to make comparison easier
+void RemoveFitter(TH1D* hist, std::string name) {
+  // *********************
+
+  TList *listOfFunctions = hist->GetListOfFunctions();
+  TF1 *fitter = dynamic_cast<TF1*>(listOfFunctions->FindObject(name.c_str()));
+
+  listOfFunctions->Remove(fitter);
+  delete fitter;
 }
 
 // ****************
