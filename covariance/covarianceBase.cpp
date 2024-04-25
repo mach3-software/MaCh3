@@ -99,7 +99,7 @@ covarianceBase::~covarianceBase(){
   if (invCovMatrix != NULL) delete invCovMatrix;
   if (throwMatrix_CholDecomp != NULL) delete throwMatrix_CholDecomp;
 
-  for(int i = 0; i < size; i++) 
+  for(int i = 0; i < _fNumPar; i++)
   {
     delete[] InvertCovMatrix[i];
     delete[] throwMatrixCholDecomp[i];
@@ -577,9 +577,9 @@ void covarianceBase::TransferToPCA() {
     throw;
   }
   // Make the temporary vectors
-  TVectorD fParCurr_vec(size);
-  TVectorD fParProp_vec(size);
-  for (int i = 0; i < size; ++i) {
+  TVectorD fParCurr_vec(_fNumPar);
+  TVectorD fParProp_vec(_fNumPar);
+  for (int i = 0; i < _fNumPar; ++i) {
     fParCurr_vec(i) = _fCurrVal[i];
     fParProp_vec(i) = _fPropVal[i];
   }
@@ -602,23 +602,23 @@ void covarianceBase::TransferToParam() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < _fNumPar; ++i) {
     _fPropVal[i] = fParProp_vec(i);
     _fCurrVal[i] = fParCurr_vec(i);
   }
 }
 
 const std::vector<double> covarianceBase::getProposed() const {
-  std::vector<double> props(size);
-  for (int i = 0; i < size; ++i) props[i] = _fPropVal[i];
+  std::vector<double> props(_fNumPar);
+  for (int i = 0; i < _fNumPar; ++i) props[i] = _fPropVal[i];
   return props;
 }
 
 // Throw nominal values
 void covarianceBase::throwNominal(bool nomValues, int seed) {
 
-  TVectorD* vec = new TVectorD(size);
-  for (int i = 0; i < size; i++) {
+  TVectorD* vec = new TVectorD(_fNumPar);
+  for (int i = 0; i < _fNumPar; i++) {
     (*vec)(i) = 1.0;
   }
 
@@ -626,7 +626,7 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
   nom_throws->SetSeed(seed);
   std::vector<double> nominal = getNominalArray();
   nominal.clear();
-  nominal.resize(size);
+  nominal.resize(_fNumPar);
 
   // If we want to put the nominals somewhere else than user specified
   // Don't fully understand this though: won't we have to reweight the MC somehow?
@@ -641,7 +641,7 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
       std::cout << "- setting " << getName() << " nominal values to random throws." << std::endl;
       nom_throws->ThrowSet(nominal);
 
-      for (int i = 0; i < size; i++)
+      for (int i = 0; i < _fNumPar; i++)
       {
       // if parameter is fixed, dont throw
         if (_fError[i] < 0) {
@@ -677,12 +677,12 @@ void covarianceBase::throwParameters() {
   randomize();
 
   if (!pca) {
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, size);
+    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < _fNumPar; ++i) {
       // Check if parameter is fixed first: if so don't randomly throw
       if (isParameterFixed(i)) continue;
 
@@ -695,7 +695,7 @@ void covarianceBase::throwParameters() {
 #else
         randParams[i] = random_number[0]->Gaus(0,1);
 #endif
-        const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, size, i);
+        const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
         {
@@ -731,7 +731,7 @@ void covarianceBase::RandomConfiguration() {
   // Don't want to change the nominal array because that's what determines our likelihood
   // Want to change the fParProp, fParCurr, fParInit
   // fParInit and the others will already be set
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < _fNumPar; ++i) {
     // Check if parameter is fixed first: if so don't randomly throw
     if (isParameterFixed(i)) continue;
     // Check that the sigma range is larger than the parameter range
@@ -799,7 +799,7 @@ void covarianceBase::randomize() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
       if (_fError[i] > 0.0) {
 #ifdef MULTITHREAD
@@ -818,7 +818,7 @@ void covarianceBase::randomize() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; ++i)
+    for (int i = 0; i < _fNumPar; ++i)
     {
       if (fParSigma_PCA[i] > 0. && i < _fNumParPCA)
       {
@@ -840,14 +840,14 @@ void covarianceBase::randomize() {
 void covarianceBase::CorrelateSteps() {
 // ************************************************
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
-  MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, size);
+  MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
   // If not doing PCA
   if (!pca) {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < _fNumPar; ++i) {
       if (_fError[i] > 0.) {
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
       }
@@ -890,7 +890,7 @@ void covarianceBase::acceptStep() {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < _fNumPar; ++i) {
       // Update state so that current state is proposed state
       _fCurrVal[i] = _fPropVal[i];
     }
@@ -913,20 +913,20 @@ void covarianceBase::throwParProp(const double mag) {
   randomize();
   if (!pca) {
     // Make the correlated throw
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, size);
+    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // Number of sigmas we throw
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < _fNumPar; i++) {
       if (_fError[i] > 0.)
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*mag;
     }
   } else {
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < _fNumPar; i++) {
       fParProp_PCA(i) = fParCurr_PCA(i)+mag*randParams[i];
     }
     // And update the fParCurr in the basis
     // Then update the fParProp in the parameter basis using the transfer matrix, so likelihood is evaluated correctly
     TVectorD proposed = TransferMat*fParProp_PCA;
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < _fNumPar; ++i) {
       if (fParSigma_PCA[i] > 0.) {
         _fPropVal[i] = proposed(i);
       }
@@ -941,22 +941,22 @@ void covarianceBase::throwParCurr(const double mag)
   randomize();
   if (!pca) {
     // Get the correlated throw vector
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, size);
+    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // The number of sigmas to throw
     // Should probably have this as a default parameter input to the function instead
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < _fNumPar; i++) {
       if (_fError[i] > 0.){
         _fCurrVal[i] = corr_throw[i]*mag;
       }
     }
   } else {
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < _fNumPar; i++) {
       fParProp_PCA(i) = mag*randParams[i];
     }
     // And update the fParCurr in the basis
     // Then update the fParProp in the parameter basis using the transfer matrix, so likelihood is evaluated correctly
     TVectorD current = TransferMat*fParCurr_PCA;
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < _fNumPar; ++i) {
       if (fParSigma_PCA[i] > 0.) {
         _fCurrVal[i] = current(i);
       }
@@ -967,7 +967,7 @@ void covarianceBase::throwParCurr(const double mag)
 // Function to print the nominal values
 void covarianceBase::printNominal() {
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < _fNumPar; i++) {
     std::cout << "    " << GetParFancyName(i) << "   " << getParInit(i) << "\n";
   }
   std::cout << std::endl;
@@ -985,7 +985,7 @@ void covarianceBase::printNominalCurrProp() {
     }
   }
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < _fNumPar; ++i) {
     MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
    //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
@@ -1003,12 +1003,11 @@ double covarianceBase::CalcLikelihood() {
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
-  for(int i = 0; i < size; ++i){
+  for(int i = 0; i < _fNumPar; ++i){
     for (int j = 0; j <= i; ++j) {
       if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
-        //KS: Since matrix is symmetric we can calcaute non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-        int scale = 1;
-        if(i != j) scale = 2;
+        //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
+        short int scale = (i != j) ? 2 : 1;
         logL += scale * 0.5*(_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
       }
     }
@@ -1061,7 +1060,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
   // If empty, set the proposed to nominal
   if (pars.empty()) {
     // For xsec this means setting to the prior (because nominal is the prior)
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < _fNumPar; i++) {
       _fPropVal[i] = _fPreFitValue[i];
     }
     // If not empty, set the parameters to the specified
@@ -1095,7 +1094,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
 
 void covarianceBase::setBranches(TTree &tree) {
   // loop over parameters and set a branch
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < _fNumPar; ++i) {
     tree.Branch(_fNames[i].c_str(), &_fCurrVal[i], Form("%s/D", _fNames[i].c_str()));
   }
   // When running PCA, also save PCA parameters
@@ -1122,7 +1121,7 @@ void covarianceBase::toggleFixAllParameters() {
   // fix or unfix all parameters by multiplying by -1
   if(!pca)
   {
-    for (int i = 0; i < size; i++) _fError[i] *= -1.0;
+    for (int i = 0; i < _fNumPar; i++) _fError[i] *= -1.0;
   } else{
      for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
   }
@@ -1197,14 +1196,15 @@ double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* ve
 }
 
 void covarianceBase::setIndivStepScale(std::vector<double> stepscale) {
-  if ((int)stepscale.size()!=size) {
-    std::cout << "Stepscale vector not equal to number of parameters. Qutting.." << std::endl;
-    std::cout << "Size of argument vector:" << stepscale.size() << std::endl;
-    std::cout << "Expected size:" << size << std::endl;
+  if ((int)stepscale.size() != _fNumPar)
+  {
+    MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
+    MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
+    MACH3LOG_WARN("Expected size: {}", _fNumPar);
     return;
   }
 
-  for (int iParam=0;iParam<size;iParam++) {
+  for (int iParam = 0 ; iParam < _fNumPar; iParam++) {
     _fIndivStepScale[iParam] = stepscale[iParam];
   }
 
@@ -1217,7 +1217,7 @@ void covarianceBase::setIndivStepScale(std::vector<double> stepscale) {
 void covarianceBase::printIndivStepScale() {
   std::cout << "============================================================" << std::endl;
   std::cout << std::setw(PrintLength) << "Parameter:" << " | " << std::setw(11) << "Step scale:" << std::endl;
-  for (int iParam=0;iParam<size;iParam++) {
+  for (int iParam = 0; iParam < _fNumPar; iParam++) {
     std::cout << std::setw(PrintLength) << _fNames[iParam].c_str() << " | " << std::setw(11) << _fIndivStepScale[iParam] << std::endl;
   }
   std::cout << "============================================================" << std::endl;
@@ -1228,7 +1228,7 @@ void covarianceBase::printIndivStepScale() {
 void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
-  if(cov==NULL){
+  if(cov == NULL){
     cov = &*covMatrix;
   }
 
@@ -1241,7 +1241,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   bool CanDecomp = false;
   TDecompChol chdcmp;
   
-  for (iAttempt=0;iAttempt<MaxAttempts;iAttempt++) {
+  for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
     chdcmp = TDecompChol(*cov);
     if (chdcmp.Decompose()) {
       CanDecomp = true;
@@ -1250,7 +1250,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-      for (int iVar=0;iVar<size;iVar++) {
+      for (int iVar = 0 ; iVar < _fNumPar; iVar++) {
         (*cov)(iVar,iVar) += pow(10,-9);
       }
     }
@@ -1271,8 +1271,8 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
 }
 
 void covarianceBase::resetIndivStepScale() {
-  std::vector<double> stepScales(size);
-  for (int i=0;i<size;i++) {
+  std::vector<double> stepScales(_fNumPar);
+  for (int i = 0; i <_fNumPar; i++) {
     stepScales[i] = 1.;
   }
   _fGlobalStepScale=1.0;
@@ -1315,9 +1315,9 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 #ifdef MULTITHREAD
 #pragma omp parallel for
 #endif
-  for (int i = 0; i < size; ++i)
+  for (int i = 0; i < _fNumPar; ++i)
   {
-    for (int j = 0; j < size; ++j)
+    for (int j = 0; j < _fNumPar; ++j)
     {
       throwMatrixCholDecomp[i][j] = (*throwMatrix_CholDecomp)(i,j);
     }

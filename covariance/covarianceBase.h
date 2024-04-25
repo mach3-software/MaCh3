@@ -4,10 +4,7 @@
 #include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
-
-// Don't forget yaml!
-#include "yaml-cpp/yaml.h"
-#include "manager/MaCh3Logger.h"
+#include "manager/manager.h"
 
 #ifndef __LARGE_LOGL__
 #define __LARGE_LOGL__ 1234567890.0
@@ -36,7 +33,7 @@ class covarianceBase {
   //"Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
-  // For Eigen Value decomp
+  /// @brief Constructor For Eigen Value decomp
   covarianceBase(const char *name, const char *file, int seed, double threshold,int FirstPCAdpar, int LastPCAdpar);
   virtual ~covarianceBase();
   
@@ -356,7 +353,7 @@ class covarianceBase {
   //Unity for null systs to point back to
   const double Unity = 1.0;
 
-  // PCA
+  /// perform PCA or not
   bool pca;
   double eigen_threshold;
   int _fNumParPCA;
