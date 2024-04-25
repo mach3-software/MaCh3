@@ -1,3 +1,5 @@
+# Type to see number of commits per user: git shortlog -n -s
+
 # Edward Atkin
 Edward Atkin <edhuthwaite@aol.com> EdAtkin <edhuthwaite@aol.com>
 Edward Atkin <edhuthwaite@aol.com> EdAtkin <35494466+EdAtkin@users.noreply.github.com>

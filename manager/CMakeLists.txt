@@ -3,6 +3,7 @@ set(HEADERS
     YamlHelper.h
     MaCh3Logger.h
     Monitor.h
+    MaCh3Exception.h
 )
 
 add_library(Manager SHARED
