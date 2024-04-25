@@ -40,6 +40,11 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   endif()
 endif()
 
+include_directories(
+    $ENV{CUDAPATH}/include
+    $ENV{CUDAPATH}/samples/common/inc>
+)
+
 # Join elements of the list with spaces
 string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CMAKE_CUDA_ARCHITECTURES}")
 
@@ -62,10 +67,6 @@ else()
 	)
 endif()
 
-include_directories(
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$ENV{CUDAPATH}/include>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$ENV{CUDAPATH}/samples/common/inc>
-)
 
 add_link_options(-I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 if(NOT DEFINED ENV{CUDAPATH})

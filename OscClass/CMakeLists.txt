@@ -56,6 +56,7 @@ set(HEADERS
     ${CUDAProb3_SOURCE_DIR}/math.hpp
     ${CUDAProb3_SOURCE_DIR}/physics.hpp
     ${CUDAProb3_SOURCE_DIR}/cpupropagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/cuda_unique.cuh
 )
 
 add_library(OscClass SHARED
