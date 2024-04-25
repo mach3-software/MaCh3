@@ -794,54 +794,6 @@ std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 	MACH3LOG_ERROR("You are trying to get axis {} but have only got {}", Axis, Dimensions[iSample]);
 	throw;
   }
-//  std::string ReturnVal;
-//  switch (BinningOpt)
-//  {
-//  case 0:
-//    if (Axis == 0)
-//      ReturnVal = "ETrue";
-//    if (Axis == 1)
-//      ReturnVal = "Erec";
-//    if (Axis == 2)
-//      ReturnVal = "Dummy";
-//    break;
-//  case 1:
-//    if (Axis == 0)
-//      ReturnVal = "ETrue";
-//    if (Axis == 1)
-//      ReturnVal = "Momentum";
-//    if (Axis == 2)
-//      ReturnVal = "Theta";
-//    break;
-//  case 2:
-//    if (Axis == 0)
-//      ReturnVal = "ETrue";
-//    if (Axis == 1)
-//      ReturnVal = "Erec";
-//    if (Axis == 2)
-//      ReturnVal = "Theta";
-//    break;
-//  case 3:
-//    if (Axis == 0)
-//      ReturnVal = "ETrue";
-//    if (Axis == 1)
-//      ReturnVal = "Erec";
-//    if (Axis == 2)
-//      ReturnVal = "Q2";
-//    break;
-//  case 4:
-//    if (Axis == 0)
-//      ReturnVal = "ETrue";
-//    if (Axis == 1)
-//      ReturnVal = "Momentum";
-//    if (Axis == 2)
-//      ReturnVal = "CosineZenith";
-//    break;
-//  default:
-//    std::cout << "Unrecognised BinningOpt = " << BinningOpt << std::endl;
-//    throw;
-//  }
-
   return DimensionLabels[iSample][Axis];
 }
 
@@ -873,19 +825,12 @@ void splineFDBase::PrintSampleDetails(std::string SampleName)
   int iSample = getSampleIndex(SampleName);
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
-//  MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample])
-/*  std::cout << "Details about sample: " << std::setw(20) << SampleNames[iSample] << std::endl;
-  std::cout << "\t" << std::setw(35) << "Binning Option"
-            << ":" << BinningOpts[iSample] << std::endl;
-  std::cout << "\t" << std::setw(35) << "Dimension"
-            << ":" << Dimensions[iSample] << std::endl;
-  std::cout << "\t" << std::setw(35) << "DetID"
-            << ":" << DetIDs[iSample] << std::endl;
-  std::cout << "\t" << std::setw(35) << "Number of Spline Params"
-            << ":" << nSplineParams[iSample] << std::endl;
-  std::cout << "\t" << std::setw(35) << "Number of Oscillation Channels"
-            << ":" << nOscChans[iSample] << std::endl;
-			*/
+  MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
+  MACH3LOG_INFO("\t DetID: {:<35}", DetIDs[iSample]);
+  MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
+  MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
+
+  return;
 }
 
 //****************************************
