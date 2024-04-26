@@ -82,7 +82,12 @@ void covarianceXsec::InitXsecFromConfig() {
         {
           _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
         }
-      }
+      } else{
+		//ETA - This is a bit of a hack. As we check on the ND name for the SplineInterpolation type
+		//we also need a default value for Far Detector only spline parameters. This can be removed
+		//soon as we will no longer have separate ND and FD names
+		_fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
+	  }
 
 	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
  
@@ -805,8 +810,8 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("=====================================================");
   MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|");
   MACH3LOG_INFO("-----------------------------------------------------");
-  for (unsigned int i = 0; i < SplineParsIndex.size(); ++i) {
-    MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|", SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])), "|");
+  for (auto index = SplineParsIndex.begin() ; index != SplineParsIndex.end() ; ++index){
+	MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", *index, "|", GetParFancyName(*index), "|", SplineInterpolation_ToString(GetParSplineInterpolation(*index)), "|");
   }
   MACH3LOG_INFO("=====================================================");
 
