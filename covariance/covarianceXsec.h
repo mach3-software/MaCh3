@@ -11,35 +11,36 @@
 #include "covariance/covarianceBase.h"
 #include "samplePDF/Structs.h"
 
+/// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline , normalisation parameters etc.
 class covarianceXsec : public covarianceBase {
 
   public:
-    /// Constructor
+    /// @brief Constructor
     covarianceXsec(std::vector<std::string> FileNames, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
-    /// Destructor
+    /// @brief Destructor
     ~covarianceXsec();
 
-    /// ETA - trying out the yaml parsing
+    /// @brief ETA - trying out the yaml parsing
     inline void InitXsecFromConfig();
-    /// Initialise Norm params
+    /// @brief Initialise Norm params
     inline void SetupNormPars();
-    /// Print information about the whole object once it is set
+    /// @brief Print information about the whole object once it is set
     inline void Print();
 
     // General Getter functions not split by detector
-    /// ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
+    /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     int GetParDetID(const int i) const { return _fDetID[i];};
-    /// ETA - just return a string of "spline", "norm" or "functional"
+    /// @brief ETA - just return a string of "spline", "norm" or "functional"
     const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
 
-    ///Get interpolation type vector
+    /// @brief Get interpolation type vector
     const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
-    ///Get interpolation type for a given parameter
+    /// @brief Get interpolation type for a given parameter
     SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType.at(i);}
 
-    /// DB Get spline parameters depending on given DetID
+    /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
-    /// DB Get spline parameters depending on given DetID
+    /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
 
     /// ETA - what does this even do?
@@ -49,7 +50,7 @@ class covarianceXsec : public covarianceBase {
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
     int GetNumSplineParamsFromDetID(int DetID);
 
-    /// DB Get norm/func parameters depending on given DetID
+    /// @brief DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
 
     int GetNumFuncParamsFromDetID(int DetID);
@@ -67,19 +68,19 @@ class covarianceXsec : public covarianceBase {
       }
       return nominal;
     }
-    /// Get nominal for a given param
+    /// @brief Get nominal for a given param
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
    
-    /// Is parameter a flux param or not. This might become deprecated in future
+    /// @brief Is parameter a flux param or not. This might become deprecated in future
     bool IsParFlux(const int i){ return isFlux[i]; }
 
-    /// KS Function to set to nominal flux parameters
+    /// @brief KS Function to set to nominal flux parameters
     void setXsecOnlyParameters();
-    /// KS Function to set to nominal flux  parameters
+    /// @brief KS Function to set to nominal flux  parameters
     void setFluxOnlyParameters();
     
   protected:
-    /// Initialise CovarianceXsec
+    /// @brief Initialise CovarianceXsec
     void initParams(const double fScale);
     /// Is parameter flux or not, This might become deprecated in future
     std::vector<bool> isFlux;

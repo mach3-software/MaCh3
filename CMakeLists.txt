@@ -9,6 +9,7 @@ SET(MaCh3_VERSION 1.1.0)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
+add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
@@ -139,8 +140,6 @@ cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
 if(${ROOT_CXX_STANDARD} LESS 14)
   cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
 endif()
-
-add_library(MaCh3CompilerOptions INTERFACE)
 
 ############################  Setting Flags  ####################################
 # Check the where to install 

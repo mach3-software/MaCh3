@@ -26,6 +26,7 @@
 
 #endif
 
+/// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file

@@ -32,7 +32,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   #KS: See this for more info https://cmake.org/cmake/help/latest/prop_tgt/CUDA_ARCHITECTURES.html
   if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.23 )
     set(CMAKE_CUDA_ARCHITECTURES all )
-    #KS: Consider using native, requires cmake 3.24... will be terrible for containters but should results in more optimised code
+    #KS: Consider using native, requires cmake 3.24... will be terrible for containers but should results in more optimised code
     #set(CMAKE_CUDA_ARCHITECTURES native )
   else()
     #KS: Apparently with newer cmake and GPU
@@ -52,7 +52,7 @@ string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CMAKE_CUDA_ARCHITECTURES}")
 cmessage(STATUS "Using following CUDA architectures: ${CUDA_ARCHITECTURES_STR}")
 
 if(NOT MaCh3_DEBUG_ENABLED)
-    add_compile_options(
+    target_compile_options(MaCh3CompilerOptions INTERFACE
         "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-O3;-Werror;cross-execution-space-call;-w>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
@@ -60,15 +60,15 @@ if(NOT MaCh3_DEBUG_ENABLED)
 else()
 #CWret: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
 #-pxtas-options=-v, -maxregcount=N
-	add_compile_options(
-		"$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-Werror;cross-execution-space-call;-w>"
-		"$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-g;>"
-		"$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-dlcm=ca;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills;-Xptxas=-v;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
-	)
+    target_compile_options(MaCh3CompilerOptions INTERFACE
+        "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-Werror;cross-execution-space-call;-w>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-g;>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-dlcm=ca;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills;-Xptxas=-v;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
+    )
 endif()
 
+target_link_options(MaCh3CompilerOptions INTERFACE -I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 
-add_link_options(-I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 if(NOT DEFINED ENV{CUDAPATH})
     cmessage(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
 endif()

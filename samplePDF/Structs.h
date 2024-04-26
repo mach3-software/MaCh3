@@ -18,7 +18,7 @@
 //
 #define __TH2PolyOverflowBins__ 9
 
-// Include some healthy defines for constructors
+/// Include some healthy defines for constructors
 #define __BAD_DOUBLE__ -999.99
 #define __BAD_INT__ -999
 
@@ -49,7 +49,7 @@
 #endif
 
 // *******************
-// Template to make vector out of an array of any length
+/// Template to make vector out of an array of any length
 template< typename T, size_t N >
 std::vector<T> MakeVector( const T (&data)[N] ) {
 // *******************
@@ -57,53 +57,50 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
 }
 
 // *******************
-//KS: This is mad way of converting string to int. Why? To be able to use string with switch
+/// KS: This is mad way of converting string to int. Why? To be able to use string with switch
 constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
   return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
 
 // *******************
-// ETA - new version of this for refactor
-// Normalisations for cross-section parameters
-// Carrier for whether you want to apply a systematic to an event or not
+/// ETA - Normalisations for cross-section parameters
+/// Carrier for whether you want to apply a systematic to an event or not
 class XsecNorms4 {
   // *******************
   public:
-    // Bins for normalisation parameter
+    /// Bins for normalisation parameter
     TAxis *ebins;
-    // Name of parameters
+    /// Name of parameters
     std::string name;
-    // Mode which parameter applies to
+    /// Mode which parameter applies to
     std::vector<int> modes;
-    // Horn currents which parameter applies to
+    /// Horn currents which parameter applies to
     std::vector<int> horncurrents;
-    // PDG which parameter applies to
+    /// PDG which parameter applies to
     std::vector<int> pdgs;
-    // Preosc PDG which parameter applies to
+    /// Preosc PDG which parameter applies to
     std::vector<int> preoscpdgs;
-    // Targets which parameter applies to
+    /// Targets which parameter applies to
     std::vector<int> targets;
-    //Does this parameter have kinematic bounds
+    /// Does this parameter have kinematic bounds
     bool hasKinBounds;
-	//Generic vector contain enum relating to a kinematic variable
-    //and lower and upper bounds. This can then be passed to IsEventSelected
+	/// Generic vector contain enum relating to a kinematic variable
+    /// and lower and upper bounds. This can then be passed to IsEventSelected
 	std::vector< std::vector<double> > Selection;
 	
-	//Generic vector containing the string of kinematic type
-	//This then needs to be converted to a kinematic type enum 
-	//within a samplePDF daughter class
-	//The bounds for each kinematic variable are given in Selection
+	/// Generic vector containing the string of kinematic type
+	/// This then needs to be converted to a kinematic type enum
+	/// within a samplePDF daughter class
+	/// The bounds for each kinematic variable are given in Selection
 	std::vector< std::string > KinematicVarStr;
 	
-    // Parameter number of this normalisation in current systematic model
+    /// Parameter number of this normalisation in current systematic model
     int index;
 };
 
 // *******************
-// Add a struct to hold info about the splinified xsec parameters
-// Used in ND280 code to accelerate CPU TSpline3 evaluation
-// Adaptable for SK
+/// CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
 // *******************
   // Number of points in spline
@@ -121,13 +118,13 @@ struct FastSplineInfo {
 };
 
 // ********************************************
-// Generic xsec class
-// Can use TF1 or TSpline3 or TSpline5 here, tjoho
+/// CW: Generic xsec class
+/// Can use TF1 or TSpline3 or TSpline5 here, tjoho
 template <class T>
 class XSecStruct{
   // ********************************************
   public:
-    // The light constructor
+    /// The light constructor
     XSecStruct(__int__ NumberOfSplines) { 
       nParams = NumberOfSplines;
       Func.reserve(nParams);
@@ -136,23 +133,23 @@ class XSecStruct{
       }
     }
 
-    // The empty constructor
+    /// The empty constructor
     XSecStruct() {
       nParams = 0;
       Func = NULL;
     };
 
-    // The light destructor
+    /// The light destructor
     ~XSecStruct() {
       for (int i = 0; i < nParams; ++i) {
         if (Func[i]) delete Func[i];
       }
     }
 
-    // Get number of splines
+    /// Get number of splines
     inline __int__ GetNumberOfParams() { return nParams; }
 
-    // The Printer
+    /// The Printer
     inline void Print() {
       std::cout << "    Splines: " << std::endl;
       for (int i = 0; i < nParams; ++i) {
@@ -161,17 +158,17 @@ class XSecStruct{
       }
     }
 
-    // Set the number of splines for this event
+    /// Set the number of splines for this event
     inline void SetSplineNumber(__int__ NumberOfSplines) {
       nParams = NumberOfSplines;
       Func = new T[nParams];
     }
 
-    // Get the function for the nth spline
+    /// Get the function for the nth spline
     inline T GetFunc(__int__ nSpline) { return Func[nSpline]; }
-    // Set the function for the nth spline
+    /// Set the function for the nth spline
     inline void SetFunc(__int__ nSpline, T Function) { Func[nSpline] = Function; }
-    // Eval the current variation
+    /// Eval the current variation
     inline double Eval(__int__ nSpline, __float__ variation) { 
       // Some will be NULL, check this
       if (Func[nSpline]) {
@@ -181,26 +178,26 @@ class XSecStruct{
       }
     }
   private:
-    // Number of parameters
+    /// Number of parameters
     __int__ nParams;
-    // The function
+    /// The function
     T* Func;
 };
 
 
 // ************************
-// A reduced TF1 class only
-// Only saves parameters for each TF1 and how many parameters each parameter set has
+/// CW: A reduced TF1 class only
+/// Only saves parameters for each TF1 and how many parameters each parameter set has
 class TF1_red {
 // ************************
   public:
-    // Empty constructor
+    /// Empty constructor
     TF1_red() {
       length = 0;
       Par = NULL;
     }
 
-    // Empty destructor
+    /// Empty destructor
     ~TF1_red() {
       if (Par != NULL) {
         delete[] Par;
@@ -208,7 +205,7 @@ class TF1_red {
       }
     }
 
-    // The useful constructor with deep copy
+    /// The useful constructor with deep copy
     TF1_red(__int__ nSize, __float__* Array, __int__ Parameter) {
       length = nSize;
       for (int i = 0; i < length; ++i) {
@@ -217,7 +214,7 @@ class TF1_red {
       ParamNo = Parameter;
     }
 
-    // The TF1 constructor with deep copy
+    /// The TF1 constructor with deep copy
     TF1_red(TF1* &Function, int Param = -1) {
       Par = NULL;
       SetFunc(Function, Param);
@@ -230,7 +227,7 @@ class TF1_red {
       return ss.str();
     }
 
-    // Set the function
+    /// Set the function
     inline void SetFunc(TF1* &Func, int Param = -1) {
       length = Func->GetNpar();
       if (Par != NULL) delete[] Par;
@@ -243,12 +240,12 @@ class TF1_red {
       Func = NULL;
     }
 
-    // Evaluate a variation
+    /// Evaluate a variation
     inline double Eval(__float__ var) {
-      // If we have 5 parameters we're using a fifth order polynomial
+      /// If we have 5 parameters we're using a fifth order polynomial
       if (length == 5) {
         return 1+Par[0]*var+Par[1]*var*var+Par[2]*var*var*var+Par[3]*var*var*var*var+Par[4]*var*var*var*var*var;
-      // If we have 2 parameters we're using two linear equations
+      /// If we have 2 parameters we're using two linear equations
       } else if (length == 2) {
         return (var<=0)*(1+Par[0]*var)+(var>0)*(1+Par[1]*var);
       } else {
@@ -260,12 +257,12 @@ class TF1_red {
       }
     }
 
-    // Set a parameter to a value
+    /// Set a parameter to a value
     inline void SetParameter(__int__ Parameter, __float__ Value) {
       Par[Parameter] = Value;
     }
 
-    // Get a parameter value
+    /// Get a parameter value
     double GetParameter(__int__ Parameter) {
       if (Parameter > length) {
         std::cerr << "Error: you requested parameter number " << Parameter << " but length is " << length << " parameters" << std::endl;
@@ -275,12 +272,12 @@ class TF1_red {
       return Par[Parameter];
     }
 
-    // Set the size
+    /// Set the size
     inline void SetSize(__int__ nSpline) {
       length = nSpline;
       Par = new __float__[length];
     }
-    // Get the size
+    /// Get the size
     inline int GetSize() { return length; }
     inline void Print() {
       std::cout << "Printing TF1_red: " << std::endl;
@@ -296,24 +293,24 @@ class TF1_red {
     }
 
   private:
-    // The parameters
+    /// The parameters
     __float__* Par;
     __int__ length;
-    // Save the parameter number this spline applies to
+    /// Save the parameter number this spline applies to
     __int__ ParamNo;
 };
 
-// Make an enum of the spline interpolation type
+/// Make an enum of the spline interpolation type
 enum SplineInterpolation {
   kTSpline3,
   kLinear,
   kMonotonic,
   kAkima,
-  kSplineInterpolations  //This only enumarates
+  kSplineInterpolations  //This only enumerates
 };
 
 // **************************************************
-// Convert a LLH type to a string
+/// Convert a LLH type to a string
 inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
 // **************************************************
     std::string name = "";
@@ -343,11 +340,11 @@ inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
 
 
 // ************************
-// Reduced TSpline3 class
+/// CW: Reduced TSpline3 class
 class TSpline3_red {
 // ************************
   public:
-    // Empty constructor
+    /// @brief Empty constructor
     TSpline3_red() {
       nPoints = 0;
       Par = NULL;
@@ -355,7 +352,7 @@ class TSpline3_red {
       YResp = NULL;
     }
 
-    // The constructor that takes a TSpline3 pointer and copies in to memory
+    /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
     TSpline3_red(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
       Par = NULL;
       XPos = NULL;
@@ -363,7 +360,7 @@ class TSpline3_red {
       SetFunc(spline, Param, InterPolation);
     }
 
-    // constructor taking parameters
+    /// @brief constructor taking parameters
     TSpline3_red(__float__ *X, __float__ *Y, __int__ N, __float__ **P, __int__ parNo){
       nPoints = N;
       ParamNo = parNo;
@@ -650,7 +647,7 @@ class TSpline3_red {
       spline = NULL;
     }
 
-    // Empty destructor
+    /// @brief Empty destructor
     ~TSpline3_red() {
       for (int i = 0; i < nPoints; ++i) {
         if (Par[i] != NULL) {
@@ -664,8 +661,8 @@ class TSpline3_red {
       XPos = YResp = NULL;
     }
 
-    // Find the segment relevant to this variation in x
-    // See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
+    /// Find the segment relevant to this variation in x
+    /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
     inline int FindX(double x) {
       // The segment we're interested in (klow in ROOT code)
       int segment = 0;
@@ -699,7 +696,7 @@ class TSpline3_red {
       return segment;
     }
 
-    // Evaluate the weight from a variation
+    /// @brief CW: Evaluate the weight from a variation
     inline double Eval(double var) {
       // Get the segment for this variation
       int segment = FindX(var);
@@ -712,7 +709,7 @@ class TSpline3_red {
       return weight;
     }
 
-    // Get the number of points
+    /// @brief CW: Get the number of points
     inline int GetNp() { return nPoints; }
     // Get the ith knot's x and y position
     inline void GetKnot(int i, __float__ &xtmp, __float__ &ytmp) {
@@ -720,7 +717,7 @@ class TSpline3_red {
       ytmp = YResp[i];
     }
 
-    // Get the coefficient of a given segment
+    /// @brief CW: Get the coefficient of a given segment
     inline void GetCoeff(int segment, __float__ &x, __float__ &y, __float__ &b, __float__ &c, __float__ &d) {
       b = Par[segment][0];
       c = Par[segment][1];
@@ -729,7 +726,7 @@ class TSpline3_red {
       y = YResp[segment];
     }
 
-    // Get the number
+    /// CW: Get the number
     inline std::string GetName() {
       std::stringstream ss;
       ss << ParamNo;
@@ -737,43 +734,43 @@ class TSpline3_red {
     }
 
   protected: //changed to protected from private so can be accessed by derived classes
-    // Number of points/knot in TSpline3
+    /// Number of points/knot in TSpline3
     __int__ nPoints;
-    // Always uses a third order polynomial, so hard-code the number of coefficients in implementation
+    /// Always uses a third order polynomial, so hard-code the number of coefficients in implementation
     __float__ **Par;
-    // Positions of each x for each knot
+    /// Positions of each x for each knot
     __float__ *XPos;
-    // y-value for each knot
+    /// y-value for each knot
     __float__ *YResp;
-    // Parameter number (which parameter is this spline for)
+    /// Parameter number (which parameter is this spline for)
     __int__ ParamNo;
 };
 
 // ************************
-// Truncated spline class
+/// @brief CW: Truncated spline class
 class Truncated_Spline: public TSpline3_red {
 // ************************
 // cubic spline which is flat (returns y_first or y_last) if x outside of knot range
   public:
-    // Empty constructor
+    /// Empty constructor
     Truncated_Spline()
     :TSpline3_red()
     {
     }
 
-    // The constructor that takes a TSpline3 pointer and copies in to memory
+    /// The constructor that takes a TSpline3 pointer and copies in to memory
     Truncated_Spline(TSpline3* &spline, int Param = -1)
     :TSpline3_red(spline, Param)
     {
     }
 
-    // Empty destructor
+    /// Empty destructor
     ~Truncated_Spline()
     {
     }
 
-    // Find the segment relevant to this variation in x
-    // See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
+    /// Find the segment relevant to this variation in x
+    /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
     inline int FindX(double x) {
       // The segment we're interested in (klow in ROOT code)
       int segment = 0;
@@ -806,7 +803,7 @@ class Truncated_Spline: public TSpline3_red {
       return segment;
     }
 
-    // Evaluate the weight from a variation
+    /// Evaluate the weight from a variation
     inline double Eval(double var) {
       // Get the segment for this variation
       int segment = FindX(var);
@@ -855,7 +852,7 @@ namespace MaCh3Utils {
 } // end MaCh3Utils namespace
 
 // *****************
-// Enum to track the target material
+/// Enum to track the target material
 enum TargetMat {
 // *****************
   kTarget_H  = 1,
@@ -870,7 +867,7 @@ enum TargetMat {
 };
 
 // *****************
-// Converted the Target Mat to a string
+/// Converted the Target Mat to a string
 inline std::string TargetMat_ToString(TargetMat i) {
 // *****************
   std::string name;
@@ -909,7 +906,7 @@ inline std::string TargetMat_ToString(TargetMat i) {
 }
 
 // *****************
-// Enum to track the incoming neutrino species
+/// Enum to track the incoming neutrino species
 enum NuPDG {
 // *****************
   kNue = 12,
@@ -921,7 +918,7 @@ enum NuPDG {
 };
 
 // *****************
-// Enum to track neutrino species for Prob3
+/// Enum to track neutrino species for Prob3
 enum ProbNu {
 // *****************
   kProbNue = 1,
@@ -932,8 +929,7 @@ enum ProbNu {
   kProbNutauBar = -3
 };
 
-//ETA - Probs3++ doesn't use the PDG codes for the neutrino type
-//so add in a small converter
+/// ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter
 inline int PDGToProbs(NuPDG pdg){
 
   int ReturnProbNu = -999;
@@ -996,18 +992,18 @@ inline int ProbsToPDG(ProbNu NuType){
   return ReturnNuPDG;
 }
 
-// Make an enum of the test statistic that we're using
+/// Make an enum of the test statistic that we're using
 enum TestStatistic {
   kPoisson,
   kBarlowBeeston,
   kIceCube,
   kPearson,
   kDembinskiAbdelmottele,
-  kNTestStatistics //This only enumarates statistic
+  kNTestStatistics //This only enumerates statistic
 };
 
 // **************************************************
-// Convert a LLH type to a string
+/// Convert a LLH type to a string
 inline std::string TestStatistic_ToString(TestStatistic i) {
 // **************************************************
     std::string name = "";
@@ -1038,7 +1034,7 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
 }
 
 // *******************
-// Class containing information about interaction modes
+/// Class containing information about interaction modes
 class MaCh3_Modes {
   // *******************
   public:
@@ -1049,28 +1045,28 @@ class MaCh3_Modes {
     virtual int Mode_ToSplineMode(int i);
 };
 
-//WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
+/// WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly*);
 
-//WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
+/// WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly*);
 
-//WP: Poly Projectors
+/// WP: Poly Projectors
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
 
-//WP: Helper to Normalise histograms
+/// WP: Helper to Normalise histograms
 TH2Poly* NormalisePoly(TH2Poly* Histogram);
 
-//WP: Helper to scale th2poly analogous to th2d scale with option "width"
+/// WP: Helper to scale th2poly analogous to th2d scale with option "width"
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
-//WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
+/// WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
 
-//KS: Sanity check for TH2Poly
+/// KS: Sanity check for TH2Poly
 void CheckTH2PolyFileVersion(TFile *file);
 
-//KS: Remove fitted TF1 from hist to make comparison easier
+/// KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, std::string name);
 
 // Helper to check if files exist or not
@@ -1107,7 +1103,7 @@ enum CUDAProb_nu {
  
 
 // ************************************************
-// Get CUDAProb3 flavour from intital and final states
+/// Get CUDAProb3 flavour from intital and final states
 inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
 //*************************************************  
     

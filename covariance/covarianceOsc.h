@@ -3,6 +3,7 @@
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
 
+/// @brief Class responsible for handling of neutrino oscillation  parameters.
 class covarianceOsc : public covarianceBase
 {
  public:
