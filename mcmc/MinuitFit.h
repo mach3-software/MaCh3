@@ -5,6 +5,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 
+/// @brief Implementation of Minuit fitting algorithm
 class MinuitFit : public LikelihoodFit {
  public:
   /// @brief Constructor

@@ -69,6 +69,7 @@ class particle{
 
 };
 
+/// @brief Implementation of PSO fitting algorithm
 class PSO : public LikelihoodFit {
     /**
      * Class PSO, consist of a vector of object Class Particle and global best

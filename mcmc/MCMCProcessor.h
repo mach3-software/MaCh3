@@ -53,7 +53,7 @@
 //
 // Make LLH scans around output
 
-//KS: Enum for different covariance classes
+/// KS: Enum for different covariance classes
 enum ParameterEnum {
   kXSecPar  = 0, //KS: This hold both xsec and flux
   kNDPar = 1,
@@ -63,9 +63,14 @@ enum ParameterEnum {
   kNParameterEnum = 4 //KS: keep it at the end to keep track of all parameters
 };
 
+/// @brief Class responsible for processing MCMC chains and performing diagnostic, making plots etc
 class MCMCProcessor {
   public:
+    /// @brief Constructs an MCMCProcessor object with the specified input file and options.
+    /// @param InputFile The path to the input file containing MCMC data.
+    /// @param MakePostfitCorr A boolean indicating whether to apply post-fit corrections during processing.
     MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
+    /// @brief Destroys the MCMCProcessor object.
     ~MCMCProcessor();
 
     /// @brief Scan chain, what parameters we have and load information from covariance matrices
@@ -76,6 +81,7 @@ class MCMCProcessor {
     void MakeCovariance();
     /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
+    /// @brief Calculate covariance by making 2D projection of each combination of parameters using multithreading
     void MakeCovariance_MP();
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
     void ResetHistograms();
@@ -253,14 +259,14 @@ class MCMCProcessor {
     //Useful strings telling us about output etc
     std::string MCMCFile;
     std::string OutputSuffix;
-    // Covariance matrix name position
+    /// Covariance matrix name position
     std::vector<std::vector<std::string>> CovPos;
     // ND runs
     //std::string NDruns;
     // ND selections
     //std::vector<std::string> NDsel;
 
-    //Main chain storing all steps etc
+    /// Main chain storing all steps etc
     TChain *Chain;
     //BurnIn Cuts
     std::string StepCut;
@@ -278,7 +284,7 @@ class MCMCProcessor {
     std::vector<std::string> ExcludedTypes;
     std::vector<std::string> ExcludedNames;
     
-    //Number of all parameters used in the analysis
+    /// Number of all parameters used in the analysis
     int nDraw;
     
     // Is the ith parameter varied
@@ -288,15 +294,15 @@ class MCMCProcessor {
     std::vector<std::vector<double>>  ParamNom;
     std::vector<std::vector<double>>  ParamErrors;
     std::vector<std::vector<bool>>    ParamFlat;
-    //Number of parameters per type
+    /// Number of parameters per type
     std::vector<int> nParam;
-    // Make an enum for which class this parameter belongs to so we don't have to keep string comparing
+    /// Make an enum for which class this parameter belongs to so we don't have to keep string comparing
     std::vector<ParameterEnum> ParamType;
-    //KS: in MCMC output there is order of parameters so for example first goes xsec then nd det etc.
-    //Idea is that this paraemter will keep track of it so code is flexible
+    /// KS: in MCMC output there is order of parameters so for example first goes xsec then nd det etc.
+    /// Idea is that this parameter will keep track of it so code is flexible
     std::vector<int> ParamTypeStartPos;
     
-    //In XsecMatrix we have both xsec and flux parameters, this is just for some ploting options
+    //In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
     std::vector<bool>   IsXsec; 
     int nFlux; // This keep number of Flux params in xsec matrix
 
@@ -321,21 +327,21 @@ class MCMCProcessor {
     bool FancyPlotNames;
     bool plotBinValue; //If true it will print value on each bin of covariance matrix
     bool ApplySmoothing;
-    //KS: If true credible stuff is done in sigmas not %
+    /// KS: If true credible stuff is done in sigmas not %
     bool CredibleInSigmas;
-    //KS: Set Threshold when to plot 2D posterior as by default we get a LOT of plots
+    /// KS: Set Threshold when to plot 2D posterior as by default we get a LOT of plots
     double Post2DPlotThreshold;
 
     std::vector< int > NDSamplesBins;
     std::vector< std::string > NDSamplesNames;
 
-    // Gaussian fitter
+    /// Gaussian fitter
     TF1 *Gauss;
 
-    // The output file
+    /// The output file
     TFile *OutputFile;
     
-    //Fancy canvas used for our beautiful plots
+    /// Fancy canvas used for our beautiful plots
     TCanvas *Posterior;
 
     //Vector of best fit points and errors obtained with different methods
@@ -361,9 +367,9 @@ class MCMCProcessor {
     double** ParStep;
     int* StepNumber;
 
-    // Number of bins
+    /// Number of bins
     int nBins;
-    // Drawrange for SetMaximum
+    /// Drawrange for SetMaximum
     double DrawRange;
     
     //Flags related with MCMC diagnostic
@@ -379,9 +385,9 @@ class MCMCProcessor {
     double **BatchedAverages;
     double **LagL;
 
-    // Holds the sample values
+    /// Holds the sample values
     double **SampleValues;
-    // Holds the systs values
+    /// Holds the systs values
     double **SystValues;
 
     // Holds all accProb

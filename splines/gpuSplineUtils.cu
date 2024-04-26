@@ -35,10 +35,10 @@
 #endif
 
 
-//KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
+/// KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4
 
-//KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
+/// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
 #define __BlockSize__ 1024
 
 // CUDA_ERROR_CHECK is now defined in the makefile instead
@@ -64,7 +64,7 @@ inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
 }
 
 // **************************************************
-// Check if there's been an error
+/// Check if there's been an error
 inline void __cudaCheckError( const char *file, const int line ) {
 // **************************************************
 #ifdef CUDA_ERROR_CHECK
@@ -95,8 +95,7 @@ __device__ __constant__ short int d_spline_size;
 #ifndef Weight_On_SplineBySpline_Basis
 __device__ __constant__ int d_n_events;
 #endif
-//CW: Constant memory needs to be hard-coded on compile time
-// Could make this texture memory instead, but don't care enough right now...
+/// CW: Constant memory needs to be hard-coded on compile time. Could make this texture memory instead, but don't care enough right now...
 __device__ __constant__ float val_gpu[__N_SPLINES__];
 __device__ __constant__ short int segment_gpu[__N_SPLINES__];
 
@@ -123,7 +122,7 @@ cudaTextureObject_t text_nParamPerEvent = 0;
 // *******************************************
 
 // *******************************************
-//KS: Get some fancy info about VRAM usage
+/// KS: Get some fancy info about VRAM usage
 inline void checkGpuMem() {
 // *******************************************
 
@@ -140,7 +139,7 @@ inline void checkGpuMem() {
 }
 
 // *******************************************
-//KS: Get some fancy info about GPU
+/// KS: Get some fancy info about GPU
 inline void PrintNdevices() {
 // *******************************************
 
@@ -155,7 +154,7 @@ inline void PrintNdevices() {
 // *******************************************
 
 // *******************************************
-// Initialiser when using the x array and combined y,b,c,d array
+/// Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_SepMany(
 // *******************************************
                           float **gpu_x_array,
@@ -217,7 +216,7 @@ __host__ void InitGPU_SepMany(
 }
 
 // *******************************************
-// Initialiser when using the x array and combined y,b,c,d array
+/// Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_TF1(
 // *******************************************
                           float **gpu_coeffs,
@@ -300,7 +299,7 @@ __host__ void InitGPU_Vals(float **vals) {
 // ******************************************************
 
 // ******************************************************
-// Copy to GPU for x array and separate ybcd array
+/// Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_SepMany(
 // ******************************************************
                             short int *gpu_paramNo_arr,
@@ -406,7 +405,7 @@ __host__ void CopyToGPU_SepMany(
 }
 
 // ******************************************************
-// Copy to GPU for x array and separate ybcd array
+/// Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_TF1(
 // ******************************************************
                             float *gpu_coeffs,
@@ -558,8 +557,7 @@ __global__ void EvalOnGPU_SepMany(
 }
 
 //*********************************************************
-// Evaluate the TF1 on the GPU
-// Using 5th order polynomial
+/// Evaluate the TF1 on the GPU Using 5th order polynomial
 __global__ void EvalOnGPU_TF1( 
     const float* __restrict__ gpu_coeffs,
     const short int* __restrict__ gpu_paramNo_arr,
@@ -609,7 +607,7 @@ __global__ void EvalOnGPU_TF1(
 
 #ifndef Weight_On_SplineBySpline_Basis
 //*********************************************************
-//KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
+/// KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
    const float* __restrict__ gpu_weights,
    float *gpu_total_weights,
@@ -746,7 +744,7 @@ __host__ void RunGPU_SepMany(
 }
 
 // *****************************************
-// Run the GPU code for the TF1
+/// Run the GPU code for the TF1
 __host__ void RunGPU_TF1(
     const float *gpu_coeffs,
     const short int* gpu_paramNo_arr,
@@ -845,7 +843,7 @@ __host__ void RunGPU_TF1(
 }
 
 // *****************************************
-// Make sure all Cuda threads finished execution
+/// Make sure all Cuda threads finished execution
 __host__ void SynchroniseSplines() {
   cudaDeviceSynchronize();
 }
@@ -855,7 +853,7 @@ __host__ void SynchroniseSplines() {
 // *********************************
 
 // *********************************
-// Clean up the {x},{ybcd} arrays
+/// Clean up the {x},{ybcd} arrays
 __host__ void CleanupGPU_SepMany( 
     short int *gpu_paramNo_arr,
     unsigned int *gpu_nKnots_arr,
@@ -890,7 +888,7 @@ __host__ void CleanupGPU_SepMany(
 }
 
 // *******************************************
-// Clean up pinned variables at CPU
+/// Clean up pinned variables at CPU
 __host__ void CleanupGPU_Segments(short int *segment, float *vals) {
 // *******************************************
     cudaFreeHost(segment);
@@ -900,7 +898,7 @@ __host__ void CleanupGPU_Segments(short int *segment, float *vals) {
 }
 
 // *********************************
-// Clean up the TF1 arrays
+/// Clean up the TF1 arrays
 __host__ void CleanupGPU_TF1(
     float *gpu_coeffs,
     short int *gpu_paramNo_arr,

@@ -10,6 +10,9 @@
 
 #include "yaml-cpp/yaml.h"
 
+/// @brief Get content of config file if node is not found take default value specified
+/// @param node Yaml node
+/// @param defval Default value which will be used in case node doesn't exist
 template<typename Type>
 Type GetFromManager(const YAML::Node& node, Type defval)
 {
@@ -21,15 +24,15 @@ Type GetFromManager(const YAML::Node& node, Type defval)
   return tmpNode.as<Type>();
 }
 
-// Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
-//KS: Base case for recursion
+/// @brief Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
+/// KS: Base case for recursion
 template<typename T>
 bool CheckNodeExistsHelper(const T& node) {
   (void)node;
   return true; // Node exists, return true
 }
 
-//KS: Recursive function to traverse YAML nodes
+/// @brief KS: Recursive function to traverse YAML nodes
 template<typename T, typename... Args>
 bool CheckNodeExistsHelper(const T& node, const std::string& key, Args... args) {
   if (!node[key]) {
@@ -39,20 +42,20 @@ bool CheckNodeExistsHelper(const T& node, const std::string& key, Args... args) 
   return CheckNodeExistsHelper(node[key], args...);
 }
 
-//KS: Wrapper function to call the recursive helper
+/// @brief KS: Wrapper function to call the recursive helper
 template<typename... Args>
 bool CheckNodeExists(const YAML::Node& node, Args... args) {
   return CheckNodeExistsHelper(node, args...);
 }
 
 /// Use this like this FindFromManager<std::string>(config, "LikelihoodOptions", "TestStatistic");
-// Base case for recursion
+/// Base case for recursion
 template<typename T>
 T FindFromManagerHelper(const YAML::Node& node) {
   return node.as<T>(); // Convert YAML node to the specified type
 }
 
-// Recursive function to traverse YAML nodes
+/// @brief Recursive function to traverse YAML nodes
 template<typename T, typename... Args>
 T FindFromManagerHelper(const YAML::Node& node, const std::string& key, Args... args) {
   if (!node[key]) {
@@ -63,14 +66,14 @@ T FindFromManagerHelper(const YAML::Node& node, const std::string& key, Args... 
   return FindFromManagerHelper<T>(node[key], args...); // Recursive call
 }
 
-// Wrapper function to call the recursive helper
+/// @brief Wrapper function to call the recursive helper
 template<typename T, typename... Args>
 T FindFromManager(const YAML::Node& node, Args... args) {
   return FindFromManagerHelper<T>(node, args...);
 }
 
-
-// Function to convert a YAML string to a YAML node
+/// @brief Function to convert a YAML string to a YAML node
+/// @param yaml_string String which will be converted to yaml node
 YAML::Node STRINGtoYAML(const std::string& yaml_string);
 
 /// @brief KS: Convert a YAML node to a string representation.

@@ -28,13 +28,14 @@
 
 class covarianceBase {
  public:
-  //ETA - constructor for a YAML file
+  /// @brief ETA - constructor for a YAML file
   covarianceBase(std::vector<std::string> YAMLFile, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
-  //"Usual" constructors from root file
+  /// "Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   covarianceBase(const char *name, const char *file, int seed);
   /// @brief Constructor For Eigen Value decomp
   covarianceBase(const char *name, const char *file, int seed, double threshold,int FirstPCAdpar, int LastPCAdpar);
+  /// @brief Destructor
   virtual ~covarianceBase();
   
   // Setters
@@ -58,7 +59,7 @@ class covarianceBase {
   //DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; };
   void setIndivStepScale(std::vector<double> stepscale);
-  //KS: In case someone really want to change this
+  /// @brief KS: In case someone really want to change this
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; };
 
   // Throwers
@@ -66,7 +67,7 @@ class covarianceBase {
   void throwParCurr(const double mag = 1.);
   void throwParameters();
   void throwNominal(bool nomValues = false, int seed = 0);
-  // Randomly throw the parameters in their 1 sigma range
+  /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
   //LLH Related
@@ -86,7 +87,7 @@ class covarianceBase {
   const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); };
   std::string const getInputFile() const { return inputFile; };
 
-  // Get diagonal error for ith parameter
+  /// @brief Get diagonal error for ith parameter
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
 
   // Adaptive Step Tuning Stuff
@@ -101,7 +102,7 @@ class covarianceBase {
     total_steps = nsteps;
     if(total_steps >= lower_adapt)resetIndivStepScale();
   }
-  // Set thresholds for MCMC steps
+  /// @brief HW: Set thresholds for MCMC steps
   inline void setAdaptiveThresholds(const int low_threshold = 10000, const int up_threshold = 1000000){lower_adapt=low_threshold; upper_adapt = up_threshold;}
 
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
@@ -377,7 +378,7 @@ class covarianceBase {
   //Same as above but much faster as TMatrixDSym cache miss
   double **throwMatrixCholDecomp;
 
-  // Truly Adaptive Stuff
+  /// @brief HW: Truly Adaptive Stuff
   void initialiseNewAdaptiveChain();
   // TMatrixD* getMatrixSqrt(TMatrixDSym* inputMatrix);
   // double calculateSubmodality(TMatrixD* sqrtVectorCov, TMatrixDSym* throwCov);

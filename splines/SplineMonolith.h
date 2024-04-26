@@ -33,7 +33,7 @@
 extern void SynchroniseSplines();
 #endif
 
-// Make template class so we can use TF1 and TSpline3
+/// @brief Even-by-event class calculating response for spline parameters
 class SMonolith {
   public:
     /// @brief Constructor

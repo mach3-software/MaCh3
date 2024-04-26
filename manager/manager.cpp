@@ -33,7 +33,7 @@ manager::manager(std::string const &filename)
       {
         MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
       }
-      MaCh3Exception(__FILE__ , __LINE__ );
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   } else {
     mc_stat_llh = kPoisson;

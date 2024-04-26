@@ -2,6 +2,7 @@
 
 #include "FitterBase.h"
 
+/// @brief Implementation of MR2T2 algorithm
 class mcmc : public FitterBase {
  public:
    /// @brief Constructor

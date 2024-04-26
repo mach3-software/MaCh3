@@ -21,22 +21,20 @@
 
 
 namespace MaCh3Utils {
-
-  /**
-   * @brief KS: Prints welcome message with MaCh3 logo
-   */
+  /// @brief KS: Prints welcome message with MaCh3 logo
   void MaCh3Welcome();
-  //KS: Check what CPU you are using
+  /// @brief KS: Check what CPU you are using
   void GetCPUInfo();
-  //KS: Check what GPU you are using
+  /// @brief KS: Check what GPU you are using
   void GetGPUInfo();
-  //KS: Convoluted code to grab output from terminal to string
+  /// @brief KS: Convoluted code to grab output from terminal to string
   std::string TerminalToString(const char* cmd);
-  //KS: Check what CPU you are using
+  /// @brief KS: Check what CPU you are using
   void EstimateDataTransferRate(TChain* chain, const int entry);
-  //KS: Simply print progress bar
+  /// @brief KS: Simply print progress bar
   void PrintProgressBar(const int Done, const int All);
-  //CW: Get info like RAM
+  /// @brief CW: Get info like RAM
   int getValue(std::string Type);
+  /// @brief CW: Get memory, which is probably silly
   int parseLine(const std::string& line);
 }
