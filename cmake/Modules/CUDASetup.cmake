@@ -65,7 +65,11 @@ else()
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-g;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-dlcm=ca;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills;-Xptxas=-v;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
     )
+
+    target_compile_definitions(MaCh3CompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
+
+
 
 target_link_options(MaCh3CompilerOptions INTERFACE -I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 

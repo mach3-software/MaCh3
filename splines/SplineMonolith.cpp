@@ -1252,11 +1252,10 @@ SMonolith::~SMonolith() {
 #else
   if(segments != NULL) delete[] segments;
   if(vals != NULL) delete[] vals;
+  if(cpu_total_weights != NULL) delete[] cpu_total_weights;
 #endif
 
   if(SplineInfoArray != NULL) delete[] SplineInfoArray;
-
-  if(cpu_total_weights != NULL) delete[] cpu_total_weights;
 
 #ifdef Weight_On_SplineBySpline_Basis
   if(cpu_weights != NULL) delete[] cpu_weights;

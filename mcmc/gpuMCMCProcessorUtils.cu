@@ -1,4 +1,4 @@
-// MaCh3 utils for processing/diagnosic MCMC
+// MaCh3 utils for processing/diagnostic MCMC
 // Written by Kamil Skwarczynski
 //
 // Contains code to run on CUDA GPUs. Right now only can calculate autocorealtions
@@ -7,63 +7,8 @@
 // -Effective Sample Size evaluation
 
 
-// C i/o  for printf and others
-#include <stdio.h>
+#include "manager/gpuUtils.cu"
 
-// CUDA specifics
-#include <cuda_runtime.h>
-
-#ifdef CUDA_ERROR_CHECK
-#include <helper_functions.h>
-#include <helper_cuda.h>
-#endif
-
-// Define the macros
-#define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)
-#define CudaCheckError()  __cudaCheckError(__FILE__, __LINE__)
-
-//KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
-#define __BlockSize__ 1024
-
-// **************************************************
-//             ERROR CHECKING ROUTINES
-// Also exist in helper_cuda.h
-// **************************************************
-
-// **************************************************
-// Check for a safe call on GPU
-inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
-// **************************************************
-#ifdef CUDA_ERROR_CHECK
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaSafeCall() failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-#endif
-  return;
-}
-
-// **************************************************
-// Check if there's been an error
-inline void __cudaCheckError( const char *file, const int line ) {
-// **************************************************
-#ifdef CUDA_ERROR_CHECK
-  cudaError err = cudaGetLastError();
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-
-  // More careful checking. However, this will affect performance.
-  // Comment away if needed.
-  err = cudaDeviceSynchronize();
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaCheckError() with sync failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-#endif
-  return;
-}
 
 // ******************************************
 // CONSTANTS
@@ -84,7 +29,7 @@ static int h_nEntries = -1;
 // *******************************************
 
 // *******************************************
-//KS: Initaliser, here we allocate memory for variables and copy constants
+//KS: Initialiser, here we allocate memory for variables and copy constants
 __host__ void InitGPU_AutoCorr(
 // *******************************************
                           float **ParStep_gpu,
@@ -112,7 +57,7 @@ __host__ void InitGPU_AutoCorr(
   CudaCheckError();
 
   // Allocate chunks of memory to GPU
-  //Numerator which is directly used for calcualing LagL
+  //Numerator which is directly used for calculating LagL
   cudaMalloc((void **) NumeratorSum_gpu, h_nLag*h_nDraws*sizeof(float));
   CudaCheckError();
 
@@ -128,7 +73,7 @@ __host__ void InitGPU_AutoCorr(
   cudaMalloc((void **) ParStep_gpu, h_nDraws*h_nEntries*sizeof(float*));
   CudaCheckError();
 
-  printf(" Allocated in total %f MB for autocorealtions calculations on GPU\n", double(sizeof(float)*(h_nLag*h_nDraws+h_nLag*h_nDraws+h_nDraws+h_nDraws*h_nEntries))/1.E6);
+  printf(" Allocated in total %f MB for autocorrelations calculations on GPU\n", double(sizeof(float)*(h_nLag*h_nDraws+h_nLag*h_nDraws+h_nDraws+h_nDraws*h_nEntries))/1.E6);
 
 }
 
@@ -158,11 +103,11 @@ __host__ void CopyToGPU_AutoCorr(
   cudaMemcpy(ParamSums_gpu, ParamSums_cpu, h_nDraws*sizeof(float), cudaMemcpyHostToDevice);
   CudaCheckError();
 
-  //Numerator which is directly used for calcualing LagL
+  //Numerator which is directly used for calculating LagL
   cudaMemcpy(NumeratorSum_gpu, NumeratorSum_cpu, h_nLag*h_nDraws*sizeof(float), cudaMemcpyHostToDevice);
   CudaCheckError();
 
-  //Denominator which is directly used for calcualing LagL
+  //Denominator which is directly used for calculating LagL
   cudaMemcpy(DenomSum_gpu, DenomSum_cpu, h_nLag*h_nDraws*sizeof(float), cudaMemcpyHostToDevice);
   CudaCheckError();
 }
@@ -173,7 +118,7 @@ __host__ void CopyToGPU_AutoCorr(
 //*********************************************************
 
 //*********************************************************
-//Eval autocorealtions based on Box and Jenkins
+//Eval autocorrelations based on Box and Jenkins
 __global__ void EvalOnGPU_AutoCorr(
     const float* __restrict__ ParStep_gpu,
     const float* __restrict__ ParamSums_gpu,
@@ -183,7 +128,7 @@ __global__ void EvalOnGPU_AutoCorr(
 
   const unsigned int CurrentLagNum = (blockIdx.x * blockDim.x + threadIdx.x);
 
-  //KS: Accesing shared memory is much much faster than global memory hence we use shared memory for calcualtion and then write to global memory
+  //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
   __shared__ float shared_NumeratorSum[__BlockSize__];
   __shared__ float shared_DenomSum[__BlockSize__];
 
@@ -216,7 +161,7 @@ __global__ void EvalOnGPU_AutoCorr(
         shared_DenomSum[threadIdx.x] += Denom;
       }
 
-      //KS: Make sure threads are synchorised before moving to global memory
+      //KS: Make sure threads are synchronised before moving to global memory
       __syncthreads();
       NumeratorSum_gpu[CurrentLagNum] = shared_NumeratorSum[threadIdx.x];
       DenomSum_gpu[CurrentLagNum]     = shared_DenomSum[threadIdx.x];

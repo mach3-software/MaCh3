@@ -5,22 +5,8 @@
 // Now also supports TF1 evals
 // Called from samplePDF/samplePDFND.cpp -> splines/SplineMonolith.cpp -> splines/gpuSplineUtils.cu
 
-// C i/o  for printf and others
-#include <stdio.h>
-#include <vector>
-
-// CUDA specifics
-
-#include <cuda_runtime.h>
-
-#ifdef CUDA_ERROR_CHECK
-#include <helper_functions.h>
-#include <helper_cuda.h>
-#endif
-
-// Define the macros
-#define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)
-#define CudaCheckError()  __cudaCheckError(__FILE__, __LINE__)
+//MaCh3 included
+#include "manager/gpuUtils.cu"
 
 // Hard code the number of splines
 // Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
@@ -34,56 +20,9 @@
 #pragma message("using default N splines")
 #endif
 
-
 /// KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_ 4
 
-/// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
-#define __BlockSize__ 1024
-
-// CUDA_ERROR_CHECK is now defined in the makefile instead
-//#define CUDA_ERROR_CHECK
-//#define Weight_On_SplineBySpline_Basis
-
-// **************************************************
-//             ERROR CHECKING ROUTINES
-// Also exist in helper_cuda.h
-// **************************************************
-
-// **************************************************
-// Check for a safe call on GPU
-inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
-// **************************************************
-#ifdef CUDA_ERROR_CHECK
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaSafeCall() failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-#endif
-  return;
-}
-
-// **************************************************
-/// Check if there's been an error
-inline void __cudaCheckError( const char *file, const int line ) {
-// **************************************************
-#ifdef CUDA_ERROR_CHECK
-  cudaError err = cudaGetLastError();
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-
-  // More careful checking. However, this will affect performance.
-  // Comment away if needed.
-  err = cudaDeviceSynchronize();
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaCheckError() with sync failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-#endif
-  return;
-}
 
 // ******************************************
 // CONSTANTS
@@ -116,38 +55,6 @@ cudaTextureObject_t text_coeff_x = 0;
 cudaTextureObject_t text_nParamPerEvent = 0;
 #endif
 
-
-// *******************************************
-//              Utils
-// *******************************************
-
-// *******************************************
-/// KS: Get some fancy info about VRAM usage
-inline void checkGpuMem() {
-// *******************************************
-
-  float free_m, total_m,used_m;
-  size_t free_t, total_t;
-
-  cudaMemGetInfo(&free_t, &total_t);
-
-  free_m = (uint)free_t/1048576.0;
-  total_m = (uint)total_t/1048576.0;
-  used_m = total_m - free_m;
-
-  printf("  Memory free %f MB, total memory %f MB, memory used %f MB\n", free_m, total_m, used_m);
-}
-
-// *******************************************
-/// KS: Get some fancy info about GPU
-inline void PrintNdevices() {
-// *******************************************
-
-  int nDevices;
-  cudaGetDeviceCount(&nDevices);
-
-  printf("  Found %i GPUs, currenlty I only support one GPU\n", nDevices);
-}
 
 // *******************************************
 //              INITIALISE GPU
@@ -883,6 +790,7 @@ __host__ void CleanupGPU_SepMany(
   cudaDestroyTextureObject(text_nParamPerEvent);
   cudaFree(gpu_nParamPerEvent);
   cudaFreeHost(cpu_total_weights);
+  cpu_total_weights = nullptr;
 #endif
   return;
 }
@@ -893,6 +801,9 @@ __host__ void CleanupGPU_Segments(short int *segment, float *vals) {
 // *******************************************
     cudaFreeHost(segment);
     cudaFreeHost(vals);
+
+    segment = nullptr;
+    vals = nullptr;
 
     return;
 }

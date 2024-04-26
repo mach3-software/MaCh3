@@ -19,10 +19,6 @@ if(NOT CPU_ONLY)
     set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-if(MaCh3_DEBUG_ENABLED)
-    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
-endif()
-
 set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
