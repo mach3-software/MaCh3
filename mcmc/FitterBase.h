@@ -15,6 +15,7 @@
 class TRandom3;
 class TStopwatch;
 class TTree;
+class TGraphAsymmErrors;
 
 /// @brief Base class for implementing fitting algorithms
 class FitterBase {
@@ -52,6 +53,10 @@ class FitterBase {
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
+  /// @brief Perform a 2D and 1D sigma var for all samples.
+  /// @warning Code uses TH2Poly
+  void RunSigmaVar();
+
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
 protected:
@@ -64,6 +69,9 @@ protected:
 
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
+
+  /// @brief Used by sigma variation, check how 1 sigma changes spectra
+  inline TGraphAsymmErrors* MakeAssymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title);
 
   /// The manager
   manager *fitMan;
@@ -89,6 +97,8 @@ protected:
 
   /// Sample holder
   std::vector<samplePDFBase*> samples;
+  /// Total number of samples used
+  unsigned int TotalNSamples;
 
   /// Systematic holder
   std::vector<covarianceBase*> systematics;

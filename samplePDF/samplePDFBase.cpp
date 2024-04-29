@@ -318,7 +318,6 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     //KS: Alterantive calcaution of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
     case (kDembinskiAbdelmottele):
     {
-
       //KS: code follows authors implementation from:
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
 

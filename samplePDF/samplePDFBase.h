@@ -72,17 +72,15 @@ class samplePDFBase : public samplePDFInterface
   void addData(TH1D* binneddata);
   void addData(TH2D* binneddata);
 
-  void addXsecSplines(splineBase* splines){xsecsplines=splines;}
-  //virtual void whatAmI(){std::cout << "__FILE__" << std::endl;};
-
   // For adding sample dependent branches to the posteriors tree
   virtual void setMCMCBranches(TTree *outtree) {(void)outtree;};
 
-  protected:
-  void init(double pot);
-  void init(double pot, std::string mc_version);
-  
-  //bool gpu_rw; 
+  // WARNING KS: Needed for sigma var
+  virtual void SetupBinning(const __int__ Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
+    (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");};
+  virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); };
+  virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");};
+  virtual TH1* getPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");};
 
   double GetLikelihood_kernel(std::vector<double> &data);
   double getTestStatLLH(double data, double mc);
@@ -90,7 +88,10 @@ class samplePDFBase : public samplePDFInterface
   // Provide a setter for the test-statistic
   void SetTestStatistic(TestStatistic test_stat);
 
-
+protected:
+  void init(double pot);
+  void init(double pot, std::string mc_version);
+  
   std::vector<double>* dataSample;
   std::vector< vector <double> >* dataSample2D;
    
@@ -110,9 +111,6 @@ class samplePDFBase : public samplePDFInterface
   // binned PDFs
   TH1D*_hPDF1D;
   TH2D*_hPDF2D;
-
-  //splines
-  splineBase* xsecsplines;
 
   TRandom3* rnd;
   bool MCthrow;
