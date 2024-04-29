@@ -1039,19 +1039,6 @@ void FitterBase::RunSigmaVar() {
         }
         */
 
-        /* KURWA
-        SampleIterator = 0;
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
-        {
-          for(__int__ k = 0; k < samples[ivs]->GetNsamples(); k++ )
-          {
-            std::string title = std::string(samples[ivs]->getPDF(k)->GetName());
-            dirArryDial->cd();
-            dirArrySample[SampleIterator] = dirArryDial->mkdir(title.c_str());
-            SampleIterator++;
-          }
-        }
-        */
         SampleIterator = 0;
         // Get each sample and how it's responded to our reweighted parameter
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )

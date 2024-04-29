@@ -59,7 +59,7 @@ public:
   void addData(TH1D* Data);
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
-  void addData(std::vector< vector <double> > &data);
+  void addData(std::vector< std::vector <double> > &data);
   //DB Multi-threaded GetLikelihood
   double GetLikelihood();
   //===============================================================================
@@ -215,7 +215,7 @@ public:
 
   //===============================================================================
   //MC variables
-  vector<struct fdmc_base> MCSamples;
+  std::vector<struct fdmc_base> MCSamples;
   TFile *_sampleFile;
   TTree *_data;
   //===============================================================================

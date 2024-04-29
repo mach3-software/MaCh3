@@ -72,7 +72,7 @@ class stretch
       TStopwatch clock;
       bool debug;
       int debugInterval; // how many steps to print to debug file
-      ofstream debugFile;
+      std::ofstream debugFile;
       
       //random number
       TRandom3* random;      

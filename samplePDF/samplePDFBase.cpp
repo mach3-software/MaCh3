@@ -54,7 +54,7 @@ void samplePDFBase::addData(std::vector<double> &data)
     dathist->Fill(dataSample->at(i));
 }
 
-void samplePDFBase::addData(std::vector< vector <double> > &data)
+void samplePDFBase::addData(std::vector< std::vector <double> > &data)
 {
   if(nDims != 0 && nDims != 2)
   {
@@ -63,7 +63,7 @@ void samplePDFBase::addData(std::vector< vector <double> > &data)
     throw;
   }
   nDims = 2;  
-  dataSample2D = new std::vector< vector <double> >(data);
+  dataSample2D = new std::vector< std::vector <double> >(data);
   if(dathist2d == NULL)
   {
       std::cerr<<"dathist2d not initialised"<<std::endl;
@@ -142,9 +142,9 @@ std::vector<double> samplePDFBase::generate()
   return data;
 }
 
-std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
+std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 {
-  std::vector< vector <double> > data;
+  std::vector< std::vector <double> > data;
   if(!pdf) pdf = (TH2D*)get2DHist();
 
   if(MCthrow)

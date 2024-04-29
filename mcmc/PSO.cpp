@@ -214,7 +214,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         }
         uncertainties_list.push_back({abs(position[i]-position_list[1][i]),abs(position[i]-position_list_p[1][i])});
         std::cout << "Uncertainty finished for d = "<< i << std::endl;
-        std::cout << setprecision(10)<< "LLR values for ± positive and negative uncertainties are " << CalcChi(position_list[1]) << " and " << CalcChi(position_list_p[1]) << std::endl;
+        std::cout << std::setprecision(10)<< "LLR values for ± positive and negative uncertainties are " << CalcChi(position_list[1]) << " and " << CalcChi(position_list_p[1]) << std::endl;
     }
     return uncertainties_list;
 }
@@ -403,7 +403,7 @@ void PSO::run() {
             std::cout << "Current LLR = " << fBestValue << std::endl;
             std::cout << "Position = " <<std::endl;
             for (int j = 0; j< fDim; ++j){
-                std::cout << "    Dim " << j << " = " << setprecision(10) << get_best_particle()->get_personal_best_position()[j] << std::endl; 
+                std::cout << "    Dim " << j << " = " << std::setprecision(10) << get_best_particle()->get_personal_best_position()[j] << std::endl;
             }
             
         }
@@ -420,7 +420,7 @@ void PSO::run() {
     uncertainties = bisection(get_best_particle()->get_personal_best_position(),get_best_particle()->get_personal_best_value(),0.5,0.005);
     std::cout << "Position for Global Minimum = "<<std::endl;
     for (int i = 0; i< fDim; ++i){
-        std::cout << "    Dim " << i << " = " << setprecision(10) << get_best_particle()->get_personal_best_position()[i]  << " +" << uncertainties[i][1] << ", -" <<  uncertainties[i][0] << std::endl;
+        std::cout << "    Dim " << i << " = " << std::setprecision(10) << get_best_particle()->get_personal_best_position()[i]  << " +" << uncertainties[i][1] << ", -" <<  uncertainties[i][0] << std::endl;
     }
 }
 

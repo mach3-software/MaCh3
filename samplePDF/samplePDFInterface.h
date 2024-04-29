@@ -12,8 +12,6 @@
 
 #include "samplePDF/Structs.h"
 
-using namespace std;
-
 class samplePDFInterface
 {
  public:
@@ -21,13 +19,13 @@ class samplePDFInterface
 
   virtual double getEventRate()=0;
  
-  virtual vector< vector <double> > generate2D(TH2D* pdf)=0;
-  virtual vector<double> generate()=0;
+  virtual std::vector< std::vector <double> > generate2D(TH2D* pdf)=0;
+  virtual std::vector<double> generate()=0;
 
   virtual double GetLikelihood()=0;
 
   virtual void addData(std::vector<double> &dat)=0;
-  virtual void addData(std::vector< vector <double> > &dat)=0;
+  virtual void addData(std::vector< std::vector <double> > &dat)=0;
   virtual void addData(TH1D* binneddata)=0;
   virtual void addData(TH2D* binneddata)=0;
 

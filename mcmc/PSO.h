@@ -105,12 +105,12 @@ class PSO : public LikelihoodFit {
 
         std::vector<double> vector_add(std::vector<double> v1, std::vector<double> v2){
             std::vector<double> v3;
-            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), plus<double>());
+            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), std::plus<double>());
             return v3;
         };
         std::vector<double> vector_subtract(std::vector<double> v1, std::vector<double> v2){
             std::vector<double> v3 ;
-            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), minus<double>());
+            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), std::minus<double>());
             return v3;
         };
         std::vector<double> three_vector_addition(std::vector<double> vec1, std::vector<double> vec2,std::vector<double> vec3){

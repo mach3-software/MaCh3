@@ -1248,8 +1248,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
   return;
 }
 
-void samplePDFFDBase::addData(std::vector< vector <double> > &data) {
-  dataSample2D = new std::vector< vector <double> >(data);
+void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
+  dataSample2D = new std::vector< std::vector <double> >(data);
   dataSample = NULL;
   dathist = NULL;
   dathist2d->Reset();                                                       

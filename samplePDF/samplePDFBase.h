@@ -56,8 +56,8 @@ class samplePDFBase : public samplePDFInterface
   void setMCthrow(bool mc){MCthrow= mc;}
       
   // generate fake dataset based on rejection sampling    
-  vector< vector <double> > generate2D(TH2D* pdf = 0);
-  vector<double> generate();
+  std::vector< std::vector <double> > generate2D(TH2D* pdf = 0);
+  std::vector<double> generate();
   virtual double GetLikelihood() = 0;
   virtual std::vector<double>* getDataSample() {return dataSample;};
   // nominal spectrum things
@@ -68,7 +68,7 @@ class samplePDFBase : public samplePDFInterface
   TH2D *nominalSpectrum2D;*/
 
   void addData(std::vector<double> &dat);
-  void addData(std::vector< vector <double> > &dat);
+  void addData(std::vector< std::vector <double> > &dat);
   void addData(TH1D* binneddata);
   void addData(TH2D* binneddata);
 
@@ -93,7 +93,7 @@ protected:
   void init(double pot, std::string mc_version);
   
   std::vector<double>* dataSample;
-  std::vector< vector <double> >* dataSample2D;
+  std::vector< std::vector <double> >* dataSample2D;
    
   // Contains how many samples we've got
   __int__ nSamples;
