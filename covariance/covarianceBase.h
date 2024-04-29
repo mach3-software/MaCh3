@@ -57,11 +57,15 @@ class covarianceBase {
   // set branches for output file
   void setBranches(TTree &tree);
   void setStepScale(double scale);
-  //DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; };
+  /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   void setIndivStepScale(std::vector<double> stepscale);
   /// @brief KS: In case someone really want to change this
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; };
+
+  /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
+  void SaveUpdatedMatrixConfig();
 
   // Throwers
   void throwParProp(const double mag = 1.);
@@ -109,6 +113,7 @@ class covarianceBase {
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   inline std::vector<double> getParameterMeans(){return par_means;}
+  /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
   // What parameter Gets reweighted by what amount according to MCMC
@@ -133,7 +138,7 @@ class covarianceBase {
   const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
-  int    GetNumParams()               {return _fNumPar;}
+  inline int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
   const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
   const std::vector<double>& getGeneratedValues(){return _fGenerated;}
@@ -255,12 +260,14 @@ class covarianceBase {
   void printPars();
   void printIndivStepScale();
 
-  // Steppers
-  virtual void proposeStep(); // generate a new proposed state
-  void acceptStep(); // accepted this step
+  /// generate a new proposed state
+  virtual void proposeStep();
+  /// accepted this step
+  void acceptStep();
 
-  // fix parameters at nominal values
+  /// @brief fix parameters at nominal values
   void toggleFixAllParameters();
+  /// @brief fix parameter at nominal values
   void toggleFixParameter(const int i);
   bool isParameterFixed(const int i) {
     if (_fError[i] < 0) {
@@ -271,17 +278,17 @@ class covarianceBase {
   }
   void ConstructPCA();
   #ifdef DEBUG_PCA
+  /// @brief KS: Let's dump all useful matrices to properly validate PCA
   void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat);
   #endif
 
-  // is PCA, can use to query e.g. LLH scans
-  bool IsPCA() { return pca; };
+  /// is PCA, can use to query e.g. LLH scans
+  inline bool IsPCA() { return pca; };
 
   inline void MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n);
   inline double MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i);
 
-  //Turn on/off true adaptive MCMC
-  //Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
+  /// @brief HW: Turn on/off true adaptive MCMC, Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
   void enableAdaptiveMCMC(bool enable = true){
     use_adaptive = enable;
     total_steps = 0; //Set these to default values
@@ -292,7 +299,7 @@ class covarianceBase {
 
  protected:
   void init(const char *name, const char *file);
-  //YAML init
+  /// Initialisation of the class using config
   void init(std::vector<std::string> YAMLFile);
   void init(TMatrixDSym* covMat);
   void ReserveMemory(const int size);
@@ -305,20 +312,20 @@ class covarianceBase {
   void TransferToPCA();
   void TransferToParam();
 
-  //Handy function to return 1 for any systs
+  /// Handy function to return 1 for any systs
   const double* ReturnUnity(){return &Unity;}
 
-  // The input root file we read in
+  /// The input root file we read in
   const std::string inputFile;
 
   int size;
-  // Name of cov matrix
+  /// Name of cov matrix
   const char *matrixName;
-  // The covariance matrix
+  /// The covariance matrix
   TMatrixDSym *covMatrix;
-  // The inverse covariance matrix
+  /// The inverse covariance matrix
   TMatrixDSym *invCovMatrix;
-  //KS: Same as above but much faster as TMatrixDSym cache miss
+  /// KS: Same as above but much faster as TMatrixDSym cache miss
   double **InvertCovMatrix;
     
   //KS: set Random numbers for each thread so each thread has different seed
@@ -373,7 +380,7 @@ class covarianceBase {
   std::vector<double> fParSigma_PCA;
   std::vector<int> isDecomposed_PCA;
 
-  //Adaptive MCMC
+  // Adaptive MCMC
   TMatrixDSym* throwMatrix;
   TMatrixD* throwMatrix_CholDecomp;
   //Same as above but much faster as TMatrixDSym cache miss

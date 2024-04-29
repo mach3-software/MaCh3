@@ -1540,6 +1540,37 @@ TH2D* covarianceBase::GetCorrelationMatrix() {
   return hMatrix;
 }
 
+
+// ********************************************
+// KS: After step scale, prefit etc. value were modified save this modified config.
+void covarianceBase::SaveUpdatedMatrixConfig() {
+// ********************************************
+
+  if (!_fYAMLDoc)
+  {
+    MACH3LOG_CRITICAL("Yaml node hasn't been initialised for matrix {}, something is not right", matrixName);
+    MACH3LOG_CRITICAL("I am not throwing error but should be investigated");
+    return;
+  }
+
+  YAML::Node copyNode = _fYAMLDoc;
+  int i = 0;
+
+  for (YAML::Node param : copyNode["Systematics"])
+  {
+    //KS: Feel free to update it, if you need updated prefit value etc
+    param["Systematic"]["StepScale"]["MCMC"] = _fIndivStepScale[i];
+
+    i++;
+  }
+
+  // Save the modified node to a file
+  std::ofstream fout( std::string("Modified" + inputFile + "_Matrix.yaml"));
+  fout << copyNode;
+  fout.close();
+}
+
+
 #ifdef DEBUG_PCA
 //KS: Let's dump all useful matrices to properly validate PCA
 void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat)
