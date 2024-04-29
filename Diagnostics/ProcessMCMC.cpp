@@ -1,6 +1,5 @@
+//MaCh3 includes
 #include "mcmc/MCMCProcessor.h"
-#include "samplePDF/Structs.h"
-
 #include "manager/manager.h"
 
 inline void ProcessMCMC(std::string inputFile);

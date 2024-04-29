@@ -16,6 +16,7 @@ class TRandom3;
 class TStopwatch;
 class TTree;
 class TGraphAsymmErrors;
+class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
 class FitterBase {

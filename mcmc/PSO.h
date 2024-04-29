@@ -13,7 +13,7 @@
 #include "mcmc/LikelihoodFit.h"
 
 
-/// Class particle - stores the position, velocity and personal best
+/// @brief Class particle - stores the position, velocity and personal best
 /// With functions which move particle and update velocity
 class particle{
 
@@ -21,6 +21,8 @@ class particle{
 
         particle(){};
         particle(std::vector<double> position, std::vector<double> velocity) : position(position), velocity(velocity){};
+        /// @brief Destructor
+        ~particle() {};
 
         void set_position(std::vector<double> new_position) {
             position = new_position;
@@ -71,16 +73,17 @@ class particle{
 
 };
 
-/// @brief Implementation of PSO fitting algorithm
-class PSO : public LikelihoodFit {
-    /**
-     * Class PSO, consist of a vector of object Class Particle and global best
-     * Takes in the size (number of particle) and number of iteration
-     * functions includes: finding global best, updating velocity, actual minimisation function
-     */
-    public:
 
+ /// @brief Class PSO, consist of a vector of object Class Particle and global best
+ /// Takes in the size (number of particle) and number of iteration
+ /// functions includes: finding global best, updating velocity, actual minimisation function
+class PSO : public LikelihoodFit {
+
+    public:
+        /// @brief constructor
         PSO(manager * const fitMan);
+        /// @brief Destructor
+        ~PSO() {};
 
         particle* get_best_particle(){
             return best_particle;

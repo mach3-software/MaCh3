@@ -9,7 +9,6 @@
 
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
-#include "samplePDF/Structs.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline , normalisation parameters etc.
 class covarianceXsec : public covarianceBase {
