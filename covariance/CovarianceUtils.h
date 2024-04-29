@@ -28,11 +28,16 @@
 
 namespace MaCh3Utils
 {
+  /// @brief Handy conversion for matrix to TH2D for plotting
   TH2D* TMatrixIntoTH2D(const TMatrix &Matrix, std::string title);
 
+  /// @brief number of threads which we need for example for TRandom3
   int GetNThreads();
+  /// @brief CW: Multi-threaded matrix multiplication
   double* MatrixMult(double*, double*, int);
+  /// @brief CW: Multi-threaded matrix multiplication
   double** MatrixMult(double**, double**, int);
+  /// @brief CW: Multi-threaded matrix multiplication
   TMatrixD MatrixMult(TMatrixD, TMatrixD);
 
 }

@@ -30,20 +30,29 @@ class covarianceOsc : public covarianceBase
   /// @brief Sets extra branches for processing.
   void setExtraBranches(TTree &tree);
 
+  /// @brief Get baseline
   inline double GetPathLength() { return L;}
+  /// @brief Get density
   inline double GetDensity() { return density;}
+  /// @brief Check if we are performing beta study or not
   inline bool GetPerformBetaStudy(){return PerformBetaStudy;}
-  /// KS: Print all useful information's after initialization
+  /// @brief KS: Print all useful information's after initialization
   void Print();
-  /// KS: Currently prob3++/probgpu requires particular order so we need to check this is the case
+  /// @brief KS: Currently prob3++/probgpu requires particular order so we need to check this is the case
   void CheckOrderOfParams();
 
  protected:
+    /// Value of baseline
     double L;
+    /// Value of density
     double density;
+    /// Do we flip DeltaM23 or not
     bool flipdelM;
+    /// Bool whether we apply additional reactor prior or not
     bool reactorPrior;
+    /// Do we flip Beta or not
     bool flipBeta;
+    /// Value of all osc parameters
     double *oscpars1;
     /// Bool whether we are performing beta study or not
     bool PerformBetaStudy;

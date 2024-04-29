@@ -76,7 +76,7 @@ void stretch::addSamplePDF(samplePDFBase *sample)
 void stretch::addSystObj(covarianceBase *cov, bool isOsc)
 {
   systematics.push_back(cov);
-  N+=cov->getSize();
+  N+=cov->GetNumParams();
 
   if(save_nominal)
     {
@@ -95,7 +95,7 @@ void stretch::addSystObj(covarianceBase *cov, bool isOsc)
   
   std::vector< std::vector < double > > walkp;
 
-  for(int i=0; i<cov->getSize(); i++)
+  for(int i=0; i<cov->GetNumParams(); i++)
   {
      std::vector<double> ww;
      for(int j=0; j<nwalk; j++)
@@ -190,7 +190,7 @@ void stretch::runStretch()
 	std::vector<double> startpar = systematics[i]->getNominalArray();
 	systematics[i]->setParameters(startpar);
 
-	for(int j=0; j<systematics[i]->getSize(); j++)
+	for(int j=0; j<systematics[i]->GetNumParams(); j++)
 	   currentpar[i][j][k]=systematics[i]->getParProp(j);
 	   
 	systematics[i]->throwNominal();
@@ -246,7 +246,7 @@ void stretch::runStretch()
 	for(size_t i=0; i<systematics.size(); i++)
 	{
 	   std::vector<double> pars(currentpar[i].size());
-	   for(int j=0; j<systematics[i]->getSize(); j++)
+	   for(int j=0; j<systematics[i]->GetNumParams(); j++)
 	   {
 	      proposedpar[i][j][nw] = currentpar[i][j][ow]+z*(currentpar[i][j][nw]-currentpar[i][j][ow]);
 	      if(!systematics[i]->isParameterFixed(j))
@@ -278,7 +278,7 @@ void stretch::runStretch()
 	if(random->Uniform(0,1)>q)
 	{
 	   for(size_t i=0; i<systematics.size(); i++)
-	      for(int j=0; j<systematics[i]->getSize(); j++)
+	      for(int j=0; j<systematics[i]->GetNumParams(); j++)
 		 proposedpar[i][j][nw]=currentpar[i][j][nw];
 	   logLProp[nw]=logLCurr[nw];
 	}
@@ -287,7 +287,7 @@ void stretch::runStretch()
      for(int nw=0; nw<nwalk; nw++)
      {
 	 for(size_t i=0; i<systematics.size(); i++)
-	      for(int j=0; j<systematics[i]->getSize(); j++)
+	      for(int j=0; j<systematics[i]->GetNumParams(); j++)
 		 currentpar[i][j][nw]=proposedpar[i][j][nw];
 	 logLCurr[nw]=logLProp[nw];
      }

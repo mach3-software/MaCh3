@@ -27,7 +27,7 @@
 // **************************************************
 
 // **************************************************
-// Check for a safe call on GPU
+/// Check for a safe call on GPU
 inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
 // **************************************************
 #ifdef CUDA_ERROR_CHECK

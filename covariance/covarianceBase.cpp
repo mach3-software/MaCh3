@@ -1559,13 +1559,12 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
   for (YAML::Node param : copyNode["Systematics"])
   {
     //KS: Feel free to update it, if you need updated prefit value etc
-    param["Systematic"]["StepScale"]["MCMC"] = _fIndivStepScale[i];
+    param["Systematic"]["StepScale"]["MCMC"] = std::round(_fIndivStepScale[i] * 100.0) / 100.0; // Round to 2 decimal places
 
     i++;
   }
-
   // Save the modified node to a file
-  std::ofstream fout( std::string("Modified" + inputFile + "_Matrix.yaml"));
+  std::ofstream fout("Modified_Matrix.yaml");
   fout << copyNode;
   fout.close();
 }

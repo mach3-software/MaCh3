@@ -27,7 +27,7 @@ void tune::init(TFile *file)
 
 void tune::tuneParameters(covarianceBase& cov, char *prefix)
 {
-  for (int i = 0; i < cov.getSize(); ++i)
+  for (int i = 0; i < cov.GetNumParams(); ++i)
     {
       char name[64];
       sprintf(name, "%s%i", prefix, i);

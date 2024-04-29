@@ -706,6 +706,54 @@ void FitterBase::RunLLHScan() {
 }
 
 
+
+// *************************
+//LLH scan is good first estimate of step scale
+void FitterBase::GetStepScaleBasedOnLLHScan() {
+// *************************
+  TDirectory *Sample_LLH = (TDirectory*) outputFile->Get("Sample_LLH");
+
+  MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
+
+  if(Sample_LLH->IsZombie())
+  {
+    MACH3LOG_WARN("Couldn't find Sample_LLH, it looks like LLH scan wasn't run, will do this now");
+    RunLLHScan();
+  }
+
+  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  {
+    bool isxsec = (std::string((*it)->getName()) == "xsec_cov");
+
+    const int npars = (*it)->GetNumParams();
+    std::vector<double> StepScale(npars);
+    for (int i = 0; i < npars; ++i)
+    {
+      std::string name = (*it)->GetParName(i);
+      // For xsec we can get the actual name, hurray for being informative
+      if (isxsec) name = (*it)->GetParFancyName(i);
+
+      StepScale[i] = (*it)->GetIndivStepScale(i);
+      TH1D* LLHScan = (TH1D*) Sample_LLH->Get((name+"_sam").c_str());
+
+      if(LLHScan == nullptr)
+      {
+        MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
+        continue;
+      }
+      double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
+      //If there is no sensitivity leave it
+      if(LLH_val < 0.001) continue;
+
+      // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
+      double NewStepScale = LLH_val * 2.38/std::sqrt(npars);
+      StepScale[i] = NewStepScale;
+    }
+    (*it)->setIndivStepScale(StepScale);
+    (*it)->SaveUpdatedMatrixConfig();
+  }
+}
+
 // *************************
 // Run 2D LLH scan
 void FitterBase::Run2DLLHScan() {
@@ -713,6 +761,8 @@ void FitterBase::Run2DLLHScan() {
 
   // Save the settings into the output file
   SaveSettings();
+
+  MACH3LOG_INFO("Starting 2D LLH Scan");
 
   TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
   std::vector<std::string> SkipVector;

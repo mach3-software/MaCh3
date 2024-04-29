@@ -85,6 +85,7 @@ class covarianceXsec : public covarianceBase {
     /// Is parameter flux or not, This might become deprecated in future
     std::vector<bool> isFlux;
 
+    /// Tells to which samples object param should be applied
     std::vector<int> _fDetID;
     //std::vector<std::string> _fDetString;
     /// Type of parameter like norm, spline etc.

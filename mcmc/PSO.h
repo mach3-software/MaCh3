@@ -8,13 +8,15 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
-#include "LikelihoodFit.h"
 
+// MaCh3 includes
+#include "mcmc/LikelihoodFit.h"
+
+
+/// Class particle - stores the position, velocity and personal best
+/// With functions which move particle and update velocity
 class particle{
-    /**
-     * Class particle - stores the position, velocity and personal best
-     * With functions which move particle and update velocity
-     */
+
     public:
 
         particle(){};

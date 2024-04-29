@@ -39,6 +39,7 @@ namespace MaCh3Utils
     return C;
   }
 
+  //CW: Multi-threaded matrix multiplication
   double** MatrixMult(double **A, double **B, int n) {
     // First make into monolithic array
     double *A_mon = new double[n*n];
@@ -74,6 +75,7 @@ namespace MaCh3Utils
     return C;
   }
 
+  //CW: Multi-threaded matrix multiplication
   double* MatrixMult(double *A, double *B, int n) {
     //CW: First transpose to increse cache hits
     double *BT = new double[n*n];

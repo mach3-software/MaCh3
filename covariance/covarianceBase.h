@@ -151,7 +151,7 @@ class covarianceBase {
   inline double GetGenerated(const int i) { return _fGenerated[i];}
   inline double GetUpperBound(const int i){ return _fUpBound[i];}
   inline double GetLowerBound(const int i){ return _fLowBound[i]; }
-
+  inline double GetIndivStepScale(int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); };
   double getParProp_PCA(const int i) {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");

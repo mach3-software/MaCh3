@@ -63,8 +63,8 @@ void PSO::init(){
         for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it){
             if(!(*it)->IsPCA())
             {
-                fDim += (*it)->getSize();
-                for(int i = 0; i < (*it)->getSize(); ++i)
+                fDim += (*it)->GetNumParams();
+                for(int i = 0; i < (*it)->GetNumParams(); ++i)
                 {
                     double curr = (*it)->getParInit(i);
                     double lim = 10.0*(*it)->getDiagonalError(i);
@@ -452,7 +452,7 @@ void PSO::WriteOutput(){
         {
             if(!(*it)->IsPCA())
             {
-                for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+                for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
                 {
                     double ParVal = minimum[ParCounter];
                     //KS: Basically apply mirroring for parameters out of bounds
@@ -468,10 +468,10 @@ void PSO::WriteOutput(){
             else
             {
                 //KS: We need to convert parameters from PCA to normal base
-                TVectorD ParVals((*it)->getSize());
+                TVectorD ParVals((*it)->GetNumParams());
                 TVectorD ParVals_PCA((*it)->getNpars());
 
-                TVectorD ErrorVals((*it)->getSize());
+                TVectorD ErrorVals((*it)->GetNumParams());
                 TVectorD ErrorVals_PCA((*it)->getNpars());
 
                 //First save them
@@ -487,7 +487,7 @@ void PSO::WriteOutput(){
 
                 ParCounter = StartVal;
                 //KS: Now after going from PCA to normal let';s save it
-                for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+                for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
                 {
                     (*PSOParValue)(ParCounter) = ParVals(i);
                     (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));
