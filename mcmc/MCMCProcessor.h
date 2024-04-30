@@ -101,9 +101,11 @@ class MCMCProcessor {
     /// @brief Make funny polar plot
     void GetPolarPlot(std::vector<std::string> ParNames);
 
-    //Bayesian statistic hypothesis testing
+    /// @brief Calculate Bayes factor for vector of params, and model boundaries
     void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
+    /// @brief Calculate Bayes factor for point like hypothesis using SavageDickey
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
+    /// @brief Reweight Prior by giving new central value and new error
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
     
     /// @brief KS: Perform MCMC diagnostic including AutoCorrelation, Trace etc.
@@ -117,10 +119,13 @@ class MCMCProcessor {
     inline int GetNFD() { return nParam[kFDDetPar]; };
     inline int GetOSC() { return nParam[kOSCPar]; };
         
-    //Posterior getters
+    /// @brief Get 1D posterior for a given parameter
     inline TH1D* GetHpost(const int i) { return hpost[i]; };
+    /// @brief Get 2D posterior for a given parameter combination
     inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
+    /// @brief Get Violin plot for all parameters with posterior values
     inline TH2D* GetViolin() { return hviolin; };
+    /// @brief Get Violin plot for all parameters with prior values
     inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
@@ -138,12 +143,15 @@ class MCMCProcessor {
     /// @brief Or the individual post-fits
     void GetPostfit_Ind(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Peaks, ParameterEnum kParam);
     
-    // Get the vector of branch names
+    /// @brief Get the vector of branch names from root file
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
-    //Getters
+    /// @brief Get properties of parameter by passing it number
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
+    /// @brief Get parameter number based on name
     int GetParamIndexFromName(const std::string Name);
+    /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
     inline int GetnEntries(){return nEntries;};
+    /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
     inline int GetnSteps(){return nSteps;};
     
     //KS: Many setters which in future will be loaded via config
@@ -222,7 +230,7 @@ class MCMCProcessor {
     inline void MakeOutputFile();
     inline void DrawCorrelations1D();
 
-    // Read Matrices
+    /// @brief Read Matrices
     inline void ReadInputCov();
     inline void FindInputFiles();
     inline void ReadXSecFile();
@@ -231,19 +239,27 @@ class MCMCProcessor {
     inline void ReadOSCFile();
     inline void RemoveParameters();
    
-    // Scan Input etc.
+    /// @brief Scan Input etc.
     inline void ScanInput();
     inline void ScanParameterOrder();
     inline void SetupOutput();
 
     //Analyse posterior distribution
+    /// @brief Get Arithmetic mean from posterior
     inline void GetArithmetic(TH1D * const hpost, const int i);
+    /// @brief Fit Gaussian to posterior
     inline void GetGaussian(TH1D *& hpost, const int i);
+    /// @brief Get Highest Posterior Density (HPD)
     inline void GetHPD(TH1D * const hpost, const int i, const double coverage = 0.6827);
+    /// @brief Get 1D Credible Interval
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
+    /// @brief Get 2D Credible Region
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
+    /// @brief Get significance of Bayes factor result following Jeffreys scale
     inline std::string GetJeffreysScale(const double BayesFactor);
+    /// @brief Get significance of Bayes factor result following Dunne-Kaboth scale
     inline std::string GetDunneKaboth(const double BayesFactor);
+    /// @brief Convert sigma from normal distribution into percentage
     inline double GetSigmaValue(int sigma);
 
     // MCMC Diagnostic
@@ -273,13 +289,14 @@ class MCMCProcessor {
     std::string Posterior1DCut;
     int BurnInCut;
     int nBranches;
-    //KS: For merged chains number of entries will be different from nSteps
+    /// KS: For merged chains number of entries will be different from nSteps
     int nEntries;
+    /// KS: For merged chains number of entries will be different from nSteps
     int nSteps;
     int nSamples;
     int nSysts;
 
-    //Name of all branches as well as branches we don't want to incldue in the analysis
+    //Name of all branches as well as branches we don't want to include in the analysis
     std::vector<TString> BranchNames;
     std::vector<std::string> ExcludedTypes;
     std::vector<std::string> ExcludedNames;
@@ -287,7 +304,7 @@ class MCMCProcessor {
     /// Number of all parameters used in the analysis
     int nDraw;
     
-    // Is the ith parameter varied
+    /// Is the ith parameter varied
     std::vector<bool> IamVaried;
     std::vector<std::vector<TString>> ParamNames;
     std::vector<std::vector<double>>  ParamCentral;
@@ -304,7 +321,8 @@ class MCMCProcessor {
     
     //In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
     std::vector<bool>   IsXsec; 
-    int nFlux; // This keep number of Flux params in xsec matrix
+    /// This keep number of Flux params in xsec matrix
+    int nFlux;
 
     // Vector of each systematic
     std::vector<TString> SampleName_v;
@@ -317,15 +335,20 @@ class MCMCProcessor {
     bool PlotXSec;
     bool PlotDet;
     bool PlotFlatPrior;
+    /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
     
     //Even more flags
+    /// Make correlation matrix or not
     bool MakeCorr;
     bool plotRelativeToPrior;
     bool MadePostfit;
+    /// Will plot all plot to PDF not only to root file
     bool printToPDF;
     bool FancyPlotNames;
-    bool plotBinValue; //If true it will print value on each bin of covariance matrix
+    /// If true it will print value on each bin of covariance matrix
+    bool plotBinValue;
+    /// Apply smoothing for 2D histos using root algorithm
     bool ApplySmoothing;
     /// KS: If true credible stuff is done in sigmas not %
     bool CredibleInSigmas;
@@ -358,13 +381,18 @@ class MCMCProcessor {
     TMatrixDSym *Covariance;
     TMatrixDSym *Correlation;
 
-    // Holds Posterior Distributions
+    /// Holds 1D Posterior Distributions
     TH1D **hpost;
+    /// Holds 2D Posterior Distributions
     TH2D ***hpost2D;
+    /// Holds violin plot for all dials
     TH2D *hviolin;
+    /// Holds prior violin plot for all dials,
     TH2D *hviolin_prior;
 
+    /// Array holding values for all parameters
     double** ParStep;
+    /// Step number for step, important if chains were merged
     int* StepNumber;
 
     /// Number of bins
@@ -377,7 +405,9 @@ class MCMCProcessor {
     bool doDiagMCMC;
     
     //Number of batches and LagL used in MCMC diagnostic
+    /// Number of batches for Batched Mean
     int nBatches;
+    /// LagL used in AutoCorrelation
     int AutoCorrLag;
     
     // Holds all the parameter variations
