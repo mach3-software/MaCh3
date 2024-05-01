@@ -1092,6 +1092,8 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
 	  //Set x_var and y_var values based on XVarStr and YVarStr
       MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
+	  //Give y)_var a dummy value
+      MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);//-9999.;// = dummy;//ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
 
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
