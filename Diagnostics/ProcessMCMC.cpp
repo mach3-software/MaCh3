@@ -199,89 +199,103 @@ void MultipleProcessMCMC()
 
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
-      // This holds the posterior density
-      TH1D **hpost = new TH1D*[nFiles];
-      TLine **hpd = new TLine*[nFiles];
-      for (int ik = 0 ; ik < nFiles;  ik++) hpost[ik] = (TH1D *) (Processor[ik]->GetHpost(i))->Clone();
+    // This holds the posterior density
+    TH1D **hpost = new TH1D*[nFiles];
+    TLine **hpd = new TLine*[nFiles];
+    hpost[0] = (TH1D *) (Processor[0]->GetHpost(i))->Clone();
 
-      // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-      if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
+    bool Skip = false;
+    for (int ik = 1 ; ik < nFiles;  ik++)
+    {
+      // KS: If somehow this chain doesn't given params we skip it
+      const int Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
+      if(Index == __UNDEF__)
       {
-        for (int ik = 0; ik < nFiles;  ik++)
-          delete hpost[ik];
-        
-        delete[] hpost;
-        delete[] hpd;
-        continue;
+        Skip = true;
+        break;
       }
-      for (int ik = 0; ik < nFiles;  ik++)
-      {
-        RemoveFitter(hpost[ik], "Gauss");
-        
-        // Set some nice colours
-        hpost[ik]->SetLineColor(PosteriorColor[ik]);
-        //hpost[ik]->SetLineStyle(PosteriorStyle[ik]);
-        hpost[ik]->SetLineWidth(2);
-        
-        // Area normalise the distributions
-        hpost[ik]->Scale(1./hpost[ik]->Integral(), "width");
-      }
-      TString Title;
-      double Prior = 1.0;
-      double PriorError = 1.0;
-  
-      Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
-      
-      // Now make the TLine for the Asimov
-      TLine *Asimov = new TLine(Prior,  hpost[0]->GetMinimum(), Prior,  hpost[0]->GetMaximum());
-      Asimov->SetLineColor(kRed-3);
-      Asimov->SetLineWidth(2);
-      Asimov->SetLineStyle(kDashed);
+      hpost[ik] = (TH1D *)(Processor[ik]->GetHpost(Index))->Clone();
+    }
+    if(Skip) continue;
 
-      // Make a nice little TLegend
-      TLegend *leg = new TLegend(0.12, 0.7, 0.6, 0.97);
-      leg->SetTextSize(0.03);
-      leg->SetFillColor(0);
-      leg->SetFillStyle(0);
-      leg->SetLineColor(0);
-      leg->SetLineStyle(0);
-      TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
-      leg->AddEntry(Asimov, asimovLeg, "l"); 
-      
+    // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
+    {
       for (int ik = 0; ik < nFiles;  ik++)
-      {
-        TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
-        leg->AddEntry(hpost[ik],  rebinLeg, "l");
-        
-        hpd[ik] = new TLine(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(), hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
-        hpd[ik]->SetLineColor(hpost[ik]->GetLineColor());
-        hpd[ik]->SetLineWidth(2);
-        hpd[ik]->SetLineStyle(kSolid);
-      }
-
-      // Find the maximum value to nicley resize hist
-      double maximum = 0;
-      for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
-      for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
-  
-      hpost[0]->Draw("hist");
-      for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
-      Asimov->Draw("same");
-      for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
-      leg->Draw("same");
-      Posterior->cd();
-      Posterior->Print(canvasname);
-      
-      delete Asimov;
-      delete leg;
-      for (int ik = 0; ik < nFiles;  ik++)
-      {
         delete hpost[ik];
-        delete hpd[ik];
-      }
+
       delete[] hpost;
       delete[] hpd;
-    }//End loop over paramters
+      continue;
+    }
+    for (int ik = 0; ik < nFiles;  ik++)
+    {
+      RemoveFitter(hpost[ik], "Gauss");
+
+      // Set some nice colours
+      hpost[ik]->SetLineColor(PosteriorColor[ik]);
+      //hpost[ik]->SetLineStyle(PosteriorStyle[ik]);
+      hpost[ik]->SetLineWidth(2);
+
+      // Area normalise the distributions
+      hpost[ik]->Scale(1./hpost[ik]->Integral(), "width");
+    }
+    TString Title;
+    double Prior = 1.0;
+    double PriorError = 1.0;
+
+    Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
+
+    // Now make the TLine for the Asimov
+    TLine *Asimov = new TLine(Prior,  hpost[0]->GetMinimum(), Prior,  hpost[0]->GetMaximum());
+    Asimov->SetLineColor(kRed-3);
+    Asimov->SetLineWidth(2);
+    Asimov->SetLineStyle(kDashed);
+
+    // Make a nice little TLegend
+    TLegend *leg = new TLegend(0.12, 0.7, 0.6, 0.97);
+    leg->SetTextSize(0.03);
+    leg->SetFillColor(0);
+    leg->SetFillStyle(0);
+    leg->SetLineColor(0);
+    leg->SetLineStyle(0);
+    TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
+    leg->AddEntry(Asimov, asimovLeg, "l");
+
+    for (int ik = 0; ik < nFiles;  ik++)
+    {
+      TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
+      leg->AddEntry(hpost[ik],  rebinLeg, "l");
+
+      hpd[ik] = new TLine(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(), hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
+      hpd[ik]->SetLineColor(hpost[ik]->GetLineColor());
+      hpd[ik]->SetLineWidth(2);
+      hpd[ik]->SetLineStyle(kSolid);
+    }
+
+    // Find the maximum value to nicley resize hist
+    double maximum = 0;
+    for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
+    for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
+
+    hpost[0]->Draw("hist");
+    for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
+    Asimov->Draw("same");
+    for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
+    leg->Draw("same");
+    Posterior->cd();
+    Posterior->Print(canvasname);
+
+    delete Asimov;
+    delete leg;
+    for (int ik = 0; ik < nFiles;  ik++)
+    {
+      delete hpost[ik];
+      delete hpd[ik];
+    }
+    delete[] hpost;
+    delete[] hpd;
+  }//End loop over paramters
     
   // Finally draw the parameter plot onto the PDF
   // Close the .pdf file with all the posteriors
@@ -600,11 +614,23 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     double PriorError = 1.0;
 
     Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
-  
+    bool Skip = false;
     for (int ik = 0 ; ik < nFiles;  ik++)
     {
-      hpost[ik] = (TH1D*) (Processor[ik]->GetHpost(i))->Clone();
-      CumulativeDistribution[ik] = (TH1D*) (Processor[ik]->GetHpost(i))->Clone();
+      int Index = 0;
+      if(ik == 0 ) Index = i;
+      else
+      {
+        // KS: If somehow this chain doesn't given params we skip it
+        Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
+        if(Index == __UNDEF__)
+        {
+          Skip = true;
+          break;
+        }
+      }
+      hpost[ik] = (TH1D*) (Processor[ik]->GetHpost(Index))->Clone();
+      CumulativeDistribution[ik] = (TH1D*) (Processor[ik]->GetHpost(Index))->Clone();
       CumulativeDistribution[ik]->Fill(0., 0.);
       CumulativeDistribution[ik]->Reset();
       CumulativeDistribution[ik]->SetMaximum(1.);
@@ -619,6 +645,8 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       CumulativeDistribution[ik]->SetLineColor(CumulativeColor[ik]);
       CumulativeDistribution[ik]->SetLineStyle(CumulativeStyle[ik]);
     }
+    if(Skip) continue;
+
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
     {

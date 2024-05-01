@@ -382,8 +382,8 @@ void MCMCProcessor::MakePostfit() {
     IamVaried[i] = true;
 
     // Write to file
-    Posterior->SetName(hpost[i]->GetName());
-    Posterior->SetTitle(hpost[i]->GetTitle());
+    Posterior->SetName(Title);
+    Posterior->SetTitle(Title);
 
     // Draw onto the TCanvas
     hpost[i]->Draw();
