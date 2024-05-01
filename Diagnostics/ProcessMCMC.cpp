@@ -216,10 +216,9 @@ void MultipleProcessMCMC()
       }
       hpost[ik] = (TH1D *)(Processor[ik]->GetHpost(Index))->Clone();
     }
-    if(Skip) continue;
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
     {
       for (int ik = 0; ik < nFiles;  ik++)
         delete hpost[ik];
@@ -428,7 +427,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   const int IntervalsSize = entries/NIntervals;
   //We start with burn from 0 (no burn in at all)
   int BurnIn = 0;
-  std::cout<<"Diagnosing matirces with entries="<< entries<<", NIntervals="<<NIntervals<<" and IntervalsSize="<<IntervalsSize<<std::endl;
+  std::cout<<"Diagnosing matrices with entries="<< entries<<", NIntervals="<<NIntervals<<" and IntervalsSize="<<IntervalsSize<<std::endl;
 
   TMatrixDSym *Covariance = nullptr;
   TMatrixDSym *Correlation = nullptr;
@@ -645,10 +644,9 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       CumulativeDistribution[ik]->SetLineColor(CumulativeColor[ik]);
       CumulativeDistribution[ik]->SetLineStyle(CumulativeStyle[ik]);
     }
-    if(Skip) continue;
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
     {
       for (int ik = 0; ik < nFiles;  ik++)
       {
