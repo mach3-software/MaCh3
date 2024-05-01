@@ -66,6 +66,10 @@ if(NOT TARGET ROOT::ROOT)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
 endif()
 
+if(ROOT_VERSION VERSION_LESS 6.18.0)
+    message(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
+endif()
+
 #YAML for reading in config files
 set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
 set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")

@@ -110,7 +110,7 @@ Based on several test here are recommended version:
 ```
   GCC: ...
   CMake: >= 3.14
-  ROOT: ...
+  ROOT: >= 6.18
 ```
 
 # How To Use
