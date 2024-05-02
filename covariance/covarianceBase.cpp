@@ -638,7 +638,7 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
     while(throw_again == true)
     {
       throw_again = false;
-      MACH3LOG_INFO("Setting {} nominal values to random throws.", getName())
+      MACH3LOG_INFO("Setting {} nominal values to random throws.", getName());
       nom_throws->ThrowSet(nominal);
 
       for (int i = 0; i < _fNumPar; i++)
