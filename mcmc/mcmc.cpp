@@ -251,7 +251,7 @@ void mcmc::ProposeStep() {
 
   // Check if we've hit a boundary in the systematics
   // In this case we can save time by not having to reconfigure the simulation
-  if (llh >= __LARGE_LOGL__) {
+  if (llh >= _LARGE_LOGL_) {
     reject = true;
     #ifdef DEBUG
     if (debug) debugFile << "Rejecting based on boundary" << std::endl;
@@ -290,7 +290,7 @@ void mcmc::ProposeStep() {
   } else {
     for (size_t i = 0; i < samples.size(); ++i) {
       // Set the sample_llh[i] to be madly high also to signify a step out of bounds
-      sample_llh[i] = __LARGE_LOGL__;
+      sample_llh[i] = _LARGE_LOGL_;
       #ifdef DEBUG
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
       #endif

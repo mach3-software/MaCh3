@@ -262,7 +262,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   vals = new float[nParams]();
 #endif
 
-  for (__int__ j = 0; j < nParams; j++)
+  for (_int_ j = 0; j < nParams; j++)
   {
     segments[j] = 0;
     vals[j] = -999;
@@ -573,13 +573,13 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     cpu_nParamPerEvent[i] = nParamPerEvent;
   }
 
-  __int__ nPoints = 0;
+  _int_ nPoints = 0;
   float xtemp[20];
   FastSplineInfoTree->SetBranchAddress("nPts", &nPoints);
   FastSplineInfoTree->SetBranchAddress("xPts", &xtemp);
 
   SplineInfoArray = new FastSplineInfo[nParams];
-  for (__int__ i = 0; i < nParams; ++i) {
+  for (_int_ i = 0; i < nParams; ++i) {
     FastSplineInfoTree->GetEntry(i);
     SplineInfoArray[i].nPts = -999;
     SplineInfoArray[i].xPts = NULL;
@@ -589,8 +589,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     // Fill the number of points
     SplineInfoArray[i].nPts = nPoints;
     if(nPoints == -999) continue;
-    SplineInfoArray[i].xPts = new __float__[SplineInfoArray[i].nPts];
-    for (__int__ k = 0; k < SplineInfoArray[i].nPts; ++k)
+    SplineInfoArray[i].xPts = new _float_[SplineInfoArray[i].nPts];
+    for (_int_ k = 0; k < SplineInfoArray[i].nPts; ++k)
     {
       SplineInfoArray[i].xPts[k] = xtemp[k];
     }
@@ -692,16 +692,16 @@ void SMonolith::PrepareSplineFile() {
   SplineFile->cd();
   EventInfo->Write();
 
-  __int__ nPoints = 0;
+  _int_ nPoints = 0;
   float xtemp[20];
   FastSplineInfoTree->Branch("nPts", &nPoints, "nPts/I");
   FastSplineInfoTree->Branch("xPts", xtemp, "xPts[nPts]/F");
 
-  for (__int__ i = 0; i < nParams; ++i)
+  for (_int_ i = 0; i < nParams; ++i)
   {
     nPoints = SplineInfoArray[i].nPts;
 
-    for (__int__ k = 0; k < SplineInfoArray[i].nPts; ++k)
+    for (_int_ k = 0; k < SplineInfoArray[i].nPts; ++k)
     {
       xtemp[k] = SplineInfoArray[i].xPts[k];
     }
@@ -826,7 +826,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline)
 #else
   vals = new float[nParams]();
 #endif
-  for (__int__ j = 0; j < nParams; j++)
+  for (_int_ j = 0; j < nParams; j++)
   {
     vals[j] = -999;
   }
@@ -1104,7 +1104,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   nParams = MasterSpline[0].size();
   // Initialise
   SplineInfoArray = new FastSplineInfo[nParams];
-  for (__int__ i = 0; i < nParams; ++i) {
+  for (_int_ i = 0; i < nParams; ++i) {
     SplineInfoArray[i].nPts = -999;
     SplineInfoArray[i].xPts = NULL;
     SplineInfoArray[i].CurrSegment = 0;
@@ -1145,11 +1145,11 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
         SplineInfoArray[ij].nPts = (*InnerIt)->GetNp();
 
         // Fill the x points
-        SplineInfoArray[ij].xPts = new __float__[SplineInfoArray[ij].nPts];
-        for (__int__ k = 0; k < SplineInfoArray[ij].nPts; ++k)
+        SplineInfoArray[ij].xPts = new _float_[SplineInfoArray[ij].nPts];
+        for (_int_ k = 0; k < SplineInfoArray[ij].nPts; ++k)
         {
-          __float__ xtemp = -999.99;
-          __float__ ytemp = -999.99;
+          _float_ xtemp = -999.99;
+          _float_ ytemp = -999.99;
           (*InnerIt)->GetKnot(k, xtemp, ytemp);
           SplineInfoArray[ij].xPts[k] = xtemp;
         }
@@ -1163,10 +1163,10 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   
   int Counter = 0;
   //KS: Sanity check that everything was set correctly
-  for (__int__ i = 0; i < nParams; ++i)
+  for (_int_ i = 0; i < nParams; ++i)
   {
-    const __int__ nPoints = SplineInfoArray[i].nPts;
-    const __float__* xArray = SplineInfoArray[i].xPts;
+    const _int_ nPoints = SplineInfoArray[i].nPts;
+    const _float_* xArray = SplineInfoArray[i].xPts;
     if (nPoints == -999 || xArray == NULL) {
       Counter++;
       if(Counter < 5)
@@ -1385,7 +1385,7 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
   }
 
   // The coefficients we're writing to
-  __float__ x, y, b, c, d;
+  _float_ x, y, b, c, d;
   // TSpline3 can only take doubles, not floats
   // But our GPU is slow with doubles, so need to cast to float
   for(int i = 0; i < Np; i++) {
@@ -1444,7 +1444,7 @@ void SMonolith::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
 bool SMonolith::isFlat(TSpline3_red* &spl) {
 // *****************************************
   int Np = spl->GetNp();
-  __float__ x, y, b, c, d;
+  _float_ x, y, b, c, d;
   // Go through spline segment parameters,
   // Get y values for each spline knot,
   // Every knot must evaluate to 1.0 to create a flat spline
@@ -1522,10 +1522,10 @@ void SMonolith::FindSplineSegment() {
 
   // Loop over the splines
   //KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting
-  for (__int__ i = 0; i < nParams; ++i)
+  for (_int_ i = 0; i < nParams; ++i)
   {
-    const __int__ nPoints = SplineInfoArray[i].nPts;
-    const __float__* xArray = SplineInfoArray[i].xPts;
+    const _int_ nPoints = SplineInfoArray[i].nPts;
+    const _float_* xArray = SplineInfoArray[i].xPts;
 
     // EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here
     //     In principle, such parameters shouldn't really be included in the first place, but with new det syst splines this
@@ -1533,14 +1533,14 @@ void SMonolith::FindSplineSegment() {
     if(xArray == NULL) continue;
 
     // Get the variation for this reconfigure for the ith parameter
-    const __float__ xvar = *SplineInfoArray[i].splineParsPointer;
+    const _float_ xvar = *SplineInfoArray[i].splineParsPointer;
     vals[i] = xvar;
 
     // The segment we're interested in (klow in ROOT code)
-    __int__ segment = 0;
-    __int__ kHigh = nPoints-1;
+    _int_ segment = 0;
+    _int_ kHigh = nPoints-1;
     //KS: We expect new segment is very close to previous
-    const __int__ PreviousSegment = SplineInfoArray[i].CurrSegment;
+    const _int_ PreviousSegment = SplineInfoArray[i].CurrSegment;
 
     //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
     if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ) segment = PreviousSegment;
@@ -1554,7 +1554,7 @@ void SMonolith::FindSplineSegment() {
       // If the variation is between the maximum and minimum, perform a binary search
     } else {
       // The top point we've got
-      __int__ kHalf = 0;
+      _int_ kHalf = 0;
       // While there is still a difference in the points (we haven't yet found the segment)
       // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
       while (kHigh - segment > 1) {
@@ -1587,7 +1587,7 @@ void SMonolith::FindSplineSegment() {
       std::cerr << "Found segment   = " << segment << std::endl;
       std::cerr << "Doing variation = " << xvar << std::endl;
       std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
-      for (__int__ j = 0; j < SplineInfoArray[j].nPts; ++j) {
+      for (_int_ j = 0; j < SplineInfoArray[j].nPts; ++j) {
         std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
       }
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
@@ -1643,7 +1643,7 @@ void SMonolith::Evaluate_TF1() {
 // *****************************************
 
   // Feed the parameter variations
-  for (__int__ i = 0; i < nParams; ++i) {
+  for (_int_ i = 0; i < nParams; ++i) {
     // Update the values and which segment it belongs to
     vals[i] = *splineParsPointer[i];
   }
@@ -1673,7 +1673,7 @@ void SMonolith::Evaluate_TF1() {
 // *****************************************
 
   // Feed the parameter variations
-  for (__int__ i = 0; i < nParams; ++i) {
+  for (_int_ i = 0; i < nParams; ++i) {
     // Update the values and which segment it belongs to
     vals[i] = *splineParsPointer[i];
   }

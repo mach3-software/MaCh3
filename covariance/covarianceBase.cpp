@@ -638,7 +638,7 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
     while(throw_again == true)
     {
       throw_again = false;
-      std::cout << "- setting " << getName() << " nominal values to random throws." << std::endl;
+      MACH3LOG_INFO("Setting {} nominal values to random throws.", getName())
       nom_throws->ThrowSet(nominal);
 
       for (int i = 0; i < _fNumPar; i++)
@@ -747,15 +747,16 @@ void covarianceBase::RandomConfiguration() {
     int throws = 0;
     while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
       if (throws > 1000) {
-        std::cerr << "Tried " << throws << " times to throw parameter " << i << " but failed" << std::endl;
-        std::cerr << "Matrix: " << matrixName << std::endl;
-        std::cerr << "Param:  " << _fNames[i].c_str() << std::endl;
+        MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
+        MACH3LOG_WARN("Matrix: {}", matrixName);
+        MACH3LOG_WARN("Param: {}", _fNames[i]);
+        MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
         throw;
       }
       _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
       throws++;
     }
-    std::cout << "Setting current step in " << matrixName << " param " << i << " = " << _fPropVal[i] << " from " << _fCurrVal[i] << std::endl;
+    MACH3LOG_INFO("Setting current step in {} param {} = {} from {}", matrixName, i, _fPropVal[i], _fCurrVal[i]);
     _fCurrVal[i] = _fPropVal[i];
   }
   if (pca) TransferToPCA();
@@ -968,9 +969,8 @@ void covarianceBase::throwParCurr(const double mag)
 void covarianceBase::printNominal() {
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
   for (int i = 0; i < _fNumPar; i++) {
-    std::cout << "    " << GetParFancyName(i) << "   " << getParInit(i) << "\n";
+    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), getParInit(i));
   }
-  std::cout << std::endl;
 }
 
 // Function to print the nominal, current and proposed values
@@ -988,8 +988,8 @@ void covarianceBase::printNominalCurrProp() {
   for (int i = 0; i < _fNumPar; ++i) {
     MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
-   //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
-  std::cout << std::endl;
+  //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
+  //std::cout << std::endl;
 }
 
 // Get the likelihood in the case where we want to include priors on the parameters
@@ -1037,7 +1037,7 @@ double covarianceBase::GetLikelihood(){
   const int NOutside = CheckBounds();
   
   if(NOutside > 0)
-    return NOutside*__LARGE_LOGL__;
+    return NOutside*_LARGE_LOGL_;
 
   return CalcLikelihood();
 }
@@ -1106,12 +1106,12 @@ void covarianceBase::setBranches(TTree &tree) {
 }
 
 void covarianceBase::setStepScale(double scale) {
-    if(scale == 0)
-    {
-        std::cerr << "You are trying so set StepScale to 0 this will not work"<< std::endl;
-        throw;   
-    }
-  std::cout << getName() << " setStepScale() = " << scale << std::endl;
+  if(scale == 0)
+  {
+    MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
+    throw;
+  }
+  MACH3LOG_INFO("{} setStepScale() = {}", getName(), scale);
   _fGlobalStepScale = scale;
 }
 
@@ -1133,8 +1133,8 @@ void covarianceBase::toggleFixParameter(const int i) {
 // ********************************************
   if(!pca) {
 	if (i > size) {
-	  std::cerr << "Can't toggleFixParameter for parameter " << i << " because size of covariance =" << size << std::endl;
-	  std::cerr << "Fix this in your config file please!" << std::endl;
+      MACH3LOG_ERROR("Can't toggleFixParameter for parameter {} because size of covariance ={}", i, _fNumPar);
+      MACH3LOG_ERROR("Fix this in your config file please!");
 	  throw;
 	} else {
 	  _fError[i] *= -1.0;
@@ -1146,7 +1146,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  if(isDecomposed_PCA[im] == i) {isDecom = im;}
 	}
 	if(isDecom < 0) {
-	  std::cerr << "Parameter " << GetParName(i) << " is PCA decomposed can't fix this" << std::endl;
+      MACH3LOG_ERROR("Setting {}(parameter {}) to fixed at {}", GetParName(i), i, _fCurrVal[i]);
 	  //throw; 
 	} else {
 	  fParSigma_PCA[isDecom] *= -1.0;
@@ -1161,8 +1161,8 @@ void covarianceBase::setEvalLikelihood(int i, bool eL) {
 
   std::cout << "covarianceBase::setEvalLikelihood set to " << eL << std::endl;
   if (i > size) {
-    std::cerr << "Can't setEvalLikelihood for " << getName() << "_" << i << " because size of covarianceXsec2015 = " << size << std::endl;
-    std::cerr << "Fix this in your config file please!" << std::endl;
+    std::cerr << "Can't setEvalLikelihood for " << getName() << "_" << i << " because size of covarianceXsec2015 = " << _fNumPar << std::endl;
+    MACH3LOG_ERROR("Fix this in your config file please!");
     throw;
   } else {
     std::cout << "Setting " << GetParName(i) << " (parameter " << i << ") to flat prior? " << eL << std::endl;
@@ -1282,7 +1282,7 @@ void covarianceBase::resetIndivStepScale() {
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
    if (cov == NULL) {
-    std::cerr << "Could not find covariance matrix you provided to setThrowMatrix" << std::endl;
+    MACH3LOG_ERROR("Could not find covariance matrix you provided to setThrowMatrix");
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
@@ -1303,7 +1303,6 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   
   if(!TDecompChol_throwMatrix.Decompose()) {
     std::cerr << "Cholesky decomposition failed for " << matrixName << " trying to make positive definite" << std::endl;
-    
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
@@ -1450,7 +1449,6 @@ void covarianceBase::saveAdaptiveToFile(TString outFileName, TString systematicN
   outMeanVec->Write(systematicName+"_mean_vec");
   outFile->Close();
   delete outFile;
-
 }
 
 //HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob
@@ -1501,9 +1499,10 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)
   //Now can just add a makeposdef!
   MakePosDef(cov);
 }
+// ********************************************
+std::vector<double> covarianceBase::getNominalArray() {
+// ********************************************
 
-std::vector<double> covarianceBase::getNominalArray()
-{
   std::vector<double> nominal(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i)
   {
@@ -1539,7 +1538,6 @@ TH2D* covarianceBase::GetCorrelationMatrix() {
   }
   return hMatrix;
 }
-
 
 // ********************************************
 // KS: After step scale, prefit etc. value were modified save this modified config.

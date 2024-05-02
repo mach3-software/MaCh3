@@ -6,8 +6,8 @@
 #include "covariance/ThrowParms.h"
 #include "manager/manager.h"
 
-#ifndef __LARGE_LOGL__
-#define __LARGE_LOGL__ 1234567890.0
+#ifndef _LARGE_LOGL_
+#define _LARGE_LOGL_ 1234567890.0
 #endif
 
 //#define DEBUG_PCA 1

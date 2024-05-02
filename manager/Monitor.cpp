@@ -6,6 +6,11 @@ namespace MaCh3Utils {
 void MaCh3Welcome() {
 // *************************
 
+  // KS: Just make sure we only call it once
+  static bool MaCh3WelcomeInitialised = false;
+
+  if(MaCh3WelcomeInitialised) return;
+
   //KS: Find MaCh3 version based on header file. There could be better way to just include version.h but as long as we don't have to hardcode version I am content
   std::string MaCh3_VERSION = "";
   std::string file = std::string(std::getenv("MaCh3_ROOT")) + "/version.h";
@@ -46,6 +51,12 @@ void MaCh3Welcome() {
   MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
   MACH3LOG_INFO("Version: {}", MaCh3_VERSION);
   MACH3LOG_INFO("##################################");
+
+  GetCPUInfo();
+
+  GetGPUInfo();
+
+  MaCh3WelcomeInitialised = true;
 }
 
 // ************************

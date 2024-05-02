@@ -410,7 +410,7 @@ void FitterBase::RunLLHScan() {
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
     {
-      for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
       {
         SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleName(is)+ "_LLH").c_str());
         SampleIterator++;
@@ -527,7 +527,7 @@ void FitterBase::RunLLHScan() {
         {
           hScanSamSplit = new TH1D*[TotalNSamples];
           sampleSplitllh = new double[TotalNSamples];
-          for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+          for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
           {
             hScanSamSplit[SampleIterator] = new TH1D( (name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper );
             hScanSamSplit[SampleIterator]->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
@@ -581,7 +581,7 @@ void FitterBase::RunLLHScan() {
           int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
           {
-            for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+            for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++)
             {
               sampleSplitllh[SampleIterator] = samples[ivs]->getSampleLikelihood(is);
               SampleIterator++;
@@ -606,7 +606,7 @@ void FitterBase::RunLLHScan() {
           int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
           {
-            for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+            for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++)
             {
               hScanSamSplit[is]->SetBinContent(j+1, 2*sampleSplitllh[is]);
               SampleIterator++;
@@ -652,7 +652,7 @@ void FitterBase::RunLLHScan() {
         int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+          for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++)
           {
             SampleSplit_LLH[SampleIterator]->cd();
             hScanSamSplit[SampleIterator]->Write();
@@ -695,7 +695,7 @@ void FitterBase::RunLLHScan() {
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
     {
-      for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
       {
         SampleSplit_LLH[SampleIterator]->Write();
         delete SampleSplit_LLH[SampleIterator];
@@ -1026,7 +1026,7 @@ void FitterBase::RunSigmaVar() {
       // Get each sample and how it's responded to our reweighted parameter
       for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
-        for(__int__ k = 0; k < samples[ivs]->GetNsamples(); k++ )
+        for(_int_ k = 0; k < samples[ivs]->GetNsamples(); k++ )
         {
           std::string title = std::string(samples[ivs]->getPDF(k)->GetName());
           dirArryDial->cd();
@@ -1093,7 +1093,7 @@ void FitterBase::RunSigmaVar() {
         // Get each sample and how it's responded to our reweighted parameter
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          for (__int__ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+          for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
           {
             // Make a string of the double
             std::ostringstream ss;
@@ -1199,7 +1199,7 @@ void FitterBase::RunSigmaVar() {
       // Get each sample and how it's responded to our reweighted parameter
       for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
-        for (__int__ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+        for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
           std::string title = std::string(samples[ivs]->getPDF(k)->GetName()) + "_" + name;
           TGraphAsymmErrors *var_x = MakeAssymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
@@ -1243,7 +1243,7 @@ void FitterBase::RunSigmaVar() {
       SampleIterator = 0;
       for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
-        for (__int__ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+        for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
           dirArrySample[SampleIterator]->Close();
           delete dirArrySample[SampleIterator];
@@ -1257,7 +1257,7 @@ void FitterBase::RunSigmaVar() {
         int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          for (__int__ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+          for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
           {
             delete sigmaArray_x[j][SampleIterator];
             delete sigmaArray_y[j][SampleIterator];
@@ -1287,7 +1287,7 @@ void FitterBase::RunSigmaVar() {
           SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
           {
-            for (__int__ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+            for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
             {
               for(int ir = 0; ir < nRelevantModes;ir++)
               {

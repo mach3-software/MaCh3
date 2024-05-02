@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __BAD_SPLINE__
-#define __BAD_SPLINE__ 123456789
+#ifndef _BAD_SPLINE_
+#define _BAD_SPLINE_ 123456789
 #endif
 
 //ROOT
@@ -63,7 +63,7 @@ class splineFDBase
 
 	void BuildSampleIndexingArray(std::string SampleName);
 	void PrepForReweight();
-	void getSplineCoeff_SepMany(int splineindex, __float__ *& xArray, __float__ *&manyArray);
+	void getSplineCoeff_SepMany(int splineindex, _float_ *& xArray, _float_ *&manyArray);
 	void PrintBinning(TAxis* Axis);
 	void PrintSampleDetails(std::string SampleName);
 	void PrintArrayDetails(std::string SampleName);
@@ -101,7 +101,7 @@ class splineFDBase
 	std::vector<int> UniqueSystIndices;
 	std::vector<int> UniqueSystNKnots;
 	std::vector<int> UniqueSystCurrSegment;
-	std::vector< std::vector<__float__> > UniqueSystXPts;
+	std::vector< std::vector<_float_> > UniqueSystXPts;
 
 	// //DB Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
@@ -115,10 +115,10 @@ class splineFDBase
 	int CoeffIndex;
 
 	//Probably need to clear these arrays up at some point
-	__float__ *xVarArray;
+	_float_ *xVarArray;
 	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
-	__float__ *xcoeff_arr;    //x coefficients for each spline
-	__float__ *manycoeff_arr; //ybcd coefficients for each spline
+	_float_ *xcoeff_arr;    //x coefficients for each spline
+	_float_ *manycoeff_arr; //ybcd coefficients for each spline
 
 	std::vector<double> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;

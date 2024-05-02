@@ -1040,7 +1040,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
-	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
+	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin==0) {
 		low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
 	  } else {
@@ -1053,7 +1053,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	  //std::cout << "Low edge is " << low_edge << std::endl;
 	  //std::cout << "Upper edge is " << upper_edge << std::endl;
 
-	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
+	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin<(_hPDF1D->GetNbinsX()-2)) {
 		upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
 	  } else {
@@ -1064,10 +1064,10 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 		MCSamples[mc_i].NomXBin[event_i] = bin-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = __DEFAULT_RETURN_VAL__;
-		upper_edge = __DEFAULT_RETURN_VAL__;
-		low_lower_edge = __DEFAULT_RETURN_VAL__;
-		upper_upper_edge = __DEFAULT_RETURN_VAL__;
+		low_edge = _DEFAULT_RETURN_VAL_;
+		upper_edge = _DEFAULT_RETURN_VAL_;
+		low_lower_edge = _DEFAULT_RETURN_VAL_;
+		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = 0;
 
@@ -1168,7 +1168,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	  _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
 	  //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
 
-	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
+	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin==0) {
 		low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
 	  } else {
@@ -1178,7 +1178,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	  double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
 	  double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
 
-	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
+	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin<(_hPDF2D->GetNbinsX()-2)) {
 		upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
 	  } else {
@@ -1189,10 +1189,10 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = __DEFAULT_RETURN_VAL__;
-		upper_edge = __DEFAULT_RETURN_VAL__;
-		low_lower_edge = __DEFAULT_RETURN_VAL__;
-		upper_upper_edge = __DEFAULT_RETURN_VAL__;
+		low_edge = _DEFAULT_RETURN_VAL_;
+		upper_edge = _DEFAULT_RETURN_VAL_;
+		low_lower_edge = _DEFAULT_RETURN_VAL_;
+		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
 	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;

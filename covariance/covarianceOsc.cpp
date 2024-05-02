@@ -224,8 +224,8 @@ void covarianceOsc::setExtraBranches(TTree &tree) {
 void covarianceOsc::Print() {
 // *************************************
 
-  std::cout << "Number of pars: " << _fNumPar << std::endl;
-  std::cout << "current " << matrixName << " parameters:" << std::endl;
+  MACH3LOG_INFO("Number of pars: {}", _fNumPar);
+  MACH3LOG_INFO("Current: {} parameters:", matrixName);
   std::cout << std::left << std::setw(5) << "#" << std::setw(2) << "|" << std::setw(25) << "Name" << std::setw(2) << "|" << std::setw(10) << "Nom." << std::setw(2) << "|" << std::setw(15) << "IndivStepScale" << std::setw(2) << "|" <<std::setw(15) << "_fError"  << std::endl;
   for(int i = 0; i < _fNumPar; i++) {
     std::cout << std::fixed << std::setprecision(5) << std::left << std::setw(5) << i << std::setw(2) << "|" << std::setw(25) << _fNames[i].c_str() << std::setw(2) << "|" << std::setw(10) << _fPreFitValue[i]<< std::setw(2) << "|" << std::setw(15) << _fIndivStepScale[i] << std::setw(2) << "|" << std::setw(15)<< _fError[i]<< std::endl;
@@ -236,7 +236,7 @@ void covarianceOsc::Print() {
 }
 
 // *************************************
-//KS: Currently prob3++/probgp requires particular order so we need to check this is the case
+//KS: Currently prob3++/probgpu requires particular order so we need to check this is the case
 void covarianceOsc::CheckOrderOfParams()  {
 // *************************************
 
@@ -254,11 +254,10 @@ void covarianceOsc::CheckOrderOfParams()  {
   {
     for(unsigned int i = 0; i < wrongParam.size(); i++ )
     {
-        std::cerr << "Osc Patameter "<< _fNames[i].c_str() <<" isn't in good order"<<std::endl;
+      MACH3LOG_ERROR("Osc Parameter  {} isn't in good order", _fNames[i].c_str());
     }
-    std::cerr << "Currently prob3++/probgp requires particular order"<< std::endl;
-    std::cerr << "Please modify XML and make new matrix with good order"<< std::endl;
-    std::cerr << "Find me here "<<__FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("Currently prob3++/probgp requires particular order");
+    MACH3LOG_ERROR("Please modify XML and make new matrix with good order");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 }

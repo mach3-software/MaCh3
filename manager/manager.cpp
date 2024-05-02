@@ -10,8 +10,6 @@ manager::manager(std::string const &filename)
   FileName = filename;
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
-  MaCh3Utils::GetCPUInfo();
-  MaCh3Utils::GetGPUInfo();
 
   MACH3LOG_INFO("Setting config to be: {}", filename);
 

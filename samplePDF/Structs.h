@@ -1,30 +1,34 @@
 #pragma once
 
-// Run low or high memory versions of structs
-// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
-//KS: Need more testing on FD
-//#define __LOW_MEMORY_STRUCTS__
-
-#ifdef __LOW_MEMORY_STRUCTS__
-#define __float__ float
-#define __int__ short int
-#define __unsigned_int__ unsigned short int
+/// Run low or high memory versions of structs
+/// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
+/// KS: Need more testing on FD
+#ifdef _LOW_MEMORY_STRUCTS_
+#define _float_ float
+#define _int_ short int
+#define _unsigned_int_ unsigned short int
 #else
-#define __float__ double
-#define __int__ int
-#define __unsigned_int__ unsigned int
+#define _float_ double
+#define _int_ int
+#define _unsigned_int_ unsigned int
 #endif
 
-//
-#define __TH2PolyOverflowBins__ 9
+/// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class. Keep it in ND for the time being
+#define SafeException
+#ifdef SafeException
+#define _noexcept_ noexcept
+#else
+#define _noexcept_
+#endif
+
+/// Number of overflow bins in TH2Poly,
+#define _TH2PolyOverflowBins_ 9
 
 /// Include some healthy defines for constructors
-#define __BAD_DOUBLE__ -999.99
-#define __BAD_INT__ -999
+#define _BAD_DOUBLE_ -999.99
+#define _BAD_INT_ -999
 
-#define __TH2PolyOverflowBins__ 9
-
-#define __DEFAULT_RETURN_VAL__ -999999.123456
+#define _DEFAULT_RETURN_VAL_ -999999.123456
 
 // C++ includes
 #include <sstream>
@@ -104,14 +108,14 @@ class XsecNorms4 {
 struct FastSplineInfo {
 // *******************
   // Number of points in spline
-  __int__ nPts;
+  _int_ nPts;
 
   // Array of the knots positions
-  __float__ *xPts;
+  _float_ *xPts;
 
   // Array of what segment of spline we're currently interested in
   // Gets updated once per MCMC iteration
-  __int__ CurrSegment;
+  _int_ CurrSegment;
   
   // Array of the knots positions
   const double* splineParsPointer;
@@ -125,7 +129,7 @@ class XSecStruct{
   // ********************************************
   public:
     /// The light constructor
-    XSecStruct(__int__ NumberOfSplines) { 
+    XSecStruct(_int_ NumberOfSplines) {
       nParams = NumberOfSplines;
       Func.reserve(nParams);
       for (int i = 0; i < nParams; ++i) {
@@ -147,7 +151,7 @@ class XSecStruct{
     }
 
     /// Get number of splines
-    inline __int__ GetNumberOfParams() { return nParams; }
+    inline _int_ GetNumberOfParams() { return nParams; }
 
     /// The Printer
     inline void Print() {
@@ -159,17 +163,17 @@ class XSecStruct{
     }
 
     /// Set the number of splines for this event
-    inline void SetSplineNumber(__int__ NumberOfSplines) {
+    inline void SetSplineNumber(_int_ NumberOfSplines) {
       nParams = NumberOfSplines;
       Func = new T[nParams];
     }
 
     /// Get the function for the nth spline
-    inline T GetFunc(__int__ nSpline) { return Func[nSpline]; }
+    inline T GetFunc(_int_ nSpline) { return Func[nSpline]; }
     /// Set the function for the nth spline
-    inline void SetFunc(__int__ nSpline, T Function) { Func[nSpline] = Function; }
+    inline void SetFunc(_int_ nSpline, T Function) { Func[nSpline] = Function; }
     /// Eval the current variation
-    inline double Eval(__int__ nSpline, __float__ variation) { 
+    inline double Eval(_int_ nSpline, _float_ variation) {
       // Some will be NULL, check this
       if (Func[nSpline]) {
         return Func[nSpline]->Eval(variation);
@@ -179,7 +183,7 @@ class XSecStruct{
     }
   private:
     /// Number of parameters
-    __int__ nParams;
+    _int_ nParams;
     /// The function
     T* Func;
 };
@@ -206,7 +210,7 @@ class TF1_red {
     }
 
     /// The useful constructor with deep copy
-    TF1_red(__int__ nSize, __float__* Array, __int__ Parameter) {
+    TF1_red(_int_ nSize, _float_* Array, _int_ Parameter) {
       length = nSize;
       for (int i = 0; i < length; ++i) {
         Par[i] = Array[i];
@@ -231,7 +235,7 @@ class TF1_red {
     inline void SetFunc(TF1* &Func, int Param = -1) {
       length = Func->GetNpar();
       if (Par != NULL) delete[] Par;
-      Par = new __float__[length];
+      Par = new _float_[length];
       for (int i = 0; i < length; ++i) {
         Par[i] = Func->GetParameter(i);
       }
@@ -241,7 +245,7 @@ class TF1_red {
     }
 
     /// Evaluate a variation
-    inline double Eval(__float__ var) {
+    inline double Eval(_float_ var) {
       /// If we have 5 parameters we're using a fifth order polynomial
       if (length == 5) {
         return 1+Par[0]*var+Par[1]*var*var+Par[2]*var*var*var+Par[3]*var*var*var*var+Par[4]*var*var*var*var*var;
@@ -258,12 +262,12 @@ class TF1_red {
     }
 
     /// Set a parameter to a value
-    inline void SetParameter(__int__ Parameter, __float__ Value) {
+    inline void SetParameter(_int_ Parameter, _float_ Value) {
       Par[Parameter] = Value;
     }
 
     /// Get a parameter value
-    double GetParameter(__int__ Parameter) {
+    double GetParameter(_int_ Parameter) {
       if (Parameter > length) {
         std::cerr << "Error: you requested parameter number " << Parameter << " but length is " << length << " parameters" << std::endl;
         throw;
@@ -273,9 +277,9 @@ class TF1_red {
     }
 
     /// Set the size
-    inline void SetSize(__int__ nSpline) {
+    inline void SetSize(_int_ nSpline) {
       length = nSpline;
-      Par = new __float__[length];
+      Par = new _float_[length];
     }
     /// Get the size
     inline int GetSize() { return length; }
@@ -294,10 +298,10 @@ class TF1_red {
 
   private:
     /// The parameters
-    __float__* Par;
-    __int__ length;
+    _float_* Par;
+    _int_ length;
     /// Save the parameter number this spline applies to
-    __int__ ParamNo;
+    _int_ ParamNo;
 };
 
 /// Make an enum of the spline interpolation type
@@ -361,18 +365,18 @@ class TSpline3_red {
     }
 
     /// @brief constructor taking parameters
-    TSpline3_red(__float__ *X, __float__ *Y, __int__ N, __float__ **P, __int__ parNo){
+    TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P, _int_ parNo){
       nPoints = N;
       ParamNo = parNo;
       // std::cout<<"nPoints: "<<nPoints<<std::endl;
       // Save the parameters for each knot
-      Par = new __float__*[nPoints];
+      Par = new _float_*[nPoints];
       // Save the positions of the knots
-      XPos = new __float__[nPoints];
+      XPos = new _float_[nPoints];
       // Save the y response at each knot
-      YResp = new __float__[nPoints];
+      YResp = new _float_[nPoints];
       for(int j=0; j<N; ++j){
-        Par[j] = new __float__[3];
+        Par[j] = new _float_[3];
         Par[j][0] = P[j][0];
         Par[j][1] = P[j][1];
         Par[j][2] = P[j][2];
@@ -402,18 +406,18 @@ class TSpline3_red {
       if (XPos != NULL) delete[] XPos;
       if (YResp != NULL) delete[] YResp;
       // Save the parameters for each knot
-      Par = new __float__*[nPoints];
+      Par = new _float_*[nPoints];
       // Save the positions of the knots
-      XPos = new __float__[nPoints];
+      XPos = new _float_[nPoints];
       // Save the y response at each knot
-      YResp = new __float__[nPoints];
+      YResp = new _float_[nPoints];
 
       //KS: Default TSpline3 ROOT implementation
       if(InterPolation == kTSpline3)
       {
         for (int i = 0; i < nPoints; ++i) {
           // 3 is the size of the TSpline3 coefficients
-          Par[i] = new __float__[3];
+          Par[i] = new _float_[3];
           double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
           spline->GetCoeff(i, x, y, b, c, d);
           XPos[i]   = x;
@@ -432,7 +436,7 @@ class TSpline3_red {
       {
         for (int k = 0; k < nPoints; ++k) {
           // 3 is the size of the TSpline3 coefficients
-          Par[k] = new __float__[3];
+          Par[k] = new _float_[3];
           Double_t x1, y1, b1, c1, d1, x2, y2, b2, c2, d2 = 0;
           spline->GetCoeff(k, x1, y1, b1, c1, d1);
           spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
@@ -452,7 +456,7 @@ class TSpline3_red {
         // get the knot values for the spline
         for (int i = 0; i < nPoints; ++i) {
           // 3 is the size of the TSpline3 coefficients
-          Par[i] = new __float__[3];
+          Par[i] = new _float_[3];
 
           double x = -999.99, y = -999.99;
           spline->GetKnot(i, x, y);
@@ -461,8 +465,8 @@ class TSpline3_red {
           YResp[i]  = y;
         }
 
-        __float__* mvals = new __float__[nPoints + 3];
-        __float__* svals = new __float__[nPoints + 1];
+        _float_* mvals = new _float_[nPoints + 3];
+        _float_* svals = new _float_[nPoints + 1];
 
         for (int i = -2; i <= nPoints; ++i) {
           // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
@@ -494,7 +498,7 @@ class TSpline3_red {
 
         // calculate the coefficients for the spline
         for(int i = 0; i <nPoints; i++){
-          __float__ b, c, d = -999.999;
+          _float_ b, c, d = -999.999;
 
           b = svals[i];
           c = (3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
@@ -525,14 +529,14 @@ class TSpline3_red {
       else if(InterPolation == kMonotonic)
       {
         // values of the secants at each point (for calculating monotone spline)
-        __float__ * Secants = new __float__[nPoints -1];
+        _float_ * Secants = new _float_[nPoints -1];
         // values of the tangens at each point (for calculating monotone spline)
-       __float__ *  Tangents = new __float__[nPoints];
+       _float_ *  Tangents = new _float_[nPoints];
 
         // get the knot values for the spline
         for (int i = 0; i < nPoints; ++i) {
           // 3 is the size of the TSpline3 coefficients
-          Par[i] = new __float__[3];
+          Par[i] = new _float_[3];
 
           double x = -999.99, y = -999.99;
           spline->GetKnot(i, x, y);
@@ -564,8 +568,8 @@ class TSpline3_red {
         Tangents[0] = Secants[0];
         Tangents[nPoints-1] = Secants[nPoints -2];
 
-        __float__ alpha;
-        __float__ beta;
+        _float_ alpha;
+        _float_ beta;
 
         // second pass over knots to calculate tangents
         for (int i = 1; i < nPoints-1; ++i) {
@@ -593,16 +597,16 @@ class TSpline3_red {
             }
 
             if (alpha * alpha + beta * beta >9.0){
-              __float__ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
+              _float_ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
               Tangents[i]   = tau * alpha * Secants[i];
               Tangents[i+1] = tau * beta  * Secants[i];
             }
           }
         } // finished rescaling tangents
         // fourth pass over knots to calculate the coefficients for the spline
-        __float__ dx;
+        _float_ dx;
         for(int i = 0; i <nPoints-1; i++){
-          __float__ b, c, d = -999.999;
+          _float_ b, c, d = -999.999;
           dx = XPos[i+1] - XPos[i];
 
           b = Tangents[i] * dx;
@@ -701,7 +705,7 @@ class TSpline3_red {
       // Get the segment for this variation
       int segment = FindX(var);
       // The get the coefficients for this variation
-      __float__ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+      _float_ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
       GetCoeff(segment, x, y, b, c, d);
       double dx = var - x;
       // Evaluate the third order polynomial
@@ -712,13 +716,13 @@ class TSpline3_red {
     /// @brief CW: Get the number of points
     inline int GetNp() { return nPoints; }
     // Get the ith knot's x and y position
-    inline void GetKnot(int i, __float__ &xtmp, __float__ &ytmp) {
+    inline void GetKnot(int i, _float_ &xtmp, _float_ &ytmp) {
       xtmp = XPos[i];
       ytmp = YResp[i];
     }
 
     /// @brief CW: Get the coefficient of a given segment
-    inline void GetCoeff(int segment, __float__ &x, __float__ &y, __float__ &b, __float__ &c, __float__ &d) {
+    inline void GetCoeff(int segment, _float_ &x, _float_ &y, _float_ &b, _float_ &c, _float_ &d) {
       b = Par[segment][0];
       c = Par[segment][1];
       d = Par[segment][2];
@@ -735,15 +739,15 @@ class TSpline3_red {
 
   protected: //changed to protected from private so can be accessed by derived classes
     /// Number of points/knot in TSpline3
-    __int__ nPoints;
+    _int_ nPoints;
     /// Always uses a third order polynomial, so hard-code the number of coefficients in implementation
-    __float__ **Par;
+    _float_ **Par;
     /// Positions of each x for each knot
-    __float__ *XPos;
+    _float_ *XPos;
     /// y-value for each knot
-    __float__ *YResp;
+    _float_ *YResp;
     /// Parameter number (which parameter is this spline for)
-    __int__ ParamNo;
+    _int_ ParamNo;
 };
 
 // ************************
@@ -808,7 +812,7 @@ class Truncated_Spline: public TSpline3_red {
       // Get the segment for this variation
       int segment = FindX(var);
       // The get the coefficients for this variation
-      __float__ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+      _float_ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
 
       if(segment >=0){
         GetCoeff(segment, x, y, b, c, d);

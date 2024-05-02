@@ -217,7 +217,7 @@ if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
 endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE __LOW_MEMORY_STRUCTS__)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
 endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)

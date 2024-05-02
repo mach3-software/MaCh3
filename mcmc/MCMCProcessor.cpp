@@ -45,8 +45,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
 
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
-  MaCh3Utils::GetCPUInfo();
-  MaCh3Utils::GetGPUInfo();
   MACH3LOG_INFO("Making post-fit processor for: {}", MCMCFile);
 
   ParStep = nullptr;
@@ -994,7 +992,7 @@ void MCMCProcessor::MakeViolin() {
       hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw); 
       hviolin_prior->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw);
     }
-    //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
+    //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
     hviolin_prior->Draw("VIOLIN");
     hviolin->Draw("VIOLIN SAME");
     if(printToPDF) Posterior->Print(CanvasName);
@@ -1016,7 +1014,7 @@ void MCMCProcessor::MakeCovariance() {
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == __UNDEF__) {
+    if ((*Covariance)(i,i) == _UNDEF_) {
       HaveMadeDiagonal = false;
       MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
@@ -1245,7 +1243,7 @@ void MCMCProcessor::MakeCovariance_MP() {
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < covBinning; ++i) {
-    if ((*Covariance)(i,i) == __UNDEF__) {
+    if ((*Covariance)(i,i) == _UNDEF_) {
       HaveMadeDiagonal = false;
       std::cout << "Have not run diagonal elements in covariance, will do so now by calling MakePostfit()" << std::endl;
       break;
@@ -1769,7 +1767,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   for(int j = 0; j < nParamPlot; ++j)
   {
     //KS: First we need to find parameter number based on name
-    int ParamNo = __UNDEF__;
+    int ParamNo = _UNDEF_;
     for (int i = 0; i < nDraw; ++i)
     {
       TString Title = "";
@@ -1780,7 +1778,7 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 
       if(ParamNames[j] == Title) ParamNo = i;
     }
-    if(ParamNo == __UNDEF__)
+    if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParamNames[j]);
       return;
@@ -2290,18 +2288,18 @@ void MCMCProcessor::SetupOutput() {
   #endif
   for (int i = 0; i < nDraw; ++i)
   {
-    (*Central_Value)(i) = __UNDEF__;
-    (*Means)(i) = __UNDEF__;
-    (*Errors)(i) = __UNDEF__;
-    (*Means_Gauss)(i) = __UNDEF__;
-    (*Errors_Gauss)(i) = __UNDEF__;
-    (*Means_HPD)(i) = __UNDEF__;
-    (*Errors_HPD)(i) = __UNDEF__;
-    (*Errors_HPD_Positive)(i) = __UNDEF__;
-    (*Errors_HPD_Negative)(i) = __UNDEF__;
+    (*Central_Value)(i) = _UNDEF_;
+    (*Means)(i) = _UNDEF_;
+    (*Errors)(i) = _UNDEF_;
+    (*Means_Gauss)(i) = _UNDEF_;
+    (*Errors_Gauss)(i) = _UNDEF_;
+    (*Means_HPD)(i) = _UNDEF_;
+    (*Errors_HPD)(i) = _UNDEF_;
+    (*Errors_HPD_Positive)(i) = _UNDEF_;
+    (*Errors_HPD_Negative)(i) = _UNDEF_;
     for (int j = 0; j < nDraw; ++j) {
-      (*Covariance)(i, j) = __UNDEF__;
-      (*Correlation)(i, j) = __UNDEF__;
+      (*Covariance)(i, j) = _UNDEF_;
+      (*Correlation)(i, j) = _UNDEF_;
     }
   } 
   
@@ -2958,7 +2956,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 // **************************
 
   ParameterEnum ParType = ParamType[param];
-  int ParamNo = __UNDEF__;
+  int ParamNo = _UNDEF_;
   ParamNo = param - ParamTypeStartPos[ParType];
 
   Prior = ParamCentral[ParType][ParamNo];
@@ -2972,7 +2970,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 int MCMCProcessor::GetParamIndexFromName(const std::string Name){
 // **************************
 
-  int ParamNo = __UNDEF__;
+  int ParamNo = _UNDEF_;
   for (int i = 0; i < nDraw; ++i)
   {
     TString Title = "";
@@ -3035,7 +3033,7 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
     bool skip = false;
-    if(ParamNo == __UNDEF__)
+    if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Polar Plot", ParNames[k]);
       skip = true;
@@ -3108,7 +3106,7 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
     bool skip = false;
-    if(ParamNo == __UNDEF__)
+    if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Bayes Factor", ParNames[k]);
       skip = true;
@@ -3171,7 +3169,7 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
     bool skip = false;
-    if(ParamNo == __UNDEF__)
+    if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate SavageDickey", ParNames[k]);
       skip = true;
@@ -3351,7 +3349,7 @@ void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<do
     {
       //KS: First we need to find parameter number based on name
       int ParamNo = GetParamIndexFromName(Names[k]);
-      if(ParamNo == __UNDEF__)
+      if(ParamNo == _UNDEF_)
       {
         MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
         continue;
@@ -4012,8 +4010,8 @@ void MCMCProcessor::CalculateESS(const int nLags) {
   //KS: Calculate ESS and MCMC efficiency for each parameter
   for (int j = 0; j < nDraw; ++j)
   {
-    (*EffectiveSampleSize)(j) = __UNDEF__;
-    (*SamplingEfficiency)(j) = __UNDEF__;
+    (*EffectiveSampleSize)(j) = _UNDEF_;
+    (*SamplingEfficiency)(j) = _UNDEF_;
     TempDenominator[j] = 0.;
     //KS: Firs sum over all Calculated autoceralations
     for (int k = 0; k < nLags; ++k)

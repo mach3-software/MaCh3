@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __UNDEF__
-#define __UNDEF__ 1234567890
+#ifndef _UNDEF_
+#define _UNDEF_ 1234567890
 #endif
 // C++ includes
 #include <iostream>

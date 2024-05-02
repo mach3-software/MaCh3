@@ -209,7 +209,7 @@ void MultipleProcessMCMC()
     {
       // KS: If somehow this chain doesn't given params we skip it
       const int Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-      if(Index == __UNDEF__)
+      if(Index == _UNDEF_)
       {
         Skip = true;
         break;
@@ -474,13 +474,13 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
       {
         if( std::fabs (CovarianceDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CovariancePreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CovarianceDiff->SetBinContent(j, i, __UNDEF__);
-          CovariancePreviousHist->SetBinContent(j, i, __UNDEF__);
+          CovarianceDiff->SetBinContent(j, i, _UNDEF_);
+          CovariancePreviousHist->SetBinContent(j, i, _UNDEF_);
         }
         if( std::fabs (CorrelationDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CorrelationPreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CorrelationDiff->SetBinContent(j, i, __UNDEF__);
-          CorrelationPreviousHist->SetBinContent(j, i, __UNDEF__);
+          CorrelationDiff->SetBinContent(j, i, _UNDEF_);
+          CorrelationPreviousHist->SetBinContent(j, i, _UNDEF_);
         }
       }
     }
@@ -622,7 +622,7 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       {
         // KS: If somehow this chain doesn't given params we skip it
         Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-        if(Index == __UNDEF__)
+        if(Index == _UNDEF_)
         {
           Skip = true;
           break;
