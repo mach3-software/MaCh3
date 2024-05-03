@@ -50,7 +50,7 @@ class covarianceBase {
   void setParProp(int i, double val) {
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
-  };
+  }
   void setParameters(std::vector<double> pars = std::vector<double>());    
   void setEvalLikelihood(int i, bool eL);
   
@@ -58,11 +58,11 @@ class covarianceBase {
   void setBranches(TTree &tree);
   void setStepScale(double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
-  void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; };
+  void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   void setIndivStepScale(std::vector<double> stepscale);
   /// @brief KS: In case someone really want to change this
-  inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; };
+  inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -75,22 +75,24 @@ class covarianceBase {
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
-  //LLH Related
+  /// @brief Check if parameters wre proposed outside physical boundary
   virtual int CheckBounds();
+  /// @brief Calc penalty term based on inverted covariance matrix
   double CalcLikelihood();
+  /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
 
   // Getters
-  TMatrixDSym *getCovMatrix() { return covMatrix; };
-  TMatrixDSym *getInvCovMatrix() { return invCovMatrix; };
-  bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; };
+  TMatrixDSym *getCovMatrix() { return covMatrix; }
+  TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
+  inline bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; }
 
-  const char *getName() { return matrixName; };
-  std::string GetParName(const int i) {return _fNames[i];};
-  const char* GetParName(const int i) const { return _fNames[i].c_str(); };
-  std::string GetParFancyName(const int i) {return _fFancyNames[i];};
-  const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); };
-  std::string const getInputFile() const { return inputFile; };
+  const char *getName() { return matrixName; }
+  std::string GetParName(const int i) {return _fNames[i];}
+  const char* GetParName(const int i) const { return _fNames[i].c_str(); }
+  std::string GetParFancyName(const int i) {return _fFancyNames[i];}
+  const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); }
+  std::string const getInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
@@ -103,7 +105,7 @@ class covarianceBase {
 
   void setThrowMatrix(TMatrixDSym *cov);
   void updateThrowMatrix(TMatrixDSym *cov);
-  void setNumberOfSteps(const int nsteps){
+  inline void setNumberOfSteps(const int nsteps) {
     total_steps = nsteps;
     if(total_steps >= lower_adapt)resetIndivStepScale();
   }
@@ -121,21 +123,21 @@ class covarianceBase {
     if (bin >= 0 && bin < _fNumPar) {
       return _fPropVal[bin];
     } else {
-      std::cerr << "Specified bin is <= 0 OR bin > npar!" << std::endl;
-      std::cerr << "bin = " << bin << ", npar = " << _fNumPar << std::endl;
-      std::cerr << "This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!" << std::endl;
+      MACH3LOG_WARN("Specified bin is <= 0 OR bin > npar!");
+      MACH3LOG_WARN("bin = {}, npar = {}", bin, _fNumPar);
+      MACH3LOG_WARN("This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!");
       return 1.0;
     }
     return 1.0;
-  };
+  }
   //========
-  //DB Pointer return
   //ETA - This might be a bit squiffy? If the vector gots moved from say a
   //push_back then the pointer is no longer valid... maybe need a better 
   //way to deal with this? It was fine before when the return was to an 
   //element of a new array. There must be a clever C++ way to be careful
   //========
-  const double* retPointer(int iParam) {return &(_fPropVal.data()[iParam]);}
+  /// DB Pointer return to param position
+  inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
   inline int    GetNumParams()               {return _fNumPar;}
@@ -151,24 +153,18 @@ class covarianceBase {
   inline double GetGenerated(const int i) { return _fGenerated[i];}
   inline double GetUpperBound(const int i){ return _fUpBound[i];}
   inline double GetLowerBound(const int i){ return _fLowBound[i]; }
-  inline double GetIndivStepScale(int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); };
-  double getParProp_PCA(const int i) {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline double GetIndivStepScale(int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  inline double getParProp_PCA(const int i) {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return fParProp_PCA(i);
-  };
+  }
   
-  double getParCurr_PCA(const int i) {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline double getParCurr_PCA(const int i) {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return fParCurr_PCA(i);
-  };
+  }
 
-  bool isParameterFixedPCA(const int i) {
+  inline bool isParameterFixedPCA(const int i) {
     if (fParSigma_PCA[i] < 0) {
       return true;
     } else {
@@ -176,79 +172,55 @@ class covarianceBase {
     }
   }
 
-  const TMatrixD getTransferMatrix() {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline const TMatrixD getTransferMatrix() {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return TransferMat;
   }
 
-  const TMatrixD getEigenVectors() {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline const TMatrixD getEigenVectors() {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return eigen_vectors;
   }
 
-  const TVectorD getEigenValues() {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline const TVectorD getEigenValues() {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return eigen_values;
   }
 
   inline const std::vector<double> getEigenValuesMaster() {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return eigen_values_master;
   }
 
-  void setParProp_PCA(const int i, const double value) {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline void setParProp_PCA(const int i, const double value) {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     fParProp_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
   }
 
-  void setParCurr_PCA(const int i, const double value) {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline void setParCurr_PCA(const int i, const double value) {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     fParCurr_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
   }
 
-  inline void setParameters_PCA(std::vector<double> pars)
-  {
-    if (!pca)
-    {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw;
-    }
+  inline void setParameters_PCA(std::vector<double> pars) {
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     if (pars.size() != size_t(_fNumParPCA)) {
-      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
+      MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw;
     }
     unsigned int parsSize = pars.size();
-    for (unsigned int i = 0; i < parsSize; i++)
-    {
+    for (unsigned int i = 0; i < parsSize; i++) {
       fParProp_PCA(i) = pars[i];
     }
     //KS: Transfer to normal base
     TransferToParam();
   }
 
-  inline int getSize() { return size; };
+  inline int getSize() { return _fNumPar; }
   inline int getNpars() {
     if (pca) return _fNumParPCA;
     else return _fNumPar;
@@ -260,9 +232,9 @@ class covarianceBase {
   void printPars();
   void printIndivStepScale();
 
-  /// generate a new proposed state
+  /// @brief Generate a new proposed state
   virtual void proposeStep();
-  /// accepted this step
+  /// @brief Accepted this step
   void acceptStep();
 
   /// @brief fix parameters at nominal values
@@ -276,16 +248,19 @@ class covarianceBase {
       return false;
     }
   }
+  /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   void ConstructPCA();
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
   void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat);
   #endif
 
-  /// is PCA, can use to query e.g. LLH scans
-  inline bool IsPCA() { return pca; };
+  /// @brief is PCA, can use to query e.g. LLH scans
+  inline bool IsPCA() { return pca; }
 
+  /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
   inline void MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n);
+  /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
   inline double MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i);
 
   /// @brief HW: Turn on/off true adaptive MCMC, Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
@@ -295,13 +270,15 @@ class covarianceBase {
     lower_adapt = 10000;
     upper_adapt = 10000000;
   }
+  /// @brief HW: Update throw matrix used for proposal
   void updateAdaptiveCovariance();
 
  protected:
   void init(const char *name, const char *file);
-  /// Initialisation of the class using config
+  /// @brief Initialisation of the class using config
   void init(std::vector<std::string> YAMLFile);
   void init(TMatrixDSym* covMat);
+  /// @brief Initialise vectors with parameters information
   void ReserveMemory(const int size);
 
   void randomize();
@@ -328,15 +305,16 @@ class covarianceBase {
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   double **InvertCovMatrix;
     
-  //KS: set Random numbers for each thread so each thread has different seed
+  /// KS: set Random numbers for each thread so each thread has different seed
   TRandom3 **random_number;
 
   // For Cholesky decomposed parameter throw
   double* randParams;
   double* corr_throw;
+  /// Global step scale applied ot all params in this class
   double _fGlobalStepScale;
 
-  //KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
+  /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
   unsigned int PrintLength;
 
   // state info (now mostly vectors)
@@ -347,26 +325,41 @@ class covarianceBase {
   //this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
   std::vector<std::string> _fFancyNames;
-  int _fNumPar;
+  /// Stores config describing systematics
   YAML::Node _fYAMLDoc;
+  /// Number of systematic parameters
+  int _fNumPar;
+  /// Parameter value dictated by the prior model. Based on it penalty term is calculated
   std::vector<double> _fPreFitValue;
+  /// Current value of the parameter
   std::vector<double> _fCurrVal;
+  /// Proposed value of the parameter
   std::vector<double> _fPropVal;
+  /// Generated value of the parameter
   std::vector<double> _fGenerated;
+  /// Prior error on the parameter
   std::vector<double> _fError;
+  /// Lowest physical bound, parameter will not be able to go beyond it
   std::vector<double> _fLowBound;
+  /// Upper physical bound, parameter will not be able to go beyond it
   std::vector<double> _fUpBound;
+  /// Individual step scale used by MCMC algorithm
   std::vector<double> _fIndivStepScale;
+  /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
 
-  //Unity for null systs to point back to
+  /// Unity for null systs to point back to
   const double Unity = 1.0;
 
   /// perform PCA or not
   bool pca;
+  /// CW: Threshold based on which we remove parameters in eigen base
   double eigen_threshold;
+  /// Number of parameters in PCA base
   int _fNumParPCA;
+  /// Index of the first param that is being decomposed
   int FirstPCAdpar;
+  /// Index of the last param that is being decomposed
   int LastPCAdpar;
   int nKeptPCApars;
   TVectorD eigen_values;
@@ -383,13 +376,14 @@ class covarianceBase {
   // Adaptive MCMC
   TMatrixDSym* throwMatrix;
   TMatrixD* throwMatrix_CholDecomp;
-  //Same as above but much faster as TMatrixDSym cache miss
+  /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double **throwMatrixCholDecomp;
 
   /// @brief HW: Truly Adaptive Stuff
   void initialiseNewAdaptiveChain();
   // TMatrixD* getMatrixSqrt(TMatrixDSym* inputMatrix);
   // double calculateSubmodality(TMatrixD* sqrtVectorCov, TMatrixDSym* throwCov);
+  /// HW: Do we use adaptive MCMC or not
   bool use_adaptive;
   int total_steps;
   int lower_adapt, upper_adapt; //Thresholds for when to turn on/off adaptive MCMC

@@ -28,7 +28,6 @@
 //KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track
 #define _nTF1Coeff_ 5
 
-
 #ifdef CUDA
 extern void SynchroniseSplines();
 #endif
@@ -95,10 +94,11 @@ class SMonolith {
     inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &nParams);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
+    /// @brief CW: The shared initialiser from constructors of TSpline3 and TSpline3_red
     inline void PrepareForGPU_TSpline3();
-
     /// @brief CW: Prepare the TF1_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
+    /// @brief CW: The shared initialiser from constructors of TF1 and TF1_red
     inline void PrepareForGPU_TF1();
         
     /// @brief CW: Reduced the TSpline3 to TSpline3_red
@@ -133,8 +133,9 @@ class SMonolith {
     /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
     /// Method identical to TSpline3::Eval(double) but faster because less operations
     FastSplineInfo *SplineInfoArray;
-    // Segments store currently found segment while vals parameter values, they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
+    /// Store currently found segment they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
     short int *segments;
+    /// Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
     float *vals;
     /// This holds pointer to parameter position which we later copy paste it to GPU
     std::vector< const double* > splineParsPointer;
@@ -159,32 +160,40 @@ class SMonolith {
     /// Sum of all knots over all splines
     unsigned int nKnots;
     
-    // Just some pointers to memory that doesn't get allocated so we can access the GPU
-    // GPU arrays to hold monolith and weights
+    /// GPU arrays to hold weight for each spline
     float *gpu_weights;
+    /// GPU arrays to hold weight for event
     float *gpu_total_weights;
-    // CPU arrays to hold monolith and weights
+    /// CPU arrays to hold weight for each spline
     float *cpu_weights_var;
     
-    /// KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+    /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent;
+    /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     unsigned int *gpu_nParamPerEvent;
 
-    // GPU arrays to hold number of points
+    /// CPU arrays to hold number of points
     std::vector<short int> cpu_nPoints_arr;
+    /// GPU arrays to hold number of points
     short int *gpu_nPoints_arr;
     //KS: Consider merging paramNo and nKnots into one consecutive array
+    /// CW: CPU array with the number of points per spline (not per spline point!)
     std::vector<short int> cpu_paramNo_arr;
+    /// CW: GPU array with the number of points per spline (not per spline point!)
     short int *gpu_paramNo_arr;
-    //KS: Number of knots per spline
+    /// KS: CPU Number of knots per spline
     std::vector<unsigned int> cpu_nKnots_arr;
+    /// KS: GPU Number of knots per spline
     unsigned int *gpu_nKnots_arr;
-    //KS: GPU arrays to hold X coefficient
+    /// KS: CPU arrays to hold X coefficient
     std::vector<float> cpu_coeff_x;
+    /// KS: GPU arrays to hold X coefficient
     float *gpu_coeff_x;
-    // GPU arrays to hold other coefficients
+    /// CPU arrays to hold other coefficients
     std::vector<float> cpu_coeff_many;
+    /// GPU arrays to hold other coefficients
     float *gpu_coeff_many;
 
+    /// Flag telling whether we are saving spline monolith into handy root file
     bool SaveSplineFile;
 };

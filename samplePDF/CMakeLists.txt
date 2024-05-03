@@ -1,9 +1,7 @@
 set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
-    interfacePDFEbE.h
     Structs.h
-    samplePDFInterface.h
     ShiftFunctors.h
     FDMCStruct.h
 )
@@ -11,7 +9,6 @@ set(HEADERS
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
-    interfacePDFEbE.cpp
     Structs.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu.cu>

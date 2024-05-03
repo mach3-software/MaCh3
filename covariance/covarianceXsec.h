@@ -28,38 +28,45 @@ class covarianceXsec : public covarianceBase {
 
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
-    int GetParDetID(const int i) const { return _fDetID[i];};
+    inline int GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
-    const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
+    inline const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
 
     /// @brief Get interpolation type vector
-    const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
+    inline const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
     /// @brief Get interpolation type for a given parameter
-    SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType.at(i);}
+    inline SplineInterpolation GetParSplineInterpolation(const int i) {return _fSplineInterpolationType.at(i);}
 
     /// @brief EM: value at which we cap spline knot weight
-    double GetParSplineKnotUpperBound(const int i) {return fSplineKnotUpBound[i];}
+    inline double GetParSplineKnotUpperBound(const int i) {return fSplineKnotUpBound[i];}
     /// @brief EM: value at which we cap spline knot weight
-    double GetParSplineKnotLowerBound(const int i) {return fSplineKnotLowBound[i];}
+    inline double GetParSplineKnotLowerBound(const int i) {return fSplineKnotLowBound[i];}
 
     /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
+    const std::vector<std::string> GetSplineParsNamesFromDetID(const int DetID);
     /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
+    const std::vector<std::string> GetSplineFileParsNamesFromDetID(const int DetID);
 
     /// ETA - what does this even do?
-    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
-    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
-    const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
-    const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
-    int GetNumSplineParamsFromDetID(int DetID);
+    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(const int DetID);
+    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(const int DetID);
+    /// @brief DB Grab the Spline Modes for the relevant DetID
+    const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
+    /// @brief DB Grab the Spline Indices for the relevant DetID
+    const std::vector<int> GetSplineParsIndexFromDetID(const int DetID);
+
+    /// @brief DB Grab the Number of splines for the relevant DetID
+    int GetNumSplineParamsFromDetID(const int DetID);
 
     /// @brief DB Get norm/func parameters depending on given DetID
-    const std::vector<XsecNorms4> GetNormParsFromDetID(int DetID);
+    const std::vector<XsecNorms4> GetNormParsFromDetID(const int DetID);
 
-    int GetNumFuncParamsFromDetID(int DetID);
-    const std::vector<std::string> GetFuncParsNamesFromDetID(int DetID);
-    const std::vector<int> GetFuncParsIndexFromDetID(int DetID);
+    /// @brief DB Grab the number of Normalisation parameters for the relevant DetID
+    int GetNumFuncParamsFromDetID(const int DetID);
+    /// @brief DB Grab the Functional parameter names for the relevant DetID
+    const std::vector<std::string> GetFuncParsNamesFromDetID(const int DetID);
+    /// @brief DB Grab the Functional parameter indices for the relevant DetID
+    const std::vector<int> GetFuncParsIndexFromDetID(const int DetID);
 
     /// KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
     /// For example Sigma Var are done around nominal in ND280, no idea why though...
@@ -74,13 +81,14 @@ class covarianceXsec : public covarianceBase {
     }
     /// @brief Get nominal for a given param
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
-   
     /// @brief Is parameter a flux param or not. This might become deprecated in future
-    bool IsParFlux(const int i){ return isFlux[i]; }
-
+    /// @warning Will become deprecated
+    inline bool IsParFlux(const int i){ return isFlux[i]; }
     /// @brief KS Function to set to nominal flux parameters
+    /// @warning Will become deprecated
     void setXsecOnlyParameters();
     /// @brief KS Function to set to nominal flux  parameters
+    /// @warning Will become deprecated
     void setFluxOnlyParameters();
     
   protected:

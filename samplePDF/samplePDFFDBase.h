@@ -23,24 +23,19 @@
 //MaCh3 includes
 #include "OscClass/OscClass_CUDAProb3.h"
 
-#include "samplePDF/interfacePDFEbE.h"
-#include "samplePDF/samplePDFBase.h"
-
-#include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
 
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
+#include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
 #include "samplePDF/ShiftFunctors.h"
-
-#include "manager/manager.h"
 
 
 #define USEBETA 0
 
-class samplePDFFDBase : virtual public samplePDFBase , virtual public interfacePDFEbE
+class samplePDFFDBase : virtual public samplePDFBase
 {
 public:
   //######################################### Functions #########################################
@@ -65,7 +60,7 @@ public:
   //===============================================================================
 
   void reweight(double *oscpar);
-  inline double GetEventWeight(int iSample, int iEntry);
+  double GetEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
   void UseNonDoubledAngles(bool ans) {doubled_angle = ans;};

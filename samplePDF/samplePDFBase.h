@@ -1,6 +1,5 @@
 #pragma once
 
-
 //C++ includes
 #include <iostream>
 #include <vector>
@@ -20,18 +19,14 @@
 #include "TString.h"
 #include "TMath.h"
 
+//MaCh3 includes
+#include "samplePDF/Structs.h"
 #include "manager/manager.h"
 
-//MaCh3 includes
-#include "samplePDF/samplePDFInterface.h"
-#include "splines/splineBase.h"
-#include "samplePDF/Structs.h"
-
-
-class samplePDFBase : public samplePDFInterface 
+class samplePDFBase
 {
  public:
-   samplePDFBase(){};
+  samplePDFBase(){};
   samplePDFBase(double pot);
 
   virtual ~samplePDFBase();
@@ -58,14 +53,12 @@ class samplePDFBase : public samplePDFInterface
   // generate fake dataset based on rejection sampling    
   std::vector< std::vector <double> > generate2D(TH2D* pdf = 0);
   std::vector<double> generate();
+  virtual void reweight(double *oscpar)=0;
   virtual double GetLikelihood() = 0;
   virtual std::vector<double>* getDataSample() {return dataSample;};
-  // nominal spectrum things
-  //  double GetLikelihoodNominal(); // computes the likelihood against a nominal spectra
-  /*  TH1D *generateNominal1D();
-  TH2D *generateNominal2D();
-  TH1D *nominalSpectrum1D; 
-  TH2D *nominalSpectrum2D;*/
+
+  virtual int getNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual int getNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
 
   void addData(std::vector<double> &dat);
   void addData(std::vector< std::vector <double> > &dat);
@@ -77,16 +70,18 @@ class samplePDFBase : public samplePDFInterface
 
   // WARNING KS: Needed for sigma var
   virtual void SetupBinning(const _int_ Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
-    (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");};
-  virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); };
-  virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");};
-  virtual TH1* getPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");};
+    (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  virtual TH1* getPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
 
-  double GetLikelihood_kernel(std::vector<double> &data);
   double getTestStatLLH(double data, double mc);
   double getTestStatLLH(const double data, const double mc, const double w2);
   // Provide a setter for the test-statistic
-  void SetTestStatistic(TestStatistic test_stat);
+  //void SetTestStatistic(TestStatistic test_stat);
+
+  virtual void fill1DHist()=0;
+  virtual void fill2DHist()=0;
 
 protected:
   void init(double pot);

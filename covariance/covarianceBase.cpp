@@ -988,11 +988,14 @@ void covarianceBase::printNominalCurrProp() {
   //std::cout << std::endl;
 }
 
+// ********************************************
 // Get the likelihood in the case where we want to include priors on the parameters
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
 double covarianceBase::CalcLikelihood() {
+// ********************************************
+
   double logL = 0.0;
   //TStopwatch clock;
   ///clock.Start();
@@ -1013,8 +1016,10 @@ double covarianceBase::CalcLikelihood() {
 
   return logL;
 }
+// ********************************************
+int covarianceBase::CheckBounds() {
+// ********************************************
 
-int covarianceBase::CheckBounds(){
   int NOutside = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:NOutside)
@@ -1026,8 +1031,10 @@ int covarianceBase::CheckBounds(){
   }
   return NOutside;
 }
+// ********************************************
+double covarianceBase::GetLikelihood() {
+// ********************************************
 
-double covarianceBase::GetLikelihood(){
   // Checkbounds and calclikelihood are virtual
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
@@ -1063,14 +1070,14 @@ void covarianceBase::setParameters(std::vector<double> pars) {
   } else {
 
 	if (pars.size() != size_t(_fNumPar)) {
-      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << _fNumPar << std::endl;
+      MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw;
     }
 
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
 	  //Make sure that you are actually passing a number to set the parameter to
-	  if(isnan(pars[i])) {
+	  if(std::isnan(pars[i])) {
 		std::cerr << "Error: trying to set parameter value to a nan for parameter " << GetParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
 		throw;
 	  } else {
@@ -1166,8 +1173,11 @@ void covarianceBase::setEvalLikelihood(int i, bool eL) {
   }
 }
 
-//KS: Custom function to perform multiplication of matrix and vector with mulithreadeing
+// ********************************************
+//KS: Custom function to perform multiplication of matrix and vector with multithreading
 void covarianceBase::MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n) {
+// ********************************************
+
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -1182,8 +1192,10 @@ void covarianceBase::MatrixVectorMulti(double* VecMulti, double** matrix, const 
   }
 }
 
-double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i)
-{
+// ********************************************
+double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i) {
+// ********************************************
+
   double Element = 0.0;
   for (int j = 0; j < Length; ++j) {
     Element += matrix[i][j]*vector[j];
@@ -1191,7 +1203,10 @@ double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* ve
   return Element;
 }
 
+// ********************************************
 void covarianceBase::setIndivStepScale(std::vector<double> stepscale) {
+// ********************************************
+
   if ((int)stepscale.size() != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
@@ -1508,6 +1523,7 @@ std::vector<double> covarianceBase::getNominalArray() {
 }
 
 // ********************************************
+// KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
 TH2D* covarianceBase::GetCorrelationMatrix() {
 // ********************************************
 

@@ -1318,8 +1318,8 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
 }
 
-inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
-  //HI : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
+double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
+  //HW : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
 	//std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;

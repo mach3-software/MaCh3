@@ -216,48 +216,6 @@ double samplePDFBase::getTestStatLLH(double data, double mc) {
     return negLogL; 
 }
 
-// this function will compute the likelihood against a nominal dataset (histogram)
-/*double samplePDFBase::GetLikelihoodNominal()
-  {
-  TH1D* pdf = get1DHist();
-  double mc = pdf->GetBinContent(i,j);
-  double dat = //dathist->GetBinContent(i,j);
-  if(mc > 0 && dat > 0)
-  {
-  negLogL += (mc - dat + dat * TMath::Log(dat/mc));// + 1 / (12 * dat) + 0.5 *  TMath::Log(2*TMath::Pi() * dat));
-  }
-  else if(mc > 0 && dat == 0)
-  negLogL += mc;
-
-  }*/
-
-double samplePDFBase::GetLikelihood_kernel(std::vector<double> &dataSet)
-{
-  // this doesnt work
-  /*  std::cout << "kernel estimation likelihood" << std::endl;
-      double sig = 0.5;
-      double sum = 0;
-      double norm = 1 / (sig * TMath::Sqrt(2*TMath::Pi()));
-
-      for(int d = 0; d < dataSet.size(); d++)
-      {
-      for(int i = 0; i < skmcSamples.size(); i ++)
-      for(int j = 0; j < skmcSamples[i].nEvents; j++)
-      {
-  //sum += TMath::Power(dataSet[d] - skmcSamples[i].rw_erec[j]);
-  sum += skmcSamples[i].pot_s * skmcSamples[i].norm_s * skmcSamples[i].osc_w[j] * skmcSamples[i].flux_w[j] * skmcSamples[i].skdet_w[j] * skmcSamples[i].energyscale_w[j] * norm * TMath::Exp(-0.5 * TMath::Power((dataSet[d] - skmcSamples[i].rw_erec[j])/sig, 2));
-  }
-  }
-  //sum /= dataSet[d];
-  //  sum /= sig * sig;
-  // sum *= -1 * dataSet[d] * skmcSamples[i].pot_s * skmcSamples[i].norm_s * skmcSamples[i].osc_w[j] * skmcSamples[i].flux_w[j] * skmcSamples[i].skdet_w[j] * skmcSamples[i].energyscale_w[j];
-  // sum += -1 * dataSet[d] * TMath::Log(sig);
-
-  std::cout << "finished." << std::endl;
-  return -1 * TMath::Log(sum); */
-  return 0;
-}
-
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
@@ -402,17 +360,19 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
   } // end switch
 }
 
+/*
 // **************************************************
 // Helper function to set LLH type used in the fit
 void samplePDFBase::SetTestStatistic(TestStatistic test_stat) {
 // **************************************************
   fTestStatistic = test_stat;
-  
+
   std::string name = TestStatistic_ToString((TestStatistic)test_stat);
   std::cout << "Using "<< name <<" likelihood in ND280" << std::endl;
   //if(UpdateW2) std::cout << "With updating W2" << std::endl;
   //else  std::cout << "Without updating W2" << std::endl;
 }
+*/
 
 void samplePDFBase::set1DBinning(int nbins, double* boundaries)
 {
