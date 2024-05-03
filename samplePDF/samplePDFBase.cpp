@@ -480,3 +480,29 @@ void samplePDFBase::GetModeName(std::vector<std::string> &modeNameVect) {
   }
 
 }
+
+// ***************************************************************************
+// CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
+void samplePDFBase::QuietPlease() {
+// ***************************************************************************
+  #if DEBUG > 0
+  return;
+  #else
+  buf = std::cout.rdbuf();
+  errbuf = std::cerr.rdbuf();
+  std::cout.rdbuf( nullptr );
+  std::cerr.rdbuf( nullptr );
+  #endif
+}
+
+// ***************************************************************************
+// CW: Reset cout and cerr
+void samplePDFBase::NowTalk() {
+// ***************************************************************************
+  #if DEBUG > 0
+  return;
+  #else
+  std::cout.rdbuf(buf);
+  std::cerr.rdbuf(errbuf);
+  #endif
+}

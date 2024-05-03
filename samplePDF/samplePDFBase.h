@@ -92,9 +92,24 @@ protected:
   void init(double pot);
   void init(double pot, std::string mc_version);
   
+  /// @brief CW: Redirect std::cout to silence some experiment specific libraries
+  void QuietPlease();
+  /// @brief CW: Redirect std::cout to silence some experiment specific libraries
+  void NowTalk();
+
+  /// Test statistic tells what kind of likelihood sample is using
+  TestStatistic fTestStatistic;
+
+  /// Keep the cout buffer
+  std::streambuf *buf;
+  /// Keep the cerr buffer
+  std::streambuf *errbuf;
+
+  // KS: Need thinking what to do with them
+
   std::vector<double>* dataSample;
   std::vector< std::vector <double> >* dataSample2D;
-   
+
   // Contains how many samples we've got
   _int_ nSamples;
   //KS: number of dimension for this sample
@@ -104,17 +119,14 @@ protected:
 
   //GetterForModes
   MaCh3_Modes* ModeStruct;
-  
+
   TH1D *dathist; // tempstore for likelihood calc
-  TH2D *dathist2d;    
-  
+  TH2D *dathist2d;
+
   // binned PDFs
   TH1D*_hPDF1D;
   TH2D*_hPDF2D;
 
   TRandom3* rnd;
   bool MCthrow;
- 
-  TestStatistic fTestStatistic;
-
 };

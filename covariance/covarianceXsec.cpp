@@ -53,7 +53,7 @@ void covarianceXsec::InitXsecFromConfig() {
 	 //Fill the map to get the correlations later as well
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
 	 int nFDSplines;
-	 //Now load in varaibles for spline systematics only
+	 //Now load in variables for spline systematics only
 	 if (ParamType.find("Spline") != std::string::npos)
      {
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
@@ -150,7 +150,7 @@ covarianceXsec::~covarianceXsec() {
 
 // ********************************************
 // DB Grab the Number of splines for the relevant DetID
-int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
+int covarianceXsec::GetNumSplineParamsFromDetID(const int DetID) {
   int returnVal = 0; 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
@@ -166,7 +166,7 @@ int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
 
 // ********************************************
 // DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int DetID) {
+const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const int DetID) {
 
   std::vector<std::string> returnVec;
 
@@ -197,7 +197,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int D
 // ETA - this is a complete fudge for now and is only here because on
 // T2K the splines at ND280 and SK have different names... 
 // this is completely temporary and will be removed in the future
-const std::vector<std::string> covarianceXsec::GetFDSplineFileParsNamesFromDetID(int DetID) {
+const std::vector<std::string> covarianceXsec::GetFDSplineFileParsNamesFromDetID(const int DetID) {
 
   std::vector<std::string> returnVec;
   int FDSplineCounter = 0;
@@ -220,7 +220,7 @@ const std::vector<std::string> covarianceXsec::GetFDSplineFileParsNamesFromDetID
 // ETA - this is another fudge for now and is only here because on
 // T2K the splines at ND280 and SK have different names... 
 // this is completely temporary and will be removed in the future
-const std::vector<std::string> covarianceXsec::GetNDSplineFileParsNamesFromDetID(int DetID) {
+const std::vector<std::string> covarianceXsec::GetNDSplineFileParsNamesFromDetID(const int DetID) {
 
   std::vector<std::string> returnVec;
   int NDSplineCounter = 0;
@@ -240,7 +240,7 @@ const std::vector<std::string> covarianceXsec::GetNDSplineFileParsNamesFromDetID
 
 // ********************************************
 // DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(int DetID) {
+const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(const int DetID) {
   std::vector<std::string> returnVec;
 
   int FDSplineCounter = 0;
@@ -267,7 +267,7 @@ const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(i
 
 // ********************************************
 // DB Grab the Spline Modes for the relevant DetID
-const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(int DetID) {
+const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(const int DetID) {
   std::vector< std::vector<int> > returnVec;
 
   //Need a counter or something to correctly get the index in _fFDSplineModes since it's not of length nPars
@@ -288,7 +288,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
 
 // ********************************************
 // DB Grab the Spline Indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
+const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(const int DetID) {
   std::vector<int> returnVec;
 
   for (int i = 0; i < _fNumPar; ++i) {
@@ -344,11 +344,11 @@ void covarianceXsec::SetupNormPars(){
 		  //Push back with the bounds for the kinematic cut
           norm.Selection.push_back(_fKinematicBounds.at(i).at(KinematicCut_i));
 		}
-		norm.hasKinBounds=HasKinBounds;
+		norm.hasKinBounds = HasKinBounds;
 		//End of kinematic bound checking
 
 		// Set the global parameter index of the normalisation parameter
-		norm.index=i;
+		norm.index = i;
 		//Add this parameter to the vector of parameters
 		NormParams.push_back(norm);
 		norm_counter++;
@@ -363,7 +363,7 @@ void covarianceXsec::SetupNormPars(){
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
 // ETA - I think this doesn't need to be the same as scanParameters, haven't we already got this info??
-const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
+const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const int DetID) {
   std::vector<XsecNorms4> returnVec;
   int norm_counter = 0;
 
@@ -408,7 +408,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 		//End of kinematic bound checking
 
 		// Set the global parameter index of the normalisation parameter
-		norm.index=i;
+		norm.index = i;
 		//Add this parameter to the vector of parameters
 		returnVec.push_back(norm);
 	  }
@@ -422,7 +422,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(int DetID) {
 
 // ********************************************
 // DB Grab the number of Normalisation parameters for the relevant DetID
-int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
+int covarianceXsec::GetNumFuncParamsFromDetID(const int DetID) {
   int returnVal = 0;
 
   for (int i = 0; i < _fNumPar; ++i) {
@@ -439,7 +439,7 @@ int covarianceXsec::GetNumFuncParamsFromDetID(int DetID) {
 
 // ********************************************
 // DB Grab the Functional parameter names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(int DetID) {
+const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(const int DetID) {
   std::vector<std::string> returnVec;
 
   for (int i = 0; i < _fNumPar; ++i) {
@@ -456,11 +456,10 @@ const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(int Det
 
 // ********************************************
 // DB Grab the Functional parameter indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(int DetID) {
+const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(const int DetID) {
   std::vector<int> returnVec;
 
   for (int i = 0; i < _fNumPar; ++i) {
-	//std::cout << "TRYING TO SETUP FUNCTIONAL PARAMETER for " << i << " which is of type " << GetParamType(i) << std::endl;
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
       if (strcmp(GetParamType(i), "Functional") == 0) { //If parameter is implemented as a functional param
 		//std::cout << "Found Functional parameter" << std::endl;
@@ -474,7 +473,7 @@ const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(int DetID) {
 // ********************************************
 
 // ********************************************
-void covarianceXsec::initParams(double fScale) {
+void covarianceXsec::initParams(const double fScale) {
   // ********************************************
 
   for (int i = 0; i < _fNumPar; ++i) {
@@ -519,23 +518,23 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("#################################################");
   MACH3LOG_INFO("Printing covarianceXsec:");
 
-  MACH3LOG_INFO("=====================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10} {:2} {:<10} {:2} {:<15} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID");
-  MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------------------");
+  MACH3LOG_INFO("=====================================================================================================================================================");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<15} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID");
+  MACH3LOG_INFO("-----------------------------------------------------------------------------------------------------------------------------------------------------");
 
   for (int i = 0; i < GetNumParams(); i++) {
-    MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10} {:2} {:<10} {:2} {:<15} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + std::to_string(_fError[i]), "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i]);
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<15} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + std::to_string(_fError[i]), "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i]);
   }
 
-  MACH3LOG_INFO("=====================================================================================================================================");
+  MACH3LOG_INFO("=====================================================================================================================================================");
 
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
 
   //KS: Consider making some class producing table..
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────┬──────────┬──────────┬──────────┐");
-  MACH3LOG_INFO("│#   │Global #  │Name                │Int. mode │Target    │pdg       │");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────┼──────────┼──────────┼──────────┤");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬──────────┬──────────┬──────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:10}│{4:10}│{5:10}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼──────────┼──────────┼──────────┤");
 
   for (unsigned int i = 0; i < NormParams.size(); ++i)
   {
@@ -560,9 +559,9 @@ void covarianceXsec::Print() {
     }
     if (NormParams[i].pdgs.empty()) pdgString += "all";
 
-    MACH3LOG_INFO("│{: <4}│{: <10}│{: <20}│{: <10}│{: <10}│{: <10}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <10}│{: <10}│{: <10}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────┴──────────┴──────────┴──────────┘");
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴──────────┴──────────┴──────────┘");
 
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
@@ -573,15 +572,15 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
 
 
-  MACH3LOG_INFO("===============================================================================================================================");
-  MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2} {:<30} {:<2} {:<30} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Lower Bound", "|", "Upper Bound", "|");
-  MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------------");
+  MACH3LOG_INFO("=========================================================================================================================");
+  MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
+  MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------");
   for (unsigned int i = 0; i < SplineParsIndex.size(); ++i) {
-    MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2} {:<30} {:<2} {:<30} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|",
+    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|",
                   SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])), "|",
                   fSplineKnotLowBound[i], "|", fSplineKnotUpBound[i], "|");
   }
-  MACH3LOG_INFO("===============================================================================================================================");
+  MACH3LOG_INFO("=========================================================================================================================");
 
   std::vector<int> FuncParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
@@ -590,14 +589,13 @@ void covarianceXsec::Print() {
   }
 
   MACH3LOG_INFO("Functional parameters: {}", FuncParsIndex.size());
-  MACH3LOG_INFO("=================================");
-  MACH3LOG_INFO("{0:4} {1:2} {2:10}", "#", "|", "Name");
-  MACH3LOG_INFO("---------------------------------");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
   for (unsigned int i = 0; i < FuncParsIndex.size(); ++i) {
-    MACH3LOG_INFO("{0:4} {1:2} {2:10}", std::to_string(i), "|", GetParFancyName(FuncParsIndex[i]));
+      MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(i), FuncParsIndex[i], GetParFancyName(FuncParsIndex[i]));
   }
-  MACH3LOG_INFO("=================================");
-
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
 } // End
 
 // ********************************************

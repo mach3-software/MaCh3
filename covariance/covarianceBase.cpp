@@ -394,11 +394,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
     _fUpBound[i] = TempBoundsVec[1];
 
     //ETA - now for parameters which are optional and have default values
-    if (param["Systematic"]["FlatPrior"]) {
-      _fFlatPrior[i] = param["Systematic"]["FlatPrior"].as<bool>();
-    } else {
-      _fFlatPrior[i] = false;
-    }
+    _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false);
 
     //Fill the map to get the correlations later as well
     CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
@@ -447,7 +443,7 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
         MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[i], key);
         exit(5);
       }
-      (*_fCovMatrix)(i,index)= (*_fCovMatrix)(index,i) = Corr1*_fError[i]*_fError[index];
+      (*_fCovMatrix)(i, index)= (*_fCovMatrix)(index, i) = Corr1*_fError[i]*_fError[index];
     }
   }
 
@@ -1066,8 +1062,8 @@ void covarianceBase::setParameters(std::vector<double> pars) {
     // If not empty, set the parameters to the specified
   } else {
 
-	if (pars.size() != size_t(size)) {
-      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
+	if (pars.size() != size_t(_fNumPar)) {
+      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << _fNumPar << std::endl;
       throw;
     }
 
@@ -1132,7 +1128,7 @@ void covarianceBase::toggleFixAllParameters() {
 void covarianceBase::toggleFixParameter(const int i) {
 // ********************************************
   if(!pca) {
-	if (i > size) {
+	if (i > _fNumPar) {
       MACH3LOG_ERROR("Can't toggleFixParameter for parameter {} because size of covariance ={}", i, _fNumPar);
       MACH3LOG_ERROR("Fix this in your config file please!");
 	  throw;
@@ -1160,7 +1156,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 void covarianceBase::setEvalLikelihood(int i, bool eL) {
 
   std::cout << "covarianceBase::setEvalLikelihood set to " << eL << std::endl;
-  if (i > size) {
+  if (i > _fNumPar) {
     std::cerr << "Can't setEvalLikelihood for " << getName() << "_" << i << " because size of covarianceXsec2015 = " << _fNumPar << std::endl;
     MACH3LOG_ERROR("Fix this in your config file please!");
     throw;
@@ -1578,7 +1574,7 @@ void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym subma
 
   bool PlotText = true;
   //KS: If we have more than 200 plot becomes unreadable :(
-  if(size > 200) PlotText = false;
+  if(_fNumPar > 200) PlotText = false;
 
   TH1D* heigen_values = new TH1D("eigen_values", "Eigen Values", (int)eigen_values.GetNrows(), 0.0, (int)eigen_values.GetNrows());
   TH1D* heigen_cumulative = new TH1D("heigen_cumulative", "heigen_cumulative", (int)eigen_values.GetNrows(), 0.0, (int)eigen_values.GetNrows());
