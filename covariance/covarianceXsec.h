@@ -37,6 +37,11 @@ class covarianceXsec : public covarianceBase {
     /// @brief Get interpolation type for a given parameter
     SplineInterpolation GetParSplineInterpolation(int i) {return _fSplineInterpolationType.at(i);}
 
+    /// @brief EM: value at which we cap spline knot weight
+    double GetParSplineKnotUpperBound(const int i) {return fSplineKnotUpBound[i];}
+    /// @brief EM: value at which we cap spline knot weight
+    double GetParSplineKnotLowerBound(const int i) {return fSplineKnotLowBound[i];}
+
     /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
     /// @brief DB Get spline parameters depending on given DetID
@@ -102,6 +107,11 @@ class covarianceXsec : public covarianceBase {
     std::vector<std::vector<int>> _fFDSplineModes;
     /// Spline interpolation vector
     std::vector<SplineInterpolation> _fSplineInterpolationType;
+
+    /// EM: Cap spline knot lower value
+    std::vector<double> fSplineKnotLowBound;
+    /// EM: Cap spline knot higher value
+    std::vector<double> fSplineKnotUpBound;
 
     /// Information to be able to apply generic cuts
     std::vector<std::vector<std::string>> _fKinematicPars;

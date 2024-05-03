@@ -54,8 +54,8 @@ void covarianceXsec::InitXsecFromConfig() {
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
 	 int nFDSplines;
 	 //Now load in varaibles for spline systematics only
-	 if (ParamType.find("Spline") != std::string::npos) {
-
+	 if (ParamType.find("Spline") != std::string::npos)
+     {
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
 		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
 		 nFDSplines++;
@@ -67,62 +67,36 @@ void covarianceXsec::InitXsecFromConfig() {
 
       if (param["Systematic"]["SplineInformation"]["NDSplineName"]) {
         _fNDSplineNames.push_back(param["Systematic"]["SplineInformation"]["NDSplineName"].as<std::string>());
-        //MASSIVE HACKK!!! This only works because we only need the interpolation type at the ND
-        //Now get the Spline interpolation type
-        if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
-          for(int InterpType = 0; InterpType < kSplineInterpolations ; InterpType++){
-            if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
-            {
-              _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
-            }
+      }
+
+      //Now get the Spline interpolation type
+      if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
+        for(int InterpType = 0; InterpType < kSplineInterpolations ; InterpType++){
+          if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
+          {
+            _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
           }
         }
-        //KS: By default use TSpline3
-        else
-        {
-          _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
-        }
+      } else { //KS: By default use TSpline3
+        _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
       }
+
+      fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
+      fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
 
 	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
  
-	   //Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
+	   // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
+       // ETA Has to be of size 0 to mean apply to all
 	   std::vector<int> DummyModeVec;
-	   //Ultimately all thsi information ends up in the NormParams vector
+	   //Ultimately all this information ends up in the NormParams vector
 
-	   // Set the target of the normalisation parameter
-	   if(param["Systematic"]["TargetNuclei"]){
-		 _fTargetNuclei.push_back(param["Systematic"]["TargetNuclei"].as<std::vector<int>>());
-	   } else{
-		 //Has to be of size 0 to mean apply to all
-		 _fTargetNuclei.push_back(DummyModeVec);
-	   }
-
-	   // Set the neutrino flavours to apply to 
-	   if(param["Systematic"]["NeutrinoFlavour"]){
-		 _fNeutrinoFlavour.push_back(param["Systematic"]["NeutrinoFlavour"].as<std::vector<int>>());
-	   } else{
-		 //Has to be of size 0 to mean apply to all
-		 _fNeutrinoFlavour.push_back(DummyModeVec);
-	   }
-
-	   // Set the unoscillated neutrino flavours to apply to which is often used for flux systs 
-	   if(param["Systematic"]["NeutrinoFlavourUnosc"]){
-		 _fNeutrinoFlavourUnosc.push_back(param["Systematic"]["NeutrinoFlavourUnosc"].as<std::vector<int>>());
-	   } else{
-		 //Has to be of size 0 to mean apply to all
-		 _fNeutrinoFlavourUnosc.push_back(DummyModeVec);
-	   }
-
-	   //First check to see if we have specified a mode
-	   //std::cout << "Found a norm parameter at " << i << std::endl;
-	   if(param["Systematic"]["Mode"]){
-		 _fNormModes.push_back(param["Systematic"]["Mode"].as<std::vector<int>>());
-	   } else{
-		 //Has to be of size 0 to mean apply to all
-		 _fNormModes.push_back(DummyModeVec);
-	   }
-	 }
+        // Set the target of the normalisation parameter
+       _fTargetNuclei.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["TargetNuclei"], DummyModeVec));
+       _fNeutrinoFlavour.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["NeutrinoFlavour"], DummyModeVec));
+       _fNeutrinoFlavourUnosc.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["NeutrinoFlavourUnosc"], DummyModeVec));
+       _fNormModes.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["Mode"], DummyModeVec));
+      }
      else if(param["Systematic"]["Type"].as<std::string>() == "Functional"){
 	   //std::cout << "Found a functional parameter!!" << std::endl;
 	    
@@ -599,13 +573,15 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
 
 
-  MACH3LOG_INFO("=====================================================");
-  MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|");
-  MACH3LOG_INFO("-----------------------------------------------------");
+  MACH3LOG_INFO("===============================================================================================================================");
+  MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2} {:<30} {:<2} {:<30} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Lower Bound", "|", "Upper Bound", "|");
+  MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------------");
   for (unsigned int i = 0; i < SplineParsIndex.size(); ++i) {
-    MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|", SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])), "|");
+    MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2} {:<30} {:<2} {:<30} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|",
+                  SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])), "|",
+                  fSplineKnotLowBound[i], "|", fSplineKnotUpBound[i], "|");
   }
-  MACH3LOG_INFO("=====================================================");
+  MACH3LOG_INFO("===============================================================================================================================");
 
   std::vector<int> FuncParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
