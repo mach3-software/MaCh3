@@ -7,6 +7,7 @@
 
 //MaCh3 included
 #include "manager/gpuUtils.cu"
+#include "splines/SplineStructs.h"
 
 // Hard code the number of splines
 // Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
@@ -19,10 +20,6 @@
 #define __N_SPLINES__ 160
 #pragma message("using default N splines")
 #endif
-
-/// KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
-#define _nCoeff_ 4
-
 
 // ******************************************
 // CONSTANTS

@@ -1,14 +1,11 @@
 #pragma once
 
-#ifndef _BAD_SPLINE_
-#define _BAD_SPLINE_ 123456789
-#endif
-
 //ROOT
 #include "TH3F.h"
 
 //MaCh3
 #include "covariance/covarianceXsec.h"
+#include "splines/SplineStructs.h"
 
 class splineFDBase
 {
@@ -122,7 +119,4 @@ class splineFDBase
 
 	std::vector<double> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;
-
-	//Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
-	enum SplineSegmentCoeffs{kCoeffY=0, kCoeffB=1, kCoeffC=2, kCoeffD=3};
 };

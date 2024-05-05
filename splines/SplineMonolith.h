@@ -22,11 +22,7 @@
 // MaCh3  includes
 #include "samplePDF/Structs.h"
 #include "manager/MaCh3Logger.h"
-
-//KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
-#define _nCoeff_ 4
-//KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track
-#define _nTF1Coeff_ 5
+#include "splines/SplineStructs.h"
 
 #ifdef CUDA
 extern void SynchroniseSplines();
