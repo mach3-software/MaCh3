@@ -27,7 +27,7 @@
 // **************************************************
 
 // **************************************************
-/// Check for a safe call on GPU
+/// @brief Check for a safe call on GPU
 inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
 // **************************************************
 #ifdef CUDA_ERROR_CHECK
@@ -40,7 +40,7 @@ inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
 }
 
 // **************************************************
-/// Check if there's been an error
+/// @brief Check if there's been an error
 inline void __cudaCheckError( const char *file, const int line ) {
 // **************************************************
 #ifdef CUDA_ERROR_CHECK
@@ -66,7 +66,7 @@ inline void __cudaCheckError( const char *file, const int line ) {
 // *******************************************
 
 // *******************************************
-/// KS: Get some fancy info about VRAM usage
+/// @brief KS: Get some fancy info about VRAM usage
 inline void checkGpuMem() {
 // *******************************************
 
@@ -74,6 +74,7 @@ inline void checkGpuMem() {
   size_t free_t, total_t;
 
   cudaMemGetInfo(&free_t, &total_t);
+  CudaCheckError();
 
   free_m = (uint)free_t/1048576.0;
   total_m = (uint)total_t/1048576.0;
@@ -83,12 +84,42 @@ inline void checkGpuMem() {
 }
 
 // *******************************************
-/// KS: Get some fancy info about GPU
+/// @brief KS: Get some fancy info about GPU
 inline void PrintNdevices() {
 // *******************************************
 
   int nDevices;
   cudaGetDeviceCount(&nDevices);
+  CudaCheckError();
 
   printf("  Found %i GPUs, currently I only support one GPU\n", nDevices);
+}
+
+
+// *******************************************
+/// @brief KS: Completely clean GPU, this is time consuming and may lead to unexpected behaviour.
+inline void ResetDevice() {
+// *******************************************
+
+  cudaDeviceReset();
+  CudaCheckError();
+}
+
+
+// *******************************************
+inline void SetDevice(const int deviceId) {
+// *******************************************
+
+  // Check if the device ID is valid
+  int deviceCount;
+  cudaGetDeviceCount(&deviceCount);
+  if (deviceId < 0 || deviceId >= deviceCount) {
+    printf("Invalid device ID: %i \n", deviceId);
+    throw;
+  }
+
+  cudaSetDevice(deviceId);
+  CudaCheckError();
+  printf("GPU device set to ID: %i \n", deviceId);
+
 }
