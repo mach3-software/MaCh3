@@ -1369,8 +1369,9 @@ void covarianceBase::useSeparateThrowMatrix(TString throwMatrixFileName, TString
   }
 
   adaptiveCovariance = (TMatrixDSym*)tmp_throwMatrix->Clone();
-  for(int iMean=0; iMean<tmp_meansvec->GetNrows(); iMean++){
-      par_means.push_back((*tmp_meansvec)(iMean));
+  par_means.resize(tmp_meansvec->GetNrows());
+  for(int iMean = 0; iMean < tmp_meansvec->GetNrows(); iMean++){
+      par_means[iMean] = (*tmp_meansvec)(iMean);
       updateThrowMatrix(adaptiveCovariance);
   }
   delete tmp_throwMatrix;

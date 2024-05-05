@@ -40,6 +40,15 @@ void covarianceXsec::InitXsecFromConfig() {
   //for a particular kinematic variables
   _fKinematicBounds = std::vector<std::vector<std::vector<double>>>(_fNumPar);
 
+  //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
+  _fSplineInterpolationType.reserve(_fNumPar);
+  _fTargetNuclei.reserve(_fNumPar);
+  _fNeutrinoFlavour.reserve(_fNumPar);
+  _fNeutrinoFlavourUnosc.reserve(_fNumPar);
+  _fNormModes.reserve(_fNumPar);
+  _fSplineKnotUpBound.reserve(_fNumPar);
+  _fSplineKnotLowBound.reserve(_fNumPar);
+
   int i = 0;
 
   //ETA - read in the systematics. Would be good to add in some checks to make sure
@@ -71,18 +80,16 @@ void covarianceXsec::InitXsecFromConfig() {
 
       //Now get the Spline interpolation type
       if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
-        for(int InterpType = 0; InterpType < kSplineInterpolations ; InterpType++){
+        for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
           if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
-          {
             _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
-          }
         }
       } else { //KS: By default use TSpline3
         _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
       }
 
-      fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
-      fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
+      _fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
+      _fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
 
 	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
  
@@ -138,6 +145,14 @@ void covarianceXsec::InitXsecFromConfig() {
 	 i++;
   }
 
+
+  _fSplineInterpolationType.shrink_to_fit();
+  _fTargetNuclei.shrink_to_fit();
+  _fNeutrinoFlavour.shrink_to_fit();
+  _fNeutrinoFlavourUnosc.shrink_to_fit();
+  _fNormModes.shrink_to_fit();
+  _fSplineKnotUpBound.shrink_to_fit();
+  _fSplineKnotLowBound.shrink_to_fit();
   return;
 }
 
@@ -169,7 +184,7 @@ int covarianceXsec::GetNumSplineParamsFromDetID(const int DetID) {
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const int DetID) {
 
   std::vector<std::string> returnVec;
-
+  returnVec.reserve(_fNumPar);
   int nd_counter = 0;
   //int counter = 0;
   for (int i = 0; i < _fNumPar; ++i) {
@@ -188,6 +203,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
       }
     }
   }
+  returnVec.shrink_to_fit();
 
   return returnVec;
 }
@@ -518,15 +534,14 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("#################################################");
   MACH3LOG_INFO("Printing covarianceXsec:");
 
-  MACH3LOG_INFO("=====================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<15} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID");
-  MACH3LOG_INFO("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-
+  MACH3LOG_INFO("============================================================================================================================================================");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
+  MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<15} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + std::to_string(_fError[i]), "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i]);
+    std::string ErrString = fmt::format("{:.4f}", _fError[i]);
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", _fParamType[i]);
   }
-
-  MACH3LOG_INFO("=====================================================================================================================================================");
+  MACH3LOG_INFO("============================================================================================================================================================");
 
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
@@ -578,7 +593,7 @@ void covarianceXsec::Print() {
   for (unsigned int i = 0; i < SplineParsIndex.size(); ++i) {
     MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|",
                   SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])), "|",
-                  fSplineKnotLowBound[i], "|", fSplineKnotUpBound[i], "|");
+                  _fSplineKnotLowBound[i], "|", _fSplineKnotUpBound[i], "|");
   }
   MACH3LOG_INFO("=========================================================================================================================");
 
