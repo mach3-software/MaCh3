@@ -1,7 +1,6 @@
 // C i/o  for printf and others
 #include <stdio.h>
 #include <vector>
-#include <iostream>
 
 // CUDA specifics
 
@@ -94,7 +93,7 @@ inline void PrintNdevices() {
   CudaCheckError();
 
   if (nDevices == 0) {
-    std::cerr << "No CUDA devices found!" << std::endl;
+    printf("No CUDA devices found");
     throw;
   }
 
@@ -140,7 +139,7 @@ inline void GetNumGPUThreads(const int Device = 0) {
   cudaGetDeviceCount(&deviceCount);
 
   if (deviceCount == 0) {
-    std::cerr << "No CUDA devices found" << std::endl;
+    printf("No CUDA devices found");
     throw;
   }
 

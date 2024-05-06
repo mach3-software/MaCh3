@@ -14,10 +14,10 @@
 // EM: for OA2022:
 #ifdef NSPLINES_ND280
 #pragma message("using User Specified N splines")
-#define __N_SPLINES__ NSPLINES_ND280
+#define _N_SPLINES_ NSPLINES_ND280
 // EM: for OA2024:
 #else
-#define __N_SPLINES__ 160
+#define _N_SPLINES_ 160
 #pragma message("using default N splines")
 #endif
 
@@ -76,8 +76,8 @@ __device__ __constant__ short int d_spline_size;
 __device__ __constant__ int d_n_events;
 #endif
 /// CW: Constant memory needs to be hard-coded on compile time. Could make this texture memory instead, but don't care enough right now...
-__device__ __constant__ float val_gpu[__N_SPLINES__];
-__device__ __constant__ short int segment_gpu[__N_SPLINES__];
+__device__ __constant__ float val_gpu[_N_SPLINES_];
+__device__ __constant__ short int segment_gpu[_N_SPLINES_];
 
 // h_NAME declares HOST constants (live on CPU)
 static short int h_spline_size  = -1;
@@ -227,7 +227,7 @@ __host__ void InitGPU_Segments(short int **segment) {
 // *******************************************
 
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
-  cudaMallocHost((void **) segment, __N_SPLINES__*sizeof(short int));
+  cudaMallocHost((void **) segment, _N_SPLINES_*sizeof(short int));
   CudaCheckError();
 }
 
@@ -237,7 +237,7 @@ __host__ void InitGPU_Vals(float **vals) {
 // *******************************************
 
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
-  cudaMallocHost((void **) vals, __N_SPLINES__*sizeof(float));
+  cudaMallocHost((void **) vals, _N_SPLINES_*sizeof(float));
   CudaCheckError();
 }
 
@@ -269,8 +269,8 @@ __host__ void CopyToGPU_SepMany(
                             unsigned int n_splines,
                             short int spline_size,
                             unsigned int sizeof_array) {
-  if (n_params != __N_SPLINES__) {
-    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", __N_SPLINES__);
+  if (n_params != _N_SPLINES_) {
+    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", _N_SPLINES_);
     printf("n_params = %i\n", n_params);
     printf("%s : %i\n", __FILE__, __LINE__);
     exit(-1);
@@ -373,8 +373,8 @@ __host__ void CopyToGPU_TF1(
                             unsigned int n_splines,
                             short int _max_knots) {
 
-  if (n_params != __N_SPLINES__) {
-    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", __N_SPLINES__);
+  if (n_params != _N_SPLINES_) {
+    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", _N_SPLINES_);
     printf("n_params = %i\n", n_params);
     printf("%s : %i\n", __FILE__, __LINE__);
     exit(-1);
