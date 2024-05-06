@@ -1,6 +1,7 @@
 set(HEADERS
     splineFDBase.h
     SplineMonolith.h
+    SplineCommon.h
     SplineStructs.h
 )
 

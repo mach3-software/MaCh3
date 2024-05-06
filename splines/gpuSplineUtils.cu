@@ -7,7 +7,7 @@
 
 //MaCh3 included
 #include "manager/gpuUtils.cu"
-#include "splines/SplineStructs.h"
+#include "splines/SplineCommon.h"
 
 // Hard code the number of splines
 // Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
@@ -19,6 +19,50 @@
 #else
 #define __N_SPLINES__ 160
 #pragma message("using default N splines")
+#endif
+
+
+// KS: Forgive me father, for I have sinned.
+#if defined(__CUDA_ARCH__)
+  #if __CUDA_ARCH__ >= 1200
+    #pragma message("Compiling with CUDA Architecture: 12.x")
+  #elif __CUDA_ARCH__ >= 1100
+    #pragma message("Compiling with CUDA Architecture: 11.x")
+  #elif __CUDA_ARCH__ >= 1000
+    #pragma message("Compiling with CUDA Architecture: 10.x")
+  #elif __CUDA_ARCH__ >= 900
+    #pragma message("Compiling with CUDA Architecture: 9.x")
+  #elif __CUDA_ARCH__ >= 800
+    #pragma message("Compiling with CUDA Architecture: 8.x")
+  #elif __CUDA_ARCH__ >= 750
+    #pragma message("Compiling with CUDA Architecture: 7.5")
+  #elif __CUDA_ARCH__ >= 730
+    #pragma message("Compiling with CUDA Architecture: 7.3")
+  #elif __CUDA_ARCH__ >= 720
+    #pragma message("Compiling with CUDA Architecture: 7.2")
+  #elif __CUDA_ARCH__ >= 710
+    #pragma message("Compiling with CUDA Architecture: 7.1")
+  #elif __CUDA_ARCH__ >= 700
+    #pragma message("Compiling with CUDA Architecture: 7.x")
+  #elif __CUDA_ARCH__ >= 650
+    #pragma message("Compiling with CUDA Architecture: 6.5")
+  #elif __CUDA_ARCH__ >= 600
+    #pragma message("Compiling with CUDA Architecture: 6.x")
+  #elif __CUDA_ARCH__ >= 530
+    #pragma message("Compiling with CUDA Architecture: 5.3")
+  #elif __CUDA_ARCH__ >= 520
+    #pragma message("Compiling with CUDA Architecture: 5.2")
+  #elif __CUDA_ARCH__ >= 510
+    #pragma message("Compiling with CUDA Architecture: 5.1")
+  #elif __CUDA_ARCH__ >= 500
+    #pragma message("Compiling with CUDA Architecture: 5.x")
+  #elif __CUDA_ARCH__ >= 400
+    #pragma message("Compiling with CUDA Architecture: 4.x")
+  #elif __CUDA_ARCH__ >= 300
+    #pragma message("Compiling with CUDA Architecture: 3.x")
+  #else
+    #pragma message("Compiling with CUDA Architecture: < 3.x")
+  #endif
 #endif
 
 // ******************************************
@@ -519,7 +563,7 @@ __global__ void EvalOnGPU_TotWeight(
 //*********************************************************
   const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
   //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
-  __shared__ float shared_total_weights[__BlockSize__];
+  __shared__ float shared_total_weights[_BlockSize_];
   if(EventNum < d_n_events) //stopping condition
   {
     shared_total_weights[threadIdx.x] = 1.f;
@@ -565,7 +609,7 @@ __host__ void RunGPU_SepMany(
   dim3 block_size;
   dim3 grid_size;
 
-  block_size.x = __BlockSize__;
+  block_size.x = _BlockSize_;
   grid_size.x = (h_n_splines / block_size.x) + 1;
 
   // Copy the segment values to the GPU (segment_gpu), which is h_n_params long
@@ -670,7 +714,7 @@ __host__ void RunGPU_TF1(
   dim3 block_size;
   dim3 grid_size;
 
-  block_size.x = __BlockSize__;
+  block_size.x = _BlockSize_;
   grid_size.x = (h_n_splines / block_size.x) + 1;
 
   // Copy the parameter values values to the GPU (vals_gpu), which is h_n_params long

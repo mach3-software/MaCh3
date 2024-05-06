@@ -1,6 +1,7 @@
 // C i/o  for printf and others
 #include <stdio.h>
 #include <vector>
+#include <iostream>
 
 // CUDA specifics
 
@@ -16,7 +17,7 @@
 #define CudaCheckError()  __cudaCheckError(__FILE__, __LINE__)
 
 /// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
-#define __BlockSize__ 1024
+#define _BlockSize_ 1024
 
 // CUDA_ERROR_CHECK is now defined in the makefile instead
 //#define CUDA_ERROR_CHECK
@@ -92,6 +93,11 @@ inline void PrintNdevices() {
   cudaGetDeviceCount(&nDevices);
   CudaCheckError();
 
+  if (nDevices == 0) {
+    std::cerr << "No CUDA devices found!" << std::endl;
+    throw;
+  }
+
   printf("  Found %i GPUs, currently I only support one GPU\n", nDevices);
 }
 
@@ -107,6 +113,7 @@ inline void ResetDevice() {
 
 
 // *******************************************
+/// @brief Only useful if using multiple GPU
 inline void SetDevice(const int deviceId) {
 // *******************************************
 
@@ -122,4 +129,26 @@ inline void SetDevice(const int deviceId) {
   CudaCheckError();
   printf("GPU device set to ID: %i \n", deviceId);
 
+}
+
+// *******************************************
+/// @brief Get number of GPU threads for currently used GPU
+inline void GetNumGPUThreads(const int Device = 0) {
+// *******************************************
+
+  int deviceCount;
+  cudaGetDeviceCount(&deviceCount);
+
+  if (deviceCount == 0) {
+    std::cerr << "No CUDA devices found" << std::endl;
+    throw;
+  }
+
+  cudaDeviceProp deviceProp;
+  cudaGetDeviceProperties(&deviceProp, Device);
+
+  // Define the number of threads per block
+  int nThreadsBlocks = (deviceProp.multiProcessorCount * deviceProp.maxThreadsPerMultiProcessor);
+
+  printf("Currently used GPU has : %i threads \n", nThreadsBlocks);
 }

@@ -20,9 +20,9 @@
 #endif
 
 // MaCh3  includes
-#include "samplePDF/Structs.h"
 #include "manager/MaCh3Logger.h"
 #include "splines/SplineStructs.h"
+#include "splines/SplineCommon.h"
 
 #ifdef CUDA
 extern void SynchroniseSplines();

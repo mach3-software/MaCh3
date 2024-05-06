@@ -3,9 +3,9 @@
 //ROOT
 #include "TH3F.h"
 
-//MaCh3
-#include "covariance/covarianceXsec.h"
+// MaCh3  includes
 #include "splines/SplineStructs.h"
+#include "splines/SplineCommon.h"
 
 class splineFDBase
 {

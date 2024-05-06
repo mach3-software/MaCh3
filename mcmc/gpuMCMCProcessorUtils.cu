@@ -127,8 +127,8 @@ __global__ void EvalOnGPU_AutoCorr(
   const unsigned int CurrentLagNum = (blockIdx.x * blockDim.x + threadIdx.x);
 
   //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
-  __shared__ float shared_NumeratorSum[__BlockSize__];
-  __shared__ float shared_DenomSum[__BlockSize__];
+  __shared__ float shared_NumeratorSum[_BlockSize_];
+  __shared__ float shared_DenomSum[_BlockSize_];
 
   // this is the stopping condition!
   if (CurrentLagNum < d_nLag*d_nDraws)
@@ -180,7 +180,7 @@ __host__ void RunGPU_AutoCorr(
   dim3 block_size;
   dim3 grid_size;
 
-  block_size.x = __BlockSize__;
+  block_size.x = _BlockSize_;
   grid_size.x = (h_nLag*h_nDraws / block_size.x) + 1;
 
   EvalOnGPU_AutoCorr<<<grid_size, block_size>>>(

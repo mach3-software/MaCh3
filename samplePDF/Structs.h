@@ -53,7 +53,7 @@
 #endif
 
 // *******************
-/// Template to make vector out of an array of any length
+/// @brief Template to make vector out of an array of any length
 template< typename T, size_t N >
 std::vector<T> MakeVector( const T (&data)[N] ) {
 // *******************
@@ -101,91 +101,6 @@ class XsecNorms4 {
 	
     /// Parameter number of this normalisation in current systematic model
     int index;
-};
-
-// *******************
-/// CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
-struct FastSplineInfo {
-// *******************
-  // Number of points in spline
-  _int_ nPts;
-
-  // Array of the knots positions
-  _float_ *xPts;
-
-  // Array of what segment of spline we're currently interested in
-  // Gets updated once per MCMC iteration
-  _int_ CurrSegment;
-  
-  // Array of the knots positions
-  const double* splineParsPointer;
-};
-
-// ********************************************
-/// CW: Generic xsec class
-/// Can use TF1 or TSpline3 or TSpline5 here, tjoho
-template <class T>
-class XSecStruct{
-  // ********************************************
-  public:
-    /// The light constructor
-    XSecStruct(_int_ NumberOfSplines) {
-      nParams = NumberOfSplines;
-      Func.reserve(nParams);
-      for (int i = 0; i < nParams; ++i) {
-        Func[i] = NULL;
-      }
-    }
-
-    /// The empty constructor
-    XSecStruct() {
-      nParams = 0;
-      Func = NULL;
-    };
-
-    /// The light destructor
-    ~XSecStruct() {
-      for (int i = 0; i < nParams; ++i) {
-        if (Func[i]) delete Func[i];
-      }
-    }
-
-    /// Get number of splines
-    inline _int_ GetNumberOfParams() { return nParams; }
-
-    /// The Printer
-    inline void Print() {
-      std::cout << "    Splines: " << std::endl;
-      for (int i = 0; i < nParams; ++i) {
-        if (!Func[i]) continue;
-        std::cout << "    " << std::left << std::setw(25) << Func[i]->GetName() << std::endl;
-      }
-    }
-
-    /// Set the number of splines for this event
-    inline void SetSplineNumber(_int_ NumberOfSplines) {
-      nParams = NumberOfSplines;
-      Func = new T[nParams];
-    }
-
-    /// Get the function for the nth spline
-    inline T GetFunc(_int_ nSpline) { return Func[nSpline]; }
-    /// Set the function for the nth spline
-    inline void SetFunc(_int_ nSpline, T Function) { Func[nSpline] = Function; }
-    /// Eval the current variation
-    inline double Eval(_int_ nSpline, _float_ variation) {
-      // Some will be NULL, check this
-      if (Func[nSpline]) {
-        return Func[nSpline]->Eval(variation);
-      } else {
-        return 1.0;
-      }
-    }
-  private:
-    /// Number of parameters
-    _int_ nParams;
-    /// The function
-    T* Func;
 };
 
 
@@ -317,29 +232,29 @@ enum SplineInterpolation {
 /// Convert a LLH type to a string
 inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
 // **************************************************
-    std::string name = "";
-    switch(i) {
-        //  TSpline3 (third order spline in ROOT)
-        case kTSpline3:
-        name = "TSpline3";
-        break;
-        case kLinear:
-        name = "Linear";
-        break;
-        case kMonotonic:
-        name = "Monotonic";
-        break;
-        //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
-        case kAkima:
-        name = "Akima";
-        break;
-        default:
-            std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-            std::cerr << "You gave  " << i << std::endl;
-            std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-            throw;
-    }
-    return name;
+  std::string name = "";
+  switch(i) {
+    //  TSpline3 (third order spline in ROOT)
+    case kTSpline3:
+    name = "TSpline3";
+    break;
+    case kLinear:
+    name = "Linear";
+    break;
+    case kMonotonic:
+    name = "Monotonic";
+    break;
+    //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
+    case kAkima:
+    name = "Akima";
+    break;
+    default:
+      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return name;
 }
 
 
@@ -871,7 +786,7 @@ enum TargetMat {
 };
 
 // *****************
-/// Converted the Target Mat to a string
+/// @brief Converted the Target Mat to a string
 inline std::string TargetMat_ToString(TargetMat i) {
 // *****************
   std::string name;
@@ -933,7 +848,7 @@ enum ProbNu {
   kProbNutauBar = -3
 };
 
-/// ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter
+/// @brief ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter
 inline int PDGToProbs(NuPDG pdg){
 
   int ReturnProbNu = -999;
@@ -1007,34 +922,34 @@ enum TestStatistic {
 };
 
 // **************************************************
-/// Convert a LLH type to a string
+/// @brief Convert a LLH type to a string
 inline std::string TestStatistic_ToString(TestStatistic i) {
 // **************************************************
-    std::string name = "";
+  std::string name = "";
 
-    switch(i) {
-        case kPoisson:
-        name = "Poisson";
-        break;
-        case kBarlowBeeston:
-        name = "BarlowBeeston";
-        break;
-        case kIceCube:
-        name = "IceCube";
-        break;
-        case kPearson:
-        name = "Pearson";
-        break;
-        case kDembinskiAbdelmottele:
-        name = "DembinskiAbdelmottele";
-        break;
-        default:
-            std::cerr << "UNKNOWN LIKELHOOD SPECIFIED TO ND280!" << std::endl;
-            std::cerr << "You gave test-statistic " << i << std::endl;
-            std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-            throw;
-    }
-    return name;
+  switch(i) {
+    case kPoisson:
+    name = "Poisson";
+    break;
+    case kBarlowBeeston:
+    name = "BarlowBeeston";
+    break;
+    case kIceCube:
+    name = "IceCube";
+    break;
+    case kPearson:
+    name = "Pearson";
+    break;
+    case kDembinskiAbdelmottele:
+    name = "DembinskiAbdelmottele";
+    break;
+    default:
+      std::cerr << "UNKNOWN LIKELHOOD SPECIFIED TO ND280!" << std::endl;
+      std::cerr << "You gave test-statistic " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return name;
 }
 
 // *******************
@@ -1049,31 +964,31 @@ class MaCh3_Modes {
     virtual int Mode_ToSplineMode(int i);
 };
 
-/// WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
+/// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly*);
 
-/// WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
+/// @brief WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly*);
 
-/// WP: Poly Projectors
+/// @brief WP: Poly Projectors
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
 
-/// WP: Helper to Normalise histograms
+/// @brief WP: Helper to Normalise histograms
 TH2Poly* NormalisePoly(TH2Poly* Histogram);
 
-/// WP: Helper to scale th2poly analogous to th2d scale with option "width"
+/// @brief WP: Helper to scale th2poly analogous to th2d scale with option "width"
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
-/// WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
+/// @brief WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
 
-/// KS: Sanity check for TH2Poly
+/// @brief KS: Sanity check for TH2Poly
 void CheckTH2PolyFileVersion(TFile *file);
 
-/// KS: Remove fitted TF1 from hist to make comparison easier
+/// @brief KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, std::string name);
 
-// Helper to check if files exist or not
+/// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {
   std::ifstream infile(filename.c_str());
   if (!infile.good()) {
@@ -1086,7 +1001,7 @@ inline std::string file_exists(std::string filename) {
 
   return filename;
 }
-//DB Get the Cernekov momentum threshold in MeV
+/// @brief DB Get the Cernekov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG);
 
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
@@ -1107,7 +1022,7 @@ enum CUDAProb_nu {
  
 
 // ************************************************
-/// Get CUDAProb3 flavour from intital and final states
+/// @brief Get CUDAProb3 flavour from intital and final states
 inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
 //*************************************************  
     
