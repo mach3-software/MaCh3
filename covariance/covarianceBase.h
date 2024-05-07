@@ -7,6 +7,7 @@
 #include "manager/manager.h"
 
 #ifndef _LARGE_LOGL_
+/// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
 #define _LARGE_LOGL_ 1234567890.0
 #endif
 
@@ -31,8 +32,9 @@ class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file
   covarianceBase(std::vector<std::string> YAMLFile, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
-  /// "Usual" constructors from root file
+  /// @brief "Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
+  /// @brief "Usual" constructors from root file with seed
   covarianceBase(const char *name, const char *file, int seed);
   /// @brief Constructor For Eigen Value decomp
   covarianceBase(const char *name, const char *file, int seed, double threshold,int FirstPCAdpar, int LastPCAdpar);
@@ -46,19 +48,23 @@ class covarianceBase {
   void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   void setPar(const int i, const double val);
-  void setParCurrProp(int i, double val);
-  void setParProp(int i, double val) {
+  /// @brief Set current parameter value
+  void setParCurrProp(const int i, const double val);
+  /// @brief Set proposed parameter value
+  void setParProp(const int i, const double val) {
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
   }
-  void setParameters(std::vector<double> pars = std::vector<double>());    
-  void setEvalLikelihood(int i, bool eL);
+  void setParameters(std::vector<double> pars = std::vector<double>());
+  /// @brief Set if parameter should have flat prior or not
+  void setEvalLikelihood(const int i, const bool eL);
   
-  // set branches for output file
+  /// @brief set branches for output file
   void setBranches(TTree &tree);
-  void setStepScale(double scale);
+  /// @brief Set global step scale for covariance object
+  void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
-  void setIndivStepScale(int ParameterIndex, double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
+  void setIndivStepScale(const int ParameterIndex, const double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   void setIndivStepScale(std::vector<double> stepscale);
   /// @brief KS: In case someone really want to change this
@@ -71,11 +77,12 @@ class covarianceBase {
   void throwParProp(const double mag = 1.);
   void throwParCurr(const double mag = 1.);
   void throwParameters();
+  /// @brief Throw nominal values
   void throwNominal(bool nomValues = false, int seed = 0);
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
-  /// @brief Check if parameters wre proposed outside physical boundary
+  /// @brief Check if parameters were proposed outside physical boundary
   virtual int CheckBounds();
   /// @brief Calc penalty term based on inverted covariance matrix
   double CalcLikelihood();
@@ -85,13 +92,20 @@ class covarianceBase {
   // Getters
   TMatrixDSym *getCovMatrix() { return covMatrix; }
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
+  /// @brief Get if param has flat prior or not
   inline bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; }
 
+  /// @brief Get name of covariance
   const char *getName() { return matrixName; }
+  /// @brief Get name of covariance
   std::string GetParName(const int i) {return _fNames[i];}
+  /// @brief Get name of the Parameter
   const char* GetParName(const int i) const { return _fNames[i].c_str(); }
+  /// @brief Get fancy name of the Parameter
   std::string GetParFancyName(const int i) {return _fFancyNames[i];}
+  /// @brief Get fancy name of the Parameter
   const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); }
+  /// @brief Get name of input file
   std::string const getInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
@@ -107,7 +121,7 @@ class covarianceBase {
   void updateThrowMatrix(TMatrixDSym *cov);
   inline void setNumberOfSteps(const int nsteps) {
     total_steps = nsteps;
-    if(total_steps >= lower_adapt)resetIndivStepScale();
+    if(total_steps >= lower_adapt) resetIndivStepScale();
   }
   /// @brief HW: Set thresholds for MCMC steps
   inline void setAdaptiveThresholds(const int low_threshold = 10000, const int up_threshold = 1000000){lower_adapt=low_threshold; upper_adapt = up_threshold;}
@@ -118,7 +132,7 @@ class covarianceBase {
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
-  // What parameter Gets reweighted by what amount according to MCMC
+  /// @brief What parameter Gets reweighted by what amount according to MCMC
   inline double calcReWeight(const int bin) {
     if (bin >= 0 && bin < _fNumPar) {
       return _fPropVal[bin];
@@ -136,7 +150,7 @@ class covarianceBase {
   //way to deal with this? It was fine before when the return was to an 
   //element of a new array. There must be a clever C++ way to be careful
   //========
-  /// DB Pointer return to param position
+  /// @brief DB Pointer return to param position
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
@@ -165,11 +179,8 @@ class covarianceBase {
   }
 
   inline bool isParameterFixedPCA(const int i) {
-    if (fParSigma_PCA[i] < 0) {
-      return true;
-    } else {
-      return false;
-    }
+    if (fParSigma_PCA[i] < 0) { return true;  }
+    else                      { return false; }
   }
 
   inline const TMatrixD getTransferMatrix() {
@@ -221,6 +232,7 @@ class covarianceBase {
   }
 
   inline int getSize() { return _fNumPar; }
+  /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   inline int getNpars() {
     if (pca) return _fNumParPCA;
     else return _fNumPar;
@@ -241,12 +253,10 @@ class covarianceBase {
   void toggleFixAllParameters();
   /// @brief fix parameter at nominal values
   void toggleFixParameter(const int i);
+  /// @brief Is parameter fixed or not
   bool isParameterFixed(const int i) {
-    if (_fError[i] < 0) {
-      return true;
-    } else {
-      return false;
-    }
+    if (_fError[i] < 0) { return true; }
+    else                { return false; }
   }
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   void ConstructPCA();
@@ -282,14 +292,18 @@ class covarianceBase {
   void ReserveMemory(const int size);
 
   void randomize();
+  /// @brief Use Cholesky throw matrix for better step proposal
   void CorrelateSteps();
 
+  /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   void MakePosDef(TMatrixDSym *cov = NULL);
   void makeClosestPosDef(TMatrixDSym *cov);
+  /// @brief Transfer param values from normal base to PCA base
   void TransferToPCA();
+  /// @brief Transfer param values from PCA base to normal base
   void TransferToParam();
 
-  /// Handy function to return 1 for any systs
+  /// @brief Handy function to return 1 for any systs
   const double* ReturnUnity(){return &Unity;}
 
   /// The input root file we read in
@@ -317,13 +331,9 @@ class covarianceBase {
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
   unsigned int PrintLength;
 
-  // state info (now mostly vectors)
-  //ETA - duplication of some of these
-  //ideally these should all be private and we have setters be protected 
-  //setters and public getters
-  //_fNames is set automatically in the covariance class to be something like xsec_i
-  //this is currently to make things compatible with the Diagnostic tools
+  /// ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
+  /// Fancy name for example rather than xsec_0 it is MAQE, useful for human reading
   std::vector<std::string> _fFancyNames;
   /// Stores config describing systematics
   YAML::Node _fYAMLDoc;
@@ -361,16 +371,27 @@ class covarianceBase {
   int FirstPCAdpar;
   /// Index of the last param that is being decomposed
   int LastPCAdpar;
+  /// Total number that remained after applying PCA Threshold
   int nKeptPCApars;
+  /// Eigen value only of particles which are being decomposed
   TVectorD eigen_values;
+  /// Eigen vectors only of params which are being decomposed
   TMatrixD eigen_vectors;
+  /// Eigen values which have dimension equal to _fNumParPCA, and can be used in CorrelateSteps
   std::vector<double> eigen_values_master;
+  /// Prefit value for PCA params
+  std::vector<double> _fPreFitValue_PCA;
+  /// Matrix used to converting from PCA base to normal base
   TMatrixD TransferMat;
+  /// Matrix used to converting from normal base to PCA base
   TMatrixD TransferMatT;
-  // Also save current and proposed parameter in PCA basis
+  /// CW: Current parameter value in PCA base
   TVectorD fParProp_PCA;
+  /// CW: Proposed parameter value in PCA base
   TVectorD fParCurr_PCA;
+  /// Tells if parameter is fixed in PCA base or not
   std::vector<double> fParSigma_PCA;
+  /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
   std::vector<int> isDecomposed_PCA;
 
   // Adaptive MCMC

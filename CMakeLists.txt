@@ -102,7 +102,7 @@ endif()
 
 
 ################################## Oscillation ################################
-
+#KS: All of these should be moved to separate cmake and be handled by osc class, keep it for now
 #If USE_PROB3 not defined turn it off by default
 if(NOT DEFINED USE_PROB3)
   SET(USE_PROB3 FALSE)

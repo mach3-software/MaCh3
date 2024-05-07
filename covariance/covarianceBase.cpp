@@ -162,7 +162,7 @@ void covarianceBase::ConstructPCA() {
   for (int i = 0; i < eigen_values.GetNrows(); ++i) {
     sum += eigen_values(i);
   }
-  nKeptPCApars=eigen_values.GetNrows();
+  nKeptPCApars = eigen_values.GetNrows();
   //CW: Now go through again and see how many eigen values correspond to threshold
   for (int i = 0; i < eigen_values.GetNrows(); ++i) {
     // Get the relative size of the eigen value
@@ -227,7 +227,8 @@ void covarianceBase::ConstructPCA() {
   // Make the PCA parameter arrays
   fParCurr_PCA.ResizeTo(_fNumParPCA);
   fParProp_PCA.ResizeTo(_fNumParPCA);
-  
+  _fPreFitValue_PCA.resize(_fNumParPCA);
+
   //KS: make easy map so we could easily find un-decomposed parameters
   isDecomposed_PCA.resize(_fNumParPCA);
   fParSigma_PCA.resize(_fNumParPCA);
@@ -1108,7 +1109,7 @@ void covarianceBase::setBranches(TTree &tree) {
   }
 }
 
-void covarianceBase::setStepScale(double scale) {
+void covarianceBase::setStepScale(const double scale) {
   if(scale == 0)
   {
     MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
@@ -1159,16 +1160,15 @@ void covarianceBase::toggleFixParameter(const int i) {
   
   return;
 }
-
-void covarianceBase::setEvalLikelihood(int i, bool eL) {
-
-  std::cout << "covarianceBase::setEvalLikelihood set to " << eL << std::endl;
+// ********************************************
+void covarianceBase::setEvalLikelihood(const int i, const bool eL) {
+// ********************************************
   if (i > _fNumPar) {
-    std::cerr << "Can't setEvalLikelihood for " << getName() << "_" << i << " because size of covarianceXsec2015 = " << _fNumPar << std::endl;
+    MACH3LOG_INFO("Can't setEvalLikelihood for Cov={}/Param={} because size of Covariance = {}", getName(), i, _fNumPar);
     MACH3LOG_ERROR("Fix this in your config file please!");
     throw;
   } else {
-    std::cout << "Setting " << GetParName(i) << " (parameter " << i << ") to flat prior? " << eL << std::endl;
+    MACH3LOG_INFO("Setting {} (parameter {}) to flat prior", GetParName(i), i);
     _fFlatPrior[i] = eL;
   }
 }
@@ -1286,7 +1286,7 @@ void covarianceBase::resetIndivStepScale() {
   for (int i = 0; i <_fNumPar; i++) {
     stepScales[i] = 1.;
   }
-  _fGlobalStepScale=1.0;
+  _fGlobalStepScale = 1.0;
   setIndivStepScale(stepScales);
 }
 

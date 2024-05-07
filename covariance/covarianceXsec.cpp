@@ -490,7 +490,7 @@ const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(const int DetID
 
 // ********************************************
 void covarianceXsec::initParams(const double fScale) {
-  // ********************************************
+// ********************************************
 
   for (int i = 0; i < _fNumPar; ++i) {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
@@ -519,7 +519,14 @@ void covarianceXsec::initParams(const double fScale) {
 
   randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
-  if (pca) TransferToPCA();
+  if (pca)
+  {
+    TransferToPCA();
+    for (int i = 0; i < _fNumParPCA; ++i)
+    {
+      _fPreFitValue_PCA[i] = fParCurr_PCA(i);
+    }
+  }
   CorrelateSteps();
 }
 
