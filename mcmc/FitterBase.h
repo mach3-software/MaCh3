@@ -63,7 +63,7 @@ class FitterBase {
 
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
-protected:
+ protected:
 
   /// @brief Prepare the output file.
   void PrepareOutput();
@@ -135,6 +135,8 @@ protected:
   bool fTestLikelihood;
   /// save nominal matrix info or not
   bool save_nominal;
+  /// Save proposal at each step
+  bool SaveProposal;
 
   /// Checks if file saved not repeat some operations
   bool FileSaved;

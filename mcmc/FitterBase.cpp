@@ -32,6 +32,9 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Do we want to save the nominal parameters to output
   save_nominal = true;
 
+  // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
+  SaveProposal = false;
+
   // Set the output file
   outputFile = new TFile(outfile.c_str(), "RECREATE");
   outputFile->cd();
@@ -79,12 +82,19 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 FitterBase::~FitterBase() {
 // *************************
   SaveOutput();
+
   if(random != nullptr) delete random;
+  random = nullptr;
   if(sample_llh != nullptr) delete[] sample_llh;
+  sample_llh = nullptr;
   if(syst_llh != nullptr) delete[] syst_llh;
+  syst_llh = nullptr;
   if(outputFile != nullptr) delete outputFile;
-  delete clock;
-  delete stepClock;
+  outputFile = nullptr;
+  if(clock != nullptr) delete clock;
+  clock = nullptr;
+  if(stepClock != nullptr) delete stepClock;
+  stepClock = nullptr;
   MACH3LOG_INFO("Closing MaCh3 Fitter Engine");
 }
 
@@ -173,11 +183,11 @@ void FitterBase::PrepareOutput() {
 
     // Prepare the output trees
     for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
-      (*it)->setBranches(*outTree);
+      (*it)->SetBranches(*outTree, SaveProposal);
     }
 
     if (osc) {
-      osc->setBranches(*outTree);
+      osc->SetBranches(*outTree, SaveProposal);
       outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
     }
 

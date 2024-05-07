@@ -60,7 +60,7 @@ class covarianceBase {
   void setEvalLikelihood(const int i, const bool eL);
   
   /// @brief set branches for output file
-  void setBranches(TTree &tree);
+  void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
@@ -242,6 +242,7 @@ class covarianceBase {
   void printNominal();
   void printNominalCurrProp();
   void printPars();
+  /// @brief Print step scale for each parameter
   void printIndivStepScale();
 
   /// @brief Generate a new proposed state
@@ -291,12 +292,16 @@ class covarianceBase {
   /// @brief Initialise vectors with parameters information
   void ReserveMemory(const int size);
 
+
+  /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
   void randomize();
   /// @brief Use Cholesky throw matrix for better step proposal
   void CorrelateSteps();
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   void MakePosDef(TMatrixDSym *cov = NULL);
+
+  /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
   void makeClosestPosDef(TMatrixDSym *cov);
   /// @brief Transfer param values from normal base to PCA base
   void TransferToPCA();

@@ -1096,7 +1096,10 @@ void covarianceBase::setParameters(std::vector<double> pars) {
   return;
 }
 
-void covarianceBase::setBranches(TTree &tree) {
+// ********************************************
+void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
+// ********************************************
+
   // loop over parameters and set a branch
   for (int i = 0; i < _fNumPar; ++i) {
     tree.Branch(_fNames[i].c_str(), &_fCurrVal[i], Form("%s/D", _fNames[i].c_str()));
@@ -1107,9 +1110,23 @@ void covarianceBase::setBranches(TTree &tree) {
       tree.Branch(Form("%s_PCA", _fNames[i].c_str()), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
+  if(SaveProposal)
+  {
+    // loop over parameters and set a branch
+    for (int i = 0; i < _fNumPar; ++i) {
+      tree.Branch(Form("%s_Prop", _fNames[i].c_str()), &_fPropVal[i], Form("%s_Prop/D", _fNames[i].c_str()));
+    }
+    // When running PCA, also save PCA parameters
+    if (pca) {
+      for (int i = 0; i < _fNumParPCA; ++i) {
+        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), (double*)&(fParProp_PCA.GetMatrixArray()[i]), Form("%s_PCA_Prop/D", _fNames[i].c_str()));
+      }
+    }
+  }
 }
-
+// ********************************************
 void covarianceBase::setStepScale(const double scale) {
+// ********************************************
   if(scale == 0)
   {
     MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
@@ -1142,7 +1159,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  throw;
 	} else {
 	  _fError[i] *= -1.0;
-	  std::cout << "Setting " << GetParName(i) << "(parameter " << i << ") to fixed at " << _fCurrVal[i] << std::endl;
+      MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParName(i), i, _fCurrVal[i]);
 	} 
   } else {
 	int isDecom = -1;
@@ -1154,7 +1171,7 @@ void covarianceBase::toggleFixParameter(const int i) {
 	  //throw; 
 	} else {
 	  fParSigma_PCA[isDecom] *= -1.0;
-	  std::cout << "Setting un-decomposed " << GetParName(i) << "(parameter " << i <<"/"<< isDecom<< " in PCA base) to fixed at " << _fCurrVal[i] << std::endl;
+      MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
 	}
   }
   
@@ -1268,14 +1285,14 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   }
 
   if (!CanDecomp) {
-    std::cerr << "Tried " << MaxAttempts << " times to shift diagonal but still can not decompose the matrix" << std::endl;
-    std::cerr << "This indicates that something is wrong with the input matrix" << std::endl;
+    MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
+    MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
     throw;
   }
   if(total_steps < 2) {
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
-  //DB Reseting warning level
+  //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
 
   return;
@@ -1299,7 +1316,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   }
 
   if (covMatrix->GetNrows() != cov->GetNrows()) {
-    std::cerr << "Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!" << std::endl;
+    MACH3LOG_ERROR("Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!");
     std::cerr << "Stored covariance matrix size:" << covMatrix->GetNrows() << std::endl;
     std::cerr << "Given matrix size:" << cov->GetNrows() << std::endl;
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
@@ -1313,7 +1330,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
   
   if(!TDecompChol_throwMatrix.Decompose()) {
-    std::cerr << "Cholesky decomposition failed for " << matrixName << " trying to make positive definite" << std::endl;
+    MACH3LOG_ERROR("Cholesky decomposition failed for {} trying to make positive definite", matrixName);
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
@@ -1348,7 +1365,7 @@ void covarianceBase::useSeparateThrowMatrix(TString throwMatrixFileName, TString
   TFile* throwMatrixFile = new TFile(throwMatrixFileName);
   resetIndivStepScale();
   if(throwMatrixFile->IsZombie()) {
-    std::cerr<<"ERROR : Couldn't find throw Matrix file : "<<throwMatrixFileName<<std::endl;
+    MACH3LOG_ERROR("Couldn't find throw Matrix file : {}", throwMatrixFileName);
     std::cerr<<__FILE__<<" : "<<__LINE__<<std::endl;
     throw;
   } //We're done for now
@@ -1396,8 +1413,8 @@ void covarianceBase::updateAdaptiveCovariance(){
 #pragma omp parallel for
 #endif
   for(int iRow = 0; iRow < _fNumPar; ++iRow){
-    par_means_prev[iRow]=par_means[iRow];
-    par_means[iRow]=(_fCurrVal[iRow]+par_means[iRow]*total_steps)/(total_steps+1);  
+    par_means_prev[iRow] = par_means[iRow];
+    par_means[iRow] = (_fCurrVal[iRow]+par_means[iRow]*total_steps)/(total_steps+1);
   }
 
   //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
@@ -1417,8 +1434,8 @@ void covarianceBase::updateAdaptiveCovariance(){
     }
   }
   //This is likely going to be the slow bit!
-  total_steps+=1;
-  if(total_steps==lower_adapt) 
+  total_steps += 1;
+  if(total_steps == lower_adapt)
   {
     resetIndivStepScale();
   }
@@ -1453,7 +1470,7 @@ void covarianceBase::saveAdaptiveToFile(TString outFileName, TString systematicN
     throw;
   }
   TVectorD* outMeanVec = new TVectorD((int)par_means.size());
-  for(int i=0; i<(int)par_means.size(); i++){
+  for(int i = 0; i < (int)par_means.size(); i++){
     (*outMeanVec)(i)=par_means[i];
   }
   outFile->cd();
@@ -1498,7 +1515,7 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)
 
   
   //Can finally get H=VSV
-  TMatrixDSym cov_sym_polar =cov_sym_sig.SimilarityT(cov_sym_vt);//V*S*V^T (this took forver to find!)
+  TMatrixDSym cov_sym_polar = cov_sym_sig.SimilarityT(cov_sym_vt);//V*S*V^T (this took forver to find!)
   
   //Now we can construct closest approximater Ahat=0.5*(B+H)
   TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);//Not fully sure why this is even needed since symmetric B -> U=V
