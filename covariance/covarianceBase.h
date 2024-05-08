@@ -47,6 +47,7 @@ class covarianceBase {
   void setName(const char *name) { matrixName = name; }
   void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
+  /// @brief Set all the covariance matrix parameters to a user-defined value
   void setPar(const int i, const double val);
   /// @brief Set current parameter value
   void setParCurrProp(const int i, const double val);
@@ -73,9 +74,12 @@ class covarianceBase {
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
 
-  // Throwers
+  /// @brief Throw the proposed parameter by mag sigma. Should really just have the user specify this throw by having argument double
   void throwParProp(const double mag = 1.);
+
+  /// @brief Helper function to throw the current parameter by mag sigma. Can study bias in MCMC with this; put different starting parameters
   void throwParCurr(const double mag = 1.);
+  /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void throwParameters();
   /// @brief Throw nominal values
   void throwNominal(bool nomValues = false, int seed = 0);
@@ -327,8 +331,9 @@ class covarianceBase {
   /// KS: set Random numbers for each thread so each thread has different seed
   TRandom3 **random_number;
 
-  // For Cholesky decomposed parameter throw
+  /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
+  /// Result of multiplication of Cholesky matrix and randParams
   double* corr_throw;
   /// Global step scale applied ot all params in this class
   double _fGlobalStepScale;

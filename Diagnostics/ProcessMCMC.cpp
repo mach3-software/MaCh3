@@ -580,7 +580,7 @@ void ReweightPrior(MCMCProcessor* Processor)
   Processor->ReweightPrior(Names, NewCentral, NewError);
 }
 
-//KS: Convert TMatrix to TH2D, mostly usefull for making fancy plots
+//KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
 TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, std::string title)       
 {
   TH2D* hMatrix = new TH2D(title.c_str(), title.c_str(), Matrix->GetNrows(), 0.0, Matrix->GetNrows(), Matrix->GetNcols(), 0.0, Matrix->GetNcols());

@@ -120,7 +120,7 @@ ProcessMCMC:
   # apply reactor constraints [vector of param names] [vector of new central value] [vector of new prior errors]
   PriorReweighting: [ ["sin2th_13"], [0.0220], [0.0007] ]
   #Fancy example, not physics motivated but to show funcionality
-  PriorReweighting: [ ["MAQE", "Pauli_Blocking_C_nu"], [1.05, 0.1], [ 0.04, 0.5] ]
+  #PriorReweighting: [ ["MAQE", "Pauli_Blocking_C_nu"], [1.05, 0.1], [ 0.04, 0.5] ]
 
 #########################################
 GetPostfitParamPlots:

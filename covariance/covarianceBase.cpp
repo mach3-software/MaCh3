@@ -94,6 +94,7 @@ covarianceBase::~covarianceBase(){
   _fFlatPrior.clear();
 
   delete[] randParams;
+  delete[] corr_throw;
 
   if (covMatrix != NULL) delete covMatrix;
   if (invCovMatrix != NULL) delete invCovMatrix;

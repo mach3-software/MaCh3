@@ -1034,8 +1034,8 @@ void MCMCProcessor::MakeCovariance() {
   for (int i = 0; i < covBinning; ++i) 
   {
     if (i % (covBinning/5) == 0) 
-      std::cout << "  " << i << "/" << covBinning << " (" << int((double(i)/double(covBinning)*100.0))+1 << "%)" << std::endl;
-      
+      MaCh3Utils::PrintProgressBar(i, covBinning);
+
     TString Title_i = "";
     double Prior_i, PriorError;
 
@@ -1129,8 +1129,8 @@ void MCMCProcessor::CacheSteps() {
   if(ParStep != nullptr)
   {
     MACH3LOG_ERROR("It look like ParStep was already filled ");
-    MACH3LOG_ERROR("Eventhough it is used for MakeCovariance_MP and for DiagMCMC ");
-    MACH3LOG_ERROR("it has differnt structure in both for cache hits, sorry ");
+    MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC ");
+    MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
     throw;
   }
 
@@ -1245,7 +1245,7 @@ void MCMCProcessor::MakeCovariance_MP() {
   for (int i = 0; i < covBinning; ++i) {
     if ((*Covariance)(i,i) == _UNDEF_) {
       HaveMadeDiagonal = false;
-      std::cout << "Have not run diagonal elements in covariance, will do so now by calling MakePostfit()" << std::endl;
+      MACH3LOG_WARN("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
     } else {
       HaveMadeDiagonal = true;
@@ -1601,7 +1601,7 @@ void MCMCProcessor::MakeCredibleRegions() {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
-  std::cout << "Making Credible Regions "<< std::endl;
+  MACH3LOG_INFO("Making Credible Regions");
 
   //Load values set via config or executable
   std::vector<double> CredibleRegions = Credible_Regions;
@@ -2139,7 +2139,7 @@ double MCMCProcessor::GetSigmaValue(int sigma) {
       width = 0.999999998027;
       break;
     default:
-      std::cerr<<sigma<<" is unsuported value of sigma"<<std::endl;
+      std::cerr<<sigma<<" is unsupported value of sigma"<<std::endl;
       throw;
       break;
     }
@@ -2424,6 +2424,8 @@ void MCMCProcessor::FindInputFiles() {
   if (std::getenv("MACH3") != nullptr) {
     MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
   }
+
+  MACH3LOG_INFO("Loading YAML config from MCMC chain");
 
   YAML::Node Settings = TMacroToYAML(*Config);
 
@@ -2835,7 +2837,7 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
 
   if(coverage > 1)
   {
-    std::cerr<<"Specified Credible Interval is greater that 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
+    MACH3LOG_ERROR("Specified Credible Interval is greater that 1 and equal to {} Should be between 0 and 1", coverage);
     throw;
   }
   //KS: Reset first copy of histogram
@@ -3024,7 +3026,7 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
   Posterior->SetRightMargin(0.1);
   Posterior->Update();
 
-  std::cout << "Calculating Polar Plot "<< std::endl;
+  MACH3LOG_INFO("Calculating Polar Plot");
   TDirectory *PolarDir = OutputFile->mkdir("PolarDir");
   PolarDir->cd();
 
@@ -3334,99 +3336,101 @@ std::string MCMCProcessor::GetDunneKaboth(const double BayesFactor){
 void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError){
 // **************************
 
-    if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
-    {
-      MACH3LOG_ERROR("Size of passed vectors doesn't match in ReweightPrior");
-      throw;
-    }
-    std::vector<int> Param;
-    std::vector<double> OldCentral;
-    std::vector<double> OldError;
-    std::vector<bool> FlatPrior;
+  MACH3LOG_INFO("Reweighting Prior");
 
+  if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
+  {
+    MACH3LOG_ERROR("Size of passed vectors doesn't match in ReweightPrior");
+    throw;
+  }
+  std::vector<int> Param;
+  std::vector<double> OldCentral;
+  std::vector<double> OldError;
+  std::vector<bool> FlatPrior;
+
+  //KS: First we need to find parameter number based on name
+  for(unsigned int k = 0; k < Names.size(); ++k)
+  {
     //KS: First we need to find parameter number based on name
-    for(unsigned int k = 0; k < Names.size(); ++k)
+    int ParamNo = GetParamIndexFromName(Names[k]);
+    if(ParamNo == _UNDEF_)
     {
-      //KS: First we need to find parameter number based on name
-      int ParamNo = GetParamIndexFromName(Names[k]);
-      if(ParamNo == _UNDEF_)
-      {
-        MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
-        continue;
-      }
-      
-      TString Title = "";
-      double Prior = 1.0;
-      double PriorError = 1.0;
-      GetNthParameter(ParamNo, Prior, PriorError, Title);
-    
-      Param.push_back(ParamNo);
-      OldCentral.push_back(Prior);
-      OldError.push_back(PriorError);
-
-      ParameterEnum ParType = ParamType[ParamNo];
-      int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
-
-      FlatPrior.push_back(ParamFlat[ParType][ParamTemp]);
+      MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
+      continue;
     }
 
-    double* ParameterPos = new double[Names.size()];
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+    GetNthParameter(ParamNo, Prior, PriorError, Title);
 
-    std::string InputFile = MCMCFile+".root";
-    std::string OutputFilename = MCMCFile + "_reweighted.root";
+    Param.push_back(ParamNo);
+    OldCentral.push_back(Prior);
+    OldError.push_back(PriorError);
 
-    //KS: Simply create copy of file and add there new branch
-    system(("cp "+InputFile+" "+OutputFilename).c_str());
+    ParameterEnum ParType = ParamType[ParamNo];
+    int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
 
-    TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
-    OutputChain->cd();
-    TTree *post = (TTree *)OutputChain->Get("posteriors");
+    FlatPrior.push_back(ParamFlat[ParType][ParamTemp]);
+  }
 
-    double Weight = 1.;
+  double* ParameterPos = new double[Names.size()];
 
-    post->SetBranchStatus("*",false);
-    // Set the branch addresses for params
-    for (unsigned int j = 0; j < Names.size(); ++j) {
-      post->SetBranchStatus(BranchNames[Param[j]].Data(), true);
-      post->SetBranchAddress(BranchNames[Param[j]].Data(), &ParameterPos[j]);
-    }
-    TBranch *bpt = post->Branch("Weight", &Weight, "Weight/D");
-    post->SetBranchStatus("Weight", true);
+  std::string InputFile = MCMCFile+".root";
+  std::string OutputFilename = MCMCFile + "_reweighted.root";
 
-    for (int i = 0; i < nEntries; ++i)
+  //KS: Simply create copy of file and add there new branch
+  system(("cp "+InputFile+" "+OutputFilename).c_str());
+
+  TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+  OutputChain->cd();
+  TTree *post = (TTree *)OutputChain->Get("posteriors");
+
+  double Weight = 1.;
+
+  post->SetBranchStatus("*",false);
+  // Set the branch addresses for params
+  for (unsigned int j = 0; j < Names.size(); ++j) {
+    post->SetBranchStatus(BranchNames[Param[j]].Data(), true);
+    post->SetBranchAddress(BranchNames[Param[j]].Data(), &ParameterPos[j]);
+  }
+  TBranch *bpt = post->Branch("Weight", &Weight, "Weight/D");
+  post->SetBranchStatus("Weight", true);
+
+  for (int i = 0; i < nEntries; ++i)
+  {
+    post->GetEntry(i);
+    Weight = 1.;
+
+    //KS: Calculate reweight weight. Weights are multiplicative so we can do several reweights at once. FIXME Big limitation is that code only works for uncorrelated parameters :(
+    for (unsigned int j = 0; j < Names.size(); ++j)
     {
-      post->GetEntry(i);
-      Weight = 1.;
+      double new_chi = (ParameterPos[j] - NewCentral[j])/NewError[j];
+      double new_prior = std::exp(-0.5 * new_chi * new_chi);
 
-      //KS: Calcualte reweight weight. Weights are multiplicative so we can do several reweights at once. FIXME Big limitation is that code only works for uncorelated paramters :(
-      for (unsigned int j = 0; j < Names.size(); ++j)
+      double old_chi = -1;
+      double old_prior = -1;
+      if(FlatPrior[j])
       {
-        double new_chi = (ParameterPos[j] - NewCentral[j])/NewError[j];
-        double new_prior = std::exp(-0.5 * new_chi * new_chi);
-
-        double old_chi = -1;
-        double old_prior = -1;
-        if(FlatPrior[j])
-        {
-          old_prior = 1.0;
-        }
-        else
-        {
-          old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
-          old_prior = std::exp(-0.5 * old_chi * old_chi);
-        }
-        Weight *= new_prior/old_prior;
+        old_prior = 1.0;
       }
-      bpt->Fill();
+      else
+      {
+        old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
+        old_prior = std::exp(-0.5 * old_chi * old_chi);
+      }
+      Weight *= new_prior/old_prior;
     }
-    post->SetBranchStatus("*",true);
-    OutputChain->cd();
-    post->Write("posteriors", TObject::kOverwrite);
-    OutputChain->Close();
-    delete OutputChain;
-    delete[] ParameterPos;
+    bpt->Fill();
+  }
+  post->SetBranchStatus("*",true);
+  OutputChain->cd();
+  post->Write("posteriors", TObject::kOverwrite);
+  OutputChain->Close();
+  delete OutputChain;
+  delete[] ParameterPos;
 
-    OutputFile->cd();
+  OutputFile->cd();
 }
 
 // **************************
@@ -3562,9 +3566,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
   //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
   for (int i = 0; i < nEntries; ++i) {
 
-    if (i % countwidth == 0) {
-      std::cout << i << "/" << nEntries << " (" << double(i)/double(nEntries)*100. << "%)" << std::endl;
-    }
+    if (i % countwidth == 0)
+      MaCh3Utils::PrintProgressBar(i, nEntries);
 
     // Set the branch addresses for params
     for (int j = 0; j < nDraw; ++j) {
@@ -3780,7 +3783,7 @@ void MCMCProcessor::AutoCorrelation() {
   // Loop over the lags
   //CW: Each lag is independent so might as well multi-thread them!
   #ifdef MULTITHREAD
-  std::cout << "Using multi-threading..." << std::endl;
+  MACH3LOG_INFO("Using multi-threading...");
   #pragma omp parallel for
   #endif
   for (int k = 0; k < nLags; ++k) {
@@ -3804,7 +3807,7 @@ void MCMCProcessor::AutoCorrelation() {
     }
   }
 #else //NOW GPU specific code
-  std::cout << "Using GPU" << std::endl;
+  MACH3LOG_INFO("Using GPU");
   //KS: This allocates memory and copy data from CPU to GPU
   PrepareGPU_AutoCorr(nLags);
 
@@ -3830,7 +3833,7 @@ void MCMCProcessor::AutoCorrelation() {
       DenomSum[j][k] = DenomSum_cpu[temp_index];
     }
   }
-  //delete auxilary variables
+  //delete auxiliary variables
   delete[] NumeratorSum_cpu;
   delete[] DenomSum_cpu;
   delete[] ParStep_cpu;
@@ -3860,7 +3863,7 @@ void MCMCProcessor::AutoCorrelation() {
   }
   delete[] LagKPlots;
 
-  //KS: This is different diagnostic however it relies on calucated Lag, thus we call it before we delete LagKPlots
+  //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
   CalculateESS(nLags);
 
   for (int j = 0; j < nDraw; ++j) {
@@ -3888,7 +3891,7 @@ void MCMCProcessor::AutoCorrelation() {
 void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // **************************
 
-  //KS: Create temproary arrays that will comiunicate with GPU code
+  //KS: Create temporary arrays that will communicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
   NumeratorSum_cpu = new float[nDraw*nLags];
   DenomSum_cpu = new float[nDraw*nLags];
@@ -3899,7 +3902,7 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
   #pragma omp parallel
   {
   #endif
-    //KS: Operations are indepenedt thus we are using nowait close
+    //KS: Operations are independent thus we are using nowait close
     #ifdef MULTITHREAD
     #pragma omp for nowait
     #endif
@@ -3965,18 +3968,18 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 
 // **************************
 // KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
-// Furthermore we calculate Sampling efficiency follwing https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
+// Furthermore we calculate Sampling efficiency following https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
 // Rule of thumb is to have efficiency above 25%
 void MCMCProcessor::CalculateESS(const int nLags) {
 // **************************
 
   if(LagL == nullptr)
   {
-    std::cerr<<"Trying to call CalculateESS before LagL was calcauted, this will not work"<<std::endl;
+    MACH3LOG_ERROR("Trying to call CalculateESS before LagL was calcauted, this will not work");
     std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
-  std::cout << "Making ESS plots..." << std::endl;
+  MACH3LOG_INFO("Making ESS plots...");
     
   TVectorD* EffectiveSampleSize = new TVectorD(nDraw);
   TVectorD* SamplingEfficiency = new TVectorD(nDraw);
@@ -4013,14 +4016,14 @@ void MCMCProcessor::CalculateESS(const int nLags) {
     (*EffectiveSampleSize)(j) = _UNDEF_;
     (*SamplingEfficiency)(j) = _UNDEF_;
     TempDenominator[j] = 0.;
-    //KS: Firs sum over all Calculated autoceralations
+    //KS: Firs sum over all Calculated autocorrelations
     for (int k = 0; k < nLags; ++k)
     {
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
     (*EffectiveSampleSize)(j) = nEntries/TempDenominator[j];
-    // 100 becasue we convert to percentage
+    // 100 because we convert to percentage
     (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
 
     for(int i = 0; i < Nhists; ++i)
@@ -4083,8 +4086,7 @@ void MCMCProcessor::BatchedMeans() {
 // **************************
 
   if (BatchedAverages == nullptr) PrepareDiagMCMC();
-
-  std::cout << "Making BatchedMeans plots..." << std::endl;
+  MACH3LOG_INFO("Making BatchedMeans plots...");
   
   TH1D ** BatchedParamPlots = new TH1D*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
@@ -4146,14 +4148,14 @@ void MCMCProcessor::BatchedAnalysis() {
 
   if(BatchedAverages == nullptr)
   {
-    std::cerr<<"BatchedAverages haven't been initialises or have been deleted somehting is wrong"<<std::endl;
-    std::cerr<<"I need it and refuse to go further"<<std::endl;
+    MACH3LOG_ERROR("BatchedAverages haven't been initialises or have been deleted something is wrong");
+    MACH3LOG_ERROR("I need it and refuse to go further");
     throw;
   }
 
-  // Calcualte variance estimator using batched means following https://arxiv.org/pdf/1911.00915.pdf see Eq. 1.2
+  // Calculate variance estimator using batched means following https://arxiv.org/pdf/1911.00915.pdf see Eq. 1.2
   TVectorD* BatchedVariance = new TVectorD(nDraw);
-  //KS: The hypothesis is rejected if C > z α for a given confidence level α. If the batch means do not pass the test, Correlated is reported for the half-width on the statistical reports following https://rossetti.github.io/RossettiArenaBook/ch5-BatchMeansMethod.html alternatively for more oldschhol see Alexopoulos and Seila 1998 section 3.4.3
+  //KS: The hypothesis is rejected if C > z α for a given confidence level α. If the batch means do not pass the test, Correlated is reported for the half-width on the statistical reports following https://rossetti.github.io/RossettiArenaBook/ch5-BatchMeansMethod.html alternatively for more old-school see Alexopoulos and Seila 1998 section 3.4.3
   TVectorD* C_Test_Statistics = new TVectorD(nDraw);
  
   double* OverallBatchMean = new double[nDraw]();
@@ -4170,7 +4172,7 @@ void MCMCProcessor::BatchedAnalysis() {
   #ifdef MULTITHREAD
   #pragma omp for
   #endif
-  //KS: First calcuate mean of batched means for each param and Initialise everything to 0
+  //KS: First calculate mean of batched means for each param and Initialise everything to 0
   for (int j = 0; j < nDraw; ++j)
   {
     OverallBatchMean[j] = 0.0;
@@ -4191,7 +4193,7 @@ void MCMCProcessor::BatchedAnalysis() {
   #ifdef MULTITHREAD
   #pragma omp for nowait
   #endif
-  //KS: next loop is copletely idnepend thus nowait clause
+  //KS: next loop is completely independent thus nowait clause
   for (int j = 0; j < nDraw; ++j)
   {
     for (int i = 0; i < nBatches; ++i)
@@ -4201,7 +4203,7 @@ void MCMCProcessor::BatchedAnalysis() {
     (*BatchedVariance)(j) = (BatchLength/(nBatches-1))* (*BatchedVariance)(j);
   }
   
-  //KS: Now we focus on C test statistic, again use nowait as next is calcualtion is independent
+  //KS: Now we focus on C test statistic, again use nowait as next is calculation is independent
   #ifdef MULTITHREAD
   #pragma omp for nowait
   #endif
@@ -4216,7 +4218,7 @@ void MCMCProcessor::BatchedAnalysis() {
     C_Denominator[j] = 2*C_Denominator[j];
   }
   
-  //KS: We still calcualte C and for this we need rho wee need autocorealtion between bathces
+  //KS: We still calculate C and for this we need rho wee need autocorrelations between batches
   #ifdef MULTITHREAD
   #pragma omp for
   #endif
@@ -4233,7 +4235,7 @@ void MCMCProcessor::BatchedAnalysis() {
     }
   }
   
-  //KS: Finall calcuations of C
+  //KS: Final calculations of C
   #ifdef MULTITHREAD
   #pragma omp for
   #endif
@@ -4267,7 +4269,7 @@ void MCMCProcessor::BatchedAnalysis() {
 void MCMCProcessor::GewekeDiagnostic() {
 // **************************
 
-  std::cout << "Making Geweke Diagnostic "<< std::endl;
+  MACH3LOG_INFO("Making Geweke Diagnostic");
 
   //KS: Up refers to upper limit we check, it stays constnt, in literature it is moslty 50% thus using 0.5 for threshold
   double* MeanUp = new double[nDraw]();
@@ -4304,7 +4306,7 @@ void MCMCProcessor::GewekeDiagnostic() {
 #pragma omp parallel
 {
 #endif
-  //KS: First we calcualte mean and spectral variance for the upper limit, this doesn't change and in literature is most often 50%
+  //KS: First we calculate mean and spectral variance for the upper limit, this doesn't change and in literature is most often 50%
   #ifdef MULTITHREAD
   #pragma omp for
   #endif
@@ -4336,13 +4338,13 @@ void MCMCProcessor::GewekeDiagnostic() {
     }
   }
 
-  //Loop over how many intervals we calucate
+  //Loop over how many intervals we calculate
   #ifdef MULTITHREAD
   #pragma omp for
   #endif
   for (int k = 1; k < NChecks+1; ++k)
   {
-    //KS each thread has it't own
+    //KS each thread has it's own
     double* MeanDown = new double[nDraw]();
     double* SpectralVarianceDown = new double[nDraw]();
     int* DenomCounterDown = new int[nDraw]();
@@ -4381,7 +4383,7 @@ void MCMCProcessor::GewekeDiagnostic() {
         }
       }
     }
-    //Lasly calc T score and fill histogram entry
+    //Lastly calc T score and fill histogram entry
     for (int j = 0; j < nDraw; ++j)
     {
       double T_score = std::fabs((MeanDown[j] - MeanUp[j])/std::sqrt(SpectralVarianceDown[j]/DenomCounterDown[j] + SpectralVarianceUp[j]/DenomCounterUp[j]));
@@ -4430,7 +4432,7 @@ void MCMCProcessor::AcceptanceProbabilities() {
 // **************************
   if (AccProbBatchedAverages == nullptr) PrepareDiagMCMC();
 
-  std::cout << "Making AccProb plots..." << std::endl;
+  MACH3LOG_INFO("Making AccProb plots...");
 
   // Set the titles and limits for TH1Ds
   TH1D* AcceptanceProbPlot = new TH1D("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
