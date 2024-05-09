@@ -2113,40 +2113,6 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
   Posterior->SetRightMargin(RighMargin);
 }
 
-// *********************
-// Convert sigma from normal distribution into percentage
-double MCMCProcessor::GetSigmaValue(int sigma) {
-// *********************
-  double width = 0;
-  switch (std::abs(sigma))
-  {
-    case 1:
-      width = 0.682689492137;
-      break;
-    case 2:
-      width = 0.954499736104;
-      break;
-    case 3:
-      width = 0.997300203937;
-      break;
-    case 4:
-      width = 0.999936657516;
-      break;
-    case 5:
-      width = 0.999999426697;
-      break;
-    case 6:
-      width = 0.999999998027;
-      break;
-    default:
-      std::cerr<<sigma<<" is unsupported value of sigma"<<std::endl;
-      throw;
-      break;
-    }
-  return width;
-}
-
-
 // **************************
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
@@ -2547,44 +2513,44 @@ void MCMCProcessor::ReadXSecFile() {
 void MCMCProcessor::ReadNDFile() {
 // ***************
 
-    // Do the same for the ND280
-    TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
-    if (NDdetFile->IsZombie()) {
-        std::cerr << "Couldn't find NDdetFile " << CovPos[kNDPar].back() << std::endl;
-        throw;
-    }
-    NDdetFile->cd();
-    
-    TMatrixDSym *NDdetMatrix = (TMatrixDSym*)(NDdetFile->Get("nddet_cov"));
-    TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
-    TDirectory *BinningDirectory = (TDirectory*)NDdetFile->Get("Binning")->Clone();
+  // Do the same for the ND280
+  TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
+  if (NDdetFile->IsZombie()) {
+    std::cerr << "Couldn't find NDdetFile " << CovPos[kNDPar].back() << std::endl;
+    throw;
+  }
+  NDdetFile->cd();
 
-    for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
-    {
-      ParamNom[kNDPar].push_back( (*NDdetNominal)(i) );
-      ParamCentral[kNDPar].push_back( (*NDdetNominal)(i) );
-      
-      ParamErrors[kNDPar].push_back( std::sqrt((*NDdetMatrix)(i,i)) );
-      ParamNames[kNDPar].push_back( Form("ND Det %i", i) );
-      //KS: Currently we can only set it via config, change it in future
-      ParamFlat[kNDPar].push_back( false );
-    }  
+  TMatrixDSym *NDdetMatrix = (TMatrixDSym*)(NDdetFile->Get("nddet_cov"));
+  TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
+  TDirectory *BinningDirectory = (TDirectory*)NDdetFile->Get("Binning")->Clone();
 
-    TIter next(BinningDirectory->GetListOfKeys());
-    TKey *key = nullptr;
-    
-    // Loop through all entries
-    while ((key = (TKey*)next())) 
-    {
-      std::string name = std::string(key->GetName());
-      TH2Poly* RefPoly = (TH2Poly*)BinningDirectory->Get((name).c_str())->Clone();
-      int size = RefPoly->GetNumberOfBins();
-      NDSamplesBins.push_back(size);
-      NDSamplesNames.push_back(RefPoly->GetTitle());
-    }
+  for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
+  {
+    ParamNom[kNDPar].push_back( (*NDdetNominal)(i) );
+    ParamCentral[kNDPar].push_back( (*NDdetNominal)(i) );
 
-    NDdetFile->Close();
-    delete NDdetFile;
+    ParamErrors[kNDPar].push_back( std::sqrt((*NDdetMatrix)(i,i)) );
+    ParamNames[kNDPar].push_back( Form("ND Det %i", i) );
+    //KS: Currently we can only set it via config, change it in future
+    ParamFlat[kNDPar].push_back( false );
+  }
+
+  TIter next(BinningDirectory->GetListOfKeys());
+  TKey *key = nullptr;
+
+  // Loop through all entries
+  while ((key = (TKey*)next()))
+  {
+    std::string name = std::string(key->GetName());
+    TH2Poly* RefPoly = (TH2Poly*)BinningDirectory->Get((name).c_str())->Clone();
+    int size = RefPoly->GetNumberOfBins();
+    NDSamplesBins.push_back(size);
+    NDSamplesNames.push_back(RefPoly->GetTitle());
+  }
+
+  NDdetFile->Close();
+  delete NDdetFile;
 }
 
 
@@ -2628,50 +2594,50 @@ void MCMCProcessor::ReadFDFile() {
 void MCMCProcessor::ReadOSCFile() {
 // ***************
 
-    // Do the same for the ND280
-    TFile *OscFile = new TFile(CovPos[kOSCPar].back().c_str(), "open");
-    if (OscFile->IsZombie()) {
-        std::cerr << "Couldn't find OSCFile " << CovPos[kOSCPar].back() << std::endl;
-        throw;
-    }
-    OscFile->cd();
-    
-    TMatrixDSym *OscMatrix = (TMatrixDSym*)(OscFile->Get("osc_cov"));
-    //KS: Osc nominal we can also set via config so there is danger that this will nor corrspond to what was used in the fit
-    TVectorD *OscNominal = (TVectorD*)(OscFile->Get("osc_nom"));
-    TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
-    TVectorD* osc_flat_prior = (TVectorD*)OscFile->Get("osc_flat_prior");
+  // Do the same for the ND280
+  TFile *OscFile = new TFile(CovPos[kOSCPar].back().c_str(), "open");
+  if (OscFile->IsZombie()) {
+    std::cerr << "Couldn't find OSCFile " << CovPos[kOSCPar].back() << std::endl;
+    throw;
+  }
+  OscFile->cd();
 
-    for (int i = 0; i < osc_flat_prior->GetNrows(); ++i)
-    {
-      ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
-      ParamCentral[kOSCPar].push_back( (*OscNominal)(i) );
-      
-      ParamErrors[kOSCPar].push_back( std::sqrt((*OscMatrix)(i,i)) );
-      // Push back the name
-      std::string TempString = std::string(((TObjString*)osc_param_names->At(i))->GetString());
-      ParamNames[kOSCPar].push_back(TempString);
+  TMatrixDSym *OscMatrix = (TMatrixDSym*)(OscFile->Get("osc_cov"));
+  //KS: Osc nominal we can also set via config so there is danger that this will nor corrspond to what was used in the fit
+  TVectorD *OscNominal = (TVectorD*)(OscFile->Get("osc_nom"));
+  TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
+  TVectorD* osc_flat_prior = (TVectorD*)OscFile->Get("osc_flat_prior");
 
-      ParamFlat[kOSCPar].push_back( (bool)((*osc_flat_prior)(i)) );
-    }
-    if(PlotJarlskog)
-    {
-      Chain->SetAlias("J_cp", "TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)");
-      BranchNames.push_back("J_cp");
-      ParamType.push_back(kOSCPar);
-      nParam[kOSCPar]++;
-      nDraw++;
-      
-      //TODO we should actually calucate central value and prior error but leave it for now...
-      ParamNom[kOSCPar].push_back( 0. );
-      ParamCentral[kOSCPar].push_back( 0. );
-      ParamErrors[kOSCPar].push_back( 1. );
-      // Push back the name
-      ParamNames[kOSCPar].push_back("J_cp");
-      ParamFlat[kOSCPar].push_back( false );
-    }
-    OscFile->Close();
-    delete OscFile;
+  for (int i = 0; i < osc_flat_prior->GetNrows(); ++i)
+  {
+    ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
+    ParamCentral[kOSCPar].push_back( (*OscNominal)(i) );
+
+    ParamErrors[kOSCPar].push_back( std::sqrt((*OscMatrix)(i,i)) );
+    // Push back the name
+    std::string TempString = std::string(((TObjString*)osc_param_names->At(i))->GetString());
+    ParamNames[kOSCPar].push_back(TempString);
+
+    ParamFlat[kOSCPar].push_back( (bool)((*osc_flat_prior)(i)) );
+  }
+  if(PlotJarlskog)
+  {
+    Chain->SetAlias("J_cp", "TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)");
+    BranchNames.push_back("J_cp");
+    ParamType.push_back(kOSCPar);
+    nParam[kOSCPar]++;
+    nDraw++;
+
+    //TODO we should actually calucate central value and prior error but leave it for now...
+    ParamNom[kOSCPar].push_back( 0. );
+    ParamCentral[kOSCPar].push_back( 0. );
+    ParamErrors[kOSCPar].push_back( 1. );
+    // Push back the name
+    ParamNames[kOSCPar].push_back("J_cp");
+    ParamFlat[kOSCPar].push_back( false );
+  }
+  OscFile->Close();
+  delete OscFile;
 }
 
 // ***************
@@ -2795,13 +2761,13 @@ void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage
     //KS:: Move further only if you haven't reached histogram end
     if(LowBin > 1)
     {
-        LowBin--;
-        LowCon = hpost->GetBinContent(LowBin);
+      LowBin--;
+      LowCon = hpost->GetBinContent(LowBin);
     }
     if(HighBin < hpost->GetNbinsX())
     {
-        HighBin++;
-        HighCon = hpost->GetBinContent(HighBin);
+      HighBin++;
+      HighCon = hpost->GetBinContent(HighBin);
     }
 
     // If we're on the last slice and the lower contour is larger than the upper
@@ -3295,41 +3261,6 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
   OutputFile->cd();
 }
 
-
-// **************************
-// KS: Following H. Jeffreys. The theory of probability. UOP Oxford, 1998. DOI: 10.2307/3619118.
-std::string MCMCProcessor::GetJeffreysScale(const double BayesFactor){
-// **************************
-    std::string JeffreysScale = "";
-    //KS: Get fancy Jeffreys Scale as I am to lazy to look into table everytime
-    if(BayesFactor < 0)        JeffreysScale = "Negative";
-    else if( 5 > BayesFactor)  JeffreysScale = "Barely worth mentioning";
-    else if( 10 > BayesFactor) JeffreysScale = "Substantial";
-    else if( 15 > BayesFactor) JeffreysScale = "Strong";
-    else if( 20 > BayesFactor) JeffreysScale = "Very strong";
-    else JeffreysScale = "Decisive";
-
-    MACH3LOG_INFO("Following Jeffreys Scale = {}",JeffreysScale);
-    return JeffreysScale;
-}
-
-
-// **************************
-// KS: Based on Table 1 in https://www.t2k.org/docs/technotes/435
-std::string MCMCProcessor::GetDunneKaboth(const double BayesFactor){
-// **************************
-    std::string DunneKaboth = "";
-    //KS: Get fancy DunneKaboth Scale as I am to lazy to look into table everytime
-
-    if(2.125 > BayesFactor)    DunneKaboth = "< 1 #sigma";
-    else if( 20.74 > BayesFactor)  DunneKaboth = "> 1 #sigma";
-    else if( 369.4 > BayesFactor) DunneKaboth = "> 2 #sigma";
-    else if( 15800 > BayesFactor) DunneKaboth = "> 3 #sigma";
-    else if( 1745000 > BayesFactor) DunneKaboth = "> 4 #sigma";
-    else DunneKaboth = "> 5 #sigma";
-
-    return DunneKaboth;
-}
 
 // **************************
 // KS: Reweight prior of MCMC chain to another

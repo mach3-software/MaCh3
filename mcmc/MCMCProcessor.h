@@ -3,13 +3,6 @@
 #ifndef _UNDEF_
 #define _UNDEF_ 1234567890
 #endif
-// C++ includes
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <vector>
-#include <algorithm>
-#include <cmath>
 
 // ROOT includes
 #include "TObjArray.h"
@@ -40,9 +33,7 @@
 #include "TGraphPolar.h"
 #include "TMath.h"
 
-#include "samplePDF/Structs.h"
-#include "manager/manager.h"
-
+#include "mcmc/StatisticalUtils.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
 // Useful for when we want to extract values from a previous MCMC 
@@ -255,12 +246,6 @@ class MCMCProcessor {
     inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
     /// @brief Get 2D Credible Region
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
-    /// @brief Get significance of Bayes factor result following Jeffreys scale
-    inline std::string GetJeffreysScale(const double BayesFactor);
-    /// @brief Get significance of Bayes factor result following Dunne-Kaboth scale
-    inline std::string GetDunneKaboth(const double BayesFactor);
-    /// @brief Convert sigma from normal distribution into percentage
-    inline double GetSigmaValue(int sigma);
 
     // MCMC Diagnostic
     inline void PrepareDiagMCMC();

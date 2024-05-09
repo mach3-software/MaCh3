@@ -7,6 +7,7 @@ set(HEADERS
     tune.h
     stretch.h
     MCMCProcessor.h
+    StatisticalUtils.h
 )
 
 add_library(MCMC SHARED
