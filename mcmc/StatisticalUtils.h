@@ -97,7 +97,7 @@ inline double GetBIC(const double llh, const int data, const int nPars){
 }
 
 // ****************
-//KS: See 14.3.10 in Numerical Recipes in C
+/// @brief KS: See 14.3.10 in Numerical Recipes in C
 inline double GetNeffective(const int N1, const int N2) {
 // ****************
 
