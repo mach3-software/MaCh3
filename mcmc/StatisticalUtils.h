@@ -25,7 +25,6 @@ inline std::string GetJeffreysScale(const double BayesFactor){
   else if( 20 > BayesFactor) JeffreysScale = "Very strong";
   else JeffreysScale = "Decisive";
 
-  MACH3LOG_INFO("Following Jeffreys Scale = {}",JeffreysScale);
   return JeffreysScale;
 }
 
