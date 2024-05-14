@@ -274,9 +274,9 @@ class covarianceBase {
   inline bool IsPCA() { return pca; }
 
   /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
-  inline void MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n);
+  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n);
   /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
-  inline double MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i);
+  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
 
   /// @brief HW: Turn on/off true adaptive MCMC, Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
   void enableAdaptiveMCMC(bool enable = true){

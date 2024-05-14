@@ -1193,7 +1193,7 @@ void covarianceBase::setEvalLikelihood(const int i, const bool eL) {
 
 // ********************************************
 //KS: Custom function to perform multiplication of matrix and vector with multithreading
-void covarianceBase::MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n) {
+void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) {
 // ********************************************
 
   #ifdef MULTITHREAD
@@ -1211,7 +1211,7 @@ void covarianceBase::MatrixVectorMulti(double* VecMulti, double** matrix, const 
 }
 
 // ********************************************
-double covarianceBase::MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i) {
+double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) {
 // ********************************************
 
   double Element = 0.0;

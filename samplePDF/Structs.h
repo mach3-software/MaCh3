@@ -14,11 +14,18 @@
 #endif
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class. Keep it in ND for the time being
-#define SafeException
-#ifdef SafeException
+//#define SafeException
+#ifndef SafeException
 #define _noexcept_ noexcept
 #else
 #define _noexcept_
+#endif
+
+/// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
+#ifndef DEBUG
+#define _restrict_ __restrict__
+#else
+#define _restrict_
 #endif
 
 /// Number of overflow bins in TH2Poly,
