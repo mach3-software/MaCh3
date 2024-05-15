@@ -4206,16 +4206,19 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   MACH3LOG_INFO("Making Power Spectrum plots...");
 
-  const int start = -(nEntries/2-1);
-  const int end = nEntries/2-1;
+  // WARNING This is only to reduce number of computations...
+  const int N_Coeffs = std::min(10000, nEntries);
+  const int start = -(N_Coeffs/2-1);
+  const int end = N_Coeffs/2-1;
   const int v_size = end - start;
 
+
   int nPrams = nDraw;
-  //KS: Code is awfully slow... I know how to make it slower (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
+  //KS: WARNING Code is awfully slow... I know how to make it slower (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
   nPrams = 2;
 
-  std::vector<std::vector<float>> x(nDraw, std::vector<float>(v_size, 0.0));
-  std::vector<std::vector<float>> a_j(nDraw, std::vector<float>(v_size, 0.0));
+  std::vector<std::vector<float>> x(nPrams, std::vector<float>(v_size, 0.0));
+  std::vector<std::vector<float>> a_j(nPrams, std::vector<float>(v_size, 0.0));
 
   int _N = nEntries;
   if (_N % 2 != 0) _N -= 1; // N must be even
