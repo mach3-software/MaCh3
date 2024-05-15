@@ -2880,7 +2880,7 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) 
   const long double Integral = hpost->Integral();
   long double sum = 0;
 
-  //We need to as ROOT requiers array to set to contour
+  //We need to as ROOT requires array to set to contour
   double Contour[1];
   while ((sum / Integral) < coverage)
   {

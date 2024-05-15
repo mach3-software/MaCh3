@@ -369,6 +369,56 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
   return;
 }
 
+// *******************
+// Process the MCMC output to get postfit etc
+void FitterBase::ProcessMCMC() {
+// *******************
+
+  if (fitMan == NULL) return;
+
+  // Process the MCMC
+  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
+
+    // Make the processor
+    MCMCProcessor Processor(std::string(outputFile->GetName()), false);
+
+    Processor.Initialise();
+    // Make the TVectorD pointers which hold the processed output
+    TVectorD *Central = nullptr;
+    TVectorD *Errors = nullptr;
+    TVectorD *Central_Gauss = nullptr;
+    TVectorD *Errors_Gauss = nullptr;
+    TVectorD *Peaks = nullptr;
+
+    // Make the postfit
+    Processor.GetPostfit(Central, Errors, Central_Gauss, Errors_Gauss, Peaks);
+    Processor.DrawPostfit();
+
+    // Make the TMatrix pointers which hold the processed output
+    TMatrixDSym *Covariance = nullptr;
+    TMatrixDSym *Correlation = nullptr;
+
+    // Make the covariance matrix
+    Processor.GetCovariance(Covariance, Correlation);
+    Processor.DrawCovariance();
+
+    std::vector<TString> BranchNames = Processor.GetBranchNames();
+
+    // Re-open the TFile
+    if (!outputFile->IsOpen()) {
+      MACH3LOG_INFO("Opening output again to update with means..");
+      outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
+    }
+
+    Central->Write("PDF_Means");
+    Errors->Write("PDF_Errors");
+    Central_Gauss->Write("Gauss_Means");
+    Errors_Gauss->Write("Errors_Gauss");
+    Covariance->Write("Covariance");
+    Correlation->Write("Correlation");
+  }
+}
+
 // *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {

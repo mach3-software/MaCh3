@@ -64,6 +64,8 @@ class FitterBase {
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
  protected:
+  /// @brief Process MCMC output
+  void ProcessMCMC();
 
   /// @brief Prepare the output file.
   void PrepareOutput();

@@ -27,10 +27,9 @@ void LikelihoodFit::PrepareFit() {
   // Prepare the output branches
   PrepareOutput();
   
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
-  {
-    NPars += (*it)->GetNumParams();
-    NParsPCA += (*it)->getNpars();
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    NPars += systematics[s]->GetNumParams();
+    NParsPCA += systematics[s]->getNpars();
   }
 
   if (osc) {

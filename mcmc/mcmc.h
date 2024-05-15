@@ -22,10 +22,6 @@ class mcmc : public FitterBase {
   /// @brief Get name of class
   inline std::string GetName()const {return "MCMC";};
  private:
-
-  /// @brief Process MCMC output
-  inline void ProcessMCMC();
-
   /// @brief Propose a step
   inline void ProposeStep();
 
