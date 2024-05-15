@@ -4217,8 +4217,8 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   //KS: WARNING Code is awfully slow... I know how to make it slower (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
   nPrams = 2;
 
-  std::vector<std::vector<float>> x(nPrams, std::vector<float>(v_size, 0.0));
-  std::vector<std::vector<float>> a_j(nPrams, std::vector<float>(v_size, 0.0));
+  std::vector<std::vector<float>> k_j(nPrams, std::vector<float>(v_size, 0.0));
+  std::vector<std::vector<float>> P_j(nPrams, std::vector<float>(v_size, 0.0));
 
   int _N = nEntries;
   if (_N % 2 != 0) _N -= 1; // N must be even
@@ -4232,23 +4232,22 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   {
     for (int jj = start; jj < end; ++jj)
     {
-      std::complex<double> temp = 0.0;
+      std::complex<double> a_j = 0.0;
 
       for (int n = 0; n < _N; ++n)
       {
         //if(StepNumber[n] < BurnInCut) continue;
         std::complex<double> exp_temp(0, 2*TMath::Pi()*(jj*float(n)/float(_N)));
-        temp += ParStep[n][j] * std::exp(exp_temp);
+        a_j += ParStep[n][j] * std::exp(exp_temp);
       }
-      temp /= float(std::sqrt(float(_N)));
+      a_j /= float(std::sqrt(float(_N)));
       int _c = jj - start;
 
-      x[j][_c] = 2*TMath::Pi()*(jj/float(_N));
-      a_j[j][_c] = std::norm(temp);
+      k_j[j][_c] = 2*TMath::Pi()*(jj/float(_N));
+      // Equation 13
+      P_j[j][_c] = std::norm(a_j);
     }
   }
-
-  MACH3LOG_INFO("Now fitting");
 
   TDirectory *PowerDir = OutputFile->mkdir("PowerSpectrum");
   PowerDir->cd();
@@ -4258,7 +4257,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   for (int j = 0; j < nPrams; ++j)
   {
-    plot[j] = new TGraph(v_size, x[j].data(), a_j[j].data());
+    plot[j] = new TGraph(v_size, k_j[j].data(), P_j[j].data());
 
     TString Title = "";
     double Prior = 1.0;
@@ -4275,10 +4274,12 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
     // Equation 18
     TF1 *func = new TF1("power_template", "[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )", 0.0, 1.0);
-
-    func->SetParameter(0, 10.0); // P0
-    func->SetParameter(1, 0.1); // k*
-    func->SetParameter(2, 2.0); // alpha
+    // P0 gives the amplitude of the white noise spectrum in the k → 0 limit
+    func->SetParameter(0, 10.0);
+    // k* indicates the position of the turnover to a different power law behaviour
+    func->SetParameter(1, 0.1);
+    // alpha free parameter
+    func->SetParameter(2, 2.0);
 
     plot[j]->Fit("power_template","Rq");
 
