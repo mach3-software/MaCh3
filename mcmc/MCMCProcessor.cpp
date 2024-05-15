@@ -4214,14 +4214,8 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   //KS: Code is awfully slow... I know how to make it slower (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
   nPrams = 2;
 
-  float **x = new float*[nPrams];
-  float **a_j = new float*[nPrams];
-
-  for (int j = 0; j < nPrams; ++j)
-  {
-    x[j] = new float[v_size];
-    a_j[j] = new float[v_size];
-  }
+  std::vector<std::vector<float>> x(nDraw, std::vector<float>(v_size, 0.0));
+  std::vector<std::vector<float>> a_j(nDraw, std::vector<float>(v_size, 0.0));
 
   int _N = nEntries;
   if (_N % 2 != 0) _N -= 1; // N must be even
@@ -4257,9 +4251,11 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   PowerDir->cd();
 
   TGraph **plot = new TGraph*[nPrams];
+  TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
+
   for (int j = 0; j < nPrams; ++j)
   {
-    plot[j] = new TGraph(v_size, x[j], a_j[j]);
+    plot[j] = new TGraph(v_size, x[j].data(), a_j[j].data());
 
     TString Title = "";
     double Prior = 1.0;
@@ -4273,10 +4269,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     name = Form("%s_power_spectrum", Title.Data());
     plot[j]->SetName(name.c_str());
     plot[j]->SetMarkerStyle(7);
-  }
-  TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
-  for (int j = 0; j < nPrams; ++j)
-  {
+
     // Equation 18
     TF1 *func = new TF1("power_template", "[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )", 0.0, 1.0);
 
@@ -4298,12 +4291,8 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
     delete func;
     delete plot[j];
-    delete [] x[j];
-    delete [] a_j[j];
   }
   delete [] plot;
-  delete [] x;
-  delete [] a_j;
 
   PowerSpectrumStepSize->Write("PowerSpectrumStepSize");
   delete PowerSpectrumStepSize;
