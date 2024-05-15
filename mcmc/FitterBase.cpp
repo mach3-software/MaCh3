@@ -229,7 +229,6 @@ void FitterBase::PrepareOutput() {
   MACH3LOG_INFO("-------------------- Starting MCMC --------------------");
   #ifdef DEBUG
   if (debug) {
-    PrintInitialState();
     debugFile << "----- Starting MCMC -----" << std::endl;
   }
   #endif

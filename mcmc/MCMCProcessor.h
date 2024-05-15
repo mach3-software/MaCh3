@@ -4,6 +4,9 @@
 #define _UNDEF_ 1234567890
 #endif
 
+// C++ includes
+#include <complex>
+
 // ROOT includes
 #include "TObjArray.h"
 #include "TObjString.h"
@@ -33,6 +36,7 @@
 #include "TGraphPolar.h"
 #include "TMath.h"
 
+// MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
 
 // Class to process MCMC output produced by mcmc::runMCMC
@@ -124,8 +128,6 @@ class MCMCProcessor {
     inline std::string const & GetNDCov() const { return CovPos[kNDPar].back(); };
     inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar].back(); };
     inline std::string const & GetOscCov()   const { return CovPos[kOSCPar].back(); };
-    //inline std::string const & GetNDruns()   const { return NDruns; };
-    //inline std::vector<std::string> const & GetNDsel() const {return NDsel;};
 
     /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
@@ -159,7 +161,7 @@ class MCMCProcessor {
     inline void SetPlotBinValue(const bool PlotOrNot){plotBinValue = PlotOrNot; };
     inline void SetFancyNames(const bool PlotOrNot){FancyPlotNames = PlotOrNot; };
     inline void SetSmoothing(const bool PlotOrNot){ApplySmoothing = PlotOrNot; };
-    //Code will only plot 2D posteriors if Correlation are larger than defined threshold
+    /// @biref Code will only plot 2D posteriors if Correlation are larger than defined threshold
     inline void SetPost2DPlotThreshold(const double Threshold){Post2DPlotThreshold = Threshold; };
 
     //Setter related what parameters we want to exclude from analysis
@@ -217,6 +219,7 @@ class MCMCProcessor {
     inline void SetCredibleInSigmas(const bool Intervals){CredibleInSigmas = Intervals; };
 
   private:
+    /// @brief Prepare prefit histogram for parameter overlay plot
     inline TH1D* MakePrefit();
     inline void MakeOutputFile();
     inline void DrawCorrelations1D();
@@ -248,24 +251,30 @@ class MCMCProcessor {
     inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
 
     // MCMC Diagnostic
+    /// @brief CW: Prepare branches etc. for DiagMCMC
     inline void PrepareDiagMCMC();
+    /// @brief CW: Draw trace plots of the parameters i.e. parameter vs step
     inline void ParamTraces();
+    /// @brief KS: Calculate autocorrelations supports both OpenMP and CUDA :)
     inline void AutoCorrelation();
+    /// @brief KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
     inline void CalculateESS(const int nLags);
+    /// @brief Get the batched means variance estimation and variable indicating if number of batches is sensible
     inline void BatchedAnalysis();
+    /// @brief CW: Batched means, literally read from an array and chuck into TH1D
     inline void BatchedMeans();
+    /// @brief Geweke Diagnostic based on https://www.math.arizona.edu/~piegorsch/675/GewekeDiagnostics.pdf
     inline void GewekeDiagnostic();
+    /// @brief Acceptance Probability
     inline void AcceptanceProbabilities();
-    
+    /// @brief RC: Perform spectral analysis of MCMC based on http://arxiv.org/abs/astro-ph/0405462
+    inline void PowerSpectrumAnalysis();
+
     //Useful strings telling us about output etc
     std::string MCMCFile;
     std::string OutputSuffix;
     /// Covariance matrix name position
     std::vector<std::vector<std::string>> CovPos;
-    // ND runs
-    //std::string NDruns;
-    // ND selections
-    //std::vector<std::string> NDsel;
 
     /// Main chain storing all steps etc
     TChain *Chain;
@@ -278,7 +287,9 @@ class MCMCProcessor {
     int nEntries;
     /// KS: For merged chains number of entries will be different from nSteps
     int nSteps;
+    /// Number of sample PDF objects
     int nSamples;
+    /// Number of covariance objects
     int nSysts;
 
     //Name of all branches as well as branches we don't want to include in the analysis
@@ -411,6 +422,7 @@ class MCMCProcessor {
     
   //Only if GPU is enabled
   #ifdef CUDA
+    /// @brief Move stuff to GPU to perform auto correlation calculations there
     inline void PrepareGPU_AutoCorr(const int nLags);
 
     float* ParStep_cpu;

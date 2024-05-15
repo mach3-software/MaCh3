@@ -948,8 +948,8 @@ void MCMCProcessor::MakeViolin() {
     }
   } // end the for loop over nDraw
   clock.Stop();
-  std::cout << "Making Violin plot took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
-  
+  MACH3LOG_INFO("Making Violin plot took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
+
   //KS: Tells how many parameters in one canvas we want
   const int IntervalsSize = 10;
   const int NIntervals = nDraw/IntervalsSize;
@@ -3369,13 +3369,6 @@ void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<do
 void MCMCProcessor::DiagMCMC() {
 // **************************
 
-// MCMC stuff to implement:
-// Trace plots            -- DONE
-// LogL vs step plots     -- DONE
-// Acceptance probability -- DONE
-// Autocorrelation        -- DONE
-// _Batched Means_        -- DONE
-    
   // Prepare branches etc for DiagMCMC
   PrepareDiagMCMC();
 
@@ -3387,6 +3380,9 @@ void MCMCProcessor::DiagMCMC() {
 
   // Draw the auto-correlations
   AutoCorrelation();
+
+  // Calculate Power Spectrum for each param
+  PowerSpectrumAnalysis();
 
   // Get Geweke Z score helping select burn-in
   GewekeDiagnostic();
@@ -3544,7 +3540,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   }
 
   clock.Stop();
-  std::cout << "Took " << clock.RealTime() << "s to finish caching statistic for Diag MCMC with " << nEntries << " steps" << std::endl;
+  MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nEntries);
 
   // Make the sums into average
   #ifdef MULTITHREAD
@@ -3667,7 +3663,7 @@ void MCMCProcessor::ParamTraces() {
 
 
 // *********************************
-//KS: Calculate autocoraetlions supports both OpenMP and CUDA :)
+//KS: Calculate autocorrelations supports both OpenMP and CUDA :)
 void MCMCProcessor::AutoCorrelation() {
 // *********************************
 
@@ -3813,7 +3809,7 @@ void MCMCProcessor::AutoCorrelation() {
   OutputFile->cd();
 
   clock.Stop();
-  std::cout << "It took " << clock.RealTime() << std::endl;
+  MACH3LOG_INFO("It took {:.2f}s", clock.RealTime());
 }
 
 #ifdef CUDA
@@ -3928,6 +3924,7 @@ void MCMCProcessor::CalculateESS(const int nLags) {
     EffectiveSampleSizeHist[i]->GetYaxis()->SetTitle("N_{eff}/N");
     EffectiveSampleSizeHist[i]->SetFillColor(ESSColours[i]);
     EffectiveSampleSizeHist[i]->SetLineColor(ESSColours[i]);
+    EffectiveSampleSizeHist[i]->Sumw2();
     for (int j = 0; j < nDraw; ++j)
     {
       TString Title = "";
@@ -4194,6 +4191,133 @@ void MCMCProcessor::BatchedAnalysis() {
 }
 
 // **************************
+// RC: Perform spectral analysis of MCMC based on http://arxiv.org/abs/astro-ph/0405462
+void MCMCProcessor::PowerSpectrumAnalysis() {
+// **************************
+  TStopwatch clock;
+  clock.Start();
+
+  //KS: Store it as we go back to them at the end
+  const double TopMargin  = Posterior->GetTopMargin();
+  const int OptTitle = gStyle->GetOptTitle();
+
+  Posterior->SetTopMargin(0.1);
+  gStyle->SetOptTitle(1);
+
+  MACH3LOG_INFO("Making Power Spectrum plots...");
+
+  const int start = -(nEntries/2-1);
+  const int end = nEntries/2-1;
+  const int v_size = end - start;
+
+  int nPrams = nDraw;
+  //KS: Code is awfully slow... I know how to make it slower (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
+  nPrams = 2;
+
+  float **x = new float*[nPrams];
+  float **a_j = new float*[nPrams];
+
+  for (int j = 0; j < nPrams; ++j)
+  {
+    x[j] = new float[v_size];
+    a_j[j] = new float[v_size];
+  }
+
+  int _N = nEntries;
+  if (_N % 2 != 0) _N -= 1; // N must be even
+
+  // KS: This could be moved to GPU I guess
+  #ifdef MULTITHREAD
+  #pragma omp parallel for collapse(2)
+  #endif
+  // RC: equation 11: for each value of j coef, from range -N/2 -> N/2
+  for (int j = 0; j < nPrams; ++j)
+  {
+    for (int jj = start; jj < end; ++jj)
+    {
+      std::complex<double> temp = 0.0;
+
+      for (int n = 0; n < _N; ++n)
+      {
+        //if(StepNumber[n] < BurnInCut) continue;
+        std::complex<double> exp_temp(0, 2*TMath::Pi()*(jj*float(n)/float(_N)));
+        temp += ParStep[n][j] * std::exp(exp_temp);
+      }
+      temp /= float(std::sqrt(float(_N)));
+      int _c = jj - start;
+
+      x[j][_c] = 2*TMath::Pi()*(jj/float(_N));
+      a_j[j][_c] = std::norm(temp);
+    }
+  }
+
+  MACH3LOG_INFO("Now fitting");
+
+  TDirectory *PowerDir = OutputFile->mkdir("PowerSpectrum");
+  PowerDir->cd();
+
+  TGraph **plot = new TGraph*[nPrams];
+  for (int j = 0; j < nPrams; ++j)
+  {
+    plot[j] = new TGraph(v_size, x[j], a_j[j]);
+
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+
+    GetNthParameter(j, Prior, PriorError, Title);
+
+    std::string name = Form("Power Spectrum of %s;k;P(k)", Title.Data());
+
+    plot[j]->SetTitle(name.c_str());
+    name = Form("%s_power_spectrum", Title.Data());
+    plot[j]->SetName(name.c_str());
+    plot[j]->SetMarkerStyle(7);
+  }
+  TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
+  for (int j = 0; j < nPrams; ++j)
+  {
+    // Equation 18
+    TF1 *func = new TF1("power_template", "[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )", 0.0, 1.0);
+
+    func->SetParameter(0, 10.0); // P0
+    func->SetParameter(1, 0.1); // k*
+    func->SetParameter(2, 2.0); // alpha
+
+    plot[j]->Fit("power_template","Rq");
+
+    Posterior->SetLogx();
+    Posterior->SetLogy();
+    Posterior->SetGrid();
+    plot[j]->Write(plot[j]->GetName());
+    plot[j]->Draw("AL");
+    func->Draw("SAME");
+    if(printToPDF) Posterior->Print(CanvasName);
+
+    (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
+
+    delete func;
+    delete plot[j];
+    delete [] x[j];
+    delete [] a_j[j];
+  }
+  delete [] plot;
+  delete [] x;
+  delete [] a_j;
+
+  PowerSpectrumStepSize->Write("PowerSpectrumStepSize");
+  delete PowerSpectrumStepSize;
+  PowerDir->Close();
+  delete PowerDir;
+
+  clock.Stop();
+  MACH3LOG_INFO("It took {:.2f}s", clock.RealTime());
+
+  Posterior->SetTopMargin(TopMargin);
+  gStyle->SetOptTitle(OptTitle);
+}
+
+// **************************
 // Geweke Diagnostic based on
 // https://www.math.arizona.edu/~piegorsch/675/GewekeDiagnostics.pdf
 // https://www2.math.su.se/matstat/reports/master/2011/rep2/report.pdf Chapter 3.1
@@ -4356,6 +4480,7 @@ void MCMCProcessor::GewekeDiagnostic() {
 
   OutputFile->cd();
 }
+
 
 // **************************
 // Acceptance Probability
