@@ -272,8 +272,7 @@ void samplePDFFDBase::fillArray() {
   }
 
   PrepFunctionalParameters();
-  splineFile->FindSplineSegment();
-  splineFile->calcWeights();
+  splineFile->Evaluate();
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -444,8 +443,7 @@ void samplePDFFDBase::fillArray_MP()
 	PrepFunctionalParameters();
 	//==================================================
 	//Calc Weights and fill Array
-	splineFile->FindSplineSegment();
-	splineFile->calcWeights();
+	splineFile->Evaluate();
 
 	for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
 #pragma omp for

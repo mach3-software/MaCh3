@@ -186,7 +186,10 @@ void SMonolith::Initialise() {
 // Uses an x array and one combined yabd array
 // This should optimise cache hitting because we use the same yabd points once we've found the x point
 // So make these yabd points lay right next to each other in memory
-SMonolith::SMonolith(std::vector<std::vector<TSpline3*> > &MasterSpline) {
+SMonolith::SMonolith(std::vector<std::vector<TSpline3*> > &MasterSpline)
+          : SplineBase() {
+// *****************************************
+
   Initialise();
   MACH3LOG_INFO("Using full TSpline3, about to reduce it and send to GPU");
   // Convert the TSpline3 pointers to the reduced form and call the reduced constructor
@@ -196,7 +199,8 @@ SMonolith::SMonolith(std::vector<std::vector<TSpline3*> > &MasterSpline) {
 
 // *****************************************
 // Constructor for the reduced TSpline3 object
-SMonolith::SMonolith(std::vector<std::vector<TSpline3_red*> > &MasterSpline) {
+SMonolith::SMonolith(std::vector<std::vector<TSpline3_red*> > &MasterSpline)
+          : SplineBase() {
 // *****************************************
   Initialise();
   MACH3LOG_INFO("-- GPUING WITH {X} and {Y,B,C,D} arrays and master spline containing TSpline3_red");
@@ -206,8 +210,10 @@ SMonolith::SMonolith(std::vector<std::vector<TSpline3_red*> > &MasterSpline) {
 // *****************************************
 // Uses a fifth order polynomial for most shape except 2p2h shape C/O which are two superimposed linear eq
 // Reduce first
-SMonolith::SMonolith(std::vector<std::vector<TF1*> > &MasterSpline) {
+SMonolith::SMonolith(std::vector<std::vector<TF1*> > &MasterSpline)
+          : SplineBase() {
 // *****************************************
+
   Initialise();
   MACH3LOG_INFO("Using full TF1, about to reduce it and send to GPU");
   // Convert the TSpline3 pointers to the reduced form and call the reduced constructor
@@ -218,7 +224,8 @@ SMonolith::SMonolith(std::vector<std::vector<TF1*> > &MasterSpline) {
 // *****************************************
 // Uses a fifth order polynomial for most shape except 2p2h shape C/O which are two superimposed linear eq
 // Reduce first
-SMonolith::SMonolith(std::vector<std::vector<TF1_red*> > &MasterSpline) {
+SMonolith::SMonolith(std::vector<std::vector<TF1_red*> > &MasterSpline)
+          : SplineBase() {
 // *****************************************
   Initialise();
   MACH3LOG_INFO("-- GPUING WITH TF1_red");
@@ -229,7 +236,8 @@ SMonolith::SMonolith(std::vector<std::vector<TF1_red*> > &MasterSpline) {
 
 // *****************************************
 // Load SplineFile
-SMonolith::SMonolith(std::string FileName) {
+SMonolith::SMonolith(std::string FileName)
+          : SplineBase() {
 // *****************************************
   Initialise();
   MACH3LOG_INFO("-- GPUING WITH {X} and {Y,B,C,D} arrays and master spline containing TSpline3_red");

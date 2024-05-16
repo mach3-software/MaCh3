@@ -262,8 +262,6 @@ endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
-#ETA - commenting out as not c++11 compatible...
-#add_subdirectory(yaml_test)
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties

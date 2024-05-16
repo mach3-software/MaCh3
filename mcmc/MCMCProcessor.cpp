@@ -2133,6 +2133,9 @@ void MCMCProcessor::ScanInput() {
   IamVaried.reserve(nBranches);
   ParamType.reserve(nBranches);
 
+  // Set all the branches to off
+  Chain->SetBranchStatus("*", false);
+
   // Loop over the number of branches
   // Find the name and how many of each systematic we have
   for (int i = 0; i < nBranches; i++)
@@ -2152,6 +2155,10 @@ void MCMCProcessor::ScanInput() {
       }
     }
     if(rejected) continue;
+
+    // Turn on the branches which we want for parameters
+    Chain->SetBranchStatus(bname.Data(), true);
+
     // If we're on beam systematics
     if(bname.BeginsWith("xsec_")) 
     {

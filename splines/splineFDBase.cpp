@@ -1,9 +1,9 @@
 #include "splineFDBase.h"
 
 //****************************************
-splineFDBase::splineFDBase(covarianceXsec *xsec_) {
+splineFDBase::splineFDBase(covarianceXsec *xsec_)
+              : SplineBase() {
 //****************************************
-//
   if (xsec_ == NULL) {
     std::cerr << "Trying to create splineSKBase with NULL covariance object" << std::endl;
     throw;
@@ -173,6 +173,22 @@ void splineFDBase::TransferToMonolith()
 }
 
 
+// *****************************************
+void splineFDBase::Evaluate() {
+// *****************************************
+
+  // There's a parameter mapping that goes from spline parameter to a global parameter index
+  // Find the spline segments
+  FindSplineSegment();
+
+  //KS: Huge MP loop over all valid splines
+  CalcSplineWeights();
+
+  //KS: Huge MP loop over all events calculating total weight
+  ModifyWeights();
+
+  return;
+}
 
 //****************************************
 void splineFDBase::FindSplineSegment()
@@ -255,7 +271,7 @@ void splineFDBase::FindSplineSegment()
 }
 
 //****************************************
-void splineFDBase::calcWeights()
+void splineFDBase::CalcSplineWeights()
 //****************************************
 {
   #ifdef MULTITHREAD

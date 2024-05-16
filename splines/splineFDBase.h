@@ -3,12 +3,10 @@
 //ROOT
 #include "TH3F.h"
 
-// MaCh3  includes
-#include "splines/SplineStructs.h"
-#include "splines/SplineCommon.h"
+//MaCh3
+#include "SplineBase.h"
 
-class splineFDBase
-{
+class splineFDBase : public SplineBase {
   //ETA - do all of these functions and members actually need to be public?
   public:
 	//splineFDBase(const char *spline, int nutype, int nevents, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1 splines
@@ -17,6 +15,9 @@ class splineFDBase
 	virtual ~splineFDBase(){};
 	void SetupSplines();
 	void SetupSplines(int BinningOpt);
+
+    /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
+    void Evaluate();
 
 	void FindUniqueModes();
 
@@ -65,8 +66,6 @@ class splineFDBase
 	void PrintSampleDetails(std::string SampleName);
 	void PrintArrayDetails(std::string SampleName);
 	void PrintArrayDimension();
-	void FindSplineSegment();
-	void calcWeights();
 
 	const double* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
 	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
@@ -75,7 +74,11 @@ class splineFDBase
 
 
   protected:
-	covarianceXsec* xsec;
+    inline void FindSplineSegment() override;
+    inline void CalcSplineWeights() override;
+    inline void ModifyWeights() override {return;};
+
+    covarianceXsec* xsec;
 
 	//And now the actual member variables	
 	std::vector<std::string> SampleNames;

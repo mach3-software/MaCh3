@@ -183,3 +183,33 @@ inline int GetNumberOfRuns(std::vector<int> GroupClasifier) {
 
   return NumberOfRuns;
 }
+
+// ****************
+inline double GetBetaParameter(const double data, const double mc, const double w2, TestStatistic TestStat) {
+// ****************
+  double Beta = 0.0;
+
+  if (TestStat == kDembinskiAbdelmottele) {
+    //the so-called effective count
+    const double k = mc*mc / w2;
+    //Calculate beta which is scaling factor between true and generated MC
+    Beta = (data + k) / (mc + k);
+  }
+  //KS: Below is technically only true for Cowan's BB, which will not be true for Poisson or IceCube, because why not...
+  else {
+    // CW: Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
+    const double fractional = std::sqrt(w2)/mc;
+    // CW: -b/2a in quadratic equation
+    const double temp = mc*fractional*fractional-1;
+    // CW: b^2 - 4ac in quadratic equation
+    const double temp2 = temp*temp + 4*data*fractional*fractional;
+    if (temp2 < 0) {
+      std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }
+    // CW: Solve for the positive beta
+    Beta = (-1*temp+std::sqrt(temp2))/2.;
+  }
+  return Beta;
+}

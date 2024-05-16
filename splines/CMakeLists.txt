@@ -1,4 +1,5 @@
 set(HEADERS
+    SplineBase.h
     splineFDBase.h
     SplineMonolith.h
     SplineCommon.h
@@ -6,6 +7,7 @@ set(HEADERS
 )
 
 add_library(Splines SHARED
+    SplineBase.cpp
     splineFDBase.cpp
     SplineMonolith.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>

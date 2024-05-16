@@ -1,35 +1,13 @@
 #pragma once
 
-// C++ includes
-#include <cstdlib>
-#include <iomanip>
-
-// ROOT include
-#include "TFile.h"
-#include "TH1F.h"
-#include "TKey.h"
-#include "TString.h"
-#include "TIterator.h"
-#include "TStopwatch.h"
-#include "TCanvas.h"
-#include "TStyle.h"
-#include "TTree.h"
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
-// MaCh3  includes
-#include "manager/MaCh3Logger.h"
-#include "splines/SplineStructs.h"
-#include "splines/SplineCommon.h"
+#include "SplineBase.h"
 
 #ifdef CUDA
 extern void SynchroniseSplines();
 #endif
 
 /// @brief Even-by-event class calculating response for spline parameters
-class SMonolith {
+class SMonolith : public SplineBase {
   public:
     /// @brief Constructor
     /// @param MasterSpline Vector of TSpline3 pointers which we strip back
@@ -47,10 +25,10 @@ class SMonolith {
     /// @param FileName path to pre-processed root file containing stripped monolith info
     SMonolith(std::string FileName);
     /// @brief Destructor for SMonolith class.
-    ~SMonolith();
+    virtual ~SMonolith();
 
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
-    void Evaluate();
+    void Evaluate() override;
 
     /// @brief CW: Evaluate weights on the CPU/GPU
     void Evaluate_TF1();
@@ -111,13 +89,13 @@ class SMonolith {
     inline void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
     
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
-    inline void FindSplineSegment();
+    inline void FindSplineSegment() override;
     /// @brief CPU based code which eval weight for each spline
-    inline void CalcSplineWeights();
+    inline void CalcSplineWeights() override;
     /// @brief Same but TF1
     inline void CalcSplineWeights_TF1();
     /// @brief Calc total event weight
-    inline void ModifyWeights();
+    inline void ModifyWeights() override;
     /// @brief Conversion from valid splines to all
     inline void ModifyWeights_GPU();
     
