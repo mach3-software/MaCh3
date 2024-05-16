@@ -3416,26 +3416,28 @@ void MCMCProcessor::PrepareDiagMCMC() {
   if(nBatches == 0)
   {
     MACH3LOG_ERROR("nBatches is equal to 0");
-    MACH3LOG_ERROR("please use SetnBatches to set other value fore exampl 20");
+    MACH3LOG_ERROR("please use SetnBatches to set other value fore example 20");
     throw;      
   }
     
   // Initialise ParStep
-  ParStep = new double*[nEntries]();
+  ParStep = new double*[nDraw]();
+  for (int j = 0; j < nDraw; ++j) {
+    ParStep[j] = new double[nEntries]();
+    for (int i = 0; i < nEntries; ++i) {
+      ParStep[j][i] = -999.99;
+    }
+  }
+
   SampleValues = new double*[nEntries]();
   SystValues = new double*[nEntries]();
   AccProbValues = new double[nEntries]();
   StepNumber = new int[nEntries]();
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
+
   for (int i = 0; i < nEntries; ++i) {
-    ParStep[i] = new double[nDraw]();
     SampleValues[i] = new double[nSamples]();
     SystValues[i] = new double[nSysts]();
-    for (int j = 0; j < nDraw; ++j) {
-      ParStep[i][j] = -999.99;
-    }
+
     for (int j = 0; j < nSamples; ++j) {
       SampleValues[i][j] = -999.99;
     }
@@ -3459,7 +3461,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
 
-// Turn on the branches which we want for parameters
+  // Turn on the branches which we want for parameters
   for (int i = 0; i < nDraw; ++i) {
     Chain->SetBranchStatus(BranchNames[i].Data(), true);
   }
@@ -3505,7 +3507,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
 
     // Set the branch addresses for params
     for (int j = 0; j < nDraw; ++j) {
-      Chain->SetBranchAddress(BranchNames[j].Data(), &ParStep[i][j]);
+      Chain->SetBranchAddress(BranchNames[j].Data(), &ParStep[j][i]);
     }
 
     // Set the branch addresses for samples
@@ -3538,8 +3540,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
 
     // Fill up the sum for each j param
     for (int j = 0; j < nDraw; ++j) {
-      ParamSums[j] += ParStep[i][j];
-      BatchedAverages[BatchNumber][j] += ParStep[i][j];
+      ParamSums[j] += ParStep[j][i];
+      BatchedAverages[BatchNumber][j] += ParStep[j][i];
     }
     
     //KS: Could easyli add this to above loop but I accProb is different beast so better keep it like this
@@ -3558,7 +3560,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
     for (int j = 0; j < nBatches; ++j) {
       // Divide by the total number of events in the batch
       BatchedAverages[j][i] /= BatchLength;
-      if(i==0) AccProbBatchedAverages[j] /= BatchLength; //KS: we have only one accProb, keep it like this for now
+      if(i == 0) AccProbBatchedAverages[j] /= BatchLength; //KS: we have only one accProb, keep it like this for now
     }
   }
 
@@ -3618,7 +3620,7 @@ void MCMCProcessor::ParamTraces() {
   for (int i = 0; i < nEntries; ++i) {
     // Set bin content for the ith bin to the parameter values
     for (int j = 0; j < nDraw; ++j) {
-      TraceParamPlots[j]->SetBinContent(i, ParStep[i][j]);
+      TraceParamPlots[j]->SetBinContent(i, ParStep[j][i]);
     }
 
     for (int j = 0; j < nSamples; ++j) {
@@ -3718,18 +3720,17 @@ void MCMCProcessor::AutoCorrelation() {
   //CW: Each lag is independent so might as well multi-thread them!
   #ifdef MULTITHREAD
   MACH3LOG_INFO("Using multi-threading...");
-  #pragma omp parallel for
-  #endif
-  for (int k = 0; k < nLags; ++k) {
-    // Loop over the number of entries
-    for (int i = 0; i < nEntries; ++i) {
-      // Loop over the number of parameters
-      for (int j = 0; j < nDraw; ++j) {
-        const double Diff = ParStep[i][j]-ParamSums[j];
+  #pragma omp parallel for collapse(2)
+  #endif      // Loop over the number of parameters
+  for (int j = 0; j < nDraw; ++j) {
+    for (int k = 0; k < nLags; ++k) {
+      // Loop over the number of entries
+      for (int i = 0; i < nEntries; ++i) {
+        const double Diff = ParStep[j][i]-ParamSums[j];
 
         // Only sum the numerator up to i = N-k
         if (i < nEntries-k) {
-          const double LagTerm = ParStep[i+k][j]-ParamSums[j];
+          const double LagTerm = ParStep[j][i+k]-ParamSums[j];
           const double Product = Diff*LagTerm;
           NumeratorSum[j][k] += Product;
         }
@@ -3867,7 +3868,7 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
       for (int i = 0; i < nEntries; ++i)
       {
         const int temp = j*nEntries+i;
-        ParStep_cpu[temp] = ParStep[i][j];
+        ParStep_cpu[temp] = ParStep[j][i];
       }
     }
   #ifdef MULTITHREAD
@@ -4213,7 +4214,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   MACH3LOG_INFO("Making Power Spectrum plots...");
 
-  // WARNING This is only to reduce number of computations...
+  // This is only to reduce number of computations...
   const int N_Coeffs = std::min(10000, nEntries);
   const int start = -(N_Coeffs/2-1);
   const int end = N_Coeffs/2-1;
@@ -4221,7 +4222,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
 
   int nPrams = nDraw;
-  //KS: WARNING Code is awfully slow... I know how to make it slower (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
+  //KS: WARNING Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
   nPrams = 2;
 
   std::vector<std::vector<float>> k_j(nPrams, std::vector<float>(v_size, 0.0));
@@ -4229,6 +4230,9 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   int _N = nEntries;
   if (_N % 2 != 0) _N -= 1; // N must be even
+
+  //This is being used a lot so calculate it once to increase performance
+  const double two_pi_over_N = 2 * TMath::Pi() / static_cast<double>(_N);
 
   // KS: This could be moved to GPU I guess
   #ifdef MULTITHREAD
@@ -4240,17 +4244,16 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     for (int jj = start; jj < end; ++jj)
     {
       std::complex<double> a_j = 0.0;
-
       for (int n = 0; n < _N; ++n)
       {
         //if(StepNumber[n] < BurnInCut) continue;
-        std::complex<double> exp_temp(0, 2*TMath::Pi()*(jj*float(n)/float(_N)));
-        a_j += ParStep[n][j] * std::exp(exp_temp);
+        std::complex<double> exp_temp(0, two_pi_over_N * jj * n);
+        a_j += ParStep[j][n] * std::exp(exp_temp);
       }
       a_j /= float(std::sqrt(float(_N)));
-      int _c = jj - start;
+      const int _c = jj - start;
 
-      k_j[j][_c] = 2*TMath::Pi()*(jj/float(_N));
+      k_j[j][_c] = two_pi_over_N * jj;
       // Equation 13
       P_j[j][_c] = std::norm(a_j);
     }
@@ -4261,7 +4264,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   TGraph **plot = new TGraph*[nPrams];
   TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
-
   for (int j = 0; j < nPrams; ++j)
   {
     plot[j] = new TGraph(v_size, k_j[j].data(), P_j[j].data());
@@ -4288,6 +4290,11 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     // alpha free parameter
     func->SetParameter(2, 2.0);
 
+    // Set parameter limits for stability
+    func->SetParLimits(0, 0.0, 100.0); // Amplitude should be non-negative
+    func->SetParLimits(1, 0.001, 1.0); // k* should be within a reasonable range
+    func->SetParLimits(2, 0.0, 5.0);   // alpha should be positive
+
     plot[j]->Fit("power_template","Rq");
 
     Posterior->SetLogx();
@@ -4298,6 +4305,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     func->Draw("SAME");
     if(printToPDF) Posterior->Print(CanvasName);
 
+    //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
 
     delete func;
@@ -4371,7 +4379,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     {
       if(StepNumber[i] > Threshold)
       {
-        MeanUp[j] += ParStep[i][j];
+        MeanUp[j] += ParStep[j][i];
         DenomCounterUp[j]++;
       }
     }
@@ -4388,7 +4396,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     {
       if(StepNumber[i] > Threshold)
       {
-        SpectralVarianceUp[j] += (ParStep[i][j] - MeanUp[j])*(ParStep[i][j] - MeanUp[j]);
+        SpectralVarianceUp[j] += (ParStep[j][i] - MeanUp[j])*(ParStep[j][i] - MeanUp[j]);
       }
     }
   }
@@ -4420,7 +4428,7 @@ void MCMCProcessor::GewekeDiagnostic() {
       {
         if(StepNumber[i] < ThresholsCheck)
         {
-          MeanDown[j] += ParStep[i][j];
+          MeanDown[j] += ParStep[j][i];
           DenomCounterDown[j]++;
         }
       }
@@ -4434,7 +4442,7 @@ void MCMCProcessor::GewekeDiagnostic() {
       {
         if(StepNumber[i] < ThresholsCheck)
         {
-          SpectralVarianceDown[j] += (ParStep[i][j] - MeanDown[j])*(ParStep[i][j] - MeanDown[j]);
+          SpectralVarianceDown[j] += (ParStep[j][i] - MeanDown[j])*(ParStep[j][i] - MeanDown[j]);
         }
       }
     }
@@ -4470,7 +4478,7 @@ void MCMCProcessor::GewekeDiagnostic() {
   delete[] DenomCounterUp;
   delete[] SpectralVarianceUp;
 
-  for (int i = 0; i < nEntries; ++i) {
+  for (int i = 0; i < nDraw; ++i) {
     delete[] ParStep[i];
   }
   delete[] ParStep;
