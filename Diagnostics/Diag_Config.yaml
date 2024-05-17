@@ -51,14 +51,17 @@ ProcessMCMC:
   PlotBinValue: false
 
   #Correlation related
-  PlotCorr: false
   Smoothing: true
 
-  #Functionality
+  #Functionality 1D
   MakeCredibleIntervals: true
   CalcBayesFactor: true
   CalcSavageDickey: true
   CalcBipolarPlot: false
+
+  #Functionality 2D
+  PlotCorr: true
+  MakeSubOptimality: ["false", 100]
   MakeViolin: true
   MakeCredibleRegions: false
   GetTrianglePlot: true

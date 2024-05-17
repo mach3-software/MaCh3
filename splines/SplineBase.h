@@ -35,6 +35,9 @@ class SplineBase {
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
     virtual void Evaluate() = 0;
 
+    /// @brief Get class name
+    virtual inline std::string GetName()const {return "SplineBase";};
+
   protected:
 
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param

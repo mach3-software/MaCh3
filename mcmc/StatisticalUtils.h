@@ -213,3 +213,21 @@ inline double GetBetaParameter(const double data, const double mc, const double 
   }
   return Beta;
 }
+
+
+// *********************
+/// @brief Based on http://probability.ca/jeff/ftpdir/adaptex.pdf
+inline double GetSubOptimality(std::vector<double> EigenValues, const int TotalTarameters) {
+// *********************
+  double sum_eigenvalues_squared_inv = 0.0;
+  double sum_eigenvalues_inv = 0.0;
+  for (unsigned int j = 0; j < EigenValues.size(); j++)
+  {
+    //KS: IF Eigen values are super small skip them
+    //if(EigenValues[j] < 0.0000001) continue;
+    sum_eigenvalues_squared_inv += std::pow(EigenValues[j], -2);
+    sum_eigenvalues_inv += 1.0 / EigenValues[j];
+  }
+  const double SubOptimality = TotalTarameters * sum_eigenvalues_squared_inv / std::pow(sum_eigenvalues_inv, 2);
+  return SubOptimality;
+}

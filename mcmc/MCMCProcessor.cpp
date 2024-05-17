@@ -84,6 +84,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   nDraw = 0;
   nFlux = 0;
   nEntries = 0;
+  UpperCut = _UNDEF_;
   nSteps = 0;
   nBatches = 0;
   AutoCorrLag = 0;
@@ -931,7 +932,11 @@ void MCMCProcessor::MakeViolin() {
     {
       //KS: Burn in cut
       if(StepNumber[k] < BurnInCut) continue;
-      //KS: We know exaclty which x bin we will end up, find y bin. This allow to avoid coslty Fill() and enable multithreading becasue I am master of faster
+
+      //Only used for Suboptimatlity
+      if(StepNumber[k] > UpperCut) continue;
+
+      //KS: We know exactly which x bin we will end up, find y bin. This allow to avoid coslty Fill() and enable multithreading becasue I am master of faster
       const double y = hviolin->GetYaxis()->FindBin(ParStep[x][k]);
       hviolin->SetBinContent(x+1, y,  hviolin->GetBinContent(x+1, y)+1);
     }
@@ -980,7 +985,7 @@ void MCMCProcessor::MakeViolin() {
   OutputFile->cd();
   hviolin->Write("param_violin");
   hviolin_prior->Write("param_violin_prior");
-  //KS: This is moslty for example plots, we have full file in the ROOT file so can do much better plot later
+  //KS: This is mostly for example plots, we have full file in the ROOT file so can do much better plot later
   hviolin->GetYaxis()->SetRangeUser(-1, +2);
   hviolin_prior->GetYaxis()->SetRangeUser(-1, +2);
   for (int i = 0; i < NIntervals+1; ++i)
@@ -1230,7 +1235,7 @@ void MCMCProcessor::CacheSteps() {
 
 // *********************
 // Make the post-fit covariance matrix in all dimensions
-void MCMCProcessor::MakeCovariance_MP() {
+void MCMCProcessor::MakeCovariance_MP(bool Mute) {
 // *********************
     
   if (OutputFile == nullptr) MakeOutputFile();
@@ -1253,9 +1258,9 @@ void MCMCProcessor::MakeCovariance_MP() {
   }
     
   if (HaveMadeDiagonal == false) MakePostfit();
-  MACH3LOG_INFO("Calculating covaraince matrix");
+  if(!Mute) MACH3LOG_INFO("Calculating covariance matrix");
   TStopwatch clock;
-  clock.Start();
+  if(!Mute) clock.Start();
 
   gStyle->SetPalette(55);
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
@@ -1293,16 +1298,16 @@ void MCMCProcessor::MakeCovariance_MP() {
       (*Covariance)(i,j) = hpost2D[i][j]->GetCovariance();
       (*Covariance)(j,i) = (*Covariance)(i,j);
 
-      //KS: Since we already have covariance consider calcaulating correlation using it, right now we effectively calcaualte covariance twice
+      //KS: Since we already have covariance consider calculating correlation using it, right now we effectively calculate covariance twice
       //https://root.cern.ch/doc/master/TH2_8cxx_source.html#l01099
       (*Correlation)(i,j) = hpost2D[i][j]->GetCorrelationFactor();
       (*Correlation)(j,i) = (*Correlation)(i,j);
     }// End j loop
   }// End i loop
 
-  clock.Stop();
-  std::cout << "Making Covariance took " << clock.RealTime() << "s to finish for " << nEntries << " steps" << std::endl;
-      
+  if(!Mute) clock.Stop();
+  if(!Mute) MACH3LOG_INFO("Making Covariance took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
+
   OutputFile->cd();
   if(printToPDF)
   {
@@ -1330,8 +1335,82 @@ void MCMCProcessor::MakeCovariance_MP() {
       }// End j loop
     }// End i loop
   } //end if pdf
-  Covariance->Write("Covariance");
-  Correlation->Write("Correlation");
+  if(!Mute) Covariance->Write("Covariance");
+  if(!Mute) Correlation->Write("Correlation");
+}
+
+
+// *********************
+// Based on https://www.jstor.org/stable/25651249?seq=3,
+// all credits for finding and studying it goes to Henry
+void MCMCProcessor::MakeSubOptimality(int NIntervals) {
+// *********************
+
+  //Save burn in cut, at the end of the loop we will return to default values
+  const int DefaultUpperCut = UpperCut;
+  const int DefaultBurnInCut = BurnInCut;
+  bool defaultPrintToPDF = printToPDF;
+  BurnInCut = 0;
+  UpperCut = 0;
+  printToPDF = false;
+
+  //Set via config in future
+  int MaxStep = nSteps;
+  int MinStep = 0;
+  const int IntervalsSize = nSteps/NIntervals;
+
+  MACH3LOG_INFO("Making Suboptimality");
+  TStopwatch clock;
+  clock.Start();
+
+  TH1D* SubOptimality = new TH1D("Suboptimality", "Suboptimality", NIntervals, MinStep, MaxStep);
+  SubOptimality->GetXaxis()->SetTitle("Step");
+  SubOptimality->GetYaxis()->SetTitle("Suboptimality");
+  SubOptimality->SetLineWidth(2);
+  SubOptimality->SetLineColor(kBlue);
+
+  for(int i = 0; i < NIntervals; ++i)
+  {
+    //Reset our cov matrix
+    ResetHistograms();
+
+    //Set threshold for calculating new matrix
+    UpperCut = i*IntervalsSize;
+    //Calculate cov matrix
+    MakeCovariance_MP(true);
+
+    //Calculate eigen values
+    TMatrixDSymEigen eigen(*Covariance);
+    TVectorD eigen_values;
+    eigen_values.ResizeTo(eigen.GetEigenValues());
+    eigen_values = eigen.GetEigenValues();
+
+    //KS: Converting from ROOT to vector as to make using other libraires (Eigen) easier in future
+    std::vector<double> EigenValues(eigen_values.GetNrows());
+    for(unsigned int j = 0; j < EigenValues.size(); j++)
+    {
+      EigenValues[j] = eigen_values(j);
+    }
+    const double SubOptimalityValue = GetSubOptimality(EigenValues, nDraw);
+    SubOptimality->SetBinContent(i+1, SubOptimalityValue);
+  }
+  clock.Stop();
+  MACH3LOG_INFO("Making Suboptimality took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
+
+  UpperCut = DefaultUpperCut;
+  BurnInCut = DefaultBurnInCut;
+  printToPDF = defaultPrintToPDF;
+
+  SubOptimality->Draw("l");
+  Posterior->SetName(SubOptimality->GetName());
+  Posterior->SetTitle(SubOptimality->GetTitle());
+
+  if(printToPDF) Posterior->Print(CanvasName);
+  // Write it to root file
+  OutputFile->cd();
+  Posterior->Write();
+
+  delete SubOptimality;
 }
 
 // *********************
@@ -2123,6 +2202,9 @@ void MCMCProcessor::ScanInput() {
 
   nEntries = Chain->GetEntries();
   
+  //Only is suboptimality we might want to change it, therefore set it high enough so it doesn't affect other functionality
+  UpperCut = nEntries+1;
+
   // Get the list of branches
   TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
 
@@ -2523,7 +2605,7 @@ void MCMCProcessor::ReadNDFile() {
   // Do the same for the ND280
   TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
   if (NDdetFile->IsZombie()) {
-    std::cerr << "Couldn't find NDdetFile " << CovPos[kNDPar].back() << std::endl;
+    MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kNDPar].back());
     throw;
   }
   NDdetFile->cd();
@@ -2566,34 +2648,34 @@ void MCMCProcessor::ReadNDFile() {
 void MCMCProcessor::ReadFDFile() {
 // ***************
 
-    // Do the same for the FD
-    TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
-    if (FDdetFile->IsZombie()) {
-        std::cerr << "Couldn't find FDdetFile " << CovPos[kFDDetPar].back() << std::endl;
-        throw;
-    }
-    FDdetFile->cd();
-    
-    TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
+  // Do the same for the FD
+  TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
+  if (FDdetFile->IsZombie()) {
+    MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kFDDetPar].back());
+    throw;
+  }
+  FDdetFile->cd();
 
-    for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
-    {
-      //KS: FD parameters start at 1. in contrary to ND280
-      ParamNom[kFDDetPar].push_back(1.);
-      ParamCentral[kFDDetPar].push_back(1.);
-      
-      ParamErrors[kFDDetPar].push_back( std::sqrt((*FDdetMatrix)(i,i)) );
-      ParamNames[kFDDetPar].push_back( Form("FD Det %i", i) );
+  TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
 
-      //KS: Currently we can only set it via config, change it in future
-      ParamFlat[kFDDetPar].push_back( false );
-    }  
-    //KS: The last parameter is p scale
-    if(FancyPlotNames) ParamNames[kFDDetPar].back() = "Momentum Scale";
+  for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
+  {
+    //KS: FD parameters start at 1. in contrary to ND280
+    ParamNom[kFDDetPar].push_back(1.);
+    ParamCentral[kFDDetPar].push_back(1.);
 
-    FDdetFile->Close();
-    delete FDdetFile;
-    delete FDdetMatrix;
+    ParamErrors[kFDDetPar].push_back( std::sqrt((*FDdetMatrix)(i,i)) );
+    ParamNames[kFDDetPar].push_back( Form("FD Det %i", i) );
+
+    //KS: Currently we can only set it via config, change it in future
+    ParamFlat[kFDDetPar].push_back( false );
+  }
+  //KS: The last parameter is p scale
+  if(FancyPlotNames) ParamNames[kFDDetPar].back() = "Momentum Scale";
+
+  FDdetFile->Close();
+  delete FDdetFile;
+  delete FDdetMatrix;
 }
 
 // ***************
@@ -2635,7 +2717,7 @@ void MCMCProcessor::ReadOSCFile() {
     nParam[kOSCPar]++;
     nDraw++;
 
-    //TODO we should actually calucate central value and prior error but leave it for now...
+    //TODO we should actually calculate central value and prior error but leave it for now...
     ParamNom[kOSCPar].push_back( 0. );
     ParamCentral[kOSCPar].push_back( 0. );
     ParamErrors[kOSCPar].push_back( 1. );
@@ -3817,7 +3899,7 @@ void MCMCProcessor::AutoCorrelation() {
   OutputFile->cd();
 
   clock.Stop();
-  MACH3LOG_INFO("It took {:.2f}s", clock.RealTime());
+  MACH3LOG_INFO("Making auto-correlations took {:.2f}s", clock.RealTime());
 }
 
 #ifdef CUDA
@@ -4319,7 +4401,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   delete PowerDir;
 
   clock.Stop();
-  MACH3LOG_INFO("It took {:.2f}s", clock.RealTime());
+  MACH3LOG_INFO("Making Power Spectrum took {:.2f}s", clock.RealTime());
 
   Posterior->SetTopMargin(TopMargin);
   gStyle->SetOptTitle(OptTitle);

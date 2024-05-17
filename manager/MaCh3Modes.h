@@ -35,6 +35,9 @@ class MaCh3Modes {
   /// @brief KS: Empty destructor
   virtual ~MaCh3Modes(){};
 
+  /// @brief KS: Print info about initialised modes
+  void Print();
+
   /// @brief KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category
   inline int GetNModes(){return NModes;}
   /// @brief KS: Get mode number based on name, if mode not known you will get UNKNOWN_BAD
@@ -45,9 +48,8 @@ class MaCh3Modes {
   std::string GetMaCh3ModeFancyName(const int Index);
   /// @brief KS: Get MaCh3 mode from generator mode
   MaCh3Modes_t GetModeFromGenerator(const int Index);
-
-  /// @brief KS: Print info about initialised modes
-  void Print();
+  /// @brief Get class name
+  inline std::string GetName()const {return "MaCh3Modes";};
 
  private:
   /// @brief KS: Make sure we don't have two modes with the same name

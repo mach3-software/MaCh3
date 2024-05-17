@@ -22,7 +22,7 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
                     config[names[i]]["Name"].as<std::string>(),
                     config[names[i]]["GeneratorMaping"].as<std::vector<int>>());
   }
-  // Add unknown category, it's better to have garbage category where all undefinede modes will go rather than get random crashes
+  // Add unknown category, it's better to have garbage category where all undefined modes will go rather than get random crashes
   DeclareNewMode("UNKNOWN_BAD",
                  "UNKNOWN_BAD",
                  {});
@@ -123,6 +123,9 @@ void MaCh3Modes::PrepareMap() {
 // *******************
 std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
 // *******************
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
+
   // return UNKNOWN_BAD if out of boundary
   if(Index > NModes) return fMode[NModes].Name;
   return fMode[Index].Name;
@@ -132,6 +135,8 @@ std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
 std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
 // *******************
   // return UNKNOWN_BAD if out of boundary
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
 
   if(Index > NModes) return fMode[NModes].FancyName;
   return fMode[Index].FancyName;
@@ -150,6 +155,9 @@ MaCh3Modes_t MaCh3Modes::GetMode(std::string name) {
 // *******************
 MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
 // *******************
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
+
   if(Index > NModes) return NModes;
   return ModeMap[Index];
 }

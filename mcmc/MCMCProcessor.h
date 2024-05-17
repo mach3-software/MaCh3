@@ -35,6 +35,7 @@
 #include "TRandom3.h"
 #include "TGraphPolar.h"
 #include "TMath.h"
+#include "TMatrixDSymEigen.h"
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
@@ -66,7 +67,7 @@ class MCMCProcessor {
     /// @param MakePostfitCorr A boolean indicating whether to apply post-fit corrections during processing.
     MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
     /// @brief Destroys the MCMCProcessor object.
-    ~MCMCProcessor();
+    virtual ~MCMCProcessor();
 
     /// @brief Scan chain, what parameters we have and load information from covariance matrices
     void Initialise();
@@ -77,7 +78,10 @@ class MCMCProcessor {
     /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
     /// @brief Calculate covariance by making 2D projection of each combination of parameters using multithreading
-    void MakeCovariance_MP();
+    void MakeCovariance_MP(bool Mute = false);
+    /// @brief Make and Draw SubOptimality
+    void MakeSubOptimality(int NIntervals = 10);
+
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
     void ResetHistograms();
         
@@ -221,7 +225,9 @@ class MCMCProcessor {
   private:
     /// @brief Prepare prefit histogram for parameter overlay plot
     inline TH1D* MakePrefit();
+    /// @brief prepare output root file and canvas to which we will save EVERYTHING
     inline void MakeOutputFile();
+    /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     inline void DrawCorrelations1D();
 
     /// @brief Read Matrices
@@ -235,7 +241,9 @@ class MCMCProcessor {
    
     /// @brief Scan Input etc.
     inline void ScanInput();
+    /// @brief Scan order of params from a different groups
     inline void ScanParameterOrder();
+    /// @brief Prepare all objects used for output
     inline void SetupOutput();
 
     //Analyse posterior distribution
@@ -270,18 +278,24 @@ class MCMCProcessor {
     /// @brief RC: Perform spectral analysis of MCMC based on http://arxiv.org/abs/astro-ph/0405462
     inline void PowerSpectrumAnalysis();
 
-    //Useful strings telling us about output etc
+    /// Name of MCMC file
     std::string MCMCFile;
+    /// Output file suffix useful when running over same file with different settings
     std::string OutputSuffix;
     /// Covariance matrix name position
     std::vector<std::vector<std::string>> CovPos;
 
     /// Main chain storing all steps etc
     TChain *Chain;
-    //BurnIn Cuts
+    /// BurnIn Cuts
     std::string StepCut;
+    /// Cut used when making 1D Posterior distribution
     std::string Posterior1DCut;
+    /// KS: Used only for SubOptimality
+    int UpperCut;
+    /// Value of burn in cut
     int BurnInCut;
+    /// Number of branches in a TTree
     int nBranches;
     /// KS: For merged chains number of entries will be different from nSteps
     int nEntries;
@@ -324,12 +338,15 @@ class MCMCProcessor {
     std::vector<TString> SampleName_v;
     std::vector<TString> SystName_v;
     
+    /// Name of output files
     std::string OutputName;
+    /// Name of canvas which help to save to the sample pdf
     TString CanvasName;
 
     //Plotting flags
     bool PlotXSec;
     bool PlotDet;
+    /// whether we plot flat prior or not
     bool PlotFlatPrior;
     /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
@@ -337,10 +354,13 @@ class MCMCProcessor {
     //Even more flags
     /// Make correlation matrix or not
     bool MakeCorr;
+    /// Whether we plot relative to prior or nominal, in most cases is prior
     bool plotRelativeToPrior;
+    /// Sanity check if Postfit is already done to not make several times
     bool MadePostfit;
     /// Will plot all plot to PDF not only to root file
     bool printToPDF;
+    /// Whether we want fancy plot names or not
     bool FancyPlotNames;
     /// If true it will print value on each bin of covariance matrix
     bool plotBinValue;
@@ -374,7 +394,9 @@ class MCMCProcessor {
     TVectorD *Errors_HPD_Positive; 
     TVectorD *Errors_HPD_Negative; 
 
+    /// Posterior Covariance Matrix
     TMatrixDSym *Covariance;
+    /// Posterior Correlation Matrix
     TMatrixDSym *Correlation;
 
     /// Holds 1D Posterior Distributions
@@ -396,8 +418,9 @@ class MCMCProcessor {
     /// Drawrange for SetMaximum
     double DrawRange;
     
-    //Flags related with MCMC diagnostic
+    /// MCMC Chain has been cached
     bool CacheMCMC;
+    /// Doing MCMC Diagnostic
     bool doDiagMCMC;
     
     //Number of batches and LagL used in MCMC diagnostic
@@ -425,11 +448,13 @@ class MCMCProcessor {
     /// @brief Move stuff to GPU to perform auto correlation calculations there
     inline void PrepareGPU_AutoCorr(const int nLags);
 
+    /// Value of each param that will be copied to GPU
     float* ParStep_cpu;
     float* NumeratorSum_cpu;
     float* ParamSums_cpu;
     float* DenomSum_cpu;
 
+    /// Value of each param at GPU
     float* ParStep_gpu;
     float* NumeratorSum_gpu;
     float* ParamSums_gpu;

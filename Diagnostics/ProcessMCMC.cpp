@@ -124,6 +124,10 @@ void ProcessMCMC(std::string inputFile)
     //Processor->MakeCovariance();
 //#endif
     Processor->DrawCovariance();
+
+    auto const &MakeSubOptimality = Settings["MakeSubOptimality"];
+    if(MakeSubOptimality[0].as<bool>()) Processor->MakeSubOptimality(MakeSubOptimality[1].as<int>());
+
     if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false)) Processor->MakeCredibleRegions();
     if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor);
 

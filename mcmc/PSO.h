@@ -22,7 +22,7 @@ class particle{
         particle(){};
         particle(std::vector<double> position, std::vector<double> velocity) : position(position), velocity(velocity){};
         /// @brief Destructor
-        ~particle() {};
+        virtual ~particle() {};
 
         void set_position(std::vector<double> new_position) {
             position = new_position;
@@ -83,7 +83,7 @@ class PSO : public LikelihoodFit {
         /// @brief constructor
         PSO(manager * const fitMan);
         /// @brief Destructor
-        ~PSO() {};
+        virtual ~PSO() {};
 
         particle* get_best_particle(){
             return best_particle;
