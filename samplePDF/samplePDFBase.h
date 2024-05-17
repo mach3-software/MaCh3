@@ -37,7 +37,6 @@ class samplePDFBase
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
-  MaCh3_Modes* GetModeStruct() const { return ModeStruct; }
   
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
@@ -113,7 +112,7 @@ protected:
   std::vector<std::string> SampleName;
 
   //GetterForModes
-  MaCh3_Modes* ModeStruct;
+  MaCh3Modes* Modes;
 
   TH1D *dathist; // tempstore for likelihood calc
   TH2D *dathist2d;

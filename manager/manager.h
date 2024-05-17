@@ -18,6 +18,7 @@
 #include "manager/YamlHelper.h"
 #include "manager/Monitor.h"
 #include "manager/MaCh3Exception.h"
+#include "manager/MaCh3Modes.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;
@@ -54,5 +55,6 @@ private:
   std::string FileName;
   /// The likelihood type defined in the configuration.
   int mc_stat_llh;
-
+  /// MaCh3 Modes
+  MaCh3Modes* Modes;
 };

@@ -345,18 +345,6 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
   return name;
 }
 
-// *******************
-/// Class containing information about interaction modes
-class MaCh3_Modes {
-  // *******************
-  public:
-    //KS: Getter for Modes, each experiment has to define it
-    virtual int GetNModes();
-    virtual std::string Mode_ToString(int i);
-    virtual std::string Mode_ToFancyString(int i);
-    virtual int Mode_ToSplineMode(int i);
-};
-
 /// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly*);
 

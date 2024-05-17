@@ -37,6 +37,9 @@ manager::manager(std::string const &filename)
     mc_stat_llh = kPoisson;
   }
 
+  Modes = nullptr;
+  std::string ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null");
+  if(ModeInput != "null") Modes = new MaCh3Modes(ModeInput);
 }
 
 // *************************
@@ -44,6 +47,7 @@ manager::manager(std::string const &filename)
 manager::~manager() {
 // *************************
 
+  if(!Modes) delete Modes;
 
 }
 

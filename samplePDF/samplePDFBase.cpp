@@ -434,9 +434,9 @@ void samplePDFBase::GetModeName(std::vector<std::string> &modeNameVect) {
   if(modeNameVect.size() !=0)
     modeNameVect.clear() ;
 
-  for(int i = 0; ModeStruct->GetNModes()+1; i++)
+  for(int i = 0; Modes->GetNModes()+1; i++)
   {
-    modeNameVect.push_back(ModeStruct->Mode_ToString(i));
+    modeNameVect.push_back(Modes->GetMaCh3ModeName(i));
   }
 
 }
