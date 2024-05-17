@@ -37,7 +37,10 @@ class samplePDFBase
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
   inline void GetModeName(std::vector<std::string> &modeNameVect);
-  
+
+  /// @brief Return pointer to MaCh3 modes
+  MaCh3Modes* GetMaCh3Modes() const { return Modes; }
+
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
   TH1D* get1DDataHist(){return dathist;}
@@ -73,8 +76,10 @@ class samplePDFBase
   virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
   virtual TH1* getPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
-  inline TH1* getPDFMode(const int Selection, const int Mode) {
+  virtual inline TH1* getPDFMode(const int Selection, const int Mode) {
     (void) Selection; (void) Mode; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
+    (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
   double getTestStatLLH(double data, double mc);
   double getTestStatLLH(const double data, const double mc, const double w2);

@@ -6,6 +6,7 @@ set(HEADERS
     PSO.h
     stretch.h
     MCMCProcessor.h
+    SampleSummary.h
     StatisticalUtils.h
 )
 
@@ -17,6 +18,7 @@ add_library(MCMC SHARED
     PSO.cpp
     stretch.cpp
     MCMCProcessor.cpp
+    SampleSummary.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
 )
 
