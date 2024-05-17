@@ -11,6 +11,9 @@
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
 
+  //Get mach3 modes from manager
+  Modes = fitMan->GetMaCh3Modes();
+
   random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
@@ -1024,11 +1027,11 @@ void FitterBase::RunSigmaVar() {
 
   outputFile->cd();
 
-  // WARNING All by mode stuff will be added later, sorry :(
-  //KS:this is only relevant if PlotByMode is turned on
+  //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
-  //const int nRelevantModes = 2;
-  //MaCh3_Mode RelevantModes[nRelevantModes] = {kMaCh3_CCQE, kMaCh3_2p2h};
+  const int nRelevantModes = 2;
+  MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
+  bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false);
 
   //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
   bool PlotLLHperBin = false;
@@ -1102,16 +1105,15 @@ void FitterBase::RunSigmaVar() {
       TH1D ***sigmaArray_x_norm = new TH1D**[numVar]();
       TH1D ***sigmaArray_y_norm = new TH1D**[numVar]();
 
-      /* WARNING will be added later
       // Set up for single mode
       TH1D ****sigmaArray_mode_x = NULL;
       TH1D ****sigmaArray_mode_y = NULL;
-      if (fitMan->getPlotByMode())
+      if (DoByMode)
       {
         sigmaArray_mode_x = new TH1D***[numVar]();
         sigmaArray_mode_y = new TH1D***[numVar]();
       }
-      */
+
       MACH3LOG_INFO("{:<20}{}", name, "");
 
       // Make asymmetric errors just in case
@@ -1140,13 +1142,11 @@ void FitterBase::RunSigmaVar() {
         sigmaArray_x_norm[j] = new TH1D*[TotalNSamples]();
         sigmaArray_y_norm[j] = new TH1D*[TotalNSamples]();
 
-        /* WARNING will be implemented later
-        if (fitMan->getPlotByMode())
+        if (DoByMode)
         {
           sigmaArray_mode_x[j] = new TH1D**[TotalNSamples]();
           sigmaArray_mode_y[j] = new TH1D**[TotalNSamples]();
         }
-        */
 
         SampleIterator = 0;
         // Get each sample and how it's responded to our reweighted parameter
@@ -1171,9 +1171,8 @@ void FitterBase::RunSigmaVar() {
             std::vector<double> ybins;
             samples[ivs]->SetupBinning(k, xbins, ybins);
 
-            /* WARNING this will be added later
             //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
-            if (fitMan->getPlotByMode())
+            if (DoByMode)
             {
               sigmaArray_mode_x[j][SampleIterator] = new TH1D*[nRelevantModes]();
               sigmaArray_mode_y[j][SampleIterator] = new TH1D*[nRelevantModes]();
@@ -1185,7 +1184,7 @@ void FitterBase::RunSigmaVar() {
                 currSampMode[ir] = (TH2Poly*)(samples[ivs]->getPDFMode(k, RelevantModes[ir]))->Clone();
                 currSampMode[ir]->SetDirectory(0);
 
-                mode_title_long = title_long+"_"+MaCh3mode_ToString(MaCh3_Mode(RelevantModes[ir]));
+                mode_title_long = title_long + "_" + Modes->GetMaCh3ModeName(RelevantModes[ir]);
                 currSampMode[ir]->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
                 dirArrySample[SampleIterator]->cd();
                 currSampMode[ir]->Write();
@@ -1198,7 +1197,7 @@ void FitterBase::RunSigmaVar() {
               }
               delete[] currSampMode;
             }
-            */
+
             //KS: This will give different results depending if data or asimov, both have their uses
             if (PlotLLHperBin)
             {
@@ -1277,15 +1276,13 @@ void FitterBase::RunSigmaVar() {
           delete var_x_norm;
           delete var_y_norm;
 
-          /* WARNING will be added in the future
-          //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
-          if (fitMan->getPlotByMode())
+          //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
+          if (DoByMode)
           {
             for(int ir = 0; ir < nRelevantModes;ir++)
             {
-              TGraphAsymmErrors* var_mode_x = MakeAssymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+MaCh3mode_ToString(MaCh3_Mode(RelevantModes[ir]))+"_X").c_str());
-              TGraphAsymmErrors* var_mode_y = MakeAssymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+MaCh3mode_ToString(MaCh3_Mode(RelevantModes[ir]))+"_Y").c_str());
-
+              TGraphAsymmErrors* var_mode_x = MakeAssymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+              TGraphAsymmErrors* var_mode_y = MakeAssymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
 
               dirArrySample[SampleIterator]->cd();
               var_mode_x->Write();
@@ -1295,7 +1292,7 @@ void FitterBase::RunSigmaVar() {
               delete var_mode_y;
             } // end for nRelevantModes
           } // end if mode
-          */
+
           SampleIterator++;
         }//End loop over samples(k)
       }//end looping over sample object
@@ -1338,8 +1335,7 @@ void FitterBase::RunSigmaVar() {
       dirArryDial->Close();
       delete dirArryDial;
 
-      /* WARNING will be added in the future
-      if (fitMan->getPlotByMode())
+      if (DoByMode)
       {
         for (int j = 0; j < numVar; ++j)
         {
@@ -1362,7 +1358,6 @@ void FitterBase::RunSigmaVar() {
         delete[] sigmaArray_mode_x;
         delete[] sigmaArray_mode_y;
       }
-      */
     } // end looping over xsec parameters (i)
   } // end looping over covarianceBase objects
 }
