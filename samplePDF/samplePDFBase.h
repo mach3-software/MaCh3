@@ -73,6 +73,8 @@ class samplePDFBase
   virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
   virtual TH1* getPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  inline TH1* getPDFMode(const int Selection, const int Mode) {
+    (void) Selection; (void) Mode; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
 
   double getTestStatLLH(double data, double mc);
   double getTestStatLLH(const double data, const double mc, const double w2);

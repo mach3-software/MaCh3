@@ -48,6 +48,8 @@ public:
   /// @brief Print currently used config
   void Print();
 
+  /// @brief Return pointer to MaCh3 modes
+  MaCh3Modes* GetMaCh3Modes() const { return Modes; }
 private:
   /// The YAML node containing the configuration data.
   YAML::Node config;

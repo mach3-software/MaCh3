@@ -2,9 +2,13 @@
 #include "MaCh3Modes.h"
 
 // *******************
-MaCh3Modes::MaCh3Modes(std::string const &filename)
-            : config(YAML::LoadFile(filename)) {
+MaCh3Modes::MaCh3Modes(std::string const &filename) {
 // *******************
+
+  // Load config
+  YAML::Node config = YAML::LoadFile(filename);
+
+  std::string GetMaCh3ModeName(const int Index);
   NModes = 0;
 
   Title = config["Title"].as<std::string>();
@@ -18,7 +22,7 @@ MaCh3Modes::MaCh3Modes(std::string const &filename)
                     config[names[i]]["Name"].as<std::string>(),
                     config[names[i]]["GeneratorMaping"].as<std::vector<int>>());
   }
-
+  // Add unknown category, it's better to have garbage category where all undefinede modes will go rather than get random crashes
   DeclareNewMode("UNKNOWN_BAD",
                  "UNKNOWN_BAD",
                  {});
@@ -60,6 +64,7 @@ void MaCh3Modes::Print() {
   }
   MACH3LOG_INFO("==========================");
 }
+
 // *******************
 MaCh3Modes_t MaCh3Modes::EnsureModeNameRegistered(std::string const &name) {
 // *******************
@@ -118,15 +123,18 @@ void MaCh3Modes::PrepareMap() {
 // *******************
 std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
 // *******************
-  if(Index > NModes) return fMode[NModes+1].Name;
+  // return UNKNOWN_BAD if out of boundary
+  if(Index > NModes) return fMode[NModes].Name;
   return fMode[Index].Name;
 }
 
 // *******************
 std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
-  // *******************
-  if(Index > NModes) return fMode[NModes+1].FancyName;
-  return fMode[Index].Name;
+// *******************
+  // return UNKNOWN_BAD if out of boundary
+
+  if(Index > NModes) return fMode[NModes].FancyName;
+  return fMode[Index].FancyName;
 }
 
 // *******************
@@ -135,13 +143,13 @@ MaCh3Modes_t MaCh3Modes::GetMode(std::string name) {
   if (Mode.count(name)) {
     return Mode[name];
   }
-  MACH3LOG_ERROR("Mode {} doesn't exist", name);
-  throw;
+  // return UNKNOWN_BAD
+  return NModes;
 }
 
 // *******************
 MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
 // *******************
-  if(Index > NModes) return NModes+1;
+  if(Index > NModes) return NModes;
   return ModeMap[Index];
 }
