@@ -10,7 +10,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   LastPCAdpar = -999;
 }
 // ********************************************
-covarianceBase::covarianceBase(std::vector<std::string> YAMLFile, double threshold, int FirstPCAdpar, int LastPCAdpar) : inputFile(YAMLFile[0].c_str()), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCAdpar), LastPCAdpar(LastPCAdpar) {
+covarianceBase::covarianceBase(std::vector<std::string> YAMLFile, const char *name, double threshold, int FirstPCAdpar, int LastPCAdpar) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCAdpar), LastPCAdpar(LastPCAdpar) {
 // ********************************************
 
   MACH3LOG_INFO("Constructing instance of covarianceBase using ");

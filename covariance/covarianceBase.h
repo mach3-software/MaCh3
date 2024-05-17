@@ -31,7 +31,7 @@
 class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file
-  covarianceBase(std::vector<std::string> YAMLFile, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  covarianceBase(std::vector<std::string> YAMLFile, const char *name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
   covarianceBase(const char *name, const char *file);
   /// @brief "Usual" constructors from root file with seed

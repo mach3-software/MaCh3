@@ -4,11 +4,10 @@
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
-covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile, double threshold, int FirstPCAdpar, int LastPCAdpar)
-               : covarianceBase(YAMLFile, threshold, FirstPCAdpar, LastPCAdpar){
+covarianceXsec::covarianceXsec(std::vector<std::string> YAMLFile, const char *name, double threshold, int FirstPCAdpar, int LastPCAdpar)
+               : covarianceBase(YAMLFile, name, threshold, FirstPCAdpar, LastPCAdpar){
 // ********************************************
 
-  setName("xsec_cov");
   InitXsecFromConfig();
   SetupNormPars();
 
