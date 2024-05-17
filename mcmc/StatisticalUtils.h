@@ -231,3 +231,18 @@ inline double GetSubOptimality(std::vector<double> EigenValues, const int TotalT
   const double SubOptimality = TotalTarameters * sum_eigenvalues_squared_inv / std::pow(sum_eigenvalues_inv, 2);
   return SubOptimality;
 }
+
+// *********************
+// Interquartile Range (IQR)
+inline double GetIQR(TH1D *Hist){
+// *********************
+
+  if(Hist->Integral() == 0) return 0.0;
+
+  double quartiles_x[3] = {0.25, 0.5, 0.75};
+  double quartiles[3];
+
+  Hist->GetQuantiles(3, quartiles, quartiles_x);
+
+  return quartiles[2] - quartiles[0];
+}
