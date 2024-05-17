@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SplineBase.h"
+#include "splines/SplineBase.h"
 
 #ifdef CUDA
 extern void SynchroniseSplines();

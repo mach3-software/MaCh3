@@ -1,4 +1,4 @@
-#include "SplineBase.h"
+#include "splines/SplineBase.h"
 
 
 // *****************************************

@@ -4,7 +4,7 @@
 #include "TH3F.h"
 
 //MaCh3
-#include "SplineBase.h"
+#include "splines/SplineBase.h"
 
 class splineFDBase : public SplineBase {
   //ETA - do all of these functions and members actually need to be public?
