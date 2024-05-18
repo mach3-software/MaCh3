@@ -353,7 +353,13 @@ double NoOverflowIntegral(TH2Poly*);
 
 /// @brief WP: Poly Projectors
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
+/// @brief WP: Poly Projectors
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
+
+/// @brief KS: Convert TH2D to TH2Poly
+TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *TH2Dhist);
+/// @brief KS: Convert TH2Poly to TH2D
+TH2Poly* ConvertTH2DtoTH2Poly(TH2D *TH2Dhist);
 
 /// @brief WP: Helper to Normalise histograms
 TH2Poly* NormalisePoly(TH2Poly* Histogram);
@@ -365,6 +371,8 @@ double PolyIntegralWidth(TH2Poly *Histogram);
 
 /// @brief KS: Sanity check for TH2Poly
 void CheckTH2PolyFileVersion(TFile *file);
+
+
 
 /// @brief KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, std::string name);

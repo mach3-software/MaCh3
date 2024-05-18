@@ -60,6 +60,18 @@ void MaCh3Welcome() {
 }
 
 // ************************
+void GetOSInfo() {
+// ************************
+
+  MACH3LOG_INFO("Operating System Information:");
+
+  // Distribution and version
+  MACH3LOG_INFO("Distribution: {}", TerminalToString("lsb_release -d | awk -F':' '{print $2}'"));
+  MACH3LOG_INFO("Kernel Version: {}", TerminalToString("uname -r"));
+}
+
+
+// ************************
 //KS: Simple function retrieving CPU info
 void GetCPUInfo(){
 // ************************
@@ -99,6 +111,15 @@ void GetGPUInfo(){
   MACH3LOG_INFO("Driver Version: {}", TerminalToString("nvidia-smi --query-gpu=driver_version --format=csv,noheader"));
 #endif
   return;
+}
+
+// ************************
+void GetDiskUsage() {
+// ************************
+  MACH3LOG_INFO("Disk Usage:");
+
+  // Get disk usage
+  MACH3LOG_INFO("{}", TerminalToString("df -h --total | grep total"));
 }
 
 

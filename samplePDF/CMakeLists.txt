@@ -31,7 +31,6 @@ target_include_directories(SamplePDF PUBLIC
 if(NOT CPU_ONLY)
     set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     set_property(TARGET SamplePDF PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
-    target_compile_definitions(SamplePDF PUBLIC GPU_ON)
 endif()
 
 set_target_properties(SamplePDF PROPERTIES

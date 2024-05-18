@@ -23,6 +23,8 @@
 namespace MaCh3Utils {
   /// @brief KS: Prints welcome message with MaCh3 logo
   void MaCh3Welcome();
+  /// @brief KS: Find out more about operational system
+  void GetOSInfo();
   /// @brief KS: Check what CPU you are using
   void GetCPUInfo();
   /// @brief KS: Check what GPU you are using
@@ -31,6 +33,8 @@ namespace MaCh3Utils {
   std::string TerminalToString(const char* cmd);
   /// @brief KS: Check what CPU you are using
   void EstimateDataTransferRate(TChain* chain, const int entry);
+  /// @brief KS: Find out about Disk usage
+  void GetDiskUsage();
   /// @brief KS: Simply print progress bar
   void PrintProgressBar(const int Done, const int All);
   /// @brief CW: Get info like RAM

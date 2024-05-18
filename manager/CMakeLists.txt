@@ -10,7 +10,6 @@ set(HEADERS
 add_library(Manager SHARED
     manager.cpp
     MaCh3Modes.cpp
-    YamlHelper.cpp
     Monitor.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuUtils.cu>
 )
