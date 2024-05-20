@@ -11,8 +11,39 @@ void MaCh3Welcome() {
 
   if(MaCh3WelcomeInitialised) return;
 
+  std::string MaCh3_VERSION = GetMaCh3Version();
+
+  MACH3LOG_INFO("##################################");
+  MACH3LOG_INFO("Welcome to:  ");
+  MACH3LOG_INFO("  __  __        _____ _     ____  ");
+  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
+  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
+  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
+  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
+  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
+  MACH3LOG_INFO("Version: {}", MaCh3_VERSION);
+  MACH3LOG_INFO("##################################");
+
+  GetCPUInfo();
+
+  GetGPUInfo();
+
+  #ifdef DEBUG
+  GetOSInfo();
+  GetDiskUsage();
+  #endif
+
+  MaCh3WelcomeInitialised = true;
+}
+
+// ************************
+// KS: Get version of MaCh3
+std::string GetMaCh3Version() {
+// ************************
+
   //KS: Find MaCh3 version based on header file. There could be better way to just include version.h but as long as we don't have to hardcode version I am content
   std::string MaCh3_VERSION = "";
+
   std::string file = std::string(std::getenv("MaCh3_ROOT")) + "/version.h";
   // Open the version.h file
   std::ifstream versionFile(file);
@@ -41,25 +72,12 @@ void MaCh3Welcome() {
   // Close the file
   versionFile.close();
 
-  MACH3LOG_INFO("##################################");
-  MACH3LOG_INFO("Welcome to:  ");
-  MACH3LOG_INFO("  __  __        _____ _     ____  ");
-  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
-  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
-  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
-  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
-  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
-  MACH3LOG_INFO("Version: {}", MaCh3_VERSION);
-  MACH3LOG_INFO("##################################");
-
-  GetCPUInfo();
-
-  GetGPUInfo();
-
-  MaCh3WelcomeInitialised = true;
+  return MaCh3_VERSION;
 }
 
+
 // ************************
+// KS: Find out more about operational system
 void GetOSInfo() {
 // ************************
 
@@ -114,6 +132,7 @@ void GetGPUInfo(){
 }
 
 // ************************
+// KS: Find out about Disk usage
 void GetDiskUsage() {
 // ************************
   MACH3LOG_INFO("Disk Usage:");
@@ -124,6 +143,7 @@ void GetDiskUsage() {
 
 
 // ************************
+// KS: Convoluted code to grab output from terminal to string
 std::string TerminalToString(const char* cmd) {
 // ************************
 

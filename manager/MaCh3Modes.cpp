@@ -127,7 +127,11 @@ std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
 
   // return UNKNOWN_BAD if out of boundary
-  if(Index > NModes) return fMode[NModes].Name;
+  if(Index > NModes)
+  {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    return fMode[NModes].Name;
+  }
   return fMode[Index].Name;
 }
 
@@ -138,7 +142,11 @@ std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
 
-  if(Index > NModes) return fMode[NModes].FancyName;
+  if(Index > NModes)
+  {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    return fMode[NModes].FancyName;
+  }
   return fMode[Index].FancyName;
 }
 
@@ -148,6 +156,8 @@ MaCh3Modes_t MaCh3Modes::GetMode(std::string name) {
   if (Mode.count(name)) {
     return Mode[name];
   }
+  MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+
   // return UNKNOWN_BAD
   return NModes;
 }
@@ -158,6 +168,10 @@ MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
 
-  if(Index > NModes) return NModes;
+  if(Index > NModes)
+  {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    return NModes;
+  }
   return ModeMap[Index];
 }

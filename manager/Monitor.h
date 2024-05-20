@@ -37,6 +37,8 @@ namespace MaCh3Utils {
   void GetDiskUsage();
   /// @brief KS: Simply print progress bar
   void PrintProgressBar(const int Done, const int All);
+  /// @brief KS: Get version of MaCh3
+  std::string GetMaCh3Version();
   /// @brief CW: Get info like RAM
   int getValue(std::string Type);
   /// @brief CW: Get memory, which is probably silly
