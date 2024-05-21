@@ -37,7 +37,7 @@ class covarianceBase {
   /// @brief "Usual" constructors from root file with seed
   covarianceBase(const char *name, const char *file, int seed);
   /// @brief Constructor For Eigen Value decomp
-  covarianceBase(const char *name, const char *file, int seed, double threshold,int FirstPCAdpar, int LastPCAdpar);
+  covarianceBase(const char *name, const char *file, int seed, double threshold, int FirstPCAdpar, int LastPCAdpar);
   /// @brief Destructor
   virtual ~covarianceBase();
   

@@ -159,7 +159,15 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options
 #KS: Add -Werror  and maybe -Wconversion in the future
-target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall -pedantic)
+target_compile_options(MaCh3CompilerOptions INTERFACE
+                                                    -g
+                                                    -Wextra
+                                                    -Wall
+                                                    -pedantic
+                                                    -Wshadow
+                                                    -Wuninitialized
+                                                    -Wnon-virtual-dtor
+                                                    -Woverloaded-virtual)
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)

@@ -2767,29 +2767,29 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 
 // **************************
 //CW: Get the mean and RMS of a 1D posterior
-void MCMCProcessor::GetArithmetic(TH1D * const hpost, const int i) {
+void MCMCProcessor::GetArithmetic(TH1D * const hist, const int i) {
 // **************************
-  (*Means)(i) = hpost->GetMean();
-  (*Errors)(i) = hpost->GetRMS();
+  (*Means)(i) = hist->GetMean();
+  (*Errors)(i) = hist->GetRMS();
 }
 
 // **************************
 //CW: Get Gaussian characteristics
-void MCMCProcessor::GetGaussian(TH1D *& hpost , const int i) {
+void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
 // **************************
 
-  const double mean = hpost->GetMean();
-  const double err = hpost->GetRMS();
-  const double peakval = hpost->GetBinCenter(hpost->GetMaximumBin());
+  const double mean = hist->GetMean();
+  const double err = hist->GetRMS();
+  const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
 
   // Set the range for the Gaussian fit
   Gauss->SetRange(mean - 1.5*err , mean + 1.5*err);
   // Set the starting parameters close to RMS and peaks of the histograms
-  Gauss->SetParameters(hpost->GetMaximum()*err*std::sqrt(2*3.14), peakval, err);
+  Gauss->SetParameters(hist->GetMaximum()*err*std::sqrt(2*3.14), peakval, err);
 
   // Perform the fit
-  hpost->Fit(Gauss->GetName(),"Rq");
-  hpost->SetStats(0);
+  hist->Fit(Gauss->GetName(),"Rq");
+  hist->SetStats(0);
 
   (*Means_Gauss)(i) = Gauss->GetParameter(1);
   (*Errors_Gauss)(i) = Gauss->GetParameter(2);
@@ -2798,52 +2798,52 @@ void MCMCProcessor::GetGaussian(TH1D *& hpost , const int i) {
 
 // ***************
 //CW: Get the highest posterior density from a TH1D
-void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage) {
+void MCMCProcessor::GetHPD(TH1D* const hist, const int i, const double coverage) {
 // ***************
   // Get the bin which has the largest posterior density
-  const int MaxBin = hpost->GetMaximumBin();
+  const int MaxBin = hist->GetMaximumBin();
   // And it's value
-  const double peakval = hpost->GetBinCenter(MaxBin);
+  const double peakval = hist->GetBinCenter(MaxBin);
 
   // The total integral of the posterior
-  const long double Integral = hpost->Integral();
+  const long double Integral = hist->Integral();
   //KS: and integral of left handed and right handed parts
-  const long double LowIntegral = hpost->Integral(1, MaxBin-1) + hpost->GetBinContent(MaxBin)/2.0;
-  const long double HighIntegral = hpost->Integral(MaxBin+1, hpost->GetNbinsX()) + hpost->GetBinContent(MaxBin)/2.0;
+  const long double LowIntegral = hist->Integral(1, MaxBin-1) + hist->GetBinContent(MaxBin)/2.0;
+  const long double HighIntegral = hist->Integral(MaxBin+1, hist->GetNbinsX()) + hist->GetBinContent(MaxBin)/2.0;
 
   // Keep count of how much area we're covering
   //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
-  long double sum = hpost->GetBinContent(MaxBin)/2.0;
+  long double sum = hist->GetBinContent(MaxBin)/2.0;
 
   // Counter for current bin
   int CurrBin = MaxBin;
-  while (sum/HighIntegral < coverage && CurrBin < hpost->GetNbinsX()) {
+  while (sum/HighIntegral < coverage && CurrBin < hist->GetNbinsX()) {
     CurrBin++;
-    sum += hpost->GetBinContent(CurrBin);
+    sum += hist->GetBinContent(CurrBin);
   }
-  const double sigma_p = std::fabs(hpost->GetBinCenter(MaxBin)-hpost->GetXaxis()->GetBinUpEdge(CurrBin));
+  const double sigma_p = std::fabs(hist->GetBinCenter(MaxBin)-hist->GetXaxis()->GetBinUpEdge(CurrBin));
   // Reset the sum
   //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
-  sum = hpost->GetBinContent(MaxBin)/2.0;
+  sum = hist->GetBinContent(MaxBin)/2.0;
 
   // Reset the bin counter
   CurrBin = MaxBin;
   // Counter for current bin
   while (sum/LowIntegral < coverage && CurrBin > 1) {
     CurrBin--;
-    sum += hpost->GetBinContent(CurrBin);
+    sum += hist->GetBinContent(CurrBin);
   }
-  const double sigma_m = std::fabs(hpost->GetBinCenter(CurrBin)-hpost->GetBinLowEdge(MaxBin));
+  const double sigma_m = std::fabs(hist->GetBinCenter(CurrBin)-hist->GetBinLowEdge(MaxBin));
 
   // Now do the double sided HPD
   //KS: Start sum from the HPD
-  sum = hpost->GetBinContent(MaxBin);
+  sum = hist->GetBinContent(MaxBin);
   int LowBin = MaxBin;
   int HighBin = MaxBin;
   long double LowCon = 0.0;
   long double HighCon = 0.0;
 
-  while (sum/Integral < coverage && (LowBin > 0 || HighBin < hpost->GetNbinsX()+1))
+  while (sum/Integral < coverage && (LowBin > 0 || HighBin < hist->GetNbinsX()+1))
   {
     LowCon = 0.0;
     HighCon = 0.0;
@@ -2851,12 +2851,12 @@ void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage
     if(LowBin > 1)
     {
       LowBin--;
-      LowCon = hpost->GetBinContent(LowBin);
+      LowCon = hist->GetBinContent(LowBin);
     }
-    if(HighBin < hpost->GetNbinsX())
+    if(HighBin < hist->GetNbinsX())
     {
       HighBin++;
-      HighCon = hpost->GetBinContent(HighBin);
+      HighCon = hist->GetBinContent(HighBin);
     }
 
     // If we're on the last slice and the lower contour is larger than the upper
@@ -2874,9 +2874,9 @@ void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage
 
   double sigma_hpd = 0.0;
   if (LowCon > HighCon) {
-    sigma_hpd = std::fabs(hpost->GetBinLowEdge(LowBin)-hpost->GetBinCenter(MaxBin));
+    sigma_hpd = std::fabs(hist->GetBinLowEdge(LowBin)-hist->GetBinCenter(MaxBin));
   } else {
-    sigma_hpd = std::fabs(hpost->GetXaxis()->GetBinUpEdge(HighBin)-hpost->GetBinCenter(MaxBin));
+    sigma_hpd = std::fabs(hist->GetXaxis()->GetBinUpEdge(HighBin)-hist->GetBinCenter(MaxBin));
   }
 
   (*Means_HPD)(i) = peakval;
@@ -2887,7 +2887,7 @@ void MCMCProcessor::GetHPD(TH1D* const hpost, const int i, const double coverage
 
 // ***************
 //KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
-void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage) {
+void MCMCProcessor::GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage) {
 // ***************
 
   if(coverage > 1)
@@ -2900,16 +2900,16 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
   hpost_copy->Fill(0.0, 0.0);
 
   //KS: Temporary structure to be thread save
-  double *hist_copy = new double[hpost->GetXaxis()->GetNbins()+1];
-  bool *hist_copy_fill = new bool[hpost->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  double *hist_copy = new double[hist->GetXaxis()->GetNbins()+1];
+  bool *hist_copy_fill = new bool[hist->GetXaxis()->GetNbins()+1];
+  for (int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
   {
-    hist_copy[i] = hpost->GetBinContent(i);
+    hist_copy[i] = hist->GetBinContent(i);
     hist_copy_fill[i] = false;
   }
 
   /// Loop over histogram bins with highest number of entries until covered 90 or 68.3%
-  const long double Integral = hpost->Integral();
+  const long double Integral = hist->Integral();
   long double sum = 0;
 
   while ((sum / Integral) < coverage)
@@ -2917,7 +2917,7 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
     /// Get bin of highest content and save the number of entries reached so far
     int max_entry_bin = 0;
     double max_entries = 0.;
-    for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+    for (int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
     {
       if (hist_copy[i] > max_entries)
       {
@@ -2932,9 +2932,9 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
     sum += max_entries;
   }
   //KS: Now fill our copy only for bins which got included in coverage region
-  for(int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  for(int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
   {
-    if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hpost->GetBinContent(i));
+    if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hist->GetBinContent(i));
   }
 
   delete[] hist_copy;
@@ -2945,7 +2945,7 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, con
 
 // ***************
 //KS: Set 2D contour within some coverage
-void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) {
+void MCMCProcessor::GetCredibleRegion(TH2D* const hist2D, const double coverage) {
 // ***************
 
   if(coverage > 1)
@@ -2955,18 +2955,18 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) 
   }
 
   //KS: Temporary structure to be thread save
-  double **hist_copy = new double*[hpost->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  double **hist_copy = new double*[hist2D->GetXaxis()->GetNbins()+1];
+  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
   {
-    hist_copy[i] = new double[hpost->GetYaxis()->GetNbins()+1];
-    for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
+    hist_copy[i] = new double[hist2D->GetYaxis()->GetNbins()+1];
+    for (int j = 0; j <= hist2D->GetYaxis()->GetNbins(); ++j)
     {
-      hist_copy[i][j] = hpost->GetBinContent(i,j);
+      hist_copy[i][j] = hist2D->GetBinContent(i,j);
     }
   }
 
   /// Loop over histogram bins with highest number of entries until covered 90 or 68.3%
-  const long double Integral = hpost->Integral();
+  const long double Integral = hist2D->Integral();
   long double sum = 0;
 
   //We need to as ROOT requires array to set to contour
@@ -2977,9 +2977,9 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) 
     int max_entry_bin_x = 0;
     int max_entry_bin_y = 0;
     double max_entries = 0.;
-    for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+    for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
     {
-      for (int j = 0; j <= hpost->GetYaxis()->GetNbins(); ++j)
+      for (int j = 0; j <= hist2D->GetYaxis()->GetNbins(); ++j)
       {
         if (hist_copy[i][j] > max_entries)
         {
@@ -2995,10 +2995,10 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hpost, const double coverage) 
     sum += max_entries;
     Contour[0] = max_entries;
   }
-  hpost->SetContour(1, Contour);
+  hist2D->SetContour(1, Contour);
 
   //Delete temporary arrays
-  for (int i = 0; i <= hpost->GetXaxis()->GetNbins(); ++i)
+  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
   {
     delete[] hist_copy[i];
   }

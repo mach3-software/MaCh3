@@ -248,15 +248,15 @@ class MCMCProcessor {
 
     //Analyse posterior distribution
     /// @brief Get Arithmetic mean from posterior
-    inline void GetArithmetic(TH1D * const hpost, const int i);
+    inline void GetArithmetic(TH1D * const hist, const int i);
     /// @brief Fit Gaussian to posterior
-    inline void GetGaussian(TH1D *& hpost, const int i);
+    inline void GetGaussian(TH1D *& hist, const int i);
     /// @brief Get Highest Posterior Density (HPD)
-    inline void GetHPD(TH1D * const hpost, const int i, const double coverage = 0.6827);
+    inline void GetHPD(TH1D * const hist, const int i, const double coverage = 0.6827);
     /// @brief Get 1D Credible Interval
-    inline void GetCredibleInterval(TH1D* const hpost, TH1D* hpost_copy, const double coverage = 0.6827);
+    inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage = 0.6827);
     /// @brief Get 2D Credible Region
-    inline void GetCredibleRegion(TH2D* hpost, const double coverage = 0.6827);
+    inline void GetCredibleRegion(TH2D* hist2D, const double coverage = 0.6827);
 
     // MCMC Diagnostic
     /// @brief CW: Prepare branches etc. for DiagMCMC

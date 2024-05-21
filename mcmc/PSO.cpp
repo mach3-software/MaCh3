@@ -233,14 +233,14 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
         double start = position[i];
         std::vector<double> x(num);
         std::vector<double> y(num);
-        double step = (start-neg_stop) / (num - 1);
+        double StepPoint = (start-neg_stop) / (num - 1);
         double value = start;
         for (int j = 0; j < num; ++j) {
             pos[i] = value;
             double LLR = CalcChi(position) - minimum - 1.0;
             x[j] = value;
             y[j] = LLR;
-            value -= step;
+            value -= StepPoint;
         }
         pos[i] = curr_ival;
 
@@ -257,14 +257,14 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
         std::cout << "Neg" << std::endl;
         x.assign(num, 0);
         y.assign(num, 0);
-        step = (pos_stop-start) / (num - 1);
+        StepPoint = (pos_stop-start) / (num - 1);
         value = start;
         for (int j = 0; j < num; ++j) {
             pos[i] = value;
             double LLR = CalcChi(position) - minimum - 1.0;
             x[j] = value;
             y[j] = LLR;
-            value += step;
+            value += StepPoint;
         }
         pos[i] = curr_ival;
         closest_index = 0;
@@ -293,7 +293,7 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
         double stop = previous_pos[i] + 1e-1;
         std::vector<double> x(num);
         std::vector<double> y(num);
-        double step = (stop - start) / (num - 1);
+        double StepPoint = (stop - start) / (num - 1);
         double value = start;
         // std::cout << "result for fDim " << 1 << std::endl;
         for (int j =0;j< num; ++j){
@@ -301,7 +301,7 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
             double LLR = CalcChi(position);
             x[j] = value;
             y[j] = LLR;
-            value +=step;
+            value += StepPoint;
         }
         position[i] = curr_ival;
         std::cout << " " << std::endl;

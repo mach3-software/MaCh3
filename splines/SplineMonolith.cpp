@@ -1088,7 +1088,7 @@ void SMonolith::PrepareForGPU_TF1() {
 // Need to specify template functions in header
 // *****************************************
 // Scan the master spline to get the maximum number of knots in any of the TSpline3*
-void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & MasterSpline, unsigned int &nEvents, int &MaxPoints, short int &nParams, int &nSplines, unsigned int &nKnots) {
+void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & MasterSpline, unsigned int &nEvents, int &MaxPoints, short int &numParams, int &nSplines, unsigned int &numKnots) {
 // *****************************************
 
   // Need to extract: the total number of events
@@ -1096,9 +1096,9 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   //                  maximum number of knots
   MaxPoints = 0;
   nEvents   = 0;
-  nParams   = 0;
+  numParams   = 0;
   nSplines = 0;
-  nKnots = 0;
+  numKnots = 0;
   std::vector<std::vector<TSpline3_red*> >::iterator OuterIt;
   std::vector<TSpline3_red*>::iterator InnerIt;
 
@@ -1109,10 +1109,10 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   int nMaxSplines_PerEvent = 0;
   
   //KS: We later check that each event has the same number of splines so this is fine
-  nParams = MasterSpline[0].size();
+  numParams = MasterSpline[0].size();
   // Initialise
-  SplineInfoArray = new FastSplineInfo[nParams];
-  for (_int_ i = 0; i < nParams; ++i) {
+  SplineInfoArray = new FastSplineInfo[numParams];
+  for (_int_ i = 0; i < numParams; ++i) {
     SplineInfoArray[i].nPts = -999;
     SplineInfoArray[i].xPts = NULL;
     SplineInfoArray[i].CurrSegment = 0;
@@ -1123,16 +1123,16 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   // Loop over each parameter
   for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
     // Check that each event has each spline saved
-    if (nParams > 0) {
+    if (numParams > 0) {
       int TempSize = (*OuterIt).size();
-      if (TempSize != nParams) {
+      if (TempSize != numParams) {
         MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
-        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", nParams);
+        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", numParams);
         MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
         throw;
       }
     }
-    nParams = (*OuterIt).size();
+    numParams = (*OuterIt).size();
 
     int nSplines_SingleEvent = 0;
     // Loop over each pointer
@@ -1143,7 +1143,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
       if (nPoints > MaxPoints) {
         MaxPoints = nPoints;
       }
-      nKnots += nPoints;
+      numKnots += nPoints;
       nSplines_SingleEvent++;
       
       // Fill the SplineInfoArray entries with information on each splinified parameter
@@ -1171,7 +1171,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   
   int Counter = 0;
   //KS: Sanity check that everything was set correctly
-  for (_int_ i = 0; i < nParams; ++i)
+  for (_int_ i = 0; i < numParams; ++i)
   {
     const _int_ nPoints = SplineInfoArray[i].nPts;
     const _float_* xArray = SplineInfoArray[i].xPts;
@@ -1191,7 +1191,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
 // Need to specify template functions in header
 // *****************************************
 // Scan the master spline to get the maximum number of knots in any of the TSpline3*
-void SMonolith::ScanMasterSpline(std::vector<std::vector<TF1_red*> > & MasterSpline, unsigned int &nEvents, int &MaxPoints, short int &nParams) {
+void SMonolith::ScanMasterSpline(std::vector<std::vector<TF1_red*> > & MasterSpline, unsigned int &nEvents, int &MaxPoints, short int &numParams) {
 // *****************************************
 
   // Need to extract: the total number of events
@@ -1199,7 +1199,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TF1_red*> > & MasterSpl
   //                  maximum number of knots
   MaxPoints = 0;
   nEvents   = 0;
-  nParams   = 0;
+  numParams   = 0;
 
   std::vector<std::vector<TF1_red*> >::iterator OuterIt;
   std::vector<TF1_red*>::iterator InnerIt;
@@ -1211,16 +1211,16 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TF1_red*> > & MasterSpl
   // Loop over each parameter
   for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
     // Check that each event has each spline saved
-    if (nParams > 0) {
+    if (numParams > 0) {
       int TempSize = (*OuterIt).size();
-      if (TempSize != nParams) {
+      if (TempSize != numParams) {
         MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
-        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", nParams);
+        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", numParams);
         MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
         throw;
       }
     }
-    nParams = (*OuterIt).size();
+    numParams = (*OuterIt).size();
 
     // Loop over each pointer
     for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt) {

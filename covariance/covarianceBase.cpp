@@ -259,8 +259,8 @@ void covarianceBase::init(const char *name, const char *file)
   }
 
   // Should put in a 
-  TMatrixDSym *covMatrix = (TMatrixDSym*)(infile->Get(name));
-  if (covMatrix == NULL) {
+  TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name));
+  if (CovMat == NULL) {
     std::cerr << "Could not find covariance matrix name " << name << " in file " << file << std::endl;
     std::cerr << "Are you really sure " << name << " exists in the file?" << std::endl;
     std::cerr << __FILE__ << ":" << __LINE__  << std::endl;
@@ -284,7 +284,7 @@ void covarianceBase::init(const char *name, const char *file)
   upper_adapt = -999;
 
   // Set the covariance matrix
-  size = covMatrix->GetNrows();
+  size = CovMat->GetNrows();
   _fNumPar = size;
     
   InvertCovMatrix = new double*[_fNumPar]();
@@ -302,8 +302,8 @@ void covarianceBase::init(const char *name, const char *file)
   }
 
   setName(name);
-  MakePosDef(covMatrix);
-  setCovMatrix(covMatrix);
+  MakePosDef(CovMat);
+  setCovMatrix(CovMat);
 
   if (_fNumPar <= 0) {
     MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", getName(), _fNumPar);

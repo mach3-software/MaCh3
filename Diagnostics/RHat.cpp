@@ -35,7 +35,6 @@
 int Ntoys;
 int Nchains;
 
-TChain *Chain;
 int nDraw;
 
 bool VERBOSE;
@@ -207,39 +206,39 @@ void PrepareChains() {
         // Find the name and how many of each systematic we have
         for (int i = 0; i < nBranches[m]; i++) 
         {
-            // Get the TBranch and its name
-            TBranch* br = (TBranch*)brlis->At(i);
-            TString bname = br->GetName();
+          // Get the TBranch and its name
+          TBranch* br = (TBranch*)brlis->At(i);
+          TString bname = br->GetName();
 
-            // Read in the step
-            if (bname == "step") {
-                Chain->SetBranchStatus(bname, true);
-                Chain->SetBranchAddress(bname, &step[m]);
-            }
-            //Count all branches
-            else if (bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
+          // Read in the step
+          if (bname == "step") {
+              Chain->SetBranchStatus(bname, true);
+              Chain->SetBranchAddress(bname, &step[m]);
+          }
+          //Count all branches
+          else if (bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
+          {
+              continue;
+          }
+          else
+          {
+            //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
+            if(m == 0)
             {
-                continue;
+              BranchNames.push_back(bname);
+              //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+              if(bname.BeginsWith("LogL"))
+              {
+                ValidPar.push_back(false);
+              }
+              else
+              {
+                ValidPar.push_back(true);
+              }
             }
-            else
-            {
-                //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
-                if(m == 0)
-                {
-                    BranchNames.push_back(bname);
-                    //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
-                    if(bname.BeginsWith("LogL"))
-                    {
-                        ValidPar.push_back(false);
-                    }
-                    else
-                    {
-                        ValidPar.push_back(true);
-                    }
-                }
-                Chain->SetBranchStatus(bname, true);
-                if (VERBOSE) std::cout<<bname<<std::endl;
-            }
+            Chain->SetBranchStatus(bname, true);
+            if (VERBOSE) std::cout<<bname<<std::endl;
+          }
         } 
 
         if(m == 0) nDraw = BranchNames.size();
@@ -247,12 +246,12 @@ void PrepareChains() {
         //TN: Qualitatively faster sanity check, with the very same outcome (all chains have the same #branches)
         if(m > 0)
         {
-            if(nBranches[m] != nBranches[0])
-            {
-                std::cerr<<"Ups, something went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while 0 called "<<MCMCFile[0]<<" has "<<nBranches[0]<<" branches"<<std::endl;
-                std::cerr<<"All chains should have the same number of branches"<<std::endl;
-                throw;
-            }
+          if(nBranches[m] != nBranches[0])
+          {
+            std::cerr<<"Ups, something went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while 0 called "<<MCMCFile[0]<<" has "<<nBranches[0]<<" branches"<<std::endl;
+            std::cerr<<"All chains should have the same number of branches"<<std::endl;
+            throw;
+          }
         }
 
 
@@ -261,53 +260,53 @@ void PrepareChains() {
         DrawsFolded[m] = new double*[Ntoys]();
         for(int i = 0; i < Ntoys; i++)
         {
-            Draws[m][i] = new double[nDraw]();
-            DrawsFolded[m][i] = new double[nDraw]();
-            for(int j = 0; j < nDraw; j++)
-            {
-               Draws[m][i][j] = 0.;
-               DrawsFolded[m][i][j] = 0.;
-            }
+          Draws[m][i] = new double[nDraw]();
+          DrawsFolded[m][i] = new double[nDraw]();
+          for(int j = 0; j < nDraw; j++)
+          {
+            Draws[m][i][j] = 0.;
+            DrawsFolded[m][i][j] = 0.;
+          }
         }
 
         //TN: move looping over toys here, so we don't need to loop over chains more than once
         if(BurnIn[m] >= nEntries[m])
         {
-            std::cerr<<"You are running on a chain shorter than BurnIn cut"<<std::endl;
-            std::cerr<<"Number of entries "<<nEntries[m]<<" BurnIn cut "<<BurnIn<<std::endl;
-            std::cerr<<"You will run into the infinite loop"<<std::endl;
-            std::cerr<<"You can make a new chain or modify BurnIn cut"<<std::endl;
-            std::cerr<<"Find me here: "<<__FILE__ << ":" << __LINE__ << std::endl;
-            throw;
+          std::cerr<<"You are running on a chain shorter than BurnIn cut"<<std::endl;
+          std::cerr<<"Number of entries "<<nEntries[m]<<" BurnIn cut "<<BurnIn<<std::endl;
+          std::cerr<<"You will run into the infinite loop"<<std::endl;
+          std::cerr<<"You can make a new chain or modify BurnIn cut"<<std::endl;
+          std::cerr<<"Find me here: "<<__FILE__ << ":" << __LINE__ << std::endl;
+          throw;
         }
 
         for (int i = 0; i < Ntoys; i++)
         {
-            // Get a random entry after burn in
-            int entry = (int)(nEntries[m]*rnd->Rndm());
+          // Get a random entry after burn in
+          int entry = (int)(nEntries[m]*rnd->Rndm());
 
-            Chain->GetEntry(entry);
+          Chain->GetEntry(entry);
 
-            // If we have combined chains by hadd need to check the step in the chain
-            // Note, entry is not necessarily the same as the step due to merged ROOT files, so can't choose an entry in the range BurnIn - nEntries :(
-            if (step[m] < BurnIn[m])
-            {
-                i--;
-                continue;
-            }
+          // If we have combined chains by hadd need to check the step in the chain
+          // Note, entry is not necessarily the same as the step due to merged ROOT files, so can't choose an entry in the range BurnIn - nEntries :(
+          if (step[m] < BurnIn[m])
+          {
+            i--;
+            continue;
+          }
 
-            // Output some info for the user
-            if (Ntoys > 10 && i % (Ntoys/10) == 0) {
-                std::cout << "On toy " << i << "/" << Ntoys << " (" << int(double(i)/double(Ntoys)*100.0) << "%)" << std::endl;
-                std::cout << "   Getting random entry " << entry << std::endl;
-            }
+          // Output some info for the user
+          if (Ntoys > 10 && i % (Ntoys/10) == 0) {
+              std::cout << "On toy " << i << "/" << Ntoys << " (" << int(double(i)/double(Ntoys)*100.0) << "%)" << std::endl;
+              std::cout << "   Getting random entry " << entry << std::endl;
+          }
 
-            // Set the branch addresses for params
-            for (int j = 0; j < nDraw; ++j)
-            {
-                Chain->SetBranchAddress(BranchNames[j].Data(), &Draws[m][i][j]);
-            }
-            Chain->GetEntry(entry);
+          // Set the branch addresses for params
+          for (int j = 0; j < nDraw; ++j)
+          {
+            Chain->SetBranchAddress(BranchNames[j].Data(), &Draws[m][i][j]);
+          }
+          Chain->GetEntry(entry);
 
         }//end loop over toys
 
@@ -323,18 +322,18 @@ void PrepareChains() {
     #endif
     for(int j = 0; j < nDraw; j++)
     {
-        MedianArr[j] = 0.;
-        double* TempDraws = new double[Ntoys*Nchains]();
-        for(int m = 0; m < Nchains; m++)
+      MedianArr[j] = 0.;
+      double* TempDraws = new double[Ntoys*Nchains]();
+      for(int m = 0; m < Nchains; m++)
+      {
+        for(int i = 0; i < Ntoys; i++)
         {
-            for(int i = 0; i < Ntoys; i++)
-            {
-                const int im = i+m;
-                TempDraws[im] = Draws[m][i][j];
-            }
+          const int im = i+m;
+          TempDraws[im] = Draws[m][i][j];
         }
-        MedianArr[j] = CalcMedian(TempDraws, Ntoys*Nchains);
-        delete[] TempDraws;
+      }
+      MedianArr[j] = CalcMedian(TempDraws, Ntoys*Nchains);
+      delete[] TempDraws;
     } 
     
     #ifdef MULTITHREAD

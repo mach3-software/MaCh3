@@ -910,7 +910,7 @@ void FitterBase::Run2DLLHScan() {
         // For xsec we can get the actual name, hurray for being informative
         if (isxsec) name_y = (*it)->GetParFancyName(j);
 
-        bool skip = false;
+        skip = false;
         for(unsigned int is = 0; is < SkipVector.size(); is++)
         {
           if(name_y.substr(0, SkipVector[is].length()) == SkipVector[is])
@@ -1310,7 +1310,7 @@ void FitterBase::RunSigmaVar() {
 
       for (int j = 0; j < numVar; ++j)
       {
-        int SampleIterator = 0;
+        SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
           for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)

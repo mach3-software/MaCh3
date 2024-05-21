@@ -455,9 +455,9 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   Correlation = nullptr;
   
   //KS: Loop over alls dsired cuts
-  for(int i = 1; i < NIntervals; ++i)
+  for(int k = 1; k < NIntervals; ++k)
   {
-    BurnIn = i*IntervalsSize;
+    BurnIn = k*IntervalsSize;
     Processor->SetStepCut(BurnIn);
     Processor->GetCovariance(Covariance, Correlation);
     Processor->ResetHistograms();
@@ -516,7 +516,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
     ss << BurnIn;
     ss << "/";
     ss << "BCut_";
-    ss << (i-1)*IntervalsSize;
+    ss << (k-1)*IntervalsSize;
     std::string str = ss.str();
     
     TString Title = "Cov " + str;

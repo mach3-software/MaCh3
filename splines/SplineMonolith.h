@@ -66,9 +66,9 @@ class SMonolith : public SplineBase {
     /// @brief KS: Set everything to null etc.
     inline void Initialise();
     /// @brief CW: Function to scan through the MasterSpline of TSpline3
-    inline void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &nParams, int &nSplines, unsigned int &nKnots);
+    inline void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams, int &nSplines, unsigned int &numKnots);
     /// @brief CW: Function to scan through the MasterSpline of TF1
-    inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &nParams);
+    inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
     inline void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
     /// @brief CW: The shared initialiser from constructors of TSpline3 and TSpline3_red
