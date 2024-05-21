@@ -145,7 +145,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
     std::vector<std::vector<double>> uncertainties_list;
     for (unsigned int i = 0; i< position.size(); ++i){
         std::cout << i << std::endl;
-        std::vector<double> uncertainties;
+        //std::vector<double> uncertainties;
         std::vector<double> new_position = position; new_position[i] = position[i]-range;
         double val_1 = CalcChi(new_position)-minimum-1.0;
         while (val_1*-1.0> 0.0){
@@ -236,22 +236,22 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
         double StepPoint = (start-neg_stop) / (num - 1);
         double value = start;
         for (int j = 0; j < num; ++j) {
-            pos[i] = value;
-            double LLR = CalcChi(position) - minimum - 1.0;
-            x[j] = value;
-            y[j] = LLR;
-            value -= StepPoint;
+          pos[i] = value;
+          double LLR = CalcChi(position) - minimum - 1.0;
+          x[j] = value;
+          y[j] = LLR;
+          value -= StepPoint;
         }
         pos[i] = curr_ival;
 
         int closest_index = 0;
         double closest_value = abs(y[0]); // Initialize with the first element
-        for (unsigned int i = 1; i < y.size(); ++i) {
-            double abs_y = abs(y[i]);
-            if (abs_y < closest_value) {
-                closest_index = i;
-                closest_value = abs_y;
-            }
+        for (unsigned int ii = 1; ii < y.size(); ++ii) {
+          double abs_y = abs(y[ii]);
+          if (abs_y < closest_value) {
+            closest_index = ii;
+            closest_value = abs_y;
+          }
         }
         neg_uncertainty[i] = x[closest_index];
         std::cout << "Neg" << std::endl;
@@ -260,21 +260,21 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
         StepPoint = (pos_stop-start) / (num - 1);
         value = start;
         for (int j = 0; j < num; ++j) {
-            pos[i] = value;
-            double LLR = CalcChi(position) - minimum - 1.0;
-            x[j] = value;
-            y[j] = LLR;
-            value += StepPoint;
+          pos[i] = value;
+          double LLR = CalcChi(position) - minimum - 1.0;
+          x[j] = value;
+          y[j] = LLR;
+          value += StepPoint;
         }
         pos[i] = curr_ival;
         closest_index = 0;
         closest_value = abs(y[0]); // Initialize with the first element
-        for (unsigned int i = 1; i < y.size(); ++i) {
-            double abs_y = abs(y[i]);
-            if (abs_y < closest_value) {
-                closest_index = i;
-                closest_value = abs_y;
-            }
+        for (unsigned int ii = 1; ii < y.size(); ++ii) {
+          double abs_y = abs(y[ii]);
+          if (abs_y < closest_value) {
+            closest_index = ii;
+            closest_value = abs_y;
+          }
         } 
         pos_uncertainty[i] = x[closest_index];
     } 

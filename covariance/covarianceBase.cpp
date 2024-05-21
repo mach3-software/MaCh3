@@ -10,7 +10,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   LastPCAdpar = -999;
 }
 // ********************************************
-covarianceBase::covarianceBase(std::vector<std::string> YAMLFile, const char *name, double threshold, int FirstPCAdpar, int LastPCAdpar) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCAdpar), LastPCAdpar(LastPCAdpar) {
+covarianceBase::covarianceBase(std::vector<std::string> YAMLFile, const char *name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
 
   MACH3LOG_INFO("Constructing instance of covarianceBase using ");
@@ -415,10 +415,10 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
   //ETA
   //Now that we've been through all systematic let's fill the covmatrix
   //This makes the root TCov from YAML
-  for(int i=0; i < _fNumPar; i++) {
-    (*_fCovMatrix)(i,i)=_fError[i]*_fError[i];
+  for(int j = 0; j < _fNumPar;j++) {
+    (*_fCovMatrix)(j, j)=_fError[j]*_fError[j];
     //Get the map of parameter name to correlation fomr the Correlations object
-    for (auto const& [key, val] : Correlations[i]) {
+    for (auto const& [key, val] : Correlations[j]) {
       int index = -1;
 
       //If you found the parameter name then get the index
@@ -433,19 +433,19 @@ void covarianceBase::init(std::vector<std::string> YAMLFile)
       //
       double Corr1 = val;
       double Corr2 = 0;
-      if(Correlations[index].find(_fFancyNames[i]) != Correlations[index].end()) {
-        Corr2 = Correlations[index][_fFancyNames[i]];
+      if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
+        Corr2 = Correlations[index][_fFancyNames[j]];
         //Do they agree to better than float precision?
         if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
-          MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[i], key);
+          MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
           MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
           exit(5);
         }
       } else {
-        MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[i], key);
+        MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[j], key);
         exit(5);
       }
-      (*_fCovMatrix)(i, index)= (*_fCovMatrix)(index, i) = Corr1*_fError[i]*_fError[index];
+      (*_fCovMatrix)(j, index)= (*_fCovMatrix)(index, j) = Corr1*_fError[j]*_fError[index];
     }
   }
 

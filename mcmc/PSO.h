@@ -20,7 +20,7 @@ class particle{
     public:
 
         particle(){};
-        particle(std::vector<double> position, std::vector<double> velocity) : position(position), velocity(velocity){};
+        particle(std::vector<double> pos, std::vector<double> vel) : position(pos), velocity(vel){};
         /// @brief Destructor
         virtual ~particle() {};
 

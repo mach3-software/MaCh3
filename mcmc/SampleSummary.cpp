@@ -1720,33 +1720,33 @@ void SampleSummary::NormaliseTH2Poly(TH2Poly* Histogram){
 
 // ****************
 // Calculate the LLH for TH1D, set the LLH to title of MCHist
-void SampleSummary::CalcLLH(TH1D * const & DataHist, TH1D * const & MCHist, TH1D * const & W2Hist) {
+void SampleSummary::CalcLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D * const & W2Hist) {
 // ****************
-  const double llh = GetLLH(DataHist, MCHist, W2Hist);
+  const double llh = GetLLH(DatHist, MCHist, W2Hist);
   std::stringstream ss;
   ss << "_2LLH=" << llh;
   MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
-  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << DataHist->Integral() << std::setw(10) << MCHist->Integral() << std::setw(10) << llh << std::endl;
+  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << DatHist->Integral() << std::setw(10) << MCHist->Integral() << std::setw(10) << llh << std::endl;
 }
 
 // ****************
 // Calculate the LLH for TH1D, set the LLH to title of MCHist
-void SampleSummary::CalcLLH(TH2Poly * const & DataHist, TH2Poly * const & MCHist, TH2Poly * const & W2Hist) {
+void SampleSummary::CalcLLH(TH2Poly * const & DatHist, TH2Poly * const & MCHist, TH2Poly * const & W2Hist) {
 // ****************
-  const double llh = GetLLH(DataHist, MCHist, W2Hist);
+  const double llh = GetLLH(DatHist, MCHist, W2Hist);
   std::stringstream ss;
   ss << "_2LLH=" << llh;
   MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
-  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << NoOverflowIntegral(DataHist) << std::setw(10) << NoOverflowIntegral(MCHist) << std::setw(10) << llh << std::endl;
+  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << NoOverflowIntegral(DatHist) << std::setw(10) << NoOverflowIntegral(MCHist) << std::setw(10) << llh << std::endl;
 }
 
 // ****************
-double SampleSummary::GetLLH(TH2Poly * const & DataHist, TH2Poly * const & MCHist, TH2Poly * const & W2Hist) {
+double SampleSummary::GetLLH(TH2Poly * const & DatHist, TH2Poly * const & MCHist, TH2Poly * const & W2Hist) {
 // ****************
   double llh = 0.0;
-  for (int i = 1; i < DataHist->GetNumberOfBins()+1; ++i) 
+  for (int i = 1; i < DatHist->GetNumberOfBins()+1; ++i)
   {
-    const double data = DataHist->GetBinContent(i);
+    const double data = DatHist->GetBinContent(i);
     const double mc = MCHist->GetBinContent(i);
     const double w2 = W2Hist->GetBinContent(i);
     llh += SamplePDF->getTestStatLLH(data, mc, w2);
@@ -1756,12 +1756,12 @@ double SampleSummary::GetLLH(TH2Poly * const & DataHist, TH2Poly * const & MCHis
 }
 
 // ****************
-double SampleSummary::GetLLH(TH1D * const & DataHist, TH1D * const & MCHist, TH1D * const & W2Hist) {
+double SampleSummary::GetLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D * const & W2Hist) {
 // ****************
   double llh = 0.0;
-  for (int i = 1; i <= DataHist->GetXaxis()->GetNbins(); ++i) 
+  for (int i = 1; i <= DatHist->GetXaxis()->GetNbins(); ++i)
   {
-    const double data = DataHist->GetBinContent(i);
+    const double data = DatHist->GetBinContent(i);
     const double mc = MCHist->GetBinContent(i);
     const double w2 = W2Hist->GetBinContent(i);
     llh += SamplePDF->getTestStatLLH(data, mc, w2);

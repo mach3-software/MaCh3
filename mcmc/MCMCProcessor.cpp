@@ -1835,13 +1835,13 @@ void MCMCProcessor::MakeCredibleRegions() {
 
 // *********************
 // Make fancy triangle plot for selected parameters
-void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
+void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames) {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
   MACH3LOG_INFO("Making Triangle Plot");
 
-  const int nParamPlot = ParamNames.size();
+  const int nParamPlot = ParNames.size();
   std::vector<int> ParamNumber;
   for(int j = 0; j < nParamPlot; ++j)
   {
@@ -1855,11 +1855,11 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParamNames) {
 
       GetNthParameter(i, Prior, PriorError, Title);
 
-      if(ParamNames[j] == Title) ParamNo = i;
+      if(ParNames[j] == Title) ParamNo = i;
     }
     if(ParamNo == _UNDEF_)
     {
-      MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParamNames[j]);
+      MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParNames[j]);
       return;
     }
     ParamNumber.push_back(ParamNo);

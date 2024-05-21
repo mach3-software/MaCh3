@@ -96,7 +96,7 @@ class MCMCProcessor {
     /// @brief Make and Draw Credible Regions
     void MakeCredibleRegions();
     /// @brief Make fancy triangle plot for selected parameters
-    void MakeTrianglePlot(std::vector<std::string> ParamNames);
+    void MakeTrianglePlot(std::vector<std::string> ParNames);
     /// @brief Make funny polar plot
     void GetPolarPlot(std::vector<std::string> ParNames);
 
