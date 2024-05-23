@@ -215,8 +215,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
 	if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
 		returnVec.push_back(_fSplineModes.at(SplineIndex));	
-	  }
-	}
+	  }	
   }
 
   return returnVec;
@@ -231,8 +230,7 @@ const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
   for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
 		returnVec.push_back(SplineIndex);
-      }
-    }
+      } 
   }
   return returnVec;
 }
