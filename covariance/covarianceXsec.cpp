@@ -52,43 +52,39 @@ void covarianceXsec::InitXsecFromConfig() {
 
 	 //Fill the map to get the correlations later as well
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
-	 int nFDSplines;
 	 //Now load in varaibles for spline systematics only
+	 int SplineCounter = 0;
 	 if (ParamType.find("Spline") != std::string::npos) {
+	   //ETA - do some checks whether various Spline-related information exists
+	   if(CheckNodeExists(param["Systematic"], "SplineInformation")){ 
 
-	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
-		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
-		 nFDSplines++;
+		 if (param["Systematic"]["SplineInformation"]["SplineName"]) {
+		   _fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
+		 }
+
+		 _fSplineModes.push_back(GetFromManager(param["Systematic"]["SplineInformation"]["Mode"], std::vector<int>()));
+
+		 if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
+
+		   for(int InterpType = 0 ; InterpType < kSplineInterpolations ; ++InterpType){
+			 if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
+			 {
+			   _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
+			 }
+		   }
+		 }else{
+		   //KS: By default use TSpline3
+		   _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
+		 }
+	   }
+	   else{
+         MACH3LOG_ERROR("Spline Information does not exist for spline {}", param["Systematic"]["FancyName"].as<std::string>());
 	   }
 
-	   if (param["Systematic"]["SplineInformation"]["FDMode"]) {
-		 _fFDSplineModes.push_back(param["Systematic"]["SplineInformation"]["FDMode"].as<std::vector<int>>());
-	   }
-
-      if (param["Systematic"]["SplineInformation"]["NDSplineName"]) {
-        _fNDSplineNames.push_back(param["Systematic"]["SplineInformation"]["NDSplineName"].as<std::string>());
-        //MASSIVE HACKK!!! This only works because we only need the interpolation type at the ND
-        //Now get the Spline interpolation type
-        if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
-          for(int InterpType = 0; InterpType < kSplineInterpolations ; InterpType++){
-            if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
-            {
-              _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
-            }
-          }
-        }
-        //KS: By default use TSpline3
-        else
-        {
-          _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
-        }
-      } else{
-		//ETA - This is a bit of a hack. As we check on the ND name for the SplineInterpolation type
-		//we also need a default value for Far Detector only spline parameters. This can be removed
-		//soon as we will no longer have separate ND and FD names
-		_fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
-	  }
-
+	   //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
+	   //to the Systematic index i.e. the counter for things like _fDetID and _fDetID
+	   _fSplineToSystIndexMap.insert(std::pair{SplineCounter, i}); 
+       SplineCounter++;
 	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
  
 	   //Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
@@ -183,14 +179,12 @@ covarianceXsec::~covarianceXsec() {
 // DB Grab the Number of splines for the relevant DetID
 int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
   int returnVal = 0; 
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+
+  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
 		returnVal += 1;
-      }
     }
   }
-
   return returnVal;
 }
 // ********************************************
@@ -200,96 +194,10 @@ int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(int DetID) {
 
   std::vector<std::string> returnVec;
-
-  int nd_counter = 0;
-  //int counter = 0;
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-
-		//ETA - Horrible hard-code becuase ND and FD spline names are different...
-        // this is only true at T2K and needs to change!
-		if(DetID == 1){
-		  returnVec.push_back(_fNDSplineNames[nd_counter]);
-		  nd_counter++;
-		}
-		else{
-		  returnVec.push_back(GetParName(i));
-		}
-      }
-    }
-  }
-
-  return returnVec;
-}
-// ********************************************
-//
-
-// ETA - this is a complete fudge for now and is only here because on
-// T2K the splines at ND280 and SK have different names... 
-// this is completely temporary and will be removed in the future
-const std::vector<std::string> covarianceXsec::GetFDSplineFileParsNamesFromDetID(int DetID) {
-
-  std::vector<std::string> returnVec;
-  int FDSplineCounter = 0;
-  for (int i = 0; i < _fNumPar; ++i) {
-	//std::cout << " Param i has DetID " << GetParDetID(i) << " from yaml" << std::endl;
-	if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-	  if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		//This is horrible but has to be here whilst the ND and FD splines are named
-		//differently on T2K. This is easy to fix but isn't currently available.
-		//std::cout << "FDSplineIndex is " << std::endl;
-		//std::cout << "Getting FD spline name " << _fFDSplineNames[FDSplineCounter] << " compared DetID " << DetID << " with " << GetParDetID(i) << std::endl;
-		returnVec.push_back(_fFDSplineNames[FDSplineCounter]); //Append spline name
-		FDSplineCounter++;
-	  }
+  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+    if ((GetParDetID(SystIndex) & DetID )){
+      returnVec.push_back(_fSplineNames.at(SplineIndex));
 	}
-  }
-  return returnVec;
-}
-
-// ETA - this is another fudge for now and is only here because on
-// T2K the splines at ND280 and SK have different names... 
-// this is completely temporary and will be removed in the future
-const std::vector<std::string> covarianceXsec::GetNDSplineFileParsNamesFromDetID(int DetID) {
-
-  std::vector<std::string> returnVec;
-  int NDSplineCounter = 0;
-  for (int i = 0; i < _fNumPar; ++i) {
-	if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-	  if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		//This is horrible but has to be here whilst the ND and ND splines are named
-		//differently on T2K. This is easy to fix but isn't currently available.
-		std::cout << "Getting ND spline name " << _fNDSplineNames[NDSplineCounter] << std::endl;
-		returnVec.push_back(_fNDSplineNames[NDSplineCounter]); //Append spline name
-	  }
-	  NDSplineCounter++;
-	}
-  }
-  return returnVec;
-}
-
-// ********************************************
-// DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(int DetID) {
-  std::vector<std::string> returnVec;
-
-  int FDSplineCounter = 0;
-  int NDSplineCounter = 0;
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		//This is horrible but has to be here whilst the ND and FD splines are named
-		//differently on T2K. This is easy to fix but isn't currently available.
-		if((GetParDetID(i) & 1) == 1){
-		  returnVec.push_back(_fNDSplineNames[NDSplineCounter]);
-		  NDSplineCounter++;
-		} else{
-		  returnVec.push_back(_fFDSplineNames[FDSplineCounter]);
-		  FDSplineCounter++;
-		}
-      }
-    }
   }
 
   return returnVec;
@@ -298,17 +206,15 @@ const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(i
 
 // ********************************************
 // DB Grab the Spline Modes for the relevant DetID
+// ETA - This funciton will only work for the far detector.
 const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(int DetID) {
   std::vector< std::vector<int> > returnVec;
 
-  //Need a counter or something to correctly get the index in _fFDSplineModes since it's not of length nPars
+  //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
   //Should probably just make a std::map<std::string, int> for param name to FD spline index
-  int nFDSplineCounter = 0;
-  for (int i = 0; i < _fNumPar; ++i) {
-	if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-	  if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		returnVec.push_back(_fFDSplineModes[nFDSplineCounter]);	
-		nFDSplineCounter++;
+  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+	if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+		returnVec.push_back(_fSplineModes.at(SplineIndex));	
 	  }
 	}
   }
@@ -322,14 +228,12 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
 const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
   std::vector<int> returnVec;
 
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		returnVec.push_back(i);
+  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+		returnVec.push_back(SplineIndex);
       }
     }
   }
-
   return returnVec;
 }
 // ********************************************

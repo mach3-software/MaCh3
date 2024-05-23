@@ -10,6 +10,7 @@
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
 #include "samplePDF/Structs.h"
+#include "manager/YamlHelper.h"
 
 #include "yaml-cpp/yaml.h"
 
@@ -39,8 +40,8 @@ class covarianceXsec : public covarianceBase {
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
     //ETA - what does this even do?
-    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
-    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
+    //const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
+    //const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
     int GetNumSplineParamsFromDetID(int DetID);
@@ -87,10 +88,11 @@ class covarianceXsec : public covarianceBase {
     std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
 
     //Variables related to spline systematics
-    std::vector<std::string> _fNDSplineNames;
-    std::vector<std::string> _fFDSplineNames;
-    std::vector<std::vector<int>> _fFDSplineModes;
+    //std::vector<std::string> _fSplineNames;
+    std::vector<std::string> _fSplineNames;
+    std::vector<std::vector<int>> _fSplineModes;
     std::vector<SplineInterpolation> _fSplineInterpolationType;
+    std::map<int, int> _fSplineToSystIndexMap;
 
     //Information to be able to apply generic cuts
     std::vector<std::vector<std::string>> _fKinematicPars;
