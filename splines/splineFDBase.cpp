@@ -33,8 +33,8 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
   std::vector<int> SplineParsIndex_Sample = xsec->GetSplineParsIndexFromDetID(DetID);
   SplineParsIndex.push_back(SplineParsIndex_Sample);
 
-  std::cout << "Filling with GetFDSplineFileParsNamesFromDetID" << std::endl;
-  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetFDSplineFileParsNamesFromDetID(DetID);
+  std::cout << "Filling with GetSplineParsNamesFromDetID" << std::endl;
+  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
@@ -68,8 +68,7 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
 void splineFDBase::TransferToMonolith()
 //****************************************
 {
-  std::cout << "TRANSFERING TO MONOLITH!!" << std::endl;
-  //FindUniqueModes();
+
   PrepForReweight(); 
   MonolithSize = CountNumberOfLoadedSplines();
 
@@ -77,11 +76,13 @@ void splineFDBase::TransferToMonolith()
     std::cerr<<"Something's gone wrong when we tried to get the size of your monolith"<<std::endl;
 	std::cout << "MonolishSize is " << MonolithSize << std::endl;
 	std::cout << "MonolithIndex is " << MonolithIndex << std::endl;
-    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
     throw;
   }
-  uniquesplinevec_Monolith.reserve(MonolithSize);
-  weightvec_Monolith.reserve(MonolithSize);
+
+  MACH3LOG_INFO("Now transfering splines to a monolith if size {}", MonolithSize);
+
+  uniquesplinevec_Monolith.resize(MonolithSize);
+  weightvec_Monolith.resize(MonolithSize);
   isflatarray = new bool[MonolithSize];
   
   xcoeff_arr = new __float__[CoeffIndex];
@@ -111,12 +112,18 @@ void splineFDBase::TransferToMonolith()
                     uniquesplinevec_Monolith[splineindex] = iUniqueSyst;
                     foundUniqueSpline = true;
                   }
+
                 }//unique syst loop end
 
                 if (!foundUniqueSpline)
                 {
                   std::cerr << "Unique spline index not found" << std::endl;
-                  std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+				  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
+				  MACH3LOG_ERROR("Couldn't match {} with any of the following modes:", SplineFileParPrefixNames[iSample][iSyst]);
+				  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+				  {
+					std::cout << UniqueSystNames[iUniqueSyst] << ", ";
+				  }//unique syst loop end				
                   throw;
                 }
                 int splineKnots;
@@ -407,14 +414,14 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (isHist3D)
   {
-    Hist3D = (TH3F *)Obj->Clone();
+
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
       std::cerr << "Trying to load a 3D spline template when nDim=" << Dimensions[iSample] << std::endl;
       std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
       throw;
     }
-	//File->Get("dev_tmp_0_0");
+    Hist3D = (TH3F *)Obj->Clone();
   }
 
   int nDummyBins = 1;
@@ -433,7 +440,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 	else if(isHist3D){
 	  ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
 	  ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(Hist3D->GetZaxis())->Clone());
+	  ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
 	}
   }
   else if (Dimensions[iSample] == 3)
@@ -449,12 +456,14 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     throw;
   }
 
-  for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); iAxis++)
+  for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis)
   {
     std::cout << "Stored Var " << iAxis << " (" << getDimLabel(iSample, iAxis) << ") Spline Binning for sample " << SampleNames[iSample] << ":" << std::endl;
+	std::cout << "ReturnVec is of size " << ReturnVec.size() << std::endl;
     PrintBinning(ReturnVec[iAxis]);
   }
 
+  MACH3LOG_INFO("Left PrintBinning now tidying up");
   //This could be NULL if 2D
   if(isHist2D){
 	delete Hist2D;
@@ -478,17 +487,22 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
   int FullCounter_NonFlat = 0;
   int FullCounter_All = 0;
 
+  std::cout << "indexvec is of size " << indexvec.size() << std::endl;
+
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over systematics
+	std::cout << "indexvec[" << iSample << "] i.e. OscChan is of size " << indexvec[iSample].size() << std::endl;
     SampleCounter_NonFlat = 0;
     SampleCounter_All = 0;
     std::string SampleName = SampleNames[iSample];
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
     { // Loop over oscillation channels
+	  std::cout << "indexvec[" << iSample << "][" << iOscChan << "] i.e. systs is of size " << indexvec[iSample][iOscChan].size() << std::endl;
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
       { // Loop over systematics
-        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+   		for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
         { // Loop over modes
+		  std::cout << "indexvec[" << iSample << "][" << iOscChan << "][" << iSyst << "][" << iMode << "] i.e. mode is of size " << indexvec[iSample][iOscChan][iSyst][iMode].size() << std::endl;
           for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
           { // Loop over first dimension
             for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
@@ -563,8 +577,6 @@ void splineFDBase::PrepForReweight()
       }
       if (!FoundSyst)
       {
-        UniqueSystNames.push_back(SystName);
-
         bool FoundNonFlatSpline = false;
 		//This is all basically to check that you have some resposne from a spline
 		//systematic somewhere
@@ -610,19 +622,22 @@ void splineFDBase::PrepForReweight()
             break;
           }
         }//osc loop end
+		 //ETA - only push back unique name if a non-flat response has been found
+		if(FoundNonFlatSpline){
+		  UniqueSystNames.push_back(SystName);
+		}
 
         if (!FoundNonFlatSpline)
         {
-          std::cerr << SystName << " syst has no response in sample " << iSample << std::endl;
-          std::cerr << "Whilst this isn't neccessarily a problem, it seems odd" << std::endl;
-          std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+          //std::cerr << SystName << " syst has no response in sample " << iSample << std::endl;
+          //std::cerr << "Whilst this isn't neccessarily a problem, it seems odd" << std::endl;
+          //std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
           continue;
         }
       }
     }//Syst loop end
   }
   
-
   nUniqueSysts = UniqueSystSplines.size();
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
@@ -794,7 +809,7 @@ std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 	MACH3LOG_ERROR("You are trying to get axis {} but have only got {}", Axis, Dimensions[iSample]);
 	throw;
   }
-  return DimensionLabels[iSample][Axis];
+  return DimensionLabels.at(iSample).at(Axis);
 }
 
 
@@ -980,4 +995,5 @@ void splineFDBase::PrintBinning(TAxis *Axis)
     std::cout << BinEdges[iBin] << " ";
   }
   std::cout << std::endl;
+  return;
 }
