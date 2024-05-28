@@ -90,13 +90,30 @@ class MCMCProcessor {
     /// @brief Make and Draw Violin
     void MakeViolin();
     /// @brief Make and Draw Credible intervals
-    void MakeCredibleIntervals();
+    void MakeCredibleIntervals(std::vector<double> CredibleIntervals = {0.99, 0.90, 0.68 },
+                               std::vector<Color_t> CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
+                               bool CredibleInSigmas = false
+                               );
     /// @brief Draw the post-fit covariances
     void DrawCovariance();
     /// @brief Make and Draw Credible Regions
-    void MakeCredibleRegions();
+    void MakeCredibleRegions(std::vector<double> CredibleRegions = {0.99, 0.90, 0.68},
+                             std::vector<Style_t> CredibleRegionStyle = {kDashed, kSolid, kDotted},
+                             std::vector<Color_t> CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
+                             bool CredibleInSigmas = false
+                             );
     /// @brief Make fancy triangle plot for selected parameters
-    void MakeTrianglePlot(std::vector<std::string> ParNames);
+    void MakeTrianglePlot(std::vector<std::string> ParNames,
+                          // 1D
+                          std::vector<double> CredibleIntervals = {0.99, 0.90, 0.68 },
+                          std::vector<Color_t> CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
+                          //2D
+                          std::vector<double> CredibleRegions = {0.99, 0.90, 0.68},
+                          std::vector<Style_t> CredibleRegionStyle = {kDashed, kSolid, kDotted},
+                          std::vector<Color_t> CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
+                          // Other
+                          bool CredibleInSigmas = false
+                          );
     /// @brief Make funny polar plot
     void GetPolarPlot(std::vector<std::string> ParNames);
 
@@ -178,50 +195,6 @@ class MCMCProcessor {
     
     inline void SetOutputSuffix(const std::string Suffix){OutputSuffix = Suffix; };
     inline void SetPosterior1DCut(const std::string Cut){Posterior1DCut = Cut; };
-
-    //Setter related to Credible Intervals or Regions
-    inline void SetCredibleIntervals(std::vector<double> Intervals)
-    {
-      if(Intervals.size() > 1)
-      {
-        for(unsigned int i = 1; i < Intervals.size(); i++ )
-        {
-          if(Intervals[i] > Intervals[i-1])
-          {
-            std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
-            std::cerr<<Intervals[i] <<" "<<Intervals[i-1]<<std::endl;
-            std::cerr<<" They should be grouped in decreasing order"<<std::endl;
-            std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-            throw;
-          }
-        }
-      }
-      Credible_Intervals = Intervals;
-    };
-    inline void SetCredibleIntervalsColours(std::vector<Color_t> Intervals){Credible_IntervalsColours = Intervals; };
-
-    inline void SetCredibleRegions(std::vector<double> Intervals)
-    {
-      if(Intervals.size() > 1)
-      {
-        for(unsigned int i = 1; i < Intervals.size(); i++ )
-        {
-          if(Intervals[i] > Intervals[i-1])
-          {
-            std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
-            std::cerr<<Intervals[i] <<" "<<Intervals[i-1]<<std::endl;
-            std::cerr<<" They should be grouped in decreasing order"<<std::endl;
-            std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-            throw;
-          }
-        }
-      }
-      Credible_Regions = Intervals;
-    };
-    inline void SetCredibleRegionStyle(std::vector<Style_t> Intervals){Credible_RegionStyle = Intervals; };
-    inline void SetCredibleRegionColor(std::vector<Color_t> Intervals){Credible_RegionColor = Intervals; };
-    inline void SetCredibleInSigmas(const bool Intervals){CredibleInSigmas = Intervals; };
-
   private:
     /// @brief Prepare prefit histogram for parameter overlay plot
     inline TH1D* MakePrefit();
@@ -366,8 +339,6 @@ class MCMCProcessor {
     bool plotBinValue;
     /// Apply smoothing for 2D histos using root algorithm
     bool ApplySmoothing;
-    /// KS: If true credible stuff is done in sigmas not %
-    bool CredibleInSigmas;
     /// KS: Set Threshold when to plot 2D posterior as by default we get a LOT of plots
     double Post2DPlotThreshold;
 
@@ -460,12 +431,4 @@ class MCMCProcessor {
     float* ParamSums_gpu;
     float* DenomSum_gpu;
   #endif
-
-  //KS: Credible Intervals/Regions related
-  std::vector<double> Credible_Intervals;
-  std::vector<Color_t> Credible_IntervalsColours;
-
-  std::vector<double> Credible_Regions;
-  std::vector<Style_t> Credible_RegionStyle;
-  std::vector<Color_t> Credible_RegionColor;
 };

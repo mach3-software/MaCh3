@@ -75,18 +75,6 @@ void ProcessMCMC(std::string inputFile)
   //Apply additional cuts to 1D posterior
   Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
 
-  //KS: Settings how many credible regions you want, colors, etc., don't worry there are default values if nothing is passed
-  Processor->SetCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}));
-  Processor->SetCredibleIntervalsColours(GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}));
-
-  Processor->SetCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}));
-
-  Processor->SetCredibleRegionStyle(GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}));
-
-  Processor->SetCredibleRegionColor(GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}));
-
-  Processor->SetCredibleInSigmas(GetFromManager<bool>(Settings["CredibleInSigmas"], false));
-
   if(PlotCorr) Processor->SetOutputSuffix("_drawCorr");
   //KS:Turn off plotting detector and some other setting, should be via some config
   Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false));
@@ -105,7 +93,11 @@ void ProcessMCMC(std::string inputFile)
   Processor->MakePostfit();
   Processor->DrawPostfit();
   //KS: Should set via config whether you want below or not
-  if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) Processor->MakeCredibleIntervals();
+  if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
+    Processor->MakeCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
+                                     GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false));
+  }
   if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor);
   if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor);
   if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor);
@@ -128,7 +120,13 @@ void ProcessMCMC(std::string inputFile)
     auto const &MakeSubOptimality = Settings["MakeSubOptimality"];
     if(MakeSubOptimality[0].as<bool>()) Processor->MakeSubOptimality(MakeSubOptimality[1].as<int>());
 
-    if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false)) Processor->MakeCredibleRegions();
+    if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false)) {
+      Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
+                                     GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
+                                     GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false)
+                                     );
+    }
     if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor);
 
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
@@ -387,7 +385,13 @@ void GetTrianglePlot(MCMCProcessor* Processor){
     std::string ParName = dg[0].as<std::string>();
 
     std::vector<std::string> NameVec = dg[1].as<std::vector<std::string>>();
-    Processor->MakeTrianglePlot(NameVec);
+    Processor->MakeTrianglePlot(NameVec,
+                                GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
+                                GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
+                                GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
+                                GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
+                                GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
+                                GetFromManager<bool>(Settings["CredibleInSigmas"], false));
   }
 }
 

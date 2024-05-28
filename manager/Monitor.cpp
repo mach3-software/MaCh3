@@ -266,4 +266,22 @@ int parseLine(const std::string& line){
   return value;
 }
 
+
+// ***************************************************************************
+//KS: Print Yaml config using logger
+void PrintConfig(const YAML::Node& node){
+// ***************************************************************************
+  std::stringstream ss;
+  ss << node;
+  std::string yamlString = ss.str();
+
+  std::istringstream iss(yamlString);
+  std::string line;
+  while (std::getline(iss, line)) {
+    MACH3LOG_INFO("{}", line);
+  }
+}
+
+
+
 }

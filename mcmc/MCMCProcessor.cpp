@@ -95,7 +95,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   DrawRange = 1.5;
   
   Posterior1DCut = "";
-  CredibleInSigmas = false;
   //KS:Those keep basic information for ParameterEnum
   ParamNames.resize(kNParameterEnum);
   ParamCentral.resize(kNParameterEnum);
@@ -712,7 +711,9 @@ void MCMCProcessor::DrawPostfit() {
 
 // *********************
 // Make fancy Credible Intervals plots
-void MCMCProcessor::MakeCredibleIntervals() {
+void MCMCProcessor::MakeCredibleIntervals(std::vector<double> CredibleIntervals,
+                                          std::vector<Color_t> CredibleIntervalsColours,
+                                          bool CredibleInSigmas) {
 // *********************
 
   if(hpost[0] == nullptr) MakePostfit();
@@ -722,20 +723,27 @@ void MCMCProcessor::MakeCredibleIntervals() {
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
-  //Load values set via config or executable
-  std::vector<double> CredibleIntervals = Credible_Intervals;
-  std::vector<Color_t> CredibleIntervalsColours = Credible_IntervalsColours;
-  //Nothing was passed via config so use default values which are fancy ;)
-  if(CredibleIntervals.size() == 0 && CredibleIntervalsColours.size() == 0)
-  {
-    CredibleIntervals.insert(CredibleIntervals.end(), { 0.99, 0.90, 0.68 });
-    CredibleIntervalsColours.insert(CredibleIntervalsColours.end(), { kCyan+4, kCyan-2, kCyan-10 });
-  }
   if(CredibleIntervals.size() != CredibleIntervalsColours.size())
   {
-    MACH3LOG_ERROR("Size of  CredibleIntervals is not equat to size of CredibleIntervalsColours");
+    MACH3LOG_ERROR("Size of  CredibleIntervals is not equal to size of CredibleIntervalsColours");
     throw;
   }
+
+  if(CredibleIntervals.size() > 1)
+  {
+    for(unsigned int i = 1; i < CredibleIntervals.size(); i++ )
+    {
+      if(CredibleIntervals[i] > CredibleIntervals[i-1])
+      {
+        std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+        std::cerr<<CredibleIntervals[i] <<" "<<CredibleIntervals[i-1]<<std::endl;
+        std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+        std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+        throw;
+      }
+    }
+  }
+
   const int nCredible = CredibleIntervals.size();
   TH1D** hpost_copy = new TH1D*[nDraw];
   TH1D*** hpost_cl = new TH1D**[nDraw];
@@ -768,7 +776,7 @@ void MCMCProcessor::MakeCredibleIntervals() {
       // Scale the histograms before gettindg credible intervals
       hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
 
-      //KS: We have sliglhy different approach depdening if you passed percentage or sigmas
+      //KS: We have slightly different approach depending if you passed percentage or sigmas
       if(CredibleInSigmas)
       {
         //KS: Convert sigmas into percentage
@@ -1676,24 +1684,15 @@ void MCMCProcessor::DrawCorrelations1D() {
 
 // *********************
 // Make fancy Credible Intervals plots
-void MCMCProcessor::MakeCredibleRegions() {
+void MCMCProcessor::MakeCredibleRegions(std::vector<double> CredibleRegions,
+                                        std::vector<Style_t> CredibleRegionStyle,
+                                        std::vector<Color_t> CredibleRegionColor,
+                                        bool CredibleInSigmas) {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");
 
-  //Load values set via config or executable
-  std::vector<double> CredibleRegions = Credible_Regions;
-  std::vector<Style_t> CredibleRegionStyle = Credible_RegionStyle;
-  std::vector<Color_t> CredibleRegionColor = Credible_RegionColor;
-
-  //Nothing was passed via config so use default values which are still fancy
-  if(CredibleRegions.size() == 0 && CredibleRegionStyle.size() == 0 && CredibleRegionColor.size() == 0)
-  {
-    CredibleRegions.insert(CredibleRegions.end(), { 0.99, 0.90, 0.68 });
-    CredibleRegionStyle.insert(CredibleRegionStyle.end(), { kDashed, kSolid, kDotted });
-    CredibleRegionColor.insert(CredibleRegionColor.end(), { kGreen-3, kGreen-10, kGreen });
-  }
   if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
   {
     std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
@@ -1835,7 +1834,16 @@ void MCMCProcessor::MakeCredibleRegions() {
 
 // *********************
 // Make fancy triangle plot for selected parameters
-void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames) {
+void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames,
+                                     // 1D
+                                     std::vector<double> CredibleIntervals,
+                                     std::vector<Color_t> CredibleIntervalsColours,
+                                     //2D
+                                     std::vector<double> CredibleRegions,
+                                     std::vector<Style_t> CredibleRegionStyle,
+                                     std::vector<Color_t> CredibleRegionColor,
+                                     // Other
+                                     bool CredibleInSigmas) {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
@@ -1887,38 +1895,42 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames) {
   for(int j = 1; j < nParamPlot+1; j++) Npad += j;
   Posterior->cd();
 
-  //Load values set via config or executable
-  std::vector<double> CredibleIntervals = Credible_Intervals;
-  std::vector<Color_t> CredibleIntervalsColours = Credible_IntervalsColours;
-  //Nothing was passed via config so use default values which are still fancy
-  if(CredibleIntervals.size() == 0 && CredibleIntervalsColours.size() == 0)
-  {
-    CredibleIntervals.insert(CredibleIntervals.end(), { 0.99, 0.90, 0.68 });
-    CredibleIntervalsColours.insert(CredibleIntervalsColours.end(), { kCyan+4, kCyan-2, kCyan-10 });
-  }
   if(CredibleIntervals.size() != CredibleIntervalsColours.size())
   {
     std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
     std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
-  //Load values set via config or executable
-  std::vector<double> CredibleRegions = Credible_Regions;
-  std::vector<Style_t> CredibleRegionStyle = Credible_RegionStyle;
-  std::vector<Color_t> CredibleRegionColor = Credible_RegionColor;
-
-  //Nothing was passed via config so use default values which are still fancy
-  if(CredibleRegions.size() == 0 && CredibleRegionStyle.size() == 0 && CredibleRegionColor.size() == 0)
+  if(CredibleIntervals.size() > 1)
   {
-    CredibleRegions.insert(CredibleRegions.end(), { 0.99, 0.90, 0.68 });
-    CredibleRegionStyle.insert(CredibleRegionStyle.end(), { kDashed, kSolid, kDotted });
-    CredibleRegionColor.insert(CredibleRegionColor.end(), { kGreen-3, kGreen-10, kGreen });
+    for(unsigned int i = 1; i < CredibleIntervals.size(); i++ )
+    {
+      if(CredibleIntervals[i] > CredibleIntervals[i-1])
+      {
+        std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+        std::cerr<<CredibleIntervals[i] <<" "<<CredibleIntervals[i-1]<<std::endl;
+        std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+        std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+        throw;
+      }
+    }
   }
   if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
   {
     std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
     std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
     throw;
+  }
+  for(unsigned int i = 1; i < CredibleRegions.size(); i++ )
+  {
+    if(CredibleRegions[i] > CredibleRegions[i-1])
+    {
+      std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
+      std::cerr<<CredibleRegions[i] <<" "<<CredibleRegions[i-1]<<std::endl;
+      std::cerr<<" They should be grouped in decreasing order"<<std::endl;
+      std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+    }
   }
   const int nCredibleIntervals = CredibleIntervals.size();
   const int nCredibleRegions = CredibleRegions.size();
@@ -2516,7 +2528,7 @@ void MCMCProcessor::FindInputFiles() {
     MACH3LOG_WARN("Couldn't find OscCov branch in output");
     InputNotFound = true;
   }
-  if(InputNotFound) std::cout<<Settings<<std::endl;
+  if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
   if (std::getenv("MACH3") != nullptr)
   {

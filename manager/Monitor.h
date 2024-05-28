@@ -43,4 +43,6 @@ namespace MaCh3Utils {
   int getValue(std::string Type);
   /// @brief CW: Get memory, which is probably silly
   int parseLine(const std::string& line);
+  /// @brief KS: Print Yaml config using logger
+  void PrintConfig(const YAML::Node& node);
 }

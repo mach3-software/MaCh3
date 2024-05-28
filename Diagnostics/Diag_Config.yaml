@@ -60,7 +60,7 @@ ProcessMCMC:
   CalcBipolarPlot: false
 
   #Functionality 2D
-  PlotCorr: true
+  PlotCorr: false
   MakeSubOptimality: ["false", 100]
   MakeViolin: true
   MakeCredibleRegions: false
