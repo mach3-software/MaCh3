@@ -22,7 +22,7 @@ class splineFDBase
 	void SetupSplines();
 	void SetupSplines(int BinningOpt);
 
-	void FindUniqueModes();
+	//void FindUniqueModes();
 
     //Spline Monolith things
 	//Essential methods used externally

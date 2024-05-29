@@ -26,14 +26,12 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
   DetIDs.push_back(DetID);
 
   int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
-  std::cout << "FOund " << nSplineParam << " spline parameters" << std::endl;
   nSplineParams.push_back(nSplineParam);
 
-  std::cout << "Filling with GetSplineParsIndexFromDetID" << std::endl;
+  //This holds the relative spline index i.e. 0 to nSplines
   std::vector<int> SplineParsIndex_Sample = xsec->GetSplineParsIndexFromDetID(DetID);
   SplineParsIndex.push_back(SplineParsIndex_Sample);
 
-  std::cout << "Filling with GetSplineParsNamesFromDetID" << std::endl;
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
@@ -73,9 +71,9 @@ void splineFDBase::TransferToMonolith()
   MonolithSize = CountNumberOfLoadedSplines();
 
   if(MonolithSize!=MonolithIndex){
-    std::cerr<<"Something's gone wrong when we tried to get the size of your monolith"<<std::endl;
-	std::cout << "MonolishSize is " << MonolithSize << std::endl;
-	std::cout << "MonolithIndex is " << MonolithIndex << std::endl;
+    MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
+	MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
+	MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
     throw;
   }
 
@@ -112,12 +110,11 @@ void splineFDBase::TransferToMonolith()
                     uniquesplinevec_Monolith[splineindex] = iUniqueSyst;
                     foundUniqueSpline = true;
                   }
-
                 }//unique syst loop end
 
                 if (!foundUniqueSpline)
                 {
-                  std::cerr << "Unique spline index not found" << std::endl;
+                  MACH3LOG_ERROR("Unique spline index not found");
 				  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
 				  MACH3LOG_ERROR("Couldn't match {} with any of the following modes:", SplineFileParPrefixNames[iSample][iSyst]);
 				  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
@@ -128,7 +125,6 @@ void splineFDBase::TransferToMonolith()
                 }
                 int splineKnots;
                 if(splinevec_Monolith[splineindex]!=NULL){
-				  //std::cout << "Looking at splineindex " << splineindex << "and found a non-flat spline (wahoo!)" << std::endl;
                   isflatarray[splineindex]=false;
                   splineKnots=splinevec_Monolith[splineindex]->GetNp();
 
@@ -202,62 +198,54 @@ void splineFDBase::FindSplineSegment()
     //Rather than starting from 0 everytime, let's use what we know!    
     int segment = UniqueSystCurrSegment[iSyst];
     int kHigh = nPoints - 1;
-    // If the variation is below the lowest saved spline point
-    if(segment<nPoints-1 && segment>=0 && xvar>=xArray[segment] && xvar<xArray[segment+1]) //We're still in the same place!
-      {
-	      continue;
-      }
-    //Now check to see if it's the segment below it
-    else if(segment >= 1  && segment<=nPoints && xvar>=xArray[segment-1] && xvar<xArray[segment])
-      {
-	      segment--;
-      }
-    //Okay what if we're above it
-    else if(segment <= nPoints-2 && segment>=0 && xvar>=xArray[segment+1] && xvar<xArray[segment+2])
-      {
-	      segment++;
-      }
-    else if (xvar <= xArray[0])
-      {
-	      segment=0;
-	// If the variation is above the highest saved spline point
-      }
-    else if (xvar >= xArray[nPoints - 1])
-    {
-      // Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
-      segment = kHigh;
-      // If the variation is between the maximum and minimum, perform a binary search
-    }
-    //Now we resort to binary search!
-    else
-    {
-      segment=0;
+	if (xvar <= xArray[0]) {
+	  segment = 0;
+	  // If the variation is above the highest saved spline point
+	} else if (xvar >= xArray[nPoints-1]) {
+	  //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
+	  segment = kHigh;
+	  //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
+	} else if( xArray[segment+1] > xvar && xvar >= xArray[segment] ) {
+	  continue;
+	} else {
       // The top point we've got
-      int kHalf = 0;
+      __int__ kHalf = 0;
       // While there is still a difference in the points (we haven't yet found the segment)
       // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-      while (kHigh - segment > 1)
-      {
+      while (kHigh - segment > 1) {
         // Increment the half-step
-        kHalf = (segment + kHigh) / 2;
+        kHalf = (segment + kHigh)/2;
         // If our variation is above the kHalf, set the segment to kHalf
-        if (xvar > xArray[kHalf])
-        {
+        if (xvar > xArray[kHalf]) {
           segment = kHalf;
           // Else move kHigh down
-        }
-        else
-        {
+        } else {
           kHigh = kHalf;
         }
       } // End the while: we've now done our binary search
-    }   // End the else: we've now found our point
-    if (segment >= nPoints - 1 && nPoints > 1){
-      segment = nPoints - 2;}
-    // Save the segment for the ith parameter
-    UniqueSystCurrSegment[iSyst] = segment;
-  }
-  // std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+    } // End the else: we've now found our point
+
+    if (segment >= nPoints-1 && nPoints > 1){segment = nPoints-2;}
+    UniqueSystCurrSegment[iSyst] = segment; 
+      
+//#ifdef DEBUG
+//    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
+//      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
+//      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
+//      std::cerr << "Spline: "<< i << std::endl;
+//
+//      std::cerr << "Found segment   = " << segment << std::endl;
+//      std::cerr << "Doing variation = " << xvar << std::endl;
+//      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
+//      for (__int__ j = 0; j < SplineInfoArray[j].nPts; ++j) {
+//        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
+//      }
+//      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+//      throw;
+//    }
+//#endif
+  } //end loop over params
+
 }
 
 //****************************************
@@ -487,22 +475,17 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
   int FullCounter_NonFlat = 0;
   int FullCounter_All = 0;
 
-  std::cout << "indexvec is of size " << indexvec.size() << std::endl;
-
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over systematics
-	std::cout << "indexvec[" << iSample << "] i.e. OscChan is of size " << indexvec[iSample].size() << std::endl;
     SampleCounter_NonFlat = 0;
     SampleCounter_All = 0;
     std::string SampleName = SampleNames[iSample];
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
     { // Loop over oscillation channels
-	  std::cout << "indexvec[" << iSample << "][" << iOscChan << "] i.e. systs is of size " << indexvec[iSample][iOscChan].size() << std::endl;
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
       { // Loop over systematics
    		for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
         { // Loop over modes
-		  std::cout << "indexvec[" << iSample << "][" << iOscChan << "][" << iSyst << "][" << iMode << "] i.e. mode is of size " << indexvec[iSample][iOscChan][iSyst][iMode].size() << std::endl;
           for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
           { // Loop over first dimension
             for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++)
@@ -663,7 +646,8 @@ void splineFDBase::PrepForReweight()
       }
       UniqueSystXPts[iSpline][iKnot] = xPoint;
     }
-    UniqueSystCurrSegment[iSpline] = -999;
+	//ETA - let this just be set as the first segment by default
+    UniqueSystCurrSegment[iSpline] = 0;
     xVarArray[iSpline]=0;
   }
   
@@ -680,7 +664,6 @@ void splineFDBase::PrepForReweight()
     std::cout << std::setw(15) << iUniqueSyst << " | " << std::setw(20) << UniqueSystNames[iUniqueSyst] << " | " << std::setw(6) << UniqueSystNKnots[iUniqueSyst] << std::endl;
   }
   std::cout << std::endl;
-
 
 
   //ETA
@@ -770,33 +753,6 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, __float__* &xArray, _
   delete splinevec_Monolith[splineindex];
   splinevec_Monolith[splineindex] = NULL;
 }
-
-
-//****************************************
-//int splineFDBase::getNDim(int BinningOpt)
-//****************************************
-/*{
-  int ReturnVal = -1;
-
-  switch (BinningOpt)
-  {
-  case 0:
-    ReturnVal = 2;
-    break;
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-    ReturnVal = 3;
-    break;
-  default:
-    std::cout << "Unrecognised BinningOpt = " << BinningOpt << std::endl;
-    throw;
-  }
-
-  return ReturnVal;
-}
-*/
 
 //ETA - this may need to be virtual and then we can define this in the experiment.
 //Equally though could just use KinematicVariable to map back
