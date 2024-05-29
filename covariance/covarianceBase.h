@@ -113,17 +113,7 @@ class covarianceBase {
   TH2D* GetCorrelationMatrix();
 
   // What parameter Gets reweighted by what amount according to MCMC
-  inline double calcReWeight(const int bin) {
-    if (bin >= 0 && bin < _fNumPar) {
-      return _fPropVal[bin];
-    } else {
-      std::cerr << "Specified bin is <= 0 OR bin > npar!" << std::endl;
-      std::cerr << "bin = " << bin << ", npar = " << _fNumPar << std::endl;
-      std::cerr << "This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!" << std::endl;
-      return 1.0;
-    }
-    return 1.0;
-  };
+  inline double calcReWeight(const int bin) {return _fPropVal[bin];}
   //========
   //DB Pointer return
   //ETA - This might be a bit squiffy? If the vector gots moved from say a
