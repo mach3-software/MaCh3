@@ -47,7 +47,9 @@
 //
 // Return: Postfit parameters, Postfit covariance matrix
 //
-// Make LLH scans around output
+// TODO
+// Apply reweighted weight to plotting and Bayes Factor
+// Implement Diagnostics/GetPenaltyTerm.cpp here
 
 /// KS: Enum for different covariance classes
 enum ParameterEnum {
