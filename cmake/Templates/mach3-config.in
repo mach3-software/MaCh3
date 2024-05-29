@@ -3,9 +3,10 @@
 #Modify this if moving install from original prefix
 INSTALL_ROOT="@CMAKE_INSTALL_PREFIX@"
 SCRIPTNAME=$0
+CREATION_DATE="@CREATION_DATE@"
 
 if [ ${#} -eq 0 ]; then
-  echo "${SCRIPTNAME} [--features] [--has-feature <feature name>] [--incdir] [--cflags] [--libdir] [--libs] [--version]"
+  echo "${SCRIPTNAME} [--features] [--has-feature <feature name>] [--incdir] [--cflags] [--libdir] [--libs] [--version] [--date]"
   exit 0
 fi
 
@@ -47,6 +48,10 @@ while [[ ${#} -gt 0 ]]; do
       echo -n "@MaCh3_VERSION@ "
       ;;
 
+      --date)
+      echo -n "${CREATION_DATE} "
+      ;;
+
       -?|--help)
 
       echo "[RUNLIKE] ${SCRIPTNAME}"
@@ -57,6 +62,7 @@ while [[ ${#} -gt 0 ]]; do
       echo -e "\t--features                 : Print list of features."
       echo -e "\t--has-feature <feature>    : Returns 0 if has feature, 1 if not."
       echo -e "\t--version                  : Print MaCh3 version."
+      echo -e "\t--date                     : Print creation date."
       echo -e "\t-?|--help                  : Print this message."
       exit 0
       ;;
