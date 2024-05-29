@@ -41,7 +41,9 @@ void covarianceXsec::InitXsecFromConfig() {
   _fKinematicBounds = std::vector<std::vector<std::vector<double>>>(_fNumPar);
 
   int i = 0;
-
+  int SplineCounter = 0;
+  int NormCounter = 0;
+  int FunctionalCounter = 0;
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPars for Names,
   //PreFitValues etc etc.
@@ -53,7 +55,7 @@ void covarianceXsec::InitXsecFromConfig() {
 	 //Fill the map to get the correlations later as well
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
 	 //Now load in varaibles for spline systematics only
-	 int SplineCounter = 0;
+
 	 if (ParamType.find("Spline") != std::string::npos) {
 	   //ETA - do some checks whether various Spline-related information exists
 	   if(CheckNodeExists(param["Systematic"], "SplineInformation")){ 
@@ -116,17 +118,17 @@ void covarianceXsec::InitXsecFromConfig() {
 	   }
 
 	   //First check to see if we have specified a mode
-	   //std::cout << "Found a norm parameter at " << i << std::endl;
 	   if(param["Systematic"]["Mode"]){
 		 _fNormModes.push_back(param["Systematic"]["Mode"].as<std::vector<int>>());
 	   } else{
 		 //Has to be of size 0 to mean apply to all
 		 _fNormModes.push_back(DummyModeVec);
 	   }
+	   NormCounter++;
 	 }
      else if(param["Systematic"]["Type"].as<std::string>() == "Functional"){
 	   //std::cout << "Found a functional parameter!!" << std::endl;
-	    
+	   FunctionalCounter++; 
 	 }
      else{
        MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
@@ -164,7 +166,6 @@ void covarianceXsec::InitXsecFromConfig() {
 	 else isFlux[i] = false;
 	 i++;
   }
-
   return;
 }
 
@@ -215,7 +216,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
 	if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
 		returnVec.push_back(_fSplineModes.at(SplineIndex));	
-	  }	
+	}	
   }
 
   return returnVec;
@@ -700,6 +701,7 @@ void covarianceXsec::Print() {
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────┴──────────┴──────────┴──────────┘");
 
+  //ETA - don't need this anymore due to map 
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
@@ -712,11 +714,12 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("=====================================================");
   MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|");
   MACH3LOG_INFO("-----------------------------------------------------");
-  for (auto index = SplineParsIndex.begin() ; index != SplineParsIndex.end() ; ++index){
-	MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", *index, "|", GetParFancyName(*index), "|", SplineInterpolation_ToString(GetParSplineInterpolation(*index)), "|");
+  for (auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap) {
+	MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", SplineIndex, "|", GetParFancyName(SystIndex), "|", SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|");
   }
   MACH3LOG_INFO("=====================================================");
 
+  //ETA - can replace this with map shortly
   std::vector<int> FuncParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
