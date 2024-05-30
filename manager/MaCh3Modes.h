@@ -63,9 +63,9 @@ class MaCh3Modes {
   /// @brief KS: Fill ModeMap
   inline void PrepareMap();
 
-  /// KS: Handy map which halpes find mode number based on string
+  /// KS: Handy map which helps find mode number based on string
   std::map<std::string, MaCh3Modes_t> Mode;
-  /// KS: Main map stroing info about used modes
+  /// KS: Main map storing info about used modes
   std::map<MaCh3Modes_t, MaCh3ModeInfo> fMode;
   /// KS: Handy map helping us find MaCh3 mode based on Generator mode value
   std::vector<int> ModeMap;

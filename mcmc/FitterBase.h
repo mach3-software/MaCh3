@@ -77,7 +77,7 @@ class FitterBase {
   void SaveSettings();
 
   /// @brief Used by sigma variation, check how 1 sigma changes spectra
-  inline TGraphAsymmErrors* MakeAssymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title);
+  inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title);
 
   /// The manager
   manager *fitMan;
