@@ -4,7 +4,6 @@ set(HEADERS
     LikelihoodFit.h
     $<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.h>
     PSO.h
-    stretch.h
     MCMCProcessor.h
     SampleSummary.h
     StatisticalUtils.h
@@ -16,7 +15,6 @@ add_library(MCMC SHARED
     LikelihoodFit.cpp
     $<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.cpp>
     PSO.cpp
-    stretch.cpp
     MCMCProcessor.cpp
     SampleSummary.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>

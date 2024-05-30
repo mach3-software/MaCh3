@@ -1630,22 +1630,22 @@ void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym subma
   heigen_cumulative->Write("heigen_values_cumulative");
   heigen_frac->Write("heigen_values_frac");
 
-  TH2D* heigen_vectors = MaCh3Utils::TMatrixIntoTH2D(eigen_vectors, "eigen_vectors");
+  TH2D* heigen_vectors = new TH2D(eigen_vectors);
   heigen_vectors->GetXaxis()->SetTitle("Parameter in Normal Base");
   heigen_vectors->GetYaxis()->SetTitle("Parameter in Decomposed Base");
   heigen_vectors->Write("heigen_vectors");
   eigen_vectors.Write("eigen_vectors");
 
-  TH2D* SubsetPCA = MaCh3Utils::TMatrixIntoTH2D(temp, "SubsetPCA");
+  TH2D* SubsetPCA = new TH2D(temp);
   SubsetPCA->GetXaxis()->SetTitle("Parameter in Normal Base");
   SubsetPCA->GetYaxis()->SetTitle("Parameter in Decomposed Base");
 
   SubsetPCA->Write("hSubsetPCA");
   temp.Write("SubsetPCA");
-  TH2D* hTransferMat = MaCh3Utils::TMatrixIntoTH2D(TransferMat, "hTransferMat");
+  TH2D* hTransferMat = new TH2D(TransferMat);
   hTransferMat->GetXaxis()->SetTitle("Parameter in Normal Base");
   hTransferMat->GetYaxis()->SetTitle("Parameter in Decomposed Base");
-  TH2D* hTransferMatT = MaCh3Utils::TMatrixIntoTH2D(TransferMatT, "hTransferMatT");
+  TH2D* hTransferMatT = new TH2D(TransferMatT);
 
   hTransferMatT->GetXaxis()->SetTitle("Parameter in Decomposed Base");
   hTransferMatT->GetYaxis()->SetTitle("Parameter in Normal Base");

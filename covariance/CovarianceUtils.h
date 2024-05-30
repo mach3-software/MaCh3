@@ -28,22 +28,6 @@
 
 namespace MaCh3Utils
 {
-  /// @brief Handy conversion for matrix to TH2D for plotting
-  inline TH2D* TMatrixIntoTH2D(const TMatrix &Matrix, std::string title)
-  {
-    TH2D* hMatrix = new TH2D(title.c_str(), title.c_str(), Matrix.GetNrows(), 0.0, Matrix.GetNrows(), Matrix.GetNcols(), 0.0, Matrix.GetNcols());
-    for(int i = 0; i < Matrix.GetNrows(); i++)
-    {
-      for(int j = 0; j < Matrix.GetNcols(); j++)
-      {
-        //KS: +1 becasue there is offset in histogram relative to TMatrix
-        hMatrix->SetBinContent(i+1,j+1, (Matrix)(i,j));
-      }
-    }
-
-    return hMatrix;
-  }
-
   /// @brief number of threads which we need for example for TRandom3
   inline int GetNThreads()
   {
