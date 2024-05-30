@@ -13,7 +13,7 @@
 using MaCh3Modes_t = int;
 
 /// @brief KS: Class containing information for a single MaCh3Mode
-struct ModeInfo {
+struct MaCh3ModeInfo {
   /// Mode name
   std::string Name;
   /// Mode fancy name
@@ -66,7 +66,7 @@ class MaCh3Modes {
   /// KS: Handy map which halpes find mode number based on string
   std::map<std::string, MaCh3Modes_t> Mode;
   /// KS: Main map stroing info about used modes
-  std::map<MaCh3Modes_t, ModeInfo> fMode;
+  std::map<MaCh3Modes_t, MaCh3ModeInfo> fMode;
   /// KS: Handy map helping us find MaCh3 mode based on Generator mode value
   std::vector<int> ModeMap;
 

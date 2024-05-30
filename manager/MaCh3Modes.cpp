@@ -81,7 +81,7 @@ void MaCh3Modes::DeclareNewMode(std::string const &name,
                     std::string const &fancyname,
                     std::vector<int> const &GenMap) {
 // *******************
-  ModeInfo newinfo;
+  MaCh3ModeInfo newinfo;
   newinfo.GeneratorMaping = GenMap;
   newinfo.FancyName = fancyname;
   newinfo.Name = name;
