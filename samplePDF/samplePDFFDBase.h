@@ -84,7 +84,7 @@ public:
   void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
 #endif
 
-  std::string GetSampleName(){return samplename;}
+  std::string GetName(){return samplename;}
 
   void SetXsecCov(covarianceXsec* xsec_cov);
 
