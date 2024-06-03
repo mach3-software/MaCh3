@@ -214,10 +214,10 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
 
 //CalcOsc for Prob3++ CPU
 #if defined (USE_PROB3) && defined (CPU_ONLY)
-double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar)
+double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en)
 {
-  MCSamples[sample].Oscillator->SetMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], en, doubled_angle, nutype);
-  MCSamples[sample].Oscillator->propagateLinear(nutype , oscpar[7], oscpar[8]); 
+  MCSamples[sample].Oscillator->SetMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], en, doubled_angle, nutype);
+  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpar[7], *oscpar[8]); 
 
   return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
 }
@@ -228,10 +228,10 @@ double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, do
 extern "C" void setMNS(double x12, double x13, double x23, double m21, double m23, double Delta, bool kSquared);
 extern "C" void GetProb(int Alpha, int Beta, double Path, double Density, double *Energy, int n, double *oscw); 
 
-void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar)
+void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num)
 {
-  setMNS(oscpar[0], oscpar[2], oscpar[1], oscpar[3], oscpar[4], oscpar[5], doubled_angle);
-  GetProb(nutype, oscnutype, oscpar[7], oscpar[8], en, num, w);
+  setMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], doubled_angle);
+  GetProb(nutype, oscnutype, &oscpar[7], &oscpar[8], en, num, w);
 
 
   if (std::isnan(w[10]))
@@ -243,22 +243,22 @@ void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, doub
 
 //CalcOsc for CUDAProb3 CPU/GPU
 #if not defined (USE_PROB3)
-void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w, double *oscpar)
+void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w)
 {
-  MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(oscpar[0])),asin(sqrt(oscpar[2])), asin(sqrt(oscpar[1])), oscpar[5], nutype);
-  MCSamples[sample].Oscillator->setNeutrinoMasses(oscpar[3], oscpar[4]);
+  MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(*oscpars[0])),asin(sqrt(*oscpars[2])), asin(sqrt(*oscpars[1])), (*oscpars[5]), nutype);
+  MCSamples[sample].Oscillator->setNeutrinoMasses(*oscpars[3], *oscpars[4]);
   MCSamples[sample].Oscillator->calculateProbabilities(MCSamples[sample].NeutrinoType);
   MCSamples[sample].Oscillator->getProbabilityArr(w, MCSamples[sample].ProbType);
 }
 #endif 
 
-void samplePDFFDBase::reweight(double *oscpar) // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
+void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
 {
 
   if (Osc!=NULL) {
 	std::cout << "Osc is not NULL!! i.e. doing atm oscillations " << std::endl;
     //DB Currently hardcoded to assume rho_electrons = rho_matter/2, 25km production height
-    Osc->FillOscillogram(oscpar,25.0,0.5);
+    Osc->FillOscillogram(oscpars,25.0,0.5);
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 		MCSamples[iSample].osc_w[iEvent] = *(MCSamples[iSample].osc_w_pointer[iEvent]);
@@ -270,16 +270,16 @@ void samplePDFFDBase::reweight(double *oscpar) // Reweight function - Depending 
 #if defined (USE_PROB3) && defined (CPU_ONLY)
       //Prob3 CPU needs to loop through events too
       for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-		MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]), oscpar);
+		MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]));
       } //event loop
 #endif
       
 #if defined (USE_PROB3) && not defined (CPU_ONLY)
-      calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents, oscpar);
+      calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents);
 #endif
       
 #if not defined (USE_PROB3)
-      calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w, oscpar);
+      calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w);
 #endif
     }// Sample loop
   }
@@ -735,6 +735,16 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   std::cout << "Found " << xsec_norms.size() << " normalisation parameters" << std::endl;
   std::cout << "Found " << funcParsNames.size() << " functional parameters" << std::endl;
 
+  return;
+}
+
+void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
+  OscCov = osc_cov;
+  int nOscPars = OscCov->getProposed().size(); 
+  oscpars = new const double*[nOscPars];
+  for(auto osc_par_i = 0; osc_par_i < nOscPars ; ++osc_par_i){
+	oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
+  } 
   return;
 }
 

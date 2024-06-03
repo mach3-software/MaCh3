@@ -552,10 +552,10 @@ void FitterBase::RunLLHScan() {
         }
 
         // Reweight the MC
-        double *fake = 0;
+        //double *fake = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          samples[ivs]->reweight(fake);
+          samples[ivs]->reweight();
         }
         //Total LLH
         double totalllh = 0;
@@ -864,9 +864,9 @@ void FitterBase::Run2DLLHScan() {
             }
 
             // Reweight the MC
-            double *fake = 0;
+            //double *fake = 0;
             for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
-              samples[ivs]->reweight(fake);
+              samples[ivs]->reweight();
             }
 
             // Get the -log L likelihoods

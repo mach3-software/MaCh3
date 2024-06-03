@@ -17,7 +17,7 @@ using namespace std;
 class samplePDFInterface
 {
  public:
-  virtual void reweight(double *oscpar)=0;
+  virtual void reweight()=0;
 
   virtual double getEventRate()=0;
  

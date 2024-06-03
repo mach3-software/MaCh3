@@ -41,7 +41,7 @@ class Oscillator {
 
   int GetOscillogramNBins(int Switcher);
 
-  void FillOscillogram(double* oscpar, double prodH, double Yp_Val=0.468);
+  void FillOscillogram(const double** oscpar, double prodH, double Yp_Val=0.468);
   double ReturnProb(double NeutrinoEnergy, double Cosz, int InitialFlavour, int FinalFlavour);
 
   void RebinOscillogram(int Switcher, std::vector<double> NewBinning);
@@ -103,8 +103,8 @@ class Oscillator {
   void FillSecondaryHistograms(int NeutrinoSignIndex, int InitialNeutrinoIndex, int FinalNeutrinoIndex);
   void FillPrimaryHistograms(int NeutrinoSignIndex, int InitialNeutrinoIndex, int FinalNeutrinoIndex);
 
-  bool isAlreadyCalculated(double* oscpar, double prodH, double Yp_Val);
-  void SaveParams(double* oscpar, double prodH, double Yp_Val);
+  bool isAlreadyCalculated(const double** oscpar, double prodH, double Yp_Val);
+  void SaveParams(const double** oscpar, double prodH, double Yp_Val);
   void ResetSavedParams();
 
   void PrintBox(Box Box1);

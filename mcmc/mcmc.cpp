@@ -268,11 +268,11 @@ void mcmc::ProposeStep() {
     {
       // If we're running with different oscillation parameters for neutrino and anti-neutrino
       if (osc ){ 
-        samples[i]->reweight(osc->getPropPars());
+        samples[i]->reweight();//reweight(osc->getPropPars());
         // If we aren't using any oscillation
       } else {
-        double* fake = NULL;
-        samples[i]->reweight(fake);
+        //double* fake = NULL;
+        samples[i]->reweight();
       }
     }
 

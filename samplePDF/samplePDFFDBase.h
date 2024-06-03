@@ -64,7 +64,7 @@ public:
   double GetLikelihood();
   //===============================================================================
 
-  void reweight(double *oscpar);
+  void reweight();
   inline double GetEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
@@ -73,20 +73,22 @@ public:
   void UseBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
   
 #if defined (USE_PROB3) && defined (CPU_ONLY)
-  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
+  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en);
 #endif
 
 #if defined (USE_PROB3) && not defined (CPU_ONLY)
-  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar);
+  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num);
 #endif
 
 #if not defined (USE_PROB3)
-  void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
+  void calcOscWeights(int sample, int nutype, double *w);
 #endif
 
   std::string GetName(){return samplename;}
 
+  const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
+  void SetOscCov(covarianceOsc* osc_cov);
 
   //============================= Should be deprecated =============================
   // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
@@ -246,7 +248,9 @@ public:
   //===============================================================================
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
+  //these should be added to samplePDFBase to be honest
   covarianceXsec *XsecCov;
+  covarianceOsc *OscCov;
   //=============================================================================== 
 
   //ETA - binning opt can probably go soon...

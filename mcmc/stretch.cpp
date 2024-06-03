@@ -205,12 +205,12 @@ void stretch::runStretch()
      {
 	if (osc!=-1)
 	{
-	   samples[i]->reweight(((covarianceOsc*)systematics[osc])->getPropPars());
+	   samples[i]->reweight();//((covarianceOsc*)systematics[osc])->getPropPars());
 	}
 	else
 	{
-	   double* fake = NULL;
-	   samples[i]->reweight(fake);
+	   //double* fake = NULL;
+	   samples[i]->reweight();
 	}
 	
 	llh_init[k] += samples[i]->GetLikelihood();
@@ -263,12 +263,12 @@ void stretch::runStretch()
 	{
 	   if (osc!=-1)
 	   {
-	      samples[i]->reweight(((covarianceOsc*)systematics[osc])->getPropPars());
+	      samples[i]->reweight();//((covarianceOsc*)systematics[osc])->getPropPars());
 	   }
 	   else
 	   {
-	      double* fake = NULL;
-	      samples[i]->reweight(fake);
+	      //double* fake = NULL;
+	      samples[i]->reweight();
 	   }
 	   
 	   logLProp[nw] += samples[i]->GetLikelihood();

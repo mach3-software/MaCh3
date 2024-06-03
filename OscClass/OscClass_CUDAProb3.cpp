@@ -911,11 +911,11 @@ void Oscillator::Reset(int NeutrinoSignIndex, int InitialNeutrinoIndex, int Fina
 
 }
 
-bool Oscillator::isAlreadyCalculated(double* oscpar, double prodH, double Yp_Val) {
+bool Oscillator::isAlreadyCalculated(const double** oscpar, double prodH, double Yp_Val) {
 
   bool fAlreadyCalculated = true;
   for (int i=0;i<nOscpars;i++) {
-    if (oscpar[i]!=foscpar[i]) {
+    if (*oscpar[i]!=foscpar[i]) {
       fAlreadyCalculated = false;
     }
   }
@@ -940,9 +940,9 @@ bool Oscillator::isAlreadyCalculated(double* oscpar, double prodH, double Yp_Val
   return fAlreadyCalculated;
 }
 
-void Oscillator::SaveParams(double* oscpar, double prodH, double Yp_Val) {
+void Oscillator::SaveParams(const double** oscpar, double prodH, double Yp_Val) {
   for (int i=0;i<nOscpars;i++) {
-    foscpar[i] = oscpar[i];
+    foscpar[i] = *oscpar[i];
   }
   fprodH = prodH;
   fYp_Val = Yp_Val;
@@ -952,7 +952,7 @@ void Oscillator::SaveParams(double* oscpar, double prodH, double Yp_Val) {
   fBinning[3] = nFineEnergy;
 }
 
-void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
+void  Oscillator::FillOscillogram(const double** oscpar, double prodH, double Yp_Val) {
   if (isAlreadyCalculated(oscpar,prodH,Yp_Val)) {
     return;
   }
@@ -961,8 +961,8 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
 
   //DB oscpar, as given from MaCh3, expresses the mixing angles in sin^2(theta). The propagator expects them in theta
   for (int iOscPar=0;iOscPar<3;iOscPar++) {
-    if (oscpar[iOscPar] < 0) {
-      std::cerr << "Invalid oscillation parameter (Can not sqrt this value)!:" << oscpar[iOscPar] << std::endl;
+    if (*oscpar[iOscPar] < 0) {
+      std::cerr << "Invalid oscillation parameter (Can not sqrt this value)!:" << *oscpar[iOscPar] << std::endl;
       throw;
     }
   }
