@@ -4,6 +4,7 @@
 #include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
+#include "manager/manager.h"
 
 // Don't forget yaml!
 #include "yaml-cpp/yaml.h"
@@ -94,18 +95,17 @@ class covarianceBase {
 
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
-  void useSeparateThrowMatrix(TString throwMatrixName, TString throwMatrixFile, TString parameterMeansName="");
-  void useSeparateThrowMatrix();
+
+  void initialiseAdaption(manager* fitMan);
   void saveAdaptiveToFile(TString outFileName, TString systematicName);
 
   void setThrowMatrix(TMatrixDSym *cov);
   void updateThrowMatrix(TMatrixDSym *cov);
   void setNumberOfSteps(const int nsteps){
     total_steps = nsteps;
-    if(total_steps >= lower_adapt)resetIndivStepScale();
+    if(total_steps >= start_adaptive_throw) resetIndivStepScale();
   }
   // Set thresholds for MCMC steps
-  inline void setAdaptiveThresholds(const int low_threshold = 10000, const int up_threshold = 1000000){lower_adapt=low_threshold; upper_adapt = up_threshold;}
 
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
@@ -281,17 +281,7 @@ class covarianceBase {
   inline void MatrixVectorMulti(double* VecMulti, double** matrix, const double* vector, const int n);
   inline double MatrixVectorMultiSingle(double** matrix, const double* vector, const int Length, const int i);
 
-  //Turn on/off true adaptive MCMC
-  //Also set thresholds for use (having a lower threshold gives us some data to adapt from!)
-  void enableAdaptiveMCMC(bool enable = true){
-    use_adaptive = enable;
-    total_steps = 0; //Set these to default values
-    lower_adapt = 10000;
-    upper_adapt = 10000000;
-  }
-  void updateAdaptiveCovariance();
-
- protected:
+  protected:
   void init(const char *name, const char *file);
   //YAML init
   void init(std::vector<std::string> YAMLFile);
@@ -380,15 +370,26 @@ class covarianceBase {
   //Same as above but much faster as TMatrixDSym cache miss
   double **throwMatrixCholDecomp;
 
-  // Truly Adaptive Stuff
-  void initialiseNewAdaptiveChain();
-  // TMatrixD* getMatrixSqrt(TMatrixDSym* inputMatrix);
-  // double calculateSubmodality(TMatrixD* sqrtVectorCov, TMatrixDSym* throwCov);
+  // Adaptive Stuff
+
+  void setAdaptionDefaults();
+  void setAdaptiveBlocks(std::vector<std::vector<int>> block_indices);
+  void setThrowMatrixFromFile(std::string matrix_file_name, std::string matrix_name, std::string means_name);
+  void updateAdaptiveCovariance();
+  void createNewAdaptiveCovariance();
+
   bool use_adaptive;
   int total_steps;
-  int lower_adapt, upper_adapt; //Thresholds for when to turn on/off adaptive MCMC
-  // TMatrixD* covSqrt;
+  int start_adaptive_throw; // When do we start throwing?
+
+  int start_adaptive_update; //Thresholds for when to turn on/off updating adaptive MCMC
+  int end_adaptive_update;
+  int adaptive_update_step;
+
+  std::vector<int> adapt_block_matrix_indices;
+  std::vector<int> adapt_block_sizes;
+
+
   std::vector<double> par_means;
-  std::vector<double> par_means_prev;
   TMatrixDSym* adaptiveCovariance;
 };
