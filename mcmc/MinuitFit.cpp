@@ -47,7 +47,7 @@ void MinuitFit::runMCMC() {
   {
     if(!(*it)->IsPCA())
     {
-      for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+      for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
         //KS: Index, name, prior, step scale [differrent to MCMC],
         minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->getParInit(i), (*it)->getDiagonalError(i)/10);
@@ -104,7 +104,7 @@ void MinuitFit::runMCMC() {
   {
     if(!(*it)->IsPCA())
     {
-      for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+      for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
         double ParVal = X[ParCounter];
         //KS: Basically apply mirroring for parameters out of bounds
@@ -132,13 +132,13 @@ void MinuitFit::runMCMC() {
     else
     {
       //KS: We need to convert parameters from PCA to normal base
-      TVectorD ParVals((*it)->getSize());
+      TVectorD ParVals((*it)->GetNumParams());
       TVectorD ParVals_PCA((*it)->getNpars());
 
-      TVectorD ErrorVals((*it)->getSize());
+      TVectorD ErrorVals((*it)->GetNumParams());
       TVectorD ErrorVals_PCA((*it)->getNpars());
 
-      TMatrixD MatrixVals((*it)->getSize(), (*it)->getSize());
+      TMatrixD MatrixVals((*it)->GetNumParams(), (*it)->GetNumParams());
       TMatrixD MatrixVals_PCA((*it)->getNpars(), (*it)->getNpars());
 
       //First save them
@@ -160,12 +160,12 @@ void MinuitFit::runMCMC() {
 
       ParCounter = StartVal;
       //KS: Now after going from PCA to normal let';s save it
-      for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+      for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
         (*MinuitParValue)(ParCounter) = ParVals(i);
         (*MinuitParError)(ParCounter) = std::fabs(ErrorVals(i));
         int ParCounterMatrix = StartVal;
-        for(int j = 0; j < (*it)->getSize(); ++j, ++ParCounterMatrix)
+        for(int j = 0; j < (*it)->GetNumParams(); ++j, ++ParCounterMatrix)
         {
           (*Postmatrix)(ParCounter,ParCounterMatrix)  = MatrixVals(i,j);
         }

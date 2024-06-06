@@ -308,6 +308,87 @@ TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 }
 
 // ****************
+TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
+// ****************
+  double xlow, xup, ylow, yup;
+  std::string HistTempName = poly->GetName();
+
+  HistTempName += "_";
+  //make the th2d
+  TH2D *hist = (TH2D*) h2dhist->Clone();
+  hist->SetNameTitle(HistTempName.c_str(), HistTempName.c_str());
+
+  for(int ix = 0; ix < hist->GetNbinsX() + 2; ix++) {
+    for(int iy = 0; iy < hist->GetNbinsY() + 2; iy++) {
+      hist->SetBinContent(ix, iy, 0);
+    }
+  }
+  //Loop over poly bins, find the corresponding th2d and setbincontent!
+  for(int i = 0; i< poly->GetNumberOfBins(); i++){
+    TH2PolyBin* polybin = (TH2PolyBin*) (poly->GetBins()->At(i)->Clone());
+    xlow = polybin->GetXMin();
+    xup = polybin->GetXMax();
+    ylow = polybin->GetYMin();
+    yup = polybin->GetYMax();
+    int xbin, ybin;
+
+    xbin = hist->GetXaxis()->FindBin(xlow+(xup-xlow)/2);
+    ybin = hist->GetYaxis()->FindBin(ylow+(yup-ylow)/2);
+
+    //std::cout << "Poly bin " << i << ", xlow: " << xlow << ", xup: " << xup << ", ylow: " << ylow << ", yup: " << yup << ". Finding bin for (" << (xlow+(xup-xlow)/2) << "," << (ylow+(yup-ylow)/2) << ")" << ". Found Bin (" << xbin << "," << ybin << ") with content " << polybin->GetContent() << ". But Poly content: " << poly->GetBinContent(i) << std::endl;
+    hist->SetBinContent(xbin, ybin, polybin->GetContent());
+  }
+  return hist;
+}
+// ****************
+TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
+// ****************
+  // Make the x axis from the momentum of lepton
+  TAxis* xaxis = hist->GetXaxis();
+  // Make the y axis from the cos theta of lepton
+  TAxis* yaxis = hist->GetYaxis();
+
+  TString histname = hist->GetName();
+  // Convert TH2D binning to TH2Poly
+  TH2Poly* poly = new TH2Poly();
+  poly->SetName(histname);
+  poly->SetTitle(histname);
+
+  // Copy axis titles
+  poly->GetXaxis()->SetTitle(xaxis->GetTitle());
+  poly->GetYaxis()->SetTitle(yaxis->GetTitle());
+
+  double xmax, xmin, ymax, ymin;
+  for (int iy = 1; iy <= yaxis->GetNbins(); iy++) {
+    ymax = yaxis->GetBinUpEdge(iy);
+    ymin = yaxis->GetBinLowEdge(iy);
+    for (int ix = 1; ix <= xaxis->GetNbins(); ix++) {
+      xmax = xaxis->GetBinUpEdge(ix);
+      xmin = xaxis->GetBinLowEdge(ix);
+      double binofx[] = {xmin, xmax, xmax, xmin};
+      double binofy[] = {ymin, ymin, ymax, ymax};
+      poly->AddBin(4, binofx, binofy);
+    }
+  }
+
+  for (int iy = 1; iy <= yaxis->GetNbins(); iy++) {
+    ymax = yaxis->GetBinUpEdge(iy);
+    ymin = yaxis->GetBinLowEdge(iy);
+    for (int ix = 1; ix <= xaxis->GetNbins(); ix++) {
+      xmax = xaxis->GetBinUpEdge(ix);
+      xmin = xaxis->GetBinLowEdge(ix);
+
+      // Get the content of the corresponding bin in TH2D and set it in TH2Poly
+      int bin = hist->GetBin(ix, iy);
+      double content = hist->GetBinContent(bin);
+      poly->SetBinContent(poly->FindBin((xmin + xmax) / 2, (ymin + ymax) / 2), content);
+    }
+  }
+
+  return poly;
+}
+
+// ****************
 //WP: Scale a TH2Poly and divide by bin width
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 // ****************

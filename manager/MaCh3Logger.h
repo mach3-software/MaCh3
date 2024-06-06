@@ -12,7 +12,7 @@
 #define MACH3LOG_CRITICAL SPDLOG_CRITICAL
 #define MACH3LOG_OFF SPDLOG_OFF
 
-
+/// @brief Set messaging format of the logger
 inline void SetMaCh3LoggerFormat()
 {
   //KS: %H for hour, %M for minute, %S for second, [%s:%#] for class and line

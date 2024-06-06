@@ -63,8 +63,8 @@ void PSO::init(){
         for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it){
             if(!(*it)->IsPCA())
             {
-                fDim += (*it)->getSize();
-                for(int i = 0; i < (*it)->getSize(); ++i)
+                fDim += (*it)->GetNumParams();
+                for(int i = 0; i < (*it)->GetNumParams(); ++i)
                 {
                     double curr = (*it)->getParInit(i);
                     double lim = 10.0*(*it)->getDiagonalError(i);
@@ -145,7 +145,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
     std::vector<std::vector<double>> uncertainties_list;
     for (unsigned int i = 0; i< position.size(); ++i){
         std::cout << i << std::endl;
-        std::vector<double> uncertainties;
+        //std::vector<double> uncertainties;
         std::vector<double> new_position = position; new_position[i] = position[i]-range;
         double val_1 = CalcChi(new_position)-minimum-1.0;
         while (val_1*-1.0> 0.0){
@@ -214,7 +214,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         }
         uncertainties_list.push_back({abs(position[i]-position_list[1][i]),abs(position[i]-position_list_p[1][i])});
         std::cout << "Uncertainty finished for d = "<< i << std::endl;
-        std::cout << setprecision(10)<< "LLR values for ± positive and negative uncertainties are " << CalcChi(position_list[1]) << " and " << CalcChi(position_list_p[1]) << std::endl;
+        std::cout << std::setprecision(10)<< "LLR values for ± positive and negative uncertainties are " << CalcChi(position_list[1]) << " and " << CalcChi(position_list_p[1]) << std::endl;
     }
     return uncertainties_list;
 }
@@ -233,48 +233,48 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
         double start = position[i];
         std::vector<double> x(num);
         std::vector<double> y(num);
-        double step = (start-neg_stop) / (num - 1);
+        double StepPoint = (start-neg_stop) / (num - 1);
         double value = start;
         for (int j = 0; j < num; ++j) {
-            pos[i] = value;
-            double LLR = CalcChi(position) - minimum - 1.0;
-            x[j] = value;
-            y[j] = LLR;
-            value -= step;
+          pos[i] = value;
+          double LLR = CalcChi(position) - minimum - 1.0;
+          x[j] = value;
+          y[j] = LLR;
+          value -= StepPoint;
         }
         pos[i] = curr_ival;
 
         int closest_index = 0;
         double closest_value = abs(y[0]); // Initialize with the first element
-        for (unsigned int i = 1; i < y.size(); ++i) {
-            double abs_y = abs(y[i]);
-            if (abs_y < closest_value) {
-                closest_index = i;
-                closest_value = abs_y;
-            }
+        for (unsigned int ii = 1; ii < y.size(); ++ii) {
+          double abs_y = abs(y[ii]);
+          if (abs_y < closest_value) {
+            closest_index = ii;
+            closest_value = abs_y;
+          }
         }
         neg_uncertainty[i] = x[closest_index];
         std::cout << "Neg" << std::endl;
         x.assign(num, 0);
         y.assign(num, 0);
-        step = (pos_stop-start) / (num - 1);
+        StepPoint = (pos_stop-start) / (num - 1);
         value = start;
         for (int j = 0; j < num; ++j) {
-            pos[i] = value;
-            double LLR = CalcChi(position) - minimum - 1.0;
-            x[j] = value;
-            y[j] = LLR;
-            value += step;
+          pos[i] = value;
+          double LLR = CalcChi(position) - minimum - 1.0;
+          x[j] = value;
+          y[j] = LLR;
+          value += StepPoint;
         }
         pos[i] = curr_ival;
         closest_index = 0;
         closest_value = abs(y[0]); // Initialize with the first element
-        for (unsigned int i = 1; i < y.size(); ++i) {
-            double abs_y = abs(y[i]);
-            if (abs_y < closest_value) {
-                closest_index = i;
-                closest_value = abs_y;
-            }
+        for (unsigned int ii = 1; ii < y.size(); ++ii) {
+          double abs_y = abs(y[ii]);
+          if (abs_y < closest_value) {
+            closest_index = ii;
+            closest_value = abs_y;
+          }
         } 
         pos_uncertainty[i] = x[closest_index];
     } 
@@ -293,7 +293,7 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
         double stop = previous_pos[i] + 1e-1;
         std::vector<double> x(num);
         std::vector<double> y(num);
-        double step = (stop - start) / (num - 1);
+        double StepPoint = (stop - start) / (num - 1);
         double value = start;
         // std::cout << "result for fDim " << 1 << std::endl;
         for (int j =0;j< num; ++j){
@@ -301,7 +301,7 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
             double LLR = CalcChi(position);
             x[j] = value;
             y[j] = LLR;
-            value +=step;
+            value += StepPoint;
         }
         position[i] = curr_ival;
         std::cout << " " << std::endl;
@@ -403,7 +403,7 @@ void PSO::run() {
             std::cout << "Current LLR = " << fBestValue << std::endl;
             std::cout << "Position = " <<std::endl;
             for (int j = 0; j< fDim; ++j){
-                std::cout << "    Dim " << j << " = " << setprecision(10) << get_best_particle()->get_personal_best_position()[j] << std::endl; 
+                std::cout << "    Dim " << j << " = " << std::setprecision(10) << get_best_particle()->get_personal_best_position()[j] << std::endl;
             }
             
         }
@@ -420,7 +420,7 @@ void PSO::run() {
     uncertainties = bisection(get_best_particle()->get_personal_best_position(),get_best_particle()->get_personal_best_value(),0.5,0.005);
     std::cout << "Position for Global Minimum = "<<std::endl;
     for (int i = 0; i< fDim; ++i){
-        std::cout << "    Dim " << i << " = " << setprecision(10) << get_best_particle()->get_personal_best_position()[i]  << " +" << uncertainties[i][1] << ", -" <<  uncertainties[i][0] << std::endl;
+        std::cout << "    Dim " << i << " = " << std::setprecision(10) << get_best_particle()->get_personal_best_position()[i]  << " +" << uncertainties[i][1] << ", -" <<  uncertainties[i][0] << std::endl;
     }
 }
 
@@ -452,7 +452,7 @@ void PSO::WriteOutput(){
         {
             if(!(*it)->IsPCA())
             {
-                for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+                for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
                 {
                     double ParVal = minimum[ParCounter];
                     //KS: Basically apply mirroring for parameters out of bounds
@@ -468,10 +468,10 @@ void PSO::WriteOutput(){
             else
             {
                 //KS: We need to convert parameters from PCA to normal base
-                TVectorD ParVals((*it)->getSize());
+                TVectorD ParVals((*it)->GetNumParams());
                 TVectorD ParVals_PCA((*it)->getNpars());
 
-                TVectorD ErrorVals((*it)->getSize());
+                TVectorD ErrorVals((*it)->GetNumParams());
                 TVectorD ErrorVals_PCA((*it)->getNpars());
 
                 //First save them
@@ -487,7 +487,7 @@ void PSO::WriteOutput(){
 
                 ParCounter = StartVal;
                 //KS: Now after going from PCA to normal let';s save it
-                for(int i = 0; i < (*it)->getSize(); ++i, ++ParCounter)
+                for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
                 {
                     (*PSOParValue)(ParCounter) = ParVals(i);
                     (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));

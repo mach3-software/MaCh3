@@ -3,12 +3,16 @@
 #include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
+#include "TGraphAsymmErrors.h"
 
 // *************************
 // Initialise the manager and make it an object of FitterBase class
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
+
+  //Get mach3 modes from manager
+  Modes = fitMan->GetMaCh3Modes();
 
   random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
 
@@ -30,6 +34,9 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
   // Do we want to save the nominal parameters to output
   save_nominal = true;
+
+  // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
+  SaveProposal = false;
 
   // Set the output file
   outputFile = new TFile(outfile.c_str(), "RECREATE");
@@ -60,6 +67,8 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   sample_llh = nullptr;
   syst_llh = nullptr;
 
+  TotalNSamples = 0;
+
   fTestLikelihood = false;
   //ETA - No guarantee that "Fitter" field exists so check this first before
   //checking ["Fitter"]["FitTestLikelihood"]
@@ -76,12 +85,19 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 FitterBase::~FitterBase() {
 // *************************
   SaveOutput();
+
   if(random != nullptr) delete random;
+  random = nullptr;
   if(sample_llh != nullptr) delete[] sample_llh;
+  sample_llh = nullptr;
   if(syst_llh != nullptr) delete[] syst_llh;
+  syst_llh = nullptr;
   if(outputFile != nullptr) delete outputFile;
-  delete clock;
-  delete stepClock;
+  outputFile = nullptr;
+  if(clock != nullptr) delete clock;
+  clock = nullptr;
+  if(stepClock != nullptr) delete stepClock;
+  stepClock = nullptr;
   MACH3LOG_INFO("Closing MaCh3 Fitter Engine");
 }
 
@@ -143,11 +159,11 @@ void FitterBase::SaveSettings() {
 
   MACH3LOG_INFO("#####Current Setup#####");
   MACH3LOG_INFO("Number of covariances: {}", systematics.size());
-  for(unsigned int i = 0; i < systematics.size(); i++)
-    MACH3LOG_INFO("{}: Cov name: {}",i,  systematics[i]->getName());
+  for(unsigned int i = 0; i < systematics.size(); ++i)
+    MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->getName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
-  for(unsigned int i = 0; i < samples.size(); i++)
-    MACH3LOG_INFO("{}: SamplePDF name: {}",i , samples[i]->GetName());
+  for(unsigned int i = 0; i < samples.size(); ++i)
+    MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNsamples());
 
   SettingsSaved = true;
 }
@@ -170,11 +186,11 @@ void FitterBase::PrepareOutput() {
 
     // Prepare the output trees
     for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
-      (*it)->setBranches(*outTree);
+      (*it)->SetBranches(*outTree, SaveProposal);
     }
 
     if (osc) {
-      osc->setBranches(*outTree);
+      osc->SetBranches(*outTree, SaveProposal);
       outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
     }
 
@@ -216,7 +232,6 @@ void FitterBase::PrepareOutput() {
   MACH3LOG_INFO("-------------------- Starting MCMC --------------------");
   #ifdef DEBUG
   if (debug) {
-    PrintInitialState();
     debugFile << "----- Starting MCMC -----" << std::endl;
   }
   #endif
@@ -255,7 +270,8 @@ void FitterBase::SaveOutput() {
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // *************************
-  MACH3LOG_INFO("Adding {} object ", sample->GetName());
+  TotalNSamples += sample->GetNsamples();
+  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());
   samples.push_back(sample);
 
   return;
@@ -266,15 +282,15 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 void FitterBase::addSystObj(covarianceBase * const cov) {
 // *************************
 
-  MACH3LOG_INFO("Adding systematic object {}", cov->getName());
+  MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->getName(), cov->GetNumParams());
   systematics.push_back(cov);
 
   CovFolder->cd();
-  double *n_vec = new double[cov->getSize()];
-  for (int i = 0; i < cov->getSize(); ++i)
+  double *n_vec = new double[cov->GetNumParams()];
+  for (int i = 0; i < cov->GetNumParams(); ++i)
     n_vec[i] = cov->getParInit(i);
 
-  TVectorT<double> t_vec(cov->getSize(), n_vec);
+  TVectorT<double> t_vec(cov->GetNumParams(), n_vec);
   t_vec.Write((std::string(cov->getName()) + "_prior").c_str());
   delete[] n_vec;
 
@@ -356,6 +372,56 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
   return;
 }
 
+// *******************
+// Process the MCMC output to get postfit etc
+void FitterBase::ProcessMCMC() {
+// *******************
+
+  if (fitMan == NULL) return;
+
+  // Process the MCMC
+  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
+
+    // Make the processor
+    MCMCProcessor Processor(std::string(outputFile->GetName()), false);
+
+    Processor.Initialise();
+    // Make the TVectorD pointers which hold the processed output
+    TVectorD *Central = nullptr;
+    TVectorD *Errors = nullptr;
+    TVectorD *Central_Gauss = nullptr;
+    TVectorD *Errors_Gauss = nullptr;
+    TVectorD *Peaks = nullptr;
+
+    // Make the postfit
+    Processor.GetPostfit(Central, Errors, Central_Gauss, Errors_Gauss, Peaks);
+    Processor.DrawPostfit();
+
+    // Make the TMatrix pointers which hold the processed output
+    TMatrixDSym *Covariance = nullptr;
+    TMatrixDSym *Correlation = nullptr;
+
+    // Make the covariance matrix
+    Processor.GetCovariance(Covariance, Correlation);
+    Processor.DrawCovariance();
+
+    std::vector<TString> BranchNames = Processor.GetBranchNames();
+
+    // Re-open the TFile
+    if (!outputFile->IsOpen()) {
+      MACH3LOG_INFO("Opening output again to update with means..");
+      outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
+    }
+
+    Central->Write("PDF_Means");
+    Errors->Write("PDF_Errors");
+    Central_Gauss->Write("Gauss_Means");
+    Errors_Gauss->Write("Errors_Gauss");
+    Covariance->Write("Covariance");
+    Correlation->Write("Correlation");
+  }
+}
+
 // *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
@@ -365,11 +431,6 @@ void FitterBase::RunLLHScan() {
   SaveSettings();
 
   MACH3LOG_INFO("Starting LLH Scan");
-  int TotalNSamples = 0;
-  for(unsigned int i = 0; i < samples.size(); i++ )
-  {
-    TotalNSamples += samples[i]->GetNsamples();
-  }
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotAllNDsamplesLLH = false;
@@ -408,13 +469,13 @@ void FitterBase::RunLLHScan() {
   if(PlotAllNDsamplesLLH)
   {
     SampleSplit_LLH = new TDirectory*[TotalNSamples];
-    int iterator = 0;
+    int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
     {
-      for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
       {
-        SampleSplit_LLH[iterator] = outputFile->mkdir((samples[ivs]->GetSampleName(is)+ "_LLH").c_str());
-        iterator++;
+        SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleName(is)+ "_LLH").c_str());
+        SampleIterator++;
       }
     }
   }
@@ -437,7 +498,7 @@ void FitterBase::RunLLHScan() {
 
     // Scan over all the parameters
     // Get the number of parameters
-    int npars = (*it)->getSize();
+    int npars = (*it)->GetNumParams();
     bool IsPCA = (*it)->IsPCA();
     if (IsPCA) npars = (*it)->getNpars();
     for (int i = 0; i < npars; ++i)
@@ -523,16 +584,16 @@ void FitterBase::RunLLHScan() {
       double *sampleSplitllh = nullptr;
       if(PlotAllNDsamplesLLH)
       {
-        int iterator = 0;
+        int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
           hScanSamSplit = new TH1D*[TotalNSamples];
           sampleSplitllh = new double[TotalNSamples];
-          for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+          for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
           {
-            hScanSamSplit[iterator] = new TH1D( (name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper );
-            hScanSamSplit[iterator]->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
-            iterator++;
+            hScanSamSplit[SampleIterator] = new TH1D( (name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper );
+            hScanSamSplit[SampleIterator]->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
+            SampleIterator++;
           }
         }
       }
@@ -579,13 +640,13 @@ void FitterBase::RunLLHScan() {
 
         if(PlotAllNDsamplesLLH)
         {
-          int iterator = 0;
+          int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
           {
-            for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+            for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++)
             {
-              sampleSplitllh[iterator] = samples[ivs]->getSampleLikelihood(is);
-              iterator++;
+              sampleSplitllh[SampleIterator] = samples[ivs]->getSampleLikelihood(is);
+              SampleIterator++;
             }
           }
         }
@@ -604,13 +665,13 @@ void FitterBase::RunLLHScan() {
 
         if(PlotAllNDsamplesLLH)
         {
-          int iterator = 0;
+          int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
           {
-            for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+            for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++)
             {
               hScanSamSplit[is]->SetBinContent(j+1, 2*sampleSplitllh[is]);
-              iterator++;
+              SampleIterator++;
             }
           }
         }
@@ -650,15 +711,15 @@ void FitterBase::RunLLHScan() {
 
       if(PlotAllNDsamplesLLH)
       {
-        int iterator = 0;
+        int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++)
+          for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++)
           {
-            SampleSplit_LLH[iterator]->cd();
-            hScanSamSplit[iterator]->Write();
-            delete hScanSamSplit[iterator];
-            iterator++;
+            SampleSplit_LLH[SampleIterator]->cd();
+            hScanSamSplit[SampleIterator]->Write();
+            delete hScanSamSplit[SampleIterator];
+            SampleIterator++;
           }
         }
         delete[] hScanSamSplit;
@@ -693,19 +754,67 @@ void FitterBase::RunLLHScan() {
 
   if(PlotAllNDsamplesLLH)
   {
-    int iterator = 0;
+    int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
     {
-      for(__int__ is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
       {
-        SampleSplit_LLH[iterator]->Write();
-        delete SampleSplit_LLH[iterator];
-        iterator++;
+        SampleSplit_LLH[SampleIterator]->Write();
+        delete SampleSplit_LLH[SampleIterator];
+        SampleIterator++;
       }
     }
   }
 }
 
+
+
+// *************************
+//LLH scan is good first estimate of step scale
+void FitterBase::GetStepScaleBasedOnLLHScan() {
+// *************************
+  TDirectory *Sample_LLH = (TDirectory*) outputFile->Get("Sample_LLH");
+
+  MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
+
+  if(Sample_LLH->IsZombie())
+  {
+    MACH3LOG_WARN("Couldn't find Sample_LLH, it looks like LLH scan wasn't run, will do this now");
+    RunLLHScan();
+  }
+
+  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  {
+    bool isxsec = (std::string((*it)->getName()) == "xsec_cov");
+
+    const int npars = (*it)->GetNumParams();
+    std::vector<double> StepScale(npars);
+    for (int i = 0; i < npars; ++i)
+    {
+      std::string name = (*it)->GetParName(i);
+      // For xsec we can get the actual name, hurray for being informative
+      if (isxsec) name = (*it)->GetParFancyName(i);
+
+      StepScale[i] = (*it)->GetIndivStepScale(i);
+      TH1D* LLHScan = (TH1D*) Sample_LLH->Get((name+"_sam").c_str());
+
+      if(LLHScan == nullptr)
+      {
+        MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
+        continue;
+      }
+      double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
+      //If there is no sensitivity leave it
+      if(LLH_val < 0.001) continue;
+
+      // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
+      double NewStepScale = LLH_val * 2.38/std::sqrt(npars);
+      StepScale[i] = NewStepScale;
+    }
+    (*it)->setIndivStepScale(StepScale);
+    (*it)->SaveUpdatedMatrixConfig();
+  }
+}
 
 // *************************
 // Run 2D LLH scan
@@ -714,6 +823,8 @@ void FitterBase::Run2DLLHScan() {
 
   // Save the settings into the output file
   SaveSettings();
+
+  MACH3LOG_INFO("Starting 2D LLH Scan");
 
   TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
   std::vector<std::string> SkipVector;
@@ -740,13 +851,12 @@ void FitterBase::Run2DLLHScan() {
     }
     // Scan over all the parameters
     // Get the number of parameters
-    int npars = (*it)->getSize();
+    int npars = (*it)->GetNumParams();
     bool IsPCA = (*it)->IsPCA();
     if (IsPCA) npars = (*it)->getNpars();
 
     for (int i = 0; i < npars; ++i)
     {
-
       std::string name_x = (*it)->GetParName(i);
       if (IsPCA) name_x += "_PCA";
       // For xsec we can get the actual name, hurray for being informative
@@ -800,7 +910,7 @@ void FitterBase::Run2DLLHScan() {
         // For xsec we can get the actual name, hurray for being informative
         if (isxsec) name_y = (*it)->GetParFancyName(j);
 
-        bool skip = false;
+        skip = false;
         for(unsigned int is = 0; is < SkipVector.size(); is++)
         {
           if(name_y.substr(0, SkipVector[is].length()) == SkipVector[is])
@@ -899,4 +1009,388 @@ void FitterBase::Run2DLLHScan() {
   Sample_2DLLH->Write();
   delete Sample_2DLLH;
 
+}
+
+// *************************
+void FitterBase::RunSigmaVar() {
+// *************************
+
+  // Save the settings into the output file
+  SaveSettings();
+
+  MACH3LOG_INFO("Starting Sigma Variation");
+
+  // Number of variations we want
+  const int numVar = 5;
+  //-3 -1 0 +1 +3 sigma variation
+  const int sigmaArray[numVar] = {-3, -1, 0, 1, 3};
+
+  outputFile->cd();
+
+  //KS: this is only relevant if PlotByMode is turned on
+  //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+  const int nRelevantModes = 2;
+  MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
+  bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false);
+
+  //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
+  bool PlotLLHperBin = false;
+
+  std::vector<std::string> SkipVector;
+  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  {
+    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
+  }
+
+  bool isxsec = false;
+
+  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  {
+    TMatrixDSym *Cov = (*it)->getCovMatrix();
+
+    if((*it)->IsPCA())
+    {
+      MACH3LOG_ERROR("Usin PCAed matrix not implemented within simga var code, I am sorry :(");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+
+    if (std::string((*it)->getName()) == "xsec_cov")
+    {
+      isxsec = true;
+    } else {
+      isxsec = false;
+    }
+
+    // Loop over xsec parameters
+    for (int i = 0; i < (*it)->GetNumParams(); ++i)
+    {
+      // Get the parameter name
+      std::string name = (*it)->GetParName(i);
+      // For xsec we can get the actual name, hurray for being informative
+      if (isxsec) name = (*it)->GetParFancyName(i);
+      bool skip = false;
+      for(unsigned int is = 0; is < SkipVector.size(); is++)
+      {
+        if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
+        {
+          skip = true;
+          break;
+        }
+      }
+      if(skip) continue;
+
+      outputFile->cd();
+      TDirectory * dirArryDial = outputFile->mkdir(name.c_str());
+      TDirectory **dirArrySample = new TDirectory*[TotalNSamples];
+
+      int SampleIterator = 0;
+      // Get each sample and how it's responded to our reweighted parameter
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      {
+        for(_int_ k = 0; k < samples[ivs]->GetNsamples(); k++ )
+        {
+          std::string title = std::string(samples[ivs]->getPDF(k)->GetName());
+          dirArryDial->cd();
+          dirArrySample[SampleIterator] = dirArryDial->mkdir(title.c_str());
+          SampleIterator++;
+        }
+      }
+
+      // Get the initial value of ith parameter
+      double init = (*it)->getParInit(i);
+
+      TH1D ***sigmaArray_x = new TH1D**[numVar]();
+      TH1D ***sigmaArray_y = new TH1D**[numVar]();
+      TH1D ***sigmaArray_x_norm = new TH1D**[numVar]();
+      TH1D ***sigmaArray_y_norm = new TH1D**[numVar]();
+
+      // Set up for single mode
+      TH1D ****sigmaArray_mode_x = NULL;
+      TH1D ****sigmaArray_mode_y = NULL;
+      if (DoByMode)
+      {
+        sigmaArray_mode_x = new TH1D***[numVar]();
+        sigmaArray_mode_y = new TH1D***[numVar]();
+      }
+
+      MACH3LOG_INFO("{:<20}{}", name, "");
+
+      // Make asymmetric errors just in case
+      for (int j = 0; j < numVar; ++j)
+      {
+        // New value = prior + variation*1sigma uncertainty
+        double paramVal = (*it)->getParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));
+
+        // Check the bounds on the parameter
+        if (paramVal > (*it)->GetUpperBound(i)) {
+          paramVal = (*it)->GetUpperBound(i);
+        } else if (paramVal < (*it)->GetLowerBound(i)) {
+          paramVal = (*it)->GetLowerBound(i);
+        }
+
+        // Set the parameter
+        (*it)->setParProp(i, paramVal);
+        // And reweight the sample
+        double *fake = 0;
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
+          samples[ivs]->reweight(fake);
+        }
+
+        sigmaArray_x[j] = new TH1D*[TotalNSamples]();
+        sigmaArray_y[j] = new TH1D*[TotalNSamples]();
+        sigmaArray_x_norm[j] = new TH1D*[TotalNSamples]();
+        sigmaArray_y_norm[j] = new TH1D*[TotalNSamples]();
+
+        if (DoByMode)
+        {
+          sigmaArray_mode_x[j] = new TH1D**[TotalNSamples]();
+          sigmaArray_mode_y[j] = new TH1D**[TotalNSamples]();
+        }
+
+        SampleIterator = 0;
+        // Get each sample and how it's responded to our reweighted parameter
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+          {
+            // Make a string of the double
+            std::ostringstream ss;
+            ss << paramVal;
+            std::string parVarTitle = std::string(name) + "_" + ss.str();
+
+            // This is a TH2D
+            TH2Poly* currSamp = (TH2Poly*)(samples[ivs]->getPDF(k))->Clone();
+            currSamp->SetDirectory(0);
+            // Set a descriptiv-ish title
+            std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
+
+            // Enable the mode histograms AFTER addSelection is called
+            //Get the 1d binning we want. Let's just use SetupBinning to get this as it already exists
+            std::vector<double> xbins;
+            std::vector<double> ybins;
+            samples[ivs]->SetupBinning(k, xbins, ybins);
+
+            //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
+            if (DoByMode)
+            {
+              sigmaArray_mode_x[j][SampleIterator] = new TH1D*[nRelevantModes]();
+              sigmaArray_mode_y[j][SampleIterator] = new TH1D*[nRelevantModes]();
+              // Now get the TH2D mode variations
+              TH2Poly** currSampMode; currSampMode = new TH2Poly*[nRelevantModes]();
+              std::string mode_title_long;
+              for(int ir = 0; ir < nRelevantModes; ir++)
+              {
+                currSampMode[ir] = (TH2Poly*)(samples[ivs]->getPDFMode(k, RelevantModes[ir]))->Clone();
+                currSampMode[ir]->SetDirectory(0);
+
+                mode_title_long = title_long + "_" + Modes->GetMaCh3ModeName(RelevantModes[ir]);
+                currSampMode[ir]->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
+                dirArrySample[SampleIterator]->cd();
+                currSampMode[ir]->Write();
+
+                sigmaArray_mode_x[j][SampleIterator][ir] = PolyProjectionX(currSampMode[ir], (mode_title_long+"_xProj").c_str(), xbins);
+                sigmaArray_mode_x[j][SampleIterator][ir]->SetDirectory(0);
+                sigmaArray_mode_y[j][SampleIterator][ir] = PolyProjectionY(currSampMode[ir], (mode_title_long+"_yProj").c_str(), ybins);
+                sigmaArray_mode_y[j][SampleIterator][ir]->SetDirectory(0);
+                delete currSampMode[ir];
+              }
+              delete[] currSampMode;
+            }
+
+            //KS: This will give different results depending if data or asimov, both have their uses
+            if (PlotLLHperBin)
+            {
+              TH2Poly* currLLHSamp = (TH2Poly*)(samples[ivs]->getPDF(k))->Clone();
+              currLLHSamp->SetDirectory(0);
+              currLLHSamp->Reset("");
+              currLLHSamp->Fill(0.0, 0.0, 0.0);
+
+              TH2Poly* MCpdf = (TH2Poly*)(samples[ivs]->getPDF(k));
+              TH2Poly* Datapdf = (TH2Poly*)(samples[ivs]->getData(k));
+              TH2Poly* W2pdf = (TH2Poly*)(samples[ivs]->getW2(k));
+
+              for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; bin++)
+              {
+                const double mc = MCpdf->GetBinContent(bin);
+                const double dat = Datapdf->GetBinContent(bin);
+                const double w2 = W2pdf->GetBinContent(bin);
+                currLLHSamp->SetBinContent(bin, samples[ivs]->getTestStatLLH(dat, mc, w2));
+              }
+              currLLHSamp->SetNameTitle((title_long+"_LLH").c_str() ,(title_long+"_LLH").c_str());
+              dirArrySample[SampleIterator]->cd();
+              currLLHSamp->Write();
+              delete currLLHSamp;
+            }
+
+            // Project down onto x axis
+            sigmaArray_x[j][SampleIterator] = PolyProjectionX(currSamp, (title_long+"_xProj").c_str(), xbins);
+            sigmaArray_x[j][SampleIterator]->SetDirectory(0);
+            sigmaArray_x[j][SampleIterator]->GetXaxis()->SetTitle(currSamp->GetXaxis()->GetTitle());
+            sigmaArray_y[j][SampleIterator] = PolyProjectionY(currSamp, (title_long+"_yProj").c_str(), ybins);
+            sigmaArray_y[j][SampleIterator]->SetDirectory(0);
+            sigmaArray_y[j][SampleIterator]->GetXaxis()->SetTitle(currSamp->GetYaxis()->GetTitle());
+
+            sigmaArray_x_norm[j][SampleIterator] = (TH1D*)sigmaArray_x[j][SampleIterator]->Clone();
+            sigmaArray_x_norm[j][SampleIterator]->SetDirectory(0);
+            sigmaArray_x_norm[j][SampleIterator]->Scale(1., "width");
+            sigmaArray_y_norm[j][SampleIterator] = (TH1D*)sigmaArray_y[j][SampleIterator]->Clone();
+            sigmaArray_y_norm[j][SampleIterator]->SetDirectory(0);
+            sigmaArray_y_norm[j][SampleIterator]->Scale(1., "width");
+
+            currSamp->SetNameTitle(title_long.c_str(), title_long.c_str());
+            dirArrySample[k]->cd();
+            currSamp->Write();
+
+            sigmaArray_x[j][k]->Write();
+            sigmaArray_y[j][k]->Write();
+            delete currSamp;
+            SampleIterator++;
+          }//End loop over samples
+        }
+      } // End looping over variation
+
+      // Restore the parameter to prior value
+      (*it)->setParProp(i, init);
+
+      SampleIterator = 0;
+      // Get each sample and how it's responded to our reweighted parameter
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      {
+        for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+        {
+          std::string title = std::string(samples[ivs]->getPDF(k)->GetName()) + "_" + name;
+          TGraphAsymmErrors *var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
+          TGraphAsymmErrors *var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
+
+          TGraphAsymmErrors *var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+"_X_norm").c_str());
+          TGraphAsymmErrors *var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+"_Y_norm").c_str());
+
+          dirArrySample[SampleIterator]->cd();
+          var_x->Write();
+          var_y->Write();
+          var_x_norm->Write();
+          var_y_norm->Write();
+          delete var_x;
+          delete var_y;
+          delete var_x_norm;
+          delete var_y_norm;
+
+          //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
+          if (DoByMode)
+          {
+            for(int ir = 0; ir < nRelevantModes;ir++)
+            {
+              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
+
+              dirArrySample[SampleIterator]->cd();
+              var_mode_x->Write();
+              var_mode_y->Write();
+
+              delete var_mode_x;
+              delete var_mode_y;
+            } // end for nRelevantModes
+          } // end if mode
+
+          SampleIterator++;
+        }//End loop over samples(k)
+      }//end looping over sample object
+      SampleIterator = 0;
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      {
+        for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+        {
+          dirArrySample[SampleIterator]->Close();
+          delete dirArrySample[SampleIterator];
+          SampleIterator++;
+        }
+      }
+      delete[] dirArrySample;
+
+      for (int j = 0; j < numVar; ++j)
+      {
+        SampleIterator = 0;
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        {
+          for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+          {
+            delete sigmaArray_x[j][SampleIterator];
+            delete sigmaArray_y[j][SampleIterator];
+            delete sigmaArray_x_norm[j][SampleIterator];
+            delete sigmaArray_y_norm[j][SampleIterator];
+            SampleIterator++;
+          }
+        }
+        delete[] sigmaArray_x[j];
+        delete[] sigmaArray_y[j];
+        delete[] sigmaArray_x_norm[j];
+        delete[] sigmaArray_y_norm[j];
+      }
+      delete[] sigmaArray_x;
+      delete[] sigmaArray_y;
+      delete[] sigmaArray_x_norm;
+      delete[] sigmaArray_y_norm;
+
+      dirArryDial->Close();
+      delete dirArryDial;
+
+      if (DoByMode)
+      {
+        for (int j = 0; j < numVar; ++j)
+        {
+          SampleIterator = 0;
+          for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+          {
+            for (_int_ k = 0; k < samples[ivs]->GetNsamples(); ++k)
+            {
+              for(int ir = 0; ir < nRelevantModes;ir++)
+              {
+                delete sigmaArray_mode_x[j][SampleIterator][ir];
+                delete sigmaArray_mode_y[j][SampleIterator][ir];
+              }// end for nRelevantModes
+              delete[] sigmaArray_mode_x[j][SampleIterator];
+              delete[] sigmaArray_mode_y[j][SampleIterator];
+              SampleIterator++;
+            }// end for samples
+          }
+        }
+        delete[] sigmaArray_mode_x;
+        delete[] sigmaArray_mode_y;
+      }
+    } // end looping over xsec parameters (i)
+  } // end looping over covarianceBase objects
+}
+
+// *************************
+TGraphAsymmErrors* FitterBase::MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title) {
+// *************************
+
+  TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
+  var->SetNameTitle((title).c_str(), (title).c_str());
+
+  // Need to draw TGraphs to set axes labels
+  var->Draw("AP");
+  var->GetXaxis()->SetTitle(sigmaArrayCentr->GetXaxis()->GetTitle());
+  var->GetYaxis()->SetTitle("Number of events/bin");
+
+  for (int m = 0; m < var->GetN(); ++m)
+  {
+    double xlow = sigmaArrayLeft->GetBinContent(m+1);
+    double xhigh = sigmaArrayRight->GetBinContent(m+1);
+    double xtemp;
+
+    // Figure out which variation is larger so we set the error correctly
+    if (xlow > xhigh)
+    {
+      xtemp = xlow;
+      xlow = xhigh;
+      xhigh = xtemp;
+    }
+
+    var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
+    var->SetPointEYlow(m, var->GetY()[m] - xlow);
+  }
+
+  return var;
 }

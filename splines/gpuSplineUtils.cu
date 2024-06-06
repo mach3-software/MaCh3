@@ -5,85 +5,65 @@
 // Now also supports TF1 evals
 // Called from samplePDF/samplePDFND.cpp -> splines/SplineMonolith.cpp -> splines/gpuSplineUtils.cu
 
-// C i/o  for printf and others
-#include <stdio.h>
-#include <vector>
-
-// CUDA specifics
-
-#include <cuda_runtime.h>
-
-#ifdef CUDA_ERROR_CHECK
-#include <helper_functions.h>
-#include <helper_cuda.h>
-#endif
-
-// Define the macros
-#define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)
-#define CudaCheckError()  __cudaCheckError(__FILE__, __LINE__)
+//MaCh3 included
+#include "manager/gpuUtils.cu"
+#include "splines/SplineCommon.h"
 
 // Hard code the number of splines
 // Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
 // EM: for OA2022:
 #ifdef NSPLINES_ND280
 #pragma message("using User Specified N splines")
-#define __N_SPLINES__ NSPLINES_ND280
+#define _N_SPLINES_ NSPLINES_ND280
 // EM: for OA2024:
 #else
-#define __N_SPLINES__ 160
+#define _N_SPLINES_ 160
 #pragma message("using default N splines")
 #endif
 
 
-//KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
-#define _nCoeff_ 4
-
-//KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
-#define __BlockSize__ 1024
-
-// CUDA_ERROR_CHECK is now defined in the makefile instead
-//#define CUDA_ERROR_CHECK
-//#define Weight_On_SplineBySpline_Basis
-
-// **************************************************
-//             ERROR CHECKING ROUTINES
-// Also exist in helper_cuda.h
-// **************************************************
-
-// **************************************************
-// Check for a safe call on GPU
-inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
-// **************************************************
-#ifdef CUDA_ERROR_CHECK
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaSafeCall() failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
+// KS: Forgive me father, for I have sinned.
+#if defined(__CUDA_ARCH__)
+  #if __CUDA_ARCH__ >= 1200
+    #pragma message("Compiling with CUDA Architecture: 12.x")
+  #elif __CUDA_ARCH__ >= 1100
+    #pragma message("Compiling with CUDA Architecture: 11.x")
+  #elif __CUDA_ARCH__ >= 1000
+    #pragma message("Compiling with CUDA Architecture: 10.x")
+  #elif __CUDA_ARCH__ >= 900
+    #pragma message("Compiling with CUDA Architecture: 9.x")
+  #elif __CUDA_ARCH__ >= 800
+    #pragma message("Compiling with CUDA Architecture: 8.x")
+  #elif __CUDA_ARCH__ >= 750
+    #pragma message("Compiling with CUDA Architecture: 7.5")
+  #elif __CUDA_ARCH__ >= 730
+    #pragma message("Compiling with CUDA Architecture: 7.3")
+  #elif __CUDA_ARCH__ >= 720
+    #pragma message("Compiling with CUDA Architecture: 7.2")
+  #elif __CUDA_ARCH__ >= 710
+    #pragma message("Compiling with CUDA Architecture: 7.1")
+  #elif __CUDA_ARCH__ >= 700
+    #pragma message("Compiling with CUDA Architecture: 7.x")
+  #elif __CUDA_ARCH__ >= 650
+    #pragma message("Compiling with CUDA Architecture: 6.5")
+  #elif __CUDA_ARCH__ >= 600
+    #pragma message("Compiling with CUDA Architecture: 6.x")
+  #elif __CUDA_ARCH__ >= 530
+    #pragma message("Compiling with CUDA Architecture: 5.3")
+  #elif __CUDA_ARCH__ >= 520
+    #pragma message("Compiling with CUDA Architecture: 5.2")
+  #elif __CUDA_ARCH__ >= 510
+    #pragma message("Compiling with CUDA Architecture: 5.1")
+  #elif __CUDA_ARCH__ >= 500
+    #pragma message("Compiling with CUDA Architecture: 5.x")
+  #elif __CUDA_ARCH__ >= 400
+    #pragma message("Compiling with CUDA Architecture: 4.x")
+  #elif __CUDA_ARCH__ >= 300
+    #pragma message("Compiling with CUDA Architecture: 3.x")
+  #else
+    #pragma message("Compiling with CUDA Architecture: < 3.x")
+  #endif
 #endif
-  return;
-}
-
-// **************************************************
-// Check if there's been an error
-inline void __cudaCheckError( const char *file, const int line ) {
-// **************************************************
-#ifdef CUDA_ERROR_CHECK
-  cudaError err = cudaGetLastError();
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-
-  // More careful checking. However, this will affect performance.
-  // Comment away if needed.
-  err = cudaDeviceSynchronize();
-  if (cudaSuccess != err) {
-    fprintf(stderr, "cudaCheckError() with sync failed at %s:%i : %s\n", file, line, cudaGetErrorString(err));
-    exit(-1);
-  }
-#endif
-  return;
-}
 
 // ******************************************
 // CONSTANTS
@@ -95,10 +75,9 @@ __device__ __constant__ short int d_spline_size;
 #ifndef Weight_On_SplineBySpline_Basis
 __device__ __constant__ int d_n_events;
 #endif
-//CW: Constant memory needs to be hard-coded on compile time
-// Could make this texture memory instead, but don't care enough right now...
-__device__ __constant__ float val_gpu[__N_SPLINES__];
-__device__ __constant__ short int segment_gpu[__N_SPLINES__];
+/// CW: Constant memory needs to be hard-coded on compile time. Could make this texture memory instead, but don't care enough right now...
+__device__ __constant__ float val_gpu[_N_SPLINES_];
+__device__ __constant__ short int segment_gpu[_N_SPLINES_];
 
 // h_NAME declares HOST constants (live on CPU)
 static short int h_spline_size  = -1;
@@ -119,43 +98,11 @@ cudaTextureObject_t text_nParamPerEvent = 0;
 
 
 // *******************************************
-//              Utils
-// *******************************************
-
-// *******************************************
-//KS: Get some fancy info about VRAM usage
-inline void checkGpuMem() {
-// *******************************************
-
-  float free_m, total_m,used_m;
-  size_t free_t, total_t;
-
-  cudaMemGetInfo(&free_t, &total_t);
-
-  free_m = (uint)free_t/1048576.0;
-  total_m = (uint)total_t/1048576.0;
-  used_m = total_m - free_m;
-
-  printf("  Memory free %f MB, total memory %f MB, memory used %f MB\n", free_m, total_m, used_m);
-}
-
-// *******************************************
-//KS: Get some fancy info about GPU
-inline void PrintNdevices() {
-// *******************************************
-
-  int nDevices;
-  cudaGetDeviceCount(&nDevices);
-
-  printf("  Found %i GPUs, currenlty I only support one GPU\n", nDevices);
-}
-
-// *******************************************
 //              INITIALISE GPU
 // *******************************************
 
 // *******************************************
-// Initialiser when using the x array and combined y,b,c,d array
+/// Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_SepMany(
 // *******************************************
                           float **gpu_x_array,
@@ -217,7 +164,7 @@ __host__ void InitGPU_SepMany(
 }
 
 // *******************************************
-// Initialiser when using the x array and combined y,b,c,d array
+/// Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_TF1(
 // *******************************************
                           float **gpu_coeffs,
@@ -280,7 +227,7 @@ __host__ void InitGPU_Segments(short int **segment) {
 // *******************************************
 
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
-  cudaMallocHost((void **) segment, __N_SPLINES__*sizeof(short int));
+  cudaMallocHost((void **) segment, _N_SPLINES_*sizeof(short int));
   CudaCheckError();
 }
 
@@ -290,7 +237,7 @@ __host__ void InitGPU_Vals(float **vals) {
 // *******************************************
 
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
-  cudaMallocHost((void **) vals, __N_SPLINES__*sizeof(float));
+  cudaMallocHost((void **) vals, _N_SPLINES_*sizeof(float));
   CudaCheckError();
 }
 
@@ -300,7 +247,7 @@ __host__ void InitGPU_Vals(float **vals) {
 // ******************************************************
 
 // ******************************************************
-// Copy to GPU for x array and separate ybcd array
+/// Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_SepMany(
 // ******************************************************
                             short int *gpu_paramNo_arr,
@@ -322,8 +269,8 @@ __host__ void CopyToGPU_SepMany(
                             unsigned int n_splines,
                             short int spline_size,
                             unsigned int sizeof_array) {
-  if (n_params != __N_SPLINES__) {
-    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", __N_SPLINES__);
+  if (n_params != _N_SPLINES_) {
+    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", _N_SPLINES_);
     printf("n_params = %i\n", n_params);
     printf("%s : %i\n", __FILE__, __LINE__);
     exit(-1);
@@ -406,7 +353,7 @@ __host__ void CopyToGPU_SepMany(
 }
 
 // ******************************************************
-// Copy to GPU for x array and separate ybcd array
+/// Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_TF1(
 // ******************************************************
                             float *gpu_coeffs,
@@ -426,8 +373,8 @@ __host__ void CopyToGPU_TF1(
                             unsigned int n_splines,
                             short int _max_knots) {
 
-  if (n_params != __N_SPLINES__) {
-    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", __N_SPLINES__);
+  if (n_params != _N_SPLINES_) {
+    printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", _N_SPLINES_);
     printf("n_params = %i\n", n_params);
     printf("%s : %i\n", __FILE__, __LINE__);
     exit(-1);
@@ -558,8 +505,7 @@ __global__ void EvalOnGPU_SepMany(
 }
 
 //*********************************************************
-// Evaluate the TF1 on the GPU
-// Using 5th order polynomial
+/// Evaluate the TF1 on the GPU Using 5th order polynomial
 __global__ void EvalOnGPU_TF1( 
     const float* __restrict__ gpu_coeffs,
     const short int* __restrict__ gpu_paramNo_arr,
@@ -609,7 +555,7 @@ __global__ void EvalOnGPU_TF1(
 
 #ifndef Weight_On_SplineBySpline_Basis
 //*********************************************************
-//KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
+/// KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
    const float* __restrict__ gpu_weights,
    float *gpu_total_weights,
@@ -617,7 +563,7 @@ __global__ void EvalOnGPU_TotWeight(
 //*********************************************************
   const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
   //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
-  __shared__ float shared_total_weights[__BlockSize__];
+  __shared__ float shared_total_weights[_BlockSize_];
   if(EventNum < d_n_events) //stopping condition
   {
     shared_total_weights[threadIdx.x] = 1.f;
@@ -663,7 +609,7 @@ __host__ void RunGPU_SepMany(
   dim3 block_size;
   dim3 grid_size;
 
-  block_size.x = __BlockSize__;
+  block_size.x = _BlockSize_;
   grid_size.x = (h_n_splines / block_size.x) + 1;
 
   // Copy the segment values to the GPU (segment_gpu), which is h_n_params long
@@ -746,7 +692,7 @@ __host__ void RunGPU_SepMany(
 }
 
 // *****************************************
-// Run the GPU code for the TF1
+/// Run the GPU code for the TF1
 __host__ void RunGPU_TF1(
     const float *gpu_coeffs,
     const short int* gpu_paramNo_arr,
@@ -768,7 +714,7 @@ __host__ void RunGPU_TF1(
   dim3 block_size;
   dim3 grid_size;
 
-  block_size.x = __BlockSize__;
+  block_size.x = _BlockSize_;
   grid_size.x = (h_n_splines / block_size.x) + 1;
 
   // Copy the parameter values values to the GPU (vals_gpu), which is h_n_params long
@@ -845,7 +791,7 @@ __host__ void RunGPU_TF1(
 }
 
 // *****************************************
-// Make sure all Cuda threads finished execution
+/// Make sure all Cuda threads finished execution
 __host__ void SynchroniseSplines() {
   cudaDeviceSynchronize();
 }
@@ -855,7 +801,7 @@ __host__ void SynchroniseSplines() {
 // *********************************
 
 // *********************************
-// Clean up the {x},{ybcd} arrays
+/// Clean up the {x},{ybcd} arrays
 __host__ void CleanupGPU_SepMany( 
     short int *gpu_paramNo_arr,
     unsigned int *gpu_nKnots_arr,
@@ -885,22 +831,26 @@ __host__ void CleanupGPU_SepMany(
   cudaDestroyTextureObject(text_nParamPerEvent);
   cudaFree(gpu_nParamPerEvent);
   cudaFreeHost(cpu_total_weights);
+  cpu_total_weights = nullptr;
 #endif
   return;
 }
 
 // *******************************************
-// Clean up pinned variables at CPU
+/// Clean up pinned variables at CPU
 __host__ void CleanupGPU_Segments(short int *segment, float *vals) {
 // *******************************************
     cudaFreeHost(segment);
     cudaFreeHost(vals);
 
+    segment = nullptr;
+    vals = nullptr;
+
     return;
 }
 
 // *********************************
-// Clean up the TF1 arrays
+/// Clean up the TF1 arrays
 __host__ void CleanupGPU_TF1(
     float *gpu_coeffs,
     short int *gpu_paramNo_arr,

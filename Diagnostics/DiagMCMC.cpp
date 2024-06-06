@@ -39,7 +39,7 @@ void DiagMCMC(std::string inputFile, std::string config)
     //KS: Use 20 batches for batched means
     Processor->SetnBatches(GetFromManager<int>(Settings["DiagMCMC"]["nBatches"], 20));
     Processor->SetnLags(GetFromManager<int>(Settings["DiagMCMC"]["nLags"], 25000));
-
+    Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true));
     Processor->Initialise();
 
     //KS: finally call main method

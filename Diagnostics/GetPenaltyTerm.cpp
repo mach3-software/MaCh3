@@ -188,11 +188,11 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
     hLogL[i]->SetLineColor(kBlue);
   }
   double* logL = new double[NSets]();
-  for(int i = 0;  i < AllEvents; i++)
+  for(int n = 0;  n < AllEvents; n++)
   {
-    if(i%10000 == 0) std::cout<<i<<std::endl;
+    if(n%10000 == 0) std::cout<<n<<std::endl;
       
-    Chain->GetEntry(i);
+    Chain->GetEntry(n);
 
     for(int k = 0; k < NSets; ++k) logL[k] = 0.;
 #ifdef MULTITHREAD
@@ -263,7 +263,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
 #endif
     for(int k = 0; k < NSets; ++k)
     {
-      hLogL[k]->SetBinContent(i, logL[k]);
+      hLogL[k]->SetBinContent(n, logL[k]);
     }
   }//End loop over steps
 
@@ -352,8 +352,7 @@ void ReadXSecFile(std::string inputFile)
   size = XSecMatrix->GetNrows();
 
   auto systematics = XSecFile["Systematics"];
-  int i = 0;
-  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
+  for (auto it = systematics.begin(); it != systematics.end(); ++it)
   {
     auto const &param = *it;
 

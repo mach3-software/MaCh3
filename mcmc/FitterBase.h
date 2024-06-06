@@ -15,7 +15,10 @@
 class TRandom3;
 class TStopwatch;
 class TTree;
+class TGraphAsymmErrors;
+class TDirectory;
 
+/// @brief Base class for implementing fitting algorithms
 class FitterBase {
 
  public:
@@ -47,13 +50,22 @@ class FitterBase {
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
+  /// @brief LLH scan is good first estimate of step scale
+  void GetStepScaleBasedOnLLHScan();
+
   /// @brief Perform a 2D likelihood scan.
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
+  /// @brief Perform a 2D and 1D sigma var for all samples.
+  /// @warning Code uses TH2Poly
+  void RunSigmaVar();
+
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
-protected:
+ protected:
+  /// @brief Process MCMC output
+  void ProcessMCMC();
 
   /// @brief Prepare the output file.
   void PrepareOutput();
@@ -64,8 +76,14 @@ protected:
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
 
+  /// @brief Used by sigma variation, check how 1 sigma changes spectra
+  inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title);
+
   /// The manager
   manager *fitMan;
+
+  /// MaCh3 Modes
+  MaCh3Modes* Modes;
 
   /// current state
   unsigned int step;
@@ -88,6 +106,8 @@ protected:
 
   /// Sample holder
   std::vector<samplePDFBase*> samples;
+  /// Total number of samples used
+  unsigned int TotalNSamples;
 
   /// Systematic holder
   std::vector<covarianceBase*> systematics;
@@ -120,6 +140,8 @@ protected:
   bool fTestLikelihood;
   /// save nominal matrix info or not
   bool save_nominal;
+  /// Save proposal at each step
+  bool SaveProposal;
 
   /// Checks if file saved not repeat some operations
   bool FileSaved;
