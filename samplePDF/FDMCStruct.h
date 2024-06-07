@@ -68,8 +68,8 @@ struct fdmc_base {
 #if defined (USE_PROB3) 
   BargerPropagator *Oscillator; // Prob3++
 #else
-  cudaprob3::Propagator<double>  *Oscillator; // CUDAProb3
-  cudaprob3::ProbType  ProbType;
-  cudaprob3::NeutrinoType  NeutrinoType;
+  //cudaprob3::Propagator<double>  *Oscillator; // CUDAProb3
+  //cudaprob3::ProbType  ProbType;
+  //cudaprob3::NeutrinoType  NeutrinoType;
 #endif
 };

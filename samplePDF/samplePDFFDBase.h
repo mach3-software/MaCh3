@@ -21,7 +21,7 @@
 #include "TString.h"
 
 //MaCh3 includes
-#include "OscClass/OscClass_CUDAProb3.h"
+#include "OscillatorBase.h"
 
 #include "samplePDF/interfacePDFEbE.h"
 #include "samplePDF/samplePDFBase.h"
@@ -50,6 +50,7 @@ public:
   virtual ~samplePDFFDBase();
 
   const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  std::string GetName(){return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -84,8 +85,6 @@ public:
   void calcOscWeights(int sample, int nutype, double *w);
 #endif
 
-  std::string GetName(){return samplename;}
-
   const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
   void SetOscCov(covarianceOsc* osc_cov);
@@ -113,8 +112,6 @@ public:
 
   virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
   // LW - Setup Osc 
-  void virtual SetupOscCalc(double PathLength, double Density);
-  void SetOscillator(Oscillator* Osc_);
   void FindEventOscBin();
 
  protected:
@@ -205,9 +202,6 @@ public:
   // Helper function to reset histograms
   inline void ResetHistograms();
   
-#ifndef USE_PROB3
-  inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
-#endif
   //===============================================================================
   //DB Variables required for GetLikelihood
   //
@@ -235,8 +229,8 @@ public:
 
   //===============================================================================
   //DB Variables required for oscillation
-  Oscillator *Osc = NULL;
-
+  OscillatorBase* NuOscillator = nullptr;
+  
   // An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;
   //===============================================================================
@@ -253,6 +247,8 @@ public:
   covarianceOsc *OscCov;
   //=============================================================================== 
 
+  std::string samplename;
+
   //ETA - binning opt can probably go soon...
   int BinningOpt;
   /// @var const int nDimensions
@@ -263,8 +259,6 @@ public:
   /// @var std::vector<std::string> SplineBinnedVars
   /// @brief  holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
-
-  std::string samplename;
 
   //Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;

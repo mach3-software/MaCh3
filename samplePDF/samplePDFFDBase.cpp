@@ -17,7 +17,6 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   
   //KS: For now FD support only one sample
   nSamples = 1;
-  SampleName.push_back("FDsample");
 
   //Default TestStatistic is kPoisson
   fTestStatistic = kPoisson;
@@ -212,78 +211,8 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
   return true;
 }
 
-//CalcOsc for Prob3++ CPU
-#if defined (USE_PROB3) && defined (CPU_ONLY)
-double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en)
-{
-  MCSamples[sample].Oscillator->SetMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], en, doubled_angle, nutype);
-  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpar[7], *oscpar[8]); 
-
-  return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
-}
-#endif
-
-//CalcOsc for Prob3++ GPU (ProbGpu)
-#if defined (USE_PROB3) && not defined (CPU_ONLY)
-extern "C" void setMNS(double x12, double x13, double x23, double m21, double m23, double Delta, bool kSquared);
-extern "C" void GetProb(int Alpha, int Beta, double Path, double Density, double *Energy, int n, double *oscw); 
-
-void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num)
-{
-  setMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], doubled_angle);
-  GetProb(nutype, oscnutype, &oscpar[7], &oscpar[8], en, num, w);
-
-
-  if (std::isnan(w[10]))
-    {
-      std::cerr << "WARNING: ProbGPU oscillation weight returned NaN! " << w[10] << std::endl;
-    }
-}
-#endif
-
-//CalcOsc for CUDAProb3 CPU/GPU
-#if not defined (USE_PROB3)
-void samplePDFFDBase::calcOscWeights(int sample, int nutype, double *w)
-{
-  MCSamples[sample].Oscillator->setMNSMatrix(asin(sqrt(*oscpars[0])),asin(sqrt(*oscpars[2])), asin(sqrt(*oscpars[1])), (*oscpars[5]), nutype);
-  MCSamples[sample].Oscillator->setNeutrinoMasses(*oscpars[3], *oscpars[4]);
-  MCSamples[sample].Oscillator->calculateProbabilities(MCSamples[sample].NeutrinoType);
-  MCSamples[sample].Oscillator->getProbabilityArr(w, MCSamples[sample].ProbType);
-}
-#endif 
-
 void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
 {
-
-  if (Osc!=NULL) {
-	std::cout << "Osc is not NULL!! i.e. doing atm oscillations " << std::endl;
-    //DB Currently hardcoded to assume rho_electrons = rho_matter/2, 25km production height
-    Osc->FillOscillogram(oscpars,25.0,0.5);
-    for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
-      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-		MCSamples[iSample].osc_w[iEvent] = *(MCSamples[iSample].osc_w_pointer[iEvent]);
-      }
-    }
-  } else {
-    for (int i=0; i< (int)MCSamples.size(); ++i) {
-      
-#if defined (USE_PROB3) && defined (CPU_ONLY)
-      //Prob3 CPU needs to loop through events too
-      for(int j = 0; j < MCSamples[i].nEvents; ++j) {
-		MCSamples[i].osc_w[j] = calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru[j]));
-      } //event loop
-#endif
-      
-#if defined (USE_PROB3) && not defined (CPU_ONLY)
-      calcOscWeights(MCSamples[i].nutype, MCSamples[i].oscnutype, *(MCSamples[i].rw_etru), MCSamples[i].osc_w, MCSamples[i].nEvents);
-#endif
-      
-#if not defined (USE_PROB3)
-      calcOscWeights(i, MCSamples[i].nutype, MCSamples[i].osc_w);
-#endif
-    }// Sample loop
-  }
-
   //KS: Reset the histograms before reweight 
   ResetHistograms();
 
@@ -696,28 +625,6 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   return xsecw;
 }
 
-//DB Adding in Oscillator class support for smeared oscillation probabilities
-void samplePDFFDBase::SetOscillator(Oscillator* Osc_) {
-#if defined (USE_PROB3)
-  std::cerr << "Atmospheric Oscillator only defined using CUDAProb3 - USE_PROB3 is defined and indicates that Prob3++/probGPU is being used" << std::endl;
-  throw;
-#endif
-
-  Osc = Osc_;
-  std::cout << "Set Oscillator" << std::endl;
-
-  FindEventOscBin();
-}
-
-void samplePDFFDBase::FindEventOscBin() {
-  for(int i = 0; i < getNMCSamples(); i++) {
-    for (int j = 0;j < getNEventsInSample(i); j++) {
-      MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),MCSamples[i].rw_truecz[j]);
-    }
-  }
-  std::cout << "Set all oscillation pointers to Oscillator" << std::endl;
-}
-
 void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   std::cout << "SETTING UP XSEC COV!!" << std::endl;
@@ -894,58 +801,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 	} // end if (xsecCov)
 	fdobj->xsec_norms_bins[iEvent]=XsecBins;
   }//end loop over events
-  return;
-}
-
-//LW 
-//Setup chosen oscillation calculator for each subsample
-//Default Baseline Implementation
-//Add your own implementation in experiment specific SamplePDF Class if necessary!!
-// ETA - pass the yaml config used in the executable. This will include the cov osc
-// and other information. Need to double check that this is sensible
-void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
-{
-
-  for (int iSample=0; iSample < (int)MCSamples.size(); iSample++) {
-
-#if defined (USE_PROB3) && defined (CPU_ONLY)
-// if we're using Prob3++ CPU then initialise BargerPropagator object
-// if we're using Prob3++ GPU then we don't need to do this since event information gets passed straight to ProbGpu.cu in CalcOscWeights
-    MCSamples[iSample].Oscillator = new BargerPropagator();
-    MCSamples[iSample].Oscillator->UseMassEigenstates(false);
-    MCSamples[iSample].Oscillator->SetOneMassScaleMode(false);
-    MCSamples[iSample].Oscillator->SetWarningSuppression(true);
-#endif
-
-#if not defined (USE_PROB3)
-//if we're using CUDAProb3 then make vector of energies and convert to CUDAProb3 structs
-    std::vector<double> etruVector(*(MCSamples[iSample].rw_etru), *(MCSamples[iSample].rw_etru) + MCSamples[iSample].nEvents);
-    MCSamples[iSample].ProbType = SwitchToCUDAProbType(GetCUDAProbFlavour(MCSamples[iSample].nutype, MCSamples[iSample].oscnutype));
-	// CUDAProb3 takes probType and antineutrino/neutrino separately
-    if (MCSamples[iSample].nutype < 0) {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Antineutrino;}
-    else {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Neutrino;}
-#if defined (CPU_ONLY)
-//if we just want to use CUDAProb3 CPU then setup BeamCpuPropagator object
-#if defined (MULTITHREAD)
-//if we want to multithread then get number of threads from OMP_NUM_THREADS env variable
-    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, std::atoi(std::getenv("OMP_NUM_THREADS")));
-  MCSamples[iSample].Oscillator->setPathLength(PathLength);
-  MCSamples[iSample].Oscillator->setDensity(Density);
-#else
-//if we're not mulithreading then just set it to 1
-    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, 1);
-  MCSamples[iSample].Oscillator->setPathLength(PathLength);
-  MCSamples[iSample].Oscillator->setDensity(Density);
-#endif //MULTITHREAD
-#else
-//if we want to use CUDAProb3 GPU then setup BeamCudaPropagator object
-    MCSamples[iSample].Oscillator = new cudaprob3::BeamCudaPropagatorSingle(0, MCSamples[iSample].nEvents);
-    MCSamples[iSample].Oscillator->setPathLength(PathLength);
-    MCSamples[iSample].Oscillator->setDensity(Density);
-#endif // CPU_ONLY
-    MCSamples[iSample].Oscillator->setEnergyList(etruVector);
-#endif // USE_PROB3
-  }
   return;
 }
 
@@ -1393,7 +1248,10 @@ inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   //HI : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
-	//std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
+	if(iParam == 2){
+	  std::cout << "------------_" << std::endl;
+	  std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
+	}
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
   }
   return totalweight;
@@ -1497,27 +1355,3 @@ double samplePDFFDBase::GetLikelihood()
   }
   return negLogL;
 }
- 
-#ifndef USE_PROB3 
-// ************************************************
-// Switch from MaCh3 CUDAProb flavour to CUDAProb Probtype
-inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu) {
-//*************************************************  
-  switch(CUDAProb_nu)
-  {
-    case CUDAProb_nu::e_e : return cudaprob3::ProbType::e_e;
-    case CUDAProb_nu::e_m : return cudaprob3::ProbType::e_m;
-    case CUDAProb_nu::e_t : return cudaprob3::ProbType::e_m;
-    case CUDAProb_nu::m_e : return cudaprob3::ProbType::m_e;
-    case CUDAProb_nu::m_m : return cudaprob3::ProbType::m_m;
-    case CUDAProb_nu::m_t : return cudaprob3::ProbType::m_t;
-    case CUDAProb_nu::t_e : return cudaprob3::ProbType::t_e;
-    case CUDAProb_nu::t_m : return cudaprob3::ProbType::t_m;
-    case CUDAProb_nu::t_t : return cudaprob3::ProbType::t_t;
-    default:
-      MACH3LOG_ERROR("Unknown CUDAProbType!");
-      throw;
-  }
-}
-#endif
-

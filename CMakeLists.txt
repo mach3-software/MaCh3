@@ -26,7 +26,6 @@ else()
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 endif()
 
-
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
 if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
@@ -79,6 +78,26 @@ CPMAddPackage(
 
 if(NOT TARGET yaml-cpp::yaml-cpp)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
+endif()
+
+#Try adding Oscillator Class
+CPMAddPackage(
+  NAME NUOSCILLATOR
+    VERSION 0.0
+    GITHUB_REPOSITORY "dbarrow257/NuOscillator"
+	GIT_TAG "FNALBuild"
+    OPTIONS
+	  "UseGPU 0"
+	  "UseMultithreading 1"
+	  "UseDoubles 1"
+	  "UseCUDAProb3 1"	
+	  "UseCUDAProb3Linear 0"
+	  "UseProbGPULinear 0"
+	  "UseProb3ppLinear 0"
+)
+
+if(NOT TARGET Oscillator)
+  cmessage(FATAL_ERROR "Expecting dependency Oscillator::Oscillator")
 endif()
 
 #KS: Not being used right now so commenting it out.
@@ -253,19 +272,18 @@ endforeach()
 add_subdirectory(manager)
 add_subdirectory(covariance)
 add_subdirectory(splines)
-if (NOT USE_PROB3)
-  add_subdirectory(OscClass)
-endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
 #ETA - commenting out as not c++11 compatible...
 #add_subdirectory(yaml_test)
 
+
+
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
+target_link_libraries(MaCh3 INTERFACE MCMC Oscillator::Oscillator OscProbCalcer::OscProbCalcer SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

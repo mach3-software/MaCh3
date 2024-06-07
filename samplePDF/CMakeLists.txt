@@ -16,13 +16,7 @@ add_library(SamplePDF SHARED
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
 )
 
-target_link_libraries(SamplePDF Splines Covariance MaCh3CompilerOptions)
-
-if(USE_PROB3)
-    target_link_libraries(SamplePDF Prob3plusplus)
-else()
-    target_link_libraries(SamplePDF OscClass)
-endif()
+target_link_libraries(SamplePDF Oscillator OscProbCalcer Splines Covariance MaCh3CompilerOptions)
 
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
@@ -48,4 +42,25 @@ install(TARGETS SamplePDF
 
 add_library(MaCh3::SamplePDF ALIAS SamplePDF)
 
+install(TARGETS Oscillator
+        EXPORT MaCh3-targets
+	    LIBRARY DESTINATION lib/	
+		PUBLIC_HEADER DESTINATION include/Oscillator)
 
+install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/Oscillator/
+	    DESTINATION include/
+)
+
+install(TARGETS OscProbCalcer
+        EXPORT MaCh3-targets
+	    LIBRARY DESTINATION lib/	
+		PUBLIC_HEADER DESTINATION include/OscProbCalcer)
+
+install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/OscProbCalcer/
+	    DESTINATION include/
+)
+
+install(TARGETS NuOscillatorInterface
+        EXPORT MaCh3-targets
+	    LIBRARY DESTINATION lib/	
+		PUBLIC_HEADER DESTINATION include/OscProbCalcer)
