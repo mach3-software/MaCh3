@@ -598,7 +598,7 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------");
   for (unsigned int i = 0; i < SplineParsIndex.size(); ++i) {
     MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|",
-                  SplineInterpolation_ToString(SplineInterpolation(SplineParsIndex[i])), "|",
+                  SplineInterpolation_ToString(_fSplineInterpolationType[i]), "|",
                   _fSplineKnotLowBound[i], "|", _fSplineKnotUpBound[i], "|");
   }
   MACH3LOG_INFO("=========================================================================================================================");
