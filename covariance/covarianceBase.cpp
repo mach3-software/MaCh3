@@ -1408,38 +1408,33 @@ void covarianceBase::initialiseAdaption(manager* fitMan){
   // need to cast matrixName to string
   std::string matrixName_str(matrixName);
 
-  if(!CheckNodeExists<std::string>(fitMan->raw(), "Adaption", "Covariance", matrixName_str)){
+  if(!CheckNodeExists<std::string>(fitMan->raw(), "AdaptionOptions", "Covariance", matrixName_str)){
     MACH3LOG_WARN("Adaptive Settings not found for {}, this is fine if you don't want adaptive MCMC", matrixName_str);
     return;
   }
 
-  if(!fitMan->raw()["Adaption"]["Covariance"][matrixName_str]["DoAdaption"].as<bool>()) {
-    MACH3LOG_INFO("Not using adaption for {}", matrixName_str);
-    return;
-  }
-
   // We"re going to grab this info from the YAML manager
-  if(!fitMan->raw()["Adaption"]["Covariance"][matrixName_str]["DoAdaption"].as<bool>()) {
+  if(!fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["DoAdaption"].as<bool>()) {
     MACH3LOG_INFO("Not using adaption for {}", matrixName_str);
     return;
   }
 
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  start_adaptive_throw  = fitMan->raw()["Adaption"]["Settings"]["AdaptionStartThrow"].as<int>();
-  start_adaptive_update =  fitMan->raw()["Adaption"]["Settings"]["AdaptionStartUpdate"].as<int>();
-  end_adaptive_update   =  fitMan->raw()["Adaption"]["Settings"]["AdaptionEndUpdate"].as<int>();
-  adaptive_update_step  =  fitMan->raw()["Adaption"]["Settings"]["AdaptionUpdateStep"].as<int>();
+  start_adaptive_throw  = fitMan->raw()["AdaptionOptions"]["Settings"]["AdaptionStartThrow"].as<int>();
+  start_adaptive_update =  fitMan->raw()["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"].as<int>();
+  end_adaptive_update   =  fitMan->raw()["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"].as<int>();
+  adaptive_update_step  =  fitMan->raw()["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"].as<int>();
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
 
   // We"ll set a dummy variable here
-  std::vector<std::vector<int>> matrix_blocks = fitMan->raw()["Adaption"]["Covariance"][matrixName_str]["MatrixBlocks"].as<std::vector<std::vector<int>>>();
+  std::vector<std::vector<int>> matrix_blocks = fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["MatrixBlocks"].as<std::vector<std::vector<int>>>();
   setAdaptiveBlocks(matrix_blocks);
 
   // Next let"s check for external matrices
    // We"re going to grab this info from the YAML manager
-  if(!fitMan->raw()["Adaption"]["Covariance"][matrixName_str]["UseExternalMatrix"].as<bool>()) {
+  if(!fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["UseExternalMatrix"].as<bool>()) {
     MACH3LOG_INFO("Not using external matrix for {}, initialising adaption", matrixName_str);
     createNewAdaptiveCovariance();
     return;
@@ -1447,9 +1442,9 @@ void covarianceBase::initialiseAdaption(manager* fitMan){
 
    // Finally, we accept that we want to read the matrix from a file!
 
-  setThrowMatrixFromFile(fitMan->raw()["Adaption"]["Settings"][matrixName_str]["ExternalMatrixFileName"].as<std::string>(),
-                         fitMan->raw()["Adaption"]["Settings"][matrixName_str]["ExternalMatrixName"].as<std::string>(),
-                         fitMan->raw()["Adaption"]["Settings"][matrixName_str]["ExternalMeansName"].as<std::string>());
+  setThrowMatrixFromFile(fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["ExternalMatrixFileName"].as<std::string>(),
+                         fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["ExternalMatrixName"].as<std::string>(),
+                         fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["ExternalMeansName"].as<std::string>());
 }
 
 // HW : I would like this to be less painful to use!
