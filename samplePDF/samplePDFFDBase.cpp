@@ -1,5 +1,7 @@
 #include "samplePDFFDBase.h"
 
+#include "OscillatorFactory.h"
+
 // Constructors for erec-binned errors
 
 samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov)
@@ -1242,6 +1244,48 @@ void samplePDFFDBase::addData(TH2D* Data) {
       samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
   }
+}
+
+/// @func SetupNuOscillator()
+//  @brief including Dan's magic NuOscillator
+void samplePDFFDBase::SetupNuOscillator(std::string OscYaml){
+  OscillatorFactory *OscFactory = new OscillatorFactory();
+  NuOscillator = OscFactory->CreateOscillator(OscYaml);
+
+  //Check if the Energy and CosineZ evaluation points have been set in the constructor of the object (i.e. Binned where the templates have been picked up by the constructor)
+  //or if we need to set them after the fact (i.e. unbinned where the points may change depending on the events etc.)
+  if (!NuOscillator->EvalPointsSetInConstructor()) {
+
+	MACH3LOG_ERROR("UNSUPPORTED FOR NOW!!!");
+	throw;
+	/*
+	std::vector<__float__> TrueEnuVec(nEvents);
+	for(int i){
+	for(int iEvent = 0 ; iEvent < nEvents ; ++iEvent){
+	  TrueEnuVec[iEvent] = 
+
+	}
+
+    //It's possible for one Oscillator to have multiple OscProbCalcers, these could be interfaced with individually such that each could have a different Energy and CosineZ array
+    for (int iCalcer=0;iCalcer<Oscillator->ReturnNOscProbCalcers();iCalcer++) {
+
+      Oscillator->SetEnergyArrayInCalcer(FDMC.rw_etru,iCalcer);
+
+      //Check if we also need to set the CosineZ binning
+      if (!Oscillator->CosineZIgnored()) {
+	Oscillator->SetCosineZArrayInCalcer(CosineZArray,iCalcer);
+      }
+    }
+	*/
+  }
+
+  NuOscillator->Setup();
+
+  std::vector<__float__> OscVec = {3.07e-1, 5.28e-1, 2.18e-2, 7.53e-5, 2.509e-3, -1.601, 290.0, 2.6};
+  NuOscillator->CalculateProbabilities(OscVec);
+  NuOscillator->PrintWeights();
+  throw;
+
 }
 
 inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {

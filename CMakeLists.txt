@@ -90,10 +90,10 @@ CPMAddPackage(
 	  "UseGPU 0"
 	  "UseMultithreading 1"
 	  "UseDoubles 1"
-	  "UseCUDAProb3 1"	
+	  "UseCUDAProb3 0"	
 	  "UseCUDAProb3Linear 0"
 	  "UseProbGPULinear 0"
-	  "UseProb3ppLinear 0"
+	  "UseProb3ppLinear 1"
 )
 
 if(NOT TARGET Oscillator)
@@ -118,30 +118,30 @@ endif()
 ################################## Oscillation ################################
 
 #If USE_PROB3 not defined turn it off by default
-if(NOT DEFINED USE_PROB3)
-  SET(USE_PROB3 FALSE)
-endif()
+#if(NOT DEFINED USE_PROB3)
+#  SET(USE_PROB3 FALSE)
+#endif()
 
 # Oscillation calcualtion
 # In the future which osc calc we use might be set with a flag
-SET(MaCh3_Oscillator_ENABLED "")
-if (USE_PROB3)
-  CPMFindPackage(
-    NAME Prob3plusplus
-    VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
-else()
-  CPMFindPackage(
-    NAME CUDAProb3
-    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-    GIT_TAG "feature_cleanup"
-    DOWNLOAD_ONLY YES
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
-endif()
+#SET(MaCh3_Oscillator_ENABLED "")
+#if (USE_PROB3)
+#  CPMFindPackage(
+#    NAME Prob3plusplus
+#    VERSION 3.10.3
+#    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
+#    GIT_TAG v3.10.3
+#  )
+#  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
+#else()
+#  CPMFindPackage(
+#    NAME CUDAProb3
+#    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
+#    GIT_TAG "feature_cleanup"
+#    DOWNLOAD_ONLY YES
+#  )
+#  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
+#endif()
 
 #dump_cmake_variables(Prob3plusplus)
 
@@ -219,9 +219,10 @@ if(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
-if(USE_PROB3)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
-endif()
+# ETA - this should be sorted in the NuOscillator dependency
+#if(USE_PROB3)
+#  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
+#endif()
 
 if(MaCh3_GPU_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)

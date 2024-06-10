@@ -88,6 +88,7 @@ public:
   const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
   void SetOscCov(covarianceOsc* osc_cov);
+  void SetupNuOscillator(std::string OscillatorYaml);
 
   //============================= Should be deprecated =============================
   // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
