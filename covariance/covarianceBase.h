@@ -120,6 +120,7 @@ class covarianceBase {
 
   void initialiseAdaption(manager* fitMan);
   void saveAdaptiveToFile(TString outFileName, TString systematicName);
+  bool getDoAdaption(){return use_adaptive;}
 
   void setThrowMatrix(TMatrixDSym *cov);
   void updateThrowMatrix(TMatrixDSym *cov);
