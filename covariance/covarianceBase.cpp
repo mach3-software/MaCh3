@@ -1407,6 +1407,8 @@ void covarianceBase::initialiseAdaption(manager* fitMan){
 
   // need to cast matrixName to string
   std::string matrixName_str(matrixName);
+  
+  //  setAdaptionDefaults();
 
   if(!CheckNodeExists<std::string>(fitMan->raw(), "AdaptionOptions", "Covariance", matrixName_str)){
     MACH3LOG_WARN("Adaptive Settings not found for {}, this is fine if you don't want adaptive MCMC", matrixName_str);
@@ -1435,7 +1437,7 @@ void covarianceBase::initialiseAdaption(manager* fitMan){
   // Next let"s check for external matrices
    // We"re going to grab this info from the YAML manager
   if(!fitMan->raw()["AdaptionOptions"]["Covariance"][matrixName_str]["UseExternalMatrix"].as<bool>()) {
-    MACH3LOG_INFO("Not using external matrix for {}, initialising adaption", matrixName_str);
+    MACH3LOG_INFO("Not using external matrix for {}, initialising adaption from scratch", matrixName_str);
     createNewAdaptiveCovariance();
     return;
   }
@@ -1461,13 +1463,13 @@ void covarianceBase::setThrowMatrixFromFile(std::string matrix_file_name, std::s
   }
 
   // Next we grab our matrix
-  TMatrixDSym* external_matrix = static_cast<TMatrixDSym*>(matrix_file->Get(matrix_name.c_str()));
-  if(!external_matrix){
+  adaptiveCovariance = static_cast<TMatrixDSym*>(matrix_file->Get(matrix_name.c_str()));
+  if(!adaptiveCovariance){
     MACH3LOG_ERROR("Coukdn't find {} in {}", matrix_name, matrix_file_name);
     throw;
   }
 
-  setThrowMatrix(external_matrix);
+  setThrowMatrix(adaptiveCovariance);
 
   // Finally we grab the means vector
   TVectorD* means_vector = static_cast<TVectorD*>(matrix_file->Get(means_name.c_str()));
@@ -1526,22 +1528,32 @@ void covarianceBase::setAdaptiveBlocks(std::vector<std::vector<int>> block_indic
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
-      std::cout<<block_lb<<" "<<block_ub<<std::endl;
+      //      std::cout<<block_lb<<" "<<block_ub<<std::endl;
+      
+      if(block_lb>getNpars() || block_ub>getNpars()){
+	MACH3LOG_ERROR("Cannot set matrix block with edges {}, {} for matrix of size {}",
+		       block_lb, block_ub, getNpars());
+	throw;
+      }
 
       for(int ipar=block_lb; ipar<block_ub; ipar++){
-        adapt_block_matrix_indices[ipar]=iblock+1;
+	adapt_block_matrix_indices[ipar]=iblock+1;
         adapt_block_sizes[iblock+1]+=1;
         adapt_block_sizes[0]-=1;
       }
 
     }
   }
+  for(auto i : adapt_block_matrix_indices){
+    std::cout<<i<<" ,";
+  }
+  std::cout<<std::endl;
+  std::cout<<adapt_block_matrix_indices.size()<<std::endl;
 }
 
 void covarianceBase::createNewAdaptiveCovariance(){
   // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
   use_adaptive=true;
-
   adaptiveCovariance = new TMatrixDSym(size);
   adaptiveCovariance->Zero();
   par_means = std::vector<double>(size, 0);
