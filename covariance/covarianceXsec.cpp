@@ -544,7 +544,7 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
-    std::string ErrString = fmt::format("{:.4f}", _fError[i]);
+    std::string ErrString = fmt::format("{:.2f}", _fError[i]);
     MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", _fParamType[i]);
   }
   MACH3LOG_INFO("============================================================================================================================================================");
@@ -553,9 +553,9 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
 
   //KS: Consider making some class producing table..
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬──────────┬──────────┬──────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:10}│{4:10}│{5:10}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼──────────┼──────────┼──────────┤");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬───────────────┬───────────────┬───────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:15}│{4:15}│{5:15}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼───────────────┼───────────────┼───────────────┤");
 
   for (unsigned int i = 0; i < NormParams.size(); ++i)
   {
@@ -580,9 +580,9 @@ void covarianceXsec::Print() {
     }
     if (NormParams[i].pdgs.empty()) pdgString += "all";
 
-    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <10}│{: <10}│{: <10}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <15}│{: <15}│{: <15}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴──────────┴──────────┴──────────┘");
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴───────────────┴───────────────┴───────────────┘");
 
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
@@ -617,7 +617,34 @@ void covarianceXsec::Print() {
       MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(i), FuncParsIndex[i], GetParFancyName(FuncParsIndex[i]));
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  CheckCorrectInitialisation();
 } // End
+
+
+// ********************************************
+// KS: Check if matrix is correctly initialised
+void covarianceXsec::CheckCorrectInitialisation() {
+  // ********************************************
+  // KS: Lambda Function which simply checks if there are no duplicates in std::vector
+  auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
+    std::unordered_map<std::string, int> seenStrings;
+    for (size_t i = 0; i < names.size(); ++i) {
+      const auto& name = names[i];
+      if (seenStrings.find(name) != seenStrings.end()) {
+        int firstIndex = seenStrings[name];
+        MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      seenStrings[name] = i;
+    }
+  };
+
+  // KS: Checks if there are no duplicates in fancy names etc, this can happen if we merge configs etc
+  CheckForDuplicates(_fFancyNames, "_fFancyNames");
+  CheckForDuplicates(_fNDSplineNames, "_fNDSplineNames");
+  CheckForDuplicates(_fFDSplineNames, "_fFDSplineNames");
+}
 
 // ********************************************
 // Sets the proposed Flux parameters to the prior values

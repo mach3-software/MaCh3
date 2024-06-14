@@ -26,6 +26,9 @@ class covarianceXsec : public covarianceBase {
     /// @brief Print information about the whole object once it is set
     inline void Print();
 
+    /// @brief KS: Check if matrix is correctly initialised
+    void CheckCorrectInitialisation();
+
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     inline int GetParDetID(const int i) const { return _fDetID[i];};
