@@ -2511,19 +2511,19 @@ int SampleSummary::GetRandomPoly2(const TH2Poly* PolyHist){
 // ****************
 // Get the mode error from a TH1D
 double SampleSummary::GetModeError(TH1D* hpost){
-// ****************
+  // ****************
   // Get the bin which has the largest posterior density
   int MaxBin = hpost->GetMaximumBin();
 
   // The total integral of the posterior
   const double Integral = hpost->Integral();
 
-  double sum = 0.0;
   int LowBin = MaxBin;
   int HighBin = MaxBin;
+  double sum = hpost->GetBinContent(MaxBin);;
   double LowCon = 0.0;
   double HighCon = 0.0;
-  while (sum/Integral < 0.6827 && (LowBin >= 0 || HighBin < hpost->GetNbinsX()+1) )
+  while (sum/Integral < 0.6827 && (LowBin > 0 || HighBin < hpost->GetNbinsX()+1) )
   {
     LowCon = 0.0;
     HighCon = 0.0;
