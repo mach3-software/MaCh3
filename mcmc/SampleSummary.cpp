@@ -2511,7 +2511,7 @@ int SampleSummary::GetRandomPoly2(const TH2Poly* PolyHist){
 // ****************
 // Get the mode error from a TH1D
 double SampleSummary::GetModeError(TH1D* hpost){
-  // ****************
+// ****************
   // Get the bin which has the largest posterior density
   int MaxBin = hpost->GetMaximumBin();
 
