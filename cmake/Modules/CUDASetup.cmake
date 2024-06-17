@@ -40,11 +40,6 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   endif()
 endif()
 
-include_directories(
-    $ENV{CUDAPATH}/include
-    $ENV{CUDAPATH}/samples/common/inc>
-)
-
 # Join elements of the list with spaces
 string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CMAKE_CUDA_ARCHITECTURES}")
 
@@ -69,8 +64,6 @@ else()
     target_compile_definitions(MaCh3CompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
 
-
-
 target_link_options(MaCh3CompilerOptions INTERFACE -I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
 
 if(NOT DEFINED ENV{CUDAPATH})
@@ -80,6 +73,15 @@ endif()
 #if(NOT DEFINED CUDA_SAMPLES)
 #  cmessage(FATAL_ERROR "When using CUDA, CUDA_SAMPLES must be defined to point to the CUDAToolkit samples directory (should contain common/helper_functions.h).")
 #endif()
+
+# Set the CUDA samples path
+set(CMAKE_CUDA_SAMPLES_PATH
+    $ENV{CUDAPATH}/include
+    $ENV{CUDAPATH}/samples/common/inc
+)
+
+cmessage(STATUS "Using the following CUDA samples paths: ${CMAKE_CUDA_SAMPLES_PATH}")
+target_include_directories(MaCh3CompilerOptions INTERFACE ${CMAKE_CUDA_SAMPLES_PATH})
 
 #HW: If we're doing GPU stuff, we need the CUDA helper module
 if(BUILTIN_CUDASAMPLES_ENABLED )
