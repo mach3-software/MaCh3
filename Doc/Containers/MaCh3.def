@@ -1,0 +1,31 @@
+#Run like singularity build mach3.sif MaCh3.def
+
+Bootstrap: docker
+From: picker24/root_v6_26_10:alma9
+
+
+%post
+    export MACH3_VERSION=develop
+    export MACH3_INSTALL_DIR=/opt/mach3/${MACH3_VERSION}
+
+    # Create directories
+    mkdir -p /opt/MaCh3/
+    mkdir -p ${MACH3_INSTALL_DIR}
+
+    # Clone the repository
+    cd /opt/
+    git clone https://github.com/mach3-software/MaCh3 mach3-src
+    cd mach3-src
+    git checkout ${MACH3_VERSION}
+
+    # Build and install
+    cd ${MACH3_INSTALL_DIR}
+    cmake /opt/mach3-src
+    make VERBOSE=1 && make install
+
+    # Source the setup script
+    echo "source ${MACH3_INSTALL_DIR}/bin/setup.MaCh3.sh" >> ${SINGULARITY_ENVIRONMENT}
+
+%runscript
+    exec /bin/bash
+
