@@ -1,9 +1,9 @@
 #include "splineFDBase.h"
 
 //****************************************
-splineFDBase::splineFDBase(covarianceXsec *xsec_) {
+splineFDBase::splineFDBase(covarianceXsec *xsec_)
+              : SplineBase() {
 //****************************************
-//
   if (xsec_ == NULL) {
     std::cerr << "Trying to create splineSKBase with NULL covariance object" << std::endl;
     throw;
@@ -85,8 +85,8 @@ void splineFDBase::TransferToMonolith()
   isflatarray = new bool[MonolithSize];
   
 
-  xcoeff_arr = new __float__[CoeffIndex];
-  manycoeff_arr = new __float__[CoeffIndex*4];
+  xcoeff_arr = new _float_[CoeffIndex];
+  manycoeff_arr = new _float_[CoeffIndex*4];
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over sample
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
@@ -127,8 +127,8 @@ void splineFDBase::TransferToMonolith()
                   splineKnots=splinevec_Monolith[splineindex]->GetNp();
 
                   //Now to fill up our coefficient arrayss
-                  __float__* tmpXCoeffArr = new __float__[splineKnots];
-                  __float__* tmpManyCoeffArr = new __float__[splineKnots*4];
+                  _float_* tmpXCoeffArr = new _float_[splineKnots];
+                  _float_* tmpManyCoeffArr = new _float_[splineKnots*4];
 
                   int iCoeff=coeffindexvec[splineindex];
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
@@ -173,24 +173,40 @@ void splineFDBase::TransferToMonolith()
 }
 
 
+// *****************************************
+void splineFDBase::Evaluate() {
+// *****************************************
+
+  // There's a parameter mapping that goes from spline parameter to a global parameter index
+  // Find the spline segments
+  FindSplineSegment();
+
+  //KS: Huge MP loop over all valid splines
+  CalcSplineWeights();
+
+  //KS: Huge MP loop over all events calculating total weight
+  ModifyWeights();
+
+  return;
+}
 
 //****************************************
 void splineFDBase::FindSplineSegment()
 //****************************************
 {
-  //HI okay let's try this, we delete+refill a new array which we'll fill with x-s for our segment
+  //HW okay let's try this, we delete+refill a new array which we'll fill with x-s for our segment
   #ifdef MULTITHREAD
   #pragma omp parallel //for schedule(dynamic)
   #endif
   for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++)
   {
     int nPoints = UniqueSystNKnots[iSyst];
-    std::vector<__float__> xArray = UniqueSystXPts[iSyst];
+    std::vector<_float_> xArray = UniqueSystXPts[iSyst];
 
     // Get the variation for this reconfigure for the ith parameter
     int GlobalIndex = UniqueSystIndices[iSyst];
 
-    __float__ xvar=__float__(xsec->calcReWeight(GlobalIndex));
+    _float_ xvar=_float_(xsec->calcReWeight(GlobalIndex));
     xVarArray[iSyst]=xvar;
     
     //Rather than starting from 0 everytime, let's use what we know!    
@@ -255,7 +271,7 @@ void splineFDBase::FindSplineSegment()
 }
 
 //****************************************
-void splineFDBase::calcWeights()
+void splineFDBase::CalcSplineWeights()
 //****************************************
 {
   #ifdef MULTITHREAD
@@ -271,19 +287,19 @@ void splineFDBase::calcWeights()
     int segCoeff = coeffindexvec[iSpline]+currentsegment;
 
     // These are what we can extract from the TSpline3
-    __float__ x = xcoeff_arr[segCoeff];
-    __float__ y = manycoeff_arr[(segCoeff)*4+kCoeffY];
-    __float__ b = manycoeff_arr[(segCoeff)*4+kCoeffB];
-    __float__ c = manycoeff_arr[(segCoeff)*4+kCoeffC];
-    __float__ d = manycoeff_arr[(segCoeff)*4+kCoeffD];
+    _float_ x = xcoeff_arr[segCoeff];
+    _float_ y = manycoeff_arr[(segCoeff)*4+kCoeffY];
+    _float_ b = manycoeff_arr[(segCoeff)*4+kCoeffB];
+    _float_ c = manycoeff_arr[(segCoeff)*4+kCoeffC];
+    _float_ d = manycoeff_arr[(segCoeff)*4+kCoeffD];
 
     // Get the variation for this reconfigure for the ith parameter
-    __float__ xvar = xVarArray[uniqueIndex];
+    _float_ xvar = xVarArray[uniqueIndex];
     // The Delta(x)
-    __float__ dx = xvar - x;
+    _float_ dx = xvar - x;
 
     //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
-    __float__ weight = fmaf(dx, fmaf(dx, fmaf(dx, d, c), b), y); 
+    _float_ weight = fmaf(dx, fmaf(dx, fmaf(dx, d, c), b), y);
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
 
 
@@ -617,7 +633,7 @@ void splineFDBase::PrepForReweight()
   UniqueSystNKnots.resize(nUniqueSysts);
   UniqueSystCurrSegment.resize(nUniqueSysts);
   UniqueSystXPts.resize(nUniqueSysts);
-  xVarArray=new __float__[nUniqueSysts];
+  xVarArray=new _float_[nUniqueSysts];
 
   for (int iSpline = 0; iSpline < nUniqueSysts; iSpline++)
   {
@@ -697,7 +713,7 @@ void splineFDBase::PrepForReweight()
 }
 
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-void splineFDBase::getSplineCoeff_SepMany(int splineindex, __float__* &xArray, __float__* &manyArray){
+void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _float_* &manyArray){
 
   // Initialise all arrays to 1.0
   int nPoints;
@@ -714,25 +730,25 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, __float__* &xArray, _
 
   for(int i=0; i<nPoints; i++){
     // Spline coefficients to be
-    __float__ x = -999.99;
-    __float__ y = -999.99;
-    __float__ b = -999.99;
-    __float__ c = -999.99;
-    __float__ d = -999.99;
+    _float_ x = -999.99;
+    _float_ y = -999.99;
+    _float_ b = -999.99;
+    _float_ c = -999.99;
+    _float_ d = -999.99;
     splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
     //Let's save some memory and store them as floats! (It's a surprise tool that will help with GPU later)
-    xArray[i]=__float__(x); 
+    xArray[i]=_float_(x);
 
     //Might as well copy ND here and 
-    xArray[i] = __float__(x);
-    manyArray[i*4] = __float__(y); // 4 because manyArray stores y,b,c,d
-    manyArray[i*4+1] = __float__(b);
-    manyArray[i*4+2] = __float__(c);
-    manyArray[i*4+3] = __float__(d);
+    xArray[i] = _float_(x);
+    manyArray[i*4] = _float_(y); // 4 because manyArray stores y,b,c,d
+    manyArray[i*4+1] = _float_(b);
+    manyArray[i*4+2] = _float_(c);
+    manyArray[i*4+3] = _float_(d);
     
     if((xArray[i] == -999) | (manyArray[i*4] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*4+2] == -999) | (manyArray[i*4+3] == -999)){
       std::cerr << "*********** Bad params in getSplineCoeff_SepMany() ************"<<std::endl;
-      std::cerr << "pre cast to __float__ (x, y, b, c, d) = "<<x<<", "<<y<<", "<<b<<", "<<c<<", "<<d<<std::endl;
+      std::cerr << "pre cast to _float_ (x, y, b, c, d) = "<<x<<", "<<y<<", "<<b<<", "<<c<<", "<<d<<std::endl;
       std::cerr << "post cast to float (x, y, b, c, d) = "<<xArray[i]<<", "<<manyArray[i*4]<<", "<<manyArray[i*4+1]<<", "<<manyArray[i*4+2]<<", "<<manyArray[i*4+3]<<std::endl;
       std::cerr<<__FILE__<<"::"<<__LINE__<<std::endl;
       std::cerr << "***************************************************************"<<std::endl;

@@ -27,10 +27,9 @@ void LikelihoodFit::PrepareFit() {
   // Prepare the output branches
   PrepareOutput();
   
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
-  {
-    NPars += (*it)->getSize();
-    NParsPCA += (*it)->getNpars();
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    NPars += systematics[s]->GetNumParams();
+    NParsPCA += systematics[s]->getNpars();
   }
 
   if (osc) {
@@ -59,7 +58,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
     if(!(*it)->IsPCA())
     {
       std::vector<double> pars;
-      const int Size = (*it)->getSize();
+      const int Size = (*it)->GetNumParams();
       //KS: Avoid push back as they are slow
       pars.resize(Size);
       for(int i = 0; i < Size; ++i, ++ParCounter)

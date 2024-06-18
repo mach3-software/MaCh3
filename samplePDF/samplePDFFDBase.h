@@ -23,24 +23,19 @@
 //MaCh3 includes
 #include "OscClass/OscClass_CUDAProb3.h"
 
-#include "samplePDF/interfacePDFEbE.h"
-#include "samplePDF/samplePDFBase.h"
-
-#include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
 
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
+#include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
 #include "samplePDF/ShiftFunctors.h"
-
-#include "manager/manager.h"
 
 
 #define USEBETA 0
 
-class samplePDFFDBase : virtual public samplePDFBase , virtual public interfacePDFEbE
+class samplePDFFDBase : virtual public samplePDFBase
 {
 public:
   //######################################### Functions #########################################
@@ -59,13 +54,13 @@ public:
   void addData(TH1D* Data);
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
-  void addData(std::vector< vector <double> > &data);
+  void addData(std::vector< std::vector <double> > &data);
   //DB Multi-threaded GetLikelihood
   double GetLikelihood();
   //===============================================================================
 
   void reweight(double *oscpar);
-  inline double GetEventWeight(int iSample, int iEntry);
+  double GetEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
   void UseNonDoubledAngles(bool ans) {doubled_angle = ans;};
@@ -215,7 +210,7 @@ public:
 
   //===============================================================================
   //MC variables
-  vector<struct fdmc_base> MCSamples;
+  std::vector<struct fdmc_base> MCSamples;
   TFile *_sampleFile;
   TTree *_data;
   //===============================================================================

@@ -110,7 +110,7 @@ Based on several test here are recommended version:
 ```
   GCC: ...
   CMake: >= 3.14
-  ROOT: ...
+  ROOT: >= 6.18
 ```
 
 # How To Use
@@ -155,7 +155,7 @@ Example of chain diagnostic utils can be found [here](https://github.com/mach3-s
 
 **GetPostfitParamPlots** - This will plot output from ProcessMCMC for nice plots which can go to TN. Bits are hardcoded to make plots nicer users should be careful when using the non-conventional xsec model. If you used `ProcessMCMC` with `PlotDet` you will also get an overlay of detector parameters (ND or ND+FD depending on chain type). If Violin plot was produced in `ProcessMCMC` you will get fancy plots here as well.
 
-**GetPenaltyTerm** - Since xsec and flux and ND spline systeamatic are treated as the same systematic object we cannot just take log_xsec, hence we need this script, use `GetFluxPenaltyTerm MCMCChain.root config`. Parameters of relevance are loaded via config, thus you can study any combination you want. Time needed increases with number of sets :(
+**GetPenaltyTerm** - Since xsec and flux and ND spline systematic are treated as the same systematic object we cannot just take log_xsec, hence we need this script, use `GetFluxPenaltyTerm MCMCChain.root config`. Parameters of relevance are loaded via config, thus you can study any combination you want. Time needed increases with number of sets :(
 
 **DiagMCMC** - Perform MCMC diagnostic like autocorrelation or trace plots.
 

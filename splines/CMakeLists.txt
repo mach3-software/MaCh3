@@ -1,13 +1,13 @@
 set(HEADERS
-    splineBase.h
-    splineInterface.h
+    SplineBase.h
     splineFDBase.h
     SplineMonolith.h
-    spline.h
+    SplineCommon.h
+    SplineStructs.h
 )
 
 add_library(Splines SHARED
-    splineBase.cpp
+    SplineBase.cpp
     splineFDBase.cpp
     SplineMonolith.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>
@@ -15,11 +15,8 @@ add_library(Splines SHARED
 
 if(NOT CPU_ONLY)
     set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
-endif()
-
-if(MaCh3_DEBUG_ENABLED)
-    target_compile_definitions(Splines PUBLIC CUDA_ERROR_CHECK)
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET Splines PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
 set_target_properties(Splines PROPERTIES
@@ -30,10 +27,7 @@ target_link_libraries(Splines Manager MaCh3CompilerOptions)
 
 target_include_directories(Splines PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
 install(TARGETS Splines

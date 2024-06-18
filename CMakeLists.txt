@@ -9,6 +9,7 @@ SET(MaCh3_VERSION 1.1.0)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
+add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
@@ -65,6 +66,10 @@ if(NOT TARGET ROOT::ROOT)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
 endif()
 
+if(ROOT_VERSION VERSION_LESS 6.18.0)
+    message(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
+endif()
+
 #YAML for reading in config files
 set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
 set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
@@ -97,7 +102,7 @@ endif()
 
 
 ################################## Oscillation ################################
-
+#KS: All of these should be moved to separate cmake and be handled by osc class, keep it for now
 #If USE_PROB3 not defined turn it off by default
 if(NOT DEFINED USE_PROB3)
   SET(USE_PROB3 FALSE)
@@ -140,8 +145,6 @@ if(${ROOT_CXX_STANDARD} LESS 14)
   cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
 endif()
 
-add_library(MaCh3CompilerOptions INTERFACE)
-
 ############################  Setting Flags  ####################################
 # Check the where to install 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
@@ -156,7 +159,15 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 #Compile and link options
 #KS: Add -Werror  and maybe -Wconversion in the future
-target_compile_options(MaCh3CompilerOptions INTERFACE -g -Wextra -Wall -pedantic)
+target_compile_options(MaCh3CompilerOptions INTERFACE
+                                                    -g
+                                                    -Wextra
+                                                    -Wall
+                                                    -pedantic
+                                                    -Wshadow
+                                                    -Wuninitialized
+                                                    -Wnon-virtual-dtor
+                                                    -Woverloaded-virtual)
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)
@@ -189,7 +200,7 @@ if(NOT DEFINED MaCh3_MULTITHREAD_ENABLED)
   SET(MaCh3_MULTITHREAD_ENABLED TRUE)
 endif()
 
-#Add MultiThread flags
+#Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
@@ -214,7 +225,7 @@ if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
 endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE __LOW_MEMORY_STRUCTS__)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
 endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
@@ -259,8 +270,6 @@ endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
-#ETA - commenting out as not c++11 compatible...
-#add_subdirectory(yaml_test)
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties

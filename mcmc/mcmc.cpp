@@ -157,56 +157,6 @@ void mcmc::runMCMC() {
 }
 
 // *******************
-// Process the MCMC output to get postfit etc
-void mcmc::ProcessMCMC() {
-// *******************
-
-  if (fitMan == NULL) return;
-
-  // Process the MCMC
-  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
-
-    // Make the processor
-    MCMCProcessor Processor(std::string(outputFile->GetName()), false);
-    
-    Processor.Initialise();
-    // Make the TVectorD pointers which hold the processed output
-    TVectorD *Central = NULL;
-    TVectorD *Errors = NULL;
-    TVectorD *Central_Gauss = NULL;
-    TVectorD *Errors_Gauss = NULL;
-    TVectorD *Peaks = NULL;
-    
-    // Make the postfit
-    Processor.GetPostfit(Central, Errors, Central_Gauss, Errors_Gauss, Peaks);
-    Processor.DrawPostfit();
-
-    // Make the TMatrix pointers which hold the processed output
-    TMatrixDSym *Covariance = NULL;
-    TMatrixDSym *Correlation = NULL;
-
-    // Make the covariance matrix
-    Processor.GetCovariance(Covariance, Correlation);
-    Processor.DrawCovariance();
-
-    std::vector<TString> BranchNames = Processor.GetBranchNames();
-
-    // Re-open the TFile
-    if (!outputFile->IsOpen()) {
-      MACH3LOG_INFO("Opening output again to update with means..");
-      outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
-    }
-    
-    Central->Write("PDF_Means");
-    Errors->Write("PDF_Errors");
-    Central_Gauss->Write("Gauss_Means");
-    Errors_Gauss->Write("Errors_Gauss");
-    Covariance->Write("Covariance");
-    Correlation->Write("Correlation");
-  }
-}
-
-// *******************
 // Do the initial reconfigure of the MCMC
 void mcmc::ProposeStep() {
 // *******************
@@ -232,17 +182,15 @@ void mcmc::ProposeStep() {
     #endif
   }
 
-  int stdIt = 0;
   // Loop over the systematics and propose the initial step
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it, ++stdIt) {
-
+  for (size_t s = 0; s < systematics.size(); ++s) {
     // Could throw the initial value here to do MCMC stability studies
     // Propose the steps for the systematics
-    (*it)->proposeStep();
+    systematics[s]->proposeStep();
 
     // Get the likelihood from the systematics
-    syst_llh[stdIt] = (*it)->GetLikelihood();
-    llh += syst_llh[stdIt];
+    syst_llh[s] = systematics[s]->GetLikelihood();
+    llh += syst_llh[s];
 
     #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
@@ -251,7 +199,7 @@ void mcmc::ProposeStep() {
 
   // Check if we've hit a boundary in the systematics
   // In this case we can save time by not having to reconfigure the simulation
-  if (llh >= __LARGE_LOGL__) {
+  if (llh >= _LARGE_LOGL_) {
     reject = true;
     #ifdef DEBUG
     if (debug) debugFile << "Rejecting based on boundary" << std::endl;
@@ -290,7 +238,7 @@ void mcmc::ProposeStep() {
   } else {
     for (size_t i = 0; i < samples.size(); ++i) {
       // Set the sample_llh[i] to be madly high also to signify a step out of bounds
-      sample_llh[i] = __LARGE_LOGL__;
+      sample_llh[i] = _LARGE_LOGL_;
       #ifdef DEBUG
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
       #endif

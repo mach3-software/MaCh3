@@ -1,19 +1,28 @@
 set(HEADERS
     manager.h
+    MaCh3Modes.h
     YamlHelper.h
     MaCh3Logger.h
     Monitor.h
+    MaCh3Exception.h
 )
 
 add_library(Manager SHARED
     manager.cpp
-    YamlHelper.cpp
+    MaCh3Modes.cpp
     Monitor.cpp
+    $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuUtils.cu>
 )
 
 set_target_properties(Manager PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Manager)
+
+if(NOT CPU_ONLY)
+    set_target_properties(Manager PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET Manager PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+endif()
 
 target_link_libraries(Manager yaml-cpp spdlog ROOT::ROOT MaCh3CompilerOptions)
 target_include_directories(Manager PUBLIC

@@ -25,13 +25,12 @@ if (NOT CPU_ONLY)
       $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
       $<BUILD_INTERFACE:${CUDAProb3_SOURCE_DIR}/>
       $<INSTALL_INTERFACE:include>
-      $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-      $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
   )
 
   if(NOT CPU_ONLY)
       set_target_properties(Atmos PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-      set_property(TARGET Atmos PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+      #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+      set_property(TARGET Atmos PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
   endif()
 
   install(TARGETS Atmos
@@ -48,15 +47,16 @@ set(HEADERS
     OscClass_CUDAProb3.h
     ${CUDAProb3_SOURCE_DIR}/beamcudapropagator.cuh
     ${CUDAProb3_SOURCE_DIR}/atmoscudapropagator.cuh
-	${CUDAProb3_SOURCE_DIR}/constants.hpp
-	${CUDAProb3_SOURCE_DIR}/hpc_helpers.cuh
+    ${CUDAProb3_SOURCE_DIR}/constants.hpp
+    ${CUDAProb3_SOURCE_DIR}/hpc_helpers.cuh
     ${CUDAProb3_SOURCE_DIR}/beamcpupropagator.hpp
     ${CUDAProb3_SOURCE_DIR}/atmoscpupropagator.hpp
-	${CUDAProb3_SOURCE_DIR}/propagator.hpp
-	${CUDAProb3_SOURCE_DIR}/types.hpp
-	${CUDAProb3_SOURCE_DIR}/math.hpp
-	${CUDAProb3_SOURCE_DIR}/physics.hpp
-	${CUDAProb3_SOURCE_DIR}/cpupropagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/propagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/types.hpp
+    ${CUDAProb3_SOURCE_DIR}/math.hpp
+    ${CUDAProb3_SOURCE_DIR}/physics.hpp
+    ${CUDAProb3_SOURCE_DIR}/cpupropagator.hpp
+    ${CUDAProb3_SOURCE_DIR}/cuda_unique.cuh
 )
 
 add_library(OscClass SHARED
@@ -78,13 +78,12 @@ target_include_directories(OscClass PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<BUILD_INTERFACE:${CUDAProb3_SOURCE_DIR}/>
     $<INSTALL_INTERFACE:include>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
 if(NOT CPU_ONLY)
     set_target_properties(OscClass PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET OscClass PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET OscClass PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
 install(TARGETS OscClass

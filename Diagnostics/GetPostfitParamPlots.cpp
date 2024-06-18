@@ -186,9 +186,9 @@ inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
   return Ratio;
 }
 
-inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
+inline void DrawPlots(TCanvas *canvas, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
   // EM: Draw!
-  canv->cd();
+  canvas->cd();
   mainPad->Draw();
   mainPad->cd();
   PrefitCopy->GetYaxis()->SetTitle("Parameter Value");
@@ -210,7 +210,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
     postFitHist->Draw("e1, same");
   }
 
-  canv->Update();
+  canvas->Update();
   TGaxis *axis = new TGaxis(PrefitCopy->GetXaxis()->GetBinLowEdge(PrefitCopy->GetXaxis()->GetFirst()), gPad->GetUymin()+0.01,
                             PrefitCopy->GetXaxis()->GetBinLowEdge(PrefitCopy->GetXaxis()->GetFirst()), gPad->GetUymax(),
                             gPad->GetUymin()+0.01, gPad->GetUymax(), 510, "");
@@ -218,7 +218,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
   axis->SetLabelSize(25);
   axis->Draw();
 
-  canv->cd();
+  canvas->cd();
   ratioPad->Draw();
   ratioPad->cd();
 
@@ -259,7 +259,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
   line2.Draw("same");
   line3.Draw("same");
 
-  canv->Print((SaveName).c_str());
+  canvas->Print((SaveName).c_str());
 
   ratioHists.clear();
   delete axis;

@@ -8,17 +8,21 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
-#include "LikelihoodFit.h"
 
+// MaCh3 includes
+#include "mcmc/LikelihoodFit.h"
+
+
+/// @brief Class particle - stores the position, velocity and personal best
+/// With functions which move particle and update velocity
 class particle{
-    /**
-     * Class particle - stores the position, velocity and personal best
-     * With functions which move particle and update velocity
-     */
+
     public:
 
         particle(){};
-        particle(std::vector<double> position, std::vector<double> velocity) : position(position), velocity(velocity){};
+        particle(std::vector<double> pos, std::vector<double> vel) : position(pos), velocity(vel){};
+        /// @brief Destructor
+        virtual ~particle() {};
 
         void set_position(std::vector<double> new_position) {
             position = new_position;
@@ -69,15 +73,17 @@ class particle{
 
 };
 
-class PSO : public LikelihoodFit {
-    /**
-     * Class PSO, consist of a vector of object Class Particle and global best
-     * Takes in the size (number of particle) and number of iteration
-     * functions includes: finding global best, updating velocity, actual minimisation function
-     */
-    public:
 
+ /// @brief Class PSO, consist of a vector of object Class Particle and global best
+ /// Takes in the size (number of particle) and number of iteration
+ /// functions includes: finding global best, updating velocity, actual minimisation function
+class PSO : public LikelihoodFit {
+
+    public:
+        /// @brief constructor
         PSO(manager * const fitMan);
+        /// @brief Destructor
+        virtual ~PSO() {};
 
         particle* get_best_particle(){
             return best_particle;
@@ -104,12 +110,12 @@ class PSO : public LikelihoodFit {
 
         std::vector<double> vector_add(std::vector<double> v1, std::vector<double> v2){
             std::vector<double> v3;
-            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), plus<double>());
+            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), std::plus<double>());
             return v3;
         };
         std::vector<double> vector_subtract(std::vector<double> v1, std::vector<double> v2){
             std::vector<double> v3 ;
-            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), minus<double>());
+            transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), std::minus<double>());
             return v3;
         };
         std::vector<double> three_vector_addition(std::vector<double> vec1, std::vector<double> vec2,std::vector<double> vec3){
