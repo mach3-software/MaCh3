@@ -933,12 +933,64 @@ void SampleSummary::Write() {
     //KS: This will dump lots of hists, use it only for debugging
     if(Debug > 0)
     {
+      TDirectory* DebugDir = Dir[i]->mkdir("Debug");
+      DebugDir->cd();
       for (int b = 1; b <= maxBins[i]; ++b)
       {
         PosteriorHist[i][b]->Write();
+        std::string Title = PosteriorHist[i][b]->GetName();
+
+        TLine *TempLine = new TLine(NominalHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMinimum(), NominalHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMaximum());
+        TempLine->SetLineColor(kRed);
+        TempLine->SetLineWidth(2);
+
+        TLine *TempLineData = new TLine(DataHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMinimum(), DataHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMaximum());
+        TempLineData->SetLineColor(kGreen);
+        TempLineData->SetLineWidth(2);
+
+        // Also fit a Gaussian because why not?
+        TF1 *Fitter = new TF1("Fit", "gaus", PosteriorHist[i][b]->GetBinLowEdge(1), PosteriorHist[i][b]->GetBinLowEdge(PosteriorHist[i][b]->GetNbinsX()+1));
+        PosteriorHist[i][b]->Fit(Fitter, "RQ");
+        Fitter->SetLineColor(kRed-5);
+
+        TLegend *Legend = new TLegend(0.4, 0.75, 0.98, 0.90);
+        Legend->SetFillColor(0);
+        Legend->SetFillStyle(0);
+        Legend->SetLineWidth(0);
+        Legend->SetLineColor(0);
+        Legend->AddEntry(TempLineData, Form("Data #mu=%.2f", DataHist[i]->GetBinContent(b)), "l");
+        Legend->AddEntry(TempLine, Form("Prior #mu=%.2f", NominalHist[i]->GetBinContent(b)), "l");
+        Legend->AddEntry(PosteriorHist[i][b], Form("Post, #mu=%.2f#pm%.2f", PosteriorHist[i][b]->GetMean(), PosteriorHist[i][b]->GetRMS()), "l");
+        Legend->AddEntry(Fitter, Form("Gauss, #mu=%.2f#pm%.2f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
+        std::string TempTitle = std::string(PosteriorHist[i][b]->GetName());
+
+        TempTitle += "_canv";
+        TCanvas *TempCanvas = new TCanvas(TempTitle.c_str(), TempTitle.c_str(), 1024, 1024);
+        TempCanvas->SetGridx();
+        TempCanvas->SetGridy();
+        TempCanvas->SetRightMargin(0.03);
+        TempCanvas->SetBottomMargin(0.08);
+        TempCanvas->SetLeftMargin(0.10);
+        TempCanvas->SetTopMargin(0.06);
+        TempCanvas->cd();
+        PosteriorHist[i][b]->Draw();
+        TempLine->Draw("same");
+        TempLineData->Draw("same");
+        Fitter->Draw("same");
+        Legend->Draw("same");
+        TempCanvas->Write();
+
+        delete TempLine;
+        delete TempLineData;
+        delete TempCanvas;
+        delete Fitter;
+        delete Legend;
         //This isn't useful check only in desperation
         if(Debug > 1) w2Hist[i][b]->Write();
       }
+      DebugDir->Close();
+      delete DebugDir;
+      Dir[i]->cd();
     }
     lnLHist_Mean[i]->Write();
     lnLHist_Mode[i]->Write();
