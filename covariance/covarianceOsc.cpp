@@ -31,7 +31,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
     
     //KS: Set flat prior
     //HW: Might as well set it for everything in case default behaviour changes
-    setEvalLikelihood(io, (*osc_flat_prior)(io));
+    setFlatPrior(io, (*osc_flat_prior)(io));
   }
 
   kDeltaCP = -999;
