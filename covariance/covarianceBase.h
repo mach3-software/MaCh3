@@ -58,7 +58,7 @@ class covarianceBase {
   }
   void setParameters(std::vector<double> pars = std::vector<double>());
   /// @brief Set if parameter should have flat prior or not
-  void setEvalLikelihood(const int i, const bool eL);
+  void setFlatPrior(const int i, const bool eL);
   
   /// @brief set branches for output file
   void SetBranches(TTree &tree, bool SaveProposal = false);
@@ -97,7 +97,7 @@ class covarianceBase {
   TMatrixDSym *getCovMatrix() { return covMatrix; }
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
   /// @brief Get if param has flat prior or not
-  inline bool getEvalLikelihood(const int i) { return _fFlatPrior[i]; }
+  inline bool getFlatPrior(const int i) { return _fFlatPrior[i]; }
 
   /// @brief Get name of covariance
   const char *getName() { return matrixName; }
