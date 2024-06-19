@@ -1,23 +1,28 @@
 #To run use:  docker build -t mach3 .
-#FROM rootproject/root:6.24.06-centos7 AS mach3_build
-#KS: Get glorious container from Luke which will work as a base
+# KS: Get glorious container from Luke which will work as a base
 FROM picker24/root_v6_26_10:alma9 AS mach3_build
 
 ENV MACH3_VERSION="develop"
-ENV MACH3_INSTALL_DIR=/opt/mach3/${MACH3_VERSION}
+ENV MACH3_WORK_DIR=/opt/MaCh3/
+ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 
-RUN mkdir -p /opt/MaCh3/
+RUN mkdir -p ${MACH3_WORK_DIR}
 
 WORKDIR /opt/
-RUN --mount=type=ssh git clone https://github.com/mach3-software/MaCh3 mach3-src
-WORKDIR /opt/mach3-src
+# KS: Let's clone MaCh3
+RUN --mount=type=ssh git clone https://github.com/mach3-software/MaCh3 ${MACH3_WORK_DIR}
+WORKDIR ${MACH3_WORK_DIR}
 RUN git checkout ${MACH3_VERSION}
 
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
-RUN cmake /opt/mach3-src
+RUN cmake ${MACH3_WORK_DIR}
 RUN make VERBOSE=1 && make install
 
-RUN source ${MACH3_INSTALL_DIR}/bin/setup.MaCh3.sh
+# KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
+ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
+ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
+    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
 
+# Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}
