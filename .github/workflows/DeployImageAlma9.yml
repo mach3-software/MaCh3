@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker CI Alma9
 
 # The events that trigger the workflow
 on:

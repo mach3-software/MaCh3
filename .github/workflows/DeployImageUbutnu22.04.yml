@@ -4,8 +4,6 @@ name: Docker CI Ubuntu22.04
 on:
   push:
     branches: [ develop, feature_DockerFile ]
-  pull_request:
-    branches: [ develop ]
 
 permissions:
   contents: read

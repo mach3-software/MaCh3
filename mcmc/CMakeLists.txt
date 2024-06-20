@@ -2,18 +2,21 @@ set(HEADERS
     FitterBase.h
     mcmc.h
     LikelihoodFit.h
-    $<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.h>
     PSO.h
     MCMCProcessor.h
     SampleSummary.h
     StatisticalUtils.h
 )
 
+if(${MaCh3_MINUIT2_ENABLED})
+    list(APPEND HEADERS MinuitFit.h)
+endif()
+
 add_library(MCMC SHARED
     FitterBase.cpp
     mcmc.cpp
     LikelihoodFit.cpp
-    $<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.cpp>
+    $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.cpp>
     PSO.cpp
     MCMCProcessor.cpp
     SampleSummary.cpp
