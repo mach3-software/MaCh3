@@ -1,9 +1,9 @@
-name: Docker CI Ubuntu22.04
+name: Build CI Ubuntu22.04
 
 # The events that trigger the workflow
 on:
-  push:
-    branches: [ develop, feature_DockerFile ]
+  pull_request:
+    branches: [ develop ]
 
 permissions:
   contents: read
@@ -21,8 +21,5 @@ jobs:
 
     - name: Build the Docker image
       run: docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
-
-    - name: Push the Docker image to GitHub Container Registry
-      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
 
 

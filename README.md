@@ -8,7 +8,7 @@ The framework has also evolved to allow non MCMC modules to interrogate the like
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
-[![Build Status](https://github.com/mach3-software/MaCh3/workflows/Docker%20Image%20CI/badge.svg)](https://github.com/mach3-software/MaCh3/actions?query=workflow%3A%22Docker+Image+CI%22)
+[![Build Status](https://github.com/mach3-software/MaCh3/workflows/Docker%20CI%20Alma9/badge.svg)](https://github.com/mach3-software/MaCh3/actions?query=workflow%3A%22Docker+CI+Alma9%22)
 
 ## Famous Plots
 TODO this should be expanded
