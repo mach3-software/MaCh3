@@ -1,5 +1,6 @@
 name: Docker Image CI
 
+# The events that trigger the workflow
 on:
   push:
     branches: [ develop ]

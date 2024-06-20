@@ -3,11 +3,12 @@ The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter
 
 The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
 
-
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
 [![Release - v1.0.0](https://img.shields.io/badge/Release-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+[![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
+[![Build Status](https://github.com/mach3-software/MaCh3/workflows/Docker%20Image%20CI/badge.svg)](https://github.com/mach3-software/MaCh3/actions?query=workflow%3A%22Docker+Image+CI%22)
 
 ## Famous Plots
 TODO this should be expanded
