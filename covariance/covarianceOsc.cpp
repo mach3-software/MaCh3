@@ -30,7 +30,8 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
     _fIndivStepScale[io] = fScale * (*osc_stepscale)(io);
     
     //KS: Set flat prior
-    if( (bool)((*osc_flat_prior)(io)) ) setEvalLikelihood(io, false);
+    //HW: Might as well set it for everything in case default behaviour changes
+    setFlatPrior(io, (*osc_flat_prior)(io));
   }
 
   kDeltaCP = -999;
@@ -166,14 +167,14 @@ void covarianceOsc::proposeStep() {
 
   covarianceBase::proposeStep();
 
-  //ETA
-  //this won't work if abs(_fPropVal) > 2pi so we should consider
-  //plonking a while here
+  // HW :: This method is a tad hacky but modular arithmetic gives me a headache.
+  //        It should now automatically set dcp to be with [-pi, pi]
   if(_fPropVal[kDeltaCP] > TMath::Pi()) {
-    _fPropVal[kDeltaCP] = (-2.*TMath::Pi() + _fPropVal[kDeltaCP]);
+    _fPropVal[kDeltaCP] = -1*TMath::Pi() + std::fmod(_fPropVal[kDeltaCP], TMath::Pi());
   } else if (_fPropVal[kDeltaCP] < -TMath::Pi()) {
-    _fPropVal[kDeltaCP] = (2.*TMath::Pi() + _fPropVal[kDeltaCP]);
+    _fPropVal[kDeltaCP] = TMath::Pi() + std::fmod(_fPropVal[kDeltaCP], TMath::Pi());
   }
+
   
   // Okay now we've done the standard steps, we can add in our nice flips
   // hierarchy flip first

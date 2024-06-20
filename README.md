@@ -5,8 +5,10 @@ The framework has also evolved to allow non MCMC modules to interrogate the like
 
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
-[![Relase - v1.0.0](https://img.shields.io/badge/Relase-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+[![Release - v1.0.0](https://img.shields.io/badge/Release-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
+[![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
+
 ## Famous Plots
 TODO this should be expanded
 

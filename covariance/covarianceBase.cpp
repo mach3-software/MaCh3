@@ -1179,14 +1179,21 @@ void covarianceBase::toggleFixParameter(const int i) {
   return;
 }
 // ********************************************
-void covarianceBase::setEvalLikelihood(const int i, const bool eL) {
+void covarianceBase::setFlatPrior(const int i, const bool eL) {
 // ********************************************
   if (i > _fNumPar) {
     MACH3LOG_INFO("Can't setEvalLikelihood for Cov={}/Param={} because size of Covariance = {}", getName(), i, _fNumPar);
     MACH3LOG_ERROR("Fix this in your config file please!");
     throw;
   } else {
-    MACH3LOG_INFO("Setting {} (parameter {}) to flat prior", GetParName(i), i);
+
+    if(eL){
+      MACH3LOG_INFO("Setting {} (parameter {}) to flat prior", GetParName(i), i);
+    }
+    else{
+      // HW :: This is useful
+      MACH3LOG_INFO("Setting {} (parameter {}) to non-flat prior", GetParName(i), i);
+    }
     _fFlatPrior[i] = eL;
   }
 }
