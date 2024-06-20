@@ -2,15 +2,12 @@ set(HEADERS
     FitterBase.h
     mcmc.h
     LikelihoodFit.h
+    MinuitFit.h
     PSO.h
     MCMCProcessor.h
     SampleSummary.h
     StatisticalUtils.h
 )
-
-if(${MaCh3_MINUIT2_ENABLED})
-    list(APPEND HEADERS MinuitFit.h)
-endif()
 
 add_library(MCMC SHARED
     FitterBase.cpp
