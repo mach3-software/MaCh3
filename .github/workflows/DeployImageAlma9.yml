@@ -1,6 +1,5 @@
 name: Docker CI Alma9
 
-# The events that trigger the workflow
 on:
   push:
     branches: [ develop ]
@@ -32,7 +31,6 @@ jobs:
           echo "alma9latest" >> $GITHUB_ENV
         elif [[ "${{ github.event_name }}" == 'release' ]]; then
           echo "alma9${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-        fi
 
     - name: Debug GITHUB_ENV
       run: echo "Tag value: $(cat $GITHUB_ENV)"
