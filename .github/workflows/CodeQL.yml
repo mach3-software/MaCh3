@@ -27,6 +27,8 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: c-cpp
+          build: none  # Specify build none to skip any build steps
+
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
