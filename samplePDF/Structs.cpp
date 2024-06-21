@@ -11,6 +11,15 @@ namespace MaCh3Utils {
   double GetMassFromPDG(int PDG) {
   // *****************************
 
+
+    // Allocate memory but forget to deallocate it
+    void* memoryLeak = malloc(100 * sizeof(int));
+
+    int* ptr = nullptr;
+    *ptr = 10; // Attempting to dereference a null pointer
+
+    double unusedVariable = 0.0;
+
     switch (abs(PDG)) {  
     case 11:
       return 0.511E-3;
