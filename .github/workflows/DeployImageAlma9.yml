@@ -2,6 +2,35 @@ name: Docker CI Alma9
 
 on:
   push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Determine Docker image tag
+      id: set-tag
+      run: |
+        if [[ "${{ github.event_name }}" == 'push' && "${{ github.ref }}" == 'refs/heads/develop' ]]; then
+          echo "alma9latest" >> $GITHUB_ENV
+        elif [[ "${{ github.event_name }}" == 'pull_request' && "${{ githubname: Docker CI Alma9
+
+on:
+  push:
     branches: [develop]
   pull_request:
     branches: [develop]
@@ -25,15 +54,31 @@ jobs:
     - name: Determine Docker image tag
       id: set-tag
       run: |
-        if [[ "${{ github.event_name }}" == 'push' && "${{ github.ref }}" == 'refs/heads/develop' ]]; then
+        if [[ "${{ github.event_name }}" == 'push' ]]; then
           echo "alma9latest" >> $GITHUB_ENV
-        elif [[ "${{ github.event_name }}" == 'pull_request' && "${{ github.ref }}" == 'refs/pull/62/merge' ]]; then
+        elif [[ "${{ github.event_name }}" == 'pull_request' ]]; then
           echo "alma9latest" >> $GITHUB_ENV
         elif [[ "${{ github.event_name }}" == 'release' ]]; then
           echo "alma9${{ github.event.release.tag_name }}" >> $GITHUB_ENV
         else
           echo "alma9unknown" >> $GITHUB_ENV  # Handle unexpected cases for debugging
         fi
+
+    - name: Debug GITHUB_ENV
+      run: |
+        echo "Debugging GITHUB_ENV contents:"
+        cat $GITHUB_ENV
+        echo "Tag value: $(cat $GITHUB_ENV)"
+
+    - name: Build Docker image
+      run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:$(cat $GITHUB_ENV)
+
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:$(cat $GITHUB_ENV)
+.event.pull_request.head.ref }}" == 'develop' ]]; then
+          echo "alma9latest" >> $GITHUB_ENV
+        elif [[ "${{ github.event_name }}" == 'release' ]]; then
+          echo "alma9${{ github.event.release.tag_name }}" >> $GITHUB_ENV
 
     - name: Debug GITHUB_ENV
       run: |
