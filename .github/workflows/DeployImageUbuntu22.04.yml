@@ -3,7 +3,10 @@ name: Docker CI Ubuntu22.04
 # The events that trigger the workflow
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - develop
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -19,10 +22,19 @@ jobs:
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+    - name: Set Docker image tag
+      run: |
+        if [[ "${{ github.event_name }}" == 'push' && "${{ github.ref }}" == 'refs/heads/develop' ]]; then
+          TAG="ubuntu22.04latest"
+        elif [[ "${{ github.event_name }}" == 'pull_request' && "${{ github.event.pull_request.head.ref }}" == 'develop' ]]; then
+          TAG="ubuntu22.04latest"
+        elif [[ "${{ github.event_name }}" == 'release' ]]; then
+          TAG="ubuntu22.04${{ github.event.release.tag_name }}"
+        fi
+        echo "::set-output name=tag::$TAG"
+
     - name: Build the Docker image
-      run: docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
+      run: docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ steps.set-tag.outputs.tag }}
 
     - name: Push the Docker image to GitHub Container Registry
-      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
-
-
+      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ steps.set-tag.outputs.tag }}
