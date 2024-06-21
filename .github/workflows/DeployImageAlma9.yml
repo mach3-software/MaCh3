@@ -33,7 +33,10 @@ jobs:
           echo "alma9${{ github.event.release.tag_name }}" >> $GITHUB_ENV
 
     - name: Debug GITHUB_ENV
-      run: echo "Tag value: $(cat $GITHUB_ENV)"
+    run: |
+        echo "Debugging GITHUB_ENV contents:"
+        cat $GITHUB_ENV
+        echo "Tag value: $(cat $GITHUB_ENV)"
 
     - name: Build Docker image
       run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:$(cat $GITHUB_ENV)
