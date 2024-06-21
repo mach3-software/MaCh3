@@ -33,7 +33,7 @@ jobs:
           echo "alma9${{ github.event.release.tag_name }}" >> $GITHUB_ENV
 
     - name: Debug GITHUB_ENV
-    run: |
+      run: |
         echo "Debugging GITHUB_ENV contents:"
         cat $GITHUB_ENV
         echo "Tag value: $(cat $GITHUB_ENV)"
