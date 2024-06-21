@@ -2,8 +2,8 @@ name: Build CI Alma9
 
 # The events that trigger the workflow
 on:
-  release:
-    types: [published]
+  pull_request:
+    branches: [ develop ]
 
 permissions:
   contents: read

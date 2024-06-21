@@ -3,14 +3,9 @@ name: Docker CI Alma9
 # The events that trigger the workflow
 on:
   push:
-    branches:
-      - develop
-  pull_request:
-    branches:
-      - develop
+    branches: [ develop ]
   release:
-    types:
-      - published
+    types: [ published ]
 
 permissions:
   contents: read

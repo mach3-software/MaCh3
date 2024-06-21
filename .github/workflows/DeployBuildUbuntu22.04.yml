@@ -2,8 +2,8 @@ name: Build CI Ubuntu22.04
 
 # The events that trigger the workflow
 on:
-  release:
-    types: [published]
+  pull_request:
+    branches: [ develop ]
 
 permissions:
   contents: read

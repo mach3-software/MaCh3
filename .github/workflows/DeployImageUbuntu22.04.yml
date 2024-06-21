@@ -5,7 +5,7 @@ on:
   push:
     branches: [ develop ]
   release:
-    types: [published]
+    types: [ published ]
 
 permissions:
   contents: read
@@ -16,24 +16,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Log in to GitHub Container Registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Set Docker image tag
-      run: |
-        if [[ "${{ github.event_name }}" == 'push' && "${{ github.ref }}" == 'refs/heads/develop' ]]; then
-          TAG="ubuntu22.04latest"
-        elif [[ "${{ github.event_name }}" == 'pull_request' && "${{ github.event.pull_request.head.ref }}" == 'develop' ]]; then
-          TAG="ubuntu22.04latest"
-        elif [[ "${{ github.event_name }}" == 'release' ]]; then
-          TAG="ubuntu22.04${{ github.event.release.tag_name }}"
-        fi
-        echo "::set-output name=tag::$TAG"
+      - name: Build Docker image
+        run: |
+          if [ "${{ github.event_name }}" == 'release' ]; then
+            docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04v1.1.0
+          else
+            docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
+          fi
 
-    - name: Build the Docker image
-      run: docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ steps.set-tag.outputs.tag }}
-
-    - name: Push the Docker image to GitHub Container Registry
-      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ steps.set-tag.outputs.tag }}
+      - name: Push Docker image
+        run: |
+          if [ "${{ github.event_name }}" == 'release' ]; then
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04v1.1.0
+          else
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
+          fi
