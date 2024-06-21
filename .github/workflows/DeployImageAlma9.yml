@@ -23,19 +23,19 @@ jobs:
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Set Docker image tag
+    - name: Determine Docker image tag
+      id: set-tag
       run: |
         if [[ "${{ github.event_name }}" == 'push' && "${{ github.ref }}" == 'refs/heads/develop' ]]; then
-          TAG="alma9latest"
+          echo "alma9latest" >> $GITHUB_ENV
         elif [[ "${{ github.event_name }}" == 'pull_request' && "${{ github.event.pull_request.head.ref }}" == 'develop' ]]; then
-          TAG="alma9latest"
+          echo "alma9latest" >> $GITHUB_ENV
         elif [[ "${{ github.event_name }}" == 'release' ]]; then
-          TAG="alma9${{ github.event.release.tag_name }}"
+          echo "alma9${{ github.event.release.tag_name }}" >> $GITHUB_ENV
         fi
-        echo "::set-output name=tag::$TAG"
 
-    - name: Build the Docker image
-      run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ steps.set-tag.outputs.tag }}
+    - name: Build Docker image
+      run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:$(cat $GITHUB_ENV)
 
-    - name: Push the Docker image to GitHub Container Registry
-      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ steps.set-tag.outputs.tag }}
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:$(cat $GITHUB_ENV)
