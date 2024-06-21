@@ -1,12 +1,16 @@
 name: Docker CI Alma9
 
+# The events that trigger the workflow
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
   release:
-    types: [published]
+    types:
+      - published
 
 permissions:
   contents: read
@@ -15,18 +19,26 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TagName: ${{ github.event_name == 'release' && 'alma9' + github.event.release.tag_name || 'alma9latest' }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Log in to GitHub Container Registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Build Docker image
-      run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ env.TagName }}
+      - name: Build Docker image
+        run: |
+          if [ "${{ github.event_name }}" == 'release' ]; then
+            docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9:${{ github.event.release.tag_name }}
+          else
+            docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9:latest
+          fi
 
-    - name: Push Docker image
-      run: docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ env.TagName }}
+      - name: Push Docker image
+        run: |
+          if [ "${{ github.event_name }}" == 'release' ]; then
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:alma9:${{ github.event.release.tag_name }}
+          else
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:alma9:latest
+          fi
