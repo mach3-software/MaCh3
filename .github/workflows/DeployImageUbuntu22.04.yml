@@ -3,8 +3,7 @@ name: Docker CI Ubuntu22.04
 # The events that trigger the workflow
 on:
   push:
-    branches:
-      - develop
+    branches: [ develop ]
   release:
     types: [published]
 
