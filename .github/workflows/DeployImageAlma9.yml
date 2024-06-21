@@ -30,15 +30,15 @@ jobs:
       - name: Build Docker image
         run: |
           if [ "${{ github.event_name }}" == 'release' ]; then
-            docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9:${{ github.event.release.tag_name }}
+            docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9v1.1.0
           else
-            docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9:latest
+            docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9latest
           fi
 
       - name: Push Docker image
         run: |
           if [ "${{ github.event_name }}" == 'release' ]; then
-            docker push ghcr.io/${{ github.repository_owner }}/mach3:alma9:${{ github.event.release.tag_name }}
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:alma9v1.1.0
           else
-            docker push ghcr.io/${{ github.repository_owner }}/mach3:alma9:latest
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:alma9latest
           fi
