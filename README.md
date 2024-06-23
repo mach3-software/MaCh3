@@ -110,10 +110,21 @@ Most of external libraries are being handled through CPM. The only external libr
 
 Based on several test here are recommended version:
 ```
-  GCC: ...
+  GCC: >= 8.5 [lower versions may work]
   CMake: >= 3.14
   ROOT: >= 6.18
 ```
+### Supported operational systems
+| Name        | Status |
+|-------------|--------|
+| Alma9       | ✅     |
+| Ubuntu22.04 | ✅     |
+| CentOS7     | ❔     |
+| Windows     | ❌     |
+
+✅ - Part of CI/CD
+❔ - Not part of CI/CD but used by some users/developers so it might work
+❌ - Not supported and no plans right now
 
 # How To Use
 This is an example how your executable can look like using MaCh3:

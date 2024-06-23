@@ -17,13 +17,14 @@ WORKDIR /opt/
 # KS: Let's clone MaCh3
 RUN --mount=type=ssh git clone https://github.com/mach3-software/MaCh3 ${MACH3_WORK_DIR}
 WORKDIR ${MACH3_WORK_DIR}
+RUN echo "Checking out ${MACH3_VERSION}"
 RUN git checkout ${MACH3_VERSION}
 
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
 RUN cmake ${MACH3_WORK_DIR}
 RUN make VERBOSE=1
-RUN make install
+#RUN make install
 
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
