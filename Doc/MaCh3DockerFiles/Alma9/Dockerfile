@@ -14,7 +14,6 @@ WORKDIR /opt/
 # KS: Let's clone MaCh3
 RUN --mount=type=ssh git clone https://github.com/mach3-software/MaCh3 ${MACH3_WORK_DIR}
 WORKDIR ${MACH3_WORK_DIR}
-RUN echo "Checking out ${MACH3_VERSION}"
 RUN git checkout ${MACH3_VERSION}
 
 RUN mkdir -p ${MACH3_INSTALL_DIR}
