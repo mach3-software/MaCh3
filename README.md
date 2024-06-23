@@ -14,8 +14,6 @@ The framework has also evolved to allow non MCMC modules to interrogate the like
 Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://github.com/mach3-software/MaCh3/wiki/14.-MaCh3-in-the-Field)
 <img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
-<img src="Doc/Plots/NaturePlot.png" alt="MaCh3" align="center" width="200"/>
-
 
 ## Cite
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/10949376) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10949376.svg)](https://doi.org/10.5281/zenodo.10949376).

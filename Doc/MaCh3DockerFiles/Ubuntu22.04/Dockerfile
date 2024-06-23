@@ -1,5 +1,5 @@
 #To run use:  docker build -t mach3 .
-# KS: Get glorious container from Luke which will work as a base
+# KS: Get glorious container from ROOT which will work as a base
 FROM rootproject/root:6.32.02-ubuntu22.04 AS mach3_build
 
 RUN apt update && apt upgrade -y
@@ -8,7 +8,6 @@ RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
 RUN apt install -y --no-install-recommends vim less nano gdb csh tcsh ed quota python3 python3-dev cvs procmail ca-certificates
 
-ENV MACH3_VERSION="develop"
 ENV MACH3_WORK_DIR=/opt/MaCh3/
 ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 

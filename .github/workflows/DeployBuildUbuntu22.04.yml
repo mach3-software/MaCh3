@@ -20,6 +20,6 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Build the Docker image
-      run: docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest
+      run: docker build . --file Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:ubuntu22.04latest --build-arg MACH3_VERSION=develop
 
 
