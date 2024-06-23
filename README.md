@@ -122,9 +122,9 @@ Based on several test here are recommended version:
 | CentOS7     | ❔     |
 | Windows     | ❌     |
 
-✅ - Part of CI/CD
-❔ - Not part of CI/CD but used by some users/developers so it might work
-❌ - Not supported and no plans right now
+✅ - Part of CI/CD <br>
+❔ - Not part of CI/CD but used by some users/developers so it might work <br>
+❌ - Not supported and no plans right now <br>
 
 # How To Use
 This is an example how your executable can look like using MaCh3:
