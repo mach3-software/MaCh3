@@ -2,7 +2,6 @@
 # KS: Get glorious container from Luke which will work as a base
 FROM picker24/root_v6_26_10:alma9 AS mach3_build
 
-ENV MACH3_VERSION="develop"
 ENV MACH3_WORK_DIR=/opt/MaCh3/
 ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 

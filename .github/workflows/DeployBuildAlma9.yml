@@ -20,6 +20,6 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Build the Docker image
-      run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9latest
+      run: docker build . --file Doc/MaCh3DockerFiles/Alma9/Dockerfile --tag ghcr.io/${{ github.repository_owner }}/mach3:alma9latest --build-arg MACH3_VERSION=develop
 
 
