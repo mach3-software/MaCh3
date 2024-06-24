@@ -150,7 +150,7 @@ void MultipleProcessMCMC()
   Processor = new MCMCProcessor*[nFiles];
   for (int ik = 0; ik < nFiles;  ik++)
   {
-    MACH3LOG_INFO("File for study: {}" <<, FileNames[ik]);
+    MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
     Processor[ik] = new MCMCProcessor(FileNames[ik], false);
     Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
