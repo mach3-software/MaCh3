@@ -14,9 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [Ubuntu22.04, Alma9]
-        file: [Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile, Doc/MaCh3DockerFiles/Alma9/Dockerfile]
-        tag: [ubuntu22.04latest, alma9latest]
+        include:
+          - os: Ubuntu22.04
+            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
+            tag: ubuntu22.04latest
+          - os: Alma9
+            file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
+            tag: alma9latest
 
     name: Build CI ${{ matrix.os }}
 
