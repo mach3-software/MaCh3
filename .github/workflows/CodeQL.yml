@@ -14,6 +14,8 @@ jobs:
   analyze:
     name: Analyze C++ Code with CodeQL
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
     permissions:
       security-events: write
       packages: read
@@ -29,6 +31,12 @@ jobs:
           languages: c-cpp
           build: none  # Specify build none to skip any build steps
 
+      - name: Build Code
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
