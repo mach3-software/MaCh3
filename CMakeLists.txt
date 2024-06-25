@@ -67,7 +67,7 @@ if(NOT TARGET ROOT::ROOT)
 endif()
 
 if(ROOT_VERSION VERSION_LESS 6.18.0)
-    message(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
+  cmessage(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
 endif()
 
 #YAML for reading in config files
@@ -108,7 +108,7 @@ if(NOT DEFINED USE_PROB3)
   SET(USE_PROB3 FALSE)
 endif()
 
-# Oscillation calcualtion
+# Oscillation calculation
 # In the future which osc calc we use might be set with a flag
 SET(MaCh3_Oscillator_ENABLED "")
 if (USE_PROB3)
@@ -244,6 +244,12 @@ endif()
 #Include logger
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)
 ################################# Features ##################################
+#KS: Retrieve and print the compile options and link libraries for maximal verbose
+get_target_property(compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
+get_target_property(link_libraries MaCh3CompilerOptions INTERFACE_LINK_LIBRARIES)
+
+cmessage(STATUS "Compile options for MaCh3CompilerOptions: ${compile_options}")
+cmessage(STATUS "Link libraries for MaCh3CompilerOptions: ${link_libraries}")
 
 LIST(APPEND ALL_FEATURES
   DEBUG
