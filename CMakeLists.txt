@@ -286,20 +286,11 @@ add_library(MaCh3::All ALIAS MaCh3)
 configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-
-set(export_destinations
-    ${CMAKE_INSTALL_PREFIX}/lib/cmake/
-    ${CMAKE_INSTALL_PREFIX}/
+install(EXPORT MaCh3-targets
+        FILE MaCh3Targets.cmake
+        NAMESPACE MaCh3::
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
-
-foreach(dest ${export_destinations})
-  install(EXPORT MaCh3-targets
-          FILE MaCh3Targets.cmake
-          NAMESPACE MaCh3::
-          DESTINATION ${dest}
-  )
-endforeach()
-
 
 #KS: Options to print dependency graph
 if(NOT DEFINED MaCh3_DependancyGraph)
