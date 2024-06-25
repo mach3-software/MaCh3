@@ -1,14 +1,8 @@
 name: "CodeQL C++ Analysis"
 
 on:
-  push:
-    branches:
-      - develop
-      - featrue_Codacy
-  pull_request:
-    branches:
-      - develop
-      - featrue_Codacy
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight
 
 jobs:
   analyze:
