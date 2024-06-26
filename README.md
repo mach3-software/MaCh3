@@ -8,8 +8,7 @@ The framework has also evolved to allow non MCMC modules to interrogate the like
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
-[![Build Status](https://github.com/mach3-software/MaCh3/workflows/Docker%20CI%20Alma9/badge.svg)](https://github.com/mach3-software/MaCh3/actions?query=workflow%3A%22Docker+CI+Alma9%22)
-
+[![Build CI](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml/badge.svg)](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml)
 ## Famous Plots
 Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://github.com/mach3-software/MaCh3/wiki/14.-MaCh3-in-the-Field)
 <img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
