@@ -339,22 +339,20 @@ include(mach3-config)
 ## dump of the versions of the main dependencies of MaCh3
 ## We also check the git hash of each of the dependencies and info
 ## on whether or not they were using a tagged commit or not
-set(GENERATED_VERSION_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
-
-if(EXISTS ${GENERATED_VERSION_HEADER_DIR}/_version.h)
-  message(FATAL_ERROR "File \"${GENERATED_VERSION_HEADER_DIR}/_version.h\" found, \
-  this should never be created, remove!")
+if(EXISTS "${CMAKE_INSTALL_PREFIX}/_version.h")
+  cmessage(FATAL_ERROR "File \"${CMAKE_INSTALL_PREFIX}/_version.h\" found, this should never be created, remove!")
 endif()
 
+# Define custom target for version_header
 add_custom_target(
   version_header ALL
-  DEPENDS ${GENERATED_VERSION_HEADER_DIR}/_version.h
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/_version.h
 )
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${GENERATED_VERSION_HEADER_DIR}/version.h
-         ${GENERATED_VERSION_HEADER_DIR}/_version.h
-
+# Add custom command to generate version.h and _version.h
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
+         ${CMAKE_CURRENT_BINARY_DIR}/_version.h
   COMMAND ${CMAKE_COMMAND}
           -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
           -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
@@ -362,8 +360,14 @@ ADD_CUSTOM_COMMAND(
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
-          -P
-          ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
+          -P ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
+  COMMENT "Generating version.h and _version.h"
 )
 
-set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${GENERATED_VERSION_HEADER_DIR})
+# Set properties for the target
+set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR})
+
+# Install version.h to the install directory
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/)
