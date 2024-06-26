@@ -20,41 +20,42 @@ std::string config;
 
 int main(int argc, char *argv[]) 
 {
-    nFiles = 0;
-    if (argc != 3 && argc !=6 && argc != 8)
-    {
-      std::cerr << "How to use: "<< argv[0] <<"<Config> <MCMM_ND_Output.root>" << std::endl;
-      exit(-1);
-    }
-  
-    if (argc == 3)
-    {
-      std::cout << "Producing single fit output" << std::endl;
-      config = argv[1];
-      std::string filename = argv[2];
-      ProcessMCMC(filename);
-    } 
-    // If we want to compare two or more fits (e.g. binning changes or introducing new params/priors)
-    else if (argc == 6 || argc == 8)
-    {
-      std::cout << "Producing two fit comparison" << std::endl;
-      config = argv[1];
+  SetMaCh3LoggerFormat();
+  nFiles = 0;
+  if (argc != 3 && argc !=6 && argc != 8)
+  {
+    MACH3LOG_ERROR("How to use: {}<Config> <MCMM_ND_Output.root>", argv[0]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
 
-      FileNames.push_back(argv[2]);
-      TitleNames.push_back(argv[3]);
-          
-      FileNames.push_back(argv[4]);
-      TitleNames.push_back(argv[5]);
-      //KS: If there is third file add it
-      if(argc == 8)
-      {
-        FileNames.push_back(argv[6]);
-        TitleNames.push_back(argv[7]);
-      }
+  if (argc == 3)
+  {
+    MACH3LOG_INFO("Producing single fit output");
+    config = argv[1];
+    std::string filename = argv[2];
+    ProcessMCMC(filename);
+  }
+  // If we want to compare two or more fits (e.g. binning changes or introducing new params/priors)
+  else if (argc == 6 || argc == 8)
+  {
+    MACH3LOG_INFO("Producing two fit comparison");
+    config = argv[1];
 
-      MultipleProcessMCMC();
+    FileNames.push_back(argv[2]);
+    TitleNames.push_back(argv[3]);
+
+    FileNames.push_back(argv[4]);
+    TitleNames.push_back(argv[5]);
+    //KS: If there is third file add it
+    if(argc == 8)
+    {
+      FileNames.push_back(argv[6]);
+      TitleNames.push_back(argv[7]);
     }
-    
+
+    MultipleProcessMCMC();
+  }
+
   return 0;
 }
 
@@ -149,7 +150,7 @@ void MultipleProcessMCMC()
   Processor = new MCMCProcessor*[nFiles];
   for (int ik = 0; ik < nFiles;  ik++)
   {
-    std::cout << "File for study:       " << FileNames[ik] << std::endl;
+    MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
     Processor[ik] = new MCMCProcessor(FileNames[ik], false);
     Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
@@ -274,7 +275,7 @@ void MultipleProcessMCMC()
       hpd[ik]->SetLineStyle(kSolid);
     }
 
-    // Find the maximum value to nicley resize hist
+    // Find the maximum value to nicely resize hist
     double maximum = 0;
     for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
     for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
@@ -296,7 +297,7 @@ void MultipleProcessMCMC()
     }
     delete[] hpost;
     delete[] hpd;
-  }//End loop over paramters
+  }//End loop over parameters
     
   // Finally draw the parameter plot onto the PDF
   // Close the .pdf file with all the posteriors
@@ -315,7 +316,7 @@ void MultipleProcessMCMC()
   delete[] Processor;
 }
 
-// KS: Calculate Bayes factor for a given hiphothesis, most onformative are those related to osc params. However, it make realtive easy interpreation for switch dials
+// KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
 void CalcBayesFactor(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
@@ -472,7 +473,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
     TH2D *CovarianceDiff = (TH2D*)CovarianceHist->Clone("Covariance_Ratio");
     TH2D *CorrelationDiff = (TH2D*)CorrelationHist->Clone("Correlation_Ratio");
     
-    //KS: Bit messy but quite often covariance is 0 is divided by 0 is problemiatic so
+    //KS: Bit messy but quite often covariance is 0 is divided by 0 is problematic so
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
@@ -674,7 +675,6 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       for (int j = 1; j < NumberOfBins+1; ++j)
       {
         Cumulative += hpost[ik]->GetBinContent(j)/Integral;
-        
         CumulativeDistribution[ik]->SetBinContent(j, Cumulative);
       }
       //KS: Set overflow to 1 just in case
@@ -695,7 +695,7 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       {
         double BinValue = CumulativeDistribution[0]->GetBinCenter(j);
         int BinNumber = CumulativeDistribution[ik]->FindBin(BinValue);
-        //KS: Calculate D statistic for this bin, only save it if it's bigger than previosly found value
+        //KS: Calculate D statistic for this bin, only save it if it's bigger than previously found value
         double TempDstat = std::fabs(CumulativeDistribution[0]->GetBinContent(j) - CumulativeDistribution[ik]->GetBinContent(BinNumber));
         if(TempDstat > TestStatD[ik])
         {
@@ -737,9 +737,9 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     delete leg;
     for (int ik = 0; ik < nFiles;  ik++)
     {
-        delete hpost[ik];
-        delete CumulativeDistribution[ik];
-        delete LineD[ik];
+      delete hpost[ik];
+      delete CumulativeDistribution[ik];
+      delete LineD[ik];
     }
     delete[] hpost;
     delete[] CumulativeDistribution;

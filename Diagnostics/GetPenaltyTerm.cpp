@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
   SetMaCh3LoggerFormat();
   if (argc != 3 )
   {
-    std::cerr<< " Something went wrong " << std::endl;
-    std::cerr << "./GetPenaltyTerm root_file_to_analyse.root " << std::endl;
-    exit(-1);
+    MACH3LOG_WARN("Something went wrong ");
+    MACH3LOG_WARN("./GetPenaltyTerm root_file_to_analyse.root ");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   std::string filename = argv[1];
   std::string config = argv[2];
@@ -140,7 +140,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
   {
     isRelevantParam[i].resize(size);
     int counter = 0;
-    //Loop over paramters in the Covariance object
+    //Loop over parameters in the Covariance object
     for (int j = 0; j < size; j++)
     {
       isRelevantParam[i][j] = false;
@@ -176,7 +176,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
         }
       }
     }
-    std::cout<<" Found "<<counter<<" params for set "<<SetsNames[i]<<std::endl;
+    MACH3LOG_INFO(" Found {} params for set {}", counter, SetsNames[i]);
   }
 
   int AllEvents = Chain->GetEntries();
@@ -188,9 +188,9 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
     hLogL[i]->SetLineColor(kBlue);
   }
   double* logL = new double[NSets]();
-  for(int n = 0;  n < AllEvents; n++)
+  for(int n = 0; n < AllEvents; n++)
   {
-    if(n%10000 == 0) std::cout<<n<<std::endl;
+    if(n%10000 == 0) MaCh3Utils::PrintProgressBar(n, AllEvents);
       
     Chain->GetEntry(n);
 
@@ -317,7 +317,7 @@ void ReadXSecFile(std::string inputFile)
   if (Config == nullptr) {
     MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
     TempFile->ls();
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   YAML::Node Settings = TMacroToYAML(*Config);
@@ -327,8 +327,8 @@ void ReadXSecFile(std::string inputFile)
   if(XsecCovPos.back() == "none")
   {
     MACH3LOG_WARN("Couldn't find XsecCov branch in output");
-    std::cout<<Settings<<std::endl;
-    throw;
+    MaCh3Utils::PrintConfig(Settings);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
