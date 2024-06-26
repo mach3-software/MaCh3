@@ -15,7 +15,7 @@ class covarianceXsec : public covarianceBase {
 
   public:
     /// @brief Constructor
-    covarianceXsec(std::vector<std::string> FileNames, const char *name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+    covarianceXsec(const std::vector<std::string>& FileNames, const char *name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     /// @brief Destructor
     ~covarianceXsec();
 

@@ -31,20 +31,38 @@
 class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file
-  covarianceBase(std::vector<std::string> YAMLFile, const char *name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
+  /// @param name Matrix name
+  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+  /// @param LastPCAdpar First PCA parameter that will be decomposed.
+  covarianceBase(const std::vector<std::string>& YAMLFile, const char *name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
   covarianceBase(const char *name, const char *file);
   /// @brief "Usual" constructors from root file with seed
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
+  /// @param seed Seed for TRandom3
   covarianceBase(const char *name, const char *file, int seed);
   /// @brief Constructor For Eigen Value decomp
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
+  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+  /// @param LastPCAdpar First PCA parameter that will be decomposed.
   covarianceBase(const char *name, const char *file, int seed, double threshold, int FirstPCAdpar, int LastPCAdpar);
   /// @brief Destructor
   virtual ~covarianceBase();
   
   // Setters
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
+  /// @brief Set covariance matrix
   void setCovMatrix(TMatrixDSym *cov);
+  /// @brief Set matrix name
   void setName(const char *name) { matrixName = name; }
+  /// @brief change parameter name
   void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   /// @brief Set all the covariance matrix parameters to a user-defined value
@@ -97,20 +115,25 @@ class covarianceBase {
   TMatrixDSym *getCovMatrix() { return covMatrix; }
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
   /// @brief Get if param has flat prior or not
+  /// @param i Parameter index
   inline bool getFlatPrior(const int i) { return _fFlatPrior[i]; }
 
   /// @brief Get name of covariance
   const char *getName() { return matrixName; }
   /// @brief Get name of covariance
+  /// @param i Parameter index
   std::string GetParName(const int i) {return _fNames[i];}
   /// @brief Get name of the Parameter
+  /// @param i Parameter index
   const char* GetParName(const int i) const { return _fNames[i].c_str(); }
   /// @brief Get fancy name of the Parameter
+  /// @param i Parameter index
   std::string GetParFancyName(const int i) {return _fFancyNames[i];}
   /// @brief Get fancy name of the Parameter
+  /// @param i Parameter index
   const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); }
   /// @brief Get name of input file
-  std::string const getInputFile() const { return inputFile; }
+  std::string getInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
@@ -158,6 +181,7 @@ class covarianceBase {
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
+  /// Get total number of parameters
   inline int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
   const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
@@ -254,15 +278,21 @@ class covarianceBase {
   /// @brief Accepted this step
   void acceptStep();
 
-  /// @brief fix parameters at nominal values
+  /// @brief fix parameters at prior values
   void toggleFixAllParameters();
-  /// @brief fix parameter at nominal values
+  /// @brief fix parameter at prior values
   void toggleFixParameter(const int i);
+  /// @brief Fix parameter at prior values
+  void toggleFixParameter(const std::string& name);
+
   /// @brief Is parameter fixed or not
   bool isParameterFixed(const int i) {
     if (_fError[i] < 0) { return true; }
     else                { return false; }
   }
+  /// @brief Is parameter fixed or not
+  bool isParameterFixed(const std::string& name);
+
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   void ConstructPCA();
   #ifdef DEBUG_PCA
@@ -291,9 +321,11 @@ class covarianceBase {
  protected:
   void init(const char *name, const char *file);
   /// @brief Initialisation of the class using config
-  void init(std::vector<std::string> YAMLFile);
+  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
+  void init(const std::vector<std::string>& YAMLFile);
   void init(TMatrixDSym* covMat);
   /// @brief Initialise vectors with parameters information
+  /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
 
 
