@@ -31,8 +31,10 @@ class covarianceXsec : public covarianceBase {
 
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
+    /// @param i parameter index
     inline int GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
+    /// @param i parameter index
     inline const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
 
     /// @brief Get interpolation type vector
@@ -41,8 +43,10 @@ class covarianceXsec : public covarianceBase {
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return _fSplineInterpolationType.at(i);}
 
     /// @brief EM: value at which we cap spline knot weight
+    /// @param i parameter index
     inline double GetParSplineKnotUpperBound(const int i) {return _fSplineKnotUpBound[i];}
     /// @brief EM: value at which we cap spline knot weight
+    /// @param i parameter index
     inline double GetParSplineKnotLowerBound(const int i) {return _fSplineKnotLowBound[i];}
 
     /// @brief DB Get spline parameters depending on given DetID
@@ -71,18 +75,18 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Grab the Functional parameter indices for the relevant DetID
     const std::vector<int> GetFuncParsIndexFromDetID(const int DetID);
 
-    /// KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
+    /// @brief KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
     /// For example Sigma Var are done around nominal in ND280, no idea why though...
     std::vector<double> getNominalArray() override
     {
-      std::vector<double> nominal;
-      for (int i = 0; i < size; i++)
-      {
-        nominal.push_back(_fPreFitValue.at(i));
+      std::vector<double> nominal(_fNumPar);
+      for (int i = 0; i < _fNumPar; i++) {
+        nominal[i] = _fPreFitValue.at(i);
       }
       return nominal;
     }
     /// @brief Get nominal for a given param
+    /// @param i parameter index
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
     /// @brief Is parameter a flux param or not. This might become deprecated in future
     /// @warning Will become deprecated

@@ -80,6 +80,7 @@ class MCMCProcessor {
     /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
     /// @brief Calculate covariance by making 2D projection of each combination of parameters using multithreading
+    /// @param Mute Allow silencing many messages, especially important if we calculate matrix many times
     void MakeCovariance_MP(bool Mute = false);
     /// @brief Make and Draw SubOptimality
     void MakeSubOptimality(int NIntervals = 10);
@@ -138,8 +139,11 @@ class MCMCProcessor {
     inline int GetOSC() { return nParam[kOSCPar]; };
         
     /// @brief Get 1D posterior for a given parameter
+    /// @param i parameter index
     inline TH1D* GetHpost(const int i) { return hpost[i]; };
     /// @brief Get 2D posterior for a given parameter combination
+    /// @param i parameter index X
+    /// @param j parameter index Y
     inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
     /// @brief Get Violin plot for all parameters with posterior values
     inline TH2D* GetViolin() { return hviolin; };
@@ -212,6 +216,7 @@ class MCMCProcessor {
     inline void ReadNDFile();
     inline void ReadFDFile();
     inline void ReadOSCFile();
+    /// @brief Remove parameter specified in config
     inline void RemoveParameters();
    
     /// @brief Scan Input etc.
@@ -412,8 +417,9 @@ class MCMCProcessor {
     /// Holds the systs values
     double **SystValues;
 
-    // Holds all accProb
+    /// Holds all accProb
     double *AccProbValues;
+    /// Holds all accProb in batches
     double *AccProbBatchedAverages;
     
   //Only if GPU is enabled
