@@ -25,6 +25,10 @@ class SampleSummary {
 // *******************
   public:
     /// @brief Constructor
+    /// @param n_Samples total number of samples
+    /// @param Filename name of output file
+    /// @param sample pointer to sample PDF object
+    /// @param nChainSteps number of steps in a chain, 0 indicate prior predictive was used
     SampleSummary(const int n_Samples, const std::string &Filename, samplePDFBase* const sample, const int nSteps);
     /// @brief Destructor
     ~SampleSummary();
@@ -53,16 +57,20 @@ class SampleSummary {
     /// @brief KS: Prepare output tree and necessary variables
     inline void PrepareOutput();
 
-    // Helper functions to calculate likelihoods for TH1D and TH2Ds
+    /// @brief Helper functions to calculate likelihoods using TH2Poly, will modify MC hist tittle to include LLH
     inline void CalcLLH(TH2Poly * const & Data, TH2Poly * const & MC, TH2Poly * const & W2);
+    /// @brief Helper functions to calculate likelihoods using TH1D, will modify MC hist tittle to include LLH
     inline void CalcLLH(TH1D * const & Data, TH1D * const & MC, TH1D * const & W2);
 
+    /// @brief Helper functions to calculate likelihoods using TH2Poly
     inline double GetLLH(TH2Poly * const & Data, TH2Poly * const & MC, TH2Poly * const & W2);
+    /// @brief Helper functions to calculate likelihoods using TH1D
     inline double GetLLH(TH1D * const & Data, TH1D * const & MC, TH1D * const & W2);
 
-    //KS: In Barlow Beeston we have Beta Parameters which scale generated MC
+    /// @brief KS: In Barlow Beeston we have Beta Parameters which scale generated MC
     inline void PlotBetaParameters();
 
+    /// @brief KS: Study how correlated are sample or kinematic bins
     inline void StudyKinematicCorrelations();
 
     // Helper functions to change titles etc of finished plots, calculate pvalues etc
@@ -103,6 +111,7 @@ class SampleSummary {
     /// @brief Get the mode error from a TH1D
     inline double GetModeError(TH1D* hpost);
 
+    /// @brief Study Bayesian Information Criterion (BIC)
     inline void StudyBIC();
 
     /// @brief KS: Get the Deviance Information Criterion (DIC)
@@ -111,16 +120,19 @@ class SampleSummary {
     /// @brief Helper to Normalise histograms
     inline void NormaliseTH2Poly(TH2Poly* Histogram);
 
+    /// Random number generator
     TRandom3* rnd;
-    /// @brief KS: Hacky flag to let us know if this is first toy
+    /// KS: Hacky flag to let us know if this is first toy
     bool first_pass;
 
-    /// @brief KS: We have two methods for Poissonian fluctuation
+    /// KS: We have two methods for Poissonian fluctuation
     bool StandardFluctuation;
 
-    // Vector of vectors which holds the loaded MC histograms
+    /// Vector of vectors which holds the loaded MC histograms
     std::vector<std::vector<TH2Poly*> > MCVector;
+    /// Vector of vectors which holds the loaded W2 histograms
     std::vector<std::vector<TH2Poly*> > W2MCVector;
+    /// Vector of vectors which holds the loaded MC histograms for each mode
     std::vector<std::vector<std::vector<TH2Poly*> > > MCVectorByMode;
 
     /// Vector to hold the penalty term
@@ -131,22 +143,26 @@ class SampleSummary {
     /// Number of samples
     _int_ nSamples;
 
-    // name for each sample
+    /// name for each sample
     std::vector<std::string> SampleNames;
 
-    // The posterior predictive for the whole selection: this gets built after adding in the toys. Now an array of Th1ds, 1 for each poly bin, for each sample, and the same for W2
+    /// The posterior predictive for the whole selection: this gets built after adding in the toys. Now an array of Th1ds, 1 for each poly bin, for each sample
     TH1D ***PosteriorHist;
+    /// The posterior predictive for the whole selection: this gets built after adding in the toys. Now an array of Th1ds, 1 for each poly bin, for each sample for W2
     TH1D ***w2Hist;
 
-    //Posterior predictive but for projection but as a violin plot
+    /// Posterior predictive but for X projection but as a violin plot
     TH2D **ViolinHists_ProjectX;
+    /// Posterior predictive but for Y projection but as a violin plot
     TH2D **ViolinHists_ProjectY;
     
-    // The data histogram for the selection
+    /// The data histogram for the selection
     TH2Poly **DataHist;
+    /// The data histogram for the selection X projection
     TH1D **DataHist_ProjectX;
+    /// The data histogram for the selection Y projection
     TH1D **DataHist_ProjectY;
-    // The nominal histogram for the selection
+    /// The nominal histogram for the selection
     TH2Poly **NominalHist;
     // The w2 histograms
     TH2Poly **W2NomHist;
@@ -306,6 +322,7 @@ class SampleSummary {
     TH2Poly ***MeanHist_ByMode;
     TH1D ****PosteriorHist_ByMode;
     
+    /// Pointer to samplePDF object, mostly used to get sample names, binning etc.
     samplePDFBase* SamplePDF;
 
     /// MaCh3 Modes
@@ -317,6 +334,6 @@ class SampleSummary {
     /// Number of parameters
     int nModelParams;
 
-    //Tells Debug level to save additional histograms
+    /// Tells Debug level to save additional histograms
     _int_ Debug;
 };

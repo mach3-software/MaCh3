@@ -23,6 +23,7 @@ class FitterBase {
 
  public:
   /// @brief Constructor
+  /// @param fitMan A pointer to a manager object, whcih will handle all settings.
   FitterBase(manager * const fitMan);
   /// @brief Destructor
   virtual ~FitterBase();
@@ -77,6 +78,10 @@ class FitterBase {
   void SaveSettings();
 
   /// @brief Used by sigma variation, check how 1 sigma changes spectra
+  /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
+  /// @param sigmaArrayCentr sigma var hist at prior values
+  /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
+  /// @param title A tittle for returned object
   inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title);
 
   /// The manager

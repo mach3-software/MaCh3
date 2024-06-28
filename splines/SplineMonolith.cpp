@@ -727,7 +727,6 @@ void SMonolith::PrepareSplineFile() {
   delete FastSplineInfoTree;
   SplineFile->Close();
   delete SplineFile;
-
 }
 
 // *****************************************

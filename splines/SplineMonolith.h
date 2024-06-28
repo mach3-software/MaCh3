@@ -66,27 +66,38 @@ class SMonolith : public SplineBase {
     /// @brief KS: Set everything to null etc.
     inline void Initialise();
     /// @brief CW: Function to scan through the MasterSpline of TSpline3
+    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
     inline void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams, int &nSplines, unsigned int &numKnots);
     /// @brief CW: Function to scan through the MasterSpline of TF1
+    /// @param MasterSpline Vector of TF1_red pointers which we strip back
     inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
+    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
     inline void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
     /// @brief CW: The shared initialiser from constructors of TSpline3 and TSpline3_red
     inline void PrepareForGPU_TSpline3();
     /// @brief CW: Prepare the TF1_red objects for the GPU
+    /// @param MasterSpline Vector of TF1_red pointers which we strip back
     inline void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
     /// @brief CW: The shared initialiser from constructors of TF1 and TF1_red
     inline void PrepareForGPU_TF1();
         
     /// @brief CW: Reduced the TSpline3 to TSpline3_red
+    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
     inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline);
     /// @brief CW: Reduced the TF1 to TF1_red
+    /// @param MasterSpline Vector of TF1_red pointers which we strip back
     inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline);
     
     /// @brief CW: This loads up coefficients into two arrays: one x array and one yabcd array
     /// @brief CW: This should maximize our cache hits!
+    /// @param spl pointer to TSpline3_red
+    /// @param nPoints number of knots
+    /// @param xArray array X value for each knot
+    /// @param manyArray Array holding coefficients for each knot
     inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
     /// @brief CW: Helper function used in the constructor, tests to see if the spline is flat
+    /// @param spl pointer to TSpline3_red that will be checked
     inline bool isFlat(TSpline3_red* &spl);
     /// @brief CW: Gets the polynomial coefficients for TF1
     inline void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
