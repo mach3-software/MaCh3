@@ -19,8 +19,8 @@ class TGraphAsymmErrors;
 class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
 class FitterBase {
-
  public:
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, whcih will handle all settings.

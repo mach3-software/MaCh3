@@ -28,6 +28,7 @@
 #endif
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file
@@ -59,6 +60,7 @@ class covarianceBase {
   // Setters
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
+  /// @param cov Covariance matrix which we set and will be used later for evaluation of penalty term
   void setCovMatrix(TMatrixDSym *cov);
   /// @brief Set matrix name
   void setName(const char *name) { matrixName = name; }
@@ -294,6 +296,7 @@ class covarianceBase {
   bool isParameterFixed(const std::string& name);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
   void ConstructPCA();
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
@@ -304,6 +307,10 @@ class covarianceBase {
   inline bool IsPCA() { return pca; }
 
   /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
+  /// @param VecMulti Output Vector, VecMulti = matrix x vector
+  /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
+  /// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
+  /// @param n this is size of matrix and vector, we assume matrix is symmetric
   inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n);
   /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
   inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
@@ -319,15 +326,16 @@ class covarianceBase {
   void updateAdaptiveCovariance();
 
  protected:
+  /// @brief Initialisation of the class using matrix stored in the ROOT file
   void init(const char *name, const char *file);
   /// @brief Initialisation of the class using config
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
   void init(const std::vector<std::string>& YAMLFile);
+  /// @brief Initialisation of the class using only TMatrix
   void init(TMatrixDSym* covMat);
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
-
 
   /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
   void randomize();
@@ -335,6 +343,7 @@ class covarianceBase {
   void CorrelateSteps();
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
+  /// @param cov Matrix which we evaluate Positive Definitiveness
   void MakePosDef(TMatrixDSym *cov = NULL);
 
   /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
@@ -350,6 +359,7 @@ class covarianceBase {
   /// The input root file we read in
   const std::string inputFile;
 
+  /// Total number of parmas, deprecated, please don't use it
   int size;
   /// Name of cov matrix
   const char *matrixName;
@@ -360,7 +370,7 @@ class covarianceBase {
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   double **InvertCovMatrix;
     
-  /// KS: set Random numbers for each thread so each thread has different seed
+  /// KS: Set Random numbers for each thread so each thread has different seed
   TRandom3 **random_number;
 
   /// Random number taken from gaussian around prior error used for corr_throw

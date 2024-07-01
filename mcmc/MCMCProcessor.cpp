@@ -2207,6 +2207,11 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames,
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
 // **************************
+  // KS: This can reduce time necessary for caching even by half
+  #ifdef MULTITHREAD
+  ROOT::EnableImplicitMT();
+  #endif
+
   // Open the Chain
   Chain = new TChain("posteriors","posteriors");
   Chain->Add(MCMCFile.c_str());

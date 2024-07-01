@@ -10,9 +10,9 @@
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
 
-/// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline , normalisation parameters etc.
+/// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 class covarianceXsec : public covarianceBase {
-
   public:
     /// @brief Constructor
     covarianceXsec(const std::vector<std::string>& FileNames, const char *name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);

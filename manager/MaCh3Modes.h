@@ -28,6 +28,7 @@ struct MaCh3ModeInfo {
 };
 
 /// @brief KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/08.-MaCh3-Modes).
 class MaCh3Modes {
  public:
   /// @brief KS: Initialise MaCh3 modes

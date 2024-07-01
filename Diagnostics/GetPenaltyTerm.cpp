@@ -21,6 +21,7 @@
 #include "TH1.h"
 #include "TColor.h"
 #include "TObjString.h"
+#include "TROOT.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
@@ -76,6 +77,11 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
 
   ReadXSecFile(inputFile);
     
+  // KS: This can reduce time necessary for caching even by half
+  #ifdef MULTITHREAD
+  ROOT::EnableImplicitMT();
+  #endif
+
   // Open the Chain
   TChain* Chain = new TChain("posteriors","");
   Chain->Add(inputFile.c_str()); 
@@ -145,7 +151,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
     {
       isRelevantParam[i][j] = false;
 
-      //KS: Here we loop over all names and if parameters wasn't matched then we set it is relevant. For xsec it is easier to do it liek this
+      //KS: Here we loop over all names and if parameters wasn't matched then we set it is relevant. For xsec it is easier to do it like this
       if(Exclude[i])
       {
         bool found = false;
@@ -219,7 +225,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
               //Check if parameter is relevant for this set
               if (isRelevantParam[k][i] && isRelevantParam[k][j])
               {
-                //KS: Since matrix is symmetric we can calcaute non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
+                //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
                 int scale = 1;
                 if(i != j) scale = 2;
                 logL_private[k] += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*invCovMatrix[i][j];
@@ -234,7 +240,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
         #pragma omp atomic
         logL[k] += logL_private[k];
       }
-      //Delete private arrayss
+      //Delete private arrays
       delete[] logL_private;
     }//End omp range
 
@@ -251,7 +257,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
             //Check if parameter is relevant for this set
             if (isRelevantParam[k][i] && isRelevantParam[k][j])
             {
-              //KS: Since matrix is symetric we can calcaute non daigonal elements only once and multiply by 2, can bring up to factor speed decrease.
+              //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
               int scale = 1;
               if(i != j) scale = 2;
               logL[k] += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*invCovMatrix[i][j];
@@ -347,7 +353,6 @@ void ReadXSecFile(std::string inputFile)
       XSecFile["Systematics"].push_back(item);
     }
   }
-
 
   size = XSecMatrix->GetNrows();
 
