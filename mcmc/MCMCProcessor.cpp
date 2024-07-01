@@ -2308,10 +2308,9 @@ void MCMCProcessor::ScanInput() {
   MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
   MACH3LOG_INFO("# XSec params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar] - nFlux, ParamTypeStartPos[kXSecPar]);
   MACH3LOG_INFO("# Flux params:   {}", nFlux);
-  MACH3LOG_INFO("# Flux params:   {}", nFlux);
-  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar] - nFlux, ParamTypeStartPos[kNDPar]);
-  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar] - nFlux, ParamTypeStartPos[kFDDetPar]);
-  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar] - nFlux, ParamTypeStartPos[kOSCPar]);
+  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
+  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
+  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
   MACH3LOG_INFO("************************************************");
 
   nSteps = Chain->GetMaximum("step");
