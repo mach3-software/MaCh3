@@ -21,7 +21,7 @@
 #include "TString.h"
 
 //MaCh3 includes
-#include "OscillatorBase.h"
+#include "Oscillator/OscillatorBase.h"
 
 #include "samplePDF/interfacePDFEbE.h"
 #include "samplePDF/samplePDFBase.h"

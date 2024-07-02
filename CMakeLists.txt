@@ -82,7 +82,7 @@ endif()
 
 #Try adding Oscillator Class
 CPMAddPackage(
-  NAME NUOSCILLATOR
+  NAME NuOscillator
     VERSION 0.0
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
 	GIT_TAG "FNALBuild"
@@ -96,9 +96,16 @@ CPMAddPackage(
 	  "UseProb3ppLinear 1"
 )
 
-if(NOT TARGET Oscillator)
-  cmessage(FATAL_ERROR "Expecting dependency Oscillator::Oscillator")
+if(NOT TARGET NuOscillator)
+  cmessage(FATAL_ERROR "Expecting dependency NuOscillator")
 endif()
+
+#install(TARGETS NuOscillator
+#        EXPORT MaCh3-targets
+#        LIBRARY DESTINATION lib/
+#		PUBLIC_HEADER DESTINATION include/NuOscillator
+#        )
+
 
 #KS: Not being used right now so commenting it out.
 #CPMAddPackage(
@@ -113,37 +120,6 @@ endif()
 #  add_library(Eigen INTERFACE IMPORTED)
 #  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
 #endif()
-
-
-################################## Oscillation ################################
-
-#If USE_PROB3 not defined turn it off by default
-#if(NOT DEFINED USE_PROB3)
-#  SET(USE_PROB3 FALSE)
-#endif()
-
-# Oscillation calcualtion
-# In the future which osc calc we use might be set with a flag
-#SET(MaCh3_Oscillator_ENABLED "")
-#if (USE_PROB3)
-#  CPMFindPackage(
-#    NAME Prob3plusplus
-#    VERSION 3.10.3
-#    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-#    GIT_TAG v3.10.3
-#  )
-#  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
-#else()
-#  CPMFindPackage(
-#    NAME CUDAProb3
-#    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-#    GIT_TAG "feature_cleanup"
-#    DOWNLOAD_ONLY YES
-#  )
-#  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
-#endif()
-
-#dump_cmake_variables(Prob3plusplus)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
@@ -284,7 +260,7 @@ add_subdirectory(Diagnostics)
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC Oscillator::Oscillator OscProbCalcer::OscProbCalcer SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
+target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

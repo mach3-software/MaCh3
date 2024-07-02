@@ -1,7 +1,5 @@
 #include "samplePDFFDBase.h"
-
-#include "OscillatorFactory.h"
-
+#include "Oscillator/OscillatorFactory.h"
 // Constructors for erec-binned errors
 
 samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov)

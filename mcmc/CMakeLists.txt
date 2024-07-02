@@ -2,8 +2,8 @@ set(HEADERS
     FitterBase.h
     mcmc.h
     LikelihoodFit.h
-    $<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.h>
-    PSO.h
+    MinuitFit.h
+	PSO.h
     tune.h
     stretch.h
     MCMCProcessor.h
@@ -13,7 +13,7 @@ add_library(MCMC SHARED
     FitterBase.cpp
     mcmc.cpp
     LikelihoodFit.cpp
-    $<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.cpp>
+	#$<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.cpp>
     PSO.cpp
     tune.cpp
     stretch.cpp

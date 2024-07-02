@@ -16,7 +16,7 @@ add_library(SamplePDF SHARED
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
 )
 
-target_link_libraries(SamplePDF Oscillator OscProbCalcer Splines Covariance MaCh3CompilerOptions)
+target_link_libraries(SamplePDF Splines NuOscillator Covariance MaCh3CompilerOptions)
 
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
@@ -42,25 +42,31 @@ install(TARGETS SamplePDF
 
 add_library(MaCh3::SamplePDF ALIAS SamplePDF)
 
-install(TARGETS Oscillator
+install(TARGETS NuOscillator
         EXPORT MaCh3-targets
-	    LIBRARY DESTINATION lib/	
-		PUBLIC_HEADER DESTINATION include/Oscillator)
+        LIBRARY DESTINATION lib/
+		PUBLIC_HEADER DESTINATION include/NuOscillator
+        )
 
-install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/Oscillator/
-	    DESTINATION include/
-)
+		#install(TARGETS Oscillator
+		#        EXPORT MaCh3-targets
+		#	    LIBRARY DESTINATION lib/	
+		#		PUBLIC_HEADER DESTINATION include/Oscillator)
+		#
+		install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/Oscillator/
+		  DESTINATION include/
+		)
+		#
+		#install(TARGETS OscProbCalcer
+		#        EXPORT MaCh3-targets
+		#	    LIBRARY DESTINATION lib/	
+		#		PUBLIC_HEADER DESTINATION include/OscProbCalcer)
+		#
+		install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/OscProbCalcer/
+			    DESTINATION include/
+		)
 
-install(TARGETS OscProbCalcer
-        EXPORT MaCh3-targets
-	    LIBRARY DESTINATION lib/	
-		PUBLIC_HEADER DESTINATION include/OscProbCalcer)
-
-install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/OscProbCalcer/
-	    DESTINATION include/
-)
-
-install(TARGETS NuOscillatorInterface
-        EXPORT MaCh3-targets
-	    LIBRARY DESTINATION lib/	
-		PUBLIC_HEADER DESTINATION include/OscProbCalcer)
+		#install(TARGETS NuOscillatorInterface
+		#EXPORT MaCh3-targets
+		#LIBRARY DESTINATION lib/	
+		#PUBLIC_HEADER DESTINATION include/OscProbCalcer)
