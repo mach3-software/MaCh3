@@ -2209,7 +2209,7 @@ void MCMCProcessor::ScanInput() {
 // **************************
   // KS: This can reduce time necessary for caching even by half
   #ifdef MULTITHREAD
-  ROOT::EnableImplicitMT();
+  //ROOT::EnableImplicitMT();
   #endif
 
   // Open the Chain

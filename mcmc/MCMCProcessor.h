@@ -89,6 +89,9 @@ class MCMCProcessor {
     /// @brief Make and Draw Violin
     void MakeViolin();
     /// @brief Make and Draw Credible intervals
+    /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
+    /// @param CredibleIntervalsColours Color_t telling what colour to use for each Interval line
+    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeCredibleIntervals(std::vector<double> CredibleIntervals = {0.99, 0.90, 0.68 },
                                std::vector<Color_t> CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
                                bool CredibleInSigmas = false
@@ -96,12 +99,23 @@ class MCMCProcessor {
     /// @brief Draw the post-fit covariances
     void DrawCovariance();
     /// @brief Make and Draw Credible Regions
+    /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
+    /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
+    /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
+    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeCredibleRegions(std::vector<double> CredibleRegions = {0.99, 0.90, 0.68},
                              std::vector<Style_t> CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              std::vector<Color_t> CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
                              bool CredibleInSigmas = false
                              );
     /// @brief Make fancy triangle plot for selected parameters
+    /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
+    /// @param CredibleIntervalsColours Color_t telling what colour to use for each Interval line
+    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
+    /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
+    /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
+    /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
+    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeTrianglePlot(std::vector<std::string> ParNames,
                           // 1D
                           std::vector<double> CredibleIntervals = {0.99, 0.90, 0.68 },
@@ -114,13 +128,21 @@ class MCMCProcessor {
                           bool CredibleInSigmas = false
                           );
     /// @brief Make funny polar plot
+    /// @param ParNames Vector with parameter names for which Polar Plot will be made
     void GetPolarPlot(std::vector<std::string> ParNames);
 
     /// @brief Calculate Bayes factor for vector of params, and model boundaries
+    /// @param ParName Vector with parameter names for which we calculate Bayes factor
+    /// @param Model1Bounds Lower and upper bound for hypothesis 1. Within this bound we calculate integral used later for Bayes Factor
+    /// @param Model2Bounds Lower and upper bound for hypothesis 2. Within this bound we calculate integral used later for Bayes Factor
+    /// @param ModelNames Names for hypothesis 1 and 2
     void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
     /// @brief Calculate Bayes factor for point like hypothesis using SavageDickey
     void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
     /// @brief Reweight Prior by giving new central value and new error
+    /// @param ParName Parameter names for which we do reweighting
+    /// @param NewCentral New central value for which we reweight
+    /// @param NewError New error used for calculating weight
     void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
     
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
@@ -180,19 +202,23 @@ class MCMCProcessor {
     //Setter related to plotting
     inline void SetPlotRelativeToPrior(const bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
     inline void SetPrintToPDF(const bool PlotOrNot){printToPDF = PlotOrNot; };
+    /// @brief Set whether you want to plot error for parameters which have flat prior
     inline void SetPlotErrorForFlatPrior(const bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
     inline void SetPlotBinValue(const bool PlotOrNot){plotBinValue = PlotOrNot; };
     inline void SetFancyNames(const bool PlotOrNot){FancyPlotNames = PlotOrNot; };
+    /// @brief Set whether want to use smoothing for histograms using ROOT algorithm
     inline void SetSmoothing(const bool PlotOrNot){ApplySmoothing = PlotOrNot; };
     /// @brief Code will only plot 2D posteriors if Correlation are larger than defined threshold
     /// @param Threshold This threshold is compared with correlation value
     inline void SetPost2DPlotThreshold(const double Threshold){Post2DPlotThreshold = Threshold; };
 
-    /// Setter related what parameters we want to exclude from analysis
+    /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like xsec_, then passing "xsec_" will
+    /// @param Batches Vector with parameters type names we want to exclude
     inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
     inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
 
-    //DiagMCMC-related setter
+    /// @brief Set value of Nbatches used for batched mean, this need to be done earlier as batches are made when reading tree
+    /// @param Batches Number of batches, default is 20
     inline void SetnBatches(const int Batches){nBatches = Batches; };
     inline void SetnLags(const int nLags){AutoCorrLag = nLags; };
     
@@ -228,6 +254,7 @@ class MCMCProcessor {
     /// @brief Get Arithmetic mean from posterior
     inline void GetArithmetic(TH1D * const hist, const int i);
     /// @brief Fit Gaussian to posterior
+    /// @param hist histograms to which we fit gaussian
     inline void GetGaussian(TH1D *& hist, const int i);
     /// @brief Get Highest Posterior Density (HPD)
     inline void GetHPD(TH1D * const hist, const int i, const double coverage = 0.6827);
@@ -303,7 +330,9 @@ class MCMCProcessor {
     
     /// Is the ith parameter varied
     std::vector<bool> IamVaried;
+    /// Name of parameters which we are going to analyse
     std::vector<std::vector<TString>> ParamNames;
+    /// Parameters central values which we are going to analyse
     std::vector<std::vector<double>>  ParamCentral;
     std::vector<std::vector<double>>  ParamNom;
     std::vector<std::vector<double>>  ParamErrors;
@@ -316,13 +345,14 @@ class MCMCProcessor {
     /// Idea is that this parameter will keep track of it so code is flexible
     std::vector<int> ParamTypeStartPos;
     
-    //In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
+    /// In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
     std::vector<bool>   IsXsec; 
     /// This keep number of Flux params in xsec matrix
     int nFlux;
 
-    // Vector of each systematic
+    /// Vector of each systematic
     std::vector<TString> SampleName_v;
+    /// Vector of each sample PDF object
     std::vector<TString> SystName_v;
     
     /// Name of output files
@@ -369,14 +399,23 @@ class MCMCProcessor {
     TCanvas *Posterior;
 
     //Vector of best fit points and errors obtained with different methods
+    /// Vector with central value for each parameter
     TVectorD *Central_Value;
+    /// Vector with mean values using Arithmetic Mean
     TVectorD *Means;
+    /// Vector with errors values using RMS
     TVectorD *Errors;
+    /// Vector with mean values using Gaussian fit
     TVectorD *Means_Gauss;
+    /// Vector with error values using Gaussian fit
     TVectorD *Errors_Gauss;
+    /// Vector with mean values using Highest Posterior Density
     TVectorD *Means_HPD;
+    /// Vector with error values using Highest Posterior Density
     TVectorD *Errors_HPD; 
+    /// Vector with positive error (right hand side) values using Highest Posterior Density
     TVectorD *Errors_HPD_Positive; 
+    /// Vector with negative error (left hand side) values using Highest Posterior Density
     TVectorD *Errors_HPD_Negative; 
 
     /// Posterior Covariance Matrix
@@ -414,9 +453,11 @@ class MCMCProcessor {
     /// LagL used in AutoCorrelation
     int AutoCorrLag;
     
-    // Holds all the parameter variations
+    /// Total parameter sum for each param
     double *ParamSums;
+    /// Values of batched average for every param and batch
     double **BatchedAverages;
+    /// Value of LagL for each dial and each Lag
     double **LagL;
 
     /// Holds the sample values

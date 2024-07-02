@@ -23,7 +23,7 @@ class TDirectory;
 class FitterBase {
  public:
   /// @brief Constructor
-  /// @param fitMan A pointer to a manager object, whcih will handle all settings.
+  /// @param fitMan A pointer to a manager object, which will handle all settings.
   FitterBase(manager * const fitMan);
   /// @brief Destructor
   virtual ~FitterBase();
