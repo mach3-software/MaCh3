@@ -419,6 +419,52 @@ void FitterBase::ProcessMCMC() {
 }
 
 // *************************
+// Run Drag Race
+void FitterBase::DragRace() {
+// *************************
+
+  MACH3LOG_INFO("Let the Race Begin!");
+  // Reweight the MC
+  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  {
+    double *fake = 0;
+    TStopwatch clockRace;
+    clockRace.Start();
+    samples[ivs]->reweight(fake);
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.6f} s for a single reweight of sample:  {}", clockRace.RealTime(), samples[ivs]->GetName());
+  }
+
+  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  {
+    TStopwatch clockRace;
+    clockRace.Start();
+    samples[ivs]->GetLikelihood();
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.6f} s for a single GetLikelihood of sample:  {}", clockRace.RealTime(), samples[ivs]->GetName());
+  }
+
+
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    TStopwatch clockRace;
+    clockRace.Start();
+    systematics[s]->proposeStep();
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.6f} s for a single propose step of cov:  {}", clockRace.RealTime(), systematics[s]->getName());
+  }
+
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    TStopwatch clockRace;
+    clockRace.Start();
+    systematics[s]->GetLikelihood();
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.6f} s for a single get likelihood of cov:  {}", clockRace.RealTime(), systematics[s]->getName());
+  }
+  MACH3LOG_INFO("End of race");
+
+}
+
+// *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************

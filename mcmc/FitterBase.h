@@ -48,6 +48,9 @@ class FitterBase {
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
 
+  /// @brief Checks how much time we need for every sample/covariance object
+  void DragRace();
+
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
