@@ -444,7 +444,6 @@ void FitterBase::DragRace() {
     MACH3LOG_INFO("It took {:.6f} s for a single GetLikelihood of sample:  {}", clockRace.RealTime(), samples[ivs]->GetName());
   }
 
-
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
@@ -461,7 +460,6 @@ void FitterBase::DragRace() {
     MACH3LOG_INFO("It took {:.6f} s for a single get likelihood of cov:  {}", clockRace.RealTime(), systematics[s]->getName());
   }
   MACH3LOG_INFO("End of race");
-
 }
 
 // *************************
@@ -488,7 +486,6 @@ void FitterBase::RunLLHScan() {
 
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
-
   std::vector<TDirectory *> Cov_LLH(systematics.size());
   for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
   {
