@@ -28,28 +28,51 @@
 #endif
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file
-  covarianceBase(std::vector<std::string> YAMLFile, const char *name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
+  /// @param name Matrix name
+  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+  /// @param LastPCAdpar First PCA parameter that will be decomposed.
+  covarianceBase(const std::vector<std::string>& YAMLFile, const char *name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
   covarianceBase(const char *name, const char *file);
   /// @brief "Usual" constructors from root file with seed
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
+  /// @param seed Seed for TRandom3
   covarianceBase(const char *name, const char *file, int seed);
   /// @brief Constructor For Eigen Value decomp
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
+  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+  /// @param LastPCAdpar First PCA parameter that will be decomposed.
   covarianceBase(const char *name, const char *file, int seed, double threshold, int FirstPCAdpar, int LastPCAdpar);
   /// @brief Destructor
   virtual ~covarianceBase();
   
   // Setters
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
+  /// @brief Set covariance matrix
+  /// @param cov Covariance matrix which we set and will be used later for evaluation of penalty term
   void setCovMatrix(TMatrixDSym *cov);
+  /// @brief Set matrix name
   void setName(const char *name) { matrixName = name; }
+  /// @brief change parameter name
+  /// @param i Parameter index
   void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   /// @brief Set all the covariance matrix parameters to a user-defined value
+  /// @param i Parameter index
   void setPar(const int i, const double val);
   /// @brief Set current parameter value
+  /// @param i Parameter index
   void setParCurrProp(const int i, const double val);
   /// @brief Set proposed parameter value
   void setParProp(const int i, const double val) {
@@ -58,15 +81,20 @@ class covarianceBase {
   }
   void setParameters(std::vector<double> pars = std::vector<double>());
   /// @brief Set if parameter should have flat prior or not
+  /// @param i Parameter index
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief set branches for output file
   void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
+  /// @param scale Value of global step scale
   void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  /// @param ParameterIndex Parameter Index
+  /// @param StepScale Value of individual step scale
   void setIndivStepScale(const int ParameterIndex, const double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  /// @param stepscale Vector of individual step scale, should have same
   void setIndivStepScale(std::vector<double> stepscale);
   /// @brief KS: In case someone really want to change this
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
@@ -93,26 +121,33 @@ class covarianceBase {
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
 
-  // Getters
+  /// @brief Return covariance matrix
   TMatrixDSym *getCovMatrix() { return covMatrix; }
+  /// @brief Return inverted covariance matrix
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
   /// @brief Get if param has flat prior or not
+  /// @param i Parameter index
   inline bool getFlatPrior(const int i) { return _fFlatPrior[i]; }
 
   /// @brief Get name of covariance
   const char *getName() { return matrixName; }
   /// @brief Get name of covariance
+  /// @param i Parameter index
   std::string GetParName(const int i) {return _fNames[i];}
   /// @brief Get name of the Parameter
+  /// @param i Parameter index
   const char* GetParName(const int i) const { return _fNames[i].c_str(); }
   /// @brief Get fancy name of the Parameter
+  /// @param i Parameter index
   std::string GetParFancyName(const int i) {return _fFancyNames[i];}
   /// @brief Get fancy name of the Parameter
+  /// @param i Parameter index
   const char* GetParFancyName(const int i) const { return _fFancyNames[i].c_str(); }
   /// @brief Get name of input file
-  std::string const getInputFile() const { return inputFile; }
+  std::string getInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
+  /// @param i Parameter index
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
 
   // Adaptive Step Tuning Stuff
@@ -158,6 +193,7 @@ class covarianceBase {
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
+  /// Get total number of parameters
   inline int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
   const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
@@ -169,14 +205,24 @@ class covarianceBase {
 
   virtual double getNominal(const int i) { return getParInit(i); }
   inline double GetGenerated(const int i) { return _fGenerated[i];}
+  /// @brief Get upper parameter bound in which it is physically valid
+  /// @param i Parameter index
   inline double GetUpperBound(const int i){ return _fUpBound[i];}
+  /// @brief Get lower parameter bound in which it is physically valid
+  /// @param i Parameter index
   inline double GetLowerBound(const int i){ return _fLowBound[i]; }
-  inline double GetIndivStepScale(int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  /// @brief Get individual step scale for selected parameter
+  /// @param ParameterIndex Parameter index
+  inline double GetIndivStepScale(const int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
   inline double getParProp_PCA(const int i) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return fParProp_PCA(i);
   }
   
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
   inline double getParCurr_PCA(const int i) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return fParCurr_PCA(i);
@@ -242,8 +288,9 @@ class covarianceBase {
     else return _fNumPar;
   }
 
-  // Printers
+  /// @brief Print nominal value for every parameter
   void printNominal();
+  /// @brief Print nominal, current and proposed value for each parameter
   void printNominalCurrProp();
   void printPars();
   /// @brief Print step scale for each parameter
@@ -254,16 +301,26 @@ class covarianceBase {
   /// @brief Accepted this step
   void acceptStep();
 
-  /// @brief fix parameters at nominal values
+  /// @brief fix parameters at prior values
   void toggleFixAllParameters();
-  /// @brief fix parameter at nominal values
+  /// @brief fix parameter at prior values
+  /// @param i Parameter index
   void toggleFixParameter(const int i);
+  /// @brief Fix parameter at prior values
+  /// @param name Name of parameter you want to fix
+  void toggleFixParameter(const std::string& name);
+
   /// @brief Is parameter fixed or not
+  /// @param i Parameter index
   bool isParameterFixed(const int i) {
     if (_fError[i] < 0) { return true; }
     else                { return false; }
   }
+  /// @brief Is parameter fixed or not
+  bool isParameterFixed(const std::string& name);
+
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
   void ConstructPCA();
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
@@ -274,6 +331,10 @@ class covarianceBase {
   inline bool IsPCA() { return pca; }
 
   /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
+  /// @param VecMulti Output Vector, VecMulti = matrix x vector
+  /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
+  /// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
+  /// @param n this is size of matrix and vector, we assume matrix is symmetric
   inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n);
   /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
   inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
@@ -289,13 +350,16 @@ class covarianceBase {
   void updateAdaptiveCovariance();
 
  protected:
+  /// @brief Initialisation of the class using matrix stored in the ROOT file
   void init(const char *name, const char *file);
   /// @brief Initialisation of the class using config
-  void init(std::vector<std::string> YAMLFile);
+  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
+  void init(const std::vector<std::string>& YAMLFile);
+  /// @brief Initialisation of the class using only TMatrix
   void init(TMatrixDSym* covMat);
   /// @brief Initialise vectors with parameters information
+  /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
-
 
   /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
   void randomize();
@@ -303,6 +367,7 @@ class covarianceBase {
   void CorrelateSteps();
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
+  /// @param cov Matrix which we evaluate Positive Definitiveness
   void MakePosDef(TMatrixDSym *cov = NULL);
 
   /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
@@ -318,6 +383,7 @@ class covarianceBase {
   /// The input root file we read in
   const std::string inputFile;
 
+  /// Total number of parmas, deprecated, please don't use it
   int size;
   /// Name of cov matrix
   const char *matrixName;
@@ -328,7 +394,7 @@ class covarianceBase {
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   double **InvertCovMatrix;
     
-  /// KS: set Random numbers for each thread so each thread has different seed
+  /// KS: Set Random numbers for each thread so each thread has different seed
   TRandom3 **random_number;
 
   /// Random number taken from gaussian around prior error used for corr_throw

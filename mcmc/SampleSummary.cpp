@@ -1222,7 +1222,6 @@ void SampleSummary::MakePredictive() {
 
   // Get the 1D LLH dists
   MakeCutLLH();
-
 } // End MakePredictive() function
 
 // *******************
@@ -1617,7 +1616,6 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
   delete TempCanvas;
   delete Legend;
 }
-
 
 // ****************
 // Make the 2D cut distribution and give the 2D p-value
@@ -2395,7 +2393,6 @@ void SampleSummary::StudyKinematicCorrelations() {
   Outputfile->cd();
 }
 
-
 // ****************
 // Make a projection
 TH1D* SampleSummary::ProjectHist(TH2D* Histogram, bool ProjectX) {
@@ -2418,7 +2415,6 @@ TH1D* SampleSummary::ProjectHist(TH2D* Histogram, bool ProjectX) {
 // Make a projection
 TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const _int_ selection, const bool MakeErrorHist) {
 // ****************
-
   std::vector<double> xbins;
   std::vector<double> ybins;
 
@@ -2436,7 +2432,6 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
 
   return Projection;
 }
-
 
 // ****************
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default

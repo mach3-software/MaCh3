@@ -21,12 +21,14 @@
 #include "TStopwatch.h"
 #include "TColor.h"
 #include "TStyle.h"
+#include "TROOT.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
 
 #include "manager/manager.h"
+
 
 //KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one. 
 //Based on Gelman et. al. arXiv:1903.08008v5
@@ -178,6 +180,11 @@ void PrepareChains() {
 
   Draws = new double**[Nchains]();
   DrawsFolded = new double**[Nchains]();
+
+  // KS: This can reduce time necessary for caching even by half
+  #ifdef MULTITHREAD
+  //ROOT::EnableImplicitMT();
+  #endif
 
   // Open the Chain
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(

@@ -19,4 +19,3 @@ enum SplineSegmentCoeffs
 };
 
 // WARNING KS: Please add stuff here with super caution. This header is being added to gpuSplineUtils.cu. Right now we support most of CUDA even super old. If you add some header with fancy templates it will not compile for older CUDA. This header is a way to use common macros or Enum in CPU and GPU code. For more sophisticated structs please use SplineStructs.h
-// WARNING

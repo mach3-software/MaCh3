@@ -38,6 +38,11 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
   SaveProposal = false;
 
+  #ifdef MULTITHREAD
+  //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
+  //Based on other tests it is really helpful
+  //ROOT::EnableImplicitMT();
+  #endif
   // Set the output file
   outputFile = new TFile(outfile.c_str(), "RECREATE");
   outputFile->cd();
@@ -68,16 +73,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   syst_llh = nullptr;
 
   TotalNSamples = 0;
-
-  fTestLikelihood = false;
-  //ETA - No guarantee that "Fitter" field exists so check this first before
-  //checking ["Fitter"]["FitTestLikelihood"]
-  if(fitMan->raw()["General"]["Fitter"])
-  {
-    if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"]){
-      fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
-    }
-  }
+  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false);;
 }
 
 // *************************

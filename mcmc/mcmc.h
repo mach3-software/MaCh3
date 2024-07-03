@@ -6,6 +6,7 @@
 class mcmc : public FitterBase {
  public:
    /// @brief Constructor
+   /// @param fitMan A pointer to a manager object, which will handle all settings.
   mcmc(manager * const fitMan);
   /// @brief Destructor
   virtual ~mcmc();

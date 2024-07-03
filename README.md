@@ -150,7 +150,7 @@ This is an example how your executable can look like using MaCh3:
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
-
+- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 
 ### Plotting and Diagnostic
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.

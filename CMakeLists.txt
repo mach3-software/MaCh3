@@ -136,6 +136,7 @@ if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   SET(CMAKE_CXX_STANDARD 11)
 endif()
 
+# KS: If C++ standard is lower than C++ standar used for ROOT compilation things will go terribly wrong
 if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
 endif()
@@ -167,7 +168,8 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
                                                     -Wshadow
                                                     -Wuninitialized
                                                     -Wnon-virtual-dtor
-                                                    -Woverloaded-virtual)
+                                                    -Woverloaded-virtual
+                                                    )
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
   SET(MaCh3_DEBUG_ENABLED FALSE)
@@ -190,9 +192,16 @@ if(MaCh3_DEBUG_ENABLED)
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops --param=max-vartrack-size=100000000 -finline-limit=100000000)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+                                                        -O3
+                                                        -funroll-loops
+                                                        --param=max-vartrack-size=100000000
+                                                        -finline-limit=100000000
+                                                        #-flto # FIXME need more testing
+                                                        )
   #KS: addomg Link-Time Optimization (LTO)
-  target_link_options(MaCh3CompilerOptions INTERFACE -flto)
+  # FIXME previously it wasn't used correctly but would need more testing
+  #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
 #KS: If multithreading is not defined enable it by default
