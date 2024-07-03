@@ -54,7 +54,7 @@ install(TARGETS NuOscillator
 		#		PUBLIC_HEADER DESTINATION include/Oscillator)
 		#
 		install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/Oscillator/
-		  DESTINATION include/
+		  DESTINATION include/Oscillator
 		)
 		#
 		#install(TARGETS OscProbCalcer
@@ -63,7 +63,11 @@ install(TARGETS NuOscillator
 		#		PUBLIC_HEADER DESTINATION include/OscProbCalcer)
 		#
 		install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/OscProbCalcer/
-			    DESTINATION include/
+		  DESTINATION include/OscProbCalcer
+		)
+
+		install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/Constants/
+		  DESTINATION include/Constants
 		)
 
 		#install(TARGETS NuOscillatorInterface

@@ -80,26 +80,6 @@ if(NOT TARGET yaml-cpp::yaml-cpp)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
 endif()
 
-#Try adding Oscillator Class
-CPMAddPackage(
-  NAME NuOscillator
-    VERSION 0.0
-    GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-	GIT_TAG "FNALBuild"
-    OPTIONS
-	  "UseGPU 0"
-	  "UseMultithreading 1"
-	  "UseDoubles 1"
-	  "UseCUDAProb3 0"	
-	  "UseCUDAProb3Linear 0"
-	  "UseProbGPULinear 0"
-	  "UseProb3ppLinear 1"
-)
-
-if(NOT TARGET NuOscillator)
-  cmessage(FATAL_ERROR "Expecting dependency NuOscillator")
-endif()
-
 #install(TARGETS NuOscillator
 #        EXPORT MaCh3-targets
 #        LIBRARY DESTINATION lib/
@@ -191,6 +171,8 @@ if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
+target_compile_definitions(MaCh3CompilerOptions INTERFACE UseDoubles)
+
 if(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
@@ -242,6 +224,45 @@ cmessage(STATUS "MaCh3 Features: ")
 foreach(f ${ALL_FEATURES})
   cmessage(STATUS "     ${f}: ${MaCh3_${f}_ENABLED}")
 endforeach()
+
+if(MaCh3_GPU_ENABLED)
+  set(DAN_USE_GPU 1)
+else()
+  set(DAN_USE_GPU 0)
+endif()
+
+if(MaCh3_MULTITHREAD_ENABLED)
+  set(DAN_USE_MULTITHREAD 1)
+else()
+  set(DAN_USE_MULTITHREAD 0)
+endif()
+
+if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
+  set(DAN_DOUBLE 0)
+else()
+  set(DAN_DOUBLE 1)
+endif()
+
+#Try adding Oscillator Class
+CPMAddPackage(
+  NAME NuOscillator
+    VERSION 0.0
+    GITHUB_REPOSITORY "dbarrow257/NuOscillator"
+	GIT_TAG "FNALBuild"
+    OPTIONS
+	"UseGPU ${DAN_USE_GPU}"
+	"UseMultithreading ${DAN_USE_MULTITHREAD}"
+	"UseDoubles ${DAN_DOUBLE}"
+	  "UseCUDAProb3 0"	
+	  "UseCUDAProb3Linear 1"
+	  "UseProbGPULinear 0"
+	  "UseProb3ppLinear 0"
+)
+
+if(NOT TARGET NuOscillator)
+  cmessage(FATAL_ERROR "Expecting dependency NuOscillator")
+endif()
+
 
 ################################# Build MaCh3 ##################################
 

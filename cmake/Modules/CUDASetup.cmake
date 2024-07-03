@@ -30,7 +30,7 @@ else()
 endif()
 
 #KS: Apparently with newer cmake and GPU
-set(CUDA_ARCHITECTURES 35 52 60 61 70 75 80 86)
+set(CUDA_ARCHITECTURES 52 60 61 70 75 80 86)
 # Join elements of the list with spaces
 string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CUDA_ARCHITECTURES}")
 

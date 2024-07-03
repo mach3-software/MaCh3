@@ -10,7 +10,7 @@ foreach(app
     CombineMaCh3Chains
     )
     add_executable(${app} ${app}.cpp)
-    target_link_libraries(${app} MaCh3::All)
+	target_link_libraries(${app} MaCh3::All Oscillator OscProbCalcer)
 
     add_dependencies(DiagApps ${app})
 
