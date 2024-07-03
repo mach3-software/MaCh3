@@ -18,7 +18,7 @@ class covarianceOsc : public covarianceBase
   inline int CheckBounds() override;
   /// @brief Retrieves the proposed parameters.
   double *getPropPars();
-  /// @brief Propose MCMC step, including mass fliping
+  /// @brief Propose MCMC step, including mass flipping
   void proposeStep() override;
   /// @brief Sets whether to flip delta M23.
   void setFlipDeltaM23(bool flip){flipdelM = flip;}
@@ -28,6 +28,7 @@ class covarianceOsc : public covarianceBase
   /// @warning May become deprecated
   void useReactorPrior(bool reactor){reactorPrior = reactor;};
   /// @brief Sets extra branches for processing.
+  /// @param tree ROOT tree to which we set additional variables
   void setExtraBranches(TTree &tree);
 
   /// @brief Get baseline

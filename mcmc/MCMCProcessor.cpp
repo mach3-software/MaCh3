@@ -3399,7 +3399,9 @@ void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<do
   std::string OutputFilename = MCMCFile + "_reweighted.root";
 
   //KS: Simply create copy of file and add there new branch
-  system(("cp "+InputFile+" "+OutputFilename).c_str());
+  int ret = system(("cp " + InputFile + " " + OutputFilename).c_str());
+  if (ret != 0)
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
 
   TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
   OutputChain->cd();

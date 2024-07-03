@@ -68,9 +68,16 @@ class SMonolith : public SplineBase {
     inline void Initialise();
     /// @brief CW: Function to scan through the MasterSpline of TSpline3
     /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
+    /// @param NEvents Number of MC events
+    /// @param MaxPoints Maximal number of knots per splines
+    /// @param numParams Total number of parameters
+    /// @param numKnots Total number of knots, which is sum of individual knots per each spline
     inline void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams, int &nSplines, unsigned int &numKnots);
     /// @brief CW: Function to scan through the MasterSpline of TF1
     /// @param MasterSpline Vector of TF1_red pointers which we strip back
+    /// @param NEvents Number of MC events
+    /// @param MaxPoints Maximal number of knots per splines
+    /// @param numParams Total number of parameters
     inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
     /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
@@ -101,6 +108,9 @@ class SMonolith : public SplineBase {
     /// @param spl pointer to TSpline3_red that will be checked
     inline bool isFlat(TSpline3_red* &spl);
     /// @brief CW: Gets the polynomial coefficients for TF1
+    /// @param spl pointer to TF1_red that will be checked
+    /// @param nPoints number of knots
+    /// @param coeffs Array holding coefficients for each knot
     inline void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
     
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
@@ -117,6 +127,7 @@ class SMonolith : public SplineBase {
     /// @brief KS: Prepare spline file that can be used for fast loading
     inline void PrepareSplineFile();
     /// @brief KS: Load preprocessed spline file
+    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
     inline void LoadSplineFile(std::string FileName);
 
     /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation

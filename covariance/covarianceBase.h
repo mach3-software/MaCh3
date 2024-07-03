@@ -65,11 +65,14 @@ class covarianceBase {
   /// @brief Set matrix name
   void setName(const char *name) { matrixName = name; }
   /// @brief change parameter name
+  /// @param i Parameter index
   void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   /// @brief Set all the covariance matrix parameters to a user-defined value
+  /// @param i Parameter index
   void setPar(const int i, const double val);
   /// @brief Set current parameter value
+  /// @param i Parameter index
   void setParCurrProp(const int i, const double val);
   /// @brief Set proposed parameter value
   void setParProp(const int i, const double val) {
@@ -78,15 +81,20 @@ class covarianceBase {
   }
   void setParameters(std::vector<double> pars = std::vector<double>());
   /// @brief Set if parameter should have flat prior or not
+  /// @param i Parameter index
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief set branches for output file
   void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
+  /// @param scale Value of global step scale
   void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  /// @param ParameterIndex Parameter Index
+  /// @param StepScale Value of individual step scale
   void setIndivStepScale(const int ParameterIndex, const double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
+  /// @param stepscale Vector of individual step scale, should have same
   void setIndivStepScale(std::vector<double> stepscale);
   /// @brief KS: In case someone really want to change this
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
@@ -113,8 +121,9 @@ class covarianceBase {
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
 
-  // Getters
+  /// @brief Return covariance matrix
   TMatrixDSym *getCovMatrix() { return covMatrix; }
+  /// @brief Return inverted covariance matrix
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
   /// @brief Get if param has flat prior or not
   /// @param i Parameter index
@@ -138,6 +147,7 @@ class covarianceBase {
   std::string getInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
+  /// @param i Parameter index
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
 
   // Adaptive Step Tuning Stuff
@@ -195,14 +205,24 @@ class covarianceBase {
 
   virtual double getNominal(const int i) { return getParInit(i); }
   inline double GetGenerated(const int i) { return _fGenerated[i];}
+  /// @brief Get upper parameter bound in which it is physically valid
+  /// @param i Parameter index
   inline double GetUpperBound(const int i){ return _fUpBound[i];}
+  /// @brief Get lower parameter bound in which it is physically valid
+  /// @param i Parameter index
   inline double GetLowerBound(const int i){ return _fLowBound[i]; }
-  inline double GetIndivStepScale(int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  /// @brief Get individual step scale for selected parameter
+  /// @param ParameterIndex Parameter index
+  inline double GetIndivStepScale(const int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
   inline double getParProp_PCA(const int i) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return fParProp_PCA(i);
   }
   
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
   inline double getParCurr_PCA(const int i) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return fParCurr_PCA(i);
@@ -268,8 +288,9 @@ class covarianceBase {
     else return _fNumPar;
   }
 
-  // Printers
+  /// @brief Print nominal value for every parameter
   void printNominal();
+  /// @brief Print nominal, current and proposed value for each parameter
   void printNominalCurrProp();
   void printPars();
   /// @brief Print step scale for each parameter
@@ -283,11 +304,14 @@ class covarianceBase {
   /// @brief fix parameters at prior values
   void toggleFixAllParameters();
   /// @brief fix parameter at prior values
+  /// @param i Parameter index
   void toggleFixParameter(const int i);
   /// @brief Fix parameter at prior values
+  /// @param name Name of parameter you want to fix
   void toggleFixParameter(const std::string& name);
 
   /// @brief Is parameter fixed or not
+  /// @param i Parameter index
   bool isParameterFixed(const int i) {
     if (_fError[i] < 0) { return true; }
     else                { return false; }

@@ -22,9 +22,11 @@ inline void SetMaCh3LoggerFormat()
   //KS: %H for hour, %M for minute, %S for second, [%s:%#] for class and line
   //For documentation see https://github.com/gabime/spdlog/wiki/3.-Custom-formatting
   #ifdef DEBUG
-  spdlog::set_pattern("[%H:%M:%S][%s:%#][%^%l%$] %v");
+  //spdlog::set_pattern("[%H:%M:%S][%s:%#][%^%l%$] %v");
+  spdlog::set_pattern("[%s:%#][%^%l%$] %v");
   #else
-  spdlog::set_pattern("[%H:%M:%S][%s][%^%l%$] %v");
+  //spdlog::set_pattern("[%H:%M:%S][%s][%^%l%$] %v");
+  spdlog::set_pattern("[%s][%^%l%$] %v");
   #endif
 }
 
