@@ -2,8 +2,6 @@
 # KS: Get glorious container from ROOT which will work as a base
 FROM rootproject/root:6.20.06-fedora32 AS mach3_build
 
-RUN apt update && apt upgrade -y
-
 # Declare the build argument
 ARG MACH3_VERSION
 ENV MACH3_VERSION=${MACH3_VERSION:-develop}
