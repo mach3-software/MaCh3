@@ -1057,7 +1057,7 @@ void covarianceBase::printPars() {
 
 // ********************************************
 // Sets the proposed parameters to the nominal values
-void covarianceBase::setParameters(std::vector<double> pars) {
+void covarianceBase::setParameters(const std::vector<double>& pars) {
 // ********************************************
   // If empty, set the proposed to nominal
   if (pars.empty()) {

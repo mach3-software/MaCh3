@@ -25,7 +25,7 @@ class FitterBase {
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, which will handle all settings.
   FitterBase(manager * const fitMan);
-  /// @brief Destructor
+  /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
@@ -47,6 +47,10 @@ class FitterBase {
 
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
+
+  /// @brief Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan's feature
+  /// @param NLaps number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time
+  void DragRace(const int NLaps = 100);
 
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();

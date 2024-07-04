@@ -1426,6 +1426,9 @@ void MCMCProcessor::MakeSubOptimality(int NIntervals) {
 void MCMCProcessor::DrawCovariance() {
 // *********************
     
+  const double RightMargin  = Posterior->GetRightMargin();
+  Posterior->SetRightMargin(0.15);
+
   int covBinning = nDraw;
   // The Covariance matrix from the fit
   TH2D* hCov = new TH2D("hCov", "hCov", covBinning, 0, covBinning, covBinning, 0, covBinning);
@@ -1497,14 +1500,12 @@ void MCMCProcessor::DrawCovariance() {
   Posterior->Clear();
   if(plotBinValue) hCov->Draw("colz text");
   else hCov->Draw("colz");
-  Posterior->SetRightMargin(0.15);
   if(printToPDF) Posterior->Print(CanvasName);
 
   Posterior->cd();
   Posterior->Clear();
   if(plotBinValue) hCorr->Draw("colz text");
   else hCorr->Draw("colz");
-  Posterior->SetRightMargin(0.15);
   if(printToPDF) Posterior->Print(CanvasName);
 
   hCov->Write("Covariance_plot");
@@ -1512,14 +1513,13 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->Write("Correlation_plot");
   
   //Back to normal
-  Posterior->SetRightMargin(0.03);
+  Posterior->SetRightMargin(RightMargin);
   delete hCov;
   delete hCovSq;
   delete hCorr;
 
   DrawCorrelations1D();
 }
-
 
 // *********************
 //KS: Make the 1D projections of Correlations inspired by Henry's slides (page 28) https://www.t2k.org/asg/oagroup/meeting/2023/2023-07-10-oa-pre-meeting/MaCh3FDUpdate
