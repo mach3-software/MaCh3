@@ -195,14 +195,20 @@ class covarianceBase {
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
-  /// Get total number of parameters
+  /// @brief Get total number of parameters
   inline int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
   const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
   const std::vector<double>& getGeneratedValues(){return _fGenerated;}
   const std::vector<double> getProposed() const;
+  /// @brief Get proposed parameter value
+  /// @param i Parameter index
   inline double getParProp(const int i) { return _fPropVal[i]; }
+  /// @brief Get current parameter value
+  /// @param i Parameter index
   inline double getParCurr(const int i) { return _fCurrVal[i]; }
+  /// @brief Get prior parameter value
+  /// @param i Parameter index
   inline double getParInit(const int i) { return _fPreFitValue[i]; }
 
   virtual double getNominal(const int i) { return getParInit(i); }
@@ -230,6 +236,8 @@ class covarianceBase {
     return fParCurr_PCA(i);
   }
 
+  /// @brief Is parameter fixed in PCA base or not
+  /// @param i Parameter index
   inline bool isParameterFixedPCA(const int i) {
     if (fParSigma_PCA[i] < 0) { return true;  }
     else                      { return false; }
@@ -269,7 +277,9 @@ class covarianceBase {
     TransferToParam();
   }
 
-  inline void setParameters_PCA(std::vector<double> pars) {
+  /// @brief Set values for PCA parameters in PCA base
+  /// @param pars vector with new values of PCA params
+  inline void setParameters_PCA(const std::vector<double> &pars) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     if (pars.size() != size_t(_fNumParPCA)) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
@@ -282,7 +292,7 @@ class covarianceBase {
     //KS: Transfer to normal base
     TransferToParam();
   }
-
+  /// @brief Get number of params in normal Base, if you want something which will work with PCA as well please use getNpars()
   inline int getSize() { return _fNumPar; }
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   inline int getNpars() {
@@ -319,6 +329,7 @@ class covarianceBase {
     else                { return false; }
   }
   /// @brief Is parameter fixed or not
+  /// @param name Name of parameter you want to check if is fixed
   bool isParameterFixed(const std::string& name);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold

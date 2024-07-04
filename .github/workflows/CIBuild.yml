@@ -21,6 +21,9 @@ jobs:
           - os: Alma9
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
+          - os: Fedora32
+            file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
+            tag_latest: fedore32latest
 
     name: Build CI ${{ matrix.os }}
 

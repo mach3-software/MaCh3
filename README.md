@@ -118,6 +118,7 @@ Based on several test here are recommended version:
 |-------------|--------|
 | Alma9       | ✅     |
 | Ubuntu22.04 | ✅     |
+| Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
 
