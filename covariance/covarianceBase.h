@@ -79,7 +79,9 @@ class covarianceBase {
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
   }
-  void setParameters(std::vector<double> pars = std::vector<double>());
+  /// @brief Set parameter values using vector, it has to have same size as covariance class
+  /// @param pars Vector holding new values for every parameter
+  void setParameters(const std::vector<double>& pars = {});
   /// @brief Set if parameter should have flat prior or not
   /// @param i Parameter index
   void setFlatPrior(const int i, const bool eL);

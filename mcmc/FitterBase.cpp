@@ -420,44 +420,56 @@ void FitterBase::ProcessMCMC() {
 
 // *************************
 // Run Drag Race
-void FitterBase::DragRace() {
+void FitterBase::DragRace(const int NLaps) {
 // *************************
 
   MACH3LOG_INFO("Let the Race Begin!");
   // Reweight the MC
   for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
   {
-    double *fake = 0;
     TStopwatch clockRace;
     clockRace.Start();
-    samples[ivs]->reweight(fake);
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      double *fake = 0;
+      samples[ivs]->reweight(fake);
+    }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.6f} s for a single reweight of sample:  {}", clockRace.RealTime(), samples[ivs]->GetName());
+    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
   for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
   {
     TStopwatch clockRace;
     clockRace.Start();
-    samples[ivs]->GetLikelihood();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      samples[ivs]->GetLikelihood();
+    }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.6f} s for a single GetLikelihood of sample:  {}", clockRace.RealTime(), samples[ivs]->GetName());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
-    systematics[s]->proposeStep();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      systematics[s]->proposeStep();
+    }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.6f} s for a single propose step of cov:  {}", clockRace.RealTime(), systematics[s]->getName());
+    MACH3LOG_INFO("It took {:.4f} s to propose step {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
-    systematics[s]->GetLikelihood();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      systematics[s]->GetLikelihood();
+    }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.6f} s for a single get likelihood of cov:  {}", clockRace.RealTime(), systematics[s]->getName());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  get likelihood {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   MACH3LOG_INFO("End of race");
 }
