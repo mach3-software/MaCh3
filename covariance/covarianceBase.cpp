@@ -605,10 +605,10 @@ void covarianceBase::TransferToParam() {
   }
 }
 
-const std::vector<double> covarianceBase::getProposed() const {
+std::vector<double> covarianceBase::getProposed() const {
   std::vector<double> props(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i) props[i] = _fPropVal[i];
-  return props;
+  return props; // return by value, not by reference
 }
 
 // Throw nominal values
@@ -1248,7 +1248,7 @@ double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const
 }
 
 // ********************************************
-void covarianceBase::setIndivStepScale(std::vector<double> stepscale) {
+void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
 
   if ((int)stepscale.size() != _fNumPar)
@@ -1283,7 +1283,7 @@ void covarianceBase::printIndivStepScale() {
 void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
-  if(cov == NULL){
+  if(cov == nullptr){
     cov = &*covMatrix;
   }
 

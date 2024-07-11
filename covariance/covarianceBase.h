@@ -84,6 +84,7 @@ class covarianceBase {
   void setParameters(const std::vector<double>& pars = {});
   /// @brief Set if parameter should have flat prior or not
   /// @param i Parameter index
+  /// @param eL bool telling if it will be flat or not
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief set branches for output file
@@ -97,7 +98,7 @@ class covarianceBase {
   void setIndivStepScale(const int ParameterIndex, const double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param stepscale Vector of individual step scale, should have same
-  void setIndivStepScale(std::vector<double> stepscale);
+  void setIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
@@ -112,7 +113,7 @@ class covarianceBase {
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void throwParameters();
   /// @brief Throw nominal values
-  void throwNominal(bool nomValues = false, int seed = 0);
+  void throwNominal(const bool nomValues = false, const int seed = 0);
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
@@ -198,9 +199,9 @@ class covarianceBase {
   /// @brief Get total number of parameters
   inline int    GetNumParams()               {return _fNumPar;}
   virtual std::vector<double> getNominalArray();
-  const std::vector<double>& getPreFitValues(){return _fPreFitValue;}
-  const std::vector<double>& getGeneratedValues(){return _fGenerated;}
-  const std::vector<double> getProposed() const;
+  std::vector<double> getPreFitValues(){return _fPreFitValue;}
+  std::vector<double> getGeneratedValues(){return _fGenerated;}
+  std::vector<double> getProposed() const;
   /// @brief Get proposed parameter value
   /// @param i Parameter index
   inline double getParProp(const int i) { return _fPropVal[i]; }
@@ -381,7 +382,7 @@ class covarianceBase {
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   /// @param cov Matrix which we evaluate Positive Definitiveness
-  void MakePosDef(TMatrixDSym *cov = NULL);
+  void MakePosDef(TMatrixDSym *cov = nullptr);
 
   /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
   void makeClosestPosDef(TMatrixDSym *cov);

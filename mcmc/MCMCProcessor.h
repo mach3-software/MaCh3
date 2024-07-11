@@ -77,9 +77,9 @@ class MCMCProcessor {
     void CacheSteps();
     /// @brief Calculate covariance by making 2D projection of each combination of parameters using multithreading
     /// @param Mute Allow silencing many messages, especially important if we calculate matrix many times
-    void MakeCovariance_MP(bool Mute = false);
+    void MakeCovariance_MP(const bool Mute = false);
     /// @brief Make and Draw SubOptimality
-    void MakeSubOptimality(int NIntervals = 10);
+    void MakeSubOptimality(const int NIntervals = 10);
 
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
     void ResetHistograms();
@@ -92,8 +92,8 @@ class MCMCProcessor {
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
     /// @param CredibleIntervalsColours Color_t telling what colour to use for each Interval line
     /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
-    void MakeCredibleIntervals(std::vector<double> CredibleIntervals = {0.99, 0.90, 0.68 },
-                               std::vector<Color_t> CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
+    void MakeCredibleIntervals(const std::vector<double>& CredibleIntervals = {0.99, 0.90, 0.68 },
+                               const std::vector<Color_t>& CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
                                bool CredibleInSigmas = false
                                );
     /// @brief Draw the post-fit covariances
@@ -103,9 +103,9 @@ class MCMCProcessor {
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
     /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
-    void MakeCredibleRegions(std::vector<double> CredibleRegions = {0.99, 0.90, 0.68},
-                             std::vector<Style_t> CredibleRegionStyle = {kDashed, kSolid, kDotted},
-                             std::vector<Color_t> CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
+    void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
+                             const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
+                             const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
                              bool CredibleInSigmas = false
                              );
     /// @brief Make fancy triangle plot for selected parameters
@@ -116,39 +116,47 @@ class MCMCProcessor {
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
     /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
-    void MakeTrianglePlot(std::vector<std::string> ParNames,
+    void MakeTrianglePlot(const std::vector<std::string>& ParNames,
                           // 1D
-                          std::vector<double> CredibleIntervals = {0.99, 0.90, 0.68 },
-                          std::vector<Color_t> CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
+                          const std::vector<double>& CredibleIntervals = {0.99, 0.90, 0.68 },
+                          const std::vector<Color_t>& CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
                           //2D
-                          std::vector<double> CredibleRegions = {0.99, 0.90, 0.68},
-                          std::vector<Style_t> CredibleRegionStyle = {kDashed, kSolid, kDotted},
-                          std::vector<Color_t> CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
+                          const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
+                          const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
+                          const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
                           // Other
                           bool CredibleInSigmas = false
                           );
     /// @brief Make funny polar plot
     /// @param ParNames Vector with parameter names for which Polar Plot will be made
-    void GetPolarPlot(std::vector<std::string> ParNames);
+    void GetPolarPlot(const std::vector<std::string>& ParNames);
 
     /// @brief Calculate Bayes factor for vector of params, and model boundaries
     /// @param ParName Vector with parameter names for which we calculate Bayes factor
     /// @param Model1Bounds Lower and upper bound for hypothesis 1. Within this bound we calculate integral used later for Bayes Factor
     /// @param Model2Bounds Lower and upper bound for hypothesis 2. Within this bound we calculate integral used later for Bayes Factor
     /// @param ModelNames Names for hypothesis 1 and 2
-    void GetBayesFactor(std::vector<std::string> ParName, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames);
+    void GetBayesFactor(const std::vector<std::string>& ParName,
+                        const std::vector<std::vector<double>>& Model1Bounds,
+                        const std::vector<std::vector<double>>& Model2Bounds,
+                        const std::vector<std::vector<std::string>>& ModelNames);
     /// @brief Calculate Bayes factor for point like hypothesis using SavageDickey
-    void GetSavageDickey(std::vector<std::string> ParName, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds);
+    void GetSavageDickey(const std::vector<std::string>& ParName,
+                         const std::vector<double>& EvaluationPoint,
+                         const std::vector<std::vector<double>>& Bounds);
     /// @brief Reweight Prior by giving new central value and new error
     /// @param ParName Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight
     /// @param NewError New error used for calculating weight
-    void ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError);
+    void ReweightPrior(const std::vector<std::string>& Names,
+                       const std::vector<double>& NewCentral,
+                       const std::vector<double>& NewError);
     
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     
     // Get the number of parameters
+    /// @brief Get total number of used parameters
     inline int GetNParams() { return nDraw; };
     inline int GetNFlux() { return nFlux; };
     inline int GetNXSec() { return nParam[kXSecPar]; };
@@ -177,6 +185,8 @@ class MCMCProcessor {
     /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
     /// @brief Get the post-fit covariances and correlations
+    /// @param Cov Covariance matrix
+    /// @param Corr Correlation matrix
     void GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr);
     /// @brief Or the individual post-fits
     void GetPostfit_Ind(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Peaks, ParameterEnum kParam);
@@ -252,11 +262,14 @@ class MCMCProcessor {
 
     //Analyse posterior distribution
     /// @brief Get Arithmetic mean from posterior
+    /// @param hist histograms from which we extract arithmetic mean
     inline void GetArithmetic(TH1D * const hist, const int i);
     /// @brief Fit Gaussian to posterior
     /// @param hist histograms to which we fit gaussian
     inline void GetGaussian(TH1D *& hist, const int i);
     /// @brief Get Highest Posterior Density (HPD)
+    /// @param hist histograms from which we HPD
+    /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
     inline void GetHPD(TH1D * const hist, const int i, const double coverage = 0.6827);
     /// @brief Get 1D Credible Interval
     /// @param hist histograms based on which we calculate credible interval
