@@ -248,8 +248,10 @@ void covarianceBase::ConstructPCA() {
   #endif
 }
 
-void covarianceBase::init(const char *name, const char *file)
-{
+// ********************************************
+void covarianceBase::init(const char *name, const char *file) {
+// ********************************************
+
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file, "READ");
   if (infile->IsZombie()) {
@@ -321,12 +323,13 @@ void covarianceBase::init(const char *name, const char *file)
   delete infile;
 }
 
+// ********************************************
 // ETA
 // An init function for the YAML constructor
 // All you really need from the YAML file is the number of Systematics
 // Then get all the info from the YAML file in the covarianceXsec::ParseYAML function
-void covarianceBase::init(const std::vector<std::string>& YAMLFile)
-{
+void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
+// ********************************************
   _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
@@ -427,7 +430,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile)
       }
       else {
         MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
-        exit(5);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
 
       //
@@ -439,11 +442,11 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile)
         if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
           MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
           MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
-          exit(5);
+          throw MaCh3Exception(__FILE__ , __LINE__ );
         }
       } else {
         MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[j], key);
-        exit(5);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       (*_fCovMatrix)(j, index)= (*_fCovMatrix)(index, j) = Corr1*_fError[j]*_fError[index];
     }
@@ -470,8 +473,9 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile)
   return;
 }
 
+// ********************************************
 void covarianceBase::init(TMatrixDSym* covMat) {
-
+// ********************************************
   size = covMat->GetNrows();
   _fNumPar = size;
   InvertCovMatrix = new double*[_fNumPar]();
@@ -495,8 +499,10 @@ void covarianceBase::init(TMatrixDSym* covMat) {
   MACH3LOG_INFO("Created covariance matrix named: {}", getName());
 }
 
+// ********************************************
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
+// ********************************************
   if (cov == NULL) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setCovMatrix");
     MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
@@ -604,11 +610,12 @@ void covarianceBase::TransferToParam() {
     _fCurrVal[i] = fParCurr_vec(i);
   }
 }
-
+// ********************************************
 std::vector<double> covarianceBase::getProposed() const {
+// ********************************************
   std::vector<double> props(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i) props[i] = _fPropVal[i];
-  return props; // return by value, not by reference
+  return props;
 }
 
 // Throw nominal values
