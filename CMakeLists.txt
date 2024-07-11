@@ -58,7 +58,8 @@ if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
 endif()
 cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
 
-if(ROOT_CXX_STANDARD LESS 14)
+# KS: ROOT changed cmake in 6.32, we should move avay from using Luke's hack, keep it for due to compatibility
+if(ROOT_CXX_STANDARD LESS 14 AND ROOT_VERSION VERSION_LESS 6.32.00)
   cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
 endif()
 
