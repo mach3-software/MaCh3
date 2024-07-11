@@ -27,7 +27,6 @@ else()
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 endif()
 
-
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
 if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
@@ -43,106 +42,23 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 ################################## Dependencies ################################
-
-include(CPM)
-
-#Luke's handing cmake modules which Neutrino hep experiments might want
-CPMFindPackage(
-      NAME CMakeModules
-      GIT_TAG stable
-      GITHUB_REPOSITORY NuHepMC/CMakeModules
-      DOWNLOAD_ONLY
-  )
-include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
-include(NuHepMCUtils)
-
-# Check if CUDA was found
-if(MaCh3_GPU_ENABLED)
-  include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
-endif()
-
-include(ROOT)
-if(NOT TARGET ROOT::ROOT)
-  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
-endif()
-
-if(ROOT_VERSION VERSION_LESS 6.18.0)
-  cmessage(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
-endif()
-
-#YAML for reading in config files
-set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
-set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
-CPMAddPackage(
-    NAME yaml-cpp
-    VERSION ${YAML_CPP_VERSION}
-    GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG "${YAML_CPP_GIT_TAG}"
-    OPTIONS
-      "YAML_BUILD_SHARED_LIBS ON"
-)
-
-if(NOT TARGET yaml-cpp::yaml-cpp)
-  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
-endif()
-
-#KS: Not being used right now so commenting it out.
-#CPMAddPackage(
-#  NAME Eigen
-#  VERSION 3.2.8
-#  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
-#  # Eigen's CMakelists are not intended for library use
-#  DOWNLOAD_ONLY YES
-#)
-
-#if(Eigen_ADDED)
-#  add_library(Eigen INTERFACE IMPORTED)
-#  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
-#endif()
-
-
-################################## Oscillation ################################
-#KS: All of these should be moved to separate cmake and be handled by osc class, keep it for now
-#If USE_PROB3 not defined turn it off by default
-if(NOT DEFINED USE_PROB3)
-  SET(USE_PROB3 FALSE)
-endif()
-
-# Oscillation calculation
-# In the future which osc calc we use might be set with a flag
-SET(MaCh3_Oscillator_ENABLED "")
-if (USE_PROB3)
-  CPMFindPackage(
-    NAME Prob3plusplus
-    VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
-else()
-  CPMFindPackage(
-    NAME CUDAProb3
-    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-    GIT_TAG "feature_cleanup"
-    DOWNLOAD_ONLY YES
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
-endif()
-
-#dump_cmake_variables(Prob3plusplus)
+#KS: Store some handy cmake functions
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Utils.cmake)
+#Loads all dependencies
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   SET(CMAKE_CXX_STANDARD 11)
 endif()
 
-# KS: If C++ standard is lower than C++ standar used for ROOT compilation things will go terribly wrong
+# KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
 if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
 endif()
 cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
 
-if(${ROOT_CXX_STANDARD} LESS 14)
+if(ROOT_CXX_STANDARD LESS 14)
   cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
 endif()
 
@@ -171,9 +87,7 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
                                                     -Woverloaded-virtual
                                                     )
 #KS: If Debug is not defined disable it by default
-if(NOT DEFINED MaCh3_DEBUG_ENABLED)
-  SET(MaCh3_DEBUG_ENABLED FALSE)
-endif()
+DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
@@ -205,9 +119,7 @@ else()
 endif()
 
 #KS: If multithreading is not defined enable it by default
-if(NOT DEFINED MaCh3_MULTITHREAD_ENABLED)
-  SET(MaCh3_MULTITHREAD_ENABLED TRUE)
-endif()
+DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
@@ -241,14 +153,6 @@ set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOption
 install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
-
-#KS: Consider moving it somewhere else
-SET(MaCh3_Fitter_ENABLED "MR2T2")
-SET(MaCh3_MINUIT2_ENABLED FALSE)
-if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
-  LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
-  SET(MaCh3_MINUIT2_ENABLED TRUE)
-endif()
 
 #Include logger
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)

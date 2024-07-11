@@ -29,7 +29,7 @@ class manager {
 public:
   /// @brief Constructs a manager object with the specified file name.
   /// @param filename The name of the configuration file.
-  manager(std::string const &filename);
+  explicit manager(std::string const &filename);
   /// @brief Destroys the manager object.
   virtual ~manager();
 
