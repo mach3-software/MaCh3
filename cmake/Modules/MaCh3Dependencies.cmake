@@ -20,13 +20,13 @@ if(NOT TARGET ROOT::ROOT)
   cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
 endif()
 
-if(ROOT_VERSION VERSION_LESS 6.18.0)
+if(ROOT_VERSION VERSION_LESS 6.18.00)
   cmessage(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
 endif()
 
 # KS: Since ROOT 6.32.0 Minuit is turned on by default
 SET(MaCh3_MINUIT2_ENABLED FALSE)
-if(ROOT_VERSION GREATER 6.32.0 OR ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
+if(ROOT_VERSION GREATER_EQUAL 6.32.00 OR ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
   SET(MaCh3_MINUIT2_ENABLED TRUE)
 endif()
 
