@@ -68,7 +68,7 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
 }
 
 // *******************
-/// KS: This is mad way of converting string to int. Why? To be able to use string with switch
+/// @brief KS: This is mad way of converting string to int. Why? To be able to use string with switch
 constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
   return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
@@ -77,11 +77,8 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
 /// ETA - Normalisations for cross-section parameters
 /// Carrier for whether you want to apply a systematic to an event or not
-class XsecNorms4 {
-  // *******************
-  public:
-    /// Bins for normalisation parameter
-    TAxis *ebins;
+struct XsecNorms4 {
+// *******************
     /// Name of parameters
     std::string name;
     /// Mode which parameter applies to
@@ -96,16 +93,16 @@ class XsecNorms4 {
     std::vector<int> targets;
     /// Does this parameter have kinematic bounds
     bool hasKinBounds;
-	/// Generic vector contain enum relating to a kinematic variable
+    /// Generic vector contain enum relating to a kinematic variable
     /// and lower and upper bounds. This can then be passed to IsEventSelected
-	std::vector< std::vector<double> > Selection;
-	
+    std::vector< std::vector<double> > Selection;
+
 	/// Generic vector containing the string of kinematic type
 	/// This then needs to be converted to a kinematic type enum
 	/// within a samplePDF daughter class
 	/// The bounds for each kinematic variable are given in Selection
 	std::vector< std::string > KinematicVarStr;
-	
+
     /// Parameter number of this normalisation in current systematic model
     int index;
 };
@@ -121,7 +118,7 @@ enum SplineInterpolation {
 
 // **************************************************
 /// Convert a LLH type to a string
-inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
+inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
 // **************************************************
   std::string name = "";
   switch(i) {
@@ -147,6 +144,39 @@ inline std::string SplineInterpolation_ToString(SplineInterpolation i) {
   }
   return name;
 }
+
+/// Make an enum of systematic type recognised by covariance class
+enum SystType {
+  kNorm,
+  kSpline,
+  kFunc,
+  kSystTypes  //This only enumerates
+};
+
+// **************************************************
+/// Convert a Syst type type to a string
+inline std::string SystType_ToString(const SystType i) {
+// **************************************************
+  std::string name = "";
+  switch(i) {
+    case kNorm:
+      name = "Norm";
+      break;
+    case kSpline:
+      name = "Spline";
+      break;
+    case kFunc:
+      name = "Functional";
+      break;
+    default:
+      std::cerr << "UNKNOWN SYST TYPE SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return name;
+}
+
 
 // ***************************
 // A handy namespace for variables extraction
@@ -180,7 +210,7 @@ enum TargetMat {
 
 // *****************
 /// @brief Converted the Target Mat to a string
-inline std::string TargetMat_ToString(TargetMat i) {
+inline std::string TargetMat_ToString(const TargetMat i) {
 // *****************
   std::string name;
 

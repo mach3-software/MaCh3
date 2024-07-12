@@ -1,5 +1,7 @@
 #include "MCMCProcessor.h"
 
+#include "TChain.h"
+
 //Only if GPU is enabled
 #ifdef CUDA
 extern void InitGPU_AutoCorr(
@@ -711,8 +713,8 @@ void MCMCProcessor::DrawPostfit() {
 
 // *********************
 // Make fancy Credible Intervals plots
-void MCMCProcessor::MakeCredibleIntervals(std::vector<double> CredibleIntervals,
-                                          std::vector<Color_t> CredibleIntervalsColours,
+void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleIntervals,
+                                          const std::vector<Color_t>& CredibleIntervalsColours,
                                           bool CredibleInSigmas) {
 // *********************
 
@@ -1683,9 +1685,9 @@ void MCMCProcessor::DrawCorrelations1D() {
 
 // *********************
 // Make fancy Credible Intervals plots
-void MCMCProcessor::MakeCredibleRegions(std::vector<double> CredibleRegions,
-                                        std::vector<Style_t> CredibleRegionStyle,
-                                        std::vector<Color_t> CredibleRegionColor,
+void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
+                                        const std::vector<Style_t>& CredibleRegionStyle,
+                                        const std::vector<Color_t>& CredibleRegionColor,
                                         bool CredibleInSigmas) {
 // *********************
 
@@ -1833,14 +1835,14 @@ void MCMCProcessor::MakeCredibleRegions(std::vector<double> CredibleRegions,
 
 // *********************
 // Make fancy triangle plot for selected parameters
-void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames,
+void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      // 1D
-                                     std::vector<double> CredibleIntervals,
-                                     std::vector<Color_t> CredibleIntervalsColours,
+                                     const std::vector<double>& CredibleIntervals,
+                                     const std::vector<Color_t>& CredibleIntervalsColours,
                                      //2D
-                                     std::vector<double> CredibleRegions,
-                                     std::vector<Style_t> CredibleRegionStyle,
-                                     std::vector<Color_t> CredibleRegionColor,
+                                     const std::vector<double>& CredibleRegions,
+                                     const std::vector<Style_t>& CredibleRegionStyle,
+                                     const std::vector<Color_t>& CredibleRegionColor,
                                      // Other
                                      bool CredibleInSigmas) {
 // *********************
@@ -2756,7 +2758,7 @@ void MCMCProcessor::RemoveParameters() {
 
 // ***************
 // Make the step cut from a string
-void MCMCProcessor::SetStepCut(std::string Cuts) {
+void MCMCProcessor::SetStepCut(const std::string& Cuts) {
 // ***************
   StepCut = Cuts;
   BurnInCut = std::stoi( Cuts );
@@ -3066,7 +3068,7 @@ void MCMCProcessor::ResetHistograms() {
 
 // **************************
 // KS: Get Super Fancy Polar Plot
-void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
+void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 // **************************
   if(hpost[0] == nullptr) MakePostfit();
 
@@ -3146,8 +3148,11 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
 }
 
 // **************************
-// Get Bayes Factor for particualar parameter
-void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames){
+// Get Bayes Factor for particular parameter
+void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
+                                   const std::vector<std::vector<double>>& Model1Bounds,
+                                   const std::vector<std::vector<double>>& Model2Bounds,
+                                   const std::vector<std::vector<std::string>>& ModelNames){
 // **************************
   if(hpost[0] == nullptr) MakePostfit();
 
@@ -3204,8 +3209,10 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
 
 
 // **************************
-// KS: Get Savage Dockey point hypothesis test
-void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds){
+// KS: Get Savage Dickey point hypothesis test
+void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
+                                    const std::vector<double>& EvaluationPoint,
+                                    const std::vector<std::vector<double>>& Bounds){
 // **************************
 
   if((ParNames.size() != EvaluationPoint.size()) || (Bounds.size() != EvaluationPoint.size()))
@@ -3352,7 +3359,9 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
 
 // **************************
 // KS: Reweight prior of MCMC chain to another
-void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError){
+void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
+                                  const std::vector<double>& NewCentral,
+                                  const std::vector<double>& NewError) {
 // **************************
 
   MACH3LOG_INFO("Reweighting Prior");
