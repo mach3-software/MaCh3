@@ -10,7 +10,6 @@
 // ROOT includes
 #include "TObjArray.h"
 #include "TObjString.h"
-#include "TChain.h"
 #include "TFile.h"
 #include "TBranch.h"
 #include "TCanvas.h"
@@ -20,7 +19,6 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TF1.h"
-#include "TH2Poly.h"
 #include "TGraphErrors.h"
 #include "TVectorD.h"
 #include "TColor.h"
@@ -28,7 +26,6 @@
 #include "TStopwatch.h"
 #include "TText.h"
 #include "TGaxis.h"
-#include "TObjString.h"
 #include "TTree.h"
 #include "TROOT.h"
 #include "TKey.h"
@@ -39,6 +36,9 @@
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
+
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class TChain;
 
 // TODO
 // Apply reweighted weight to plotting and Bayes Factor
@@ -204,12 +204,13 @@ class MCMCProcessor {
     
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
-    void SetStepCut(std::string Cuts);
+    void SetStepCut(const std::string& Cuts);
     /// @brief Set the step cutting by int
     /// @param Cuts integer telling cut value
     void SetStepCut(const int Cuts);
 
-    //Setter related to plotting
+    /// @brief You can set relative to prior or relative to generated. It is advised to use relate to prior
+    /// @param PlotOrNot bool controlling plotRelativeToPrior argument
     inline void SetPlotRelativeToPrior(const bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
     inline void SetPrintToPDF(const bool PlotOrNot){printToPDF = PlotOrNot; };
     /// @brief Set whether you want to plot error for parameters which have flat prior
@@ -243,12 +244,17 @@ class MCMCProcessor {
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     inline void DrawCorrelations1D();
 
-    /// @brief Read Matrices
+    /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
+    /// @brief Read the output MCMC file and find what inputs were used
     inline void FindInputFiles();
+    /// @brief Read the xsec file and get the input central values and errors
     inline void ReadXSecFile();
+    /// @brief Read the ND cov file and get the input central values and errors
     inline void ReadNDFile();
+    /// @brief Read the FD cov file and get the input central values and errors
     inline void ReadFDFile();
+    /// @brief Read the Osc cov file and get the input central values and errors
     inline void ReadOSCFile();
     /// @brief Remove parameter specified in config
     inline void RemoveParameters();

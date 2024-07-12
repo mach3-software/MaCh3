@@ -23,6 +23,10 @@ class covarianceXsec : public covarianceBase {
     inline void InitXsecFromConfig();
     /// @brief Initialise Norm params
     inline void SetupNormPars();
+    /// @brief Get Norm params
+    /// @param i Global parameter index
+    /// @param norm_counter norm parameter index
+    inline XsecNorms4 GetXsecNorm(const int i, const int norm_counter);
     /// @brief Print information about the whole object once it is set
     inline void Print();
 

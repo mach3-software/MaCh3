@@ -1,5 +1,7 @@
 #include "MCMCProcessor.h"
 
+#include "TChain.h"
+
 //Only if GPU is enabled
 #ifdef CUDA
 extern void InitGPU_AutoCorr(
@@ -2756,7 +2758,7 @@ void MCMCProcessor::RemoveParameters() {
 
 // ***************
 // Make the step cut from a string
-void MCMCProcessor::SetStepCut(std::string Cuts) {
+void MCMCProcessor::SetStepCut(const std::string& Cuts) {
 // ***************
   StepCut = Cuts;
   BurnInCut = std::stoi( Cuts );
