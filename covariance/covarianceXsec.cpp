@@ -62,7 +62,7 @@ void covarianceXsec::InitXsecFromConfig() {
 	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
 	 int nFDSplines;
 	 //Now load in variables for spline systematics only
-	 if (ParamType.find("Spline") != std::string::npos)
+	 if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
      {
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
 		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
@@ -90,7 +90,7 @@ void covarianceXsec::InitXsecFromConfig() {
       _fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
       _fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
 
-	 } else if(param["Systematic"]["Type"].as<std::string>() == "Norm") {
+	 } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
  
 	   // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
        // ETA Has to be of size 0 to mean apply to all
@@ -103,15 +103,21 @@ void covarianceXsec::InitXsecFromConfig() {
        _fNeutrinoFlavourUnosc.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["NeutrinoFlavourUnosc"], DummyModeVec));
        _fNormModes.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["Mode"], DummyModeVec));
       }
-     else if(param["Systematic"]["Type"].as<std::string>() == "Functional"){
+     else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
 	   //std::cout << "Found a functional parameter!!" << std::endl;
 	    
 	 }
      else{
        MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
-       MACH3LOG_ERROR("Expecting \"Norm\", \"Spline\" or \"Functional\"");
+       std::string expectedTypes = "Expecting ";
+       for (int s = 0; s < kSystTypes; ++s) {
+         if (s > 0) expectedTypes += ", ";
+         expectedTypes += SystType_ToString(static_cast<SystType>(s)) + "\"";
+       }
+       expectedTypes += ".";
+       MACH3LOG_ERROR(expectedTypes);
        throw;
-	 }
+      }
 
 	 //ETA - I think this can go in the norm parameters only if statement above
 	 int NumKinematicCuts = 0;
@@ -157,26 +163,9 @@ covarianceXsec::~covarianceXsec() {
 }
 
 // ********************************************
-// DB Grab the Number of splines for the relevant DetID
-int covarianceXsec::GetNumSplineParamsFromDetID(const int DetID) {
-// ********************************************
-  int returnVal = 0; 
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		returnVal += 1;
-      }
-    }
-  }
-
-  return returnVal;
-}
-
-// ********************************************
 // DB Grab the Spline Names for the relevant DetID
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const int DetID) {
 // ********************************************
-
   std::vector<std::string> returnVec;
   returnVec.reserve(_fNumPar);
   int nd_counter = 0;
@@ -185,15 +174,15 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
       if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
 
-		//ETA - Horrible hard-code becuase ND and FD spline names are different...
+        //ETA - Horrible hard-code becuase ND and FD spline names are different...
         // this is only true at T2K and needs to change!
-		if(DetID == 1){
-		  returnVec.push_back(_fNDSplineNames[nd_counter]);
-		  nd_counter++;
-		}
-		else{
-		  returnVec.push_back(GetParName(i));
-		}
+        if(DetID == 1){
+          returnVec.push_back(_fNDSplineNames[nd_counter]);
+          nd_counter++;
+        }
+        else{
+          returnVec.push_back(GetParName(i));
+        }
       }
     }
   }
@@ -201,6 +190,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
 
   return returnVec;
 }
+
 // ********************************************
 // ETA - this is a complete fudge for now and is only here because on
 // T2K the splines at ND280 and SK have different names... 
@@ -292,22 +282,6 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   return returnVec;
 }
 
-// ********************************************
-// DB Grab the Spline Indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(const int DetID) {
-// ********************************************
-  std::vector<int> returnVec;
-
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
-		returnVec.push_back(i);
-      }
-    }
-  }
-
-  return returnVec;
-}
 
 // ********************************************
 // Get Norm params
@@ -384,14 +358,14 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const int Det
 
 
 // ********************************************
-// DB Grab the number of Normalisation parameters for the relevant DetID
-int covarianceXsec::GetNumFuncParamsFromDetID(const int DetID) {
+// DB Grab the number of parameters for the relevant DetID
+int covarianceXsec::GetNumParamsFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   int returnVal = 0;
 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Functional") == 0) { //If parameter is implemented as a functional parameter
+      if (strcmp(GetParamType(i), SystType_ToString(Type).c_str()) == 0) { //If parameter is implemented as a functional parameter
         returnVal += 1;
       }
     }
@@ -400,15 +374,15 @@ int covarianceXsec::GetNumFuncParamsFromDetID(const int DetID) {
 }
 
 // ********************************************
-// DB Grab the Functional parameter names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(const int DetID) {
+// DB Grab the parameter names for the relevant DetID
+const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   std::vector<std::string> returnVec;
 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Functional") == 0) { //If parameter is implemented as a functional param
-		returnVec.push_back(GetParFancyName(i));
+      if (strcmp(GetParamType(i), SystType_ToString(Type).c_str()) == 0) { //If parameter is implemented as a functional param
+        returnVec.push_back(GetParFancyName(i));
       }
     }
   }
@@ -416,15 +390,15 @@ const std::vector<std::string> covarianceXsec::GetFuncParsNamesFromDetID(const i
 }
 
 // ********************************************
-// DB Grab the Functional parameter indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetFuncParsIndexFromDetID(const int DetID) {
+// DB DB Grab the parameter indices for the relevant DetID
+const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Functional") == 0) { //If parameter is implemented as a functional param
-		returnVec.push_back(i);
+      if (strcmp(GetParamType(i), SystType_ToString(Type).c_str()) == 0) { //If parameter is implemented as a functional param
+        returnVec.push_back(i);
       }
     }
   }

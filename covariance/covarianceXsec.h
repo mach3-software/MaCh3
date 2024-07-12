@@ -15,6 +15,11 @@
 class covarianceXsec : public covarianceBase {
   public:
     /// @brief Constructor
+    /// @param FileNames A vector of strings representing the YAML files used for initialisation of matrix
+    /// @param name Matrix name
+    /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+    /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+    /// @param LastPCAdpar First PCA parameter that will be decomposed.
     covarianceXsec(const std::vector<std::string>& FileNames, const char *name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     /// @brief Destructor
     ~covarianceXsec();
@@ -39,19 +44,30 @@ class covarianceXsec : public covarianceBase {
     inline int GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
-    inline const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
+    inline const char* GetParamType(const int i) const {return _fParamType[i].c_str();}
 
     /// @brief Get interpolation type vector
     inline const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
     /// @brief Get interpolation type for a given parameter
+    /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return _fSplineInterpolationType.at(i);}
 
     /// @brief EM: value at which we cap spline knot weight
-    /// @param i parameter index
+    /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotUpperBound(const int i) {return _fSplineKnotUpBound[i];}
     /// @brief EM: value at which we cap spline knot weight
-    /// @param i parameter index
+    /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotLowerBound(const int i) {return _fSplineKnotLowBound[i];}
+
+    /// @brief DB Grab the number of parameters for the relevant DetID
+    /// @param Type Type of syst, for example kNorm, kSpline etc
+    int GetNumParamsFromDetID(const int DetID, const SystType Type);
+    /// @brief DB Grab the parameter names for the relevant DetID
+    /// @param Type Type of syst, for example kNorm, kSpline etc
+    const std::vector<std::string> GetParsNamesFromDetID(const int DetID, const SystType Type);
+    /// @brief DB Grab the parameter indices for the relevant DetID
+    /// @param Type Type of syst, for example kNorm, kSpline etc
+    const std::vector<int> GetParsIndexFromDetID(const int DetID, const SystType Type);
 
     /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(const int DetID);
@@ -64,20 +80,20 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Grab the Spline Modes for the relevant DetID
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
     /// @brief DB Grab the Spline Indices for the relevant DetID
-    const std::vector<int> GetSplineParsIndexFromDetID(const int DetID);
+    const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}
 
     /// @brief DB Grab the Number of splines for the relevant DetID
-    int GetNumSplineParamsFromDetID(const int DetID);
+    int GetNumSplineParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kSpline);}
 
     /// @brief DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(const int DetID);
 
     /// @brief DB Grab the number of Normalisation parameters for the relevant DetID
-    int GetNumFuncParamsFromDetID(const int DetID);
+    int GetNumFuncParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kFunc);}
     /// @brief DB Grab the Functional parameter names for the relevant DetID
-    const std::vector<std::string> GetFuncParsNamesFromDetID(const int DetID);
+    const std::vector<std::string> GetFuncParsNamesFromDetID(const int DetID){return GetParsNamesFromDetID(DetID, kFunc);}
     /// @brief DB Grab the Functional parameter indices for the relevant DetID
-    const std::vector<int> GetFuncParsIndexFromDetID(const int DetID);
+    const std::vector<int> GetFuncParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kFunc);}
 
     /// @brief KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
     /// For example Sigma Var are done around nominal in ND280, no idea why though...
@@ -93,6 +109,7 @@ class covarianceXsec : public covarianceBase {
     /// @param i parameter index
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
     /// @brief Is parameter a flux param or not. This might become deprecated in future
+    /// @param i parameter index
     /// @warning Will become deprecated
     inline bool IsParFlux(const int i){ return isFlux[i]; }
     /// @brief KS Function to set to nominal flux parameters
@@ -106,11 +123,11 @@ class covarianceXsec : public covarianceBase {
     /// @brief Initialise CovarianceXsec
     void initParams(const double fScale);
     /// Is parameter flux or not, This might become deprecated in future
+    /// @warning Will become deprecated
     std::vector<bool> isFlux;
 
     /// Tells to which samples object param should be applied
     std::vector<int> _fDetID;
-    //std::vector<std::string> _fDetString;
     /// Type of parameter like norm, spline etc.
     std::vector<std::string> _fParamType;
 

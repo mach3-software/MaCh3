@@ -145,6 +145,39 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
   return name;
 }
 
+/// Make an enum of systematic type recognised by covariance class
+enum SystType {
+  kNorm,
+  kSpline,
+  kFunc,
+  kSystTypes  //This only enumerates
+};
+
+// **************************************************
+/// Convert a Syst type type to a string
+inline std::string SystType_ToString(const SystType i) {
+// **************************************************
+  std::string name = "";
+  switch(i) {
+    case kNorm:
+      name = "Norm";
+      break;
+    case kSpline:
+      name = "Spline";
+      break;
+    case kFunc:
+      name = "Functional";
+      break;
+    default:
+      std::cerr << "UNKNOWN SYST TYPE SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return name;
+}
+
+
 // ***************************
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
