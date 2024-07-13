@@ -55,7 +55,7 @@ public:
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
   void addData(std::vector< std::vector <double> > &data);
-  //DB Multi-threaded GetLikelihood
+  /// DB Multi-threaded GetLikelihood
   double GetLikelihood();
   //===============================================================================
 

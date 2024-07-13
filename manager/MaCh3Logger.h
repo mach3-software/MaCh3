@@ -56,15 +56,20 @@ inline void SetMaCh3LoggerFormat()
 template <typename Func, typename LogFunc, typename... Args>
 void LoggerPrint(const std::string& LibName, LogFunc logFunction, Func&& func, Args&&... args)
 {
+  // Create a stringstream to capture the output
   std::stringstream sss;
+  // Save the original stream buffers
   std::streambuf* coutBuf = std::cout.rdbuf();
   std::streambuf* cerrBuf = std::cerr.rdbuf();
 
+  // Redirect std::cout and std::cerr to the stringstream buffer
   std::cout.rdbuf(sss.rdbuf());
   std::cerr.rdbuf(sss.rdbuf());
 
+  // Call the provided function
   func(std::forward<Args>(args)...);
 
+  // Restore the original stream buffers
   std::cout.rdbuf(coutBuf);
   std::cerr.rdbuf(cerrBuf);
 

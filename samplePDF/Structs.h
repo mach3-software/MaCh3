@@ -75,7 +75,7 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 }
 
 // *******************
-/// ETA - Normalisations for cross-section parameters
+/// @brief ETA - Normalisations for cross-section parameters
 /// Carrier for whether you want to apply a systematic to an event or not
 struct XsecNorms4 {
 // *******************
@@ -97,11 +97,11 @@ struct XsecNorms4 {
     /// and lower and upper bounds. This can then be passed to IsEventSelected
     std::vector< std::vector<double> > Selection;
 
-	/// Generic vector containing the string of kinematic type
-	/// This then needs to be converted to a kinematic type enum
-	/// within a samplePDF daughter class
-	/// The bounds for each kinematic variable are given in Selection
-	std::vector< std::string > KinematicVarStr;
+    /// Generic vector containing the string of kinematic type
+    /// This then needs to be converted to a kinematic type enum
+    /// within a samplePDF daughter class
+    /// The bounds for each kinematic variable are given in Selection
+    std::vector< std::string > KinematicVarStr;
 
     /// Parameter number of this normalisation in current systematic model
     int index;
@@ -117,7 +117,7 @@ enum SplineInterpolation {
 };
 
 // **************************************************
-/// Convert a LLH type to a string
+/// @brief Convert a LLH type to a string
 inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
 // **************************************************
   std::string name = "";
@@ -154,7 +154,7 @@ enum SystType {
 };
 
 // **************************************************
-/// Convert a Syst type type to a string
+/// @brief Convert a Syst type type to a string
 inline std::string SystType_ToString(const SystType i) {
 // **************************************************
   std::string name = "";
@@ -184,7 +184,7 @@ namespace MaCh3Utils {
   // ***************************
 
   // ***************************
-  // Return mass for given PDG
+  /// @brief Return mass for given PDG
   double GetMassFromPDG(int PDG);
   // ***************************
 

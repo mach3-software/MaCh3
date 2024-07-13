@@ -1,7 +1,7 @@
 #pragma once
 
 
-//constructors are same for all three so put in here
+/// @brief constructors are same for all three so put in here
 struct fdmc_base {
   int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
   int oscnutype;    
@@ -20,10 +20,10 @@ struct fdmc_base {
   double** y_var;
   double **rw_etru;
 
-  // xsec bins  
+  /// xsec bins
   std::list< int > *xsec_norms_bins;
 
-  //DB Speedup bits
+  /// DB Speedup bits
   double Unity;
 
   int* nxsec_norm_pointers;
@@ -54,7 +54,7 @@ struct fdmc_base {
 
   int **mode;
   
-  // DB Atmospheric Parameters
+  /// DB Atmospheric Parameters
   const double **osc_w_pointer;
   double *rw_truecz;
   

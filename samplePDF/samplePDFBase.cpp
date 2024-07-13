@@ -273,7 +273,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       return stat+penalty;
     }
     break;
-    //KS: Alterantive calcaution of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
+    //KS: Alternative calculation of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
     case (kDembinskiAbdelmottele):
     {
       //KS: code follows authors implementation from:
@@ -334,7 +334,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     //KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk
     case (kPearson):
     {
-      //KS: 2 is beacuese this function returns -LLH not -2LLH
+      //KS: 2 is because this function returns -LLH not -2LLH
       const double stat = (data-mc)*(data-mc)/(2*mc);
 
       // Return the statistical

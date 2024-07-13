@@ -50,6 +50,7 @@ class covarianceBase {
   /// @brief Constructor For Eigen Value decomp
   /// @param name Matrix name
   /// @param file Path to matrix root file
+  /// @param seed Seed for TRandom3
   /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
   /// @param FirstPCAdpar First PCA parameter that will be decomposed.
   /// @param LastPCAdpar First PCA parameter that will be decomposed.
@@ -66,15 +67,19 @@ class covarianceBase {
   void setName(const char *name) { matrixName = name; }
   /// @brief change parameter name
   /// @param i Parameter index
+  /// @param name new name which will be set
   void setParName(int i, char *name) { _fNames.at(i) = std::string(name); }
   void setSingleParameter(const int parNo, const double parVal);
   /// @brief Set all the covariance matrix parameters to a user-defined value
   /// @param i Parameter index
+  /// @param val new value which will be set
   void setPar(const int i, const double val);
   /// @brief Set current parameter value
   /// @param i Parameter index
+  /// @param val new value which will be set
   void setParCurrProp(const int i, const double val);
   /// @brief Set proposed parameter value
+  /// @param val new value which will be set
   void setParProp(const int i, const double val) {
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
@@ -88,6 +93,8 @@ class covarianceBase {
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief set branches for output file
+  /// @param tree Tree to which we will save branches
+  /// @param SaveProposal Normally we only save parameter after is accepted, for debugging purpose it is helpful to see also proposed values. That's what this variable controls
   void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
@@ -175,6 +182,7 @@ class covarianceBase {
   TH2D* GetCorrelationMatrix();
 
   /// @brief What parameter Gets reweighted by what amount according to MCMC
+  /// @param bin simply parameter index
   inline double calcReWeight(const int bin) {
     if (bin >= 0 && bin < _fNumPar) {
       return _fPropVal[bin];
@@ -201,6 +209,7 @@ class covarianceBase {
   virtual std::vector<double> getNominalArray();
   std::vector<double> getPreFitValues(){return _fPreFitValue;}
   std::vector<double> getGeneratedValues(){return _fGenerated;}
+  /// @brief Get vector of all proposed parameter values
   std::vector<double> getProposed() const;
   /// @brief Get proposed parameter value
   /// @param i Parameter index
@@ -211,8 +220,11 @@ class covarianceBase {
   /// @brief Get prior parameter value
   /// @param i Parameter index
   inline double getParInit(const int i) { return _fPreFitValue[i]; }
-
+  /// @brief Return generated value, although is virtual so class inheriting might actual get nominal not generated.
+  /// @param i Parameter index
   virtual double getNominal(const int i) { return getParInit(i); }
+  /// @brief Return generated value for a given parameter
+  /// @param i Parameter index
   inline double GetGenerated(const int i) { return _fGenerated[i];}
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
@@ -243,34 +255,38 @@ class covarianceBase {
     if (fParSigma_PCA[i] < 0) { return true;  }
     else                      { return false; }
   }
-
+  /// @brief Get transfer matrix allowing to go from PCA base to normal base
   inline const TMatrixD getTransferMatrix() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return TransferMat;
   }
-
+  /// @brief Get eigen vectors of covariance matrix, only works with PCA
   inline const TMatrixD getEigenVectors() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return eigen_vectors;
   }
-
+  /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use getEigenValuesMaster
   inline const TVectorD getEigenValues() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return eigen_values;
   }
-
+  /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use getEigenValues
   inline const std::vector<double> getEigenValuesMaster() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     return eigen_values_master;
   }
-
+  /// @brief Set proposed value for parameter in PCA base
+  /// @param i Parameter index
+  /// @param value new value
   inline void setParProp_PCA(const int i, const double value) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     fParProp_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
   }
-
+  /// @brief Set current value for parameter in PCA base
+  /// @param i Parameter index
+  /// @param value new value
   inline void setParCurr_PCA(const int i, const double value) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
     fParCurr_PCA(i) = value;

@@ -78,15 +78,15 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 #Compile and link options
 #KS: Add -Werror  and maybe -Wconversion in the future
 target_compile_options(MaCh3CompilerOptions INTERFACE
-                                                    -g
-                                                    -Wextra
-                                                    -Wall
-                                                    -pedantic
-                                                    -Wshadow
-                                                    -Wuninitialized
-                                                    -Wnon-virtual-dtor
-                                                    -Woverloaded-virtual
-                                                    )
+    -g                      # Generate debug information
+    -Wextra                 # Enable extra warning flags
+    -Wall                   # Enable all standard warning flags
+    -pedantic               # Enforce strict ISO compliance
+    -Wshadow                # Warn when a variable declaration shadows one from an outer scope
+    -Wuninitialized         # Warn about uninitialized variables
+    -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
+    -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
+)
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
@@ -94,7 +94,7 @@ DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 if(DEFINED DEBUG_LEVEL)
   SET(MaCh3_DEBUG_ENABLED TRUE)
 else()
-  #If MaCh debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
+  #If MaCh3 debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
   if(MaCh3_DEBUG_ENABLED)
     SET(DEBUG_LEVEL 1)
   endif()
@@ -107,14 +107,14 @@ if(MaCh3_DEBUG_ENABLED)
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-  target_compile_options(MaCh3CompilerOptions INTERFACE
-                                                        -O3
-                                                        -funroll-loops
-                                                        --param=max-vartrack-size=100000000
-                                                        -finline-limit=100000000
-                                                        #-flto # FIXME need more testing
-                                                        )
-  #KS: addomg Link-Time Optimization (LTO)
+target_compile_options(MaCh3CompilerOptions INTERFACE
+    -O3                                  # Optimize code for maximum speed
+    -funroll-loops                       # Unroll loops where possible for performance
+    --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
+    -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
+    #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
+)
+  #KS: add Link-Time Optimization (LTO)
   # FIXME previously it wasn't used correctly but would need more testing
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
