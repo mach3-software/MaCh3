@@ -75,8 +75,7 @@ endif()
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-#Compile and link options
-#KS: Add -Werror  and maybe -Wconversion in the future
+# KS: Compile and link options for more see https://github.com/cpp-best-practices/cppbestpractices/tree/master
 target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
     -Wextra                 # Enable extra warning flags
@@ -86,6 +85,11 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Wuninitialized         # Warn about uninitialized variables
     -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
+    -Wnull-dereference      # Warn if a null dereference is detected
+    -Wformat=2              # Warn on security issues around functions that format output (ie printf)
+    #-Wold-style-cast       # Warn for c-style casts
+    #-Wconversion           # Warn on type conversions that may lose data
+    #-Werror                # Treat Warnings as Errors
 )
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
