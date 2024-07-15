@@ -85,8 +85,8 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Wuninitialized         # Warn about uninitialized variables
     -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
-    -Wnull-dereference      # Warn if a null dereference is detected
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
+    #-Wnull-dereference      # Warn if a null dereference is detected
     #-Wold-style-cast       # Warn for c-style casts
     #-Wconversion           # Warn on type conversions that may lose data
     #-Werror                # Treat Warnings as Errors
@@ -106,18 +106,21 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -O0                                  # Turn off any optimisation to have best debug experience
+  )
   target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-target_compile_options(MaCh3CompilerOptions INTERFACE
+  target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                  # Optimize code for maximum speed
     -funroll-loops                       # Unroll loops where possible for performance
     --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
     -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
     #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
-)
+  )
   #KS: add Link-Time Optimization (LTO)
   # FIXME previously it wasn't used correctly but would need more testing
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
@@ -217,9 +220,7 @@ install(EXPORT MaCh3-targets
 )
 
 #KS: Options to print dependency graph
-if(NOT DEFINED MaCh3_DependancyGraph)
-  set(MaCh3_DependancyGraph FALSE)
-endif()
+DefineEnabledRequiredSwitch(MaCh3_DependancyGraph FALSE)
 
 if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL

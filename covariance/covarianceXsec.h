@@ -44,7 +44,10 @@ class covarianceXsec : public covarianceBase {
     inline int GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
-    inline const char* GetParamType(const int i) const {return _fParamType[i].c_str();}
+    inline const char* GetParamTypeString(const int i) const {return SystType_ToString(_fParamType[i]).c_str();}
+    /// @brief Returns enum describing our param type
+    /// @param i parameter index
+    inline SystType GetParamType(const int i) const {return _fParamType[i];}
 
     /// @brief Get interpolation type vector
     inline const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
@@ -121,7 +124,7 @@ class covarianceXsec : public covarianceBase {
     
   protected:
     /// @brief Initialise CovarianceXsec
-    void initParams(const double fScale);
+    void initParams();
     /// Is parameter flux or not, This might become deprecated in future
     /// @warning Will become deprecated
     std::vector<bool> isFlux;
@@ -129,7 +132,7 @@ class covarianceXsec : public covarianceBase {
     /// Tells to which samples object param should be applied
     std::vector<int> _fDetID;
     /// Type of parameter like norm, spline etc.
-    std::vector<std::string> _fParamType;
+    std::vector<SystType> _fParamType;
 
     //Some "usual" variables. Don't think we really need the ND/FD split
     std::vector<std::vector<int>> _fNormModes;

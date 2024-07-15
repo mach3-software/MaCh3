@@ -18,8 +18,8 @@ covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, const c
     if(_fNames[i].length() > PrintLength) PrintLength = _fNames[i].length();
   } // end the for loop
 
-  MACH3LOG_INFO("Constructing instance of covarianceXsec");
-  initParams(0.001);
+  MACH3LOG_DEBUG("Constructing instance of covarianceXsec");
+  initParams();
   // Print
   Print();
 }
@@ -29,7 +29,7 @@ void covarianceXsec::InitXsecFromConfig() {
 // ********************************************
 
   _fDetID = std::vector<int>(_fNumPar);
-  _fParamType = std::vector<std::string>(_fNumPar);
+  _fParamType = std::vector<SystType>(_fNumPar);
   //_fDetString = std::vector<std::string>(_fNumPar);
   isFlux.resize(_fNumPar);
   //Vector of vectors of strings to contain potentially multiple variables that
@@ -55,7 +55,6 @@ void covarianceXsec::InitXsecFromConfig() {
   //PreFitValues etc etc.
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
-    _fParamType[i] = (param["Systematic"]["Type"].as<std::string>());
     _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
 
 	 //Fill the map to get the correlations later as well
@@ -64,6 +63,7 @@ void covarianceXsec::InitXsecFromConfig() {
 	 //Now load in variables for spline systematics only
 	 if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
      {
+       _fParamType[i] = SystType::kSpline;
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
 		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
 		 nFDSplines++;
@@ -90,12 +90,12 @@ void covarianceXsec::InitXsecFromConfig() {
       _fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
       _fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
 
-	 } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
- 
-	   // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
+      } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
+       _fParamType[i] = SystType::kNorm;
+        // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
        // ETA Has to be of size 0 to mean apply to all
-	   std::vector<int> DummyModeVec;
-	   //Ultimately all this information ends up in the NormParams vector
+        std::vector<int> DummyModeVec;
+        //Ultimately all this information ends up in the NormParams vector
 
         // Set the target of the normalisation parameter
        _fTargetNuclei.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["TargetNuclei"], DummyModeVec));
@@ -104,9 +104,8 @@ void covarianceXsec::InitXsecFromConfig() {
        _fNormModes.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["Mode"], DummyModeVec));
       }
      else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
-	   //std::cout << "Found a functional parameter!!" << std::endl;
-	    
-	 }
+       _fParamType[i] = SystType::kFunc;
+     }
      else{
        MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
        std::string expectedTypes = "Expecting ";
@@ -128,7 +127,6 @@ void covarianceXsec::InitXsecFromConfig() {
 	   std::vector<std::string> TempKinematicStrings;
 	   std::vector<std::vector<double>> TempKinematicBounds;
 	   //First element of TempKinematicBounds is always -999, and size is then 3
-
 	   for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){ 
 		 //ETA
 		 //This is a bit messy, Kinematic cuts is a list of maps
@@ -172,7 +170,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
   //int counter = 0;
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+      if (GetParamType(i) == kSpline) { //If parameter is implemented as a spline
 
         //ETA - Horrible hard-code becuase ND and FD spline names are different...
         // this is only true at T2K and needs to change!
@@ -202,7 +200,7 @@ const std::vector<std::string> covarianceXsec::GetFDSplineFileParsNamesFromDetID
   for (int i = 0; i < _fNumPar; ++i) {
 	//std::cout << " Param i has DetID " << GetParDetID(i) << " from yaml" << std::endl;
 	if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-	  if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+	  if (GetParamType(i) == kSpline) { //If parameter is implemented as a spline
 		//This is horrible but has to be here whilst the ND and FD splines are named
 		//differently on T2K. This is easy to fix but isn't currently available.
 		returnVec.push_back(_fFDSplineNames[FDSplineCounter]); //Append spline name
@@ -223,7 +221,7 @@ const std::vector<std::string> covarianceXsec::GetNDSplineFileParsNamesFromDetID
   int NDSplineCounter = 0;
   for (int i = 0; i < _fNumPar; ++i) {
 	if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-	  if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+	  if (GetParamType(i) == kSpline) { //If parameter is implemented as a spline
 		//This is horrible but has to be here whilst the ND and ND splines are named
 		//differently on T2K. This is easy to fix but isn't currently available.
 		std::cout << "Getting ND spline name " << _fNDSplineNames[NDSplineCounter] << std::endl;
@@ -245,7 +243,7 @@ const std::vector<std::string> covarianceXsec::GetSplineFileParsNamesFromDetID(c
   int NDSplineCounter = 0;
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+      if (GetParamType(i) == kSpline) { //If parameter is implemented as a spline
 		//This is horrible but has to be here whilst the ND and FD splines are named
 		//differently on T2K. This is easy to fix but isn't currently available.
 		if((GetParDetID(i) & 1) == 1){
@@ -273,7 +271,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   int nFDSplineCounter = 0;
   for (int i = 0; i < _fNumPar; ++i) {
 	if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-	  if (strcmp(GetParamType(i), "Spline") == 0) { //If parameter is implemented as a spline
+	  if (GetParamType(i) == kSpline) { //If parameter is implemented as a spline
 		returnVec.push_back(_fFDSplineModes[nFDSplineCounter]);	
 		nFDSplineCounter++;
 	  }
@@ -281,7 +279,6 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   }
   return returnVec;
 }
-
 
 // ********************************************
 // Get Norm params
@@ -328,7 +325,7 @@ void covarianceXsec::SetupNormPars(){
 
   int norm_counter = 0;
   for (int i = 0; i < _fNumPar; ++i) {
-    if (strcmp(GetParamType(i), "Norm") == 0) { //If parameter is implemented as a normalisation
+    if (GetParamType(i) == kNorm) { //If parameter is implemented as a normalisation
       //Add this parameter to the vector of parameters
       NormParams.push_back(GetXsecNorm(i, norm_counter));
       norm_counter++;
@@ -345,7 +342,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const int Det
   int norm_counter = 0;
 
   for (int i = 0; i < _fNumPar; ++i) {
-    if (strcmp(GetParamType(i), "Norm") == 0) { //If parameter is implemented as a normalisation
+    if (GetParamType(i) == kNorm) { //If parameter is implemented as a normalisation
       if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
         //Add this parameter to the vector of parameters
           returnVec.push_back(GetXsecNorm(i, norm_counter));
@@ -365,7 +362,7 @@ int covarianceXsec::GetNumParamsFromDetID(const int DetID, const SystType Type) 
 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), SystType_ToString(Type).c_str()) == 0) { //If parameter is implemented as a functional parameter
+      if (GetParamType(i) == Type) { //If parameter is implemented as a functional parameter
         returnVal += 1;
       }
     }
@@ -381,7 +378,7 @@ const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const int D
 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), SystType_ToString(Type).c_str()) == 0) { //If parameter is implemented as a functional param
+      if (GetParamType(i) == Type) { //If parameter is implemented as a functional param
         returnVec.push_back(GetParFancyName(i));
       }
     }
@@ -397,7 +394,7 @@ const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const int DetID, co
 
   for (int i = 0; i < _fNumPar; ++i) {
     if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (strcmp(GetParamType(i), SystType_ToString(Type).c_str()) == 0) { //If parameter is implemented as a functional param
+      if (GetParamType(i) == Type) { //If parameter is implemented as a functional param
         returnVec.push_back(i);
       }
     }
@@ -406,7 +403,7 @@ const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const int DetID, co
 }
 
 // ********************************************
-void covarianceXsec::initParams(const double fScale) {
+void covarianceXsec::initParams() {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
@@ -447,7 +444,7 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", _fParamType[i]);
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", SystType_ToString(_fParamType[i]));
   }
   MACH3LOG_INFO("============================================================================================================================================================");
 
@@ -489,11 +486,10 @@ void covarianceXsec::Print() {
   std::vector<int> SplineParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
-    if (strcmp(GetParamType(i), "Spline") == 0) { SplineParsIndex.push_back(i); }
+    if (GetParamType(i) == kSpline) { SplineParsIndex.push_back(i); }
   }
 
   MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
-
 
   MACH3LOG_INFO("=========================================================================================================================");
   MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
@@ -508,7 +504,7 @@ void covarianceXsec::Print() {
   std::vector<int> FuncParsIndex;
   for (int i = 0; i < _fNumPar; ++i)
   {
-    if (strcmp(GetParamType(i), "Functional") == 0) { FuncParsIndex.push_back(i); }
+    if (GetParamType(i) == kFunc) { FuncParsIndex.push_back(i); }
   }
 
   MACH3LOG_INFO("Functional parameters: {}", FuncParsIndex.size());
