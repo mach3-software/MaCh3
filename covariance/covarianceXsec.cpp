@@ -9,7 +9,6 @@ covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, const c
 // ********************************************
 
   InitXsecFromConfig();
-  SetupNormPars();
 
   //ETA - again this really doesn't need to be hear...
   for (int i = 0; i < _fNumPar; i++)
@@ -30,26 +29,14 @@ void covarianceXsec::InitXsecFromConfig() {
 
   _fDetID = std::vector<int>(_fNumPar);
   _fParamType = std::vector<SystType>(_fNumPar);
-  //_fDetString = std::vector<std::string>(_fNumPar);
   isFlux.resize(_fNumPar);
-  //Vector of vectors of strings to contain potentially multiple variables that
-  //might be cut on
-  _fKinematicPars = std::vector<std::vector<std::string>>(_fNumPar);
-  //Vector of vector of ints to contain the lower and upper bounds of a cut
-  //for a particular kinematic variables
-  _fKinematicBounds = std::vector<std::vector<std::vector<double>>>(_fNumPar);
 
   //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
   _fSplineInterpolationType.reserve(_fNumPar);
-  _fTargetNuclei.reserve(_fNumPar);
-  _fNeutrinoFlavour.reserve(_fNumPar);
-  _fNeutrinoFlavourUnosc.reserve(_fNumPar);
-  _fNormModes.reserve(_fNumPar);
   _fSplineKnotUpBound.reserve(_fNumPar);
   _fSplineKnotLowBound.reserve(_fNumPar);
 
   int i = 0;
-
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPars for Names,
   //PreFitValues etc etc.
@@ -57,22 +44,18 @@ void covarianceXsec::InitXsecFromConfig() {
   {
     _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
 
-	 //Fill the map to get the correlations later as well
-	 std::string ParamType = param["Systematic"]["Type"].as<std::string>();
-	 int nFDSplines;
-	 //Now load in variables for spline systematics only
-	 if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
-     {
+    //Fill the map to get the correlations later as well
+    std::string ParamType = param["Systematic"]["Type"].as<std::string>();
+    //Now load in variables for spline systematics only
+    if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
+    {
        _fParamType[i] = SystType::kSpline;
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
 		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
-		 nFDSplines++;
 	   }
-
 	   if (param["Systematic"]["SplineInformation"]["FDMode"]) {
 		 _fFDSplineModes.push_back(param["Systematic"]["SplineInformation"]["FDMode"].as<std::vector<int>>());
 	   }
-
       if (param["Systematic"]["SplineInformation"]["NDSplineName"]) {
         _fNDSplineNames.push_back(param["Systematic"]["SplineInformation"]["NDSplineName"].as<std::string>());
       }
@@ -86,69 +69,33 @@ void covarianceXsec::InitXsecFromConfig() {
       } else { //KS: By default use TSpline3
         _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
       }
-
       _fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
       _fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
 
-      } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
-       _fParamType[i] = SystType::kNorm;
-        // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
-       // ETA Has to be of size 0 to mean apply to all
-        std::vector<int> DummyModeVec;
-        //Ultimately all this information ends up in the NormParams vector
-
-        // Set the target of the normalisation parameter
-       _fTargetNuclei.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["TargetNuclei"], DummyModeVec));
-       _fNeutrinoFlavour.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["NeutrinoFlavour"], DummyModeVec));
-       _fNeutrinoFlavourUnosc.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["NeutrinoFlavourUnosc"], DummyModeVec));
-       _fNormModes.push_back(GetFromManager<std::vector<int>>(param["Systematic"]["Mode"], DummyModeVec));
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
+      _fParamType[i] = SystType::kNorm;
+      NormParams.push_back(GetXsecNorm(param["Systematic"], i));
+    }
+    else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
+      _fParamType[i] = SystType::kFunc;
+    }
+    else{
+      MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
+      std::string expectedTypes = "Expecting ";
+      for (int s = 0; s < kSystTypes; ++s) {
+        if (s > 0) expectedTypes += ", ";
+        expectedTypes += SystType_ToString(static_cast<SystType>(s)) + "\"";
       }
-     else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
-       _fParamType[i] = SystType::kFunc;
-     }
-     else{
-       MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
-       std::string expectedTypes = "Expecting ";
-       for (int s = 0; s < kSystTypes; ++s) {
-         if (s > 0) expectedTypes += ", ";
-         expectedTypes += SystType_ToString(static_cast<SystType>(s)) + "\"";
-       }
-       expectedTypes += ".";
-       MACH3LOG_ERROR(expectedTypes);
-       throw;
-      }
+      expectedTypes += ".";
+      MACH3LOG_ERROR(expectedTypes);
+      throw;
+    }
 
-	 //ETA - I think this can go in the norm parameters only if statement above
-	 int NumKinematicCuts = 0;
-	 if(param["Systematic"]["KinematicCuts"]){
-
-	   NumKinematicCuts = param["Systematic"]["KinematicCuts"].size();
-
-	   std::vector<std::string> TempKinematicStrings;
-	   std::vector<std::vector<double>> TempKinematicBounds;
-	   //First element of TempKinematicBounds is always -999, and size is then 3
-	   for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){ 
-		 //ETA
-		 //This is a bit messy, Kinematic cuts is a list of maps
-		 //The for loop h
-		 for (YAML::const_iterator it = param["Systematic"]["KinematicCuts"][KinVar_i].begin();it!=param["Systematic"]["KinematicCuts"][KinVar_i].end();++it) {
-		   TempKinematicStrings.push_back(it->first.as<std::string>());
-		   TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
-		   std::vector<double> bounds = it->second.as<std::vector<double>>();
-		 }
-	   }
-        _fKinematicPars.at(i) = TempKinematicStrings;
-        _fKinematicBounds.at(i) = TempKinematicBounds;
-      }
-	 if(_fFancyNames[i].find("b_")==0) isFlux[i] = true;
-	 else isFlux[i] = false;
-	 i++;
+    if(_fFancyNames[i].find("b_")==0) isFlux[i] = true;
+    else isFlux[i] = false;
+    i++;
   }
   _fSplineInterpolationType.shrink_to_fit();
-  _fTargetNuclei.shrink_to_fit();
-  _fNeutrinoFlavour.shrink_to_fit();
-  _fNeutrinoFlavourUnosc.shrink_to_fit();
-  _fNormModes.shrink_to_fit();
   _fSplineKnotUpBound.shrink_to_fit();
   _fSplineKnotLowBound.shrink_to_fit();
   return;
@@ -282,57 +229,60 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
 
 // ********************************************
 // Get Norm params
-XsecNorms4 covarianceXsec::GetXsecNorm(const int i, const int norm_counter) {
+XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index) {
 // ********************************************
+
   XsecNorms4 norm;
-  norm.name = GetParFancyName(i);
+  norm.name = GetParFancyName(Index);
+
+  // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
+  // ETA Has to be of size 0 to mean apply to all
+  std::vector<int> DummyModeVec;
+  //Ultimately all this information ends up in the NormParams vector
 
   //Copy the mode information into an XsecNorms4 struct
-  norm.modes = _fNormModes[norm_counter];
-  norm.pdgs = _fNeutrinoFlavour[norm_counter];
-  norm.preoscpdgs = _fNeutrinoFlavourUnosc[norm_counter];
-  norm.targets = _fTargetNuclei[norm_counter];
+  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], DummyModeVec);
+  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], DummyModeVec);
+  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], DummyModeVec);
+  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], DummyModeVec);
+
+  //ETA - I think this can go in the norm parameters only if statement above
+  int NumKinematicCuts = 0;
+  if(param["KinematicCuts"]){
+
+    NumKinematicCuts = param["KinematicCuts"].size();
+
+    std::vector<std::string> TempKinematicStrings;
+    std::vector<std::vector<double>> TempKinematicBounds;
+    //First element of TempKinematicBounds is always -999, and size is then 3
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
+      //ETA
+      //This is a bit messy, Kinematic cuts is a list of maps
+      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
+        TempKinematicStrings.push_back(it->first.as<std::string>());
+        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+        std::vector<double> bounds = it->second.as<std::vector<double>>();
+      }
+    }
+    norm.KinematicVarStr = TempKinematicStrings;
+    norm.Selection = TempKinematicBounds;
+  }
 
   //Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
   //We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
   bool HasKinBounds = false;
 
-  if(_fKinematicPars.at(i).size() > 0) HasKinBounds = true;
+  if(norm.KinematicVarStr.size() > 0) HasKinBounds = true;
 
-  for(unsigned int KinematicCut_i = 0; KinematicCut_i < _fKinematicPars[i].size(); ++KinematicCut_i) {
-    //Push back with the string for the kinematic cut
-    norm.KinematicVarStr.push_back(_fKinematicPars.at(i).at(KinematicCut_i));
-    //Push back with the bounds for the kinematic cut
-    norm.Selection.push_back(_fKinematicBounds.at(i).at(KinematicCut_i));
-  }
   norm.hasKinBounds = HasKinBounds;
   //End of kinematic bound checking
 
   // Set the global parameter index of the normalisation parameter
-  norm.index = i;
+  norm.index = Index;
 
   return norm;
 }
 
-// ********************************************
-// DB Grab the Normalisation parameters
-// I have changed this because it is quite nice for the covariance object not to care
-// which samplePDF a parameter should affect or not.
-void covarianceXsec::SetupNormPars(){
-// ********************************************
-  //ETA - in case NormParams already is filled
-  NormParams.clear();
-
-  int norm_counter = 0;
-  for (int i = 0; i < _fNumPar; ++i) {
-    if (GetParamType(i) == kNorm) { //If parameter is implemented as a normalisation
-      //Add this parameter to the vector of parameters
-      NormParams.push_back(GetXsecNorm(i, norm_counter));
-      norm_counter++;
-    }
-  }
-  return; 
-}
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
@@ -344,8 +294,10 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const int Det
   for (int i = 0; i < _fNumPar; ++i) {
     if (GetParamType(i) == kNorm) { //If parameter is implemented as a normalisation
       if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
+        //KS: Make Copy of XsecNorms4
+        XsecNorms4 Temp = NormParams[norm_counter];
         //Add this parameter to the vector of parameters
-          returnVec.push_back(GetXsecNorm(i, norm_counter));
+        returnVec.push_back(Temp);
       }
       norm_counter++;
     }

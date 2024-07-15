@@ -26,12 +26,10 @@ class covarianceXsec : public covarianceBase {
 
     /// @brief ETA - trying out the yaml parsing
     inline void InitXsecFromConfig();
-    /// @brief Initialise Norm params
-    inline void SetupNormPars();
     /// @brief Get Norm params
     /// @param i Global parameter index
     /// @param norm_counter norm parameter index
-    inline XsecNorms4 GetXsecNorm(const int i, const int norm_counter);
+    inline XsecNorms4 GetXsecNorm(const YAML::Node& param, const int Index);
     /// @brief Print information about the whole object once it is set
     inline void Print();
 
@@ -134,12 +132,6 @@ class covarianceXsec : public covarianceBase {
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
 
-    //Some "usual" variables. Don't think we really need the ND/FD split
-    std::vector<std::vector<int>> _fNormModes;
-    std::vector<std::vector<int>> _fTargetNuclei;
-    std::vector<std::vector<int>> _fNeutrinoFlavour;
-    std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
-
     //Variables related to spline systematics
     std::vector<std::string> _fNDSplineNames;
     std::vector<std::string> _fFDSplineNames;
@@ -151,11 +143,6 @@ class covarianceXsec : public covarianceBase {
     std::vector<double> _fSplineKnotLowBound;
     /// EM: Cap spline knot higher value
     std::vector<double> _fSplineKnotUpBound;
-
-    /// Information to be able to apply generic cuts
-    std::vector<std::vector<std::string>> _fKinematicPars;
-    /// Information to be able to apply generic cuts
-    std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecNorms4> NormParams;
