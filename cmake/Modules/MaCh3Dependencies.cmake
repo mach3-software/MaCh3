@@ -12,7 +12,7 @@ include(NuHepMCUtils)
 
 # Check if CUDA was found
 if(MaCh3_GPU_ENABLED)
-  include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/CUDASetup.cmake)
 endif()
 
 include(ROOT)
