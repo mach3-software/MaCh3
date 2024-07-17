@@ -31,6 +31,10 @@ void covarianceXsec::InitXsecFromConfig() {
   _fParamType = std::vector<SystType>(_fNumPar);
   isFlux.resize(_fNumPar);
 
+  //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
+  NormParams.reserve(_fNumPar);
+  SplineParams.reserve(_fNumPar);
+
   int i = 0;
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPars for Names,
@@ -80,6 +84,10 @@ void covarianceXsec::InitXsecFromConfig() {
     else isFlux[i] = false;
     i++;
   }
+
+  NormParams.shrink_to_fit();
+  SplineParams.shrink_to_fit();
+
   return;
 }
 
