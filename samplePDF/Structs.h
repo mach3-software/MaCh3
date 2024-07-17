@@ -13,7 +13,7 @@
 #define _unsigned_int_ unsigned int
 #endif
 
-/// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class. Keep it in ND for the time being
+/// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
 //#define SafeException
 #ifndef SafeException
 #define _noexcept_ noexcept
@@ -107,6 +107,7 @@ struct XsecNorms4 {
     int index;
 };
 
+
 /// Make an enum of the spline interpolation type
 enum SplineInterpolation {
   kTSpline3,
@@ -151,6 +152,20 @@ enum SystType {
   kSpline,
   kFunc,
   kSystTypes  //This only enumerates
+};
+
+
+// *******************
+/// @brief KS: Struct holding info about Spline Systematics
+struct XsecSplines1 {
+  // *******************
+  /// Spline interpolation vector
+  SplineInterpolation SplineInterpolationType;
+
+  /// EM: Cap spline knot lower value
+  double SplineKnotLowBound;
+  /// EM: Cap spline knot higher value
+  double SplineKnotUpBound;
 };
 
 // **************************************************

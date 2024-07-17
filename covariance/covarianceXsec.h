@@ -24,12 +24,6 @@ class covarianceXsec : public covarianceBase {
     /// @brief Destructor
     ~covarianceXsec();
 
-    /// @brief ETA - trying out the yaml parsing
-    inline void InitXsecFromConfig();
-    /// @brief Get Norm params
-    /// @param i Global parameter index
-    /// @param norm_counter norm parameter index
-    inline XsecNorms4 GetXsecNorm(const YAML::Node& param, const int Index);
     /// @brief Print information about the whole object once it is set
     inline void Print();
 
@@ -47,18 +41,16 @@ class covarianceXsec : public covarianceBase {
     /// @param i parameter index
     inline SystType GetParamType(const int i) const {return _fParamType[i];}
 
-    /// @brief Get interpolation type vector
-    inline const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
-    inline SplineInterpolation GetParSplineInterpolation(const int i) {return _fSplineInterpolationType.at(i);}
+    inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i).SplineInterpolationType;}
 
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotUpperBound(const int i) {return _fSplineKnotUpBound[i];}
+    inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i).SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotLowerBound(const int i) {return _fSplineKnotLowBound[i];}
+    inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i).SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
@@ -123,6 +115,16 @@ class covarianceXsec : public covarianceBase {
   protected:
     /// @brief Initialise CovarianceXsec
     void initParams();
+    /// @brief ETA - trying out the yaml parsing
+    inline void InitXsecFromConfig();
+    /// @brief Get Norm params
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    inline XsecNorms4 GetXsecNorm(const YAML::Node& param, const int Index);
+    /// @brief Get Spline params
+    /// @param param Yaml node describing param
+    inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
+
     /// Is parameter flux or not, This might become deprecated in future
     /// @warning Will become deprecated
     std::vector<bool> isFlux;
@@ -136,13 +138,9 @@ class covarianceXsec : public covarianceBase {
     std::vector<std::string> _fNDSplineNames;
     std::vector<std::string> _fFDSplineNames;
     std::vector<std::vector<int>> _fFDSplineModes;
-    /// Spline interpolation vector
-    std::vector<SplineInterpolation> _fSplineInterpolationType;
 
-    /// EM: Cap spline knot lower value
-    std::vector<double> _fSplineKnotLowBound;
-    /// EM: Cap spline knot higher value
-    std::vector<double> _fSplineKnotUpBound;
+    /// Vector containing info for normalisation systematics
+    std::vector<XsecSplines1> SplineParams;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecNorms4> NormParams;

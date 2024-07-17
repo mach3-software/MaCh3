@@ -31,11 +31,6 @@ void covarianceXsec::InitXsecFromConfig() {
   _fParamType = std::vector<SystType>(_fNumPar);
   isFlux.resize(_fNumPar);
 
-  //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
-  _fSplineInterpolationType.reserve(_fNumPar);
-  _fSplineKnotUpBound.reserve(_fNumPar);
-  _fSplineKnotLowBound.reserve(_fNumPar);
-
   int i = 0;
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPars for Names,
@@ -49,7 +44,10 @@ void covarianceXsec::InitXsecFromConfig() {
     //Now load in variables for spline systematics only
     if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
     {
-       _fParamType[i] = SystType::kSpline;
+      //Set param type
+      _fParamType[i] = SystType::kSpline;
+      // Fill Spline info
+      SplineParams.push_back(GetXsecSpline(param["Systematic"]));
 	   if (param["Systematic"]["SplineInformation"]["FDSplineName"]) {
 		 _fFDSplineNames.push_back(param["Systematic"]["SplineInformation"]["FDSplineName"].as<std::string>());
 	   }
@@ -59,19 +57,6 @@ void covarianceXsec::InitXsecFromConfig() {
       if (param["Systematic"]["SplineInformation"]["NDSplineName"]) {
         _fNDSplineNames.push_back(param["Systematic"]["SplineInformation"]["NDSplineName"].as<std::string>());
       }
-
-      //Now get the Spline interpolation type
-      if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
-        for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
-          if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
-            _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
-        }
-      } else { //KS: By default use TSpline3
-        _fSplineInterpolationType.push_back(SplineInterpolation(kTSpline3));
-      }
-      _fSplineKnotUpBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotUpBound"], 9999));
-      _fSplineKnotLowBound.push_back(GetFromManager<double>(param["Systematic"]["SplineInformation"]["SplineKnotLowBound"], -9999));
-
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
       _fParamType[i] = SystType::kNorm;
       NormParams.push_back(GetXsecNorm(param["Systematic"], i));
@@ -95,9 +80,6 @@ void covarianceXsec::InitXsecFromConfig() {
     else isFlux[i] = false;
     i++;
   }
-  _fSplineInterpolationType.shrink_to_fit();
-  _fSplineKnotUpBound.shrink_to_fit();
-  _fSplineKnotLowBound.shrink_to_fit();
   return;
 }
 
@@ -283,6 +265,29 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
   return norm;
 }
 
+// ********************************************
+// Get Norm params
+XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
+// ********************************************
+
+  XsecSplines1 Spline;
+
+  //Now get the Spline interpolation type
+  if (param["SplineInformation"]["InterpolationType"]){
+    for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
+      if(param["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
+        Spline.SplineInterpolationType = SplineInterpolation(InterpType);
+    }
+  } else { //KS: By default use TSpline3
+    Spline.SplineInterpolationType = SplineInterpolation(kTSpline3);
+  }
+  Spline.SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999);
+  Spline.SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999);
+
+
+  return Spline;
+}
+
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
@@ -448,8 +453,8 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------");
   for (unsigned int i = 0; i < SplineParsIndex.size(); ++i) {
     MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", i, "|", GetParFancyName(SplineParsIndex[i]), "|",
-                  SplineInterpolation_ToString(_fSplineInterpolationType[i]), "|",
-                  _fSplineKnotLowBound[i], "|", _fSplineKnotUpBound[i], "|");
+                  SplineInterpolation_ToString(GetParSplineInterpolation(i)), "|",
+                  GetParSplineKnotLowerBound(i), "|", GetParSplineKnotUpperBound(i), "|");
   }
   MACH3LOG_INFO("=========================================================================================================================");
 
