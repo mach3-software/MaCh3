@@ -86,7 +86,8 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
-    #-Wnull-dereference      # Warn if a null dereference is detected
+    #-Wpadded               # Warn when padding is added to a structure or class for alignment
+    #-Wnull-dereference     # Warn if a null dereference is detected
     #-Wold-style-cast       # Warn for c-style casts
     #-Wconversion           # Warn on type conversions that may lose data
     #-Werror                # Treat Warnings as Errors
