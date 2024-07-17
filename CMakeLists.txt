@@ -87,9 +87,6 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
     -Wunused                # Warn on anything being unused
-    -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
-    -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
-    -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     #-Wuseless-cast         # Warn if you perform a cast to the same type (only in GCC >= 4.8)
     #-Wpadded               # Warn when padding is added to a structure or class for alignment
     #-Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
@@ -97,6 +94,15 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     #-Wconversion           # Warn on type conversions that may lose data
     #-Werror                # Treat Warnings as Errors
 )
+# KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
+    -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
+    -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
+  )
+endif()
+
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
