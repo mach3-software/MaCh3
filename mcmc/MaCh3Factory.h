@@ -13,4 +13,4 @@
 /// @param fitMan pointer to Manager class
 /// @param Samples vector of Sample PDF which will be used in the fits
 /// @param Covariances vector of Systematic objects which will be used in the fits
-FitterBase* MaCh3FitterFactory(manager *fitMan, std::vector<samplePDFBase>& Samples, std::vector<covarianceBase>& Covariances);
+std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samplePDFBase>& Samples, std::vector<covarianceBase>& Covariances);
