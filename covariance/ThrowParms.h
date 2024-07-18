@@ -14,6 +14,8 @@
 #include <TVectorT.h>
 #include <TDecompChol.h>
 
+/// @brief No idea really...
+/// @warning this is deprecated don't use it
 class ThrowParms {
  private:
   TVectorD    *pvals;

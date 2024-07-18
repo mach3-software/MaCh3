@@ -38,6 +38,11 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
   SaveProposal = false;
 
+  #ifdef MULTITHREAD
+  //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
+  //Based on other tests it is really helpful
+  //ROOT::EnableImplicitMT();
+  #endif
   // Set the output file
   outputFile = new TFile(outfile.c_str(), "RECREATE");
   outputFile->cd();
@@ -68,16 +73,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   syst_llh = nullptr;
 
   TotalNSamples = 0;
-
-  fTestLikelihood = false;
-  //ETA - No guarantee that "Fitter" field exists so check this first before
-  //checking ["Fitter"]["FitTestLikelihood"]
-  if(fitMan->raw()["General"]["Fitter"])
-  {
-    if(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"]){
-      fTestLikelihood = fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"].as<bool>();
-    }
-  }
+  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false);;
 }
 
 // *************************
@@ -423,6 +419,62 @@ void FitterBase::ProcessMCMC() {
 }
 
 // *************************
+// Run Drag Race
+void FitterBase::DragRace(const int NLaps) {
+// *************************
+
+  MACH3LOG_INFO("Let the Race Begin!");
+  // Reweight the MC
+  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  {
+    TStopwatch clockRace;
+    clockRace.Start();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      double *fake = 0;
+      samples[ivs]->reweight(fake);
+    }
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
+  }
+
+  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  {
+    TStopwatch clockRace;
+    clockRace.Start();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      samples[ivs]->GetLikelihood();
+    }
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
+  }
+
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    TStopwatch clockRace;
+    clockRace.Start();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      systematics[s]->proposeStep();
+    }
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.4f} s to propose step {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
+  }
+
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    TStopwatch clockRace;
+    clockRace.Start();
+    for(int Lap = 0; Lap < NLaps; Lap++) {
+      systematics[s]->GetLikelihood();
+    }
+    clockRace.Stop();
+    MACH3LOG_INFO("It took {:.4f} s to calculate  get likelihood {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
+    MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
+  }
+  MACH3LOG_INFO("End of race");
+}
+
+// *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************
@@ -446,7 +498,6 @@ void FitterBase::RunLLHScan() {
 
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
-
   std::vector<TDirectory *> Cov_LLH(systematics.size());
   for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
   {

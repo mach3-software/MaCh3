@@ -40,11 +40,6 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   endif()
 endif()
 
-include_directories(
-    $ENV{CUDAPATH}/include
-    $ENV{CUDAPATH}/samples/common/inc>
-)
-
 # Join elements of the list with spaces
 string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CMAKE_CUDA_ARCHITECTURES}")
 
@@ -58,7 +53,7 @@ if(NOT MaCh3_DEBUG_ENABLED)
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
     )
 else()
-#CWret: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
+#CW: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
 #-pxtas-options=-v, -maxregcount=N
     target_compile_options(MaCh3CompilerOptions INTERFACE
         "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-Werror;cross-execution-space-call;-w>"
@@ -68,35 +63,8 @@ else()
 
     target_compile_definitions(MaCh3CompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
-
-
-
-target_link_options(MaCh3CompilerOptions INTERFACE -I$ENV{CUDAPATH}/lib64 -I$ENV{CUDAPATH}/include -I$ENV{CUDAPATH}/common/inc -I$ENV{CUDAPATH}/samples/common/inc)
-
-if(NOT DEFINED ENV{CUDAPATH})
-    cmessage(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
-endif()
-
-#if(NOT DEFINED CUDA_SAMPLES)
-#  cmessage(FATAL_ERROR "When using CUDA, CUDA_SAMPLES must be defined to point to the CUDAToolkit samples directory (should contain common/helper_functions.h).")
-#endif()
-
-#HW: If we're doing GPU stuff, we need the CUDA helper module
-if(BUILTIN_CUDASAMPLES_ENABLED )
-    cmessage("Adding Builtin CUDA Sample Library")
-    CPMAddPackage(
-        NAME cuda-samples
-        GITHUB_REPOSITORY "NVIDIA/cuda-samples"
-        GIT_TAG v12.3
-    SOURCE_SUBDIR Common
-    DOWNLOAD_ONLY YES
-    )
-# Now we add the library
-    if(cuda-samples_ADDED)
-         add_library(cuda-samples INTERFACE IMPORTED)
-         target_include_directories(cuda-samples INTERFACE ${cuda-samples_SOURCE_DIR})
-    endif()
-endif()
+target_include_directories(MaCh3CompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
+include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
 
 #KS: Keep this for backward compatibility
 
@@ -104,7 +72,7 @@ endif()
 #-Xcompiler "-fpic" -c
 #-prec-sqrt=false -use_fast_math
 
-#CWRET comment: could change arch here. also, prec-div is only used in (seg+khig)/2; could replace by *0.5
+#CW comment: could change arch here. also, prec-div is only used in (seg+khig)/2; could replace by *0.5
 # -prec-sqrt is not needed (no sqrts in program code!), -use_fast_math forces intrinsic
 #  tried this on GTX 660 and no speed increase, buu and P6 6c
 #  don't use fastmath!

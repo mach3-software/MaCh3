@@ -23,12 +23,13 @@
 #include "samplePDF/Structs.h"
 #include "manager/manager.h"
 
+/// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFBase
 {
  public:
   samplePDFBase(){};
   samplePDFBase(double pot);
-
+  /// @brief destructor
   virtual ~samplePDFBase();
 
   virtual inline _int_ GetNsamples(){ return nSamples; };
@@ -82,6 +83,10 @@ class samplePDFBase
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
   double getTestStatLLH(double data, double mc);
+  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
+  /// @param data is data
+  /// @param mc is mc
+  /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
   double getTestStatLLH(const double data, const double mc, const double w2);
   // Provide a setter for the test-statistic
   //void SetTestStatistic(TestStatistic test_stat);
@@ -111,11 +116,11 @@ protected:
   std::vector<double>* dataSample;
   std::vector< std::vector <double> >* dataSample2D;
 
-  // Contains how many samples we've got
+  /// Contains how many samples we've got
   _int_ nSamples;
-  //KS: number of dimension for this sample
+  /// KS: number of dimension for this sample
   int nDims;
-  //Name of Sample
+  /// Name of Sample
   std::vector<std::string> SampleName;
 
   //GetterForModes

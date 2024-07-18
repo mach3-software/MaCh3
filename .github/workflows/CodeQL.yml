@@ -1,0 +1,36 @@
+name: "CodeQL C++ Analysis"
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight
+
+jobs:
+  analyze:
+    name: Analyze C++ Code with CodeQL
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: c-cpp
+          build: none  # Specify build none to skip any build steps
+
+      - name: Build Code
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

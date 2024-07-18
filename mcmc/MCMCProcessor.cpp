@@ -1,5 +1,7 @@
 #include "MCMCProcessor.h"
 
+#include "TChain.h"
+
 //Only if GPU is enabled
 #ifdef CUDA
 extern void InitGPU_AutoCorr(
@@ -711,8 +713,8 @@ void MCMCProcessor::DrawPostfit() {
 
 // *********************
 // Make fancy Credible Intervals plots
-void MCMCProcessor::MakeCredibleIntervals(std::vector<double> CredibleIntervals,
-                                          std::vector<Color_t> CredibleIntervalsColours,
+void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleIntervals,
+                                          const std::vector<Color_t>& CredibleIntervalsColours,
                                           bool CredibleInSigmas) {
 // *********************
 
@@ -1426,6 +1428,9 @@ void MCMCProcessor::MakeSubOptimality(int NIntervals) {
 void MCMCProcessor::DrawCovariance() {
 // *********************
     
+  const double RightMargin  = Posterior->GetRightMargin();
+  Posterior->SetRightMargin(0.15);
+
   int covBinning = nDraw;
   // The Covariance matrix from the fit
   TH2D* hCov = new TH2D("hCov", "hCov", covBinning, 0, covBinning, covBinning, 0, covBinning);
@@ -1497,14 +1502,12 @@ void MCMCProcessor::DrawCovariance() {
   Posterior->Clear();
   if(plotBinValue) hCov->Draw("colz text");
   else hCov->Draw("colz");
-  Posterior->SetRightMargin(0.15);
   if(printToPDF) Posterior->Print(CanvasName);
 
   Posterior->cd();
   Posterior->Clear();
   if(plotBinValue) hCorr->Draw("colz text");
   else hCorr->Draw("colz");
-  Posterior->SetRightMargin(0.15);
   if(printToPDF) Posterior->Print(CanvasName);
 
   hCov->Write("Covariance_plot");
@@ -1512,14 +1515,13 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->Write("Correlation_plot");
   
   //Back to normal
-  Posterior->SetRightMargin(0.03);
+  Posterior->SetRightMargin(RightMargin);
   delete hCov;
   delete hCovSq;
   delete hCorr;
 
   DrawCorrelations1D();
 }
-
 
 // *********************
 //KS: Make the 1D projections of Correlations inspired by Henry's slides (page 28) https://www.t2k.org/asg/oagroup/meeting/2023/2023-07-10-oa-pre-meeting/MaCh3FDUpdate
@@ -1679,14 +1681,13 @@ void MCMCProcessor::DrawCorrelations1D() {
   Posterior->SetTopMargin(TopMargin);
   Posterior->SetBottomMargin(BottomMargin);
   gStyle->SetOptTitle(OptTitle);
-
 }
 
 // *********************
 // Make fancy Credible Intervals plots
-void MCMCProcessor::MakeCredibleRegions(std::vector<double> CredibleRegions,
-                                        std::vector<Style_t> CredibleRegionStyle,
-                                        std::vector<Color_t> CredibleRegionColor,
+void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
+                                        const std::vector<Style_t>& CredibleRegionStyle,
+                                        const std::vector<Color_t>& CredibleRegionColor,
                                         bool CredibleInSigmas) {
 // *********************
 
@@ -1834,14 +1835,14 @@ void MCMCProcessor::MakeCredibleRegions(std::vector<double> CredibleRegions,
 
 // *********************
 // Make fancy triangle plot for selected parameters
-void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames,
+void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      // 1D
-                                     std::vector<double> CredibleIntervals,
-                                     std::vector<Color_t> CredibleIntervalsColours,
+                                     const std::vector<double>& CredibleIntervals,
+                                     const std::vector<Color_t>& CredibleIntervalsColours,
                                      //2D
-                                     std::vector<double> CredibleRegions,
-                                     std::vector<Style_t> CredibleRegionStyle,
-                                     std::vector<Color_t> CredibleRegionColor,
+                                     const std::vector<double>& CredibleRegions,
+                                     const std::vector<Style_t>& CredibleRegionStyle,
+                                     const std::vector<Color_t>& CredibleRegionColor,
                                      // Other
                                      bool CredibleInSigmas) {
 // *********************
@@ -2208,6 +2209,11 @@ void MCMCProcessor::MakeTrianglePlot(std::vector<std::string> ParNames,
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
 // **************************
+  // KS: This can reduce time necessary for caching even by half
+  #ifdef MULTITHREAD
+  //ROOT::EnableImplicitMT();
+  #endif
+
   // Open the Chain
   Chain = new TChain("posteriors","posteriors");
   Chain->Add(MCMCFile.c_str());
@@ -2304,10 +2310,9 @@ void MCMCProcessor::ScanInput() {
   MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
   MACH3LOG_INFO("# XSec params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar] - nFlux, ParamTypeStartPos[kXSecPar]);
   MACH3LOG_INFO("# Flux params:   {}", nFlux);
-  MACH3LOG_INFO("# Flux params:   {}", nFlux);
-  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar] - nFlux, ParamTypeStartPos[kNDPar]);
-  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar] - nFlux, ParamTypeStartPos[kFDDetPar]);
-  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar] - nFlux, ParamTypeStartPos[kOSCPar]);
+  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
+  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
+  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
   MACH3LOG_INFO("************************************************");
 
   nSteps = Chain->GetMaximum("step");
@@ -2457,7 +2462,6 @@ TH1D* MCMCProcessor::MakePrefit() {
   return PreFitPlot;
 }
 
-
 // **************************
 //CW: Read the input Covariance matrix entries
 // Get stuff like parameter input errors, names, and so on
@@ -2476,7 +2480,6 @@ void MCMCProcessor::ReadInputCov() {
 // Read the output MCMC file and find what inputs were used
 void MCMCProcessor::FindInputFiles() {
 // **************************
-
   // Now read the MCMC file
   TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
 
@@ -2553,7 +2556,6 @@ void MCMCProcessor::FindInputFiles() {
   delete TempFile;
 }
 
-
 // ***************
 // Read the xsec file and get the input central values and errors
 void MCMCProcessor::ReadXSecFile() {
@@ -2613,7 +2615,6 @@ void MCMCProcessor::ReadXSecFile() {
 // Read the ND cov file and get the input central values and errors
 void MCMCProcessor::ReadNDFile() {
 // ***************
-
   // Do the same for the ND280
   TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
   if (NDdetFile->IsZombie()) {
@@ -2654,12 +2655,10 @@ void MCMCProcessor::ReadNDFile() {
   delete NDdetFile;
 }
 
-
 // ***************
 // Read the FD cov file and get the input central values and errors
 void MCMCProcessor::ReadFDFile() {
 // ***************
-
   // Do the same for the FD
   TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
   if (FDdetFile->IsZombie()) {
@@ -2745,7 +2744,6 @@ void MCMCProcessor::ReadOSCFile() {
 //This is bit messy as currently BranchNames is taken from actual Chain.root file while proper parameter name from matrix.root and right now we don't access them at the same time.
 void MCMCProcessor::RemoveParameters() {
 // ***************
-
   for(int i = 0; i < nDraw; i++)
   {
     if(BranchNames[i] == "delete")
@@ -2758,10 +2756,9 @@ void MCMCProcessor::RemoveParameters() {
   }
 }
 
-
 // ***************
 // Make the step cut from a string
-void MCMCProcessor::SetStepCut(std::string Cuts) {
+void MCMCProcessor::SetStepCut(const std::string& Cuts) {
 // ***************
   StepCut = Cuts;
   BurnInCut = std::stoi( Cuts );
@@ -2789,7 +2786,6 @@ void MCMCProcessor::GetArithmetic(TH1D * const hist, const int i) {
 //CW: Get Gaussian characteristics
 void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
 // **************************
-
   const double mean = hist->GetMean();
   const double err = hist->GetRMS();
   const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
@@ -2806,7 +2802,6 @@ void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
   (*Means_Gauss)(i) = Gauss->GetParameter(1);
   (*Errors_Gauss)(i) = Gauss->GetParameter(2);
 }
-
 
 // ***************
 //CW: Get the highest posterior density from a TH1D
@@ -2901,7 +2896,6 @@ void MCMCProcessor::GetHPD(TH1D* const hist, const int i, const double coverage)
 //KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
 void MCMCProcessor::GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage) {
 // ***************
-
   if(coverage > 1)
   {
     MACH3LOG_ERROR("Specified Credible Interval is greater that 1 and equal to {} Should be between 0 and 1", coverage);
@@ -2959,7 +2953,6 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, cons
 //KS: Set 2D contour within some coverage
 void MCMCProcessor::GetCredibleRegion(TH2D* const hist2D, const double coverage) {
 // ***************
-
   if(coverage > 1)
   {
     std::cerr<<"Specified Credible Region is greater than 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
@@ -3023,7 +3016,6 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hist2D, const double coverage)
 // Pass central value
 void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title){
 // **************************
-
   ParameterEnum ParType = ParamType[param];
   int ParamNo = _UNDEF_;
   ParamNo = param - ParamTypeStartPos[ParType];
@@ -3038,7 +3030,6 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 // Find Param Index based on name
 int MCMCProcessor::GetParamIndexFromName(const std::string Name){
 // **************************
-
   int ParamNo = _UNDEF_;
   for (int i = 0; i < nDraw; ++i)
   {
@@ -3077,9 +3068,8 @@ void MCMCProcessor::ResetHistograms() {
 
 // **************************
 // KS: Get Super Fancy Polar Plot
-void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
+void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 // **************************
-
   if(hpost[0] == nullptr) MakePostfit();
 
   const double TopMargin = Posterior->GetTopMargin();
@@ -3158,10 +3148,12 @@ void MCMCProcessor::GetPolarPlot(std::vector<std::string> ParNames){
 }
 
 // **************************
-// Get Bayes Factor for particualar parameter
-void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vector<std::vector<double>> Model1Bounds, std::vector<std::vector<double>> Model2Bounds, std::vector<std::vector<std::string>> ModelNames){
+// Get Bayes Factor for particular parameter
+void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
+                                   const std::vector<std::vector<double>>& Model1Bounds,
+                                   const std::vector<std::vector<double>>& Model2Bounds,
+                                   const std::vector<std::vector<std::string>>& ModelNames){
 // **************************
-
   if(hpost[0] == nullptr) MakePostfit();
 
   MACH3LOG_INFO("Calculating Bayes Factor");
@@ -3217,8 +3209,10 @@ void MCMCProcessor::GetBayesFactor(std::vector<std::string> ParNames, std::vecto
 
 
 // **************************
-// KS: Get Savage Dockey point hypothesis test
-void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vector<double> EvaluationPoint, std::vector<std::vector<double>> Bounds){
+// KS: Get Savage Dickey point hypothesis test
+void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
+                                    const std::vector<double>& EvaluationPoint,
+                                    const std::vector<std::vector<double>>& Bounds){
 // **************************
 
   if((ParNames.size() != EvaluationPoint.size()) || (Bounds.size() != EvaluationPoint.size()))
@@ -3365,7 +3359,9 @@ void MCMCProcessor::GetSavageDickey(std::vector<std::string> ParNames, std::vect
 
 // **************************
 // KS: Reweight prior of MCMC chain to another
-void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<double> NewCentral, std::vector<double> NewError){
+void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
+                                  const std::vector<double>& NewCentral,
+                                  const std::vector<double>& NewError) {
 // **************************
 
   MACH3LOG_INFO("Reweighting Prior");
@@ -3412,7 +3408,9 @@ void MCMCProcessor::ReweightPrior(std::vector<std::string> Names, std::vector<do
   std::string OutputFilename = MCMCFile + "_reweighted.root";
 
   //KS: Simply create copy of file and add there new branch
-  system(("cp "+InputFile+" "+OutputFilename).c_str());
+  int ret = system(("cp " + InputFile + " " + OutputFilename).c_str());
+  if (ret != 0)
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
 
   TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
   OutputChain->cd();
@@ -3763,7 +3761,6 @@ void MCMCProcessor::ParamTraces() {
 
   OutputFile->cd();
 }
-
 
 // *********************************
 //KS: Calculate autocorrelations supports both OpenMP and CUDA :)
@@ -4632,5 +4629,4 @@ void MCMCProcessor::AcceptanceProbabilities() {
   delete probDir;
 
   OutputFile->cd();
-
 }

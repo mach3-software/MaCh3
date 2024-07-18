@@ -21,12 +21,14 @@
 #include "TStopwatch.h"
 #include "TColor.h"
 #include "TStyle.h"
+#include "TROOT.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
 
 #include "manager/manager.h"
+
 
 //KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one. 
 //Based on Gelman et. al. arXiv:1903.08008v5
@@ -37,7 +39,6 @@ int Nchains;
 
 int nDraw;
 
-bool VERBOSE;
 std::vector<TString> BranchNames;  
 std::vector<std::string> MCMCFile;  
 std::vector<bool> ValidPar;
@@ -86,40 +87,40 @@ int main(int argc, char *argv[]) {
 // *******************    
 
   SetMaCh3LoggerFormat();
+  MaCh3Utils::MaCh3Welcome();
 
-  Draws = NULL;
-  Mean = NULL;
-  StandardDeviation = NULL;
+  Draws = nullptr;
+  Mean = nullptr;
+  StandardDeviation = nullptr;
 
-  MeanGlobal = NULL;
-  StandardDeviationGlobal = NULL;
+  MeanGlobal = nullptr;
+  StandardDeviationGlobal = nullptr;
 
-  BetweenChainVariance = NULL;
-  MarginalPosteriorVariance = NULL;
-  RHat = NULL;
-  EffectiveSampleSize = NULL;
+  BetweenChainVariance = nullptr;
+  MarginalPosteriorVariance = nullptr;
+  RHat = nullptr;
+  EffectiveSampleSize = nullptr;
 
-  DrawsFolded = NULL;
-  MedianArr = NULL;
-  MeanFolded = NULL;
-  StandardDeviationFolded = NULL;
+  DrawsFolded = nullptr;
+  MedianArr = nullptr;
+  MeanFolded = nullptr;
+  StandardDeviationFolded = nullptr;
 
-  MeanGlobalFolded = NULL;
-  StandardDeviationGlobalFolded = NULL;
+  MeanGlobalFolded = nullptr;
+  StandardDeviationGlobalFolded = nullptr;
 
-  BetweenChainVarianceFolded = NULL;
-  MarginalPosteriorVarianceFolded = NULL;
-  RHatFolded = NULL;
-  EffectiveSampleSizeFolded = NULL;
+  BetweenChainVarianceFolded = nullptr;
+  MarginalPosteriorVarianceFolded = nullptr;
+  RHatFolded = nullptr;
+  EffectiveSampleSizeFolded = nullptr;
 
-  VERBOSE = false;
   Nchains = 0;
 
-  if (argc == 1 && argc == 2)
+  if (argc == 1 || argc == 2)
   {
-    std::cerr << "Wrong arguments" << std::endl;
-    std::cerr << "./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]" << std::endl;
-    exit(-1);
+    MACH3LOG_ERROR("Wrong arguments");
+    MACH3LOG_ERROR("./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   Ntoys = atoi(argv[1]);
@@ -128,22 +129,22 @@ int main(int argc, char *argv[]) {
   for (int i = 2; i < argc; i++)
   {
     MCMCFile.push_back(std::string(argv[i]));
-    std::cout<<"Adding file: "<<MCMCFile.back()<<std::endl;
+    MACH3LOG_INFO("Adding file: {}", MCMCFile.back());
     Nchains++;
   }
 
   if(Ntoys < 1)
   {
-    std::cerr << "You specified " << Ntoys << " specify larger greater than 0" << std::endl;
-    exit(-1);
+    MACH3LOG_ERROR("You specified {} specify larger greater than 0", Ntoys);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if(Nchains == 1)
   {
-    std::cout<<" Gelman is going to be sad :(. He suggested you should use more than one chain (at least 4). Code works fine for one chain, however, estimator might be biased."<<std::endl;
-    std::cout<<" Multiple chains are more likely to reveal multimodality and poor adaptation or mixing:"<<std::endl;
+    MACH3LOG_WARN("Gelman is going to be sad :(. He suggested you should use more than one chain (at least 4). Code works fine for one chain, however, estimator might be biased.");
+    MACH3LOG_WARN("Multiple chains are more likely to reveal multimodality and poor adaptation or mixing:");
   }
-  std::cout<<"Diagnosing "<<Nchains<<" chians, with "<<Ntoys<<" toys"<<std::endl;
+  MACH3LOG_INFO("Diagnosing {} chains, with {} toys", Nchains, Ntoys);
 
   PrepareChains();
 
@@ -166,7 +167,8 @@ void PrepareChains() {
 
   TRandom3 *rnd = new TRandom3(0);
 
-  std::cout << "Generating " << Ntoys << std::endl;
+  MACH3LOG_INFO("Generating {}", Ntoys);
+
   TStopwatch clock;
   clock.Start();
 
@@ -179,13 +181,18 @@ void PrepareChains() {
   Draws = new double**[Nchains]();
   DrawsFolded = new double**[Nchains]();
 
+  // KS: This can reduce time necessary for caching even by half
+  #ifdef MULTITHREAD
+  //ROOT::EnableImplicitMT();
+  #endif
+
   // Open the Chain
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
   for (int m = 0; m < Nchains; m++)
   {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
-
+    MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
     nEntries[m] = Chain->GetEntries();
 
     // Set the step cut to be 20%
@@ -237,7 +244,7 @@ void PrepareChains() {
           }
         }
         Chain->SetBranchStatus(bname, true);
-        if (VERBOSE) std::cout<<bname<<std::endl;
+        MACH3LOG_DEBUG("{}", bname);
       }
     }
 
@@ -248,12 +255,11 @@ void PrepareChains() {
     {
       if(nBranches[m] != nBranches[0])
       {
-        std::cerr<<"Ups, something went wrong, chain "<<m<<" called "<< MCMCFile[m] <<" has "<<nBranches[m]<<" branches, while 0 called "<<MCMCFile[0]<<" has "<<nBranches[0]<<" branches"<<std::endl;
-        std::cerr<<"All chains should have the same number of branches"<<std::endl;
-        throw;
+        MACH3LOG_ERROR("Ups, something went wrong, chain {} called {} has {} branches, while 0 called {} has {} branches", m, MCMCFile[m], nBranches[m], MCMCFile[0], nBranches[0]);
+        MACH3LOG_ERROR("All chains should have the same number of branches");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
-
 
     //TN: move the Draws here, so we need to iterate over every chain only once
     Draws[m] = new double*[Ntoys]();
@@ -272,12 +278,11 @@ void PrepareChains() {
     //TN: move looping over toys here, so we don't need to loop over chains more than once
     if(BurnIn[m] >= nEntries[m])
     {
-      std::cerr<<"You are running on a chain shorter than BurnIn cut"<<std::endl;
-      std::cerr<<"Number of entries "<<nEntries[m]<<" BurnIn cut "<<BurnIn<<std::endl;
-      std::cerr<<"You will run into the infinite loop"<<std::endl;
-      std::cerr<<"You can make a new chain or modify BurnIn cut"<<std::endl;
-      std::cerr<<"Find me here: "<<__FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("You are running on a chain shorter than BurnIn cut");
+      MACH3LOG_ERROR("Number of entries {} BurnIn cut {}", nEntries[m], BurnIn[m]);
+      MACH3LOG_ERROR("You will run into the infinite loop");
+      MACH3LOG_ERROR("You can make a new chain or modify BurnIn cut");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     for (int i = 0; i < Ntoys; i++)
@@ -297,8 +302,8 @@ void PrepareChains() {
 
       // Output some info for the user
       if (Ntoys > 10 && i % (Ntoys/10) == 0) {
-        std::cout << "On toy " << i << "/" << Ntoys << " (" << int(double(i)/double(Ntoys)*100.0) << "%)" << std::endl;
-        std::cout << "   Getting random entry " << entry << std::endl;
+        MaCh3Utils::PrintProgressBar(i+m*Ntoys, Ntoys*Nchains);
+        MACH3LOG_DEBUG("Getting random entry {}", entry);
       }
 
       // Set the branch addresses for params
@@ -356,7 +361,7 @@ void PrepareChains() {
   delete[] nBranches;
 
   clock.Stop();
-  std::cout << "Finsihed producing Toys, it took " << clock.RealTime() << "s to finish" << std::endl;
+  MACH3LOG_INFO("Finished calculating Toys, it took {:.2f}s to finish", clock.RealTime());
 }
 
 // *******************
@@ -364,8 +369,7 @@ void PrepareChains() {
 void InitialiseArrays() {
 // *******************
 
-  std::cout << "Initialising arrays " << std::endl;
-
+  MACH3LOG_INFO("Initialising arrays");
   Mean = new double*[Nchains]();
   StandardDeviation = new double*[Nchains]();
 
@@ -577,7 +581,7 @@ void CalcRhat() {
   #endif
 
   clock.Stop();
-  std::cout << "Finsihed calcaulting RHat, it took " << clock.RealTime() << "s to finish" << std::endl;
+  MACH3LOG_INFO("Finished calculating RHat, it took {:.2f}s to finish", clock.RealTime());
 }
 
 
@@ -585,7 +589,7 @@ void CalcRhat() {
 void SaveResults() {
 // *******************    
   std::string NameTemp = "";
-  //KS: If we run over many many chains there is danger that name will be so absurdly long we run over systmat limit and job will be killed :(
+  //KS: If we run over many many chains there is danger that name will be so absurdly long we run over system limit and job will be killed :(
   if(Nchains < 5)
   {
     for (int i = 0; i < Nchains; i++)
@@ -599,9 +603,8 @@ void SaveResults() {
       NameTemp = NameTemp + temp + "_";
     }
   }
-  else
-  {
-      NameTemp = std::to_string(Nchains) + "Chains" + "_";
+  else {
+    NameTemp = std::to_string(Nchains) + "Chains" + "_";
   }
   NameTemp += "diag.root";
 
@@ -653,13 +656,12 @@ void SaveResults() {
     }
   }
   //KS: We set criterium of 1.1 based on Gelman et al. (2003) Bayesian Data Analysis
-  std::cout<<" Number of parameters which has R hat greater than 1.1 is "<<Criterium<<"("<<100*double(Criterium)/double(nDraw)<<"%) while for R hat folded "<<CiteriumFolded<<"("<<100*double(CiteriumFolded)/double(nDraw)<<"%)"<<std::endl;
-
+  MACH3LOG_WARN("Number of parameters which has R hat greater than 1.1 is {}({:.2f}%) while for R hat folded {}({:.2f}%)", Criterium, 100*double(Criterium)/double(nDraw), CiteriumFolded, 100*double(CiteriumFolded)/double(nDraw));
   for(int j = 0; j < nDraw; j++)
   {
     if( (RHat[j] > 1.1 || RHatFolded[j] > 1.1) && ValidPar[j])
     {
-      std::cout<<"Parameter "<<BranchNames[j]<<" has R hat higher than 1.1"<<std::endl;
+      MACH3LOG_CRITICAL("Parameter {} has R hat higher than 1.1", BranchNames[j]);
     }
   }
   StandardDeviationGlobalPlot->Write();
@@ -709,7 +711,7 @@ void SaveResults() {
   Legend->Draw("same");
   TempCanvas->Write("Rhat");
   delete Legend;
-  Legend = NULL;
+  Legend = nullptr;
 
   //Now R hat for log L
   RhatLogPlot->GetXaxis()->SetTitle("R hat for LogL");
@@ -734,7 +736,7 @@ void SaveResults() {
   Legend->Draw("same");
   TempCanvas->Write("RhatLog");
   delete Legend;
-  Legend = NULL;
+  Legend = nullptr;
 
   //Now canvas for effective sample size
   EffectiveSampleSizePlot->GetXaxis()->SetTitle("S_{eff, BDA2}");
@@ -785,7 +787,7 @@ void SaveResults() {
   DiagFile->Close();
   delete DiagFile;
 
-  std::cout<<"Finished and wrote results to "<<NameTemp<<std::endl;
+  MACH3LOG_INFO("Finished and wrote results to {}", NameTemp);
 }
 
 // *******************
@@ -793,7 +795,7 @@ void SaveResults() {
 void DestroyArrays() {
 // *******************
     
-  std::cout<<"Killing all arrays"<<std::endl;
+  MACH3LOG_INFO("Killing all arrays");
   delete[] MeanGlobal;
   delete[] StandardDeviationGlobal;
   delete[] BetweenChainVariance;
@@ -836,7 +838,7 @@ void DestroyArrays() {
 
 // *******************
 //calculate median
-double CalcMedian(double arr[], int size) {
+double CalcMedian(double arr[], const int size) {
 // *******************   
   std::sort(arr, arr+size);
   if (size % 2 != 0)
@@ -847,7 +849,7 @@ double CalcMedian(double arr[], int size) {
 
 // *******************
 //calculate median
-void CapVariable(double var, double cap) {
+void CapVariable(double var, const double cap) {
 // *******************   
 
   if(std::isnan(var) || !std::isfinite(var)) var = cap;

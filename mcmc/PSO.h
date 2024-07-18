@@ -2,7 +2,6 @@
 //
 // Created by Emily Ip on 24/2/2023.
 //
-//
 // Created by Emily Ip on 26/1/2023.
 //
 #include <algorithm>
@@ -16,9 +15,7 @@
 /// @brief Class particle - stores the position, velocity and personal best
 /// With functions which move particle and update velocity
 class particle{
-
     public:
-
         particle(){};
         particle(std::vector<double> pos, std::vector<double> vel) : position(pos), velocity(vel){};
         /// @brief Destructor
@@ -69,16 +66,12 @@ class particle{
         double personal_best_value;
         double curr_value;
         std::vector<double> personal_best_position;
-
-
 };
-
 
  /// @brief Class PSO, consist of a vector of object Class Particle and global best
  /// Takes in the size (number of particle) and number of iteration
  /// functions includes: finding global best, updating velocity, actual minimisation function
 class PSO : public LikelihoodFit {
-
     public:
         /// @brief constructor
         PSO(manager * const fitMan);

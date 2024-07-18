@@ -27,7 +27,6 @@ else()
   project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 endif()
 
-
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
 if(CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL
@@ -43,105 +42,24 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 ################################## Dependencies ################################
-
-include(CPM)
-
-#Luke's handing cmake modules which Neutrino hep experiments might want
-CPMFindPackage(
-      NAME CMakeModules
-      GIT_TAG stable
-      GITHUB_REPOSITORY NuHepMC/CMakeModules
-      DOWNLOAD_ONLY
-  )
-include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
-include(NuHepMCUtils)
-
-# Check if CUDA was found
-if(MaCh3_GPU_ENABLED)
-  include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
-endif()
-
-include(ROOT)
-if(NOT TARGET ROOT::ROOT)
-  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
-endif()
-
-if(ROOT_VERSION VERSION_LESS 6.18.0)
-    message(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
-endif()
-
-#YAML for reading in config files
-set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
-set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
-CPMAddPackage(
-    NAME yaml-cpp
-    VERSION ${YAML_CPP_VERSION}
-    GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG "${YAML_CPP_GIT_TAG}"
-    OPTIONS
-      "YAML_BUILD_SHARED_LIBS ON"
-)
-
-if(NOT TARGET yaml-cpp::yaml-cpp)
-  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: yaml-cpp::yaml-cpp")
-endif()
-
-#KS: Not being used right now so commenting it out.
-#CPMAddPackage(
-#  NAME Eigen
-#  VERSION 3.2.8
-#  URL https://gitlab.com/libeigen/eigen/-/archive/3.2.8/eigen-3.2.8.tar.gz
-#  # Eigen's CMakelists are not intended for library use
-#  DOWNLOAD_ONLY YES
-#)
-
-#if(Eigen_ADDED)
-#  add_library(Eigen INTERFACE IMPORTED)
-#  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
-#endif()
-
-
-################################## Oscillation ################################
-#KS: All of these should be moved to separate cmake and be handled by osc class, keep it for now
-#If USE_PROB3 not defined turn it off by default
-if(NOT DEFINED USE_PROB3)
-  SET(USE_PROB3 FALSE)
-endif()
-
-# Oscillation calcualtion
-# In the future which osc calc we use might be set with a flag
-SET(MaCh3_Oscillator_ENABLED "")
-if (USE_PROB3)
-  CPMFindPackage(
-    NAME Prob3plusplus
-    VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
-else()
-  CPMFindPackage(
-    NAME CUDAProb3
-    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-    GIT_TAG "feature_cleanup"
-    DOWNLOAD_ONLY YES
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
-endif()
-
-#dump_cmake_variables(Prob3plusplus)
+#KS: Store some handy cmake functions
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Utils.cmake)
+#Loads all dependencies
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   SET(CMAKE_CXX_STANDARD 11)
 endif()
 
+# KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
 if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
 endif()
 cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
 
-if(${ROOT_CXX_STANDARD} LESS 14)
+# KS: ROOT changed cmake in 6.32, we should move avay from using Luke's hack, keep it for due to compatibility
+if(ROOT_CXX_STANDARD LESS 14 AND ROOT_VERSION VERSION_LESS 6.32.00)
   cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
 endif()
 
@@ -157,27 +75,30 @@ endif()
 # Custom commands
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-#Compile and link options
-#KS: Add -Werror  and maybe -Wconversion in the future
+# KS: Compile and link options for more see https://github.com/cpp-best-practices/cppbestpractices/tree/master
 target_compile_options(MaCh3CompilerOptions INTERFACE
-                                                    -g
-                                                    -Wextra
-                                                    -Wall
-                                                    -pedantic
-                                                    -Wshadow
-                                                    -Wuninitialized
-                                                    -Wnon-virtual-dtor
-                                                    -Woverloaded-virtual)
+    -g                      # Generate debug information
+    -Wextra                 # Enable extra warning flags
+    -Wall                   # Enable all standard warning flags
+    -pedantic               # Enforce strict ISO compliance
+    -Wshadow                # Warn when a variable declaration shadows one from an outer scope
+    -Wuninitialized         # Warn about uninitialized variables
+    -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
+    -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
+    -Wnull-dereference      # Warn if a null dereference is detected
+    -Wformat=2              # Warn on security issues around functions that format output (ie printf)
+    #-Wold-style-cast       # Warn for c-style casts
+    #-Wconversion           # Warn on type conversions that may lose data
+    #-Werror                # Treat Warnings as Errors
+)
 #KS: If Debug is not defined disable it by default
-if(NOT DEFINED MaCh3_DEBUG_ENABLED)
-  SET(MaCh3_DEBUG_ENABLED FALSE)
-endif()
+DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
   SET(MaCh3_DEBUG_ENABLED TRUE)
 else()
-  #If MaCh debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
+  #If MaCh3 debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
   if(MaCh3_DEBUG_ENABLED)
     SET(DEBUG_LEVEL 1)
   endif()
@@ -190,15 +111,20 @@ if(MaCh3_DEBUG_ENABLED)
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-  target_compile_options(MaCh3CompilerOptions INTERFACE -O3 -funroll-loops --param=max-vartrack-size=100000000 -finline-limit=100000000)
-  #KS: addomg Link-Time Optimization (LTO)
-  target_link_options(MaCh3CompilerOptions INTERFACE -flto)
+target_compile_options(MaCh3CompilerOptions INTERFACE
+    -O3                                  # Optimize code for maximum speed
+    -funroll-loops                       # Unroll loops where possible for performance
+    --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
+    -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
+    #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
+)
+  #KS: add Link-Time Optimization (LTO)
+  # FIXME previously it wasn't used correctly but would need more testing
+  #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
 #KS: If multithreading is not defined enable it by default
-if(NOT DEFINED MaCh3_MULTITHREAD_ENABLED)
-  SET(MaCh3_MULTITHREAD_ENABLED TRUE)
-endif()
+DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
@@ -233,17 +159,15 @@ install(TARGETS MaCh3CompilerOptions
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
-#KS: Consider moving it somewhere else
-SET(MaCh3_Fitter_ENABLED "MR2T2")
-SET(MaCh3_MINUIT2_ENABLED FALSE)
-if(ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
-  LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
-  SET(MaCh3_MINUIT2_ENABLED TRUE)
-endif()
-
 #Include logger
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)
 ################################# Features ##################################
+#KS: Retrieve and print the compile options and link libraries for maximal verbose
+get_target_property(compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
+get_target_property(link_libraries MaCh3CompilerOptions INTERFACE_LINK_LIBRARIES)
+
+cmessage(STATUS "Compile options for MaCh3CompilerOptions: ${compile_options}")
+cmessage(STATUS "Link libraries for MaCh3CompilerOptions: ${link_libraries}")
 
 LIST(APPEND ALL_FEATURES
   DEBUG
@@ -286,20 +210,11 @@ add_library(MaCh3::All ALIAS MaCh3)
 configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-
-set(export_destinations
-    ${CMAKE_INSTALL_PREFIX}/lib/cmake/
-    ${CMAKE_INSTALL_PREFIX}/
+install(EXPORT MaCh3-targets
+        FILE MaCh3Targets.cmake
+        NAMESPACE MaCh3::
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
-
-foreach(dest ${export_destinations})
-  install(EXPORT MaCh3-targets
-          FILE MaCh3Targets.cmake
-          NAMESPACE MaCh3::
-          DESTINATION ${dest}
-  )
-endforeach()
-
 
 #KS: Options to print dependency graph
 if(NOT DEFINED MaCh3_DependancyGraph)
@@ -342,22 +257,20 @@ include(mach3-config)
 ## dump of the versions of the main dependencies of MaCh3
 ## We also check the git hash of each of the dependencies and info
 ## on whether or not they were using a tagged commit or not
-set(GENERATED_VERSION_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
-
-if(EXISTS ${GENERATED_VERSION_HEADER_DIR}/_version.h)
-  message(FATAL_ERROR "File \"${GENERATED_VERSION_HEADER_DIR}/_version.h\" found, \
-  this should never be created, remove!")
+if(EXISTS "${CMAKE_INSTALL_PREFIX}/_version.h")
+  cmessage(FATAL_ERROR "File \"${CMAKE_INSTALL_PREFIX}/_version.h\" found, this should never be created, remove!")
 endif()
 
+# Define custom target for version_header
 add_custom_target(
   version_header ALL
-  DEPENDS ${GENERATED_VERSION_HEADER_DIR}/_version.h
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/_version.h
 )
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${GENERATED_VERSION_HEADER_DIR}/version.h
-         ${GENERATED_VERSION_HEADER_DIR}/_version.h
-
+# Add custom command to generate version.h and _version.h
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
+         ${CMAKE_CURRENT_BINARY_DIR}/_version.h
   COMMAND ${CMAKE_COMMAND}
           -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
           -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
@@ -365,8 +278,14 @@ ADD_CUSTOM_COMMAND(
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
-          -P
-          ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
+          -P ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
+  COMMENT "Generating version.h and _version.h"
 )
 
-set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${GENERATED_VERSION_HEADER_DIR})
+# Set properties for the target
+set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR})
+
+# Install version.h to the install directory
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/)

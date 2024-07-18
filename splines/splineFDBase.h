@@ -6,6 +6,8 @@
 //MaCh3
 #include "splines/SplineBase.h"
 
+/// @brief Bin-by-bin class calculating response for spline parameters.
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 class splineFDBase : public SplineBase {
   //ETA - do all of these functions and members actually need to be public?
   public:

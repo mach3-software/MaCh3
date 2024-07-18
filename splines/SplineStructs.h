@@ -4,28 +4,25 @@
 #include "covariance/covarianceXsec.h"
 #include "samplePDF/Structs.h"
 
-
 // *******************
-/// CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
+/// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
 // *******************
-  // Number of points in spline
+  /// Number of points in spline
   _int_ nPts;
 
-  // Array of the knots positions
+  /// Array of the knots positions
   _float_ *xPts;
 
-  // Array of what segment of spline we're currently interested in
-  // Gets updated once per MCMC iteration
+  /// Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration
   _int_ CurrSegment;
 
-  // Array of the knots positions
+  /// Array of the knots positions
   const double* splineParsPointer;
 };
 
 // ********************************************
-/// CW: Generic xsec class
-/// Can use TF1 or TSpline3 or TSpline5 here, tjoho
+/// @brief CW: Generic xsec class. Can use TF1 or TSpline3 or TSpline5 here, tjoho
 template <class T>
 class XSecStruct{
 // ********************************************
@@ -92,7 +89,7 @@ private:
 
 
 // ***************************************************************************
-//EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
+/// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
 inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianceXsec* XsecCov) {
 // ***************************************************************************
   if(xsecgraph == NULL){
@@ -143,18 +140,17 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianc
 }
 
 // ************************
-/// CW: A reduced TF1 class only
-/// Only saves parameters for each TF1 and how many parameters each parameter set has
+/// @brief CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each parameter set has
 class TF1_red {
-  // ************************
+// ************************
 public:
-  /// Empty constructor
+  /// @brief Empty constructor
   TF1_red() {
     length = 0;
     Par = NULL;
   }
 
-  /// Empty destructor
+  /// @brief Empty destructor
   ~TF1_red() {
     if (Par != NULL) {
       delete[] Par;
@@ -162,7 +158,7 @@ public:
     }
   }
 
-  /// The useful constructor with deep copy
+  /// @brief The useful constructor with deep copy
   TF1_red(_int_ nSize, _float_* Array, _int_ Parameter) {
     length = nSize;
     for (int i = 0; i < length; ++i) {
@@ -171,20 +167,20 @@ public:
     ParamNo = Parameter;
   }
 
-  /// The TF1 constructor with deep copy
+  /// @brief The TF1 constructor with deep copy
   TF1_red(TF1* &Function, int Param = -1) {
     Par = NULL;
     SetFunc(Function, Param);
   }
 
-  // Get the number
+  /// @brief Get the number
   inline std::string GetName() {
     std::stringstream ss;
     ss << ParamNo;
     return ss.str();
   }
 
-  /// Set the function
+  /// @brief Set the function
   inline void SetFunc(TF1* &Func, int Param = -1) {
     length = Func->GetNpar();
     if (Par != NULL) delete[] Par;
@@ -197,7 +193,7 @@ public:
     Func = NULL;
   }
 
-  /// Evaluate a variation
+  /// @brief Evaluate a variation
   inline double Eval(_float_ var) {
     /// If we have 5 parameters we're using a fifth order polynomial
     if (length == 5) {
@@ -214,12 +210,12 @@ public:
     }
   }
 
-  /// Set a parameter to a value
+  /// @brief Set a parameter to a value
   inline void SetParameter(_int_ Parameter, _float_ Value) {
     Par[Parameter] = Value;
   }
 
-  /// Get a parameter value
+  /// @brief Get a parameter value
   double GetParameter(_int_ Parameter) {
     if (Parameter > length) {
       std::cerr << "Error: you requested parameter number " << Parameter << " but length is " << length << " parameters" << std::endl;
@@ -229,13 +225,14 @@ public:
     return Par[Parameter];
   }
 
-  /// Set the size
+  /// @brief Set the size
   inline void SetSize(_int_ nSpline) {
     length = nSpline;
     Par = new _float_[length];
   }
-  /// Get the size
+  /// @brief Get the size
   inline int GetSize() { return length; }
+  /// @brief Print detailed info
   inline void Print() {
     std::cout << "Printing TF1_red: " << std::endl;
     std::cout << "  ParamNo = " << ParamNo << std::endl;
@@ -261,7 +258,7 @@ private:
 // ************************
 /// CW: Reduced TSpline3 class
 class TSpline3_red {
-  // ************************
+// ************************
 public:
   /// @brief Empty constructor
   TSpline3_red() {
@@ -306,7 +303,7 @@ public:
       }
     }
   }
-
+  /// @brief Set the function
   inline void SetFunc(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
     nPoints = spline->GetNp();
     ParamNo = Param;
@@ -580,7 +577,7 @@ public:
     XPos = YResp = NULL;
   }
 
-  /// Find the segment relevant to this variation in x
+  /// @brief Find the segment relevant to this variation in x
   /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
   inline int FindX(double x) {
     // The segment we're interested in (klow in ROOT code)
@@ -645,7 +642,7 @@ public:
     y = YResp[segment];
   }
 
-  /// CW: Get the number
+  /// @brief CW: Get the number
   inline std::string GetName() {
     std::stringstream ss;
     ss << ParamNo;
@@ -668,27 +665,27 @@ public:
 // ************************
 /// @brief CW: Truncated spline class
 class Truncated_Spline: public TSpline3_red {
-  // ************************
-  // cubic spline which is flat (returns y_first or y_last) if x outside of knot range
+// ************************
+// cubic spline which is flat (returns y_first or y_last) if x outside of knot range
 public:
-  /// Empty constructor
+  /// @brief Empty constructor
   Truncated_Spline()
   :TSpline3_red()
   {
   }
 
-  /// The constructor that takes a TSpline3 pointer and copies in to memory
+  /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
   Truncated_Spline(TSpline3* &spline, int Param = -1)
   :TSpline3_red(spline, Param)
   {
   }
 
-  /// Empty destructor
+  /// @brief Empty destructor
   ~Truncated_Spline()
   {
   }
 
-  /// Find the segment relevant to this variation in x
+  /// @brief Find the segment relevant to this variation in x
   /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
   inline int FindX(double x) {
     // The segment we're interested in (klow in ROOT code)
@@ -722,7 +719,7 @@ public:
     return segment;
   }
 
-  /// Evaluate the weight from a variation
+  /// @brief Evaluate the weight from a variation
   inline double Eval(double var) {
     // Get the segment for this variation
     int segment = FindX(var);
@@ -753,5 +750,3 @@ public:
     return weight;
   }
 };
-
-// TODO KS: Consider moving here FastSplineInfo, and TSpline3_red etc

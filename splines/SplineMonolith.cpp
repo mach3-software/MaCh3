@@ -727,7 +727,6 @@ void SMonolith::PrepareSplineFile() {
   delete FastSplineInfoTree;
   SplineFile->Close();
   delete SplineFile;
-
 }
 
 // *****************************************
@@ -1407,11 +1406,11 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
     manyArray[i*_nCoeff_+3] = float(d);
     
     if((xArray[i] == -999) | (manyArray[i*_nCoeff_] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*_nCoeff_+2] == -999) | (manyArray[i*_nCoeff_+3] == -999)){
-      std::cerr << "*********** Bad params in getSplineCoeff_SepMany() ************"<<std::endl;
-      std::cerr << "pre cast to float (x, y, b, c, d) = "<<x<<", "<<y<<", "<<b<<", "<<c<<", "<<d<<std::endl;
-      std::cerr << "post cast to float (x, y, b, c, d) = "<<xArray[i]<<", "<<manyArray[i*4]<<", "<<manyArray[i*4+1]<<", "<<manyArray[i*4+2]<<", "<<manyArray[i*_nCoeff_+3]<<std::endl;
-      std::cerr << "This will cause problems when preparing for GPU"<<std::endl;
-      std::cerr << "***************************************************************"<<std::endl;
+      MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
+      MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", x, y, b, c, d);
+      MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*_nCoeff_+3]);
+      MACH3LOG_ERROR("This will cause problems when preparing for GPU");
+      MACH3LOG_ERROR("***************************************************************");
     }
   }
   // The structure is now xarray  ={x1,x2,x3} 
