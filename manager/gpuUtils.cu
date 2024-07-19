@@ -1,34 +1,9 @@
-// C i/o  for printf and others
-#include <stdio.h>
-#include <vector>
-
-// CUDA specifics
-
-#include <cuda_runtime.h>
-
-#ifdef CUDA_ERROR_CHECK
-#include <helper_functions.h>
-#include <helper_cuda.h>
-#endif
-
-// Define the macros
-#define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)
-#define CudaCheckError()  __cudaCheckError(__FILE__, __LINE__)
-
-/// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
-#define _BlockSize_ 1024
-
-// CUDA_ERROR_CHECK is now defined in the makefile instead
-//#define CUDA_ERROR_CHECK
+// MaCh3 includes
+#include "manager/gpuUtils.cuh"
 
 // **************************************************
-//             ERROR CHECKING ROUTINES
-// Also exist in helper_cuda.h
-// **************************************************
-
-// **************************************************
-/// @brief Check for a safe call on GPU
-inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
+// Check for a safe call on GPU
+void __cudaSafeCall( cudaError err, const char *file, const int line ) {
 // **************************************************
 #ifdef CUDA_ERROR_CHECK
   if (cudaSuccess != err) {
@@ -40,8 +15,8 @@ inline void __cudaSafeCall( cudaError err, const char *file, const int line ) {
 }
 
 // **************************************************
-/// @brief Check if there's been an error
-inline void __cudaCheckError( const char *file, const int line ) {
+// Check if there's been an error
+void __cudaCheckError( const char *file, const int line ) {
 // **************************************************
 #ifdef CUDA_ERROR_CHECK
   cudaError err = cudaGetLastError();
@@ -66,8 +41,8 @@ inline void __cudaCheckError( const char *file, const int line ) {
 // *******************************************
 
 // *******************************************
-/// @brief KS: Get some fancy info about VRAM usage
-inline void checkGpuMem() {
+// KS: Get some fancy info about VRAM usage
+void checkGpuMem() {
 // *******************************************
 
   float free_m, total_m,used_m;
@@ -84,8 +59,8 @@ inline void checkGpuMem() {
 }
 
 // *******************************************
-/// @brief KS: Get some fancy info about GPU
-inline void PrintNdevices() {
+// KS: Get some fancy info about GPU
+void PrintNdevices() {
 // *******************************************
 
   int nDevices;
@@ -102,8 +77,8 @@ inline void PrintNdevices() {
 
 
 // *******************************************
-/// @brief KS: Completely clean GPU, this is time consuming and may lead to unexpected behaviour.
-inline void ResetDevice() {
+// KS: Completely clean GPU, this is time consuming and may lead to unexpected behaviour.
+void ResetDevice() {
 // *******************************************
 
   cudaDeviceReset();
@@ -113,7 +88,7 @@ inline void ResetDevice() {
 
 // *******************************************
 /// @brief Only useful if using multiple GPU
-inline void SetDevice(const int deviceId) {
+void SetDevice(const int deviceId) {
 // *******************************************
 
   // Check if the device ID is valid
@@ -131,8 +106,8 @@ inline void SetDevice(const int deviceId) {
 }
 
 // *******************************************
-/// @brief Get number of GPU threads for currently used GPU
-inline void GetNumGPUThreads(const int Device = 0) {
+// Get number of GPU threads for currently used GPU
+int GetNumGPUThreads(const int Device) {
 // *******************************************
 
   int deviceCount;
@@ -149,5 +124,5 @@ inline void GetNumGPUThreads(const int Device = 0) {
   // Define the number of threads per block
   int nThreadsBlocks = (deviceProp.multiProcessorCount * deviceProp.maxThreadsPerMultiProcessor);
 
-  printf("Currently used GPU has : %i threads \n", nThreadsBlocks);
+  return nThreadsBlocks;
 }

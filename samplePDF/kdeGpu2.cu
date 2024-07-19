@@ -4,7 +4,7 @@
 #define MULTI_DATA 10
 
 //MaCh3 included
-#include "manager/gpuUtils.cu"
+#include "manager/gpuUtils.cuh"
 
 
 #include "stdio.h"

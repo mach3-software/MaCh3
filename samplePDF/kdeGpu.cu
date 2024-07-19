@@ -1,5 +1,5 @@
 //MaCh3 included
-#include "manager/gpuUtils.cu"
+#include "manager/gpuUtils.cuh"
 
 // -*- c++ -*-
 #include "stdio.h"

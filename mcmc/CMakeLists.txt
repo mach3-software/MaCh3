@@ -7,6 +7,7 @@ set(HEADERS
     MCMCProcessor.h
     SampleSummary.h
     StatisticalUtils.h
+    gpuMCMCProcessorUtils.cuh
 )
 
 add_library(MCMC SHARED
