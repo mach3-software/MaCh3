@@ -31,3 +31,52 @@ endif()
 
 cmessage(STATUS "Using the following CUDA samples paths: ${CMAKE_CUDA_SAMPLES_PATH}")
 target_include_directories(MaCh3CompilerOptions INTERFACE ${CMAKE_CUDA_SAMPLES_PATH})
+
+
+# KS: Perform fancy CUDA Benchmarking
+DefineEnabledRequiredSwitch(MaCh3_GPU_BENCHMARK FALSE)
+if(MaCh3_GPU_BENCHMARK)
+    cmessage(STATUS "Building CUDA Benchmark")
+
+    # KS: Define directories to iterate over, might be useful to expand
+    set(CUDA_SAMPLES_DIRS
+        "deviceQuery"
+        "bandwidthTest"
+    )
+
+    # KS: Iterate over each directory
+    foreach(sample_dir ${CUDA_SAMPLES_DIRS})
+        # Define source and destination directories
+        set(SRC_DIR "${CMAKE_CUDA_SAMPLES_PATH}/../Samples/1_Utilities/${sample_dir}")
+        set(DST_DIR "${CMAKE_BINARY_DIR}/GPU_Benchmark/")
+
+        # CW: Copy over the provided nvidia utility
+        # CW: Often we can't write to the CUDA install directory, so let's build it here
+        file(COPY ${SRC_DIR} DESTINATION ${DST_DIR})
+
+        # KS: Change directory to copied sample
+        set(SAMPLE_DIR "${CMAKE_BINARY_DIR}/GPU_Benchmark/${sample_dir}")
+
+        # Modify Makefile path
+        set(MAKEFILE_PATH "${SAMPLE_DIR}/Makefile")
+
+        # CW: Patch the litle hard-coded NVIDIA makefile
+        execute_process(
+            COMMAND sed -i "s,../../../Common,${CMAKE_CUDA_SAMPLES_PATH},g" ${MAKEFILE_PATH}
+            RESULT_VARIABLE SED_RESULT
+        )
+
+        # Add custom target to run make
+        add_custom_target(run_${sample_dir} ALL
+            COMMAND make
+            WORKING_DIRECTORY ${SAMPLE_DIR}
+        )
+
+        # Add custom target to run sample
+        add_custom_target(run_${sample_dir}_exec ALL
+            COMMAND ./${sample_dir}
+            WORKING_DIRECTORY ${SAMPLE_DIR}
+            DEPENDS run_${sample_dir}
+        )
+    endforeach(sample_dir)
+endif()

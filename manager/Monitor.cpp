@@ -101,10 +101,10 @@ void GetCPUInfo(){
   MACH3LOG_INFO("{}", TerminalToString("cat /proc/cpuinfo | grep -m 1 MHz"));
   //KS: Below code is convoluted because I mostly work on English based Linux but sometimes on Polish based Linux, this ensures it works on both. We can add support for other languages if needed
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i Archit"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L1d'"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L1i'"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L2'"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L3'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L1d |L1d:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L1i |L1i:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L2 |L2:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L3 |L3:'"));
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'Thread.* per core:|Wątków na rdzeń:'"));
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E '^CPU(:|\\(s\\)):?\\s+[0-9]+'"));
 
@@ -127,6 +127,8 @@ void GetGPUInfo(){
   MACH3LOG_INFO("Total VRAM: {} MB", TerminalToString("nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits"));
   // Print Driver Version
   MACH3LOG_INFO("Driver Version: {}", TerminalToString("nvidia-smi --query-gpu=driver_version --format=csv,noheader"));
+  // Print N GPU thread
+  MACH3LOG_INFO("Currently used GPU has: {} threads", GetNumGPUThreads());
 #endif
   return;
 }

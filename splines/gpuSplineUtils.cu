@@ -6,7 +6,7 @@
 // Called from samplePDF/samplePDFND.cpp -> splines/SplineMonolith.cpp -> splines/gpuSplineUtils.cu
 
 //MaCh3 included
-#include "manager/gpuUtils.cu"
+#include "manager/gpuUtils.cuh"
 #include "splines/SplineCommon.h"
 
 // Hard code the number of splines

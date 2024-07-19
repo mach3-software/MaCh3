@@ -2,43 +2,6 @@
 
 #include "TChain.h"
 
-//Only if GPU is enabled
-#ifdef CUDA
-extern void InitGPU_AutoCorr(
-    float **ParStep_gpu,
-    float **NumeratorSum_gpu,
-    float **ParamSums_gpu,
-    float **DenomSum_gpu,
-    int n_Entries,
-    int n_Pars,
-    const int n_Lags);
-
-extern void CopyToGPU_AutoCorr(
-    float *ParStep_cpu,
-    float *NumeratorSum_cpu,
-    float *ParamSums_cpu,
-    float *DenomSum_cpu,
-
-    float *ParStep_gpu,
-    float *NumeratorSum_gpu,
-    float *ParamSums_gpu,
-    float *DenomSum_gpu);
-
-extern void RunGPU_AutoCorr(
-    float *ParStep_gpu,
-    float *ParamSums_gpu,
-    float *NumeratorSum_gpu,
-    float *DenomSum_gpu,
-    float *NumeratorSum_cpu,
-    float *DenomSum_cpu);
-
-extern void CleanupGPU_AutoCorr(
-    float *ParStep_gpu,
-    float *NumeratorSum_gpu,
-    float *ParamSums_gpu,
-    float *DenomSum_gpu);
-#endif
-
 // ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
   Chain(nullptr), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
