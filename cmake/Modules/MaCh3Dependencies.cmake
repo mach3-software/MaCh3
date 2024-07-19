@@ -12,7 +12,7 @@ include(NuHepMCUtils)
 
 # Check if CUDA was found
 if(MaCh3_GPU_ENABLED)
-  include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/CUDASetup.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/CUDASetup.cmake)
 endif()
 
 include(ROOT)
@@ -65,6 +65,7 @@ SET(MaCh3_Fitter_ENABLED "MR2T2")
 LIST(APPEND MaCh3_Fitter_ENABLED " PSO")
 if(MaCh3_MINUIT2_ENABLED)
   LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE MaCh3_MINUIT2)
 endif()
 
 ################################## Oscillation ################################

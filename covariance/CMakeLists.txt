@@ -4,6 +4,7 @@ set(HEADERS
     covarianceBase.h
     covarianceOsc.h
     covarianceXsec.h
+    adaptiveMCMCStruct.h
 )
 
 add_library(Covariance SHARED

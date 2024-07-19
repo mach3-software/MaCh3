@@ -1,5 +1,4 @@
 #include "covarianceBase.h"
-
 // ********************************************
 covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {
 // ********************************************
@@ -112,6 +111,11 @@ covarianceBase::~covarianceBase(){
   for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
   delete[] random_number;
   if (throwMatrix != NULL) delete throwMatrix;
+
+  if(adaption_struct.adaptive_covariance != nullptr){
+    delete adaption_struct.adaptive_covariance;
+  }
+
 }
 
 // ********************************************
@@ -279,11 +283,7 @@ void covarianceBase::init(const char *name, const char *file) {
   }
 
   // Not using adaptive by default
-  use_adaptive = false;
-  total_steps = 0;
-  lower_adapt = -999;
-  upper_adapt = -999;
-
+  setAdaptionDefaults();
   // Set the covariance matrix
   size = CovMat->GetNrows();
   _fNumPar = size;
@@ -348,16 +348,13 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 
   PrintLength = 35;
 
-  // Not using adaptive by default
-  use_adaptive = false;
-  total_steps = 0;
-  lower_adapt = -999;
-  upper_adapt = -999;
 
   // Set the covariance matrix
   _fNumPar = _fYAMLDoc["Systematics"].size();
   size = _fNumPar;
-    
+
+  setAdaptionDefaults();
+
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
@@ -489,7 +486,8 @@ void covarianceBase::init(TMatrixDSym* covMat) {
       throwMatrixCholDecomp[i][j] = 0.;
     }
   }
-  
+
+  setAdaptionDefaults();
   setCovMatrix(covMat);
 
   ReserveMemory(_fNumPar);
@@ -782,7 +780,10 @@ void covarianceBase::proposeStep() {
   // Make the random numbers for the step proposal
   randomize();
   CorrelateSteps();
-  if(use_adaptive && total_steps < upper_adapt) updateAdaptiveCovariance();
+  if(use_adaptive){
+    updateAdaptiveCovariance();
+    total_steps++;
+  }
 }
 
 // ************************************************
@@ -1348,7 +1349,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   }
 
   throwMatrix = (TMatrixDSym*)cov->Clone();
-  if(total_steps <= lower_adapt) makeClosestPosDef(throwMatrix);
+  if(use_adaptive && total_steps <= adaption_struct.start_adaptive_throw) makeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
@@ -1373,8 +1374,9 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
     }
   }
 }
-
+// ********************************************
 void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
+// ********************************************
   delete throwMatrix;
   throwMatrix = NULL;
   delete throwMatrix_CholDecomp;
@@ -1382,129 +1384,282 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
   setThrowMatrix(cov);
 }
 
-// The setter
-void covarianceBase::useSeparateThrowMatrix(TString throwMatrixFileName, TString throwMatrixName, TString meansVectorName){
-// Firstly let's check if the file exists
-  TFile* throwMatrixFile = new TFile(throwMatrixFileName);
-  resetIndivStepScale();
-  if(throwMatrixFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find throw Matrix file : {}", throwMatrixFileName);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  } //We're done for now
-
-  TMatrixDSym* tmp_throwMatrix = (TMatrixDSym*)throwMatrixFile->Get(throwMatrixName);
-  TVectorD* tmp_meansvec = (TVectorD*)throwMatrixFile->Get(meansVectorName);
-
-  if(!tmp_throwMatrix){
-    std::cerr<<"ERROR : Couldn't find throw matrix "<<throwMatrixName<<" in "<<throwMatrixFileName<<std::endl;
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  if(!tmp_meansvec){
-    std::cerr<<"ERROR : Couldn't find means vector "<<meansVectorName<<" in "<<throwMatrixFileName<<std::endl;
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  adaptiveCovariance = (TMatrixDSym*)tmp_throwMatrix->Clone();
-  par_means.resize(tmp_meansvec->GetNrows());
-  for(int iMean = 0; iMean < tmp_meansvec->GetNrows(); iMean++){
-      par_means[iMean] = (*tmp_meansvec)(iMean);
-      updateThrowMatrix(adaptiveCovariance);
-  }
-  delete tmp_throwMatrix;
-  delete tmp_meansvec;
-  throwMatrixFile->Close();
-  delete throwMatrixFile; // Just in case
-}
-
-
-void covarianceBase::useSeparateThrowMatrix(){
-    initialiseNewAdaptiveChain(); 
-    updateThrowMatrix(covMatrix);
-}
-
+// ********************************************
 //HW: Truly adaptive MCMC!
-void covarianceBase::updateAdaptiveCovariance(){
-  // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
-  // Updates adaptive matrix
-  // First we update the total means
-
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
-  for(int iRow = 0; iRow < _fNumPar; ++iRow){
-    par_means_prev[iRow] = par_means[iRow];
-    par_means[iRow] = (_fCurrVal[iRow]+par_means[iRow]*total_steps)/(total_steps+1);
-  }
-
-  //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
-  for(int iRow = 0; iRow < _fNumPar; ++iRow){
-    for(int iCol = 0; iCol <= iRow; ++iCol){
-
-      double cov_val = (*adaptiveCovariance)(iRow, iCol)*_fNumPar/5.6644;
-      cov_val += par_means_prev[iRow]*par_means_prev[iCol]; //First we remove the current means
-      cov_val = (cov_val*total_steps+_fCurrVal[iRow]*_fCurrVal[iCol])/(total_steps+1); //Now get mean(iRow*iCol)
-      cov_val -= par_means[iCol]*par_means[iRow];
-      cov_val*=5.6644/_fNumPar;
-      (*adaptiveCovariance)(iRow, iCol) = cov_val;
-      (*adaptiveCovariance)(iCol, iRow) = cov_val;
-    }
-  }
-  //This is likely going to be the slow bit!
-  total_steps += 1;
-  if(total_steps == lower_adapt)
-  {
-    resetIndivStepScale();
-  }
-
-  if(total_steps >= lower_adapt) {
-    updateThrowMatrix(adaptiveCovariance); //Now we update and continue!
-  }
-  // if(total_steps%1000==0 && total_steps>1000){
-  //   suboptimality_vals.push_back(calculatesuboptimality(covSqrt, adaptiveCovariance));
-  // }
-}
-
-void covarianceBase::initialiseNewAdaptiveChain(){
-  // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
-  adaptiveCovariance = new TMatrixDSym(_fNumPar);
-  par_means.resize(_fNumPar);
-  par_means_prev.resize(_fNumPar);
-  for(int i = 0; i < _fNumPar; ++i){
-    par_means[i] = 0.;
-    par_means_prev[i] = 0.;
-    for(int j = 0; j <= i; ++j){
-      (*adaptiveCovariance)(i,j) = 0.0; // Just make an empty matrix
-      (*adaptiveCovariance)(j,i) = 0.0; // Just make an empty matrix
-    }
-  }
-}
-
-void covarianceBase::saveAdaptiveToFile(TString outFileName, TString systematicName){
+void covarianceBase::saveAdaptiveToFile(const TString& outFileName, const TString& systematicName){
+// ********************************************
   TFile* outFile = new TFile(outFileName, "UPDATE");
   if(outFile->IsZombie()){
     MACH3LOG_ERROR("Couldn't find {}", outFileName);
     throw;
   }
-  TVectorD* outMeanVec = new TVectorD((int)par_means.size());
-  for(int i = 0; i < (int)par_means.size(); i++){
-    (*outMeanVec)(i)=par_means[i];
+  TVectorD* outMeanVec = new TVectorD((int)adaption_struct.par_means.size());
+  for(int i = 0; i < (int)adaption_struct.par_means.size(); i++){
+    (*outMeanVec)(i)=adaption_struct.par_means[i];
   }
   outFile->cd();
-  adaptiveCovariance->Write(systematicName+"_postfit_matrix");
+  adaption_struct.adaptive_covariance->Write(systematicName+"_postfit_matrix");
   outMeanVec->Write(systematicName+"_mean_vec");
   outFile->Close();
+  delete outMeanVec;
   delete outFile;
 }
 
+
+void covarianceBase::setAdaptionDefaults(){
+  // Puts adaptive MCMC default attributes somewhere obvious
+  use_adaptive          = false;
+  total_steps           = 0;
+  adaption_struct.start_adaptive_throw  = 0;
+  adaption_struct.start_adaptive_update = 0;
+  adaption_struct.end_adaptive_update   = 1;
+  adaption_struct.adaptive_update_step  = 1000;
+
+  adaption_struct.par_means = {};
+  adaption_struct.adaptive_covariance = nullptr;
+}
+// ********************************************
+// HW : Here be adaption
+void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
+// ********************************************
+  /*
+    HW: Idea is that adaption can simply read the YAML config
+    Options :
+            External Info:
+              * UseExternalMatrix [bool]     :    Use an external matrix
+              * ExternalMatrixFileName [str] :    Name of file containing external info
+              * ExternalMatrixName [str]     :    Name of external Matrix
+              * ExternalMeansName [str]      :    Name of external means vector [for updates]
+
+            General Info:
+              * DoAdaption [bool]            :    Do we want to do adaption?
+              * AdaptionStartThrow [int]     :    Step we start throwing adaptive matrix from
+              * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix
+              * AdaptionStartUpdate [int]    :    Do we skip the first N steps?
+              * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
+              * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
+ */
+
+  // need to cast matrixName to string
+  std::string matrix_name_str(matrixName);
+  
+  //  setAdaptionDefaults();
+  if(GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str], "")==""){
+    MACH3LOG_WARN("Adaptive Settings not found for {}, this is fine if you don't want adaptive MCMC", matrix_name_str);
+    return;
+  }
+
+  // We"re going to grab this info from the YAML manager
+  if(GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["DoAdaption"], false)) {
+    MACH3LOG_INFO("Not using adaption for {}", matrix_name_str);
+    return;
+  }
+
+  // Now we read the general settings [these SHOULD be common across all matrices!]
+  adaption_struct.start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartThrow"], 10);
+  adaption_struct.start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"], 0);
+  adaption_struct.end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
+  adaption_struct.adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
+
+  adaptive_mcmc::print_adaptive_struct(adaption_struct);
+
+  // We also want to check for "blocks" by default all parameters "know" about each other
+  // but we can split the matrix into independent block matrices
+
+  // We"ll set a dummy variable here
+  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Settings"][matrix_name_str]["AdaptionUpdateStep"], {{}});
+
+  setAdaptiveBlocks(matrix_blocks);
+
+  // Next let"s check for external matrices
+   // We"re going to grab this info from the YAML manager
+  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["UseExternalMatrix"], false)) {
+    MACH3LOG_INFO("Not using external matrix for {}, initialising adaption from scratch", matrix_name_str);
+    createNewAdaptiveCovariance();
+    return;
+  }
+
+   // Finally, we accept that we want to read the matrix from a file!
+   //
+  std::string external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMatrixFileName"], "");
+  std::string external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMatrixName"], "");
+  std::string external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMeansName"], "");
+
+  setThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name);
+}
+
+// HW : I would like this to be less painful to use!
+// First things first we need setters
+void covarianceBase::setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name){
+  // Lets you set the throw matrix externally
+  // Open file
+  std::unique_ptr<TFile>matrix_file(new TFile(matrix_file_name.c_str()));
+  use_adaptive = true;
+
+  if(matrix_file->IsZombie()){
+    MACH3LOG_ERROR("Couldn't find {}", matrix_file_name);
+    throw;
+ }
+
+  // Next we grab our matrix
+  adaption_struct.adaptive_covariance = static_cast<TMatrixDSym*>(matrix_file->Get(matrix_name.c_str()));
+  if(!adaption_struct.adaptive_covariance){
+    MACH3LOG_ERROR("Couldn't find {} in {}", matrix_name, matrix_file_name);
+    throw;
+  }
+
+  MACH3LOG_INFO("Succesfully Set External Throw Matrix Stored in {}", matrix_file_name);
+
+  setThrowMatrix(adaption_struct.adaptive_covariance);
+
+  // Finally we grab the means vector
+  TVectorD* means_vector = static_cast<TVectorD*>(matrix_file->Get(means_name.c_str()));
+
+  // This is fine to not exist!
+  if(means_vector){
+    // Yay our vector exists! Let's loop and fill it
+
+    // Should check this is done
+    if(means_vector->GetNrows()){
+      MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), size);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    adaption_struct.par_means = std::vector<double>(size);
+    for(int i=0; i<size; i++){
+      adaption_struct.par_means[i] = (*means_vector)(i);
+    }
+    MACH3LOG_INFO("Found Means in External File, Will be able to adapt");
+
+  }
+  // Totally fine if it doesn't exist, we just can't do adaption
+  else{
+    // We don't need a means vector, set the adaption=false
+    MACH3LOG_WARN("Cannot find means vector in {}, therefore I will not be able to adapt!", matrix_file_name);
+    use_adaptive=false;
+  }
+
+  matrix_file->Close();
+
+  std::cout<<"Set up matrix from external file"<<std::endl;
+}
+
+void covarianceBase::setAdaptiveBlocks(std::vector<std::vector<int>> block_indices){
+  /*
+    In order to adapt efficient we want to setup our throw matrix to be a serious of block-diagonal (ish) matrices
+
+    To do this we set sub-block in the config by parameter index. For example having
+    [[0,4],[4, 6]] in your config will set up two blocks one with all indices 0<=i<4 and the other with 4<=i<6
+  */
+  // Set up block regions
+  adaption_struct.adapt_block_matrix_indices = std::vector<int>(getNpars(), 0);
+
+  // Should also make a matrix of block sizes
+  adaption_struct.adapt_block_sizes = std::vector<int>((int)block_indices.size()+1, 0);
+  adaption_struct.adapt_block_sizes[0]=getNpars();
+
+  if(block_indices.size()==0 || block_indices[0].size()==0) return;
+
+
+  // Now we loop over our blocks
+  for(int iblock=0; iblock<(int)block_indices.size(); iblock++){
+    // Loop over blocks in the block
+    for(int isubblock=0; isubblock<(int)block_indices[iblock].size()-1; isubblock+=2){
+      int block_lb = block_indices[iblock][isubblock];
+      int block_ub = block_indices[iblock][isubblock+1];
+
+      //      std::cout<<block_lb<<" "<<block_ub<<std::endl;
+      
+      if(block_lb>getNpars() || block_ub>getNpars()){
+        MACH3LOG_ERROR("Cannot set matrix block with edges {}, {} for matrix of size {}",
+		       block_lb, block_ub, getNpars());
+        throw MaCh3Exception(__FILE__, __LINE__);;
+      }
+
+      for(int ipar=block_lb; ipar<block_ub; ipar++){
+        adaption_struct.adapt_block_matrix_indices[ipar]=iblock+1;
+        adaption_struct.adapt_block_sizes[iblock+1]+=1;
+        adaption_struct.adapt_block_sizes[0]-=1;
+      }
+
+    }
+  }
+}
+
+// ********************************************
+void covarianceBase::createNewAdaptiveCovariance(){
+// ********************************************
+  // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
+  use_adaptive=true;
+  adaption_struct.adaptive_covariance = new TMatrixDSym(size);
+  adaption_struct.adaptive_covariance->Zero();
+  adaption_struct.par_means = std::vector<double>(size, 0);
+}
+
+// Truely adaptive MCMC!
+void covarianceBase::updateAdaptiveCovariance(){
+  // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  // Updates adaptive matrix
+  // First we update the total means
+
+  // Skip this if we're at a large number of steps
+  if(total_steps>adaption_struct.end_adaptive_update || total_steps<adaption_struct.start_adaptive_update) return;
+
+  int steps_post_burn = total_steps - adaption_struct.start_adaptive_update;
+
+  std::vector<double> par_means_prev = adaption_struct.par_means;
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for(int iRow=0; iRow<size; iRow++){
+    adaption_struct.par_means[iRow]=(_fCurrVal[iRow]+adaption_struct.par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
+  }
+
+  //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for(int irow=0; irow<size; irow++){
+    int block = adaption_struct.adapt_block_matrix_indices[irow];
+    // int scale_factor = 5.76/double(adapt_block_sizes[block]);
+    for(int icol=0; icol<=irow; icol++){
+      double cov_val=0;
+      // Not in the same blocks
+      if(adaption_struct.adapt_block_matrix_indices[icol]==block){
+          // Calculate Covariance for block
+          // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+          cov_val = (*adaption_struct.adaptive_covariance)(irow, icol)*size/5.6644;
+          cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
+          cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
+          cov_val -= adaption_struct.par_means[icol]*adaption_struct.par_means[irow];
+          cov_val*=5.6644/size;
+        }
+
+        (*adaption_struct.adaptive_covariance)(icol, irow) = cov_val;
+        (*adaption_struct.adaptive_covariance)(irow, icol) = cov_val;
+    }
+  }
+
+  //This is likely going to be the slow bit!
+  if(total_steps==adaption_struct.start_adaptive_throw)
+  {
+    resetIndivStepScale();
+  }
+
+  if(total_steps>=adaption_struct.start_adaptive_throw && (total_steps-adaption_struct.start_adaptive_throw)%adaption_struct.adaptive_update_step==0) {
+    TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(adaption_struct.adaptive_covariance->Clone());
+    updateThrowMatrix(update_matrix); //Now we update and continue!
+  }
+}
+
+// ********************************************
 //HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob
 // Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space
 // then does Euclidean norm)
-void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)
-{
+void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
+// ********************************************
+
   // Want to get cov' = (cov_sym+cov_polar)/2
   // cov_sym=(cov+cov^T)/2
   // cov_polar-> SVD cov to cov=USV^T then cov_polar=VSV^T

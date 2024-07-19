@@ -1,12 +1,4 @@
-// MaCh3 utils for processing/diagnostic MCMC
-// Written by Kamil Skwarczynski
-//
-// Contains code to run on CUDA GPUs. Right now only can calculate autocorrelations
-// Potential extensions:
-// -Covariance matrix calculations and other matrix operations
-// -Effective Sample Size evaluation
-
-#include "manager/gpuUtils.cu"
+#include "mcmc/gpuMCMCProcessorUtils.cuh"
 
 // ******************************************
 // CONSTANTS

@@ -6,7 +6,9 @@ set(HEADERS
     PSO.h
     MCMCProcessor.h
     SampleSummary.h
+    MaCh3Factory.h
     StatisticalUtils.h
+    gpuMCMCProcessorUtils.cuh
 )
 
 add_library(MCMC SHARED
@@ -17,6 +19,7 @@ add_library(MCMC SHARED
     PSO.cpp
     MCMCProcessor.cpp
     SampleSummary.cpp
+    MaCh3Factory.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
 )
 

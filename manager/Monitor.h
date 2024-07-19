@@ -19,6 +19,9 @@
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
 
+#ifdef CUDA
+#include "manager/gpuUtils.cuh"
+#endif
 
 namespace MaCh3Utils {
   /// @brief KS: Prints welcome message with MaCh3 logo

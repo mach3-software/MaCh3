@@ -5,6 +5,7 @@ set(HEADERS
     MaCh3Logger.h
     Monitor.h
     MaCh3Exception.h
+    gpuUtils.cuh
 )
 
 add_library(Manager SHARED
