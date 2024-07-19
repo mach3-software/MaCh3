@@ -35,6 +35,7 @@ class SampleSummary {
     ~SampleSummary();
 
     /// @brief KS: Add data histograms
+    /// @param DataHist Histogram with data even rates for each sample
     void AddData(std::vector<TH2Poly*> &DataHist);
     /// @brief KS: Add prior histograms
     void AddNominal(std::vector<TH2Poly*> &NominalHist, std::vector<TH2Poly*> &W2Nom);
@@ -94,14 +95,18 @@ class SampleSummary {
     /// @brief Helper to project TH2Poly onto axis
     inline TH1D* ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const _int_ selection, const bool MakeErrorHist = false);
 
-    // Make Poisson fluctuation of TH1D hist
+    /// @brief Make Poisson fluctuation of TH1D hist
     inline void MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist);
+    /// @brief Make Poisson fluctuation of TH1D hist using default fast method
     inline void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist);
+    /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
     inline void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist);
 
-    // Make Poisson fluctuation of TH2Poly hist
+    /// @brief Make Poisson fluctuation of TH2Poly hist
     inline void MakeFluctuatedHistogram(TH2Poly *FluctHist, TH2Poly* PolyHist);
+    /// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
     inline void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist);
+    /// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check
     inline void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist);
         
     /// @brief KS: Fill Violin histogram with entry from a toy

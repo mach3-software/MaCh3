@@ -267,10 +267,9 @@ void covarianceBase::init(const char *name, const char *file) {
   // Should put in a 
   TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name));
   if (CovMat == NULL) {
-    std::cerr << "Could not find covariance matrix name " << name << " in file " << file << std::endl;
-    std::cerr << "Are you really sure " << name << " exists in the file?" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__  << std::endl;
-    throw;
+    MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
+    MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   } 
 
   PrintLength = 35;
@@ -418,9 +417,10 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   for(int j = 0; j < _fNumPar;j++) {
     (*_fCovMatrix)(j, j)=_fError[j]*_fError[j];
     //Get the map of parameter name to correlation from the Correlations object
-    for (auto const& [key, val] : Correlations[j]) {
+    for (auto const& pair : Correlations[j]) {
+      auto const& key = pair.first;
+      auto const& val = pair.second;
       int index = -1;
-
       //If you found the parameter name then get the index
       if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
         index = CorrNamesMap[key];
@@ -429,8 +429,6 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
         MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-
-      //
       double Corr1 = val;
       double Corr2 = 0;
       if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
@@ -503,8 +501,7 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 // ********************************************
   if (cov == NULL) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setCovMatrix");
-    MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   covMatrix = cov;
   invCovMatrix = (TMatrixDSym*)cov->Clone();
@@ -574,8 +571,7 @@ void covarianceBase::setPar(int i , double val) {
 void covarianceBase::TransferToPCA() {
   if (!pca) {
     MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
-    MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   // Make the temporary vectors
   TVectorD fParCurr_vec(_fNumPar);
@@ -593,8 +589,7 @@ void covarianceBase::TransferToPCA() {
 void covarianceBase::TransferToParam() {
   if (!pca) {
     MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
-    MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Make the temporary vectors
@@ -750,8 +745,7 @@ void covarianceBase::RandomConfiguration() {
         MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
         MACH3LOG_WARN("Matrix: {}", matrixName);
         MACH3LOG_WARN("Param: {}", _fNames[i]);
-        MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
-        throw;
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
       throws++;
@@ -768,7 +762,7 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
   // *************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  std::cout << "Setting " << GetParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
+  MACH3LOG_DEBUG("Setting {}(parameter {}) to {}", GetParName(parNo), parNo, parVal);
 
   if (pca) TransferToPCA();
 }
@@ -776,7 +770,8 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
 void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  std::cout << "Setting " << GetParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
+  MACH3LOG_DEBUG("Setting {}(parameter {}) to {}", GetParName(parNo), parNo, parVal);
+
   if (pca) TransferToPCA();
 }
 
@@ -975,15 +970,17 @@ void covarianceBase::printNominal() {
   }
 }
 
+
+// ********************************************
 // Function to print the nominal, current and proposed values
 void covarianceBase::printNominalCurrProp() {
-
+// ********************************************
   MACH3LOG_INFO("Printing parameters for {}", getName());
   // Dump out the PCA parameters too
   if (pca) {
     MACH3LOG_INFO("PCA:");
     for (int i = 0; i < _fNumParPCA; ++i) {
-      std::cout << std::setw(PrintLength) << std::left << "PCA " << i << " Current: " << fParCurr_PCA(i) << " Proposed: " << fParProp_PCA(i) << std::endl;
+      MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, fParCurr_PCA(i), fParProp_PCA(i));
     }
   }
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
@@ -1003,8 +1000,6 @@ double covarianceBase::CalcLikelihood() {
 // ********************************************
 
   double logL = 0.0;
-  //TStopwatch clock;
-  ///clock.Start();
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
@@ -1017,11 +1012,9 @@ double covarianceBase::CalcLikelihood() {
       }
     }
   }
-  //clock.Stop();
-  //std::cout << __FILE__ << "::GetLikelihood took " << clock.RealTime() << "s" << std::endl;
-
   return logL;
 }
+
 // ********************************************
 int covarianceBase::CheckBounds() {
 // ********************************************
@@ -1059,7 +1052,6 @@ void covarianceBase::printPars() {
   for(int i = 0; i < _fNumPar; i++) {
     std::cout << std::fixed << std::setprecision(5) << _fNames[i].c_str() << " current: \t" << _fCurrVal[i] << "   \tproposed: \t" << _fPropVal[i] << std::endl;
   }
-
   return;
 }
 
@@ -1097,7 +1089,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
     TransferToPCA();
     TransferToParam();
   }
-
   return;
 }
 
@@ -1276,8 +1267,9 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
   return;
 }
 
-
+// ********************************************
 void covarianceBase::printIndivStepScale() {
+// ********************************************
   std::cout << "============================================================" << std::endl;
   std::cout << std::setw(PrintLength) << "Parameter:" << " | " << std::setw(11) << "Step scale:" << std::endl;
   for (int iParam = 0; iParam < _fNumPar; iParam++) {
@@ -1346,16 +1338,14 @@ void covarianceBase::resetIndivStepScale() {
 void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
    if (cov == NULL) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setThrowMatrix");
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (covMatrix->GetNrows() != cov->GetNrows()) {
     MACH3LOG_ERROR("Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!");
     std::cerr << "Stored covariance matrix size:" << covMatrix->GetNrows() << std::endl;
     std::cerr << "Given matrix size:" << cov->GetNrows() << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   throwMatrix = (TMatrixDSym*)cov->Clone();
@@ -1366,8 +1356,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   
   if(!TDecompChol_throwMatrix.Decompose()) {
     MACH3LOG_ERROR("Cholesky decomposition failed for {} trying to make positive definite", matrixName);
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   throwMatrix_CholDecomp = new TMatrixD(TDecompChol_throwMatrix.GetU());
@@ -1385,8 +1374,9 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
     }
   }
 }
-
+// ********************************************
 void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
+// ********************************************
   delete throwMatrix;
   throwMatrix = NULL;
   delete throwMatrix_CholDecomp;
@@ -1394,8 +1384,10 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
   setThrowMatrix(cov);
 }
 
+// ********************************************
 //HW: Truly adaptive MCMC!
-void covarianceBase::saveAdaptiveToFile(TString outFileName, TString systematicName){
+void covarianceBase::saveAdaptiveToFile(const TString& outFileName, const TString& systematicName){
+// ********************************************
   TFile* outFile = new TFile(outFileName, "UPDATE");
   if(outFile->IsZombie()){
     MACH3LOG_ERROR("Couldn't find {}", outFileName);
@@ -1426,9 +1418,10 @@ void covarianceBase::setAdaptionDefaults(){
   adaption_struct.par_means = {};
   adaption_struct.adaptive_covariance = nullptr;
 }
-
+// ********************************************
 // HW : Here be adaption
-void covarianceBase::initialiseAdaption(YAML::Node& adapt_manager){
+void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
+// ********************************************
   /*
     HW: Idea is that adaption can simply read the YAML config
     Options :
@@ -1451,7 +1444,6 @@ void covarianceBase::initialiseAdaption(YAML::Node& adapt_manager){
   std::string matrix_name_str(matrixName);
   
   //  setAdaptionDefaults();
-
   if(GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str], "")==""){
     MACH3LOG_WARN("Adaptive Settings not found for {}, this is fine if you don't want adaptive MCMC", matrix_name_str);
     return;
@@ -1468,7 +1460,6 @@ void covarianceBase::initialiseAdaption(YAML::Node& adapt_manager){
   adaption_struct.start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"], 0);
   adaption_struct.end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
   adaption_struct.adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
-
 
   adaptive_mcmc::print_adaptive_struct(adaption_struct);
 
@@ -1495,12 +1486,11 @@ void covarianceBase::initialiseAdaption(YAML::Node& adapt_manager){
   std::string external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMeansName"], "");
 
   setThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name);
-
 }
 
 // HW : I would like this to be less painful to use!
 // First things first we need setters
-void covarianceBase::setThrowMatrixFromFile(std::string matrix_file_name, std::string matrix_name, std::string means_name){
+void covarianceBase::setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name){
   // Lets you set the throw matrix externally
   // Open file
   std::unique_ptr<TFile>matrix_file(new TFile(matrix_file_name.c_str()));
@@ -1514,7 +1504,7 @@ void covarianceBase::setThrowMatrixFromFile(std::string matrix_file_name, std::s
   // Next we grab our matrix
   adaption_struct.adaptive_covariance = static_cast<TMatrixDSym*>(matrix_file->Get(matrix_name.c_str()));
   if(!adaption_struct.adaptive_covariance){
-    MACH3LOG_ERROR("Coukdn't find {} in {}", matrix_name, matrix_file_name);
+    MACH3LOG_ERROR("Couldn't find {} in {}", matrix_name, matrix_file_name);
     throw;
   }
 
@@ -1539,7 +1529,6 @@ void covarianceBase::setThrowMatrixFromFile(std::string matrix_file_name, std::s
     for(int i=0; i<size; i++){
       adaption_struct.par_means[i] = (*means_vector)(i);
     }
-
     MACH3LOG_INFO("Found Means in External File, Will be able to adapt");
 
   }
@@ -1550,11 +1539,9 @@ void covarianceBase::setThrowMatrixFromFile(std::string matrix_file_name, std::s
     use_adaptive=false;
   }
 
-
   matrix_file->Close();
 
   std::cout<<"Set up matrix from external file"<<std::endl;
-
 }
 
 void covarianceBase::setAdaptiveBlocks(std::vector<std::vector<int>> block_indices){
@@ -1599,15 +1586,15 @@ void covarianceBase::setAdaptiveBlocks(std::vector<std::vector<int>> block_indic
   }
 }
 
+// ********************************************
 void covarianceBase::createNewAdaptiveCovariance(){
+// ********************************************
   // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
   use_adaptive=true;
   adaption_struct.adaptive_covariance = new TMatrixDSym(size);
   adaption_struct.adaptive_covariance->Zero();
   adaption_struct.par_means = std::vector<double>(size, 0);
 }
-
-
 
 // Truely adaptive MCMC!
 void covarianceBase::updateAdaptiveCovariance(){
@@ -1666,11 +1653,13 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 }
 
+// ********************************************
 //HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob
 // Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space
 // then does Euclidean norm)
-void covarianceBase::makeClosestPosDef(TMatrixDSym *cov)
-{
+void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
+// ********************************************
+
   // Want to get cov' = (cov_sym+cov_polar)/2
   // cov_sym=(cov+cov^T)/2
   // cov_polar-> SVD cov to cov=USV^T then cov_polar=VSV^T
@@ -1785,9 +1774,10 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
 
 
 #ifdef DEBUG_PCA
+// ********************************************
 //KS: Let's dump all useful matrices to properly validate PCA
-void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat)
-{
+void covarianceBase::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat) {
+// ********************************************
   (void)submat;//This is used if DEBUG_PCA==2, this hack is to avoid compiler warnings
   TFile *PCA_Debug = new TFile("Debug_PCA.root", "RECREATE");
   PCA_Debug->cd();

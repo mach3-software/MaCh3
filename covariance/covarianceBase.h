@@ -161,11 +161,15 @@ class covarianceBase {
   /// @param i Parameter index
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
 
-  // Adaptive Step Tuning Stuff
+  /// @brief Adaptive Step Tuning Stuff
   void resetIndivStepScale();
 
-  void initialiseAdaption(YAML::Node& adapt_manager);
-  void saveAdaptiveToFile(TString outFileName, TString systematicName);
+  /// @brief Initialise adaptive MCMC
+  /// @param adapt_manager Node having from which we load all adaptation options
+  void initialiseAdaption(const YAML::Node& adapt_manager);
+  /// @brief Save adaptive throw matrix to file
+  void saveAdaptiveToFile(const TString& outFileName, const TString& systematicName);
+  /// @brief Do we adapt or not
   bool getDoAdaption(){return use_adaptive;}
 
   void setThrowMatrix(TMatrixDSym *cov);
@@ -507,7 +511,7 @@ protected:
   /// @param matrix_file_name name of file matrix lives in
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
-  void setThrowMatrixFromFile(std::string matrix_file_name, std::string matrix_name, std::string means_name);
+  void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
 
   /// @brief Method to update adaptive MCMC
   void updateAdaptiveCovariance();

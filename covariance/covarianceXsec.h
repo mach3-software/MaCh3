@@ -24,14 +24,6 @@ class covarianceXsec : public covarianceBase {
     /// @brief Destructor
     ~covarianceXsec();
 
-    /// @brief ETA - trying out the yaml parsing
-    inline void InitXsecFromConfig();
-    /// @brief Initialise Norm params
-    inline void SetupNormPars();
-    /// @brief Get Norm params
-    /// @param i Global parameter index
-    /// @param norm_counter norm parameter index
-    inline XsecNorms4 GetXsecNorm(const int i, const int norm_counter);
     /// @brief Print information about the whole object once it is set
     inline void Print();
 
@@ -44,20 +36,21 @@ class covarianceXsec : public covarianceBase {
     inline int GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
-    inline const char* GetParamType(const int i) const {return _fParamType[i].c_str();}
+    inline const char* GetParamTypeString(const int i) const {return SystType_ToString(_fParamType[i]).c_str();}
+    /// @brief Returns enum describing our param type
+    /// @param i parameter index
+    inline SystType GetParamType(const int i) const {return _fParamType[i];}
 
-    /// @brief Get interpolation type vector
-    inline const std::vector<SplineInterpolation>& GetSplineInterpolation() const{return _fSplineInterpolationType;}
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
-    inline SplineInterpolation GetParSplineInterpolation(const int i) {return _fSplineInterpolationType.at(i);}
+    inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i).SplineInterpolationType;}
 
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotUpperBound(const int i) {return _fSplineKnotUpBound[i];}
+    inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i).SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotLowerBound(const int i) {return _fSplineKnotLowBound[i];}
+    inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i).SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
@@ -121,7 +114,17 @@ class covarianceXsec : public covarianceBase {
     
   protected:
     /// @brief Initialise CovarianceXsec
-    void initParams(const double fScale);
+    void initParams();
+    /// @brief ETA - trying out the yaml parsing
+    inline void InitXsecFromConfig();
+    /// @brief Get Norm params
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    inline XsecNorms4 GetXsecNorm(const YAML::Node& param, const int Index);
+    /// @brief Get Spline params
+    /// @param param Yaml node describing param
+    inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
+
     /// Is parameter flux or not, This might become deprecated in future
     /// @warning Will become deprecated
     std::vector<bool> isFlux;
@@ -129,30 +132,15 @@ class covarianceXsec : public covarianceBase {
     /// Tells to which samples object param should be applied
     std::vector<int> _fDetID;
     /// Type of parameter like norm, spline etc.
-    std::vector<std::string> _fParamType;
-
-    //Some "usual" variables. Don't think we really need the ND/FD split
-    std::vector<std::vector<int>> _fNormModes;
-    std::vector<std::vector<int>> _fTargetNuclei;
-    std::vector<std::vector<int>> _fNeutrinoFlavour;
-    std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
+    std::vector<SystType> _fParamType;
 
     //Variables related to spline systematics
     std::vector<std::string> _fNDSplineNames;
     std::vector<std::string> _fFDSplineNames;
     std::vector<std::vector<int>> _fFDSplineModes;
-    /// Spline interpolation vector
-    std::vector<SplineInterpolation> _fSplineInterpolationType;
 
-    /// EM: Cap spline knot lower value
-    std::vector<double> _fSplineKnotLowBound;
-    /// EM: Cap spline knot higher value
-    std::vector<double> _fSplineKnotUpBound;
-
-    /// Information to be able to apply generic cuts
-    std::vector<std::vector<std::string>> _fKinematicPars;
-    /// Information to be able to apply generic cuts
-    std::vector<std::vector<std::vector<double>>> _fKinematicBounds;
+    /// Vector containing info for normalisation systematics
+    std::vector<XsecSplines1> SplineParams;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecNorms4> NormParams;

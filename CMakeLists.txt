@@ -80,17 +80,29 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
     -Wextra                 # Enable extra warning flags
     -Wall                   # Enable all standard warning flags
-    -pedantic               # Enforce strict ISO compliance
+    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
     -Wshadow                # Warn when a variable declaration shadows one from an outer scope
     -Wuninitialized         # Warn about uninitialized variables
     -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
-    -Wnull-dereference      # Warn if a null dereference is detected
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
+    -Wunused                # Warn on anything being unused
+    #-Wuseless-cast         # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+    #-Wpadded               # Warn when padding is added to a structure or class for alignment
+    #-Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
     #-Wold-style-cast       # Warn for c-style casts
     #-Wconversion           # Warn on type conversions that may lose data
     #-Werror                # Treat Warnings as Errors
 )
+# KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
+    -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
+    -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
+  )
+endif()
+
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
@@ -106,18 +118,21 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -O0                                  # Turn off any optimisation to have best debug experience
+  )
   target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
-target_compile_options(MaCh3CompilerOptions INTERFACE
+  target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                  # Optimize code for maximum speed
     -funroll-loops                       # Unroll loops where possible for performance
     --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
     -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
     #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
-)
+  )
   #KS: add Link-Time Optimization (LTO)
   # FIXME previously it wasn't used correctly but would need more testing
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
@@ -217,9 +232,7 @@ install(EXPORT MaCh3-targets
 )
 
 #KS: Options to print dependency graph
-if(NOT DEFINED MaCh3_DependancyGraph)
-  set(MaCh3_DependancyGraph FALSE)
-endif()
+DefineEnabledRequiredSwitch(MaCh3_DependancyGraph FALSE)
 
 if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL
@@ -289,3 +302,15 @@ set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_CURR
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+
+
+# uninstall target
+if(NOT TARGET uninstall)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+  add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()
