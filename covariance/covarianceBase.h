@@ -5,6 +5,7 @@
 #include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
 #include "manager/manager.h"
+#include "covariance/adaptiveMCMCStruct.h"
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
@@ -163,7 +164,7 @@ class covarianceBase {
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
 
-  void initialiseAdaption(manager* fitMan);
+  void initialiseAdaption(YAML::Node& adapt_manager);
   void saveAdaptiveToFile(TString outFileName, TString systematicName);
   bool getDoAdaption(){return use_adaptive;}
 
@@ -171,12 +172,12 @@ class covarianceBase {
   void updateThrowMatrix(TMatrixDSym *cov);
   inline void setNumberOfSteps(const int nsteps) {
     total_steps = nsteps;
-    if(total_steps >= start_adaptive_throw) resetIndivStepScale();
+    if(total_steps >= adaption_struct.start_adaptive_throw) resetIndivStepScale();
   }
 
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
-  inline std::vector<double> getParameterMeans(){return par_means;}
+  inline std::vector<double> getParameterMeans(){return adaption_struct.par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
@@ -513,27 +514,10 @@ protected:
   /// @brief method to create new throw matrix
   void createNewAdaptiveCovariance();
 
-  // Are we using AMCMC?
+  /// Are we using AMCMC?
   bool use_adaptive;
-  // Total number of steps chain has performed
   int total_steps;
-  // When do we start throwing?
-  int start_adaptive_throw;
-  //Thresholds for when to turn on/off updating adaptive MCMC
-  int start_adaptive_update;
-  // When do we stop update the adaptive matrix?
-  int end_adaptive_update;
-  // Steps between changing throw matrix
-  int adaptive_update_step;
 
-
-  // Indices for block-matrix adaption
-  std::vector<int> adapt_block_matrix_indices;
-  // Size of blocks for adaption
-  std::vector<int> adapt_block_sizes;
-
-  // Parameter means
-  std::vector<double> par_means;
-  // Adaptive matrix that gets updated every step
-  TMatrixDSym* adaptiveCovariance;
+  /// Struct containing information about adaption
+  adaptive_mcmc::AdaptiveMCMCStruct adaption_struct;
 };
