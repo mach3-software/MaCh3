@@ -18,16 +18,24 @@ namespace adaptive_mcmc{
 ///@brief struct encapsulating all adaptive MCMC information
 struct AdaptiveMCMCStruct{
   // Meta variables related to adaption run time
-  int start_adaptive_throw; /// When do we start throwing
-  int start_adaptive_update; /// When do we stop update the adaptive matrix
-  int end_adaptive_update; /// Steps between changing throw matrix
-  int adaptive_update_step; /// Steps between changing throw matrix
-  std::vector<int> adapt_block_matrix_indices; ///Indices for block-matrix adaption
-  std::vector<int> adapt_block_sizes; ///Size of blocks for adaption
+  /// When do we start throwing
+  int start_adaptive_throw;
+/// When do we stop update the adaptive matrix
+  int start_adaptive_update;
+  /// Steps between changing throw matrix
+  int end_adaptive_update;
+  /// Steps between changing throw matrix
+  int adaptive_update_step;
+  ///Indices for block-matrix adaption
+  std::vector<int> adapt_block_matrix_indices;
+  ///Size of blocks for adaption
+  std::vector<int> adapt_block_sizes;
 
   // Variables directely linked to adaption
-  std::vector<double> par_means; /// Mean values for all parameters
-  TMatrixDSym*  adaptive_covariance; /// Full adaptive covariance matrix
+  /// Mean values for all parameters
+  std::vector<double> par_means;
+  /// Full adaptive covariance matrix
+  TMatrixDSym*  adaptive_covariance;
 };
 
 
