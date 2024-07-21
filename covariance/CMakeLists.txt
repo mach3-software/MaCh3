@@ -4,7 +4,7 @@ set(HEADERS
     covarianceBase.h
     covarianceOsc.h
     covarianceXsec.h
-    adaptiveMCMCStruct.h
+    AdaptiveMCMCHandler.h
 )
 
 add_library(Covariance SHARED
@@ -12,6 +12,7 @@ add_library(Covariance SHARED
     covarianceBase.cpp
     covarianceOsc.cpp
     covarianceXsec.cpp
+    AdaptiveMCMCHandler.cpp
 )
 
 set_target_properties(Covariance PROPERTIES

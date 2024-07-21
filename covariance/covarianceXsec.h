@@ -36,7 +36,7 @@ class covarianceXsec : public covarianceBase {
     inline int GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
-    inline const char* GetParamTypeString(const int i) const {return SystType_ToString(_fParamType[i]).c_str();}
+    inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
     /// @brief Returns enum describing our param type
     /// @param i parameter index
     inline SystType GetParamType(const int i) const {return _fParamType[i];}

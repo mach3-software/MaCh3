@@ -5,7 +5,7 @@
 #include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
 #include "manager/manager.h"
-#include "covariance/adaptiveMCMCStruct.h"
+#include "covariance/AdaptiveMCMCHandler.h"
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
@@ -167,8 +167,7 @@ class covarianceBase {
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
   void initialiseAdaption(const YAML::Node& adapt_manager);
-  /// @brief Save adaptive throw matrix to file
-  void saveAdaptiveToFile(const TString& outFileName, const TString& systematicName);
+
   /// @brief Do we adapt or not
   bool getDoAdaption(){return use_adaptive;}
 
@@ -176,12 +175,12 @@ class covarianceBase {
   void updateThrowMatrix(TMatrixDSym *cov);
   inline void setNumberOfSteps(const int nsteps) {
     total_steps = nsteps;
-    if(total_steps >= adaption_struct.start_adaptive_throw) resetIndivStepScale();
+    if(total_steps >= AdaptiveHandler.start_adaptive_throw) resetIndivStepScale();
   }
 
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
-  inline std::vector<double> getParameterMeans(){return adaption_struct.par_means;}
+  inline std::vector<double> getParameterMeans(){return AdaptiveHandler.par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
@@ -503,10 +502,6 @@ protected:
   /// @brief sets default values for adaptive MCMC parameters
   void setAdaptionDefaults();
 
-  /// @brief sets adaptive block matrix
-  /// @param block_indices Values for sub-matrix blocks
-  void setAdaptiveBlocks(std::vector<std::vector<int>> block_indices);
-
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
   /// @param matrix_name name of matrix in file
@@ -514,14 +509,13 @@ protected:
   void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
 
   /// @brief Method to update adaptive MCMC
+  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
   void updateAdaptiveCovariance();
-  /// @brief method to create new throw matrix
-  void createNewAdaptiveCovariance();
 
   /// Are we using AMCMC?
   bool use_adaptive;
   int total_steps;
 
   /// Struct containing information about adaption
-  adaptive_mcmc::AdaptiveMCMCStruct adaption_struct;
+  adaptive_mcmc::AdaptiveMCMCHandler AdaptiveHandler;
 };

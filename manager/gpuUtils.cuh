@@ -32,10 +32,17 @@
 // Also exist in helper_cuda.h
 // **************************************************
 
-/// @brief Check for a safe call on GPU
+/// @brief Check for a safe call on GPU.
+/// @details This function checks the error status returned by CUDA runtime API functions and reports any errors.
+/// @param err The CUDA error code.
+/// @param file The file name where the error occurred.
+/// @param line The line number where the error occurred.
 void __cudaSafeCall( cudaError err, const char *file, const int line );
 
-/// @brief Check if there's been an error
+/// @brief Check if there's been an error.
+/// @details This function checks if there has been any CUDA runtime API error and reports it.
+/// @param file The file name where the error occurred.
+/// @param line The line number where the error occurred.
 void __cudaCheckError( const char *file, const int line );
 
 // *******************************************
@@ -53,7 +60,10 @@ void PrintNdevices();
 void ResetDevice();
 
 /// @brief KS: Only useful if using multiple GPU
+/// @param deviceId The ID of the device to be set as active.
 void SetDevice(const int deviceId);
 
 /// @brief KS: Get number of GPU threads for currently used GPU
+/// @param Device The ID of the device. Defaults to 0.
+/// @return The number of GPU threads.
 int GetNumGPUThreads(const int Device = 0);
