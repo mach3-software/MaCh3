@@ -512,9 +512,9 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 
   setThrowMatrix(cov);
 }
-
+// ********************************************
 void covarianceBase::ReserveMemory(const int SizeVec) {
-
+// ********************************************
   _fNames = std::vector<std::string>(SizeVec);
   _fFancyNames = std::vector<std::string>(SizeVec);
   _fGenerated = std::vector<double>(SizeVec);
@@ -548,9 +548,11 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
   _fGlobalStepScale = 1.0;
 }
 
+// ********************************************
 // Set all the covariance matrix parameters to a user-defined value
 // Might want to split this
 void covarianceBase::setPar(int i , double val) {
+// ********************************************
   MACH3LOG_INFO("Over-riding {}: ", GetParName(i));
   MACH3LOG_INFO("_fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})", _fPropVal[i], _fCurrVal[i], _fPreFitValue[i], val);
 
@@ -580,8 +582,10 @@ void covarianceBase::TransferToPCA() {
   fParProp_PCA = TransferMatT*fParProp_vec;
 }
 
+// ********************************************
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void covarianceBase::TransferToParam() {
+// ********************************************
   if (!pca) {
     MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -662,7 +666,6 @@ void covarianceBase::throwNominal(bool nomValues, int seed) {
 // This shouldn't be used in MCMC code ase it can break Detailed Balance;
 void covarianceBase::throwParameters() {
 // *************************************
-
   // First draw new randParams
   randomize();
 
@@ -716,7 +719,7 @@ void covarianceBase::throwParameters() {
 // Throw each parameter within their 1 sigma range
 // Used to start the chain in different states
 void covarianceBase::RandomConfiguration() {
-  // *************************************
+// *************************************
   // Have the 1 sigma for each parameter in each covariance class, sweet!
   // Don't want to change the nominal array because that's what determines our likelihood
   // Want to change the fParProp, fParCurr, fParInit
@@ -754,15 +757,16 @@ void covarianceBase::RandomConfiguration() {
 // *************************************
 // Set a single parameter
 void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
-  // *************************************
+// *************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {}(parameter {}) to {}", GetParName(parNo), parNo, parVal);
 
   if (pca) TransferToPCA();
 }
-
+// ********************************************
 void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
+// ********************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {}(parameter {}) to {}", GetParName(parNo), parNo, parVal);
@@ -878,9 +882,10 @@ void covarianceBase::CorrelateSteps() {
     TransferToParam();
   }
 }
-
+// ********************************************
 // Update so that current step becomes the previously proposed step
 void covarianceBase::acceptStep() {
+// ********************************************
   if (!pca) {
     #ifdef MULTITHREAD
     #pragma omp parallel for
@@ -901,10 +906,11 @@ void covarianceBase::acceptStep() {
     TransferToParam();
   }
 }
-
+// ********************************************
 // Throw the proposed parameter by mag sigma
 // Should really just have the user specify this throw by having argument double
 void covarianceBase::throwParProp(const double mag) {
+// ********************************************
   randomize();
   if (!pca) {
     // Make the correlated throw
@@ -1070,9 +1076,9 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
 
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
-	  //Make sure that you are actually passing a number to set the parameter to
-	  if(std::isnan(pars[i])) {
-		std::cerr << "Error: trying to set parameter value to a nan for parameter " << GetParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
+      //Make sure that you are actually passing a number to set the parameter to
+      if(std::isnan(pars[i])) {
+        std::cerr << "Error: trying to set parameter value to a nan for parameter " << GetParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
 		throw;
 	  } else {
 		_fPropVal[i] = pars[i];
@@ -1166,7 +1172,6 @@ void covarianceBase::toggleFixParameter(const int i) {
       MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
     }
   }
-  
   return;
 }
 
@@ -1245,7 +1250,6 @@ double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const
 // ********************************************
 void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
-
   if ((int)stepscale.size() != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
@@ -1451,6 +1455,7 @@ void covarianceBase::updateAdaptiveCovariance(){
   if(total_steps>AdaptiveHandler.end_adaptive_update || total_steps<AdaptiveHandler.start_adaptive_update) return;
 
   int steps_post_burn = total_steps - AdaptiveHandler.start_adaptive_update;
+  // Call main adaption function
   AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, steps_post_burn, _fNumPar);
 
   //This is likely going to be the slow bit!
