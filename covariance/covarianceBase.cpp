@@ -590,9 +590,9 @@ void covarianceBase::TransferToParam() {
   // Make the temporary vectors
   TVectorD fParProp_vec = TransferMat*fParProp_PCA;
   TVectorD fParCurr_vec = TransferMat*fParCurr_PCA;
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
   for (int i = 0; i < _fNumPar; ++i) {
     _fPropVal[i] = fParProp_vec(i);
     _fCurrVal[i] = fParCurr_vec(i);
@@ -669,9 +669,9 @@ void covarianceBase::throwParameters() {
   if (!pca) {
     MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumPar; ++i) {
       // Check if parameter is fixed first: if so don't randomly throw
       if (isParameterFixed(i)) continue;
@@ -791,9 +791,9 @@ void covarianceBase::randomize() {
 // ************************************************
   if (!pca) {
 //KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit      
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
       if (_fError[i] > 0.0) {
@@ -810,9 +810,9 @@ void covarianceBase::randomize() {
   // If we're in the PCA basis we instead throw parameters there (only _fNumParPCA parameter)
   } else {
     // Scale the random parameters by the sqrt of eigen values for the throw
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumPar; ++i)
     {
       if (fParSigma_PCA[i] > 0. && i < _fNumParPCA)
@@ -839,9 +839,9 @@ void covarianceBase::CorrelateSteps() {
 
   // If not doing PCA
   if (!pca) {
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumPar; ++i) {
       if (_fError[i] > 0.) {
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
@@ -850,9 +850,9 @@ void covarianceBase::CorrelateSteps() {
     // If doing PCA throw uncorrelated in PCA basis (orthogonal basis by definition)
   } else { 
     // Throw around the current step
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumParPCA; ++i)
     {
       if (fParSigma_PCA[i] > 0.) 
@@ -882,18 +882,18 @@ void covarianceBase::CorrelateSteps() {
 // Update so that current step becomes the previously proposed step
 void covarianceBase::acceptStep() {
   if (!pca) {
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumPar; ++i) {
       // Update state so that current state is proposed state
       _fCurrVal[i] = _fPropVal[i];
     }
   } else {
   // Update the book-keeping for the output
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
     for (int i = 0; i < _fNumParPCA; ++i) {
       fParCurr_PCA(i) = fParProp_PCA(i);
     }
@@ -1273,10 +1273,11 @@ void covarianceBase::printIndivStepScale() {
   }
   std::cout << "============================================================" << std::endl;
 }
-
+// ********************************************
 //Makes sure that matrix is positive-definite (so no error is thrown when
 //throwNominal() is called) by adding a small number to on-diagonal elements
 void covarianceBase::MakePosDef(TMatrixDSym *cov) {
+// ********************************************
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
   if(cov == nullptr){
@@ -1298,9 +1299,9 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
       CanDecomp = true;
       break;
     } else {
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+      #ifdef MULTITHREAD
+      #pragma omp parallel for
+      #endif
       for (int iVar = 0 ; iVar < _fNumPar; iVar++) {
         (*cov)(iVar,iVar) += pow(10,-9);
       }
@@ -1320,8 +1321,9 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
 
   return;
 }
-
+// ********************************************
 void covarianceBase::resetIndivStepScale() {
+// ********************************************
   std::vector<double> stepScales(_fNumPar);
   for (int i = 0; i <_fNumPar; i++) {
     stepScales[i] = 1.;
@@ -1433,62 +1435,9 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   std::string external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMatrixName"], "");
   std::string external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMeansName"], "");
 
-  setThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name);
-}
-// ********************************************
-// HW : I would like this to be less painful to use!
-// First things first we need setters
-void covarianceBase::setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name){
-// ********************************************
-  // Lets you set the throw matrix externally
-  // Open file
-  std::unique_ptr<TFile>matrix_file(new TFile(matrix_file_name.c_str()));
-  use_adaptive = true;
-
-  if(matrix_file->IsZombie()){
-    MACH3LOG_ERROR("Couldn't find {}", matrix_file_name);
-    throw;
- }
-
-  // Next we grab our matrix
-  AdaptiveHandler.adaptive_covariance = static_cast<TMatrixDSym*>(matrix_file->Get(matrix_name.c_str()));
-  if(!AdaptiveHandler.adaptive_covariance){
-    MACH3LOG_ERROR("Couldn't find {} in {}", matrix_name, matrix_file_name);
-    throw;
-  }
-
-  MACH3LOG_INFO("Succesfully Set External Throw Matrix Stored in {}", matrix_file_name);
-
+  AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);
-
-  // Finally we grab the means vector
-  TVectorD* means_vector = static_cast<TVectorD*>(matrix_file->Get(means_name.c_str()));
-
-  // This is fine to not exist!
-  if(means_vector){
-    // Yay our vector exists! Let's loop and fill it
-
-    // Should check this is done
-    if(means_vector->GetNrows()){
-      MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), size);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-
-    AdaptiveHandler.par_means = std::vector<double>(size);
-    for(int i=0; i<size; i++){
-      AdaptiveHandler.par_means[i] = (*means_vector)(i);
-    }
-    MACH3LOG_INFO("Found Means in External File, Will be able to adapt");
-  }
-  // Totally fine if it doesn't exist, we just can't do adaption
-  else{
-    // We don't need a means vector, set the adaption=false
-    MACH3LOG_WARN("Cannot find means vector in {}, therefore I will not be able to adapt!", matrix_file_name);
-    use_adaptive=false;
-  }
-
-  matrix_file->Close();
-  MACH3LOG_INFO("Set up matrix from external file");
+  MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
 
 // ********************************************
@@ -1502,44 +1451,10 @@ void covarianceBase::updateAdaptiveCovariance(){
   if(total_steps>AdaptiveHandler.end_adaptive_update || total_steps<AdaptiveHandler.start_adaptive_update) return;
 
   int steps_post_burn = total_steps - AdaptiveHandler.start_adaptive_update;
-
-  std::vector<double> par_means_prev = AdaptiveHandler.par_means;
-
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int iRow=0; iRow<size; iRow++) {
-    AdaptiveHandler.par_means[iRow]=(_fCurrVal[iRow]+AdaptiveHandler.par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
-  }
-
-  //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int irow=0; irow<size; irow++){
-    int block = AdaptiveHandler.adapt_block_matrix_indices[irow];
-    // int scale_factor = 5.76/double(adapt_block_sizes[block]);
-    for(int icol=0; icol<=irow; icol++){
-      double cov_val=0;
-      // Not in the same blocks
-      if(AdaptiveHandler.adapt_block_matrix_indices[icol]==block){
-          // Calculate Covariance for block
-          // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
-          cov_val = (*AdaptiveHandler.adaptive_covariance)(irow, icol)*size/5.6644;
-          cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
-          cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
-          cov_val -= AdaptiveHandler.par_means[icol]*AdaptiveHandler.par_means[irow];
-          cov_val*=5.6644/size;
-        }
-
-        (*AdaptiveHandler.adaptive_covariance)(icol, irow) = cov_val;
-        (*AdaptiveHandler.adaptive_covariance)(irow, icol) = cov_val;
-    }
-  }
+  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, steps_post_burn, _fNumPar);
 
   //This is likely going to be the slow bit!
-  if(total_steps==AdaptiveHandler.start_adaptive_throw)
-  {
+  if(total_steps == AdaptiveHandler.start_adaptive_throw) {
     resetIndivStepScale();
   }
 
@@ -1561,7 +1476,7 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
   // cov_polar-> SVD cov to cov=USV^T then cov_polar=VSV^T
 
   //Get frob norm of cov
-//  Double_t cov_norm=cov->E2Norm();
+  //  Double_t cov_norm=cov->E2Norm();
   
   TMatrixDSym* cov_trans = cov;
   cov_trans->T();
@@ -1590,14 +1505,14 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
   //Now we can construct closest approximater Ahat=0.5*(B+H)
   TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);//Not fully sure why this is even needed since symmetric B -> U=V
   //Get norm of transformed
-//  Double_t approx_norm=cov_closest_approx.E2Norm();
-
+  //  Double_t approx_norm=cov_closest_approx.E2Norm();
   //std::cout<<"Initial Norm : "<<cov_norm<<" | Norm after transformation : "<<approx_norm<<" | Ratio : "<<cov_norm/approx_norm<<std::endl;
   
   *cov = cov_closest_approx;
   //Now can just add a makeposdef!
   MakePosDef(cov);
 }
+
 // ********************************************
 std::vector<double> covarianceBase::getNominalArray() {
 // ********************************************

@@ -35,6 +35,23 @@ class AdaptiveMCMCHandler{
   /// @brief HW: Save adaptive throw matrix to file
   void SaveAdaptiveToFile(const TString& outFileName, const TString& systematicName);
 
+  /// @brief sets throw matrix from a file
+  /// @param matrix_file_name name of file matrix lives in
+  /// @param matrix_name name of matrix in file
+  /// @param means_name name of means vec in file
+  void SetThrowMatrixFromFile(const std::string& matrix_file_name,
+                              const std::string& matrix_name,
+                              const std::string& means_name,
+                              bool& use_adaptive,
+                              const int Npars);
+
+
+
+
+  /// @brief Method to update adaptive MCMC
+  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int steps_post_burn, const int Npars);
+
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;
