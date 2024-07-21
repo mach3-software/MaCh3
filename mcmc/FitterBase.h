@@ -1,13 +1,14 @@
 #pragma once
 
+// C++ includes
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+// MaCh3 Includes
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
 #include "covariance/covarianceOsc.h"
-
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
 

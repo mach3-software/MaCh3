@@ -14,8 +14,8 @@
 #include "TChain.h"
 #include "TStopwatch.h"
 
+// MaCh3 includes
 #include "manager/MaCh3Logger.h"
-
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
 

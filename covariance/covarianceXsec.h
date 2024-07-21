@@ -1,7 +1,6 @@
 #pragma once
 
 // C++ includes
-#include <math.h>
 #include <map>
 
 // ROOT includes

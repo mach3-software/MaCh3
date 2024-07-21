@@ -5,12 +5,6 @@
 #include "manager/manager.h"
 #include "covariance/CovarianceUtils.h"
 
-// ROOT Includes
-#include "TMatrixDSym.h"
-
-// C++ Includes
-#include <vector>
-
 namespace adaptive_mcmc{
 
 /// @brief Contains information about adaptive covariance matrix

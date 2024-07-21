@@ -1030,7 +1030,6 @@ int covarianceBase::CheckBounds() {
 // ********************************************
 double covarianceBase::GetLikelihood() {
 // ********************************************
-
   // Checkbounds and calclikelihood are virtual
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();

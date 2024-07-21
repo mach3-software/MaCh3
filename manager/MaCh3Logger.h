@@ -1,6 +1,9 @@
 #pragma once
 
+// spdlog Includes
 #include "spdlog/spdlog.h"
+
+// C++ Includes
 #include <iostream>
 #include <sstream>
 #include <functional>

@@ -1,13 +1,16 @@
 #pragma once
 
+// C++ Includes
 #include <iostream>
 #include <fstream>
 #include <string>
 
+// ROOT Includes
 #include "TMacro.h"
 #include "TList.h"
 #include "TObjString.h"
 
+// yaml Includes
 #include "yaml-cpp/yaml.h"
 
 // **********************
@@ -143,7 +146,6 @@ inline std::string TMacroToString(const TMacro& macro) {
 /// @return YAML::Node The YAML node representing the TMacro object.
 inline YAML::Node TMacroToYAML(const TMacro& macro) {
 // **********************
-
   std::string yaml_string = TMacroToString(macro);
 
   // Convert the YAML string to a YAML node

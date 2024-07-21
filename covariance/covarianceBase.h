@@ -15,6 +15,7 @@
 //#define DEBUG_PCA 1
 #ifdef DEBUG_PCA
 //KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
+#include "TCanvas.h"
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TColor.h"
