@@ -37,11 +37,6 @@
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
 
-//Only if GPU is enabled
-#ifdef CUDA
-#include "mcmc/gpuMCMCProcessorUtils.cuh"
-#endif
-
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
 

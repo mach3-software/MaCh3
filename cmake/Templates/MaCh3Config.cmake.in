@@ -48,9 +48,6 @@ if(MaCh3_GPU_ENABLED)
   #KS: Maybe just include CUDASetup.cmake or make cmake more robust rather than copy paste?
   find_package(CUDAToolkit)
   set(CUDA_ARCHITECTURES @CUDA_ARCHITECTURES@)
-  if(NOT DEFINED ENV{CUDAPATH})
-    cmessage(FATAL_ERROR "CUDAPATH environment variable is not defined. Please set it to the root directory of your CUDA installation.")
-  endif()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/MaCh3Targets.cmake)

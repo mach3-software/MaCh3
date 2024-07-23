@@ -2,6 +2,12 @@
 
 #include "TChain.h"
 
+
+//Only if GPU is enabled
+#ifdef CUDA
+#include "mcmc/gpuMCMCProcessorUtils.cuh"
+#endif
+
 // ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
   Chain(nullptr), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
