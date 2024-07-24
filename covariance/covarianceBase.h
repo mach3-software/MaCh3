@@ -171,9 +171,10 @@ class covarianceBase {
 
   /// @brief Do we adapt or not
   bool getDoAdaption(){return use_adaptive;}
-
+  /// @brief Use new throw matrix, used in adaptive MCMC
   void setThrowMatrix(TMatrixDSym *cov);
   void updateThrowMatrix(TMatrixDSym *cov);
+  /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
   inline void setNumberOfSteps(const int nsteps) {
     total_steps = nsteps;
     if(total_steps >= AdaptiveHandler.start_adaptive_throw) resetIndivStepScale();
@@ -374,7 +375,7 @@ class covarianceBase {
   inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
 
 protected:
-
+  /// @brief Initialisation of the class using matrix from root file
   void init(const char *name, const char *file);
   /// @brief Initialisation of the class using config
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
@@ -404,10 +405,23 @@ protected:
   /// @brief Handy function to return 1 for any systs
   const double* ReturnUnity(){return &Unity;}
 
+  /// @brief sets default values for adaptive MCMC parameters
+  void setAdaptionDefaults();
+
+  /// @brief sets throw matrix from a file
+  /// @param matrix_file_name name of file matrix lives in
+  /// @param matrix_name name of matrix in file
+  /// @param means_name name of means vec in file
+  void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
+
+  /// @brief Method to update adaptive MCMC
+  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  void updateAdaptiveCovariance();
+
   /// The input root file we read in
   const std::string inputFile;
 
-  /// Total number of parmas, deprecated, please don't use it
+  /// Total number of params, deprecated, please don't use it
   int size;
   /// Name of cov matrix
   const char *matrixName;
@@ -494,27 +508,16 @@ protected:
   /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
   std::vector<int> isDecomposed_PCA;
 
-  // Adaptive MCMC
+  /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
+  /// Matrix which we use for step proposal after Cholesky decomposition
   TMatrixD* throwMatrix_CholDecomp;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double **throwMatrixCholDecomp;
 
-  /// @brief sets default values for adaptive MCMC parameters
-  void setAdaptionDefaults();
-
-  /// @brief sets throw matrix from a file
-  /// @param matrix_file_name name of file matrix lives in
-  /// @param matrix_name name of matrix in file
-  /// @param means_name name of means vec in file
-  void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
-  /// @brief Method to update adaptive MCMC
-  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
-  void updateAdaptiveCovariance();
-
   /// Are we using AMCMC?
   bool use_adaptive;
+  /// Total number of MCMC steps
   int total_steps;
 
   /// Struct containing information about adaption

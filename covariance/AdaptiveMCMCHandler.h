@@ -23,6 +23,7 @@ class AdaptiveMCMCHandler{
   void Print();
 
   /// @brief Read initial values from config file
+  /// @param adapt_manager Config file from which we update matrix
   void InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars);
 
   /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
@@ -50,6 +51,7 @@ class AdaptiveMCMCHandler{
 
   /// @brief Method to update adaptive MCMC
   /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
   void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int steps_post_burn, const int Npars);
 
   /// Meta variables related to adaption run time
