@@ -196,7 +196,7 @@ class MCMCProcessor {
     /// @brief Get properties of parameter by passing it number
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
     /// @brief Get parameter number based on name
-    int GetParamIndexFromName(const std::string Name);
+    int GetParamIndexFromName(const std::string& Name);
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
     inline int GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries

@@ -9,9 +9,9 @@
 #include "manager/gpuUtils.cuh"
 #include "splines/SplineCommon.h"
 
-// Hard code the number of splines
-// Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
-// EM: for OA2022:
+/// Hard code the number of splines
+/// Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
+/// EM: for OA2022:
 #ifdef NSPLINES_ND280
 #pragma message("using User Specified N splines")
 #define _N_SPLINES_ NSPLINES_ND280
@@ -70,9 +70,12 @@
 // ******************************************
 
 // d_NAME declares DEVICE constants (live on GPU)
+/// Number of splines living on GPU
 __device__ __constant__ unsigned int d_n_splines;
+/// Size of splines living on GPU
 __device__ __constant__ short int d_spline_size;
 #ifndef Weight_On_SplineBySpline_Basis
+/// Number of events living on GPU
 __device__ __constant__ int d_n_events;
 #endif
 /// CW: Constant memory needs to be hard-coded on compile time. Could make this texture memory instead, but don't care enough right now...
@@ -80,19 +83,22 @@ __device__ __constant__ float val_gpu[_N_SPLINES_];
 __device__ __constant__ short int segment_gpu[_N_SPLINES_];
 
 // h_NAME declares HOST constants (live on CPU)
+/// Number of splines living on CPU
 static short int h_spline_size  = -1;
+/// Number of params living on CPU
 static int h_n_params     = -1;
 #ifndef Weight_On_SplineBySpline_Basis
+/// Number of events living on CPU
 static int h_n_events     = -1;
 #endif
 
 // ******************************************
 // TEXTURES
 // ******************************************
-//KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for variables you often access but rarely overwrite. There are limits on texture memory so don't use huge arrays
+/// KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for variables you often access but rarely overwrite. There are limits on texture memory so don't use huge arrays
 cudaTextureObject_t text_coeff_x = 0;
 #ifndef Weight_On_SplineBySpline_Basis
-//KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+/// KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
 cudaTextureObject_t text_nParamPerEvent = 0;
 #endif
 
@@ -102,7 +108,7 @@ cudaTextureObject_t text_nParamPerEvent = 0;
 // *******************************************
 
 // *******************************************
-/// Initialiser when using the x array and combined y,b,c,d array
+/// @brief Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_SepMany(
 // *******************************************
                           float **gpu_x_array,
@@ -164,7 +170,7 @@ __host__ void InitGPU_SepMany(
 }
 
 // *******************************************
-/// Initialiser when using the x array and combined y,b,c,d array
+/// @brief Initialiser when using the x array and combined y,b,c,d array
 __host__ void InitGPU_TF1(
 // *******************************************
                           float **gpu_coeffs,
@@ -222,10 +228,9 @@ __host__ void InitGPU_TF1(
 
 
 // *******************************************
-// Allocate memory for spline segments
+/// @brief Allocate memory for spline segments
 __host__ void InitGPU_Segments(short int **segment) {
 // *******************************************
-
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) segment, _N_SPLINES_*sizeof(short int));
   CudaCheckError();
@@ -247,7 +252,7 @@ __host__ void InitGPU_Vals(float **vals) {
 // ******************************************************
 
 // ******************************************************
-/// Copy to GPU for x array and separate ybcd array
+/// @brief Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_SepMany(
 // ******************************************************
                             short int *gpu_paramNo_arr,
@@ -353,7 +358,7 @@ __host__ void CopyToGPU_SepMany(
 }
 
 // ******************************************************
-/// Copy to GPU for x array and separate ybcd array
+/// @brief Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_TF1(
 // ******************************************************
                             float *gpu_coeffs,
@@ -443,11 +448,9 @@ __host__ void CopyToGPU_TF1(
 // Once it knows this, we simply extract the pre-computed coefficients for that spline point and multiply together to get a weight
 
 //*********************************************************
-// Evaluate the spline on the GPU
-// Using one {y,b,c,d} array
-// And one {x} array
-// Should be most efficient at cache hitting and memory coalescence
-// But using spline segments rather than the parameter value: avoids doing binary search on GPU
+/// @brief Evaluate the spline on the GPU Using one {y,b,c,d} array and one {x} array
+/// Should be most efficient at cache hitting and memory coalescence
+/// But using spline segments rather than the parameter value: avoids doing binary search on GPU
 __global__ void EvalOnGPU_SepMany(
     const short int* __restrict__ gpu_paramNo_arr,
     const unsigned int* __restrict__ gpu_nKnots_arr,
@@ -505,7 +508,7 @@ __global__ void EvalOnGPU_SepMany(
 }
 
 //*********************************************************
-/// Evaluate the TF1 on the GPU Using 5th order polynomial
+/// @brief Evaluate the TF1 on the GPU Using 5th order polynomial
 __global__ void EvalOnGPU_TF1( 
     const float* __restrict__ gpu_coeffs,
     const short int* __restrict__ gpu_paramNo_arr,
@@ -555,7 +558,7 @@ __global__ void EvalOnGPU_TF1(
 
 #ifndef Weight_On_SplineBySpline_Basis
 //*********************************************************
-/// KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
+/// @brief KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
    const float* __restrict__ gpu_weights,
    float *gpu_total_weights,
@@ -582,10 +585,9 @@ __global__ void EvalOnGPU_TotWeight(
 #endif
 
 // *****************************************
-// Run the GPU code for the separate many arrays
-// As in separate {x}, {y,b,c,d} arrays
-// Pass the segment and the parameter values
-// (binary search already performed in samplePDFND::FindSplineSegment()
+/// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
+/// Pass the segment and the parameter values
+/// (binary search already performed in samplePDFND::FindSplineSegment()
 __host__ void RunGPU_SepMany(
     const short int* gpu_paramNo_arr,
     const unsigned int* gpu_nKnots_arr,
@@ -692,7 +694,7 @@ __host__ void RunGPU_SepMany(
 }
 
 // *****************************************
-/// Run the GPU code for the TF1
+/// @brief Run the GPU code for the TF1
 __host__ void RunGPU_TF1(
     const float *gpu_coeffs,
     const short int* gpu_paramNo_arr,
@@ -801,7 +803,7 @@ __host__ void SynchroniseSplines() {
 // *********************************
 
 // *********************************
-/// Clean up the {x},{ybcd} arrays
+/// @brief Clean up the {x},{ybcd} arrays
 __host__ void CleanupGPU_SepMany( 
     short int *gpu_paramNo_arr,
     unsigned int *gpu_nKnots_arr,
@@ -850,7 +852,7 @@ __host__ void CleanupGPU_Segments(short int *segment, float *vals) {
 }
 
 // *********************************
-/// Clean up the TF1 arrays
+/// @brief Clean up the TF1 arrays
 __host__ void CleanupGPU_TF1(
     float *gpu_coeffs,
     short int *gpu_paramNo_arr,

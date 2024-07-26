@@ -314,3 +314,6 @@ if(NOT TARGET uninstall)
   add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
+
+# KS: Configure the Doxygen input file, this is to ensure whenever we update MaCh3 version Doxyfile will have same version.
+configure_file(${CMAKE_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_SOURCE_DIR}/Doc/Doxyfile @ONLY)

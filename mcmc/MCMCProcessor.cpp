@@ -2997,7 +2997,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 
 // ***************
 // Find Param Index based on name
-int MCMCProcessor::GetParamIndexFromName(const std::string Name){
+int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
 // **************************
   int ParamNo = _UNDEF_;
   for (int i = 0; i < nDraw; ++i)

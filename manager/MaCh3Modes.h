@@ -1,5 +1,6 @@
 #pragma once
 
+// C++ Includes
 #include <cmath>
 #include <map>
 #include <string>
@@ -42,7 +43,7 @@ class MaCh3Modes {
   /// @brief KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category
   inline int GetNModes(){return NModes;}
   /// @brief KS: Get mode number based on name, if mode not known you will get UNKNOWN_BAD
-  MaCh3Modes_t GetMode(std::string name);
+  MaCh3Modes_t GetMode(const std::string& name);
   /// @brief KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD
   std::string GetMaCh3ModeName(const int Index);
   /// @brief KS: Get fancy name of mode, if mode not known you will get UNKNOWN_BAD

@@ -5,7 +5,7 @@
 #include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
 #include "manager/manager.h"
-#include "covariance/adaptiveMCMCStruct.h"
+#include "covariance/AdaptiveMCMCHandler.h"
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
@@ -15,6 +15,7 @@
 //#define DEBUG_PCA 1
 #ifdef DEBUG_PCA
 //KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
+#include "TCanvas.h"
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TColor.h"
@@ -167,21 +168,21 @@ class covarianceBase {
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
   void initialiseAdaption(const YAML::Node& adapt_manager);
-  /// @brief Save adaptive throw matrix to file
-  void saveAdaptiveToFile(const TString& outFileName, const TString& systematicName);
+
   /// @brief Do we adapt or not
   bool getDoAdaption(){return use_adaptive;}
-
+  /// @brief Use new throw matrix, used in adaptive MCMC
   void setThrowMatrix(TMatrixDSym *cov);
   void updateThrowMatrix(TMatrixDSym *cov);
+  /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
   inline void setNumberOfSteps(const int nsteps) {
     total_steps = nsteps;
-    if(total_steps >= adaption_struct.start_adaptive_throw) resetIndivStepScale();
+    if(total_steps >= AdaptiveHandler.start_adaptive_throw) resetIndivStepScale();
   }
 
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
-  inline std::vector<double> getParameterMeans(){return adaption_struct.par_means;}
+  inline std::vector<double> getParameterMeans(){return AdaptiveHandler.par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
@@ -374,7 +375,7 @@ class covarianceBase {
   inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
 
 protected:
-
+  /// @brief Initialisation of the class using matrix from root file
   void init(const char *name, const char *file);
   /// @brief Initialisation of the class using config
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
@@ -404,10 +405,23 @@ protected:
   /// @brief Handy function to return 1 for any systs
   const double* ReturnUnity(){return &Unity;}
 
+  /// @brief sets default values for adaptive MCMC parameters
+  void setAdaptionDefaults();
+
+  /// @brief sets throw matrix from a file
+  /// @param matrix_file_name name of file matrix lives in
+  /// @param matrix_name name of matrix in file
+  /// @param means_name name of means vec in file
+  void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
+
+  /// @brief Method to update adaptive MCMC
+  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  void updateAdaptiveCovariance();
+
   /// The input root file we read in
   const std::string inputFile;
 
-  /// Total number of parmas, deprecated, please don't use it
+  /// Total number of params, deprecated, please don't use it
   int size;
   /// Name of cov matrix
   const char *matrixName;
@@ -494,34 +508,18 @@ protected:
   /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
   std::vector<int> isDecomposed_PCA;
 
-  // Adaptive MCMC
+  /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
+  /// Matrix which we use for step proposal after Cholesky decomposition
   TMatrixD* throwMatrix_CholDecomp;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double **throwMatrixCholDecomp;
 
-  /// @brief sets default values for adaptive MCMC parameters
-  void setAdaptionDefaults();
-
-  /// @brief sets adaptive block matrix
-  /// @param block_indices Values for sub-matrix blocks
-  void setAdaptiveBlocks(std::vector<std::vector<int>> block_indices);
-
-  /// @brief sets throw matrix from a file
-  /// @param matrix_file_name name of file matrix lives in
-  /// @param matrix_name name of matrix in file
-  /// @param means_name name of means vec in file
-  void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
-  /// @brief Method to update adaptive MCMC
-  void updateAdaptiveCovariance();
-  /// @brief method to create new throw matrix
-  void createNewAdaptiveCovariance();
-
   /// Are we using AMCMC?
   bool use_adaptive;
+  /// Total number of MCMC steps
   int total_steps;
 
   /// Struct containing information about adaption
-  adaptive_mcmc::AdaptiveMCMCStruct adaption_struct;
+  adaptive_mcmc::AdaptiveMCMCHandler AdaptiveHandler;
 };

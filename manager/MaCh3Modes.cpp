@@ -151,7 +151,7 @@ std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
 }
 
 // *******************
-MaCh3Modes_t MaCh3Modes::GetMode(std::string name) {
+MaCh3Modes_t MaCh3Modes::GetMode(const std::string& name) {
 // *******************
   if (Mode.count(name)) {
     return Mode[name];
