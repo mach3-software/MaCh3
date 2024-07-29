@@ -5,7 +5,7 @@
 #include "manager/manager.h"
 #include "covariance/CovarianceUtils.h"
 
-#define DEBUG_PCA 1
+//#define DEBUG_PCA 1
 #ifdef DEBUG_PCA
 //KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
 #include "TCanvas.h"
