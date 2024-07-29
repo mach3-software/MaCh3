@@ -168,6 +168,9 @@ class covarianceBase {
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
   void initialiseAdaption(const YAML::Node& adapt_manager);
+  /// @brief Save adaptive throw matrix to file
+  void saveAdaptiveToFile(const TString& outFileName, const TString& systematicName) {
+    AdaptiveHandler.SaveAdaptiveToFile(outFileName, systematicName); }
 
   /// @brief Do we adapt or not
   bool getDoAdaption(){return use_adaptive;}
