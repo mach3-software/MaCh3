@@ -1,33 +1,19 @@
 #pragma once
 
 // MaCh3 includes
+#include "manager/manager.h"
 #include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
 #include "covariance/ThrowParms.h"
-#include "manager/manager.h"
 #include "covariance/AdaptiveMCMCHandler.h"
+#include "covariance/PCAHandler.h"
+
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
 #define _LARGE_LOGL_ 1234567890.0
 #endif
 
-//#define DEBUG_PCA 1
-#ifdef DEBUG_PCA
-//KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
-#include "TCanvas.h"
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TColor.h"
-#include "TLine.h"
-#include "TText.h"
-#include "TLegend.h"
-
-#if DEBUG_PCA == 2
-#include "Eigen/Eigenvalues"
-#endif
-
-#endif
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -263,22 +249,22 @@ class covarianceBase {
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
   inline const TMatrixD getTransferMatrix() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
-    return TransferMat;
+    return PCAObj.TransferMat;
   }
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
   inline const TMatrixD getEigenVectors() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
-    return eigen_vectors;
+    return PCAObj.eigen_vectors;
   }
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use getEigenValuesMaster
   inline const TVectorD getEigenValues() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
-    return eigen_values;
+    return PCAObj.eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use getEigenValues
   inline const std::vector<double> getEigenValuesMaster() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
-    return eigen_values_master;
+    return PCAObj.eigen_values_master;
   }
   /// @brief Set proposed value for parameter in PCA base
   /// @param i Parameter index
@@ -355,12 +341,8 @@ class covarianceBase {
   bool isParameterFixed(const std::string& name);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
+  /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
   void ConstructPCA();
-  #ifdef DEBUG_PCA
-  /// @brief KS: Let's dump all useful matrices to properly validate PCA
-  void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat);
-  #endif
 
   /// @brief is PCA, can use to query e.g. LLH scans
   inline bool IsPCA() { return pca; }
@@ -485,20 +467,9 @@ protected:
   int FirstPCAdpar;
   /// Index of the last param that is being decomposed
   int LastPCAdpar;
-  /// Total number that remained after applying PCA Threshold
-  int nKeptPCApars;
-  /// Eigen value only of particles which are being decomposed
-  TVectorD eigen_values;
-  /// Eigen vectors only of params which are being decomposed
-  TMatrixD eigen_vectors;
-  /// Eigen values which have dimension equal to _fNumParPCA, and can be used in CorrelateSteps
-  std::vector<double> eigen_values_master;
+
   /// Prefit value for PCA params
   std::vector<double> _fPreFitValue_PCA;
-  /// Matrix used to converting from PCA base to normal base
-  TMatrixD TransferMat;
-  /// Matrix used to converting from normal base to PCA base
-  TMatrixD TransferMatT;
   /// CW: Current parameter value in PCA base
   TVectorD fParProp_PCA;
   /// CW: Proposed parameter value in PCA base
@@ -520,6 +491,8 @@ protected:
   /// Total number of MCMC steps
   int total_steps;
 
+  /// Struct containing information about PCA
+  PCAHandler PCAObj;
   /// Struct containing information about adaption
   adaptive_mcmc::AdaptiveMCMCHandler AdaptiveHandler;
 };
