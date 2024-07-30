@@ -589,10 +589,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   SplineInfoArray = new FastSplineInfo[nParams];
   for (_int_ i = 0; i < nParams; ++i) {
     FastSplineInfoTree->GetEntry(i);
-    SplineInfoArray[i].nPts = -999;
-    SplineInfoArray[i].xPts = NULL;
-    SplineInfoArray[i].CurrSegment = 0;
-    SplineInfoArray[i].splineParsPointer = NULL;
 
     // Fill the number of points
     SplineInfoArray[i].nPts = nPoints;
@@ -1080,7 +1076,6 @@ void SMonolith::PrepareForGPU_TF1() {
   #endif
   MACH3LOG_INFO("Good TF1 GPU loading");
 #endif
-
   return;
 }
 
@@ -1111,12 +1106,6 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & Mast
   numParams = MasterSpline[0].size();
   // Initialise
   SplineInfoArray = new FastSplineInfo[numParams];
-  for (_int_ i = 0; i < numParams; ++i) {
-    SplineInfoArray[i].nPts = -999;
-    SplineInfoArray[i].xPts = NULL;
-    SplineInfoArray[i].CurrSegment = 0;
-    SplineInfoArray[i].splineParsPointer = NULL;
-  }
 
   unsigned int EventCounter = 0;
   // Loop over each parameter
@@ -1263,11 +1252,8 @@ SMonolith::~SMonolith() {
 #endif
 
   if(SplineInfoArray != NULL) delete[] SplineInfoArray;
-
-#ifdef Weight_On_SplineBySpline_Basis
   if(cpu_weights != NULL) delete[] cpu_weights;
   if(cpu_weights_var != NULL) delete[] cpu_weights_var;
-#endif
   if(index_cpu != NULL) delete[] index_cpu;
 
   //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL

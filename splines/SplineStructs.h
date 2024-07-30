@@ -8,6 +8,20 @@
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
 // *******************
+  /// @brief Constructor
+  FastSplineInfo() {
+    nPts = -999;
+    xPts = NULL;
+    CurrSegment = 0;
+    splineParsPointer = NULL;
+  }
+
+  /// @brief Destructor
+  ~FastSplineInfo() {
+    // Free dynamically allocated memory
+    if(xPts != NULL) delete[] xPts;
+  }
+
   /// Number of points in spline
   _int_ nPts;
 
@@ -24,7 +38,7 @@ struct FastSplineInfo {
 // ********************************************
 /// @brief CW: Generic xsec class. Can use TF1 or TSpline3 or TSpline5 here, tjoho
 template <class T>
-class XSecStruct{
+class XSecStruct {
 // ********************************************
 public:
   /// @brief CW: The light constructor
@@ -86,7 +100,6 @@ private:
   /// The function
   T* Func;
 };
-
 
 // ***************************************************************************
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
