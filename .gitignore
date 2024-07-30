@@ -9,6 +9,7 @@
 lib/*
 
 build/
+install/
 Doc/latex/
 Doc/html/
 
