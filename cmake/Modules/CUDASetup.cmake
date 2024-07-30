@@ -64,7 +64,11 @@ else()
     target_compile_definitions(MaCh3CompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
 target_include_directories(MaCh3CompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
-include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
+
+if(MaCh3_DEBUG_ENABLED)
+  include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
+endif()
+
 
 #KS: Keep this for backward compatibility
 
