@@ -639,6 +639,12 @@ public:
     y = YResp[segment];
   }
 
+  /// @brief CW: Make a TSpline3 from the reduced splines
+  inline TSpline3* ConstructTSpline3() {
+    TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
+    return spline;
+  }
+
   protected: //changed to protected from private so can be accessed by derived classes
     /// Number of points/knot in TSpline3
     _int_ nPoints;
