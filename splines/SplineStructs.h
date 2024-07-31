@@ -8,6 +8,20 @@
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
 // *******************
+  /// @brief Constructor
+  FastSplineInfo() {
+    nPts = -999;
+    xPts = NULL;
+    CurrSegment = 0;
+    splineParsPointer = NULL;
+  }
+
+  /// @brief Destructor
+  ~FastSplineInfo() {
+    // Free dynamically allocated memory
+    if(xPts != NULL) delete[] xPts;
+  }
+
   /// Number of points in spline
   _int_ nPts;
 
@@ -24,7 +38,7 @@ struct FastSplineInfo {
 // ********************************************
 /// @brief CW: Generic xsec class. Can use TF1 or TSpline3 or TSpline5 here, tjoho
 template <class T>
-class XSecStruct{
+class XSecStruct {
 // ********************************************
 public:
   /// @brief CW: The light constructor
@@ -86,7 +100,6 @@ private:
   /// The function
   T* Func;
 };
-
 
 // ***************************************************************************
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
@@ -159,36 +172,27 @@ public:
   }
 
   /// @brief The useful constructor with deep copy
-  TF1_red(_int_ nSize, _float_* Array, _int_ Parameter) {
+  TF1_red(_int_ nSize, _float_* Array) {
     length = nSize;
     for (int i = 0; i < length; ++i) {
       Par[i] = Array[i];
     }
-    ParamNo = Parameter;
   }
 
   /// @brief The TF1 constructor with deep copy
-  TF1_red(TF1* &Function, int Param = -1) {
+  TF1_red(TF1* &Function) {
     Par = NULL;
-    SetFunc(Function, Param);
-  }
-
-  /// @brief Get the number
-  inline std::string GetName() {
-    std::stringstream ss;
-    ss << ParamNo;
-    return ss.str();
+    SetFunc(Function);
   }
 
   /// @brief Set the function
-  inline void SetFunc(TF1* &Func, int Param = -1) {
+  inline void SetFunc(TF1* &Func) {
     length = Func->GetNpar();
     if (Par != NULL) delete[] Par;
     Par = new _float_[length];
     for (int i = 0; i < length; ++i) {
       Par[i] = Func->GetParameter(i);
     }
-    ParamNo = Param;
     delete Func;
     Func = NULL;
   }
@@ -235,7 +239,6 @@ public:
   /// @brief Print detailed info
   inline void Print() {
     std::cout << "Printing TF1_red: " << std::endl;
-    std::cout << "  ParamNo = " << ParamNo << std::endl;
     std::cout << "  Length  = " << length << std::endl;
     std::cout << "  a       = " << Par[0] << std::endl;
     std::cout << "  b       = " << Par[1] << std::endl;
@@ -250,10 +253,7 @@ private:
   /// The parameters
   _float_* Par;
   _int_ length;
-  /// Save the parameter number this spline applies to
-  _int_ ParamNo;
 };
-
 
 // ************************
 /// CW: Reduced TSpline3 class
@@ -269,18 +269,16 @@ public:
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
-  TSpline3_red(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
+  TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
     Par = NULL;
     XPos = NULL;
     YResp = NULL;
-    SetFunc(spline, Param, InterPolation);
+    SetFunc(spline, InterPolation);
   }
 
   /// @brief constructor taking parameters
-  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P, _int_ parNo){
+  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P){
     nPoints = N;
-    ParamNo = parNo;
-    // std::cout<<"nPoints: "<<nPoints<<std::endl;
     // Save the parameters for each knot
     Par = new _float_*[nPoints];
     // Save the positions of the knots
@@ -304,9 +302,8 @@ public:
     }
   }
   /// @brief Set the function
-  inline void SetFunc(TSpline3* &spline, int Param = -1, SplineInterpolation InterPolation = kTSpline3) {
+  inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
     nPoints = spline->GetNp();
-    ParamNo = Param;
     if (Par != NULL) {
       for (int i = 0; i < nPoints; ++i) {
         delete[] Par[i];
@@ -460,7 +457,7 @@ public:
       }
 
       // deal with the case of two points (just do linear interpolation between them)
-      if (nPoints ==2){
+      if (nPoints == 2){
         Par[0][0] = (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]);
         Par[0][1] = 0.0;
         Par[0][2] = 0.0;
@@ -642,13 +639,6 @@ public:
     y = YResp[segment];
   }
 
-  /// @brief CW: Get the number
-  inline std::string GetName() {
-    std::stringstream ss;
-    ss << ParamNo;
-    return ss.str();
-  }
-
   protected: //changed to protected from private so can be accessed by derived classes
     /// Number of points/knot in TSpline3
     _int_ nPoints;
@@ -658,8 +648,6 @@ public:
     _float_ *XPos;
     /// y-value for each knot
     _float_ *YResp;
-    /// Parameter number (which parameter is this spline for)
-    _int_ ParamNo;
 };
 
 // ************************
@@ -675,8 +663,8 @@ public:
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
-  Truncated_Spline(TSpline3* &spline, int Param = -1)
-  :TSpline3_red(spline, Param)
+  Truncated_Spline(TSpline3* &spline)
+  :TSpline3_red(spline)
   {
   }
 

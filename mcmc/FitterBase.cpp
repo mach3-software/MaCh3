@@ -818,8 +818,6 @@ void FitterBase::RunLLHScan() {
   }
 }
 
-
-
 // *************************
 //LLH scan is good first estimate of step scale
 void FitterBase::GetStepScaleBasedOnLLHScan() {
@@ -854,13 +852,21 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
         MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
         continue;
       }
-      double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
+      const double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
       //If there is no sensitivity leave it
       if(LLH_val < 0.001) continue;
 
+      // EM: assuming that the likelihood is gaussian, approximate sigma value is given by variation/sqrt(-2LLH)
+      // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
+      // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
+      const double Var = 1.;
+      const double approxSigma = TMath::Abs(Var)/std::sqrt(LLH_val);
+
       // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-      double NewStepScale = LLH_val * 2.38/std::sqrt(npars);
+      const double NewStepScale = approxSigma * 2.38/std::sqrt(npars);
       StepScale[i] = NewStepScale;
+      MACH3LOG_DEBUG("Sigma: {}", approxSigma);
+      MACH3LOG_DEBUG("optimal Step Size: {}", NewStepScale);
     }
     (*it)->setIndivStepScale(StepScale);
     (*it)->SaveUpdatedMatrixConfig();
@@ -1056,16 +1062,13 @@ void FitterBase::Run2DLLHScan() {
       } //end loop over systematics y
     }//end loop over systematics X
   }//end loop covariance classes
-
   Sample_2DLLH->Write();
   delete Sample_2DLLH;
-
 }
 
 // *************************
 void FitterBase::RunSigmaVar() {
 // *************************
-
   // Save the settings into the output file
   SaveSettings();
 
@@ -1414,7 +1417,7 @@ void FitterBase::RunSigmaVar() {
 }
 
 // *************************
-TGraphAsymmErrors* FitterBase::MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, std::string title) {
+TGraphAsymmErrors* FitterBase::MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
 // *************************
 
   TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
@@ -1442,6 +1445,5 @@ TGraphAsymmErrors* FitterBase::MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaAr
     var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
     var->SetPointEYlow(m, var->GetY()[m] - xlow);
   }
-
   return var;
 }

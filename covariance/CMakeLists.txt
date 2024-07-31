@@ -5,6 +5,7 @@ set(HEADERS
     covarianceOsc.h
     covarianceXsec.h
     AdaptiveMCMCHandler.h
+    PCAHandler.h
 )
 
 add_library(Covariance SHARED
@@ -13,6 +14,7 @@ add_library(Covariance SHARED
     covarianceOsc.cpp
     covarianceXsec.cpp
     AdaptiveMCMCHandler.cpp
+    PCAHandler.cpp
 )
 
 set_target_properties(Covariance PROPERTIES
