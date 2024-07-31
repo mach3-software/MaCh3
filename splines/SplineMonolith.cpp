@@ -163,6 +163,7 @@ void SMonolith::Initialise() {
 
   index_cpu = NULL;
   cpu_weights_var = NULL;
+  cpu_weights = NULL;
   gpu_weights = nullptr;
 
   cpu_total_weights = NULL;
