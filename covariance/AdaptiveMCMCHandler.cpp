@@ -24,18 +24,18 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 
 
 // ********************************************
-void AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars) {
+bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars) {
 // ********************************************
   //  setAdaptionDefaults();
-  if(GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str], "")==""){
+  if(!adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]) {
     MACH3LOG_WARN("Adaptive Settings not found for {}, this is fine if you don't want adaptive MCMC", matrix_name_str);
-    return;
+    return false;
   }
 
   // We"re going to grab this info from the YAML manager
-  if(GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["DoAdaption"], false)) {
+  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["DoAdaption"], false)) {
     MACH3LOG_WARN("Not using adaption for {}", matrix_name_str);
-    return;
+    return false;
   }
 
   start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartThrow"], 10);
@@ -43,14 +43,14 @@ void AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
   adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
 
-
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
 
   // We"ll set a dummy variable here
-  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Settings"][matrix_name_str]["AdaptionUpdateStep"], {{}});
+  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Settings"][matrix_name_str]["MatrixBlocks"], {{}});
 
   SetAdaptiveBlocks(matrix_blocks, Npars);
+  return true;
 }
 
 // ********************************************
@@ -60,7 +60,6 @@ void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance(const int Npars) {
   adaptive_covariance->Zero();
   par_means = std::vector<double>(Npars, 0);
 }
-
 
 // ********************************************
 void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices, const int Npars) {

@@ -221,7 +221,6 @@ void covarianceBase::init(const char *name, const char *file) {
   setName(name);
   MakePosDef(CovMat);
   setCovMatrix(CovMat);
-
   if (_fNumPar <= 0) {
     MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", getName(), _fNumPar);
     throw;
@@ -263,7 +262,6 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   }
 
   PrintLength = 35;
-
 
   // Set the covariance matrix
   _fNumPar = _fYAMLDoc["Systematics"].size();
@@ -485,8 +483,10 @@ void covarianceBase::setPar(int i , double val) {
   if (pca) TransferToPCA();
 }
 
+// ********************************************
 // Transfer a parameter variation in the parameter basis to the eigen basis
 void covarianceBase::TransferToPCA() {
+// ********************************************
   if (!pca) {
     MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -855,11 +855,11 @@ void covarianceBase::throwParProp(const double mag) {
     }
   }
 }
-
+// ********************************************
 // Helper function to throw the current parameter by mag sigmas
 // Can study bias in MCMC with this; put different starting parameters
-void covarianceBase::throwParCurr(const double mag)
-{
+void covarianceBase::throwParCurr(const double mag) {
+// ********************************************
   randomize();
   if (!pca) {
     // Get the correlated throw vector
@@ -1342,11 +1342,12 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   std::string matrix_name_str(matrixName);
 
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  AdaptiveHandler.InitFromConfig(adapt_manager, matrix_name_str, getNpars());
+  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrix_name_str, getNpars());
+  if(!success) return;
   AdaptiveHandler.Print();
 
   // Next let"s check for external matrices
-   // We"re going to grab this info from the YAML manager
+  // We"re going to grab this info from the YAML manager
   if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["UseExternalMatrix"], false)) {
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrix_name_str);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!

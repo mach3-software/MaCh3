@@ -24,7 +24,7 @@ class AdaptiveMCMCHandler{
 
   /// @brief Read initial values from config file
   /// @param adapt_manager Config file from which we update matrix
-  void InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars);
+  bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars);
 
   /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
   void CreateNewAdaptiveCovariance(const int Npars);
