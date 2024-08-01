@@ -17,6 +17,7 @@
 // MaCh3 includes
 #include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"
+#include "manager/MaCh3Exception.h"
 #include "manager/YamlHelper.h"
 
 namespace MaCh3Utils {
