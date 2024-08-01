@@ -49,6 +49,10 @@ std::string GetMaCh3Version() {
   //KS: Find MaCh3 version based on header file. There could be better way to just include version.h but as long as we don't have to hardcode version I am content
   std::string MaCh3_VERSION = "";
 
+  if(std::getenv("MaCh3_ROOT") == nullptr){
+    throw MaCh3Exception(__FILE__, __LINE__, "Error: you haven't sourced setup.MaCh3.sh in core!");
+  }
+
   std::string file = std::string(std::getenv("MaCh3_ROOT")) + "/version.h";
   // Open the version.h file
   std::ifstream versionFile(file);
