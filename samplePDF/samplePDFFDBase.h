@@ -115,9 +115,6 @@ public:
   //DB Function to determine which weights apply to which types of samples
   //pure virtual!!
   virtual void SetupWeightPointers() = 0;
-
-  //DB Setup the MC
-  virtual void Init() = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
