@@ -115,6 +115,9 @@ public:
   //DB Function to determine which weights apply to which types of samples
   //pure virtual!!
   virtual void SetupWeightPointers() = 0;
+
+  //DB Require all objects to have a function which reads in the MC
+  virtual void Init() = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
@@ -231,6 +234,8 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   covarianceXsec *XsecCov;
+
+  std::string mc_version;
   //=============================================================================== 
 
   //ETA - binning opt can probably go soon...
@@ -264,9 +269,4 @@ public:
   std::vector< std::vector<double> > StoredSelection; 
   //===========================================================================
   //
-
-  //ETA - trying new way of doing shift parameters
-  // leave this for now but coming soon!
-  //std::vector< EnergyScale* > ShiftFunctors;
-  //std::vector< BaseFuncPar* > ShiftFunctors;
 };
