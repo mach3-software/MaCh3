@@ -30,6 +30,14 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
 
   //Default TestStatistic is kPoisson
   fTestStatistic = kPoisson;
+
+  //The binning here is arbitrary, now we get info from cfg so the
+  //set1DBinning and set2Dbinning calls below will make the binning
+  //to be what we actually want
+  _hPDF1D = new TH1D("hErec_nue", "Reconstructed Energy", 200, 0 , 50.0);
+  dathist = new TH1D("dat_nue","",200,0, 50.0);
+  _hPDF2D = new TH2D("blah","blah",15,0,50.0*1000,15,0,150);
+  dathist2d = new TH2D("dat2d_nue","",15,0,1500,15,0,150);
 }
 
 samplePDFFDBase::~samplePDFFDBase()
