@@ -85,29 +85,6 @@ public:
 
   void SetXsecCov(covarianceXsec* xsec_cov);
 
-  //============================= Should be deprecated =============================
-  // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
-  // DB 27/08/2020 The following functions shouldn't be used (Currently included for backwards compatibility)
-
-  //DB Incredibly hardcoded - Could probably make 'LetsPrintSomeWeights' do the same functionality and remove this?
-
-  virtual void DumpWeights(std::string outname){return;};
-  // ETA - in the future it would be nice to have some generic getHIst functions
-  // although, this introduces a root dependence into the core code?
-  //TH1D *getModeHist1D(int s, int m, int style = 0);
-  //TH2D *getModeHist2D(int s, int m, int style = 0);
-  // Direct translation of getModeHist1D(s,m,style) = get1DVarHist(kPDFBinning,m,s,style)
-  //TH1D* get1DVarHist(ND280KinematicTypes Var1, int fModeToFill=-1, int fSampleToFill=-1, int WeightStyle=0, TAxis* Axis=0);
-  //TH1D* get1DVarHist(ND280KinematicTypes Var1, std::vector< std::vector<double> > Selection, int WeightStyle=0, TAxis* Axis=0);
-  // Direct translation of getModeHist2D(s,m,style) = get2DVarHist(kPDFBinning,kPDFBinning,m,s,style)
-  //TH2D* get2DVarHist(ND280KinematicTypes Var1, ND280KinematicTypes Var2, int fModeToFill=-1, int fSampleToFill=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
-  //TH2D* get2DVarHist(ND280KinematicTypes Var1, ND280KinematicTypes Var2, std::vector< std::vector<double> > Selection, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
-  //TH3D* get3DVarHist(ND280KinematicTypes Var1, ND280KinematicTypes Var2, ND280KinematicTypes Var3, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* XAxis=0, TAxis* YAxis=0, TAxis* ZAxis=0);
- 
-  //================================================================================
-
-  virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
-  // LW - Setup Osc 
   void virtual SetupOscCalc(double PathLength, double Density);
   void SetOscillator(Oscillator* Osc_);
   void FindEventOscBin();
@@ -120,6 +97,9 @@ public:
 
   //DB Require all objects to have a function which reads in the MC
   virtual void Init() = 0;
+
+  //DB Experiment specific setup
+  virtual void setupExperimentMC() = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
