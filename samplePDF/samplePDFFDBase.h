@@ -143,7 +143,6 @@ public:
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
   // Calculate the norm weight for a given event
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
-  virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
 
   int GetBinningOpt(){return BinningOpt;}
 
