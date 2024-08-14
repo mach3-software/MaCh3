@@ -98,8 +98,8 @@ public:
   //DB Require all objects to have a function which reads in the MC
   virtual void Init() = 0;
 
-  //DB Experiment specific setup
-  virtual void setupExperimentMC(int iSample) = 0;
+  //DB Experiment specific setup, returns the number of events which were loaded
+  virtual int setupExperimentMC(int iSample) = 0;
 
   //DB Function weights and shifts are differentiated in core by how they return their "effect"
   virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;

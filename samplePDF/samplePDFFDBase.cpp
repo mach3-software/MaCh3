@@ -94,8 +94,8 @@ void samplePDFFDBase::Initialise() {
   Init();
 
   for(unsigned iSample=0 ; iSample < nSamples.size() ; iSample++){
-    setupExperimentMC(iSample);
-    InitialiseSingleFDMCObject(iSample,dunemcSamples[iSample].nEvents);
+    int nEvents = setupExperimentMC(iSample);
+    InitialiseSingleFDMCObject(iSample,nEvents);
     setupFDMC(iSample);
   }
 }
