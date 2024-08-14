@@ -1475,9 +1475,9 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   MCSamples[iSample] = fdmc_base();
   
   fdobj->nEvents = nEvents_;
-  fdobj->nutype = duneobj->nutype;
-  fdobj->oscnutype = duneobj->oscnutype;
-  fdobj->signal = duneobj->signal;
+  fdobj->nutype = -9;
+  fdobj->oscnutype = -9;
+  fdobj->signal = false;
   fdobj->Unity = 1.;
   
   fdobj->x_var = new double*[fdobj->nEvents];
