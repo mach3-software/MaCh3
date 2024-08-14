@@ -93,7 +93,7 @@ samplePDFFDBase::~samplePDFFDBase()
 void samplePDFFDBase::Initialise() {
   Init();
 
-  for(unsigned iSample=0 ; iSample < dunemcSamples.size() ; iSample++){
+  for(unsigned iSample=0 ; iSample < nSamples.size() ; iSample++){
     setupExperimentMC(iSample);
     InitialiseSingleFDMCObject(iSample,dunemcSamples[iSample].nEvents);
     setupFDMC(iSample);
