@@ -14,7 +14,8 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
-
+  SetXsecCov(xsec_cov);
+  
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
   
