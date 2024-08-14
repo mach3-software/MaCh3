@@ -23,7 +23,6 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   fTestStatistic = kPoisson;
 }
 
-
 samplePDFFDBase::~samplePDFFDBase()
 {
   std::cout << "I'm deleting samplePDFFDBase" << std::endl;

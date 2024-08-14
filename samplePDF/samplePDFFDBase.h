@@ -116,6 +116,9 @@ public:
   //pure virtual!!
   virtual void SetupWeightPointers() = 0;
 
+  //DB Setup the MC
+  virtual void Init() = 0;
+  
   splineFDBase *splineFile;
   //===============================================================================
   //DB Functions relating to sample and exec setup  
