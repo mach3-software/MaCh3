@@ -100,6 +100,9 @@ public:
 
   //DB Experiment specific setup
   virtual void setupExperimentMC(int iSample) = 0;
+
+  //DB Function weights and shifts are differentiated in core by how they return their "effect"
+  virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
