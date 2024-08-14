@@ -1549,4 +1549,8 @@ void samplePDFFDBase::InitialiseSplineObject(std::vector<std::string> spline_fil
   std::cout << "################" << std::endl;
   std::cout << "Setup FD splines   " << std::endl;
   std::cout << "################" << std::endl;
+
+  SetupNormParameters();
+  SetupWeightPointers();
+  fillSplineBins();
 }
