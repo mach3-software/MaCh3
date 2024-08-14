@@ -27,11 +27,6 @@ void samplePDFBase::init(double pot_)
 
 void samplePDFBase::init(double pot, std::string mc_version)
 {
-    
-    
-  //TODO KS: Need to set test stat from config file
-  // Set the test-statistic
-  //SetTestStatistic(static_cast<TestStatistic>(FitManager->GetMCStatLLH()));
 }
 
 void samplePDFBase::addData(std::vector<double> &data)

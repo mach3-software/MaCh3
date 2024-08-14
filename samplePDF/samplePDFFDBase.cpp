@@ -57,6 +57,22 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
         std::cout << "With bounds " << SelectionCuts["Bounds"].as<std::vector<double>>()[0] << " to " << SelectionCuts["Bounds"].as<std::vector<double>>()[1] << std::endl;
   }
   NSelections = SelectionStr.size();
+
+  //FD file info
+  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
+  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
+  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
+  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+
+  for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+    mtuple_files.push_back(osc_channel["mtuplefile"].as<std::string>());
+    spline_files.push_back(osc_channel["splinefile"].as<std::string>());
+    sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
+    sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
+    sample_oscnutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>())));
+    sample_signal.push_back(osc_channel["signal"].as<bool>());
+  }
+
 }
 
 samplePDFFDBase::~samplePDFFDBase()

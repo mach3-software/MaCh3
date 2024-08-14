@@ -275,4 +275,11 @@ public:
   manager* SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject(std::vector<std::string> spline_filepaths);
+
+  std::vector<std::string> mtuple_files;
+  std::vector<std::string> spline_files;
+  std::vector<int> sample_vecno;
+  std::vector<int> sample_oscnutype;
+  std::vector<int> sample_nutype;
+  std::vector<bool> sample_signal;
 };
