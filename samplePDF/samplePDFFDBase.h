@@ -103,6 +103,9 @@ public:
 
   //DB Function weights and shifts are differentiated in core by how they return their "effect"
   virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
+
+  //DB Function which translates experiment struct into core struct
+  virtual void setupFDMC(int iSample) = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
