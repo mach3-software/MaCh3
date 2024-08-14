@@ -282,4 +282,9 @@ public:
   std::vector<int> sample_oscnutype;
   std::vector<int> sample_nutype;
   std::vector<bool> sample_signal;
+
+  std::string mtupleprefix;
+  std::string mtuplesuffix;
+  std::string splineprefix;
+  std::string splinesuffix;
 };
