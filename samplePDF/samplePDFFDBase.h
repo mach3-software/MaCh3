@@ -106,6 +106,9 @@ public:
 
   //DB Function which translates experiment struct into core struct
   virtual void setupFDMC(int iSample) = 0;
+
+  //DB Function which does a lot of the lifting regarding the workflow in creating different MC objects
+  void Initialise();
   
   splineFDBase *splineFile;
   //===============================================================================

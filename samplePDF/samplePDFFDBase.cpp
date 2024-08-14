@@ -2,10 +2,8 @@
 
 // Constructors for erec-binned errors
 
-samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covarianceXsec* xsec_cov)
-  : samplePDFBase(pot)
-//DB Throughout constructor and init, pot is livetime for atmospheric samples
-{
+samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covarianceXsec* xsec_cov) : samplePDFBase(pot) {
+  
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
   
@@ -90,6 +88,16 @@ samplePDFFDBase::~samplePDFFDBase()
   delete[] samplePDFFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
   if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
+}
+
+void samplePDFFDBase::Initialise() {
+  Init();
+
+  for(unsigned iSample=0 ; iSample < dunemcSamples.size() ; iSample++){
+    setupExperimentMC(iSample);
+    InitialiseSingleFDMCObject(iSample,dunemcSamples[iSample].nEvents);
+    setupFDMC(iSample);
+  }
 }
 
 void samplePDFFDBase::fill1DHist()
