@@ -1480,6 +1480,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->oscnutype = -9;
   fdobj->signal = false;
   fdobj->Unity = 1.;
+  fdobj->Unity_Int = 1.;
   
   fdobj->x_var = new double*[fdobj->nEvents];
   fdobj->y_var = new double*[fdobj->nEvents];
@@ -1514,8 +1515,8 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_truecz = new double[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
-    fdobj->rw_etru[iEvent] = 0.;
-    fdobj->mode[iEvent] = -1.;
+    fdobj->rw_etru[iEvent] = &fdobj->Unity;
+    fdobj->mode[iEvent] = &fdobj->Unity_Int;
     fdobj->Target[iEvent] = 0;
     fdobj->NomXBin[iEvent] = -1;
     fdobj->NomYBin[iEvent] = -1;
@@ -1532,8 +1533,8 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->SampleDetID = -1;
     fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
     fdobj->rw_truecz[iEvent] = -999.;
-    fdobj->x_var[iEvent] = -999.;
-    fdobj->y_var[iEvent] = -999.;
+    fdobj->x_var[iEvent] = &fdobj->Unity;
+    fdobj->y_var[iEvent] = &fdobj->Unity;
   }
   
 }
