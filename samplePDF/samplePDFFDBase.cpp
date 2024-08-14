@@ -46,6 +46,17 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
 
   set1DBinning(XBinEdges.size()-1, XBinEdges.data());
   set2DBinning(XBinEdges.size()-1, XBinEdges.data(), YBinEdges.size()-1, YBinEdges.data());
+
+  //Now grab the selection cuts from the manager
+  for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
+        std::cout << "Looping over selection cuts " << std::endl;
+        SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
+
+        SelectionBounds.push_back(SelectionCuts["Bounds"].as<std::vector<double>>());
+        std::cout << "Found cut on string " << SelectionCuts["KinematicStr"].as<std::string>() << std::endl;
+        std::cout << "With bounds " << SelectionCuts["Bounds"].as<std::vector<double>>()[0] << " to " << SelectionCuts["Bounds"].as<std::vector<double>>()[1] << std::endl;
+  }
+  NSelections = SelectionStr.size();
 }
 
 samplePDFFDBase::~samplePDFFDBase()
