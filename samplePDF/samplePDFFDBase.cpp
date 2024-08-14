@@ -1473,6 +1473,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   }
   
   MCSamples[iSample] = fdmc_base();
+  fdmc_base *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
   fdobj->nutype = -9;
