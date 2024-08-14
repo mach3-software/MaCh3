@@ -9,6 +9,9 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
 
+  char* sample_char = (char*)samplecfgfile.c_str();
+  manager* SampleManager = new manager(sample_char);
+  
   //DB Save the argument value
   mc_version = mc_version_;
   

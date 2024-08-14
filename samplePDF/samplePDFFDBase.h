@@ -32,6 +32,8 @@
 #include "samplePDF/FDMCStruct.h"
 #include "samplePDF/ShiftFunctors.h"
 
+#include "manager/manager.h"
+
 
 #define USEBETA 0
 
@@ -269,4 +271,6 @@ public:
   std::vector< std::vector<double> > StoredSelection; 
   //===========================================================================
   //
+
+  manager* SampleManager;
 };
