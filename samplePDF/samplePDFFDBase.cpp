@@ -8,12 +8,12 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
 {
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
-
-  char* sample_char = (char*)samplecfgfile.c_str();
-  manager* SampleManager = new manager(sample_char);
   
   //DB Save the argument value
   mc_version = mc_version_;
+  
+  char* sample_char = (char*)mc_version.c_str();
+  manager* SampleManager = new manager(sample_char);
   
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
