@@ -273,4 +273,5 @@ public:
   //
 
   manager* SampleManager;
+  void InitialiseSingleFDMCObject(int nEvents);
 };

@@ -1466,3 +1466,73 @@ inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUD
 }
 #endif
 
+void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
+  if (iSample < 0 || iSample >= nSamples) {
+    std::cerr << "Invalid iSample index in InitialiseSingleFDMCObject" << std::endl;
+    throw;
+  }
+  
+  MCSamples[iSample] = fdmc_base();
+  
+  fdobj->nEvents = nEvents_;
+  fdobj->nutype = duneobj->nutype;
+  fdobj->oscnutype = duneobj->oscnutype;
+  fdobj->signal = duneobj->signal;
+  fdobj->Unity = 1.;
+  
+  fdobj->x_var = new double*[fdobj->nEvents];
+  fdobj->y_var = new double*[fdobj->nEvents];
+  fdobj->rw_etru = new double*[fdobj->nEvents];
+  fdobj->XBin = new int[fdobj->nEvents];
+  fdobj->YBin = new int[fdobj->nEvents];    
+  fdobj->NomXBin = new int[fdobj->nEvents];
+  fdobj->NomYBin = new int[fdobj->nEvents];
+  fdobj->XBin = new int [fdobj->nEvents];
+  fdobj->YBin = new int [fdobj->nEvents];;	 
+  fdobj->rw_lower_xbinedge = new double [fdobj->nEvents];
+  fdobj->rw_lower_lower_xbinedge = new double [fdobj->nEvents];
+  fdobj->rw_upper_xbinedge = new double [fdobj->nEvents];
+  fdobj->rw_upper_upper_xbinedge = new double [fdobj->nEvents];
+  fdobj->mode = new int*[fdobj->nEvents];
+  fdobj->nxsec_spline_pointers = new int[fdobj->nEvents]; 
+  fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
+  fdobj->nxsec_norm_pointers = new int[fdobj->nEvents];
+  fdobj->xsec_norm_pointers = new const double**[fdobj->nEvents];
+  fdobj->xsec_norms_bins = new std::list< int >[fdobj->nEvents];
+  fdobj->xsec_w = new double[fdobj->nEvents];
+  fdobj->flux_w = new double[fdobj->nEvents];
+  fdobj->osc_w = new double[fdobj->nEvents];
+  fdobj->isNC = new bool[fdobj->nEvents];
+  fdobj->rw_etru = new double*[fdobj->nEvents];
+  fdobj->nxsec_spline_pointers = new int[fdobj->nEvents];
+  fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
+  fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
+  fdobj->total_weight_pointers = new double**[fdobj->nEvents];
+  fdobj->Target = new int*[fdobj->nEvents];
+  fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
+  fdobj->rw_truecz = new double[fdobj->nEvents];
+  
+  for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
+    fdobj->rw_etru[iEvent] = 0.;
+    fdobj->mode[iEvent] = -1.;
+    fdobj->Target[iEvent] = 0;
+    fdobj->NomXBin[iEvent] = -1;
+    fdobj->NomYBin[iEvent] = -1;
+    fdobj->XBin[iEvent] = -1;
+    fdobj->YBin[iEvent] = -1;	 
+    fdobj->rw_lower_xbinedge[iEvent] = -1;
+    fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
+    fdobj->rw_upper_xbinedge[iEvent] = -1;
+    fdobj->rw_upper_upper_xbinedge[iEvent] = -1;
+    fdobj->xsec_w[iEvent] = 1.0;
+    fdobj->osc_w[iEvent] = 1.0;
+    fdobj->isNC[iEvent] = false;
+    fdobj->flux_w[iEvent] = 0.;
+    fdobj->SampleDetID = -1;
+    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
+    fdobj->rw_truecz[iEvent] = -999.;
+    fdobj->x_var[iEvent] = -999.;
+    fdobj->y_var[iEvent] = -999.;
+  }
+  
+}
