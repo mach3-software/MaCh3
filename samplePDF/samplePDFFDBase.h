@@ -99,7 +99,7 @@ public:
   virtual void Init() = 0;
 
   //DB Experiment specific setup
-  virtual void setupExperimentMC() = 0;
+  virtual void setupExperimentMC(int iSample) = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
