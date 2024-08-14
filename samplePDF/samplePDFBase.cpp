@@ -20,8 +20,9 @@ samplePDFBase::~samplePDFBase()
   delete rnd;
 }
 
-void samplePDFBase::init(double pot)
+void samplePDFBase::init(double pot_)
 {
+  pot = pot_;
 }
 
 void samplePDFBase::init(double pot, std::string mc_version)

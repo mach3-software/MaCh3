@@ -135,4 +135,6 @@ protected:
 
   TRandom3* rnd;
   bool MCthrow;
+
+  double pot;
 };
