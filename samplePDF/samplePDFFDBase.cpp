@@ -21,7 +21,8 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
-  
+
+  samplename = SampleManager->raw()["SampleName"].as<std::string>();
   nSamples = SampleManager->raw()["NSubSamples"].as<int>();
   for (int i=0;i<nSamples;i++) {
     struct fdmc_base obj = fdmc_base();
@@ -38,6 +39,13 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   dathist = new TH1D("dat_nue","",200,0, 50.0);
   _hPDF2D = new TH2D("blah","blah",15,0,50.0*1000,15,0,150);
   dathist2d = new TH2D("dat2d_nue","",15,0,1500,15,0,150);
+
+  BinningOpt = SampleManager->raw()["Binning"]["BinningOpt"].as<int>();
+  std::vector<double> XBinEdges = SampleManager->raw()["Binning"]["XVarBins"].as<std::vector<double>>();
+  std::vector<double> YBinEdges = SampleManager->raw()["Binning"]["YVarBins"].as<std::vector<double>>();
+
+  set1DBinning(XBinEdges.size()-1, XBinEdges.data());
+  set2DBinning(XBinEdges.size()-1, XBinEdges.data(), YBinEdges.size()-1, YBinEdges.data());
 }
 
 samplePDFFDBase::~samplePDFFDBase()
