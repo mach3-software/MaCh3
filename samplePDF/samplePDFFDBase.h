@@ -274,4 +274,5 @@ public:
 
   manager* SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
+  void InitialiseSplineObject(std::vector<std::string> spline_filepaths);
 };

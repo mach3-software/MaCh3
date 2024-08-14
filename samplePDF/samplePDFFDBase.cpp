@@ -1538,3 +1538,15 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   }
   
 }
+
+void InitialiseSplineObject(std::vector<std::string> spline_filepaths) {
+  splineFile->AddSample(samplename, BinningOpt, SampleDetID, spline_filepaths);
+  splineFile->PrintArrayDimension();
+  splineFile->CountNumberOfLoadedSplines(false, 1);
+  splineFile->TransferToMonolith();
+
+  std::cout << "--------------------------------" <<std::endl;
+  std::cout << "################" << std::endl;
+  std::cout << "Setup FD splines   " << std::endl;
+  std::cout << "################" << std::endl;
+}
