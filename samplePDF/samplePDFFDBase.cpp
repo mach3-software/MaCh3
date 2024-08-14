@@ -22,9 +22,11 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
   
-  //KS: For now FD support only one sample
-  nSamples = 1;
-  SampleName.push_back("FDsample");
+  nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+  for (int i=0;i<nSamples;i++) {
+    struct fdmc_base obj = fdmc_base();
+    MCSamples.push_back(obj);
+  }
 
   //Default TestStatistic is kPoisson
   fTestStatistic = kPoisson;
