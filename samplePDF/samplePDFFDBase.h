@@ -133,7 +133,7 @@ public:
   //you need to pass a value to some custom reweight calc or engine
   virtual void PrepFunctionalParameters(){};
   //ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){};
+  virtual void applyShifts(int iSample, int iEvent) = 0;
   //DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(int iSample, int iEvent); 
   bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
