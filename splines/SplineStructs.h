@@ -153,12 +153,25 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianc
 }
 
 // ************************
-/// @brief CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each parameter set has
-class TF1_red {
+/// @brief KS: A reduced ResponseFunction Generic function used for evaluating weight
+class TResponseFunction_red {
 // ************************
 public:
   /// @brief Empty constructor
-  TF1_red() {
+  TResponseFunction_red() { }
+  /// @brief Empty destructor
+  virtual ~TResponseFunction_red() { }
+  /// @brief Evaluate a variation
+  virtual double Eval(const double var)=0;
+};
+
+// ************************
+/// @brief CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each parameter set has
+class TF1_red: public TResponseFunction_red {
+// ************************
+public:
+  /// @brief Empty constructor
+  TF1_red() : TResponseFunction_red() {
     length = 0;
     Par = NULL;
   }
@@ -172,7 +185,7 @@ public:
   }
 
   /// @brief The useful constructor with deep copy
-  TF1_red(_int_ nSize, _float_* Array) {
+  TF1_red(_int_ nSize, _float_* Array) : TResponseFunction_red() {
     length = nSize;
     for (int i = 0; i < length; ++i) {
       Par[i] = Array[i];
@@ -180,7 +193,7 @@ public:
   }
 
   /// @brief The TF1 constructor with deep copy
-  TF1_red(TF1* &Function) {
+  TF1_red(TF1* &Function) : TResponseFunction_red() {
     Par = NULL;
     SetFunc(Function);
   }
@@ -198,20 +211,27 @@ public:
   }
 
   /// @brief Evaluate a variation
-  inline double Eval(_float_ var) {
-    /// If we have 5 parameters we're using a fifth order polynomial
-    if (length == 5) {
+  inline double Eval(const double var) override {
+    return Par[1]+Par[0]*var;
+
+    /* FIXME in future we might introduce more TF1
+    //If we have 5 parameters we're using a fifth order polynomial
+    if (Type == kFifthOrderPolynomial) {
       return 1+Par[0]*var+Par[1]*var*var+Par[2]*var*var*var+Par[3]*var*var*var*var+Par[4]*var*var*var*var*var;
-      /// If we have 2 parameters we're using two linear equations
-    } else if (length == 2) {
-      return (var<=0)*(1+Par[0]*var)+(var>0)*(1+Par[1]*var);
-    } else {
+    } else if (Type == kTwoLinears) {
+      return (var <= 0)*(Par[2]+Par[0]*var)+(var > 0)*(Par[2]+Par[1]*var);
+    } else if (Type == kLinear) {
+      return (Par[1]+Par[0]*var);
+    } else if (Type == kPseudoHeaviside) {
+      return (var <= 0)*(1+Par[0]*var) + (1 >= var)*(var > 0)*(1+Par[1]*var) + (var > 1)*(Par[3]+Par[2]*var);
+    }else {
       std::cerr << "*** Error in reduced TF1 class!" << std::endl;
-      std::cerr << "    Class only knows about 5th order polynomial and two superposed linear function" << std::endl;
+      std::cerr << "    Class only knows about 5th order polynomial, two superposed linear function, linear function or pseudo Heaviside" << std::endl;
       std::cerr << "    You have tried something else than this, which remains unimplemented" << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
     }
+    */
   }
 
   /// @brief Set a parameter to a value
@@ -257,11 +277,11 @@ private:
 
 // ************************
 /// CW: Reduced TSpline3 class
-class TSpline3_red {
+class TSpline3_red: public TResponseFunction_red {
 // ************************
 public:
   /// @brief Empty constructor
-  TSpline3_red() {
+  TSpline3_red() : TResponseFunction_red() {
     nPoints = 0;
     Par = NULL;
     XPos = NULL;
@@ -269,7 +289,7 @@ public:
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
-  TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
+  TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) : TResponseFunction_red() {
     Par = NULL;
     XPos = NULL;
     YResp = NULL;
@@ -277,7 +297,7 @@ public:
   }
 
   /// @brief constructor taking parameters
-  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P){
+  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P) : TResponseFunction_red() {
     nPoints = N;
     // Save the parameters for each knot
     Par = new _float_*[nPoints];
@@ -610,7 +630,7 @@ public:
   }
 
   /// @brief CW: Evaluate the weight from a variation
-  inline double Eval(double var) {
+  inline double Eval(double var) override {
     // Get the segment for this variation
     int segment = FindX(var);
     // The get the coefficients for this variation

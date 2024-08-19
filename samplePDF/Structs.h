@@ -107,6 +107,12 @@ struct XsecNorms4 {
     int index;
 };
 
+/// Make an enum of the spline interpolation type
+enum RespFuncType {
+  kTSpline3_red,
+  kTF1_red,
+  kRespFuncTypes  //This only enumerates
+};
 
 /// Make an enum of the spline interpolation type
 enum SplineInterpolation {
@@ -114,8 +120,41 @@ enum SplineInterpolation {
   kLinear,
   kMonotonic,
   kAkima,
+  kLinearFunc,
   kSplineInterpolations  //This only enumerates
 };
+
+// **************************************************
+/// @brief Convert a RespFuncType type to a SplineInterpolation
+inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation i) {
+// **************************************************
+  RespFuncType Type = kRespFuncTypes;
+  switch(i) {
+    //  TSpline3 (third order spline in ROOT)
+    case kTSpline3:
+      Type = kTSpline3_red;
+      break;
+    case kLinear:
+      Type = kTSpline3_red;
+      break;
+    case kMonotonic:
+      Type = kTSpline3_red;
+      break;
+    //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
+    case kAkima:
+      Type = kTSpline3_red;
+      break;
+    case kLinearFunc:
+      Type = kTF1_red;
+      break;
+    default:
+      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return Type;
+}
 
 // **************************************************
 /// @brief Convert a LLH type to a string
@@ -125,18 +164,21 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
   switch(i) {
     //  TSpline3 (third order spline in ROOT)
     case kTSpline3:
-    name = "TSpline3";
-    break;
+      name = "TSpline3";
+      break;
     case kLinear:
-    name = "Linear";
-    break;
+      name = "Linear";
+      break;
     case kMonotonic:
-    name = "Monotonic";
-    break;
+      name = "Monotonic";
+      break;
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
     case kAkima:
-    name = "Akima";
-    break;
+      name = "Akima";
+      break;
+    case kLinearFunc:
+      name = "kLinearFunc";
+      break;
     default:
       std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
       std::cerr << "You gave  " << i << std::endl;
