@@ -1536,15 +1536,16 @@ void SMonolith::FindSplineSegment() {
     //KS: We expect new segment is very close to previous
     const _int_ PreviousSegment = SplineInfoArray[i].CurrSegment;
 
-    //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-    if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ) segment = PreviousSegment;
     // If the variation is below the lowest saved spline point
-    else if (xvar <= xArray[0]) {
+    if (xvar <= xArray[0]) {
       segment = 0;
       // If the variation is above the highest saved spline point
     } else if (xvar >= xArray[nPoints-1]) {
       //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
       segment = kHigh;
+      //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search, first we have to check if it is in bounds to avoid seg fault
+    } else if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ) {
+      segment = PreviousSegment;
       // If the variation is between the maximum and minimum, perform a binary search
     } else {
       // The top point we've got
