@@ -199,7 +199,7 @@ SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSp
 
 // *****************************************
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
-void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType) {
+void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType) {
 // *****************************************
 
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
@@ -293,13 +293,18 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   #else
   //KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
   cpu_nParamPerEvent.resize(2*NSplines_total);
+  cpu_nParamPerEvent_tf1.resize(2*NSplines_total);
   int ParamCounter = 0;
   int ParamCounterGlobal = 0;
+
+  int ParamCounter_TF1 = 0;
+  int ParamCounterGlobalTF1 = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
   for (unsigned int j = 0; j < 2*NSplines_total; j++) {
     cpu_nParamPerEvent[j] = -1;
+    cpu_nParamPerEvent_tf1[j] = -1;
   }
   #endif
   // Set index array and number of points arrays to something silly, again to be safe...
@@ -330,6 +335,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
   //KS: Some params has less splines but this is all right main array will get proper number while this temp will be deleted
   float *x_tmp = new float[_max_knots]();
   float *many_tmp = new float[_max_knots*_nCoeff_]();
+  float *temp_coeffs = new float[_nTF1Coeff_]();
+
   // Number of valid splines in total for our entire ensemble of events
   NSplines_valid = 0;
   NTF1_valid = 0;
@@ -388,7 +395,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
         // Don't actually use this ever -- we give each spline the maximum number of points found in all splines
         int nPoints_tmp = 0;
         // Get a pointer to the current spline for this event
-        TF1_red* CurrSpline = = dynamic_cast<TF1_red*>(*InnerIt);
+        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(*InnerIt);
         // If NULL we don't have this spline for the event, so move to next spline
         if (CurrSpline == NULL) continue;
 
@@ -409,7 +416,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
         ++NTF1_valid;
       }
       #ifndef Weight_On_SplineBySpline_Basis
-      ParamCounter++;
+      ParamCounter_TF1++;
       #endif
 
     } // End the loop over the parameters in the MasterSpline
@@ -417,11 +424,19 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSp
     cpu_nParamPerEvent[2*EventCounter] = ParamCounter;
     cpu_nParamPerEvent[2*EventCounter+1] = ParamCounterGlobal;
     ParamCounterGlobal += ParamCounter;
+
+
+    cpu_nParamPerEvent_tf1[2*EventCounter] = ParamCounter_TF1;
+    cpu_nParamPerEvent_tf1[2*EventCounter+1] = ParamCounterGlobalTF1;
+    ParamCounterGlobalTF1 += ParamCounter_TF1;
+
     ParamCounter = 0;
+    ParamCounter_TF1 = 0;
     #endif
   } // End the loop over the number of events
   delete[] many_tmp;
   delete[] x_tmp;
+  delete[] temp_coeffs;
 
   // Now that we have looped through all events we can make the number of splines smaller
   // Going from number of events * number of points per spline * number of NIWG params to spln_counter (=valid splines)
@@ -539,8 +554,279 @@ void SMonolith::MoveToGPU() {
 // *****************************************
 
 //TODO !!!!!!!!!!
+/// ZA TEMERIE!!!
 
+ #ifdef CUDA
+
+
+  /*
+  unsigned int event_size_max = _max_knots * nParams;
+  MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
+                (double(sizeof(float) * nKnots * _nCoeff_) + double(sizeof(float) * event_size_max) / 1.E6 +
+                double(sizeof(short int) * NSplines_valid)) / 1.E6);
+  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * NSplines_valid) / 1.E6);
+  #ifndef Weight_On_SplineBySpline_Basis
+  MACH3LOG_INFO("Since you are running Total event weight mode then GPU weight array (GPU->CPU every step) = {:.2f} MB",
+                double(sizeof(float) * NEvents) / 1.E6);
+  #endif
+  MACH3LOG_INFO("Parameter value array (CPU->GPU every step) = {:.4f} MB", double(sizeof(float) * nParams) / 1.E6);
+
+
+  //CW: With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
+  //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
+  //                                return gpu_weights
+
+  // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
+  // Can probably make this a bit prettier but will do for now
+  // Could be a lot smaller of a function...
+  InitGPU_SepMany(
+    &gpu_coeff_x,
+    &gpu_coeff_many,
+    &gpu_weights,
+
+    &gpu_paramNo_arr,
+    &gpu_nKnots_arr,
+    #ifndef Weight_On_SplineBySpline_Basis
+    &cpu_total_weights,
+    &gpu_total_weights,
+    NEvents,
+
+    &gpu_nParamPerEvent,
+    #endif
+    nKnots, // How many entries in coefficient array (*4 for the "many" array)
+  NSplines_valid, // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
+  event_size_max //Knots times event number of unique splines
+  );
+
+  // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
+  // The implementation lives in splines/gpuSplineUtils.cu
+  // The GPU splines don't actually need declaring but is good for demonstration, kind of
+  // fixed by passing const reference
+  CopyToGPU_SepMany(
+    gpu_paramNo_arr,
+    gpu_nKnots_arr,
+    gpu_coeff_x,
+    gpu_coeff_many,
+
+    cpu_paramNo_arr,
+    cpu_nKnots_arr,
+    cpu_coeff_x,
+    cpu_coeff_many,
+    #ifndef Weight_On_SplineBySpline_Basis
+    NEvents,
+    cpu_nParamPerEvent,
+    gpu_nParamPerEvent,
+    #endif
+    nParams,
+    NSplines_valid,
+    _max_knots,
+    nKnots);
+
+  // Delete all the coefficient arrays from the CPU once they are on the GPU
+  cpu_coeff_x.clear();
+  cpu_coeff_x.shrink_to_fit();
+  cpu_coeff_many.clear();
+  cpu_coeff_many.shrink_to_fit();
+  cpu_paramNo_arr.clear();
+  cpu_paramNo_arr.shrink_to_fit();
+  cpu_nKnots_arr.clear();
+  cpu_nKnots_arr.shrink_to_fit();
+  #ifndef Weight_On_SplineBySpline_Basis
+  cpu_nParamPerEvent.clear();
+  cpu_nParamPerEvent.shrink_to_fit();
+  #endif
+
+
+  */
+  //TODO !!!!!!!!!!
+
+
+
+  /*
+  std::cout << "  Total size = " << (double(sizeof(float)*NSplines_valid*_nTF1Coeff_)+double(2.0*sizeof(short int)*NSplines_valid))/1.E6 << " MB memory on CPU to move to GPU" << std::endl;
+  std::cout << "  GPU weight array (GPU->CPU every step) = " << double(sizeof(float)*NSplines_valid)/1.E6 << " MB" << std::endl;
+  std::cout << "  Parameter value array (CPU->GPU every step) = " << double(sizeof(float)*nParams)/1.E6 << " MB" << std::endl;
+  // With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
+  //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
+  //                                return gpu_weights
+
+  // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
+  // Can probably make this a bit prettier but will do for now
+  // Could be a lot smaller of a function...
+  InitGPU_TF1(
+    &gpu_coeff_many,
+    &gpu_paramNo_arr,
+    &gpu_nPoints_arr,
+
+    &gpu_weights,
+
+    #ifndef Weight_On_SplineBySpline_Basis
+    &cpu_total_weights,
+    &gpu_total_weights,
+    NEvents,
+    &gpu_nParamPerEvent,
+    #endif
+    NSplines_valid); // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
+
+    // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
+    // The implementation lives in splines/gpuSplineUtils.cu
+    // The GPU splines don't actually need declaring but is good for demonstration, kind of
+    // fixed by passing const reference
+    CopyToGPU_TF1(
+      gpu_coeff_many,
+      gpu_paramNo_arr,
+      gpu_nPoints_arr,
+
+      cpu_coeff_many,
+      cpu_paramNo_arr,
+      cpu_nPoints_arr,
+      #ifndef Weight_On_SplineBySpline_Basis
+      NEvents,
+      cpu_nParamPerEvent,
+      gpu_nParamPerEvent,
+      #endif
+      nParams,
+      NSplines_valid,
+      _max_knots);
+
+    // Delete all the coefficient arrays from the CPU once they are on the GPU
+    cpu_coeff_many.clear();
+    cpu_coeff_many.shrink_to_fit();
+    cpu_nPoints_arr.clear();
+    cpu_nPoints_arr.shrink_to_fit();
+    cpu_paramNo_arr.clear();
+    cpu_paramNo_arr.shrink_to_fit();
+    #ifndef Weight_On_SplineBySpline_Basis
+    cpu_nParamPerEvent.clear();
+    cpu_nParamPerEvent.shrink_to_fit();
+    #endif
+*/
+
+  MACH3LOG_INFO("Good TF1 GPU loading");
+  #endif
+  return;
 }
+
+
+
+// Need to specify template functions in header
+// *****************************************
+// Scan the master spline to get the maximum number of knots in any of the TSpline3*
+void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
+                                 unsigned int &nEvents,
+                                 int &MaxPoints,
+                                 short int &numParams,
+                                 int &nSplines,
+                                 unsigned int &numKnots,
+                                 const std::vector<RespFuncType> &SplineType) {
+// *****************************************
+
+  // Need to extract: the total number of events
+  //                  number of parameters
+  //                  maximum number of knots
+  MaxPoints = 0;
+  nEvents   = 0;
+  numParams   = 0;
+  nSplines = 0;
+  numKnots = 0;
+  std::vector<std::vector<TResponseFunction_red*> >::iterator OuterIt;
+  std::vector<TResponseFunction_red*>::iterator InnerIt;
+
+  // Check the number of events
+  nEvents = MasterSpline.size();
+
+  // Maximum number of splines one event can have (scan through and find this number)
+  int nMaxSplines_PerEvent = 0;
+
+  //KS: We later check that each event has the same number of splines so this is fine
+  numParams = MasterSpline[0].size();
+  // Initialise
+  SplineInfoArray = new FastSplineInfo[numParams];
+
+  unsigned int EventCounter = 0;
+  // Loop over each parameter
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
+    // Check that each event has each spline saved
+    if (numParams > 0) {
+      int TempSize = (*OuterIt).size();
+      if (TempSize != numParams) {
+        MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
+        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", numParams);
+        MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
+        throw;
+      }
+    }
+    numParams = (*OuterIt).size();
+
+    int nSplines_SingleEvent = 0;
+    // Loop over each pointer
+    int ij = 0;
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ij++) {
+      if ((*InnerIt) == NULL) continue;
+
+      if(SplineType[ij] == kTSpline3_red)
+      {
+        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(*InnerIt);
+        int nPoints = CurrSpline->GetNp();
+        if (nPoints > MaxPoints) {
+          MaxPoints = nPoints;
+        }
+        numKnots += nPoints;
+        nSplines_SingleEvent++;
+
+        // Fill the SplineInfoArray entries with information on each splinified parameter
+        if (SplineInfoArray[ij].xPts == NULL)
+        {
+          // Fill the number of points
+          SplineInfoArray[ij].nPts = CurrSpline->GetNp();
+
+          // Fill the x points
+          SplineInfoArray[ij].xPts = new _float_[SplineInfoArray[ij].nPts];
+          for (_int_ k = 0; k < SplineInfoArray[ij].nPts; ++k)
+          {
+            _float_ xtemp = -999.99;
+            _float_ ytemp = -999.99;
+            CurrSpline->GetKnot(k, xtemp, ytemp);
+            SplineInfoArray[ij].xPts[k] = xtemp;
+          }
+        }
+      }
+      else if (SplineType[ij] == kTF1_red)
+      {
+        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(*InnerIt);
+        int nPoints = CurrSpline->GetSize();
+        if (nPoints > MaxPoints) {
+          MaxPoints = nPoints;
+        }
+      }
+    }
+
+    if (nSplines_SingleEvent > nMaxSplines_PerEvent) nMaxSplines_PerEvent = nSplines_SingleEvent;
+    EventCounter++;
+  }
+  nSplines = nMaxSplines_PerEvent;
+
+  int Counter = 0;
+  //KS: Sanity check that everything was set correctly
+  for (_int_ i = 0; i < numParams; ++i)
+  {
+    // KS: We don't find segment for TF1, so ignore this
+    if (SplineType[numParams] == kTF1_red) continue;
+
+    const _int_ nPoints = SplineInfoArray[i].nPts;
+    const _float_* xArray = SplineInfoArray[i].xPts;
+    if (nPoints == -999 || xArray == NULL) {
+      Counter++;
+      if(Counter < 5) {
+        MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
+      }
+      continue;
+      //throw;
+    }
+  }
+  MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);
+}
+
 
 ////////////////////////////////////////////////////////////
 
@@ -560,6 +846,8 @@ SMonolith::SMonolith(std::string FileName)
 // Load SplineMonolith from ROOT file
 void SMonolith::LoadSplineFile(std::string FileName) {
 // *****************************************
+
+//// TODO NEEEED FIXING!!!!!
 
   #ifdef Weight_On_SplineBySpline_Basis
   MACH3LOG_ERROR("Trying to load Monolith from file using weight by weight base, this is not supported right now, sorry");
@@ -689,13 +977,15 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
   MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
 
-  PrepareForGPU_TSpline3();
+  MoveToGPU();
 }
 
 // *****************************************
 // Save SplineMonolith into ROOT file
 void SMonolith::PrepareSplineFile() {
 // *****************************************
+
+  //// TODO NEEEED FIXING!!!!!
 
   std::string FileName = "inputs/SplineFile.root";
   if (std::getenv("MACH3") != NULL) {
@@ -804,330 +1094,33 @@ void SMonolith::PrepareSplineFile() {
 }
 
 // *****************************************
-// The shared initialiser from constructors of TSpline3 and TSpline3_red
-void SMonolith::PrepareForGPU_TSpline3() {
-// *****************************************
-  #ifdef CUDA
-  unsigned int event_size_max = _max_knots * nParams;
-  MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
-              (double(sizeof(float) * nKnots * _nCoeff_) + double(sizeof(float) * event_size_max) / 1.E6 +
-              double(sizeof(short int) * NSplines_valid)) / 1.E6);
-  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * NSplines_valid) / 1.E6);
-  #ifndef Weight_On_SplineBySpline_Basis
-  MACH3LOG_INFO("Since you are running Total event weight mode then GPU weight array (GPU->CPU every step) = {:.2f} MB",
-              double(sizeof(float) * NEvents) / 1.E6);
-  #endif
-  MACH3LOG_INFO("Parameter value array (CPU->GPU every step) = {:.4f} MB", double(sizeof(float) * nParams) / 1.E6);
-
-
-  //CW: With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
-  //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
-  //                                return gpu_weights
-
-  // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
-  // Can probably make this a bit prettier but will do for now
-  // Could be a lot smaller of a function...
-  InitGPU_SepMany(
-      &gpu_coeff_x,
-      &gpu_coeff_many,
-      &gpu_weights,
-
-      &gpu_paramNo_arr,
-      &gpu_nKnots_arr,
-#ifndef Weight_On_SplineBySpline_Basis
-      &cpu_total_weights,
-      &gpu_total_weights,
-      NEvents,
-
-      &gpu_nParamPerEvent,
-#endif
-      nKnots, // How many entries in coefficient array (*4 for the "many" array)
-      NSplines_valid, // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
-      event_size_max //Knots times event number of unique splines
-);
-
-  // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
-  // The implementation lives in splines/gpuSplineUtils.cu
-  // The GPU splines don't actually need declaring but is good for demonstration, kind of
-  // fixed by passing const reference
-  CopyToGPU_SepMany(
-      gpu_paramNo_arr,
-      gpu_nKnots_arr,
-      gpu_coeff_x,
-      gpu_coeff_many,
-
-      cpu_paramNo_arr,
-      cpu_nKnots_arr,
-      cpu_coeff_x,
-      cpu_coeff_many,
-#ifndef Weight_On_SplineBySpline_Basis
-      NEvents,
-      cpu_nParamPerEvent,
-      gpu_nParamPerEvent,
-#endif
-      nParams,
-      NSplines_valid,
-      _max_knots,
-      nKnots);
-
-  // Delete all the coefficient arrays from the CPU once they are on the GPU
-  cpu_coeff_x.clear();
-  cpu_coeff_x.shrink_to_fit();
-  cpu_coeff_many.clear();
-  cpu_coeff_many.shrink_to_fit();
-  cpu_paramNo_arr.clear();
-  cpu_paramNo_arr.shrink_to_fit();
-  cpu_nKnots_arr.clear();
-  cpu_nKnots_arr.shrink_to_fit();
-  #ifndef Weight_On_SplineBySpline_Basis
-  cpu_nParamPerEvent.clear();
-  cpu_nParamPerEvent.shrink_to_fit();
-  #endif
-  MACH3LOG_INFO("Good GPU loading");
-#endif
-  return;
-}
-
-
-// *****************************************
-// The shared initialiser from constructors of TF1 and TF1_red
-void SMonolith::PrepareForGPU_TF1() {
-// *****************************************
-
-#ifdef CUDA
-  std::cout << "  Total size = " << (double(sizeof(float)*NSplines_valid*_nTF1Coeff_)+double(2.0*sizeof(short int)*NSplines_valid))/1.E6 << " MB memory on CPU to move to GPU" << std::endl;
-  std::cout << "  GPU weight array (GPU->CPU every step) = " << double(sizeof(float)*NSplines_valid)/1.E6 << " MB" << std::endl;
-  std::cout << "  Parameter value array (CPU->GPU every step) = " << double(sizeof(float)*nParams)/1.E6 << " MB" << std::endl;
-  // With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
-  //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
-  //                                return gpu_weights
-
-  // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
-  // Can probably make this a bit prettier but will do for now
-  // Could be a lot smaller of a function...
-  InitGPU_TF1(
-      &gpu_coeff_many,
-      &gpu_paramNo_arr,
-      &gpu_nPoints_arr,
-
-      &gpu_weights,
-
-#ifndef Weight_On_SplineBySpline_Basis
-      &cpu_total_weights,
-      &gpu_total_weights,
-      NEvents,
-      &gpu_nParamPerEvent,
-#endif
-      NSplines_valid); // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
-
-  // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
-  // The implementation lives in splines/gpuSplineUtils.cu
-  // The GPU splines don't actually need declaring but is good for demonstration, kind of
-  // fixed by passing const reference
-  CopyToGPU_TF1(
-      gpu_coeff_many,
-      gpu_paramNo_arr,
-      gpu_nPoints_arr,
-
-      cpu_coeff_many,
-      cpu_paramNo_arr,
-      cpu_nPoints_arr,
-#ifndef Weight_On_SplineBySpline_Basis
-      NEvents,
-      cpu_nParamPerEvent,
-      gpu_nParamPerEvent,
-#endif
-      nParams,
-      NSplines_valid,
-      _max_knots);
-
-  // Delete all the coefficient arrays from the CPU once they are on the GPU
-  cpu_coeff_many.clear();
-  cpu_coeff_many.shrink_to_fit();
-  cpu_nPoints_arr.clear();
-  cpu_nPoints_arr.shrink_to_fit();
-  cpu_paramNo_arr.clear();
-  cpu_paramNo_arr.shrink_to_fit();
-  #ifndef Weight_On_SplineBySpline_Basis
-  cpu_nParamPerEvent.clear();
-  cpu_nParamPerEvent.shrink_to_fit();
-  #endif
-  MACH3LOG_INFO("Good TF1 GPU loading");
-#endif
-  return;
-}
-
-// Need to specify template functions in header
-// *****************************************
-// Scan the master spline to get the maximum number of knots in any of the TSpline3*
-void SMonolith::ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > & MasterSpline, unsigned int &nEvents, int &MaxPoints, short int &numParams, int &nSplines, unsigned int &numKnots) {
-// *****************************************
-
-  // Need to extract: the total number of events
-  //                  number of parameters
-  //                  maximum number of knots
-  MaxPoints = 0;
-  nEvents   = 0;
-  numParams   = 0;
-  nSplines = 0;
-  numKnots = 0;
-  std::vector<std::vector<TSpline3_red*> >::iterator OuterIt;
-  std::vector<TSpline3_red*>::iterator InnerIt;
-
-  // Check the number of events
-  nEvents = MasterSpline.size();
-
-  // Maximum number of splines one event can have (scan through and find this number)
-  int nMaxSplines_PerEvent = 0;
-  
-  //KS: We later check that each event has the same number of splines so this is fine
-  numParams = MasterSpline[0].size();
-  // Initialise
-  SplineInfoArray = new FastSplineInfo[numParams];
-
-  unsigned int EventCounter = 0;
-  // Loop over each parameter
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
-    // Check that each event has each spline saved
-    if (numParams > 0) {
-      int TempSize = (*OuterIt).size();
-      if (TempSize != numParams) {
-        MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
-        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", numParams);
-        MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
-        throw;
-      }
-    }
-    numParams = (*OuterIt).size();
-
-    int nSplines_SingleEvent = 0;
-    // Loop over each pointer
-    int ij = 0;
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ij++) {
-      if ((*InnerIt) == NULL) continue;
-      int nPoints = (*InnerIt)->GetNp();
-      if (nPoints > MaxPoints) {
-        MaxPoints = nPoints;
-      }
-      numKnots += nPoints;
-      nSplines_SingleEvent++;
-      
-      // Fill the SplineInfoArray entries with information on each splinified parameter
-      if (SplineInfoArray[ij].xPts == NULL)
-      {
-        // Fill the number of points
-        SplineInfoArray[ij].nPts = (*InnerIt)->GetNp();
-
-        // Fill the x points
-        SplineInfoArray[ij].xPts = new _float_[SplineInfoArray[ij].nPts];
-        for (_int_ k = 0; k < SplineInfoArray[ij].nPts; ++k)
-        {
-          _float_ xtemp = -999.99;
-          _float_ ytemp = -999.99;
-          (*InnerIt)->GetKnot(k, xtemp, ytemp);
-          SplineInfoArray[ij].xPts[k] = xtemp;
-        }
-      }
-    }
-
-    if (nSplines_SingleEvent > nMaxSplines_PerEvent) nMaxSplines_PerEvent = nSplines_SingleEvent;
-    EventCounter++;
-  }
-  nSplines = nMaxSplines_PerEvent;
-  
-  int Counter = 0;
-  //KS: Sanity check that everything was set correctly
-  for (_int_ i = 0; i < numParams; ++i)
-  {
-    const _int_ nPoints = SplineInfoArray[i].nPts;
-    const _float_* xArray = SplineInfoArray[i].xPts;
-    if (nPoints == -999 || xArray == NULL) {
-      Counter++;
-      if(Counter < 5)
-      {
-        MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
-      }
-      continue;
-      //throw;
-    }
-  }
-  MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);
-}
-
-// Need to specify template functions in header
-// *****************************************
-// Scan the master spline to get the maximum number of knots in any of the TSpline3*
-void SMonolith::ScanMasterSpline(std::vector<std::vector<TF1_red*> > & MasterSpline, unsigned int &nEvents, int &MaxPoints, short int &numParams) {
-// *****************************************
-
-  // Need to extract: the total number of events
-  //                  number of parameters
-  //                  maximum number of knots
-  MaxPoints = 0;
-  nEvents   = 0;
-  numParams   = 0;
-
-  std::vector<std::vector<TF1_red*> >::iterator OuterIt;
-  std::vector<TF1_red*>::iterator InnerIt;
-
-  // Check the number of events
-  nEvents = MasterSpline.size();
-
-  unsigned int EventCounter = 0;
-  // Loop over each parameter
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
-    // Check that each event has each spline saved
-    if (numParams > 0) {
-      int TempSize = (*OuterIt).size();
-      if (TempSize != numParams) {
-        MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
-        MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", numParams);
-        MACH3LOG_ERROR("Somehow this event has a different number of spline parameters... Please study further!");
-        throw;
-      }
-    }
-    numParams = (*OuterIt).size();
-
-    // Loop over each pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt) {
-      if ((*InnerIt) == NULL) continue;
-      int nPoints = (*InnerIt)->GetSize();
-      if (nPoints > MaxPoints) {
-        MaxPoints = nPoints;
-      }
-    }
-    EventCounter++;
-  }
-}
-
-// *****************************************
 // Destructor
 // Cleans up the allocated GPU memory
 SMonolith::~SMonolith() {
-// *****************************************
+  // *****************************************
 
-#ifdef CUDA
+  #ifdef CUDA
   CleanupGPU_SepMany(
-      gpu_paramNo_arr,
-      gpu_nKnots_arr,
+    gpu_paramNo_arr,
+    gpu_nKnots_arr,
 
-      gpu_coeff_x,
-      gpu_coeff_many,
-      
-  #ifndef Weight_On_SplineBySpline_Basis
-      gpu_total_weights,
-      gpu_nParamPerEvent,
-      cpu_total_weights,
-  #endif
-      gpu_weights);
-  
+    gpu_coeff_x,
+    gpu_coeff_many,
+
+    #ifndef Weight_On_SplineBySpline_Basis
+    gpu_total_weights,
+    gpu_nParamPerEvent,
+    cpu_total_weights,
+    #endif
+    gpu_weights);
+
   //KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions
   CleanupGPU_Segments(segments, vals);
-#else
+  #else
   if(segments != NULL) delete[] segments;
   if(vals != NULL) delete[] vals;
   if(cpu_total_weights != NULL) delete[] cpu_total_weights;
-#endif
+  #endif
 
   if(SplineInfoArray != NULL) delete[] SplineInfoArray;
   if(cpu_weights != NULL) delete[] cpu_weights;
@@ -1361,7 +1354,7 @@ void SMonolith::Evaluate() {
       segments,
       NSplines_valid);
 
-/*
+/* TODO!!!!!
   RunGPU_TF1(
     gpu_coeff_many,
     gpu_paramNo_arr,
@@ -1539,7 +1532,7 @@ void SMonolith::CalcSplineWeights() {
       const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
       const float b = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_+1];
 
-      cpu_weights_tf1_var[tf1Num] = b + a*var;
+      cpu_weights_tf1_var[tf1Num] = b + a*x;
       //cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
     }
   #ifdef MULTITHREAD

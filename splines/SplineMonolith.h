@@ -12,19 +12,7 @@ class SMonolith : public SplineBase {
   public:
     /// @brief Constructor
     /// @param MasterSpline Vector of TSpline3 pointers which we strip back
-    SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
-    /// @brief Constructor
-    /// @param MasterSpline Vector of TSpline3 pointers which we strip back
-    SMonolith(std::vector< std::vector<TSpline3*> > &MasterSpline);
-    /// @brief Constructor
-    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
-    SMonolith(std::vector< std::vector<TSpline3_red*> > &MasterSpline);
-    /// @brief Constructor
-    /// @param MasterSpline Vector of TF1 pointers which we strip back
-    SMonolith(std::vector< std::vector<TF1*> > &MasterSpline);
-    /// @brief Constructor
-    /// @param MasterSpline Vector of TF1_red pointers which we strip back
-    SMonolith(std::vector< std::vector<TF1_red*> > &MasterSpline);
+    SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
     SMonolith(std::string FileName);
@@ -75,23 +63,18 @@ class SMonolith : public SplineBase {
     /// @param MaxPoints Maximal number of knots per splines
     /// @param numParams Total number of parameters
     /// @param numKnots Total number of knots, which is sum of individual knots per each spline
-    inline void ScanMasterSpline(std::vector<std::vector<TSpline3_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams, int &nSplines, unsigned int &numKnots);
-    /// @brief CW: Function to scan through the MasterSpline of TF1
-    /// @param MasterSpline Vector of TF1_red pointers which we strip back
-    /// @param NEvents Number of MC events
-    /// @param MaxPoints Maximal number of knots per splines
-    /// @param numParams Total number of parameters
-    inline void ScanMasterSpline(std::vector<std::vector<TF1_red*> > &MasterSpline, unsigned int &NEvents, int &MaxPoints, short int &numParams);
+    inline void ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
+                                 unsigned int &nEvents,
+                                 int &MaxPoints,
+                                 short int &numParams,
+                                 int &nSplines,
+                                 unsigned int &numKnots,
+                                 const std::vector<RespFuncType> &SplineType);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
-    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
-    inline void PrepareForGPU(std::vector<std::vector<TSpline3_red*> > &MasterSpline);
-    /// @brief CW: The shared initialiser from constructors of TSpline3 and TSpline3_red
-    inline void PrepareForGPU_TSpline3();
-    /// @brief CW: Prepare the TF1_red objects for the GPU
-    /// @param MasterSpline Vector of TF1_red pointers which we strip back
-    inline void PrepareForGPU(std::vector<std::vector<TF1_red*> > &MasterSpline);
-    /// @brief CW: The shared initialiser from constructors of TF1 and TF1_red
-    inline void PrepareForGPU_TF1();
+    /// @param MasterSpline Vector of TResponseFunction_red pointers which we strip back
+    inline void PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
+    /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
+    inline void MoveToGPU();
         
     /// @brief CW: Reduced the TSpline3 to TSpline3_red
     /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
@@ -182,6 +165,8 @@ class SMonolith : public SplineBase {
 
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent;
+
+    std::vector<unsigned int> cpu_nParamPerEvent_tf1;
     /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     unsigned int *gpu_nParamPerEvent;
 
