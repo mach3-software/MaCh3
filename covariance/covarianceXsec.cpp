@@ -68,11 +68,16 @@ void covarianceXsec::InitXsecFromConfig() {
 
 		 if (param["Systematic"]["SplineInformation"]["InterpolationType"]){
 
+		   bool FoundInterpolationType = false;
 		   for(int InterpType = 0 ; InterpType < kSplineInterpolations ; ++InterpType){
 			 if(param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
 			 {
+			   FoundInterpolationType = true;
 			   _fSplineInterpolationType.push_back(SplineInterpolation(InterpType));
 			 }
+		   }
+		   if(!FoundInterpolationType){
+			 MACH3LOG_ERROR("Could not match Spline interpolation type {} with any known ", param["Systematic"]["SplineInformation"]["InterpolationType"].as<std::string>());
 		   }
 		 }else{
 		   //KS: By default use TSpline3
@@ -80,7 +85,7 @@ void covarianceXsec::InitXsecFromConfig() {
 		 }
 	   }
 	   else{
-         MACH3LOG_ERROR("Spline Information does not exist for spline {}", param["Systematic"]["FancyName"].as<std::string>());
+         MACH3LOG_ERROR("Spline Information does not exist for spline {}", param["Systematic"]["Names"]["FancyName"].as<std::string>());
 	   }
 
 	   //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
@@ -166,6 +171,13 @@ void covarianceXsec::InitXsecFromConfig() {
 	 else isFlux[i] = false;
 	 i++;
   }
+
+  //Add a sanity check,
+  if(_fSplineNames.size() != SplineCounter){
+	MACH3LOG_ERROR("_fSplineNames is of size {} but found {} spline parameters", _fSplineNames.size(), SplineCounter);
+	throw;
+  }
+
   return;
 }
 
@@ -230,7 +242,7 @@ const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
 
   for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
-		returnVec.push_back(SplineIndex);
+		returnVec.push_back(SystIndex);
       } 
   }
   return returnVec;
@@ -712,10 +724,10 @@ void covarianceXsec::Print() {
 
 
   MACH3LOG_INFO("=====================================================");
-  MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|");
+  MACH3LOG_INFO("{:<4} {:<2} {:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", "#", "|", "Global Index", "|", "Name", "|", "Spline Interpolation", "|");
   MACH3LOG_INFO("-----------------------------------------------------");
   for (auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap) {
-	MACH3LOG_INFO("{:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", SplineIndex, "|", GetParFancyName(SystIndex), "|", SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|");
+	MACH3LOG_INFO("{:<4} {:<2} {:<4} {:<2} {:<10} {:<2} {:<30} {:<2}", SplineIndex, "|", SystIndex, "|", GetParFancyName(SystIndex), "|", SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|");
   }
   MACH3LOG_INFO("=====================================================");
 
