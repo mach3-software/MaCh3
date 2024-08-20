@@ -44,6 +44,7 @@ class covarianceXsec : public covarianceBase {
     //const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
+    const std::vector<int> GetGlobalSystIndexFromDetID(int DetID);
     int GetNumSplineParamsFromDetID(int DetID);
 
     //DB Get norm/func parameters depending on given DetID

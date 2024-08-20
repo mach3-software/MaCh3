@@ -242,6 +242,19 @@ const std::vector<int> covarianceXsec::GetSplineParsIndexFromDetID(int DetID) {
 
   for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+		returnVec.push_back(SplineIndex);
+      } 
+  }
+  return returnVec;
+}
+
+// ********************************************
+// DB Grab the Spline Indices for the relevant DetID
+const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(int DetID) {
+  std::vector<int> returnVec;
+
+  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
 		returnVec.push_back(SystIndex);
       } 
   }
