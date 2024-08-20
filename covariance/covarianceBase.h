@@ -91,6 +91,8 @@ class covarianceBase {
 
   // Get diagonal error for ith parameter
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
+  // Get the error for the ith parameter
+  const double GetError(const int i) {return _fError[i];}
 
   // Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -112,8 +114,6 @@ class covarianceBase {
   inline std::vector<double> getParameterMeans(){return par_means;}
   TH2D* GetCorrelationMatrix();
 
-  // What parameter Gets reweighted by what amount according to MCMC
-  inline double calcReWeight(const int bin) {return _fPropVal[bin];}
   //========
   //DB Pointer return
   //ETA - This might be a bit squiffy? If the vector gots moved from say a
