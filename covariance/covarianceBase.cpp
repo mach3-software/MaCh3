@@ -772,15 +772,14 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
   // *************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  std::cout << "Setting " << GetParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
-
+  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})" GetParName(parNo),  parNo, parVal);
   if (pca) TransferToPCA();
 }
 
 void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  std::cout << "Setting " << GetParName(parNo) << "(parameter " << parNo << ") to " << parVal << std::endl;
+  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})" GetParName(parNo),  parNo, parVal);
   if (pca) TransferToPCA();
 }
 
