@@ -114,10 +114,10 @@ MCMCProcessor::~MCMCProcessor() {
   delete Means_Gauss;
   delete Errors_Gauss;
   delete Means_HPD;
-  delete Errors_HPD; 
-  delete Errors_HPD_Positive; 
-  delete Errors_HPD_Negative; 
-  
+  delete Errors_HPD;
+  delete Errors_HPD_Positive;
+  delete Errors_HPD_Negative;
+
   if(hpost != nullptr)
   {
     for (int i = 0; i < nDraw; ++i) 
@@ -191,7 +191,6 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
     ++ParamNumber;
   }
 }
-
 
 // ***************
 void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
@@ -295,10 +294,21 @@ void MCMCProcessor::MakePostfit() {
 
     (*Central_Value)(i) = Prior;
 
-    GetArithmetic(hpost[i], i);
-    GetGaussian(hpost[i], i);
-    GetHPD(hpost[i], i);
-    
+    double Mean, Err, Err_p, Err_m;
+    GetArithmetic(hpost[i], Mean, Err);
+    (*Means)(i) = Mean;
+    (*Errors)(i) = Err;
+
+    GetGaussian(hpost[i], Mean, Err);
+    (*Means_Gauss)(i) = Mean;
+    (*Errors_Gauss)(i) = Err;
+
+    GetHPD(hpost[i], Mean, Err, Err_p, Err_m);
+    (*Means_HPD)(i) = Mean;
+    (*Errors_HPD)(i) = Err;
+    (*Errors_HPD_Positive)(i) = Err_p;
+    (*Errors_HPD_Negative)(i) = Err_m;
+
     // Write the results from the projection into the TVectors and TMatrices
     (*Covariance)(i,i) = (*Errors)(i)*(*Errors)(i);
     (*Correlation)(i,i) = 1.0;
@@ -2315,10 +2325,10 @@ void MCMCProcessor::SetupOutput() {
   Means_Gauss = new TVectorD(nDraw);
   Errors_Gauss = new TVectorD(nDraw);
   Means_HPD    = new TVectorD(nDraw);
-  Errors_HPD   = new TVectorD(nDraw); 
-  Errors_HPD_Positive = new TVectorD(nDraw); 
-  Errors_HPD_Negative = new TVectorD(nDraw); 
-    
+  Errors_HPD   = new TVectorD(nDraw);
+  Errors_HPD_Positive = new TVectorD(nDraw);
+  Errors_HPD_Negative = new TVectorD(nDraw);
+
   // Initialise to something silly
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -2338,7 +2348,7 @@ void MCMCProcessor::SetupOutput() {
       (*Covariance)(i, j) = _UNDEF_;
       (*Correlation)(i, j) = _UNDEF_;
     }
-  } 
+  }
   
   hpost = new TH1D*[nDraw]();
 }
@@ -2739,22 +2749,22 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 
 // **************************
 //CW: Get the mean and RMS of a 1D posterior
-void MCMCProcessor::GetArithmetic(TH1D * const hist, const int i) {
+void MCMCProcessor::GetArithmetic(TH1D * const hist, double& Mean, double& Error) {
 // **************************
-  (*Means)(i) = hist->GetMean();
-  (*Errors)(i) = hist->GetRMS();
+  Mean = hist->GetMean();
+  Error = hist->GetRMS();
 }
 
 // **************************
 //CW: Get Gaussian characteristics
-void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
+void MCMCProcessor::GetGaussian(TH1D *& hist, double& Mean, double& Error) {
 // **************************
-  const double mean = hist->GetMean();
+  const double meanval = hist->GetMean();
   const double err = hist->GetRMS();
   const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
 
   // Set the range for the Gaussian fit
-  Gauss->SetRange(mean - 1.5*err , mean + 1.5*err);
+  Gauss->SetRange(meanval - 1.5*err , meanval + 1.5*err);
   // Set the starting parameters close to RMS and peaks of the histograms
   Gauss->SetParameters(hist->GetMaximum()*err*std::sqrt(2*3.14), peakval, err);
 
@@ -2762,13 +2772,13 @@ void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
   hist->Fit(Gauss->GetName(),"Rq");
   hist->SetStats(0);
 
-  (*Means_Gauss)(i) = Gauss->GetParameter(1);
-  (*Errors_Gauss)(i) = Gauss->GetParameter(2);
+  Mean = Gauss->GetParameter(1);
+  Error = Gauss->GetParameter(2);
 }
 
 // ***************
 //CW: Get the highest posterior density from a TH1D
-void MCMCProcessor::GetHPD(TH1D* const hist, const int i, const double coverage) {
+void MCMCProcessor::GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_p, double& Error_m, const double coverage) {
 // ***************
   // Get the bin which has the largest posterior density
   const int MaxBin = hist->GetMaximumBin();
@@ -2849,10 +2859,10 @@ void MCMCProcessor::GetHPD(TH1D* const hist, const int i, const double coverage)
     sigma_hpd = std::fabs(hist->GetXaxis()->GetBinUpEdge(HighBin)-hist->GetBinCenter(MaxBin));
   }
 
-  (*Means_HPD)(i) = peakval;
-  (*Errors_HPD)(i) = sigma_hpd;
-  (*Errors_HPD_Positive)(i) = sigma_p;
-  (*Errors_HPD_Negative)(i) = sigma_m;
+  Mean = peakval;
+  Error = sigma_hpd;
+  Error_p = sigma_p;
+  Error_m = sigma_m;
 }
 
 // ***************
@@ -3169,7 +3179,6 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
   }
   return;
 }
-
 
 // **************************
 // KS: Get Savage Dickey point hypothesis test
