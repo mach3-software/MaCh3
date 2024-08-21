@@ -28,15 +28,27 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
   int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
   nSplineParams.push_back(nSplineParam);
 
-  //This holds the relative spline index i.e. 0 to nSplines
-  std::vector<int> SplineParsIndex_Sample = xsec->GetSplineParsIndexFromDetID(DetID);
-  SplineParsIndex.push_back(SplineParsIndex_Sample);
+  //This holds the global index of the spline i.e. 0 -> _fNumPar
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID);
+  //Keep track of this for all the samples
+  GlobalSystIndex.push_back(GlobalSystIndex_Sample);
+
+  //std::vector<int> SplineParsIndex_Sample_temp = xsec->GetSplineParsIndexFromDetID(DetID);
 
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
   SplineModeVecs.push_back(SplineModeVecs_Sample);
+
+ // int counter = 0;
+ // std::cout << "Name        |     Spline     |    SplineIndex    |    GlobalIndex " << std::endl;
+  //for(auto splineindex : SplineParsIndex_Sample){
+  //for(int spline_i = 0 ; spline_i < GlobalSystIndex_Sample.size() ; spline_i++){
+//	std::cout << (SplineFileParPrefixNames_Sample.at(spline_i)).c_str() << ",       " << counter << ",     " << SplineParsIndex_Sample_temp.at(spline_i) << ",   " << GlobalSystIndex_Sample.at(spline_i) << std::endl;
+//	counter++;
+ // }
+
 
   int nOscChan = OscChanFileNames.size();
   nOscChans.push_back(nOscChan);
@@ -66,9 +78,8 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
 void splineFDBase::TransferToMonolith()
 //****************************************
 {
-
   PrepForReweight(); 
-  MonolithSize = CountNumberOfLoadedSplines();
+  MonolithSize = CountNumberOfLoadedSplines(false, 1);
 
   if(MonolithSize!=MonolithIndex){
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
@@ -116,13 +127,14 @@ void splineFDBase::TransferToMonolith()
                 {
                   MACH3LOG_ERROR("Unique spline index not found");
 				  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
-				  MACH3LOG_ERROR("Couldn't match {} with any of the following modes:", SplineFileParPrefixNames[iSample][iSyst]);
+				  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nUniqueSysts);
 				  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
 				  {
-					std::cout << UniqueSystNames[iUniqueSyst] << ", ";
+					MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
 				  }//unique syst loop end				
                   throw;
                 }
+
                 int splineKnots;
                 if(splinevec_Monolith[splineindex]!=NULL){
                   isflatarray[splineindex]=false;
@@ -174,9 +186,10 @@ void splineFDBase::TransferToMonolith()
   return;
 }
 
-
-
 //****************************************
+// ETA - find the spline segment that the current parameter
+// value is in. This is now extremely similar to the
+// function in SplineMonolith.cpp
 void splineFDBase::FindSplineSegment()
 //****************************************
 {
@@ -192,21 +205,24 @@ void splineFDBase::FindSplineSegment()
     // Get the variation for this reconfigure for the ith parameter
     int GlobalIndex = UniqueSystIndices[iSyst];
 
-    __float__ xvar=__float__(xsec->calcReWeight(GlobalIndex));
+    __float__ xvar=__float__(xsec->getParProp(GlobalIndex));
     xVarArray[iSyst]=xvar;
     
-    //Rather than starting from 0 everytime, let's use what we know!    
-    int segment = UniqueSystCurrSegment[iSyst];
-    int kHigh = nPoints - 1;
-	if (xvar <= xArray[0]) {
+    __int__ segment = 0;
+	__int__ kHigh = nPoints - 1;
+
+    //KS: We expect new segment is very close to previous
+    const __int__ PreviousSegment = UniqueSystCurrSegment[iSyst];
+    //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
+    if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
+    // If the variation is below the lowest saved spline point
+	else if (xvar <= xArray[0]) {
 	  segment = 0;
 	  // If the variation is above the highest saved spline point
 	} else if (xvar >= xArray[nPoints-1]) {
 	  //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
 	  segment = kHigh;
 	  //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-	} else if( xArray[segment+1] > xvar && xvar >= xArray[segment] ) {
-	  continue;
 	} else {
       // The top point we've got
       __int__ kHalf = 0;
@@ -245,7 +261,6 @@ void splineFDBase::FindSplineSegment()
 //    }
 //#endif
   } //end loop over params
-
 }
 
 //****************************************
@@ -281,6 +296,8 @@ void splineFDBase::calcWeights()
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
 
 
+	//ETA - do we need this? We check later for negative weights and I wonder if this is even
+	//possible with the fmaf line above?
     if(weight<0){weight=0;}  //Stops is getting negative weights
 
     weightvec_Monolith[iSpline]=double(weight);
@@ -371,17 +388,13 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   {
     isHist2D = true;
   }
+
+  //For T2K annoyingly all objects are TH3Fs
   if (Obj->IsA() == TH3F::Class())
   {
     isHist3D = true;
   }
 
-  if (isHist2D && isHist3D)
-  {
-    std::cerr << "Object inherits from both TH2D and TH3D - Odd" << std::endl;
-    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
-  }
   if (!isHist2D && !isHist3D)
   {
     std::cerr << "Object doesn't inherit from either TH2D and TH3D - Odd A" << std::endl;
@@ -446,8 +459,6 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis)
   {
-    std::cout << "Stored Var " << iAxis << " (" << getDimLabel(iSample, iAxis) << ") Spline Binning for sample " << SampleNames[iSample] << ":" << std::endl;
-	std::cout << "ReturnVec is of size " << ReturnVec.size() << std::endl;
     PrintBinning(ReturnVec[iAxis]);
   }
 
@@ -460,11 +471,10 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
 
   File->Close();
+  delete File;
   delete DummyAxis;
   return ReturnVec;
 }
-
-
 
 //****************************************
 int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
@@ -537,7 +547,7 @@ void splineFDBase::PrepForReweight()
 //****************************************
 {
 
-  std::vector<TSpline3_red *> UniqueSystSplines;
+  std::vector<TSpline3_red*> UniqueSystSplines;
 
   // DB Find all the Unique systs across each sample and oscillation channel
   //    This assumes that each occurence of the same systematic spline has the same knot spacing
@@ -577,7 +587,7 @@ void splineFDBase::PrepForReweight()
                   if (splinevec_Monolith[splineindex] != NULL)
                   {
                     UniqueSystSplines.push_back(splinevec_Monolith[splineindex]);
-                    UniqueSystIndices.push_back(SplineParsIndex[iSample][iSyst]);
+                    UniqueSystIndices.push_back(GlobalSystIndex[iSample][iSyst]);
                     FoundNonFlatSpline = true;
                   }
                   if (FoundNonFlatSpline)
@@ -612,9 +622,8 @@ void splineFDBase::PrepForReweight()
 
         if (!FoundNonFlatSpline)
         {
-          //std::cerr << SystName << " syst has no response in sample " << iSample << std::endl;
-          //std::cerr << "Whilst this isn't neccessarily a problem, it seems odd" << std::endl;
-          //std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
+		  MACH3LOG_INFO("{} syst has no response in sample {}", SystName, iSample);
+		  MACH3LOG_INFO("Whilst this isn't neccessarily a problem, it seems odd");
           continue;
         }
       }
@@ -664,7 +673,6 @@ void splineFDBase::PrepForReweight()
     std::cout << std::setw(15) << iUniqueSyst << " | " << std::setw(20) << UniqueSystNames[iUniqueSyst] << " | " << std::setw(6) << UniqueSystNKnots[iUniqueSyst] << std::endl;
   }
   std::cout << std::endl;
-
 
   //ETA
   //Isn't this just doing what CountNumberOfLoadedSplines() does?

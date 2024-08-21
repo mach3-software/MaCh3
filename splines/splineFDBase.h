@@ -40,8 +40,8 @@ class splineFDBase
 	  SplineFileParPrefixNames.shrink_to_fit();
 	  SplineBinning.clear();
 	  SplineBinning.shrink_to_fit();
-	  SplineParsIndex.clear();
-	  SplineParsIndex.shrink_to_fit();
+	  GlobalSystIndex.clear();
+	  GlobalSystIndex.shrink_to_fit();
 	  UniqueSystNames.clear();
 	  UniqueSystNames.shrink_to_fit();
 	  splinevec_Monolith.clear();
@@ -91,8 +91,12 @@ class splineFDBase
 	std::vector<int> nSplineParams;
 	std::vector<int> nOscChans;
 
-	std::vector< std::vector<int> > SplineParsIndex;
+	//This holds the global spline index and is used to grab the current parameter value
+    // to evaluate splines at. Each internal vector will be of size of the number of spline
+    // systematics which affect that sample.
+	std::vector< std::vector<int> > GlobalSystIndex;
 	std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
+	/// 
 	std::vector< std::vector<std::string> > SplineFileParPrefixNames;
 	//A vector of vectors of the spline modes that a systematic applies to
 	//This gets compared against the event mode to figure out if a syst should 
@@ -111,7 +115,7 @@ class splineFDBase
 	std::vector<int > coeffindexvec;
 	std::vector<int>uniquecoeffindices; //Unique coefficient indices
 
-	std::vector< TSpline3_red* > splinevec_Monolith;
+	std::vector<TSpline3_red*> splinevec_Monolith;
 
 	int MonolithSize;
 	int MonolithIndex;
