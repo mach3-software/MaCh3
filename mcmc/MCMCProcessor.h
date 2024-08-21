@@ -63,8 +63,7 @@ class MCMCProcessor {
   public:
     /// @brief Constructs an MCMCProcessor object with the specified input file and options.
     /// @param InputFile The path to the input file containing MCMC data.
-    /// @param MakePostfitCorr A boolean indicating whether to apply post-fit corrections during processing.
-    MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
+    MCMCProcessor(const std::string &InputFile);
     /// @brief Destroys the MCMCProcessor object.
     virtual ~MCMCProcessor();
 
@@ -300,7 +299,8 @@ class MCMCProcessor {
     /// This function computes the Effective Sample Size (ESS) using the autocorrelations
     /// calculated by AutoCorrelation(). Ensure that the parameter nLags here matches
     /// the number of lags used in AutoCorrelation() to obtain accurate results.
-    inline void CalculateESS(const int nLags);
+    /// @param LagL Value of LagL for each dial and each Lag
+    inline void CalculateESS(const int nLags, double **LagL);
     /// @brief Get the batched means variance estimation and variable indicating if number of batches is sensible
     inline void BatchedAnalysis();
     /// @brief CW: Batched means, literally read from an array and chuck into TH1D
@@ -366,8 +366,10 @@ class MCMCProcessor {
     std::vector<int> ParamTypeStartPos;
     
     /// In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
+    /// @warning will become deprecated
     std::vector<bool>   IsXsec; 
     /// This keep number of Flux params in xsec matrix
+    /// @warning will become deprecated
     int nFlux;
 
     /// Vector of each systematic
@@ -380,17 +382,12 @@ class MCMCProcessor {
     /// Name of canvas which help to save to the sample pdf
     TString CanvasName;
 
-    //Plotting flags
-    bool PlotXSec;
-    bool PlotDet;
-    /// whether we plot flat prior or not
+    /// Whether we plot flat prior or not, we usually provide error even for flat prior params
     bool PlotFlatPrior;
     /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
     
     //Even more flags
-    /// Make correlation matrix or not
-    bool MakeCorr;
     /// Whether we plot relative to prior or nominal, in most cases is prior
     bool plotRelativeToPrior;
     /// Sanity check if Postfit is already done to not make several times
@@ -477,8 +474,6 @@ class MCMCProcessor {
     double *ParamSums;
     /// Values of batched average for every param and batch
     double **BatchedAverages;
-    /// Value of LagL for each dial and each Lag
-    double **LagL;
 
     /// Holds the sample values
     double **SampleValues;

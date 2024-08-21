@@ -63,7 +63,7 @@ void ProcessMCMC(std::string inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
   // Make the processor)
-  MCMCProcessor* Processor = new MCMCProcessor(inputFile, false);
+  MCMCProcessor* Processor = new MCMCProcessor(inputFile);
 
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -151,7 +151,7 @@ void MultipleProcessMCMC()
   {
     MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
-    Processor[ik] = new MCMCProcessor(FileNames[ik], false);
+    Processor[ik] = new MCMCProcessor(FileNames[ik]);
     Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
 
     Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {""}));

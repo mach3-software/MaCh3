@@ -9,8 +9,8 @@
 #endif
 
 // ****************************
-MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
-  Chain(nullptr), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
+MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
+  Chain(nullptr), StepCut(""), MadePostfit(false) {
 // ****************************
   MCMCFile = InputFile;
 
@@ -31,7 +31,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   
   ParamSums = nullptr;
   BatchedAverages = nullptr;
-  LagL = nullptr;
   SampleValues = nullptr;
   SystValues = nullptr;
   AccProbValues = nullptr;
@@ -235,7 +234,6 @@ void MCMCProcessor::MakeOutputFile() {
   OutputFile = new TFile(OutputName.c_str(), "recreate");
   OutputFile->cd();
 }
-
 
 // ****************************
 //CW: Function to make the post-fit
@@ -559,7 +557,7 @@ void MCMCProcessor::DrawPostfit() {
 
   OutputFile->cd();
   //KS: Plot Xsec and Flux
-  if (PlotXSec == true)
+  if (nParam[kXSecPar] > 0)
   {
     const int Start = ParamTypeStartPos[kXSecPar];
     // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
@@ -618,7 +616,7 @@ void MCMCProcessor::DrawPostfit() {
     if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
-  if(PlotDet)
+  if(nParam[kNDPar] > 0)
   {
     int Start = ParamTypeStartPos[kNDPar];
     int NDbinCounter = Start;
@@ -2233,14 +2231,12 @@ void MCMCProcessor::ScanInput() {
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kXSecPar);
-      PlotXSec = true;
       nParam[kXSecPar]++;
     }
     else if (bname.BeginsWith("ndd_"))
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kNDPar);
-      PlotDet = true;
       nParam[kNDPar]++;
     }
     else if (bname.BeginsWith("skd_joint_"))
@@ -3465,8 +3461,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
   if(ParStep != nullptr)
   {
     MACH3LOG_ERROR("It look like ParStep was already filled ");
-    MACH3LOG_ERROR("Eventhough it is used for MakeCovariance_MP and for DiagMCMC");
-    MACH3LOG_ERROR("it has differnt structure in both for cache hits, sorry ");
+    MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC");
+    MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
     throw;
   }
   if(nBatches == 0)
@@ -3741,7 +3737,7 @@ void MCMCProcessor::AutoCorrelation() {
   // The sum of (Y-Ymean)^2 over all steps for each parameter
   double **DenomSum = new double*[nDraw]();
   double **NumeratorSum = new double*[nDraw]();
-  LagL = new double*[nDraw];
+  double **LagL = new double*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
     DenomSum[j] = new double[nLags];
     NumeratorSum[j] = new double[nLags];
@@ -3854,7 +3850,7 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] LagKPlots;
 
   //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
-  CalculateESS(nLags);
+  CalculateESS(nLags, LagL);
 
   for (int j = 0; j < nDraw; ++j) {
     delete[] NumeratorSum[j];
@@ -3960,14 +3956,14 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
 // Furthermore we calculate Sampling efficiency following https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
 // Rule of thumb is to have efficiency above 25%
-void MCMCProcessor::CalculateESS(const int nLags) {
+void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
 // **************************
-
   if(LagL == nullptr)
   {
-    MACH3LOG_ERROR("Trying to call CalculateESS before LagL was calcauted, this will not work");
+    MACH3LOG_ERROR("LagL is nullptr");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+
   MACH3LOG_INFO("Making ESS plots...");
     
   TVectorD* EffectiveSampleSize = new TVectorD(nDraw);
