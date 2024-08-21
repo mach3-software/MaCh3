@@ -268,14 +268,17 @@ class MCMCProcessor {
 
     //Analyse posterior distribution
     /// @brief Get Arithmetic mean from posterior
+    /// @param hist histograms from which we extract arithmetic mean
     /// @param Mean Arithmetic Mean value
     /// @param Error Arithmetic Error value
     inline void GetArithmetic(TH1D * const hist, double& Mean, double& Error);
     /// @brief Fit Gaussian to posterior
+    /// @param hist histograms to which we fit gaussian
     /// @param Mean Gaussian Mean value
     /// @param Error Gaussian Error value
     inline void GetGaussian(TH1D *& hist, double& Mean, double& Error);
     /// @brief Get Highest Posterior Density (HPD)
+    /// @param hist histograms from which we HPD
     /// @param Mean HPD Mean value
     /// @param Error HPD Error value
     /// @param Error_p HPD Negative (left hand side) Error value
