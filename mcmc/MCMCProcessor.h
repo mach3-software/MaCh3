@@ -31,6 +31,7 @@
 #include "TKey.h"
 #include "TRandom3.h"
 #include "TGraphPolar.h"
+#include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
 

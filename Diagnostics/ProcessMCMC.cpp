@@ -61,9 +61,8 @@ int main(int argc, char *argv[])
 
 void ProcessMCMC(std::string inputFile)
 {
-  std::cout << "File for study: " << inputFile << " with config  "<<config<<std::endl;
-    
-  // Make the processor
+  MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
+  // Make the processor)
   MCMCProcessor* Processor = new MCMCProcessor(inputFile, false);
 
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
@@ -307,7 +306,7 @@ void MultipleProcessMCMC()
   if(GetFromManager<bool>(Settings["PerformKStest"], true)) KolmogorovSmirnovTest(Processor, Posterior, canvasname);
   
   // Close the pdf file
-  std::cout << "Closing pdf " << canvasname << std::endl;
+  MACH3LOG_INFO("Closing pdf {}", canvasname);
   canvasname+="]";
   Posterior->Print(canvasname);
   
@@ -358,7 +357,6 @@ void CalcSavageDickey(MCMCProcessor* Processor)
   return;
 }
 
-
 void CalcBipolarPlot(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
@@ -374,10 +372,7 @@ void CalcBipolarPlot(MCMCProcessor* Processor)
   return;
 }
 
-
-void GetTrianglePlot(MCMCProcessor* Processor){
-  std::cout<<std::endl;
-
+void GetTrianglePlot(MCMCProcessor* Processor) {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
@@ -413,7 +408,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   Canvas->SetRightMargin(0.15);
   Canvas->SetLeftMargin(0.10);
   
-  //KS: Fancy colots
+  //KS: Fancy colours
   const int NRGBs = 10;
   TColor::InitializeColors();
   Double_t stops[NRGBs] = { 0.00, 0.10, 0.25, 0.35, 0.50, 0.60, 0.65, 0.75, 0.90, 1.00 };
@@ -436,7 +431,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   const int IntervalsSize = entries/NIntervals;
   //We start with burn from 0 (no burn in at all)
   int BurnIn = 0;
-  std::cout<<"Diagnosing matrices with entries="<< entries<<", NIntervals="<<NIntervals<<" and IntervalsSize="<<IntervalsSize<<std::endl;
+  MACH3LOG_INFO("Diagnosing matrices with entries={}, NIntervals={} and IntervalsSize={}", entries, NIntervals, IntervalsSize);
 
   TMatrixDSym *Covariance = nullptr;
   TMatrixDSym *Correlation = nullptr;
@@ -459,7 +454,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   delete Correlation;
   Correlation = nullptr;
   
-  //KS: Loop over alls dsired cuts
+  //KS: Loop over all desired cuts
   for(int k = 1; k < NIntervals; ++k)
   {
     BurnIn = k*IntervalsSize;
@@ -575,7 +570,6 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
 
 void ReweightPrior(MCMCProcessor* Processor)
 {
-  std::cout<<std::endl;
 
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -597,11 +591,10 @@ TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, std::string title)
   {
     for(int j = 0; j < Matrix->GetNcols(); j++)
     {
-      //KS: +1 becasue there is offset in histogram realtive to TMatrix
+      //KS: +1 because there is offset in histogram relative to TMatrix
       hMatrix->SetBinContent(i+1,j+1, (*Matrix)(i,j));
     }
   }
-  
   return hMatrix;
 }
 
