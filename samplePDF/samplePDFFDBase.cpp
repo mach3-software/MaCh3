@@ -20,6 +20,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   SampleName.push_back("FDsample");
 
   //Default TestStatistic is kPoisson
+  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   fTestStatistic = kPoisson;
 }
 
@@ -217,7 +218,7 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
 double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en)
 {
   MCSamples[sample].Oscillator->SetMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], en, doubled_angle, nutype);
-  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpar[7], *oscpar[8]); 
+  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpars[7], *oscpars[8]); 
 
   return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
 }
@@ -442,12 +443,6 @@ void samplePDFFDBase::fillArray_MP()
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
-//  std::cout << "~~~~~~~~~~" << std::endl;
-//  std::cout << "In samplePDFFDBase::fillArray_MP " << std::endl; 
-//  std::cout << "nXBins is " << nXBins << std::endl;
-//  std::cout << "nYBins is " << nYBins << std::endl;
-//  std::cout << "~~~~~~~~~~" << std::endl;
-
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
 	  for (int xBin=0;xBin<nXBins;xBin++) {
@@ -524,7 +519,6 @@ void samplePDFFDBase::fillArray_MP()
 		//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
         splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-		//std::cout << "Spline weight is " << splineweight << std::endl;
 		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
 		if (splineweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -1406,7 +1400,6 @@ void samplePDFFDBase::fillSplineBins() {
 
   std::cout << "Now in fillSplineBins" << std::endl;
   for (int i = 0; i < (int)MCSamples.size(); ++i) {
-	//std::cout << "Found " << MCSamples[i].nEvents << " in sample " << i << std::endl;
 	//Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
 
@@ -1424,26 +1417,8 @@ void samplePDFFDBase::fillSplineBins() {
 		MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
 		break;
 	  }
-	  /*
-	  switch (BinningOpt) {
-		case 0: // splines binned in erec
-		case 1:
-		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
-		  break;
-		case 2:
-		  //Straight out of SKBase
-		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j])*0.001, *(MCSamples[i].y_var[j]));
-		  //FD base
-		  //EventSplines = MCSamples[i].splineFile->GetEventSplines(SampleName, j, *(MCSamples[i].mode[j]), MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j], MCSamples[i].yvar_s_bin[j]); 
-		  break;
-		default:
-		  std::cout << "Error in assigning spline bins because BinningOpt = " << BinningOpt << std::endl;
-		  break;
-	  }
-	  */
 
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
-
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
  
 	  for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
@@ -1453,12 +1428,8 @@ void samplePDFFDBase::fillSplineBins() {
 	  }
 
 	}
-	//I think this is now obsolete due to spline monolith
-    //MCSamples[i].splineFile->SetSplineInfoArrays();
   }
-
   std::cout << "Filled spline bins" << std::endl;
-
   return;
 }
 
@@ -1488,11 +1459,9 @@ double samplePDFFDBase::GetLikelihood()
         double DataVal = samplePDFFD_data[yBin][xBin];
         double MCPred = samplePDFFD_array[yBin][xBin];
         double w2 = samplePDFFD_array_w2[yBin][xBin];
+
         //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
-		//ETA: there seems to be some bug in here which needs to be fixed. I
-		//see differences even when kPoisson is set?
-        //negLogL += getTestStatLLH(DataVal, MCPred, w2);
-        negLogL += getTestStatLLH(DataVal, MCPred);
+        negLogL += getTestStatLLH(DataVal, MCPred, w2);
     }
   }
   return negLogL;
