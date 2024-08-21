@@ -46,6 +46,9 @@ public:
 
   int GetNDim(); //DB Function to differentiate 1D or 2D binning
 
+  /// @brief Returns binning options
+  int GetBinningOpt(){return BinningOpt;}
+
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
@@ -159,8 +162,6 @@ public:
   // Calculate the norm weight for a given event
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
   virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
-
-  int GetBinningOpt(){return BinningOpt;}
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
