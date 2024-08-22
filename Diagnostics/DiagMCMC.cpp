@@ -28,7 +28,7 @@ void DiagMCMC(std::string inputFile, std::string config)
   YAML::Node Settings = YAML::LoadFile(config);
 
   // Make the processor
-  MCMCProcessor* Processor = new MCMCProcessor(inputFile, false);
+  MCMCProcessor* Processor = new MCMCProcessor(inputFile);
 
   Processor->SetOutputSuffix("_MCMC_Diag");
   //KS:Turn off plotting detector and some other setting

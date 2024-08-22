@@ -379,7 +379,7 @@ void FitterBase::ProcessMCMC() {
   if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
 
     // Make the processor
-    MCMCProcessor Processor(std::string(outputFile->GetName()), false);
+    MCMCProcessor Processor(std::string(outputFile->GetName()));
 
     Processor.Initialise();
     // Make the TVectorD pointers which hold the processed output

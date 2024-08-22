@@ -31,6 +31,7 @@
 #include "TKey.h"
 #include "TRandom3.h"
 #include "TGraphPolar.h"
+#include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
 
@@ -62,8 +63,7 @@ class MCMCProcessor {
   public:
     /// @brief Constructs an MCMCProcessor object with the specified input file and options.
     /// @param InputFile The path to the input file containing MCMC data.
-    /// @param MakePostfitCorr A boolean indicating whether to apply post-fit corrections during processing.
-    MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr);
+    MCMCProcessor(const std::string &InputFile);
     /// @brief Destroys the MCMCProcessor object.
     virtual ~MCMCProcessor();
 
@@ -269,14 +269,22 @@ class MCMCProcessor {
     //Analyse posterior distribution
     /// @brief Get Arithmetic mean from posterior
     /// @param hist histograms from which we extract arithmetic mean
-    inline void GetArithmetic(TH1D * const hist, const int i);
+    /// @param Mean Arithmetic Mean value
+    /// @param Error Arithmetic Error value
+    inline void GetArithmetic(TH1D * const hist, double& Mean, double& Error);
     /// @brief Fit Gaussian to posterior
     /// @param hist histograms to which we fit gaussian
-    inline void GetGaussian(TH1D *& hist, const int i);
+    /// @param Mean Gaussian Mean value
+    /// @param Error Gaussian Error value
+    inline void GetGaussian(TH1D *& hist, double& Mean, double& Error);
     /// @brief Get Highest Posterior Density (HPD)
     /// @param hist histograms from which we HPD
+    /// @param Mean HPD Mean value
+    /// @param Error HPD Error value
+    /// @param Error_p HPD Negative (left hand side) Error value
+    /// @param Error_m HPD Positive (right hand side) Error value
     /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-    inline void GetHPD(TH1D * const hist, const int i, const double coverage = 0.6827);
+    inline void GetHPD(TH1D * const hist, double& Mean, double& Error, double& Error_p, double& Error_m, const double coverage = 0.6827);
     /// @brief Get 1D Credible Interval
     /// @param hist histograms based on which we calculate credible interval
     /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
@@ -295,11 +303,12 @@ class MCMCProcessor {
     inline void AutoCorrelation();
     /// @brief KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
     /// @param nLags Should be the same nLags as used in AutoCorrelation()
+    /// @param LagL Value of LagL for each dial and each Lag
     ///
     /// This function computes the Effective Sample Size (ESS) using the autocorrelations
     /// calculated by AutoCorrelation(). Ensure that the parameter nLags here matches
     /// the number of lags used in AutoCorrelation() to obtain accurate results.
-    inline void CalculateESS(const int nLags);
+    inline void CalculateESS(const int nLags, double **LagL);
     /// @brief Get the batched means variance estimation and variable indicating if number of batches is sensible
     inline void BatchedAnalysis();
     /// @brief CW: Batched means, literally read from an array and chuck into TH1D
@@ -338,14 +347,13 @@ class MCMCProcessor {
     int nSamples;
     /// Number of covariance objects
     int nSysts;
+    /// Number of all parameters used in the analysis
+    int nDraw;
 
     //Name of all branches as well as branches we don't want to include in the analysis
     std::vector<TString> BranchNames;
     std::vector<std::string> ExcludedTypes;
     std::vector<std::string> ExcludedNames;
-    
-    /// Number of all parameters used in the analysis
-    int nDraw;
     
     /// Is the ith parameter varied
     std::vector<bool> IamVaried;
@@ -365,8 +373,10 @@ class MCMCProcessor {
     std::vector<int> ParamTypeStartPos;
     
     /// In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
-    std::vector<bool>   IsXsec; 
+    /// @warning will become deprecated
+    std::vector<bool> IsXsec;
     /// This keep number of Flux params in xsec matrix
+    /// @warning will become deprecated
     int nFlux;
 
     /// Vector of each systematic
@@ -379,17 +389,12 @@ class MCMCProcessor {
     /// Name of canvas which help to save to the sample pdf
     TString CanvasName;
 
-    //Plotting flags
-    bool PlotXSec;
-    bool PlotDet;
-    /// whether we plot flat prior or not
+    /// Whether we plot flat prior or not, we usually provide error even for flat prior params
     bool PlotFlatPrior;
     /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
     
     //Even more flags
-    /// Make correlation matrix or not
-    bool MakeCorr;
     /// Whether we plot relative to prior or nominal, in most cases is prior
     bool plotRelativeToPrior;
     /// Sanity check if Postfit is already done to not make several times
@@ -431,11 +436,11 @@ class MCMCProcessor {
     /// Vector with mean values using Highest Posterior Density
     TVectorD *Means_HPD;
     /// Vector with error values using Highest Posterior Density
-    TVectorD *Errors_HPD; 
+    TVectorD *Errors_HPD;
     /// Vector with positive error (right hand side) values using Highest Posterior Density
-    TVectorD *Errors_HPD_Positive; 
+    TVectorD *Errors_HPD_Positive;
     /// Vector with negative error (left hand side) values using Highest Posterior Density
-    TVectorD *Errors_HPD_Negative; 
+    TVectorD *Errors_HPD_Negative;
 
     /// Posterior Covariance Matrix
     TMatrixDSym *Covariance;
@@ -476,8 +481,6 @@ class MCMCProcessor {
     double *ParamSums;
     /// Values of batched average for every param and batch
     double **BatchedAverages;
-    /// Value of LagL for each dial and each Lag
-    double **LagL;
 
     /// Holds the sample values
     double **SampleValues;
