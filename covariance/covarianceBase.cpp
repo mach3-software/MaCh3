@@ -1071,7 +1071,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
   } else {
 
 	if (pars.size() != size_t(size)) {
-      std::cerr << "Warning: parameter arrays of incompatible size! Not changing parameters! " << matrixName << " has size " << pars.size() << " but was expecting " << size << std::endl;
+	  MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), size);
       throw;
     }
 
@@ -1079,7 +1079,7 @@ void covarianceBase::setParameters(std::vector<double> pars) {
     for (unsigned int i = 0; i < parsSize; i++) {
 	  //Make sure that you are actually passing a number to set the parameter to
 	  if(isnan(pars[i])) {
-		std::cerr << "Error: trying to set parameter value to a nan for parameter " << GetParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
+	    MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
 		throw;
 	  } else {
 		_fPropVal[i] = pars[i];
@@ -1087,11 +1087,11 @@ void covarianceBase::setParameters(std::vector<double> pars) {
     }
   }
 
+  MACH3LOG_DEBUG("Set parameters to:");
   std::cout << "Set parameters to: " << std::endl;
   for(int par_i = 0 ; par_i < pars.size() ; ++par_i){
-    std::cout << par_i << " : " << _fPropVal[par_i] << std::endl;
+	MACH3LOG_DEBUG("{} : {}", par_i, _fPropVal[par_i]);
   }
-
 
   // And if pca make the transfer
   if (pca) {
@@ -1116,12 +1116,12 @@ void covarianceBase::setBranches(TTree &tree) {
 }
 
 void covarianceBase::setStepScale(double scale) {
-    if(scale == 0)
-    {
-        std::cerr << "You are trying so set StepScale to 0 this will not work"<< std::endl;
-        throw;   
-    }
-  std::cout << getName() << " setStepScale() = " << scale << std::endl;
+  if(scale == 0)
+  {
+	MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
+	throw;   
+  }
+  MACH3LOG_INFO("Set global step scale for covariance matrix {} to {}", getName(), scale);
   _fGlobalStepScale = scale;
 }
 
