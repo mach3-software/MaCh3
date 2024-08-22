@@ -27,7 +27,6 @@ class covarianceXsec : public covarianceBase {
     inline void Print();
 
     // General Getter functions not split by detector
-    // ETA - a lot of these can go... they're just duplications from the base class.
     //ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     int GetParDetID(const int i) const { return _fDetID[i];};
     //ETA - just return a string of "spline", "norm" or "functional"
@@ -39,9 +38,6 @@ class covarianceXsec : public covarianceBase {
     //DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
-    //ETA - what does this even do?
-    //const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(int DetID);
-    //const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(int DetID);
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
     const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
     const std::vector<int> GetGlobalSystIndexFromDetID(int DetID);
@@ -89,7 +85,6 @@ class covarianceXsec : public covarianceBase {
     std::vector<std::vector<int>> _fNeutrinoFlavourUnosc;
 
     //Variables related to spline systematics
-    //std::vector<std::string> _fSplineNames;
     std::vector<std::string> _fSplineNames;
     std::vector<std::vector<int>> _fSplineModes;
     std::vector<SplineInterpolation> _fSplineInterpolationType;
