@@ -248,32 +248,6 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
   return object;
 }
 
-// helper function to read from the translation config file to get an option for a particular sub
-// node (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
-// fitter and parameter otherwise returns false
-template <typename T>
-bool InputManager::getFitterSpecificOption(fitterEnum fitter, std::string option, T *ret,
-                                           std::string parameter, YAML::Node subConfig) const {
-  if (subConfig[parameter])
-  {
-
-    // EM: this is config definition of fitter specific names for this parameter
-    YAML::Node paramTranslation = subConfig[parameter];
-
-    if (paramTranslation[convertFitterNames(fitter)])
-    {
-      // EM: then this is definition of how to find parameter in the specified fitter
-      YAML::Node fitterParamTranslation = paramTranslation[convertFitterNames(fitter)];
-
-      if (fitterParamTranslation[option])
-      {
-        *ret = fitterParamTranslation[option].as<T>();
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
 bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string parameter,
                                    fitterEnum fitter, std::string sample, bool setInputFileScan) {
