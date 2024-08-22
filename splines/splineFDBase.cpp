@@ -223,15 +223,15 @@ void splineFDBase::FindSplineSegment()
     // Get the variation for this reconfigure for the ith parameter
     int GlobalIndex = UniqueSystIndices[iSyst];
 
-    _float_ xvar=_float_(xsec->calcReWeight(GlobalIndex));
+    _float_ xvar=_float_(xsec->getParProp(GlobalIndex));
 
     xVarArray[iSyst]=xvar;
     
-    __int__ segment = 0;
-	__int__ kHigh = nPoints - 1;
+    _int_ segment = 0;
+	_int_ kHigh = nPoints - 1;
 
     //KS: We expect new segment is very close to previous
-    const __int__ PreviousSegment = UniqueSystCurrSegment[iSyst];
+    const _int_ PreviousSegment = UniqueSystCurrSegment[iSyst];
     //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
     if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
     // If the variation is below the lowest saved spline point
@@ -244,7 +244,7 @@ void splineFDBase::FindSplineSegment()
 	  //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
 	} else {
       // The top point we've got
-      __int__ kHalf = 0;
+      _int_ kHalf = 0;
       // While there is still a difference in the points (we haven't yet found the segment)
       // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
       while (kHigh - segment > 1) {

@@ -110,20 +110,6 @@ covarianceXsec::~covarianceXsec() {
 }
 
 // ********************************************
-// DB Grab the Number of splines for the relevant DetID
-int covarianceXsec::GetNumSplineParamsFromDetID(int DetID) {
-  int returnVal = 0; 
-
-  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
-		returnVal += 1;
-    }
-  }
-  return returnVal;
-}
-// ********************************************
-
-// ********************************************
 // DB Grab the Spline Names for the relevant DetID
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const int DetID) {
 // ********************************************
@@ -406,7 +392,7 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
   MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------");
   for (auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap) {
-    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", i, "|", GetParFancyName(SystIndex), "|",
+    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", SplineIndex, "|", GetParFancyName(SystIndex), "|",
                   SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|",
                   GetParSplineKnotLowerBound(SplineIndex), "|", GetParSplineKnotUpperBound(SplineIndex), "|");
   }
@@ -451,8 +437,7 @@ void covarianceXsec::CheckCorrectInitialisation() {
 
   // KS: Checks if there are no duplicates in fancy names etc, this can happen if we merge configs etc
   CheckForDuplicates(_fFancyNames, "_fFancyNames");
-  CheckForDuplicates(_fNDSplineNames, "_fNDSplineNames");
-  CheckForDuplicates(_fFDSplineNames, "_fFDSplineNames");
+  CheckForDuplicates(_fSplineNames, "_fSplineNames");
 }
 
 // ********************************************

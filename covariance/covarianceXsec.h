@@ -8,13 +8,10 @@
 
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
-<<<<<<< HEAD
 #include "samplePDF/Structs.h"
 #include "manager/YamlHelper.h"
 
 #include "yaml-cpp/yaml.h"
-=======
->>>>>>> 850a3cc52e81d79cb84f050c25db754607dc948e
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -37,12 +34,6 @@ class covarianceXsec : public covarianceBase {
     void CheckCorrectInitialisation();
 
     // General Getter functions not split by detector
-<<<<<<< HEAD
-    //ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
-    int GetParDetID(const int i) const { return _fDetID[i];};
-    //ETA - just return a string of "spline", "norm" or "functional"
-    const char*  GetParamType(const int i) const {return _fParamType[i].c_str();}
-=======
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     /// @param i parameter index
     inline int GetParDetID(const int i) const { return _fDetID[i];};
@@ -52,28 +43,20 @@ class covarianceXsec : public covarianceBase {
     /// @brief Returns enum describing our param type
     /// @param i parameter index
     inline SystType GetParamType(const int i) const {return _fParamType[i];}
->>>>>>> 850a3cc52e81d79cb84f050c25db754607dc948e
 
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i).SplineInterpolationType;}
 
-<<<<<<< HEAD
     //DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineParsNamesFromDetID(int DetID);
-    const std::vector<std::string> GetSplineFileParsNamesFromDetID(int DetID);
-    const std::vector< std::vector<int> > GetSplineModeVecFromDetID(int DetID);
-    const std::vector<int> GetSplineParsIndexFromDetID(int DetID);
     const std::vector<int> GetGlobalSystIndexFromDetID(int DetID);
-    int GetNumSplineParamsFromDetID(int DetID);
-=======
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i).SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i).SplineKnotLowBound;}
->>>>>>> 850a3cc52e81d79cb84f050c25db754607dc948e
+
 
     /// @brief DB Grab the number of parameters for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
@@ -90,10 +73,7 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(const int DetID);
 
-    /// ETA - what does this even do?
-    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(const int DetID);
-    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(const int DetID);
-    /// @brief DB Grab the Spline Modes for the relevant DetID
+	/// @brief DB Grab the Spline Modes for the relevant DetID
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
     /// @brief DB Grab the Spline Indices for the relevant DetID
     const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}

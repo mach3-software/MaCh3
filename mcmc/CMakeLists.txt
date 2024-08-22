@@ -2,7 +2,7 @@ set(HEADERS
     FitterBase.h
     mcmc.h
     LikelihoodFit.h
-    $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.h>
+    MinuitFit.h
     PSO.h
     MCMCProcessor.h
     SampleSummary.h

@@ -55,7 +55,7 @@ class samplePDFBase
   // generate fake dataset based on rejection sampling    
   std::vector< std::vector <double> > generate2D(TH2D* pdf = 0);
   std::vector<double> generate();
-  virtual void reweight(double *oscpar)=0;
+  virtual void reweight()=0;
   virtual double GetLikelihood() = 0;
   virtual std::vector<double>* getDataSample() {return dataSample;};
 
@@ -94,8 +94,7 @@ class samplePDFBase
   virtual void fill2DHist()=0;
 
 protected:
-  void init(double pot);
-  void init(double pot, std::string mc_version);
+  void init();
   
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries
   void QuietPlease();
