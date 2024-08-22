@@ -28,7 +28,8 @@ void StyleManager::setPalette(std::string configStyleName) const {
 
   // get the definition of the provided style from the config file
   YAML::Node palettes = _styleConfig["ColorPallettes"];
-  std::vector<std::vector<double>> paletteDef = palettes[configStyleName].as<std::vector<std::vector<double>>>();
+  std::vector<std::vector<double>> paletteDef =
+      palettes[configStyleName].as<std::vector<std::vector<double>>>();
 
   const Int_t NCont = (Int_t)(paletteDef[0][0]);
 

@@ -248,8 +248,8 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
   return object;
 }
 
-// helper function to read from the translation config file to get an option for a particular sub node
-// (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
+// helper function to read from the translation config file to get an option for a particular sub
+// node (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
 // fitter and parameter otherwise returns false
 template <typename T>
 bool InputManager::getFitterSpecificOption(fitterEnum fitter, std::string option, T *ret,
@@ -263,8 +263,7 @@ bool InputManager::getFitterSpecificOption(fitterEnum fitter, std::string option
     if (paramTranslation[convertFitterNames(fitter)])
     {
       // EM: then this is definition of how to find parameter in the specified fitter
-      YAML::Node fitterParamTranslation =
-          paramTranslation[convertFitterNames(fitter)];
+      YAML::Node fitterParamTranslation = paramTranslation[convertFitterNames(fitter)];
 
       if (fitterParamTranslation[option])
       {
@@ -279,8 +278,7 @@ bool InputManager::getFitterSpecificOption(fitterEnum fitter, std::string option
 bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string parameter,
                                    fitterEnum fitter, std::string sample, bool setInputFileScan) {
 
-  YAML::Node thisFitterSpec_config =
-      _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
 
   // EM: Get where the by sample LLH scan for this parameter *should* live if it exists
   YAML::Node testLLHConfig = thisFitterSpec_config["bySample_LLH"];
@@ -427,7 +425,8 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
 
       // vector of all the possible locations that we might find LLH scans for this type of LLH
       YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
-      std::vector<std::string> testLLHRawLocations = testLLHConfig["location"].as<std::vector<std::string>>();
+      std::vector<std::string> testLLHRawLocations =
+          testLLHConfig["location"].as<std::vector<std::string>>();
 
       // counter for the total number of parameters we find scans for
       numLLHParams = 0;
@@ -480,7 +479,8 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
       {
         std::cout << "Default type specified with possible locations: ";
         YAML::Node postFitErrorSpec = thisFitterSpec_config["postFitErrorTypes"];
-        YAML::Node defaultErrorType = postFitErrorSpec[ thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>() ];
+        YAML::Node defaultErrorType =
+            postFitErrorSpec[thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>()];
         std::vector<std::string> locations = defaultErrorType["Loc"].as<std::vector<std::string>>();
         for (std::string loc : locations)
           std::cout << std::endl << loc;
@@ -495,7 +495,8 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     int numPostFitParams = 0;
     std::vector<std::string> enabledPostFitParams;
 
-    std::string defaultErrorType = thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
+    std::string defaultErrorType =
+        thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
     for (std::string parameter : knownParameters)
     {
       if (findPostFitParamError(inputFileDef, parameter, fitterEnum(i), defaultErrorType))
@@ -588,7 +589,8 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(inputFileDef->fitter)];
 
   // set the default post fit error type so we can read it as default later
-  inputFileDef->defaultErrorType = thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
+  inputFileDef->defaultErrorType =
+      thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
 
   // ########### First fill up the LLH vectors ############
   for (std::string LLHType : {"sample", "penalty", "total"})
@@ -598,7 +600,8 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
 
     // vector of all the possible locations that we might find LLH scans for this type of LLH
     YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
-    std::vector<std::string> testLLHRawLocations = testLLHConfig["location"].as<std::vector<std::string>>();
+    std::vector<std::string> testLLHRawLocations =
+        testLLHConfig["location"].as<std::vector<std::string>>();
 
     // get the expected root object type of the llh scans
     std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
@@ -631,8 +634,8 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
       // now convert it to a TGraph
       TGraph *LLHGraph = new TGraph();
 
-      // EM: maybe have the type of the LLH object specified in the config to know what to downcast it
-      // to??
+      // EM: maybe have the type of the LLH object specified in the config to know what to downcast
+      // it to??
       if (LLHObjType == "TH1D")
       {
         LLHGraph = new TGraph((TH1D *)LLHObj);
@@ -669,7 +672,8 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
   // ####### Get the processed post fit errors #######
   for (std::string parameter : inputFileDef->availableParams_postFitErrors)
   {
-    std::vector<std::string> availableErrorTypes = thisFitterSpec_config["AvailablePostFitErrorTypes"].as<std::vector<std::string>>();
+    std::vector<std::string> availableErrorTypes =
+        thisFitterSpec_config["AvailablePostFitErrorTypes"].as<std::vector<std::string>>();
     for (std::string errorType : availableErrorTypes)
     {
       findPostFitParamError(inputFileDef, parameter, inputFileDef->fitter, errorType, true);

@@ -15,8 +15,8 @@
 #include "TStyle.h"
 
 // MaCh3 Includes
-#include "manager/YamlHelper.h"
 #include "manager/MaCh3Logger.h"
+#include "manager/YamlHelper.h"
 
 // Other MaCh3Plotting stuff
 #include "inputManager.h"
@@ -43,8 +43,9 @@ public:
                                             //!< InputManager.
   const std::string DEFAULT_STYLE_CONFIG =
       std::string(std::getenv("MACH3")) +
-      "/plotting/StyleConfig.yaml"; //!< The default style config config to be used by PlottingManager
-                                    //!< instances when instantiating the StyleManager.
+      "/plotting/StyleConfig.yaml"; //!< The default style config config to be used by
+                                    //!< PlottingManager instances when instantiating the
+                                    //!< StyleManager.
   const std::string DEFAULT_PLOTTING_CONFIG =
       std::string(std::getenv("MACH3")) +
       "/plotting/PlottingConfig.yaml"; //!< The default plotting config config to use when
@@ -55,8 +56,8 @@ public:
   PlottingManager();
 
   /// @brief Construct a new PlottingManager using specified plottingConfig config.
-  /// @param PlottingConfigName The config file file defining executables specific options, and other minor
-  /// manager related options.
+  /// @param PlottingConfigName The config file file defining executables specific options, and
+  /// other minor manager related options.
   /// @return Constructed PlottingManager instance.
   PlottingManager(std::string PlottingConfigName);
 
@@ -103,39 +104,22 @@ public:
   /// @tparam T the type of parameter expected for this option, e.g. std::string.
   /// @param option The option that you want from the config.
   /// @return The specified value for the option.
-  template <typename T> T GetOption(std::string option) {
-    return _execOptions[option].as<T>();
-  }
-  YAML::Node GetOption(std::string option) 
-  { 
-    return _execOptions[option]; 
-  }
+  template <typename T> T GetOption(std::string option) { return _execOptions[option].as<T>(); }
+  YAML::Node GetOption(std::string option) { return _execOptions[option]; }
 
   // ############# getters ##############
   /// @name General getters
   /// @{
-  const std::string GetFileName(int i) 
-	{
-		return FileNames[i];
-	}
+  const std::string GetFileName(int i) { return FileNames[i]; }
 
-  const std::string GetFileLabel(int i) 
-	{
-		return FileLabels[i];
-	}
+  const std::string GetFileLabel(int i) { return FileLabels[i]; }
 
-  const std::string GetDrawOptions() 
-	{
-		return extraDrawOptions;
-	}
+  const std::string GetDrawOptions() { return extraDrawOptions; }
 
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string GetOutputName() 
-	{
-		return OutputName;
-	}
+  const std::string GetOutputName() { return OutputName; }
 
   /// @brief Get the output name but can specify a siffix to add to the name, before the file
   /// extension.
@@ -143,55 +127,28 @@ public:
   /// @return Output file name with suffix added before the extension.
   const std::string GetOutputName(std::string suffix);
 
-  const std::vector<std::string> GetFileNames() 
-	{
-		return FileNames;
-	}
+  const std::vector<std::string> GetFileNames() { return FileNames; }
 
-  const std::vector<std::string> GetFileLabels() 
-	{
-		return FileLabels;
-	}
+  const std::vector<std::string> GetFileLabels() { return FileLabels; }
 
+  const int GetNFiles() { return (int)FileNames.size(); }
 
-  const int GetNFiles() 
-	{
-		return (int)FileNames.size();
-	}
+  const bool GetSplitBySample() { return splitBySample; }
 
+  const bool GetPlotRatios() { return plotRatios; }
 
-  const bool GetSplitBySample() 
-	{
-		return splitBySample;
-	}
-
-  const bool GetPlotRatios() 
-	{
-		return plotRatios;
-	}
-
-  const bool GetDrawGrid() 
-	{
-		return drawGrid;
-	}
+  const bool GetDrawGrid() { return drawGrid; }
 
   /// @}
 
   // for managers contained in this manager
   /// @brief Get the StyleManager contained within this PlottingManager, for doing style related
   /// things.
-  const StyleManager *Style() 
-	{
-		return styleMan;
-	}
+  const StyleManager *Style() { return styleMan; }
 
   /// @brief Get the InputManager contained within this PlottingManager, for doing input related
   /// things.
-  const InputManager *Input() 
-	{
-		return inputMan;
-	}
-
+  const InputManager *Input() { return inputMan; }
 
 private:
   // name of the config file to read configs from

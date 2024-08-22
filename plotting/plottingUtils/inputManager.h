@@ -1,8 +1,8 @@
 #pragma once
 
 // MaCh3 Includes
-#include "manager/YamlHelper.h"
 #include "manager/MaCh3Logger.h"
+#include "manager/YamlHelper.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
@@ -193,8 +193,8 @@ public:
       "__PARAM_NAME_NOT_FOUND__"; //!< the default string to return if something can't be found
 
   /// @brief Construct a new InputManager using specified fitter translation config file.
-  /// @param translationConfigName The config file defining the fitter file structures, fit parameter,
-  /// and what the parameters are called in each fitter.
+  /// @param translationConfigName The config file defining the fitter file structures, fit
+  /// parameter, and what the parameters are called in each fitter.
   /// @return Constructed InputManager instance.
   InputManager(std::string translationConfigName);
 
@@ -430,8 +430,8 @@ private:
     return parameter;
   }
 
-  // helper function to read from the translation config file to get the sample name for a specific fitter
-  // and file type
+  // helper function to read from the translation config file to get the sample name for a specific
+  // fitter and file type
   inline std::string getFitterSpecificSampleName(fitterEnum fitter, fileTypeEnum fileType,
                                                  std::string sample) const {
     std::string specificName;
@@ -457,8 +457,8 @@ private:
   // config used to create it
   std::vector<std::string> knownParameters;
 
-  // all samples which are known to this InputManager: all the ones defined in the translation config
-  // used to create it
+  // all samples which are known to this InputManager: all the ones defined in the translation
+  // config used to create it
   std::vector<std::string> knownSamples;
 
   // map the enum to actual fitter names

@@ -19,7 +19,7 @@ PlottingManager::PlottingManager(std::string PlottingConfigName) {
 /// - Instantiate an InputManager using the translation config file specified in the plotting config
 /// file, or if none was provided, using DEFAULT_TRANSLATION_CONFIG.
 /// - Add all files specified in this PlottingManagers FileNames vector to the new InputManager that
-/// was just created 
+/// was just created
 /// @warning This should always be called *After* ParseInputs() unless you are
 /// manually specifying all input file names and config file names in your drawing application.
 void PlottingManager::Initialise() {
@@ -168,7 +168,7 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
 /// @todo Would be good to add functionality to this to allow user to add their own options.
 /// @todo The way I can think to do this would be have fn addUserOption() to set the options,
 /// defining the cmd line option (e.g. -x), the name of the option, and maybe some description of
-/// the option to be used in the help message 
+/// the option to be used in the help message
 /// @todo can then store these options in some map or
 /// something to be retrieved later by getUserOption()
 void PlottingManager::addUserOption() {
@@ -216,7 +216,7 @@ void PlottingManager::setOutFileName(std::string saveName) {
 
 /// Output file name, including the file extension will be returned, but with specified suffix after
 /// the name but before the extension. This is useful for e.g. saving multiple LLH scan types to
-/// separate files: can specify suffix "_PriotLLH" will return OutputName_PriorLLH.ext 
+/// separate files: can specify suffix "_PriotLLH" will return OutputName_PriorLLH.ext
 /// @todo Make this support .root files too
 const std::string PlottingManager::GetOutputName(std::string suffix) {
   std::string ext = std::string(OutputName);

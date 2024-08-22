@@ -1,8 +1,8 @@
 #pragma once
 
 // MaCh3 Includes
-#include "manager/YamlHelper.h"
 #include "manager/MaCh3Logger.h"
+#include "manager/YamlHelper.h"
 
 // ROOT Things
 #include "TColor.h"
