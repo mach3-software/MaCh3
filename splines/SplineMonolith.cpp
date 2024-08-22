@@ -154,17 +154,18 @@ void SMonolith::Initialise() {
   SaveSplineFile = false;
 
   nKnots = 0;
+  nTF1coeff = 0;
   NEvents = 0;
   _max_knots = 0;
   nParams = 0;
   NSplines_total = 0;
-  NTF1_total = 0;
-  NObjects_total = 0.;
 
   NSplines_valid = 0;
+  NTF1_valid = 0;
   NSplines_total_large = 0;
 
   index_cpu = NULL;
+  index_TF1_cpu = NULL;
   cpu_weights_var = NULL;
   cpu_weights = NULL;
   gpu_weights = nullptr;
@@ -204,7 +205,17 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
   int nSplines = 0;
-  ScanMasterSpline(MasterSpline, NEvents, _max_knots, nParams, nSplines, nKnots, SplineType);
+  ScanMasterSpline(MasterSpline,
+                   NEvents,
+                   _max_knots,
+                   nParams,
+                   nSplines,
+                   nKnots,
+                   NSplines_valid,
+                   nTF1coeff,
+                   NTF1_valid,
+                   SplineType);
+
   MACH3LOG_INFO("Found {} events", NEvents);
   MACH3LOG_INFO("Found {} knots at max", _max_knots);
   MACH3LOG_INFO("Found {} parameters", nParams);
@@ -244,49 +255,32 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   //KS: For x coeff we assume that for given dial (MAQE) spacing is identical, here we are sloppy and assume each dial has the same number of knots, not a big problem
   cpu_coeff_x.resize(event_size_max);
 
-
-  // Every event maximally has nParams TF1s which we've saved
-  NTF1_total = NEvents * nParams; //FIXME
-
-  //CW: With TF1 we only save the coefficients and the order of the polynomial
-  // Makes most sense to have one large monolithic array, but then it becomes impossible to tell apart a coefficient from a "number of points". So have two arrays: one of coefficients and one of number of points
-  // Let's first assume all are of _max_knots size
-  short int *nPoints_big = new short int[NTF1_total];
-  float *coeffs_big = new float[NTF1_total*_nTF1Coeff_]; // *5 because we store a,b,c,d,e coefficients of fifth order polynomial in this array
-
   // Set all the big arrays to -999 to keep us safe...
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (unsigned int j = 0; j < nKnots; j++) {
-    for (int k = 0; k < _nCoeff_; k++) {
-      cpu_coeff_many[j*_nCoeff_+k] = -999;
-    }
-  }
   for (unsigned int j = 0; j < event_size_max; j++) {
     cpu_coeff_x[j] = -999;
   }
 
-  // Set all the big arrays to -999 to keep us safe...
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (unsigned int j = 0; j < NTF1_total; j++) {
-    // 1 number of points for each spline
-    nPoints_big[j] = -999;
-    // 5 coefficients for each spline
-    for (int k = 0; k < _nTF1Coeff_; k++) {
-      coeffs_big[j*_nTF1Coeff_+k] = -999;
-    }
-  }
-
-  // Will hold what spline number a certain spline has
-  short int *paramNo_big = new short int[NSplines_total];
-  // Will hold map where given spline starts
-  unsigned int *knotNo_big = new unsigned int[NSplines_total];
+  //CW: With TF1 we only save the coefficients and the order of the polynomial
+  // Makes most sense to have one large monolithic array, but then it becomes impossible to tell apart a coefficient from a "number of points". So have two arrays: one of coefficients and one of number of points
+  // Let's first assume all are of _max_knots size
+  // Now declare the arrays for each point in the valid splines which the event actually has (i.e. include the splines that the event undergoes)
+  // Also make array with the number of points per spline (not per spline point!)
+  // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
+  cpu_nPoints_arr.resize(NTF1_valid);
+  cpu_coeff_TF1_many.resize(nTF1coeff); // *5 because this array holds  a,b,c,d,e parameters
 
   // This holds the index of each spline
   index_cpu = new int[NSplines_total_large];
+  index_TF1_cpu = new int[NSplines_total_large];
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (unsigned int j = 0; j < NSplines_total_large; j++) {
+    index_cpu[j] = -1;
+    index_TF1_cpu[j] = -1;
+  }
+
   // This holds the total CPU weights that gets read in samplePDFND
   #ifdef Weight_On_SplineBySpline_Basis
   cpu_weights = new float[NSplines_total_large];
@@ -294,11 +288,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   //KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
   cpu_nParamPerEvent.resize(2*NSplines_total);
   cpu_nParamPerEvent_tf1.resize(2*NSplines_total);
-  int ParamCounter = 0;
-  int ParamCounterGlobal = 0;
-
-  int ParamCounter_TF1 = 0;
-  int ParamCounterGlobalTF1 = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -307,28 +296,12 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     cpu_nParamPerEvent_tf1[j] = -1;
   }
   #endif
-  // Set index array and number of points arrays to something silly, again to be safe...
-  #ifdef MULTITHREAD
-  #pragma omp parallel
-  {
-    //KS: Gain from nowait is minimal mostly done as I am learning how to better utilise OMP
-    #pragma omp for nowait
-    #endif
-    for (unsigned int j = 0; j < NSplines_total_large; j++) {
-      index_cpu[j] = -1;
-    }
 
-    #ifdef MULTITHREAD
-    #pragma omp for
-    #endif
-    for (unsigned int j = 0; j < NSplines_total; j++) {
-      paramNo_big[j] = -1;
-      knotNo_big[j] = -1;
-    }
-    #ifdef MULTITHREAD
-  } //end parallel region
-  #endif
-
+  // Make array with the number of points per spline (not per spline point!)
+  cpu_paramNo_arr.resize(NSplines_valid);
+  //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
+  cpu_nKnots_arr.resize(NSplines_valid);
+  cpu_paramNo_TF1_arr.resize(NTF1_valid);
 
   // Temporary arrays to hold the coefficients for each spline
   // We get one x, one y, one b,... for each point, so only need to be _max_knots big
@@ -337,30 +310,30 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   float *many_tmp = new float[_max_knots*_nCoeff_]();
   float *temp_coeffs = new float[_nTF1Coeff_]();
 
-  // Number of valid splines in total for our entire ensemble of events
-  NSplines_valid = 0;
-  NTF1_valid = 0;
-
-  std::vector<std::vector<TResponseFunction_red*> >::iterator OuterIt;
-  std::vector<TResponseFunction_red*>::iterator InnerIt;
   // Count the number of events
-  unsigned int EventCounter = 0;
   unsigned int KnotCounter = 0;
+  unsigned int TF1PointsCounter = 0;
+  unsigned int NSplinesCounter = 0;
+  unsigned int TF1sCounter = 0;
+  int ParamCounter = 0;
+  int ParamCounterGlobal = 0;
+  int ParamCounter_TF1 = 0;
+  int ParamCounterGlobalTF1 = 0;
   // Loop over events and extract the spline coefficients
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++EventCounter) {
+  for(unsigned int EventCounter = 0; EventCounter < MasterSpline.size(); ++EventCounter) {
     // Structure of MasterSpline is std::vector<std::vector<TSpline3*>>
     // A conventional iterator to count which parameter a given spline should be applied to
-    int ParamNumber = 0;
-    for (InnerIt = (*OuterIt).begin(); InnerIt != (*OuterIt).end(); ++InnerIt, ++ParamNumber) {
+    for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
+
+      // If NULL we don't have this spline for the event, so move to next spline
+      if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
 
       if(SplineType[ParamNumber] == kTSpline3_red)
       {
         //KS: how much knots each spline has
         int nPoints_tmp = 0;
         // Get a pointer to the current spline for this event
-        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(*InnerIt);
-        // If NULL we don't have this spline for the event, so move to next spline
-        if (CurrSpline == NULL) continue;
+        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(MasterSpline[EventCounter][ParamNumber]);
 
         // If the number of knots are greater than 2 the spline is not a dummy and we should extract coefficients to load onto the GPU
         getSplineCoeff_SepMany(CurrSpline, nPoints_tmp, x_tmp, many_tmp);
@@ -368,7 +341,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         //KS: One knot means flat spline so ignore
         if (nPoints_tmp == 1) continue;
 
-        (*InnerIt) = CurrSpline;
         for (int j = 0; j < _max_knots; ++j) {
           cpu_coeff_x[ParamNumber*_max_knots + j] = x_tmp[j];
         }
@@ -380,40 +352,38 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         }
 
         // Set the parameter number for this spline
-        paramNo_big[NSplines_valid] = ParamNumber;
+        cpu_paramNo_arr[NSplinesCounter] = ParamNumber;
         //KS: Fill map when each spline starts
-        knotNo_big[NSplines_valid] = KnotCounter;
+        cpu_nKnots_arr[NSplinesCounter] = KnotCounter;
 
         KnotCounter += nPoints_tmp;
         // Set the index of the spline so we can tell apart from flat splines
-        index_cpu[EventCounter*nParams + ParamNumber] = NSplines_valid;
+        index_cpu[EventCounter*nParams + ParamNumber] = NSplinesCounter;
         // Increment the counter for the number of good splines we have
-        ++NSplines_valid;
+        ++NSplinesCounter;
       }
       else if (SplineType[ParamNumber] == kTF1_red)
       {
         // Don't actually use this ever -- we give each spline the maximum number of points found in all splines
         int nPoints_tmp = 0;
         // Get a pointer to the current spline for this event
-        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(*InnerIt);
-        // If NULL we don't have this spline for the event, so move to next spline
-        if (CurrSpline == NULL) continue;
+        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(MasterSpline[EventCounter][ParamNumber]);
 
         // If the number of knots are greater than 2 the spline is not a dummy and we should extract coefficients to load onto the GPU
         getTF1Coeff(CurrSpline, nPoints_tmp, temp_coeffs);
-        (*InnerIt) = CurrSpline;
+
         for (int j = 0; j < _nTF1Coeff_; ++j) {
-          coeffs_big[NTF1_valid*_nTF1Coeff_+j] = temp_coeffs[j];
+          cpu_coeff_TF1_many[TF1PointsCounter+j] = temp_coeffs[j];
         }
         // Save the number of points for this spline
-        nPoints_big[NTF1_valid] = nPoints_tmp;
-
+        cpu_nPoints_arr[TF1sCounter] = nPoints_tmp;
+        TF1PointsCounter += nPoints_tmp;
         // Set the parameter number for this spline
-        paramNo_big[NTF1_valid] = ParamNumber;
+        cpu_paramNo_TF1_arr[TF1sCounter] = ParamNumber;
         // Set the index of the spline so we can tell apart from flat splines
-        index_cpu[EventCounter*nParams + ParamNumber] = NTF1_valid;
+        index_TF1_cpu[EventCounter*nParams + ParamNumber] = TF1sCounter;
         // Increment the counter for the number of good splines we have
-        ++NTF1_valid;
+        ++TF1sCounter;
       }
       #ifndef Weight_On_SplineBySpline_Basis
       ParamCounter_TF1++;
@@ -424,7 +394,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     cpu_nParamPerEvent[2*EventCounter] = ParamCounter;
     cpu_nParamPerEvent[2*EventCounter+1] = ParamCounterGlobal;
     ParamCounterGlobal += ParamCounter;
-
 
     cpu_nParamPerEvent_tf1[2*EventCounter] = ParamCounter_TF1;
     cpu_nParamPerEvent_tf1[2*EventCounter+1] = ParamCounterGlobalTF1;
@@ -441,30 +410,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   // Now that we have looped through all events we can make the number of splines smaller
   // Going from number of events * number of points per spline * number of NIWG params to spln_counter (=valid splines)
   MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
-  MACH3LOG_INFO("Number of TF1 = {}", NSplines_valid);
+  MACH3LOG_INFO("Number of TF1 = {}", NTF1_valid);
 
-  // Make array with the number of points per spline (not per spline point!)
-  cpu_paramNo_arr.resize(NSplines_valid);
-  //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_nKnots_arr.resize(NTF1_valid);
-
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (unsigned int i = 0; i < NSplines_valid; i++) {
-    cpu_paramNo_arr[i] = paramNo_big[i];
-    cpu_nKnots_arr[i] = knotNo_big[i];
-    // Perform checks that all array entries have been changed from negative numbers and no number of points is greater than max knots, inputted by user
-    // Don't do this for the index array since some entries there should be -1 so we know what splines to include and not include in each event for loading onto the GPU
-    if (cpu_paramNo_arr[i] < 0) {
-      std::cerr << "***** NEGATIVE PARAMETER NUMBER!!! ***** \n" << "On spline " << i << " " << cpu_paramNo_arr[i] << std::endl;
-      std::cerr << "Indicates bad reading and stripping back of splines pre-GPU" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-  }
-  delete[] paramNo_big;
-  delete[] knotNo_big;
   int BadXCounter = 0;
   for (unsigned int j = 0; j < event_size_max; j++) {
     if (cpu_coeff_x[j] == -999) BadXCounter++;
@@ -478,56 +425,17 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     if(BadXCounter == 5) MACH3LOG_WARN("There is more unutilised knots although I will stop spamming");
   }
 
-  // Now declare the arrays for each point in the valid splines which the event actually has (i.e. include the splines that the event undergoes)
-  // Also make array with the number of points per spline (not per spline point!)
-  // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
-  cpu_nPoints_arr.resize(NTF1_valid);
-  cpu_coeff_TF1_many.resize(NTF1_valid*_nTF1Coeff_); // *5 because this array holds  a,b,c,d,e parameters
-
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (unsigned int i = 0; i < NTF1_valid; i++) {
-    cpu_nPoints_arr[i] = nPoints_big[i];
-    for (unsigned int j = 0; j < _nTF1Coeff_; ++j) {
-      cpu_coeff_TF1_many[i*_nTF1Coeff_+j] = coeffs_big[i*_nTF1Coeff_+j];
-      if (cpu_coeff_TF1_many[i*_nTF1Coeff_+j] == -999) {
-        std::cerr << "***** BAD COEFFICIENT OF POLY!!! ***** \n" << "On spline " << i << " = " << cpu_coeff_TF1_many[i*_nTF1Coeff_+j] << std::endl;
-        std::cerr << "Indicates bad reading and stripping back of splines pre-GPU" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
-      }
-    }
-    // Perform checks that all array entries have been changed from negative numbers and no number of points is greater than max knots, inputted by user
-    // Don't do this for the index array since some entries there should be -1 so we know what splines to include and not include in each event for loading onto the GPU
-    if (cpu_paramNo_arr[i] < 0) {
-      std::cerr << "***** NEGATIVE PARAMETER NUMBER!!! ***** \n" << "On spline " << i << " = " << cpu_paramNo_arr[i] << std::endl;
-      std::cerr << "Indicates bad reading and stripping back of splines pre-GPU" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-
-    if (cpu_nPoints_arr[i] < 0) {
-      std::cerr << "***** NEGATIVE NUMBER OF POINTS!!! ***** \n" << "On spline " << i << " = " << cpu_nPoints_arr[i] << std::endl;
-      std::cerr << "Indicates bad reading and stripping back of splines pre-GPU" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
-    }
-  }
-  // Delete allocated memory
-  delete[] nPoints_big;
-  delete[] coeffs_big;
-
-
   MACH3LOG_WARN("Found in total {} BAD X", BadXCounter);
   #ifdef Weight_On_SplineBySpline_Basis
   // Make the array that holds all the returned weights from the GPU to pass to the CPU
-  cpu_weights_var = new float[NSplines_valid+NTF1_valid]();
+  cpu_weights_var = new float[NSplines_valid]();
+  cpu_weights_tf1_var = new float[NTF1_valid]();
   #else
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
   #ifndef CUDA
   cpu_total_weights = new float[NEvents]();
-  cpu_weights_var = new float[NSplines_valid+NTF1_valid]();
+  cpu_weights_var = new float[NSplines_valid]();
+  cpu_weights_tf1_var = new float[NTF1_valid]();
   #endif
   #endif
 
@@ -717,7 +625,10 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
                                  int &MaxPoints,
                                  short int &numParams,
                                  int &nSplines,
+                                 unsigned int &NSplines_valid,
                                  unsigned int &numKnots,
+                                 unsigned int &NTF1_valid,
+                                 unsigned int &nTF1coeff,
                                  const std::vector<RespFuncType> &SplineType) {
 // *****************************************
 
@@ -729,6 +640,9 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   numParams   = 0;
   nSplines = 0;
   numKnots = 0;
+  NSplines_valid = 0;
+  NTF1_valid = 0;
+  nTF1coeff = 0;
   std::vector<std::vector<TResponseFunction_red*> >::iterator OuterIt;
   std::vector<TResponseFunction_red*>::iterator InnerIt;
 
@@ -790,14 +704,14 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
             SplineInfoArray[ij].xPts[k] = xtemp;
           }
         }
+        NSplines_valid++;
       }
       else if (SplineType[ij] == kTF1_red)
       {
         TF1_red* CurrSpline = dynamic_cast<TF1_red*>(*InnerIt);
         int nPoints = CurrSpline->GetSize();
-        if (nPoints > MaxPoints) {
-          MaxPoints = nPoints;
-        }
+        nTF1coeff += nPoints;
+        NTF1_valid++;
       }
     }
 
@@ -826,7 +740,6 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   }
   MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);
 }
-
 
 ////////////////////////////////////////////////////////////
 
@@ -1126,6 +1039,7 @@ SMonolith::~SMonolith() {
   if(cpu_weights != NULL) delete[] cpu_weights;
   if(cpu_weights_var != NULL) delete[] cpu_weights_var;
   if(index_cpu != NULL) delete[] index_cpu;
+  if(index_TF1_cpu != NULL) delete[] index_TF1_cpu;
 
   //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL
   cpu_coeff_x.clear();
@@ -1306,7 +1220,7 @@ void SMonolith::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
 // *****************************************
 //CW: Check if the TSpline3 object is flat; if it is, we won't load it onto the GPU
 bool SMonolith::isFlat(TSpline3_red* &spl) {
-// *****************************************
+  // *****************************************
   int Np = spl->GetNp();
   _float_ x, y, b, c, d;
   // Go through spline segment parameters,
@@ -1320,7 +1234,6 @@ bool SMonolith::isFlat(TSpline3_red* &spl) {
   }
   return true;
 }
-
 
 #ifdef CUDA
 // *****************************************
@@ -1527,7 +1440,7 @@ void SMonolith::CalcSplineWeights() {
     for (unsigned int tf1Num = 0; tf1Num < NTF1_valid; ++tf1Num)
     {
       // The is the variation itself (needed to evaluate variation - stored spline point = dx)
-      const float x = vals[cpu_paramNo_arr[tf1Num]];
+      const float x = vals[cpu_paramNo_TF1_arr[tf1Num]];
 
       // Read the coefficients
       const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
@@ -1596,8 +1509,8 @@ void SMonolith::ModifyWeights_GPU(){
   for (unsigned int i = 0; i < NSplines_total; ++i) {
     if (index_cpu[i] >= 0) {
       cpu_weights[i] = cpu_weights_var[index_cpu[i]];
-    } else if (index_cpu[i] >= 0) {
-      cpu_weights[i] = cpu_weights_tf1_var[index_cpu[i]];
+    } else if (index_TF1_cpu[i] >= 0) {
+      cpu_weights[i] = cpu_weights_tf1_var[index_TF1_cpu[i]];
     }  else {
       cpu_weights[i] = 1.;
     }
