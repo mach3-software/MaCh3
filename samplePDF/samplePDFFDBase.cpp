@@ -24,7 +24,6 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   fTestStatistic = kPoisson;
 }
 
-
 samplePDFFDBase::~samplePDFFDBase()
 {
   std::cout << "I'm deleting samplePDFFDBase" << std::endl;
@@ -320,8 +319,7 @@ void samplePDFFDBase::fillArray() {
   }
 
   PrepFunctionalParameters();
-  splineFile->FindSplineSegment();
-  splineFile->calcWeights();
+  splineFile->Evaluate();
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -492,8 +490,7 @@ void samplePDFFDBase::fillArray_MP()
 	PrepFunctionalParameters();
 	//==================================================
 	//Calc Weights and fill Array
-	splineFile->FindSplineSegment();
-	splineFile->calcWeights();
+	splineFile->Evaluate();
 
 	for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
 #pragma omp for
@@ -922,7 +919,7 @@ void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 //if we just want to use CUDAProb3 CPU then setup BeamCpuPropagator object
 #if defined (MULTITHREAD)
 //if we want to multithread then get number of threads from OMP_NUM_THREADS env variable
-    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, std::atoi(std::getenv("OMP_NUM_THREADS")));
+    MCSamples[iSample].Oscillator = new cudaprob3::BeamCpuPropagator<double>(MCSamples[iSample].nEvents, omp_get_max_threads());
   MCSamples[iSample].Oscillator->setPathLength(PathLength);
   MCSamples[iSample].Oscillator->setDensity(Density);
 #else
@@ -1101,7 +1098,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
-	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
+	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin==0) {
 		low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
 	  } else {
@@ -1111,7 +1108,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	  double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
 	  double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
 
-	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
+	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin<(_hPDF1D->GetNbinsX()-2)) {
 		upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
 	  } else {
@@ -1122,10 +1119,10 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 		MCSamples[mc_i].NomXBin[event_i] = bin-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = __DEFAULT_RETURN_VAL__;
-		upper_edge = __DEFAULT_RETURN_VAL__;
-		low_lower_edge = __DEFAULT_RETURN_VAL__;
-		upper_upper_edge = __DEFAULT_RETURN_VAL__;
+		low_edge = _DEFAULT_RETURN_VAL_;
+		upper_edge = _DEFAULT_RETURN_VAL_;
+		low_lower_edge = _DEFAULT_RETURN_VAL_;
+		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = 0;
 
@@ -1229,7 +1226,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	  _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
 	  //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
 
-	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
+	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin==0) {
 		low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
 	  } else {
@@ -1239,7 +1236,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	  double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
 	  double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
 
-	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
+	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin<(_hPDF2D->GetNbinsX()-2)) {
 		upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
 	  } else {
@@ -1250,10 +1247,10 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = __DEFAULT_RETURN_VAL__;
-		upper_edge = __DEFAULT_RETURN_VAL__;
-		low_lower_edge = __DEFAULT_RETURN_VAL__;
-		upper_upper_edge = __DEFAULT_RETURN_VAL__;
+		low_edge = _DEFAULT_RETURN_VAL_;
+		upper_edge = _DEFAULT_RETURN_VAL_;
+		low_lower_edge = _DEFAULT_RETURN_VAL_;
+		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
 	  if(MCSamples[mc_i].NomYBin[event_i] < 0){ 
@@ -1313,8 +1310,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
   return;
 }
 
-void samplePDFFDBase::addData(std::vector< vector <double> > &data) {
-  dataSample2D = new std::vector< vector <double> >(data);
+void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
+  dataSample2D = new std::vector< std::vector <double> >(data);
   dataSample = NULL;
   dathist = NULL;
   dathist2d->Reset();                                                       
@@ -1383,8 +1380,8 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
 }
 
-inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
-  //HI : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
+double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
+  //HW : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
 	//std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;

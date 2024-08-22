@@ -1,6 +1,19 @@
+# Type to see number of commits per user: git shortlog -n -s
+
+# Edward Atkin
+Edward Atkin <edhuthwaite@aol.com> EdAtkin <edhuthwaite@aol.com>
+Edward Atkin <edhuthwaite@aol.com> EdAtkin <35494466+EdAtkin@users.noreply.github.com>
+
+# Daniel Barrow
+Daniel Barrow <danbarrow257@gmail.com> dbarrow257 <danbarrow257@gmail.com>
+
 # Kamil Skwarczynski
 Kamil Skwarczynski <skwarczynskikamil@gmail.com> Kamil <45295406+KSkwarczynski@users.noreply.github.com>
+Kamil Skwarczynski <skwarczynskikamil@gmail.com> Kamil Skwarczynski <kamilskw@bg12105.int.ets1.calculquebec.ca>
+Kamil Skwarczynski <skwarczynskikamil@gmail.com> Kamil Skwarczynski <kamilskw@cdr293.int.cedar.computecanada.ca>
 
 # Henry Wallace
 Henry Wallace <henryisrael08@gmail.com> henry-israel <henryisrael08@gmail.com>
 Henry Wallace <henryisrael08@gmail.com> Henry Wallace <67589487+henry-wallace-phys@users.noreply.github.com>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <hwallace@linappserv6.pp.rhul.ac.uk>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henry.wallace@rhul.ac.uk>

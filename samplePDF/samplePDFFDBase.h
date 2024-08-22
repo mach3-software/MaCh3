@@ -23,24 +23,19 @@
 //MaCh3 includes
 #include "OscClass/OscClass_CUDAProb3.h"
 
-#include "samplePDF/interfacePDFEbE.h"
-#include "samplePDF/samplePDFBase.h"
-
-#include "splines/splineBase.h"
 #include "splines/splineFDBase.h"
 
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
+#include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
 #include "samplePDF/ShiftFunctors.h"
-
-#include "manager/manager.h"
 
 
 #define USEBETA 0
 
-class samplePDFFDBase : virtual public samplePDFBase , virtual public interfacePDFEbE
+class samplePDFFDBase : virtual public samplePDFBase
 {
 public:
   //######################################### Functions #########################################
@@ -51,6 +46,9 @@ public:
 
   const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
 
+  /// @brief Returns binning options
+  int GetBinningOpt(){return BinningOpt;}
+
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
@@ -59,8 +57,8 @@ public:
   void addData(TH1D* Data);
   void addData(TH2D* Data);
   void addData(std::vector<double> &data);
-  void addData(std::vector< vector <double> > &data);
-  //DB Multi-threaded GetLikelihood
+  void addData(std::vector< std::vector <double> > &data);
+  /// DB Multi-threaded GetLikelihood
   double GetLikelihood();
   //===============================================================================
 
@@ -122,7 +120,7 @@ public:
   //DB Function to determine which weights apply to which types of samples
   //pure virtual!!
   virtual void SetupWeightPointers() = 0;
-
+  
   splineFDBase *splineFile;
   //===============================================================================
   //DB Functions relating to sample and exec setup  
@@ -172,8 +170,6 @@ public:
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
   //Virtual so this can be over-riden in an experiment derived class
   virtual double CalcXsecWeightFunc(int iSample, int iEvent){return 1.0;};
-
-  int GetBinningOpt(){return BinningOpt;}
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
@@ -228,7 +224,7 @@ public:
 
   //===============================================================================
   //MC variables
-  vector<struct fdmc_base> MCSamples;
+  std::vector<struct fdmc_base> MCSamples;
   TFile *_sampleFile;
   TTree *_data;
   //===============================================================================

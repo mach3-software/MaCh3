@@ -536,8 +536,8 @@ int PlotLLH(){
             splitSamplesRatioPad = new TPad("splitSampRatioPad", "splitSampRatioPad",0.0 ,0.0 , 0.0, 0.0);
           }
 
-          std::vector<Double_t> cumSums;
-          std::vector<bool> drawLabel;
+          std::vector<Double_t> cum_Sums;
+          std::vector<bool> draw_Label;
 
           THStack *splitSamplesStack = new THStack(paramName.c_str(), Form("%s - %s", paramName.c_str(), FileLabels[extraFileIdx+1].c_str()));
           TLegend *splitSamplesLegend = new TLegend(0.37,0.475,0.63,0.9);
@@ -553,8 +553,8 @@ int PlotLLH(){
 
           // if on the same y axis, also check that the contribution of the sample compared to the baseline LLH integral is above the threshold
           // otherwise the labels might get very crowded if the comparisson LLH is much smaller than the baseline one
-          if(sameAxis)getSplitSampleStack(compFile, sampleList, paramName, *compLLH_sam, cumSums, drawLabel, splitSamplesStack, splitSamplesLegend, LLH_sam->Integral());
-          else getSplitSampleStack(compFile, sampleList, paramName, *compLLH_sam, cumSums, drawLabel, splitSamplesStack, splitSamplesLegend);
+          if(sameAxis)getSplitSampleStack(compFile, sampleList, paramName, *compLLH_sam, cum_Sums, draw_Label, splitSamplesStack, splitSamplesLegend, LLH_sam->Integral());
+          else getSplitSampleStack(compFile, sampleList, paramName, *compLLH_sam, cum_Sums, draw_Label, splitSamplesStack, splitSamplesLegend);
 
           // go to the pad for the histograms
           if(drawGrid)splitSamplesPad->SetGrid();
@@ -576,9 +576,9 @@ int PlotLLH(){
           // need to draw the labels after other stuff or they dont show up
           for(uint i=0; i < sampleDirList.size(); i++){
             std::string sampName = sampleList[i];
-            if(!drawLabel[i])continue;
+            if(!draw_Label[i])continue;
 
-            label->DrawLatex(compLLH_sam->GetBinLowEdge(compLLH_sam->GetNbinsX()+1), cumSums[i], Form("#leftarrow%s", prettify_name(sampName).c_str()) );
+            label->DrawLatex(compLLH_sam->GetBinLowEdge(compLLH_sam->GetNbinsX()+1), cum_Sums[i], Form("#leftarrow%s", prettify_name(sampName).c_str()) );
           }
 
           if(plotRatios){

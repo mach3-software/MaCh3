@@ -1,13 +1,58 @@
 #include "manager/Monitor.h"
 
+//Only if GPU is enabled
+#ifdef CUDA
+#include "manager/gpuUtils.cuh"
+#endif
+
 namespace MaCh3Utils {
 
 // *************************
 void MaCh3Welcome() {
 // *************************
 
+  // KS: Just make sure we only call it once
+  static bool MaCh3WelcomeInitialised = false;
+
+  if(MaCh3WelcomeInitialised) return;
+
+  std::string MaCh3_VERSION = GetMaCh3Version();
+
+  MACH3LOG_INFO("##################################");
+  MACH3LOG_INFO("Welcome to:  ");
+  MACH3LOG_INFO("  __  __        _____ _     ____  ");
+  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
+  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
+  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
+  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
+  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
+  MACH3LOG_INFO("Version: {}", MaCh3_VERSION);
+  MACH3LOG_INFO("##################################");
+
+  GetCPUInfo();
+
+  GetGPUInfo();
+
+  #ifdef DEBUG
+  GetOSInfo();
+  GetDiskUsage();
+  #endif
+
+  MaCh3WelcomeInitialised = true;
+}
+
+// ************************
+// KS: Get version of MaCh3
+std::string GetMaCh3Version() {
+// ************************
+
   //KS: Find MaCh3 version based on header file. There could be better way to just include version.h but as long as we don't have to hardcode version I am content
   std::string MaCh3_VERSION = "";
+
+  if(std::getenv("MaCh3_ROOT") == nullptr){
+    throw MaCh3Exception(__FILE__, __LINE__, "Error: you haven't sourced setup.MaCh3.sh in core!");
+  }
+
   std::string file = std::string(std::getenv("MaCh3_ROOT")) + "/version.h";
   // Open the version.h file
   std::ifstream versionFile(file);
@@ -36,17 +81,22 @@ void MaCh3Welcome() {
   // Close the file
   versionFile.close();
 
-  MACH3LOG_INFO("##################################");
-  MACH3LOG_INFO("Welcome to:  ");
-  MACH3LOG_INFO("  __  __        _____ _     ____  ");
-  MACH3LOG_INFO(" |  \\/  |      / ____| |   |___ \\ ");
-  MACH3LOG_INFO(" | \\  / | __ _| |    | |__   __) |");
-  MACH3LOG_INFO(" | |\\/| |/ _` | |    | '_ \\ |__ < ");
-  MACH3LOG_INFO(" | |  | | (_| | |____| | | |___) |");
-  MACH3LOG_INFO(" |_|  |_|\\__,_|\\_____|_| |_|____/ ");
-  MACH3LOG_INFO("Version: {}", MaCh3_VERSION);
-  MACH3LOG_INFO("##################################");
+  return MaCh3_VERSION;
 }
+
+
+// ************************
+// KS: Find out more about operational system
+void GetOSInfo() {
+// ************************
+
+  MACH3LOG_INFO("Operating System Information:");
+
+  // Distribution and version
+  MACH3LOG_INFO("Distribution: {}", TerminalToString("lsb_release -d | awk -F':' '{print $2}'"));
+  MACH3LOG_INFO("Kernel Version: {}", TerminalToString("uname -r"));
+}
+
 
 // ************************
 //KS: Simple function retrieving CPU info
@@ -60,10 +110,10 @@ void GetCPUInfo(){
   MACH3LOG_INFO("{}", TerminalToString("cat /proc/cpuinfo | grep -m 1 MHz"));
   //KS: Below code is convoluted because I mostly work on English based Linux but sometimes on Polish based Linux, this ensures it works on both. We can add support for other languages if needed
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i Archit"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L1d'"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L1i'"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L2'"));
-  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -i 'Cache L3'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L1d |L1d:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L1i |L1i:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L2 |L2:'"));
+  MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L3 |L3:'"));
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'Thread.* per core:|Wątków na rdzeń:'"));
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E '^CPU(:|\\(s\\)):?\\s+[0-9]+'"));
 
@@ -86,12 +136,25 @@ void GetGPUInfo(){
   MACH3LOG_INFO("Total VRAM: {} MB", TerminalToString("nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits"));
   // Print Driver Version
   MACH3LOG_INFO("Driver Version: {}", TerminalToString("nvidia-smi --query-gpu=driver_version --format=csv,noheader"));
+  // Print N GPU thread
+  MACH3LOG_INFO("Currently used GPU has: {} threads", GetNumGPUThreads());
 #endif
   return;
 }
 
+// ************************
+// KS: Find out about Disk usage
+void GetDiskUsage() {
+// ************************
+  MACH3LOG_INFO("Disk Usage:");
+
+  // Get disk usage
+  MACH3LOG_INFO("{}", TerminalToString("df -h --total | grep total"));
+}
+
 
 // ************************
+// KS: Convoluted code to grab output from terminal to string
 std::string TerminalToString(const char* cmd) {
 // ************************
 
@@ -213,5 +276,23 @@ int parseLine(const std::string& line){
   iss >> value;
   return value;
 }
+
+
+// ***************************************************************************
+//KS: Print Yaml config using logger
+void PrintConfig(const YAML::Node& node){
+// ***************************************************************************
+  std::stringstream ss;
+  ss << node;
+  std::string yamlString = ss.str();
+
+  std::istringstream iss(yamlString);
+  std::string line;
+  while (std::getline(iss, line)) {
+    MACH3LOG_INFO("{}", line);
+  }
+}
+
+
 
 }

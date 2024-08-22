@@ -106,7 +106,7 @@ void CombineChain()
   bool openedFile = fileMerger->OutputFile(OutFileName.c_str(), outFileOption.c_str(), targetCompression);
   if (!openedFile){
       MACH3LOG_ERROR("Failed to create output file.");
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   TFile *prevFile = nullptr;
@@ -120,10 +120,10 @@ void CombineChain()
     TFile *file = new TFile(fileName.c_str());
 
     if(file->Get<TTree>("posteriors")->GetEntries() == 0){
-        MACH3LOG_WARN("Hmmm, file {} Doesn't seem to have any entries", fileName.c_str());
-        MACH3LOG_WARN("That's weird but I guess there's no rule that says a file can't be empty");
-        MACH3LOG_WARN("I'll skip it but maybe double check that this doesn't indicate some deeper problem");
-        continue;
+      MACH3LOG_WARN("Hmmm, file {} Doesn't seem to have any entries", fileName.c_str());
+      MACH3LOG_WARN("That's weird but I guess there's no rule that says a file can't be empty");
+      MACH3LOG_WARN("I'll skip it but maybe double check that this doesn't indicate some deeper problem");
+      continue;
     }
 
     // EM: need to set this in the initial case
@@ -143,14 +143,14 @@ void CombineChain()
       weirdFile = true;
 
     if(weirdFile){
-        MACH3LOG_ERROR("");
-        MACH3LOG_ERROR("=====================================================================================");
-        MACH3LOG_ERROR("This is not a great idea and could lead to weird outputs and cause some big headaches");
-        MACH3LOG_ERROR("further down the road. But if you reeeeally wanna do it and you know what you're");
-        MACH3LOG_ERROR("doing you can come here and remove the 'throw'");
-        MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__ + 2);
-        MACH3LOG_ERROR("=====================================================================================");
-        throw;
+      MACH3LOG_ERROR("");
+      MACH3LOG_ERROR("=====================================================================================");
+      MACH3LOG_ERROR("This is not a great idea and could lead to weird outputs and cause some big headaches");
+      MACH3LOG_ERROR("further down the road. But if you reeeeally wanna do it and you know what you're");
+      MACH3LOG_ERROR("doing you can come here and remove the 'throw'");
+      MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__ + 2);
+      MACH3LOG_ERROR("=====================================================================================");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     // EM: file seems good, we'll add the trees to the lists
     fileMerger->AddFile(file);
@@ -195,75 +195,75 @@ void CombineChain()
 }
     
 void usage(){
-    std::cout << "Combine MaCh3 Chains files, very similar to hadd, but will compare embedded version info in the files to avoid accidentally combining files made with different software versions. Also avoids having a hige dump of separate version files in the output that happens with hadd." << std::endl;
-    std::cout << "Cmd line syntax should be:" << std::endl;
-    std::cout << "combineND280Splines [-h] [-c [0-9]] [-f] [-o <output file>] input1.root [input2.root, input3.root ...] " << std::endl << std::endl;
-    std::cout << "inputX.root    : names of individual spline files to combine, can specify any number, need at least one" << std::endl;
-    std::cout << "output file    : name of combined spline file. optional: if not specified, the app will just use the first input file as the output, the same as hadd'" << std::endl;
-    std::cout << "-c             : target compression level for the combined file, default is 1, in line with hadd" << std::endl; 
-    std::cout << "-f             : force overwtite the output file if it exists already" << std::endl;
-    std::cout << "-h             : print this message and exit" << std::endl;
+  MACH3LOG_INFO("Combine MaCh3 Chains files, very similar to hadd, but will compare embedded version info in the files to avoid accidentally combining files made with different software versions. Also avoids having a hige dump of separate version files in the output that happens with hadd.");
+  MACH3LOG_INFO("Cmd line syntax should be:");
+  MACH3LOG_INFO("combineND280Splines [-h] [-c [0-9]] [-f] [-o <output file>] input1.root [input2.root, input3.root ...]");
+  MACH3LOG_INFO("inputX.root    : names of individual spline files to combine, can specify any number, need at least one");
+  MACH3LOG_INFO("output file    : name of combined spline file. optional: if not specified, the app will just use the first input file as the output, the same as hadd'");
+  MACH3LOG_INFO("-c             : target compression level for the combined file, default is 1, in line with hadd");
+  MACH3LOG_INFO("-f             : force overwrite the output file if it exists already");
+  MACH3LOG_INFO("-h             : print this message and exit");
 }
 
 void ParseArg(int argc, char *argv[]){
-  	if(argc < 2){
-        MACH3LOG_ERROR("Too few arguments!!");
-        MACH3LOG_ERROR("USAGE:");
-        usage();
-        throw;
+  if(argc < 2){
+    MACH3LOG_ERROR("Too few arguments!!");
+    MACH3LOG_ERROR("USAGE:");
+    usage();
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  int c;
+  for(;;) {
+    c = getopt(argc, argv, "o:c:hf");
+    if (c == -1){ // loop over the remaining arguments
+      while (optind < argc){
+        // any non option input is assumed to be a root file
+        std::string fName = std::string(argv[optind]);
+        MACH3LOG_DEBUG("adding {} to file list", fName.c_str());
+        inpFileList.push_back(fName);
+        optind ++;
+      }
+      break;
     }
-    
-    int c;  
-    for(;;) {    
-        c = getopt(argc, argv, "o:c:hf");
-        if (c == -1){ // loop over the remaining arguments
-            while (optind < argc){
-                // any non option input is assumed to be a root file
-                std::string fName = std::string(argv[optind]);
-                MACH3LOG_DEBUG("adding {} to file list", fName.c_str());
-                inpFileList.push_back(fName);
-                optind ++;
-            }
-            break;
-        }                        
-        else{                        
-            switch (c) {
-                case 'o': {
-                    OutFileName = optarg;
-                    break;
-                }
-                case 'f': {
-                    forceOverwrite = true;
-                    break;
-                }
-                case 'c': {
-                    targetCompression = atoi(optarg);
-                    break;
-                }
-                case 'h': {
-                    usage();
-                    exit(0);
-                }
-                default: {
-                    MACH3LOG_ERROR("Un recognised option");
-                    usage();
-                    exit(1);
-                }
-            }
+    else{
+      switch (c) {
+        case 'o': {
+          OutFileName = optarg;
+          break;
         }
+        case 'f': {
+          forceOverwrite = true;
+          break;
+        }
+        case 'c': {
+          targetCompression = atoi(optarg);
+          break;
+        }
+        case 'h': {
+          usage();
+          exit(0);
+        }
+        default: {
+          MACH3LOG_ERROR("Un recognised option");
+          usage();
+          exit(1);
+        }
+      }
     }
+  }
 
-    if(OutFileName == ""){
-      MACH3LOG_INFO("Using first file in list as output: ", inpFileList[0].c_str());
-      OutFileName = inpFileList[0];
-      inpFileList.erase(inpFileList.begin());
-    }
+  if(OutFileName == ""){
+    MACH3LOG_INFO("Using first file in list as output: ", inpFileList[0].c_str());
+    OutFileName = inpFileList[0];
+    inpFileList.erase(inpFileList.begin());
+  }
 
-    if(forceOverwrite){
-      MACH3LOG_INFO("Will overwrite {} if it exists already", OutFileName.c_str());
-    }
+  if(forceOverwrite){
+    MACH3LOG_INFO("Will overwrite {} if it exists already", OutFileName.c_str());
+  }
 
-    MACH3LOG_INFO("Combining a total of {} files into {}", inpFileList.size(), OutFileName.c_str());
+  MACH3LOG_INFO("Combining a total of {} files into {}", inpFileList.size(), OutFileName.c_str());
 }
 
 int main(int argc, char *argv[])

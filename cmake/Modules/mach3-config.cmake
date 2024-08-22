@@ -24,6 +24,8 @@ string(REPLACE ";" " " ROOT_DEFINITIONS_SEP "${ROOT_DEFINITIONS_SEP}")
 SET(ROOT_LIBRARIES_SEP ${ROOT_LIBRARIES})
 string(REPLACE ";" " -l" ROOT_LIBRARIES_SEP "-l${ROOT_LIBRARIES_SEP}")
 
+# Set the creation date
+string(TIMESTAMP CREATION_DATE "%d-%m-%Y")
 
 string(REPLACE ";" " " MACH3_FEATURES "${MACH3_FEATURES_LIST}")
 configure_file(${CMAKE_CURRENT_LIST_DIR}/../Templates/mach3-config.in

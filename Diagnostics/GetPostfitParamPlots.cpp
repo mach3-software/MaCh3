@@ -16,6 +16,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TVectorD.h"
+#include "TCandle.h"
 #include "TGraphAsymmErrors.h"
 
 #include "manager/manager.h"
@@ -186,9 +187,9 @@ inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
   return Ratio;
 }
 
-inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
+inline void DrawPlots(TCanvas *canvas, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
   // EM: Draw!
-  canv->cd();
+  canvas->cd();
   mainPad->Draw();
   mainPad->cd();
   PrefitCopy->GetYaxis()->SetTitle("Parameter Value");
@@ -210,7 +211,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
     postFitHist->Draw("e1, same");
   }
 
-  canv->Update();
+  canvas->Update();
   TGaxis *axis = new TGaxis(PrefitCopy->GetXaxis()->GetBinLowEdge(PrefitCopy->GetXaxis()->GetFirst()), gPad->GetUymin()+0.01,
                             PrefitCopy->GetXaxis()->GetBinLowEdge(PrefitCopy->GetXaxis()->GetFirst()), gPad->GetUymax(),
                             gPad->GetUymin()+0.01, gPad->GetUymax(), 510, "");
@@ -218,7 +219,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
   axis->SetLabelSize(25);
   axis->Draw();
 
-  canv->cd();
+  canvas->cd();
   ratioPad->Draw();
   ratioPad->cd();
 
@@ -259,7 +260,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
   line2.Draw("same");
   line3.Draw("same");
 
-  canv->Print((SaveName).c_str());
+  canvas->Print((SaveName).c_str());
 
   ratioHists.clear();
   delete axis;
@@ -580,7 +581,7 @@ void GetPostfitParamPlots()
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
-  gStyle->SetOptStat(0); //Set 0 to disable statystic box
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
   canv->SetLeftMargin(0.12);
   canv->SetBottomMargin(0.12);
   canv->SetTopMargin(0.08);
@@ -588,7 +589,7 @@ void GetPostfitParamPlots()
 
   canv->Print((SaveName+"[").c_str());
 
-  // these for non named params where we dont need as much space
+  // these for non named params where we don't need as much space
   p1 = new TPad("p1", "p1", 0.0, 0.3, 1.0, 1.0);
   p2 = new TPad("p2", "p2", 0.0, 0.0, 1.0, 0.3);
   p1->SetLeftMargin(canv->GetLeftMargin());
@@ -720,7 +721,10 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   //KS: Should be in some config... either way it control whether you plot symetric or assymetric error bars
   bool PlotAssym = true;
     
-  std::cout<<" Making Violin Plot"<<std::endl;
+  //KS: No idea why but ROOT changed treatment of viilin in R6. If you have non uniform binning this will results in very hard to see violin plots.
+  TCandle::SetScaledViolin(false);
+
+  MACH3LOG_INFO("Making Violin Plot");
   if (!FileName1.empty()) std::cout << "File 1 " << FileName1<< std::endl;
   if (!FileName2.empty()) std::cout << "File 2 " << FileName2<< std::endl;
     
@@ -851,14 +855,14 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
       Violin->GetYaxis()->SetRangeUser(-2., 3.);
       if(File2 != NULL) Violin2->GetYaxis()->SetRangeUser(-2., 3.);
     }
-    //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-    ViolinPre->Draw("VIOLIN");
-    Violin->Draw("VIOLIN SAME");
+    //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
+    ViolinPre->Draw("violinX(03100300)");
+    Violin->Draw("violinX(03100300) SAME");
     if(File2 != NULL)
     {
       Violin2->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
       Violin2->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-      Violin2->Draw("VIOLIN SAME");
+      Violin2->Draw("violinX(03100300) SAME");
     }
     if (Postfit != NULL) {
       Postfit->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
@@ -891,13 +895,13 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
       PostGraph->GetYaxis()->SetRangeUser(0.7, 1.3);
 
       //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-      ViolinPre->Draw("VIOLIN");
-      Violin->Draw("VIOLIN SAME");
+      ViolinPre->Draw("violinX(03100300)");
+      Violin->Draw("violinX(03100300) SAME");
       if(File2 != NULL)
       {
         Violin2->GetYaxis()->SetRangeUser(0.7, 1.3);
         Violin2->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
-        Violin2->Draw("VIOLIN SAME");
+        Violin2->Draw("violinX(03100300) SAME");
       }
       if(PlotAssym) PostGraph->Draw("P SAME");
       else Postfit->Draw("SAME");
@@ -915,14 +919,14 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   Postfit->GetYaxis()->SetRangeUser(-3.4, 3.4);
   PostGraph->GetYaxis()->SetRangeUser(-3.4, 3.4);
          
-  //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-  ViolinPre->Draw("VIOLIN");
-  Violin->Draw("VIOLIN SAME");
+  //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
+  ViolinPre->Draw("violinX(03100300)");
+  Violin->Draw("violinX(03100300) SAME");
   if(File2 != NULL)
   {
     Violin2->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
     Violin2->GetYaxis()->SetRangeUser(-3.4, 3.4);
-    Violin2->Draw("VIOLIN SAME");
+    Violin2->Draw("violinX(03100300) SAME");
   }
   if(PlotAssym) PostGraph->Draw("P SAME");
   else Postfit->Draw("SAME");

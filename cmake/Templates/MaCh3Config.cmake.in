@@ -45,6 +45,7 @@ endif()
 if(MaCh3_GPU_ENABLED)
   enable_language(CUDA)
   add_compile_definitions(CUDA)
+  #KS: Maybe just include CUDASetup.cmake or make cmake more robust rather than copy paste?
   find_package(CUDAToolkit)
   set(CUDA_ARCHITECTURES @CUDA_ARCHITECTURES@)
 endif()

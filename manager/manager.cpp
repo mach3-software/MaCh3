@@ -10,13 +10,11 @@ manager::manager(std::string const &filename)
   FileName = filename;
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
-  MaCh3Utils::GetCPUInfo();
-  MaCh3Utils::GetGPUInfo();
 
   MACH3LOG_INFO("Setting config to be: {}", filename);
 
   MACH3LOG_INFO("Config is now: ");
-  std::cout << config << std::endl;
+  MaCh3Utils::PrintConfig(config);
 
   if (config["LikelihoodOptions"])
   {
@@ -33,12 +31,15 @@ manager::manager(std::string const &filename)
       {
         MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
       }
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   } else {
     mc_stat_llh = kPoisson;
   }
 
+  Modes = nullptr;
+  std::string ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null");
+  if(ModeInput != "null") Modes = new MaCh3Modes(ModeInput);
 }
 
 // *************************
@@ -46,6 +47,7 @@ manager::manager(std::string const &filename)
 manager::~manager() {
 // *************************
 
+  if(!Modes) delete Modes;
 
 }
 

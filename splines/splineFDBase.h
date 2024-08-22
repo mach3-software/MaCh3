@@ -1,18 +1,14 @@
 #pragma once
 
-#ifndef __BAD_SPLINE__
-#define __BAD_SPLINE__ 123456789
-#endif
-
 //ROOT
 #include "TH3F.h"
 
 //MaCh3
-#include "covariance/covarianceXsec.h"
-#include "manager/manager.h"
+#include "splines/SplineBase.h"
 
-class splineFDBase
-{
+/// @brief Bin-by-bin class calculating response for spline parameters.
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
+class splineFDBase : public SplineBase {
   //ETA - do all of these functions and members actually need to be public?
   public:
 	//splineFDBase(const char *spline, int nutype, int nevents, int DetID, covarianceXsec* xsec_cov = NULL); // constructor for etrue-var1 splines
@@ -22,7 +18,8 @@ class splineFDBase
 	void SetupSplines();
 	void SetupSplines(int BinningOpt);
 
-	//void FindUniqueModes();
+    /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
+    void Evaluate();
 
     //Spline Monolith things
 	//Essential methods used externally
@@ -66,13 +63,11 @@ class splineFDBase
 
 	void BuildSampleIndexingArray(std::string SampleName);
 	void PrepForReweight();
-	void getSplineCoeff_SepMany(int splineindex, __float__ *& xArray, __float__ *&manyArray);
+	void getSplineCoeff_SepMany(int splineindex, _float_ *& xArray, _float_ *&manyArray);
 	void PrintBinning(TAxis* Axis);
 	void PrintSampleDetails(std::string SampleName);
 	void PrintArrayDetails(std::string SampleName);
 	void PrintArrayDimension();
-	void FindSplineSegment();
-	void calcWeights();
 
 	const double* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
 	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
@@ -81,7 +76,11 @@ class splineFDBase
 
 
   protected:
-	covarianceXsec* xsec;
+    inline void FindSplineSegment() override;
+    inline void CalcSplineWeights() override;
+    inline void ModifyWeights() override {return;};
+
+    covarianceXsec* xsec;
 
 	//And now the actual member variables	
 	std::vector<std::string> SampleNames;
@@ -108,7 +107,7 @@ class splineFDBase
 	std::vector<int> UniqueSystIndices;
 	std::vector<int> UniqueSystNKnots;
 	std::vector<int> UniqueSystCurrSegment;
-	std::vector< std::vector<__float__> > UniqueSystXPts;
+	std::vector< std::vector<_float_> > UniqueSystXPts;
 
 	// //DB Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
@@ -122,14 +121,11 @@ class splineFDBase
 	int CoeffIndex;
 
 	//Probably need to clear these arrays up at some point
-	__float__ *xVarArray;
+	_float_ *xVarArray;
 	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
-	__float__ *xcoeff_arr;    //x coefficients for each spline
-	__float__ *manycoeff_arr; //ybcd coefficients for each spline
+	_float_ *xcoeff_arr;    //x coefficients for each spline
+	_float_ *manycoeff_arr; //ybcd coefficients for each spline
 
 	std::vector<double> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;
-
-	//Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
-	enum SplineSegmentCoeffs{kCoeffY=0, kCoeffB=1, kCoeffC=2, kCoeffD=3};
 };

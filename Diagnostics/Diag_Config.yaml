@@ -51,14 +51,17 @@ ProcessMCMC:
   PlotBinValue: false
 
   #Correlation related
-  PlotCorr: false
   Smoothing: true
 
-  #Functionality
+  #Functionality 1D
   MakeCredibleIntervals: true
   CalcBayesFactor: true
   CalcSavageDickey: true
   CalcBipolarPlot: false
+
+  #Functionality 2D
+  PlotCorr: false
+  MakeSubOptimality: ["false", 100]
   MakeViolin: true
   MakeCredibleRegions: false
   GetTrianglePlot: true
@@ -96,7 +99,7 @@ ProcessMCMC:
     # Goes as follows: ParamName Name[Model 1, Model 2], Model1[lower, upper ], Model2[lower, upper ]
     - ["RS_Delta_Decay", ["Isotropic", "Delta Like"], [0, 0.5], [0.5, 1]]
     - ["PNNN_Shape", ["NN Only", "PN Only"], [-1, 0], [0, 1]]
-    - ["delm2_23", ["NH", "IH"], [-0.01, 0], [0, 0.01]]
+    - ["delm2_23", ["IH", "NH"], [-0.01, 0], [0, 0.01]]
     - ["sin2th_23", ["LO", "UO"], [0, 0.5], [0.5, 1]]
 
   SavageDickey:
@@ -120,7 +123,7 @@ ProcessMCMC:
   # apply reactor constraints [vector of param names] [vector of new central value] [vector of new prior errors]
   PriorReweighting: [ ["sin2th_13"], [0.0220], [0.0007] ]
   #Fancy example, not physics motivated but to show funcionality
-  PriorReweighting: [ ["MAQE", "Pauli_Blocking_C_nu"], [1.05, 0.1], [ 0.04, 0.5] ]
+  #PriorReweighting: [ ["MAQE", "Pauli_Blocking_C_nu"], [1.05, 0.1], [ 0.04, 0.5] ]
 
 #########################################
 GetPostfitParamPlots:
