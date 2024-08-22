@@ -480,7 +480,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
       {
         std::cout << "Default type specified with possible locations: ";
         YAML::Node postFitErrorSpec = thisFitterSpec_config["postFitErrorTypes"];
-        YAML::Node defaultErrorType = postFitErrorSpec[ thisFitterSpec_config["defaultPostFitErrorType"] ];
+        YAML::Node defaultErrorType = postFitErrorSpec[ thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>() ];
         std::vector<std::string> locations = defaultErrorType["Loc"].as<std::vector<std::string>>();
         for (std::string loc : locations)
           std::cout << std::endl << loc;
