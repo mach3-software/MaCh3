@@ -4,35 +4,51 @@
 #include "toml/toml_helper.h"
 
 // ROOT Things
+#include "TColor.h"
 #include "TH1.h"
 #include "TStyle.h"
-#include "TColor.h"
 
-namespace MaCh3Plotting{
-    class StyleManager{
-        public:
+namespace MaCh3Plotting {
+class StyleManager {
+public:
+  /// @brief Constructor
+  /// @param tomlName The style toml to read from
+  StyleManager(std::string tomlName);
 
-        StyleManager(std::string tomlName);
+  /// @brief Convert hideous and vulgar internal parameter name into a beautiful presentable name
+  /// @details The pretty parameter names should be specified in the style config file
+  /// @param origName The "internal" name used to uniquely identify the parameter inside the
+  /// plotting code
+  /// @return A beautiful formatted name that can be used in plots
+  std::string prettifyParamName(std::string origName) const;
 
-        std::string prettifyParamName(std::string origName) const;
+  /// @brief Convert hideous and vulgar internal sample name into a beautiful presentable name
+  /// @details The pretty sample names should be specified in the style config file
+  /// @param fullName The "internal" name used to uniquely identify the sample inside the plotting
+  /// code
+  /// @return A beautiful formatted name that can be used in plots
+  std::string prettifySampleName(std::string fullName) const;
 
-        std::string prettifySampleName(std::string fullName) const;
+  // style setting options
+  /// @brief Set the root colour palette to one of the default root pallettes as defined in (root
+  /// docs)[https://root.cern.ch/doc/master/classTColor.html#C05]
+  /// @param rootPlotStyle The index of the palette as defined by root
+  void setPalette(int rootPlotStyle) const;
 
-        // style setting options
-        void setPalette(int rootPlotStyle) const;
-        void setPalette(std::string configStyleName) const;
-        void setTH1Style(TH1* hist, std::string styleName) const;
+  /// @brief Set the root colour palette to one of the ones defined in the style config
+  /// @param rootPlotStyle The name of the palette you want to use, should be the same as it appears
+  /// in the style config
+  void setPalette(std::string configStyleName) const;
 
-        std::string prettifySampleName(std::string fullName);
+  /// @brief Set the style of a TH1 to one of the styles defined in the style config
+  /// @param hist The TH1 that you wish to modify
+  /// @param styleName The name of the style you want to use, as it appears in the config file
+  void setTH1Style(TH1 *hist, std::string styleName) const;
 
+private:
+  toml::value style_toml;
+};
 
-        private:
-        toml::value style_toml;
-    };
-
-}
-
-
-
+} // namespace MaCh3Plotting
 
 #endif
