@@ -1,46 +1,50 @@
 #include "plottingManager.h"
 
 namespace MaCh3Plotting {
-// this is the constructor using the default plotting toml
+// this is the constructor using the default plotting config file
 PlottingManager::PlottingManager() {
-  // set toml card name
-  configFileName = DEFAULT_PLOTTING_TOML;
+  // set config file name
+  _configFileName = DEFAULT_PLOTTING_CONFIG;
 }
 
-// this is the constructor with user specified toml
-PlottingManager::PlottingManager(std::string PlottingTomlName) {
-  // parse the toml card
-  configFileName = PlottingTomlName;
+// this is the constructor with user specified config
+PlottingManager::PlottingManager(std::string PlottingConfigName) {
+  // parse the config file
+  _configFileName = PlottingConfigName;
 }
 
-/// - Read the plotting config toml
-/// - Instantiate a StyleManager using the style config toml specified in the plotting config toml,
-/// or if none was provided, using DEFAULT_STYLE_TOML.
-/// - Instantiate an InputManager using the translation config toml specified in the plotting config
-/// toml, or if none was provided, using DEFAULT_TRANSLATION_TOML.
+/// - Read the plotting config file
+/// - Instantiate a StyleManager using the style config file specified in the plotting config file,
+/// or if none was provided, using DEFAULT_STYLE_CONFIG.
+/// - Instantiate an InputManager using the translation config file specified in the plotting config
+/// file, or if none was provided, using DEFAULT_TRANSLATION_CONFIG.
 /// - Add all files specified in this PlottingManagers FileNames vector to the new InputManager that
 /// was just created 
 /// @warning This should always be called *After* ParseInputs() unless you are
-/// manually specifying all input file names and config toml names in your drawing application.
+/// manually specifying all input file names and config file names in your drawing application.
 void PlottingManager::Initialise() {
-  card_toml = toml_h::parse_card(configFileName);
+  _plottingConfig = YAML::LoadFile(_configFileName);
 
   // read options from the config
-  toml::value managerOptions = toml_h::find(card_toml, "ManagerOptions");
+  YAML::Node managerOptions = _plottingConfig["ManagerOptions"];
 
-  std::string translationToml = toml_h::find<std::string>(managerOptions, "translationToml");
-  if (translationToml == "")
-    translationToml = DEFAULT_TRANSLATION_TOML;
+  std::string translationConfig = managerOptions["translationConfig"].as<std::string>();
+  if (translationConfig == "")
+  {
+    translationConfig = DEFAULT_TRANSLATION_CONFIG;
+  }
 
-  std::string styleToml = toml_h::find<std::string>(managerOptions, "styleToml");
-  if (styleToml == "")
-    styleToml = DEFAULT_STYLE_TOML;
+  std::string styleConfig = managerOptions["styleConfig"].as<std::string>();
+  if (styleConfig == "")
+  {
+    styleConfig = DEFAULT_STYLE_CONFIG;
+  }
 
   // create the StyleManager
-  styleMan = new StyleManager(styleToml);
+  styleMan = new StyleManager(styleConfig);
 
   // create the InputManager and add all the files to it
-  inputMan = new InputManager(translationToml);
+  inputMan = new InputManager(translationConfig);
   for (std::string fileName : FileNames)
   {
     inputMan->addFile(fileName);
@@ -60,7 +64,7 @@ void PlottingManager::Initialise() {
 ///   -o <OutputName> name of the file to output plots to
 ///   -l <FileLabelStr> string of labels for each file in the format Label1;Label2;... to be parsed
 ///   by parseFileLabels(), number of labels should match exactly the number of files -c
-///   <PlottingConfig> specify a plotting config toml file to be used in place of the default one
+///   <PlottingConfig> specify a plotting config file to be used in place of the default one
 ///   when initialising this manager -d <DrawOptions> extra draw options to be passed when making
 ///   plots, see https://root.cern/doc/master/classTHistPainter.html#HP01a for examples
 ///
@@ -112,7 +116,7 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
       break;
     }
     case 'c': {
-      configFileName = optarg;
+      _configFileName = optarg;
       break;
     }
     case 'd': {
@@ -232,7 +236,7 @@ const std::string PlottingManager::GetOutputName(std::string suffix) {
 /// This is used by e.g. GetOption() so the PlottingManager knows where to look for the option in
 /// the plotting config file.
 void PlottingManager::SetExec(std::string execName) {
-  ExecOptions = toml_h::find(card_toml, execName);
+  _execOptions = _plottingConfig[execName];
   if (OutputName == "Plot.pdf")
     setOutFileName(GetOption<std::string>("defaultOutputName"));
 }

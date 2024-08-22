@@ -1,6 +1,8 @@
 #pragma once
 
-#include "toml/toml_helper.h"
+// MaCh3 Includes
+#include "manager/YamlHelper.h"
+#include "manager/MaCh3Logger.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
@@ -8,7 +10,7 @@
 namespace MaCh3Plotting {
 /// @brief Possible fitters that a file can come from.
 /// @todo I don't think this is actually necessary, could make it so list of possible fitters is
-/// taken straight from which ones are defined in the translation toml.
+/// taken straight from which ones are defined in the translation config file.
 enum fitterEnum {
   kMaCh3,   //!< Came from MaCh3, not used but might be useful in cases where MaCh3_ND and MaCh3_FD
             //!< are indistinguishable?
@@ -170,7 +172,7 @@ struct InputFile {
 /// used all by itself. The interface to this object is intentionally pretty small as it is intended
 /// to deal with the complexities of the different input files pretty automatically. Usage should
 /// follow something like this:
-/// @code InputManager man(translationToml.toml) man.addFile(filename1)
+/// @code InputManager man(translationConfig.yaml) man.addFile(filename1)
 /// man.addFile(filename2)
 /// ...
 ///
@@ -190,11 +192,11 @@ public:
   const std::string NOT_FOUND_STR =
       "__PARAM_NAME_NOT_FOUND__"; //!< the default string to return if something can't be found
 
-  /// @brief Construct a new InputManager using specified fitter translation toml.
-  /// @param translationTomlName The .toml file defining the fitter file structures, fit parameter,
+  /// @brief Construct a new InputManager using specified fitter translation config file.
+  /// @param translationConfigName The config file defining the fitter file structures, fit parameter,
   /// and what the parameters are called in each fitter.
   /// @return Constructed InputManager instance.
-  InputManager(std::string translationTomlName);
+  InputManager(std::string translationConfigName);
 
   /// @brief Add a new InputFile object to this input manager.
   /// @param fileName The name of the file to read.
@@ -327,7 +329,7 @@ public:
   /// @param paramName The name of the parameter whose error you would like.
   /// @param errorType The type of error to return, usually "prior" will be defined, but other
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
-  /// will use the default one, as specified in the fitter definition toml.
+  /// will use the default one, as specified in the fitter definition config.
   /// @return The error on the specified parameter.
   const float GetPostFitError(int fileNum, std::string paramName, std::string errorType = "") const;
 
@@ -336,7 +338,7 @@ public:
   /// @param paramName The name of the parameter whose value you would like.
   /// @param errorType The type of error to return, usually "prior" will be defined, but other
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
-  /// will use the default one, as specified in the fitter definition toml.
+  /// will use the default one, as specified in the fitter definition config.
   /// @return The value of the specified parameter.
   const float GetPostFitValue(int fileNum, std::string paramName, std::string errorType = "") const;
 
@@ -398,23 +400,23 @@ private:
 
   template <typename T>
   bool getFitterSpecificOption(fitterEnum fitter, std::string option, T *ret, std::string parameter,
-                               toml::value subToml) const;
+                               YAML::Node subConfig) const;
 
   // Specialised option getter for parameters
   template <typename T>
   inline bool getFitterSpecificParamOption(fitterEnum fitter, std::string option, T *ret,
                                            std::string parameter) const {
-    return getFitterSpecificOption<T>(fitter, option, ret, parameter, parameters_toml);
+    return getFitterSpecificOption<T>(fitter, option, ret, parameter, _parametersConfig);
   }
 
   // specialised option getter for samples
   template <typename T>
   inline bool getFitterSpecificSampleOption(fitterEnum fitter, std::string option, T *ret,
                                             std::string parameter) const {
-    return getFitterSpecificOption<T>(fitter, option, ret, parameter, samples_toml);
+    return getFitterSpecificOption<T>(fitter, option, ret, parameter, _samplesConfig);
   }
 
-  // helper function to read from the translation toml to get the parameter name for a specific
+  // helper function to read from the translation config to get the parameter name for a specific
   // fitter and file type
   inline std::string getFitterSpecificParamName(fitterEnum fitter, fileTypeEnum fileType,
                                                 std::string parameter) const {
@@ -428,7 +430,7 @@ private:
     return parameter;
   }
 
-  // helper function to read from the translation toml to get the sample name for a specific fitter
+  // helper function to read from the translation config file to get the sample name for a specific fitter
   // and file type
   inline std::string getFitterSpecificSampleName(fitterEnum fitter, fileTypeEnum fileType,
                                                  std::string sample) const {
@@ -452,10 +454,10 @@ private:
   std::vector<InputFile *> fileVec;
 
   // all parameters which are known to this InputManager: all the ones defined in the translation
-  // toml used to create it
+  // config used to create it
   std::vector<std::string> knownParameters;
 
-  // all samples which are known to this InputManager: all the ones defined in the translation toml
+  // all samples which are known to this InputManager: all the ones defined in the translation config
   // used to create it
   std::vector<std::string> knownSamples;
 
@@ -468,11 +470,12 @@ private:
   std::string MaCh3ToBANFFName(std::string mach3ParamName);
   std::string BANFFfluxName(std::string);
 
-  // the toml card defining the translation of parameters between fitters and also the directory
+private:
+  // the configs defining the translation of parameters between fitters and also the directory
   // structure for each fitter
-  toml::value translator_toml;
-  toml::value fitterSpec_toml;
-  toml::value parameters_toml;
-  toml::value samples_toml;
+  YAML::Node _translatorConfig;
+  YAML::Node _fitterSpecConfig;
+  YAML::Node _parametersConfig;
+  YAML::Node _samplesConfig;
 };
 } // namespace MaCh3Plotting

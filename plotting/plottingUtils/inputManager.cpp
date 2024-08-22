@@ -4,25 +4,24 @@
 #define __BAD_FLOAT__ -999.999
 
 namespace MaCh3Plotting {
-// this is the constructor with user specified translation toml
-InputManager::InputManager(std::string translationTomlName) {
-  // read the toml file
-  translator_toml = toml_h::parse_card(translationTomlName);
+// this is the constructor with user specified translation config file
+InputManager::InputManager(std::string translationConfigName) {
+  // read the config file
+  _translatorConfig = YAML::LoadFile(translationConfigName);
 
-  // split up the parts of the toml for easier access later
-  fitterSpec_toml = toml_h::find(translator_toml, "FitterSpec");
-  parameters_toml = toml_h::find(translator_toml, "Parameters");
-  samples_toml = toml_h::find(translator_toml, "Samples");
+  // split up the parts of the config for easier access later
+  _fitterSpecConfig = _translatorConfig["FitterSpec"];
+  _parametersConfig = _translatorConfig["Parameters"];
+  _samplesConfig = _translatorConfig["Samples"];
 
   // go through each of the parameters and sample arrays and keep track of which ones we've been
   // told about
-  for (std::string parameter :
-       toml_h::find<std::vector<std::string>>(parameters_toml, "Parameters"))
+  for (std::string parameter : _parametersConfig["Parameters"].as<std::vector<std::string>>())
   {
     knownParameters.push_back(parameter);
   }
 
-  for (std::string sample : toml_h::find<std::vector<std::string>>(samples_toml, "Samples"))
+  for (std::string sample : _samplesConfig["Samples"].as<std::vector<std::string>>())
   {
     knownSamples.push_back(sample);
   }
@@ -249,27 +248,27 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
   return object;
 }
 
-// helper function to read from the translation toml to get an option for a particular sub toml
+// helper function to read from the translation config file to get an option for a particular sub node
 // (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
 // fitter and parameter otherwise returns false
 template <typename T>
 bool InputManager::getFitterSpecificOption(fitterEnum fitter, std::string option, T *ret,
-                                           std::string parameter, toml::value subToml) const {
-  if (toml_h::contains(subToml, parameter))
+                                           std::string parameter, YAML::Node subConfig) const {
+  if (subConfig[parameter])
   {
 
-    // EM: this is toml definition of fitter specific names for this parameter
-    toml::value paramTranslation = toml_h::find(subToml, parameter);
+    // EM: this is config definition of fitter specific names for this parameter
+    YAML::Node paramTranslation = subConfig[parameter];
 
-    if (toml_h::contains(paramTranslation, convertFitterNames(fitter)))
+    if (paramTranslation[convertFitterNames(fitter)])
     {
       // EM: then this is definition of how to find parameter in the specified fitter
-      toml::value fitterParamTranslation =
-          toml_h::find(paramTranslation, convertFitterNames(fitter));
+      YAML::Node fitterParamTranslation =
+          paramTranslation[convertFitterNames(fitter)];
 
-      if (toml_h::contains(fitterParamTranslation, option))
+      if (fitterParamTranslation[option])
       {
-        *ret = toml_h::find<T>(fitterParamTranslation, option);
+        *ret = fitterParamTranslation[option].as<T>();
         return true;
       }
     }
@@ -280,15 +279,15 @@ bool InputManager::getFitterSpecificOption(fitterEnum fitter, std::string option
 bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string parameter,
                                    fitterEnum fitter, std::string sample, bool setInputFileScan) {
 
-  toml::value thisFitterSpec_toml =
-      toml_h::find(fitterSpec_toml, convertFitterNames(fitterEnum(fitter)));
+  YAML::Node thisFitterSpec_config =
+      _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
 
   // EM: Get where the by sample LLH scan for this parameter *should* live if it exists
-  toml::value testLLHToml = toml_h::find(thisFitterSpec_toml, "bySample_LLH");
+  YAML::Node testLLHConfig = thisFitterSpec_config["bySample_LLH"];
   std::vector<std::string> testLLHRawLocations =
-      toml_h::find<std::vector<std::string>>(testLLHToml, "location");
+      testLLHConfig["location"].as<std::vector<std::string>>();
 
-  std::string LLHObjType = toml_h::find<std::string>(thisFitterSpec_toml, "LLHObjectType");
+  std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
 
   // EM: Now look for the parameter in this folder
   TObject *LLHObj = nullptr;
@@ -337,14 +336,13 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
                                          fitterEnum fitter, std::string errorType,
                                          bool setInputFileError) {
   std::string specificName = getFitterSpecificParamName(fitter, kPostFit, parameter);
-  toml::value thisFitterSpec_toml =
-      toml_h::find(fitterSpec_toml, convertFitterNames(fitterEnum(fitter)));
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
 
-  // EM: Get which hist this parameter lives in from the toml
-  toml::value postFitErrorTypes = toml_h::find(thisFitterSpec_toml, "postFitErrorTypes");
-  toml::value specificErrorType = toml_h::find(postFitErrorTypes, errorType);
+  // EM: Get which hist this parameter lives in from the config
+  YAML::Node postFitErrorTypes = thisFitterSpec_config["postFitErrorTypes"];
+  YAML::Node specificErrorType = postFitErrorTypes[errorType];
   std::vector<std::string> postFitLocations =
-      toml_h::find<std::vector<std::string>>(specificErrorType, "Loc");
+      specificErrorType["Loc"].as<std::vector<std::string>>();
 
   // EM: If the parameter has a specified list of locations then override the default one
   std::vector<std::string> postFitLocations_override;
@@ -362,8 +360,8 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
     if (postFitErrors == NULL)
       continue;
 
-    // EM: check the toml to see if a suffix is supplied for this
-    std::string suffix = toml_h::find<std::string>(thisFitterSpec_toml, "defaultPostFitSuffix");
+    // EM: check the config to see if a suffix is supplied for this
+    std::string suffix = thisFitterSpec_config["defaultPostFitSuffix"].as<std::string>();
     getFitterSpecificParamOption<std::string>(fitter, "postFitSuffix", &suffix, parameter);
 
     // EM: Loop through the hist to see if it contains the parameter we're looking for
@@ -407,15 +405,15 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
       std::cout << "Checking if this is a " << convertFitterNames(fitter) << " file" << std::endl;
 
     // EM: get the configuration specifying what the output of this fitter looks like
-    if (!toml_h::contains(fitterSpec_toml, convertFitterNames(fitter)))
+    if (!_fitterSpecConfig[convertFitterNames(fitter)])
     {
       std::cerr << "ERROR " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "translation toml doesnt contain a definition for fitter "
+      std::cerr << "translation config doesnt contain a definition for fitter "
                 << convertFitterNames(fitter) << std::endl;
       throw;
     }
 
-    toml::value thisFitterSpec_toml = toml_h::find(fitterSpec_toml, convertFitterNames(fitter));
+    YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitter)];
 
     size_t numLLHParams;
 
@@ -428,9 +426,8 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
         std::cout << ".... searching for " << LLHType << " LLH scans... ";
 
       // vector of all the possible locations that we might find LLH scans for this type of LLH
-      toml::value testLLHToml = toml_h::find(thisFitterSpec_toml, LLHType + "_LLH");
-      std::vector<std::string> testLLHRawLocations =
-          toml_h::find<std::vector<std::string>>(testLLHToml, "location");
+      YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
+      std::vector<std::string> testLLHRawLocations = testLLHConfig["location"].as<std::vector<std::string>>();
 
       // counter for the total number of parameters we find scans for
       numLLHParams = 0;
@@ -479,15 +476,12 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     {
       std::cout << "....searching for Post Fit Parameters (";
 
-      if (toml_h::contains<std::string>(thisFitterSpec_toml, "defaultPostFitErrorType"))
+      if (thisFitterSpec_config["defaultPostFitErrorType"])
       {
         std::cout << "Default type specified with possible locations: ";
-        toml::value postFitErrorSpec = toml_h::find(thisFitterSpec_toml, "postFitErrorTypes");
-        toml::value defaultErrorType =
-            toml_h::find(postFitErrorSpec,
-                         toml_h::find<std::string>(thisFitterSpec_toml, "defaultPostFitErrorType"));
-        std::vector<std::string> locations =
-            toml_h::find<std::vector<std::string>>(defaultErrorType, "Loc");
+        YAML::Node postFitErrorSpec = thisFitterSpec_config["postFitErrorTypes"];
+        YAML::Node defaultErrorType = postFitErrorSpec[ thisFitterSpec_config["defaultPostFitErrorType"] ];
+        std::vector<std::string> locations = defaultErrorType["Loc"].as<std::vector<std::string>>();
         for (std::string loc : locations)
           std::cout << std::endl << loc;
         std::cout << ")" << std::endl;
@@ -501,8 +495,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     int numPostFitParams = 0;
     std::vector<std::string> enabledPostFitParams;
 
-    std::string defaultErrorType =
-        toml_h::find<std::string>(thisFitterSpec_toml, "defaultPostFitErrorType");
+    std::string defaultErrorType = thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
     for (std::string parameter : knownParameters)
     {
       if (findPostFitParamError(inputFileDef, parameter, fitterEnum(i), defaultErrorType))
@@ -592,12 +585,10 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
   if (printThoughts)
     std::cout << "....getting data from file " << inputFileDef->fileName << std::endl;
 
-  toml::value thisFitterSpec_toml =
-      toml_h::find(fitterSpec_toml, convertFitterNames(inputFileDef->fitter));
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(inputFileDef->fitter)];
 
   // set the default post fit error type so we can read it as default later
-  inputFileDef->defaultErrorType =
-      toml_h::find<std::string>(thisFitterSpec_toml, "defaultPostFitErrorType");
+  inputFileDef->defaultErrorType = thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
 
   // ########### First fill up the LLH vectors ############
   for (std::string LLHType : {"sample", "penalty", "total"})
@@ -606,12 +597,11 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
       continue;
 
     // vector of all the possible locations that we might find LLH scans for this type of LLH
-    toml::value testLLHToml = toml_h::find(thisFitterSpec_toml, LLHType + "_LLH");
-    std::vector<std::string> testLLHRawLocations =
-        toml_h::find<std::vector<std::string>>(testLLHToml, "location");
+    YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
+    std::vector<std::string> testLLHRawLocations = testLLHConfig["location"].as<std::vector<std::string>>();
 
     // get the expected root object type of the llh scans
-    std::string LLHObjType = toml_h::find<std::string>(thisFitterSpec_toml, "LLHObjectType");
+    std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
 
     // EM: now get the objects from the file
     for (std::string parameter : inputFileDef->availableParams_LLH)
@@ -641,7 +631,7 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
       // now convert it to a TGraph
       TGraph *LLHGraph = new TGraph();
 
-      // EM: maybe have the type of the LLH object specified in the toml to know what to downcast it
+      // EM: maybe have the type of the LLH object specified in the config to know what to downcast it
       // to??
       if (LLHObjType == "TH1D")
       {
@@ -679,8 +669,7 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
   // ####### Get the processed post fit errors #######
   for (std::string parameter : inputFileDef->availableParams_postFitErrors)
   {
-    std::vector<std::string> availableErrorTypes =
-        toml_h::find<std::vector<std::string>>(thisFitterSpec_toml, "AvailablePostFitErrorTypes");
+    std::vector<std::string> availableErrorTypes = thisFitterSpec_config["AvailablePostFitErrorTypes"].as<std::vector<std::string>>();
     for (std::string errorType : availableErrorTypes)
     {
       findPostFitParamError(inputFileDef, parameter, inputFileDef->fitter, errorType, true);

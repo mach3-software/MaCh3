@@ -1,5 +1,4 @@
-#ifndef PLOTTING_MANAGER_H
-#define PLOTTING_MANAGER_H 1
+#pragma once
 
 // C++ includes
 #include <algorithm>
@@ -15,7 +14,9 @@
 #include "TH1.h"
 #include "TStyle.h"
 
-#include "toml/toml_helper.h"
+// MaCh3 Includes
+#include "manager/YamlHelper.h"
+#include "manager/MaCh3Logger.h"
 
 // Other MaCh3Plotting stuff
 #include "inputManager.h"
@@ -35,29 +36,29 @@ namespace MaCh3Plotting {
 class PlottingManager {
 public:
   // EM: cant make these static as std::getenv("MACH3") not known at compile time
-  const std::string DEFAULT_TRANSLATION_TOML =
+  const std::string DEFAULT_TRANSLATION_CONFIG =
       std::string(std::getenv("MACH3")) +
-      "/plotting/universalTranslator.toml"; //!< The default translation toml to be used by
+      "/plotting/universalTranslator.yaml"; //!< The default translation config to be used by
                                             //!< PlottingManager instances when instantiating the
                                             //!< InputManager.
-  const std::string DEFAULT_STYLE_TOML =
+  const std::string DEFAULT_STYLE_CONFIG =
       std::string(std::getenv("MACH3")) +
-      "/plotting/StyleConfig.toml"; //!< The default style config toml to be used by PlottingManager
+      "/plotting/StyleConfig.yaml"; //!< The default style config config to be used by PlottingManager
                                     //!< instances when instantiating the StyleManager.
-  const std::string DEFAULT_PLOTTING_TOML =
+  const std::string DEFAULT_PLOTTING_CONFIG =
       std::string(std::getenv("MACH3")) +
-      "/plotting/PlottingConfig.toml"; //!< The default plotting config toml to use when
+      "/plotting/PlottingConfig.yaml"; //!< The default plotting config config to use when
                                        //!< instantiating new PlottingManager objects.
 
-  /// @brief Construct a new PlottingManager using default plottingConfig toml.
+  /// @brief Construct a new PlottingManager using default plottingConfig config.
   /// @return Constructed PlottingManager instance.
   PlottingManager();
 
-  /// @brief Construct a new PlottingManager using specified plottingConfig toml.
-  /// @param PlottingTomlName The .toml file defining executables specific options, and other minor
+  /// @brief Construct a new PlottingManager using specified plottingConfig config.
+  /// @param PlottingConfigName The config file file defining executables specific options, and other minor
   /// manager related options.
   /// @return Constructed PlottingManager instance.
-  PlottingManager(std::string PlottingTomlName);
+  PlottingManager(std::string PlottingConfigName);
 
   /// @brief initalise this PlottingManager.
   void Initialise();
@@ -93,10 +94,9 @@ public:
   /// @param fileName the name of the output file.
   void setOutFileName(std::string fileName);
 
-  // ==== toml things (will one day be yaml things) ====
   /// @brief Internally set the name of the executable that manager is being used in.
   /// @param execName Name of the current executable, will also need to be defined in the plotting
-  /// config toml.
+  /// config file.
   void SetExec(std::string execName);
 
   /// @brief Get a specific option from the config for this executable.
@@ -104,51 +104,102 @@ public:
   /// @param option The option that you want from the config.
   /// @return The specified value for the option.
   template <typename T> T GetOption(std::string option) {
-    return toml_h::find<T>(ExecOptions, option);
+    return _execOptions[option].as<T>();
   }
-  toml::value GetOption(std::string option) { return toml_h::find(ExecOptions, option); }
+  YAML::Node GetOption(std::string option) 
+  { 
+    return _execOptions[option]; 
+  }
 
   // ############# getters ##############
   /// @name General getters
   /// @{
-  const std::string GetFileName(int i) { return FileNames[i]; }
-  const std::string GetFileLabel(int i) { return FileLabels[i]; }
-  const std::string GetDrawOptions() { return extraDrawOptions; }
+  const std::string GetFileName(int i) 
+	{
+		return FileNames[i];
+	}
+
+  const std::string GetFileLabel(int i) 
+	{
+		return FileLabels[i];
+	}
+
+  const std::string GetDrawOptions() 
+	{
+		return extraDrawOptions;
+	}
+
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string GetOutputName() { return OutputName; }
+  const std::string GetOutputName() 
+	{
+		return OutputName;
+	}
+
   /// @brief Get the output name but can specify a siffix to add to the name, before the file
   /// extension.
   /// @param suffix The suffix to add to the file name.
   /// @return Output file name with suffix added before the extension.
   const std::string GetOutputName(std::string suffix);
 
-  const std::vector<std::string> GetFileNames() { return FileNames; }
-  const std::vector<std::string> GetFileLabels() { return FileLabels; }
+  const std::vector<std::string> GetFileNames() 
+	{
+		return FileNames;
+	}
 
-  const int GetNFiles() { return (int)FileNames.size(); }
+  const std::vector<std::string> GetFileLabels() 
+	{
+		return FileLabels;
+	}
 
-  const bool GetSplitBySample() { return splitBySample; }
-  const bool GetPlotRatios() { return plotRatios; }
-  const bool GetDrawGrid() { return drawGrid; }
+
+  const int GetNFiles() 
+	{
+		return (int)FileNames.size();
+	}
+
+
+  const bool GetSplitBySample() 
+	{
+		return splitBySample;
+	}
+
+  const bool GetPlotRatios() 
+	{
+		return plotRatios;
+	}
+
+  const bool GetDrawGrid() 
+	{
+		return drawGrid;
+	}
+
   /// @}
 
   // for managers contained in this manager
   /// @brief Get the StyleManager contained within this PlottingManager, for doing style related
   /// things.
-  const StyleManager *Style() { return styleMan; }
+  const StyleManager *Style() 
+	{
+		return styleMan;
+	}
+
   /// @brief Get the InputManager contained within this PlottingManager, for doing input related
   /// things.
-  const InputManager *Input() { return inputMan; }
+  const InputManager *Input() 
+	{
+		return inputMan;
+	}
+
 
 private:
-  // name of the toml file to read configs from
-  std::string configFileName = std::string(std::getenv("MACH3")) + "/plotting/PlottingConfig.toml";
-  // the parsed toml object
-  toml::value card_toml;
-  // the toml object holding the options for the current executable
-  toml::value ExecOptions;
+  // name of the config file to read configs from
+  std::string _configFileName = std::string(std::getenv("MACH3")) + "/plotting/PlottingConfig.yaml";
+  // the parsed config
+  YAML::Node _plottingConfig;
+  // the config object holding the options for the current executable
+  YAML::Node _execOptions;
 
   // input file names and labels
   std::vector<std::string> FileNames;
@@ -169,5 +220,3 @@ private:
   InputManager *inputMan = NULL;
 };
 } // namespace MaCh3Plotting
-
-#endif

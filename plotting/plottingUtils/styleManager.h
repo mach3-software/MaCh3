@@ -1,7 +1,8 @@
-#ifndef STYLE_MANAGER_H
-#define STYLE_MANAGER_H 1
+#pragma once
 
-#include "toml/toml_helper.h"
+// MaCh3 Includes
+#include "manager/YamlHelper.h"
+#include "manager/MaCh3Logger.h"
 
 // ROOT Things
 #include "TColor.h"
@@ -12,8 +13,8 @@ namespace MaCh3Plotting {
 class StyleManager {
 public:
   /// @brief Constructor
-  /// @param tomlName The style toml to read from
-  StyleManager(std::string tomlName);
+  /// @param configName The style config to read from
+  StyleManager(std::string configName);
 
   /// @brief Convert hideous and vulgar internal parameter name into a beautiful presentable name
   /// @details The pretty parameter names should be specified in the style config file
@@ -46,9 +47,7 @@ public:
   void setTH1Style(TH1 *hist, std::string styleName) const;
 
 private:
-  toml::value style_toml;
+  YAML::Node _styleConfig;
 };
 
 } // namespace MaCh3Plotting
-
-#endif

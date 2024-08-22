@@ -1,5 +1,7 @@
-#ifndef PLOTTING_UTILS_H
-#define PLOTTING_UTILS_H 1
+#pragma once
+
+// MaCh3 includes
+#include "manager/MaCh3Logger.h"
 
 // C++
 #include <algorithm>
@@ -39,5 +41,3 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName = "", std::string newTitle =
 
 /// @}
 } // namespace MaCh3Plotting
-
-#endif

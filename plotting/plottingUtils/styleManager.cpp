@@ -1,18 +1,18 @@
 #include "styleManager.h"
 
 namespace MaCh3Plotting {
-StyleManager::StyleManager(std::string styleTomlName) {
-  style_toml = toml_h::parse_card(styleTomlName);
+StyleManager::StyleManager(std::string styleConfigName) {
+  _styleConfig = YAML::LoadFile(styleConfigName);
 }
 
 std::string StyleManager::prettifyParamName(std::string origName) const {
   std::string prettyName = origName;
 
-  auto const &PrettyNames = toml_h::find(style_toml, "PrettyNames");
+  YAML::Node prettyNames = _styleConfig["PrettyNames"];
 
-  if (toml_h::contains(PrettyNames, origName))
+  if (prettyNames[origName])
   {
-    prettyName = toml_h::find<std::string>(PrettyNames, origName);
+    prettyName = prettyNames[origName].as<std::string>();
   }
 
   return prettyName;
@@ -24,14 +24,11 @@ void StyleManager::setPalette(int rootPlotStyle) const {
 }
 
 void StyleManager::setPalette(std::string configStyleName) const {
-  // set the colour palette to one of the palettes defined in PlottingConfig.toml
+  // set the colour palette to one of the palettes defined in PlottingConfig.yaml
 
-  // get the definition of the provided style from the toml
-  auto const &card_toml =
-      toml_h::parse_card(std::string(std::getenv("MACH3")) + "/plotting/StyleConfig.toml");
-  auto const &palettes = toml_h::find(card_toml, "ColorPallettes");
-  std::vector<std::vector<double>> paletteDef =
-      toml_h::find<std::vector<std::vector<double>>>(palettes, configStyleName);
+  // get the definition of the provided style from the config file
+  YAML::Node palettes = _styleConfig["ColorPallettes"];
+  std::vector<std::vector<double>> paletteDef = palettes[configStyleName].as<std::vector<std::vector<double>>>();
 
   const Int_t NCont = (Int_t)(paletteDef[0][0]);
 
@@ -45,7 +42,7 @@ void StyleManager::setPalette(std::string configStyleName) const {
   if ((Int_t)redsVec.size() != NRGBs || (Int_t)greensVec.size() != NRGBs ||
       (Int_t)bluesVec.size() != NRGBs)
   {
-    std::cerr << "ERROR: invalid colour palettet defined in config toml: " << configStyleName
+    std::cerr << "ERROR: invalid colour palettet defined in style config file: " << configStyleName
               << std::endl;
     std::cerr << "       RGB arrays dont all have the same size, please fix that" << std::endl;
     throw;
@@ -70,35 +67,33 @@ void StyleManager::setPalette(std::string configStyleName) const {
 }
 
 void StyleManager::setTH1Style(TH1 *hist, std::string styleName) const {
-  // get the definition of the provided style from the toml
-  auto const &card_toml =
-      toml_h::parse_card(std::string(std::getenv("MACH3")) + "/plotting/StyleConfig.toml");
-  auto const &TH1Styles = toml_h::find(card_toml, "TH1Styles");
-  auto const &styleDef = toml_h::find(TH1Styles, styleName);
+  // get the definition of the provided style from the config file
+  YAML::Node TH1Styles = _styleConfig["TH1Styles"];
+  YAML::Node styleDef = TH1Styles[styleName];
 
-  if (toml_h::contains(styleDef, "MarkerColor"))
+  if (styleDef["MarkerColor"])
   {
-    hist->SetMarkerColor(toml_h::find<int>(styleDef, "MarkerColor"));
+    hist->SetMarkerColor(styleDef["MarkerColor"].as<int>());
   }
-  if (toml_h::contains(styleDef, "MarkerStyle"))
+  if (styleDef["MarkerStyle"])
   {
-    hist->SetMarkerStyle(toml_h::find<int>(styleDef, "MarkerStyle"));
+    hist->SetMarkerStyle(styleDef["MarkerStyle"].as<int>());
   }
-  if (toml_h::contains(styleDef, "FillColor"))
+  if (styleDef["FillColor"])
   {
-    hist->SetFillColor(toml_h::find<int>(styleDef, "FillColor"));
+    hist->SetFillColor(styleDef["FillColor"].as<int>());
   }
-  if (toml_h::contains(styleDef, "FillStyle"))
+  if (styleDef["FillStyle"])
   {
-    hist->SetFillStyle(toml_h::find<int>(styleDef, "FillStyle"));
+    hist->SetFillStyle(styleDef["FillStyle"].as<int>());
   }
-  if (toml_h::contains(styleDef, "LineColor"))
+  if (styleDef["LineColor"])
   {
-    hist->SetLineColor(toml_h::find<int>(styleDef, "LineColor"));
+    hist->SetLineColor(styleDef["LineColor"].as<int>());
   }
-  if (toml_h::contains(styleDef, "LineStyle"))
+  if (styleDef["LineStyle"])
   {
-    hist->SetLineStyle(toml_h::find<int>(styleDef, "LineStyle"));
+    hist->SetLineStyle(styleDef["LineStyle"].as<int>());
   }
 }
 
