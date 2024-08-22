@@ -3,6 +3,7 @@
 // MaCh3 Includes
 #include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"
+#include "manager/MaCh3Exception.h"
 
 // ROOT Things
 #include "TColor.h"

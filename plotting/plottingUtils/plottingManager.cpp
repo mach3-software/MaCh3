@@ -109,10 +109,9 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
     }
     case 'l': {
       parseFileLabels(optarg, FileLabels);
-      std::cout << "INFO: Specified file labels {";
+      MACH3LOG_INFO("Specified file labels: ");
       for (std::string label : FileLabels)
-        std::cout << label << ", ";
-      std::cout << "}" << std::endl;
+        MACH3LOG_INFO("  {}", label);
       break;
     }
     case 'c': {
@@ -126,40 +125,32 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
     }
   }
 
-  std::cout << std::endl << "Input files provided: \n{";
+  MACH3LOG_INFO("\nInput files provided");
   // optind is for the extra arguments that are not parsed by the program
   for (; optind < argc; optind++)
   {
     FileNames.push_back(argv[optind]);
-    std::cout << argv[optind] << ", ";
+    MACH3LOG_INFO(argv[optind]);
     FileLabels_default.push_back(argv[optind]);
   }
-  std::cout << "}" << std::endl << std::endl;
-
+  
   if (splitBySample)
-    std::cout << "Splitting by sample" << std::endl;
+    MACH3LOG_INFO("Splitting by sample");
 
   if (plotRatios && FileNames.size() == 0)
   {
-    std::cerr << "ERROR: you specified -r <plotRatios> = true but didnt specify any files to "
-                 "compare against, was this a mistake?"
-              << std::endl;
-    throw;
+    MACH3LOG_ERROR("you specified -r <plotRatios> = true but didnt specify any files to compare against, was this a mistake?");
   }
 
   if (FileLabels.size() == 0)
   {
-    std::cout << "INFO: No file labels specified, will just use the file names" << std::endl;
+    MACH3LOG_INFO("No file labels specified, will just use the file names");
     FileLabels = FileLabels_default;
   }
 
   if ((FileLabels.size() != 0) && (FileLabels.size() != FileNames.size()))
   {
-    std::cerr << "ERROR: hmmm, you gave me " << FileLabels.size() << " labels but "
-              << FileNames.size() << " files" << std::endl;
-    std::cerr << "       that doesn\'t seem right to me, did you forget a file? or a label maybe?"
-              << std::endl;
-    throw;
+    MACH3LOG_ERROR("hmmm, you gave me {} labels but {} files", FileLabels.size(), FileNames.size());
   }
 
   Initialise();
@@ -208,9 +199,8 @@ void PlottingManager::setOutFileName(std::string saveName) {
     return;
   }
 
-  std::cout << "WARNING: file extension " << ext
-            << " that you provided doesnt support multiple plots in one file" << std::endl;
-  std::cout << "        should be one of .pdf, .eps .ps, will use pdf" << std::endl;
+  MACH3LOG_WARN("file extension '{}' that you provided doesnt support multiple plots in one file", ext);
+  MACH3LOG_WARN("should be one of .pdf, .eps .ps, will use pdf");
   OutputName = saveName + ".pdf";
 }
 

@@ -17,6 +17,7 @@
 // MaCh3 Includes
 #include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"
+#include "manager/MaCh3Exception.h"
 
 // Other MaCh3Plotting stuff
 #include "inputManager.h"

@@ -376,7 +376,7 @@ int PlotLLH() {
   // loop over the spline parameters
   for (std::string paramName : man->Input()->GetKnownParameters())
   {
-    std::cout << "working on parameter " << paramName << std::endl;
+    MACH3LOG_DEBUG("working on parameter {}", paramName);
     // ###############################################################
     // First lets do just the straight up likelihoods from all samples
     // ###############################################################

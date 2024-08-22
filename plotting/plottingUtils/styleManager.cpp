@@ -43,10 +43,8 @@ void StyleManager::setPalette(std::string configStyleName) const {
   if ((Int_t)redsVec.size() != NRGBs || (Int_t)greensVec.size() != NRGBs ||
       (Int_t)bluesVec.size() != NRGBs)
   {
-    std::cerr << "ERROR: invalid colour palettet defined in style config file: " << configStyleName
-              << std::endl;
-    std::cerr << "       RGB arrays dont all have the same size, please fix that" << std::endl;
-    throw;
+    MACH3LOG_ERROR("invalid colour palettet defined in style config file: {}");
+    MACH3LOG_ERROR("RGB arrays dont all have the same size, please fix that");
   }
 
   // root only likes arrays so convert to those

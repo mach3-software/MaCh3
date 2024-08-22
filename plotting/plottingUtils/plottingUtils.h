@@ -2,6 +2,7 @@
 
 // MaCh3 includes
 #include "manager/MaCh3Logger.h"
+#include "manager/MaCh3Exception.h"
 
 // C++
 #include <algorithm>

@@ -3,6 +3,7 @@
 // MaCh3 Includes
 #include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"
+#include "manager/MaCh3Exception.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
@@ -78,27 +79,26 @@ struct InputFile {
   /// @todo Could add some flag to this to check if the relevant information has actually been
   /// filled already and if not give some warning or print only some of the values.
   void Summarise() {
-    std::cout << "### Input File Summary ###" << std::endl;
-    std::cout << "  Root file loc: " << fileName << std::endl;
-    std::cout << "  Came from fitter: " << fitter << std::endl;
-    std::cout << "  N LLH scans: " << availableParams_LLH.size() << std::endl;
-    std::cout << "  N Processed post fit errors: " << availableParams_postFitErrors.size()
-              << std::endl;
+    MACH3LOG_INFO("### Input File Summary ###");
+    MACH3LOG_INFO("  Root file loc: {}", fileName);
+    MACH3LOG_INFO("  Came from fitter: {}", fitter);
+    MACH3LOG_INFO("  N LLH scans: {}", availableParams_LLH.size());
+    MACH3LOG_INFO("  N Processed post fit errors: {}", availableParams_postFitErrors.size());
   }
 
   /// @brief Print out a more detailed summary of what is contained in the file.
   /// @todo Same as for Summarise(), could add a check that the file info has actually been filled.
   void Dump() {
     Summarise();
-    std::cout << "Available LLH parameters: " << std::endl;
+    MACH3LOG_INFO("Available LLH parameters: ");
     for (std::string paramName : availableParams_LLH)
     {
-      std::cout << "  " << paramName << std::endl;
+      MACH3LOG_INFO("  {}", paramName);
     }
-    std::cout << "Available Post Fit errors: " << std::endl;
+    MACH3LOG_INFO("Available Post Fit errors: ");
     for (std::string paramName : availableParams_postFitErrors)
     {
-      std::cout << "  " << paramName << std::endl;
+      MACH3LOG_INFO("  {}", paramName);
     }
   }
 
@@ -296,12 +296,7 @@ public:
   template <typename T = TGraph>
   // Default template (i.e. the template specified was not one of the ones implemented below)
   T GetSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
-    std::cerr << "ERROR: uuuuuh sorry but im not sure how to convert likelihood scans to the "
-                 "specified type"
-              << std::endl;
-    std::cerr << "       you can come and visit me and teach me how" << std::endl;
-    std::cerr << "       " << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__, "uuuuuh sorry but im not sure how to convert likelihood scans to the specified type");
   }
 
   /// @brief Get whether or not a particular parameter has an LLH scan in a particular input file.

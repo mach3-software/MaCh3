@@ -70,7 +70,11 @@ std::vector <TH1D *> PostfitHistVec;
 
 void copyParToBlockHist(int localBin, std::string paramName, TH1D*blockHist, std::string type, int fileId, bool setLabels = true){
   // Set the values in the sub-histograms
-  std::cout << localBin << ": " << paramName << ": " << man->Input()->TranslateName(fileId, MaCh3Plotting::kPostFit, paramName) << " (" << man->Input()->GetPostFitValue(fileId, paramName, type) << ", " << man->Input()->GetPostFitError(fileId, paramName, type) << ")" << std::endl;
+  MACH3LOG_DEBUG("copyin data from at local bin {}: for parameter {}", localBin, paramName);
+  MACH3LOG_DEBUG("  Fitter specific name: {}", man->Input()->TranslateName(fileId, MaCh3Plotting::kPostFit, paramName));
+  MACH3LOG_DEBUG("  value: {}", man->Input()->GetPostFitValue(fileId, paramName, type));
+  MACH3LOG_DEBUG("  error: {}", man->Input()->GetPostFitError(fileId, paramName, type));
+
   blockHist->SetBinContent(localBin +1, man->Input()->GetPostFitValue(fileId, paramName, type));
   blockHist->SetBinError(localBin +1, man->Input()->GetPostFitError(fileId, paramName, type));
 
@@ -361,14 +365,14 @@ void MakeFluxPlots()
     int nParams = blockContents[1] - blockContents[0] +1;
     // check for sanity
     if(nParams <= 0 || blockContents.size() > 2){
-      std::cerr << "ERROR: Invalid flux parameter block endpoints specified for " << fluxBlockName << std::endl;
-      std::cerr << "       Should have the form [<low index>, <up index>]" << std::endl;
-      throw;
+      MACH3LOG_CRITICAL("Invalid flux parameter block endpoints specified for {}", fluxBlockName);
+      MACH3LOG_CRITICAL("  Should have the form [<low index>, <up index>]");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     if(nParams != (int)binning.size() -1){
-      std::cerr << "ERROR: Binning provided for flux param block "  << fluxBlockName << " Does not match the number of parameters specified for the block" << std::endl;
-      std::cerr << "       Provided " << nParams << " flux parameters, but " << binning.size() -1 << " bins" << std::endl;
-      throw;
+      MACH3LOG_CRITICAL("Binning provided for flux param block {} does not match the number of parameters specified for the block", fluxBlockName);
+      MACH3LOG_CRITICAL("  Provided {} parameters but {} bins", nParams, binning.size() -1);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     TH1D *blockHist_prefit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binArray);
@@ -380,7 +384,6 @@ void MakeFluxPlots()
     for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
         int localBin = fluxParId - blockContents[0];
         std::string paramName = "b_" + std::to_string(fluxParId);
-        std::cout << paramName << std::endl;
         copyParToBlockHist(localBin, paramName, blockHist_prefit, "Prior", 0, false);
     }
 
@@ -418,11 +421,11 @@ void MakeNDDetPlots()
   int NDbinCounter = NDParametersStartingPos;
   int Start = NDbinCounter;
   
-  std::cout << "Running on " << NDSamplesNames.size() << "samples" << std::endl;
+  MACH3LOG_INFO("Running on {} samples", NDSamplesNames.size());
 
   for (unsigned int i = 0; i < NDSamplesNames.size(); ++i)
   {
-    std::cout << "--- On sample " << NDSamplesNames[i].c_str() << std::endl; 
+    MACH3LOG_DEBUG("--- On sample {}", NDSamplesNames[i]); 
     NDbinCounter += NDSamplesBins[i];
 
     std::vector<TH1D*> PostfitNDDetHistVec(man->GetNFiles());
@@ -436,7 +439,7 @@ void MakeNDDetPlots()
     PreFitNDDetHist->SetTitle(temp.c_str());
     PreFitNDDetHist->GetXaxis()->SetRangeUser(Start, NDbinCounter);
     
-    std::cout << "    Start: " << Start << ": End: " << NDbinCounter << std::endl;
+    MACH3LOG_DEBUG("  Start bin: {} :: End bin: {}", Start, NDbinCounter);
     // set the x range for the postfits
     for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
       PostfitNDDetHistVec[fileId] = (TH1D*)man->Input()->GetFile(fileId)->file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
@@ -584,7 +587,7 @@ void MakeXsecRidgePlots()
       }
 
       if(posteriorDist == NULL){
-        std::cout << "WARNING: Couldnt find parameter " << paramName << " when making ridge plots" << std::endl;
+        MACH3LOG_WARN("Couldnt find parameter {} when making ridgeline plots", paramName);
         continue;
       }
       
@@ -595,8 +598,6 @@ void MakeXsecRidgePlots()
 
       double padTop = padWidth * (1.0 + padOverlap) * (padTopMargin - padAnchor) / norm + padAnchor;
       double padBottom = padAnchor - padWidth * (1.0 + padOverlap) * (padAnchor - padBottomMargin) / norm;
-
-      //std::cout << padAnchor << " :: " << padBottom << " - " << padTop << std::endl;
 
       TPad *pad = new TPad(paramName.c_str(), "", 0.3, padBottom, 0.9, padTop, -1, 0, -1); 
       ridgeCanv->cd();
@@ -682,7 +683,7 @@ void GetPostfitParamPlots()
   plotType = "HPD";
   //plotType = "gaus"; 
     
-  std::cout<<"Plotting "<<plotType<<std::endl;
+  MACH3LOG_INFO("Plotting {} errors", plotType);
   
   ReadSettings(man->Input()->GetFile(0)->file);
 
@@ -754,7 +755,7 @@ void GetPostfitParamPlots()
   MakeFluxPlots();
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
-  std::cout << ":::::::::::::: ND Params: " << NDParameters << " ::::::::::::::::::::::" << std::endl;
+  MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
   if(NDParameters > 0) MakeNDDetPlots();
   
   //KS: Same as above but for FD parameters,
@@ -824,8 +825,8 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   TCandle::SetScaledViolin(false);
 
   MACH3LOG_INFO("Making Violin Plot");
-  if (!FileName1.empty()) std::cout << "File 1 " << FileName1<< std::endl;
-  if (!FileName2.empty()) std::cout << "File 2 " << FileName2<< std::endl;
+  if (!FileName1.empty()) MACH3LOG_INFO("File 1: {} ", FileName1);
+  if (!FileName2.empty()) MACH3LOG_INFO("File 2: {}", FileName2);
     
   SaveName = FileName1;
   SaveName = SaveName.substr(0, SaveName.find(".root"));
@@ -857,7 +858,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   Violin = (TH2D*)File1->Get( "param_violin" );
   if(Violin == NULL)
   {
-    std::cout<<"Couldn't find violin plot, make sure method from MCMCProcessor is being called"<<std::endl;
+    MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
     return;
   }
 
@@ -1060,9 +1061,10 @@ int main(int argc, char *argv[])
 
     if (argc != 2 && argc != 3 && argc !=4) 
     {
-        std::cerr << "How to use: "<< argv[0] << " MCMC_Processor_Output.root" << std::endl;
-        std::cerr << "You can add up to 3 different files" << std::endl;
-        exit(-1);
+        MACH3LOG_CRITICAL("Invalid command line options specified");
+        MACH3LOG_CRITICAL("How to use: {} <MCMC_Processor_Output>.root", argv[0]);
+        MACH3LOG_CRITICAL("You can add up to 3 different files");
+        throw MaCh3Exception(__FILE__, __LINE__);
     }
   
     if (argc == 2) 

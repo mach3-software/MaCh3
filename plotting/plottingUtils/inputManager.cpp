@@ -50,21 +50,21 @@ void InputManager::addFile(std::string fileName) {
 /// InputFile::Summarise(). If printLevel is "dump", will print all parameters known to this
 /// InputManager and then loop through all input files and call InputFile::Dump().
 void InputManager::Print(std::string printLevel) const {
-  std::cout << std::endl << "Printing contents of InputManager instance:" << std::endl;
+  MACH3LOG_INFO("Printing contents of InputManager instance:");
 
   if (printLevel == "dump")
   {
-    std::cout << "parameters known to this manager: " << std::endl;
+    MACH3LOG_INFO("parameters known to this manager: ");
     for (std::string param : knownParameters)
     {
-      std::cout << "  " << param << std::endl;
+      MACH3LOG_INFO("  ");
     }
   }
 
   int fileCount = 0;
   for (InputFile *file : fileVec)
   {
-    std::cout << " For file " << fileCount << std::endl;
+    MACH3LOG_INFO(" For file {}", fileCount);
     if (printLevel == "summary")
     {
       file->Summarise();
@@ -73,7 +73,7 @@ void InputManager::Print(std::string printLevel) const {
     fileCount++;
   }
 
-  std::cout << std::endl;
+  MACH3LOG_INFO("");
 }
 
 const float InputManager::GetPostFitError(int fileNum, std::string paramName,
@@ -86,12 +86,11 @@ const float InputManager::GetPostFitError(int fileNum, std::string paramName,
 
   if (inputFileDef->postFitErrors.find(errorType) == inputFileDef->postFitErrors.end())
   {
-    std::cerr << "ERROR: " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cerr << "  requested error type, "
-              << "\"" << errorType << "\" does not exist in the specified file: " << std::endl;
-    std::cerr << "    " << inputFileDef->fileName << std::endl;
-    std::cerr << "    at index " << fileNum << std::endl;
-    throw;
+    MACH3LOG_CRITICAL("Requested error type, {} does not exist in the specified file: ", errorType);
+    MACH3LOG_CRITICAL("  {}", inputFileDef->fileName);
+    MACH3LOG_CRITICAL("  at index {}", fileNum);
+
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (inputFileDef->postFitErrors.at(errorType).find(paramName) !=
@@ -112,12 +111,11 @@ const float InputManager::GetPostFitValue(int fileNum, std::string paramName,
 
   if (inputFileDef->postFitErrors.find(errorType) == inputFileDef->postFitErrors.end())
   {
-    std::cerr << "ERROR: " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cerr << "  requested error type, "
-              << "\"" << errorType << "\" does not exist in the specified file: " << std::endl;
-    std::cerr << "    " << inputFileDef->fileName << std::endl;
-    std::cerr << "    at index " << fileNum << std::endl;
-    throw;
+    MACH3LOG_CRITICAL("Requested error type, {} does not exist in the specified file: ", errorType);
+    MACH3LOG_CRITICAL("  {}", inputFileDef->fileName);
+    MACH3LOG_CRITICAL("  at index {}", fileNum);
+
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (inputFileDef->postFitValues.at(errorType).find(paramName) !=
@@ -174,8 +172,7 @@ std::vector<std::string> InputManager::parseLocation(std::string locationString,
   // ":" in the location string
   if (tokens.size() > 2)
   {
-    std::cerr << "Too many : tokens in location string" << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__, "Too many : tokens in location string");
   }
 
   return tokens;
@@ -222,13 +219,10 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
     // check that only one object matched the pattern
     if (nMatchingObjects > 1)
     {
-      std::cerr << "Too many objects match the pattern specified by " << locationVec[0];
-      if (locationVec.size() == 2)
-        std::cerr << locationVec[1];
-      std::cerr << std::endl;
-      std::cerr << "Found " << nMatchingObjects << " matching objects, should just be one"
-                << std::endl;
-      throw;
+      MACH3LOG_CRITICAL("Too many objects match the pattern specified by {} {}", locationVec[0], locationVec.size()==2 ? locationVec[1] : "");
+      MACH3LOG_CRITICAL("Found {} matching objects, should just be one", nMatchingObjects);
+
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
   }
@@ -236,13 +230,11 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
   // Vector too big!!
   else
   {
-    std::cerr << "Invalid object location vector" << std::endl;
-    std::cerr
-        << "Should have two elements: [ (directory to look in), (end of the name of the object) ]"
-        << std::endl;
-    std::cerr << "Or one element that is just the absolute path to the object" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_CRITICAL("Invalid object location vector");
+    MACH3LOG_CRITICAL("Should have two elements: [ (directory to look in), (end of the name of the object) ]");
+    MACH3LOG_CRITICAL("Or one element that is just the absolute path to the object");
+    
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   return object;
@@ -292,10 +284,7 @@ bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string paramete
       delete LLHObj;
     } else
     {
-      std::cerr << "ERROR: uknown type of LLH object specified: " << LLHObjType
-                << ", can tell me how to read it here" << std::endl;
-      std::cerr << "       " << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__, "uknown type of LLH object specified: " + LLHObjType);
     }
 
     inputFileDef->LLHScansBySample_map[sample][parameter] = LLHGraph;
@@ -364,7 +353,7 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
 void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
   // use the contents of the file to decide which fitter it came from and what type of file it is
   if (printThoughts)
-    std::cout << "Checking contents of file " << inputFileDef->fileName << std::endl;
+    MACH3LOG_INFO("Checking contents of file {}", inputFileDef->fileName);
 
   for (int i = 1; i < kNFitters - 1; i++)
   {
@@ -374,15 +363,12 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     // flag for whether or not the current fitterEnum is the correct one
     bool foundFitter = false;
     if (printThoughts)
-      std::cout << "Checking if this is a " << convertFitterNames(fitter) << " file" << std::endl;
+      MACH3LOG_INFO("Checking if this is a {} file", convertFitterNames(fitter));
 
     // EM: get the configuration specifying what the output of this fitter looks like
     if (!_fitterSpecConfig[convertFitterNames(fitter)])
     {
-      std::cerr << "ERROR " << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cerr << "translation config doesnt contain a definition for fitter "
-                << convertFitterNames(fitter) << std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__, "translation config doesnt contain a definition for fitter " + convertFitterNames(fitter));
     }
 
     YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitter)];
@@ -395,7 +381,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     {
 
       if (printThoughts)
-        std::cout << ".... searching for " << LLHType << " LLH scans... ";
+        MACH3LOG_INFO(".... searching for {} LLH scans... ", LLHType);
 
       // vector of all the possible locations that we might find LLH scans for this type of LLH
       YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
@@ -427,7 +413,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
       }
 
       if (printThoughts)
-        std::cout << "Found " << numLLHParams << std::endl;
+        MACH3LOG_INFO(".... Found {}\n", numLLHParams);
 
       if (numLLHParams > 0)
       {
@@ -442,28 +428,28 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     }
 
     if (printThoughts)
-      std::cout << std::endl;
+      MACH3LOG_INFO("");
 
     // ##### now look for processed post fit errors #####
     if (printThoughts)
     {
-      std::cout << "....searching for Post Fit Parameters (";
+      MACH3LOG_INFO("....searching for Post Fit Parameters");
 
       if (thisFitterSpec_config["defaultPostFitErrorType"])
       {
-        std::cout << "Default type specified with possible locations: ";
+        MACH3LOG_DEBUG("  Default type specified with possible locations: ");
         YAML::Node postFitErrorSpec = thisFitterSpec_config["postFitErrorTypes"];
         YAML::Node defaultErrorType =
             postFitErrorSpec[thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>()];
         std::vector<std::string> locations = defaultErrorType["Loc"].as<std::vector<std::string>>();
         for (std::string loc : locations)
-          std::cout << std::endl << loc;
-        std::cout << ")" << std::endl;
-      } else
+          MACH3LOG_DEBUG(loc);
+      } 
+      else
       {
-        std::cout << "No default location specified)";
+        MACH3LOG_DEBUG("  No default location specified");
       }
-      std::cout << std::endl;
+      
     }
 
     int numPostFitParams = 0;
@@ -481,7 +467,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     }
 
     if (printThoughts)
-      std::cout << "........Found " << numPostFitParams << std::endl;
+      MACH3LOG_INFO(".... Found {}\n", numPostFitParams);
 
     if (numPostFitParams > 0)
     {
@@ -494,7 +480,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     // This is really just a check to see if the number of by sample LLH scans is the same as normal
     // LLH scans
     if (printThoughts)
-      std::cout << "....Searching for LLH scans broken down by sample" << std::endl;
+      MACH3LOG_INFO("....Searching for LLH scans broken down by sample");
 
     for (std::string sample : knownSamples)
     {
@@ -514,20 +500,13 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
         inputFileDef->availableSamples_LLH.push_back(sample);
 
         if (printThoughts)
-          std::cout << "........Found " << numLLHBySampleParams << " LLH scans for sample "
-                    << sample << std::endl;
+          MACH3LOG_INFO("........ Found {} LLH scans for sample {}", numLLHBySampleParams, sample);
 
         if ((numLLHParams != numLLHBySampleParams))
         {
-          std::cerr << "ERROR: hmmmmm something weird is happening here" << std::endl;
-          std::cerr << "       I have " << numLLHBySampleParams << " LLH scans for sample "
-                    << sample << " But " << numLLHParams << " total LLH parameters " << std::endl;
-          std::cerr
-              << "       If you are at peace with this and understand why this is you can come "
-                 "here and remove the throw, otherwise you should investigate whats going on here"
-              << std::endl;
-          std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-          throw;
+          MACH3LOG_ERROR("hmmmmm something weird is happening here");
+          MACH3LOG_ERROR("  I have {} LLH scans for sample {}", numLLHBySampleParams, sample);
+          MACH3LOG_ERROR("  But {} parameters with Total_LLH scals", numLLHParams);
         }
       }
     }
@@ -541,7 +520,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     if (foundFitter)
     {
       if (printThoughts)
-        std::cout << "This is a " << convertFitterNames(fitterEnum(i)) << " File!" << std::endl;
+        MACH3LOG_INFO("This is a {} file!\n", convertFitterNames(fitterEnum(i)));
       inputFileDef->fitter = fitterEnum(i);
       return;
     }
@@ -549,8 +528,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
 
   // if we didn't return above then the fitter type wasn't found
   if (printThoughts)
-    std::cout << "I don't know what kinda fitter this came from, will proceed with caution"
-              << std::endl;
+    MACH3LOG_WARN("I don't know what kinda fitter this came from, will proceed with caution");
   inputFileDef->fitter = fitterEnum::kNFitters;
 }
 
@@ -558,7 +536,7 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
   // load in the data in the file using the info gotten above
   // EM: a lot of this is copy paste from above, could be better organised
   if (printThoughts)
-    std::cout << "....getting data from file " << inputFileDef->fileName << std::endl;
+    MACH3LOG_INFO("....getting data from file {}", inputFileDef->fileName);
 
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(inputFileDef->fitter)];
 
@@ -599,10 +577,8 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
       // double check that we actually found it.. just in case
       if (LLHObj == nullptr)
       {
-        std::cerr << "Hmmm, something seems to have gone wrong and I couldnt find the " << LLHType
-                  << " LLH scan for " << parameter << " when attempting to read the data for it"
-                  << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+        MACH3LOG_ERROR("Hmmm, something seems to have gone wrong and I couldnt find the {} LLH scan for {} when attempting to read the data for it", LLHType, parameter);
+        MACH3LOG_ERROR("This will very likely cause segfaults and sadness");
       }
 
       // now convert it to a TGraph
@@ -624,10 +600,8 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
 
       else
       {
-        std::cerr << "ERROR: uknown type of LLH object specified: " << LLHObjType
-                  << ", can tell me how to read it here" << std::endl;
-        std::cerr << "       " << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        MACH3LOG_CRITICAL("ERROR: uknown type of LLH object specified: {}", LLHObjType);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
 
       inputFileDef->LLHScans_map[LLHType][parameter] = LLHGraph;
@@ -729,8 +703,6 @@ std::string InputManager::BANFFfluxName(std::string mach3ParamName) {
   }
   std::string BANFFprefix;
 
-  std::cout << " DEBUG FluxNumber " << FluxNumber << " BANFFName " << BANFFName << std::endl;
-
   bool isSKflux = false;
   // if above 50 it is SK flux
   if (FluxNumber >= 50)
@@ -766,8 +738,6 @@ std::string InputManager::BANFFfluxName(std::string mach3ParamName) {
   // Now replace the "ND" part with "SK" to make the SK names
   if (isSKflux)
     BANFFprefix.replace(BANFFprefix.find("ND"), 2, std::string("SK"));
-
-  std::cout << " DEBUG BANFFName " << BANFFName << " BANFFprefix " << BANFFprefix << std::endl;
 
   BANFFprefix += BANFFName;
 
