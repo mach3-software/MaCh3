@@ -9,8 +9,8 @@
 #endif
 
 // ****************************
-MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr) : 
-  Chain(nullptr), StepCut(""), MakeCorr(MakePostfitCorr), MadePostfit(false) {
+MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
+  Chain(nullptr), StepCut(""), MadePostfit(false) {
 // ****************************
   MCMCFile = InputFile;
 
@@ -31,7 +31,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile, bool MakePostfitCorr)
   
   ParamSums = nullptr;
   BatchedAverages = nullptr;
-  LagL = nullptr;
   SampleValues = nullptr;
   SystValues = nullptr;
   AccProbValues = nullptr;
@@ -115,10 +114,10 @@ MCMCProcessor::~MCMCProcessor() {
   delete Means_Gauss;
   delete Errors_Gauss;
   delete Means_HPD;
-  delete Errors_HPD; 
-  delete Errors_HPD_Positive; 
-  delete Errors_HPD_Negative; 
-  
+  delete Errors_HPD;
+  delete Errors_HPD_Positive;
+  delete Errors_HPD_Negative;
+
   if(hpost != nullptr)
   {
     for (int i = 0; i < nDraw; ++i) 
@@ -193,7 +192,6 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
   }
 }
 
-
 // ***************
 void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 // ***************
@@ -212,6 +210,8 @@ void MCMCProcessor::MakeOutputFile() {
   const int uniform = int(rand->Uniform(0, 10000));
   // Open a TCanvas to write the posterior onto
   Posterior = new TCanvas(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
+  //KS: No idea why but ROOT changed treatment of viilin in R6. If you have non uniform binning this will results in very hard to see violin plots.
+  TCandle::SetScaledViolin(false);
 
   Posterior->SetGrid();
   gStyle->SetOptStat(0);
@@ -233,7 +233,6 @@ void MCMCProcessor::MakeOutputFile() {
   OutputFile = new TFile(OutputName.c_str(), "recreate");
   OutputFile->cd();
 }
-
 
 // ****************************
 //CW: Function to make the post-fit
@@ -295,10 +294,21 @@ void MCMCProcessor::MakePostfit() {
 
     (*Central_Value)(i) = Prior;
 
-    GetArithmetic(hpost[i], i);
-    GetGaussian(hpost[i], i);
-    GetHPD(hpost[i], i);
-    
+    double Mean, Err, Err_p, Err_m;
+    GetArithmetic(hpost[i], Mean, Err);
+    (*Means)(i) = Mean;
+    (*Errors)(i) = Err;
+
+    GetGaussian(hpost[i], Mean, Err);
+    (*Means_Gauss)(i) = Mean;
+    (*Errors_Gauss)(i) = Err;
+
+    GetHPD(hpost[i], Mean, Err, Err_p, Err_m);
+    (*Means_HPD)(i) = Mean;
+    (*Errors_HPD)(i) = Err;
+    (*Errors_HPD_Positive)(i) = Err_p;
+    (*Errors_HPD_Negative)(i) = Err_m;
+
     // Write the results from the projection into the TVectors and TMatrices
     (*Covariance)(i,i) = (*Errors)(i)*(*Errors)(i);
     (*Correlation)(i,i) = 1.0;
@@ -557,7 +567,7 @@ void MCMCProcessor::DrawPostfit() {
 
   OutputFile->cd();
   //KS: Plot Xsec and Flux
-  if (PlotXSec == true)
+  if (nParam[kXSecPar] > 0)
   {
     const int Start = ParamTypeStartPos[kXSecPar];
     // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
@@ -616,7 +626,7 @@ void MCMCProcessor::DrawPostfit() {
     if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
-  if(PlotDet)
+  if(nParam[kNDPar] > 0)
   {
     int Start = ParamTypeStartPos[kNDPar];
     int NDbinCounter = Start;
@@ -706,11 +716,10 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
     {
       if(CredibleIntervals[i] > CredibleIntervals[i-1])
       {
-        std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
-        std::cerr<<CredibleIntervals[i] <<" "<<CredibleIntervals[i-1]<<std::endl;
-        std::cerr<<" They should be grouped in decreasing order"<<std::endl;
-        std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        MACH3LOG_ERROR("Interval {} is smaller than {}", i, i-1);
+        MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleIntervals[i], CredibleIntervals[i-1]);
+        MACH3LOG_ERROR("They should be grouped in decreasing order");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
   }
@@ -952,6 +961,10 @@ void MCMCProcessor::MakeViolin() {
   hviolin_prior->SetMarkerStyle(20);
   hviolin_prior->SetMarkerSize(0.5);
 
+  // These control violin width, if you use larger then 1 they will most likely overlay, so be cautious
+  hviolin_prior->SetBarWidth(1.0);
+  hviolin_prior->SetBarOffset(0);
+
   hviolin->SetLineColor(kBlue);
   hviolin->SetMarkerColor(kBlue);
   hviolin->SetFillColorAlpha(kBlue, 0.35);
@@ -977,8 +990,8 @@ void MCMCProcessor::MakeViolin() {
       hviolin_prior->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw);
     }
     //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-    hviolin_prior->Draw("VIOLIN");
-    hviolin->Draw("VIOLIN SAME");
+    hviolin_prior->Draw("violinX(03100300)");
+    hviolin->Draw("violinX(03100300) SAME");
     if(printToPDF) Posterior->Print(CanvasName);
   }
   delete rand;
@@ -1665,9 +1678,8 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
 
   if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
   {
-    std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("Size of  CredibleRegions is not equat to size of CredibleRegionStyle");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   const int nCredible = CredibleRegions.size();
   TH2D*** hpost_2D_copy = new TH2D**[nDraw];
@@ -1867,9 +1879,8 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 
   if(CredibleIntervals.size() != CredibleIntervalsColours.size())
   {
-    std::cerr<<" size of  CredibleIntervals is not equat to size of CredibleIntervalsColours"<<std::endl;
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("size of  CredibleIntervals is not equat to size of CredibleIntervalsColours");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(CredibleIntervals.size() > 1)
   {
@@ -1877,29 +1888,26 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     {
       if(CredibleIntervals[i] > CredibleIntervals[i-1])
       {
-        std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
-        std::cerr<<CredibleIntervals[i] <<" "<<CredibleIntervals[i-1]<<std::endl;
-        std::cerr<<" They should be grouped in decreasing order"<<std::endl;
-        std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        MACH3LOG_ERROR("Interval {} is smaller than {}", i, i-1);
+        MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleIntervals[i], CredibleIntervals[i-1]);
+        MACH3LOG_ERROR("They should be grouped in decreasing order");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
   }
   if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
   {
-    std::cerr<<" size of  CredibleRegions is not equat to size of CredibleRegionStyle"<<std::endl;
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("size of  CredibleRegions is not equat to size of CredibleRegionStyle");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   for(unsigned int i = 1; i < CredibleRegions.size(); i++ )
   {
     if(CredibleRegions[i] > CredibleRegions[i-1])
     {
-      std::cerr<<" Interval "<<i<<" is smaller than "<<i-1<<std::endl;
-      std::cerr<<CredibleRegions[i] <<" "<<CredibleRegions[i-1]<<std::endl;
-      std::cerr<<" They should be grouped in decreasing order"<<std::endl;
-      std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("Interval {} is smaller than {}", i, i-1);
+      MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleRegions[i], CredibleRegions[i-1]);
+      MACH3LOG_ERROR("They should be grouped in decreasing order");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   const int nCredibleIntervals = CredibleIntervals.size();
@@ -1963,11 +1971,11 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       TrianglePad[counterPad]->SetBorderMode(0);
       TrianglePad[counterPad]->SetBorderSize(0);
 
-      //KS: Corresponds to bottom part of the plot, need marings for lables
+      //KS: Corresponds to bottom part of the plot, need margins for labels
       if(y == (nParamPlot-1)) TrianglePad[counterPad]->SetBottomMargin(0.1);
       else TrianglePad[counterPad]->SetBottomMargin(0);
 
-      //KS: Corresponds to left part, need marings for lables
+      //KS: Corresponds to left part, need margins for labels
       if(x == 0) TrianglePad[counterPad]->SetLeftMargin(0.15);
       else TrianglePad[counterPad]->SetLeftMargin(0);
 
@@ -1990,7 +1998,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 
           // Scale the histograms before gettindg credible intervals
           hpost_cl[counterPost][j]->Scale(1. / hpost_cl[counterPost][j]->Integral());
-          //KS: Slightly different approach depending if interavls are in pecentage or sigmas
+          //KS: Slightly different approach depending if intervals are in percentage or sigmas
           if(CredibleInSigmas)
           {
             //KS: Convert sigmas into percentage
@@ -2213,7 +2221,7 @@ void MCMCProcessor::ScanInput() {
     TBranch* br = (TBranch*)brlis->At(i);
     TString bname = br->GetName();
 
-    //KS: Exclude paramer types
+    //KS: Exclude parameter types
     bool rejected = false;
     for(unsigned int ik = 0; ik < ExcludedTypes.size(); ++ik )
     {
@@ -2233,14 +2241,12 @@ void MCMCProcessor::ScanInput() {
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kXSecPar);
-      PlotXSec = true;
       nParam[kXSecPar]++;
     }
     else if (bname.BeginsWith("ndd_"))
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kNDPar);
-      PlotDet = true;
       nParam[kNDPar]++;
     }
     else if (bname.BeginsWith("skd_joint_"))
@@ -2258,7 +2264,7 @@ void MCMCProcessor::ScanInput() {
       nParam[kOSCPar]++;
     }
 
-    //KS: as a bonus get LogL systeamtic
+    //KS: as a bonus get LogL systematic
     if (bname.BeginsWith("LogL_sample_")) {
       SampleName_v.push_back(bname);
       nSamples++;
@@ -2319,10 +2325,10 @@ void MCMCProcessor::SetupOutput() {
   Means_Gauss = new TVectorD(nDraw);
   Errors_Gauss = new TVectorD(nDraw);
   Means_HPD    = new TVectorD(nDraw);
-  Errors_HPD   = new TVectorD(nDraw); 
-  Errors_HPD_Positive = new TVectorD(nDraw); 
-  Errors_HPD_Negative = new TVectorD(nDraw); 
-    
+  Errors_HPD   = new TVectorD(nDraw);
+  Errors_HPD_Positive = new TVectorD(nDraw);
+  Errors_HPD_Negative = new TVectorD(nDraw);
+
   // Initialise to something silly
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -2342,11 +2348,10 @@ void MCMCProcessor::SetupOutput() {
       (*Covariance)(i, j) = _UNDEF_;
       (*Correlation)(i, j) = _UNDEF_;
     }
-  } 
+  }
   
   hpost = new TH1D*[nDraw]();
 }
-
 
 // ****************************
 // Check order of parameter types
@@ -2370,7 +2375,6 @@ void MCMCProcessor::ScanParameterOrder() {
 // Make the prefit plots
 TH1D* MCMCProcessor::MakePrefit() {
 // *****************************
-  
   if (OutputFile == nullptr) MakeOutputFile();
 
   TH1D *PreFitPlot = new TH1D("Prefit", "Prefit", nDraw, 0, nDraw);
@@ -2632,7 +2636,7 @@ void MCMCProcessor::ReadFDFile() {
   TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
   if (FDdetFile->IsZombie()) {
     MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kFDDetPar].back());
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   FDdetFile->cd();
 
@@ -2666,8 +2670,8 @@ void MCMCProcessor::ReadOSCFile() {
   // Do the same for the ND280
   TFile *OscFile = new TFile(CovPos[kOSCPar].back().c_str(), "open");
   if (OscFile->IsZombie()) {
-    std::cerr << "Couldn't find OSCFile " << CovPos[kOSCPar].back() << std::endl;
-    throw;
+    MACH3LOG_ERROR("Couldn't find OSCFile {}", CovPos[kOSCPar].back());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   OscFile->cd();
 
@@ -2745,22 +2749,22 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 
 // **************************
 //CW: Get the mean and RMS of a 1D posterior
-void MCMCProcessor::GetArithmetic(TH1D * const hist, const int i) {
+void MCMCProcessor::GetArithmetic(TH1D * const hist, double& Mean, double& Error) {
 // **************************
-  (*Means)(i) = hist->GetMean();
-  (*Errors)(i) = hist->GetRMS();
+  Mean = hist->GetMean();
+  Error = hist->GetRMS();
 }
 
 // **************************
 //CW: Get Gaussian characteristics
-void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
+void MCMCProcessor::GetGaussian(TH1D *& hist, double& Mean, double& Error) {
 // **************************
-  const double mean = hist->GetMean();
+  const double meanval = hist->GetMean();
   const double err = hist->GetRMS();
   const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
 
   // Set the range for the Gaussian fit
-  Gauss->SetRange(mean - 1.5*err , mean + 1.5*err);
+  Gauss->SetRange(meanval - 1.5*err , meanval + 1.5*err);
   // Set the starting parameters close to RMS and peaks of the histograms
   Gauss->SetParameters(hist->GetMaximum()*err*std::sqrt(2*3.14), peakval, err);
 
@@ -2768,13 +2772,13 @@ void MCMCProcessor::GetGaussian(TH1D *& hist , const int i) {
   hist->Fit(Gauss->GetName(),"Rq");
   hist->SetStats(0);
 
-  (*Means_Gauss)(i) = Gauss->GetParameter(1);
-  (*Errors_Gauss)(i) = Gauss->GetParameter(2);
+  Mean = Gauss->GetParameter(1);
+  Error = Gauss->GetParameter(2);
 }
 
 // ***************
 //CW: Get the highest posterior density from a TH1D
-void MCMCProcessor::GetHPD(TH1D* const hist, const int i, const double coverage) {
+void MCMCProcessor::GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_p, double& Error_m, const double coverage) {
 // ***************
   // Get the bin which has the largest posterior density
   const int MaxBin = hist->GetMaximumBin();
@@ -2855,10 +2859,10 @@ void MCMCProcessor::GetHPD(TH1D* const hist, const int i, const double coverage)
     sigma_hpd = std::fabs(hist->GetXaxis()->GetBinUpEdge(HighBin)-hist->GetBinCenter(MaxBin));
   }
 
-  (*Means_HPD)(i) = peakval;
-  (*Errors_HPD)(i) = sigma_hpd;
-  (*Errors_HPD_Positive)(i) = sigma_p;
-  (*Errors_HPD_Negative)(i) = sigma_m;
+  Mean = peakval;
+  Error = sigma_hpd;
+  Error_p = sigma_p;
+  Error_m = sigma_m;
 }
 
 // ***************
@@ -2868,7 +2872,7 @@ void MCMCProcessor::GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, cons
   if(coverage > 1)
   {
     MACH3LOG_ERROR("Specified Credible Interval is greater that 1 and equal to {} Should be between 0 and 1", coverage);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   //KS: Reset first copy of histogram
   hpost_copy->Reset("");
@@ -2924,8 +2928,8 @@ void MCMCProcessor::GetCredibleRegion(TH2D* const hist2D, const double coverage)
 // ***************
   if(coverage > 1)
   {
-    std::cerr<<"Specified Credible Region is greater than 1 and equal to "<< coverage <<" Should be between 0 and 1"<<std::endl;
-    throw;
+    MACH3LOG_ERROR("Specified Credible Region is greater than 1 and equal to {:.2f} Should be between 0 and 1 {}", coverage);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   //KS: Temporary structure to be thread save
@@ -3129,7 +3133,7 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
   if((ParNames.size() != Model1Bounds.size()) || (Model2Bounds.size() != Model1Bounds.size())  || (Model2Bounds.size() != ModelNames.size()))
   {
     MACH3LOG_ERROR("Size doesn't match");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   for(unsigned int k = 0; k < ParNames.size(); ++k)
   {
@@ -3176,7 +3180,6 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
   return;
 }
 
-
 // **************************
 // KS: Get Savage Dickey point hypothesis test
 void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
@@ -3187,7 +3190,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
   if((ParNames.size() != EvaluationPoint.size()) || (Bounds.size() != EvaluationPoint.size()))
   {
     MACH3LOG_ERROR("Size doesn't match");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   
   if(hpost[0] == nullptr) MakePostfit();
@@ -3222,14 +3225,14 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     RemoveFitter(PosteriorHist, "Gauss");
             
     TH1D* PriorHist = nullptr;
-    //KS: If flat prior we need to have well defined bounds otherwise Prior distriution will not make sense
+    //KS: If flat prior we need to have well defined bounds otherwise Prior distribution will not make sense
     if(FlatPrior)
     {
       int NBins = PosteriorHist->GetNbinsX();
       if(Bounds[k][0] > Bounds[k][1])
       {
         MACH3LOG_ERROR("Lower bound is higher than upper bound");
-        throw;
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       PriorHist = new TH1D("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
       
@@ -3325,7 +3328,6 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
   OutputFile->cd();
 }
 
-
 // **************************
 // KS: Reweight prior of MCMC chain to another
 void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
@@ -3338,7 +3340,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
   {
     MACH3LOG_ERROR("Size of passed vectors doesn't match in ReweightPrior");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   std::vector<int> Param;
   std::vector<double> OldCentral;
@@ -3459,19 +3461,17 @@ void MCMCProcessor::DiagMCMC() {
   AcceptanceProbabilities();
 }
 
-
 // **************************
 //CW: Prepare branches etc. for DiagMCMC
 void MCMCProcessor::PrepareDiagMCMC() {
 // **************************
-  
   doDiagMCMC = true;
     
   if(ParStep != nullptr)
   {
     MACH3LOG_ERROR("It look like ParStep was already filled ");
-    MACH3LOG_ERROR("Eventhough it is used for MakeCovariance_MP and for DiagMCMC");
-    MACH3LOG_ERROR("it has differnt structure in both for cache hits, sorry ");
+    MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC");
+    MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
     throw;
   }
   if(nBatches == 0)
@@ -3605,7 +3605,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
       BatchedAverages[BatchNumber][j] += ParStep[j][i];
     }
     
-    //KS: Could easyli add this to above loop but I accProb is different beast so better keep it like this
+    //KS: Could easily add this to above loop but I accProb is different beast so better keep it like this
     AccProbBatchedAverages[BatchNumber] += AccProbValues[i];
   }
 
@@ -3746,7 +3746,7 @@ void MCMCProcessor::AutoCorrelation() {
   // The sum of (Y-Ymean)^2 over all steps for each parameter
   double **DenomSum = new double*[nDraw]();
   double **NumeratorSum = new double*[nDraw]();
-  LagL = new double*[nDraw];
+  double **LagL = new double*[nDraw];
   for (int j = 0; j < nDraw; ++j) {
     DenomSum[j] = new double[nLags];
     NumeratorSum[j] = new double[nLags];
@@ -3859,7 +3859,7 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] LagKPlots;
 
   //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
-  CalculateESS(nLags);
+  CalculateESS(nLags, LagL);
 
   for (int j = 0; j < nDraw; ++j) {
     delete[] NumeratorSum[j];
@@ -3965,15 +3965,14 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
 // Furthermore we calculate Sampling efficiency following https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
 // Rule of thumb is to have efficiency above 25%
-void MCMCProcessor::CalculateESS(const int nLags) {
+void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
 // **************************
-
   if(LagL == nullptr)
   {
-    MACH3LOG_ERROR("Trying to call CalculateESS before LagL was calcauted, this will not work");
-    std::cerr <<__FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("LagL is nullptr");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+
   MACH3LOG_INFO("Making ESS plots...");
     
   TVectorD* EffectiveSampleSize = new TVectorD(nDraw);
@@ -4394,7 +4393,7 @@ void MCMCProcessor::GewekeDiagnostic() {
 
   MACH3LOG_INFO("Making Geweke Diagnostic");
 
-  //KS: Up refers to upper limit we check, it stays constnt, in literature it is moslty 50% thus using 0.5 for threshold
+  //KS: Up refers to upper limit we check, it stays constant, in literature it is mostly 50% thus using 0.5 for threshold
   double* MeanUp = new double[nDraw]();
   double* SpectralVarianceUp = new double[nDraw]();
   int* DenomCounterUp = new int[nDraw]();
@@ -4579,7 +4578,7 @@ void MCMCProcessor::AcceptanceProbabilities() {
 #pragma omp parallel for
 #endif
   for (int i = 0; i < nEntries; ++i) {
-    // Set bin content for the ith bin to the parameter values
+    // Set bin content for the i-th bin to the parameter values
     AcceptanceProbPlot->SetBinContent(i, AccProbValues[i]);
   }
     
