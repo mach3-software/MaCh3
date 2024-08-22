@@ -1,0 +1,3 @@
+
+add_library(plottingUtils)
+target_link_libraries(plottingUtils inputManager plottingManager styleManager)
