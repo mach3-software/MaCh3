@@ -499,9 +499,6 @@ private:
   // map the enum to actual fitter names
   std::map<fitterEnum, std::string> fitterNames;
 
-  std::string MaCh3ToBANFFName(std::string mach3ParamName);
-  std::string BANFFfluxName(std::string);
-
 private:
   // the configs defining the translation of parameters between fitters and also the directory
   // structure for each fitter
