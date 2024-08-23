@@ -71,12 +71,12 @@ std::vector <TH1D *> PostfitHistVec;
 void copyParToBlockHist(int localBin, std::string paramName, TH1D*blockHist, std::string type, int fileId, bool setLabels = true){
   // Set the values in the sub-histograms
   MACH3LOG_DEBUG("copyin data from at local bin {}: for parameter {}", localBin, paramName);
-  MACH3LOG_DEBUG("  Fitter specific name: {}", man->Input()->TranslateName(fileId, MaCh3Plotting::kPostFit, paramName));
-  MACH3LOG_DEBUG("  value: {}", man->Input()->GetPostFitValue(fileId, paramName, type));
-  MACH3LOG_DEBUG("  error: {}", man->Input()->GetPostFitError(fileId, paramName, type));
+  MACH3LOG_DEBUG("  Fitter specific name: {}", man->Input().TranslateName(fileId, MaCh3Plotting::kPostFit, paramName));
+  MACH3LOG_DEBUG("  value: {}", man->Input().GetPostFitValue(fileId, paramName, type));
+  MACH3LOG_DEBUG("  error: {}", man->Input().GetPostFitError(fileId, paramName, type));
 
-  blockHist->SetBinContent(localBin +1, man->Input()->GetPostFitValue(fileId, paramName, type));
-  blockHist->SetBinError(localBin +1, man->Input()->GetPostFitError(fileId, paramName, type));
+  blockHist->SetBinContent(localBin +1, man->Input().GetPostFitValue(fileId, paramName, type));
+  blockHist->SetBinError(localBin +1, man->Input().GetPostFitError(fileId, paramName, type));
 
   if(setLabels){
     blockHist->GetXaxis()->SetBinLabel(localBin +1, paramName.c_str());
@@ -88,7 +88,7 @@ void PrettifyTitles(TH1D *Hist) {
   for (int i = 0; i < Hist->GetXaxis()->GetNbins(); ++i)
   {
     std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
-    title = man->Style()->prettifyParamName(title);
+    title = man->Style().prettifyParamName(title);
     Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
@@ -98,16 +98,23 @@ void PrettifyTitles(TH2D *Hist) {
   {
     std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
 
-    title = man->Style()->prettifyParamName(title);
+    title = man->Style().prettifyParamName(title);
     Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
 
-void ReadSettings(TFile *File1)
+void ReadSettings(std::shared_ptr<TFile> File1)
 {
+  MACH3LOG_DEBUG("Reading settings for file {}", File1->GetName());
+  File1->ls();
   TTree *Settings = (TTree*)(File1->Get("Settings"));
+  MACH3LOG_DEBUG("Got settings tree");
+  Settings->Print();
+
+  std::cout << CrossSectionParameters << std::endl;
 
   Settings->SetBranchAddress("CrossSectionParameters", &CrossSectionParameters);
+  MACH3LOG_DEBUG("XSec params: {}", CrossSectionParameters);
   Settings->SetBranchAddress("FluxParameters", &FluxParameters);
   Settings->SetBranchAddress("CrossSectionParametersStartingPos", &XsecStartingPos);
   Settings->SetBranchAddress("NDParameters", &NDParameters);
@@ -126,6 +133,8 @@ void ReadSettings(TFile *File1)
 
   NDSamplesNames = *NDSamples_Names;
   NDSamplesBins = *NDSamples_Bins;
+
+  MACH3LOG_DEBUG("Read successfully");
 }
 
 inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
@@ -296,7 +305,7 @@ void MakeXsecPlots()
     // set some plot things
     TH1D *blockHist_prefit = new TH1D(blockName.c_str(), blockTitle.c_str(), nParams, 0.0, (double)nParams);
     
-    man->Style()->setTH1Style(blockHist_prefit, man->GetOption<std::string>("prefitHistStyle"));
+    man->Style().setTH1Style(blockHist_prefit, man->GetOption<std::string>("prefitHistStyle"));
 
     // set the errors for the prefit block hist
     for(int localBin=0; localBin < nParams; localBin ++){
@@ -379,7 +388,7 @@ void MakeFluxPlots()
     blockHist_prefit->GetYaxis()->SetTitle("Parameter Variation");
     blockHist_prefit->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     blockHist_prefit->GetXaxis()->SetTitleOffset(blockHist_prefit->GetXaxis()->GetTitleOffset()*1.2);
-    man->Style()->setTH1Style(blockHist_prefit, man->GetOption<std::string>("prefitHistStyle"));
+    man->Style().setTH1Style(blockHist_prefit, man->GetOption<std::string>("prefitHistStyle"));
     // set the errors for the prefit block hist
     for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
         int localBin = fluxParId - blockContents[0];
@@ -429,8 +438,8 @@ void MakeNDDetPlots()
     NDbinCounter += NDSamplesBins[i];
 
     std::vector<TH1D*> PostfitNDDetHistVec(man->GetNFiles());
-    TH1D *PreFitNDDetHist = (TH1D*)man->Input()->GetFile(0)->file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
-    man->Style()->setTH1Style(PreFitNDDetHist, man->GetOption<std::string>("prefitHistStyle"));
+    TH1D *PreFitNDDetHist = (TH1D*)man->Input().GetFile(0).file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
+    man->Style().setTH1Style(PreFitNDDetHist, man->GetOption<std::string>("prefitHistStyle"));
 
     std::string temp = NDSamplesNames[i].c_str();
     while (temp.find("_") != std::string::npos) {
@@ -442,7 +451,7 @@ void MakeNDDetPlots()
     MACH3LOG_DEBUG("  Start bin: {} :: End bin: {}", Start, NDbinCounter);
     // set the x range for the postfits
     for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
-      PostfitNDDetHistVec[fileId] = (TH1D*)man->Input()->GetFile(fileId)->file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
+      PostfitNDDetHistVec[fileId] = (TH1D*)man->Input().GetFile(fileId).file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
     }
 
     //KS: We dont' need name for every nd param
@@ -542,7 +551,7 @@ void MakeXsecRidgePlots()
     std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // the directory of histograms
-    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->Input()->GetFile(0)->file->Get("Post");
+    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->Input().GetFile(0).file->Get("Post");
 
     // get num of params in the block
     int nParams = (int)blockContents.size();
@@ -576,7 +585,7 @@ void MakeXsecRidgePlots()
       while(TKey *key = (TKey*) next()){ 
         // check if the end of the param name matches with the MaCh3 name, do this so we exclude things like nds_ at the start of the name
         std::string str(key->GetTitle());
-        std::string name = man->Input()->TranslateName(0, MaCh3Plotting::kPostFit, paramName);
+        std::string name = man->Input().TranslateName(0, MaCh3Plotting::kPostFit, paramName);
         uint pos = str.find(name);
         bool foundPar = (pos == str.length() - name.length());
 
@@ -633,7 +642,7 @@ void MakeXsecRidgePlots()
       frame->SetLineColorAlpha(0, 0.0);
       
       ridgeCanv->cd();
-      label->DrawLatexNDC(0.29, padBottom + 0.005, man->Style()->prettifyParamName(paramName).c_str());
+      label->DrawLatexNDC(0.29, padBottom + 0.005, man->Style().prettifyParamName(paramName).c_str());
       line->DrawLine(0.1, padBottom, 0.9, padBottom);
 
     }
@@ -685,7 +694,7 @@ void GetPostfitParamPlots()
     
   MACH3LOG_INFO("Plotting {} errors", plotType);
   
-  ReadSettings(man->Input()->GetFile(0)->file);
+  ReadSettings(man->Input().GetFile(0).file);
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
@@ -730,7 +739,7 @@ void GetPostfitParamPlots()
 
   // make a dummy TH1 to set out legend
   Prefit = new TH1D();
-  man->Style()->setTH1Style(Prefit, man->GetOption<std::string>("prefitHistStyle"));
+  man->Style().setTH1Style(Prefit, man->GetOption<std::string>("prefitHistStyle"));
   leg->AddEntry(Prefit, "Prior", "lpf");
 
   for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
@@ -772,7 +781,7 @@ void GetPostfitParamPlots()
 }
 
 
-inline TGraphAsymmErrors* MakeTGraphAsymmErrors(TFile *File)
+inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
 {
   double* x =   new double[nBins];
   double* y =   new double[nBins];
@@ -835,9 +844,9 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   SaveName += "_Violin";
   if(PlotAssym) SaveName += "_Assym";
    
-  TFile *File1 = new TFile(FileName1.c_str());
-  TFile *File2 = NULL;
-  if(FileName2 != "") File2 = new TFile(FileName2.c_str());
+  std::shared_ptr<TFile> File1 = std::make_shared<TFile>(FileName1.c_str());
+  std::shared_ptr<TFile> File2 = NULL;
+  if(FileName2 != "") File2 = std::make_shared<TFile>(FileName2.c_str());
   
   canv = new TCanvas("canv", "canv", 1024, 1024);
   canv->SetGrid();
@@ -1040,22 +1049,24 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   delete Postfit;
   delete PostGraph;
   File1->Close();
-  delete File1;
   if(File2 != NULL)
   {
     File2->Close();
-    delete File2;
   }
 }
 
 int main(int argc, char *argv[]) 
 {
+    SetMaCh3LoggerFormat();
+    
     man = new MaCh3Plotting::PlottingManager();
     man->ParseInputs(argc, argv);
+    std::cout << std::endl << std::endl << "====================" << std::endl;
+    man->Input().GetFile(0).file->ls();
     
     man->SetExec("GetPostfitParamPlots");
 
-    man->Style()->setPalette(man->GetOption<std::string>("colorPalette"));
+    man->Style().setPalette(man->GetOption<std::string>("colorPalette"));
 
     GetPostfitParamPlots();
 
