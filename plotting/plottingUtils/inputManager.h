@@ -57,6 +57,11 @@ struct InputFile {
   /// @brief Destructor.
   ~InputFile() {
     LLHScans_map.clear();
+  }
+
+  /// @brief Close out the underlying root file
+  /// @details Should only be done once this InputFile is *done* with, should only really ever be done by the InputManager that holds this object 
+  void Close(){
     file->Close();
   }
 
@@ -186,6 +191,18 @@ public:
   /// @param fileName The name of the file to read.
   void addFile(const std::string &fileName);
 
+  /// @brief Destructor
+  /// @details Close out all the files that the manager is responsible for
+  ~InputManager()
+  {
+    for (InputFile file: _fileVec)
+    {
+      file.Close();
+    }
+
+    _fileVec.clear();
+  }
+
   /// @brief Convert from fileTypeEnum to the name of the file type.
   /// @param fileType The file type ID to convert.
   /// @return The name of the file type, or "UNKNOWN_FILE_TYPE" if the fileType does not match any
@@ -228,7 +245,7 @@ public:
       MACH3LOG_WARN("am returning an empty TGraph");
       return TGraph(); 
     }
-    return *fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName);
+    return *_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName);
   }
 
   TH1D GetLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
@@ -238,7 +255,7 @@ public:
       MACH3LOG_WARN("am returning an empty TH1D");
       return TH1D(); 
     }
-    return TGraphToTH1D(*fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
+    return TGraphToTH1D(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
   }
 
   TGraph GetSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
@@ -250,7 +267,7 @@ public:
       MACH3LOG_WARN("am returning an empty TGraph");
       return TGraph();
     }
-    return *fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName);
+    return *_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName);
   }
 
   TH1D GetSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
@@ -260,7 +277,7 @@ public:
       MACH3LOG_WARN("am returning an empty TH1D");
       return TH1D();
     }
-    return TGraphToTH1D(*fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
+    return TGraphToTH1D(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
   }
 
   /// @brief Get the log likelihood scan for a particular parameter, for a specific sample, from a
@@ -284,7 +301,7 @@ public:
   /// @return true if scan exists, false if not.
   inline bool GetEnabled_LLH(int fileNum, std::string paramName,
                              std::string LLHType = "total") const {
-    return fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
+    return _fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
   }
 
   /// @brief Get whether or not a particular parameter has an LLH scan in a particular input file
@@ -294,7 +311,7 @@ public:
   /// @param sample The sample to check.
   /// @return true if scan exists, false if not.
   inline bool GetEnabled_LLHBySample(int fileNum, std::string paramName, std::string sample) const {
-    return fileVec[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);
+    return _fileVec[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);
   }
 
   /// @brief Get the post fit error for a particular parameter from a particular input file.
@@ -319,23 +336,23 @@ public:
   /// @{
   inline const std::vector<std::string> &GetKnownParameters() const { return knownParameters; }
   inline const std::vector<std::string> &GetKnownSamples() const { return knownSamples; }
-  inline const int GetNInputFiles() const { return fileVec.size(); }
+  inline const int GetNInputFiles() const { return _fileVec.size(); }
   /// @}
 
   /// @name File Specific Getters
   /// @{
-  inline InputFile GetFile(int fileId) const { return fileVec[fileId]; }
+  inline InputFile GetFile(int fileId) const { return _fileVec[fileId]; }
   inline std::string TranslateName(int fileId, fileTypeEnum fileType, std::string paramName) const {
-    return getFitterSpecificParamName(fileVec[fileId].fitter, fileType, paramName);
+    return getFitterSpecificParamName(_fileVec[fileId].fitter, fileType, paramName);
   }
   inline const std::vector<std::string> &GetKnownLLHParameters(int fileId) const {
-    return fileVec[fileId].availableParams_LLH;
+    return _fileVec[fileId].availableParams_LLH;
   }
   inline const std::vector<std::string> &GetKnownLLHSamples(int fileId) const {
-    return fileVec[fileId].availableSamples_LLH;
+    return _fileVec[fileId].availableSamples_LLH;
   }
   inline const std::vector<std::string> &GetKnownPostFitParameters(int fileId) const {
-    return fileVec[fileId].availableParams_postFitErrors;
+    return _fileVec[fileId].availableParams_postFitErrors;
   }
   /// @}
 
@@ -446,9 +463,6 @@ private:
     return (pos == str.length() - ending.length());
   }
 
-  // vector of InputFile objects that this manager is responsible for
-  std::vector<InputFile> fileVec;
-
   // all parameters which are known to this InputManager: all the ones defined in the translation
   // config used to create it
   std::vector<std::string> knownParameters;
@@ -467,5 +481,8 @@ private:
   YAML::Node _fitterSpecConfig;
   YAML::Node _parametersConfig;
   YAML::Node _samplesConfig;
+
+  // vector of InputFile objects that this manager is responsible for
+  std::vector<InputFile> _fileVec;
 };
 } // namespace MaCh3Plotting

@@ -36,7 +36,7 @@ void InputManager::addFile(const std::string &fileName) {
   fillFileInfo(fileInfo);
   fillFileData(fileInfo);
 
-  fileVec.push_back(fileInfo);
+  _fileVec.push_back(fileInfo);
 }
 
 /// If printLevel is "summary", will loop through all the files known to this InputManager and call
@@ -55,7 +55,7 @@ void InputManager::Print(const std::string &printLevel) const {
   }
 
   int fileCount = 0;
-  for (const InputFile file : fileVec)
+  for (const InputFile &file : _fileVec)
   {
     MACH3LOG_INFO(" For file {}", fileCount);
     if (printLevel == "summary")
@@ -72,7 +72,7 @@ void InputManager::Print(const std::string &printLevel) const {
 const float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
 
-  const InputFile &inputFileDef = fileVec[fileNum];
+  const InputFile &inputFileDef = GetFile(fileNum);
 
   // set default type if not specified
   if (errorType == "")
@@ -92,13 +92,16 @@ const float InputManager::GetPostFitError(int fileNum, const std::string &paramN
   {
     return inputFileDef.postFitErrors.at(errorType).at(paramName);
   }
+
+  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, __BAD_FLOAT__);
+
   return __BAD_FLOAT__;
 }
 
 const float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
   
-  const InputFile &inputFileDef = fileVec[fileNum];
+  const InputFile &inputFileDef = GetFile(fileNum);
 
   // set default type if not specified
   if (errorType == "")
@@ -118,6 +121,9 @@ const float InputManager::GetPostFitValue(int fileNum, const std::string &paramN
   {
     return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
+  
+  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, __BAD_FLOAT__);
+
   return __BAD_FLOAT__;
 }
 
@@ -299,7 +305,7 @@ bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::str
   YAML::Node postFitErrorTypes = thisFitterSpec_config["postFitErrorTypes"];
   YAML::Node specificErrorType = postFitErrorTypes[errorType];
   std::vector<std::string> postFitLocations =
-      specificErrorType["Loc"].as<std::vector<std::string>>();
+      specificErrorType["location"].as<std::vector<std::string>>();
 
   // EM: If the parameter has a specified list of locations then override the default one
   std::vector<std::string> postFitLocations_override;
@@ -311,21 +317,17 @@ bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::str
 
   for (std::string postFitLoc : postFitLocations)
   {
-    std::shared_ptr<TH1D> postFitErrors = std::shared_ptr<TH1D>((TH1D*)inputFileDef.file->Get(postFitLoc.c_str()));
+    std::shared_ptr<TH1D> postFitErrors = std::static_pointer_cast<TH1D>(findRootObject(inputFileDef, parseLocation(postFitLoc, fitter, kPostFit, parameter)));
 
     // EM: the postfit hist for this parameter isn't in this file
-    if (postFitErrors == NULL)
+    if (postFitErrors == nullptr)
       continue;
-
-    // EM: check the config to see if a suffix is supplied for this
-    std::string suffix = thisFitterSpec_config["defaultPostFitSuffix"].as<std::string>();
-    getFitterSpecificParamOption<std::string>(fitter, "postFitSuffix", suffix, parameter);
 
     // EM: Loop through the hist to see if it contains the parameter we're looking for
     for (int binIdx = 0; binIdx <= postFitErrors->GetNbinsX(); binIdx++)
     {
       std::string binLabel = std::string(postFitErrors->GetXaxis()->GetBinLabel(binIdx));
-      if (strEndsWith(binLabel, specificName + suffix))
+      if (strEndsWith(binLabel, specificName))
       {
         if (setInputFileError)
         {
@@ -434,7 +436,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
         YAML::Node postFitErrorSpec = thisFitterSpec_config["postFitErrorTypes"];
         YAML::Node defaultErrorType =
             postFitErrorSpec[thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>()];
-        std::vector<std::string> locations = defaultErrorType["Loc"].as<std::vector<std::string>>();
+        std::vector<std::string> locations = defaultErrorType["location"].as<std::vector<std::string>>();
         for (std::string loc : locations)
           MACH3LOG_DEBUG(loc);
       } 
