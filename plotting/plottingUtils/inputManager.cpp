@@ -14,17 +14,10 @@ InputManager::InputManager(const std::string &translationConfigName) {
   _parametersConfig = _translatorConfig["Parameters"];
   _samplesConfig = _translatorConfig["Samples"];
 
-  // go through each of the parameters and sample arrays and keep track of which ones we've been
-  // told about
-  for (std::string parameter : _parametersConfig["Parameters"].as<std::vector<std::string>>())
-  {
-    knownParameters.push_back(parameter);
-  }
-
-  for (std::string sample : _samplesConfig["Samples"].as<std::vector<std::string>>())
-  {
-    knownSamples.push_back(sample);
-  }
+  // check the config file and get which parameters, samples, and fitters we've been told about
+  knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
+  knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
+  knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
 }
 
 /// Open an input file and add to the manager, consists of:
@@ -132,7 +125,7 @@ const float InputManager::GetPostFitValue(int fileNum, const std::string &paramN
 // ################## End of public interface #######################
 // ##################################################################
 
-std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, fitterEnum fitter,
+std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
                                                      fileTypeEnum fileType, const std::string &parameter,
                                                      const std::string &sample) const {
 
@@ -247,9 +240,9 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
 
 
 bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &parameter,
-                                   fitterEnum fitter, const std::string &sample, bool setInputFileScan) {
+                                   std::string &fitter, const std::string &sample, bool setInputFileScan) {
 
-  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
   // EM: Get where the by sample LLH scan for this parameter *should* live if it exists
   YAML::Node testLLHConfig = thisFitterSpec_config["bySample_LLH"];
@@ -284,7 +277,7 @@ bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &p
       LLHGraph = std::make_shared<TGraph>((TH1D*)LLHObj.get());
     } else if (LLHObjType == "TGraph")
     {
-      LLHGraph = std::make_shared<TGraph>(*(TGraph*)LLHObj.get());
+      LLHGraph = std::shared_ptr<TGraph>((TGraph*)LLHObj->Clone());
     } else
     {
       throw MaCh3Exception(__FILE__ , __LINE__, "uknown type of LLH object specified: " + LLHObjType);
@@ -297,10 +290,10 @@ bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &p
 }
 
 bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::string &parameter,
-                                         fitterEnum fitter, const std::string &errorType,
+                                         std::string &fitter, const std::string &errorType,
                                          bool setInputFileError) {
   std::string specificName = getFitterSpecificParamName(fitter, kPostFit, parameter);
-  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
   // EM: Get which hist this parameter lives in from the config
   YAML::Node postFitErrorTypes = thisFitterSpec_config["postFitErrorTypes"];
@@ -356,23 +349,21 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
   if (printThoughts)
     MACH3LOG_INFO("Checking contents of file {}", inputFileDef.fileName);
 
-  for (int i = 1; i < kNFitters - 1; i++)
+  for (std::string fitter: knownFitters)
   {
 
-    fitterEnum fitter = fitterEnum(i);
-
-    // flag for whether or not the current fitterEnum is the correct one
+    // flag for whether or not the current fitter is the correct one
     bool foundFitter = false;
     if (printThoughts)
-      MACH3LOG_INFO("Checking if this is a {} file", convertFitterNames(fitter));
+      MACH3LOG_INFO("Checking if this is a {} file", fitter);
 
     // EM: get the configuration specifying what the output of this fitter looks like
-    if (!_fitterSpecConfig[convertFitterNames(fitter)])
+    if (!_fitterSpecConfig[fitter])
     {
-      throw MaCh3Exception(__FILE__ , __LINE__, "translation config doesnt contain a definition for fitter " + convertFitterNames(fitter));
+      throw MaCh3Exception(__FILE__ , __LINE__, "translation config doesnt contain a definition for fitter " + fitter);
     }
 
-    YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitter)];
+    YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
     size_t numLLHParams;
 
@@ -461,7 +452,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
         thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
     for (std::string parameter : knownParameters)
     {
-      if (findPostFitParamError(inputFileDef, parameter, fitterEnum(i), defaultErrorType))
+      if (findPostFitParamError(inputFileDef, parameter, fitter, defaultErrorType))
       {
         numPostFitParams++;
         enabledPostFitParams.push_back(parameter);
@@ -490,7 +481,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       for (const std::string parameter : knownParameters)
       {
         inputFileDef.availableParams_map_LLHBySample[sample][parameter] = false;
-        if (findBySampleLLH(inputFileDef, parameter, fitterEnum(i), sample))
+        if (findBySampleLLH(inputFileDef, parameter, fitter, sample))
         {
           inputFileDef.availableParams_map_LLHBySample[sample][parameter] = true;
           numLLHBySampleParams++;
@@ -522,8 +513,10 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     if (foundFitter)
     {
       if (printThoughts)
-        MACH3LOG_INFO("This is a {} file!\n", convertFitterNames(fitterEnum(i)));
-      inputFileDef.fitter = fitterEnum(i);
+      {
+        MACH3LOG_INFO("This is a {} file!\n", fitter);
+      }
+      inputFileDef.fitter = fitter;
       return;
     }
   }
@@ -531,7 +524,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
   // if we didn't return above then the fitter type wasn't found
   if (printThoughts)
     MACH3LOG_WARN("I don't know what kinda fitter this came from, will proceed with caution");
-  inputFileDef.fitter = fitterEnum::kNFitters;
+  inputFileDef.fitter = "UNKNOWN_FITTER";
 }
 
 void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
@@ -540,7 +533,7 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   if (printThoughts)
     MACH3LOG_INFO("....getting data from file {}", inputFileDef.fileName);
 
-  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(inputFileDef.fitter)];
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[inputFileDef.fitter];
 
   // set the default post fit error type so we can read it as default later
   inputFileDef.defaultErrorType =
@@ -595,7 +588,7 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
 
       else if (LLHObjType == "TGraph")
       {
-        LLHGraph = std::make_shared<TGraph>(*(TGraph*)LLHObj.get());
+        LLHGraph = std::shared_ptr<TGraph>((TGraph*)LLHObj.get()->Clone());
       }
 
       else

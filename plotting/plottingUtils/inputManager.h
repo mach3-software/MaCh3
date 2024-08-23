@@ -9,21 +9,6 @@
 #include "plottingUtils.h"
 
 namespace MaCh3Plotting {
-/// @brief Possible fitters that a file can come from.
-/// @todo I don't think this is actually necessary, could make it so list of possible fitters is
-/// taken straight from which ones are defined in the translation config file.
-enum fitterEnum {
-  kMaCh3,   //!< Came from MaCh3, not used but might be useful in cases where MaCh3_ND and MaCh3_FD
-            //!< are indistinguishable?
-  kMaCh3ND, //!< Came from MaCh3 near detector executable
-  kMaCh3FD, //!< Came from MaCh3 far detector executable
-  kGundam,  //!< Came from GUNDAM
-  kBANFF,   //!< Came from BANFF (Not fully implemented)
-  // kValor, //!< Came from Valor (Not at all implemented)
-  // kPTheta, //!< Came from PTheta (Not at all implemented)
-
-  kNFitters //!< Number of fitters known
-};
 
 /// @brief Types of possible file that can be read.
 enum fileTypeEnum {
@@ -105,8 +90,7 @@ struct InputFile {
   std::shared_ptr<TFile> file;          //!< Pointer to the underlying file for this InputFile instance.
   std::string fileName; //!< The location of the underlying file.
 
-  fitterEnum
-      fitter; //!< Which fitter this file came from, detected by InputManager::fillFileInfo().
+  std::string fitter; //!< Which fitter this file came from, detected by InputManager::fillFileInfo().
 
   /// @todo I think it would be nice to store all the InputFile data in some non root, maybe custom
   /// c++ types, and have separate reader classes for potential different input file formats that
@@ -201,29 +185,6 @@ public:
   /// @brief Add a new InputFile object to this input manager.
   /// @param fileName The name of the file to read.
   void addFile(const std::string &fileName);
-
-  /// @brief Convert from fitterEnum to the name of the fitter.
-  /// @param fitterId The fitter ID to convert.
-  /// @return The name of the fitter, or "UNKNOWN_FITTER" if the fitterId does not match any known
-  /// fitter.
-  static const std::string convertFitterNames(fitterEnum fitterId) {
-    switch (fitterId)
-    {
-    case kMaCh3ND:
-      return "MaCh3_ND";
-    case kMaCh3FD:
-      return "MaCh3_FD";
-    case kGundam:
-      return "GUNDAM";
-    case kBANFF:
-      return "BANFF";
-      // case kValor: return "Valor";
-      // case kPTheta: return "PTheta";
-
-    default:
-      return "UNKNOWN_FITTER";
-    }
-  }
 
   /// @brief Convert from fileTypeEnum to the name of the file type.
   /// @param fileType The file type ID to convert.
@@ -385,7 +346,7 @@ private:
   // any other token that gets added in future can also just be added here and added to end of the
   // argument list The string will also be split by the ":" delimeter into a directory and a name to
   // look for in that directory
-  std::vector<std::string> parseLocation(const std::string &locationString, fitterEnum fitter,
+  std::vector<std::string> parseLocation(const std::string &locationString, std::string &fitter,
                                          fileTypeEnum fileType, const std::string &parameter = "",
                                          const std::string &sample = "") const;
 
@@ -398,12 +359,12 @@ private:
 
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
-  bool findPostFitParamError(InputFile &inputFileDef, const std::string &parameter, fitterEnum fitter,
+  bool findPostFitParamError(InputFile &inputFileDef, const std::string &parameter, std::string &fitter,
                              const std::string &errorType, bool setInputFileError = false);
 
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
-  bool findBySampleLLH(InputFile &inputFileDef, const std::string &parameter, fitterEnum fitter,
+  bool findBySampleLLH(InputFile &inputFileDef, const std::string &parameter, std::string &fitter,
                        const std::string &sample, bool setInputFileScan = false);
 
   // fns tp read an input file
@@ -414,7 +375,7 @@ private:
   // node (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
   // fitter and parameter otherwise returns false
   template <typename T>
-  inline bool getFitterSpecificOption(fitterEnum fitter, std::string option, T &ret, const std::string &parameter,
+  inline bool getFitterSpecificOption(const std::string &fitter, const std::string &option, T &ret, const std::string &parameter,
                                YAML::Node subConfig) const{
     if (subConfig[parameter])
     {
@@ -422,10 +383,10 @@ private:
       // EM: this is config definition of fitter specific names for this parameter
       YAML::Node paramTranslation = subConfig[parameter];
 
-      if (paramTranslation[convertFitterNames(fitter)])
+      if (paramTranslation[fitter])
       {
         // EM: then this is definition of how to find parameter in the specified fitter
-        YAML::Node fitterParamTranslation = paramTranslation[convertFitterNames(fitter)];
+        YAML::Node fitterParamTranslation = paramTranslation[fitter];
 
         if (fitterParamTranslation[option])
         {
@@ -439,21 +400,21 @@ private:
 
   // Specialised option getter for parameters
   template <typename T>
-  inline bool getFitterSpecificParamOption(fitterEnum fitter, const std::string &option, T &ret,
+  inline bool getFitterSpecificParamOption(const std::string &fitter, const std::string &option, T &ret,
                                            const std::string &parameter) const {
     return getFitterSpecificOption<T>(fitter, option, ret, parameter, _parametersConfig);
   }
 
   // specialised option getter for samples
   template <typename T>
-  inline bool getFitterSpecificSampleOption(fitterEnum fitter, std::string option, T &ret,
+  inline bool getFitterSpecificSampleOption(const std::string &fitter, std::string option, T &ret,
                                             std::string parameter) const {
     return getFitterSpecificOption<T>(fitter, option, ret, parameter, _samplesConfig);
   }
 
   // helper function to read from the translation config to get the parameter name for a specific
   // fitter and file type
-  inline std::string getFitterSpecificParamName(fitterEnum fitter, fileTypeEnum fileType,
+  inline std::string getFitterSpecificParamName(const std::string &fitter, fileTypeEnum fileType,
                                                 const std::string &parameter) const {
     std::string specificName;
     if (getFitterSpecificParamOption<std::string>(fitter, convertFileTypeNames(fileType),
@@ -467,7 +428,7 @@ private:
 
   // helper function to read from the translation config file to get the sample name for a specific
   // fitter and file type
-  inline std::string getFitterSpecificSampleName(fitterEnum fitter, fileTypeEnum fileType,
+  inline std::string getFitterSpecificSampleName(const std::string &fitter, fileTypeEnum fileType,
                                                  const std::string &sample) const {
     std::string specificName;
     if (getFitterSpecificSampleOption<std::string>(fitter, convertFileTypeNames(fileType),
@@ -497,7 +458,7 @@ private:
   std::vector<std::string> knownSamples;
 
   // map the enum to actual fitter names
-  std::map<fitterEnum, std::string> fitterNames;
+  std::vector<std::string> knownFitters;
 
 private:
   // the configs defining the translation of parameters between fitters and also the directory
