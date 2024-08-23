@@ -18,17 +18,30 @@ double ratioLabelScaling;
 MaCh3Plotting::PlottingManager *man;
 
 void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSams,
-                         std::vector<Double_t> &cumSums, std::vector<bool> &drawLabel,
+                         std::vector<float> &cumSums, std::vector<bool> &drawLabel,
                          THStack *sampleStack, TLegend *splitSamplesLegend,
-                         float baselineLLH_main = 0.00001) {
+                         float baselineLLH_main = 0.00001) 
+  {
+
+  std::vector<std::string> sampNames = man->Input()->GetKnownSamples();
+  size_t nSamples = sampNames.size();
+
+  cumSums.resize(nSamples);
+  drawLabel.resize(nSamples);
+
+  MACH3LOG_DEBUG("cumSums.size() = {}", cumSums.size());
+  MACH3LOG_DEBUG("drawLabel.size() = {}", drawLabel.size());
+
   float LLH_main_integ = LLH_allSams.Integral();
   float cumSum = 0.0;
   int nBins = LLH_allSams.GetNbinsX();
 
-  std::vector<std::string> sampNames = man->Input()->GetKnownSamples();
-  for (uint i = 0; i < sampNames.size(); i++)
+  MACH3LOG_DEBUG("getting split sample THStack for {} known samples", nSamples);
+  for (uint i = 0; i < nSamples; i++)
   {
     std::string sampName = sampNames[i];
+    
+    MACH3LOG_DEBUG("  on sample {}/{}: {}", i, nSamples, sampName);
 
     TH1D *LLH_indivSam =
         new TH1D(man->Input()->GetSampleSpecificLLHScan_TH1D(fileIdx, parameterName, sampName));
@@ -38,29 +51,43 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
     // the hist for this sample didn't exist so move on
     if (LLH_indivSam->GetNbinsX() == 1)
     {
+      MACH3LOG_DEBUG("    sample hist had only 1 bin - assuming it doesn't exist");
       delete LLH_indivSam;
+      drawLabel[i] = false;
+      cumSums[i] = -999.9;
       continue;
     }
 
     LLH_indivSam->SetStats(0);
     LLH_indivSam->SetLineColor(TColor::GetColorPalette(
-        floor((float)i * TColor::GetNumberOfColors() / (float)sampNames.size())));
+        floor((float)i * TColor::GetNumberOfColors() / (float)nSamples)));
     LLH_indivSam->SetFillColor(TColor::GetColorPalette(
-        floor((float)i * TColor::GetNumberOfColors() / (float)sampNames.size())));
+        floor((float)i * TColor::GetNumberOfColors() / (float)nSamples)));
     sampleStack->Add(LLH_indivSam);
     splitSamplesLegend->AddEntry(LLH_indivSam, man->Style()->prettifySampleName(sampName).c_str(),
                                  "lf");
 
-    cumSum += LLH_indivSam->GetBinContent(nBins);
+    float lastBinLLH = LLH_indivSam->GetBinContent(nBins);
+    cumSum += lastBinLLH;
 
-    cumSums.push_back(cumSum);
+    MACH3LOG_DEBUG("    Last bin LLH = {} :: cumulative LLH = {}", lastBinLLH, cumSum);
+    MACH3LOG_DEBUG("    LLH fraction = {} / {} = {}", LLH_indivSam->Integral(), LLH_main_integ, LLH_indivSam->Integral() / LLH_main_integ);
 
+    cumSums[i] = cumSum;
+    
+    // dont draw a label if the likelihood contribution is less than threshold%
     if ((LLH_indivSam->Integral() / LLH_main_integ > sampleLabelThreshold) &&
         (LLH_indivSam->Integral() / baselineLLH_main > sampleLabelThreshold))
-    { // dont draw a label if the likelihood contribution is less than threshold%
-      drawLabel.push_back(true);
+    {
+      drawLabel[i] = true;
     } else
-      drawLabel.push_back(false);
+    {
+      drawLabel[i] = false;
+    }
+
+    MACH3LOG_DEBUG("    drawLabel = {}", drawLabel.back()); 
+    MACH3LOG_DEBUG("");
+  
   }
 
   return;
@@ -187,6 +214,8 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
 
 void makeSplitSampleLLHScanComparisons(std::string paramName, std::string outputFileName,
                                        TCanvas *canv, TPad *LLHPad, TPad *ratioPad) {
+  
+  MACH3LOG_DEBUG(" Making split sample LLH comparison");
   canv->Clear();
   canv->Draw();
 
@@ -195,7 +224,10 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   // get the sample hist from the main file
   TH1D LLH_main = man->Input()->GetLLHScan_TH1D(0, paramName, "sample");
   if (LLH_main.GetNbinsX() == 1)
+  {
+    MACH3LOG_DEBUG("  Main LLH had only 1 bin, assuming it doesn't exist");
     return;
+  }
 
   THStack *baseSplitSamplesStack = new THStack(
       paramName.c_str(), Form("%s - %s", paramName.c_str(), man->GetFileLabel(0).c_str()));
@@ -206,7 +238,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   else
     canv->cd(1);
 
-  std::vector<Double_t> cumSums;
+  std::vector<float> cumSums;
   std::vector<bool> drawLabel;
 
   getSplitSampleStack(0, paramName, LLH_main, cumSums, drawLabel, baseSplitSamplesStack,
@@ -232,20 +264,28 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   // need to draw the labels after other stuff or they dont show up
   for (uint i = 0; i < man->Input()->GetKnownSamples().size(); i++)
   {
+    MACH3LOG_DEBUG("  Will I draw the label for sample {}??", i);
     std::string sampName = man->Input()->GetKnownSamples()[i];
     if (!drawLabel[i])
+    { 
+      MACH3LOG_DEBUG("   - Not drawing label");
       continue;
+    }
+    MACH3LOG_DEBUG("   - Drawing label");
+
     label->DrawLatex(LLH_main.GetBinLowEdge(LLH_main.GetNbinsX() + 1), cumSums[i],
                      Form("#leftarrow%s", man->Style()->prettifySampleName(sampName).c_str()));
+    MACH3LOG_DEBUG("  I drew the label!");
   }
 
   // now we plot the comparisson file plots
   for (int extraFileIdx = 1; extraFileIdx < man->GetNFiles(); extraFileIdx++)
   {
+    MACH3LOG_DEBUG("  - Adding plot for additional file {}", extraFileIdx);
     canv->cd(1 + extraFileIdx);
 
-    std::vector<Double_t> cumSums;
-    std::vector<bool> drawLabel;
+    std::vector<float> extraCumSums;
+    std::vector<bool> extraDrawLabel;
 
     THStack *splitSamplesStack =
         new THStack(paramName.c_str(),
@@ -267,10 +307,10 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
     // baseline LLH integral is above the threshold otherwise the labels might get very crowded if
     // the comparisson LLH is much smaller than the baseline one
     if (sameAxis)
-      getSplitSampleStack(extraFileIdx, paramName, compLLH_main, cumSums, drawLabel,
+      getSplitSampleStack(extraFileIdx, paramName, compLLH_main, extraCumSums, extraDrawLabel,
                           splitSamplesStack, splitSamplesLegend, LLH_main.Integral());
     else
-      getSplitSampleStack(extraFileIdx, paramName, compLLH_main, cumSums, drawLabel,
+      getSplitSampleStack(extraFileIdx, paramName, compLLH_main, extraCumSums, extraDrawLabel,
                           splitSamplesStack, splitSamplesLegend);
 
     // go to the pad for the histograms
@@ -299,7 +339,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
       std::string sampName = man->Input()->GetKnownSamples()[i];
       if (!drawLabel[i])
         continue;
-      label->DrawLatex(compLLH_main.GetBinLowEdge(compLLH_main.GetNbinsX() + 1), cumSums[i],
+      label->DrawLatex(compLLH_main.GetBinLowEdge(compLLH_main.GetNbinsX() + 1), extraCumSums[i],
                        Form("#leftarrow%s", man->Style()->prettifySampleName(sampName).c_str()));
     }
 
@@ -410,6 +450,8 @@ int PlotLLH() {
 }
 
 int main(int argc, char **argv) {
+  SetMaCh3LoggerFormat();
+
   man = new MaCh3Plotting::PlottingManager();
   man->ParseInputs(argc, argv);
 
