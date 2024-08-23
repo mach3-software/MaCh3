@@ -212,8 +212,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
                    nSplines,
                    NSplines_valid,
                    nKnots,
-                   nTF1coeff,
                    NTF1_valid,
+                   nTF1coeff,
                    SplineType);
 
   MACH3LOG_INFO("Found {} events", NEvents);
@@ -221,6 +221,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   MACH3LOG_INFO("Found {} parameters", nParams);
   MACH3LOG_INFO("Found {} maximum number of splines in an event", nSplines);
   MACH3LOG_INFO("Found total {} knots in all splines", nKnots);
+  MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
+  MACH3LOG_INFO("Found total {} coeffs in all TF1", nTF1coeff);
+  MACH3LOG_INFO("Number of TF1 = {}", NTF1_valid);
 
   // Can pass the spline segments to the GPU instead of the values
   // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
@@ -361,7 +364,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         // Increment the counter for the number of good splines we have
         ++NSplinesCounter;
         #ifndef Weight_On_SplineBySpline_Basis
-        ParamCounter++;
+        ++ParamCounter;
         #endif
       }
       else if (SplineType[ParamNumber] == kTF1_red)
@@ -373,12 +376,12 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
         // If the number of knots are greater than 2 the spline is not a dummy and we should extract coefficients to load onto the GPU
         getTF1Coeff(CurrSpline, nPoints_tmp, temp_coeffs);
-
         for (int j = 0; j < _nTF1Coeff_; ++j) {
           cpu_coeff_TF1_many[TF1PointsCounter+j] = temp_coeffs[j];
         }
         // Save the number of points for this spline
         cpu_nPoints_arr[TF1sCounter] = nPoints_tmp;
+
         TF1PointsCounter += nPoints_tmp;
         // Set the parameter number for this spline
         cpu_paramNo_TF1_arr[TF1sCounter] = ParamNumber;
@@ -386,9 +389,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         index_TF1_cpu[EventCounter*nParams + ParamNumber] = TF1sCounter;
         // Increment the counter for the number of good splines we have
         ++TF1sCounter;
-
         #ifndef Weight_On_SplineBySpline_Basis
-        ParamCounter_TF1++;
+        ++ParamCounter_TF1;
         #endif
       }
       //KS: Don't delete in debug
@@ -414,11 +416,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   delete[] x_tmp;
   delete[] temp_coeffs;
 
-  // Now that we have looped through all events we can make the number of splines smaller
-  // Going from number of events * number of points per spline * number of NIWG params to spln_counter (=valid splines)
-  MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
-  MACH3LOG_INFO("Number of TF1 = {}", NTF1_valid);
-
   int BadXCounter = 0;
   for (unsigned int j = 0; j < event_size_max; j++) {
     if (cpu_coeff_x[j] == -999) BadXCounter++;
@@ -426,7 +423,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     if (cpu_coeff_x[j] == -999 && BadXCounter < 5) {
       MACH3LOG_WARN("***** BAD X !! *****");
       MACH3LOG_WARN("Indicates some parameter doesn't have a single spline");
-      MACH3LOG_WARN("j = {}");
+      MACH3LOG_WARN("j = {}", j);
       //throw;
     }
     if(BadXCounter == 5) MACH3LOG_WARN("There is more unutilised knots although I will stop spamming");
@@ -1195,13 +1192,18 @@ void SMonolith::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
 // *****************************************
 
   // Initialise all arrays to 1.0
-  for (int i = 0; i < _max_knots; ++i) {
+  for (int i = 0; i < _nTF1Coeff_; ++i) {
     coeffs[i] = 0.0;
   }
 
   // Get number of points in spline
   nPoints = spl->GetSize();
 
+  if(nPoints > _nTF1Coeff_)
+  {
+    MACH3LOG_ERROR("Too big number of points for TF1");
+    throw;
+  }
   // TSpline3 can only take doubles, not floats
   // But our GPU is slow with doubles, so need to cast to float
   for (int i = 0; i < nPoints; i++) {
@@ -1314,14 +1316,14 @@ void SMonolith::FindSplineSegment() {
     const _int_ nPoints = SplineInfoArray[i].nPts;
     const _float_* xArray = SplineInfoArray[i].xPts;
 
+    // Get the variation for this reconfigure for the ith parameter
+    const _float_ xvar = *SplineInfoArray[i].splineParsPointer;
+    vals[i] = xvar;
+
     // EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here
     //     In principle, such parameters shouldn't really be included in the first place, but with new det syst splines this
     //     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.
     if(xArray == NULL) continue;
-
-    // Get the variation for this reconfigure for the ith parameter
-    const _float_ xvar = *SplineInfoArray[i].splineParsPointer;
-    vals[i] = xvar;
 
     // The segment we're interested in (klow in ROOT code)
     _int_ segment = 0;
@@ -1455,7 +1457,7 @@ void SMonolith::ModifyWeights(){
 //*********************************************************
 #ifndef Weight_On_SplineBySpline_Basis
   #ifdef MULTITHREAD
-  #pragma omp parallel for simd
+  //#pragma omp parallel for simd
   #endif
   for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum)
   {
