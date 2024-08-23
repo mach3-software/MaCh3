@@ -41,10 +41,10 @@ void PlottingManager::Initialise() {
   }
 
   // create the StyleManager
-  styleMan = new StyleManager(styleConfig);
+  styleMan = std::make_unique<StyleManager>(styleConfig);
 
   // create the InputManager and add all the files to it
-  inputMan = new InputManager(translationConfig);
+  inputMan = std::make_unique<InputManager>(translationConfig);
   for (std::string fileName : FileNames)
   {
     inputMan->addFile(fileName);

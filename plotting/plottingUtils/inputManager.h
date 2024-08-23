@@ -55,10 +55,10 @@ struct InputFile {
   /// In future it would be nice to extend this to be able to read different types of files, perhaps
   /// also moving the opening of the file to a different place to keep this struct nice and simple,
   /// perhaps into the InputManager.
-  InputFile(std::string fName) {
+  InputFile(const std::string &fName) {
     fileName = fName;
 
-    file = new TFile(fileName.c_str());
+    file = std::make_shared<TFile>(fileName.c_str());
     hasLLHScans = false;
     hasPostFitErrors = false;
     hasSigmaVars = false;
@@ -78,7 +78,7 @@ struct InputFile {
   /// @brief Print out a small summary of what is contained in the file.
   /// @todo Could add some flag to this to check if the relevant information has actually been
   /// filled already and if not give some warning or print only some of the values.
-  void Summarise() {
+  void Summarise() const {
     MACH3LOG_INFO("### Input File Summary ###");
     MACH3LOG_INFO("  Root file loc: {}", fileName);
     MACH3LOG_INFO("  Came from fitter: {}", fitter);
@@ -88,7 +88,7 @@ struct InputFile {
 
   /// @brief Print out a more detailed summary of what is contained in the file.
   /// @todo Same as for Summarise(), could add a check that the file info has actually been filled.
-  void Dump() {
+  void Dump() const {
     Summarise();
     MACH3LOG_INFO("Available LLH parameters: ");
     for (std::string paramName : availableParams_LLH)
@@ -102,7 +102,7 @@ struct InputFile {
     }
   }
 
-  TFile *file;          //!< Pointer to the underlying file for this InputFile instance.
+  std::shared_ptr<TFile> file;          //!< Pointer to the underlying file for this InputFile instance.
   std::string fileName; //!< The location of the underlying file.
 
   fitterEnum
@@ -122,7 +122,7 @@ struct InputFile {
   std::unordered_map<std::string, bool>
       hasLLHScans_map; //!< Whether this file contains specific types of likelihood scans, e.g.
                        //!< hasLLHScans_map.at("prior").
-  std::unordered_map<std::string, std::unordered_map<std::string, TGraph *>>
+  std::unordered_map<std::string, std::unordered_map<std::string, std::shared_ptr<TGraph>>>
       LLHScans_map; //!< The actual graphs of the likelihood scans, organised as
                     //!< LLHScans_map.at(LLHType).at(parameter).
   std::unordered_map<std::string, std::unordered_map<std::string, bool>>
@@ -138,7 +138,7 @@ struct InputFile {
                             //!< per sample.
   std::vector<std::string> availableSamples_LLH; //!< The samples that this file contains individual
                                                  //!< likelihood scans for.
-  std::unordered_map<std::string, std::unordered_map<std::string, TGraph *>>
+  std::unordered_map<std::string, std::unordered_map<std::string, std::shared_ptr<TGraph>>>
       LLHScansBySample_map; //!< The actual graphs of the likelihood scans, organised as
                             //!< LLHScans_map.at(sample).at(parameter).
   std::unordered_map<std::string, std::unordered_map<std::string, bool>>
@@ -196,11 +196,11 @@ public:
   /// @param translationConfigName The config file defining the fitter file structures, fit
   /// parameter, and what the parameters are called in each fitter.
   /// @return Constructed InputManager instance.
-  InputManager(std::string translationConfigName);
+  InputManager(const std::string &translationConfigName);
 
   /// @brief Add a new InputFile object to this input manager.
   /// @param fileName The name of the file to read.
-  void addFile(std::string fileName);
+  void addFile(const std::string &fileName);
 
   /// @brief Convert from fitterEnum to the name of the fitter.
   /// @param fitterId The fitter ID to convert.
@@ -249,7 +249,7 @@ public:
   /// @brief Print out what this Inputmanager instance knows about.
   /// @param printLevel The level of detail to go into in the summary printout: options are
   /// "summary", and "dump".
-  void Print(std::string printLevel = "summary") const;
+  void Print(const std::string &printLevel = "summary") const;
 
   // FNs to get to the tasty tasty data stored in the files
 
@@ -262,27 +262,44 @@ public:
   /// @return The graph of the likelihood scan.
   TGraph GetLLHScan_TGraph(int fileNum, std::string paramName, std::string LLHType) const {
     if (!GetEnabled_LLH(fileNum, paramName, LLHType))
-      return TGraph(); // EM: This should maybe give a warning or something?
-    return *fileVec[fileNum]->LLHScans_map.at(LLHType).at(paramName);
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning an empty TGraph");
+      return TGraph(); 
+    }
+    return *fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName);
   }
 
   TH1D GetLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
     if (!GetEnabled_LLH(fileNum, paramName, LLHType))
-      return TH1D(); // EM: This should maybe give a warning or something?
-    return TGraphToTH1D(*fileVec[fileNum]->LLHScans_map.at(LLHType).at(paramName));
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning an empty TH1D");
+      return TH1D(); 
+    }
+    return TGraphToTH1D(*fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
   }
 
   TGraph GetSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
                                          std::string sample) const {
+    
     if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
-      return TGraph(); // EM: This should maybe give a warning or something?
-    return *fileVec[fileNum]->LLHScansBySample_map.at(sample).at(paramName);
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
+      MACH3LOG_WARN("am returning an empty TGraph");
+      return TGraph();
+    }
+    return *fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName);
   }
 
   TH1D GetSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
     if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
-      return TH1D(); // EM: This should maybe give a warning or something?
-    return TGraphToTH1D(*fileVec[fileNum]->LLHScansBySample_map.at(sample).at(paramName));
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
+      MACH3LOG_WARN("am returning an empty TH1D");
+      return TH1D();
+    }
+    return TGraphToTH1D(*fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
   }
 
   /// @brief Get the log likelihood scan for a particular parameter, for a specific sample, from a
@@ -306,7 +323,7 @@ public:
   /// @return true if scan exists, false if not.
   inline bool GetEnabled_LLH(int fileNum, std::string paramName,
                              std::string LLHType = "total") const {
-    return fileVec[fileNum]->availableParams_map_LLH.at(LLHType).at(paramName);
+    return fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
   }
 
   /// @brief Get whether or not a particular parameter has an LLH scan in a particular input file
@@ -316,7 +333,7 @@ public:
   /// @param sample The sample to check.
   /// @return true if scan exists, false if not.
   inline bool GetEnabled_LLHBySample(int fileNum, std::string paramName, std::string sample) const {
-    return fileVec[fileNum]->availableParams_map_LLHBySample.at(sample).at(paramName);
+    return fileVec[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);
   }
 
   /// @brief Get the post fit error for a particular parameter from a particular input file.
@@ -326,7 +343,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The error on the specified parameter.
-  const float GetPostFitError(int fileNum, std::string paramName, std::string errorType = "") const;
+  const float GetPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @brief Get the post fit value for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
@@ -335,7 +352,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The value of the specified parameter.
-  const float GetPostFitValue(int fileNum, std::string paramName, std::string errorType = "") const;
+  const float GetPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @name General Getters
   /// @{
@@ -346,18 +363,18 @@ public:
 
   /// @name File Specific Getters
   /// @{
-  inline InputFile *GetFile(int fileId) const { return fileVec[fileId]; }
+  inline InputFile GetFile(int fileId) const { return fileVec[fileId]; }
   inline std::string TranslateName(int fileId, fileTypeEnum fileType, std::string paramName) const {
-    return getFitterSpecificParamName(fileVec[fileId]->fitter, fileType, paramName);
+    return getFitterSpecificParamName(fileVec[fileId].fitter, fileType, paramName);
   }
   inline const std::vector<std::string> &GetKnownLLHParameters(int fileId) const {
-    return fileVec[fileId]->availableParams_LLH;
+    return fileVec[fileId].availableParams_LLH;
   }
   inline const std::vector<std::string> &GetKnownLLHSamples(int fileId) const {
-    return fileVec[fileId]->availableSamples_LLH;
+    return fileVec[fileId].availableSamples_LLH;
   }
   inline const std::vector<std::string> &GetKnownPostFitParameters(int fileId) const {
-    return fileVec[fileId]->availableParams_postFitErrors;
+    return fileVec[fileId].availableParams_postFitErrors;
   }
   /// @}
 
@@ -368,36 +385,36 @@ private:
   // any other token that gets added in future can also just be added here and added to end of the
   // argument list The string will also be split by the ":" delimeter into a directory and a name to
   // look for in that directory
-  std::vector<std::string> parseLocation(std::string locationString, fitterEnum fitter,
-                                         fileTypeEnum fileType, std::string parameter = "",
-                                         std::string sample = "") const;
+  std::vector<std::string> parseLocation(const std::string &locationString, fitterEnum fitter,
+                                         fileTypeEnum fileType, const std::string &parameter = "",
+                                         const std::string &sample = "") const;
 
   // helper function to look for an object defined by a vector of strings [ (directory to look in),
   // (end of the name of the object) ] this just calls roots TDirectoryFile->Get() function so
   // behaves in the same way:
   //   if the object exists then it is loaded and returned
   //   if it doesn't exist then just returns nullptr
-  TObject *findRootObject(InputFile *fileDef, std::vector<std::string> locationVec) const;
+  std::shared_ptr<TObject> findRootObject(const InputFile &fileDef, const std::vector<std::string> &locationVec) const;
 
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
-  bool findPostFitParamError(InputFile *inputFileDef, std::string parameter, fitterEnum fitter,
-                             std::string errorType, bool setInputFileError = false);
+  bool findPostFitParamError(InputFile &inputFileDef, const std::string &parameter, fitterEnum fitter,
+                             const std::string &errorType, bool setInputFileError = false);
 
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
-  bool findBySampleLLH(InputFile *inputFileDef, std::string parameter, fitterEnum fitter,
-                       std::string sample, bool setInputFileScan = false);
+  bool findBySampleLLH(InputFile &inputFileDef, const std::string &parameter, fitterEnum fitter,
+                       const std::string &sample, bool setInputFileScan = false);
 
   // fns tp read an input file
-  void fillFileInfo(InputFile *inputFileDef, bool printThoughts = true);
-  void fillFileData(InputFile *inputFileDef, bool printThoughts = true);
+  void fillFileInfo(InputFile &inputFileDef, bool printThoughts = true);
+  void fillFileData(InputFile &inputFileDef, bool printThoughts = true);
 
   // helper function to read from the translation config file to get an option for a particular sub
   // node (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
   // fitter and parameter otherwise returns false
   template <typename T>
-  inline bool getFitterSpecificOption(fitterEnum fitter, std::string option, T *ret, std::string parameter,
+  inline bool getFitterSpecificOption(fitterEnum fitter, std::string option, T &ret, const std::string &parameter,
                                YAML::Node subConfig) const{
     if (subConfig[parameter])
     {
@@ -412,7 +429,7 @@ private:
 
         if (fitterParamTranslation[option])
         {
-          *ret = fitterParamTranslation[option].as<T>();
+          ret = fitterParamTranslation[option].as<T>();
           return true;
         }
       }
@@ -422,14 +439,14 @@ private:
 
   // Specialised option getter for parameters
   template <typename T>
-  inline bool getFitterSpecificParamOption(fitterEnum fitter, std::string option, T *ret,
-                                           std::string parameter) const {
+  inline bool getFitterSpecificParamOption(fitterEnum fitter, const std::string &option, T &ret,
+                                           const std::string &parameter) const {
     return getFitterSpecificOption<T>(fitter, option, ret, parameter, _parametersConfig);
   }
 
   // specialised option getter for samples
   template <typename T>
-  inline bool getFitterSpecificSampleOption(fitterEnum fitter, std::string option, T *ret,
+  inline bool getFitterSpecificSampleOption(fitterEnum fitter, std::string option, T &ret,
                                             std::string parameter) const {
     return getFitterSpecificOption<T>(fitter, option, ret, parameter, _samplesConfig);
   }
@@ -437,10 +454,10 @@ private:
   // helper function to read from the translation config to get the parameter name for a specific
   // fitter and file type
   inline std::string getFitterSpecificParamName(fitterEnum fitter, fileTypeEnum fileType,
-                                                std::string parameter) const {
+                                                const std::string &parameter) const {
     std::string specificName;
     if (getFitterSpecificParamOption<std::string>(fitter, convertFileTypeNames(fileType),
-                                                  &specificName, parameter))
+                                                  specificName, parameter))
     {
       return specificName;
     }
@@ -451,10 +468,10 @@ private:
   // helper function to read from the translation config file to get the sample name for a specific
   // fitter and file type
   inline std::string getFitterSpecificSampleName(fitterEnum fitter, fileTypeEnum fileType,
-                                                 std::string sample) const {
+                                                 const std::string &sample) const {
     std::string specificName;
     if (getFitterSpecificSampleOption<std::string>(fitter, convertFileTypeNames(fileType),
-                                                   &specificName, sample))
+                                                   specificName, sample))
     {
       return specificName;
     }
@@ -469,7 +486,7 @@ private:
   }
 
   // vector of InputFile objects that this manager is responsible for
-  std::vector<InputFile *> fileVec;
+  std::vector<InputFile> fileVec;
 
   // all parameters which are known to this InputManager: all the ones defined in the translation
   // config used to create it
@@ -482,9 +499,6 @@ private:
   // map the enum to actual fitter names
   std::map<fitterEnum, std::string> fitterNames;
 
-  // fns for converting maCh3 parameter names to names in other fitters
-  std::string getGundamParamName_PostFit(std::string mach3ParamName, TDirectoryFile *fitDir,
-                                         TH1D *PostFitError_ret = NULL, Int_t *parIdx = NULL);
   std::string MaCh3ToBANFFName(std::string mach3ParamName);
   std::string BANFFfluxName(std::string);
 

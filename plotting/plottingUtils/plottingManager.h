@@ -66,8 +66,6 @@ public:
   void Initialise();
 
   ~PlottingManager() {
-    delete styleMan;
-    delete inputMan;
   }
 
   /// @brief Parse command line arguments.
@@ -145,11 +143,11 @@ public:
   // for managers contained in this manager
   /// @brief Get the StyleManager contained within this PlottingManager, for doing style related
   /// things.
-  const StyleManager *Style() { return styleMan; }
+  const StyleManager &Style() { return *styleMan; }
 
   /// @brief Get the InputManager contained within this PlottingManager, for doing input related
   /// things.
-  const InputManager *Input() { return inputMan; }
+  const InputManager &Input() { return *inputMan; }
 
 private:
   // name of the config file to read configs from
@@ -174,7 +172,7 @@ private:
   bool drawGrid = false;
 
   // other Manager objects
-  StyleManager *styleMan = NULL;
-  InputManager *inputMan = NULL;
+  std::unique_ptr<StyleManager> styleMan;
+  std::unique_ptr<InputManager> inputMan;
 };
 } // namespace MaCh3Plotting

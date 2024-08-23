@@ -5,7 +5,7 @@
 
 namespace MaCh3Plotting {
 // this is the constructor with user specified translation config file
-InputManager::InputManager(std::string translationConfigName) {
+InputManager::InputManager(const std::string &translationConfigName) {
   // read the config file
   _translatorConfig = YAML::LoadFile(translationConfigName);
 
@@ -35,8 +35,8 @@ InputManager::InputManager(std::string translationConfigName) {
 ///  plotting scripts
 ///  - Push back a pointer to the InputFile objcet to the vector of files known to this
 ///  InputManager.
-void InputManager::addFile(std::string fileName) {
-  InputFile *fileInfo = new InputFile(fileName);
+void InputManager::addFile(const std::string &fileName) {
+  InputFile fileInfo(fileName);
 
   // EM: need to be done in this order since fillFileData needs to know info about the file, e.g.
   // fitter and what things are in it
@@ -49,7 +49,7 @@ void InputManager::addFile(std::string fileName) {
 /// If printLevel is "summary", will loop through all the files known to this InputManager and call
 /// InputFile::Summarise(). If printLevel is "dump", will print all parameters known to this
 /// InputManager and then loop through all input files and call InputFile::Dump().
-void InputManager::Print(std::string printLevel) const {
+void InputManager::Print(const std::string &printLevel) const {
   MACH3LOG_INFO("Printing contents of InputManager instance:");
 
   if (printLevel == "dump")
@@ -62,66 +62,68 @@ void InputManager::Print(std::string printLevel) const {
   }
 
   int fileCount = 0;
-  for (InputFile *file : fileVec)
+  for (const InputFile file : fileVec)
   {
     MACH3LOG_INFO(" For file {}", fileCount);
     if (printLevel == "summary")
     {
-      file->Summarise();
+      file.Summarise();
     } else if (printLevel == "dump")
-    { file->Dump(); }
+    { file.Dump(); }
     fileCount++;
   }
 
   MACH3LOG_INFO("");
 }
 
-const float InputManager::GetPostFitError(int fileNum, std::string paramName,
+const float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
-  const InputFile *inputFileDef = fileVec[fileNum];
+
+  const InputFile &inputFileDef = fileVec[fileNum];
 
   // set default type if not specified
   if (errorType == "")
-    errorType = inputFileDef->defaultErrorType;
+    errorType = inputFileDef.defaultErrorType;
 
-  if (inputFileDef->postFitErrors.find(errorType) == inputFileDef->postFitErrors.end())
+  if (inputFileDef.postFitErrors.find(errorType) == inputFileDef.postFitErrors.end())
   {
     MACH3LOG_CRITICAL("Requested error type, {} does not exist in the specified file: ", errorType);
-    MACH3LOG_CRITICAL("  {}", inputFileDef->fileName);
+    MACH3LOG_CRITICAL("  {}", inputFileDef.fileName);
     MACH3LOG_CRITICAL("  at index {}", fileNum);
 
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  if (inputFileDef->postFitErrors.at(errorType).find(paramName) !=
-      inputFileDef->postFitErrors.at(errorType).end())
+  if (inputFileDef.postFitErrors.at(errorType).find(paramName) !=
+      inputFileDef.postFitErrors.at(errorType).end())
   {
-    return inputFileDef->postFitErrors.at(errorType).at(paramName);
+    return inputFileDef.postFitErrors.at(errorType).at(paramName);
   }
   return __BAD_FLOAT__;
 }
 
-const float InputManager::GetPostFitValue(int fileNum, std::string paramName,
+const float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
-  const InputFile *inputFileDef = fileVec[fileNum];
+  
+  const InputFile &inputFileDef = fileVec[fileNum];
 
   // set default type if not specified
   if (errorType == "")
-    errorType = inputFileDef->defaultErrorType;
+    errorType = inputFileDef.defaultErrorType;
 
-  if (inputFileDef->postFitErrors.find(errorType) == inputFileDef->postFitErrors.end())
+  if (inputFileDef.postFitErrors.find(errorType) == inputFileDef.postFitErrors.end())
   {
     MACH3LOG_CRITICAL("Requested error type, {} does not exist in the specified file: ", errorType);
-    MACH3LOG_CRITICAL("  {}", inputFileDef->fileName);
+    MACH3LOG_CRITICAL("  {}", inputFileDef.fileName);
     MACH3LOG_CRITICAL("  at index {}", fileNum);
 
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  if (inputFileDef->postFitValues.at(errorType).find(paramName) !=
-      inputFileDef->postFitValues.at(errorType).end())
+  if (inputFileDef.postFitValues.at(errorType).find(paramName) !=
+      inputFileDef.postFitValues.at(errorType).end())
   {
-    return inputFileDef->postFitValues.at(errorType).at(paramName);
+    return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
   return __BAD_FLOAT__;
 }
@@ -130,9 +132,11 @@ const float InputManager::GetPostFitValue(int fileNum, std::string paramName,
 // ################## End of public interface #######################
 // ##################################################################
 
-std::vector<std::string> InputManager::parseLocation(std::string locationString, fitterEnum fitter,
-                                                     fileTypeEnum fileType, std::string parameter,
-                                                     std::string sample) const {
+std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, fitterEnum fitter,
+                                                     fileTypeEnum fileType, const std::string &parameter,
+                                                     const std::string &sample) const {
+
+  std::string locationString(rawLocationString);
   std::vector<std::string> tokens;
 
   std::size_t pos = 0;
@@ -172,27 +176,28 @@ std::vector<std::string> InputManager::parseLocation(std::string locationString,
   // ":" in the location string
   if (tokens.size() > 2)
   {
-    throw MaCh3Exception(__FILE__ , __LINE__, "Too many : tokens in location string");
+    throw MaCh3Exception(__FILE__ , __LINE__, "Too many : tokens in location string: " + rawLocationString);
   }
 
   return tokens;
 }
 
-TObject *InputManager::findRootObject(InputFile *fileDef,
-                                      std::vector<std::string> locationVec) const {
-  TObject *object = nullptr;
+std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
+                                      const std::vector<std::string> &locationVec) const {
+
+  std::shared_ptr<TObject> object = nullptr;
 
   // if vector only has one element, just interpret it as the absolute path to the object
   if (locationVec.size() == 1)
   {
-    object = fileDef->file->Get(locationVec[0].c_str());
+    object = std::shared_ptr<TObject>(fileDef.file->Get(locationVec[0].c_str()));
   }
 
   // if vector has two elements, interpret the first as the directory and the second as a string to
   // match with the end of the objects in the file
   else if (locationVec.size() == 2)
   {
-    TDirectoryFile *directory = (TDirectoryFile *)fileDef->file->Get(locationVec[0].c_str());
+    TDirectoryFile *directory = (TDirectoryFile*)fileDef.file->Get(locationVec[0].c_str());
     size_t nMatchingObjects = 0;
 
     // let's make sure that the directory itself exists
@@ -206,11 +211,11 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
       // loop through the keys in the directory and find objects whose name matches the specified
       // pattern
       TIter next(directory->GetListOfKeys());
-      while (TKey *key = (TKey *)next())
+      while (TKey *key = (TKey*)next())
       {
         if (strEndsWith(std::string(key->GetName()), locationVec[1]))
         {
-          object = directory->Get(key->GetName());
+          object = std::shared_ptr<TObject>(directory->Get(key->GetName()));
           nMatchingObjects++;
         }
       }
@@ -241,8 +246,8 @@ TObject *InputManager::findRootObject(InputFile *fileDef,
 }
 
 
-bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string parameter,
-                                   fitterEnum fitter, std::string sample, bool setInputFileScan) {
+bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &parameter,
+                                   fitterEnum fitter, const std::string &sample, bool setInputFileScan) {
 
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
 
@@ -254,7 +259,7 @@ bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string paramete
   std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
 
   // EM: Now look for the parameter in this folder
-  TObject *LLHObj = nullptr;
+  std::shared_ptr<TObject> LLHObj = nullptr;
   for (std::string rawLocation : testLLHRawLocations)
   {
     LLHObj =
@@ -272,29 +277,27 @@ bool InputManager::findBySampleLLH(InputFile *inputFileDef, std::string paramete
   // EM: If specified, we set the object in the InputFile object
   if (setInputFileScan)
   {
-    TGraph *LLHGraph = new TGraph();
+    std::shared_ptr<TGraph> LLHGraph = std::make_shared<TGraph>();
 
     if (LLHObjType == "TH1D")
     {
-      LLHGraph = new TGraph((TH1D *)LLHObj);
-      delete LLHObj;
+      LLHGraph = std::make_shared<TGraph>((TH1D*)LLHObj.get());
     } else if (LLHObjType == "TGraph")
     {
-      LLHGraph = new TGraph(*(TGraph *)LLHObj);
-      delete LLHObj;
+      LLHGraph = std::make_shared<TGraph>(*(TGraph*)LLHObj.get());
     } else
     {
       throw MaCh3Exception(__FILE__ , __LINE__, "uknown type of LLH object specified: " + LLHObjType);
     }
 
-    inputFileDef->LLHScansBySample_map[sample][parameter] = LLHGraph;
+    inputFileDef.LLHScansBySample_map[sample][parameter] = LLHGraph;
   }
 
   return true;
 }
 
-bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string parameter,
-                                         fitterEnum fitter, std::string errorType,
+bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::string &parameter,
+                                         fitterEnum fitter, const std::string &errorType,
                                          bool setInputFileError) {
   std::string specificName = getFitterSpecificParamName(fitter, kPostFit, parameter);
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(fitterEnum(fitter))];
@@ -308,14 +311,14 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
   // EM: If the parameter has a specified list of locations then override the default one
   std::vector<std::string> postFitLocations_override;
   if (getFitterSpecificParamOption<std::vector<std::string>>(fitter, "postFitLoc",
-                                                             &postFitLocations_override, parameter))
+                                                             postFitLocations_override, parameter))
   {
     postFitLocations = postFitLocations_override;
   }
 
   for (std::string postFitLoc : postFitLocations)
   {
-    TH1D *postFitErrors = (TH1D *)inputFileDef->file->Get(postFitLoc.c_str());
+    std::shared_ptr<TH1D> postFitErrors = std::shared_ptr<TH1D>((TH1D*)inputFileDef.file->Get(postFitLoc.c_str()));
 
     // EM: the postfit hist for this parameter isn't in this file
     if (postFitErrors == NULL)
@@ -323,7 +326,7 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
 
     // EM: check the config to see if a suffix is supplied for this
     std::string suffix = thisFitterSpec_config["defaultPostFitSuffix"].as<std::string>();
-    getFitterSpecificParamOption<std::string>(fitter, "postFitSuffix", &suffix, parameter);
+    getFitterSpecificParamOption<std::string>(fitter, "postFitSuffix", suffix, parameter);
 
     // EM: Loop through the hist to see if it contains the parameter we're looking for
     for (int binIdx = 0; binIdx <= postFitErrors->GetNbinsX(); binIdx++)
@@ -334,15 +337,13 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
         if (setInputFileError)
         {
           // EM: if specified, we fill the postfit error TH1D in the provided InputFile object
-          inputFileDef->postFitErrors[errorType][parameter] = postFitErrors->GetBinError(binIdx);
-          inputFileDef->postFitValues[errorType][parameter] = postFitErrors->GetBinContent(binIdx);
+          inputFileDef.postFitErrors[errorType][parameter] = postFitErrors->GetBinError(binIdx);
+          inputFileDef.postFitValues[errorType][parameter] = postFitErrors->GetBinContent(binIdx);
         }
 
-        delete postFitErrors;
         return true;
       }
     }
-    delete postFitErrors;
   }
   // EM: Didn't find the parameter in any of the specified locations
   return false;
@@ -350,10 +351,10 @@ bool InputManager::findPostFitParamError(InputFile *inputFileDef, std::string pa
 
 // EM: Lots of room for improvement in fillFileInfo and fillFileData, should be split up into more
 // methods, currently a lot of copy pasting
-void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
+void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
   // use the contents of the file to decide which fitter it came from and what type of file it is
   if (printThoughts)
-    MACH3LOG_INFO("Checking contents of file {}", inputFileDef->fileName);
+    MACH3LOG_INFO("Checking contents of file {}", inputFileDef.fileName);
 
   for (int i = 1; i < kNFitters - 1; i++)
   {
@@ -393,20 +394,21 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
 
       std::vector<std::string> enabledLLHParams;
 
-      for (std::string parameter : knownParameters)
+      for (const std::string parameter : knownParameters)
       {
-
-        inputFileDef->availableParams_map_LLH[LLHType][parameter] = false;
+        MACH3LOG_DEBUG("     - for {}", parameter);
+        inputFileDef.availableParams_map_LLH[LLHType][parameter] = false;
 
         // check if we find the parameter at any of the locations we think it should be at
-        for (std::string rawLocation : testLLHRawLocations)
+        for (const std::string rawLocation : testLLHRawLocations)
         {
           if (findRootObject(inputFileDef, parseLocation(rawLocation, fitter, kLLH, parameter)) !=
               nullptr)
           {
             numLLHParams++;
             enabledLLHParams.push_back(parameter);
-            inputFileDef->availableParams_map_LLH[LLHType][parameter] = true;
+            inputFileDef.availableParams_map_LLH[LLHType][parameter] = true;
+            MACH3LOG_DEBUG("      FOUND!");
             break; // <- we've found it, no point checking the rest of the locations
           }
         }
@@ -418,9 +420,9 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
       if (numLLHParams > 0)
       {
         foundFitter = true;
-        inputFileDef->hasLLHScans = true;
-        inputFileDef->availableParams_LLH = enabledLLHParams;
-        inputFileDef->hasLLHScans_map[LLHType] = true;
+        inputFileDef.hasLLHScans = true;
+        inputFileDef.availableParams_LLH = enabledLLHParams;
+        inputFileDef.hasLLHScans_map[LLHType] = true;
       }
 
       /// \todo add a check here to make sure all the scans that are in the file are being picked up
@@ -472,8 +474,8 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     if (numPostFitParams > 0)
     {
       foundFitter = true;
-      inputFileDef->hasPostFitErrors = true;
-      inputFileDef->availableParams_postFitErrors = enabledPostFitParams;
+      inputFileDef.hasPostFitErrors = true;
+      inputFileDef.availableParams_postFitErrors = enabledPostFitParams;
     }
 
     // ######### Now look for LLH scans broken down by sample #########
@@ -482,22 +484,22 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     if (printThoughts)
       MACH3LOG_INFO("....Searching for LLH scans broken down by sample");
 
-    for (std::string sample : knownSamples)
+    for (const std::string sample : knownSamples)
     {
       size_t numLLHBySampleParams = 0;
-      for (std::string parameter : knownParameters)
+      for (const std::string parameter : knownParameters)
       {
-        inputFileDef->availableParams_map_LLHBySample[sample][parameter] = false;
+        inputFileDef.availableParams_map_LLHBySample[sample][parameter] = false;
         if (findBySampleLLH(inputFileDef, parameter, fitterEnum(i), sample))
         {
-          inputFileDef->availableParams_map_LLHBySample[sample][parameter] = true;
+          inputFileDef.availableParams_map_LLHBySample[sample][parameter] = true;
           numLLHBySampleParams++;
         }
       }
 
       if (numLLHBySampleParams != 0)
       {
-        inputFileDef->availableSamples_LLH.push_back(sample);
+        inputFileDef.availableSamples_LLH.push_back(sample);
 
         if (printThoughts)
           MACH3LOG_INFO("........ Found {} LLH scans for sample {}", numLLHBySampleParams, sample);
@@ -521,7 +523,7 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
     {
       if (printThoughts)
         MACH3LOG_INFO("This is a {} file!\n", convertFitterNames(fitterEnum(i)));
-      inputFileDef->fitter = fitterEnum(i);
+      inputFileDef.fitter = fitterEnum(i);
       return;
     }
   }
@@ -529,46 +531,46 @@ void InputManager::fillFileInfo(InputFile *inputFileDef, bool printThoughts) {
   // if we didn't return above then the fitter type wasn't found
   if (printThoughts)
     MACH3LOG_WARN("I don't know what kinda fitter this came from, will proceed with caution");
-  inputFileDef->fitter = fitterEnum::kNFitters;
+  inputFileDef.fitter = fitterEnum::kNFitters;
 }
 
-void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
+void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   // load in the data in the file using the info gotten above
   // EM: a lot of this is copy paste from above, could be better organised
   if (printThoughts)
-    MACH3LOG_INFO("....getting data from file {}", inputFileDef->fileName);
+    MACH3LOG_INFO("....getting data from file {}", inputFileDef.fileName);
 
-  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(inputFileDef->fitter)];
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[convertFitterNames(inputFileDef.fitter)];
 
   // set the default post fit error type so we can read it as default later
-  inputFileDef->defaultErrorType =
+  inputFileDef.defaultErrorType =
       thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
 
   // ########### First fill up the LLH vectors ############
-  for (std::string LLHType : {"sample", "penalty", "total"})
+  for (const std::string LLHType : {"sample", "penalty", "total"})
   {
-    if (!inputFileDef->hasLLHScans_map.at(LLHType))
+    if (!inputFileDef.hasLLHScans_map.at(LLHType))
       continue;
 
     // vector of all the possible locations that we might find LLH scans for this type of LLH
     YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
-    std::vector<std::string> testLLHRawLocations =
+    const std::vector<std::string> testLLHRawLocations =
         testLLHConfig["location"].as<std::vector<std::string>>();
 
     // get the expected root object type of the llh scans
     std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
 
     // EM: now get the objects from the file
-    for (std::string parameter : inputFileDef->availableParams_LLH)
+    for (const std::string parameter : inputFileDef.availableParams_LLH)
     {
 
-      TObject *LLHObj = nullptr;
+      std::shared_ptr<TObject> LLHObj = nullptr;
 
       // check the locations for the object
-      for (std::string rawLocation : testLLHRawLocations)
+      for (const std::string rawLocation : testLLHRawLocations)
       {
         LLHObj = findRootObject(inputFileDef,
-                                parseLocation(rawLocation, inputFileDef->fitter, kLLH, parameter));
+                                parseLocation(rawLocation, inputFileDef.fitter, kLLH, parameter));
         // if we found it then break out of the loop
         if (LLHObj != nullptr)
           break;
@@ -582,20 +584,18 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
       }
 
       // now convert it to a TGraph
-      TGraph *LLHGraph = new TGraph();
+      std::shared_ptr<TGraph> LLHGraph = std::make_shared<TGraph>();
 
       // EM: maybe have the type of the LLH object specified in the config to know what to downcast
       // it to??
       if (LLHObjType == "TH1D")
       {
-        LLHGraph = new TGraph((TH1D *)LLHObj);
-        delete LLHObj;
+        LLHGraph = std::make_shared<TGraph>((TH1D*)LLHObj.get());
       }
 
       else if (LLHObjType == "TGraph")
       {
-        LLHGraph = new TGraph(*(TGraph *)LLHObj);
-        delete LLHObj;
+        LLHGraph = std::make_shared<TGraph>(*(TGraph*)LLHObj.get());
       }
 
       else
@@ -604,27 +604,27 @@ void InputManager::fillFileData(InputFile *inputFileDef, bool printThoughts) {
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
 
-      inputFileDef->LLHScans_map[LLHType][parameter] = LLHGraph;
+      inputFileDef.LLHScans_map[LLHType][parameter] = LLHGraph;
     }
   }
 
   // ####### Get the by sample LLH scans #######
-  for (std::string parameter : inputFileDef->availableParams_LLH)
+  for (const std::string parameter : inputFileDef.availableParams_LLH)
   {
-    for (std::string sample : knownSamples)
+    for (const std::string sample : knownSamples)
     {
-      findBySampleLLH(inputFileDef, parameter, inputFileDef->fitter, sample, true);
+      findBySampleLLH(inputFileDef, parameter, inputFileDef.fitter, sample, true);
     }
   }
 
   // ####### Get the processed post fit errors #######
-  for (std::string parameter : inputFileDef->availableParams_postFitErrors)
+  for (const std::string parameter : inputFileDef.availableParams_postFitErrors)
   {
     std::vector<std::string> availableErrorTypes =
         thisFitterSpec_config["AvailablePostFitErrorTypes"].as<std::vector<std::string>>();
     for (std::string errorType : availableErrorTypes)
     {
-      findPostFitParamError(inputFileDef, parameter, inputFileDef->fitter, errorType, true);
+      findPostFitParamError(inputFileDef, parameter, inputFileDef.fitter, errorType, true);
     }
   }
 }
@@ -744,126 +744,4 @@ std::string InputManager::BANFFfluxName(std::string mach3ParamName) {
   return BANFFprefix;
 }
 
-// EM: annoyingly, need a different function for gundam names for postfit errors than LLH scans as
-// file structure is totally different, and so we also need to find the gundam file directory that
-// the parameter is in
-std::string InputManager::getGundamParamName_PostFit(std::string mach3ParamName,
-                                                     TDirectoryFile *fitDir, TH1D *PostFitError_ret,
-                                                     Int_t *parIdx) {
-  // get the name of the parameter, as it appears in the Hesse and Migrad histogram labels
-  std::string gundamName = NOT_FOUND_STR;
-  TDirectoryFile *errorDir = (TDirectoryFile *)fitDir->Get("errors");
-  TH1D *PostFitErrors;
-  int gundamBinIdx;
-
-  if ((mach3ParamName.find("b_") != std::string::npos) && mach3ParamName.size() < 5)
-  { // we got a flux parameter
-    TDirectoryFile *systDir = (TDirectoryFile *)errorDir->Get("Flux Systematics");
-    TDirectoryFile *valuesDir = (TDirectoryFile *)systDir->Get("values");
-    PostFitErrors = (TH1D *)valuesDir->Get("postFitErrors_TH1D");
-
-    std::string mach3ParamName_reduced = std::string(mach3ParamName);
-    mach3ParamName_reduced.erase(mach3ParamName_reduced.find("b_"), std::string("b_").length());
-    gundamName = "#" + mach3ParamName_reduced;
-
-    // EM: get the bin index
-    for (gundamBinIdx = 0; gundamBinIdx <= PostFitErrors->GetNbinsX(); gundamBinIdx++)
-    {
-      std::string binLabel = std::string(PostFitErrors->GetXaxis()->GetBinLabel(gundamBinIdx));
-      // EM: we check that mach3ParamName_reduced is at the very end of binLabel, so that we
-      // correctly find double digit numbers, e.g. if we a re looking for OOFV_1, it will be found
-      // in OOFV_11, OOFV_12 etc.
-      if (binLabel == gundamName)
-        break;
-    }
-  }
-
-  else if ((mach3ParamName.find("ND Det ") != std::string::npos))
-  { // we got a ND Cov parameter
-    TDirectoryFile *systDir =
-        (TDirectoryFile *)errorDir->Get("ND280 Detector Systematics (variations parameters)");
-    TDirectoryFile *valuesDir = (TDirectoryFile *)systDir->Get("values");
-    PostFitErrors = (TH1D *)valuesDir->Get("postFitErrors_TH1D");
-
-    std::string mach3ParamName_reduced = std::string(mach3ParamName);
-    mach3ParamName_reduced.erase(mach3ParamName_reduced.find("ND Det "),
-                                 std::string("ND Det ").length());
-    gundamName = "#" + mach3ParamName_reduced;
-
-    // EM: get the bin index
-    for (gundamBinIdx = 0; gundamBinIdx <= PostFitErrors->GetNbinsX(); gundamBinIdx++)
-    {
-      std::string binLabel = std::string(PostFitErrors->GetXaxis()->GetBinLabel(gundamBinIdx));
-      // EM: we check that mach3ParamName_reduced is at the very end of binLabel, so that we
-      // correctly find double digit numbers, e.g. if we a re looking for OOFV_1, it will be found
-      // in OOFV_11, OOFV_12 etc.
-      if (binLabel == gundamName)
-        break;
-    }
-  }
-
-  else
-  {
-    // EM: Need to check through all the parameter type sub-directories
-    //     not sure what the deal is with "Cross-Section FSI Systematics" directory, its
-    bool found = false;
-    for (std::string paramType : {"Cross-Section (binned) Systematics", "Cross-Section Systematics",
-                                  "ND280 Detector Systematics (splined detector parameters)",
-                                  "ND280 Detector Systematics (variations parameters)"})
-    {
-      TDirectoryFile *systDir = (TDirectoryFile *)errorDir->Get(paramType.c_str());
-      TDirectoryFile *valuesDir = (TDirectoryFile *)systDir->Get("values");
-      PostFitErrors = (TH1D *)valuesDir->Get("postFitErrors_TH1D");
-
-      // EM: strip out the NDS_ at the beginning of the near detector systematic parameteters, this
-      // isnt there in gundam
-      std::string mach3ParamName_reduced = std::string(mach3ParamName);
-      if (mach3ParamName_reduced.find("NDS_") != std::string::npos)
-        mach3ParamName_reduced.erase(mach3ParamName_reduced.find("NDS_"),
-                                     std::string("NDS_").length());
-
-      else if (mach3ParamName.find("EB_dial_") != std::string::npos)
-      {
-        mach3ParamName_reduced.erase(mach3ParamName_reduced.find("EB_dial_"),
-                                     std::string("EB_dial_").length());
-        mach3ParamName_reduced = "EB_bin_" + mach3ParamName_reduced;
-      }
-
-      else if (mach3ParamName.find("Alpha") != std::string::npos)
-      { mach3ParamName_reduced = "EB_alpha"; }
-
-      for (gundamBinIdx = 0; gundamBinIdx <= PostFitErrors->GetNbinsX(); gundamBinIdx++)
-      {
-        std::string binLabel = std::string(PostFitErrors->GetXaxis()->GetBinLabel(gundamBinIdx));
-        // EM: we check that mach3ParamName_reduced is at the very end of binLabel, so that we
-        // correctly find double digit numbers, e.g. if we a re looking for OOFV_1, it will be found
-        // in OOFV_11, OOFV_12 etc.
-        if (binLabel.find(mach3ParamName_reduced) != std::string::npos &&
-            binLabel.find(mach3ParamName_reduced) ==
-                binLabel.size() - mach3ParamName_reduced.size())
-        {
-          gundamName = binLabel;
-
-          found = true;
-          break;
-        }
-      }
-
-      if (found)
-        break;
-    }
-  }
-  // std::string gundamName_reduced = getGundamParamName_LLHScan(mach3ParamName, gundamFile);
-
-  // EM: fill the optional return values, the error TH1D that this parameter was found in and the
-  // index where it was found
-  if (PostFitError_ret != NULL)
-    *PostFitError_ret = *PostFitErrors;
-  if (parIdx != NULL)
-    *parIdx = gundamBinIdx;
-
-  delete PostFitErrors;
-
-  return gundamName;
-}
 } // namespace MaCh3Plotting
