@@ -156,7 +156,7 @@ MaCh3Modes_t MaCh3Modes::GetMode(const std::string& name) {
   if (Mode.count(name)) {
     return Mode[name];
   }
-  MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+  MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", name, NModes, fMode[NModes].Name);
 
   // return UNKNOWN_BAD
   return NModes;
