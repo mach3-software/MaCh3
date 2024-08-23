@@ -582,14 +582,16 @@ public:
 
   /// @brief Empty destructor
   ~TSpline3_red() {
-    for (int i = 0; i < nPoints; ++i) {
-      if (Par[i] != NULL) {
-        delete[] Par[i];
+    if(Par != NULL) {
+      for (int i = 0; i < nPoints; ++i) {
+        if (Par[i] != NULL) {
+          delete[] Par[i];
+        }
       }
+      delete[] Par;
     }
-    delete[] Par;
-    delete[] XPos;
-    delete[] YResp;
+    if(XPos != NULL) delete[] XPos;
+    if(YResp != NULL) delete[] YResp;
     Par = NULL;
     XPos = YResp = NULL;
   }

@@ -210,8 +210,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
                    _max_knots,
                    nParams,
                    nSplines,
-                   nKnots,
                    NSplines_valid,
+                   nKnots,
                    nTF1coeff,
                    NTF1_valid,
                    SplineType);
@@ -333,14 +333,14 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         //KS: how much knots each spline has
         int nPoints_tmp = 0;
         // Get a pointer to the current spline for this event
-        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(MasterSpline[EventCounter][ParamNumber]);
+        TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
+        TSpline3_red* CurrSpline = static_cast<TSpline3_red*>(TespFunc);
 
         // If the number of knots are greater than 2 the spline is not a dummy and we should extract coefficients to load onto the GPU
         getSplineCoeff_SepMany(CurrSpline, nPoints_tmp, x_tmp, many_tmp);
 
         //KS: One knot means flat spline so ignore
         if (nPoints_tmp == 1) continue;
-
         for (int j = 0; j < _max_knots; ++j) {
           cpu_coeff_x[ParamNumber*_max_knots + j] = x_tmp[j];
         }
@@ -350,17 +350,19 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
             cpu_coeff_many[KnotCounter*_nCoeff_ + j*_nCoeff_ + k] = many_tmp[j*_nCoeff_+k];
           }
         }
-
         // Set the parameter number for this spline
         cpu_paramNo_arr[NSplinesCounter] = ParamNumber;
         //KS: Fill map when each spline starts
         cpu_nKnots_arr[NSplinesCounter] = KnotCounter;
-
-        KnotCounter += nPoints_tmp;
         // Set the index of the spline so we can tell apart from flat splines
         index_cpu[EventCounter*nParams + ParamNumber] = NSplinesCounter;
+
+        KnotCounter += nPoints_tmp;
         // Increment the counter for the number of good splines we have
         ++NSplinesCounter;
+        #ifndef Weight_On_SplineBySpline_Basis
+        ParamCounter++;
+        #endif
       }
       else if (SplineType[ParamNumber] == kTF1_red)
       {
@@ -384,11 +386,16 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         index_TF1_cpu[EventCounter*nParams + ParamNumber] = TF1sCounter;
         // Increment the counter for the number of good splines we have
         ++TF1sCounter;
-      }
-      #ifndef Weight_On_SplineBySpline_Basis
-      ParamCounter_TF1++;
-      #endif
 
+        #ifndef Weight_On_SplineBySpline_Basis
+        ParamCounter_TF1++;
+        #endif
+      }
+      //KS: Don't delete in debug
+      #ifndef DEBUG
+      delete MasterSpline[EventCounter][ParamNumber];
+      MasterSpline[EventCounter][ParamNumber] = NULL;
+      #endif
     } // End the loop over the parameters in the MasterSpline
     #ifndef Weight_On_SplineBySpline_Basis
     cpu_nParamPerEvent[2*EventCounter] = ParamCounter;
@@ -454,7 +461,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   MoveToGPU();
 }
-
 
 // *****************************************
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
@@ -631,7 +637,6 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
                                  unsigned int &nTF1coeff,
                                  const std::vector<RespFuncType> &SplineType) {
 // *****************************************
-
   // Need to extract: the total number of events
   //                  number of parameters
   //                  maximum number of knots
@@ -643,8 +648,6 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   NSplines_valid = 0;
   NTF1_valid = 0;
   nTF1coeff = 0;
-  std::vector<std::vector<TResponseFunction_red*> >::iterator OuterIt;
-  std::vector<TResponseFunction_red*>::iterator InnerIt;
 
   // Check the number of events
   nEvents = MasterSpline.size();
@@ -657,12 +660,11 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   // Initialise
   SplineInfoArray = new FastSplineInfo[numParams];
 
-  unsigned int EventCounter = 0;
   // Loop over each parameter
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
+  for(unsigned int EventCounter = 0; EventCounter < MasterSpline.size(); ++EventCounter) {
     // Check that each event has each spline saved
     if (numParams > 0) {
-      int TempSize = (*OuterIt).size();
+      int TempSize = MasterSpline[EventCounter].size();
       if (TempSize != numParams) {
         MACH3LOG_ERROR("Found {} parameters for event {}", TempSize, EventCounter);
         MACH3LOG_ERROR("but was expecting {} since that's what I found for the previous event", numParams);
@@ -670,17 +672,18 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
         throw;
       }
     }
-    numParams = (*OuterIt).size();
+    numParams = MasterSpline[EventCounter].size();
 
     int nSplines_SingleEvent = 0;
     // Loop over each pointer
-    int ij = 0;
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ij++) {
-      if ((*InnerIt) == NULL) continue;
+    for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
+      // If NULL we don't have this spline for the event, so move to next spline
+      if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
 
-      if(SplineType[ij] == kTSpline3_red)
+      if(SplineType[ParamNumber] == kTSpline3_red)
       {
-        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(*InnerIt);
+        TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
+        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(TespFunc);
         int nPoints = CurrSpline->GetNp();
         if (nPoints > MaxPoints) {
           MaxPoints = nPoints;
@@ -689,34 +692,33 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
         nSplines_SingleEvent++;
 
         // Fill the SplineInfoArray entries with information on each splinified parameter
-        if (SplineInfoArray[ij].xPts == NULL)
+        if (SplineInfoArray[ParamNumber].xPts == NULL)
         {
           // Fill the number of points
-          SplineInfoArray[ij].nPts = CurrSpline->GetNp();
+          SplineInfoArray[ParamNumber].nPts = CurrSpline->GetNp();
 
           // Fill the x points
-          SplineInfoArray[ij].xPts = new _float_[SplineInfoArray[ij].nPts];
-          for (_int_ k = 0; k < SplineInfoArray[ij].nPts; ++k)
+          SplineInfoArray[ParamNumber].xPts = new _float_[SplineInfoArray[ParamNumber].nPts];
+          for (_int_ k = 0; k < SplineInfoArray[ParamNumber].nPts; ++k)
           {
             _float_ xtemp = -999.99;
             _float_ ytemp = -999.99;
             CurrSpline->GetKnot(k, xtemp, ytemp);
-            SplineInfoArray[ij].xPts[k] = xtemp;
+            SplineInfoArray[ParamNumber].xPts[k] = xtemp;
           }
         }
         NSplines_valid++;
       }
-      else if (SplineType[ij] == kTF1_red)
+      else if (SplineType[ParamNumber] == kTF1_red)
       {
-        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(*InnerIt);
+        TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
+        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(TespFunc);
         int nPoints = CurrSpline->GetSize();
         nTF1coeff += nPoints;
         NTF1_valid++;
       }
     }
-
     if (nSplines_SingleEvent > nMaxSplines_PerEvent) nMaxSplines_PerEvent = nSplines_SingleEvent;
-    EventCounter++;
   }
   nSplines = nMaxSplines_PerEvent;
 
@@ -1056,6 +1058,8 @@ SMonolith::~SMonolith() {
   #endif
   cpu_nPoints_arr.clear();
   cpu_nPoints_arr.shrink_to_fit();
+
+  //TODO cpu_weights_tf1_var cpu_nParamPerEvent_tf1 cpu_paramNo_TF1_arr cpu_coeff_TF1_many
 }
 
 // *********************************
@@ -1150,16 +1154,12 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
   // If spline is flat, set number of knots to 1.0,
   // This is used later to expedite the calculations for flat splines
   // tmpArray[0] is number of knots
-  if (isFlat(spl)) {
-    nPoints = 1;
-  } else {
-    nPoints = Np;
-    if (Np > _max_knots) {
-      MACH3LOG_ERROR("Error, number of points is greater than saved {}", _max_knots);
-      MACH3LOG_ERROR("This _WILL_ cause problems with GPU splines and _SHOULD_ be fixed!");
-      MACH3LOG_ERROR("nPoints = {}, _max_knots = {}", nPoints, _max_knots);
-      throw;
-    }
+  nPoints = Np;
+  if (Np > _max_knots) {
+    MACH3LOG_ERROR("Error, number of points is greater than saved {}", _max_knots);
+    MACH3LOG_ERROR("This _WILL_ cause problems with GPU splines and _SHOULD_ be fixed!");
+    MACH3LOG_ERROR("nPoints = {}, _max_knots = {}", nPoints, _max_knots);
+    throw;
   }
 
   // The coefficients we're writing to
@@ -1175,8 +1175,7 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
     manyArray[i*_nCoeff_+1] = float(b);
     manyArray[i*_nCoeff_+2] = float(c);
     manyArray[i*_nCoeff_+3] = float(d);
-    
-    if((xArray[i] == -999) | (manyArray[i*_nCoeff_] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*_nCoeff_+2] == -999) | (manyArray[i*_nCoeff_+3] == -999)){
+    if((xArray[i] == -999) || (manyArray[i*_nCoeff_] == -999) || (manyArray[i*4+1] == -999) || (manyArray[i*_nCoeff_+2] == -999) || (manyArray[i*_nCoeff_+3] == -999)){
       MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
       MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", x, y, b, c, d);
       MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*_nCoeff_+3]);
@@ -1186,10 +1185,6 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
   }
   // The structure is now xarray  ={x1,x2,x3} 
   //                      manyArr ={y1,y2,y3, b1,b2,b3, c1,c2,c3, d1,d2,d3}
-  #ifndef DEBUG
-  delete spl;
-  spl = NULL;
-  #endif
 }
 
 // *****************************************
@@ -1213,8 +1208,6 @@ void SMonolith::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
     coeffs[i] = spl->GetParameter(i);
   }
   // The structure is now coeffs  = {a,b,c,d,e}
-  delete spl;
-  spl = NULL;
 }
 
 // *****************************************
