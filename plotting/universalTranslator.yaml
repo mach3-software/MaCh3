@@ -1,0 +1,242 @@
+
+## Specify what each fitter looks like so that the plotting code knows where to look for different outputs
+FitterSpec:
+
+    ## first we declare what fitters the plotting code should be aware of
+    fitters: ["FITTER_1", "FITTER_2"]
+
+    ## now for each one specified we give some details
+    FITTER_1:
+
+        ###################################################################
+        ##### First we specify where to look for log likelihood scans #####
+        ###################################################################
+
+        ## Specify what type of objects are used to save the LLH scans
+        ## EM: could maybe just get this from the root file
+        ##     on the other hand, might be useful if one day we move away from root, 
+        ##     then could specify different file types and just specify how to read them in the input manager
+        LLHObjectType: "TH1D"
+
+        ## tell the code where to find likelihood scans for sample, penalty and total likelihood
+        sample_LLH:
+            ## we define a string that tells the code what path to look in to find likelihood scans
+            ## the token {PARAMETER} will be expanded to the fitter specific parameter name of a parameter
+            ## when the code is looking for scans for that parameter.
+            ## for example if there were parameters {p1, p2, p3} which in FITTER_1 are called {param1, param2, param3}
+            ## then the path specified below would tell the code to look for objects in the root file called:
+            ## - likelihood_scans/Sample_LLH/param1_sam
+            ## - likelihood_scans/Sample_LLH/param2_sam
+            ## - likelihood_scans/Sample_LLH/param3_sam
+            location: ["likelihood_scans/Sample_LLH/{PARAMETER}_sam"]
+            
+        penalty_LLH:
+            ## Additionally we can split the string two pars by using the ':' token
+            ## The first part should be a path to the directory within the root file
+            ## in this case that path is 'likelihood_scans/Sample_LLH'
+            ## The second part is a string to be matched to the end of the objects in that directory
+            ## this can be useful if there are a nuber of prefixes attached to the start of different parameters
+            ## e.g. re-using our example above, if the root file contained objects called
+            ## - likelihood_scans/Penalty_LLH/BLAAA_param1_pen
+            ## - likelihood_scans/Penalty_LLH/BLEEE_param2_pen
+            ## - likelihood_scans/Penalty_LLH/BLOOO_param3_pen
+            ## then the following path would correctly find the scans
+            location: [
+                "likelihood_scans/Penalty_LLH:{PARAMETER}_pen",
+                ]
+            
+        total_LLH:
+            ## Fitters may split parameters across multiple different directories
+            ## 
+            ## e.g 
+            ## - likelihood_scans/TOTAL_LLH_DIR1/BLAAA_param1_pen
+            ## - likelihood_scans/TOTAL_LLH_DIR2/BLEEE_param2_pen
+            ## - likelihood_scans/TOTAL_LLH_DIR3/BLOOO_param3_pen
+            ## 
+            ## to deal with this we can specify multiple locations to look for LLH scans as below
+            ## the code will search all of them for each parameter and will shout if it finds more than 1 matching pattern
+            location: [
+                "likelihood_scans/Total_LLH_DIR_1:{PARAMETER}_tot",
+                "likelihood_scans/Total_LLH_DIR_2:{PARAMETER}_tot",
+                ]
+
+        ## We also like to be able to beak our likelihood down by sample
+        ## here we tell the code where to find the per-sample likelihood scans
+        bySample_LLH:
+            ## we specify the locations in the same way as above, the only difference is that now there is an additional
+            ## token, {SAMPLE}, which will be expanded to the fitter specific sample name when the code 
+            ## is looking for LLH scans for a particular sample
+            location: [
+                "{SAMPLE}_LLH:{PARAMETER}{SAMPLE}",
+                ]
+
+
+
+        ######################################################################
+        ##### Now we specify where to look for processed post-fit errors #####
+        ######################################################################
+
+        ## We often have multiple different types of errors that we would like to be able to plot
+        ## here we specify all the ones that the fitter might have
+        AvailablePostFitErrorTypes: ["Gauss", "HPD", "Prior"]
+
+        ## We also specify one to use as a default, that will be assumed within the plotting code
+        ## if one is not specified
+        defaultPostFitErrorType: "HPD"
+
+
+        postFitErrorTypes:
+            Gauss:
+                ## EM: specify possible locations and then scan through all of them when reading the input
+                ##     code will look through the TH1D at each location and check it for the parameter it is looking for
+                location: 
+                    [
+                        "param_xsec_gaus", 
+                        "param_flux_gaus"
+                    ] 
+                
+            HPD:
+                location: ["param_xsec_HPD", "param_flux_HPD"]
+                
+            Prior:
+                location: ["param_xsec_prefit", "param_flux_prefit"]
+
+
+
+
+    FITTER_2:
+
+        LLHObjectType: "TGraph"
+
+        defaultPostFitErrorType: "Hesse"
+
+        AvailablePostFitErrorTypes: ["Hesse", "Migrad", "Prior"]
+
+        postFitErrorTypes:
+            Hesse:
+                location: ["FitterEngine/postFit/Hesse/errors/Cross-Section Systematics/values/postFitErrors_TH1D",
+                       "FitterEngine/postFit/Hesse/errors/Cross-Section FSI Systematics/values/postFitErrors_TH1D",
+                       "FitterEngine/postFit/Hesse/errors/ND280 Detector Systematics (splined detector parameters)/values/postFitErrors_TH1D",
+                       "FitterEngine/postFit/Hesse/errors/Flux Systematics/values/postFitErrors_TH1D",
+                      ]
+
+            Migrad:
+                location: ["FitterEngine/postFit/Migrad/errors/Cross-Section Systematics/values/postFitErrors_TH1D",
+                       "FitterEngine/postFit/Migrad/errors/Cross-Section FSI Systematics/values/postFitErrors_TH1D",
+                       "FitterEngine/postFit/Migrad/errors/ND280 Detector Systematics (splined detector parameters)/values/postFitErrors_TH1D",
+                       "FitterEngine/postFit/Migrad/errors/Flux Systematics/values/postFitErrors_TH1D",
+                       
+                       "errors/Cross-Section Systematics/values/postFitErrors",
+                       "errors/Cross-Section Systematics FSI parameters/values/postFitErrors",
+                       "errors/ND280 Detector Systematics (splined detector parameters)/values/postFitErrors",
+                       ##"errors/ND280 Detector Systematics (variations parameters)/values/postFitErrors",
+                       "errors/Cross-Section (binned) Systematics/values/postFitErrors",
+                       "errors/Flux Systematics/values/postFitErrors",
+                      ]
+                
+            Prior:
+                location: ["errors/Cross-Section Systematics/values/preFitErrors",
+                       "errors/Cross-Section Systematics FSI parameters/values/preFitErrors",
+                       "errors/ND280 Detector Systematics (splined detector parameters)/values/preFitErrors",
+                       ##"errors/ND280 Detector Systematics (variations parameters)/values/preFitErrors",
+                       "errors/Cross-Section (binned) Systematics/values/preFitErrors",
+                       "errors/Flux Systematics/values/preFitErrors",
+                      ]
+
+        
+        sample_LLH:
+            location: [
+                "FitterEngine/preFit/scan/llhStat:_{PARAMETER}_TGraph",
+                ]
+            
+        penalty_LLH:
+            location: [
+                "FitterEngine/preFit/scan/llhPenalty:_{PARAMETER}_TGraph",
+                ]
+            
+        total_LLH:
+            location: [
+                "FitterEngine/preFit/scan/llh:_{PARAMETER}_TGraph",
+                ]
+
+        bySample_LLH:
+            location: [
+                "FitterEngine/preFit/scan/llhStat/{SAMPLE}:_{PARAMETER}_TGraph",
+                ]
+
+
+Samples:
+    Samples: [
+                ## OA2022 FHC - Multipi Photon Proton Samples
+                "FGD1_numuCC_0pi_0_protons_no_photon",
+                "FGD1_numuCC_0pi_N_protons_no_photon",
+    ]
+
+    FGD1_numuCC_0pi_0_protons_no_photon: 
+        MaCh3_ND:
+            LLH: "FGD1_numuCC_0pi_0_protons_no_photon"
+
+        GUNDAM:
+            
+
+    FGD1_numuCC_0pi_N_protons_no_photon: 
+        MaCh3_ND:
+            LLH: "FGD1 numuCC 0pi N protons no photon"
+
+        GUNDAM:
+            
+
+
+Parameters:
+
+    ## EM: set out the parameters
+    Parameters: [  
+                    "MAQE",
+                    "Q2_norm_5",
+                    "Q2_norm_6",
+                    "Q2_norm_7",
+                    
+    ]
+
+    ## EM: here you can tell the input manager how it should translate the parameter name to each fitter
+    EB_dial_C_nu:
+        GUNDAM:
+            # AltNames: [""] ## EM: TODO use this for e.g. if a parameter had different names in different years in a fitter?? 
+            LLH: "EB_bin_C_nu" ## <- EM: Actually, maybe just use an array to specify this instead??
+            PostFit: "EB_bin_C_nu"
+            ## EM: maybe something like LLH_subdir for in case some parameters live in their own sub-dir or something?
+
+    EB_dial_C_nubar:
+        GUNDAM:
+            LLH: "EB_bin_C_nubar"
+            PostFit: "EB_bin_C_nubar"
+    EB_dial_O_nu:
+        GUNDAM:
+            LLH: "EB_bin_O_nu"
+            PostFit: "EB_bin_O_nu"
+    EB_dial_O_nubar:
+        GUNDAM:
+            LLH: "EB_bin_o_nubar"
+            PostFit: "EB_bin_O_nubar"
+
+    FEFQE:
+        GUNDAM:
+            postFitLoc: ["errors/Cross-Section Systematics FSI parameters/values/postFitErrors"]
+    FEFQEH:
+        GUNDAM:
+            postFitLoc: ["errors/Cross-Section Systematics FSI parameters/values/postFitErrors"]
+    FEFINEL:
+        GUNDAM:
+            postFitLoc: ["errors/Cross-Section Systematics FSI parameters/values/postFitErrors"]
+
+    b_98:
+        GUNDAM:
+            PostFit: "#98"
+            LLH: "#98"
+            postFitLoc: ["errors/Flux Systematics/values/postFitErrors"]
+
+    b_99:
+        GUNDAM:
+            PostFit: "#99"
+            LLH: "#99"
+            postFitLoc: ["errors/Flux Systematics/values/postFitErrors"]
