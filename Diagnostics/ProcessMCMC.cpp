@@ -2,15 +2,19 @@
 #include "mcmc/MCMCProcessor.h"
 #include "manager/manager.h"
 
-inline void ProcessMCMC(std::string inputFile);
+/// @brief Main function processing MCMC and Producing plots
+inline void ProcessMCMC(const std::string& inputFile);
+/// @brief Function producing comparison of posterior and more betwen a few MCMC chains
 inline void MultipleProcessMCMC();
 inline void CalcBayesFactor(MCMCProcessor* Processor);
 inline void CalcSavageDickey(MCMCProcessor* Processor);
 inline void CalcBipolarPlot(MCMCProcessor* Processor);
 inline void GetTrianglePlot(MCMCProcessor* Processor);
-inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile);
+inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile);
 inline void ReweightPrior(MCMCProcessor* Processor);
-inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, std::string title);
+/// @brief KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
+inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
+/// @brief KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
 inline void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TString canvasname);
 
 int nFiles;
@@ -59,7 +63,7 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-void ProcessMCMC(std::string inputFile)
+void ProcessMCMC(const std::string& inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
   // Make the processor)
@@ -391,8 +395,8 @@ void GetTrianglePlot(MCMCProcessor* Processor) {
   }
 }
 
-//KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
-void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
+/// @brief KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
+void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
 {
   //Turn of plots from Processor
   Processor->SetPrintToPDF(false);
@@ -584,7 +588,7 @@ void ReweightPrior(MCMCProcessor* Processor)
 }
 
 //KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
-TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, std::string title)       
+TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
 {
   TH2D* hMatrix = new TH2D(title.c_str(), title.c_str(), Matrix->GetNrows(), 0.0, Matrix->GetNrows(), Matrix->GetNcols(), 0.0, Matrix->GetNcols());
   for(int i = 0; i < Matrix->GetNrows(); i++)

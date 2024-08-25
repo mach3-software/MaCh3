@@ -15,7 +15,7 @@ MinuitFit::MinuitFit(manager *man) : LikelihoodFit(man) {
 // Destructor: close the logger and output file
 MinuitFit::~MinuitFit() {
 // *************************
-  if(minuit != NULL) delete minuit;
+  if(minuit != nullptr) delete minuit;
 }
 
 
