@@ -15,41 +15,30 @@
 // *******************************************
 
 // *******************************************
-/// @brief Initialiser when using the x array and combined y,b,c,d array
-__host__ void InitGPU_SepMany(
+/// @brief Allocate memory on gpu for spline monolith
+__host__ void InitGPU_SplineMonolith(
 // *******************************************
                           float **gpu_x_array,
                           float **gpu_many_array,
-                          float **gpu_weights, 
+                          float **gpu_weights,
 
                           short int** gpu_paramNo_arr,
                           unsigned int** gpu_nKnots_arr,
 
+                          float **gpu_many_TF1_array,
+                          float **gpu_weights_tf1,
+                          short int** gpu_paramNo_TF1_arr,
                  #ifndef Weight_On_SplineBySpline_Basis
-                          float **cpu_total_weights, 
-                          float **gpu_total_weights, 
-                          int n_events,                              
-                          unsigned int** gpu_nParamPerEvent,
-                  #endif   
-                          unsigned int sizeof_array,
-                          unsigned int n_splines,
-                          int Eve_size);
-
-/// @brief Initialiser when using the x array and combined y,b,c,d array
-__host__ void InitGPU_TF1(
-                          float **gpu_coeffs,
-                          short int** gpu_paramNo_arr,
-                          short int** gpu_nPoints_arr,
-                          float **gpu_weights, 
-                             
-                    #ifndef Weight_On_SplineBySpline_Basis
-                          float **cpu_total_weights, 
-                          float **gpu_total_weights, 
+                          float **cpu_total_weights,
+                          float **gpu_total_weights,
                           int n_events,
-                              
                           unsigned int** gpu_nParamPerEvent,
-                    #endif  
-                          unsigned int n_splines);
+                          unsigned int** gpu_nParamPerEvent_tf1,
+                  #endif
+                          unsigned int total_nknots,
+                          unsigned int n_splines,
+                          unsigned int n_tf1,
+                          int Eve_size);
 
 
 /// @brief Allocate memory for spline segments

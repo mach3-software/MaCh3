@@ -64,19 +64,19 @@ class SMonolith : public SplineBase {
     /// @param MaxPoints Maximal number of knots per splines
     /// @param numParams Total number of parameters
     /// @param numKnots Total number of knots, which is sum of individual knots per each spline
-    /// @param nTF1coeff TODO
+    /// @param nTF1_coeff TODO
     /// @param SplineType TODO
-    /// @param NSplines_valid TODO
-    /// @param NTF1_valid TODO
+    /// @param NSplinesValid TODO
+    /// @param nTF1Valid TODO
     inline void ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
                                  unsigned int &nEvents,
                                  int &MaxPoints,
                                  short int &numParams,
                                  int &nSplines,
-                                 unsigned int &NSplines_valid,
+                                 unsigned int &NSplinesValid,
                                  unsigned int &numKnots,
-                                 unsigned int &NTF1_valid,
-                                 unsigned int &nTF1coeff,
+                                 unsigned int &nTF1Valid,
+                                 unsigned int &nTF1_coeff,
                                  const std::vector<RespFuncType> &SplineType);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
     /// @param MasterSpline Vector of TResponseFunction_red pointers which we strip back
@@ -162,12 +162,14 @@ class SMonolith : public SplineBase {
     /// TODO
     unsigned int nTF1coeff;
 
-    /// GPU arrays to hold weight for each spline
-    float *gpu_weights;
     /// GPU arrays to hold weight for event
     float *gpu_total_weights;
+    /// GPU arrays to hold weight for each spline
+    float *gpu_weights;
     /// CPU arrays to hold weight for each spline
     float *cpu_weights_var;
+    /// GPU arrays to hold weight for each TF1
+    float *gpu_weights_tf1;
     /// CPU arrays to hold weight for each TF1
     float *cpu_weights_tf1_var;
 
@@ -177,6 +179,8 @@ class SMonolith : public SplineBase {
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
     /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     unsigned int *gpu_nParamPerEvent;
+    /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
+    unsigned int *gpu_nParamPerEvent_tf1;
 
     /// CPU arrays to hold number of points
     std::vector<short int> cpu_nPoints_arr;
@@ -189,6 +193,8 @@ class SMonolith : public SplineBase {
     std::vector<short int> cpu_paramNo_TF1_arr;
     /// CW: GPU array with the number of points per spline (not per spline point!)
     short int *gpu_paramNo_arr;
+    /// CW: GPU array with the number of points per TF1 object
+    short int *gpu_paramNo_TF1_arr;
     /// KS: CPU Number of knots per spline
     std::vector<unsigned int> cpu_nKnots_arr;
     /// KS: GPU Number of knots per spline
@@ -202,9 +208,9 @@ class SMonolith : public SplineBase {
     /// GPU arrays to hold other coefficients
     float *gpu_coeff_many;
 
-    /// CPU arrays to hold other coefficients
+    /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;
-    /// GPU arrays to hold other coefficients
+    /// GPU arrays to hold TF1 coefficients
     float *gpu_coeff_TF1_many;
 
     /// Flag telling whether we are saving spline monolith into handy root file

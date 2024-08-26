@@ -333,22 +333,19 @@ void SMonolith::MoveToGPU() {
 //TODO !!!!!!!!!!
 /// ZA TEMERIE!!!
 
- #ifdef CUDA
-
-
-  /*
+  #ifdef CUDA
   unsigned int event_size_max = _max_knots * nParams;
   MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
                 (double(sizeof(float) * nKnots * _nCoeff_) + double(sizeof(float) * event_size_max) / 1.E6 +
                 double(sizeof(short int) * NSplines_valid)) / 1.E6);
-  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * NSplines_valid) / 1.E6);
+  MACH3LOG_INFO("Total TF1 size = {:.2f} MB memory on CPU to move to GPU",
+                double(sizeof(float) * NTF1_valid * _nTF1Coeff_) / 1.E6);
+  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * (NSplines_valid + NTF1_valid) / 1.E6));
   #ifndef Weight_On_SplineBySpline_Basis
   MACH3LOG_INFO("Since you are running Total event weight mode then GPU weight array (GPU->CPU every step) = {:.2f} MB",
                 double(sizeof(float) * NEvents) / 1.E6);
   #endif
   MACH3LOG_INFO("Parameter value array (CPU->GPU every step) = {:.4f} MB", double(sizeof(float) * nParams) / 1.E6);
-
-
   //CW: With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
   //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
   //                                return gpu_weights
@@ -356,25 +353,32 @@ void SMonolith::MoveToGPU() {
   // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
   // Can probably make this a bit prettier but will do for now
   // Could be a lot smaller of a function...
-  InitGPU_SepMany(
+  InitGPU_SplineMonolith(
     &gpu_coeff_x,
     &gpu_coeff_many,
     &gpu_weights,
 
     &gpu_paramNo_arr,
     &gpu_nKnots_arr,
+
+    &gpu_coeff_TF1_many,
+    &gpu_weights_tf1,
+    &gpu_paramNo_TF1_arr,
     #ifndef Weight_On_SplineBySpline_Basis
     &cpu_total_weights,
     &gpu_total_weights,
     NEvents,
 
     &gpu_nParamPerEvent,
+    &gpu_nParamPerEvent_tf1,
     #endif
     nKnots, // How many entries in coefficient array (*4 for the "many" array)
-  NSplines_valid, // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
-  event_size_max //Knots times event number of unique splines
+    NSplines_valid, // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
+    NTF1_valid,
+    event_size_max //Knots times event number of unique splines
   );
 
+  /*
   // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
   // The implementation lives in splines/gpuSplineUtils.cu
   // The GPU splines don't actually need declaring but is good for demonstration, kind of
@@ -420,31 +424,6 @@ void SMonolith::MoveToGPU() {
 
 
   /*
-  std::cout << "  Total size = " << (double(sizeof(float)*NSplines_valid*_nTF1Coeff_)+double(2.0*sizeof(short int)*NSplines_valid))/1.E6 << " MB memory on CPU to move to GPU" << std::endl;
-  std::cout << "  GPU weight array (GPU->CPU every step) = " << double(sizeof(float)*NSplines_valid)/1.E6 << " MB" << std::endl;
-  std::cout << "  Parameter value array (CPU->GPU every step) = " << double(sizeof(float)*nParams)/1.E6 << " MB" << std::endl;
-  // With the new set-up we have:   1 coefficient array of size coeff_array_size, all same size
-  //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
-  //                                return gpu_weights
-
-  // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
-  // Can probably make this a bit prettier but will do for now
-  // Could be a lot smaller of a function...
-  InitGPU_TF1(
-    &gpu_coeff_many,
-    &gpu_paramNo_arr,
-    &gpu_nPoints_arr,
-
-    &gpu_weights,
-
-    #ifndef Weight_On_SplineBySpline_Basis
-    &cpu_total_weights,
-    &gpu_total_weights,
-    NEvents,
-    &gpu_nParamPerEvent,
-    #endif
-    NSplines_valid); // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
-
     // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
     // The implementation lives in splines/gpuSplineUtils.cu
     // The GPU splines don't actually need declaring but is good for demonstration, kind of
@@ -494,10 +473,10 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
                                  int &MaxPoints,
                                  short int &numParams,
                                  int &nSplines,
-                                 unsigned int &NSplines_valid,
+                                 unsigned int &NSplinesValid,
                                  unsigned int &numKnots,
-                                 unsigned int &NTF1_valid,
-                                 unsigned int &nTF1coeff,
+                                 unsigned int &nTF1Valid,
+                                 unsigned int &nTF1_coeff,
                                  const std::vector<RespFuncType> &SplineType) {
 // *****************************************
   // Need to extract: the total number of events
@@ -508,9 +487,9 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   numParams   = 0;
   nSplines = 0;
   numKnots = 0;
-  NSplines_valid = 0;
-  NTF1_valid = 0;
-  nTF1coeff = 0;
+  NSplinesValid = 0;
+  nTF1Valid = 0;
+  nTF1_coeff = 0;
 
   // Check the number of events
   nEvents = MasterSpline.size();
@@ -570,15 +549,15 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
             SplineInfoArray[ParamNumber].xPts[k] = xtemp;
           }
         }
-        NSplines_valid++;
+        NSplinesValid++;
       }
       else if (SplineType[ParamNumber] == kTF1_red)
       {
         TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
         TF1_red* CurrSpline = dynamic_cast<TF1_red*>(TespFunc);
         int nPoints = CurrSpline->GetSize();
-        nTF1coeff += nPoints;
-        NTF1_valid++;
+        nTF1_coeff += nPoints;
+        nTF1Valid++;
       }
     }
     if (nSplines_SingleEvent > nMaxSplines_PerEvent) nMaxSplines_PerEvent = nSplines_SingleEvent;

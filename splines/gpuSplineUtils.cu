@@ -100,8 +100,8 @@ cudaTextureObject_t text_nParamPerEvent = 0;
 // *******************************************
 
 // *******************************************
-/// @brief Initialiser when using the x array and combined y,b,c,d array
-__host__ void InitGPU_SepMany(
+// Initialiser when using the x array and combined y,b,c,d array
+__host__ void InitGPU_SplineMonolith(
 // *******************************************
                           float **gpu_x_array,
                           float **gpu_many_array,
@@ -110,14 +110,19 @@ __host__ void InitGPU_SepMany(
                           short int** gpu_paramNo_arr,
                           unsigned int** gpu_nKnots_arr,
 
+                          float **gpu_many_TF1_array,
+                          float **gpu_weights_tf1,
+                          short int** gpu_paramNo_TF1_arr,
                  #ifndef Weight_On_SplineBySpline_Basis
                           float **cpu_total_weights, 
                           float **gpu_total_weights, 
                           int n_events,                              
                           unsigned int** gpu_nParamPerEvent,
+                          unsigned int** gpu_nParamPerEvent_tf1,
                   #endif   
-                          unsigned int sizeof_array,
+                          unsigned int total_nknots,
                           unsigned int n_splines,
+                          unsigned int n_tf1,
                           int Eve_size) {
 
   // Allocate chunks of memory to GPU
@@ -130,12 +135,23 @@ __host__ void InitGPU_SepMany(
   cudaMalloc((void **) gpu_x_array, Eve_size*sizeof(float));
   CudaCheckError();
 
-  cudaMalloc((void **) gpu_many_array, _nCoeff_*sizeof_array*sizeof(float));
+  cudaMalloc((void **) gpu_many_array, _nCoeff_*total_nknots*sizeof(float));
   CudaCheckError();
 
   // Allocate memory for the array of weights to be returned to CPU
   cudaMalloc((void **) gpu_weights, n_splines*sizeof(float));
   CudaCheckError();
+
+  // Now TF1 specific
+  cudaMalloc((void **) gpu_many_TF1_array, _nTF1Coeff_*n_tf1*sizeof(float));
+  CudaCheckError();
+
+  cudaMalloc((void **) gpu_weights_tf1, n_tf1*sizeof(float));
+  CudaCheckError();
+
+  cudaMalloc((void **) gpu_paramNo_TF1_arr, n_tf1*sizeof(short int));
+  CudaCheckError();
+
 #ifndef Weight_On_SplineBySpline_Basis
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(float));
@@ -149,75 +165,21 @@ __host__ void InitGPU_SepMany(
   cudaMalloc((void **) gpu_nParamPerEvent, 2*n_events*sizeof(unsigned int));
   CudaCheckError();
   
+  //KS: Allocate memory for the map keeping track how many TF1 each parameter has
+  cudaMalloc((void **) gpu_nParamPerEvent_tf1, 2*n_events*sizeof(unsigned int));
+  CudaCheckError();
 #endif
   
   // Print allocation info to user
-  printf("  Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n", n_splines, double(sizeof(short int)*n_splines+sizeof(unsigned int)*n_splines)/1.E6);
-  printf("  Allocated %i entries for x coeff arrays, size = %f MB\n", Eve_size, double(sizeof(float)*Eve_size)/1.E6);
-  printf("  Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n", _nCoeff_*sizeof_array, double(sizeof(float)*_nCoeff_*sizeof_array)/1.E6);
+  printf("Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n", n_splines, double(sizeof(short int)*n_splines+sizeof(unsigned int)*n_splines)/1.E6);
+  printf("Allocated %i entries for x coeff arrays, size = %f MB\n", Eve_size, double(sizeof(float)*Eve_size)/1.E6);
+  printf("Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n", _nCoeff_*total_nknots, double(sizeof(float)*_nCoeff_*total_nknots)/1.E6);
+  printf("  Allocated %i entries for TF1 coefficient arrays, size = %f MB\n", _nTF1Coeff_*n_tf1, double(sizeof(float)*_nTF1Coeff_*n_tf1)/1.E6);
 
   //KS: Ask CUDA about memory usage
   checkGpuMem();
   PrintNdevices();
 }
-
-// *******************************************
-/// @brief Initialiser when using the x array and combined y,b,c,d array
-__host__ void InitGPU_TF1(
-// *******************************************
-                          float **gpu_coeffs,
-                          short int** gpu_paramNo_arr,
-                          short int** gpu_nPoints_arr,
-                          float **gpu_weights, 
-                             
-                    #ifndef Weight_On_SplineBySpline_Basis
-                          float **cpu_total_weights, 
-                          float **gpu_total_weights, 
-                          int n_events,
-                              
-                          unsigned int** gpu_nParamPerEvent,
-                    #endif  
-                          unsigned int n_splines) {
-
-  // Holds the parameter number
-  cudaMalloc((void **) gpu_paramNo_arr, n_splines*sizeof(short int));
-  CudaCheckError();
-
-  // Holds the number of points
-  cudaMalloc((void **) gpu_nPoints_arr, n_splines*sizeof(short int));
-  CudaCheckError();
-
-  // Holds the coefficients (5th order polynomial and constant term == 1) -> 5
-  cudaMalloc((void **) gpu_coeffs, 5*n_splines*sizeof(float));
-  CudaCheckError();
-
-  // Allocate memory for the array of weights to be returned to CPU
-  cudaMalloc((void **) gpu_weights, n_splines*sizeof(float));
-  CudaCheckError();
-
-#ifndef Weight_On_SplineBySpline_Basis
-  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
-  cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(float));
-  CudaCheckError();
-  
-  //KS: Allocate memory for the array of total weights to be returned to CPU
-  cudaMalloc((void **) gpu_total_weights, n_events*sizeof(float));
-  CudaCheckError();
-  
-  //KS: Allocate memory for the map keeping track how many splines each parameter has
-  cudaMalloc((void **) gpu_nParamPerEvent, 2*n_events*sizeof(unsigned int));
-  CudaCheckError();
-#endif
-  
-  // Print allocation info to user
-  printf("  Allocated %i entries for paramNo and nPoints arrays, size = %f MB\n", n_splines, double(2.0*sizeof(int)*n_splines)/1.E6);
-  printf("  Allocated %i entries for coefficient arrays, size = %f MB\n", 5*n_splines, double(sizeof(float)*5*n_splines)/1.E6);
-
-  //KS: Ask CUDA about memory usage
-  checkGpuMem();
-  PrintNdevices();
-}
-
 
 // *******************************************
 /// @brief Allocate memory for spline segments
