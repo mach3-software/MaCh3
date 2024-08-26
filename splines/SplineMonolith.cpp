@@ -1003,8 +1003,6 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
       MACH3LOG_ERROR("***************************************************************");
     }
   }
-  // The structure is now xarray  ={x1,x2,x3} 
-  //                      manyArr ={y1,y2,y3, b1,b2,b3, c1,c2,c3, d1,d2,d3}
 }
 
 // *****************************************

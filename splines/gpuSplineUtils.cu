@@ -175,7 +175,7 @@ __host__ void InitGPU_SplineMonolith(
   printf("Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n", n_splines, double(sizeof(short int)*n_splines+sizeof(unsigned int)*n_splines)/1.E6);
   printf("Allocated %i entries for x coeff arrays, size = %f MB\n", Eve_size, double(sizeof(float)*Eve_size)/1.E6);
   printf("Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n", _nCoeff_*total_nknots, double(sizeof(float)*_nCoeff_*total_nknots)/1.E6);
-  printf("  Allocated %i entries for TF1 coefficient arrays, size = %f MB\n", _nTF1Coeff_*n_tf1, double(sizeof(float)*_nTF1Coeff_*n_tf1)/1.E6);
+  printf("Allocated %i entries for TF1 coefficient arrays, size = %f MB\n", _nTF1Coeff_*n_tf1, double(sizeof(float)*_nTF1Coeff_*n_tf1)/1.E6);
 
   //KS: Ask CUDA about memory usage
   checkGpuMem();
@@ -252,11 +252,11 @@ __host__ void CopyToGPU_SplineMonolith(
 #endif
   // Copy the constants
   // Total number of valid splines for all loaded events
-  cudaMemcpyToSymbol(d_n_splines,   &n_splines,   sizeof(n_splines));
+  cudaMemcpyToSymbol(d_n_splines, &n_splines, sizeof(n_splines));
   CudaCheckError();
 
   // Total number of valid TF1 for all loaded events
-  cudaMemcpyToSymbol(d_n_TF1,   &n_tf1,   sizeof(n_tf1));
+  cudaMemcpyToSymbol(d_n_TF1,   &n_tf1, sizeof(n_tf1));
   CudaCheckError();
 
   // Total spline size per spline; i.e. just the number of points or knots in the spline
@@ -306,14 +306,14 @@ __host__ void CopyToGPU_SplineMonolith(
   CudaCheckError();
 
   // Also copy the parameter number for each TF1 onto the GPU; i.e. what TF1 parameter are we calculating right now
-  cudaMemcpy(gpu_paramNo_arr_TF1, cpu_paramNo_arr_TF1.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_paramNo_arr_TF1, cpu_paramNo_arr_TF1.data(), n_tf1*sizeof(short int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   #ifndef Weight_On_SplineBySpline_Basis
-  //KS: Keep track how much splines each event has  
+  //KS: Keep track how much splines each event has
   cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent.data(), 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
-  
+
   //KS: Bind our texture with the GPU variable
   // create a resource descriptor based on device pointers
   struct cudaResourceDesc resDesc_nParamPerEvent;
@@ -332,7 +332,7 @@ __host__ void CopyToGPU_SplineMonolith(
   cudaCreateTextureObject(&text_nParamPerEvent, &resDesc_nParamPerEvent, &texDesc_nParamPerEvent, NULL);
   CudaCheckError();
 
-  // Not TF1
+  // Now TF1
   cudaMemcpy(gpu_nParamPerEvent_TF1, cpu_nParamPerEvent_TF1.data(), 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
@@ -353,9 +353,9 @@ __host__ void CopyToGPU_SplineMonolith(
   //Finally create texture object
   cudaCreateTextureObject(&text_nParamPerEvent_TF1, &resDesc_nParamPerEvent_tf1, &texDesc_nParamPerEvent_tf1, NULL);
   CudaCheckError();
+
   #endif
 }
-
 
 // ********************************************************
 //                  START GPU KERNELS
@@ -378,14 +378,6 @@ __global__ void EvalOnGPU_Splines(
 
   // points per spline is the offset to skip in the index to move between splines
   const unsigned int splineNum = (blockIdx.x * blockDim.x + threadIdx.x);
-
-  // Note, the new arrays are arranged as:
-  //       gpu_paramNo_arr has length = spln_counter (keeps track of which parameter we're using on this thread)
-  //       gpu_nKnots_arrhas length = spln_counter (keeps track where current spline starts)
-  //       text_coeff_x has length = n_params * spline_size
-  //       gpu_coeff_many has length = nKnots * 4
-  //       ...
-  //       gpu_weights has length = spln_counter * spline_size
 
   // this is the stopping condition!
   if (splineNum < d_n_splines) {
@@ -429,7 +421,7 @@ __global__ void EvalOnGPU_Splines(
 __global__ void EvalOnGPU_TF1( 
     const float* __restrict__ gpu_coeffs_tf1,
     const short int* __restrict__ gpu_paramNo_arr_tf1,
-    float *gpu_weights) {
+    float *gpu_weights_tf1) {
 //*********************************************************
 
   // points per spline is the offset to skip in the index to move between splines
@@ -443,10 +435,15 @@ __global__ void EvalOnGPU_TF1(
     const float a = gpu_coeffs_tf1[tf1Num*_nTF1Coeff_];
     const float b = gpu_coeffs_tf1[tf1Num*_nTF1Coeff_+1];
 
-    gpu_weights[tf1Num] = fmaf(a, x, b);
-    // gpu_weights[tf1Num] = a*x + b;
+    gpu_weights_tf1[tf1Num] = fmaf(a, x, b);
+
+    // gpu_weights_tf1[tf1Num] = a*x + b;
     //
-    //gpu_weights[tf1Num] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
+    //gpu_weights_tf1[tf1Num] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
+
+    #ifdef DEBUG
+    printf("TF1 = %i/%i, weight = %f \n", tf1Num, d_n_TF1, gpu_weights_tf1[tf1Num]);
+    #endif
   }
 }
 
@@ -454,27 +451,30 @@ __global__ void EvalOnGPU_TF1(
 //*********************************************************
 // KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
-  float *gpu_total_weights,
-
   const float* __restrict__ gpu_weights,
   const float* __restrict__ gpu_weights_tf1,
+
+  float *gpu_total_weights,
 
   const cudaTextureObject_t __restrict__ text_nParamPerEvent,
   const cudaTextureObject_t __restrict__ text_nParamPerEvent_TF1) {
 //*********************************************************
   const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
+
   //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
   __shared__ float shared_total_weights[_BlockSize_];
   if(EventNum < d_n_events) //stopping condition
   {
     shared_total_weights[threadIdx.x] = 1.f;
+
     const unsigned int EventOffset = 2*EventNum;
+
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id)
     {
       shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
       #ifdef DEBUG
       printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
-              EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id];
+              EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id]);
       #endif
     }
 
@@ -486,7 +486,6 @@ __global__ void EvalOnGPU_TotWeight(
              EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id, gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id];
       #endif
     }
-
     gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
   }
 }
@@ -536,8 +535,7 @@ __host__ void RunGPU_SplineMonolith(
   cudaMemcpyToSymbol(val_gpu, vals, h_n_params*sizeof(float));
   CudaCheckError();
 
-  // KS: TODO consider asynchronous kernel call, this might help EvalOnGPU_Splines and EvalOnGPU_TF1 are independent
-
+  // KS: Consider asynchronous kernel call, this might help EvalOnGPU_Splines and EvalOnGPU_TF1 are independent
   // Set the cache config to prefer L1 for the kernel
   //cudaFuncSetCacheConfig(EvalOnGPU_Splines, cudaFuncCachePreferL1);
   EvalOnGPU_Splines<<<grid_size, block_size>>>(
@@ -590,10 +588,10 @@ __host__ void RunGPU_SplineMonolith(
   CudaCheckError();
 #endif
 
-  #ifdef DEBUG
-  printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
-  printf("Released calculated response from GPU with SUCCESS (drink most tea)\n");
-  #endif
+#ifdef DEBUG
+printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
+printf("Released calculated response from GPU with SUCCESS (drink most tea)\n");
+#endif
 }
 
 // *****************************************
