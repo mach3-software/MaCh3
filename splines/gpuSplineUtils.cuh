@@ -49,47 +49,35 @@ __host__ void InitGPU_Vals(float **vals);
 
 
 /// @brief Copy to GPU for x array and separate ybcd array
-__host__ void CopyToGPU_SepMany(
+__host__ void CopyToGPU_SplineMonolith(
                             short int *gpu_paramNo_arr,
                             unsigned int *gpu_nKnots_arr,
                             float *gpu_x_array,
                             float *gpu_many_array,
 
-                            std::vector<short int> paramNo_arr,
-                            std::vector<unsigned int> nKnots_arr,
+                            std::vector<short int> cpu_paramNo_arr,
+                            std::vector<unsigned int> cpu_nKnots_arr,
                             std::vector<float> cpu_x_array,
                             std::vector<float> cpu_many_array,
+                            // TFI related now
+                            float *gpu_many_TF1_array,
+                            short int* gpu_paramNo_arr_TF1,
 
-                    #ifndef Weight_On_SplineBySpline_Basis
+                            std::vector<float> cpu_many_array_TF1,
+                            std::vector<short int> cpu_paramNo_arr_TF1,
+                            #ifndef Weight_On_SplineBySpline_Basis
                             int n_events,
                             std::vector<unsigned int> cpu_nParamPerEvent,
                             unsigned int *gpu_nParamPerEvent,
-                    #endif
-                            int n_params, 
-                            unsigned int n_splines,
-                            short int spline_size,
-                            unsigned int sizeof_array);
-
-
-/// @brief Copy to GPU for x array and separate ybcd array
-__host__ void CopyToGPU_TF1(
-                            float *gpu_coeffs,
-                            short int *gpu_paramNo_arr,
-                            short int *gpu_nPoints_arr,
-
-                            std::vector<float> cpu_coeffs,
-                            std::vector<short int> paramNo_arr,
-                            std::vector<short int> nPoints_arr,
-
-                  #ifndef Weight_On_SplineBySpline_Basis
-                            int n_events,
-                            std::vector<unsigned int> cpu_nParamPerEvent,
-                            unsigned int *gpu_nParamPerEvent,
-                  #endif
+                            // TFI related now
+                            std::vector<unsigned int> cpu_nParamPerEvent_TF1,
+                            unsigned int *gpu_nParamPerEvent_TF1,
+                            #endif
                             int n_params,
                             unsigned int n_splines,
-                            short int _max_knots);
-
+                            short int spline_size,
+                            unsigned int total_nknots,
+                            unsigned int n_tf1);
 
 /// @brief Evaluate the spline on the GPU Using one {y,b,c,d} array and one {x} array
 /// Should be most efficient at cache hitting and memory coalescence

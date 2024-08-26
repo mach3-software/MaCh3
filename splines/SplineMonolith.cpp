@@ -330,9 +330,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 void SMonolith::MoveToGPU() {
 // *****************************************
 
-//TODO !!!!!!!!!!
-/// ZA TEMERIE!!!
-
   #ifdef CUDA
   unsigned int event_size_max = _max_knots * nParams;
   MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
@@ -378,12 +375,11 @@ void SMonolith::MoveToGPU() {
     event_size_max //Knots times event number of unique splines
   );
 
-  /*
   // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
   // The implementation lives in splines/gpuSplineUtils.cu
   // The GPU splines don't actually need declaring but is good for demonstration, kind of
   // fixed by passing const reference
-  CopyToGPU_SepMany(
+  CopyToGPU_SplineMonolith(
     gpu_paramNo_arr,
     gpu_nKnots_arr,
     gpu_coeff_x,
@@ -393,15 +389,25 @@ void SMonolith::MoveToGPU() {
     cpu_nKnots_arr,
     cpu_coeff_x,
     cpu_coeff_many,
+    // TFI related now
+    gpu_coeff_TF1_many,
+    gpu_paramNo_TF1_arr,
+
+    cpu_coeff_TF1_many,
+    cpu_paramNo_TF1_arr,
     #ifndef Weight_On_SplineBySpline_Basis
     NEvents,
     cpu_nParamPerEvent,
     gpu_nParamPerEvent,
+
+    cpu_nParamPerEvent_tf1,
+    gpu_nParamPerEvent_tf1,
     #endif
     nParams,
     NSplines_valid,
     _max_knots,
-    nKnots);
+    nKnots,
+    NTF1_valid);
 
   // Delete all the coefficient arrays from the CPU once they are on the GPU
   cpu_coeff_x.clear();
@@ -412,53 +418,18 @@ void SMonolith::MoveToGPU() {
   cpu_paramNo_arr.shrink_to_fit();
   cpu_nKnots_arr.clear();
   cpu_nKnots_arr.shrink_to_fit();
+  cpu_coeff_TF1_many.clear();
+  cpu_coeff_TF1_many.shrink_to_fit();
+  cpu_paramNo_TF1_arr.clear();
+  cpu_paramNo_TF1_arr.shrink_to_fit();
   #ifndef Weight_On_SplineBySpline_Basis
   cpu_nParamPerEvent.clear();
   cpu_nParamPerEvent.shrink_to_fit();
+  cpu_nParamPerEvent_tf1.clear();
+  cpu_nParamPerEvent_tf1.shrink_to_fit();
   #endif
 
-
-  */
-  //TODO !!!!!!!!!!
-
-
-
-  /*
-    // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
-    // The implementation lives in splines/gpuSplineUtils.cu
-    // The GPU splines don't actually need declaring but is good for demonstration, kind of
-    // fixed by passing const reference
-    CopyToGPU_TF1(
-      gpu_coeff_many,
-      gpu_paramNo_arr,
-      gpu_nPoints_arr,
-
-      cpu_coeff_many,
-      cpu_paramNo_arr,
-      cpu_nPoints_arr,
-      #ifndef Weight_On_SplineBySpline_Basis
-      NEvents,
-      cpu_nParamPerEvent,
-      gpu_nParamPerEvent,
-      #endif
-      nParams,
-      NSplines_valid,
-      _max_knots);
-
-    // Delete all the coefficient arrays from the CPU once they are on the GPU
-    cpu_coeff_many.clear();
-    cpu_coeff_many.shrink_to_fit();
-    cpu_nPoints_arr.clear();
-    cpu_nPoints_arr.shrink_to_fit();
-    cpu_paramNo_arr.clear();
-    cpu_paramNo_arr.shrink_to_fit();
-    #ifndef Weight_On_SplineBySpline_Basis
-    cpu_nParamPerEvent.clear();
-    cpu_nParamPerEvent.shrink_to_fit();
-    #endif
-*/
-
-  MACH3LOG_INFO("Good TF1 GPU loading");
+  MACH3LOG_INFO("Good GPU loading");
   #endif
   return;
 }
