@@ -1068,39 +1068,28 @@ void SMonolith::Evaluate() {
   FindSplineSegment();
 
   // The main call to the GPU
-  RunGPU_SepMany(
+  RunGPU_SplineMonolith(
       gpu_paramNo_arr,
       gpu_nKnots_arr,
 
       gpu_coeff_many, 
 
+      gpu_paramNo_TF1_arr,
+      gpu_coeff_TF1_many,
+
       gpu_weights, 
+      gpu_weights_tf1,
 #ifdef Weight_On_SplineBySpline_Basis
       cpu_weights_var,
+      cpu_weights_tf1_var,
 #else
-    gpu_total_weights,
-    cpu_total_weights,
+      gpu_total_weights,
+      cpu_total_weights,
 #endif
       vals,
       segments,
-      NSplines_valid);
-
-/* TODO!!!!!
-  RunGPU_TF1(
-    gpu_coeff_many,
-    gpu_paramNo_arr,
-    gpu_nPoints_arr,
-
-    gpu_weights,
-    #ifdef Weight_On_SplineBySpline_Basis
-    cpu_weights_var,
-    #else
-    gpu_total_weights,
-    cpu_total_weights,
-    #endif
-    vals,
-    NSplines_valid);
-*/
+      NSplines_valid,
+      NTF1_valid);
 
   //KS: Normally it does nothing, in case you want to have weight for each spline it does the mapping, used mostly for debugging
   ModifyWeights_GPU();
@@ -1264,7 +1253,9 @@ void SMonolith::CalcSplineWeights() {
       const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
       const float b = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_+1];
 
-      cpu_weights_tf1_var[tf1Num] = b + a*x;
+      cpu_weights_tf1_var[tf1Num] = fmaf(a, x, b);
+      // cpu_weights_tf1_var[tf1Num] = a*x + b;
+
       //cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
     }
   #ifdef MULTITHREAD
@@ -1280,7 +1271,7 @@ void SMonolith::ModifyWeights(){
 //*********************************************************
 #ifndef Weight_On_SplineBySpline_Basis
   #ifdef MULTITHREAD
-  //#pragma omp parallel for simd
+  #pragma omp parallel for simd
   #endif
   for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum)
   {

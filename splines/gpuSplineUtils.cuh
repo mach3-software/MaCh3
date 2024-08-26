@@ -97,51 +97,42 @@ __global__ void EvalOnGPU_TF1(
 #ifndef Weight_On_SplineBySpline_Basis
 /// @brief KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
-   const float* __restrict__ gpu_weights,
-   float *gpu_total_weights,
-  const cudaTextureObject_t __restrict__ text_nParamPerEvent);
+  float *gpu_total_weights,
+
+  const float* __restrict__ gpu_weights,
+  const float* __restrict__ gpu_weights_tf1,
+
+  const cudaTextureObject_t __restrict__ text_nParamPerEvent,
+  const cudaTextureObject_t __restrict__ text_nParamPerEvent_TF1);
 #endif
 
 /// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
 /// Pass the segment and the parameter values
 /// (binary search already performed in samplePDFND::FindSplineSegment()
-__host__ void RunGPU_SepMany(
-    const short int* gpu_paramNo_arr,
-    const unsigned int* gpu_nKnots_arr,
+__host__ void RunGPU_SplineMonolith(
+  const short int* gpu_paramNo_arr,
+  const unsigned int* gpu_nKnots_arr,
 
-    const float *gpu_coeff_many,
+  const float *gpu_coeff_many,
 
-    float* gpu_weights, 
-#ifdef Weight_On_SplineBySpline_Basis
-    float* cpu_weights,
-#else
-    float* gpu_total_weights,
-    float* cpu_total_weights,
-#endif
-    // Holds the changes in parameters
-    float *vals,
-    // Holds the segments for parameters
-    short int *segment,
-    const unsigned int h_n_splines) ;
+  const short int* gpu_paramNo_tf1_arr,
+  const float *gpu_coeff_many_tf1,
 
-/// @brief Run the GPU code for the TF1
-__host__ void RunGPU_TF1(
-    const float *gpu_coeffs,
-    const short int* gpu_paramNo_arr,
-    const short int* gpu_nPoints_arr,
-
-    float* gpu_weights, 
-#ifdef Weight_On_SplineBySpline_Basis
-    float* cpu_weights,
-#else
-    float* gpu_total_weights,
-    float* cpu_total_weights,
-#endif
-
+  float* gpu_weights,
+  float* gpu_weights_tf1,
+  #ifdef Weight_On_SplineBySpline_Basis
+  float* cpu_weights,
+  float* cpu_weights_tf1,
+  #else
+  float* gpu_total_weights,
+  float* cpu_total_weights,
+  #endif
   // Holds the changes in parameters
-    float *vals,
-    const unsigned int h_n_splines);
-
+  float *vals,
+  // Holds the segments for parameters
+  short int *segment,
+  const unsigned int h_n_splines,
+  const unsigned int h_n_tf1);
 
 /// @brief Make sure all Cuda threads finished execution
 __host__ void SynchroniseSplines();
