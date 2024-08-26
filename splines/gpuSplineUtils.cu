@@ -1,13 +1,5 @@
-// MaCh3 event-by-event cross-section spline code
-// Written by Richard Calland, Asher Kaboth, Clarence Wret, Kamil Skwarczynski
-// 
-// Contains code to run on CUDA GPUs. Essentially we load up stripped TSpline3 objects to the GPU and do the equivalent of TSpline3->Eval(double) for all events
-// Now also supports TF1 evals
-// Called from samplePDF/samplePDFND.cpp -> splines/SplineMonolith.cpp -> splines/gpuSplineUtils.cu
-
 //MaCh3 included
-#include "manager/gpuUtils.cuh"
-#include "splines/SplineCommon.h"
+#include "splines/gpuSplineUtils.cuh"
 
 /// Hard code the number of splines
 /// Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants

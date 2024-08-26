@@ -4,6 +4,7 @@ set(HEADERS
     SplineMonolith.h
     SplineCommon.h
     SplineStructs.h
+    gpuSplineUtils.cuh
 )
 
 add_library(Splines SHARED
