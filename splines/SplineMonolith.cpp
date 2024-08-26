@@ -30,13 +30,14 @@ void SMonolith::Initialise() {
   NTF1_valid = 0;
   NSplines_total_large = 0;
 
-  index_cpu = NULL;
-  index_TF1_cpu = NULL;
-  cpu_weights_var = NULL;
-  cpu_weights = NULL;
+  index_cpu = nullptr;
+  index_TF1_cpu = nullptr;
+  cpu_weights_var = nullptr;
+  cpu_weights = nullptr;
+  cpu_weights_tf1_var = nullptr;
   gpu_weights = nullptr;
 
-  cpu_total_weights = NULL;
+  cpu_total_weights = nullptr;
   gpu_total_weights = nullptr;
   gpu_nParamPerEvent = nullptr;
   gpu_nPoints_arr = nullptr;
@@ -45,7 +46,7 @@ void SMonolith::Initialise() {
   gpu_coeff_x = nullptr;
   gpu_coeff_many = nullptr;
   
-  SplineInfoArray = NULL;
+  SplineInfoArray = nullptr;
   segments = NULL;
   vals = NULL;
   
@@ -301,12 +302,12 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   cpu_weights_var = new float[NSplines_valid]();
   cpu_weights_tf1_var = new float[NTF1_valid]();
   #else
-  //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
-  #ifndef CUDA
-  cpu_total_weights = new float[NEvents]();
-  cpu_weights_var = new float[NSplines_valid]();
-  cpu_weights_tf1_var = new float[NTF1_valid]();
-  #endif
+    //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
+    #ifndef CUDA
+    cpu_total_weights = new float[NEvents]();
+    cpu_weights_var = new float[NSplines_valid]();
+    cpu_weights_tf1_var = new float[NTF1_valid]();
+    #endif
   #endif
 
   // Print some info; could probably make this to a separate function
@@ -434,8 +435,6 @@ void SMonolith::MoveToGPU() {
   return;
 }
 
-
-
 // Need to specify template functions in header
 // *****************************************
 // Scan the master spline to get the maximum number of knots in any of the TSpline3*
@@ -555,8 +554,6 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   }
   MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);
 }
-
-////////////////////////////////////////////////////////////
 
 // *****************************************
 // Load SplineFile
@@ -828,33 +825,38 @@ SMonolith::~SMonolith() {
   // *****************************************
 
   #ifdef CUDA
-  CleanupGPU_SepMany(
+  CleanupGPU_SplineMonolith(
     gpu_paramNo_arr,
     gpu_nKnots_arr,
 
     gpu_coeff_x,
     gpu_coeff_many,
 
+    gpu_coeff_TF1_many,
+    gpu_paramNo_TF1_arr,
     #ifndef Weight_On_SplineBySpline_Basis
     gpu_total_weights,
     gpu_nParamPerEvent,
+    gpu_nParamPerEvent,
     cpu_total_weights,
     #endif
-    gpu_weights);
+    gpu_weights,
+    gpu_weights_tf1);
 
   //KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions
   CleanupGPU_Segments(segments, vals);
   #else
-  if(segments != NULL) delete[] segments;
-  if(vals != NULL) delete[] vals;
-  if(cpu_total_weights != NULL) delete[] cpu_total_weights;
+  if(segments != nullptr) delete[] segments;
+  if(vals != nullptr) delete[] vals;
+  if(cpu_total_weights != nullptr) delete[] cpu_total_weights;
   #endif
 
-  if(SplineInfoArray != NULL) delete[] SplineInfoArray;
-  if(cpu_weights != NULL) delete[] cpu_weights;
-  if(cpu_weights_var != NULL) delete[] cpu_weights_var;
-  if(index_cpu != NULL) delete[] index_cpu;
-  if(index_TF1_cpu != NULL) delete[] index_TF1_cpu;
+  if(SplineInfoArray != nullptr) delete[] SplineInfoArray;
+  if(cpu_weights != nullptr) delete[] cpu_weights;
+  if(cpu_weights_var != nullptr) delete[] cpu_weights_var;
+  if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
+  if(index_cpu != nullptr) delete[] index_cpu;
+  if(index_TF1_cpu != nullptr) delete[] index_TF1_cpu;
 
   //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL
   cpu_coeff_x.clear();
@@ -865,14 +867,19 @@ SMonolith::~SMonolith() {
   cpu_paramNo_arr.shrink_to_fit();
   cpu_nKnots_arr.clear();
   cpu_nKnots_arr.shrink_to_fit();
+
+  cpu_coeff_TF1_many.clear();
+  cpu_coeff_TF1_many.shrink_to_fit();
+  cpu_paramNo_TF1_arr.clear();
+  cpu_paramNo_TF1_arr.shrink_to_fit();
   #ifndef Weight_On_SplineBySpline_Basis
   cpu_nParamPerEvent.clear();
   cpu_nParamPerEvent.shrink_to_fit();
+  cpu_nParamPerEvent_tf1.clear();
+  cpu_nParamPerEvent_tf1.shrink_to_fit();
   #endif
   cpu_nPoints_arr.clear();
   cpu_nPoints_arr.shrink_to_fit();
-
-  //TODO cpu_weights_tf1_var cpu_nParamPerEvent_tf1 cpu_paramNo_TF1_arr cpu_coeff_TF1_many
 }
 
 // *********************************

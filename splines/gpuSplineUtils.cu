@@ -13,7 +13,6 @@
 #pragma message("using default N splines")
 #endif
 
-
 // KS: Forgive me father, for I have sinned.
 #if defined(__CUDA_ARCH__)
   #if __CUDA_ARCH__ >= 1200
@@ -184,7 +183,7 @@ __host__ void InitGPU_SplineMonolith(
 }
 
 // *******************************************
-/// @brief Allocate memory for spline segments
+// Allocate memory for spline segments
 __host__ void InitGPU_Segments(short int **segment) {
 // *******************************************
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
@@ -208,7 +207,7 @@ __host__ void InitGPU_Vals(float **vals) {
 // ******************************************************
 
 // ******************************************************
-/// @brief Copy to GPU for x array and separate ybcd array
+// Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_SplineMonolith(
 // ******************************************************
                             short int *gpu_paramNo_arr,
@@ -366,9 +365,9 @@ __host__ void CopyToGPU_SplineMonolith(
 // Once it knows this, we simply extract the pre-computed coefficients for that spline point and multiply together to get a weight
 
 //*********************************************************
-/// @brief Evaluate the spline on the GPU Using one {y,b,c,d} array and one {x} array
-/// Should be most efficient at cache hitting and memory coalescence
-/// But using spline segments rather than the parameter value: avoids doing binary search on GPU
+// Evaluate the spline on the GPU Using one {y,b,c,d} array and one {x} array
+// Should be most efficient at cache hitting and memory coalescence
+// But using spline segments rather than the parameter value: avoids doing binary search on GPU
 __global__ void EvalOnGPU_SepMany(
     const short int* __restrict__ gpu_paramNo_arr,
     const unsigned int* __restrict__ gpu_nKnots_arr,
@@ -426,7 +425,7 @@ __global__ void EvalOnGPU_SepMany(
 }
 
 //*********************************************************
-/// @brief Evaluate the TF1 on the GPU Using 5th order polynomial
+// Evaluate the TF1 on the GPU Using 5th order polynomial
 __global__ void EvalOnGPU_TF1( 
     const float* __restrict__ gpu_coeffs,
     const short int* __restrict__ gpu_paramNo_arr,
@@ -476,7 +475,7 @@ __global__ void EvalOnGPU_TF1(
 
 #ifndef Weight_On_SplineBySpline_Basis
 //*********************************************************
-/// @brief KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
+// KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
    const float* __restrict__ gpu_weights,
    float *gpu_total_weights,
@@ -503,9 +502,9 @@ __global__ void EvalOnGPU_TotWeight(
 #endif
 
 // *****************************************
-/// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
-/// Pass the segment and the parameter values
-/// (binary search already performed in samplePDFND::FindSplineSegment()
+// Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
+// Pass the segment and the parameter values
+// (binary search already performed in samplePDFND::FindSplineSegment()
 __host__ void RunGPU_SepMany(
     const short int* gpu_paramNo_arr,
     const unsigned int* gpu_nKnots_arr,
@@ -612,7 +611,7 @@ __host__ void RunGPU_SepMany(
 }
 
 // *****************************************
-/// @brief Run the GPU code for the TF1
+// Run the GPU code for the TF1
 __host__ void RunGPU_TF1(
     const float *gpu_coeffs,
     const short int* gpu_paramNo_arr,
@@ -711,45 +710,58 @@ __host__ void RunGPU_TF1(
 }
 
 // *****************************************
-/// Make sure all Cuda threads finished execution
+// Make sure all Cuda threads finished execution
 __host__ void SynchroniseSplines() {
   cudaDeviceSynchronize();
 }
+
 
 // *********************************
 // CLEANING
 // *********************************
 
 // *********************************
-/// @brief Clean up the {x},{ybcd} arrays
-__host__ void CleanupGPU_SepMany( 
+// Clean up the {x},{ybcd} arrays
+__host__ void CleanupGPU_SplineMonolith(
     short int *gpu_paramNo_arr,
     unsigned int *gpu_nKnots_arr,
 
     float *gpu_x_array, 
-    float *gpu_many_array, 
+    float *gpu_many_array,
+
+    float *gpu_many_TF1_array,
+    short int* gpu_paramNo_arr_TF1,
 #ifndef Weight_On_SplineBySpline_Basis
     float *gpu_total_weights,
     unsigned int *gpu_nParamPerEvent,
+    unsigned int *gpu_nParamPerEvent_TF1,
     float *cpu_total_weights,
 #endif
-    float *gpu_weights) {
+    float *gpu_weights,
+    float *gpu_weights_tf1) {
 // *********************************
   cudaFree(gpu_paramNo_arr);
   cudaFree(gpu_nKnots_arr);
 
   // free the coefficient arrays
   cudaDestroyTextureObject(text_coeff_x);
+
   cudaFree(gpu_x_array);
   cudaFree(gpu_many_array);
 
+  cudaFree(gpu_many_TF1_array);
+  cudaFree(gpu_paramNo_arr_TF1);
   // free weights on the gpu
   cudaFree(gpu_weights);
+  cudaFree(gpu_weights_tf1);
 #ifndef Weight_On_SplineBySpline_Basis
   cudaFree(gpu_total_weights);
   //KS: Before removing variable let's destroy texture
   cudaDestroyTextureObject(text_nParamPerEvent);
+  cudaDestroyTextureObject(text_nParamPerEvent_TF1);
+
   cudaFree(gpu_nParamPerEvent);
+  cudaFree(gpu_nParamPerEvent_TF1);
   cudaFreeHost(cpu_total_weights);
   cpu_total_weights = nullptr;
 #endif
@@ -760,36 +772,11 @@ __host__ void CleanupGPU_SepMany(
 /// Clean up pinned variables at CPU
 __host__ void CleanupGPU_Segments(short int *segment, float *vals) {
 // *******************************************
-    cudaFreeHost(segment);
-    cudaFreeHost(vals);
+  cudaFreeHost(segment);
+  cudaFreeHost(vals);
 
-    segment = nullptr;
-    vals = nullptr;
+  segment = nullptr;
+  vals = nullptr;
 
-    return;
-}
-
-// *********************************
-/// @brief Clean up the TF1 arrays
-__host__ void CleanupGPU_TF1(
-    float *gpu_coeffs,
-    short int *gpu_paramNo_arr,
-    short int *gpu_nPoints_arr,
-    
-#ifndef Weight_On_SplineBySpline_Basis
-    float *gpu_total_weights,
-    float *cpu_total_weights,
-#endif
-    float *gpu_weights) {
-// *********************************
-  cudaFree(gpu_coeffs);
-  cudaFree(gpu_paramNo_arr);
-  cudaFree(gpu_nPoints_arr);
-  cudaFree(gpu_weights);
-#ifndef Weight_On_SplineBySpline_Basis
-  cudaFree(gpu_total_weights);
-  cudaFreeHost(cpu_total_weights);
-#endif
-  
   return;
 }

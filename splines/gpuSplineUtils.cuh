@@ -9,11 +9,6 @@
 #include "manager/gpuUtils.cuh"
 #include "splines/SplineCommon.h"
 
-
-// *******************************************
-//              INITIALISE GPU
-// *******************************************
-
 // *******************************************
 /// @brief Allocate memory on gpu for spline monolith
 __host__ void InitGPU_SplineMonolith(
@@ -42,9 +37,11 @@ __host__ void InitGPU_SplineMonolith(
 
 
 /// @brief Allocate memory for spline segments
+/// @param segment Found spline segment for each parameter
 __host__ void InitGPU_Segments(short int **segment);
 
 /// @brief Allocate memory for spline segments
+/// @param segment Value to which we want reweight for each parameter
 __host__ void InitGPU_Vals(float **vals);
 
 
@@ -150,33 +147,26 @@ __host__ void RunGPU_TF1(
 __host__ void SynchroniseSplines();
 
 /// @brief Clean up the {x},{ybcd} arrays
-__host__ void CleanupGPU_SepMany( 
-    short int *gpu_paramNo_arr,
-    unsigned int *gpu_nKnots_arr,
+__host__ void CleanupGPU_SplineMonolith(
+  short int *gpu_paramNo_arr,
+  unsigned int *gpu_nKnots_arr,
 
-    float *gpu_x_array, 
-    float *gpu_many_array, 
-#ifndef Weight_On_SplineBySpline_Basis
-    float *gpu_total_weights,
-    unsigned int *gpu_nParamPerEvent,
-    float *cpu_total_weights,
-#endif
-    float *gpu_weights);
+  float *gpu_x_array,
+  float *gpu_many_array,
+
+  float *gpu_many_TF1_array,
+  short int* gpu_paramNo_arr_TF1,
+  #ifndef Weight_On_SplineBySpline_Basis
+  float *gpu_total_weights,
+  unsigned int *gpu_nParamPerEvent,
+  unsigned int *gpu_nParamPerEvent_TF1,
+  float *cpu_total_weights,
+  #endif
+  float *gpu_weights,
+  float *gpu_weights_tf1);
 
 /// @brief Clean up pinned variables at CPU
 __host__ void CleanupGPU_Segments(short int *segment, float *vals);
 
-
-/// @brief Clean up the TF1 arrays
-__host__ void CleanupGPU_TF1(
-    float *gpu_coeffs,
-    short int *gpu_paramNo_arr,
-    short int *gpu_nPoints_arr,
-    
-#ifndef Weight_On_SplineBySpline_Basis
-    float *gpu_total_weights,
-    float *cpu_total_weights,
-#endif
-    float *gpu_weights);
 
 
