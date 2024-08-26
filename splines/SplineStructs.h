@@ -163,6 +163,8 @@ public:
   virtual ~TResponseFunction_red() { }
   /// @brief Evaluate a variation
   virtual double Eval(const double var)=0;
+  /// @brief KS: Printer
+  virtual void Print()=0;
 };
 
 // ************************
@@ -257,7 +259,7 @@ public:
   /// @brief Get the size
   inline int GetSize() { return length; }
   /// @brief Print detailed info
-  inline void Print() {
+  inline void Print() override {
     std::cout << "Printing TF1_red: " << std::endl;
     std::cout << "  Length  = " << length << std::endl;
     std::cout << "  a       = " << Par[0] << std::endl;
@@ -267,6 +269,15 @@ public:
       std::cout << "  d       = " << Par[3] << std::endl;
       std::cout << "  e       = " << Par[4] << std::endl;
     }
+  }
+
+  /// @brief KS: Make a TF1 from the reduced TF1
+  inline TF1* ConstructTF1(const std::string& function, const int xmin, const int xmax) {
+    TF1 *func = new TF1("TF1", function.c_str(), xmin, xmax);
+    for(int i = 0; i < length; ++i) {
+      func->SetParameter(i, Par[i]);
+    }
+    return func;
   }
 
 private:
@@ -665,6 +676,15 @@ public:
   inline TSpline3* ConstructTSpline3() {
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     return spline;
+  }
+
+  /// @brief Print detailed info
+  inline void Print() override {
+    std::cout << "Printing TSpline_red: " << std::endl;
+    std::cout << " Nknots  = " << nPoints << std::endl;
+    for(int i = 0; i < nPoints; ++i) {
+      std::cout<<"  i ="<<i<<" x="<<XPos[i]<<" y"<<YResp[i]<<" b="<<Par[i][0]<<" c="<<Par[i][1]<<" d="<<Par[i][2]<<std::endl;
+    }
   }
 
   protected: //changed to protected from private so can be accessed by derived classes
