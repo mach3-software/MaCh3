@@ -65,19 +65,15 @@ GetPostfitParamPlots:
     ## define the groups of parameters, should go <block name>: [<plot title>, [<ylim low>, <ylim up>], ["ParamName1", "ParamName2" ...]
     EXAMPLE_GROUP_1: ["COOL NAME 1", [-1.5, 2.0],   
         [
-            "PARAM_1", 
-            "PARAM_2", 
-            "PARAM_3"
+            "XSEC_PARAM_1", 
+            "XSEC_PARAM_2", 
+            "XSEC_PARAM_3"
         ]
     ]
 
     EXAMPLE_GROUP_2: ["COOL NAME 2", [-4.0, 4.0], 
         [
-            "PARAM_4",
-            "PARAM_5",
-            "PARAM_6", 
-            "PARAM_7", 
-            "PARAM_8", 
-            "PARAM_9",
+            "XSEC_PARAM_4",
+            "XSEC_PARAM_5",
         ]
     ]
