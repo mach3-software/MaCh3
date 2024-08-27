@@ -82,7 +82,7 @@ void covarianceXsec::InitXsecFromConfig() {
       }
       expectedTypes += ".";
       MACH3LOG_ERROR(expectedTypes);
-      throw;
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
 
 	//ETA - we really should change this... good ol' b for flux...
@@ -94,7 +94,7 @@ void covarianceXsec::InitXsecFromConfig() {
   //Add a sanity check,
   if(_fSplineNames.size() != SplineCounter){
 	MACH3LOG_ERROR("_fSplineNames is of size {} but found {} spline parameters", _fSplineNames.size(), SplineCounter);
-	throw;
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
  
   NormParams.shrink_to_fit();
@@ -450,7 +450,7 @@ void covarianceXsec::setFluxOnlyParameters() {
     }
   } else {
     MACH3LOG_ERROR("setFluxOnlyParameters not implemented for PCA");
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
@@ -464,6 +464,6 @@ void covarianceXsec::setXsecOnlyParameters() {
     }
   } else {
     MACH3LOG_ERROR("setXsecOnlyParameters not implemented for PCA");
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
