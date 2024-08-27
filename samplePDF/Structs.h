@@ -124,6 +124,25 @@ enum SplineInterpolation {
   kSplineInterpolations  //This only enumerates
 };
 
+
+// **************************************************
+/// @brief Get function for TF1_red
+inline std::string GetTF1(const SplineInterpolation i) {
+  // **************************************************
+  std::string Func = "";
+  switch(i) {
+    case kLinearFunc:
+      Func = "([1]+[0]*x)";
+      break;
+    default:
+      std::cerr << "UNKNOWN SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return Func;
+}
+
 // **************************************************
 /// @brief Convert a RespFuncType type to a SplineInterpolation
 inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation i) {
@@ -177,7 +196,7 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
       name = "Akima";
       break;
     case kLinearFunc:
-      name = "kLinearFunc";
+      name = "LinearFunc";
       break;
     default:
       std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;

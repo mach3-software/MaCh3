@@ -586,6 +586,11 @@ public:
       delete[] Secants;
       delete[] Tangents;
     }
+    else
+    {
+      std::cerr<<"Unsupported interpolations type "<<InterPolation<<std::endl;
+      throw;
+    }
 
     delete spline;
     spline = NULL;
