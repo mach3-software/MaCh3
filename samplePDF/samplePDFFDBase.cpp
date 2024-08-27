@@ -22,6 +22,10 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   fTestStatistic = kPoisson;
+
+  //Default values for oscillation-related things
+  doubled_angle = true;
+  osc_binned = false;
 }
 
 samplePDFFDBase::~samplePDFFDBase()

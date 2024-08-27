@@ -234,12 +234,12 @@ public:
   Oscillator *Osc = NULL;
 
   // An axis to set binned oscillation weights
-  TAxis *osc_binned_axis ;
+  TAxis *osc_binned_axis;
   //===============================================================================
   
   //Variables controlling oscillation parameters
-  bool doubled_angle = true;
-  bool osc_binned = false;
+  bool doubled_angle;
+  bool osc_binned;
 
   //===============================================================================
   //DB Covariance Objects
@@ -253,7 +253,7 @@ public:
   int BinningOpt;
   /// @var const int nDimensions
   /// @brief keep track of the dimensions of the sample binning
-  int nDimensions = {};
+  int nDimensions;
   int SampleDetID;
   bool IsRHC;
   /// @var std::vector<std::string> SplineBinnedVars
