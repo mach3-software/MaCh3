@@ -84,6 +84,9 @@ class SMonolith : public SplineBase {
     /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
     inline void MoveToGPU();
         
+    /// @brief KS: Print info about how much knots etc has been initialised
+    inline void PrintInitialsiation();
+
     /// @brief CW: Reduced the TSpline3 to TSpline3_red
     /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
     inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline);

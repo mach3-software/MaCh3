@@ -311,15 +311,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #endif
 
   // Print some info; could probably make this to a separate function
-  MACH3LOG_INFO("--- INITIALISED Spline Monolith ---");
-  MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
-  MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
-  MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
-  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
-  MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
-
-  MACH3LOG_INFO("On average {:.2f} TF1 per event ({}/{})", float(NTF1_valid)/float(NEvents), NTF1_valid, NEvents);
-  MACH3LOG_INFO("Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB", double(sizeof(float)*NTF1_valid*_nTF1Coeff_)/1.E6);
+  PrintInitialsiation();
 
   if(SaveSplineFile) PrepareSplineFile();
 
@@ -586,6 +578,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   TFile *SplineFile = new TFile(FileName.c_str(), "OPEN");
   TTree *Settings = (TTree*)SplineFile->Get("Settings");
   TTree *Monolith = (TTree*)SplineFile->Get("Monolith");
+  TTree *Monolith_TF1 = (TTree*)SplineFile->Get("Monolith_TF1");
   TTree *ParamInfo = (TTree*)SplineFile->Get("ParamInfo");
   TTree *XKnots = (TTree*)SplineFile->Get("XKnots");
   TTree *EventInfo = (TTree*)SplineFile->Get("EventInfo");
@@ -596,12 +589,16 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   int _max_knots_temp;
   unsigned int nKnots_temp;
   unsigned int NSplines_valid_temp;
+  unsigned int nTF1Valid_temp;
+  unsigned int nTF1coeff_temp;
 
   Settings->SetBranchAddress("NEvents", &NEvents_temp);
   Settings->SetBranchAddress("nParams", &nParams_temp);
   Settings->SetBranchAddress("_max_knots", &_max_knots_temp);
   Settings->SetBranchAddress("nKnots", &nKnots_temp);
   Settings->SetBranchAddress("NSplines_valid", &NSplines_valid_temp);
+  Settings->SetBranchAddress("NTF1_valid", &nTF1Valid_temp);
+  Settings->SetBranchAddress("nTF1coeff", &nTF1coeff_temp);
 
   Settings->GetEntry(0);
 
@@ -610,9 +607,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   _max_knots = _max_knots_temp;
   nKnots = nKnots_temp;
   NSplines_valid = NSplines_valid_temp;
-
+  NTF1_valid = nTF1Valid_temp;
   unsigned int event_size_max = _max_knots * nParams;
   NSplines_total = NEvents * nParams;
+  nTF1coeff = nTF1coeff_temp;
 
   //KS: Since we are going to copy it each step use fancy CUDA memory allocation
 #ifdef CUDA
@@ -635,6 +633,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 #ifndef CUDA
   cpu_total_weights = new float[NEvents]();
   cpu_weights_var = new float[NSplines_valid]();
+  cpu_weights_tf1_var = new float[NTF1_valid]();
 #endif
 
   float coeff = 0.;
@@ -643,6 +642,14 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   {
     Monolith->GetEntry(i);
     cpu_coeff_many[i] = coeff;
+  }
+
+  float coeff_tf1 = 0.;
+  Monolith_TF1->SetBranchAddress("cpu_coeff_TF1_many", &coeff_tf1);
+  for(unsigned int i = 0; i < nTF1coeff; i++)
+  {
+    Monolith_TF1->GetEntry(i);
+    cpu_coeff_TF1_many[i] = coeff_tf1;
   }
 
   short int paramNo_arr = 0;
@@ -665,11 +672,15 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   }
 
   unsigned int nParamPerEvent = 0;
+  unsigned int nParamPerEvent_tf1 = 0;
+
   EventInfo->SetBranchAddress("cpu_nParamPerEvent", &nParamPerEvent);
+  EventInfo->SetBranchAddress("cpu_nParamPerEvent_tf1", &nParamPerEvent_tf1);
   for(unsigned int i = 0; i < 2*NSplines_total; i++)
   {
     EventInfo->GetEntry(i);
     cpu_nParamPerEvent[i] = nParamPerEvent;
+    cpu_nParamPerEvent_tf1[i] = nParamPerEvent_tf1;
   }
 
   _int_ nPoints = 0;
@@ -695,12 +706,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   delete SplineFile;
 
   // Print some info; could probably make this to a separate function
-  MACH3LOG_INFO("--- INITIALISED (X), (YBCD) ARRAYS ---");
-  MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
-  MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
-  MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
-  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
-  MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
+  PrintInitialsiation();
 
   MoveToGPU();
 }
@@ -710,8 +716,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 void SMonolith::PrepareSplineFile() {
 // *****************************************
 
-  //// TODO NEEEED FIXING!!!!!
-
   std::string FileName = "inputs/SplineFile.root";
   if (std::getenv("MACH3") != NULL) {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
@@ -720,6 +724,7 @@ void SMonolith::PrepareSplineFile() {
   TFile *SplineFile = new TFile(FileName.c_str(), "recreate");
   TTree *Settings = new TTree("Settings", "Settings");
   TTree *Monolith = new TTree("Monolith", "Monolith");
+  TTree *Monolith_TF1 = new TTree("Monolith_TF1", "Monolith_TF1");
   TTree *ParamInfo = new TTree("ParamInfo", "ParamInfo");
   TTree *XKnots = new TTree("XKnots", "XKnots");
   TTree *EventInfo = new TTree("EventInfo", "EventInfo");
@@ -730,12 +735,16 @@ void SMonolith::PrepareSplineFile() {
   int _max_knots_temp = _max_knots;
   unsigned int nKnots_temp = nKnots;
   unsigned int NSplines_valid_temp = NSplines_valid;
+  unsigned int nTF1Valid_temp = NTF1_valid;
+  unsigned int nTF1coeff_temp = nTF1coeff;
 
   Settings->Branch("NEvents", &NEvents_temp, "NEvents/i");
   Settings->Branch("nParams", &nParams_temp, "nParams/S");
   Settings->Branch("_max_knots", &_max_knots_temp, "_max_knots/I");
   Settings->Branch("nKnots", &nKnots_temp, "nKnots/i");
   Settings->Branch("NSplines_valid", &NSplines_valid_temp, "NSplines_valid/i");
+  Settings->Branch("NTF1_valid", &nTF1Valid_temp, "NTF1_valid/i");
+  Settings->Branch("nTF1coeff", &nTF1coeff_temp, "nTF1coeff/i");
 
   Settings->Fill();
 
@@ -751,6 +760,17 @@ void SMonolith::PrepareSplineFile() {
   }
   SplineFile->cd();
   Monolith->Write();
+
+
+  float coeff_tf1 = 0.;
+  Monolith_TF1->Branch("cpu_coeff_TF1_many", &coeff_tf1, "cpu_coeff_TF1_many/F");
+  for(unsigned int i = 0; i < nTF1coeff; i++)
+  {
+    coeff_tf1 = cpu_coeff_TF1_many[i];
+    Monolith_TF1->Fill();
+  }
+  SplineFile->cd();
+  Monolith_TF1->Write();
 
   short int paramNo_arr = 0;
   unsigned int nKnots_arr = 0;
@@ -779,11 +799,15 @@ void SMonolith::PrepareSplineFile() {
   XKnots->Write();
 
   unsigned int nParamPerEvent = 0;
+  unsigned int nParamPerEvent_tf1 = 0;
+
   EventInfo->Branch("cpu_nParamPerEvent", &nParamPerEvent, "cpu_nParamPerEvent/i");
+  EventInfo->Branch("cpu_nParamPerEvent_tf1", &nParamPerEvent_tf1, "cpu_nParamPerEvent_tf1/i");
+
   for(unsigned int i = 0; i < 2*NSplines_total; i++)
   {
     nParamPerEvent = cpu_nParamPerEvent[i];
-
+    nParamPerEvent_tf1 = cpu_nParamPerEvent_tf1[i];
     EventInfo->Fill();
   }
   SplineFile->cd();
@@ -810,6 +834,7 @@ void SMonolith::PrepareSplineFile() {
 
   delete Settings;
   delete Monolith;
+  delete Monolith_TF1;
   delete ParamInfo;
   delete XKnots;
   delete EventInfo;
@@ -1323,5 +1348,25 @@ void SMonolith::ModifyWeights_GPU(){
     }
   }
 #endif
+  return;
+}
+
+//*********************************************************
+//KS: Print info about how much knots etc has been initialised
+void SMonolith::PrintInitialsiation() {
+//*********************************************************
+
+  unsigned int event_size_max = _max_knots * nParams;
+
+  MACH3LOG_INFO("--- INITIALISED Spline Monolith ---");
+  MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
+  MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
+  MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
+  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
+  MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
+
+  MACH3LOG_INFO("On average {:.2f} TF1 per event ({}/{})", float(NTF1_valid)/float(NEvents), NTF1_valid, NEvents);
+  MACH3LOG_INFO("Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB", double(sizeof(float)*NTF1_valid*_nTF1Coeff_)/1.E6);
+
   return;
 }
