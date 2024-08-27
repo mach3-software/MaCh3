@@ -23,6 +23,10 @@ PlottingManager::PlottingManager(std::string PlottingConfigName) {
 /// @warning This should always be called *After* ParseInputs() unless you are
 /// manually specifying all input file names and config file names in your drawing application.
 void PlottingManager::Initialise() {
+  /// @todo should add some kind of validataConfigs() method to got throught all of the specified
+  /// config files and make sure that all provided options are valid and all necessary options are provided
+  /// as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails
+  /// to find an option at runtime
   _plottingConfig = YAML::LoadFile(_configFileName);
 
   // read options from the config

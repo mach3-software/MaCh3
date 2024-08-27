@@ -22,14 +22,18 @@ public:
   /// @param origName The "internal" name used to uniquely identify the parameter inside the
   /// plotting code
   /// @return A beautiful formatted name that can be used in plots
-  std::string prettifyParamName(std::string origName) const;
+  inline std::string prettifyParamName(const std::string &origName) const {
+    return prettifyName(origName, "parameters");
+  };
 
   /// @brief Convert hideous and vulgar internal sample name into a beautiful presentable name
   /// @details The pretty sample names should be specified in the style config file
-  /// @param fullName The "internal" name used to uniquely identify the sample inside the plotting
+  /// @param origName The "internal" name used to uniquely identify the sample inside the plotting
   /// code
   /// @return A beautiful formatted name that can be used in plots
-  std::string prettifySampleName(std::string fullName) const;
+  inline std::string prettifySampleName(const std::string &origName) const {
+    return prettifyName(origName, "samples");
+  };
 
   // style setting options
   /// @brief Set the root colour palette to one of the default root pallettes as defined in (root
@@ -49,6 +53,10 @@ public:
 
 private:
   YAML::Node _styleConfig;
+
+  // helper to basically just read fancy names from config  
+  std::string prettifyName(const std::string &origName, const std::string &nameType) const;
+
 };
 
 } // namespace MaCh3Plotting

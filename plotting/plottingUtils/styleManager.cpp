@@ -5,10 +5,10 @@ StyleManager::StyleManager(std::string styleConfigName) {
   _styleConfig = YAML::LoadFile(styleConfigName);
 }
 
-std::string StyleManager::prettifyParamName(std::string origName) const {
+std::string StyleManager::prettifyName(const std::string &origName, const std::string &nameType) const {
   std::string prettyName = origName;
 
-  YAML::Node prettyNames = _styleConfig["PrettyNames"];
+  YAML::Node prettyNames = _styleConfig[nameType]["PrettyNames"];
 
   if (prettyNames[origName])
   {
@@ -94,35 +94,6 @@ void StyleManager::setTH1Style(TH1 *hist, std::string styleName) const {
   {
     hist->SetLineStyle(styleDef["LineStyle"].as<int>());
   }
-}
-
-std::string StyleManager::prettifySampleName(std::string fullName) const {
-  std::string newName = fullName;
-
-  std::string numu = "#nu_{#mu}";
-  std::string numuBar = "#bar{#nu}_{#mu}";
-  std::string pi = "#pi";
-  std::string gamma = "#gamma";
-  std::string nuBar = "#bar{#nu}";
-  std::string boldP = "#bf{P}";
-
-  if (newName.find("anti-numu") <= newName.length())
-    newName.replace(newName.find("anti-numu"), 9, numuBar);
-  if (newName.find("numu") <= newName.length())
-    newName.replace(newName.find("numu"), 4, numu);
-  if (newName.find("NuMu") <= newName.length())
-    newName.replace(newName.find("NuMu"), 4, numu);
-  if (newName.find("photon") <= newName.length())
-    newName.replace(newName.find("photon"), 6, gamma);
-  if (newName.find("AntiNu") <= newName.length())
-    newName.replace(newName.find("AntiNu"), 6, nuBar);
-  if (newName.find("protons") <= newName.length())
-    newName.replace(newName.find("protons"), 7, boldP);
-
-  if (newName.find("Mode") <= newName.length())
-    newName.erase(newName.find("Mode"), 4);
-
-  return newName;
 }
 
 } // namespace MaCh3Plotting
