@@ -8,7 +8,7 @@ StyleManager::StyleManager(std::string styleConfigName) {
 std::string StyleManager::prettifyName(const std::string &origName, const std::string &nameType) const {
   std::string prettyName = origName;
 
-  YAML::Node prettyNames = _styleConfig[nameType]["PrettyNames"];
+  YAML::Node prettyNames = _styleConfig["PrettyNames"][nameType];
 
   if (prettyNames[origName])
   {
