@@ -1,7 +1,7 @@
 #include "inputManager.h"
 
 // EM: will move this somewhere more sensible
-#define __BAD_FLOAT__ -999.999
+#define BAD_FLOAT -999.999
 
 namespace MaCh3Plotting {
 // this is the constructor with user specified translation config file
@@ -93,9 +93,9 @@ const float InputManager::GetPostFitError(int fileNum, const std::string &paramN
     return inputFileDef.postFitErrors.at(errorType).at(paramName);
   }
 
-  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, __BAD_FLOAT__);
+  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, BAD_FLOAT);
 
-  return __BAD_FLOAT__;
+  return BAD_FLOAT;
 }
 
 const float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
@@ -122,9 +122,9 @@ const float InputManager::GetPostFitValue(int fileNum, const std::string &paramN
     return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
   
-  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, __BAD_FLOAT__);
+  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, BAD_FLOAT);
 
-  return __BAD_FLOAT__;
+  return BAD_FLOAT;
 }
 
 // ##################################################################
