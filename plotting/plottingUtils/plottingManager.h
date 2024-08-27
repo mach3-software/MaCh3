@@ -130,13 +130,13 @@ public:
 
   const std::vector<std::string> GetFileLabels() { return FileLabels; }
 
-  const int GetNFiles() { return (int)FileNames.size(); }
+  int GetNFiles() { return (int)FileNames.size(); }
 
-  const bool GetSplitBySample() { return splitBySample; }
+  bool GetSplitBySample() { return splitBySample; }
 
-  const bool GetPlotRatios() { return plotRatios; }
+  bool GetPlotRatios() { return plotRatios; }
 
-  const bool GetDrawGrid() { return drawGrid; }
+  bool GetDrawGrid() { return drawGrid; }
 
   /// @}
 

@@ -69,7 +69,7 @@ void InputManager::Print(const std::string &printLevel) const {
   MACH3LOG_INFO("");
 }
 
-const float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
+float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
 
   const InputFile &inputFileDef = GetFile(fileNum);
@@ -98,7 +98,7 @@ const float InputManager::GetPostFitError(int fileNum, const std::string &paramN
   return BAD_FLOAT;
 }
 
-const float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
+float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
   
   const InputFile &inputFileDef = GetFile(fileNum);
@@ -392,13 +392,13 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
       std::vector<std::string> enabledLLHParams;
 
-      for (const std::string parameter : knownParameters)
+      for (const std::string &parameter : knownParameters)
       {
         MACH3LOG_DEBUG("     - for {}", parameter);
         inputFileDef.availableParams_map_LLH[LLHType][parameter] = false;
 
         // check if we find the parameter at any of the locations we think it should be at
-        for (const std::string rawLocation : testLLHRawLocations)
+        for (const std::string &rawLocation : testLLHRawLocations)
         {
           if (findRootObject(inputFileDef, parseLocation(rawLocation, fitter, kLLH, parameter)) !=
               nullptr)
@@ -482,10 +482,10 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     if (printThoughts)
       MACH3LOG_INFO("....Searching for LLH scans broken down by sample");
 
-    for (const std::string sample : knownSamples)
+    for (const std::string &sample : knownSamples)
     {
       size_t numLLHBySampleParams = 0;
-      for (const std::string parameter : knownParameters)
+      for (const std::string &parameter : knownParameters)
       {
         inputFileDef.availableParams_map_LLHBySample[sample][parameter] = false;
         if (findBySampleLLH(inputFileDef, parameter, fitter, sample))
@@ -561,13 +561,13 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
     std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
 
     // EM: now get the objects from the file
-    for (const std::string parameter : inputFileDef.availableParams_LLH)
+    for (const std::string &parameter : inputFileDef.availableParams_LLH)
     {
 
       std::shared_ptr<TObject> LLHObj = nullptr;
 
       // check the locations for the object
-      for (const std::string rawLocation : testLLHRawLocations)
+      for (const std::string &rawLocation : testLLHRawLocations)
       {
         LLHObj = findRootObject(inputFileDef,
                                 parseLocation(rawLocation, inputFileDef.fitter, kLLH, parameter));
@@ -609,20 +609,20 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   }
 
   // ####### Get the by sample LLH scans #######
-  for (const std::string parameter : inputFileDef.availableParams_LLH)
+  for (const std::string &parameter : inputFileDef.availableParams_LLH)
   {
-    for (const std::string sample : knownSamples)
+    for (const std::string &sample : knownSamples)
     {
       findBySampleLLH(inputFileDef, parameter, inputFileDef.fitter, sample, true);
     }
   }
 
   // ####### Get the processed post fit errors #######
-  for (const std::string parameter : inputFileDef.availableParams_postFitErrors)
+  for (const std::string &parameter : inputFileDef.availableParams_postFitErrors)
   {
     std::vector<std::string> availableErrorTypes =
         thisFitterSpec_config["AvailablePostFitErrorTypes"].as<std::vector<std::string>>();
-    for (std::string errorType : availableErrorTypes)
+    for (const std::string &errorType : availableErrorTypes)
     {
       findPostFitParamError(inputFileDef, parameter, inputFileDef.fitter, errorType, true);
     }

@@ -321,7 +321,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The error on the specified parameter.
-  const float GetPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  float GetPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @brief Get the post fit value for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
@@ -330,13 +330,13 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The value of the specified parameter.
-  const float GetPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  float GetPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @name General Getters
   /// @{
   inline const std::vector<std::string> &GetKnownParameters() const { return knownParameters; }
   inline const std::vector<std::string> &GetKnownSamples() const { return knownSamples; }
-  inline const int GetNInputFiles() const { return _fileVec.size(); }
+  inline int GetNInputFiles() const { return _fileVec.size(); }
   /// @}
 
   /// @name File Specific Getters

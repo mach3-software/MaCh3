@@ -22,8 +22,8 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
     title = newTitle;
 
   int nPoints = graph.GetN();
-  Double_t pointsX[nPoints];
-  Double_t pointsY[nPoints];
+  std::vector<double> pointsX(nPoints);
+  std::vector<double> pointsY(nPoints);
 
   // Get the points out
   Double_t x, y;
@@ -31,8 +31,8 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
   for (int pointId = 0; pointId < nPoints; pointId++)
   {
     graph.GetPoint(pointId, x, y);
-    pointsX[pointId] = (Double_t)x;
-    pointsY[pointId] = (Double_t)y;
+    pointsX[pointId] = x;
+    pointsY[pointId] = y;
   }
 
   // get the bin edges

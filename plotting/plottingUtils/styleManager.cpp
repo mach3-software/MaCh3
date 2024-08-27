@@ -47,21 +47,8 @@ void StyleManager::setPalette(std::string configStyleName) const {
     MACH3LOG_ERROR("RGB arrays dont all have the same size, please fix that");
   }
 
-  // root only likes arrays so convert to those
-  Double_t stops[NRGBs];
-  Double_t red[NRGBs];
-  Double_t green[NRGBs];
-  Double_t blue[NRGBs];
-  for (int i = 0; i < NRGBs; i++)
-  {
-    stops[i] = stopVec[i];
-    red[i] = redsVec[i];
-    green[i] = greensVec[i];
-    blue[i] = bluesVec[i];
-  }
-
   // now actually set the palette
-  TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
+  TColor::CreateGradientColorTable(NRGBs, stopVec.data(), redsVec.data(), greensVec.data(), bluesVec.data(), NCont);
   gStyle->SetNumberContours(NCont);
 }
 

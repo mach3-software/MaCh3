@@ -205,9 +205,9 @@ inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
     return Ratio;
 }
 
-inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
+inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
   // Draw!
-  canv->cd();
+  plotCanv->cd();
   mainPad->Draw();
   mainPad->cd();
   PrefitCopy->GetYaxis()->SetTitle("Parameter Value");
@@ -229,7 +229,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
     postFitHist->Draw("e1, same");
   }
   
-  canv->Update();
+  plotCanv->Update();
   TGaxis *axis = new TGaxis(PrefitCopy->GetXaxis()->GetBinLowEdge(PrefitCopy->GetXaxis()->GetFirst()), gPad->GetUymin()+0.01,
                             PrefitCopy->GetXaxis()->GetBinLowEdge(PrefitCopy->GetXaxis()->GetFirst()), gPad->GetUymax(),
                             gPad->GetUymin()+0.01, gPad->GetUymax(), 510, "");
@@ -237,7 +237,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
   axis->SetLabelSize(25);
   axis->Draw();
 
-  canv->cd();
+  plotCanv->cd();
   ratioPad->Draw();
   ratioPad->cd();
   
@@ -278,7 +278,7 @@ inline void DrawPlots(TCanvas *canv, TH1D* PrefitCopy, std::vector<TH1D *>Postfi
   line2.Draw("same");
   line3.Draw("same");
 
-  canv->Print((SaveName).c_str());
+  plotCanv->Print((SaveName).c_str());
   
   ratioHists.clear();
   delete axis;
@@ -364,11 +364,6 @@ void MakeFluxPlots()
 
     // get the binning for this block of flux params
     std::vector<double> binning    = fluxBinningTable[blockBinningName].as<std::vector<double>>();
-    
-    // now make an array cus root hates vectors
-    int nBinEdges = (int)binning.size();
-    double binArray[nBinEdges];
-    for(int edge = 0; edge < nBinEdges; edge ++) binArray[edge] = binning[edge];
 
     // get num of params in the block
     int nParams = blockContents[1] - blockContents[0] +1;
@@ -384,7 +379,7 @@ void MakeFluxPlots()
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    TH1D *blockHist_prefit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binArray);
+    TH1D *blockHist_prefit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binning.data());
     blockHist_prefit->GetYaxis()->SetTitle("Parameter Variation");
     blockHist_prefit->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     blockHist_prefit->GetXaxis()->SetTitleOffset(blockHist_prefit->GetXaxis()->GetTitleOffset()*1.2);
@@ -399,7 +394,7 @@ void MakeFluxPlots()
     // now set for the postfit blocks for all files
     std::vector <TH1D *> blockHist_postfit_Vec;
     for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
-      TH1D *blockHist_postfit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binArray);
+      TH1D *blockHist_postfit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binning.data());
 
       for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
         int localBin = fluxParId - blockContents[0];
