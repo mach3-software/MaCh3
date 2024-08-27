@@ -153,9 +153,6 @@ class SMonolith : public SplineBase {
     /// Number of valid TF1
     unsigned int NTF1_valid;
 
-    /// Number of total splines we can maximally have, if each event had the maximum number of splines found across all events
-    unsigned int NSplines_total;
-
     /// Number of total splines if each event had every parameter's spline
     unsigned int NSplines_total_large;
 
