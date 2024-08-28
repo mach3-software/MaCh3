@@ -112,24 +112,25 @@ struct XsecNorms4 {
 
 /// Make an enum of the spline interpolation type
 enum RespFuncType {
-  kTSpline3_red,
-  kTF1_red,
-  kRespFuncTypes  //This only enumerates
+  kTSpline3_red,  //!< Uses TSpline3_red for interpolation
+  kTF1_red,       //!< Uses TF1_red for interpolation
+  kRespFuncTypes  //!< This only enumerates
 };
 
 /// Make an enum of the spline interpolation type
 enum SplineInterpolation {
-  kTSpline3,
-  kLinear,
-  kMonotonic,
-  kAkima,
-  kLinearFunc,
-  kSplineInterpolations  //This only enumerates
+  kTSpline3,             //!< Default TSpline3 interpolation
+  kLinear,               //!< Linear interpolation between knots
+  kMonotonic,            //!< EM: DOES NOT make the entire spline monotonic, only the segments
+  kAkima,                //!< EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment
+  kLinearFunc,           //!< Liner interpolation using TF1 not spline
+  kSplineInterpolations  //!< This only enumerates
 };
 
 
 // **************************************************
 /// @brief Get function for TF1_red
+/// @param i Interpolation type
 inline std::string GetTF1(const SplineInterpolation i) {
   // **************************************************
   std::string Func = "";
@@ -148,6 +149,7 @@ inline std::string GetTF1(const SplineInterpolation i) {
 
 // **************************************************
 /// @brief Convert a RespFuncType type to a SplineInterpolation
+/// @param i Interpolation type
 inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation i) {
 // **************************************************
   RespFuncType Type = kRespFuncTypes;

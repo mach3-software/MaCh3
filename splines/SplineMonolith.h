@@ -86,13 +86,6 @@ class SMonolith : public SplineBase {
         
     /// @brief KS: Print info about how much knots etc has been initialised
     inline void PrintInitialsiation();
-
-    /// @brief CW: Reduced the TSpline3 to TSpline3_red
-    /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
-    inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline);
-    /// @brief CW: Reduced the TF1 to TF1_red
-    /// @param MasterSpline Vector of TF1_red pointers which we strip back
-    inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline);
     
     /// @brief CW: This loads up coefficients into two arrays: one x array and one yabcd array
     /// @brief CW: This should maximize our cache hits!

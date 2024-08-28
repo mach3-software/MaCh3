@@ -262,12 +262,8 @@ public:
   inline void Print() override {
     std::cout << "Printing TF1_red: " << std::endl;
     std::cout << "  Length  = " << length << std::endl;
-    std::cout << "  a       = " << Par[0] << std::endl;
-    std::cout << "  b       = " << Par[1] << std::endl;
-    if (length == 5) {
-      std::cout << "  c       = " << Par[2] << std::endl;
-      std::cout << "  d       = " << Par[3] << std::endl;
-      std::cout << "  e       = " << Par[4] << std::endl;
+    for(int i = 0; i < length; i++) {
+      std::cout << " Coeff " <<i<<"  = " << Par[i] << std::endl;
     }
   }
 
@@ -767,7 +763,7 @@ public:
     // The get the coefficients for this variation
     _float_ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
 
-    if(segment >=0){
+    if(segment >= 0){
       GetCoeff(segment, x, y, b, c, d);
     }
 
@@ -792,7 +788,6 @@ public:
   }
 };
 
-
 // *****************************************
 /// @brief CW: Helper function used in the constructor, tests to see if the spline is flat
 /// @param spl pointer to TSpline3_red that will be checked
@@ -810,4 +805,80 @@ inline bool isFlat(TSpline3_red* &spl) {
     }
   }
   return true;
+}
+
+// *********************************
+/// @brief CW: Reduced the TSpline3 to TSpline3_red
+/// @param MasterSpline Vector of TSpline3_red pointers which we strip back
+inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline) {
+// *********************************
+  std::vector<std::vector<TSpline3*> >::iterator OuterIt;
+  std::vector<TSpline3*>::iterator InnerIt;
+
+  // The return vector
+  std::vector<std::vector<TSpline3_red*> > ReducedVector;
+  ReducedVector.reserve(MasterSpline.size());
+
+  // Loop over each parameter
+  int OuterCounter = 0;
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+    // Make the temp vector
+    std::vector<TSpline3_red*> TempVector;
+    TempVector.reserve(OuterIt->size());
+    int InnerCounter = 0;
+    // Loop over each TSpline3 pointer
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+      // Here's our delicious TSpline3 object
+      TSpline3 *spline = (*InnerIt);
+      // Now make the reduced TSpline3 pointer
+      TSpline3_red *red = NULL;
+      if (spline != NULL) {
+        red = new TSpline3_red(spline);
+        (*InnerIt) = spline;
+      }
+      // Push back onto new vector
+      TempVector.push_back(red);
+    } // End inner for loop
+    ReducedVector.push_back(TempVector);
+  } // End outer for loop
+  // Now have the reduced vector
+  return ReducedVector;
+}
+
+// *********************************
+/// @brief CW: Reduced the TF1 to TF1_red
+/// @param MasterSpline Vector of TF1_red pointers which we strip back
+inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline) {
+// *********************************
+  std::vector<std::vector<TF1*> >::iterator OuterIt;
+  std::vector<TF1*>::iterator InnerIt;
+
+  // The return vector
+  std::vector<std::vector<TF1_red*> > ReducedVector;
+  ReducedVector.reserve(MasterSpline.size());
+
+  // Loop over each parameter
+  int OuterCounter = 0;
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+    // Make the temp vector
+    std::vector<TF1_red*> TempVector;
+    TempVector.reserve(OuterIt->size());
+    int InnerCounter = 0;
+    // Loop over each TSpline3 pointer
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+      // Here's our delicious TSpline3 object
+      TF1* spline = (*InnerIt);
+      // Now make the reduced TSpline3 pointer (which deleted TSpline3)
+      TF1_red* red = NULL;
+      if (spline != NULL) {
+        red = new TF1_red(spline);
+        (*InnerIt) = spline;
+      }
+      // Push back onto new vector
+      TempVector.push_back(red);
+    } // End inner for loop
+    ReducedVector.push_back(TempVector);
+  } // End outer for loop
+  // Now have the reduced vector
+  return ReducedVector;
 }

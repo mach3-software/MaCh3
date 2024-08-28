@@ -558,7 +558,6 @@ SMonolith::SMonolith(std::string FileName)
   LoadSplineFile(FileName);
 }
 
-
 // *****************************************
 // Load SplineMonolith from ROOT file
 void SMonolith::LoadSplineFile(std::string FileName) {
@@ -905,80 +904,6 @@ SMonolith::~SMonolith() {
   cpu_nPoints_arr.shrink_to_fit();
 
   delete cpu_spline_handler;
-}
-
-// *********************************
-// Reduce the large TSpline3 vector to TSpline3_red
-std::vector<std::vector<TSpline3_red*> > SMonolith::ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline) {
-// *********************************
-  std::vector<std::vector<TSpline3*> >::iterator OuterIt;
-  std::vector<TSpline3*>::iterator InnerIt;
-
-  // The return vector
-  std::vector<std::vector<TSpline3_red*> > ReducedVector;
-  ReducedVector.reserve(MasterSpline.size());
-
-  // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
-    // Make the temp vector
-    std::vector<TSpline3_red*> TempVector;
-    TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
-    // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
-      // Here's our delicious TSpline3 object
-      TSpline3 *spline = (*InnerIt);
-      // Now make the reduced TSpline3 pointer
-      TSpline3_red *red = NULL;
-      if (spline != NULL) {
-        red = new TSpline3_red(spline);
-        (*InnerIt) = spline;
-      }
-      // Push back onto new vector
-      TempVector.push_back(red);
-    } // End inner for loop
-    ReducedVector.push_back(TempVector);
-  } // End outer for loop
-  // Now have the reduced vector
-  return ReducedVector;
-}
-
-// *********************************
-// Reduce the large TF1 vector to a TF1_red
-std::vector<std::vector<TF1_red*> > SMonolith::ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline) {
-// *********************************
-  std::vector<std::vector<TF1*> >::iterator OuterIt;
-  std::vector<TF1*>::iterator InnerIt;
-
-  // The return vector
-  std::vector<std::vector<TF1_red*> > ReducedVector;
-  ReducedVector.reserve(MasterSpline.size());
-
-  // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
-    // Make the temp vector
-    std::vector<TF1_red*> TempVector;
-    TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
-    // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
-      // Here's our delicious TSpline3 object
-      TF1* spline = (*InnerIt);
-      // Now make the reduced TSpline3 pointer (which deleted TSpline3)
-      TF1_red* red = NULL;
-      if (spline != NULL) {
-        red = new TF1_red(spline);
-        (*InnerIt) = spline;
-      }
-      // Push back onto new vector
-      TempVector.push_back(red);
-    } // End inner for loop
-    ReducedVector.push_back(TempVector);
-  } // End outer for loop
-  // Now have the reduced vector
-  return ReducedVector;
 }
 
 // *****************************************
