@@ -8,7 +8,7 @@ PlottingManager::PlottingManager() {
 }
 
 // this is the constructor with user specified config
-PlottingManager::PlottingManager(std::string PlottingConfigName) {
+PlottingManager::PlottingManager(const std::string &PlottingConfigName) {
   // parse the config file
   _configFileName = PlottingConfigName;
 }
@@ -18,11 +18,11 @@ PlottingManager::PlottingManager(std::string PlottingConfigName) {
 /// or if none was provided, using DEFAULT_STYLE_CONFIG.
 /// - Instantiate an InputManager using the translation config file specified in the plotting config
 /// file, or if none was provided, using DEFAULT_TRANSLATION_CONFIG.
-/// - Add all files specified in this PlottingManagers FileNames vector to the new InputManager that
+/// - Add all files specified in this PlottingManagers _fileNames vector to the new InputManager that
 /// was just created
-/// @warning This should always be called *After* ParseInputs() unless you are
+/// @warning This should always be called *After* parseInputs() unless you are
 /// manually specifying all input file names and config file names in your drawing application.
-void PlottingManager::Initialise() {
+void PlottingManager::initialise() {
   /// @todo should add some kind of validataConfigs() method to got throught all of the specified
   /// config files and make sure that all provided options are valid and all necessary options are provided
   /// as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails
@@ -45,13 +45,13 @@ void PlottingManager::Initialise() {
   }
 
   // create the StyleManager
-  styleMan = std::make_unique<StyleManager>(styleConfig);
+  _styleMan = std::make_unique<StyleManager>(styleConfig);
 
   // create the InputManager and add all the files to it
-  inputMan = std::make_unique<InputManager>(translationConfig);
-  for (std::string fileName : FileNames)
+  _inputMan = std::make_unique<InputManager>(translationConfig);
+  for (std::string fileName : _fileNames)
   {
-    inputMan->addFile(fileName);
+    _inputMan->addFile(fileName);
   }
 }
 
@@ -65,7 +65,7 @@ void PlottingManager::Initialise() {
 /// ./ScriptName [options] [FileName1 FileName2 FileName3 ...]
 ///
 /// [options]
-///   -o <OutputName> name of the file to output plots to
+///   -o <_outputName> name of the file to output plots to
 ///   -l <FileLabelStr> string of labels for each file in the format Label1;Label2;... to be parsed
 ///   by parseFileLabels(), number of labels should match exactly the number of files -c
 ///   <PlottingConfig> specify a plotting config file to be used in place of the default one
@@ -82,7 +82,7 @@ void PlottingManager::Initialise() {
 /// @endcode
 /// @todo make this able to return any un-parsed arguments so that user can specify their own
 /// arguments for use in their plotting scripts
-void PlottingManager::ParseInputs(int argc, char **argv) {
+void PlottingManager::parseInputs(int argc, char **argv) {
   // parse the inputs
   int c;
   while ((c = getopt(argc, argv, "o:l:d:c:srgh")) != -1)
@@ -96,15 +96,15 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
       break;
     }
     case 's': {
-      splitBySample = true;
+      _splitBySample = true;
       break;
     }
     case 'r': {
-      plotRatios = true;
+      _plotRatios = true;
       break;
     }
     case 'g': {
-      drawGrid = true;
+      _drawGrid = true;
       break;
     }
     case 'h': {
@@ -112,9 +112,9 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
       throw;
     }
     case 'l': {
-      parseFileLabels(optarg, FileLabels);
+      parseFileLabels(optarg, _fileLabels);
       MACH3LOG_INFO("Specified file labels: ");
-      for (std::string label : FileLabels)
+      for (std::string label : _fileLabels)
         MACH3LOG_INFO("  {}", label);
       break;
     }
@@ -123,7 +123,7 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
       break;
     }
     case 'd': {
-      extraDrawOptions = optarg;
+      _extraDrawOptions = optarg;
       break;
     }
     }
@@ -133,31 +133,31 @@ void PlottingManager::ParseInputs(int argc, char **argv) {
   // optind is for the extra arguments that are not parsed by the program
   for (; optind < argc; optind++)
   {
-    FileNames.push_back(argv[optind]);
+    _fileNames.push_back(argv[optind]);
     MACH3LOG_INFO(argv[optind]);
-    FileLabels_default.push_back(argv[optind]);
+    _defaultFileLabels.push_back(argv[optind]);
   }
   
-  if (splitBySample)
+  if (_splitBySample)
     MACH3LOG_INFO("Splitting by sample");
 
-  if (plotRatios && FileNames.size() == 0)
+  if (_plotRatios && _fileNames.size() == 0)
   {
-    MACH3LOG_ERROR("you specified -r <plotRatios> = true but didnt specify any files to compare against, was this a mistake?");
+    MACH3LOG_ERROR("you specified -r <_plotRatios> = true but didnt specify any files to compare against, was this a mistake?");
   }
 
-  if (FileLabels.size() == 0)
+  if (_fileLabels.size() == 0)
   {
     MACH3LOG_INFO("No file labels specified, will just use the file names");
-    FileLabels = FileLabels_default;
+    _fileLabels = _defaultFileLabels;
   }
 
-  if ((FileLabels.size() != 0) && (FileLabels.size() != FileNames.size()))
+  if ((_fileLabels.size() != 0) && (_fileLabels.size() != _fileNames.size()))
   {
-    MACH3LOG_ERROR("hmmm, you gave me {} labels but {} files", FileLabels.size(), FileNames.size());
+    MACH3LOG_ERROR("hmmm, you gave me {} labels but {} files", _fileLabels.size(), _fileNames.size());
   }
 
-  Initialise();
+  initialise();
 }
 
 /// @todo Would be good to add functionality to this to allow user to add their own options.
@@ -189,7 +189,7 @@ void PlottingManager::usage() {
 void PlottingManager::setOutFileName(std::string saveName) {
   if (saveName.find(".") == std::string::npos)
   {
-    OutputName = saveName + ".pdf";
+    _outputName = saveName + ".pdf";
     return;
   }
 
@@ -199,22 +199,22 @@ void PlottingManager::setOutFileName(std::string saveName) {
     ext.erase(0, ext.find(".") + 1);
   if (ext == "pdf" || ext == "ps" || ext == "eps")
   {
-    OutputName = saveName;
+    _outputName = saveName;
     return;
   }
 
   MACH3LOG_WARN("file extension '{}' that you provided doesnt support multiple plots in one file", ext);
   MACH3LOG_WARN("should be one of .pdf, .eps .ps, will use pdf");
-  OutputName = saveName + ".pdf";
+  _outputName = saveName + ".pdf";
 }
 
 /// Output file name, including the file extension will be returned, but with specified suffix after
 /// the name but before the extension. This is useful for e.g. saving multiple LLH scan types to
 /// separate files: can specify suffix "_PriotLLH" will return OutputName_PriorLLH.ext
 /// @todo Make this support .root files too
-const std::string PlottingManager::GetOutputName(std::string suffix) {
-  std::string ext = std::string(OutputName);
-  std::string name = std::string(OutputName);
+const std::string PlottingManager::getOutputName(std::string suffix) {
+  std::string ext = std::string(_outputName);
+  std::string name = std::string(_outputName);
 
   int dotPos = 0;
   while (ext.find(".") != std::string::npos)
@@ -227,12 +227,12 @@ const std::string PlottingManager::GetOutputName(std::string suffix) {
   return name + suffix + "." + ext;
 }
 
-/// This is used by e.g. GetOption() so the PlottingManager knows where to look for the option in
+/// This is used by e.g. getOption() so the PlottingManager knows where to look for the option in
 /// the plotting config file.
-void PlottingManager::SetExec(std::string execName) {
+void PlottingManager::setExec(std::string execName) {
   _execOptions = _plottingConfig[execName];
-  if (OutputName == "Plot.pdf")
-    setOutFileName(GetOption<std::string>("defaultOutputName"));
+  if (_outputName == "Plot.pdf")
+    setOutFileName(getOption<std::string>("defaultOutputName"));
 }
 
 void PlottingManager::parseFileLabels(std::string labelString, std::vector<std::string> &labelVec) {
