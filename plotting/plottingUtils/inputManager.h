@@ -231,6 +231,21 @@ public:
 
   // FNs to get to the tasty tasty data stored in the files
 
+  /// @brief Get the log likelihood scan data for a particular parameter from a particular input file.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param paramName The parameter you want the information about.
+  /// @param LLHType The type of log likelihood scan you want (e.g. total, penalty, etc.)
+  /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis
+  std::vector<std::vector<float>> GetLLHScan(int fileNum, std::string paramName, std::string LLHType) const {
+    if (!GetEnabled_LLH(fileNum, paramName, LLHType))
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(2); 
+    }
+    return TGraphToVector(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
+  }
+
   /// @brief Get the log likelihood scan for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the scan from.
   /// @param paramName The name of the parameter whose LLH scan you would like.
@@ -238,7 +253,7 @@ public:
   /// @tparam T The type you would like your scan returned as, currently only TGraph and TH1D are
   /// supported
   /// @return The graph of the likelihood scan.
-  TGraph GetLLHScan_TGraph(int fileNum, std::string paramName, std::string LLHType) const {
+  inline TGraph GetLLHScan_TGraph(int fileNum, std::string paramName, std::string LLHType) const {
     if (!GetEnabled_LLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
@@ -248,7 +263,7 @@ public:
     return *_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName);
   }
 
-  TH1D GetLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
+  inline TH1D GetLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
     if (!GetEnabled_LLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
@@ -258,7 +273,23 @@ public:
     return TGraphToTH1D(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
   }
 
-  TGraph GetSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
+  /// @brief Get the log likelihood scan for a particular parameter, for a specific sample, from a
+  /// particular input file.
+  /// @param fileNum The index of the file that you would like to get the scan from.
+  /// @param paramName The name of the parameter whose LLH scan you would like.
+  /// @param sample The sample that you would like the LLH scan for.
+  /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis.
+  std::vector<std::vector<float>> GetSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
+    if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(2); 
+    }
+    return TGraphToVector(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
+  }
+
+  inline TGraph GetSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
                                          std::string sample) const {
     
     if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
@@ -270,7 +301,7 @@ public:
     return *_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName);
   }
 
-  TH1D GetSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
+  inline TH1D GetSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
     if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
@@ -278,20 +309,6 @@ public:
       return TH1D();
     }
     return TGraphToTH1D(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
-  }
-
-  /// @brief Get the log likelihood scan for a particular parameter, for a specific sample, from a
-  /// particular input file.
-  /// @param fileNum The index of the file that you would like to get the scan from.
-  /// @param paramName The name of the parameter whose LLH scan you would like.
-  /// @param sample The sample that you would like the LLH scan for.
-  /// @tparam T The type you would like your scan returned as, currently only TGraph and TH1D are
-  /// supported
-  /// @return The graph of the likelihood scan.
-  template <typename T = TGraph>
-  // Default template (i.e. the template specified was not one of the ones implemented below)
-  T GetSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
-    throw MaCh3Exception(__FILE__, __LINE__, "uuuuuh sorry but im not sure how to convert likelihood scans to the specified type");
   }
 
   /// @brief Get whether or not a particular parameter has an LLH scan in a particular input file.

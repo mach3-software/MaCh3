@@ -212,7 +212,7 @@ void PlottingManager::setOutFileName(std::string saveName) {
 /// the name but before the extension. This is useful for e.g. saving multiple LLH scan types to
 /// separate files: can specify suffix "_PriotLLH" will return OutputName_PriorLLH.ext
 /// @todo Make this support .root files too
-const std::string PlottingManager::getOutputName(std::string suffix) {
+const std::string PlottingManager::getOutputName(const std::string &suffix) {
   std::string ext = std::string(_outputName);
   std::string name = std::string(_outputName);
 
@@ -230,6 +230,7 @@ const std::string PlottingManager::getOutputName(std::string suffix) {
 /// This is used by e.g. getOption() so the PlottingManager knows where to look for the option in
 /// the plotting config file.
 void PlottingManager::setExec(std::string execName) {
+  MACH3LOG_DEBUG("Setting internal exec name to {}", execName);
   _execOptions = _plottingConfig[execName];
   if (_outputName == "Plot.pdf")
     setOutFileName(getOption<std::string>("defaultOutputName"));

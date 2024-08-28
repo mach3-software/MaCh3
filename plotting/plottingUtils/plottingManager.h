@@ -77,8 +77,15 @@ public:
   /// @brief Parse vector of command line arguments.
   /// @details This mainly just exists for the sake of the python binding.
   /// @param argv The arguments to parse.
-  inline void parseInputsVec(std::vector<char*> argv) {
-    parseInputs(argv.size(), argv.data());
+  inline void parseInputsVec(std::vector<std::string> argv) {
+    std::vector<char*> charVec;
+    MACH3LOG_DEBUG("Parsing Inputs :: was given vector:");
+    for( const std::string &arg : argv ) 
+    {
+      charVec.push_back( (char*)arg.c_str() );
+      MACH3LOG_DEBUG("  - {}", arg );
+    }
+    parseInputs(argv.size(), charVec.data());
   }
 
   /// @brief Describe an option you want to add to the PlottingManager which can be read in from the
@@ -132,7 +139,7 @@ public:
   /// extension.
   /// @param suffix The suffix to add to the file name.
   /// @return Output file name with suffix added before the extension.
-  const std::string getOutputName(std::string suffix);
+  const std::string getOutputName(const std::string &suffix);
 
   const std::vector<std::string> getFileNames() { return _fileNames; }
 

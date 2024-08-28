@@ -40,5 +40,11 @@ namespace MaCh3Plotting {
 /// the title of the graph.
 TH1D TGraphToTH1D(TGraph graph, std::string newName = "", std::string newTitle = "");
 
+
+/// @brief This handy little function lets you interpret a TGraph as a vector containing the same data.
+/// @param graph The graph you want to convert.
+/// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis
+std::vector<std::vector<float>> TGraphToVector(TGraph graph);
+
 /// @}
 } // namespace MaCh3Plotting

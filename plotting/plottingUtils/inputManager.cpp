@@ -21,7 +21,7 @@ InputManager::InputManager(const std::string &translationConfigName) {
 }
 
 /// Open an input file and add to the manager, consists of:
-///  - Initialise a new InputFile using the specified file
+///  -  a new InputFile using the specified file
 ///  - Get info about the file, like what fitter it came from, what it contains e.g. LLH scans,
 ///  processed post fit parameters etc.
 ///  - Load up the data from the file (LLH scans etc.) and put them in a common format to be used by
