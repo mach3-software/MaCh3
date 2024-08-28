@@ -67,4 +67,3 @@ class covarianceOsc : public covarianceBase
     /// Enum for special treatment of beta.
     int kBeta;
 };
-

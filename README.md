@@ -155,3 +155,4 @@ This is an example how your executable can look like using MaCh3:
 
 ### Plotting and Diagnostic
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
+The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.

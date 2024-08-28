@@ -30,8 +30,8 @@
 #include "manager/manager.h"
 
 
-//KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one. 
-//Based on Gelman et. al. arXiv:1903.08008v5
+/// KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one.
+/// Based on Gelman et. al. arXiv:1903.08008v5
 
 // *******************
 int Ntoys;

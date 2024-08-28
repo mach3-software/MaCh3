@@ -4,8 +4,11 @@
 /// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 /// KS: Need more testing on FD
 #ifdef _LOW_MEMORY_STRUCTS_
+/// Custom floating point (float or double)
 #define _float_ float
+/// Custom integer (int or short int)
 #define _int_ short int
+/// Custom unsigned integer (unsigned short int or unsigned int)
 #define _unsigned_int_ unsigned short int
 #else
 #define _float_ double
@@ -209,10 +212,10 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
 
 /// Make an enum of systematic type recognised by covariance class
 enum SystType {
-  kNorm,
-  kSpline,
-  kFunc,
-  kSystTypes  //This only enumerates
+  kNorm,      //!< For normalisation parameters
+  kSpline,    //!< For splined parameters (1D)
+  kFunc,      //!< For functional parameters
+  kSystTypes  //!< This only enumerates
 };
 
 
@@ -253,7 +256,6 @@ inline std::string SystType_ToString(const SystType i) {
   return name;
 }
 
-
 // ***************************
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
@@ -273,10 +275,10 @@ namespace MaCh3Utils {
 /// Enum to track the target material
 enum TargetMat {
 // *****************
-  kTarget_H  = 1,
-  kTarget_C  = 12,
+  kTarget_H  = 1,   //!< Hydrogen
+  kTarget_C  = 12,  //!< Carbon 12
   kTarget_N  = 14,
-  kTarget_O  = 16,
+  kTarget_O  = 16,  //!< Oxygen 16
   kTarget_Al = 27,
   kTarget_Ar = 40,
   kTarget_Ti = 48,
@@ -412,12 +414,12 @@ inline int ProbsToPDG(ProbNu NuType){
 
 /// Make an enum of the test statistic that we're using
 enum TestStatistic {
-  kPoisson,
-  kBarlowBeeston,
-  kIceCube,
-  kPearson,
-  kDembinskiAbdelmottele,
-  kNTestStatistics //This only enumerates statistic
+  kPoisson,                //!< Standard Poisson likelihood
+  kBarlowBeeston,          //!< Barlow-Beeston following Conway https://cds.cern.ch/record/1333496?
+  kIceCube,                //!< Based on https://arxiv.org/abs/1901.04645
+  kPearson,                //!< Standard Pearson likelihood
+  kDembinskiAbdelmottele,  //!< Based on arXiv:2206.12346v2
+  kNTestStatistics         //!< This only enumerates statistic
 };
 
 // **************************************************
@@ -452,10 +454,10 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
 }
 
 /// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
-double OverflowIntegral(TH2Poly*);
+double OverflowIntegral(TH2Poly* poly);
 
 /// @brief WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
-double NoOverflowIntegral(TH2Poly*);
+double NoOverflowIntegral(TH2Poly* poly);
 
 /// @brief WP: Poly Projectors
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
@@ -475,13 +477,13 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
 /// @brief WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
 
-/// @brief KS: Sanity check for TH2Poly
+/// @brief KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
+/// @brief However if you use ROOT6 and have ROOT6 file exactly the same code will work. Something have changed with how TH2Poly bins are stored in TFile
+/// @param file ROOT file that we will make version checks
 void CheckTH2PolyFileVersion(TFile *file);
 
-
-
 /// @brief KS: Remove fitted TF1 from hist to make comparison easier
-void RemoveFitter(TH1D* hist, std::string name);
+void RemoveFitter(TH1D* hist, const std::string& name);
 
 /// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {

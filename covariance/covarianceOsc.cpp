@@ -16,7 +16,6 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
 
   TVectorD* osc_baseline = (TVectorD*)infile->Get("osc_baseline");
   TVectorD* osc_density = (TVectorD*)infile->Get("osc_density");
-  double fScale = 1.0;
 
   //KS: Save all necessary information from covariance
   for(int io = 0; io < _fNumPar; io++)
@@ -27,7 +26,7 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
     _fCurrVal[io] = _fPropVal[io] = _fPreFitValue[io];
     _fError[io] = (*osc_sigma)(io);
  
-    _fIndivStepScale[io] = fScale * (*osc_stepscale)(io);
+    _fIndivStepScale[io] = (*osc_stepscale)(io);
     
     //KS: Set flat prior
     //HW: Might as well set it for everything in case default behaviour changes
@@ -243,13 +242,13 @@ void covarianceOsc::CheckOrderOfParams()  {
 
   std::vector<int> wrongParam;
   bool wrongMatrix = false;
-  if(strcmp( _fNames[0].c_str(),"sin2th_12") != 0 ){wrongParam.push_back(0); wrongMatrix = true;};
-  if(strcmp( _fNames[1].c_str(),"sin2th_23") != 0 ){wrongParam.push_back(1); wrongMatrix = true;};
-  if(strcmp( _fNames[2].c_str(),"sin2th_13") != 0 ){wrongParam.push_back(2); wrongMatrix = true;};
-  if(strcmp( _fNames[3].c_str(),"delm2_12")  != 0 ){wrongParam.push_back(3); wrongMatrix = true;};
-  if(strcmp( _fNames[4].c_str(),"delm2_23")  != 0 ){wrongParam.push_back(4); wrongMatrix = true;};
-  if(strcmp( _fNames[5].c_str(),"delta_cp")  != 0 ){wrongParam.push_back(5); wrongMatrix = true;};
-  if(PerformBetaStudy && strcmp( _fNames[6].c_str(),"beta")  != 0 ){wrongParam.push_back(6); wrongMatrix = true;};
+  if(_fNames[0] != "sin2th_12"){wrongParam.push_back(0); wrongMatrix = true;};
+  if(_fNames[1] != "sin2th_23"){wrongParam.push_back(1); wrongMatrix = true;};
+  if(_fNames[2] != "sin2th_13"){wrongParam.push_back(2); wrongMatrix = true;};
+  if(_fNames[3] != "delm2_12"){wrongParam.push_back(3); wrongMatrix = true;};
+  if(_fNames[4] != "delm2_23"){wrongParam.push_back(4); wrongMatrix = true;};
+  if(_fNames[5] != "delta_cp"){wrongParam.push_back(5); wrongMatrix = true;};
+  if(PerformBetaStudy && _fNames[6] != "beta"){wrongParam.push_back(6); wrongMatrix = true;};
 
   if(wrongMatrix)
   {
