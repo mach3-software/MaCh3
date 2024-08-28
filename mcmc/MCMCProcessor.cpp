@@ -2,7 +2,6 @@
 
 #include "TChain.h"
 
-
 //Only if GPU is enabled
 #ifdef CUDA
 #include "mcmc/gpuMCMCProcessorUtils.cuh"
@@ -98,7 +97,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 // The destructor
 MCMCProcessor::~MCMCProcessor() {
 // ****************************
-
   // Close the pdf file
   MACH3LOG_INFO("Closing pdf in MCMCProcessor: {}", CanvasName);
   CanvasName += "]";
@@ -210,7 +208,7 @@ void MCMCProcessor::MakeOutputFile() {
   const int uniform = int(rand->Uniform(0, 10000));
   // Open a TCanvas to write the posterior onto
   Posterior = new TCanvas(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
-  //KS: No idea why but ROOT changed treatment of viilin in R6. If you have non uniform binning this will results in very hard to see violin plots.
+  //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
   TCandle::SetScaledViolin(false);
 
   Posterior->SetGrid();
@@ -299,7 +297,7 @@ void MCMCProcessor::MakePostfit() {
     (*Means)(i) = Mean;
     (*Errors)(i) = Err;
 
-    GetGaussian(hpost[i], Mean, Err);
+    GetGaussian(hpost[i], Gauss, Mean, Err);
     (*Means_Gauss)(i) = Mean;
     (*Errors_Gauss)(i) = Err;
 
@@ -679,7 +677,6 @@ void MCMCProcessor::DrawPostfit() {
       Start += NDSamplesBins[i];
     }
   }
-
   delete prefit;
   delete paramPlot;
   delete paramPlot_Gauss;
@@ -694,7 +691,7 @@ void MCMCProcessor::DrawPostfit() {
 // Make fancy Credible Intervals plots
 void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleIntervals,
                                           const std::vector<Color_t>& CredibleIntervalsColours,
-                                          bool CredibleInSigmas) {
+                                          const bool CredibleInSigmas) {
 // *********************
 
   if(hpost[0] == nullptr) MakePostfit();
@@ -707,7 +704,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
   if(CredibleIntervals.size() != CredibleIntervalsColours.size())
   {
     MACH3LOG_ERROR("Size of  CredibleIntervals is not equal to size of CredibleIntervalsColours");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if(CredibleIntervals.size() > 1)
@@ -1114,7 +1111,6 @@ void MCMCProcessor::MakeCovariance() {
   Correlation->Write("Correlation");
 }
 
-
 // ***************
 //KS: Cache all steps to allow multithreading, hit RAM quite a bit
 void MCMCProcessor::CacheSteps() {
@@ -1128,7 +1124,7 @@ void MCMCProcessor::CacheSteps() {
     MACH3LOG_ERROR("It look like ParStep was already filled ");
     MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC ");
     MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   MACH3LOG_INFO("Caching input tree...");
@@ -1297,9 +1293,10 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
     }// End j loop
   }// End i loop
 
-  if(!Mute) clock.Stop();
-  if(!Mute) MACH3LOG_INFO("Making Covariance took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
-
+  if(!Mute) {
+    clock.Stop();
+    MACH3LOG_INFO("Making Covariance took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
+  }
   OutputFile->cd();
   if(printToPDF)
   {
@@ -1327,15 +1324,17 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
       }// End j loop
     }// End i loop
   } //end if pdf
-  if(!Mute) Covariance->Write("Covariance");
-  if(!Mute) Correlation->Write("Correlation");
+  if(!Mute) {
+    Covariance->Write("Covariance");
+    Correlation->Write("Correlation");
+  }
 }
 
 
 // *********************
 // Based on https://www.jstor.org/stable/25651249?seq=3,
 // all credits for finding and studying it goes to Henry
-void MCMCProcessor::MakeSubOptimality(int NIntervals) {
+void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
 // *********************
 
   //Save burn in cut, at the end of the loop we will return to default values
@@ -1670,7 +1669,7 @@ void MCMCProcessor::DrawCorrelations1D() {
 void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
                                         const std::vector<Style_t>& CredibleRegionStyle,
                                         const std::vector<Color_t>& CredibleRegionColor,
-                                        bool CredibleInSigmas) {
+                                        const bool CredibleInSigmas) {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
@@ -1813,7 +1812,6 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
   delete[] hpost_2D_cl;
 }
 
-
 // *********************
 // Make fancy triangle plot for selected parameters
 void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
@@ -1825,7 +1823,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      const std::vector<Style_t>& CredibleRegionStyle,
                                      const std::vector<Color_t>& CredibleRegionColor,
                                      // Other
-                                     bool CredibleInSigmas) {
+                                     const bool CredibleInSigmas) {
 // *********************
 
   if(hpost2D == nullptr) MakeCovariance_MP();
@@ -2461,7 +2459,7 @@ void MCMCProcessor::FindInputFiles() {
   if (Config == nullptr) {
     MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
     TempFile->ls();
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
   if (std::getenv("MACH3") != nullptr) {
@@ -2592,7 +2590,7 @@ void MCMCProcessor::ReadNDFile() {
   TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
   if (NDdetFile->IsZombie()) {
     MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kNDPar].back());
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   NDdetFile->cd();
 
@@ -2747,243 +2745,6 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
   BurnInCut = Cuts;
 }
 
-// **************************
-//CW: Get the mean and RMS of a 1D posterior
-void MCMCProcessor::GetArithmetic(TH1D * const hist, double& Mean, double& Error) {
-// **************************
-  Mean = hist->GetMean();
-  Error = hist->GetRMS();
-}
-
-// **************************
-//CW: Get Gaussian characteristics
-void MCMCProcessor::GetGaussian(TH1D *& hist, double& Mean, double& Error) {
-// **************************
-  const double meanval = hist->GetMean();
-  const double err = hist->GetRMS();
-  const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
-
-  // Set the range for the Gaussian fit
-  Gauss->SetRange(meanval - 1.5*err , meanval + 1.5*err);
-  // Set the starting parameters close to RMS and peaks of the histograms
-  Gauss->SetParameters(hist->GetMaximum()*err*std::sqrt(2*3.14), peakval, err);
-
-  // Perform the fit
-  hist->Fit(Gauss->GetName(),"Rq");
-  hist->SetStats(0);
-
-  Mean = Gauss->GetParameter(1);
-  Error = Gauss->GetParameter(2);
-}
-
-// ***************
-//CW: Get the highest posterior density from a TH1D
-void MCMCProcessor::GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_p, double& Error_m, const double coverage) {
-// ***************
-  // Get the bin which has the largest posterior density
-  const int MaxBin = hist->GetMaximumBin();
-  // And it's value
-  const double peakval = hist->GetBinCenter(MaxBin);
-
-  // The total integral of the posterior
-  const long double Integral = hist->Integral();
-  //KS: and integral of left handed and right handed parts
-  const long double LowIntegral = hist->Integral(1, MaxBin-1) + hist->GetBinContent(MaxBin)/2.0;
-  const long double HighIntegral = hist->Integral(MaxBin+1, hist->GetNbinsX()) + hist->GetBinContent(MaxBin)/2.0;
-
-  // Keep count of how much area we're covering
-  //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
-  long double sum = hist->GetBinContent(MaxBin)/2.0;
-
-  // Counter for current bin
-  int CurrBin = MaxBin;
-  while (sum/HighIntegral < coverage && CurrBin < hist->GetNbinsX()) {
-    CurrBin++;
-    sum += hist->GetBinContent(CurrBin);
-  }
-  const double sigma_p = std::fabs(hist->GetBinCenter(MaxBin)-hist->GetXaxis()->GetBinUpEdge(CurrBin));
-  // Reset the sum
-  //KS: Take only half content of HPD bin as one half goes for right handed error and the other for left handed error
-  sum = hist->GetBinContent(MaxBin)/2.0;
-
-  // Reset the bin counter
-  CurrBin = MaxBin;
-  // Counter for current bin
-  while (sum/LowIntegral < coverage && CurrBin > 1) {
-    CurrBin--;
-    sum += hist->GetBinContent(CurrBin);
-  }
-  const double sigma_m = std::fabs(hist->GetBinCenter(CurrBin)-hist->GetBinLowEdge(MaxBin));
-
-  // Now do the double sided HPD
-  //KS: Start sum from the HPD
-  sum = hist->GetBinContent(MaxBin);
-  int LowBin = MaxBin;
-  int HighBin = MaxBin;
-  long double LowCon = 0.0;
-  long double HighCon = 0.0;
-
-  while (sum/Integral < coverage && (LowBin > 0 || HighBin < hist->GetNbinsX()+1))
-  {
-    LowCon = 0.0;
-    HighCon = 0.0;
-    //KS:: Move further only if you haven't reached histogram end
-    if(LowBin > 1)
-    {
-      LowBin--;
-      LowCon = hist->GetBinContent(LowBin);
-    }
-    if(HighBin < hist->GetNbinsX())
-    {
-      HighBin++;
-      HighCon = hist->GetBinContent(HighBin);
-    }
-
-    // If we're on the last slice and the lower contour is larger than the upper
-    if ((sum+LowCon+HighCon)/Integral > coverage && LowCon > HighCon) {
-      sum += LowCon;
-      break;
-      // If we're on the last slice and the upper contour is larger than the lower
-    } else if ((sum+LowCon+HighCon)/Integral > coverage && HighCon >= LowCon) {
-      sum += HighCon;
-      break;
-    } else {
-      sum += LowCon + HighCon;
-    }
-  }
-
-  double sigma_hpd = 0.0;
-  if (LowCon > HighCon) {
-    sigma_hpd = std::fabs(hist->GetBinLowEdge(LowBin)-hist->GetBinCenter(MaxBin));
-  } else {
-    sigma_hpd = std::fabs(hist->GetXaxis()->GetBinUpEdge(HighBin)-hist->GetBinCenter(MaxBin));
-  }
-
-  Mean = peakval;
-  Error = sigma_hpd;
-  Error_p = sigma_p;
-  Error_m = sigma_m;
-}
-
-// ***************
-//KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
-void MCMCProcessor::GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage) {
-// ***************
-  if(coverage > 1)
-  {
-    MACH3LOG_ERROR("Specified Credible Interval is greater that 1 and equal to {} Should be between 0 and 1", coverage);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  //KS: Reset first copy of histogram
-  hpost_copy->Reset("");
-  hpost_copy->Fill(0.0, 0.0);
-
-  //KS: Temporary structure to be thread save
-  double *hist_copy = new double[hist->GetXaxis()->GetNbins()+1];
-  bool *hist_copy_fill = new bool[hist->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
-  {
-    hist_copy[i] = hist->GetBinContent(i);
-    hist_copy_fill[i] = false;
-  }
-
-  /// Loop over histogram bins with highest number of entries until covered 90 or 68.3%
-  const long double Integral = hist->Integral();
-  long double sum = 0;
-
-  while ((sum / Integral) < coverage)
-  {
-    /// Get bin of highest content and save the number of entries reached so far
-    int max_entry_bin = 0;
-    double max_entries = 0.;
-    for (int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
-    {
-      if (hist_copy[i] > max_entries)
-      {
-        max_entries = hist_copy[i];
-        max_entry_bin = i;
-      }
-    }
-    /// Replace bin value by -1 so it is not looped over as being maximum bin again
-    hist_copy[max_entry_bin] = -1.;
-    hist_copy_fill[max_entry_bin] = true;
-
-    sum += max_entries;
-  }
-  //KS: Now fill our copy only for bins which got included in coverage region
-  for(int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
-  {
-    if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hist->GetBinContent(i));
-  }
-
-  delete[] hist_copy;
-  delete[] hist_copy_fill;
-
-  return;
-}
-
-// ***************
-//KS: Set 2D contour within some coverage
-void MCMCProcessor::GetCredibleRegion(TH2D* const hist2D, const double coverage) {
-// ***************
-  if(coverage > 1)
-  {
-    MACH3LOG_ERROR("Specified Credible Region is greater than 1 and equal to {:.2f} Should be between 0 and 1 {}", coverage);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  //KS: Temporary structure to be thread save
-  double **hist_copy = new double*[hist2D->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
-  {
-    hist_copy[i] = new double[hist2D->GetYaxis()->GetNbins()+1];
-    for (int j = 0; j <= hist2D->GetYaxis()->GetNbins(); ++j)
-    {
-      hist_copy[i][j] = hist2D->GetBinContent(i,j);
-    }
-  }
-
-  /// Loop over histogram bins with highest number of entries until covered 90 or 68.3%
-  const long double Integral = hist2D->Integral();
-  long double sum = 0;
-
-  //We need to as ROOT requires array to set to contour
-  double Contour[1];
-  while ((sum / Integral) < coverage)
-  {
-    /// Get bin of highest content and save the number of entries reached so far
-    int max_entry_bin_x = 0;
-    int max_entry_bin_y = 0;
-    double max_entries = 0.;
-    for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
-    {
-      for (int j = 0; j <= hist2D->GetYaxis()->GetNbins(); ++j)
-      {
-        if (hist_copy[i][j] > max_entries)
-        {
-          max_entries = hist_copy[i][j];
-          max_entry_bin_x = i;
-          max_entry_bin_y = j;
-        }
-      }
-    }
-    /// Replace bin value by -1 so it is not looped over as being maximum bin again
-    hist_copy[max_entry_bin_x][max_entry_bin_y] = -1.;
-
-    sum += max_entries;
-    Contour[0] = max_entries;
-  }
-  hist2D->SetContour(1, Contour);
-
-  //Delete temporary arrays
-  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
-  {
-    delete[] hist_copy[i];
-  }
-  delete[] hist_copy;
-
-  return;
-}
 
 // ***************
 // Pass central value
@@ -3472,13 +3233,13 @@ void MCMCProcessor::PrepareDiagMCMC() {
     MACH3LOG_ERROR("It look like ParStep was already filled ");
     MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC");
     MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(nBatches == 0)
   {
     MACH3LOG_ERROR("nBatches is equal to 0");
     MACH3LOG_ERROR("please use SetnBatches to set other value fore example 20");
-    throw;      
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
     
   // Initialise ParStep
@@ -4145,7 +3906,7 @@ void MCMCProcessor::BatchedAnalysis() {
   {
     MACH3LOG_ERROR("BatchedAverages haven't been initialises or have been deleted something is wrong");
     MACH3LOG_ERROR("I need it and refuse to go further");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Calculate variance estimator using batched means following https://arxiv.org/pdf/1911.00915.pdf see Eq. 1.2

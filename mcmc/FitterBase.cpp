@@ -24,7 +24,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   stepClock = new TStopwatch;
   #ifdef DEBUG
   // Fit summary and debug info
-  debug = fitMan->raw()["General"]["Debug"].as<bool>();
+  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false);
   #endif
 
   std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
@@ -73,7 +73,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   syst_llh = nullptr;
 
   TotalNSamples = 0;
-  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false);;
+  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false);
 }
 
 // *************************
@@ -113,12 +113,12 @@ void FitterBase::SaveSettings() {
   if (std::getenv("MaCh3_ROOT") == NULL) {
     MACH3LOG_ERROR("Need MaCh3_ROOT environment variable");
     MACH3LOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (std::getenv("MACH3") == NULL) {
     MACH3LOG_ERROR("Need MACH3 environment variable");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   std::string header_path = std::string(std::getenv("MACH3"));
@@ -176,8 +176,7 @@ void FitterBase::PrepareOutput() {
     // Check that we have added samples
     if (!samples.size()) {
       MACH3LOG_CRITICAL("No samples Found! If this is what you want find me here");
-      MACH3LOG_CRITICAL("{}:{}", __FILE__, __LINE__);
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     // Prepare the output trees

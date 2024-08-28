@@ -94,7 +94,7 @@ class MCMCProcessor {
     /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeCredibleIntervals(const std::vector<double>& CredibleIntervals = {0.99, 0.90, 0.68 },
                                const std::vector<Color_t>& CredibleIntervalsColours = {kCyan+4, kCyan-2, kCyan-10},
-                               bool CredibleInSigmas = false
+                               const bool CredibleInSigmas = false
                                );
     /// @brief Draw the post-fit covariances
     void DrawCovariance();
@@ -106,7 +106,7 @@ class MCMCProcessor {
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
-                             bool CredibleInSigmas = false
+                             const bool CredibleInSigmas = false
                              );
     /// @brief Make fancy triangle plot for selected parameters
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
@@ -125,7 +125,7 @@ class MCMCProcessor {
                           const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                           const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
                           // Other
-                          bool CredibleInSigmas = false
+                          const bool CredibleInSigmas = false
                           );
     /// @brief Make funny polar plot
     /// @param ParNames Vector with parameter names for which Polar Plot will be made
@@ -265,34 +265,6 @@ class MCMCProcessor {
     inline void ScanParameterOrder();
     /// @brief Prepare all objects used for output
     inline void SetupOutput();
-
-    //Analyse posterior distribution
-    /// @brief Get Arithmetic mean from posterior
-    /// @param hist histograms from which we extract arithmetic mean
-    /// @param Mean Arithmetic Mean value
-    /// @param Error Arithmetic Error value
-    inline void GetArithmetic(TH1D * const hist, double& Mean, double& Error);
-    /// @brief Fit Gaussian to posterior
-    /// @param hist histograms to which we fit gaussian
-    /// @param Mean Gaussian Mean value
-    /// @param Error Gaussian Error value
-    inline void GetGaussian(TH1D *& hist, double& Mean, double& Error);
-    /// @brief Get Highest Posterior Density (HPD)
-    /// @param hist histograms from which we HPD
-    /// @param Mean HPD Mean value
-    /// @param Error HPD Error value
-    /// @param Error_p HPD Negative (left hand side) Error value
-    /// @param Error_m HPD Positive (right hand side) Error value
-    /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-    inline void GetHPD(TH1D * const hist, double& Mean, double& Error, double& Error_p, double& Error_m, const double coverage = 0.6827);
-    /// @brief Get 1D Credible Interval
-    /// @param hist histograms based on which we calculate credible interval
-    /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-    inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage = 0.6827);
-    /// @brief Get 2D Credible Region
-    /// @param hist2D histograms based on which we calculate credible regions
-    /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-    inline void GetCredibleRegion(TH2D* hist2D, const double coverage = 0.6827);
 
     // MCMC Diagnostic
     /// @brief CW: Prepare branches etc. for DiagMCMC

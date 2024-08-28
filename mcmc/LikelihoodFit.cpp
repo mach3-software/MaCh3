@@ -6,7 +6,7 @@ LikelihoodFit::LikelihoodFit(manager *man) : FitterBase(man) {
 // *******************
     NPars = 0;
     NParsPCA = 0;
-    fMirroring = true;
+    fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false);
 }
 
 

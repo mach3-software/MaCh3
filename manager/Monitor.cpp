@@ -60,7 +60,7 @@ std::string GetMaCh3Version() {
   // Check if the file is opened successfully
   if (!versionFile.is_open()) {
     MACH3LOG_ERROR("Error: Couldn't open version.h {}", file);
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   std::string line;
@@ -100,7 +100,7 @@ void GetOSInfo() {
 
 // ************************
 //KS: Simple function retrieving CPU info
-void GetCPUInfo(){
+void GetCPUInfo() {
 // ************************
 
   //KS: Use -m 1 to limit to only one grep because in one computing node there is a lot of CPU which are the same
@@ -162,7 +162,7 @@ std::string TerminalToString(const char* cmd) {
   std::string result;
   std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
   if (!pipe) {
-    throw std::runtime_error("popen() failed!");
+    throw MaCh3Exception(__FILE__, __LINE__, "popen() failed!");
   }
   while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
     result += buffer.data();
@@ -259,9 +259,8 @@ int getValue(std::string Type){ //Note: this value is in KB!
   }
   else
   {
-    std::cerr << "Not supported getValue: " << Type << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("Not supported getValue: {}", Type);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   return result;
@@ -292,7 +291,5 @@ void PrintConfig(const YAML::Node& node){
     MACH3LOG_INFO("{}", line);
   }
 }
-
-
 
 }

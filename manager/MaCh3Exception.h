@@ -21,8 +21,9 @@ public:
     std::string fileName = (lastSlashPos != std::string::npos) ? File.substr(lastSlashPos + 1) : File;
 
     errorMessage = ((Message.empty()) ? "Terminating MaCh3" : Message);
-
-    MACH3LOG_ERROR("Find me here:  {}::{}", fileName, Line);
+    // KS: Set logger format where we only have have "information type", line would be confusing
+    spdlog::set_pattern("[%^%l%$] %v");
+    MACH3LOG_ERROR("Find me here: {}::{}", fileName, Line);
   }
 
   /// @brief Returns the error message associated with this exception.
