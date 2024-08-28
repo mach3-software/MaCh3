@@ -101,9 +101,6 @@ class SMonolith : public SplineBase {
     /// @param xArray array X value for each knot
     /// @param manyArray Array holding coefficients for each knot
     inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
-    /// @brief CW: Helper function used in the constructor, tests to see if the spline is flat
-    /// @param spl pointer to TSpline3_red that will be checked
-    inline bool isFlat(TSpline3_red* &spl);
     /// @brief CW: Gets the polynomial coefficients for TF1
     /// @param spl pointer to TF1_red that will be checked
     /// @param nPoints number of knots
@@ -184,40 +181,31 @@ class SMonolith : public SplineBase {
     /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
     unsigned int *gpu_nParamPerEvent_tf1;
 
+    /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
+    SplineMonoStruct* cpu_spline_handler;
+    /// KS: GPU Number of knots per spline
+    unsigned int *gpu_nKnots_arr;
+    /// KS: GPU arrays to hold X coefficient
+    float *gpu_coeff_x;
+    /// GPU arrays to hold other coefficients
+    float *gpu_coeff_many;
+    /// CW: GPU array with the number of points per spline (not per spline point!)
+    short int *gpu_paramNo_arr;
+
+    /// CPU arrays to hold TF1 coefficients
+    std::vector<float> cpu_coeff_TF1_many;
+    /// GPU arrays to hold TF1 coefficients
+    float *gpu_coeff_TF1_many;
+
     /// CPU arrays to hold number of points
     std::vector<short int> cpu_nPoints_arr;
     /// GPU arrays to hold number of points
     short int *gpu_nPoints_arr;
 
     /// CW: CPU array with the number of points per spline (not per spline point!)
-    std::vector<short int> cpu_paramNo_arr;
-    /// CW: GPU array with the number of points per spline (not per spline point!)
-    short int *gpu_paramNo_arr;
-
-    /// CW: CPU array with the number of points per spline (not per spline point!)
     std::vector<short int> cpu_paramNo_TF1_arr;
     /// CW: GPU array with the number of points per TF1 object
     short int *gpu_paramNo_TF1_arr;
-
-    /// KS: CPU Number of knots per spline
-    std::vector<unsigned int> cpu_nKnots_arr;
-    /// KS: GPU Number of knots per spline
-    unsigned int *gpu_nKnots_arr;
-
-    /// KS: CPU arrays to hold X coefficient
-    std::vector<float> cpu_coeff_x;
-    /// KS: GPU arrays to hold X coefficient
-    float *gpu_coeff_x;
-
-    /// CPU arrays to hold other coefficients
-    std::vector<float> cpu_coeff_many;
-    /// GPU arrays to hold other coefficients
-    float *gpu_coeff_many;
-
-    /// CPU arrays to hold TF1 coefficients
-    std::vector<float> cpu_coeff_TF1_many;
-    /// GPU arrays to hold TF1 coefficients
-    float *gpu_coeff_TF1_many;
 
     /// Flag telling whether we are saving spline monolith into handy root file
     bool SaveSplineFile;

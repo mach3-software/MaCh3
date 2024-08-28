@@ -791,3 +791,23 @@ public:
     return weight;
   }
 };
+
+
+// *****************************************
+/// @brief CW: Helper function used in the constructor, tests to see if the spline is flat
+/// @param spl pointer to TSpline3_red that will be checked
+inline bool isFlat(TSpline3_red* &spl) {
+// *****************************************
+  int Np = spl->GetNp();
+  _float_ x, y, b, c, d;
+  // Go through spline segment parameters,
+  // Get y values for each spline knot,
+  // Every knot must evaluate to 1.0 to create a flat spline
+  for(int i = 0; i < Np; i++) {
+    spl->GetCoeff(i, x, y, b, c, d);
+    if (y != 1) {
+      return false;
+    }
+  }
+  return true;
+}

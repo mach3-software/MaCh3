@@ -19,6 +19,8 @@ void SMonolith::Initialise() {
   //KS: If true it will save spline monolith into huge ROOT file
   SaveSplineFile = false;
 
+  cpu_spline_handler = new SplineMonoStruct();
+
   nKnots = 0;
   nTF1coeff = 0;
   NEvents = 0;
@@ -117,13 +119,13 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Declare the {y,b,c,d} for each knot
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
-  cpu_coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
   //KS: For x coeff we assume that for given dial (MAQE) spacing is identical, here we are sloppy and assume each dial has the same number of knots, not a big problem
-  cpu_coeff_x.resize(event_size_max);
+  cpu_spline_handler->coeff_x.resize(event_size_max);
 
   // Set all the big arrays to -999 to keep us safe...
   for (unsigned int j = 0; j < event_size_max; j++) {
-    cpu_coeff_x[j] = -999;
+    cpu_spline_handler->coeff_x[j] = -999;
   }
 
   //CW: With TF1 we only save the coefficients and the order of the polynomial
@@ -163,9 +165,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #endif
 
   // Make array with the number of points per spline (not per spline point!)
-  cpu_paramNo_arr.resize(NSplines_valid);
+  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
   //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_nKnots_arr.resize(NSplines_valid);
+  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
   cpu_paramNo_TF1_arr.resize(NTF1_valid);
 
   // Temporary arrays to hold the coefficients for each spline
@@ -207,18 +209,18 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         //KS: One knot means flat spline so ignore
         if (nPoints_tmp == 1) continue;
         for (int j = 0; j < _max_knots; ++j) {
-          cpu_coeff_x[ParamNumber*_max_knots + j] = x_tmp[j];
+          cpu_spline_handler->coeff_x[ParamNumber*_max_knots + j] = x_tmp[j];
         }
         //KS: Contrary to X coeff we keep for other coeff only filled knots, there is no much gain for doing so for x coeff
         for (int j = 0; j < nPoints_tmp; ++j) {
           for (int k = 0; k < _nCoeff_; k++) {
-            cpu_coeff_many[KnotCounter*_nCoeff_ + j*_nCoeff_ + k] = many_tmp[j*_nCoeff_+k];
+            cpu_spline_handler->coeff_many[KnotCounter*_nCoeff_ + j*_nCoeff_ + k] = many_tmp[j*_nCoeff_+k];
           }
         }
         // Set the parameter number for this spline
-        cpu_paramNo_arr[NSplinesCounter] = ParamNumber;
+        cpu_spline_handler->paramNo_arr[NSplinesCounter] = ParamNumber;
         //KS: Fill map when each spline starts
-        cpu_nKnots_arr[NSplinesCounter] = KnotCounter;
+        cpu_spline_handler->nKnots_arr[NSplinesCounter] = KnotCounter;
         KnotCounter += nPoints_tmp;
 
         #ifdef Weight_On_SplineBySpline_Basis
@@ -282,9 +284,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   int BadXCounter = 0;
   for (unsigned int j = 0; j < event_size_max; j++) {
-    if (cpu_coeff_x[j] == -999) BadXCounter++;
+    if (cpu_spline_handler->coeff_x[j] == -999) BadXCounter++;
     // Perform checks that all entries have been modified from initial values
-    if (cpu_coeff_x[j] == -999 && BadXCounter < 5) {
+    if (cpu_spline_handler->coeff_x[j] == -999 && BadXCounter < 5) {
       MACH3LOG_WARN("***** BAD X !! *****");
       MACH3LOG_WARN("Indicates some parameter doesn't have a single spline");
       MACH3LOG_WARN("j = {}", j);
@@ -375,10 +377,10 @@ void SMonolith::MoveToGPU() {
     gpu_coeff_x,
     gpu_coeff_many,
 
-    cpu_paramNo_arr,
-    cpu_nKnots_arr,
-    cpu_coeff_x,
-    cpu_coeff_many,
+    cpu_spline_handler->paramNo_arr,
+    cpu_spline_handler->nKnots_arr,
+    cpu_spline_handler->coeff_x,
+    cpu_spline_handler->coeff_many,
     // TFI related now
     gpu_coeff_TF1_many,
     gpu_paramNo_TF1_arr,
@@ -400,14 +402,14 @@ void SMonolith::MoveToGPU() {
     NTF1_valid);
 
   // Delete all the coefficient arrays from the CPU once they are on the GPU
-  cpu_coeff_x.clear();
-  cpu_coeff_x.shrink_to_fit();
-  cpu_coeff_many.clear();
-  cpu_coeff_many.shrink_to_fit();
-  cpu_paramNo_arr.clear();
-  cpu_paramNo_arr.shrink_to_fit();
-  cpu_nKnots_arr.clear();
-  cpu_nKnots_arr.shrink_to_fit();
+  cpu_spline_handler->coeff_x.clear();
+  cpu_spline_handler->coeff_x.shrink_to_fit();
+  cpu_spline_handler->coeff_many.clear();
+  cpu_spline_handler->coeff_many.shrink_to_fit();
+  cpu_spline_handler->paramNo_arr.clear();
+  cpu_spline_handler->paramNo_arr.shrink_to_fit();
+  cpu_spline_handler->nKnots_arr.clear();
+  cpu_spline_handler->nKnots_arr.shrink_to_fit();
   cpu_coeff_TF1_many.clear();
   cpu_coeff_TF1_many.shrink_to_fit();
   cpu_paramNo_TF1_arr.clear();
@@ -418,7 +420,7 @@ void SMonolith::MoveToGPU() {
   cpu_nParamPerEvent_tf1.clear();
   cpu_nParamPerEvent_tf1.shrink_to_fit();
   #endif
-
+  delete cpu_spline_handler;
   MACH3LOG_INFO("Good GPU loading");
   #endif
   return;
@@ -616,12 +618,12 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
   cpu_nParamPerEvent.resize(2*NEvents);
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
-  cpu_paramNo_arr.resize(NSplines_valid);
+  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
   //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_nKnots_arr.resize(NSplines_valid);
+  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
 
-  cpu_coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
-  cpu_coeff_x.resize(event_size_max);
+  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+  cpu_spline_handler->coeff_x.resize(event_size_max);
 
   cpu_coeff_TF1_many.resize(nTF1coeff);
 
@@ -637,7 +639,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   for(unsigned int i = 0; i < nKnots*_nCoeff_; i++)
   {
     Monolith->GetEntry(i);
-    cpu_coeff_many[i] = coeff;
+    cpu_spline_handler->coeff_many[i] = coeff;
   }
 
   float coeff_tf1 = 0.;
@@ -655,8 +657,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   for(unsigned int i = 0; i < NSplines_valid; i++)
   {
     ParamInfo->GetEntry(i);
-    cpu_paramNo_arr[i] = paramNo_arr;
-    cpu_nKnots_arr[i] = nKnots_arr;
+    cpu_spline_handler->paramNo_arr[i] = paramNo_arr;
+    cpu_spline_handler->nKnots_arr[i] = nKnots_arr;
   }
 
   float coeff_x = 0.;
@@ -664,7 +666,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   for(unsigned int i = 0; i < event_size_max; i++)
   {
     XKnots->GetEntry(i);
-    cpu_coeff_x[i] = coeff_x;
+    cpu_spline_handler->coeff_x[i] = coeff_x;
   }
 
   unsigned int nParamPerEvent = 0;
@@ -750,7 +752,7 @@ void SMonolith::PrepareSplineFile() {
   Monolith->Branch("cpu_coeff_many", &coeff, "cpu_coeff_many/F");
   for(unsigned int i = 0; i < nKnots*_nCoeff_; i++)
   {
-    coeff = cpu_coeff_many[i];
+    coeff = cpu_spline_handler->coeff_many[i];
     Monolith->Fill();
   }
   SplineFile->cd();
@@ -773,8 +775,8 @@ void SMonolith::PrepareSplineFile() {
   ParamInfo->Branch("cpu_nKnots_arr", &nKnots_arr, "cpu_nKnots_arr/i");
   for(unsigned int i = 0; i < NSplines_valid; i++)
   {
-    paramNo_arr = cpu_paramNo_arr[i];
-    nKnots_arr = cpu_nKnots_arr[i];
+    paramNo_arr = cpu_spline_handler->paramNo_arr[i];
+    nKnots_arr = cpu_spline_handler->nKnots_arr[i];
 
     ParamInfo->Fill();
   }
@@ -787,7 +789,7 @@ void SMonolith::PrepareSplineFile() {
   XKnots->Branch("cpu_coeff_x", &coeff_x, "cpu_coeff_x/F");
   for(unsigned int i = 0; i < event_size_max; i++)
   {
-    coeff_x = cpu_coeff_x[i];
+    coeff_x = cpu_spline_handler->coeff_x[i];
     XKnots->Fill();
   }
   SplineFile->cd();
@@ -879,14 +881,14 @@ SMonolith::~SMonolith() {
   if(index_TF1_cpu != nullptr) delete[] index_TF1_cpu;
 
   //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL
-  cpu_coeff_x.clear();
-  cpu_coeff_x.shrink_to_fit();
-  cpu_coeff_many.clear();
-  cpu_coeff_many.shrink_to_fit();
-  cpu_paramNo_arr.clear();
-  cpu_paramNo_arr.shrink_to_fit();
-  cpu_nKnots_arr.clear();
-  cpu_nKnots_arr.shrink_to_fit();
+  cpu_spline_handler->coeff_x.clear();
+  cpu_spline_handler->coeff_x.shrink_to_fit();
+  cpu_spline_handler->coeff_many.clear();
+  cpu_spline_handler->coeff_many.shrink_to_fit();
+  cpu_spline_handler->paramNo_arr.clear();
+  cpu_spline_handler->paramNo_arr.shrink_to_fit();
+  cpu_spline_handler->nKnots_arr.clear();
+  cpu_spline_handler->nKnots_arr.shrink_to_fit();
 
   cpu_coeff_TF1_many.clear();
   cpu_coeff_TF1_many.shrink_to_fit();
@@ -900,6 +902,8 @@ SMonolith::~SMonolith() {
   #endif
   cpu_nPoints_arr.clear();
   cpu_nPoints_arr.shrink_to_fit();
+
+  delete cpu_spline_handler;
 }
 
 // *********************************
@@ -1053,23 +1057,6 @@ void SMonolith::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
   // The structure is now coeffs  = {a,b,c,d,e}
 }
 
-// *****************************************
-//CW: Check if the TSpline3 object is flat; if it is, we won't load it onto the GPU
-bool SMonolith::isFlat(TSpline3_red* &spl) {
-  // *****************************************
-  int Np = spl->GetNp();
-  _float_ x, y, b, c, d;
-  // Go through spline segment parameters,
-  // Get y values for each spline knot,
-  // Every knot must evaluate to 1.0 to create a flat spline
-  for(int i = 0; i < Np; i++) {
-    spl->GetCoeff(i, x, y, b, c, d);
-    if (y != 1) {
-      return false;
-    }
-  }
-  return true;
-}
 
 #ifdef CUDA
 // *****************************************
@@ -1231,7 +1218,7 @@ void SMonolith::CalcSplineWeights() {
     for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
     {
       //CW: Which Parameter we are accessing
-      const short int Param = cpu_paramNo_arr[splineNum];
+      const short int Param = cpu_spline_handler->paramNo_arr[splineNum];
 
       //CW: Avoids doing costly binary search on GPU
       const short int segment = segments[Param];
@@ -1240,16 +1227,16 @@ void SMonolith::CalcSplineWeights() {
       const short int segment_X = Param*_max_knots+segment;
 
       //KS: Find knot position in out monolithical structure
-      const unsigned int CurrentKnotPos = cpu_nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
+      const unsigned int CurrentKnotPos = cpu_spline_handler->nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
 
       // We've read the segment straight from CPU and is saved in segment_gpu
       // polynomial parameters from the monolithic splineMonolith
-      const float fY = cpu_coeff_many[CurrentKnotPos];
-      const float fB = cpu_coeff_many[CurrentKnotPos+1];
-      const float fC = cpu_coeff_many[CurrentKnotPos+2];
-      const float fD = cpu_coeff_many[CurrentKnotPos+3];
+      const float fY = cpu_spline_handler->coeff_many[CurrentKnotPos];
+      const float fB = cpu_spline_handler->coeff_many[CurrentKnotPos+1];
+      const float fC = cpu_spline_handler->coeff_many[CurrentKnotPos+2];
+      const float fD = cpu_spline_handler->coeff_many[CurrentKnotPos+3];
       // The is the variation itself (needed to evaluate variation - stored spline point = dx)
-      const float dx = vals[Param] - cpu_coeff_x[segment_X];
+      const float dx = vals[Param] - cpu_spline_handler->coeff_x[segment_X];
 
       //CW: Wooow, let's use some fancy intrinsic and pull down the processing time by <1% from normal multiplication! HURRAY
       cpu_weights_var[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
