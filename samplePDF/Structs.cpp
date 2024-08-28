@@ -434,8 +434,8 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
 
 // *********************
 //KS: Remove fitted TF1 from hist to make comparison easier
-void RemoveFitter(TH1D* hist, std::string name) {
-  // *********************
+void RemoveFitter(TH1D* hist, const std::string& name) {
+// *********************
 
   TList *listOfFunctions = hist->GetListOfFunctions();
   TF1 *fitter = dynamic_cast<TF1*>(listOfFunctions->FindObject(name.c_str()));
