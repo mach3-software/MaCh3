@@ -193,13 +193,30 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
 }
 
 // ********************************************
-// DB Grab the Spline Indices for the relevant DetID
+// Grab the global syst index for the relevant DetID
+// i.e. get a vector of size nSplines where each entry is filled with
+// the global syst number
 const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(int DetID) {
   std::vector<int> returnVec;
 
   for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
 		returnVec.push_back(SystIndex);
+      } 
+  }
+  return returnVec;
+}
+
+// ********************************************
+// Grab the global syst index for the relevant DetID
+// i.e. get a vector of size nSplines where each entry is filled with
+// the global syst number
+const std::vector<int> covarianceXsec::GetSplineSystIndexFromDetID(int DetID) {
+  std::vector<int> returnVec;
+
+  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+		returnVec.push_back(SplineIndex);
       } 
   }
   return returnVec;
