@@ -71,12 +71,12 @@ std::vector <TH1D *> PostfitHistVec;
 void copyParToBlockHist(int localBin, std::string paramName, TH1D*blockHist, std::string type, int fileId, bool setLabels = true){
   // Set the values in the sub-histograms
   MACH3LOG_DEBUG("copyin data from at local bin {}: for parameter {}", localBin, paramName);
-  MACH3LOG_DEBUG("  Fitter specific name: {}", man->input().TranslateName(fileId, MaCh3Plotting::kPostFit, paramName));
-  MACH3LOG_DEBUG("  value: {}", man->input().GetPostFitValue(fileId, paramName, type));
-  MACH3LOG_DEBUG("  error: {}", man->input().GetPostFitError(fileId, paramName, type));
+  MACH3LOG_DEBUG("  Fitter specific name: {}", man->input().translateName(fileId, MaCh3Plotting::kPostFit, paramName));
+  MACH3LOG_DEBUG("  value: {}", man->input().getPostFitValue(fileId, paramName, type));
+  MACH3LOG_DEBUG("  error: {}", man->input().getPostFitError(fileId, paramName, type));
 
-  blockHist->SetBinContent(localBin +1, man->input().GetPostFitValue(fileId, paramName, type));
-  blockHist->SetBinError(localBin +1, man->input().GetPostFitError(fileId, paramName, type));
+  blockHist->SetBinContent(localBin +1, man->input().getPostFitValue(fileId, paramName, type));
+  blockHist->SetBinError(localBin +1, man->input().getPostFitError(fileId, paramName, type));
 
   if(setLabels){
     blockHist->GetXaxis()->SetBinLabel(localBin +1, paramName.c_str());
@@ -433,7 +433,7 @@ void MakeNDDetPlots()
     NDbinCounter += NDSamplesBins[i];
 
     std::vector<TH1D*> PostfitNDDetHistVec(man->getNFiles());
-    TH1D *PreFitNDDetHist = (TH1D*)man->input().GetFile(0).file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
+    TH1D *PreFitNDDetHist = (TH1D*)man->input().getFile(0).file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
     man->style().setTH1Style(PreFitNDDetHist, man->getOption<std::string>("prefitHistStyle"));
 
     std::string temp = NDSamplesNames[i].c_str();
@@ -446,7 +446,7 @@ void MakeNDDetPlots()
     MACH3LOG_DEBUG("  Start bin: {} :: End bin: {}", Start, NDbinCounter);
     // set the x range for the postfits
     for(int fileId = 0; fileId < man->getNFiles(); fileId++){
-      PostfitNDDetHistVec[fileId] = (TH1D*)man->input().GetFile(fileId).file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
+      PostfitNDDetHistVec[fileId] = (TH1D*)man->input().getFile(fileId).file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
     }
 
     //KS: We dont' need name for every nd param
@@ -546,7 +546,7 @@ void MakeXsecRidgePlots()
     std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // the directory of histograms
-    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->input().GetFile(0).file->Get("Post");
+    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->input().getFile(0).file->Get("Post");
 
     // get num of params in the block
     int nParams = (int)blockContents.size();
@@ -580,7 +580,7 @@ void MakeXsecRidgePlots()
       while(TKey *key = (TKey*) next()){ 
         // check if the end of the param name matches with the MaCh3 name, do this so we exclude things like nds_ at the start of the name
         std::string str(key->GetTitle());
-        std::string name = man->input().TranslateName(0, MaCh3Plotting::kPostFit, paramName);
+        std::string name = man->input().translateName(0, MaCh3Plotting::kPostFit, paramName);
         uint pos = str.find(name);
         bool foundPar = (pos == str.length() - name.length());
 
@@ -689,7 +689,7 @@ void GetPostfitParamPlots()
     
   MACH3LOG_INFO("Plotting {} errors", plotType);
   
-  ReadSettings(man->input().GetFile(0).file);
+  ReadSettings(man->input().getFile(0).file);
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
@@ -1057,7 +1057,7 @@ int main(int argc, char *argv[])
     man = new MaCh3Plotting::PlottingManager();
     man->parseInputs(argc, argv);
     std::cout << std::endl << std::endl << "====================" << std::endl;
-    man->input().GetFile(0).file->ls();
+    man->input().getFile(0).file->ls();
     
     man->setExec("GetPostfitParamPlots");
 

@@ -23,7 +23,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
                          float baselineLLH_main = 0.00001) 
   {
 
-  std::vector<std::string> sampNames = man->input().GetKnownSamples();
+  std::vector<std::string> sampNames = man->input().getKnownSamples();
   size_t nSamples = sampNames.size();
 
   cumSums.resize(nSamples);
@@ -41,7 +41,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
     MACH3LOG_DEBUG("  on sample {}/{}: {}", i, nSamples, sampName);
 
     TH1D *LLH_indivSam =
-        new TH1D(man->input().GetSampleSpecificLLHScan_TH1D(fileIdx, parameterName, sampName));
+        new TH1D(man->input().getSampleSpecificLLHScan_TH1D(fileIdx, parameterName, sampName));
     LLH_indivSam->SetName(Form("%i_%s_%s", fileIdx, parameterName.c_str(), sampName.c_str()));
     LLH_indivSam->SetBit(kCanDelete);
 
@@ -127,7 +127,7 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
   TLegend *legend = new TLegend(0.3, 0.6, 0.7, 0.8);
 
   // get the sample reweight hist from the main file
-  TH1D LLH_main = man->input().GetLLHScan_TH1D(0, paramName, LLHType);
+  TH1D LLH_main = man->input().getLLHScan_TH1D(0, paramName, LLHType);
   LLH_main.SetStats(0);
 
   LLH_main.SetLineColor(kBlack);
@@ -137,10 +137,10 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
   int nBins = LLH_main.GetNbinsX();
 
   // go through the other files
-  for (int extraFileIdx = 1; extraFileIdx < man->input().GetNInputFiles(); extraFileIdx++)
+  for (int extraFileIdx = 1; extraFileIdx < man->input().getNInputFiles(); extraFileIdx++)
   {
 
-    TH1D *compHist = new TH1D(man->input().GetLLHScan_TH1D(extraFileIdx, paramName, LLHType));
+    TH1D *compHist = new TH1D(man->input().getLLHScan_TH1D(extraFileIdx, paramName, LLHType));
     compHist->SetBit(kCanDelete); // <- will allow this to be deleted by root once done plotting
     if (compHist->GetNbinsX() == 0)
       continue;
@@ -148,7 +148,7 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
     // make them look different to each other
     compHist->SetLineColor(
         TColor::GetColorPalette(floor((float)extraFileIdx * TColor::GetNumberOfColors() /
-                                      (float)man->input().GetNInputFiles())));
+                                      (float)man->input().getNInputFiles())));
     compHist->SetLineStyle(2 + extraFileIdx % 9);
     compHist->SetLineWidth(lineWidth);
 
@@ -219,7 +219,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   canv->Divide(man->getNFiles());
 
   // get the sample hist from the main file
-  TH1D LLH_main = man->input().GetLLHScan_TH1D(0, paramName, "sample");
+  TH1D LLH_main = man->input().getLLHScan_TH1D(0, paramName, "sample");
   if (LLH_main.GetNbinsX() == 1)
   {
     MACH3LOG_DEBUG("  Main LLH had only 1 bin, assuming it doesn't exist");
@@ -259,10 +259,10 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   label->SetTextSize(0.012);
 
   // need to draw the labels after other stuff or they dont show up
-  for (uint i = 0; i < man->input().GetKnownSamples().size(); i++)
+  for (uint i = 0; i < man->input().getKnownSamples().size(); i++)
   {
     MACH3LOG_DEBUG("  Will I draw the label for sample {}??", i);
-    std::string sampName = man->input().GetKnownSamples()[i];
+    std::string sampName = man->input().getKnownSamples()[i];
     if (!drawLabel[i])
     { 
       MACH3LOG_DEBUG("   - Not drawing label");
@@ -292,7 +292,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
     splitSamplesStack->SetBit(kCanDelete);
     splitSamplesLegend->SetBit(kCanDelete);
 
-    TH1D compLLH_main = man->input().GetLLHScan_TH1D(extraFileIdx, paramName, "sample");
+    TH1D compLLH_main = man->input().getLLHScan_TH1D(extraFileIdx, paramName, "sample");
     if (compLLH_main.GetNbinsX() == 1)
     {
       delete splitSamplesStack;
@@ -331,9 +331,9 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
     splitSamplesLegend->Draw();
 
     // need to draw the labels after other stuff or they dont show up
-    for (uint i = 0; i < man->input().GetKnownSamples().size(); i++)
+    for (uint i = 0; i < man->input().getKnownSamples().size(); i++)
     {
-      std::string sampName = man->input().GetKnownSamples()[i];
+      std::string sampName = man->input().getKnownSamples()[i];
       if (!drawLabel[i])
         continue;
       label->DrawLatex(compLLH_main.GetBinLowEdge(compLLH_main.GetNbinsX() + 1), extraCumSums[i],
@@ -348,7 +348,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
       TList *baselineHistList = baseSplitSamplesStack->GetHists();
       TList *compHistList = splitSamplesStack->GetHists();
 
-      for (uint sampleIdx = 0; sampleIdx < man->input().GetKnownSamples().size(); sampleIdx++)
+      for (uint sampleIdx = 0; sampleIdx < man->input().getKnownSamples().size(); sampleIdx++)
       {
         TH1D *divHist = new TH1D(
             Form("%s_%s_splitDiv_%i", paramName.c_str(), man->getFileLabel(extraFileIdx).c_str(),
@@ -411,7 +411,7 @@ int PlotLLH() {
     canv->SaveAs((man->getOutputName("_bySample") + "[").c_str());
 
   // loop over the spline parameters
-  for (std::string paramName : man->input().GetKnownParameters())
+  for (std::string paramName : man->input().getKnownParameters())
   {
     MACH3LOG_DEBUG("working on parameter {}", paramName);
     // ###############################################################
