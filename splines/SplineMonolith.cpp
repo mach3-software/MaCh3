@@ -421,6 +421,7 @@ void SMonolith::MoveToGPU() {
   cpu_nParamPerEvent_tf1.shrink_to_fit();
   #endif
   delete cpu_spline_handler;
+  cpu_spline_handler = nullptr;
   MACH3LOG_INFO("Good GPU loading");
   #endif
   return;
