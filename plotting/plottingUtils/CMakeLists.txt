@@ -22,11 +22,3 @@ target_link_libraries( plottingManager inputManager styleManager )
 ## chuck it all together into the Plotting library
 add_library( Plotting INTERFACE ) 
 target_link_libraries( Plotting INTERFACE inputManager plottingManager styleManager plottingUtils )
-
-
-
-
-pybind11_add_module( PythonPlotting MODULE pythonPlottingModule.cpp)
-set_property( TARGET PythonPlotting PROPERTY POSITION_INDEPENDENT_CODE ON )
-target_link_libraries( PythonPlotting PRIVATE Plotting )
-install( TARGETS PythonPlotting DESTINATION python/)

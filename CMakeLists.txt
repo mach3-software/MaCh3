@@ -211,6 +211,25 @@ add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
 add_subdirectory(plotting)
 
+
+################################# pybind11 stuff ##################################
+
+## make a module target out of all the python*Module.cpp files (currently just one...)
+pybind11_add_module( 
+  pymach3 MODULE 
+  pythonModule.cpp 
+  plotting/plottingUtils/pythonPlottingModule.cpp
+)
+## only works with code compiled with -fPIC enabled.. I think this flag can things slightly slower
+## so would be good to find a way around this. 
+## Or maybe have python interface be an optional extra and only enable -fPIC then
+set_property( TARGET pymach3 PROPERTY POSITION_INDEPENDENT_CODE ON )
+target_link_libraries( pymach3 PUBLIC Plotting )
+install( TARGETS pymach3 DESTINATION python/)
+
+
+
+
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)

@@ -12,11 +12,12 @@
 namespace py = pybind11;
 
 
-PYBIND11_MODULE(PythonPlotting, m) {
+void initPlotting(py::module &m){
 
-    m.doc() = "This is a Python binding of MaCh3s C++ based plotting library Library";
+    auto m_plotting = m.def_submodule("plotting");
+    m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library Library";
 
-    py::class_<MaCh3Plotting::PlottingManager>(m, "PlottingManager")
+    py::class_<MaCh3Plotting::PlottingManager>(m_plotting, "PlottingManager")
         .def(py::init<const std::string &>()) // <- constructor setting non-default constructor
         .def(py::init()) // <- default constructor
         .def("initialise", &MaCh3Plotting::PlottingManager::initialise, "initalise this PlottingManager")
@@ -41,7 +42,7 @@ PYBIND11_MODULE(PythonPlotting, m) {
         //     from this one and add the functions to that) and then fold that python code into the module somehow. But that is currently beyond my pybinding abilities
         ;
 
-    py::class_<MaCh3Plotting::InputManager>(m, "InputManager")
+    py::class_<MaCh3Plotting::InputManager>(m_plotting, "InputManager")
         .def("print", &MaCh3Plotting::InputManager::print, "Print a summary of everything this manager knows")
         .def("get_llh_scan", &MaCh3Plotting::InputManager::getLLHScan, "Get the LLH scan for a particular parameter from a particular file")
         .def("get_llh_scan_by_sample", &MaCh3Plotting::InputManager::getSampleSpecificLLHScan, "Get the LLH scan for a particular parameter from a particular file for a particular sample")
@@ -57,10 +58,9 @@ PYBIND11_MODULE(PythonPlotting, m) {
         .def("get_known_post_fit_parameters", &MaCh3Plotting::InputManager::getKnownPostFitParameters, "Get all the parameters that a file has post fit values and errors for")
         ;
 
-    py::class_<MaCh3Plotting::StyleManager>(m, "StyleManager")
+    py::class_<MaCh3Plotting::StyleManager>(m_plotting, "StyleManager")
         .def("prettify_parameter_name", &MaCh3Plotting::StyleManager::prettifyParamName, "Convert internally used parameter name to a nice pretty name that can be used in plots")
         .def("prettify_sample_name", &MaCh3Plotting::StyleManager::prettifyParamName, "Convert internally used sample name to a nice pretty name that can be used in plots")
         ;
-
 
 }
