@@ -5,8 +5,6 @@ foreach(app
     RHat
     GetPenaltyTerm
     ProcessMCMC
-    PlotLLH
-    GetPostfitParamPlots
     CombineMaCh3Chains
     )
     add_executable(${app} ${app}.cpp)

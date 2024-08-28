@@ -209,6 +209,7 @@ endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
+add_subdirectory(plotting)
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
