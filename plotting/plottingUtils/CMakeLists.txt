@@ -1,24 +1,35 @@
+set( HEADERS
+    plottingManager.h
+    inputManager.h
+    styleManager.h
+    plottingUtils.h
+)
 
-## build the base level library targets
-foreach(lib
-    inputManager
-    styleManager
-    plottingUtils
-    )
-    add_library( ${lib} ${lib}.cpp )
-    target_link_libraries( ${lib} ${ROOT_LIBRARIES} MaCh3::Manager )
+add_library( Plotting SHARED
+    plottingManager.cpp
+    inputManager.cpp
+    styleManager.cpp
+    plottingUtils.cpp
+)
 
-    set_property( TARGET ${lib} PROPERTY POSITION_INDEPENDENT_CODE ON )
+set_target_properties( Plotting PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME Plotting
+)
 
-endforeach(lib)
+target_link_libraries( Plotting ${ROOT_LIBRARIES} MaCh3::Manager )
 
+## to be compiled into python module needs to be compiled as position independent library
+if( MaCh3_PYTHON_ENABLED )
 
-## build the higher level plottingManager
-add_library( plottingManager plottingManager.cpp plottingManager.h )
-set_property( TARGET plottingManager PROPERTY POSITION_INDEPENDENT_CODE ON )
-target_link_libraries( plottingManager inputManager styleManager )
+    set_property( TARGET Plotting PROPERTY POSITION_INDEPENDENT_CODE ON )
 
+endif()
 
-## chuck it all together into the Plotting library
-add_library( Plotting INTERFACE ) 
-target_link_libraries( Plotting INTERFACE inputManager plottingManager styleManager plottingUtils )
+install(TARGETS Plotting
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include/plotting
+)
+
+add_library(MaCh3::Plotting ALIAS Plotting)

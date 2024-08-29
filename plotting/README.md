@@ -35,7 +35,7 @@ from pyMaCh3 import plotting
 A very basic example that will plot LLH scans is:
 
 ```
-from pymach3 import plotting
+from pyMaCh3 import plotting
 import matplotlib.backends.backend_pdf
 from matplotlib import pyplot as plt
 import sys

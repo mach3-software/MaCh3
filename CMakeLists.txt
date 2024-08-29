@@ -221,7 +221,7 @@ if( MaCh3_PYTHON_ENABLED )
   ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
   pybind11_add_module( 
     pyMaCh3 MODULE 
-    pythonMaCh3.cpp 
+    pyMaCh3.cpp 
     plotting/plottingUtils/pythonPlottingModule.cpp
   )
   ## EM: only works with code compiled with -fPIC enabled.. I think this flag can things slightly slower
@@ -237,7 +237,7 @@ endif()
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
+target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
