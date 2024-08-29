@@ -221,7 +221,7 @@ if( MaCh3_PYTHON_ENABLED )
   ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
   pybind11_add_module( 
     pyMaCh3 MODULE 
-    pythonModule.cpp 
+    pythonMaCh3.cpp 
     plotting/plottingUtils/pythonPlottingModule.cpp
   )
   ## EM: only works with code compiled with -fPIC enabled.. I think this flag can things slightly slower
