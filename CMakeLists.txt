@@ -215,9 +215,9 @@ add_subdirectory(plotting)
 ################################# pybind11 stuff ##################################
 
 # EM: If Debug is not defined disable it by default
-DefineEnabledRequiredSwitch(MaCh3_PYTHON_INTERFACE FALSE)
+DefineEnabledRequiredSwitch(MaCh3_PYTHON_ENABLED FALSE)
 
-if( MaCh3_PYTHON_INTERFACE )
+if( MaCh3_PYTHON_ENABLED )
   ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
   pybind11_add_module( 
     pyMaCh3 MODULE 
