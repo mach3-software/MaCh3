@@ -5,6 +5,6 @@ namespace py = pybind11;
 
 void initPlotting(py::module &); // <- defined in plotting/plottingUtils/pythonPlottingModule.cpp
 
-PYBIND11_MODULE( pymach3, m ) {
+PYBIND11_MODULE( pyMach3, m ) {
     initPlotting(m);
 }
