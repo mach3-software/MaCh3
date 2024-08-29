@@ -4,4 +4,4 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pyMaCh3"
-version = "0.1.0"
+version = "0.0.1"

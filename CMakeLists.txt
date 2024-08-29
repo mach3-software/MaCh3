@@ -228,7 +228,7 @@ if( MaCh3_PYTHON_ENABLED )
   ## so would be good to find a way around this. 
   set_property( TARGET pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
   target_link_libraries( pyMaCh3 PUBLIC Plotting )
-  install( TARGETS pyMaCh3 DESTINATION python/)
+  install( TARGETS pyMaCh3 DESTINATION pyMaCh3/)
 endif()
 
 
