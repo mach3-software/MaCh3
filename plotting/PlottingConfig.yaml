@@ -20,6 +20,8 @@ PlotLLH:
     lineWidth: 3
     totalOnSplitPlots: false
     sameAxis: true
+    parameterTags: []
+    sampleTags: []
 
 #########################################
 GetPostfitParamPlots:

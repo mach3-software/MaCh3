@@ -23,7 +23,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
                          float baselineLLH_main = 0.00001) 
   {
 
-  std::vector<std::string> sampNames = man->input().getKnownSamples();
+  std::vector<std::string> sampNames = man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags"));
   size_t nSamples = sampNames.size();
 
   cumSums.resize(nSamples);
@@ -259,10 +259,10 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   label->SetTextSize(0.012);
 
   // need to draw the labels after other stuff or they dont show up
-  for (uint i = 0; i < man->input().getKnownSamples().size(); i++)
+  for (uint i = 0; i < man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags")).size(); i++)
   {
     MACH3LOG_DEBUG("  Will I draw the label for sample {}??", i);
-    std::string sampName = man->input().getKnownSamples()[i];
+    std::string sampName = man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags"))[i];
     if (!drawLabel[i])
     { 
       MACH3LOG_DEBUG("   - Not drawing label");
@@ -331,9 +331,9 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
     splitSamplesLegend->Draw();
 
     // need to draw the labels after other stuff or they dont show up
-    for (uint i = 0; i < man->input().getKnownSamples().size(); i++)
+    for (uint i = 0; i < man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags")).size(); i++)
     {
-      std::string sampName = man->input().getKnownSamples()[i];
+      std::string sampName = man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags"))[i];
       if (!drawLabel[i])
         continue;
       label->DrawLatex(compLLH_main.GetBinLowEdge(compLLH_main.GetNbinsX() + 1), extraCumSums[i],
@@ -348,7 +348,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
       TList *baselineHistList = baseSplitSamplesStack->GetHists();
       TList *compHistList = splitSamplesStack->GetHists();
 
-      for (uint sampleIdx = 0; sampleIdx < man->input().getKnownSamples().size(); sampleIdx++)
+      for (uint sampleIdx = 0; sampleIdx < man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags")).size(); sampleIdx++)
       {
         TH1D *divHist = new TH1D(
             Form("%s_%s_splitDiv_%i", paramName.c_str(), man->getFileLabel(extraFileIdx).c_str(),
@@ -410,8 +410,9 @@ int PlotLLH() {
   if (man->getSplitBySample())
     canv->SaveAs((man->getOutputName("_bySample") + "[").c_str());
 
+  for( std::string par: man->getOption<std::vector<std::string>>("parameterTags")) std::cout << par << ", ";
   // loop over the spline parameters
-  for (std::string paramName : man->input().getKnownParameters())
+  for (std::string paramName : man->input().getTaggedParameters(man->getOption<std::vector<std::string>>("parameterTags")))
   {
     MACH3LOG_DEBUG("working on parameter {}", paramName);
     // ###############################################################
