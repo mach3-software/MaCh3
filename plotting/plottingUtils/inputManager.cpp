@@ -9,6 +9,8 @@ InputManager::InputManager(const std::string &translationConfigName) {
   // read the config file
   _translatorConfig = YAML::LoadFile(translationConfigName);
 
+  MACH3LOG_DEBUG("InputManager: have loaded translation config file");
+  
   // split up the parts of the config for easier access later
   _fitterSpecConfig = _translatorConfig["FitterSpec"];
   _parametersConfig = _translatorConfig["Parameters"];
@@ -18,6 +20,46 @@ InputManager::InputManager(const std::string &translationConfigName) {
   _knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
   _knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
   _knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
+
+  MACH3LOG_DEBUG("Will now check the specified parameters for tags");
+
+  // loop through all parameters and get their tags
+  for ( const std::string &param: _knownParameters )
+  {
+    std::vector<std::string> tags;
+
+    MACH3LOG_DEBUG("Looking for tags for parameter {}", param);
+    if ( _parametersConfig[param] )
+    {
+      if ( _parametersConfig[param]["tags"] )
+      {
+        tags = _parametersConfig[param]["tags"].as<std::vector<std::string>>();
+        MACH3LOG_DEBUG("  - Found {}!", tags.size());
+      }
+    }
+
+    _paramToTagsMap[param] = tags;
+  }
+
+  MACH3LOG_DEBUG("Will now check the specified samples for tags");
+  
+  // same again for samples
+  for ( const std::string &samp: _knownSamples )
+  {
+    std::vector<std::string> tags;
+
+    MACH3LOG_DEBUG("Looking for tags for sample {}", samp);
+    if ( _samplesConfig[samp])
+    {
+      if ( _samplesConfig[samp]["tags"] )
+      {
+        tags = _samplesConfig[samp]["tags"].as<std::vector<std::string>>();
+        MACH3LOG_DEBUG("  - Found {}!", tags.size());
+      }
+    }
+
+    _sampleToTagsMap[samp] = tags;
+  }
 }
 
 /// Open an input file and add to the manager, consists of:
@@ -127,9 +169,70 @@ float InputManager::getPostFitValue(int fileNum, const std::string &paramName,
   return BAD_FLOAT;
 }
 
+
 // ##################################################################
 // ################## End of public interface #######################
 // ##################################################################
+
+std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::string> &values, 
+                                                       const std::unordered_map<std::string, std::vector<std::string>> &tagMap, 
+                                                       const std::vector<std::string> &tags, std::string checkType) const {
+                                                          
+  // check that checkType is valid
+  if(
+    checkType != "all" &&
+    checkType != "any" &&
+    checkType != "exact"
+  )
+  {  
+    MACH3LOG_ERROR("Invalid tag check type specified: {}. Will instead use the default type: 'all'", checkType);
+    checkType = "all";
+  }
+
+
+  std::vector<std::string> retVec;
+
+  MACH3LOG_DEBUG("Getting tagged values using checkType {}", checkType);
+  for ( std::string val: values )
+  {
+    MACH3LOG_DEBUG("Checking tags of {}", val);
+    // get the tags that this value has
+    const std::vector<std::string> &valTags = tagMap.at(val);
+
+    // we can skip it if it has no tags
+    if (valTags.size() == 0) continue;
+
+    // count how many of the specified tags match the tags of the current value 
+    int tagCount = 0;
+    for ( const std::string &tag: tags )
+    {
+      if ( std::find( valTags.begin(), valTags.end(), tag ) != valTags.end() ) 
+      {    
+        MACH3LOG_DEBUG("  - Matched tag {} !", tag);
+        tagCount ++;
+      }
+    }
+
+    // now decide if we include the current value based on the check type
+    if ( checkType == "all" )
+    {
+      if ( tagCount == tags.size() ) retVec.push_back(val);
+    }
+    else if ( checkType == "any" )
+    {
+      if ( tagCount > 0 ) retVec.push_back(val);
+    }
+    else if ( checkType == "exect" )
+    {
+      // EM: note that this will break if duplicate tags are specified in either vector... so please don't do that
+      if ( tagCount == valTags.size() ) retVec.push_back(val);
+    }
+  }
+
+  MACH3LOG_DEBUG("Found {} values matching the specified tags", retVec.size());
+  return retVec;
+
+}
 
 std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
                                                      fileTypeEnum fileType, const std::string &parameter,

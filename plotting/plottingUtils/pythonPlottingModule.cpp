@@ -52,6 +52,8 @@ void initPlotting(py::module &m){
         .def("get_post_fit_value", &MaCh3Plotting::InputManager::getPostFitValue, "Get the post fit value for a parameter from a particular file")
         .def("get_known_parameters", &MaCh3Plotting::InputManager::getKnownParameters, "Get all the parameters that this manager knows about. Useful for iterating over")
         .def("get_known_samples", &MaCh3Plotting::InputManager::getKnownSamples, "Get all the samples that this manager knows about. Useful for iterating over")
+        .def("get_tagged_parameters", &MaCh3Plotting::InputManager::getTaggedParameters, "Get all the parameters whose tags match some specified list")
+        .def("get_tagged_samples", &MaCh3Plotting::InputManager::getTaggedSamples, "Get all the samples whose tags match some specified list")
         .def("get_n_input_files", &MaCh3Plotting::InputManager::getNInputFiles, "Get the number of input files registered with this manager")
         .def("get_known_llh_parameters", &MaCh3Plotting::InputManager::getKnownLLHParameters, "Get all the parameters that a file has LLH scans for")
         .def("get_known_llh_samples", &MaCh3Plotting::InputManager::getKnownLLHSamples, "Get all the samples that a file has individual LLH scans for")

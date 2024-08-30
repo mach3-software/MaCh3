@@ -354,6 +354,28 @@ public:
   inline const std::vector<std::string> &getKnownParameters() const { return _knownParameters; }
   inline const std::vector<std::string> &getKnownSamples() const { return _knownSamples; }
   inline int getNInputFiles() const { return _fileVec.size(); }
+
+  /// @brief Get all parameters which have some set of tags
+  /// @param tags The tags to check for 
+  /// @param checkType The type of check to perform:
+  /// checkType can be one of:
+  ///   - all: All parameters which have *all* of the specified tags will be returned 
+  ///   - any: All parameters which have *any* of the specified tags will be returned 
+  ///   - exact: All of the parameters which have *exactly* the specified tags will be returned
+  inline std::vector<std::string> getTaggedParameters(const std::vector<std::string> &tags, std::string checkType = "all") const {
+    return getTaggedValues(_knownParameters, _paramToTagsMap, tags, checkType);
+  }
+
+  /// @brief Get all samples which have some set of tags
+  /// @param tags The tags to check for 
+  /// @param checkType The type of check to perform:
+  /// checkType can be one of:
+  ///   - all: All samples which have *all* of the specified tags will be returned 
+  ///   - any: All samples which have *any* of the specified tags will be returned 
+  ///   - exact: All of the samples which have *exactly* the specified tags will be returned
+  inline std::vector<std::string> getTaggedSamples(const std::vector<std::string> &tags, std::string checkType = "all") const {
+    return getTaggedValues(_knownSamples, _sampleToTagsMap, tags, checkType);
+  }
   /// @}
 
   /// @name File Specific Getters
@@ -374,6 +396,15 @@ public:
   /// @}
 
 private:
+
+  // Helper function to get tagged values from a vector of values
+  // specify the initial list of *values*, the map of values to their tags, the tags to check,
+  // and the type of check to perform (see getTaggedParameter() for details)
+  std::vector<std::string> getTaggedValues(const std::vector<std::string> &values, 
+                                           const std::unordered_map<std::string, 
+                                           std::vector<std::string>> &tagMap, 
+                                           const std::vector<std::string> &tags, std::string checkType) const;
+
   // Helper function to parse a root file location string
   // any instance of {PARAMETER} gets replaced with fitter specific parameter name
   // similar for {SAMPLE}
@@ -493,6 +524,11 @@ private:
 
   // hold the names of the fitters known to this manager
   std::vector<std::string> _knownFitters;
+
+  // map parameter names to their specified tags
+  std::unordered_map<std::string, std::vector<std::string>> _paramToTagsMap;
+  // map sample names to their specified tags
+  std::unordered_map<std::string, std::vector<std::string>> _sampleToTagsMap;
   
   // the configs defining the translation of parameters between fitters and also the directory
   // structure for each fitter
