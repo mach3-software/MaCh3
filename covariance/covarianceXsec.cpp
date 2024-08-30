@@ -36,7 +36,7 @@ void covarianceXsec::InitXsecFromConfig() {
   SplineParams.reserve(_fNumPar);
 
   int i = 0;
-  int SplineCounter = 0;
+  unsigned int SplineCounter = 0;
 
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPars for Names,
@@ -114,10 +114,12 @@ covarianceXsec::~covarianceXsec() {
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const int DetID) {
 // ********************************************
   std::vector<std::string> returnVec;
-  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+  for (auto &pair : _fSplineToSystIndexMap) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID )){
       returnVec.push_back(_fSplineNames.at(SplineIndex));
-	}
+    }
   }
   return returnVec;
 }
@@ -129,10 +131,12 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
   //Should probably just make a std::map<std::string, int> for param name to FD spline index
-  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
-	if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
-		returnVec.push_back(_fSplineModes.at(SplineIndex));	
-	}	
+  for (auto &pair : _fSplineToSystIndexMap) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
+    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+      returnVec.push_back(_fSplineModes.at(SplineIndex));
+    }
   }
   return returnVec;
 }
@@ -197,12 +201,15 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
 // i.e. get a vector of size nSplines where each entry is filled with
 // the global syst number
 const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(int DetID) {
+// ********************************************
   std::vector<int> returnVec;
 
-  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+  for (auto &pair : _fSplineToSystIndexMap) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
-		returnVec.push_back(SystIndex);
-      } 
+      returnVec.push_back(SystIndex);
+    }
   }
   return returnVec;
 }
@@ -212,12 +219,15 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(int DetID) {
 // i.e. get a vector of size nSplines where each entry is filled with
 // the global syst number
 const std::vector<int> covarianceXsec::GetSplineSystIndexFromDetID(int DetID) {
+// ********************************************
   std::vector<int> returnVec;
 
-  for (const auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap){
+  for (auto &pair : _fSplineToSystIndexMap) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
-		returnVec.push_back(SplineIndex);
-      } 
+      returnVec.push_back(SplineIndex);
+    }
   }
   return returnVec;
 }
@@ -366,9 +376,9 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
 
   //KS: Consider making some class producing table..
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬───────────────┬───────────────┬───────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:15}│{4:15}│{5:15}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼───────────────┼───────────────┼───────────────┤");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────┬────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:20}│{5:20}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────┼────────────────────┤");
 
   for (unsigned int i = 0; i < NormParams.size(); ++i)
   {
@@ -393,22 +403,17 @@ void covarianceXsec::Print() {
     }
     if (NormParams[i].pdgs.empty()) pdgString += "all";
 
-    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <15}│{: <15}│{: <15}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴───────────────┴───────────────┴───────────────┘");
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
 
-  //ETA - don't need this anymore due to map 
-  std::vector<int> SplineParsIndex;
-  for (int i = 0; i < _fNumPar; ++i)
-  {
-    if (GetParamType(i) == kSpline) { SplineParsIndex.push_back(i); }
-  }
-
-  MACH3LOG_INFO("Spline parameters: {}", SplineParsIndex.size());
+  MACH3LOG_INFO("Spline parameters: {}", _fSplineToSystIndexMap.size());
   MACH3LOG_INFO("=========================================================================================================================");
   MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
   MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------");
-  for (auto &[SplineIndex, SystIndex] : _fSplineToSystIndexMap) {
+  for (auto &pair : _fSplineToSystIndexMap) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
     MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", SplineIndex, "|", GetParFancyName(SystIndex), "|",
                   SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|",
                   GetParSplineKnotLowerBound(SplineIndex), "|", GetParSplineKnotUpperBound(SplineIndex), "|");
@@ -484,3 +489,67 @@ void covarianceXsec::setXsecOnlyParameters() {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
+
+// ********************************************
+// Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
+void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
+// ********************************************
+  TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
+
+  TObjArray* xsec_param_names = new TObjArray();
+  TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
+  TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
+  TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_nom = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
+  TVectorD* xsec_error = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_id = new TVectorD(_fNumPar);
+
+  for(int i = 0; i < _fNumPar; ++i)
+  {
+    TObjString* nameObj = new TObjString(_fFancyNames[i].c_str());
+    xsec_param_names->AddLast(nameObj);
+
+    (*xsec_param_prior)[i] = _fPreFitValue[i];
+    (*xsec_param_nom)[i] = _fGenerated[i];
+    (*xsec_flat_prior)[i] = _fFlatPrior[i];
+    (*xsec_stepscale)[i] = _fIndivStepScale[i];
+    (*xsec_error)[i] = _fError[i];
+    (*xsec_param_id)[i] = _fDetID[i];
+
+    (*xsec_param_lb)[i] = _fLowBound[i];
+    (*xsec_param_ub)[i] = _fUpBound[i];
+  }
+  xsec_param_names->Write("xsec_param_names", TObject::kSingleKey);
+  delete xsec_param_names;
+
+  xsec_param_prior->Write("xsec_param_prior");
+  delete xsec_param_prior;
+  xsec_flat_prior->Write("xsec_flat_prior");
+  delete xsec_flat_prior;
+  xsec_stepscale->Write("xsec_stepscale");
+  delete xsec_stepscale;
+  xsec_param_nom->Write("xsec_param_nom");
+  delete xsec_param_nom;
+  xsec_param_lb->Write("xsec_param_lb");
+  delete xsec_param_lb;
+  xsec_param_ub->Write("xsec_param_ub");
+  delete xsec_param_ub;
+
+  xsec_param_id->Write("xsec_param_id");
+  delete xsec_param_id;
+  xsec_error->Write("xsec_error");
+  delete xsec_error;
+
+  covMatrix->Write("xsec_cov");
+  TH2D* CorrMatrix = GetCorrelationMatrix();
+  CorrMatrix->Write("hcov");
+  delete CorrMatrix;
+
+  outputFile->Close();
+  delete outputFile;
+
+  MACH3LOG_INFO("Finished dumping covariance object");
+}
+
