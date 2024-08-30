@@ -189,6 +189,8 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
     checkType = "all";
   }
 
+  // If no tags were specified, take this to mean that anything should be a match
+  if (tags.size() == 0) return values;
 
   std::vector<std::string> retVec;
 
