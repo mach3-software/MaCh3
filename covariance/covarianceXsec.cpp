@@ -64,7 +64,7 @@ void covarianceXsec::InitXsecFromConfig() {
 
 	  //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
 	  //to the Systematic index i.e. the counter for things like _fDetID and _fDetID
-	  _fSplineToSystIndexMap.insert(std::pair{SplineCounter, i}); 
+      _fSplineToSystIndexMap.insert(std::make_pair(SplineCounter, i));
 	  SplineCounter++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
       _fParamType[i] = SystType::kNorm;
@@ -205,7 +205,6 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(int DetID) {
   std::vector<int> returnVec;
 
   for (auto &pair : _fSplineToSystIndexMap) {
-    auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
