@@ -323,7 +323,9 @@ void samplePDFFDBase::fillArray() {
   }
 
   PrepFunctionalParameters();
-  splineFile->Evaluate();
+  if(splineFile){
+	splineFile->Evaluate();
+  }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -339,7 +341,9 @@ void samplePDFFDBase::fillArray() {
       double funcweight = 1.0;
       double totalweight = 1.0;
       
-      splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+	  if(splineFile){
+		splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+	  }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -494,7 +498,9 @@ void samplePDFFDBase::fillArray_MP()
 	PrepFunctionalParameters();
 	//==================================================
 	//Calc Weights and fill Array
-	splineFile->Evaluate();
+	if(splineFile){
+	  splineFile->Evaluate();
+	}
 
 	for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
 #pragma omp for
@@ -519,7 +525,9 @@ void samplePDFFDBase::fillArray_MP()
 		//DB SKDet Syst
 		//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
-        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+		if(splineFile){
+		  splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+		}
 		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
 		if (splineweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
