@@ -681,8 +681,7 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
 // *************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  MACH3LOG_DEBUG("Setting {}(parameter {}) to {}", GetParName(parNo), parNo, parVal);
-
+  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})" GetParName(parNo),  parNo, parVal);
   if (pca) TransferToPCA();
 }
 // ********************************************
@@ -690,8 +689,7 @@ void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
 // ********************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  MACH3LOG_DEBUG("Setting {}(parameter {}) to {}", GetParName(parNo), parNo, parVal);
-
+  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})" GetParName(parNo),  parNo, parVal);
   if (pca) TransferToPCA();
 }
 
@@ -997,14 +995,20 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
 
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
-      //Make sure that you are actually passing a number to set the parameter to
-      if(std::isnan(pars[i])) {
-        std::cerr << "Error: trying to set parameter value to a nan for parameter " << GetParName(i) << " in matrix " << matrixName << ". This will not go well!" << std::endl;
+	  //Make sure that you are actually passing a number to set the parameter to
+	  if(isnan(pars[i])) {
+	    MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
 		throw;
 	  } else {
 		_fPropVal[i] = pars[i];
 	  }
     }
+  }
+
+  MACH3LOG_DEBUG("Set parameters to:");
+  std::cout << "Set parameters to: " << std::endl;
+  for(int par_i = 0 ; par_i < pars.size() ; ++par_i){
+	MACH3LOG_DEBUG("{} : {}", par_i, _fPropVal[par_i]);
   }
 
   // And if pca make the transfer
@@ -1029,6 +1033,7 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
       tree.Branch(Form("%s_PCA", _fNames[i].c_str()), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
+
   if(SaveProposal)
   {
     // loop over parameters and set a branch
@@ -1043,6 +1048,7 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
     }
   }
 }
+
 // ********************************************
 void covarianceBase::setStepScale(const double scale) {
 // ********************************************

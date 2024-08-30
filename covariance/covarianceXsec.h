@@ -8,6 +8,10 @@
 
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
+#include "samplePDF/Structs.h"
+#include "manager/YamlHelper.h"
+
+#include "yaml-cpp/yaml.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -44,6 +48,8 @@ class covarianceXsec : public covarianceBase {
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i).SplineInterpolationType;}
 
+    //DB Get spline parameters depending on given DetID
+    const std::vector<int> GetGlobalSystIndexFromDetID(int DetID);
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i).SplineKnotUpBound;}
@@ -66,13 +72,12 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(const int DetID);
 
-    /// ETA - what does this even do?
-    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(const int DetID);
-    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(const int DetID);
     /// @brief DB Grab the Spline Modes for the relevant DetID
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
     /// @brief DB Grab the Spline Indices for the relevant DetID
     const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}
+    /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
+    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID);
 
     /// @brief DB Grab the Number of splines for the relevant DetID
     int GetNumSplineParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kSpline);}
@@ -111,6 +116,10 @@ class covarianceXsec : public covarianceBase {
     /// @warning Will become deprecated
     void setFluxOnlyParameters();
     
+    /// @brief Dump Matrix to ROOT file, usefull when we need to pass matrix info to another fitting group
+    /// @param Name Name of TFile to which we save stuff
+    /// @warning This is mostly used for backward compatibility
+    void DumpMatrixToFile(const std::string& Name);
   protected:
     /// @brief Initialise CovarianceXsec
     void initParams();
@@ -133,10 +142,13 @@ class covarianceXsec : public covarianceBase {
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
 
-    //Variables related to spline systematics
-    std::vector<std::string> _fNDSplineNames;
-    std::vector<std::string> _fFDSplineNames;
-    std::vector<std::vector<int>> _fFDSplineModes;
+    /// Name of spline in TTree (TBranch),
+    std::vector<std::string> _fSplineNames;
+    /// Modes to which spline applies (valid only for binned splines)
+    std::vector<std::vector<int>> _fSplineModes;
+    /// Type of spline interpolations per parameter for example TSpline3 or Linear
+    std::vector<SplineInterpolation> _fSplineInterpolationType;
+    std::map<int, int> _fSplineToSystIndexMap;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecSplines1> SplineParams;

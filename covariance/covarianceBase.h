@@ -147,6 +147,9 @@ class covarianceBase {
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
+  /// @brief Get the error for the ith parameter
+  /// @param i Parameter index
+  inline double GetError(const int i) {return _fError[i];}
 
   /// @brief Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -175,19 +178,6 @@ class covarianceBase {
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
-  /// @brief What parameter Gets reweighted by what amount according to MCMC
-  /// @param bin simply parameter index
-  inline double calcReWeight(const int bin) {
-    if (bin >= 0 && bin < _fNumPar) {
-      return _fPropVal[bin];
-    } else {
-      MACH3LOG_WARN("Specified bin is <= 0 OR bin > npar!");
-      MACH3LOG_WARN("bin = {}, npar = {}", bin, _fNumPar);
-      MACH3LOG_WARN("This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!");
-      return 1.0;
-    }
-    return 1.0;
-  }
   //========
   //ETA - This might be a bit squiffy? If the vector gots moved from say a
   //push_back then the pointer is no longer valid... maybe need a better 

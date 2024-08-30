@@ -21,12 +21,10 @@ class splineFDBase : public SplineBase {
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
     void Evaluate();
 
-	void FindUniqueModes();
-
     //Spline Monolith things
 	//Essential methods used externally
 	//Move these to splineFDBase in core
-	bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames);
+	bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
 	void TransferToMonolith();	
 	void cleanUpMemory(){
 	  //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
@@ -39,8 +37,8 @@ class splineFDBase : public SplineBase {
 	  SplineFileParPrefixNames.shrink_to_fit();
 	  SplineBinning.clear();
 	  SplineBinning.shrink_to_fit();
-	  SplineParsIndex.clear();
-	  SplineParsIndex.shrink_to_fit();
+	  GlobalSystIndex.clear();
+	  GlobalSystIndex.shrink_to_fit();
 	  UniqueSystNames.clear();
 	  UniqueSystNames.shrink_to_fit();
 	  splinevec_Monolith.clear();
@@ -56,8 +54,10 @@ class splineFDBase : public SplineBase {
 	std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
 
 	int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
-	int getNDim(int BinningOpt);
-	TString getDimLabel(int BinningOpt, int Axis);
+	//int getNDim(int BinningOpt);
+	std::string getDimLabel(int iSample, unsigned int Axis);
+	std::vector<std::vector<std::string>> DimensionLabels;
+    
 	int getSampleIndex(std::string SampleName);
 	bool isValidSplineIndex(std::string SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
 
@@ -90,8 +90,12 @@ class splineFDBase : public SplineBase {
 	std::vector<int> nSplineParams;
 	std::vector<int> nOscChans;
 
-	std::vector< std::vector<int> > SplineParsIndex;
+	//This holds the global spline index and is used to grab the current parameter value
+    // to evaluate splines at. Each internal vector will be of size of the number of spline
+    // systematics which affect that sample.
+	std::vector< std::vector<int> > GlobalSystIndex;
 	std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
+	/// 
 	std::vector< std::vector<std::string> > SplineFileParPrefixNames;
 	//A vector of vectors of the spline modes that a systematic applies to
 	//This gets compared against the event mode to figure out if a syst should 
@@ -110,7 +114,7 @@ class splineFDBase : public SplineBase {
 	std::vector<int > coeffindexvec;
 	std::vector<int>uniquecoeffindices; //Unique coefficient indices
 
-	std::vector< TSpline3_red* > splinevec_Monolith;
+	std::vector<TSpline3_red*> splinevec_Monolith;
 
 	int MonolithSize;
 	int MonolithIndex;

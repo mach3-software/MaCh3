@@ -98,7 +98,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 MCMCProcessor::~MCMCProcessor() {
 // ****************************
   // Close the pdf file
-  MACH3LOG_INFO("Closing pdf in MCMCProcessor: {}", CanvasName);
+  MACH3LOG_INFO("Closing pdf in MCMCProcessor: {}", CanvasName.Data());
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
   if (Posterior != nullptr) delete Posterior;

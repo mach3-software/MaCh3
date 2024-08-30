@@ -44,7 +44,7 @@ public:
   samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
   virtual ~samplePDFFDBase();
 
-  int GetNDim(); //DB Function to differentiate 1D or 2D binning
+  const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
 
   /// @brief Returns binning options
   int GetBinningOpt(){return BinningOpt;}
@@ -62,7 +62,7 @@ public:
   double GetLikelihood();
   //===============================================================================
 
-  void reweight(double *oscpar);
+  void reweight();
   double GetEventWeight(int iSample, int iEntry);
 
   // Setup and config functions
@@ -71,20 +71,22 @@ public:
   void UseBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
   
 #if defined (USE_PROB3) && defined (CPU_ONLY)
-  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en, double *oscpar);
+  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en);
 #endif
 
 #if defined (USE_PROB3) && not defined (CPU_ONLY)
-  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num, double *oscpar);
+  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num);
 #endif
 
 #if not defined (USE_PROB3)
-  void calcOscWeights(int sample, int nutype, double *w, double *oscpar);
+  void calcOscWeights(int sample, int nutype, double *w);
 #endif
 
-  std::string GetSampleName(){return samplename;}
+  std::string GetName(){return samplename;}
 
+  const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
+  void SetOscCov(covarianceOsc* osc_cov);
 
   //============================= Should be deprecated =============================
   // Note: the following functions aren't used any more! (From 14/1/2015) - KD. Just kept in for backwards compatibility in compiling, but they have no effect.
@@ -142,6 +144,11 @@ public:
   void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
   void set1DBinning(std::vector<double> &XVec);
   void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
+  void SetupSampleBinning();
+  std::string XVarStr, YVarStr;
+  unsigned int SampleNXBins, SampleNYBins;
+  std::vector<double> SampleXBins;
+  std::vector<double> SampleYBins;
   //===============================================================================
 
   //ETA - a function to setup and pass values to functional parameters where
@@ -161,12 +168,15 @@ public:
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
   // Calculate the norm weight for a given event
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
-  virtual double CalcXsecWeightFunc(int iSample, int iEvent) = 0;
+  //Virtual so this can be over-riden in an experiment derived class
+  virtual double CalcXsecWeightFunc(int iSample, int iEvent){return 1.0;};
 
   //virtual double ReturnKinematicParameter(KinematicTypes Var, int i) = 0;       //Returns parameter Var for event j in sample i
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
+  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
 
@@ -200,6 +210,9 @@ public:
   //DB Vectors to hold bin edges
   std::vector<double> XBinEdges;
   std::vector<double> YBinEdges;
+  //std::vector<std::string> XVarStr;
+  //std::vector<std::string> YVarStr;
+
 
   //DB Array to be filled after reweighting
   double** samplePDFFD_array;
@@ -221,7 +234,7 @@ public:
   Oscillator *Osc = NULL;
 
   // An axis to set binned oscillation weights
-  TAxis *osc_binned_axis ;
+  TAxis *osc_binned_axis;
   //===============================================================================
   
   //Variables controlling oscillation parameters
@@ -231,13 +244,21 @@ public:
   //===============================================================================
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
+  //these should be added to samplePDFBase to be honest
   covarianceXsec *XsecCov;
+  covarianceOsc *OscCov;
   //=============================================================================== 
 
   //ETA - binning opt can probably go soon...
   int BinningOpt;
+  /// @var const int nDimensions
+  /// @brief keep track of the dimensions of the sample binning
+  int nDimensions;
   int SampleDetID;
   bool IsRHC;
+  /// @var std::vector<std::string> SplineBinnedVars
+  /// @brief  holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
+  std::vector<std::string> SplineBinnedVars;
 
   std::string samplename;
 
@@ -265,6 +286,7 @@ public:
   std::vector< std::vector<double> > StoredSelection; 
   //===========================================================================
   //
+
 
   //ETA - trying new way of doing shift parameters
   // leave this for now but coming soon!

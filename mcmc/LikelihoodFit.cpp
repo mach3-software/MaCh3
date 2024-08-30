@@ -114,11 +114,10 @@ double LikelihoodFit::CalcChi2(const double* x) {
   {
     // If we're running with different oscillation parameters for neutrino and anti-neutrino
     if (osc) {
-      samples[i]->reweight(osc->getPropPars());
+      samples[i]->reweight();
       // If we aren't using any oscillation
       } else {
-        double* fake = NULL;
-        samples[i]->reweight(fake);
+        samples[i]->reweight();
     }
   }
 

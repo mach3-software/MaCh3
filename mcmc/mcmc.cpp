@@ -214,14 +214,7 @@ void mcmc::ProposeStep() {
     // But since sample reweight is multi-threaded it's probably better to do that
     for (size_t i = 0; i < samples.size(); ++i)
     {
-      // If we're running with different oscillation parameters for neutrino and anti-neutrino
-      if (osc ){ 
-        samples[i]->reweight(osc->getPropPars());
-        // If we aren't using any oscillation
-      } else {
-        double* fake = NULL;
-        samples[i]->reweight(fake);
-      }
+        samples[i]->reweight(); 
     }
 
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
