@@ -496,12 +496,20 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
 
   TObjArray* xsec_param_names = new TObjArray();
+  TObjArray* xsec_spline_interpolation = new TObjArray();
+  TObjArray* xsec_spline_names = new TObjArray();
+
   TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
   TVectorD* xsec_param_nom = new TVectorD(_fNumPar);
   TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
   TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
+
+
+  TVectorD* xsec_param_knot_weight_lb = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_knot_weight_ub = new TVectorD(_fNumPar);
+
   TVectorD* xsec_error = new TVectorD(_fNumPar);
   TVectorD* xsec_param_id = new TVectorD(_fNumPar);
 
@@ -509,6 +517,12 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   {
     TObjString* nameObj = new TObjString(_fFancyNames[i].c_str());
     xsec_param_names->AddLast(nameObj);
+
+    TObjString* splineType = new TObjString("TSpline3");
+    xsec_spline_interpolation->AddLast(splineType);
+
+    TObjString* splineName = new TObjString("");
+    xsec_spline_names->AddLast(splineName);
 
     (*xsec_param_prior)[i] = _fPreFitValue[i];
     (*xsec_param_nom)[i] = _fGenerated[i];
@@ -519,9 +533,31 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
 
     (*xsec_param_lb)[i] = _fLowBound[i];
     (*xsec_param_ub)[i] = _fUpBound[i];
+
+    //Default values
+    (*xsec_param_knot_weight_lb)[i] = -9999;
+    (*xsec_param_knot_weight_ub)[i] = +9999;
+  }
+
+  for (auto &pair : _fSplineToSystIndexMap) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
+
+    (*xsec_param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex).SplineKnotLowBound;
+    (*xsec_param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex).SplineKnotUpBound;
+
+    TObjString* splineType = new TObjString(SplineInterpolation_ToString(SplineParams.at(SplineIndex).SplineInterpolationType).c_str());
+    xsec_spline_interpolation->AddAt(splineType, SystIndex);
+
+    TObjString* splineName = new TObjString(_fSplineNames[SplineIndex].c_str());
+    xsec_spline_names->AddAt(splineName, SystIndex);
   }
   xsec_param_names->Write("xsec_param_names", TObject::kSingleKey);
   delete xsec_param_names;
+  xsec_spline_interpolation->Write("xsec_spline_interpolation", TObject::kSingleKey);
+  delete xsec_spline_interpolation;
+  xsec_spline_names->Write("xsec_spline_names", TObject::kSingleKey);
+  delete xsec_spline_names;
 
   xsec_param_prior->Write("xsec_param_prior");
   delete xsec_param_prior;
@@ -535,6 +571,11 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   delete xsec_param_lb;
   xsec_param_ub->Write("xsec_param_ub");
   delete xsec_param_ub;
+
+  xsec_param_knot_weight_lb->Write("xsec_param_knot_weight_lb");
+  delete xsec_param_knot_weight_lb;
+  xsec_param_knot_weight_ub->Write("xsec_param_knot_weight_ub");
+  delete xsec_param_knot_weight_ub;
 
   xsec_param_id->Write("xsec_param_id");
   delete xsec_param_id;
