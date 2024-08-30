@@ -51,6 +51,27 @@ target_link_libraries(blarb MaCh3::All)
 
 Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specific MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
+## Python
+
+MaCh3 can be compiled with a python interface by specifying the cmake option
+```
+cmake ../ MaCh3_PYTHON_ENABLED=ON
+make && make install
+```
+and then adding the path to the installed module to your `PYTHONPATH` environment variable:
+```
+export PYTHONPATH=$PYTHONPATH:<path>/<to>/<MaCh3>/build/python
+```
+Currently the python module only contains an interface to the plotting library (see [here](https://github.com/mach3-software/MaCh3/blob/develop/plotting/README.md#python) for more information on how to use it)
+
+### Building with Pip
+
+Additionally you can build just the python module by doing 
+```
+pip install -t <install location> .
+``` 
+The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
+
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
 

@@ -15,13 +15,13 @@ InputManager::InputManager(const std::string &translationConfigName) {
   _samplesConfig = _translatorConfig["Samples"];
 
   // check the config file and get which parameters, samples, and fitters we've been told about
-  knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
-  knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
-  knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
+  _knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
+  _knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
+  _knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
 }
 
 /// Open an input file and add to the manager, consists of:
-///  - Initialise a new InputFile using the specified file
+///  -  a new InputFile using the specified file
 ///  - Get info about the file, like what fitter it came from, what it contains e.g. LLH scans,
 ///  processed post fit parameters etc.
 ///  - Load up the data from the file (LLH scans etc.) and put them in a common format to be used by
@@ -42,13 +42,13 @@ void InputManager::addFile(const std::string &fileName) {
 /// If printLevel is "summary", will loop through all the files known to this InputManager and call
 /// InputFile::Summarise(). If printLevel is "dump", will print all parameters known to this
 /// InputManager and then loop through all input files and call InputFile::Dump().
-void InputManager::Print(const std::string &printLevel) const {
+void InputManager::print(const std::string &printLevel) const {
   MACH3LOG_INFO("Printing contents of InputManager instance:");
 
   if (printLevel == "dump")
   {
     MACH3LOG_INFO("parameters known to this manager: ");
-    for (std::string param : knownParameters)
+    for (std::string param : _knownParameters)
     {
       MACH3LOG_INFO("  ");
     }
@@ -69,10 +69,10 @@ void InputManager::Print(const std::string &printLevel) const {
   MACH3LOG_INFO("");
 }
 
-float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
+float InputManager::getPostFitError(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
 
-  const InputFile &inputFileDef = GetFile(fileNum);
+  const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
   if (errorType == "")
@@ -98,10 +98,10 @@ float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
   return BAD_FLOAT;
 }
 
-float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
+float InputManager::getPostFitValue(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
   
-  const InputFile &inputFileDef = GetFile(fileNum);
+  const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
   if (errorType == "")
@@ -356,7 +356,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
   if (printThoughts)
     MACH3LOG_INFO("Checking contents of file {}", inputFileDef.fileName);
 
-  for (std::string fitter: knownFitters)
+  for (std::string fitter: _knownFitters)
   {
 
     // flag for whether or not the current fitter is the correct one
@@ -392,7 +392,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
       std::vector<std::string> enabledLLHParams;
 
-      for (const std::string &parameter : knownParameters)
+      for (const std::string &parameter : _knownParameters)
       {
         MACH3LOG_DEBUG("     - for {}", parameter);
         inputFileDef.availableParams_map_LLH[LLHType][parameter] = false;
@@ -457,7 +457,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
     std::string defaultErrorType =
         thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
-    for (std::string parameter : knownParameters)
+    for (std::string parameter : _knownParameters)
     {
       if (findPostFitParamError(inputFileDef, parameter, fitter, defaultErrorType))
       {
@@ -482,10 +482,10 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     if (printThoughts)
       MACH3LOG_INFO("....Searching for LLH scans broken down by sample");
 
-    for (const std::string &sample : knownSamples)
+    for (const std::string &sample : _knownSamples)
     {
       size_t numLLHBySampleParams = 0;
-      for (const std::string &parameter : knownParameters)
+      for (const std::string &parameter : _knownParameters)
       {
         inputFileDef.availableParams_map_LLHBySample[sample][parameter] = false;
         if (findBySampleLLH(inputFileDef, parameter, fitter, sample))
@@ -611,7 +611,7 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   // ####### Get the by sample LLH scans #######
   for (const std::string &parameter : inputFileDef.availableParams_LLH)
   {
-    for (const std::string &sample : knownSamples)
+    for (const std::string &sample : _knownSamples)
     {
       findBySampleLLH(inputFileDef, parameter, inputFileDef.fitter, sample, true);
     }

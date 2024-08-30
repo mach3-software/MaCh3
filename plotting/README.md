@@ -22,6 +22,49 @@ This is responsible for the styling of the plots produces. It contains the funct
 
 The goal with MaCh3s plotting library is to be as flexible as possible and to abstract away all of the most annoying parts about plot making like reading in the data from fitter output files and keeping track of parameter names across different fitters, while allowing the user as much freedom as possible when it comes plot style and formatting . In order to do this, MaCh3s plotting library makes heavy use of config files so that the behaviour of the code can be adapted easily to individual experiments without having to totally reinvent the wheel and rewrite large ammounts of boilerplate code. In line with the rest of MaCh3, the plotting library uses [YAML](https://yaml.org/spec/1.2.2/) to specify its config files. There are a few different config files which control different parts of the plotting library. Some example yaml configs found in this directory.
 
+## Python
+
+The plotting library comes with a python interface (see [here](https://github.com/mach3-software/MaCh3/blob/develop/README.md#python) for installation details). Once installed, you can simply import the plotting submodule as follows:
+
+```
+from pyMaCh3 import plotting
+```
+
+### Usage
+
+A very basic example that will plot LLH scans is:
+
+```
+from pyMaCh3 import plotting
+import matplotlib.backends.backend_pdf
+from matplotlib import pyplot as plt
+import sys
+
+
+## create an instance of the PlottingManager
+man = plotting.PlottingManager()
+
+## use the manager to parse command line inputs passed to the scripts
+man.parse_inputs(sys.argv)
+
+## open a pdf file to save the generated plots to 
+pdf = matplotlib.backends.backend_pdf.PdfPages("LLH-scans.pdf")
+
+## now just loop through all possible parameters and plot their likelihood scans using pyplot
+for i, param in enumerate( man.input().get_known_parameters() ):
+    
+    fig = plt.figure()
+    plt.title(man.style().prettify_parameter_name(param))
+
+    for file_id in range(man.input().get_n_input_files()):
+        llh_scan = man.input().get_llh_scan(file_id, param, "sample")
+        plt.plot(llh_scan[0], llh_scan[1])
+    
+    pdf.savefig( fig )
+
+pdf.close()
+```
+
 ## Apps
 
 There are a few pre-written applications to plot some standard things that we typically look at (there will be some more to follow but they need to be "modernised" to use plotting library)

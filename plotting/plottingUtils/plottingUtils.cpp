@@ -56,4 +56,28 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
   return retHist;
 }
 
-} // namespace MaCh3Plotting
+
+std::vector<std::vector<float>> TGraphToVector(TGraph graph) {
+
+  int nPoints = graph.GetN();
+  std::vector<std::vector<float>> ret(2);
+  std::vector<float> pointsX(nPoints);
+  std::vector<float> pointsY(nPoints);
+
+  // Get the points out
+  Double_t x, y;
+
+  for (int pointId = 0; pointId < nPoints; pointId++)
+  {
+    graph.GetPoint(pointId, x, y);
+    pointsX[pointId] = x;
+    pointsY[pointId] = y;
+  }
+
+  ret[0] = pointsX;
+  ret[1] = pointsY;
+
+  return ret;
+}
+
+} // namespace MaCh3Plotting 

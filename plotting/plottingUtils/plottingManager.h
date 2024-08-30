@@ -60,10 +60,10 @@ public:
   /// @param PlottingConfigName The config file file defining executables specific options, and
   /// other minor manager related options.
   /// @return Constructed PlottingManager instance.
-  PlottingManager(std::string PlottingConfigName);
+  PlottingManager(const std::string &PlottingConfigName);
 
   /// @brief initalise this PlottingManager.
-  void Initialise();
+  void initialise();
 
   ~PlottingManager() {
   }
@@ -71,7 +71,22 @@ public:
   /// @brief Parse command line arguments.
   /// @param argc The number of command line arguments.
   /// @param argv The arguments themselves.
-  void ParseInputs(int argc, char **argv);
+  void parseInputs(int argc, char **argv);
+
+
+  /// @brief Parse vector of command line arguments.
+  /// @details This mainly just exists for the sake of the python binding.
+  /// @param argv The arguments to parse.
+  inline void parseInputsVec(std::vector<std::string> argv) {
+    std::vector<char*> charVec;
+    MACH3LOG_DEBUG("Parsing Inputs :: was given vector:");
+    for( const std::string &arg : argv ) 
+    {
+      charVec.push_back( (char*)arg.c_str() );
+      MACH3LOG_DEBUG("  - {}", arg );
+    }
+    parseInputs(argv.size(), charVec.data());
+  }
 
   /// @brief Describe an option you want to add to the PlottingManager which can be read in from the
   /// command line and retrieved later with getOption(). This should be done before calling
@@ -97,57 +112,57 @@ public:
   /// @brief Internally set the name of the executable that manager is being used in.
   /// @param execName Name of the current executable, will also need to be defined in the plotting
   /// config file.
-  void SetExec(std::string execName);
+  void setExec(std::string execName);
 
   /// @brief Get a specific option from the config for this executable.
   /// @tparam T the type of parameter expected for this option, e.g. std::string.
   /// @param option The option that you want from the config.
   /// @return The specified value for the option.
-  template <typename T> T GetOption(std::string option) { return _execOptions[option].as<T>(); }
-  YAML::Node GetOption(std::string option) { return _execOptions[option]; }
+  template <typename T> T getOption(std::string option) { return _execOptions[option].as<T>(); }
+  YAML::Node getOption(std::string option) { return _execOptions[option]; }
 
   // ############# getters ##############
   /// @name General getters
   /// @{
-  const std::string GetFileName(int i) { return FileNames[i]; }
+  const std::string getFileName(int i) { return _fileNames[i]; }
 
-  const std::string GetFileLabel(int i) { return FileLabels[i]; }
+  const std::string getFileLabel(int i) { return _fileLabels[i]; }
 
-  const std::string GetDrawOptions() { return extraDrawOptions; }
+  const std::string getDrawOptions() { return _extraDrawOptions; }
 
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string GetOutputName() { return OutputName; }
+  const std::string getOutputName() { return _outputName; }
 
   /// @brief Get the output name but can specify a siffix to add to the name, before the file
   /// extension.
   /// @param suffix The suffix to add to the file name.
   /// @return Output file name with suffix added before the extension.
-  const std::string GetOutputName(std::string suffix);
+  const std::string getOutputName(const std::string &suffix);
 
-  const std::vector<std::string> GetFileNames() { return FileNames; }
+  const std::vector<std::string> getFileNames() { return _fileNames; }
 
-  const std::vector<std::string> GetFileLabels() { return FileLabels; }
+  const std::vector<std::string> getFileLabels() { return _fileLabels; }
 
-  int GetNFiles() { return (int)FileNames.size(); }
+  int getNFiles() { return (int)_fileNames.size(); }
 
-  bool GetSplitBySample() { return splitBySample; }
+  bool getSplitBySample() { return _splitBySample; }
 
-  bool GetPlotRatios() { return plotRatios; }
+  bool getPlotRatios() { return _plotRatios; }
 
-  bool GetDrawGrid() { return drawGrid; }
+  bool getDrawGrid() { return _drawGrid; }
 
   /// @}
 
   // for managers contained in this manager
   /// @brief Get the StyleManager contained within this PlottingManager, for doing style related
   /// things.
-  const StyleManager &Style() { return *styleMan; }
+  const StyleManager &style() { return *_styleMan; }
 
   /// @brief Get the InputManager contained within this PlottingManager, for doing input related
   /// things.
-  const InputManager &Input() { return *inputMan; }
+  const InputManager &input() { return *_inputMan; }
 
 private:
   // name of the config file to read configs from
@@ -158,21 +173,21 @@ private:
   YAML::Node _execOptions;
 
   // input file names and labels
-  std::vector<std::string> FileNames;
-  std::vector<std::string> FileLabels;
-  std::vector<std::string> FileLabels_default;
+  std::vector<std::string> _fileNames;
+  std::vector<std::string> _fileLabels;
+  std::vector<std::string> _defaultFileLabels;
 
   // other string options
-  std::string OutputName = "Plot.pdf";
-  std::string extraDrawOptions = "";
+  std::string _outputName = "Plot.pdf";
+  std::string _extraDrawOptions = "";
 
   // Generic plotting options
-  bool splitBySample = false;
-  bool plotRatios = false;
-  bool drawGrid = false;
+  bool _splitBySample = false;
+  bool _plotRatios = false;
+  bool _drawGrid = false;
 
   // other Manager objects
-  std::unique_ptr<StyleManager> styleMan;
-  std::unique_ptr<InputManager> inputMan;
+  std::unique_ptr<StyleManager> _styleMan;
+  std::unique_ptr<InputManager> _inputMan;
 };
 } // namespace MaCh3Plotting

@@ -6,6 +6,6 @@ foreach(app
     PlotLLH
     )
     add_executable( ${app} ${app}.cpp )
-    target_link_libraries( ${app} Plotting )
+    target_link_libraries( ${app} MaCh3::Plotting )
 
 endforeach(app)
