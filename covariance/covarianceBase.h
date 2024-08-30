@@ -147,8 +147,9 @@ class covarianceBase {
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
-  // Get the error for the ith parameter
-  const double GetError(const int i) {return _fError[i];}
+  /// @brief Get the error for the ith parameter
+  /// @param i Parameter index
+  inline double GetError(const int i) {return _fError[i];}
 
   /// @brief Adaptive Step Tuning Stuff
   void resetIndivStepScale();
