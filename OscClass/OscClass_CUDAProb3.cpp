@@ -1019,12 +1019,12 @@ void  Oscillator::FillOscillogram(const double** oscpar, double prodH, double Yp
 	throw;
 
 #ifdef DEBUG
-    FLOAT_T theta12 = asin(sqrt(oscpar[0]));
-    FLOAT_T theta23 = asin(sqrt(oscpar[1]));
-    FLOAT_T theta13 = asin(sqrt(oscpar[2]));
-    FLOAT_T dm12sq  = oscpar[3];
-    FLOAT_T dm23sq  = oscpar[4];
-    FLOAT_T dcp     = oscpar[5];
+	FLOAT_T theta12 = asin(sqrt(*oscpar[0]));
+	FLOAT_T theta23 = asin(sqrt(*oscpar[1]));
+	FLOAT_T theta13 = asin(sqrt(*oscpar[2]));
+	FLOAT_T dm12sq  = *oscpar[3];
+	FLOAT_T dm23sq  = *oscpar[4];
+	FLOAT_T dcp     = *oscpar[5];
 
 	//DB This part could be replaced with pointers
 	for (int iter=0;iter<nSecondaryBins;iter++) {
@@ -1048,8 +1048,8 @@ void  Oscillator::FillOscillogram(const double** oscpar, double prodH, double Yp
 	    for (int iOscPar=0;iOscPar<3;iOscPar++) {
 	      std::cerr << "iOscPar:" << iOscPar << std::endl;
 	      std::cerr << "oscpar[iOscPar]:" << oscpar[iOscPar] << std::endl;
-	      std::cerr << "sqrt(oscpar[iOscPar]):" << sqrt(oscpar[iOscPar]) << std::endl;
-	      std::cerr << "asin(sqrt(oscpar[iOscPar])):" << asin(sqrt(oscpar[iOscPar])) << std::endl;
+              std::cerr << "sqrt(*oscpar[iOscPar]):" << sqrt(*oscpar[iOscPar]) << std::endl;
+              std::cerr << "asin(sqrt(*oscpar[iOscPar])):" << asin(sqrt(*oscpar[iOscPar])) << std::endl;
 	      std::cerr << "\n" << std::endl;
 	    }
 
