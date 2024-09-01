@@ -340,4 +340,4 @@ if(NOT TARGET uninstall)
 endif()
 
 # KS: Configure the Doxygen input file, this is to ensure whenever we update MaCh3 version Doxyfile will have same version.
-configure_file(${CMAKE_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_SOURCE_DIR}/Doc/Doxyfile @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doc/Doxyfile @ONLY)
