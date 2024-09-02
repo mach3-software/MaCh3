@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
           - name: SplineValidations
-
+          - name: CovarianceValidations
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
