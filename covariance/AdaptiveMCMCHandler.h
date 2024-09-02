@@ -1,7 +1,6 @@
 #pragma once
 
 // MaCh3 Includes
-#include "manager/MaCh3Logger.h"
 #include "manager/manager.h"
 #include "covariance/CovarianceUtils.h"
 

@@ -1,5 +1,4 @@
 set(HEADERS
-    ThrowParms.h
     CovarianceUtils.h
     covarianceBase.h
     covarianceOsc.h
@@ -9,7 +8,6 @@ set(HEADERS
 )
 
 add_library(Covariance SHARED
-    ThrowParms.cpp
     covarianceBase.cpp
     covarianceOsc.cpp
     covarianceXsec.cpp
