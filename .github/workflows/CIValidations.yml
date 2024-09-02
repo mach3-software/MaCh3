@@ -54,3 +54,4 @@ jobs:
       run: |
         cd /opt/MaCh3Validations/build
         Apps/${{ matrix.name }}
+
