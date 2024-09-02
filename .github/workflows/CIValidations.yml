@@ -14,20 +14,20 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    name: Validations CI ${{ matrix.name }}
+
     strategy:
-      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
+      fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
           - name: SplineValidations
 
-
-    name: Build CI ${{ matrix.name }}
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
     - uses: actions/checkout@v3
-
-    - name: Getting MaCh3 Container
-      run: docker pull ghcr.io/mach3-software/mach3:alma9latest && docker run -it --name mach3-container ghcr.io/mach3-software/mach3:alma9latest
 
     - name: Get MaCh3 Validations
       run: cd /opt/ && git clone https://@github.com/mach3-software/MaCh3Validations.git MaCh3Validations && cd MaCh3Validations && mkdir build && cd build && cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
