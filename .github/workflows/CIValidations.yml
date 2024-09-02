@@ -4,8 +4,6 @@ name: Validations CI
 on:
   pull_request:
     branches: [ develop ]
-  push:
-    branches: [ feature_CIvalidations ]
 
 permissions:
   contents: read
@@ -37,8 +35,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../
-        #-DMaCh3_Branch="${{ github.ref_name }}"
+        cmake ../ -DMaCh3_Branch="{{ github.ref_name }}
 
     - name: Build MaCh3 Validations
       run: |
@@ -54,4 +51,3 @@ jobs:
       run: |
         cd /opt/MaCh3Validations/build
         Apps/${{ matrix.name }}
-
