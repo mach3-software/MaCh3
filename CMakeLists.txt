@@ -188,6 +188,7 @@ LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  PYTHON
   LOW_MEMORY_STRUCTS
   Oscillator
   Fitter
@@ -230,8 +231,6 @@ if( MaCh3_PYTHON_ENABLED )
   target_link_libraries( pyMaCh3 PUBLIC Plotting )
   install( TARGETS pyMaCh3 DESTINATION pyMaCh3/)
 endif()
-
-
 
 
 #This is to export the target properties of MaCh3

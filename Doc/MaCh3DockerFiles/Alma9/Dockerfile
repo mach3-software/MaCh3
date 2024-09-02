@@ -18,7 +18,7 @@ RUN git checkout ${MACH3_VERSION}
 
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
-RUN cmake ${MACH3_WORK_DIR}
+RUN cmake -DMaCh3_PYTHON_ENABLED=ON ${MACH3_WORK_DIR}
 RUN make VERBOSE=1 && make install
 
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
