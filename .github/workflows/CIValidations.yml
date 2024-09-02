@@ -33,7 +33,8 @@ jobs:
       run: echo "Current Branch: ${{ github.ref }}"
 
     - name: Get MaCh3 Validations
-      run: cd /opt/ && git clone https://@github.com/mach3-software/MaCh3Validations.git MaCh3Validations && cd MaCh3Validations && mkdir build && cd build && cmake ../ -DMaCh3_Branch=feature_CIvalidations
+      run: cd /opt/ && git clone https://@github.com/mach3-software/MaCh3Validations.git MaCh3Validations && cd MaCh3Validations && mkdir build && cd build && cmake ../ -DMaCh3_Branch=develop
+
       #${{ github.head_ref }}
 
     - name: Install
