@@ -944,8 +944,8 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
 
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
-	  //Make sure that you are actually passing a number to set the parameter to
-	  if(isnan(pars[i])) {
+      //Make sure that you are actually passing a number to set the parameter to
+      if(std::isnan(pars[i])) {
 	    MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
 		throw;
 	  } else {
@@ -955,9 +955,8 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
   }
 
   MACH3LOG_DEBUG("Set parameters to:");
-  std::cout << "Set parameters to: " << std::endl;
-  for(int par_i = 0 ; par_i < pars.size() ; ++par_i){
-	MACH3LOG_DEBUG("{} : {}", par_i, _fPropVal[par_i]);
+  for(size_t par_i = 0 ; par_i < pars.size() ; ++par_i){
+    MACH3LOG_DEBUG("{} : {}", par_i, _fPropVal[par_i]);
   }
 
   // And if pca make the transfer
