@@ -27,7 +27,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Getting MaCh3 Container
-      run: docker pull ghcr.io/mach3-software/mach3:alma9latest && docker run --name mach3-container -d ghcr.io/mach3-software/mach3:alma9latest
+      run: docker pull ghcr.io/mach3-software/mach3:alma9latest && docker run -it --name mach3-container ghcr.io/mach3-software/mach3:alma9latest
 
     - name: Get MaCh3 Validations
       run: cd /opt/ && git clone https://@github.com/mach3-software/MaCh3Validations.git MaCh3Validations && cd MaCh3Validations && mkdir build && cd build && cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
