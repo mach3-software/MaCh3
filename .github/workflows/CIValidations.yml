@@ -43,12 +43,9 @@ jobs:
         cd /opt/MaCh3Validations/build
         make install # Build the project
 
-    - name: Source Setup Scripts
+    - name: Validations
       run: |
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Validations.sh
-
-    - name: Validations
-      run: |
         cd /opt/MaCh3Validations/build
         Apps/${{ matrix.name }}
