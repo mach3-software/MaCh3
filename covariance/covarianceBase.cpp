@@ -1005,12 +1005,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
     }
   }
 
-  MACH3LOG_DEBUG("Set parameters to:");
-  std::cout << "Set parameters to: " << std::endl;
-  for(int par_i = 0 ; par_i < pars.size() ; ++par_i){
-	MACH3LOG_DEBUG("{} : {}", par_i, _fPropVal[par_i]);
-  }
-
   // And if pca make the transfer
   if (pca) {
     TransferToPCA();
