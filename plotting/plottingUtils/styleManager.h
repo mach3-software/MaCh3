@@ -16,6 +16,14 @@ public:
   /// @brief Constructor
   /// @param configName The style config to read from
   StyleManager(std::string configName);
+  
+  // NO COPYING!
+  StyleManager( const StyleManager& ) = delete;
+  StyleManager( StyleManager&& ) = default;
+
+  ~StyleManager(){
+    MACH3LOG_DEBUG("##### Deleting StyleManager Instance #####");
+  }
 
   /// @brief Convert hideous and vulgar internal parameter name into a beautiful presentable name
   /// @details The pretty parameter names should be specified in the style config file
