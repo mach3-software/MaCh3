@@ -4,7 +4,7 @@ The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter
 The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
-[![Release - v1.0.0](https://img.shields.io/badge/Release-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+[![Release - v1.1.0](https://img.shields.io/badge/Release-v1.1.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
@@ -15,7 +15,7 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/10949376) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10949376.svg)](https://doi.org/10.5281/zenodo.10949376).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13642670.svg)](https://doi.org/10.5281/zenodo.13642670).
 
 # How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
