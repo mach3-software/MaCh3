@@ -57,7 +57,7 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 MaCh3 can be compiled with a python interface by specifying the cmake option
 ```
-cmake ../ MaCh3_PYTHON_ENABLED=ON
+cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
 and then adding the path to the installed module to your `PYTHONPATH` environment variable:
