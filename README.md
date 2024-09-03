@@ -32,11 +32,7 @@ Don't forget to:
 source bin/setup.MaCh3.sh
 ```
 ## Building against MaCh3
-If you compiled MaCh3 and sourced it you can simply call
-```
-find_package(MaCh3)
-```
-and cmake will find it. Alternatively, you can use CPM, for example:
+To include MaCh3 in your cmake project you can use following syntax
 ```
 CPMFindPackage(
   NAME MaCh3
@@ -44,6 +40,12 @@ CPMFindPackage(
   GITHUB_REPOSITORY mach3-software/MaCh3
 )
 ```
+Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
+If you compiled MaCh3 and sourced it you can simply call
+```
+find_package(MaCh3)
+```
+
 Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows:
 ```
 target_link_libraries(blarb MaCh3::All)
