@@ -27,6 +27,7 @@
 #include "TLine.h"
 #include "TROOT.h"
 #include "TStyle.h"
+#include "TMultiGraph.h"
 
 namespace MaCh3Plotting {
 /// @defgroup Utils Plotting Utility Functions

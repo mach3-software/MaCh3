@@ -1,7 +1,5 @@
 #include "inputManager.h"
 
-// EM: will move this somewhere more sensible
-#define BAD_FLOAT -999.999
 
 namespace MaCh3Plotting {
 // this is the constructor with user specified translation config file
@@ -71,14 +69,13 @@ InputManager::InputManager(const std::string &translationConfigName) {
 ///  - Push back a pointer to the InputFile objcet to the vector of files known to this
 ///  InputManager.
 void InputManager::addFile(const std::string &fileName) {
-  InputFile fileInfo(fileName);
+  _fileVec.emplace_back(fileName);
 
   // EM: need to be done in this order since fillFileData needs to know info about the file, e.g.
   // fitter and what things are in it
+  InputFile &fileInfo = _fileVec.back();
   fillFileInfo(fileInfo);
   fillFileData(fileInfo);
-
-  _fileVec.push_back(fileInfo);
 }
 
 /// If printLevel is "summary", will loop through all the files known to this InputManager and call
@@ -400,6 +397,59 @@ bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &p
   return true;
 }
 
+// check the input file for raw MCMC step values for a particular parameter
+bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setInputBranch) const {
+  // we'll assume for now that the chain is in the form of a TTree and the branch names are parameter names
+
+  bool wasFound = false;
+
+  // make sure that the filedef object has all the necessary stuff to read from the posterior tree
+  if ( (inputFileDef.mcmcProc != nullptr) && (inputFileDef.posteriorTree != nullptr) )
+  {
+
+    const std::vector<TString> branchNames = inputFileDef.mcmcProc->GetBranchNames();
+
+    std::string specificName = getFitterSpecificParamName(fitter, kMCMC, parameter);
+
+    // loop over possible parameters and compare names
+    for ( int paramIdx = 0; paramIdx < inputFileDef.mcmcProc->GetNParams() -1 ; paramIdx ++ )
+    {
+      TString title;
+      double prior, priorError; // <- will be discarded
+      inputFileDef.mcmcProc->GetNthParameter(paramIdx, prior, priorError, title);
+
+      if ( strEndsWith(title.Data(), specificName) )
+      {
+        wasFound = true;
+        if ( setInputBranch )
+        {
+          // EM: should probably use MCMCProcessor for this so we can use caching, gpu etc.
+          inputFileDef.MCMCstepParamsMap[parameter] = new double( BAD_FLOAT ); // <- initialise the parameter step values 
+          inputFileDef.posteriorTree->SetBranchAddress( branchNames[paramIdx], inputFileDef.MCMCstepParamsMap.at(parameter) );
+        }
+
+        break;
+      }
+    }
+  }
+
+  return wasFound;
+
+}
+
+// check the input file for processed 1d posteriors for a particular parameter
+bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter) const {
+  return false;
+
+}
+
+// check the input file for processed 1d posteriors for a particular parameter
+bool InputManager::find2dPosterior(InputFile &inputFileDef, const std::string &parameter, const std::string &parameter2, std::string &fitter) const {
+  return false;
+
+}
+
+
 bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::string &parameter,
                                          std::string &fitter, const std::string &errorType,
                                          bool setInputFileError) {
@@ -616,6 +666,120 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       }
     }
 
+    // ######### Now for the main event: Look for MCMC chains and processed posteriors ###########
+    
+    // EM: if "MCMCsteps" was defined for this fitter, we assume that it is a MaCh3 raw MCMC file
+    // thus it needs an MCMCProcessor to read from it. This isn't super general and it would probably
+    // be good to have some additional "isMaCh3" option that can decide whether or not to use MCMCProcessor
+    // but hey ho it's good enough for now
+    if ( thisFitterSpec_config["MCMCsteps"] )
+    {
+      MACH3LOG_DEBUG("Initialising MCMCProcessor for the input file");
+      inputFileDef.mcmcProc = new MCMCProcessor(inputFileDef.fileName);
+      inputFileDef.mcmcProc->Initialise();
+      std::vector<std::string> posteriorTreeRawLocations = thisFitterSpec_config["MCMCsteps"]["location"].as<std::vector<std::string>>();
+      
+      TTree *postTree = NULL;
+      for ( const std::string &rawLoc: posteriorTreeRawLocations )
+      {
+        MACH3LOG_DEBUG("  - Looking for MCMC chain parameter values at: {}", rawLoc);
+
+        postTree = (TTree*)inputFileDef.file->Get(rawLoc.c_str());
+
+        if ( postTree != NULL )
+        {
+          MACH3LOG_DEBUG("  - FOUND!");
+          break;
+        }
+      }
+    
+      if ( postTree != NULL )
+      {
+        inputFileDef.posteriorTree = postTree;
+        inputFileDef.nMCMCentries = postTree->GetEntries();
+      }
+    }
+
+    if (printThoughts)
+    {
+      MACH3LOG_INFO("....Searching for MCMC related things");
+    }
+    
+    size_t num1dPosteriors = 0;
+    std::vector<std::string> enabled1dPosteriorParams;
+
+    size_t numMCMCchainParams = 0;
+    std::vector<std::string> enabledMCMCchainParams;
+
+    size_t num2dPosteriors = 0;
+    std::vector<std::vector<std::string>> enabled2dPosteriorParams;
+
+    for ( const std::string &parameter : _knownParameters )
+    {
+      MACH3LOG_DEBUG("     - for {}", parameter);
+      // check for 1d post processing posterior
+      if ( thisFitterSpec_config["1dPosteriors"] && find1dPosterior(inputFileDef, parameter, fitter) )
+      {
+        MACH3LOG_DEBUG("       Found 1d processed posterior!");
+        enabled1dPosteriorParams.push_back(parameter);
+        num1dPosteriors++;
+      }
+      // now check for parameters in chain 
+      inputFileDef.availableParams_map_MCMCchain[parameter] = false;
+      if ( thisFitterSpec_config["MCMCsteps"] && findRawChainSteps(inputFileDef, parameter, fitter) )
+      {
+        MACH3LOG_DEBUG("       Found raw MCMC steps!");
+        enabledMCMCchainParams.push_back(parameter);
+        numMCMCchainParams++;
+        inputFileDef.availableParams_map_MCMCchain[parameter] = true;
+      }
+      // now 2nd loop over parameters to look for 2d post processing posteriors
+      if ( !thisFitterSpec_config["2dPosteriors"] ) continue;
+      std::vector<std::string> tmpEnabledParams;
+      for ( const std::string &parameter2: _knownParameters )
+      {
+        if ( find2dPosterior(inputFileDef, parameter, parameter2, fitter) )
+        {        
+          tmpEnabledParams.push_back(parameter2);
+          numMCMCchainParams++;
+        }
+
+        if ( tmpEnabledParams.size() > 0 )
+        {
+          enabled2dPosteriorParams.push_back( tmpEnabledParams );
+        }
+      }
+      MACH3LOG_DEBUG("       Found {} processed 2d posteriors!", tmpEnabledParams.size());
+    }
+
+    if  (num1dPosteriors > 0 )
+    {
+      foundFitter = true;
+      inputFileDef.has1dPosteriors = true;
+      inputFileDef.availableParams_1dPosteriors = enabled1dPosteriorParams;
+
+      if (printThoughts)
+        MACH3LOG_INFO("........ Found {} 1d processed posteriors", num1dPosteriors);
+    }
+    if ( num2dPosteriors > 0 )
+    {
+      foundFitter = true;
+      inputFileDef.has2dPosteriors = true;
+      inputFileDef.availableParams_2dPosteriors = enabled2dPosteriorParams;
+
+      if (printThoughts)
+        MACH3LOG_INFO("........ Found {} 2d processed posteriors", num2dPosteriors);
+    }
+    if ( numMCMCchainParams > 0 )
+    {
+      foundFitter = true;
+      inputFileDef.hasMCMCchain = true;
+      inputFileDef.availableParams_MCMCchain = enabledMCMCchainParams;
+
+      if (printThoughts)
+        MACH3LOG_INFO("........ Found {} parameters in MCMC chain", numMCMCchainParams);
+    }
+
     /*
     switch (i) {
         // any other weird fitter specific conditions/ edge cases should go in here
@@ -731,6 +895,12 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
     {
       findPostFitParamError(inputFileDef, parameter, inputFileDef.fitter, errorType, true);
     }
+  }
+
+  // ########## Get the MCMC related posteriors ###########
+  for (const std::string &parameter : inputFileDef.availableParams_MCMCchain)
+  {
+    findRawChainSteps(inputFileDef, parameter, inputFileDef.fitter, true);
   }
 }
 
