@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    name: Validations CI ${{ matrix.name }}
+    name: ${{ matrix.name }}
 
     strategy:
       fail-fast: false  # Prevents cancellation of remaining jobs if one fails
@@ -21,6 +21,7 @@ jobs:
         include:
           - name: SplineValidations
           - name: CovarianceValidations
+          - name: FitterValidations
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 

@@ -175,8 +175,8 @@ void FitterBase::PrepareOutput() {
   {
     // Check that we have added samples
     if (!samples.size()) {
-      MACH3LOG_CRITICAL("No samples Found! If this is what you want find me here");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_CRITICAL("No samples Found! Is this really what you wanted?");
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     // Prepare the output trees
