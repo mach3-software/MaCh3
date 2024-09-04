@@ -93,11 +93,11 @@ else()
   )
   LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
 endif()
-
 #dump_cmake_variables(Prob3plusplus)
 
-
 ######################### python binding ##########################
+# EM: If Debug is not defined disable it by default
+DefineEnabledRequiredSwitch(MaCh3_PYTHON_ENABLED FALSE)
 
 if( MaCh3_PYTHON_ENABLED )
   set(PYBIND11_FINDPYTHON ON)
