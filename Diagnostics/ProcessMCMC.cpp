@@ -9,6 +9,7 @@ inline void MultipleProcessMCMC();
 inline void CalcBayesFactor(MCMCProcessor* Processor);
 inline void CalcSavageDickey(MCMCProcessor* Processor);
 inline void CalcBipolarPlot(MCMCProcessor* Processor);
+inline void CalcParameterEvolution(MCMCProcessor* Processor);
 inline void GetTrianglePlot(MCMCProcessor* Processor);
 inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile);
 inline void ReweightPrior(MCMCProcessor* Processor);
@@ -105,6 +106,7 @@ void ProcessMCMC(const std::string& inputFile)
   if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor);
   if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor);
   if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor);
+  if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor);
 
   if(PlotCorr)
   {
@@ -361,6 +363,23 @@ void CalcSavageDickey(MCMCProcessor* Processor)
   return;
 }
 
+void CalcParameterEvolution(MCMCProcessor* Processor)
+{
+  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node Settings = card_yaml["ProcessMCMC"];
+
+  std::vector<std::string> ParNames;
+  std::vector<int> Intervals;
+
+  for (const auto& d : Settings["ParameterEvolution"])
+  {
+    ParNames.push_back(d[0].as<std::string>());
+    Intervals.push_back(d[1].as<int>());
+  }
+  Processor->ParameterEvolution(ParNames, Intervals);
+  return;
+}
+
 void CalcBipolarPlot(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
@@ -375,6 +394,7 @@ void CalcBipolarPlot(MCMCProcessor* Processor)
   Processor->GetPolarPlot(ParNames);
   return;
 }
+
 
 void GetTrianglePlot(MCMCProcessor* Processor) {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
