@@ -3255,7 +3255,8 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
       text->SetNDC(true);
       text->Draw("SAME");
 
-      Posterior->Print((std::string(Names[k]+".gif+20").c_str()));
+      if(i == 0) Posterior->Print((std::string(Names[k] + ".gif++20").c_str())); // produces infinite loop animated GIF
+      else Posterior->Print((std::string(Names[k]+".gif+20").c_str())); // add picture to .gif
 
       delete EvePlot;
       delete text;
