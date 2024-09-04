@@ -4,7 +4,7 @@ The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter
 The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
-[![Release - v1.0.0](https://img.shields.io/badge/Release-v1.0.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+[![Release - v1.1.0](https://img.shields.io/badge/Release-v1.1.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
@@ -15,7 +15,7 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/10949376) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10949376.svg)](https://doi.org/10.5281/zenodo.10949376).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13642670.svg)](https://doi.org/10.5281/zenodo.13642670).
 
 # How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
@@ -32,11 +32,7 @@ Don't forget to:
 source bin/setup.MaCh3.sh
 ```
 ## Building against MaCh3
-If you compiled MaCh3 and sourced it you can simply call
-```
-find_package(MaCh3)
-```
-and cmake will find it. Alternatively, you can use CPM, for example:
+To include MaCh3 in your cmake project you can use following syntax
 ```
 CPMFindPackage(
   NAME MaCh3
@@ -44,6 +40,12 @@ CPMFindPackage(
   GITHUB_REPOSITORY mach3-software/MaCh3
 )
 ```
+Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
+If you compiled MaCh3 and sourced it you can simply call
+```
+find_package(MaCh3)
+```
+
 Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows:
 ```
 target_link_libraries(blarb MaCh3::All)
@@ -55,7 +57,7 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 MaCh3 can be compiled with a python interface by specifying the cmake option
 ```
-cmake ../ MaCh3_PYTHON_ENABLED=ON
+cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
 and then adding the path to the installed module to your `PYTHONPATH` environment variable:

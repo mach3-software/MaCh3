@@ -188,6 +188,7 @@ LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  PYTHON
   LOW_MEMORY_STRUCTS
   Oscillator
   Fitter
@@ -230,8 +231,6 @@ if( MaCh3_PYTHON_ENABLED )
   target_link_libraries( pyMaCh3 PUBLIC Plotting )
   install( TARGETS pyMaCh3 DESTINATION pyMaCh3/)
 endif()
-
-
 
 
 #This is to export the target properties of MaCh3
@@ -340,4 +339,4 @@ if(NOT TARGET uninstall)
 endif()
 
 # KS: Configure the Doxygen input file, this is to ensure whenever we update MaCh3 version Doxyfile will have same version.
-configure_file(${CMAKE_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_SOURCE_DIR}/Doc/Doxyfile @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doc/Doxyfile @ONLY)
