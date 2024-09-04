@@ -1,0 +1,51 @@
+name: Validations CI
+
+# The events that trigger the workflow
+on:
+  pull_request:
+    branches: [ develop ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    name: ${{ matrix.name }}
+
+    strategy:
+      fail-fast: false  # Prevents cancellation of remaining jobs if one fails
+      matrix:
+        include:
+          - name: SplineValidations
+          - name: CovarianceValidations
+          - name: FitterValidations
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+
+    - name: Get MaCh3 Validations
+      run: |
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3Validations.git MaCh3Validations
+        cd MaCh3Validations
+        mkdir build
+        cd build
+        cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+
+    - name: Build MaCh3 Validations
+      run: |
+        cd /opt/MaCh3Validations/build
+        make install # Build the project
+
+    - name: Validations
+      run: |
+        source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
+        source /opt/MaCh3Validations/build/bin/setup.MaCh3Validations.sh
+        cd /opt/MaCh3Validations/build
+        Apps/${{ matrix.name }}
