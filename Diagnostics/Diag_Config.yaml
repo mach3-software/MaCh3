@@ -58,7 +58,7 @@ ProcessMCMC:
   CalcBayesFactor: true
   CalcSavageDickey: true
   CalcBipolarPlot: false
-  CalcParameterEvolution: true
+  CalcParameterEvolution: false
 
   #Functionality 2D
   PlotCorr: false
