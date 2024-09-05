@@ -28,6 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Super-linter
+        uses: super-linter/super-linter@v7.1.0 # x-release-please-version
         continue-on-error: true # Ensures the job passes even if linter fails
         env:
           # To report GitHub Actions status checks
