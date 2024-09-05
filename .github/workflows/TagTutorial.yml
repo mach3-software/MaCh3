@@ -21,16 +21,17 @@ jobs:
 
       - name: Clone the target repository
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TARGET_REPO: mach3-software/MaCh3Validations
         run: |
           git clone https://$GITHUB_TOKEN@github.com/$TARGET_REPO.git
-          cd MaCh3Validations
 
       - name: Create and push the new tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd MaCh3Validations
+          # Extract the tag name from the GITHUB_REF
           TAG_NAME=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+          cd MaCh3Validations  # Navigate to the cloned repository
           git tag $TAG_NAME
           git push https://$GITHUB_TOKEN@github.com/$TARGET_REPO.git $TAG_NAME
