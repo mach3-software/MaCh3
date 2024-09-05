@@ -1,0 +1,7 @@
+MCMC:
+  - mcmc/**
+Plotting:
+  - plotting/**
+  - Diagnostics/**
+Nu Osc/Xsec:
+  - covariance/**
