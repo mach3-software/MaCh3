@@ -251,7 +251,7 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
   Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999);
 
   //If there is no mode information given then this will be an empty vector
-  Spline._fSplineModes = GetFromManager(param["Systematic"]["SplineInformation"]["Mode"], std::vector<int>());
+  Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>());
 
   return Spline;
 }
