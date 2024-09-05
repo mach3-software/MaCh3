@@ -26,7 +26,7 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
 
     - name: Get MaCh3 Validations

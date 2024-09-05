@@ -1,4 +1,4 @@
-#include "Structs.h"
+#include "samplePDF/Structs.h"
 
 #include "TList.h"
 #include "TObjArray.h"

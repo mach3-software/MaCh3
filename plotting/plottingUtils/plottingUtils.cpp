@@ -36,7 +36,7 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
   }
 
   // get the bin edges
-  Double_t binEdges[nPoints + 1];
+  std::vector<double> binEdges(nPoints + 1);
   binEdges[0] = pointsX[0] - (pointsX[1] - pointsX[0]) / 2.0;
   binEdges[nPoints] = pointsX[nPoints - 1] + (pointsX[nPoints - 1] - pointsX[nPoints - 2]) / 2.0;
 
@@ -46,7 +46,7 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
     binEdges[pointId] = (pointsX[pointId] + pointsX[pointId - 1]) / 2.0;
   }
 
-  TH1D retHist = TH1D(name.c_str(), title.c_str(), nPoints, binEdges);
+  TH1D retHist = TH1D(name.c_str(), title.c_str(), nPoints, binEdges.data());
 
   for (int binId = 0; binId < nPoints; binId++)
   {
