@@ -3,7 +3,7 @@ name: Tag MaCh3 Tutorial
 on:
   push:
     tags:
-      - '*'
+      - '*'  # This workflow will trigger on any tag push
   pull_request:
     branches: [ develop ]
 
@@ -13,25 +13,19 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
+        with:
+          repository: mach3-software/MaCh3Validations
 
       - name: Set up Git
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
-      - name: Clone the target repository
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_REPO: mach3-software/MaCh3Validations
-        run: |
-          git clone https://$GITHUB_TOKEN@github.com/$TARGET_REPO.git
-
       - name: Create and push the new tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Extract the tag name from the GITHUB_REF
-          TAG_NAME=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
-          cd MaCh3Validations  # Navigate to the cloned repository
+          # Extract the tag name from GITHUB_REF
+          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
           git tag $TAG_NAME
-          git push https://$GITHUB_TOKEN@github.com/$TARGET_REPO.git $TAG_NAME
+          git push https://$GITHUB_TOKEN@github.com/mach3-software/MaCh3Validations.git $TAG_NAME
