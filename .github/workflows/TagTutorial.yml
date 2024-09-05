@@ -1,0 +1,36 @@
+name: Tag MaCh3 Tutorial
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Clone the target repository
+        env:
+          TARGET_REPO: mach3-software/MaCh3Validations
+        run: |
+          git clone https://github.com/$TARGET_REPO.git
+          cd MaCh3Validations
+
+      - name: Create and push the new tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd MaCh3Validations
+          TAG_NAME=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+          git tag $TAG_NAME
+          git push https://$GITHUB_TOKEN@github.com/$TARGET_REPO.git $TAG_NAME
