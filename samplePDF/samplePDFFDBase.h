@@ -1,24 +1,11 @@
 #pragma once
 
 //C++ includes
-#include <iostream>
-#include <assert.h>
-#include <stdexcept>
 #include <list>
-#include <vector>
 
 //ROOT includes
-#include "TTree.h"
-#include "TH1D.h"
-#include "TH2D.h"
 #include "THStack.h"
 #include "TLegend.h"
-#include "TMath.h"
-#include "TFile.h"
-#include "TGraph2DErrors.h"
-#include "TROOT.h"
-#include "TRandom.h"
-#include "TString.h"
 
 //MaCh3 includes
 #include "OscClass/OscClass_CUDAProb3.h"
@@ -31,9 +18,6 @@
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
 #include "samplePDF/ShiftFunctors.h"
-
-
-#define USEBETA 0
 
 class samplePDFFDBase : virtual public samplePDFBase
 {

@@ -531,57 +531,6 @@ std::vector<double> covarianceBase::getProposed() const {
   return props;
 }
 
-// Throw nominal values
-void covarianceBase::throwNominal(bool nomValues, int seed) {
-  TVectorD* vec = new TVectorD(_fNumPar);
-  for (int i = 0; i < _fNumPar; i++) {
-    (*vec)(i) = 1.0;
-  }
-
-  ThrowParms* nom_throws = new ThrowParms(*vec, (*covMatrix));
-  nom_throws->SetSeed(seed);
-  std::vector<double> nominal = getNominalArray();
-  nominal.clear();
-  nominal.resize(_fNumPar);
-
-  // If we want to put the nominals somewhere else than user specified
-  // Don't fully understand this though: won't we have to reweight the MC somehow?
-  // nominal[i] is used in GetLikelihood() as the penalty term, so we're essentially setting a random parameter penalty term?
-  if (!nomValues)
-  {
-    bool throw_again = true;
-
-    while(throw_again == true)
-    {
-      throw_again = false;
-      MACH3LOG_INFO("Setting {} nominal values to random throws.", getName());
-      nom_throws->ThrowSet(nominal);
-
-      for (int i = 0; i < _fNumPar; i++)
-      {
-      // if parameter is fixed, dont throw
-        if (_fError[i] < 0) {
-          nominal[i] = 1.0;
-          continue;
-        }
-
-        if (nominal[i] < 0) {
-          nominal[i] = 0.0;
-          throw_again = true;
-        }
-      }
-    }
-  } else {
-    // If we want nominal values, set all entries to 1 (defined as nominal in MaCh3)
-    for (int i = 0; i < int(nominal.size()); i++) {
-      nominal[i] = 1.0;
-    }
-  }
-
-  delete nom_throws;
-  delete vec;
-}
-
 // *************************************
 // Throw the parameters according to the covariance matrix
 // This shouldn't be used in MCMC code ase it can break Detailed Balance;
@@ -995,8 +944,8 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
 
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
-	  //Make sure that you are actually passing a number to set the parameter to
-	  if(isnan(pars[i])) {
+      //Make sure that you are actually passing a number to set the parameter to
+      if(std::isnan(pars[i])) {
 	    MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
 		throw;
 	  } else {
@@ -1004,7 +953,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
 	  }
     }
   }
-
   // And if pca make the transfer
   if (pca) {
     TransferToPCA();
@@ -1199,8 +1147,7 @@ void covarianceBase::printIndivStepScale() {
   std::cout << "============================================================" << std::endl;
 }
 // ********************************************
-//Makes sure that matrix is positive-definite (so no error is thrown when
-//throwNominal() is called) by adding a small number to on-diagonal elements
+//Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
 void covarianceBase::MakePosDef(TMatrixDSym *cov) {
 // ********************************************
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages

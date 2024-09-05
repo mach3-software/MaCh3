@@ -1,10 +1,7 @@
 #pragma once
 
 //C++ includes
-#include <iostream>
-#include <vector>
 #include <assert.h>
-#include <stdexcept>
 
 //ROOT includes
 #include "TTree.h"
@@ -13,11 +10,8 @@
 #include "TMath.h"
 #include "TFile.h"
 #include "TROOT.h"
-#include "TRandom.h"
-#include "TSpline.h"
 #include "TRandom3.h"
 #include "TString.h"
-#include "TMath.h"
 
 //MaCh3 includes
 #include "samplePDF/Structs.h"

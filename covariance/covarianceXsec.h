@@ -9,9 +9,6 @@
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
 #include "samplePDF/Structs.h"
-#include "manager/YamlHelper.h"
-
-#include "yaml-cpp/yaml.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).

@@ -4,10 +4,8 @@
 #include "manager/manager.h"
 #include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
-#include "covariance/ThrowParms.h"
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
-
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
