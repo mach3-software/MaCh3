@@ -74,7 +74,7 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Grab the Spline Indices for the relevant DetID
     const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}
     /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
-    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){GetSystIndexFromDetID(DetID, kSpline);};
+    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, kSpline);};
     /// @brief Grab the index of the syst relative to global numbering.
     const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
 
