@@ -353,7 +353,6 @@ void covarianceXsec::initParams() {
       _fPreFitValue_PCA[i] = fParCurr_PCA(i);
     }
   }
-  CorrelateSteps();
 }
 
 // ********************************************
