@@ -179,13 +179,21 @@ struct InputFile {
 
   /// whether or not specific parameters exist in the MCMC posterior chain
   std::unordered_map<std::string, bool> availableParams_map_MCMCchain;
+  std::unordered_map<std::string, bool> availableParams_map_1dPosteriors;
+  std::unordered_map<std::string, std::unordered_map<std::string, bool>> availableParams_map_2dPosteriors;
 
   std::vector<std::string> availableParams_1dPosteriors;
   std::vector<std::string> availableParams_MCMCchain;
+
+  /// All the available pairs of parameters with 2d posteriors
+  /// is organised as a vector of length 2 vectors which have entries like {param1, param2}
   std::vector<std::vector<std::string>> availableParams_2dPosteriors;
 
   std::unordered_map<std::string, double*> MCMCstepParamsMap;
   std::unordered_map<std::string, int> MCMCstepTreeIndicesMap;
+
+  std::unordered_map<std::string, std::shared_ptr<TGraph>> posteriors1d_map;
+  std::unordered_map<std::string, std::unordered_map<std::string, std::shared_ptr<TGraph2D>>> posteriors2d_map;
 
   // EM: almost certainly won't want to load all of these into memory at the start
   bool hasSigmaVars; //!< Whether or not this file contains Sigma variations.
@@ -329,6 +337,35 @@ public:
 
   }
 
+  /// @brief Get the 1d posterior particular parameter from a particular input file.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param paramName The parameter you want the information about.
+  /// @return A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis
+  std::vector<std::vector<float>> get1dPosterior(int fileNum, std::string paramName) const {
+    if (!getEnabled1dPosteriors(fileNum, paramName))
+    {
+      MACH3LOG_WARN("file at index {} does not have a 1d posterior for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(2);
+    }
+    return TGraphToVector(*_fileVec[fileNum].posteriors1d_map.at(paramName));
+  }
+  
+  /// @brief Get the 2d posterior particular parameter from a particular input file.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param paramName The parameter you want the information about.
+  /// @param paramName2 The other parameter you want the information about.
+  /// @return A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis
+  std::vector<std::vector<float>> get2dPosterior(int fileNum, std::string paramName, std::string paramName2) const {
+    if (!getEnabled2dPosteriors(fileNum, paramName, paramName2))
+    {
+      MACH3LOG_WARN("file at index {} does not have a 2d posterior for parameters {} and {}", fileNum, paramName, paramName2);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(3);
+    }
+    return TGraphToVector(*_fileVec[fileNum].posteriors2d_map.at(paramName).at(paramName2));
+  }
+
   /// @brief Get the number of entries in the MCMC chain in a particular file.
   /// @param fileNum The index of the file you want the number of steps from.
   int getnMCMCentries(int fileNum) const {
@@ -428,6 +465,23 @@ public:
     return _fileVec[fileNum].availableParams_map_MCMCchain.at(paramName);
   }
 
+  /// @brief Get whether or not a particular parameter has 1d posteriors in a particular input file.
+  /// @param fileNum The index of the file that you would like to know about.
+  /// @param paramName The name of the parameter whose 1d posterior you would like to check for.
+  /// @return true if scan exists, false if not.
+  inline bool getEnabled1dPosteriors(int fileNum, std::string paramName) const {
+    return _fileVec[fileNum].availableParams_map_1dPosteriors.at(paramName);
+  }
+
+  /// @brief Get whether or not a particular parameter has MCMC chain entries in a particular input file.
+  /// @param fileNum The index of the file that you would like to know about.
+  /// @param paramName The name of the 1st parameter whose 2d posterior you would like to check for.
+  /// @param paramName2 The name of the other parameter.
+  /// @return true if scan exists, false if not.
+  inline bool getEnabled2dPosteriors(int fileNum, std::string paramName, std::string paramName2) const {
+    return _fileVec[fileNum].availableParams_map_2dPosteriors.at(paramName).at(paramName2);
+  }
+
   /// @brief Get the post fit error for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
   /// @param paramName The name of the parameter whose error you would like.
@@ -519,7 +573,7 @@ private:
   // look for in that directory
   std::vector<std::string> parseLocation(const std::string &locationString, std::string &fitter,
                                          fileTypeEnum fileType, const std::string &parameter = "",
-                                         const std::string &sample = "") const;
+                                         const std::string &sample = "", const std::string &parameter2 = "") const;
 
   // helper function to look for an object defined by a vector of strings [ (directory to look in),
   // (end of the name of the object) ] this just calls roots TDirectoryFile->Get() function so
@@ -542,10 +596,10 @@ private:
   bool findRawChainSteps(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setInputBranch = false ) const ;
 
   // check the input file for processed 1d posteriors for a particular parameter
-  bool find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter) const ;
+  bool find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData = false) const ;
 
   // check the input file for processed 1d posteriors for a particular parameter
-  bool find2dPosterior(InputFile &inputFileDef, const std::string &parameter, const std::string &parameter2, std::string &fitter) const ;
+  bool find2dPosterior(InputFile &inputFileDef, const std::string &parameter, const std::string &parameter2, std::string &fitter, bool setFileData = false) const ;
 
   // fns tp read an input file
   void fillFileInfo(InputFile &inputFileDef, bool printThoughts = true);

@@ -235,7 +235,7 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
 
 std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
                                                      fileTypeEnum fileType, const std::string &parameter,
-                                                     const std::string &sample) const {
+                                                     const std::string &sample, const std::string &parameter2) const {
 
   std::string locationString(rawLocationString);
   std::vector<std::string> tokens;
@@ -258,6 +258,15 @@ std::vector<std::string> InputManager::parseLocation(const std::string &rawLocat
   {
     locationString.replace(pos, toReplace.length(),
                            getFitterSpecificSampleName(fitter, fileType, sample));
+  }
+
+  // loop through the raw location string and replace any instance of {PARAMETER2} with the name of
+  // the second specified parameter
+  toReplace = "{PARAMETER2}";
+  while ((pos = locationString.find(toReplace)) != std::string::npos)
+  {
+    locationString.replace(pos, toReplace.length(),
+                           getFitterSpecificParamName(fitter, fileType, parameter2));
   }
 
   // Now we go through and look for ":" and split the location into two parts
@@ -438,15 +447,61 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
 }
 
 // check the input file for processed 1d posteriors for a particular parameter
-bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter) const {
-  return false;
+bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData) const {
+  
+  bool wasFound = false;
+  
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
+  if ( thisFitterSpec_config["1dPosteriors"] ) {
+    std::vector<std::string> rawLocations = thisFitterSpec_config["1dPosteriors"]["location"].as<std::vector<std::string>>();
+
+    for ( const std::string &rawLoc : rawLocations)
+    {
+      std::shared_ptr<TH1D> posterior1d = std::static_pointer_cast<TH1D>(findRootObject(inputFileDef, parseLocation(rawLoc, fitter, kMCMC, parameter)));
+
+      if ( posterior1d != nullptr )
+      {
+        wasFound = true;
+
+        if ( setFileData )
+        {
+          inputFileDef.posteriors1d_map[parameter] = std::make_shared<TGraph>(posterior1d.get());
+        }
+        break;
+      }
+    }
+
+  }
+
+  return wasFound;
 }
 
 // check the input file for processed 1d posteriors for a particular parameter
-bool InputManager::find2dPosterior(InputFile &inputFileDef, const std::string &parameter, const std::string &parameter2, std::string &fitter) const {
-  return false;
+bool InputManager::find2dPosterior(InputFile &inputFileDef, const std::string &parameter, const std::string &parameter2, std::string &fitter, bool setFileData) const {
+  bool wasFound = false;
+  
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
+  if ( thisFitterSpec_config["2dPosteriors"] ) {
+    std::vector<std::string> rawLocations = thisFitterSpec_config["2dPosteriors"]["location"].as<std::vector<std::string>>();
+
+    for (std::string rawLoc : rawLocations)
+    {
+      std::shared_ptr<TH2D> posterior2d = std::static_pointer_cast<TH2D>(findRootObject(inputFileDef, parseLocation(rawLoc, fitter, kPostFit, parameter, parameter2)));
+
+      if ( posterior2d != nullptr )
+      {
+        if ( setFileData )
+        {
+          inputFileDef.posteriors2d_map[parameter][parameter2] = std::make_shared<TGraph2D>(posterior2d.get());
+        }
+        break;
+      }
+    }
+  }
+
+  return wasFound;
 }
 
 
@@ -675,8 +730,6 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     if ( thisFitterSpec_config["MCMCsteps"] )
     {
       MACH3LOG_DEBUG("Initialising MCMCProcessor for the input file");
-      inputFileDef.mcmcProc = new MCMCProcessor(inputFileDef.fileName);
-      inputFileDef.mcmcProc->Initialise();
       std::vector<std::string> posteriorTreeRawLocations = thisFitterSpec_config["MCMCsteps"]["location"].as<std::vector<std::string>>();
       
       TTree *postTree = NULL;
@@ -684,10 +737,14 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       {
         MACH3LOG_DEBUG("  - Looking for MCMC chain parameter values at: {}", rawLoc);
 
-        postTree = (TTree*)inputFileDef.file->Get(rawLoc.c_str());
+        TObject *postTreeObj = inputFileDef.file->Get(rawLoc.c_str());
 
         if ( postTree != NULL )
         {
+          postTree = (TTree *) postTreeObj;
+          inputFileDef.mcmcProc = new MCMCProcessor(inputFileDef.fileName);
+          inputFileDef.mcmcProc->Initialise();
+
           MACH3LOG_DEBUG("  - FOUND!");
           break;
         }
@@ -717,12 +774,14 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     for ( const std::string &parameter : _knownParameters )
     {
       MACH3LOG_DEBUG("     - for {}", parameter);
-      // check for 1d post processing posterior
+      // check for 1d post processing posterior.q
+      inputFileDef.availableParams_map_1dPosteriors[parameter] = false;
       if ( thisFitterSpec_config["1dPosteriors"] && find1dPosterior(inputFileDef, parameter, fitter) )
       {
         MACH3LOG_DEBUG("       Found 1d processed posterior!");
         enabled1dPosteriorParams.push_back(parameter);
         num1dPosteriors++;
+        inputFileDef.availableParams_map_1dPosteriors[parameter] = true;
       }
       // now check for parameters in chain 
       inputFileDef.availableParams_map_MCMCchain[parameter] = false;
@@ -735,13 +794,16 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       }
       // now 2nd loop over parameters to look for 2d post processing posteriors
       if ( !thisFitterSpec_config["2dPosteriors"] ) continue;
-      std::vector<std::string> tmpEnabledParams;
+      std::vector<std::string> tmpEnabledParams(2);
       for ( const std::string &parameter2: _knownParameters )
       {
+        inputFileDef.availableParams_map_2dPosteriors[parameter][parameter2] = false;
         if ( find2dPosterior(inputFileDef, parameter, parameter2, fitter) )
         {        
-          tmpEnabledParams.push_back(parameter2);
+          tmpEnabledParams[0] = parameter;
+          tmpEnabledParams[1] = parameter2;
           numMCMCchainParams++;
+          inputFileDef.availableParams_map_2dPosteriors[parameter][parameter2] = true;
         }
 
         if ( tmpEnabledParams.size() > 0 )
@@ -901,6 +963,14 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   for (const std::string &parameter : inputFileDef.availableParams_MCMCchain)
   {
     findRawChainSteps(inputFileDef, parameter, inputFileDef.fitter, true);
+  }
+  for (const std::string &parameter : inputFileDef.availableParams_1dPosteriors)
+  {
+    find1dPosterior(inputFileDef, parameter, inputFileDef.fitter, true);
+  }
+  for ( const std::vector<std::string> &parameterPair : inputFileDef.availableParams_2dPosteriors )
+  {
+    find2dPosterior(inputFileDef, parameterPair[0], parameterPair[1], inputFileDef.fitter, true);
   }
 }
 
