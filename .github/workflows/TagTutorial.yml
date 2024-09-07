@@ -4,8 +4,8 @@ on:
   push:
     tags:
       - '*'  # This workflow will trigger on any tag push
-  pull_request:
-    branches: [ develop ]
+    branches:
+      - feature_TagCI  # Trigger on commits to this branch
 
 jobs:
   create-tag:
@@ -18,14 +18,19 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name "GitHub Action"
+          git config --global user.name "MaCh3 Bot"
           git config --global user.email "action@github.com"
 
       - name: Create and push the new tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_TOKEN: ${{ secrets.MACH3_VALIDATIONS_PAT }}
         run: |
           # Extract the tag name from GITHUB_REF
-          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
+          #TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
+          TAG_NAME=1.1.0
+
+          # Create the new tag
           git tag $TAG_NAME
-          git push https://$GITHUB_TOKEN@github.com/mach3-software/MaCh3Validations.git $TAG_NAME
+
+          # Push the tag to the MaCh3Validations repository
+          git push https://$PAT_TOKEN@github.com/mach3-software/MaCh3Validations.git $TAG_NAME
