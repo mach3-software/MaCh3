@@ -8,17 +8,29 @@ on:
       - feature_TagCI  # Trigger on commits to this branch
 
 jobs:
-  tag-validations:
+  create-tag:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger workflow in MaCh3Validations
+
+      - name: Set up Git
         run: |
-          #TAG_NAME=$(git describe --tags --abbrev=0)
+          git config --global user.name "MaCh3 Bot"
+          git config --global user.email "action@github.com"
+
+      - name: Clone MaCh3Validations
+        run: |
+        git clone https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Validations.git
+
+      - name: Create and push the new tag
+        run: |
+          cd MaCh3Validations/
+
+          # Extract the tag name from GITHUB_REF
+          #TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
           TAG_NAME=1.1.0
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/mach3-software/MaCh3Validations/git/refs \
-            -d '{"ref": "refs/tags/'"$TAG_NAME"'", "sha": "'"$(git rev-parse HEAD)"'"}'
-        env:
-          GITHUB_TOKEN: ${{ secrets.MACH3_VALIDATIONS_PAT }}
+
+          # Create the new tag
+          git tag $TAG_NAME
+
+          # Push the tag to the MaCh3Validations repository
+          git push https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Validations.git $TAG_NAME
