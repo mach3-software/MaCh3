@@ -161,14 +161,17 @@ enum SystType {
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
 struct XsecSplines1 {
-  // *******************
+// *******************
   /// Spline interpolation vector
-  SplineInterpolation SplineInterpolationType;
+  SplineInterpolation _SplineInterpolationType;
+
+  /// Modes to which spline applies (valid only for binned splines)
+  std::vector<int> _fSplineModes;
 
   /// EM: Cap spline knot lower value
-  double SplineKnotLowBound;
+  double _SplineKnotLowBound;
   /// EM: Cap spline knot higher value
-  double SplineKnotUpBound;
+  double _SplineKnotUpBound;
 };
 
 // **************************************************

@@ -105,8 +105,6 @@ class covarianceBase {
   void throwParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void throwParameters();
-  /// @brief Throw nominal values
-  void throwNominal(const bool nomValues = false, const int seed = 0);
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
