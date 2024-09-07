@@ -19,7 +19,7 @@ jobs:
 
       - name: Clone MaCh3Validations
         run: |
-        git clone https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Validations.git
+          git clone https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Validations.git
 
       - name: Create and push the new tag
         run: |
