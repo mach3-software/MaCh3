@@ -22,9 +22,11 @@ jobs:
           git config --global user.email "action@github.com"
 
       - name: Create and push the new tag
-        env:
-          PAT_TOKEN: ${{ secrets.MACH3_VALIDATIONS_PAT }}
         run: |
+          # Debugging: print the GITHUB_REF and TAG_NAME
+          echo "GITHUB_REF: ${GITHUB_REF}"
+          echo "Using PAT: ${{ secrets.MACH3_VALIDATIONS_PAT }}"
+
           # Extract the tag name from GITHUB_REF
           #TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
           TAG_NAME=1.1.0
@@ -33,4 +35,4 @@ jobs:
           git tag $TAG_NAME
 
           # Push the tag to the MaCh3Validations repository
-          git push https://$PAT_TOKEN@github.com/mach3-software/MaCh3Validations.git $TAG_NAME
+          git push https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Validations.git $TAG_NAME
