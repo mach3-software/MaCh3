@@ -1,11 +1,10 @@
+# Whenever we make a new tag o MaCh3 let's make identical tag of MaCh3 Tutorial
 name: Tag MaCh3 Tutorial
 
 on:
   push:
     tags:
       - '*'  # This workflow will trigger on any tag push
-    branches:
-      - feature_TagCI  # Trigger on commits to this branch
 
 jobs:
   create-tag:
@@ -26,8 +25,7 @@ jobs:
           cd MaCh3Validations/
 
           # Extract the tag name from GITHUB_REF
-          #TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
-          TAG_NAME=1.1.0
+          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
 
           # Create the new tag
           git tag $TAG_NAME
