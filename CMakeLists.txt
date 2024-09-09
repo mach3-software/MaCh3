@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 1.1.0)
+SET(MaCh3_VERSION 1.1.1)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
@@ -127,14 +127,14 @@ else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O3                                  # Optimize code for maximum speed
-    -funroll-loops                       # Unroll loops where possible for performance
-    --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
-    -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
-    #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
+    -O3                                   # Optimize code for maximum speed
+    -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
+    #-funroll-loops                       # Unroll loops where possible for performance
+    #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
+    #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
   #KS: add Link-Time Optimization (LTO)
-  # FIXME previously it wasn't used correctly but would need more testing
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 

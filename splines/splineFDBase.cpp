@@ -14,6 +14,33 @@ splineFDBase::splineFDBase(covarianceXsec *xsec_)
   MonolithIndex=0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
   CoeffIndex=0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
 }
+//****************************************
+splineFDBase::~splineFDBase(){
+//****************************************
+
+}
+//****************************************
+void splineFDBase::cleanUpMemory() {
+//****************************************
+
+  //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
+  //Not a huge saving but it's better than leaving everything up to the compiler
+  MACH3LOG_INFO("Cleaning up spline memory");
+
+  indexvec.clear();
+  indexvec.shrink_to_fit();
+  SplineFileParPrefixNames.clear();
+  SplineFileParPrefixNames.shrink_to_fit();
+  SplineBinning.clear();
+  SplineBinning.shrink_to_fit();
+  GlobalSystIndex.clear();
+  GlobalSystIndex.shrink_to_fit();
+  UniqueSystNames.clear();
+  UniqueSystNames.shrink_to_fit();
+  splinevec_Monolith.clear();
+  splinevec_Monolith.shrink_to_fit();
+  if(isflatarray != nullptr) delete isflatarray;
+}
 
 //****************************************
 bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
@@ -83,12 +110,12 @@ void splineFDBase::TransferToMonolith()
 
   if(MonolithSize!=MonolithIndex){
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
-	MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
-	MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
+    MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
+    MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
     throw;
   }
 
-  MACH3LOG_INFO("Now transfering splines to a monolith if size {}", MonolithSize);
+  MACH3LOG_INFO("Now transferring splines to a monolith if size {}", MonolithSize);
 
   uniquesplinevec_Monolith.resize(MonolithSize);
   weightvec_Monolith.resize(MonolithSize);
@@ -351,7 +378,7 @@ void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
             std::vector<int> indexvec_Var3;
             for (int iVar3 = 0; iVar3 < (SplineBinning[iSample][iOscChan][2])->GetNbins(); iVar3++)
             { // Loop over third dimension
-	            indexvec_Var3.push_back(0); //Don't start counting yet!
+              indexvec_Var3.push_back(0); //Don't start counting yet!
             } // end iVar3 loop
             indexvec_Var2.push_back(indexvec_Var3);
           } // end iVar2 loop
@@ -733,13 +760,13 @@ void splineFDBase::PrepForReweight()
   std::cout << "Number of combinations of Sample, OscChan, Syst and Mode which have entirely flat response:" << nCombinations_FlatSplines << " / " << nCombinations_All << std::endl;
 }
 
+//****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
 void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _float_* &manyArray){
-
+//****************************************
   // Initialise all arrays to 1.0
   int nPoints;
-  //No point evalutating a flat spline
-
+  //No point evaluating a flat spline
   nPoints = splinevec_Monolith[splineindex]->GetNp();
 
   for (int i = 0; i < nPoints; i++) {
@@ -781,9 +808,9 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _fl
   splinevec_Monolith[splineindex] = NULL;
 }
 
+//****************************************
 //ETA - this may need to be virtual and then we can define this in the experiment.
 //Equally though could just use KinematicVariable to map back
-//****************************************
 std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 //****************************************
 {
@@ -794,7 +821,6 @@ std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
   }
   return DimensionLabels.at(iSample).at(Axis);
 }
-
 
 //Returns sample index in 
 int splineFDBase::getSampleIndex(std::string SampleName){

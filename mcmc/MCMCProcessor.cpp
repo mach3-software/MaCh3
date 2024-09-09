@@ -1,6 +1,7 @@
 #include "MCMCProcessor.h"
 
 #include "TChain.h"
+#include "TF1.h"
 
 //Only if GPU is enabled
 #ifdef CUDA
@@ -1332,7 +1333,7 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
 
 
 // *********************
-// Based on https://www.jstor.org/stable/25651249?seq=3,
+// Based on @cite roberts2009adaptive
 // all credits for finding and studying it goes to Henry
 void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
 // *********************
@@ -3793,8 +3794,8 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 
 
 // **************************
-// KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
-// Furthermore we calculate Sampling efficiency following https://kmh-lanl.hansonhub.com/talks/maxent00b.pdf
+// KS: calc Effective Sample Size Following @cite StanManual
+// Furthermore we calculate Sampling efficiency following @cite hanson2008mcmc
 // Rule of thumb is to have efficiency above 25%
 void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
 // **************************
@@ -3814,7 +3815,7 @@ void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
   const double Thresholds[Nhists+1] = {1, 0.02, 0.005, 0.001, 0.0001, 0.0};
   const Color_t ESSColours[Nhists] = {kGreen, kGreen+2, kYellow, kOrange, kRed};
 
-  //KS: This histogram is inspired by the following: https://mc-stan.org/bayesplot/articles/visual-mcmc-diagnostics.html
+  //KS: This histogram is inspired by the following: @cite gabry2024visual
   TH1D **EffectiveSampleSizeHist = new TH1D*[Nhists]();
   for(int i = 0; i < Nhists; ++i)
   {
@@ -3979,9 +3980,9 @@ void MCMCProcessor::BatchedAnalysis() {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  // Calculate variance estimator using batched means following https://arxiv.org/pdf/1911.00915.pdf see Eq. 1.2
+  // Calculate variance estimator using batched means following @cite chakraborty2019estimating see Eq. 1.2
   TVectorD* BatchedVariance = new TVectorD(nDraw);
-  //KS: The hypothesis is rejected if C > z α for a given confidence level α. If the batch means do not pass the test, Correlated is reported for the half-width on the statistical reports following https://rossetti.github.io/RossettiArenaBook/ch5-BatchMeansMethod.html alternatively for more old-school see Alexopoulos and Seila 1998 section 3.4.3
+  //KS: The hypothesis is rejected if C > z α for a given confidence level α. If the batch means do not pass the test, Correlated is reported for the half-width on the statistical reports following @cite rossetti2024batch alternatively for more old-school see Alexopoulos and Seila 1998 section 3.4.3
   TVectorD* C_Test_Statistics = new TVectorD(nDraw);
  
   double* OverallBatchMean = new double[nDraw]();
@@ -4089,7 +4090,7 @@ void MCMCProcessor::BatchedAnalysis() {
 }
 
 // **************************
-// RC: Perform spectral analysis of MCMC based on http://arxiv.org/abs/astro-ph/0405462
+// RC: Perform spectral analysis of MCMC based on @cite Dunkley:2004sv
 void MCMCProcessor::PowerSpectrumAnalysis() {
 // **************************
   TStopwatch clock;
@@ -4112,7 +4113,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
 
   int nPrams = nDraw;
-  //KS: WARNING Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
+  /// @todo KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
   nPrams = 2;
 
   std::vector<std::vector<float>> k_j(nPrams, std::vector<float>(v_size, 0.0));
@@ -4217,11 +4218,10 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
 // **************************
 // Geweke Diagnostic based on
-// https://www.math.arizona.edu/~piegorsch/675/GewekeDiagnostics.pdf
-// https://www2.math.su.se/matstat/reports/master/2011/rep2/report.pdf Chapter 3.1
+// @cite Fang2014GewekeDiagnostics
+// @cite karlsbakk2011 Chapter 3.1
 void MCMCProcessor::GewekeDiagnostic() {
 // **************************
-
   MACH3LOG_INFO("Making Geweke Diagnostic");
 
   //KS: Up refers to upper limit we check, it stays constant, in literature it is mostly 50% thus using 0.5 for threshold
@@ -4378,7 +4378,6 @@ void MCMCProcessor::GewekeDiagnostic() {
 
   OutputFile->cd();
 }
-
 
 // **************************
 // Acceptance Probability

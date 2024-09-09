@@ -20,8 +20,8 @@
 #include "mcmc/MCMCProcessor.h"
 
 // *******************
-/// @brief Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
+/// @brief Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff \cite gelman1996posterior
+/// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
 class SampleSummary {
 // *******************
   public:
