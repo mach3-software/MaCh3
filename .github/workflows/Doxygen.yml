@@ -37,6 +37,9 @@ jobs:
       # Installs libjs-mathjax for rendering mathematical notation in Doxygen documentation
       - run: sudo apt-get install -y libjs-mathjax
 
+      # Install perl for bibtex
+      - run: sudo apt-get install -y perl
+
       # Runs a single command using the runners shell
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@1.9.8

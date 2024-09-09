@@ -670,7 +670,7 @@ LAYOUT_FILE            =
 # search path. Do not use file names with spaces, bibtex cannot handle them. See
 # also \cite for info how to create references.
 
-CITE_BIB_FILES         = bibliography.bib
+CITE_BIB_FILES         = ../Doc/bibliography.bib
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
