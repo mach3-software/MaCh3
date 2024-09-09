@@ -27,6 +27,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+      
+      # Install texlive for LaTeX support in Doxygen
+      - run: sudo apt-get install -y texlive
 
       # Runs a single command using the runners shell
       - name: Doxygen Action
