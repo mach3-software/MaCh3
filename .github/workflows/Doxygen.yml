@@ -28,8 +28,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       
-      # Install texlive for LaTeX support in Doxygen
+      # Updates the package list to ensure you get the latest version of packages
+      - run: sudo apt-get update
+
+      # Installs texlive for LaTeX support in Doxygen documentation
       - run: sudo apt-get install -y texlive
+
+      # Installs libjs-mathjax for rendering mathematical notation in Doxygen documentation
+      - run: sudo apt-get install -y libjs-mathjax
 
       # Runs a single command using the runners shell
       - name: Doxygen Action
@@ -38,6 +44,7 @@ jobs:
           doxyfile-path: './Doxyfile'
           working-directory: ./Doc
   
+      # Deploys the generated documentation to GitHub Pages
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
