@@ -2666,6 +2666,7 @@ void MCMCProcessor::ReadFDFile() {
 void MCMCProcessor::ReadOSCFile() {
 // ***************
 
+  /// TODO WARNING remeber to fix this baka!
   // Do the same for the ND280
   TFile *OscFile = new TFile(CovPos[kOSCPar].back().c_str(), "open");
   if (OscFile->IsZombie()) {
