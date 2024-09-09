@@ -13,7 +13,7 @@
 #include "manager/manager.h"
 
 // **************************
-/// @brief  KS: Following H. Jeffreys @cite jeffreys1998theory
+/// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
 /// @param BayesFactor Obtained value of Bayes factor
 inline std::string GetJeffreysScale(const double BayesFactor){
 // **************************
@@ -99,7 +99,7 @@ inline double GetBIC(const double llh, const int data, const int nPars){
 
 // ****************
 /// @brief KS: See 14.3.10 in Numerical Recipes in C
-/// @cite press1992numerical
+/// \cite press1992numerical
 inline double GetNeffective(const int N1, const int N2) {
 // ****************
 
@@ -224,7 +224,7 @@ inline double GetBetaParameter(const double data, const double mc, const double 
 
 
 // *********************
-/// @brief Based on @cite roberts2009adaptive
+/// @brief Based on \cite roberts2009adaptive
 /// @param EigenValues Eigen values of covariance matrix
 inline double GetSubOptimality(const std::vector<double>& EigenValues, const int TotalTarameters) {
 // *********************

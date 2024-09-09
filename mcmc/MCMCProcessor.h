@@ -79,7 +79,7 @@ class MCMCProcessor {
     /// @param Mute Allow silencing many messages, especially important if we calculate matrix many times
     void MakeCovariance_MP(const bool Mute = false);
     /// @brief Make and Draw SubOptimality
-    /// @cite roberts2009adaptive
+    /// \cite roberts2009adaptive
     void MakeSubOptimality(const int NIntervals = 10);
 
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
@@ -287,23 +287,23 @@ class MCMCProcessor {
     /// This function computes the Effective Sample Size (ESS) using the autocorrelations
     /// calculated by AutoCorrelation(). Ensure that the parameter nLags here matches
     /// the number of lags used in AutoCorrelation() to obtain accurate results.
-    /// @cite StanManual
-    /// @cite hanson2008mcmc
-    /// @cite gabry2024visual
+    /// \cite StanManual
+    /// \cite hanson2008mcmc
+    /// \cite gabry2024visual
     inline void CalculateESS(const int nLags, double **LagL);
     /// @brief Get the batched means variance estimation and variable indicating if number of batches is sensible
-    /// @cite chakraborty2019estimating
-    /// @cite rossetti2024batch
+    /// \cite chakraborty2019estimating
+    /// \cite rossetti2024batch
     inline void BatchedAnalysis();
     /// @brief CW: Batched means, literally read from an array and chuck into TH1D
     inline void BatchedMeans();
     /// @brief Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011).
-    /// @cite Fang2014GewekeDiagnostics
-    /// @cite karlsbakk2011
+    /// \cite Fang2014GewekeDiagnostics
+    /// \cite karlsbakk2011
     inline void GewekeDiagnostic();
     /// @brief Acceptance Probability
     inline void AcceptanceProbabilities();
-    /// @brief RC: Perform spectral analysis of MCMC based on @cite Dunkley:2004sv
+    /// @brief RC: Perform spectral analysis of MCMC based on \cite Dunkley:2004sv
     inline void PowerSpectrumAnalysis();
 
     /// Name of MCMC file
