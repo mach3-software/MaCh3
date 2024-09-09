@@ -6,6 +6,7 @@
 
 // C++ includes
 #include <complex>
+#include <cstdio>
 
 // ROOT includes
 #include "TObjArray.h"
@@ -152,6 +153,12 @@ class MCMCProcessor {
                        const std::vector<double>& NewCentral,
                        const std::vector<double>& NewError);
     
+    /// @brief Make .gif of parameter evolution
+    /// @param ParName Parameter names for which we do .gif
+    /// @param NIntervals Number of intervals for a gif
+    void ParameterEvolution(const std::vector<std::string>& Names,
+                            const std::vector<int>& NIntervals);
+
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     

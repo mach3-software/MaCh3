@@ -3197,6 +3197,76 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
 // **************************
 // Diagnose the MCMC
+void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
+                                       const std::vector<int>& NIntervals) {
+// **************************
+  MACH3LOG_INFO("Parameter Evolution gif");
+
+  //KS: First we need to find parameter number based on name
+  for(unsigned int k = 0; k < Names.size(); ++k)
+  {
+    //KS: First we need to find parameter number based on name
+    int ParamNo = GetParamIndexFromName(Names[k]);
+    if(ParamNo == _UNDEF_)
+    {
+      MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
+      continue;
+    }
+
+    const int IntervalsSize = nSteps/NIntervals[k];
+
+    // ROOT won't overwrite gifs so we need to delete the file if it's there already
+    std::remove(std::string(Names[k]+".gif").c_str());
+
+    // This holds the posterior density
+    const double maxi = Chain->GetMaximum(BranchNames[ParamNo]);
+    const double mini = Chain->GetMinimum(BranchNames[ParamNo]);
+
+    int Counter = 0;
+    for(int i = NIntervals[k]-1; i >= 0; --i)
+    {
+      // This holds the posterior density
+      TH1D* EvePlot = new TH1D(BranchNames[ParamNo], BranchNames[ParamNo], nBins, mini, maxi);
+      EvePlot->SetMinimum(0);
+      EvePlot->GetYaxis()->SetTitle("PDF");
+      EvePlot->GetYaxis()->SetNoExponent(false);
+
+      //KS: Apply additional Cuts, like mass ordering
+      std::string CutPosterior1D = "step > " + std::to_string(i*IntervalsSize+IntervalsSize);
+
+      std::string TextTitle = "Steps = 0 - "+std::to_string(Counter*IntervalsSize+IntervalsSize);
+      // Project BranchNames[ParamNo] onto hpost, applying stepcut
+      Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], CutPosterior1D.c_str());
+
+      EvePlot->SetLineWidth(2);
+      EvePlot->SetLineColor(kBlue-1);
+      EvePlot->SetTitle(Names[k].c_str());
+      EvePlot->GetXaxis()->SetTitle(EvePlot->GetTitle());
+      EvePlot->GetYaxis()->SetLabelOffset(1000);
+      if(ApplySmoothing) EvePlot->Smooth();
+
+      EvePlot->Scale(1. / EvePlot->Integral());
+
+      EvePlot->Draw("HIST");
+
+      TText *text = new TText(0.3, 0.8, TextTitle.c_str());
+      text->SetTextFont (43);
+      text->SetTextSize (40);
+      text->SetNDC(true);
+      text->Draw("SAME");
+
+      if(i == 0) Posterior->Print((std::string(Names[k] + ".gif++20").c_str())); // produces infinite loop animated GIF
+      else Posterior->Print((std::string(Names[k]+".gif+20").c_str())); // add picture to .gif
+
+      delete EvePlot;
+      delete text;
+      Counter++;
+    }
+  }
+}
+
+// **************************
+// Diagnose the MCMC
 void MCMCProcessor::DiagMCMC() {
 // **************************
 
