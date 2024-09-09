@@ -5,3 +5,5 @@ Plotting:
   - Diagnostics/**
 Nu Osc/Xsec:
   - covariance/**
+Documentation:
+  - Doc/**
