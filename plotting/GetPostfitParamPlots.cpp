@@ -71,12 +71,12 @@ std::vector <TH1D *> PostfitHistVec;
 void copyParToBlockHist(int localBin, std::string paramName, TH1D*blockHist, std::string type, int fileId, bool setLabels = true){
   // Set the values in the sub-histograms
   MACH3LOG_DEBUG("copyin data from at local bin {}: for parameter {}", localBin, paramName);
-  MACH3LOG_DEBUG("  Fitter specific name: {}", man->Input().TranslateName(fileId, MaCh3Plotting::kPostFit, paramName));
-  MACH3LOG_DEBUG("  value: {}", man->Input().GetPostFitValue(fileId, paramName, type));
-  MACH3LOG_DEBUG("  error: {}", man->Input().GetPostFitError(fileId, paramName, type));
+  MACH3LOG_DEBUG("  Fitter specific name: {}", man->input().translateName(fileId, MaCh3Plotting::kPostFit, paramName));
+  MACH3LOG_DEBUG("  value: {}", man->input().getPostFitValue(fileId, paramName, type));
+  MACH3LOG_DEBUG("  error: {}", man->input().getPostFitError(fileId, paramName, type));
 
-  blockHist->SetBinContent(localBin +1, man->Input().GetPostFitValue(fileId, paramName, type));
-  blockHist->SetBinError(localBin +1, man->Input().GetPostFitError(fileId, paramName, type));
+  blockHist->SetBinContent(localBin +1, man->input().getPostFitValue(fileId, paramName, type));
+  blockHist->SetBinError(localBin +1, man->input().getPostFitError(fileId, paramName, type));
 
   if(setLabels){
     blockHist->GetXaxis()->SetBinLabel(localBin +1, paramName.c_str());
@@ -88,7 +88,7 @@ void PrettifyTitles(TH1D *Hist) {
   for (int i = 0; i < Hist->GetXaxis()->GetNbins(); ++i)
   {
     std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
-    title = man->Style().prettifyParamName(title);
+    title = man->style().prettifyParamName(title);
     Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
@@ -98,7 +98,7 @@ void PrettifyTitles(TH2D *Hist) {
   {
     std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
 
-    title = man->Style().prettifyParamName(title);
+    title = man->style().prettifyParamName(title);
     Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
@@ -180,7 +180,7 @@ inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
       if (Ratio->GetLineColor() == 0) Ratio->SetLineColor(kBlack);
       Ratio->SetMarkerColor(PostfitCopy->GetMarkerColor());
 
-      Ratio->SetLineWidth(man->GetOption<int>("plotLineWidth"));
+      Ratio->SetLineWidth(man->getOption<int>("plotLineWidth"));
       Ratio->SetTitle("");
 
       Ratio->SetMarkerSize(2);
@@ -224,7 +224,7 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>Po
     postFitHist->SetLineColor(TColor::GetColorPalette(fileId));
     postFitHist->SetMarkerStyle(7);
     postFitHist->SetLineStyle(1+fileId);
-    postFitHist->SetLineWidth(man->GetOption<int>("plotLineWidth"));
+    postFitHist->SetLineWidth(man->getOption<int>("plotLineWidth"));
 
     postFitHist->Draw("e1, same");
   }
@@ -254,7 +254,7 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>Po
     ratioHists[postFitIdx]->SetLineColor(TColor::GetColorPalette(postFitIdx));
     ratioHists[postFitIdx]->SetMarkerStyle(7);
     ratioHists[postFitIdx]->SetLineStyle(1+postFitIdx);
-    ratioHists[postFitIdx]->SetLineWidth(man->GetOption<int>("plotLineWidth"));
+    ratioHists[postFitIdx]->SetLineWidth(man->getOption<int>("plotLineWidth"));
 
     ratioHists[postFitIdx]->Draw("p same");
   }
@@ -266,13 +266,13 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>Po
   
   line.SetLineColor(kRed);
   line.SetLineStyle(kDashed);
-  line.SetLineWidth(man->GetOption<int>("refLineWidth"));
+  line.SetLineWidth(man->getOption<int>("refLineWidth"));
   line2.SetLineColor(kRed);
   line2.SetLineStyle(kDashed);
-  line2.SetLineWidth(man->GetOption<int>("refLineWidth"));
+  line2.SetLineWidth(man->getOption<int>("refLineWidth"));
   line3.SetLineColor(kRed);
   line3.SetLineStyle(kDashed);
-  line3.SetLineWidth(man->GetOption<int>("refLineWidth"));
+  line3.SetLineWidth(man->getOption<int>("refLineWidth"));
 
   line.Draw("same");
   line2.Draw("same");
@@ -287,14 +287,14 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>Po
 void MakeXsecPlots()
 {  
   // get the names of the blocks of parameters to group together
-  std::vector<std::string> const blockNames = man->GetOption<std::vector<std::string>>("paramGroups");
+  std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
   const int XsecPlots = (int)blockNames.size();
 
   for (int i = 0; i < XsecPlots; i++) 
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
-    YAML::Node paramBlock = man->GetOption(blockName);
+    YAML::Node paramBlock = man->getOption(blockName);
     std::string blockTitle                 = paramBlock[0].as<std::string>();
     std::vector<double>      blockLimits   = paramBlock[1].as<std::vector<double>>();
     std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
@@ -305,7 +305,7 @@ void MakeXsecPlots()
     // set some plot things
     TH1D *blockHist_prefit = new TH1D(blockName.c_str(), blockTitle.c_str(), nParams, 0.0, (double)nParams);
     
-    man->Style().setTH1Style(blockHist_prefit, man->GetOption<std::string>("prefitHistStyle"));
+    man->style().setTH1Style(blockHist_prefit, man->getOption<std::string>("prefitHistStyle"));
 
     // set the errors for the prefit block hist
     for(int localBin=0; localBin < nParams; localBin ++){
@@ -316,9 +316,9 @@ void MakeXsecPlots()
 
     // now set for the postfit blocks for all files
     std::vector <TH1D *> blockHist_postfit_Vec;
-    for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
+    for(int fileId = 0; fileId < man->getNFiles(); fileId++){
 
-      TH1D *blockHist_postfit = new TH1D((blockName + man->GetFileName(fileId)).c_str(), blockTitle.c_str(), nParams, 0.0, (double)nParams);
+      TH1D *blockHist_postfit = new TH1D((blockName + man->getFileName(fileId)).c_str(), blockTitle.c_str(), nParams, 0.0, (double)nParams);
 
       // loop throught all the parameters in this block and set the contents in the blocks TH1
       for(int localBin=0; localBin < nParams; localBin ++){
@@ -347,8 +347,8 @@ void MakeFluxPlots()
   p2->SetLogx(true);
   
   // get the names of the blocks of parameters to group together
-  std::vector<std::string> const fluxBlockNames = man->GetOption<std::vector<std::string>>("fluxGroups");
-  auto const fluxBinningTable = man->GetOption("FluxBinning");
+  std::vector<std::string> const fluxBlockNames = man->getOption<std::vector<std::string>>("fluxGroups");
+  auto const fluxBinningTable = man->getOption("FluxBinning");
 
   const int FluxPlots = (int)fluxBlockNames.size();
 
@@ -356,7 +356,7 @@ void MakeFluxPlots()
   {
     // get the configuration for this block
     std::string fluxBlockName = fluxBlockNames[i];
-    YAML::Node paramBlock           = man->GetOption(fluxBlockName);
+    YAML::Node paramBlock           = man->getOption(fluxBlockName);
     std::string blockTitle          = paramBlock[0].as<std::string>();
     std::vector<double> blockLimits = paramBlock[1].as<std::vector<double>>();
     std::string blockBinningName    = paramBlock[2].as<std::string>();
@@ -383,7 +383,7 @@ void MakeFluxPlots()
     blockHist_prefit->GetYaxis()->SetTitle("Parameter Variation");
     blockHist_prefit->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     blockHist_prefit->GetXaxis()->SetTitleOffset(blockHist_prefit->GetXaxis()->GetTitleOffset()*1.2);
-    man->Style().setTH1Style(blockHist_prefit, man->GetOption<std::string>("prefitHistStyle"));
+    man->style().setTH1Style(blockHist_prefit, man->getOption<std::string>("prefitHistStyle"));
     // set the errors for the prefit block hist
     for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
         int localBin = fluxParId - blockContents[0];
@@ -393,7 +393,7 @@ void MakeFluxPlots()
 
     // now set for the postfit blocks for all files
     std::vector <TH1D *> blockHist_postfit_Vec;
-    for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
+    for(int fileId = 0; fileId < man->getNFiles(); fileId++){
       TH1D *blockHist_postfit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binning.data());
 
       for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
@@ -432,9 +432,9 @@ void MakeNDDetPlots()
     MACH3LOG_DEBUG("--- On sample {}", NDSamplesNames[i]); 
     NDbinCounter += NDSamplesBins[i];
 
-    std::vector<TH1D*> PostfitNDDetHistVec(man->GetNFiles());
-    TH1D *PreFitNDDetHist = (TH1D*)man->Input().GetFile(0).file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
-    man->Style().setTH1Style(PreFitNDDetHist, man->GetOption<std::string>("prefitHistStyle"));
+    std::vector<TH1D*> PostfitNDDetHistVec(man->getNFiles());
+    TH1D *PreFitNDDetHist = (TH1D*)man->input().getFile(0).file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
+    man->style().setTH1Style(PreFitNDDetHist, man->getOption<std::string>("prefitHistStyle"));
 
     std::string temp = NDSamplesNames[i].c_str();
     while (temp.find("_") != std::string::npos) {
@@ -445,8 +445,8 @@ void MakeNDDetPlots()
     
     MACH3LOG_DEBUG("  Start bin: {} :: End bin: {}", Start, NDbinCounter);
     // set the x range for the postfits
-    for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
-      PostfitNDDetHistVec[fileId] = (TH1D*)man->Input().GetFile(fileId).file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
+    for(int fileId = 0; fileId < man->getNFiles(); fileId++){
+      PostfitNDDetHistVec[fileId] = (TH1D*)man->input().getFile(fileId).file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
     }
 
     //KS: We dont' need name for every nd param
@@ -460,7 +460,7 @@ void MakeNDDetPlots()
       }
     }
 
-    PreFitNDDetHist->GetYaxis()->SetRangeUser(man->GetOption<double>("detParYRange_low"), man->GetOption<double>("detParYRange_high"));
+    PreFitNDDetHist->GetYaxis()->SetRangeUser(man->getOption<double>("detParYRange_low"), man->getOption<double>("detParYRange_high"));
     
     Start += NDSamplesBins[i];
 
@@ -492,7 +492,7 @@ void MakeFDDetPlots()
       //if(j % 10) ProductOfTen = true;
       //if(j != 0 && ProductOfTen) Prefit->GetXaxis()->SetBinLabel(Start+j+1, " ");
     }
-    Prefit->GetYaxis()->SetRangeUser(man->GetOption<double>("detParYRange_low"), man->GetOption<double>("detParYRange_high"));
+    Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("detParYRange_low"), man->getOption<double>("detParYRange_high"));
     Prefit->Draw("e2");
     
     Start = FDParametersStartingPos + FDSamplesBins[i];
@@ -510,7 +510,7 @@ void MakeOscPlots()
   Prefit->SetTitle("Oscilation Parameters");
   Prefit->GetXaxis()->SetRangeUser(OscParametersStartingPos, OscParametersStartingPos+OscParameters);
 
-    Prefit->GetYaxis()->SetRangeUser(man->GetOption<double>("oscParYRange_low"), man->GetOption<double>("oscParYRange_high"));
+    Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("oscParYRange_low"), man->getOption<double>("oscParYRange_high"));
   Prefit->Draw("e2");
 
   DrawPlots(canv, Prefit, PostfitHistVec, p3, p4);
@@ -527,7 +527,7 @@ void MakeXsecRidgePlots()
   blankCanv->SaveAs("RidgePlots.pdf[");
 
   // get the names of the blocks of parameters to group together
-  std::vector<std::string> const blockNames = man->GetOption<std::vector<std::string>>("paramGroups");
+  std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
   const int XsecPlots = (int)blockNames.size();
 
   double padTopMargin = 0.9;
@@ -540,13 +540,13 @@ void MakeXsecRidgePlots()
     
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
-    auto const &paramBlock = man->GetOption(blockName);
+    auto const &paramBlock = man->getOption(blockName);
     std::string blockTitle                 = paramBlock[0].as<std::string>();
     std::vector<double>      blockLimits   = paramBlock[1].as<std::vector<double>>();
     std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // the directory of histograms
-    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->Input().GetFile(0).file->Get("Post");
+    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->input().getFile(0).file->Get("Post");
 
     // get num of params in the block
     int nParams = (int)blockContents.size();
@@ -580,7 +580,7 @@ void MakeXsecRidgePlots()
       while(TKey *key = (TKey*) next()){ 
         // check if the end of the param name matches with the MaCh3 name, do this so we exclude things like nds_ at the start of the name
         std::string str(key->GetTitle());
-        std::string name = man->Input().TranslateName(0, MaCh3Plotting::kPostFit, paramName);
+        std::string name = man->input().translateName(0, MaCh3Plotting::kPostFit, paramName);
         uint pos = str.find(name);
         bool foundPar = (pos == str.length() - name.length());
 
@@ -637,7 +637,7 @@ void MakeXsecRidgePlots()
       frame->SetLineColorAlpha(0, 0.0);
       
       ridgeCanv->cd();
-      label->DrawLatexNDC(0.29, padBottom + 0.005, man->Style().prettifyParamName(paramName).c_str());
+      label->DrawLatexNDC(0.29, padBottom + 0.005, man->style().prettifyParamName(paramName).c_str());
       line->DrawLine(0.1, padBottom, 0.9, padBottom);
 
     }
@@ -681,7 +681,7 @@ void MakeXsecRidgePlots()
 
 void GetPostfitParamPlots()
 {
-  SaveName = man->GetOutputName();
+  SaveName = man->getOutputName();
   
   //KS: By default we take HPD values, but by changing "plotType" you can use for example Gauss
   plotType = "HPD";
@@ -689,7 +689,7 @@ void GetPostfitParamPlots()
     
   MACH3LOG_INFO("Plotting {} errors", plotType);
   
-  ReadSettings(man->Input().GetFile(0).file);
+  ReadSettings(man->input().getFile(0).file);
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
@@ -734,10 +734,10 @@ void GetPostfitParamPlots()
 
   // make a dummy TH1 to set out legend
   Prefit = new TH1D();
-  man->Style().setTH1Style(Prefit, man->GetOption<std::string>("prefitHistStyle"));
+  man->style().setTH1Style(Prefit, man->getOption<std::string>("prefitHistStyle"));
   leg->AddEntry(Prefit, "Prior", "lpf");
 
-  for(int fileId = 0; fileId < man->GetNFiles(); fileId++){
+  for(int fileId = 0; fileId < man->getNFiles(); fileId++){
     TH1D *postFitHist_tmp = new TH1D();
     postFitHist_tmp->SetBit(kCanDelete);
     
@@ -745,8 +745,8 @@ void GetPostfitParamPlots()
     postFitHist_tmp->SetLineColor(TColor::GetColorPalette(fileId));
     postFitHist_tmp->SetMarkerStyle(7);
     postFitHist_tmp->SetLineStyle(1+fileId);
-    postFitHist_tmp->SetLineWidth(man->GetOption<int>("plotLineWidth"));
-    leg->AddEntry(postFitHist_tmp, man->GetFileLabel(fileId).c_str(), "lpf");
+    postFitHist_tmp->SetLineWidth(man->getOption<int>("plotLineWidth"));
+    leg->AddEntry(postFitHist_tmp, man->getFileLabel(fileId).c_str(), "lpf");
   }
   canv->cd();
   canv->Clear();
@@ -1055,13 +1055,13 @@ int main(int argc, char *argv[])
     SetMaCh3LoggerFormat();
     
     man = new MaCh3Plotting::PlottingManager();
-    man->ParseInputs(argc, argv);
+    man->parseInputs(argc, argv);
     std::cout << std::endl << std::endl << "====================" << std::endl;
-    man->Input().GetFile(0).file->ls();
+    man->input().getFile(0).file->ls();
     
-    man->SetExec("GetPostfitParamPlots");
+    man->setExec("GetPostfitParamPlots");
 
-    man->Style().setPalette(man->GetOption<std::string>("colorPalette"));
+    man->style().setPalette(man->getOption<std::string>("colorPalette"));
 
     GetPostfitParamPlots();
 

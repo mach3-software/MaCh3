@@ -911,11 +911,11 @@ void Oscillator::Reset(int NeutrinoSignIndex, int InitialNeutrinoIndex, int Fina
 
 }
 
-bool Oscillator::isAlreadyCalculated(double* oscpar, double prodH, double Yp_Val) {
+bool Oscillator::isAlreadyCalculated(const double** oscpar, double prodH, double Yp_Val) {
 
   bool fAlreadyCalculated = true;
   for (int i=0;i<nOscpars;i++) {
-    if (oscpar[i]!=foscpar[i]) {
+    if (*oscpar[i]!=foscpar[i]) {
       fAlreadyCalculated = false;
     }
   }
@@ -940,9 +940,9 @@ bool Oscillator::isAlreadyCalculated(double* oscpar, double prodH, double Yp_Val
   return fAlreadyCalculated;
 }
 
-void Oscillator::SaveParams(double* oscpar, double prodH, double Yp_Val) {
+void Oscillator::SaveParams(const double** oscpar, double prodH, double Yp_Val) {
   for (int i=0;i<nOscpars;i++) {
-    foscpar[i] = oscpar[i];
+    foscpar[i] = *oscpar[i];
   }
   fprodH = prodH;
   fYp_Val = Yp_Val;
@@ -952,7 +952,7 @@ void Oscillator::SaveParams(double* oscpar, double prodH, double Yp_Val) {
   fBinning[3] = nFineEnergy;
 }
 
-void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
+void  Oscillator::FillOscillogram(const double** oscpar, double prodH, double Yp_Val) {
   if (isAlreadyCalculated(oscpar,prodH,Yp_Val)) {
     return;
   }
@@ -961,8 +961,8 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
 
   //DB oscpar, as given from MaCh3, expresses the mixing angles in sin^2(theta). The propagator expects them in theta
   for (int iOscPar=0;iOscPar<3;iOscPar++) {
-    if (oscpar[iOscPar] < 0) {
-      std::cerr << "Invalid oscillation parameter (Can not sqrt this value)!:" << oscpar[iOscPar] << std::endl;
+    if (*oscpar[iOscPar] < 0) {
+      std::cerr << "Invalid oscillation parameter (Can not sqrt this value)!:" << *oscpar[iOscPar] << std::endl;
       throw;
     }
   }
@@ -1019,12 +1019,12 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
 	throw;
 
 #ifdef DEBUG
-    FLOAT_T theta12 = asin(sqrt(oscpar[0]));
-    FLOAT_T theta23 = asin(sqrt(oscpar[1]));
-    FLOAT_T theta13 = asin(sqrt(oscpar[2]));
-    FLOAT_T dm12sq  = oscpar[3];
-    FLOAT_T dm23sq  = oscpar[4];
-    FLOAT_T dcp     = oscpar[5];
+	FLOAT_T theta12 = asin(sqrt(*oscpar[0]));
+	FLOAT_T theta23 = asin(sqrt(*oscpar[1]));
+	FLOAT_T theta13 = asin(sqrt(*oscpar[2]));
+	FLOAT_T dm12sq  = *oscpar[3];
+	FLOAT_T dm23sq  = *oscpar[4];
+	FLOAT_T dcp     = *oscpar[5];
 
 	//DB This part could be replaced with pointers
 	for (int iter=0;iter<nSecondaryBins;iter++) {
@@ -1048,8 +1048,8 @@ void  Oscillator::FillOscillogram(double* oscpar, double prodH, double Yp_Val) {
 	    for (int iOscPar=0;iOscPar<3;iOscPar++) {
 	      std::cerr << "iOscPar:" << iOscPar << std::endl;
 	      std::cerr << "oscpar[iOscPar]:" << oscpar[iOscPar] << std::endl;
-	      std::cerr << "sqrt(oscpar[iOscPar]):" << sqrt(oscpar[iOscPar]) << std::endl;
-	      std::cerr << "asin(sqrt(oscpar[iOscPar])):" << asin(sqrt(oscpar[iOscPar])) << std::endl;
+              std::cerr << "sqrt(*oscpar[iOscPar]):" << sqrt(*oscpar[iOscPar]) << std::endl;
+              std::cerr << "asin(sqrt(*oscpar[iOscPar])):" << asin(sqrt(*oscpar[iOscPar])) << std::endl;
 	      std::cerr << "\n" << std::endl;
 	    }
 

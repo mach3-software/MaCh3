@@ -1,17 +1,5 @@
 #pragma once
 
-// C++ includes
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <cstdlib>
-
-// ROOT include
-#include "TTree.h"
-#include "TBranch.h"
-#include "TMacro.h"
-
 // MaCh3 Includes
 #include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"

@@ -175,8 +175,8 @@ void FitterBase::PrepareOutput() {
   {
     // Check that we have added samples
     if (!samples.size()) {
-      MACH3LOG_CRITICAL("No samples Found! If this is what you want find me here");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_CRITICAL("No samples Found! Is this really what you wanted?");
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     // Prepare the output trees
@@ -429,8 +429,7 @@ void FitterBase::DragRace(const int NLaps) {
     TStopwatch clockRace;
     clockRace.Start();
     for(int Lap = 0; Lap < NLaps; Lap++) {
-      double *fake = 0;
-      samples[ivs]->reweight(fake);
+      samples[ivs]->reweight();
     }
     clockRace.Stop();
     MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
@@ -663,10 +662,9 @@ void FitterBase::RunLLHScan() {
         }
 
         // Reweight the MC
-        double *fake = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          samples[ivs]->reweight(fake);
+          samples[ivs]->reweight();
         }
         //Total LLH
         double totalllh = 0;
@@ -1030,9 +1028,9 @@ void FitterBase::Run2DLLHScan() {
             }
 
             // Reweight the MC
-            double *fake = 0;
+            //double *fake = 0;
             for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
-              samples[ivs]->reweight(fake);
+              samples[ivs]->reweight();
             }
 
             // Get the -log L likelihoods
@@ -1185,9 +1183,8 @@ void FitterBase::RunSigmaVar() {
         // Set the parameter
         (*it)->setParProp(i, paramVal);
         // And reweight the sample
-        double *fake = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
-          samples[ivs]->reweight(fake);
+          samples[ivs]->reweight();
         }
 
         sigmaArray_x[j] = new TH1D*[TotalNSamples]();

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 1.1.0)
+SET(MaCh3_VERSION 1.1.1)
 
 # Try to find CUDA
 find_package(CUDAToolkit)
@@ -49,7 +49,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  SET(CMAKE_CXX_STANDARD 11)
+  SET(CMAKE_CXX_STANDARD 14)
 endif()
 
 # KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
@@ -127,14 +127,14 @@ else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O3                                  # Optimize code for maximum speed
-    -funroll-loops                       # Unroll loops where possible for performance
-    --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
-    -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
-    #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
+    -O3                                   # Optimize code for maximum speed
+    -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
+    #-funroll-loops                       # Unroll loops where possible for performance
+    #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
+    #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
   #KS: add Link-Time Optimization (LTO)
-  # FIXME previously it wasn't used correctly but would need more testing
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
@@ -188,6 +188,7 @@ LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  PYTHON
   LOW_MEMORY_STRUCTS
   Oscillator
   Fitter
@@ -211,10 +212,28 @@ add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
 add_subdirectory(plotting)
 
+
+################################# pybind11 stuff ##################################
+
+if( MaCh3_PYTHON_ENABLED )
+  ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
+  pybind11_add_module( 
+    pyMaCh3 MODULE 
+    pyMaCh3.cpp 
+    plotting/plottingUtils/pythonPlottingModule.cpp
+  )
+  ## EM: only works with code compiled with -fPIC enabled.. I think this flag can things slightly slower
+  ## so would be good to find a way around this. 
+  set_property( TARGET pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
+  target_link_libraries( pyMaCh3 PUBLIC Plotting )
+  install( TARGETS pyMaCh3 DESTINATION pyMaCh3/)
+endif()
+
+
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions)
+target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -317,4 +336,4 @@ if(NOT TARGET uninstall)
 endif()
 
 # KS: Configure the Doxygen input file, this is to ensure whenever we update MaCh3 version Doxyfile will have same version.
-configure_file(${CMAKE_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_SOURCE_DIR}/Doc/Doxyfile @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doc/Doxyfile @ONLY)

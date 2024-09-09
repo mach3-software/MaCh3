@@ -36,7 +36,7 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
   }
 
   // get the bin edges
-  Double_t binEdges[nPoints + 1];
+  std::vector<double> binEdges(nPoints + 1);
   binEdges[0] = pointsX[0] - (pointsX[1] - pointsX[0]) / 2.0;
   binEdges[nPoints] = pointsX[nPoints - 1] + (pointsX[nPoints - 1] - pointsX[nPoints - 2]) / 2.0;
 
@@ -46,7 +46,7 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
     binEdges[pointId] = (pointsX[pointId] + pointsX[pointId - 1]) / 2.0;
   }
 
-  TH1D retHist = TH1D(name.c_str(), title.c_str(), nPoints, binEdges);
+  TH1D retHist = TH1D(name.c_str(), title.c_str(), nPoints, binEdges.data());
 
   for (int binId = 0; binId < nPoints; binId++)
   {
@@ -56,4 +56,28 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
   return retHist;
 }
 
-} // namespace MaCh3Plotting
+
+std::vector<std::vector<float>> TGraphToVector(TGraph graph) {
+
+  int nPoints = graph.GetN();
+  std::vector<std::vector<float>> ret(2);
+  std::vector<float> pointsX(nPoints);
+  std::vector<float> pointsY(nPoints);
+
+  // Get the points out
+  Double_t x, y;
+
+  for (int pointId = 0; pointId < nPoints; pointId++)
+  {
+    graph.GetPoint(pointId, x, y);
+    pointsX[pointId] = x;
+    pointsY[pointId] = y;
+  }
+
+  ret[0] = pointsX;
+  ret[1] = pointsY;
+
+  return ret;
+}
+
+} // namespace MaCh3Plotting 

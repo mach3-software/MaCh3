@@ -13,7 +13,7 @@
 #include "manager/manager.h"
 
 // **************************
-/// @brief  KS: Following H. Jeffreys. The theory of probability. UOP Oxford, 1998. DOI: 10.2307/3619118.
+/// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
 /// @param BayesFactor Obtained value of Bayes factor
 inline std::string GetJeffreysScale(const double BayesFactor){
 // **************************
@@ -99,6 +99,7 @@ inline double GetBIC(const double llh, const int data, const int nPars){
 
 // ****************
 /// @brief KS: See 14.3.10 in Numerical Recipes in C
+/// \cite press1992numerical
 inline double GetNeffective(const int N1, const int N2) {
 // ****************
 
@@ -155,14 +156,12 @@ inline void CheckBonferoniCorrectedpValue(const std::vector<std::string>& Sample
   std::cout<<""<<std::endl;
 }
 
-
 // ****************
 /// @param CumulativeData Value of CDF for data
 /// @param CumulativeMC Value of CDF for MC
 /// @param CumulativeJoint Value of CDF for joint data and MC distribution
 inline double GetAndersonDarlingTestStat(const double CumulativeData, const double CumulativeMC, const double CumulativeJoint) {
 // ****************
-
   double ADstat = std::fabs(CumulativeData - CumulativeMC)/ std::sqrt(CumulativeJoint*(1 - CumulativeJoint));
 
   if( std::isinf(ADstat) || std::isnan(ADstat)) return 0;
@@ -225,7 +224,7 @@ inline double GetBetaParameter(const double data, const double mc, const double 
 
 
 // *********************
-/// @brief Based on http://probability.ca/jeff/ftpdir/adaptex.pdf
+/// @brief Based on \cite roberts2009adaptive
 /// @param EigenValues Eigen values of covariance matrix
 inline double GetSubOptimality(const std::vector<double>& EigenValues, const int TotalTarameters) {
 // *********************

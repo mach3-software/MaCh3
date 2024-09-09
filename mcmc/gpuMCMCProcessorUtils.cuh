@@ -9,10 +9,6 @@
 
 #include "manager/gpuUtils.cuh"
 
-// *******************************************
-//              INITIALISE GPU
-// *******************************************
-
 /// @brief KS: Initialiser, here we allocate memory for variables and copy constants
 /// @param ParStep_gpu Parameter value at each step
 /// @param NumeratorSum_gpu Sum used for nominator of autocorrelation calculations

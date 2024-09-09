@@ -93,5 +93,19 @@ else()
   )
   LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
 endif()
-
 #dump_cmake_variables(Prob3plusplus)
+
+######################### python binding ##########################
+# EM: If Debug is not defined disable it by default
+DefineEnabledRequiredSwitch(MaCh3_PYTHON_ENABLED FALSE)
+
+if( MaCh3_PYTHON_ENABLED )
+  set(PYBIND11_FINDPYTHON ON)
+
+  CPMFindPackage(
+      NAME pybind11
+      VERSION 2.13.5
+      GITHUB_REPOSITORY "pybind/pybind11"
+      GIT_TAG v2.13.5
+    )
+endif()

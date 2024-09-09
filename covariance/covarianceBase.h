@@ -4,10 +4,8 @@
 #include "manager/manager.h"
 #include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
-#include "covariance/ThrowParms.h"
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
-
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
@@ -107,8 +105,6 @@ class covarianceBase {
   void throwParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void throwParameters();
-  /// @brief Throw nominal values
-  void throwNominal(const bool nomValues = false, const int seed = 0);
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
@@ -147,6 +143,9 @@ class covarianceBase {
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
   inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
+  /// @brief Get the error for the ith parameter
+  /// @param i Parameter index
+  inline double GetError(const int i) {return _fError[i];}
 
   /// @brief Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -175,19 +174,6 @@ class covarianceBase {
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   TH2D* GetCorrelationMatrix();
 
-  /// @brief What parameter Gets reweighted by what amount according to MCMC
-  /// @param bin simply parameter index
-  inline double calcReWeight(const int bin) {
-    if (bin >= 0 && bin < _fNumPar) {
-      return _fPropVal[bin];
-    } else {
-      MACH3LOG_WARN("Specified bin is <= 0 OR bin > npar!");
-      MACH3LOG_WARN("bin = {}, npar = {}", bin, _fNumPar);
-      MACH3LOG_WARN("This won't ruin much that this step in the MCMC, but does indicate something wrong in memory!");
-      return 1.0;
-    }
-    return 1.0;
-  }
   //========
   //ETA - This might be a bit squiffy? If the vector gots moved from say a
   //push_back then the pointer is no longer valid... maybe need a better 

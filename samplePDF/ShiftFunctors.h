@@ -1,6 +1,6 @@
 #pragma once
 
-#include "samplePDFFDBase.h"
+#include "samplePDF/Structs.h"
 
 class BaseFuncPar{
   public:

@@ -198,6 +198,12 @@ Samples:
             ## to also be able to specify this for different file types, hence why LLH is specified
             ## and not just something general
             LLH: "Sample-1"
+
+        ## We can specify "tags" to apply to a sample
+        ## This allows you to later on in your plotting scripts get, for example, all the samples which, for example,
+        ## are related to some particular sub-detector by adding a tag for that detector
+        ## Or to samples which correspond to a particular tagged particle
+        tags: ["subDet1", "particleTag"]
             
 
     SAMPLE_2: 
@@ -252,13 +258,10 @@ Parameters:
             LLH: "XSEC-PARAMETER-1" 
             PostFit: "PARAMETER-1"
 
-        ### *** TODO *** I'd like to add some other options for parameters
-        ###     One that i think might be useful would be tagging so we can specify that a parameter
-        ###     belongs to some group
-        ###     e.g:
-        ###       tags: ["xsec", "FSI", "Pion"]
-        ###     and then can give the user easy access in the code to all xsec parameters, or all
-        ###     parameters relating to pions, or all FSI... etc.
+        ## We can also specify "tags" to apply to a parameter
+        ## This allows you to later on in your plotting scripts get, for example, all parameters which have the tag "pion"
+        ## and plot them together, or all parameters with both the tags "pion" and "FSI"
+        tags: ["xsec", "FSI", "pion"]
 
     XSEC_PAR_2:
         FITTER_2:

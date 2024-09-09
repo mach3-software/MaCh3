@@ -58,6 +58,7 @@ ProcessMCMC:
   CalcBayesFactor: true
   CalcSavageDickey: true
   CalcBipolarPlot: false
+  CalcParameterEvolution: false
 
   #Functionality 2D
   PlotCorr: false
@@ -118,6 +119,10 @@ ProcessMCMC:
     - ["PauliOptical", ["Pauli_Blocking_C_nu", "Pauli_Blocking_O_nu", "Pauli_Blocking_C_nubar", "Pauli_Blocking_O_nubar", "Optical_Potential_C", "Optical_Potential_O"]]
     - ["CCQE_Eb", ["EB_dial_C_nu", "EB_dial_O_nu", "EB_dial_C_nubar", "EB_dial_O_nubar", "Alpha_q3"]]
     - ["Oscillation", ["delta_cp", "delm2_23", "sin2th_13", "sin2th_23"]]
+
+  #First is paramter name and second number of intervals
+  ParameterEvolution:
+    - ["EB_dial_C_nu", 20]
 
   #First param name, then new prior and new prior error
   # apply reactor constraints [vector of param names] [vector of new central value] [vector of new prior errors]

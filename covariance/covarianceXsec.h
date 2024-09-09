@@ -8,6 +8,7 @@
 
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
+#include "samplePDF/Structs.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -42,14 +43,16 @@ class covarianceXsec : public covarianceBase {
 
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
-    inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i).SplineInterpolationType;}
+    inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
 
+    //DB Get spline parameters depending on given DetID
+    const std::vector<int> GetGlobalSystIndexFromDetID(const int DetID, const SystType Type);
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i).SplineKnotUpBound;}
+    inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i)._SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i).SplineKnotLowBound;}
+    inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i)._SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
@@ -66,13 +69,14 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Get spline parameters depending on given DetID
     const std::vector<std::string> GetSplineFileParsNamesFromDetID(const int DetID);
 
-    /// ETA - what does this even do?
-    const std::vector<std::string> GetFDSplineFileParsNamesFromDetID(const int DetID);
-    const std::vector<std::string> GetNDSplineFileParsNamesFromDetID(const int DetID);
     /// @brief DB Grab the Spline Modes for the relevant DetID
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
     /// @brief DB Grab the Spline Indices for the relevant DetID
     const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}
+    /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
+    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, kSpline);};
+    /// @brief Grab the index of the syst relative to global numbering.
+    const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
 
     /// @brief DB Grab the Number of splines for the relevant DetID
     int GetNumSplineParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kSpline);}
@@ -111,6 +115,10 @@ class covarianceXsec : public covarianceBase {
     /// @warning Will become deprecated
     void setFluxOnlyParameters();
     
+    /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
+    /// @param Name Name of TFile to which we save stuff
+    /// @warning This is mostly used for backward compatibility
+    void DumpMatrixToFile(const std::string& Name);
   protected:
     /// @brief Initialise CovarianceXsec
     void initParams();
@@ -133,10 +141,10 @@ class covarianceXsec : public covarianceBase {
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
 
-    //Variables related to spline systematics
-    std::vector<std::string> _fNDSplineNames;
-    std::vector<std::string> _fFDSplineNames;
-    std::vector<std::vector<int>> _fFDSplineModes;
+    /// Name of spline in TTree (TBranch),
+    std::vector<std::string> _fSplineNames;
+    /// Map between number of given parameter type with global parameter numbering. For example 2nd norm param may be 10-th global param
+    std::vector<std::map<int, int>> _fSystToGlobablSystIndexMap;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecSplines1> SplineParams;

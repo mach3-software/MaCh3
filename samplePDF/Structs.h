@@ -224,14 +224,17 @@ enum SystType {
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
 struct XsecSplines1 {
-  // *******************
+// *******************
   /// Spline interpolation vector
-  SplineInterpolation SplineInterpolationType;
+  SplineInterpolation _SplineInterpolationType;
+
+  /// Modes to which spline applies (valid only for binned splines)
+  std::vector<int> _fSplineModes;
 
   /// EM: Cap spline knot lower value
-  double SplineKnotLowBound;
+  double _SplineKnotLowBound;
   /// EM: Cap spline knot higher value
-  double SplineKnotUpBound;
+  double _SplineKnotUpBound;
 };
 
 // **************************************************
@@ -261,7 +264,7 @@ inline std::string SystType_ToString(const SystType i) {
 // ***************************
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
-  // ***************************
+// ***************************
 
   // ***************************
   /// @brief Return mass for given PDG
@@ -417,11 +420,11 @@ inline int ProbsToPDG(ProbNu NuType){
 /// Make an enum of the test statistic that we're using
 enum TestStatistic {
   kPoisson,                //!< Standard Poisson likelihood
-  kBarlowBeeston,          //!< Barlow-Beeston following Conway https://cds.cern.ch/record/1333496?
-  kIceCube,                //!< Based on https://arxiv.org/abs/1901.04645
+  kBarlowBeeston,          //!< Barlow-Beeston following Conway \cite Conway:2011in
+  kIceCube,                //!< Based on \cite Arguelles:2019izp
   kPearson,                //!< Standard Pearson likelihood
-  kDembinskiAbdelmottele,  //!< Based on arXiv:2206.12346v2
-  kNTestStatistics         //!< This only enumerates statistic
+  kDembinskiAbdelmottele,  //!< Based on \cite Dembinski:2022ios
+  kNTestStatistics         //!< Number of test statistics
 };
 
 // **************************************************

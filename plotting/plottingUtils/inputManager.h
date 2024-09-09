@@ -165,7 +165,7 @@ struct InputFile {
 /// man.addFile(filename2)
 /// ...
 ///
-/// then use various getter functions like GetLLHScan() to access the data in the files to make
+/// then use various getter functions like getLLHScan() to access the data in the files to make
 /// plots.
 /// @endcode
 /// @todo A lot of string comparisons going on in the code for the post fit errors,
@@ -227,9 +227,24 @@ public:
   /// @brief Print out what this Inputmanager instance knows about.
   /// @param printLevel The level of detail to go into in the summary printout: options are
   /// "summary", and "dump".
-  void Print(const std::string &printLevel = "summary") const;
+  void print(const std::string &printLevel = "summary") const;
 
   // FNs to get to the tasty tasty data stored in the files
+
+  /// @brief Get the log likelihood scan data for a particular parameter from a particular input file.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param paramName The parameter you want the information about.
+  /// @param LLHType The type of log likelihood scan you want (e.g. total, penalty, etc.)
+  /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis
+  std::vector<std::vector<float>> getLLHScan(int fileNum, std::string paramName, std::string LLHType) const {
+    if (!getEnabledLLH(fileNum, paramName, LLHType))
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(2); 
+    }
+    return TGraphToVector(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
+  }
 
   /// @brief Get the log likelihood scan for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the scan from.
@@ -238,8 +253,8 @@ public:
   /// @tparam T The type you would like your scan returned as, currently only TGraph and TH1D are
   /// supported
   /// @return The graph of the likelihood scan.
-  TGraph GetLLHScan_TGraph(int fileNum, std::string paramName, std::string LLHType) const {
-    if (!GetEnabled_LLH(fileNum, paramName, LLHType))
+  inline TGraph getLLHScan_TGraph(int fileNum, std::string paramName, std::string LLHType) const {
+    if (!getEnabledLLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
       MACH3LOG_WARN("am returning an empty TGraph");
@@ -248,8 +263,8 @@ public:
     return *_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName);
   }
 
-  TH1D GetLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
-    if (!GetEnabled_LLH(fileNum, paramName, LLHType))
+  inline TH1D getLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
+    if (!getEnabledLLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
       MACH3LOG_WARN("am returning an empty TH1D");
@@ -258,10 +273,26 @@ public:
     return TGraphToTH1D(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
   }
 
-  TGraph GetSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
+  /// @brief Get the log likelihood scan for a particular parameter, for a specific sample, from a
+  /// particular input file.
+  /// @param fileNum The index of the file that you would like to get the scan from.
+  /// @param paramName The name of the parameter whose LLH scan you would like.
+  /// @param sample The sample that you would like the LLH scan for.
+  /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis.
+  std::vector<std::vector<float>> getSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
+    if (!getEnabledLLHBySample(fileNum, paramName, sample))
+    {
+      MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(2); 
+    }
+    return TGraphToVector(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
+  }
+
+  inline TGraph getSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
                                          std::string sample) const {
     
-    if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
+    if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
       MACH3LOG_WARN("am returning an empty TGraph");
@@ -270,8 +301,8 @@ public:
     return *_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName);
   }
 
-  TH1D GetSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
-    if (!GetEnabled_LLHBySample(fileNum, paramName, sample))
+  inline TH1D getSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
+    if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
       MACH3LOG_WARN("am returning an empty TH1D");
@@ -280,26 +311,12 @@ public:
     return TGraphToTH1D(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
   }
 
-  /// @brief Get the log likelihood scan for a particular parameter, for a specific sample, from a
-  /// particular input file.
-  /// @param fileNum The index of the file that you would like to get the scan from.
-  /// @param paramName The name of the parameter whose LLH scan you would like.
-  /// @param sample The sample that you would like the LLH scan for.
-  /// @tparam T The type you would like your scan returned as, currently only TGraph and TH1D are
-  /// supported
-  /// @return The graph of the likelihood scan.
-  template <typename T = TGraph>
-  // Default template (i.e. the template specified was not one of the ones implemented below)
-  T GetSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
-    throw MaCh3Exception(__FILE__, __LINE__, "uuuuuh sorry but im not sure how to convert likelihood scans to the specified type");
-  }
-
   /// @brief Get whether or not a particular parameter has an LLH scan in a particular input file.
   /// @param fileNum The index of the file that you would like to know about.
   /// @param paramName The name of the parameter whose LLH scan you would like to check for.
   /// @param LLHType The type of likelihood scan you would like to check for, e.h. total, prior etc.
   /// @return true if scan exists, false if not.
-  inline bool GetEnabled_LLH(int fileNum, std::string paramName,
+  inline bool getEnabledLLH(int fileNum, std::string paramName,
                              std::string LLHType = "total") const {
     return _fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
   }
@@ -310,7 +327,7 @@ public:
   /// @param paramName The name of the parameter whose LLH scan you would like to check for.
   /// @param sample The sample to check.
   /// @return true if scan exists, false if not.
-  inline bool GetEnabled_LLHBySample(int fileNum, std::string paramName, std::string sample) const {
+  inline bool getEnabledLLHBySample(int fileNum, std::string paramName, std::string sample) const {
     return _fileVec[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);
   }
 
@@ -321,7 +338,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The error on the specified parameter.
-  float GetPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  float getPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @brief Get the post fit value for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
@@ -330,33 +347,64 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The value of the specified parameter.
-  float GetPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  float getPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @name General Getters
   /// @{
-  inline const std::vector<std::string> &GetKnownParameters() const { return knownParameters; }
-  inline const std::vector<std::string> &GetKnownSamples() const { return knownSamples; }
-  inline int GetNInputFiles() const { return _fileVec.size(); }
+  inline const std::vector<std::string> &getKnownParameters() const { return _knownParameters; }
+  inline const std::vector<std::string> &getKnownSamples() const { return _knownSamples; }
+  inline int getNInputFiles() const { return _fileVec.size(); }
+
+  /// @brief Get all parameters which have some set of tags
+  /// @param tags The tags to check for 
+  /// @param checkType The type of check to perform:
+  /// checkType can be one of:
+  ///   - all: All parameters which have *all* of the specified tags will be returned 
+  ///   - any: All parameters which have *any* of the specified tags will be returned 
+  ///   - exact: All of the parameters which have *exactly* the specified tags will be returned
+  inline std::vector<std::string> getTaggedParameters(const std::vector<std::string> &tags, std::string checkType = "all") const {
+    return getTaggedValues(_knownParameters, _paramToTagsMap, tags, checkType);
+  }
+
+  /// @brief Get all samples which have some set of tags
+  /// @param tags The tags to check for 
+  /// @param checkType The type of check to perform:
+  /// checkType can be one of:
+  ///   - all: All samples which have *all* of the specified tags will be returned 
+  ///   - any: All samples which have *any* of the specified tags will be returned 
+  ///   - exact: All of the samples which have *exactly* the specified tags will be returned
+  inline std::vector<std::string> getTaggedSamples(const std::vector<std::string> &tags, std::string checkType = "all") const {
+    return getTaggedValues(_knownSamples, _sampleToTagsMap, tags, checkType);
+  }
   /// @}
 
   /// @name File Specific Getters
   /// @{
-  inline InputFile GetFile(int fileId) const { return _fileVec[fileId]; }
-  inline std::string TranslateName(int fileId, fileTypeEnum fileType, std::string paramName) const {
+  inline InputFile getFile(int fileId) const { return _fileVec[fileId]; }
+  inline std::string translateName(int fileId, fileTypeEnum fileType, std::string paramName) const {
     return getFitterSpecificParamName(_fileVec[fileId].fitter, fileType, paramName);
   }
-  inline const std::vector<std::string> &GetKnownLLHParameters(int fileId) const {
+  inline const std::vector<std::string> &getKnownLLHParameters(int fileId) const {
     return _fileVec[fileId].availableParams_LLH;
   }
-  inline const std::vector<std::string> &GetKnownLLHSamples(int fileId) const {
+  inline const std::vector<std::string> &getKnownLLHSamples(int fileId) const {
     return _fileVec[fileId].availableSamples_LLH;
   }
-  inline const std::vector<std::string> &GetKnownPostFitParameters(int fileId) const {
+  inline const std::vector<std::string> &getKnownPostFitParameters(int fileId) const {
     return _fileVec[fileId].availableParams_postFitErrors;
   }
   /// @}
 
 private:
+
+  // Helper function to get tagged values from a vector of values
+  // specify the initial list of *values*, the map of values to their tags, the tags to check,
+  // and the type of check to perform (see getTaggedParameter() for details)
+  std::vector<std::string> getTaggedValues(const std::vector<std::string> &values, 
+                                           const std::unordered_map<std::string, 
+                                           std::vector<std::string>> &tagMap, 
+                                           const std::vector<std::string> &tags, std::string checkType) const;
+
   // Helper function to parse a root file location string
   // any instance of {PARAMETER} gets replaced with fitter specific parameter name
   // similar for {SAMPLE}
@@ -463,18 +511,25 @@ private:
     return (pos == str.length() - ending.length());
   }
 
+
+private:
+
   // all parameters which are known to this InputManager: all the ones defined in the translation
   // config used to create it
-  std::vector<std::string> knownParameters;
+  std::vector<std::string> _knownParameters;
 
   // all samples which are known to this InputManager: all the ones defined in the translation
   // config used to create it
-  std::vector<std::string> knownSamples;
+  std::vector<std::string> _knownSamples;
 
-  // map the enum to actual fitter names
-  std::vector<std::string> knownFitters;
+  // hold the names of the fitters known to this manager
+  std::vector<std::string> _knownFitters;
 
-private:
+  // map parameter names to their specified tags
+  std::unordered_map<std::string, std::vector<std::string>> _paramToTagsMap;
+  // map sample names to their specified tags
+  std::unordered_map<std::string, std::vector<std::string>> _sampleToTagsMap;
+  
   // the configs defining the translation of parameters between fitters and also the directory
   // structure for each fitter
   YAML::Node _translatorConfig;

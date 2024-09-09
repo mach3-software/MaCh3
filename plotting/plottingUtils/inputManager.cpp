@@ -9,19 +9,61 @@ InputManager::InputManager(const std::string &translationConfigName) {
   // read the config file
   _translatorConfig = YAML::LoadFile(translationConfigName);
 
+  MACH3LOG_DEBUG("InputManager: have loaded translation config file");
+  
   // split up the parts of the config for easier access later
   _fitterSpecConfig = _translatorConfig["FitterSpec"];
   _parametersConfig = _translatorConfig["Parameters"];
   _samplesConfig = _translatorConfig["Samples"];
 
   // check the config file and get which parameters, samples, and fitters we've been told about
-  knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
-  knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
-  knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
+  _knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
+  _knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
+  _knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
+
+  MACH3LOG_DEBUG("Will now check the specified parameters for tags");
+
+  // loop through all parameters and get their tags
+  for ( const std::string &param: _knownParameters )
+  {
+    std::vector<std::string> tags;
+
+    MACH3LOG_DEBUG("Looking for tags for parameter {}", param);
+    if ( _parametersConfig[param] )
+    {
+      if ( _parametersConfig[param]["tags"] )
+      {
+        tags = _parametersConfig[param]["tags"].as<std::vector<std::string>>();
+        MACH3LOG_DEBUG("  - Found {}!", tags.size());
+      }
+    }
+
+    _paramToTagsMap[param] = tags;
+  }
+
+  MACH3LOG_DEBUG("Will now check the specified samples for tags");
+  
+  // same again for samples
+  for ( const std::string &samp: _knownSamples )
+  {
+    std::vector<std::string> tags;
+
+    MACH3LOG_DEBUG("Looking for tags for sample {}", samp);
+    if ( _samplesConfig[samp])
+    {
+      if ( _samplesConfig[samp]["tags"] )
+      {
+        tags = _samplesConfig[samp]["tags"].as<std::vector<std::string>>();
+        MACH3LOG_DEBUG("  - Found {}!", tags.size());
+      }
+    }
+
+    _sampleToTagsMap[samp] = tags;
+  }
 }
 
 /// Open an input file and add to the manager, consists of:
-///  - Initialise a new InputFile using the specified file
+///  -  a new InputFile using the specified file
 ///  - Get info about the file, like what fitter it came from, what it contains e.g. LLH scans,
 ///  processed post fit parameters etc.
 ///  - Load up the data from the file (LLH scans etc.) and put them in a common format to be used by
@@ -42,13 +84,13 @@ void InputManager::addFile(const std::string &fileName) {
 /// If printLevel is "summary", will loop through all the files known to this InputManager and call
 /// InputFile::Summarise(). If printLevel is "dump", will print all parameters known to this
 /// InputManager and then loop through all input files and call InputFile::Dump().
-void InputManager::Print(const std::string &printLevel) const {
+void InputManager::print(const std::string &printLevel) const {
   MACH3LOG_INFO("Printing contents of InputManager instance:");
 
   if (printLevel == "dump")
   {
     MACH3LOG_INFO("parameters known to this manager: ");
-    for (std::string param : knownParameters)
+    for (std::string param : _knownParameters)
     {
       MACH3LOG_INFO("  ");
     }
@@ -69,10 +111,10 @@ void InputManager::Print(const std::string &printLevel) const {
   MACH3LOG_INFO("");
 }
 
-float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
+float InputManager::getPostFitError(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
 
-  const InputFile &inputFileDef = GetFile(fileNum);
+  const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
   if (errorType == "")
@@ -98,10 +140,10 @@ float InputManager::GetPostFitError(int fileNum, const std::string &paramName,
   return BAD_FLOAT;
 }
 
-float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
+float InputManager::getPostFitValue(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
   
-  const InputFile &inputFileDef = GetFile(fileNum);
+  const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
   if (errorType == "")
@@ -127,9 +169,72 @@ float InputManager::GetPostFitValue(int fileNum, const std::string &paramName,
   return BAD_FLOAT;
 }
 
+
 // ##################################################################
 // ################## End of public interface #######################
 // ##################################################################
+
+std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::string> &values, 
+                                                       const std::unordered_map<std::string, std::vector<std::string>> &tagMap, 
+                                                       const std::vector<std::string> &tags, std::string checkType) const {
+                                                          
+  // check that checkType is valid
+  if(
+    checkType != "all" &&
+    checkType != "any" &&
+    checkType != "exact"
+  )
+  {  
+    MACH3LOG_ERROR("Invalid tag check type specified: {}. Will instead use the default type: 'all'", checkType);
+    checkType = "all";
+  }
+
+  // If no tags were specified, take this to mean that anything should be a match
+  if (tags.size() == 0) return values;
+
+  std::vector<std::string> retVec;
+
+  MACH3LOG_DEBUG("Getting tagged values using checkType {}", checkType);
+  for ( std::string val: values )
+  {
+    MACH3LOG_DEBUG("Checking tags of {}", val);
+    // get the tags that this value has
+    const std::vector<std::string> &valTags = tagMap.at(val);
+
+    // we can skip it if it has no tags
+    if (valTags.size() == 0) continue;
+
+    // count how many of the specified tags match the tags of the current value 
+    unsigned int tagCount = 0;
+    for ( const std::string &tag: tags )
+    {
+      if ( std::find( valTags.begin(), valTags.end(), tag ) != valTags.end() ) 
+      {    
+        MACH3LOG_DEBUG("  - Matched tag {} !", tag);
+        tagCount ++;
+      }
+    }
+
+    // now decide if we include the current value based on the check type
+    if ( checkType == "all" )
+    {
+      if ( tagCount == tags.size() ) retVec.push_back(val);
+    }
+    else if ( checkType == "any" )
+    {
+      if ( tagCount > 0 ) retVec.push_back(val);
+    }
+    else if ( checkType == "exect" )
+    {
+      // EM: note that this will break if duplicate tags are specified in either vector... so please don't do that
+      if ( tagCount == valTags.size() ) retVec.push_back(val);
+    }
+  }
+
+  MACH3LOG_DEBUG("Found {} values matching the specified tags", retVec.size());
+  return retVec;
+
+}
 
 std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
                                                      fileTypeEnum fileType, const std::string &parameter,
@@ -356,7 +461,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
   if (printThoughts)
     MACH3LOG_INFO("Checking contents of file {}", inputFileDef.fileName);
 
-  for (std::string fitter: knownFitters)
+  for (std::string fitter: _knownFitters)
   {
 
     // flag for whether or not the current fitter is the correct one
@@ -392,7 +497,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
       std::vector<std::string> enabledLLHParams;
 
-      for (const std::string &parameter : knownParameters)
+      for (const std::string &parameter : _knownParameters)
       {
         MACH3LOG_DEBUG("     - for {}", parameter);
         inputFileDef.availableParams_map_LLH[LLHType][parameter] = false;
@@ -457,7 +562,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
     std::string defaultErrorType =
         thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
-    for (std::string parameter : knownParameters)
+    for (std::string parameter : _knownParameters)
     {
       if (findPostFitParamError(inputFileDef, parameter, fitter, defaultErrorType))
       {
@@ -482,10 +587,10 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     if (printThoughts)
       MACH3LOG_INFO("....Searching for LLH scans broken down by sample");
 
-    for (const std::string &sample : knownSamples)
+    for (const std::string &sample : _knownSamples)
     {
       size_t numLLHBySampleParams = 0;
-      for (const std::string &parameter : knownParameters)
+      for (const std::string &parameter : _knownParameters)
       {
         inputFileDef.availableParams_map_LLHBySample[sample][parameter] = false;
         if (findBySampleLLH(inputFileDef, parameter, fitter, sample))
@@ -611,7 +716,7 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   // ####### Get the by sample LLH scans #######
   for (const std::string &parameter : inputFileDef.availableParams_LLH)
   {
-    for (const std::string &sample : knownSamples)
+    for (const std::string &sample : _knownSamples)
     {
       findBySampleLLH(inputFileDef, parameter, inputFileDef.fitter, sample, true);
     }

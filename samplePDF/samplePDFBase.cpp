@@ -1,6 +1,6 @@
 #include "samplePDFBase.h"
 
-samplePDFBase::samplePDFBase(double pot) 
+samplePDFBase::samplePDFBase() 
 {
   nDims = 0;
   rnd = new TRandom3(0);
@@ -20,11 +20,7 @@ samplePDFBase::~samplePDFBase()
   delete rnd;
 }
 
-void samplePDFBase::init(double pot)
-{
-}
-
-void samplePDFBase::init(double pot, std::string mc_version)
+void samplePDFBase::init()
 {
     
     
@@ -201,21 +197,22 @@ double samplePDFBase::getEventRate()
 }
 
 // ***************************************************************************
-//KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
-double samplePDFBase::getTestStatLLH(double data, double mc) {
+// Poisson likelihood calc for data and MC event rates
+double samplePDFBase::getTestStatLLH(const double data, const double mc) {
 // ***************************************************************************
-    double negLogL = 0;
-    if(mc == 0) mc = 1E-8;
-    if(mc > 0 && data > 0)
-    {
-        //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-        negLogL += (mc - data + data * TMath::Log(data/mc));
-    }
-    else if(mc > 0 && data == 0) negLogL += mc;
-    
-    return negLogL; 
-}
+  // Need some MC
+  if(mc == 0) return 0.;
 
+  double negLogL = 0;
+  if(mc > 0 && data > 0)
+  {
+     //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+     negLogL += (mc - data + data * std::log(data/mc));
+  }
+  else if(mc > 0 && data == 0) negLogL += mc;
+  
+  return negLogL; 
+}
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
@@ -343,13 +340,9 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     break;
     case (kPoisson):
     {
-      double stat = 0.0;
-      // All likelihood calculations may use the bare Poisson likelihood, so calculate here
-      if (data == 0) stat = newmc;
-      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
-
-      // Return the statistical contribution and penalty
-      return stat;
+	  //Just call getTestStatLLH which doesn't take in weights
+	  //and is a poisson likelihood comparison.
+      return getTestStatLLH(data, mc);//stat;
     }
     break;
 
@@ -368,9 +361,7 @@ void samplePDFBase::SetTestStatistic(TestStatistic test_stat) {
   fTestStatistic = test_stat;
 
   std::string name = TestStatistic_ToString((TestStatistic)test_stat);
-  std::cout << "Using "<< name <<" likelihood in ND280" << std::endl;
-  //if(UpdateW2) std::cout << "With updating W2" << std::endl;
-  //else  std::cout << "Without updating W2" << std::endl;
+  MACH3LOG_INFO("Using {} likelihood",name); 
 }
 */
 

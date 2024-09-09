@@ -21,7 +21,8 @@ covarianceOsc::covarianceOsc(const char* name, const char *file)
   for(int io = 0; io < _fNumPar; io++)
   {
     _fNames[io] = std::string(((TObjString*)objarr_name->At(io))->GetString());
-    
+    _fFancyNames[io] = _fNames[io];
+
     _fPreFitValue[io]  = (*osc_prior)(io);
     _fCurrVal[io] = _fPropVal[io] = _fPreFitValue[io];
     _fError[io] = (*osc_sigma)(io);
