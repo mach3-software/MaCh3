@@ -368,7 +368,8 @@ public:
     // Get which parameters should be linear from the fit manager
     // Convert the spline number to global xsec parameter
     // Loop over the splines points
-    else if(InterPolation == kLinear)
+    // KS: kLinearFunc should be used with TF1, this is just as safety
+    else if(InterPolation == kLinear || InterPolation == kLinearFunc)
     {
       for (int k = 0; k < nPoints; ++k) {
         // 3 is the size of the TSpline3 coefficients
@@ -494,93 +495,95 @@ public:
 
         return;
       } // if nPoints !=2 do full monotonic spline treatment:
-
-      // first pass over knots to calculate the secants
-      for (int i = 0; i < nPoints-1; ++i) {
-        Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
-        //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
-      }
-
-      Tangents[0] = Secants[0];
-      Tangents[nPoints-1] = Secants[nPoints -2];
-
-      _float_ alpha;
-      _float_ beta;
-
-      // second pass over knots to calculate tangents
-      for (int i = 1; i < nPoints-1; ++i) {
-        if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
-          Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
-        }
-      }
-
-      // third pass over knots to rescale tangents
-      for (int i = 0; i < nPoints-1; ++i) {
-        if (Secants[i] == 0.0){
-          Tangents[i] = 0.0;
-          Tangents[i+1] = 0.0;
+      else
+      {
+        // first pass over knots to calculate the secants
+        for (int i = 0; i < nPoints-1; ++i) {
+          Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
+          //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
         }
 
-        else{
-          alpha = Tangents[i]  / Secants[i];
-          beta = Tangents[i+1] / Secants[i];
+        Tangents[0] = Secants[0];
+        Tangents[nPoints-1] = Secants[nPoints -2];
 
-          if (alpha <0.0){
-            Tangents[i] = 0.0;
+        _float_ alpha;
+        _float_ beta;
+
+        // second pass over knots to calculate tangents
+        for (int i = 1; i < nPoints-1; ++i) {
+          if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
+            Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
           }
-          if (beta < 0.0){
+        }
+
+        // third pass over knots to rescale tangents
+        for (int i = 0; i < nPoints-1; ++i) {
+          if (Secants[i] == 0.0){
+            Tangents[i] = 0.0;
             Tangents[i+1] = 0.0;
           }
 
-          if (alpha * alpha + beta * beta >9.0){
-            _float_ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
-            Tangents[i]   = tau * alpha * Secants[i];
-            Tangents[i+1] = tau * beta  * Secants[i];
+          else{
+            alpha = Tangents[i]  / Secants[i];
+            beta = Tangents[i+1] / Secants[i];
+
+            if (alpha <0.0){
+              Tangents[i] = 0.0;
+            }
+            if (beta < 0.0){
+              Tangents[i+1] = 0.0;
+            }
+
+            if (alpha * alpha + beta * beta >9.0){
+              _float_ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
+              Tangents[i]   = tau * alpha * Secants[i];
+              Tangents[i+1] = tau * beta  * Secants[i];
+            }
+          }
+        } // finished rescaling tangents
+        // fourth pass over knots to calculate the coefficients for the spline
+        _float_ dx;
+        for(int i = 0; i <nPoints-1; i++){
+          _float_ b, c, d = -999.999;
+          dx = XPos[i+1] - XPos[i];
+
+          b = Tangents[i] * dx;
+          c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
+          d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
+
+          Par[i][0] = b /  dx;
+          Par[i][1] = c / (dx * dx);
+          Par[i][2] = d / (dx * dx * dx);
+
+          if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
+            std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
+          }
+          //std::cout<<"b : "<<b<<std::endl;
+          //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
+          //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
+        }
+
+        // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
+        // should never actually get used but if not set then the GPU code gets very angry
+        Par[nPoints-1][0] = 0.0;
+        Par[nPoints-1][1] = 0.0;
+        Par[nPoints-1][2] = 0.0;
+
+        // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
+        // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+        for(int i = 0; i <nPoints-1; i++){
+          double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+          spline->GetCoeff(i, x, y, b, c, d);
+
+          if((c == 0.0 && d == 0.0)){
+            Par[i][0] = b;
+            Par[i][1] = 0.0;
+            Par[i][2] = 0.0;
           }
         }
-      } // finished rescaling tangents
-      // fourth pass over knots to calculate the coefficients for the spline
-      _float_ dx;
-      for(int i = 0; i <nPoints-1; i++){
-        _float_ b, c, d = -999.999;
-        dx = XPos[i+1] - XPos[i];
-
-        b = Tangents[i] * dx;
-        c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
-        d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
-
-        Par[i][0] = b /  dx;
-        Par[i][1] = c / (dx * dx);
-        Par[i][2] = d / (dx * dx * dx);
-
-        if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
-          std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
-        }
-        //std::cout<<"b : "<<b<<std::endl;
-        //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
-        //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
-      }
-
-      // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
-      // should never actually get used but if not set then the GPU code gets very angry
-      Par[nPoints-1][0] = 0.0;
-      Par[nPoints-1][1] = 0.0;
-      Par[nPoints-1][2] = 0.0;
-
-      // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
-      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
-      for(int i = 0; i <nPoints-1; i++){
-        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-        spline->GetCoeff(i, x, y, b, c, d);
-
-        if((c == 0.0 && d == 0.0)){
-          Par[i][0] = b;
-          Par[i][1] = 0.0;
-          Par[i][2] = 0.0;
-        }
-      }
-      delete[] Secants;
-      delete[] Tangents;
+        delete[] Secants;
+        delete[] Tangents;
+      } // end of if(nPoints !=2)
     }
     else
     {
