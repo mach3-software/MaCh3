@@ -1,3 +1,5 @@
+# Performs unit and integration testing
+
 name: Validations CI
 
 # The events that trigger the workflow

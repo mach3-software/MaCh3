@@ -1,3 +1,4 @@
+# Update MaCh3 container image registry with newest updates
 name: Image CD
 
 # The events that trigger the workflow
