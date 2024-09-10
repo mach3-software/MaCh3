@@ -121,7 +121,7 @@ void covarianceBase::ConstructPCA() {
   if (covMatrix == NULL) {
     MACH3LOG_ERROR("Covariance matrix for {} has not yet been set", matrixName);
     MACH3LOG_ERROR("Can not construct PCA until it is set");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   //Check whether first and last pcadpar are set and if not just PCA everything
@@ -132,18 +132,18 @@ void covarianceBase::ConstructPCA() {
     }
     else{
       MACH3LOG_ERROR("You must either leave FirstPCAdpar and LastPCAdpar at -999 or set them both to something");
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   if(FirstPCAdpar > covMatrix->GetNrows()-1 || LastPCAdpar>covMatrix->GetNrows()-1){
     MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
     MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, covMatrix->GetNrows()-1);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(FirstPCAdpar < 0 || LastPCAdpar < 0){
     MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are less than 0 but not default -999");
     MACH3LOG_ERROR("first: {} last: {}", FirstPCAdpar, LastPCAdpar);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA);
@@ -177,7 +177,7 @@ void covarianceBase::init(const char *name, const char *file) {
   if (infile->IsZombie()) {
     MACH3LOG_ERROR("Could not open input covariance ROOT file {} !!!", file);
     MACH3LOG_ERROR("Was about to retrieve matrix with name {}", name);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Should put in a 
@@ -223,7 +223,7 @@ void covarianceBase::init(const char *name, const char *file) {
   setCovMatrix(CovMat);
   if (_fNumPar <= 0) {
     MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", getName(), _fNumPar);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   _fNumParPCA = _fNumPar;
 
@@ -367,7 +367,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 
   if (_fNumPar <= 0) {
     MACH3LOG_ERROR("Covariance object has {} systematics!", _fNumPar);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   _fNumParPCA = _fNumPar;
 
@@ -570,7 +570,7 @@ void covarianceBase::throwParameters() {
           MACH3LOG_WARN("Setting _fPropVal:  {} to {}", _fPropVal[i], _fPreFitValue[i]);
           MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
           _fPropVal[i] = _fPreFitValue[i];
-          //throw;
+          //throw MaCh3Exception(__FILE__ , __LINE__ );
         }
         throws++;
       }
@@ -581,7 +581,7 @@ void covarianceBase::throwParameters() {
   {
     MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predicitve Code with PCA, which is wrong");
     MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 }
 
@@ -700,7 +700,6 @@ void covarianceBase::randomize() {
     }
   }
 }
-
 
 // ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
@@ -841,7 +840,6 @@ void covarianceBase::printNominal() {
   }
 }
 
-
 // ********************************************
 // Function to print the nominal, current and proposed values
 void covarianceBase::printNominalCurrProp() {
@@ -901,6 +899,7 @@ int covarianceBase::CheckBounds() {
   }
   return NOutside;
 }
+
 // ********************************************
 double covarianceBase::GetLikelihood() {
 // ********************************************
@@ -920,7 +919,7 @@ void covarianceBase::printPars() {
   MACH3LOG_INFO("Number of pars: {}", _fNumPar);
   MACH3LOG_INFO("Current {} parameters:", matrixName);
   for(int i = 0; i < _fNumPar; i++) {
-    std::cout << std::fixed << std::setprecision(5) << _fNames[i].c_str() << " current: \t" << _fCurrVal[i] << "   \tproposed: \t" << _fPropVal[i] << std::endl;
+    MACH3LOG_INFO("{:s} current: \t{:.5f}   \tproposed: \t{:.5f}", _fNames[i], _fCurrVal[i], _fPropVal[i]);
   }
   return;
 }
@@ -937,20 +936,19 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
     }
     // If not empty, set the parameters to the specified
   } else {
-	if (pars.size() != size_t(_fNumPar)) {
+    if (pars.size() != size_t(_fNumPar)) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
       //Make sure that you are actually passing a number to set the parameter to
       if(std::isnan(pars[i])) {
-	    MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
-		throw;
-	  } else {
-		_fPropVal[i] = pars[i];
-	  }
+        MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      } else {
+        _fPropVal[i] = pars[i];
+      }
     }
   }
   // And if pca make the transfer
@@ -964,7 +962,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
 // ********************************************
 void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
 // ********************************************
-
   // loop over parameters and set a branch
   for (int i = 0; i < _fNumPar; ++i) {
     tree.Branch(_fNames[i].c_str(), &_fCurrVal[i], Form("%s/D", _fNames[i].c_str()));
@@ -997,7 +994,7 @@ void covarianceBase::setStepScale(const double scale) {
   if(scale == 0)
   {
     MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("{} setStepScale() = {}", getName(), scale);
   _fGlobalStepScale = scale;
@@ -1023,7 +1020,7 @@ void covarianceBase::toggleFixParameter(const int i) {
     if (i > _fNumPar) {
       MACH3LOG_ERROR("Can't toggleFixParameter for parameter {} because size of covariance ={}", i, _fNumPar);
       MACH3LOG_ERROR("Fix this in your config file please!");
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     } else {
       _fError[i] *= -1.0;
       MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
@@ -1035,7 +1032,7 @@ void covarianceBase::toggleFixParameter(const int i) {
     }
     if(isDecom < 0) {
       MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", GetParName(i));
-      //throw;
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     } else {
       fParSigma_PCA[isDecom] *= -1.0;
       MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
@@ -1074,7 +1071,7 @@ void covarianceBase::setFlatPrior(const int i, const bool eL) {
   if (i > _fNumPar) {
     MACH3LOG_INFO("Can't setEvalLikelihood for Cov={}/Param={} because size of Covariance = {}", getName(), i, _fNumPar);
     MACH3LOG_ERROR("Fix this in your config file please!");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   } else {
     if(eL){
       MACH3LOG_INFO("Setting {} (parameter {}) to flat prior", GetParName(i), i);
@@ -1146,6 +1143,7 @@ void covarianceBase::printIndivStepScale() {
   }
   std::cout << "============================================================" << std::endl;
 }
+
 // ********************************************
 //Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
 void covarianceBase::MakePosDef(TMatrixDSym *cov) {
@@ -1183,7 +1181,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   if (!CanDecomp) {
     MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(total_steps < 2) {
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
@@ -1193,6 +1191,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
 
   return;
 }
+
 // ********************************************
 void covarianceBase::resetIndivStepScale() {
 // ********************************************
@@ -1204,8 +1203,10 @@ void covarianceBase::resetIndivStepScale() {
   setIndivStepScale(stepScales);
 }
 
+// ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
+// ********************************************
    if (cov == NULL) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setThrowMatrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1234,7 +1235,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for (int i = 0; i < _fNumPar; ++i)
   {
@@ -1244,6 +1245,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
     }
   }
 }
+
 // ********************************************
 void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 // ********************************************
@@ -1332,7 +1334,7 @@ void covarianceBase::updateAdaptiveCovariance(){
     resetIndivStepScale();
   }
 
-  if(total_steps>=AdaptiveHandler.start_adaptive_throw && (total_steps-AdaptiveHandler.start_adaptive_throw)%AdaptiveHandler.adaptive_update_step==0) {
+  if(total_steps >= AdaptiveHandler.start_adaptive_throw && (total_steps-AdaptiveHandler.start_adaptive_throw)%AdaptiveHandler.adaptive_update_step==0) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
   }
@@ -1360,7 +1362,7 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
   TDecompSVD cov_sym_svd=TDecompSVD(cov_sym);
   if(!cov_sym_svd.Decompose()){
     MACH3LOG_ERROR("Cannot do SVD on input matrix!");
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   
   TMatrixD cov_sym_v = (TMatrixD)cov_sym_svd.GetV();
@@ -1454,4 +1456,3 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
   fout << copyNode;
   fout.close();
 }
-
