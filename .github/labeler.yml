@@ -29,3 +29,26 @@ Documentation:
   - changed-files:
       - any-glob-to-any-file: 
           - Doc/**
+Cmake:
+  - changed-files:
+      - any-glob-to-any-file:
+          - cmake/**
+          - CMakeLists.txt
+
+GPU:
+  - changed-files:
+      - any-glob-to-any-file:
+          - **/*.cu
+          - **/*.cuh
+
+CI/CD:
+  - changed-files:
+      - any-glob-to-any-file:
+          - **/workflows/**
+
+python:
+  - changed-files:
+      - any-glob-to-any-file:
+          - **/*.py
+          - **/**/*.py
+
