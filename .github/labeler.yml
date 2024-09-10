@@ -1,3 +1,4 @@
+# For more see: https://github.com/actions/labeler?tab=readme-ov-file#pull-request-labeler
 MCMC:
   - changed-files:
       - any-glob-to-any-file: 
@@ -38,17 +39,16 @@ Cmake:
 GPU:
   - changed-files:
       - any-glob-to-any-file:
-          - **/*.cu
-          - **/*.cuh
+          - '**/*.cu'
+          - '**/*.cuh'
 
 CI/CD:
   - changed-files:
       - any-glob-to-any-file:
-          - **/workflows/**
+          - .github/**
 
 python:
   - changed-files:
       - any-glob-to-any-file:
-          - **/*.py
-          - **/**/*.py
+          - '**/*.py'
 
