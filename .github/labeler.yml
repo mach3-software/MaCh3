@@ -1,9 +1,31 @@
 MCMC:
-  - mcmc/**
+  - changed-files:
+      - any-glob-to-any-file: 
+          - mcmc/**
+
 Plotting:
-  - plotting/**
-  - Diagnostics/**
+  - changed-files:
+      - any-glob-to-any-file: 
+          - plotting/**
+          - Diagnostics/**
+
 Nu Osc/Xsec:
-  - covariance/**
+  - changed-files:
+      - any-glob-to-any-file: 
+          - covariance/**
+          - splines/**
+
+Samples:
+  - changed-files:
+      - any-glob-to-any-file: 
+          - samplePDF/**
+
+Manager:
+  - changed-files:
+      - any-glob-to-any-file: 
+          - manager/**
+
 Documentation:
-  - Doc/**
+  - changed-files:
+      - any-glob-to-any-file: 
+          - Doc/**
