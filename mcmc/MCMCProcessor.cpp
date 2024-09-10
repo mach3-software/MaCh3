@@ -2254,9 +2254,11 @@ void MCMCProcessor::ScanInput() {
       ParamType.push_back(kFDDetPar);
       nParam[kFDDetPar]++;
     }
-    else if (bname.BeginsWith("sin2th_") ||
-          bname.BeginsWith("delm2_")  ||
-          bname.BeginsWith("delta_")    )
+    else if (bname.BeginsWith("sin2th_")  ||
+             bname.BeginsWith("delm2_")   ||
+             bname.BeginsWith("delta_")   ||
+             bname.BeginsWith("baseline") ||
+             bname.BeginsWith("density")   )
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kOSCPar);
@@ -2497,7 +2499,7 @@ void MCMCProcessor::FindInputFiles() {
   }
 
   //CW: And the Osc Covariance matrix
-  CovPos[kOSCPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["OscCovFile"], "none"));
+  CovPos[kOSCPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["OscCovFile"], {"none"});
   if(CovPos[kOSCPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find OscCov branch in output");
@@ -2666,32 +2668,34 @@ void MCMCProcessor::ReadFDFile() {
 void MCMCProcessor::ReadOSCFile() {
 // ***************
 
-  /// TODO WARNING remeber to fix this baka!
-  // Do the same for the ND280
-  TFile *OscFile = new TFile(CovPos[kOSCPar].back().c_str(), "open");
-  if (OscFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find OSCFile {}", CovPos[kOSCPar].back());
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  OscFile->cd();
-
-  TMatrixDSym *OscMatrix = (TMatrixDSym*)(OscFile->Get("osc_cov"));
-  //KS: Osc nominal we can also set via config so there is danger that this will nor corrspond to what was used in the fit
-  TVectorD *OscNominal = (TVectorD*)(OscFile->Get("osc_nom"));
-  TObjArray* osc_param_names = (TObjArray*)(OscFile->Get("osc_param_names"));
-  TVectorD* osc_flat_prior = (TVectorD*)OscFile->Get("osc_flat_prior");
-
-  for (int i = 0; i < osc_flat_prior->GetNrows(); ++i)
+  YAML::Node OscFile;
+  OscFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < CovPos[kOSCPar].size(); i++)
   {
-    ParamNom[kOSCPar].push_back( (*OscNominal)(i) );
-    ParamCentral[kOSCPar].push_back( (*OscNominal)(i) );
+    YAML::Node YAMLDocTemp = YAML::LoadFile(CovPos[kOSCPar][i]);
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      OscFile["Systematics"].push_back(item);
+    }
+  }
 
-    ParamErrors[kOSCPar].push_back( std::sqrt((*OscMatrix)(i,i)) );
+  auto systematics = OscFile["Systematics"];
+  int i = 0;
+  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
+  {
+    auto const &param = *it;
+
     // Push back the name
-    std::string TempString = std::string(((TObjString*)osc_param_names->At(i))->GetString());
+    std::string TempString = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
+
     ParamNames[kOSCPar].push_back(TempString);
 
-    ParamFlat[kOSCPar].push_back( (bool)((*osc_flat_prior)(i)) );
+    ParamCentral[kOSCPar].push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
+    ParamNom[kOSCPar].push_back( param["Systematic"]["ParameterValues"]["Generated"].as<double>() );
+    ParamErrors[kOSCPar].push_back( param["Systematic"]["Error"].as<double>() );
+
+    bool flat = false;
+    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
+    ParamFlat[kOSCPar].push_back( flat );
   }
   if(PlotJarlskog)
   {
@@ -2709,8 +2713,6 @@ void MCMCProcessor::ReadOSCFile() {
     ParamNames[kOSCPar].push_back("J_cp");
     ParamFlat[kOSCPar].push_back( false );
   }
-  OscFile->Close();
-  delete OscFile;
 }
 
 // ***************
