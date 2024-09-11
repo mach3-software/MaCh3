@@ -845,7 +845,6 @@ int splineFDBase::getSampleIndex(std::string SampleName){
 void splineFDBase::PrintSampleDetails(std::string SampleName)
 //****************************************
 {
-
   int iSample = getSampleIndex(SampleName);
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
@@ -862,10 +861,10 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
-  int nOscChans = indexvec[iSample].size();
-  std::cout << "Sample " << iSample << " has " << nOscChans << " oscillation channels" << std::endl;
+  int nOscChannels = indexvec[iSample].size();
+  std::cout << "Sample " << iSample << " has " << nOscChannels << " oscillation channels" << std::endl;
 
-  for (int iOscChan = 0; iOscChan < nOscChans; iOscChan++)
+  for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
     int nSysts = indexvec[iSample][iOscChan].size();
     std::cout << "Oscillation channel " << iOscChan << " has " << nSysts << " systematics" << std::endl;

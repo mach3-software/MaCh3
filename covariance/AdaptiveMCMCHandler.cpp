@@ -22,7 +22,6 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
   }
 }
 
-
 // ********************************************
 bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars) {
 // ********************************************
@@ -86,7 +85,6 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
-      //std::cout<<block_lb<<" "<<block_ub<<std::endl;
       if(block_lb > Npars || block_ub > Npars){
         MACH3LOG_ERROR("Cannot set matrix block with edges {}, {} for matrix of size {}",
                        block_lb, block_ub, Npars);
@@ -101,7 +99,6 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
   }
 }
 
-
 // ********************************************
 //HW: Truly adaptive MCMC!
 void AdaptiveMCMCHandler::SaveAdaptiveToFile(const TString& outFileName, const TString& systematicName){
@@ -109,7 +106,7 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const TString& outFileName, const T
   TFile* outFile = new TFile(outFileName, "UPDATE");
   if(outFile->IsZombie()){
     MACH3LOG_ERROR("Couldn't find {}", outFileName);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   TVectorD* outMeanVec = new TVectorD((int)par_means.size());
   for(int i = 0; i < (int)par_means.size(); i++){
@@ -139,14 +136,14 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 
   if(matrix_file->IsZombie()){
     MACH3LOG_ERROR("Couldn't find {}", matrix_file_name);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Next we grab our matrix
   adaptive_covariance = static_cast<TMatrixDSym*>(matrix_file->Get(matrix_name.c_str()));
   if(!adaptive_covariance){
     MACH3LOG_ERROR("Couldn't find {} in {}", matrix_name, matrix_file_name);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Finally we grab the means vector
@@ -177,7 +174,6 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   matrix_file->Close();
   MACH3LOG_INFO("Set up matrix from external file");
 }
-
 
 // ********************************************
 void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int steps_post_burn, const int Npars) {
@@ -225,6 +221,5 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Adaption Matrix Ending Updates     : {}", end_adaptive_update);
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
 }
-
 
 } //end adaptive_mcmc

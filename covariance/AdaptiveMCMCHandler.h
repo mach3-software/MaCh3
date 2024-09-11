@@ -8,7 +8,7 @@ namespace adaptive_mcmc{
 
 /// @brief Contains information about adaptive covariance matrix
 /// @see An adaptive Metropolis algorithm, H.Haario et al., 2001 for more info!
-///@details struct encapsulating all adaptive MCMC information
+/// @details struct encapsulating all adaptive MCMC information
 class AdaptiveMCMCHandler{
  public:
 

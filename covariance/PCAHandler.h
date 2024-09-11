@@ -21,6 +21,7 @@
 
 #endif
 
+/// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
 class PCAHandler{
  public:
 
