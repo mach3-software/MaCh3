@@ -28,10 +28,10 @@ public:
   samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
   virtual ~samplePDFFDBase();
 
-  const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  inline int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
 
   /// @brief Returns binning options
-  int GetBinningOpt(){return BinningOpt;}
+  inline int GetBinningOpt(){return BinningOpt;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -66,7 +66,7 @@ public:
   void calcOscWeights(int sample, int nutype, double *w);
 #endif
 
-  std::string GetName(){return samplename;}
+  inline std::string GetName() const override { return samplename; }
 
   const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
@@ -80,10 +80,10 @@ public:
   ///       - DB Consider using 'LetsPrintSomeWeights' to achieve the same functionality.
   ///
   /// @param outname The name of the output file.
-  virtual void DumpWeights(std::string outname) { return; };
+  virtual void DumpWeights(std::string outname) {(void)outname; return; };
   //================================================================================
 
-  virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
+  virtual void setupSplines(fdmc_base *skobj, const char *splineFileName, int nutype, int signal){(void)skobj; (void)splineFileName; (void)nutype; (void)signal;};
   /// @brief LW - Setup Osc
   void virtual SetupOscCalc(double PathLength, double Density);
   void SetOscillator(Oscillator* Osc_);
@@ -127,11 +127,11 @@ public:
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){};
+  virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
-  bool IsEventSelected(int iSample, int iEvent); 
-  bool IsEventSelected(std::vector< std::string > ParameterStr, int iSample, int iEvent);
-  bool IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent);
+  bool IsEventSelected(const int iSample, const int iEvent);
+  bool IsEventSelected(const std::vector<std::string>& ParameterStr, const int iSample, const int iEvent);
+  bool IsEventSelected(const std::vector<std::string>& ParameterStr, const std::vector<std::vector<double>> &SelectionCuts, const int iSample, const int iEvent);
 
   void CalcXsecNormsBins(int iSample);
   /// @brief This just gets read in from a yaml file
@@ -141,7 +141,7 @@ public:
   /// @brief Calculate the norm weight for a given event
   double CalcXsecWeightNorm(const int iSample, const int iEvent);
   /// @brief Virtual so this can be over-riden in an experiment derived class
-  virtual double CalcXsecWeightFunc(int iSample, int iEvent){return 1.0;};
+  virtual double CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
@@ -199,7 +199,7 @@ public:
 
   //===============================================================================
   /// DB Variables required for oscillation
-  Oscillator *Osc = NULL;
+  Oscillator *Osc;
 
   /// An axis to set binned oscillation weights
   TAxis *osc_binned_axis;
@@ -251,6 +251,4 @@ public:
   //What gets pulled from config options
   std::vector< std::vector<double> > StoredSelection; 
   //===========================================================================
-  //
-
 };

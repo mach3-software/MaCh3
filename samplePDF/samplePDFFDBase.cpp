@@ -6,6 +6,8 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
+  (void) pot;
+  (void) mc_version;
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
 
@@ -26,6 +28,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //Default values for oscillation-related things
   doubled_angle = true;
   osc_binned = false;
+  Osc = NULL;
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -71,13 +74,14 @@ void samplePDFFDBase::fill2DHist()
   return;
 }
 
+// ************************************************
 /// @function samplePDFFDBase::SetupSampleBinning()
 /// @brief Function to setup the binning of your sample histograms and the underlying 
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
 void samplePDFFDBase::SetupSampleBinning(){
-
+// ************************************************
   TString histname1d = (XVarStr).c_str();
   TString histname2d = (XVarStr+YVarStr).c_str();
   TString histtitle = "";
@@ -143,20 +147,22 @@ void samplePDFFDBase::UseBinnedOscReweighting(bool ans, int nbins, double *osc_b
   return;
 }
 
-bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
-  
+// ************************************************
+bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
+// ************************************************
+
   double Val;
 
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
     
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
-	//std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
+    //std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
     if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
-	  return false;
+      return false;
     }
 
   }
@@ -165,15 +171,16 @@ bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
   return true;
 }
 
+// ************************************************
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
+                                      const int iSample, const int iEvent) {
+// ************************************************
 
-
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iSample, int iEvent) {
-  
   double Val;
 
-  for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
+  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
  
-	Val = ReturnKinematicParameter(SelectionStr[iSelection], iSample, iEvent);
+	Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
 	//ETA - still need to support other method of you specifying the cut you want in ReturnKinematicParameter
 	//like in Dan's version below from T2K
     //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
@@ -190,24 +197,28 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, i
   return true;
 }
 
+// ************************************************
 //Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent) {
-  
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
+                                      const std::vector< std::vector<double> > &SelectionCuts,
+                                      const int iSample, const int iEvent) {
+// ************************************************
+
   double Val;
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
     
     Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
     //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that Selection vector is correctly sized
+    //DB Already checked that SelectionCuts vector is correctly sized
     
-    //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
+    //DB In the case where SelectionCuts[0].size()==3, Only Events with Val >= SelectionCuts[iSelection][1] and Val < SelectionCuts[iSelection][2] are considered Passed
 	//ETA - also check whether we're actually applying a lower or upper cut by checking they aren't -999
-	if(Val >= Selection[iSelection][1] && Selection[iSelection][0] != -999){
-	  //std::cout << "Cutting event as " << Val << " is greater than " << Selection[iSelection][1]
+	if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
+	  //std::cout << "Cutting event as " << Val << " is greater than " << SelectionCuts[iSelection][1]
 	  return false;
 	}
-	else if(Val < Selection[iSelection][0] && Selection[iSelection][1] != -999){
+	else if(Val < SelectionCuts[iSelection][0] && SelectionCuts[iSelection][1] != -999){
 	  return false;
 	}
   }
@@ -296,12 +307,13 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   return;
 }
 
+// ************************************************
 //DB Function which does the core reweighting. This assumes that oscillation weights have already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]
 //This function takes advantage of most of the things called in setupSKMC to reduce reweighting time
 //It also follows the ND code reweighting pretty closely
 //This function fills the samplePDFFD_array array which is binned to match the sample binning, such that bin[1][1] is the equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void samplePDFFDBase::fillArray() {
-
+// ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
@@ -691,10 +703,10 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   //Loop over stored normalisation and function pointers
   for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
   {
-      xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-      #ifdef DEBUG
-      if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
-      #endif
+    xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+    #ifdef DEBUG
+    if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
+    #endif
   }
   return xsecw;
 }
