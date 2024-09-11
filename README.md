@@ -76,7 +76,6 @@ The -t option specifies an install location which can be useful if you are on a 
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
-
 ```
 cmake ../ [-DMaCh3_MULTITHREAD_ENABLED=<OFF>]
 ```
@@ -85,7 +84,7 @@ cmake ../ [-DMaCh3_MULTITHREAD_ENABLED=<OFF>]
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to CUDA
 ```
 mkdir build; cd build;
-cmake ../ [-USE_CPU=ON]
+cmake ../ [-DUSE_CPU=ON]
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
