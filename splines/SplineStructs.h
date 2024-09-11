@@ -153,12 +153,27 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianc
 }
 
 // ************************
-/// @brief CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each parameter set has
-class TF1_red {
+/// @brief KS: A reduced ResponseFunction Generic function used for evaluating weight
+class TResponseFunction_red {
 // ************************
 public:
   /// @brief Empty constructor
-  TF1_red() {
+  TResponseFunction_red() { }
+  /// @brief Empty destructor
+  virtual ~TResponseFunction_red() { }
+  /// @brief Evaluate a variation
+  virtual double Eval(const double var)=0;
+  /// @brief KS: Printer
+  virtual void Print()=0;
+};
+
+// ************************
+/// @brief CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each parameter set has
+class TF1_red: public TResponseFunction_red {
+// ************************
+public:
+  /// @brief Empty constructor
+  TF1_red() : TResponseFunction_red() {
     length = 0;
     Par = NULL;
   }
@@ -172,7 +187,7 @@ public:
   }
 
   /// @brief The useful constructor with deep copy
-  TF1_red(_int_ nSize, _float_* Array) {
+  TF1_red(_int_ nSize, _float_* Array) : TResponseFunction_red() {
     length = nSize;
     for (int i = 0; i < length; ++i) {
       Par[i] = Array[i];
@@ -180,7 +195,7 @@ public:
   }
 
   /// @brief The TF1 constructor with deep copy
-  TF1_red(TF1* &Function) {
+  TF1_red(TF1* &Function) : TResponseFunction_red() {
     Par = NULL;
     SetFunc(Function);
   }
@@ -198,20 +213,27 @@ public:
   }
 
   /// @brief Evaluate a variation
-  inline double Eval(_float_ var) {
-    /// If we have 5 parameters we're using a fifth order polynomial
-    if (length == 5) {
+  inline double Eval(const double var) override {
+    return Par[1]+Par[0]*var;
+
+    /* FIXME in future we might introduce more TF1
+    //If we have 5 parameters we're using a fifth order polynomial
+    if (Type == kFifthOrderPolynomial) {
       return 1+Par[0]*var+Par[1]*var*var+Par[2]*var*var*var+Par[3]*var*var*var*var+Par[4]*var*var*var*var*var;
-      /// If we have 2 parameters we're using two linear equations
-    } else if (length == 2) {
-      return (var<=0)*(1+Par[0]*var)+(var>0)*(1+Par[1]*var);
-    } else {
+    } else if (Type == kTwoLinears) {
+      return (var <= 0)*(Par[2]+Par[0]*var)+(var > 0)*(Par[2]+Par[1]*var);
+    } else if (Type == kLinear) {
+      return (Par[1]+Par[0]*var);
+    } else if (Type == kPseudoHeaviside) {
+      return (var <= 0)*(1+Par[0]*var) + (1 >= var)*(var > 0)*(1+Par[1]*var) + (var > 1)*(Par[3]+Par[2]*var);
+    }else {
       std::cerr << "*** Error in reduced TF1 class!" << std::endl;
-      std::cerr << "    Class only knows about 5th order polynomial and two superposed linear function" << std::endl;
+      std::cerr << "    Class only knows about 5th order polynomial, two superposed linear function, linear function or pseudo Heaviside" << std::endl;
       std::cerr << "    You have tried something else than this, which remains unimplemented" << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
     }
+    */
   }
 
   /// @brief Set a parameter to a value
@@ -237,16 +259,21 @@ public:
   /// @brief Get the size
   inline int GetSize() { return length; }
   /// @brief Print detailed info
-  inline void Print() {
+  inline void Print() override {
     std::cout << "Printing TF1_red: " << std::endl;
     std::cout << "  Length  = " << length << std::endl;
-    std::cout << "  a       = " << Par[0] << std::endl;
-    std::cout << "  b       = " << Par[1] << std::endl;
-    if (length == 5) {
-      std::cout << "  c       = " << Par[2] << std::endl;
-      std::cout << "  d       = " << Par[3] << std::endl;
-      std::cout << "  e       = " << Par[4] << std::endl;
+    for(int i = 0; i < length; i++) {
+      std::cout << " Coeff " <<i<<"  = " << Par[i] << std::endl;
     }
+  }
+
+  /// @brief KS: Make a TF1 from the reduced TF1
+  inline TF1* ConstructTF1(const std::string& function, const int xmin, const int xmax) {
+    TF1 *func = new TF1("TF1", function.c_str(), xmin, xmax);
+    for(int i = 0; i < length; ++i) {
+      func->SetParameter(i, Par[i]);
+    }
+    return func;
   }
 
 private:
@@ -257,11 +284,11 @@ private:
 
 // ************************
 /// CW: Reduced TSpline3 class
-class TSpline3_red {
+class TSpline3_red: public TResponseFunction_red {
 // ************************
 public:
   /// @brief Empty constructor
-  TSpline3_red() {
+  TSpline3_red() : TResponseFunction_red() {
     nPoints = 0;
     Par = NULL;
     XPos = NULL;
@@ -269,7 +296,7 @@ public:
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
-  TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
+  TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) : TResponseFunction_red() {
     Par = NULL;
     XPos = NULL;
     YResp = NULL;
@@ -277,7 +304,7 @@ public:
   }
 
   /// @brief constructor taking parameters
-  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P){
+  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P) : TResponseFunction_red() {
     nPoints = N;
     // Save the parameters for each knot
     Par = new _float_*[nPoints];
@@ -341,7 +368,8 @@ public:
     // Get which parameters should be linear from the fit manager
     // Convert the spline number to global xsec parameter
     // Loop over the splines points
-    else if(InterPolation == kLinear)
+    // KS: kLinearFunc should be used with TF1, this is just as safety
+    else if(InterPolation == kLinear || InterPolation == kLinearFunc)
     {
       for (int k = 0; k < nPoints; ++k) {
         // 3 is the size of the TSpline3 coefficients
@@ -467,93 +495,100 @@ public:
 
         return;
       } // if nPoints !=2 do full monotonic spline treatment:
-
-      // first pass over knots to calculate the secants
-      for (int i = 0; i < nPoints-1; ++i) {
-        Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
-        //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
-      }
-
-      Tangents[0] = Secants[0];
-      Tangents[nPoints-1] = Secants[nPoints -2];
-
-      _float_ alpha;
-      _float_ beta;
-
-      // second pass over knots to calculate tangents
-      for (int i = 1; i < nPoints-1; ++i) {
-        if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
-          Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
-        }
-      }
-
-      // third pass over knots to rescale tangents
-      for (int i = 0; i < nPoints-1; ++i) {
-        if (Secants[i] == 0.0){
-          Tangents[i] = 0.0;
-          Tangents[i+1] = 0.0;
+      else
+      {
+        // first pass over knots to calculate the secants
+        for (int i = 0; i < nPoints-1; ++i) {
+          Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
+          //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
         }
 
-        else{
-          alpha = Tangents[i]  / Secants[i];
-          beta = Tangents[i+1] / Secants[i];
+        Tangents[0] = Secants[0];
+        Tangents[nPoints-1] = Secants[nPoints -2];
 
-          if (alpha <0.0){
-            Tangents[i] = 0.0;
+        _float_ alpha;
+        _float_ beta;
+
+        // second pass over knots to calculate tangents
+        for (int i = 1; i < nPoints-1; ++i) {
+          if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
+            Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
           }
-          if (beta < 0.0){
+        }
+
+        // third pass over knots to rescale tangents
+        for (int i = 0; i < nPoints-1; ++i) {
+          if (Secants[i] == 0.0){
+            Tangents[i] = 0.0;
             Tangents[i+1] = 0.0;
           }
 
-          if (alpha * alpha + beta * beta >9.0){
-            _float_ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
-            Tangents[i]   = tau * alpha * Secants[i];
-            Tangents[i+1] = tau * beta  * Secants[i];
+          else{
+            alpha = Tangents[i]  / Secants[i];
+            beta = Tangents[i+1] / Secants[i];
+
+            if (alpha <0.0){
+              Tangents[i] = 0.0;
+            }
+            if (beta < 0.0){
+              Tangents[i+1] = 0.0;
+            }
+
+            if (alpha * alpha + beta * beta >9.0){
+              _float_ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
+              Tangents[i]   = tau * alpha * Secants[i];
+              Tangents[i+1] = tau * beta  * Secants[i];
+            }
+          }
+        } // finished rescaling tangents
+        // fourth pass over knots to calculate the coefficients for the spline
+        _float_ dx;
+        for(int i = 0; i <nPoints-1; i++){
+          _float_ b, c, d = -999.999;
+          dx = XPos[i+1] - XPos[i];
+
+          b = Tangents[i] * dx;
+          c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
+          d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
+
+          Par[i][0] = b /  dx;
+          Par[i][1] = c / (dx * dx);
+          Par[i][2] = d / (dx * dx * dx);
+
+          if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
+            std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
+          }
+          //std::cout<<"b : "<<b<<std::endl;
+          //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
+          //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
+        }
+
+        // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
+        // should never actually get used but if not set then the GPU code gets very angry
+        Par[nPoints-1][0] = 0.0;
+        Par[nPoints-1][1] = 0.0;
+        Par[nPoints-1][2] = 0.0;
+
+        // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
+        // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+        for(int i = 0; i <nPoints-1; i++){
+          double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+          spline->GetCoeff(i, x, y, b, c, d);
+
+          if((c == 0.0 && d == 0.0)){
+            Par[i][0] = b;
+            Par[i][1] = 0.0;
+            Par[i][2] = 0.0;
           }
         }
-      } // finished rescaling tangents
-      // fourth pass over knots to calculate the coefficients for the spline
-      _float_ dx;
-      for(int i = 0; i <nPoints-1; i++){
-        _float_ b, c, d = -999.999;
-        dx = XPos[i+1] - XPos[i];
-
-        b = Tangents[i] * dx;
-        c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
-        d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
-
-        Par[i][0] = b /  dx;
-        Par[i][1] = c / (dx * dx);
-        Par[i][2] = d / (dx * dx * dx);
-
-        if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
-          std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
-        }
-        //std::cout<<"b : "<<b<<std::endl;
-        //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
-        //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
-      }
-
-      // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
-      // should never actually get used but if not set then the GPU code gets very angry
-      Par[nPoints-1][0] = 0.0;
-      Par[nPoints-1][1] = 0.0;
-      Par[nPoints-1][2] = 0.0;
-
-      // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
-      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
-      for(int i = 0; i <nPoints-1; i++){
-        double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-        spline->GetCoeff(i, x, y, b, c, d);
-
-        if((c == 0.0 && d == 0.0)){
-          Par[i][0] = b;
-          Par[i][1] = 0.0;
-          Par[i][2] = 0.0;
-        }
-      }
-      delete[] Secants;
-      delete[] Tangents;
+        delete[] Secants;
+        delete[] Tangents;
+      } // end of if(nPoints !=2)
+    }
+    else
+    {
+      std::cerr<<"Unsupported interpolations type "<<InterPolation<<std::endl;
+      throw;
     }
 
     delete spline;
@@ -562,14 +597,16 @@ public:
 
   /// @brief Empty destructor
   ~TSpline3_red() {
-    for (int i = 0; i < nPoints; ++i) {
-      if (Par[i] != NULL) {
-        delete[] Par[i];
+    if(Par != NULL) {
+      for (int i = 0; i < nPoints; ++i) {
+        if (Par[i] != NULL) {
+          delete[] Par[i];
+        }
       }
+      delete[] Par;
     }
-    delete[] Par;
-    delete[] XPos;
-    delete[] YResp;
+    if(XPos != NULL) delete[] XPos;
+    if(YResp != NULL) delete[] YResp;
     Par = NULL;
     XPos = YResp = NULL;
   }
@@ -610,7 +647,7 @@ public:
   }
 
   /// @brief CW: Evaluate the weight from a variation
-  inline double Eval(double var) {
+  inline double Eval(double var) override {
     // Get the segment for this variation
     int segment = FindX(var);
     // The get the coefficients for this variation
@@ -643,6 +680,15 @@ public:
   inline TSpline3* ConstructTSpline3() {
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     return spline;
+  }
+
+  /// @brief Print detailed info
+  inline void Print() override {
+    std::cout << "Printing TSpline_red: " << std::endl;
+    std::cout << " Nknots  = " << nPoints << std::endl;
+    for(int i = 0; i < nPoints; ++i) {
+      std::cout<<"  i ="<<i<<" x="<<XPos[i]<<" y"<<YResp[i]<<" b="<<Par[i][0]<<" c="<<Par[i][1]<<" d="<<Par[i][2]<<std::endl;
+    }
   }
 
   protected: //changed to protected from private so can be accessed by derived classes
@@ -720,7 +766,7 @@ public:
     // The get the coefficients for this variation
     _float_ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
 
-    if(segment >=0){
+    if(segment >= 0){
       GetCoeff(segment, x, y, b, c, d);
     }
 
@@ -744,3 +790,98 @@ public:
     return weight;
   }
 };
+
+// *****************************************
+/// @brief CW: Helper function used in the constructor, tests to see if the spline is flat
+/// @param spl pointer to TSpline3_red that will be checked
+inline bool isFlat(TSpline3_red* &spl) {
+// *****************************************
+  int Np = spl->GetNp();
+  _float_ x, y, b, c, d;
+  // Go through spline segment parameters,
+  // Get y values for each spline knot,
+  // Every knot must evaluate to 1.0 to create a flat spline
+  for(int i = 0; i < Np; i++) {
+    spl->GetCoeff(i, x, y, b, c, d);
+    if (y != 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// *********************************
+/// @brief CW: Reduced the TSpline3 to TSpline3_red
+/// @param MasterSpline Vector of TSpline3_red pointers which we strip back
+inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::vector<TSpline3*> > &MasterSpline) {
+// *********************************
+  std::vector<std::vector<TSpline3*> >::iterator OuterIt;
+  std::vector<TSpline3*>::iterator InnerIt;
+
+  // The return vector
+  std::vector<std::vector<TSpline3_red*> > ReducedVector;
+  ReducedVector.reserve(MasterSpline.size());
+
+  // Loop over each parameter
+  int OuterCounter = 0;
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+    // Make the temp vector
+    std::vector<TSpline3_red*> TempVector;
+    TempVector.reserve(OuterIt->size());
+    int InnerCounter = 0;
+    // Loop over each TSpline3 pointer
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+      // Here's our delicious TSpline3 object
+      TSpline3 *spline = (*InnerIt);
+      // Now make the reduced TSpline3 pointer
+      TSpline3_red *red = NULL;
+      if (spline != NULL) {
+        red = new TSpline3_red(spline);
+        (*InnerIt) = spline;
+      }
+      // Push back onto new vector
+      TempVector.push_back(red);
+    } // End inner for loop
+    ReducedVector.push_back(TempVector);
+  } // End outer for loop
+  // Now have the reduced vector
+  return ReducedVector;
+}
+
+// *********************************
+/// @brief CW: Reduced the TF1 to TF1_red
+/// @param MasterSpline Vector of TF1_red pointers which we strip back
+inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1*> > &MasterSpline) {
+// *********************************
+  std::vector<std::vector<TF1*> >::iterator OuterIt;
+  std::vector<TF1*>::iterator InnerIt;
+
+  // The return vector
+  std::vector<std::vector<TF1_red*> > ReducedVector;
+  ReducedVector.reserve(MasterSpline.size());
+
+  // Loop over each parameter
+  int OuterCounter = 0;
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+    // Make the temp vector
+    std::vector<TF1_red*> TempVector;
+    TempVector.reserve(OuterIt->size());
+    int InnerCounter = 0;
+    // Loop over each TSpline3 pointer
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+      // Here's our delicious TSpline3 object
+      TF1* spline = (*InnerIt);
+      // Now make the reduced TSpline3 pointer (which deleted TSpline3)
+      TF1_red* red = NULL;
+      if (spline != NULL) {
+        red = new TF1_red(spline);
+        (*InnerIt) = spline;
+      }
+      // Push back onto new vector
+      TempVector.push_back(red);
+    } // End inner for loop
+    ReducedVector.push_back(TempVector);
+  } // End outer for loop
+  // Now have the reduced vector
+  return ReducedVector;
+}
