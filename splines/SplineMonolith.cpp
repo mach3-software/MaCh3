@@ -881,15 +881,17 @@ SMonolith::~SMonolith() {
   if(index_TF1_cpu != nullptr) delete[] index_TF1_cpu;
 
   //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL
-  cpu_spline_handler->coeff_x.clear();
-  cpu_spline_handler->coeff_x.shrink_to_fit();
-  cpu_spline_handler->coeff_many.clear();
-  cpu_spline_handler->coeff_many.shrink_to_fit();
-  cpu_spline_handler->paramNo_arr.clear();
-  cpu_spline_handler->paramNo_arr.shrink_to_fit();
-  cpu_spline_handler->nKnots_arr.clear();
-  cpu_spline_handler->nKnots_arr.shrink_to_fit();
-
+  if(cpu_spline_handler != nullptr)
+  {
+    cpu_spline_handler->coeff_x.clear();
+    cpu_spline_handler->coeff_x.shrink_to_fit();
+    cpu_spline_handler->coeff_many.clear();
+    cpu_spline_handler->coeff_many.shrink_to_fit();
+    cpu_spline_handler->paramNo_arr.clear();
+    cpu_spline_handler->paramNo_arr.shrink_to_fit();
+    cpu_spline_handler->nKnots_arr.clear();
+    cpu_spline_handler->nKnots_arr.shrink_to_fit();
+  }
   cpu_coeff_TF1_many.clear();
   cpu_coeff_TF1_many.shrink_to_fit();
   cpu_paramNo_TF1_arr.clear();
