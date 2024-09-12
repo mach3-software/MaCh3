@@ -44,5 +44,8 @@ namespace MaCh3Utils {
   /// @brief CW: Get memory, which is probably silly
   int parseLine(const std::string& line);
   /// @brief KS: Print Yaml config using logger
+  /// @param node yaml config node
   void PrintConfig(const YAML::Node& node);
+  /// @brief KS: Almost all MaCh3 executables have the same usage, prepare simple printer
+  void MaCh3Usage(int argc, char **argv);
 }

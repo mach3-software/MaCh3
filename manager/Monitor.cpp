@@ -10,7 +10,6 @@ namespace MaCh3Utils {
 // *************************
 void MaCh3Welcome() {
 // *************************
-
   // KS: Just make sure we only call it once
   static bool MaCh3WelcomeInitialised = false;
 
@@ -84,7 +83,6 @@ std::string GetMaCh3Version() {
   return MaCh3_VERSION;
 }
 
-
 // ************************
 // KS: Find out more about operational system
 void GetOSInfo() {
@@ -96,7 +94,6 @@ void GetOSInfo() {
   MACH3LOG_INFO("Distribution: {}", TerminalToString("lsb_release -d | awk -F':' '{print $2}'"));
   MACH3LOG_INFO("Kernel Version: {}", TerminalToString("uname -r"));
 }
-
 
 // ************************
 //KS: Simple function retrieving CPU info
@@ -119,7 +116,6 @@ void GetCPUInfo() {
 
   //KS: /proc/cpuinfo and lscpu holds much more info I have limited it but one can expand it if needed
 }
-
 
 // ************************
 //KS: Simple function retrieving GPU info
@@ -151,7 +147,6 @@ void GetDiskUsage() {
   // Get disk usage
   MACH3LOG_INFO("{}", TerminalToString("df -h --total | grep total"));
 }
-
 
 // ************************
 // KS: Convoluted code to grab output from terminal to string
@@ -189,8 +184,6 @@ void EstimateDataTransferRate(TChain* chain, const int entry){
 
   MACH3LOG_INFO("Data transfer: {} B, rate: {:.2f} MB/s", bytesProcessed, dataRateMBps);
 }
-
-
 
 // ************************
 //KS: Simply print progress bar
@@ -276,7 +269,6 @@ int parseLine(const std::string& line){
   return value;
 }
 
-
 // ***************************************************************************
 //KS: Print Yaml config using logger
 void PrintConfig(const YAML::Node& node){
@@ -292,4 +284,15 @@ void PrintConfig(const YAML::Node& node){
   }
 }
 
+// ***************************************************************************
+//KS: Almost all MaCh3 executables have the same usage, prepare simple printer
+void MaCh3Usage(int argc, char **argv){
+// ***************************************************************************
+  if (argc != 2) {
+    MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");
+    MACH3LOG_ERROR("Syntax is $: {} config.yaml", argv[0]);
+    MACH3LOG_ERROR("Where config.yaml is a valid config file, compatible with the manager class (manager/manager.cpp/h)");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
 }
