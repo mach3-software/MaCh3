@@ -1094,6 +1094,9 @@ void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _re
   for (int i = 0; i < n; ++i)
   {
     double result = 0.0;
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (int j = 0; j < n; ++j)
     {
       result += matrix[i][j]*vector[j];
