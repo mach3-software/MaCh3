@@ -14,9 +14,10 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
 
-  samplePDFFD_array = NULL;
-  samplePDFFD_data = NULL;
-  
+  samplePDFFD_array = nullptr;
+  samplePDFFD_data = nullptr;
+  oscpars = nullptr;
+
   //KS: For now FD support only one sample
   nSamples = 1;
   SampleName.push_back("FDsample");
@@ -36,16 +37,18 @@ samplePDFFDBase::~samplePDFFDBase()
   std::cout << "I'm deleting samplePDFFDBase" << std::endl;
 
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
-	if(samplePDFFD_array != NULL){delete[] samplePDFFD_array[yBin];}
-	delete[] samplePDFFD_array_w2[yBin];
-	//ETA - there is a chance that you haven't added any data...
-	if(samplePDFFD_data != NULL){delete[] samplePDFFD_data[yBin];}
+    if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
+    delete[] samplePDFFD_array_w2[yBin];
+    //ETA - there is a chance that you haven't added any data...
+    if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data[yBin];}
   }
 
-  if(samplePDFFD_array != NULL){delete[] samplePDFFD_array;}
+  if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array;}
   delete[] samplePDFFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
-  if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
+  if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
+
+  if(oscpars != nullptr) delete[] oscpars;
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -232,7 +235,7 @@ bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& Paramete
 double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en)
 {
   MCSamples[sample].Oscillator->SetMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], en, doubled_angle, nutype);
-  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpars[7], *oscpars[8]); 
+  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpars[6], *oscpars[7]);
 
   return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
 }
@@ -246,13 +249,12 @@ extern "C" void GetProb(int Alpha, int Beta, double Path, double Density, double
 void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num)
 {
   setMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], doubled_angle);
-  GetProb(nutype, oscnutype, &oscpar[7], &oscpar[8], en, num, w);
-
+  GetProb(nutype, oscnutype, *oscpar[6], *oscpar[7], en, num, w);
 
   if (std::isnan(w[10]))
-    {
-      std::cerr << "WARNING: ProbGPU oscillation weight returned NaN! " << w[10] << std::endl;
-    }
+  {
+    std::cerr << "WARNING: ProbGPU oscillation weight returned NaN! " << w[10] << std::endl;
+  }
 }
 #endif
 
@@ -755,10 +757,10 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
 void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
   OscCov = osc_cov;
-  int nOscPars = OscCov->getProposed().size(); 
+  int nOscPars = OscCov->GetNumParams();
   oscpars = new const double*[nOscPars];
   for(auto osc_par_i = 0; osc_par_i < nOscPars ; ++osc_par_i){
-	oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
+    oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
   } 
   return;
 }
