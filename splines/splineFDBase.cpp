@@ -305,7 +305,7 @@ void splineFDBase::CalcSplineWeights()
 //****************************************
 {
   #ifdef MULTITHREAD
-  #pragma omp parallel for// schedule(dynamic)
+  #pragma omp parallel for simd
   #endif
   for (unsigned int iCoeff = 0; iCoeff < uniquecoeffindices.size(); iCoeff++)
   {
