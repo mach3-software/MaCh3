@@ -165,6 +165,8 @@ public:
   virtual double Eval(const double var)=0;
   /// @brief KS: Printer
   virtual void Print()=0;
+  /// @brief DL: Get number of points
+  virtual _int_ GetNp()=0;
 };
 
 // ************************
@@ -275,6 +277,9 @@ public:
     }
     return func;
   }
+
+  /// @brief DL: Get number of points
+  inline _int_ GetNp() override { return length; }
 
 private:
   /// The parameters
@@ -660,7 +665,7 @@ public:
   }
 
   /// @brief CW: Get the number of points
-  inline int GetNp() { return nPoints; }
+  inline _int_ GetNp() override { return nPoints; }
   // Get the ith knot's x and y position
   inline void GetKnot(int i, _float_ &xtmp, _float_ &ytmp) {
     xtmp = XPos[i];
