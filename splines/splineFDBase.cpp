@@ -562,8 +562,8 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
 
   if (Verbosity > 0)
   {
-    std::cout << "Total number of splines loaded:" << FullCounter_All << std::endl;
-    std::cout << "Total number of non-flat splines loaded:" << FullCounter_NonFlat << std::endl;
+    MACH3LOG_INFO("Total number of splines loaded: {}", FullCounter_All);
+    MACH3LOG_INFO("Total number of non-flat splines loaded: {}", FullCounter_NonFlat);
   }
 
   if (NonFlat)
@@ -743,8 +743,8 @@ void splineFDBase::PrepForReweight()
 	}
   }
   // We need to grab the maximum number of knots
-
-  std::cout << "Number of combinations of Sample, OscChan, Syst and Mode which have entirely flat response:" << nCombinations_FlatSplines << " / " << nCombinations_All << std::endl;
+  MACH3LOG_INFO("Number of combinations of Sample, OscChan, Syst and Mode which have entirely flat response: {} / {}", nCombinations_FlatSplines, nCombinations_All);
+  
 }
 
 //****************************************
@@ -782,11 +782,9 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _fl
     manyArray[i*4+3] = _float_(d);
     
     if((xArray[i] == -999) | (manyArray[i*4] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*4+2] == -999) | (manyArray[i*4+3] == -999)){
-      std::cerr << "*********** Bad params in getSplineCoeff_SepMany() ************"<<std::endl;
-      std::cerr << "pre cast to _float_ (x, y, b, c, d) = "<<x<<", "<<y<<", "<<b<<", "<<c<<", "<<d<<std::endl;
-      std::cerr << "post cast to float (x, y, b, c, d) = "<<xArray[i]<<", "<<manyArray[i*4]<<", "<<manyArray[i*4+1]<<", "<<manyArray[i*4+2]<<", "<<manyArray[i*4+3]<<std::endl;
-      std::cerr<<__FILE__<<"::"<<__LINE__<<std::endl;
-      std::cerr << "***************************************************************"<<std::endl;
+      MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
+      MACH3LOG_ERROR("pre cast to _float_ (x, y, b, c, d) = {}, {}, {}, {}, {}",x, y, b, c, d);
+      MACH3LOG_ERROR("post cast to float (x, y, b, c, d) = {}, {}, {}, {}, {}",xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*4+3]);	    
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
@@ -821,7 +819,7 @@ int splineFDBase::getSampleIndex(std::string SampleName){
   }
   if (SampleIndex == -1)
   {
-    std::cerr << "Sample name not found : "<<SampleName << std::endl;
+    MACH3LOG_ERROR("Sample name not found : {}", SampleName);	  
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return SampleIndex;
@@ -848,12 +846,12 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 {
   int iSample = getSampleIndex(SampleName);
   int nOscChannels = indexvec[iSample].size();
-  std::cout << "Sample " << iSample << " has " << nOscChannels << " oscillation channels" << std::endl;
-
+  MACH3LOG_INFO("Sample {} has {} oscillation channels", iSample, nOscChannels);	
+  
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
     int nSysts = indexvec[iSample][iOscChan].size();
-    std::cout << "Oscillation channel " << iOscChan << " has " << nSysts << " systematics" << std::endl;
+    MACH3LOG_INFO("Oscillation channel {} has {} systematics", iOscChan, nSysts);	  
   }
 }
 
@@ -920,56 +918,56 @@ bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int 
 
   if (iSample < 0 || iSample >= (int)indexvec.size())
   {
-    std::cerr << "Sample index is invalid! 0 <= Index < " << indexvec.size() << std::endl;
+    MACH3LOG_ERROR("Sample index is invalid! 0 <= Index < {} ", indexvec.size());
     isValid = false;
   }
 
   if (iOscChan < 0 || iOscChan >= (int)indexvec[iSample].size())
   {
-    std::cerr << "OscChan index is invalid! 0 <= Index < " << indexvec[iSample].size() << std::endl;
+    MACH3LOG_ERROR("OscChan index is invalid! 0 <= Index < {} ", indexvec[iSample].size());
     isValid = false;
   }
 
   if (iSyst < 0 || iSyst >= (int)indexvec[iSample][iOscChan].size())
   {
-    std::cerr << "Syst index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan].size() << std::endl;
+    MACH3LOG_ERROR("Syst index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan].size());
     isValid = false;
   }
 
   if (iMode < 0 || iMode >= (int)indexvec[iSample][iOscChan][iSyst].size())
   {
-    std::cerr << "Mode index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst].size() << std::endl;
+    MACH3LOG_ERROR("Mode index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst].size());
     isValid = false;
   }
 
   if (iVar1 < 0 || iVar1 >= (int)indexvec[iSample][iOscChan][iSyst][iMode].size())
   {
-    std::cerr << "Var1 index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst][iMode].size() << std::endl;
+    MACH3LOG_ERROR("Var1 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode].size());	  
     isValid = false;
   }
 
   if (iVar2 < 0 || iVar2 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size())
   {
-    std::cerr << "Var2 index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size() << std::endl;
+    MACH3LOG_ERROR("Var2 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size());
     isValid = false;
   }
 
   if (iVar3 < 0 || iVar3 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size())
   {
-    std::cerr << "Var3 index is invalid! 0 <= Index < " << indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size() << std::endl;
+    MACH3LOG_ERROR("Var3 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size());
     isValid = false;
   }
 
   if (!isValid)
-  {
-    std::cerr << "Given iSample:" << iSample << std::endl;
-    std::cerr << "Given iOscChan:" << iOscChan << std::endl;
-    std::cerr << "Given iSyst:" << iSyst << std::endl;
-    std::cerr << "Given iMode:" << iMode << std::endl;
-    std::cerr << "Given iVar1:" << iVar1 << std::endl;
-    std::cerr << "Given iVar2:" << iVar2 << std::endl;
-    std::cerr << "Given iVar3:" << iVar3 << std::endl;
-    std::cerr << "Come visit me at : "<<__FILE__<<" : "<<__LINE__<<std::endl;
+  { 
+    MACH3LOG_ERROR("Given iSample: {}", iSample);
+    MACH3LOG_ERROR("Given iOscChan: {}", iOscChan);
+    MACH3LOG_ERROR("Given iSyst: {}", iSyst);
+    MACH3LOG_ERROR("Given iMode: {}", iMode);
+    MACH3LOG_ERROR("Given iVar1: {}", iVar1);
+    MACH3LOG_ERROR("Given iVar2: {}", iVar2);
+    MACH3LOG_ERROR("Given iVar3: {}", iVar3);	
+    MACH3LOG_ERROR("Come visit me at : {} : {}", __FILE__, __LINE__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -982,7 +980,7 @@ void splineFDBase::PrintBinning(TAxis *Axis)
 {
   const int NBins = Axis->GetNbins();
   const double *BinEdges = Axis->GetXbins()->GetArray();
-
+  
   std::cout << "\t";
   for (int iBin = 0; iBin < (NBins + 1); iBin++)
   {
