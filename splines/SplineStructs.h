@@ -165,6 +165,8 @@ public:
   virtual double Eval(const double var)=0;
   /// @brief KS: Printer
   virtual void Print()=0;
+  /// @brief DL: Get number of points
+  virtual _int_ GetNp()=0;
 };
 
 // ************************
@@ -275,6 +277,9 @@ public:
     }
     return func;
   }
+
+  /// @brief DL: Get number of points
+  inline int GetNp() override { return length; }
 
 private:
   /// The parameters
