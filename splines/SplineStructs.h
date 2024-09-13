@@ -279,7 +279,7 @@ public:
   }
 
   /// @brief DL: Get number of points
-  inline int GetNp() override { return length; }
+  inline _int_ GetNp() override { return length; }
 
 private:
   /// The parameters
@@ -665,7 +665,7 @@ public:
   }
 
   /// @brief CW: Get the number of points
-  inline int GetNp() override { return nPoints; }
+  inline _int_ GetNp() override { return nPoints; }
   // Get the ith knot's x and y position
   inline void GetKnot(int i, _float_ &xtmp, _float_ &ytmp) {
     xtmp = XPos[i];
