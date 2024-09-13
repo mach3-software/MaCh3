@@ -23,9 +23,6 @@ class SMonolith : public SplineBase {
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
     void Evaluate() override;
 
-    /// @brief CW: Evaluate weights on the CPU/GPU
-    void Evaluate_TF1();
-
     /// @brief Get class name
     inline std::string GetName()const {return "SplineMonolith";};
 
@@ -86,7 +83,7 @@ class SMonolith : public SplineBase {
         
     /// @brief KS: Print info about how much knots etc has been initialised
     inline void PrintInitialsiation();
-    
+
     /// @brief CW: This loads up coefficients into two arrays: one x array and one yabcd array
     /// @brief CW: This should maximize our cache hits!
     /// @param spl pointer to TSpline3_red
@@ -94,18 +91,11 @@ class SMonolith : public SplineBase {
     /// @param xArray array X value for each knot
     /// @param manyArray Array holding coefficients for each knot
     inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
-    /// @brief CW: Gets the polynomial coefficients for TF1
-    /// @param spl pointer to TF1_red that will be checked
-    /// @param nPoints number of knots
-    /// @param coeffs Array holding coefficients for each knot
-    inline void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
-    
+
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     inline void FindSplineSegment() override;
     /// @brief CPU based code which eval weight for each spline
     inline void CalcSplineWeights() override;
-    /// @brief Same but TF1
-    inline void CalcSplineWeights_TF1();
     /// @brief Calc total event weight
     inline void ModifyWeights() override;
     /// @brief Conversion from valid splines to all

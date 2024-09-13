@@ -5,20 +5,20 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 1.1.3)
+set(MaCh3_VERSION 1.1.3)
 
 # Try to find CUDA
-find_package(CUDAToolkit)
+find_package(CUDAToolkit QUIET)
 add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
-  SET(MaCh3_GPU_ENABLED TRUE)
-  SET(CPU_ONLY FALSE)
+  set(MaCh3_GPU_ENABLED TRUE)
+  set(CPU_ONLY FALSE)
 else()
   message(STATUS "CUDA not found. Proceeding without CUDA support.")
-  SET(MaCh3_GPU_ENABLED FALSE)
-  SET(CPU_ONLY TRUE)
+  set(MaCh3_GPU_ENABLED FALSE)
+  set(CPU_ONLY TRUE)
 endif()
 
 if(CPU_ONLY)
@@ -49,7 +49,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  SET(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 # KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
@@ -108,11 +108,11 @@ DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
-  SET(MaCh3_DEBUG_ENABLED TRUE)
+  set(MaCh3_DEBUG_ENABLED TRUE)
 else()
   #If MaCh3 debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
   if(MaCh3_DEBUG_ENABLED)
-    SET(DEBUG_LEVEL 1)
+    set(DEBUG_LEVEL 1)
   endif()
 endif()
 
@@ -162,7 +162,7 @@ if(MaCh3_GPU_ENABLED)
 endif()
 
 if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  SET(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
+  set(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
 endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)

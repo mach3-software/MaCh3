@@ -3,7 +3,7 @@ add_compile_definitions(CUDA)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
-  SET(MaCh3_DEBUG_ENABLED FALSE)
+  set(MaCh3_DEBUG_ENABLED FALSE)
 endif()
 
 EXECUTE_PROCESS( COMMAND uname -m OUTPUT_VARIABLE OS_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)

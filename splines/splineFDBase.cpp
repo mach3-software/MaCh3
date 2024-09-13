@@ -5,18 +5,20 @@ splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
 //****************************************
   if (xsec_ == NULL) {
-    std::cerr << "Trying to create splineSKBase with NULL covariance object" << std::endl;
-    throw;
+    MACH3LOG_ERROR("Trying to create splineSKBase with NULL covariance object");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   xsec = xsec_;
 
   // Keep these in class scope, important for using 1 monolith/sample!
-  MonolithIndex=0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
-  CoeffIndex=0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
+  MonolithIndex = 0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
+  CoeffIndex = 0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
 }
 //****************************************
 splineFDBase::~splineFDBase(){
 //****************************************
+  if(manycoeff_arr != nullptr) delete[] manycoeff_arr;
+  if(xcoeff_arr != nullptr) delete[] xcoeff_arr;
 
 }
 //****************************************
@@ -68,15 +70,6 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
   SplineModeVecs.push_back(SplineModeVecs_Sample);
 
- // int counter = 0;
- // std::cout << "Name        |     Spline     |    SplineIndex    |    GlobalIndex " << std::endl;
-  //for(auto splineindex : SplineParsIndex_Sample){
-  //for(int spline_i = 0 ; spline_i < GlobalSystIndex_Sample.size() ; spline_i++){
-//	std::cout << (SplineFileParPrefixNames_Sample.at(spline_i)).c_str() << ",       " << counter << ",     " << SplineParsIndex_Sample_temp.at(spline_i) << ",   " << GlobalSystIndex_Sample.at(spline_i) << std::endl;
-//	counter++;
- // }
-
-
   int nOscChan = OscChanFileNames.size();
   nOscChans.push_back(nOscChan);
 
@@ -112,7 +105,7 @@ void splineFDBase::TransferToMonolith()
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
     MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
     MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   MACH3LOG_INFO("Now transferring splines to a monolith if size {}", MonolithSize);
@@ -160,7 +153,7 @@ void splineFDBase::TransferToMonolith()
 				  {
 					MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
 				  }//unique syst loop end				
-                  throw;
+                  throw MaCh3Exception(__FILE__ , __LINE__ );
                 }
 
                 int splineKnots;
@@ -182,8 +175,7 @@ void splineFDBase::TransferToMonolith()
 
                     if(tmpXCoeffArr[i]==-999){
                       std::cerr<<"ERROR : looks like we've got a bad X, index = "<<i<<std::endl;
-                      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-                      throw;
+                      throw MaCh3Exception(__FILE__ , __LINE__ );
                     }
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
@@ -191,8 +183,7 @@ void splineFDBase::TransferToMonolith()
                       if(tmpManyCoeffArr[i*4+j]==-999){
                         std::cerr<<"Bad ybcd, index : "<<i<<", "<<j<<std::endl;
                         std::cerr<<"Param Values : "<<tmpManyCoeffArr[i*4]<<", "<<tmpManyCoeffArr[i*4+1]<<", "<<tmpManyCoeffArr[i*4+2]<<", "<<tmpManyCoeffArr[i*4+3]<<std::endl;
-                        std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-                        throw;
+                        throw MaCh3Exception(__FILE__ , __LINE__ );
                       }
                     manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
@@ -342,8 +333,8 @@ void splineFDBase::CalcSplineWeights()
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
 
 
-	//ETA - do we need this? We check later for negative weights and I wonder if this is even
-	//possible with the fmaf line above?
+    //ETA - do we need this? We check later for negative weights and I wonder if this is even
+    //possible with the fmaf line above?
     if(weight<0){weight=0;}  //Stops is getting negative weights
 
     weightvec_Monolith[iSpline]=double(weight);
@@ -420,14 +411,14 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   TObject *Obj = File->Get("dev_tmp_0_0");
   if (!Obj)
   {
-	Obj = File->Get("dev_tmp.0.0");
-	if (!Obj)
-	{
-	  std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
-	  std::cerr << "FileName: " << FileName << std::endl;
-	  std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
-	  throw;
-	}
+    Obj = File->Get("dev_tmp.0.0");
+    if (!Obj)
+    {
+      std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
+      std::cerr << "FileName: " << FileName << std::endl;
+      std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
   }
 
   if (Obj->IsA() == TH2F::Class())
@@ -444,8 +435,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   if (!isHist2D && !isHist3D)
   {
     std::cerr << "Object doesn't inherit from either TH2D and TH3D - Odd A" << std::endl;
-    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (isHist2D)
@@ -453,8 +443,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     if (Dimensions[iSample] != 2)
     {
       std::cerr << "Trying to load a 2D spline template when nDim=" << Dimensions[iSample] << std::endl;
-      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     Hist2D = (TH2F *)File->Get("dev_tmp_0_0");
   }
@@ -465,8 +454,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
       std::cerr << "Trying to load a 3D spline template when nDim=" << Dimensions[iSample] << std::endl;
-      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     Hist3D = (TH3F *)Obj->Clone();
   }
@@ -617,8 +605,8 @@ void splineFDBase::PrepForReweight()
       if (!FoundSyst)
       {
         bool FoundNonFlatSpline = false;
-		//This is all basically to check that you have some resposne from a spline
-		//systematic somewhere
+        //This is all basically to check that you have some resposne from a spline
+        //systematic somewhere
         for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
         { // Loop over oscillation channels
           for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
@@ -696,8 +684,7 @@ void splineFDBase::PrepForReweight()
       if (xPoint == -999 || yPoint == -999)
       {
         std::cerr << "Something has gone wrong in the knot finding" << std::endl;
-        std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-        throw;
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       UniqueSystXPts[iSpline][iKnot] = xPoint;
     }
@@ -800,9 +787,9 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _fl
       std::cerr << "post cast to float (x, y, b, c, d) = "<<xArray[i]<<", "<<manyArray[i*4]<<", "<<manyArray[i*4+1]<<", "<<manyArray[i*4+2]<<", "<<manyArray[i*4+3]<<std::endl;
       std::cerr<<__FILE__<<"::"<<__LINE__<<std::endl;
       std::cerr << "***************************************************************"<<std::endl;
-     throw;
-      }
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
+  }
   //We now clean up the splines!
   delete splinevec_Monolith[splineindex];
   splinevec_Monolith[splineindex] = NULL;
@@ -815,9 +802,9 @@ std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 //****************************************
 {
   if(Axis > DimensionLabels[iSample].size()){
-	MACH3LOG_ERROR("The spline Axis you are trying to get the label of is larger than the number of dimensions"); 
-	MACH3LOG_ERROR("You are trying to get axis {} but have only got {}", Axis, Dimensions[iSample]);
-	throw;
+    MACH3LOG_ERROR("The spline Axis you are trying to get the label of is larger than the number of dimensions");
+    MACH3LOG_ERROR("You are trying to get axis {} but have only got {}", Axis, Dimensions[iSample]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return DimensionLabels.at(iSample).at(Axis);
 }
@@ -835,8 +822,7 @@ int splineFDBase::getSampleIndex(std::string SampleName){
   if (SampleIndex == -1)
   {
     std::cerr << "Sample name not found : "<<SampleName << std::endl;
-    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return SampleIndex;
 }
@@ -984,7 +970,7 @@ bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int 
     std::cerr << "Given iVar2:" << iVar2 << std::endl;
     std::cerr << "Given iVar3:" << iVar3 << std::endl;
     std::cerr << "Come visit me at : "<<__FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   return true;

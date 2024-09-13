@@ -25,9 +25,9 @@ if(ROOT_VERSION VERSION_LESS 6.18.00)
 endif()
 
 # KS: Since ROOT 6.32.0 Minuit is turned on by default
-SET(MaCh3_MINUIT2_ENABLED FALSE)
+set(MaCh3_MINUIT2_ENABLED FALSE)
 if(ROOT_VERSION GREATER_EQUAL 6.32.00 OR ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABLED")
-  SET(MaCh3_MINUIT2_ENABLED TRUE)
+  set(MaCh3_MINUIT2_ENABLED TRUE)
 endif()
 
 #YAML for reading in config files
@@ -61,7 +61,7 @@ endif()
 #endif()
 
 
-SET(MaCh3_Fitter_ENABLED "MR2T2")
+set(MaCh3_Fitter_ENABLED "MR2T2")
 LIST(APPEND MaCh3_Fitter_ENABLED " PSO")
 if(MaCh3_MINUIT2_ENABLED)
   LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")
@@ -75,7 +75,7 @@ DefineEnabledRequiredSwitch(USE_PROB3 FALSE)
 
 # Oscillation calculation
 # In the future which osc calc we use might be set with a flag
-SET(MaCh3_Oscillator_ENABLED "")
+set(MaCh3_Oscillator_ENABLED "")
 if (USE_PROB3)
   CPMFindPackage(
     NAME Prob3plusplus

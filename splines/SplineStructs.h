@@ -726,7 +726,7 @@ public:
   }
 
   /// @brief Find the segment relevant to this variation in x
-  /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
+  /// See root/hist/hist/src/TSpline3::FindX(double) or SplineMonolith::FindSplineSegment
   inline int FindX(double x) {
     // The segment we're interested in (klow in ROOT code)
     int segment = 0;

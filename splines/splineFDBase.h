@@ -9,8 +9,9 @@
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 class splineFDBase : public SplineBase {
-  //ETA - do all of these functions and members actually need to be public?
+  /// @todo ETA - do all of these functions and members actually need to be public?
   public:
+    /// @brief Constructor
     splineFDBase(covarianceXsec *xsec_ = NULL);
     /// @brief Destructor
     /// @todo it need some love
@@ -21,7 +22,7 @@ class splineFDBase : public SplineBase {
 
     //Spline Monolith things
     //Essential methods used externally
-    //Move these to splineFDBase in core
+    /// @todo Move these to splineFDBase in core
     bool AddSample(std::string SampleName, int BinningOpt, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
     void TransferToMonolith();
     void cleanUpMemory();
@@ -54,10 +55,13 @@ class splineFDBase : public SplineBase {
 	}
 
   protected:
+    /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     inline void FindSplineSegment() override;
+    /// @brief CPU based code which eval weight for each spline
     inline void CalcSplineWeights() override;
+    /// @brief Calc total event weight, not used by Bin-by-bin splines
     inline void ModifyWeights() override {return;};
-
+    /// Pointer to covariance xsec
     covarianceXsec* xsec;
 
 	//And now the actual member variables	
@@ -87,10 +91,11 @@ class splineFDBase : public SplineBase {
 	std::vector<int> UniqueSystCurrSegment;
 	std::vector< std::vector<_float_> > UniqueSystXPts;
 
-	// //DB Variables related to determined which modes have splines and which piggy-back of other modes
+	/// DB Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
 	std::vector<int > coeffindexvec;
-	std::vector<int>uniquecoeffindices; //Unique coefficient indices
+    /// Unique coefficient indices
+	std::vector<int>uniquecoeffindices;
 
     std::vector<TSpline3_red*> splinevec_Monolith;
 

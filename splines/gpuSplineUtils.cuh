@@ -90,7 +90,7 @@ __global__ void EvalOnGPU_Splines(
     const cudaTextureObject_t __restrict__ text_coeff_x);
 
 /// @brief Evaluate the TF1 on the GPU Using 5th order polynomial
-/// @param gpu_coeffs_tf1 coefficents of TF1, has length = tf1 coeef counter
+/// @param gpu_coeffs_tf1 coefficients of TF1, has length = tf1 coeef counter
 /// @param gpu_paramNo_arr_tf1 has length = spln_counter (keeps track of which parameter we're using on this thread)
 /// @param gpu_weights_tf1 has length = spln_counter * spline_size
 __global__ void EvalOnGPU_TF1( 
@@ -117,7 +117,7 @@ __global__ void EvalOnGPU_TotWeight(
 
 /// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
 /// Pass the segment and the parameter values
-/// (binary search already performed in samplePDFND::FindSplineSegment()
+/// (binary search already performed in SplineMonolith::FindSplineSegment()
 __host__ void RunGPU_SplineMonolith(
   const short int* gpu_paramNo_arr,
   const unsigned int* gpu_nKnots_arr,
