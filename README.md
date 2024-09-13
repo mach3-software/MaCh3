@@ -90,13 +90,9 @@ MaCh3 supports quite a high range of CUDA architectures if something doesn't wor
 
 
 ## Oscillator
-MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
+MaCh3 uses several neutrino oscillation calculators.
 
-```
-cmake ../ [-DUSE_PROB3=<ON,OFF>]
-```
 Following neutrino oscillation calculators are available:
-
 |Oscillator  | Hardware   | Source     |
 |------------|------------|------------|
 | CUDAProb3  | CPU/GPU    | Beam/Atm   |

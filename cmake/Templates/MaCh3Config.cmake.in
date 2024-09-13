@@ -31,12 +31,8 @@ if(NOT TARGET ROOT::ROOT)
   return()
 endif()
 
-
-#if(USE_PROB3)
-#  find_package(Prob3plusplus @Prob3plusplus_VERSION@ REQUIRED)
-#endif()
-#find_package(NuOscillator 0.0 REQUIRED)
-
+#Fancy NuOscillator
+find_package(NuOscillator 0.0 REQUIRED)
 
 #We use spdlog so find all it's dependencies
 find_package(spdlog @spdlog_VERSION@ REQUIRED)

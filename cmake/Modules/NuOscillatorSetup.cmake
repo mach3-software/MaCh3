@@ -5,13 +5,8 @@
 set(MaCh3_Oscillator_ENABLED "")
 LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3Linear")
 
-set(DAN_USE_GPU 0)
-set(DAN_USE_MULTITHREAD 0)
-set(DAN_DOUBLE 0)
-
 IsTrue(MaCh3_GPU_ENABLED DAN_USE_GPU)
 IsTrue(MaCh3_MULTITHREAD_ENABLED DAN_USE_MULTITHREAD)
-
 IsTrue(MaCh3_LOW_MEMORY_STRUCTS_ENABLED DAN_DOUBLE)
 SwitchLogic(DAN_DOUBLE)
 
@@ -30,7 +25,7 @@ CPMAddPackage(
   NAME NuOscillator
     VERSION 0.0
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "feature_Cmake"
+    GIT_TAG "main"
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
@@ -48,11 +43,6 @@ CPMAddPackage(
 if(NOT TARGET NuOscillator)
   cmessage(FATAL_ERROR "Expecting dependency NuOscillator")
 endif()
-
-install(TARGETS NuOscillator
-        EXPORT MaCh3-targets
-        LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/NuOscillator)
 
 install(DIRECTORY ${NUOSCILLATOR_SOURCE_DIR}/Oscillator/
         DESTINATION include/Oscillator)
