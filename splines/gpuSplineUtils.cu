@@ -410,9 +410,9 @@ __global__ void EvalOnGPU_Splines(
     // Or for the more "easy to read" version:
     //gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
 
-#ifdef DEBUG
-  printf("splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, d_n_splines = %i, d_spline_size = %i, weight = %f \n", splineNum, d_n_splines, gpu_paramNo_arr[splineNum], val_gpu[Param], segment, tex1Dfetch<float>(text_coeff_x, segment_X), tex1Dfetch<float>(text_coeff_x, segment_X+1), dx, d_n_splines, d_spline_size, gpu_weights[splineNum]);
-#endif
+//#ifdef DEBUG
+  //printf("splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, d_n_splines = %i, d_spline_size = %i, weight = %f \n", splineNum, d_n_splines, gpu_paramNo_arr[splineNum], val_gpu[Param], segment, tex1Dfetch<float>(text_coeff_x, segment_X), tex1Dfetch<float>(text_coeff_x, segment_X+1), dx, d_n_splines, d_spline_size, gpu_weights[splineNum]);
+//#endif
   }
 }
 
@@ -441,9 +441,9 @@ __global__ void EvalOnGPU_TF1(
     //
     //gpu_weights_tf1[tf1Num] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
 
-    #ifdef DEBUG
-    printf("TF1 = %i/%i, weight = %f \n", tf1Num, d_n_TF1, gpu_weights_tf1[tf1Num]);
-    #endif
+    //#ifdef DEBUG
+    //printf("TF1 = %i/%i, weight = %f \n", tf1Num, d_n_TF1, gpu_weights_tf1[tf1Num]);
+    //#endif
   }
 }
 
@@ -472,19 +472,19 @@ __global__ void EvalOnGPU_TotWeight(
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id)
     {
       shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
-      #ifdef DEBUG
-      printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
-              EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id]);
-      #endif
+      //#ifdef DEBUG
+      //printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
+      //        EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id]);
+      //#endif
     }
 
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset); ++id)
     {
       shared_total_weights[threadIdx.x] *= gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset+1) + id];
-      #ifdef DEBUG
-      printf("Event = %i, Spline_Num = %i, gpu_weights_tf1 = %f \n",
-             EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id, gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id];
-      #endif
+      //#ifdef DEBUG
+      //printf("Event = %i, Spline_Num = %i, gpu_weights_tf1 = %f \n",
+      //       EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id, gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id]);
+      //#endif
     }
     gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
   }
@@ -588,10 +588,10 @@ __host__ void RunGPU_SplineMonolith(
   CudaCheckError();
 #endif
 
-#ifdef DEBUG
-printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
-printf("Released calculated response from GPU with SUCCESS (drink most tea)\n");
-#endif
+//#ifdef DEBUG
+//printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
+//printf("Released calculated response from GPU with SUCCESS (drink most tea)\n");
+//#endif
 }
 
 // *****************************************

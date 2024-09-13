@@ -1089,7 +1089,7 @@ void SMonolith::FindSplineSegment() {
     if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
       MACH3LOG_ERROR("Found a segment which is _ABOVE_ the variation!");
       MACH3LOG_ERROR("IT SHOULD ALWAYS BE BELOW! (except when segment 0)");
-      MACH3LOG_ERROR("Spline: {}"<< i);
+      MACH3LOG_ERROR("Spline: {}", i);
       MACH3LOG_ERROR("Found segment = {}", segment);
       MACH3LOG_ERROR("Doing variation = {}", xvar);
       MACH3LOG_ERROR("x in spline = {}", SplineInfoArray[i].xPts[segment]);
