@@ -665,7 +665,7 @@ public:
   }
 
   /// @brief CW: Get the number of points
-  inline int GetNp() { return nPoints; }
+  inline int GetNp() override { return nPoints; }
   // Get the ith knot's x and y position
   inline void GetKnot(int i, _float_ &xtmp, _float_ &ytmp) {
     xtmp = XPos[i];
