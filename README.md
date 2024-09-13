@@ -77,14 +77,14 @@ The -t option specifies an install location which can be useful if you are on a 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
 ```
-cmake ../ [-DMaCh3_MULTITHREAD_ENABLED=<OFF>]
+cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
 ```
 
 ## CUDA
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to CUDA
 ```
 mkdir build; cd build;
-cmake ../ [-DUSE_CPU=ON]
+cmake ../ -DUSE_CPU=ON
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
@@ -112,12 +112,12 @@ The following fitting algorithms are available:
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
 ```
-cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>]
+cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF>
 ```
 There are several debug modes, to enable more detailed but very heavy specific debug levels. Level 1 is the default debug activated by the above.
 
 ```
-cmake ../ [-DMaCh3_DEBUG_ENABLED=<ON,OFF>] [-DDEBUG_LEVEL=<1,2,3>]
+cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF> -DDEBUG_LEVEL=<1,2,3>
 ```
 ## System Requirements
 Most of external libraries are being handled through CPM. The only external library that is not being handled through CPM and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
