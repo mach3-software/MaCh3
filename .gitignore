@@ -1,5 +1,6 @@
 #ignore any object files
 *.o
+*.sif
 
 #ignore some stuff in libconfig
 *.lo
@@ -8,6 +9,7 @@
 lib/*
 
 build/
+install/
 Doc/latex/
 Doc/html/
 

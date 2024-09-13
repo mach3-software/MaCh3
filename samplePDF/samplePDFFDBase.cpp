@@ -6,38 +6,48 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
+  (void) pot;
+  (void) mc_version;
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
 
-  samplePDFFD_array = NULL;
-  samplePDFFD_data = NULL;
-  
+  samplePDFFD_array = nullptr;
+  samplePDFFD_data = nullptr;
+  oscpars = nullptr;
+  NuOscillator = nullptr;
+
   //KS: For now FD support only one sample
   nSamples = 1;
 
   //Default TestStatistic is kPoisson
+  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   fTestStatistic = kPoisson;
-}
 
+  //Default values for oscillation-related things
+  doubled_angle = true;
+  osc_binned = false;
+}
 
 samplePDFFDBase::~samplePDFFDBase()
 {
   std::cout << "I'm deleting samplePDFFDBase" << std::endl;
 
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
-	if(samplePDFFD_array != NULL){delete[] samplePDFFD_array[yBin];}
-	delete[] samplePDFFD_array_w2[yBin];
-	//ETA - there is a chance that you haven't added any data...
-	if(samplePDFFD_data != NULL){delete[] samplePDFFD_data[yBin];}
+    if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
+    delete[] samplePDFFD_array_w2[yBin];
+    //ETA - there is a chance that you haven't added any data...
+    if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data[yBin];}
   }
 
-  if(samplePDFFD_array != NULL){delete[] samplePDFFD_array;}
+  if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array;}
   delete[] samplePDFFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
-  if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
+  if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
+
+  if(oscpars != nullptr) delete[] oscpars;
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -66,13 +76,14 @@ void samplePDFFDBase::fill2DHist()
   return;
 }
 
+// ************************************************
 /// @function samplePDFFDBase::SetupSampleBinning()
 /// @brief Function to setup the binning of your sample histograms and the underlying 
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
 void samplePDFFDBase::SetupSampleBinning(){
-
+// ************************************************
   TString histname1d = (XVarStr).c_str();
   TString histname2d = (XVarStr+YVarStr).c_str();
   TString histtitle = "";
@@ -138,20 +149,22 @@ void samplePDFFDBase::UseBinnedOscReweighting(bool ans, int nbins, double *osc_b
   return;
 }
 
-bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
-  
+// ************************************************
+bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
+// ************************************************
+
   double Val;
 
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
     
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
-	//std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
+    //std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
     if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
-	  return false;
+      return false;
     }
 
   }
@@ -160,15 +173,16 @@ bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
   return true;
 }
 
+// ************************************************
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
+                                      const int iSample, const int iEvent) {
+// ************************************************
 
-
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iSample, int iEvent) {
-  
   double Val;
 
-  for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
+  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
  
-	Val = ReturnKinematicParameter(SelectionStr[iSelection], iSample, iEvent);
+	Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
 	//ETA - still need to support other method of you specifying the cut you want in ReturnKinematicParameter
 	//like in Dan's version below from T2K
     //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
@@ -185,24 +199,28 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, i
   return true;
 }
 
+// ************************************************
 //Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent) {
-  
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
+                                      const std::vector< std::vector<double> > &SelectionCuts,
+                                      const int iSample, const int iEvent) {
+// ************************************************
+
   double Val;
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
     
     Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
     //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that Selection vector is correctly sized
+    //DB Already checked that SelectionCuts vector is correctly sized
     
-    //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
+    //DB In the case where SelectionCuts[0].size()==3, Only Events with Val >= SelectionCuts[iSelection][1] and Val < SelectionCuts[iSelection][2] are considered Passed
 	//ETA - also check whether we're actually applying a lower or upper cut by checking they aren't -999
-	if(Val >= Selection[iSelection][1] && Selection[iSelection][0] != -999){
-	  //std::cout << "Cutting event as " << Val << " is greater than " << Selection[iSelection][1]
+	if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
+	  //std::cout << "Cutting event as " << Val << " is greater than " << SelectionCuts[iSelection][1]
 	  return false;
 	}
-	else if(Val < Selection[iSelection][0] && Selection[iSelection][1] != -999){
+	else if(Val < SelectionCuts[iSelection][0] && SelectionCuts[iSelection][1] != -999){
 	  return false;
 	}
   }
@@ -210,6 +228,7 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
   //DB To avoid unneccessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
+
 
 void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
 {
@@ -221,12 +240,13 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   return;
 }
 
+// ************************************************
 //DB Function which does the core reweighting. This assumes that oscillation weights have already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]
 //This function takes advantage of most of the things called in setupSKMC to reduce reweighting time
 //It also follows the ND code reweighting pretty closely
 //This function fills the samplePDFFD_array array which is binned to match the sample binning, such that bin[1][1] is the equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void samplePDFFDBase::fillArray() {
-
+// ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
@@ -248,8 +268,9 @@ void samplePDFFDBase::fillArray() {
   }
 
   PrepFunctionalParameters();
-  splineFile->FindSplineSegment();
-  splineFile->calcWeights();
+  if(splineFile){
+	splineFile->Evaluate();
+  }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -265,7 +286,9 @@ void samplePDFFDBase::fillArray() {
       double funcweight = 1.0;
       double totalweight = 1.0;
       
-      splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+	  if(splineFile){
+		splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+	  }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -371,12 +394,6 @@ void samplePDFFDBase::fillArray_MP()
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
-//  std::cout << "~~~~~~~~~~" << std::endl;
-//  std::cout << "In samplePDFFDBase::fillArray_MP " << std::endl; 
-//  std::cout << "nXBins is " << nXBins << std::endl;
-//  std::cout << "nYBins is " << nYBins << std::endl;
-//  std::cout << "~~~~~~~~~~" << std::endl;
-
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
 	  for (int xBin=0;xBin<nXBins;xBin++) {
@@ -426,8 +443,9 @@ void samplePDFFDBase::fillArray_MP()
 	PrepFunctionalParameters();
 	//==================================================
 	//Calc Weights and fill Array
-	splineFile->FindSplineSegment();
-	splineFile->calcWeights();
+	if(splineFile){
+	  splineFile->Evaluate();
+	}
 
 	for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
 #pragma omp for
@@ -452,8 +470,9 @@ void samplePDFFDBase::fillArray_MP()
 		//DB SKDet Syst
 		//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
-        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-		//std::cout << "Spline weight is " << splineweight << std::endl;
+		if(splineFile){
+		  splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+		}
 		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
 		if (splineweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -617,10 +636,10 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   //Loop over stored normalisation and function pointers
   for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
   {
-      xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-      #ifdef DEBUG
-      if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
-      #endif
+    xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+    #ifdef DEBUG
+    if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
+    #endif
   }
   return xsecw;
 }
@@ -647,10 +666,10 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
 void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
   OscCov = osc_cov;
-  int nOscPars = OscCov->getProposed().size(); 
+  int nOscPars = OscCov->GetNumParams();
   oscpars = new const double*[nOscPars];
   for(auto osc_par_i = 0; osc_par_i < nOscPars ; ++osc_par_i){
-	oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
+    oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
   } 
   return;
 }
@@ -962,7 +981,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
-	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
+	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin==0) {
 		low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
 	  } else {
@@ -972,7 +991,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	  double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
 	  double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
 
-	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
+	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin<(_hPDF1D->GetNbinsX()-2)) {
 		upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
 	  } else {
@@ -983,10 +1002,10 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 		MCSamples[mc_i].NomXBin[event_i] = bin-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = __DEFAULT_RETURN_VAL__;
-		upper_edge = __DEFAULT_RETURN_VAL__;
-		low_lower_edge = __DEFAULT_RETURN_VAL__;
-		upper_upper_edge = __DEFAULT_RETURN_VAL__;
+		low_edge = _DEFAULT_RETURN_VAL_;
+		upper_edge = _DEFAULT_RETURN_VAL_;
+		low_lower_edge = _DEFAULT_RETURN_VAL_;
+		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = 0;
 
@@ -1090,7 +1109,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	  _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
 	  //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
 
-	  double low_lower_edge = __DEFAULT_RETURN_VAL__;
+	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin==0) {
 		low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
 	  } else {
@@ -1100,7 +1119,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	  double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
 	  double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
 
-	  double upper_upper_edge = __DEFAULT_RETURN_VAL__;
+	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  if (bin<(_hPDF2D->GetNbinsX()-2)) {
 		upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
 	  } else {
@@ -1111,10 +1130,10 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
 	  } else {
 		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = __DEFAULT_RETURN_VAL__;
-		upper_edge = __DEFAULT_RETURN_VAL__;
-		low_lower_edge = __DEFAULT_RETURN_VAL__;
-		upper_upper_edge = __DEFAULT_RETURN_VAL__;
+		low_edge = _DEFAULT_RETURN_VAL_;
+		upper_edge = _DEFAULT_RETURN_VAL_;
+		low_lower_edge = _DEFAULT_RETURN_VAL_;
+		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
 	  if(MCSamples[mc_i].NomYBin[event_i] < 0){ 
@@ -1174,8 +1193,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
   return;
 }
 
-void samplePDFFDBase::addData(std::vector< vector <double> > &data) {
-  dataSample2D = new std::vector< vector <double> >(data);
+void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
+  dataSample2D = new std::vector< std::vector <double> >(data);
   dataSample = NULL;
   dathist = NULL;
   dathist2d->Reset();                                                       
@@ -1244,9 +1263,7 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
 }
 
-/// @func SetupNuOscillator()
-//  @brief including Dan's magic NuOscillator
-void samplePDFFDBase::SetupNuOscillator(std::string OscYaml){
+void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
   OscillatorFactory *OscFactory = new OscillatorFactory();
   NuOscillator = OscFactory->CreateOscillator(OscYaml);
 
@@ -1257,7 +1274,7 @@ void samplePDFFDBase::SetupNuOscillator(std::string OscYaml){
 	MACH3LOG_ERROR("UNSUPPORTED FOR NOW!!!");
 	throw;
 	/*
-	std::vector<__float__> TrueEnuVec(nEvents);
+	std::vector<_float_> TrueEnuVec(nEvents);
 	for(int i){
 	for(int iEvent = 0 ; iEvent < nEvents ; ++iEvent){
 	  TrueEnuVec[iEvent] = 
@@ -1279,14 +1296,13 @@ void samplePDFFDBase::SetupNuOscillator(std::string OscYaml){
 
   NuOscillator->Setup();
 
-  std::vector<__float__> OscVec = {3.07e-1, 5.28e-1, 2.18e-2, 7.53e-5, 2.509e-3, -1.601, 290.0, 2.6};
+  std::vector<_float_> OscVec = {3.07e-1, 5.28e-1, 2.18e-2, 7.53e-5, 2.509e-3, -1.601, 290.0, 2.6};
   NuOscillator->CalculateProbabilities(OscVec);
   NuOscillator->PrintWeights();
   throw;
-
 }
 
-inline double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
+double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   //HI : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
@@ -1306,7 +1322,6 @@ void samplePDFFDBase::fillSplineBins() {
 
   std::cout << "Now in fillSplineBins" << std::endl;
   for (int i = 0; i < (int)MCSamples.size(); ++i) {
-	//std::cout << "Found " << MCSamples[i].nEvents << " in sample " << i << std::endl;
 	//Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
 
@@ -1324,26 +1339,8 @@ void samplePDFFDBase::fillSplineBins() {
 		MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
 		break;
 	  }
-	  /*
-	  switch (BinningOpt) {
-		case 0: // splines binned in erec
-		case 1:
-		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
-		  break;
-		case 2:
-		  //Straight out of SKBase
-		  EventSplines = splineFile->GetEventSplines(GetSampleName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j])*0.001, *(MCSamples[i].y_var[j]));
-		  //FD base
-		  //EventSplines = MCSamples[i].splineFile->GetEventSplines(SampleName, j, *(MCSamples[i].mode[j]), MCSamples[i].enu_s_bin[j], MCSamples[i].xvar_s_bin[j], MCSamples[i].yvar_s_bin[j]); 
-		  break;
-		default:
-		  std::cout << "Error in assigning spline bins because BinningOpt = " << BinningOpt << std::endl;
-		  break;
-	  }
-	  */
 
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
-
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
  
 	  for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
@@ -1353,12 +1350,8 @@ void samplePDFFDBase::fillSplineBins() {
 	  }
 
 	}
-	//I think this is now obsolete due to spline monolith
-    //MCSamples[i].splineFile->SetSplineInfoArrays();
   }
-
   std::cout << "Filled spline bins" << std::endl;
-
   return;
 }
 
@@ -1388,11 +1381,9 @@ double samplePDFFDBase::GetLikelihood()
         double DataVal = samplePDFFD_data[yBin][xBin];
         double MCPred = samplePDFFD_array[yBin][xBin];
         double w2 = samplePDFFD_array_w2[yBin][xBin];
+
         //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
-		//ETA: there seems to be some bug in here which needs to be fixed. I
-		//see differences even when kPoisson is set?
-        //negLogL += getTestStatLLH(DataVal, MCPred, w2);
-        negLogL += getTestStatLLH(DataVal, MCPred);
+        negLogL += getTestStatLLH(DataVal, MCPred, w2);
     }
   }
   return negLogL;

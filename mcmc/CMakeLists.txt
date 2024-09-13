@@ -3,27 +3,30 @@ set(HEADERS
     mcmc.h
     LikelihoodFit.h
     MinuitFit.h
-	PSO.h
-    tune.h
-    stretch.h
+    PSO.h
     MCMCProcessor.h
+    SampleSummary.h
+    MaCh3Factory.h
+    StatisticalUtils.h
+    gpuMCMCProcessorUtils.cuh
 )
 
 add_library(MCMC SHARED
     FitterBase.cpp
     mcmc.cpp
     LikelihoodFit.cpp
-	#$<$<NOT:$<BOOL:${MaCh3_MINUIT2_ENABLED}>>:MinuitFit.cpp>
+    $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.cpp>
     PSO.cpp
-    tune.cpp
-    stretch.cpp
     MCMCProcessor.cpp
+    SampleSummary.cpp
+    MaCh3Factory.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
 )
 
 if(NOT CPU_ONLY)
     set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
+    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
 set_target_properties(MCMC PROPERTIES
@@ -34,8 +37,6 @@ target_link_libraries(MCMC SamplePDF MaCh3CompilerOptions)
 target_include_directories(MCMC PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/include>>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:$<BUILD_INTERFACE:$ENV{CUDAPATH}/samples/common/inc>>
 )
 
 install(TARGETS MCMC

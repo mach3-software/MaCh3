@@ -1,11 +1,11 @@
 #pragma once
 
-#include "samplePDFFDBase.h"
+#include "samplePDF/Structs.h"
 
 class BaseFuncPar{
   public:
 	BaseFuncPar(){};
-	~BaseFuncPar();
+	virtual ~BaseFuncPar();
 	double ScaleUncertainty = 1.0;
 	void SetUncertainty(double sigma){ScaleUncertainty = sigma;}
 	double *Param_pos;
@@ -29,7 +29,7 @@ class SKEScale : public BaseFuncPar{
 class EnergyScale : public BaseFuncPar{
   public:
    EnergyScale(){};
-   ~EnergyScale();
+   virtual ~EnergyScale();
    void Apply(){};
 
   protected:

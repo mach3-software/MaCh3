@@ -1,10 +1,15 @@
 #pragma once
 
-#include "LikelihoodFit.h"
+//MaCh3 includes
+#include "mcmc/LikelihoodFit.h"
+
+// ROOT includes
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 
+/// @brief Implementation of Minuit fitting algorithm
+/// \cite James:2004xla
 class MinuitFit : public LikelihoodFit {
  public:
   /// @brief Constructor

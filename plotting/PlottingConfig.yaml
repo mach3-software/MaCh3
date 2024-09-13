@@ -1,0 +1,81 @@
+ManagerOptions:
+    ## The translation config file to be used by the InputManager class to read files from each fitter
+    ## leave blank to use the default ({MACH3_ROOT}/plotting/universalTranslator.yaml)
+    translationConfig: "" 
+
+    ## The style definition config file to be used by the StyleManager class, sets things like colour palettes, fancy names for parameters etc.
+    ## leave blank to use the default ({MACH3_ROOT}/plotting/StyleConfig.yaml)
+    styleConfig: "" 
+
+#########################################
+PlotLLH:
+
+    defaultOutputName: "LLHScan"
+    
+    colorPalette: "OkabeItoReduced"
+
+    ratioPlotSplit: 0.3
+    yTitleOffset: 1.25
+    sampleLabelThreshold: 0.0275
+    lineWidth: 3
+    totalOnSplitPlots: false
+    sameAxis: true
+    parameterTags: []
+    sampleTags: []
+
+#########################################
+GetPostfitParamPlots:
+
+    defaultOutputName: "PostFitParamPlots"
+
+    ## makes param names muuuuch easier to read if param plots are vertical, (not implemented yet tho hehe)
+    plotVertical: false
+
+    ## The minimiser to use for making GUNDAM plots, should be "Hesse" or "Migrad"
+    gundamMinimiser: "Hesse"
+
+    ## Some stylistic choices
+    colorPalette: "BlackBlueGreen"
+    prefitHistStyle: "redHatchedError" 
+    plotLineWidth: 2
+    refLineWidth: 2
+
+    detParYRange_low : 0.25
+    detParYRange_high: 1.6
+    oscParYRange_low : -3.0
+    oscParYRange_high: 3.0
+
+    ## groups of flux parameters to be plotted together
+    fluxGroups: [
+        "EXAMPLE_FLUX_GROUP",
+    ]
+
+    ## define the groups of flux parameters, it goes groupName: [<Plot title>, <binning name>, [<param ID low>, <param ID high>]]
+    EXAMPLE_FULX_GROUP: ["COOL GROUP NAME", [0.7, 1.3], "EXAMPLE_BINNING", [0, 10]]
+
+    ## the energy binnings to be used for flux plots
+    FluxBinning:
+        EXAMPLE_BINNING : [0.3, 0.4, 0.5, 0.6, 0.7, 1.0, 1.5, 2.5, 3.5, 5.0, 7.0, 30.0]
+    
+
+    ## groups of parameters to plot together
+    paramGroups: [
+        "EXAMPLE_GROUP_1", 
+        "EXAMPLE_GROUP_2",
+    ]
+
+    ## define the groups of parameters, should go <block name>: [<plot title>, [<ylim low>, <ylim up>], ["ParamName1", "ParamName2" ...]
+    EXAMPLE_GROUP_1: ["COOL NAME 1", [-1.5, 2.0],   
+        [
+            "XSEC_PARAM_1", 
+            "XSEC_PARAM_2", 
+            "XSEC_PARAM_3"
+        ]
+    ]
+
+    EXAMPLE_GROUP_2: ["COOL NAME 2", [-4.0, 4.0], 
+        [
+            "XSEC_PARAM_4",
+            "XSEC_PARAM_5",
+        ]
+    ]

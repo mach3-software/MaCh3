@@ -20,11 +20,7 @@ samplePDFBase::~samplePDFBase()
   delete rnd;
 }
 
-void samplePDFBase::init(double pot)
-{
-}
-
-void samplePDFBase::init(double pot, std::string mc_version)
+void samplePDFBase::init()
 {
     
     
@@ -54,7 +50,7 @@ void samplePDFBase::addData(std::vector<double> &data)
     dathist->Fill(dataSample->at(i));
 }
 
-void samplePDFBase::addData(std::vector< vector <double> > &data)
+void samplePDFBase::addData(std::vector< std::vector <double> > &data)
 {
   if(nDims != 0 && nDims != 2)
   {
@@ -63,7 +59,7 @@ void samplePDFBase::addData(std::vector< vector <double> > &data)
     throw;
   }
   nDims = 2;  
-  dataSample2D = new std::vector< vector <double> >(data);
+  dataSample2D = new std::vector< std::vector <double> >(data);
   if(dathist2d == NULL)
   {
       std::cerr<<"dathist2d not initialised"<<std::endl;
@@ -142,9 +138,9 @@ std::vector<double> samplePDFBase::generate()
   return data;
 }
 
-std::vector< vector <double> > samplePDFBase::generate2D(TH2D* pdf)
+std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 {
-  std::vector< vector <double> > data;
+  std::vector< std::vector <double> > data;
   if(!pdf) pdf = (TH2D*)get2DHist();
 
   if(MCthrow)
@@ -201,63 +197,22 @@ double samplePDFBase::getEventRate()
 }
 
 // ***************************************************************************
-//KS: So far only Poisson LLH, in future Barlow-Beeston and IceCube
-double samplePDFBase::getTestStatLLH(double data, double mc) {
+// Poisson likelihood calc for data and MC event rates
+double samplePDFBase::getTestStatLLH(const double data, const double mc) {
 // ***************************************************************************
-    double negLogL = 0;
-    if(mc == 0) mc = 1E-8;
-    if(mc > 0 && data > 0)
-    {
-        //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-        negLogL += (mc - data + data * TMath::Log(data/mc));
-    }
-    else if(mc > 0 && data == 0) negLogL += mc;
-    
-    return negLogL; 
-}
+  // Need some MC
+  if(mc == 0) return 0.;
 
-// this function will compute the likelihood against a nominal dataset (histogram)
-/*double samplePDFBase::GetLikelihoodNominal()
+  double negLogL = 0;
+  if(mc > 0 && data > 0)
   {
-  TH1D* pdf = get1DHist();
-  double mc = pdf->GetBinContent(i,j);
-  double dat = //dathist->GetBinContent(i,j);
-  if(mc > 0 && dat > 0)
-  {
-  negLogL += (mc - dat + dat * TMath::Log(dat/mc));// + 1 / (12 * dat) + 0.5 *  TMath::Log(2*TMath::Pi() * dat));
+     //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+     negLogL += (mc - data + data * std::log(data/mc));
   }
-  else if(mc > 0 && dat == 0)
-  negLogL += mc;
-
-  }*/
-
-double samplePDFBase::GetLikelihood_kernel(std::vector<double> &dataSet)
-{
-  // this doesnt work
-  /*  std::cout << "kernel estimation likelihood" << std::endl;
-      double sig = 0.5;
-      double sum = 0;
-      double norm = 1 / (sig * TMath::Sqrt(2*TMath::Pi()));
-
-      for(int d = 0; d < dataSet.size(); d++)
-      {
-      for(int i = 0; i < skmcSamples.size(); i ++)
-      for(int j = 0; j < skmcSamples[i].nEvents; j++)
-      {
-  //sum += TMath::Power(dataSet[d] - skmcSamples[i].rw_erec[j]);
-  sum += skmcSamples[i].pot_s * skmcSamples[i].norm_s * skmcSamples[i].osc_w[j] * skmcSamples[i].flux_w[j] * skmcSamples[i].skdet_w[j] * skmcSamples[i].energyscale_w[j] * norm * TMath::Exp(-0.5 * TMath::Power((dataSet[d] - skmcSamples[i].rw_erec[j])/sig, 2));
-  }
-  }
-  //sum /= dataSet[d];
-  //  sum /= sig * sig;
-  // sum *= -1 * dataSet[d] * skmcSamples[i].pot_s * skmcSamples[i].norm_s * skmcSamples[i].osc_w[j] * skmcSamples[i].flux_w[j] * skmcSamples[i].skdet_w[j] * skmcSamples[i].energyscale_w[j];
-  // sum += -1 * dataSet[d] * TMath::Log(sig);
-
-  std::cout << "finished." << std::endl;
-  return -1 * TMath::Log(sum); */
-  return 0;
+  else if(mc > 0 && data == 0) negLogL += mc;
+  
+  return negLogL; 
 }
-
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
@@ -315,10 +270,9 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       return stat+penalty;
     }
     break;
-    //KS: Alterantive calcaution of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
+    //KS: Alternative calculation of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
     case (kDembinskiAbdelmottele):
     {
-
       //KS: code follows authors implementation from:
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
 
@@ -377,7 +331,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     //KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk
     case (kPearson):
     {
-      //KS: 2 is beacuese this function returns -LLH not -2LLH
+      //KS: 2 is because this function returns -LLH not -2LLH
       const double stat = (data-mc)*(data-mc)/(2*mc);
 
       // Return the statistical
@@ -386,13 +340,9 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     break;
     case (kPoisson):
     {
-      double stat = 0.0;
-      // All likelihood calculations may use the bare Poisson likelihood, so calculate here
-      if (data == 0) stat = newmc;
-      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
-
-      // Return the statistical contribution and penalty
-      return stat;
+	  //Just call getTestStatLLH which doesn't take in weights
+	  //and is a poisson likelihood comparison.
+      return getTestStatLLH(data, mc);//stat;
     }
     break;
 
@@ -403,17 +353,17 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
   } // end switch
 }
 
+/*
 // **************************************************
 // Helper function to set LLH type used in the fit
 void samplePDFBase::SetTestStatistic(TestStatistic test_stat) {
 // **************************************************
   fTestStatistic = test_stat;
-  
+
   std::string name = TestStatistic_ToString((TestStatistic)test_stat);
-  std::cout << "Using "<< name <<" likelihood in ND280" << std::endl;
-  //if(UpdateW2) std::cout << "With updating W2" << std::endl;
-  //else  std::cout << "Without updating W2" << std::endl;
+  MACH3LOG_INFO("Using {} likelihood",name); 
 }
+*/
 
 void samplePDFBase::set1DBinning(int nbins, double* boundaries)
 {
@@ -475,9 +425,35 @@ void samplePDFBase::GetModeName(std::vector<std::string> &modeNameVect) {
   if(modeNameVect.size() !=0)
     modeNameVect.clear() ;
 
-  for(int i = 0; ModeStruct->GetNModes()+1; i++)
+  for(int i = 0; Modes->GetNModes()+1; i++)
   {
-    modeNameVect.push_back(ModeStruct->Mode_ToString(i));
+    modeNameVect.push_back(Modes->GetMaCh3ModeName(i));
   }
 
+}
+
+// ***************************************************************************
+// CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
+void samplePDFBase::QuietPlease() {
+// ***************************************************************************
+  #if DEBUG > 0
+  return;
+  #else
+  buf = std::cout.rdbuf();
+  errbuf = std::cerr.rdbuf();
+  std::cout.rdbuf( nullptr );
+  std::cerr.rdbuf( nullptr );
+  #endif
+}
+
+// ***************************************************************************
+// CW: Reset cout and cerr
+void samplePDFBase::NowTalk() {
+// ***************************************************************************
+  #if DEBUG > 0
+  return;
+  #else
+  std::cout.rdbuf(buf);
+  std::cerr.rdbuf(errbuf);
+  #endif
 }

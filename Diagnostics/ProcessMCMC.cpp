@@ -1,17 +1,21 @@
+//MaCh3 includes
 #include "mcmc/MCMCProcessor.h"
-#include "samplePDF/Structs.h"
-
 #include "manager/manager.h"
 
-inline void ProcessMCMC(std::string inputFile);
+/// @brief Main function processing MCMC and Producing plots
+inline void ProcessMCMC(const std::string& inputFile);
+/// @brief Function producing comparison of posterior and more betwen a few MCMC chains
 inline void MultipleProcessMCMC();
 inline void CalcBayesFactor(MCMCProcessor* Processor);
 inline void CalcSavageDickey(MCMCProcessor* Processor);
 inline void CalcBipolarPlot(MCMCProcessor* Processor);
+inline void CalcParameterEvolution(MCMCProcessor* Processor);
 inline void GetTrianglePlot(MCMCProcessor* Processor);
-inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile);
+inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile);
 inline void ReweightPrior(MCMCProcessor* Processor);
-inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, std::string title);
+/// @brief KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
+inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
+/// @brief KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
 inline void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TString canvasname);
 
 int nFiles;
@@ -21,50 +25,50 @@ std::string config;
 
 int main(int argc, char *argv[]) 
 {
-    nFiles = 0;
-    if (argc != 3 && argc !=6 && argc != 8)
-    {
-      std::cerr << "How to use: "<< argv[0] <<"<Config> <MCMM_ND_Output.root>" << std::endl;
-      exit(-1);
-    }
-  
-    if (argc == 3)
-    {
-      std::cout << "Producing single fit output" << std::endl;
-      config = argv[1];
-      std::string filename = argv[2];
-      ProcessMCMC(filename);
-    } 
-    // If we want to compare two or more fits (e.g. binning changes or introducing new params/priors)
-    else if (argc == 6 || argc == 8)
-    {
-      std::cout << "Producing two fit comparison" << std::endl;
-      config = argv[1];
+  SetMaCh3LoggerFormat();
+  nFiles = 0;
+  if (argc != 3 && argc !=6 && argc != 8)
+  {
+    MACH3LOG_ERROR("How to use: {}<Config> <MCMM_ND_Output.root>", argv[0]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
 
-      FileNames.push_back(argv[2]);
-      TitleNames.push_back(argv[3]);
-          
-      FileNames.push_back(argv[4]);
-      TitleNames.push_back(argv[5]);
-      //KS: If there is third file add it
-      if(argc == 8)
-      {
-        FileNames.push_back(argv[6]);
-        TitleNames.push_back(argv[7]);
-      }
+  if (argc == 3)
+  {
+    MACH3LOG_INFO("Producing single fit output");
+    config = argv[1];
+    std::string filename = argv[2];
+    ProcessMCMC(filename);
+  }
+  // If we want to compare two or more fits (e.g. binning changes or introducing new params/priors)
+  else if (argc == 6 || argc == 8)
+  {
+    MACH3LOG_INFO("Producing two fit comparison");
+    config = argv[1];
 
-      MultipleProcessMCMC();
+    FileNames.push_back(argv[2]);
+    TitleNames.push_back(argv[3]);
+
+    FileNames.push_back(argv[4]);
+    TitleNames.push_back(argv[5]);
+    //KS: If there is third file add it
+    if(argc == 8)
+    {
+      FileNames.push_back(argv[6]);
+      TitleNames.push_back(argv[7]);
     }
-    
+
+    MultipleProcessMCMC();
+  }
+
   return 0;
 }
 
-void ProcessMCMC(std::string inputFile)
+void ProcessMCMC(const std::string& inputFile)
 {
-  std::cout << "File for study: " << inputFile << " with config  "<<config<<std::endl;
-    
-  // Make the processor
-  MCMCProcessor* Processor = new MCMCProcessor(inputFile, false);
+  MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
+  // Make the processor)
+  MCMCProcessor* Processor = new MCMCProcessor(inputFile);
 
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -75,18 +79,6 @@ void ProcessMCMC(std::string inputFile)
   Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {""}));
   //Apply additional cuts to 1D posterior
   Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
-
-  //KS: Settings how many credible regions you want, colors, etc., don't worry there are default values if nothing is passed
-  Processor->SetCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}));
-  Processor->SetCredibleIntervalsColours(GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}));
-
-  Processor->SetCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}));
-
-  Processor->SetCredibleRegionStyle(GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}));
-
-  Processor->SetCredibleRegionColor(GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}));
-
-  Processor->SetCredibleInSigmas(GetFromManager<bool>(Settings["CredibleInSigmas"], false));
 
   if(PlotCorr) Processor->SetOutputSuffix("_drawCorr");
   //KS:Turn off plotting detector and some other setting, should be via some config
@@ -106,10 +98,15 @@ void ProcessMCMC(std::string inputFile)
   Processor->MakePostfit();
   Processor->DrawPostfit();
   //KS: Should set via config whether you want below or not
-  if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) Processor->MakeCredibleIntervals();
+  if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
+    Processor->MakeCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
+                                     GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false));
+  }
   if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor);
   if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor);
   if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor);
+  if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor);
 
   if(PlotCorr)
   {
@@ -125,7 +122,17 @@ void ProcessMCMC(std::string inputFile)
     //Processor->MakeCovariance();
 //#endif
     Processor->DrawCovariance();
-    if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false)) Processor->MakeCredibleRegions();
+
+    auto const &MakeSubOptimality = Settings["MakeSubOptimality"];
+    if(MakeSubOptimality[0].as<bool>()) Processor->MakeSubOptimality(MakeSubOptimality[1].as<int>());
+
+    if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false)) {
+      Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
+                                     GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
+                                     GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false)
+                                     );
+    }
     if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor);
 
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
@@ -148,9 +155,9 @@ void MultipleProcessMCMC()
   Processor = new MCMCProcessor*[nFiles];
   for (int ik = 0; ik < nFiles;  ik++)
   {
-    std::cout << "File for study:       " << FileNames[ik] << std::endl;
+    MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
-    Processor[ik] = new MCMCProcessor(FileNames[ik], false);
+    Processor[ik] = new MCMCProcessor(FileNames[ik]);
     Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
 
     Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {""}));
@@ -200,89 +207,102 @@ void MultipleProcessMCMC()
 
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
-      // This holds the posterior density
-      TH1D **hpost = new TH1D*[nFiles];
-      TLine **hpd = new TLine*[nFiles];
-      for (int ik = 0 ; ik < nFiles;  ik++) hpost[ik] = (TH1D *) (Processor[ik]->GetHpost(i))->Clone();
+    // This holds the posterior density
+    TH1D **hpost = new TH1D*[nFiles];
+    TLine **hpd = new TLine*[nFiles];
+    hpost[0] = (TH1D *) (Processor[0]->GetHpost(i))->Clone();
 
-      // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-      if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
+    bool Skip = false;
+    for (int ik = 1 ; ik < nFiles;  ik++)
+    {
+      // KS: If somehow this chain doesn't given params we skip it
+      const int Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
+      if(Index == _UNDEF_)
       {
-        for (int ik = 0; ik < nFiles;  ik++)
-          delete hpost[ik];
-        
-        delete[] hpost;
-        delete[] hpd;
-        continue;
+        Skip = true;
+        break;
       }
-      for (int ik = 0; ik < nFiles;  ik++)
-      {
-        RemoveFitter(hpost[ik], "Gauss");
-        
-        // Set some nice colours
-        hpost[ik]->SetLineColor(PosteriorColor[ik]);
-        //hpost[ik]->SetLineStyle(PosteriorStyle[ik]);
-        hpost[ik]->SetLineWidth(2);
-        
-        // Area normalise the distributions
-        hpost[ik]->Scale(1./hpost[ik]->Integral(), "width");
-      }
-      TString Title;
-      double Prior = 1.0;
-      double PriorError = 1.0;
-  
-      Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
-      
-      // Now make the TLine for the Asimov
-      TLine *Asimov = new TLine(Prior,  hpost[0]->GetMinimum(), Prior,  hpost[0]->GetMaximum());
-      Asimov->SetLineColor(kRed-3);
-      Asimov->SetLineWidth(2);
-      Asimov->SetLineStyle(kDashed);
+      hpost[ik] = (TH1D *)(Processor[ik]->GetHpost(Index))->Clone();
+    }
 
-      // Make a nice little TLegend
-      TLegend *leg = new TLegend(0.12, 0.7, 0.6, 0.97);
-      leg->SetTextSize(0.03);
-      leg->SetFillColor(0);
-      leg->SetFillStyle(0);
-      leg->SetLineColor(0);
-      leg->SetLineStyle(0);
-      TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
-      leg->AddEntry(Asimov, asimovLeg, "l"); 
-      
+    // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
+    {
       for (int ik = 0; ik < nFiles;  ik++)
-      {
-        TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
-        leg->AddEntry(hpost[ik],  rebinLeg, "l");
-        
-        hpd[ik] = new TLine(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(), hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
-        hpd[ik]->SetLineColor(hpost[ik]->GetLineColor());
-        hpd[ik]->SetLineWidth(2);
-        hpd[ik]->SetLineStyle(kSolid);
-      }
-
-      // Find the maximum value to nicley resize hist
-      double maximum = 0;
-      for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
-      for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
-  
-      hpost[0]->Draw("hist");
-      for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
-      Asimov->Draw("same");
-      for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
-      leg->Draw("same");
-      Posterior->cd();
-      Posterior->Print(canvasname);
-      
-      delete Asimov;
-      delete leg;
-      for (int ik = 0; ik < nFiles;  ik++)
-      {
         delete hpost[ik];
-        delete hpd[ik];
-      }
+
       delete[] hpost;
       delete[] hpd;
-    }//End loop over paramters
+      continue;
+    }
+    for (int ik = 0; ik < nFiles;  ik++)
+    {
+      RemoveFitter(hpost[ik], "Gauss");
+
+      // Set some nice colours
+      hpost[ik]->SetLineColor(PosteriorColor[ik]);
+      //hpost[ik]->SetLineStyle(PosteriorStyle[ik]);
+      hpost[ik]->SetLineWidth(2);
+
+      // Area normalise the distributions
+      hpost[ik]->Scale(1./hpost[ik]->Integral(), "width");
+    }
+    TString Title;
+    double Prior = 1.0;
+    double PriorError = 1.0;
+
+    Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
+
+    // Now make the TLine for the Asimov
+    TLine *Asimov = new TLine(Prior,  hpost[0]->GetMinimum(), Prior,  hpost[0]->GetMaximum());
+    Asimov->SetLineColor(kRed-3);
+    Asimov->SetLineWidth(2);
+    Asimov->SetLineStyle(kDashed);
+
+    // Make a nice little TLegend
+    TLegend *leg = new TLegend(0.12, 0.7, 0.6, 0.97);
+    leg->SetTextSize(0.03);
+    leg->SetFillColor(0);
+    leg->SetFillStyle(0);
+    leg->SetLineColor(0);
+    leg->SetLineStyle(0);
+    TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
+    leg->AddEntry(Asimov, asimovLeg, "l");
+
+    for (int ik = 0; ik < nFiles;  ik++)
+    {
+      TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
+      leg->AddEntry(hpost[ik],  rebinLeg, "l");
+
+      hpd[ik] = new TLine(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(), hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
+      hpd[ik]->SetLineColor(hpost[ik]->GetLineColor());
+      hpd[ik]->SetLineWidth(2);
+      hpd[ik]->SetLineStyle(kSolid);
+    }
+
+    // Find the maximum value to nicely resize hist
+    double maximum = 0;
+    for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
+    for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
+
+    hpost[0]->Draw("hist");
+    for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
+    Asimov->Draw("same");
+    for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
+    leg->Draw("same");
+    Posterior->cd();
+    Posterior->Print(canvasname);
+
+    delete Asimov;
+    delete leg;
+    for (int ik = 0; ik < nFiles;  ik++)
+    {
+      delete hpost[ik];
+      delete hpd[ik];
+    }
+    delete[] hpost;
+    delete[] hpd;
+  }//End loop over parameters
     
   // Finally draw the parameter plot onto the PDF
   // Close the .pdf file with all the posteriors
@@ -292,7 +312,7 @@ void MultipleProcessMCMC()
   if(GetFromManager<bool>(Settings["PerformKStest"], true)) KolmogorovSmirnovTest(Processor, Posterior, canvasname);
   
   // Close the pdf file
-  std::cout << "Closing pdf " << canvasname << std::endl;
+  MACH3LOG_INFO("Closing pdf {}", canvasname);
   canvasname+="]";
   Posterior->Print(canvasname);
   
@@ -301,7 +321,7 @@ void MultipleProcessMCMC()
   delete[] Processor;
 }
 
-// KS: Calculate Bayes factor for a given hiphothesis, most onformative are those related to osc params. However, it make realtive easy interpreation for switch dials
+// KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
 void CalcBayesFactor(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
@@ -343,6 +363,22 @@ void CalcSavageDickey(MCMCProcessor* Processor)
   return;
 }
 
+void CalcParameterEvolution(MCMCProcessor* Processor)
+{
+  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node Settings = card_yaml["ProcessMCMC"];
+
+  std::vector<std::string> ParNames;
+  std::vector<int> Intervals;
+
+  for (const auto& d : Settings["ParameterEvolution"])
+  {
+    ParNames.push_back(d[0].as<std::string>());
+    Intervals.push_back(d[1].as<int>());
+  }
+  Processor->ParameterEvolution(ParNames, Intervals);
+  return;
+}
 
 void CalcBipolarPlot(MCMCProcessor* Processor)
 {
@@ -360,9 +396,7 @@ void CalcBipolarPlot(MCMCProcessor* Processor)
 }
 
 
-void GetTrianglePlot(MCMCProcessor* Processor){
-  std::cout<<std::endl;
-
+void GetTrianglePlot(MCMCProcessor* Processor) {
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
@@ -371,12 +405,18 @@ void GetTrianglePlot(MCMCProcessor* Processor){
     std::string ParName = dg[0].as<std::string>();
 
     std::vector<std::string> NameVec = dg[1].as<std::vector<std::string>>();
-    Processor->MakeTrianglePlot(NameVec);
+    Processor->MakeTrianglePlot(NameVec,
+                                GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
+                                GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
+                                GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
+                                GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
+                                GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
+                                GetFromManager<bool>(Settings["CredibleInSigmas"], false));
   }
 }
 
-//KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
-void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
+/// @brief KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
+void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
 {
   //Turn of plots from Processor
   Processor->SetPrintToPDF(false);
@@ -392,7 +432,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   Canvas->SetRightMargin(0.15);
   Canvas->SetLeftMargin(0.10);
   
-  //KS: Fancy colots
+  //KS: Fancy colours
   const int NRGBs = 10;
   TColor::InitializeColors();
   Double_t stops[NRGBs] = { 0.00, 0.10, 0.25, 0.35, 0.50, 0.60, 0.65, 0.75, 0.90, 1.00 };
@@ -415,7 +455,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   const int IntervalsSize = entries/NIntervals;
   //We start with burn from 0 (no burn in at all)
   int BurnIn = 0;
-  std::cout<<"Diagnosing matirces with entries="<< entries<<", NIntervals="<<NIntervals<<" and IntervalsSize="<<IntervalsSize<<std::endl;
+  MACH3LOG_INFO("Diagnosing matrices with entries={}, NIntervals={} and IntervalsSize={}", entries, NIntervals, IntervalsSize);
 
   TMatrixDSym *Covariance = nullptr;
   TMatrixDSym *Correlation = nullptr;
@@ -438,10 +478,10 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
   delete Correlation;
   Correlation = nullptr;
   
-  //KS: Loop over alls dsired cuts
-  for(int i = 1; i < NIntervals; ++i)
+  //KS: Loop over all desired cuts
+  for(int k = 1; k < NIntervals; ++k)
   {
-    BurnIn = i*IntervalsSize;
+    BurnIn = k*IntervalsSize;
     Processor->SetStepCut(BurnIn);
     Processor->GetCovariance(Covariance, Correlation);
     Processor->ResetHistograms();
@@ -452,7 +492,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
     TH2D *CovarianceDiff = (TH2D*)CovarianceHist->Clone("Covariance_Ratio");
     TH2D *CorrelationDiff = (TH2D*)CorrelationHist->Clone("Correlation_Ratio");
     
-    //KS: Bit messy but quite often covariance is 0 is divided by 0 is problemiatic so
+    //KS: Bit messy but quite often covariance is 0 is divided by 0 is problematic so
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
@@ -462,13 +502,13 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
       {
         if( std::fabs (CovarianceDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CovariancePreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CovarianceDiff->SetBinContent(j, i, __UNDEF__);
-          CovariancePreviousHist->SetBinContent(j, i, __UNDEF__);
+          CovarianceDiff->SetBinContent(j, i, _UNDEF_);
+          CovariancePreviousHist->SetBinContent(j, i, _UNDEF_);
         }
         if( std::fabs (CorrelationDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CorrelationPreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CorrelationDiff->SetBinContent(j, i, __UNDEF__);
-          CorrelationPreviousHist->SetBinContent(j, i, __UNDEF__);
+          CorrelationDiff->SetBinContent(j, i, _UNDEF_);
+          CorrelationPreviousHist->SetBinContent(j, i, _UNDEF_);
         }
       }
     }
@@ -500,7 +540,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
     ss << BurnIn;
     ss << "/";
     ss << "BCut_";
-    ss << (i-1)*IntervalsSize;
+    ss << (k-1)*IntervalsSize;
     std::string str = ss.str();
     
     TString Title = "Cov " + str;
@@ -554,7 +594,6 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, std::string inputFile)
 
 void ReweightPrior(MCMCProcessor* Processor)
 {
-  std::cout<<std::endl;
 
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -568,19 +607,18 @@ void ReweightPrior(MCMCProcessor* Processor)
   Processor->ReweightPrior(Names, NewCentral, NewError);
 }
 
-//KS: Convert TMatrix to TH2D, mostly usefull for making fancy plots
-TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, std::string title)       
+//KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
+TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
 {
   TH2D* hMatrix = new TH2D(title.c_str(), title.c_str(), Matrix->GetNrows(), 0.0, Matrix->GetNrows(), Matrix->GetNcols(), 0.0, Matrix->GetNcols());
   for(int i = 0; i < Matrix->GetNrows(); i++)
   {
     for(int j = 0; j < Matrix->GetNcols(); j++)
     {
-      //KS: +1 becasue there is offset in histogram realtive to TMatrix
+      //KS: +1 because there is offset in histogram relative to TMatrix
       hMatrix->SetBinContent(i+1,j+1, (*Matrix)(i,j));
     }
   }
-  
   return hMatrix;
 }
 
@@ -601,11 +639,23 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     double PriorError = 1.0;
 
     Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
-  
+    bool Skip = false;
     for (int ik = 0 ; ik < nFiles;  ik++)
     {
-      hpost[ik] = (TH1D*) (Processor[ik]->GetHpost(i))->Clone();
-      CumulativeDistribution[ik] = (TH1D*) (Processor[ik]->GetHpost(i))->Clone();
+      int Index = 0;
+      if(ik == 0 ) Index = i;
+      else
+      {
+        // KS: If somehow this chain doesn't given params we skip it
+        Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
+        if(Index == _UNDEF_)
+        {
+          Skip = true;
+          break;
+        }
+      }
+      hpost[ik] = (TH1D*) (Processor[ik]->GetHpost(Index))->Clone();
+      CumulativeDistribution[ik] = (TH1D*) (Processor[ik]->GetHpost(Index))->Clone();
       CumulativeDistribution[ik]->Fill(0., 0.);
       CumulativeDistribution[ik]->Reset();
       CumulativeDistribution[ik]->SetMaximum(1.);
@@ -620,8 +670,9 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       CumulativeDistribution[ik]->SetLineColor(CumulativeColor[ik]);
       CumulativeDistribution[ik]->SetLineStyle(CumulativeStyle[ik]);
     }
+
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5)
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
     {
       for (int ik = 0; ik < nFiles;  ik++)
       {
@@ -641,7 +692,6 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       for (int j = 1; j < NumberOfBins+1; ++j)
       {
         Cumulative += hpost[ik]->GetBinContent(j)/Integral;
-        
         CumulativeDistribution[ik]->SetBinContent(j, Cumulative);
       }
       //KS: Set overflow to 1 just in case
@@ -662,7 +712,7 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       {
         double BinValue = CumulativeDistribution[0]->GetBinCenter(j);
         int BinNumber = CumulativeDistribution[ik]->FindBin(BinValue);
-        //KS: Calculate D statistic for this bin, only save it if it's bigger than previosly found value
+        //KS: Calculate D statistic for this bin, only save it if it's bigger than previously found value
         double TempDstat = std::fabs(CumulativeDistribution[0]->GetBinContent(j) - CumulativeDistribution[ik]->GetBinContent(BinNumber));
         if(TempDstat > TestStatD[ik])
         {
@@ -704,9 +754,9 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     delete leg;
     for (int ik = 0; ik < nFiles;  ik++)
     {
-        delete hpost[ik];
-        delete CumulativeDistribution[ik];
-        delete LineD[ik];
+      delete hpost[ik];
+      delete CumulativeDistribution[ik];
+      delete LineD[ik];
     }
     delete[] hpost;
     delete[] CumulativeDistribution;

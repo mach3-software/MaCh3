@@ -1,13 +1,14 @@
 #pragma once
 
+// C++ includes
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+// MaCh3 Includes
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
 #include "covariance/covarianceOsc.h"
-
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
 
@@ -15,13 +16,17 @@
 class TRandom3;
 class TStopwatch;
 class TTree;
+class TGraphAsymmErrors;
+class TDirectory;
 
+/// @brief Base class for implementing fitting algorithms
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
 class FitterBase {
-
  public:
   /// @brief Constructor
+  /// @param fitMan A pointer to a manager object, which will handle all settings.
   FitterBase(manager * const fitMan);
-  /// @brief Destructor
+  /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
@@ -44,16 +49,29 @@ class FitterBase {
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
 
+  /// @brief Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan's feature
+  /// @param NLaps number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time
+  void DragRace(const int NLaps = 100);
+
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
+
+  /// @brief LLH scan is good first estimate of step scale
+  void GetStepScaleBasedOnLLHScan();
 
   /// @brief Perform a 2D likelihood scan.
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
+  /// @brief Perform a 2D and 1D sigma var for all samples.
+  /// @warning Code uses TH2Poly
+  void RunSigmaVar();
+
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
-protected:
+ protected:
+  /// @brief Process MCMC output
+  void ProcessMCMC();
 
   /// @brief Prepare the output file.
   void PrepareOutput();
@@ -64,8 +82,18 @@ protected:
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
 
+  /// @brief Used by sigma variation, check how 1 sigma changes spectra
+  /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
+  /// @param sigmaArrayCentr sigma var hist at prior values
+  /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
+  /// @param title A tittle for returned object
+  inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+
   /// The manager
   manager *fitMan;
+
+  /// MaCh3 Modes
+  MaCh3Modes* Modes;
 
   /// current state
   unsigned int step;
@@ -88,6 +116,8 @@ protected:
 
   /// Sample holder
   std::vector<samplePDFBase*> samples;
+  /// Total number of samples used
+  unsigned int TotalNSamples;
 
   /// Systematic holder
   std::vector<covarianceBase*> systematics;
@@ -120,6 +150,8 @@ protected:
   bool fTestLikelihood;
   /// save nominal matrix info or not
   bool save_nominal;
+  /// Save proposal at each step
+  bool SaveProposal;
 
   /// Checks if file saved not repeat some operations
   bool FileSaved;

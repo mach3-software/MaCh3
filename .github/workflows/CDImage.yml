@@ -1,0 +1,55 @@
+# Update MaCh3 container image registry with newest updates
+name: Image CD
+
+# The events that trigger the workflow
+on:
+  push:
+    branches: [ develop ]
+  release:
+    types: [ published ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
+      matrix:
+        include:
+          - os: Ubuntu22.04
+            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
+            tag_latest: ubuntu22.04latest
+          - os: Alma9
+            file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
+            tag_latest: alma9latest
+          - os: Fedora32
+            file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
+            tag_latest: fedora32latest
+
+    name: Image CD ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build Docker image
+      run: |
+        if [ "${{ github.event_name }}" == 'release' ]; then
+          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}v${{ github.event.release.tag_name }} --build-arg MACH3_VERSION=develop
+        else
+          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} --build-arg MACH3_VERSION=develop
+        fi
+
+    - name: Push Docker image
+      run: |
+        if [ "${{ github.event_name }}" == 'release' ]; then
+          docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}v${{ github.event.release.tag_name }}
+        else
+          docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
+        fi

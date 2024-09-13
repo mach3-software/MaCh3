@@ -1,0 +1,34 @@
+#Run like singularity build mach3.sif MaCh3.def
+
+Bootstrap: docker
+From: picker24/root_v6_26_10:alma9
+
+%environment
+    export MaCh3_ROOT=${MACH3_INSTALL_DIR}
+    export PATH=${MaCh3_ROOT}/bin:${PATH}
+    export LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+
+%post
+    export MACH3_VERSION="develop"
+    export MACH3_WORK_DIR=/opt/MaCh3/
+    export MACH3_INSTALL_DIR=${MACH3_WORK_DIR}/build/
+
+    # Create directories
+    mkdir -p ${MACH3_WORK_DIR}
+    mkdir -p ${MACH3_INSTALL_DIR}
+
+    # Clone MaCh3 repository
+    cd /opt/
+    git clone https://github.com/mach3-software/MaCh3 ${MACH3_WORK_DIR}
+    cd ${MACH3_WORK_DIR}
+    git checkout ${MACH3_VERSION}
+
+    # Build and install MaCh3
+    cd ${MACH3_INSTALL_DIR}
+    cmake ${MACH3_WORK_DIR}
+    make VERBOSE=1 && make install
+
+%runscript
+    # This section defines the default behavior when the container is run
+    cd ${MACH3_INSTALL_DIR}
+
