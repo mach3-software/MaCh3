@@ -34,7 +34,7 @@ jobs:
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
-        git clone https://github.com/mach3-software/MaCh3Validations.git MaCh3Validations
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
         cd MaCh3Validations
         mkdir build
         cd build

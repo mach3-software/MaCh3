@@ -19,6 +19,10 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const cha
     if(_fNames[io] == "sin2th_23") kSinTheta23 = io;
     if(_fNames[io] == "baseline") kBaseline = io;
     if(_fNames[io] == "density") kDensity = io;
+
+    // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
+    _fCurrVal[io] = _fPreFitValue[io];
+    _fPropVal[io] = _fCurrVal[io];
   }
 
   /// WARNING HARDCODED
@@ -26,6 +30,7 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const cha
   toggleFixParameter("baseline");
   toggleFixParameter("density");
 
+  /// @todo KS: Technically if we would like to use PCA we have ot initialise parts here...
   flipdelM = false;
 
   randomize();
