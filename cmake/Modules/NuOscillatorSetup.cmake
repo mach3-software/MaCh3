@@ -1,10 +1,42 @@
 ################################## Oscillation ################################
 
 # Oscillation calculation
-# In the future which osc calc we use might be set with a flag
-set(MaCh3_Oscillator_ENABLED "")
-LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3Linear")
+DefineEnabledRequiredSwitch(CUDAProb3Linear_ENABLED FALSE)
+DefineEnabledRequiredSwitch(CUDAProb3_ENABLED FALSE)
+DefineEnabledRequiredSwitch(ProbGPULinear_ENABLED FALSE)
+DefineEnabledRequiredSwitch(Prob3ppLinear_ENABLED FALSE)
 
+#KS: If all Oscillators are turned off then enable CUDAProb3Linear_ENABLED
+if (NOT CUDAProb3Linear_ENABLED AND
+    NOT CUDAProb3_ENABLED AND
+    NOT ProbGPULinear_ENABLED AND
+    NOT Prob3ppLinear_ENABLED)
+
+    set(CUDAProb3Linear_ENABLED TRUE)
+endif()
+
+#KS: Save which oscillators are being used
+set(MaCh3_Oscillator_ENABLED "")
+if(CUDAProb3Linear_ENABLED)
+  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3Linear")
+endif()
+if(CUDAProb3_ENABLED)
+  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
+endif()
+if(ProbGPULinear_ENABLED)
+  LIST(APPEND MaCh3_Oscillator_ENABLED "ProbGPULinear")
+endif()
+if(Prob3ppLinear_ENABLED)
+  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3ppLinear")
+endif()
+
+#NuOscillator uses 1/0 instead of true/false thus use conversion
+IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
+IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
+IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
+IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
+
+#Also additional flags
 IsTrue(MaCh3_GPU_ENABLED DAN_USE_GPU)
 IsTrue(MaCh3_MULTITHREAD_ENABLED DAN_USE_MULTITHREAD)
 IsTrue(MaCh3_LOW_MEMORY_STRUCTS_ENABLED DAN_DOUBLE)
@@ -31,10 +63,10 @@ CPMAddPackage(
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
     "UseDoubles ${DAN_DOUBLE}"
 
-    "UseCUDAProb3 0"
-    "UseCUDAProb3Linear 1"
-    "UseProbGPULinear 0"
-    "UseProb3ppLinear 0"
+    "UseCUDAProb3Linear ${USE_CUDAProb3Linear}"
+    "UseCUDAProb3 ${USE_CUDAProb3}"
+    "UseProbGPULinear ${USE_ProbGPULinear}"
+    "UseProb3ppLinear ${USE_Prob3ppLinear}"
 
     "NuOscillator_Compiler_Flags ${compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
