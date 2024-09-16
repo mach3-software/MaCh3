@@ -98,7 +98,7 @@ Following neutrino oscillation calculators are available:
 | CUDAProb3Linear  | CPU/GPU    | Beam       |
 | CUDAProb3        | CPU/GPU    | Atm        |
 | ProbGPULinear    | GPU        | Beam       |
-| UseProb3++Linear | CPU        | Beam       |
+| Prob3++Linear    | CPU        | Beam       |
 
 If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
 ```

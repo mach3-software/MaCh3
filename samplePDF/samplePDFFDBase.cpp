@@ -1303,7 +1303,7 @@ void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
 }
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
-  //HI : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
+  //HW : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
 	if(iParam == 2){

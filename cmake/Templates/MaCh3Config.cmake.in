@@ -32,7 +32,7 @@ if(NOT TARGET ROOT::ROOT)
 endif()
 
 #Fancy NuOscillator
-find_package(NuOscillator 0.0 REQUIRED)
+find_package(NuOscillator @NUOSCILLATOR_VERSION@ REQUIRED)
 
 #We use spdlog so find all it's dependencies
 find_package(spdlog @spdlog_VERSION@ REQUIRED)
