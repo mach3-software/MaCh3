@@ -1,5 +1,9 @@
-/// MaCh3 event-by-event cross-section spline code
-/// Written by Richard Calland, Asher Kaboth, Clarence Wret, Kamil Skwarczynski
+/// @file gpuSplineUtils.cuh
+/// @brief MaCh3 event-by-event cross-section spline code
+/// @author Richard Calland
+/// @author Asher Kaboth
+/// @author Clarence Wret
+/// @author Kamil Skwarczynski
 ///
 /// Contains code to run on CUDA GPUs. Essentially we load up stripped TSpline3 objects to the GPU and do the equivalent of TSpline3->Eval(double) for all events
 /// Now also supports TF1 evals
@@ -10,6 +14,7 @@
 #include "splines/SplineCommon.h"
 
 /// @brief Allocate memory on gpu for spline monolith
+/// @param gpu_x_array Small array with X coefficients at GPU
 __host__ void InitGPU_SplineMonolith(
                           float **gpu_x_array,
                           float **gpu_many_array,
@@ -44,6 +49,7 @@ __host__ void InitGPU_Vals(float **vals);
 
 
 /// @brief Copy to GPU for x array and separate ybcd array
+/// @param gpu_x_array Small array with X coefficients at GPU
 __host__ void CopyToGPU_SplineMonolith(
                             short int *gpu_paramNo_arr,
                             unsigned int *gpu_nKnots_arr,
@@ -79,7 +85,7 @@ __host__ void CopyToGPU_SplineMonolith(
 /// But using spline segments rather than the parameter value: avoids doing binary search on GPU
 /// @param gpu_paramNo_arr has length = spln_counter (keeps track of which parameter we're using on this thread)
 /// @param gpu_nKnots_arr has length = spln_counter (keeps track where current spline starts)
-/// @param gpu_coeff_many has length = nKnots * 4
+/// @param gpu_coeff_many has length = nKnots * 4, stores all coefficients for all splines and knots
 /// @param gpu_weights has length = spln_counter * spline_size
 /// @param text_coeff_x array storing info about X coeff, uses texture memory. Has length = n_params * spline_size,
 __global__ void EvalOnGPU_Splines(
@@ -118,6 +124,7 @@ __global__ void EvalOnGPU_TotWeight(
 /// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
 /// Pass the segment and the parameter values
 /// (binary search already performed in SplineMonolith::FindSplineSegment()
+/// @param gpu_coeff_many has length = nKnots * 4, stores all coefficients for all splines and knots
 __host__ void RunGPU_SplineMonolith(
   const short int* gpu_paramNo_arr,
   const unsigned int* gpu_nKnots_arr,
@@ -147,6 +154,8 @@ __host__ void RunGPU_SplineMonolith(
 __host__ void SynchroniseSplines();
 
 /// @brief Clean up the {x},{ybcd} arrays
+/// @param gpu_x_array Small array with X coefficients at GPU
+/// @param gpu_many_array has length = nKnots * 4, stores all coefficients for all splines and knots
 __host__ void CleanupGPU_SplineMonolith(
   short int *gpu_paramNo_arr,
   unsigned int *gpu_nKnots_arr,

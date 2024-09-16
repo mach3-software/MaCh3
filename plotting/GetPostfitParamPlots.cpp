@@ -23,11 +23,18 @@
 #include "plottingUtils/plottingUtils.h"
 #include "plottingUtils/plottingManager.h"
 
-//How to use ./GetPostfitParamPlots ProcessMCMC_Output1.root <ProcessMCMC_Output2.root> <ProcessMCMC_Output3.root>
-//Originally written by Clarence, with some changes by Will, updated by Kamil, made generic plotter by Ewan
-//Central postfit value taken is the Highest Posterior Density but can be changed easily to Gaussian etc. Watch out for parameter names and number of parameters per plot being quite hardcoded
-
-//g++ `root-config --cflags` -g -std=c++11 -o GetPostfitParamPlots GetPostfitParamPlots.cpp -I`root-config --incdir` `root-config --glibs --libs`
+/// This script generates post-fit parameter plots. The central postfit value is
+/// taken as the Highest Posterior Density (HPD), but can be easily changed to
+/// another method such as Gaussian. Be cautious as parameter names and the number
+/// of parameters per plot are currently hardcoded.
+///
+/// @details
+/// Usage:
+/// ```
+/// ./GetPostfitParamPlots ProcessMCMC_Output1.root <ProcessMCMC_Output2.root> <ProcessMCMC_Output3.root>
+/// ```
+///
+/// @note Originally written by Clarence, with changes by Will, updates by Kamil, and converted to a generic plotter by Ewan.
 
 MaCh3Plotting::PlottingManager *man;
 TH1D *Prefit;
