@@ -9,3 +9,9 @@ updates:
     directory: ".github/workflows/" # Location of the GitHub Actions workflow files
     schedule:
       interval: "weekly" # Check for updates on a weekly basis
+
+  # Update Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"  # Location of your requirements.txt file
+    schedule:
+      interval: "weekly"
