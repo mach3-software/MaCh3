@@ -3,15 +3,7 @@
 
 /// Hard code the number of splines
 /// Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants
-/// EM: for OA2022:
-#ifdef NSPLINES_ND280
-#pragma message("using User Specified N splines")
-#define _N_SPLINES_ NSPLINES_ND280
-// EM: for OA2024:
-#else
-#define _N_SPLINES_ 160
-#pragma message("using default N splines")
-#endif
+#define _N_SPLINES_ NSplines_GPU
 
 // KS: Forgive me father, for I have sinned.
 #if defined(__CUDA_ARCH__)

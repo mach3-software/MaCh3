@@ -1250,3 +1250,13 @@ void SMonolith::PrintInitialsiation() {
 
   return;
 }
+
+//*********************************************************
+//KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
+void SMonolith::SynchroniseMemTransfer() {
+//*********************************************************
+  #ifdef CUDA
+  SynchroniseSplines();
+  #endif
+  return;
+}
