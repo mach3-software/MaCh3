@@ -93,13 +93,13 @@ MaCh3 supports quite a high range of CUDA architectures if something doesn't wor
 MaCh3 uses several neutrino oscillation calculators.
 
 Following neutrino oscillation calculators are available:
-|Oscillator        | Hardware   | Source     |
-|------------------|------------|------------|
-| CUDAProb3Linear  | CPU/GPU    | Beam       |
-| CUDAProb3        | CPU/GPU    | Atm        |
-| ProbGPULinear    | GPU        | Beam       |
-| Prob3++Linear    | CPU        | Beam       |
-| NuFastLinear     | CPU        | Beam       |
+|Oscillator        | Hardware   | Source     | Reference  |
+|------------------|------------|------------|------------|
+| CUDAProb3Linear  | CPU/GPU    | Beam       |            |
+| CUDAProb3        | CPU/GPU    | Atm        | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
+| ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
+| Prob3++Linear    | CPU        | Beam       |            |
+| NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 
 If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
 ```
