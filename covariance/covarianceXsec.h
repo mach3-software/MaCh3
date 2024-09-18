@@ -1,11 +1,5 @@
 #pragma once
 
-// C++ includes
-#include <map>
-
-// ROOT includes
-#include "TList.h"
-
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
 #include "samplePDF/Structs.h"

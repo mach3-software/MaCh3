@@ -290,7 +290,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
       MACH3LOG_WARN("***** BAD X !! *****");
       MACH3LOG_WARN("Indicates some parameter doesn't have a single spline");
       MACH3LOG_WARN("j = {}", j);
-      //throw;
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     if(BadXCounter == 5) MACH3LOG_WARN("There is more unutilised knots although I will stop spamming");
   }
@@ -541,7 +541,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
         MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
       }
       continue;
-      //throw;
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);

@@ -218,14 +218,14 @@ class covarianceBase {
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParProp_PCA(const int i) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return fParProp_PCA(i);
   }
   
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParCurr_PCA(const int i) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return fParCurr_PCA(i);
   }
 
@@ -237,29 +237,29 @@ class covarianceBase {
   }
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
   inline const TMatrixD getTransferMatrix() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.TransferMat;
   }
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
   inline const TMatrixD getEigenVectors() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.eigen_vectors;
   }
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use getEigenValuesMaster
   inline const TVectorD getEigenValues() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use getEigenValues
   inline const std::vector<double> getEigenValuesMaster() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.eigen_values_master;
   }
   /// @brief Set proposed value for parameter in PCA base
   /// @param i Parameter index
   /// @param value new value
   inline void setParProp_PCA(const int i, const double value) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     fParProp_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
@@ -268,7 +268,7 @@ class covarianceBase {
   /// @param i Parameter index
   /// @param value new value
   inline void setParCurr_PCA(const int i, const double value) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     fParCurr_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
@@ -277,10 +277,10 @@ class covarianceBase {
   /// @brief Set values for PCA parameters in PCA base
   /// @param pars vector with new values of PCA params
   inline void setParameters_PCA(const std::vector<double> &pars) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     if (pars.size() != size_t(_fNumParPCA)) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
