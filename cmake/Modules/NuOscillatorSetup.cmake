@@ -5,13 +5,14 @@ DefineEnabledRequiredSwitch(CUDAProb3Linear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(CUDAProb3_ENABLED FALSE)
 DefineEnabledRequiredSwitch(ProbGPULinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(Prob3ppLinear_ENABLED FALSE)
+DefineEnabledRequiredSwitch(NuFastLinear_ENABLED FALSE)
 
 #KS: If all Oscillators are turned off then enable CUDAProb3Linear_ENABLED
 if (NOT CUDAProb3Linear_ENABLED AND
     NOT CUDAProb3_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
-    NOT Prob3ppLinear_ENABLED)
-
+    NOT Prob3ppLinear_ENABLED AND
+    NOT NuFastLinear_ENABLED)
     set(CUDAProb3Linear_ENABLED TRUE)
 endif()
 
@@ -29,12 +30,16 @@ endif()
 if(Prob3ppLinear_ENABLED)
   LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3ppLinear")
 endif()
+if(NuFastLinear_ENABLED)
+  LIST(APPEND MaCh3_Oscillator_ENABLED "NuFast")
+endif()
 
 #NuOscillator uses 1/0 instead of true/false thus use conversion
 IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
 IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
 IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
 IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
+IsTrue(NuFastLinear_ENABLED USE_NuFastLiner)
 
 #Also additional flags
 IsTrue(MaCh3_GPU_ENABLED DAN_USE_GPU)
@@ -67,6 +72,7 @@ CPMAddPackage(
     "UseCUDAProb3 ${USE_CUDAProb3}"
     "UseProbGPULinear ${USE_ProbGPULinear}"
     "UseProb3ppLinear ${USE_Prob3ppLinear}"
+    "UseNuFASTLinear  ${USE_NuFastLiner}"
 
     "NuOscillator_Compiler_Flags ${compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"

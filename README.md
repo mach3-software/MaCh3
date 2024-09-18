@@ -99,10 +99,11 @@ Following neutrino oscillation calculators are available:
 | CUDAProb3        | CPU/GPU    | Atm        |
 | ProbGPULinear    | GPU        | Beam       |
 | Prob3++Linear    | CPU        | Beam       |
+| NuFastLinear     | CPU        | Beam       |
 
 If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
 ```
-cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
 ```
 You can only specify engines you want to use, and you can in principle use more than one.
 
