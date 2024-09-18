@@ -1,4 +1,4 @@
-SET(MACH3_LIB_LIST "-libCovariance -libManager -libMCMC -libOscClass -libSamplePDF -libSplines")
+SET(MACH3_LIB_LIST "-libCovariance -libManager -libMCMC -libOscClass -libSamplePDF -libSplines -libPlotting")
 
 SET(MACH3_FEATURES_LIST)
 
@@ -12,6 +12,10 @@ endif()
 
 if(MaCh3_DEBUG_ENABLED)
   LIST(APPEND MACH3_FEATURES_LIST "DEBUG")
+endif()
+
+if(MaCh3_PYTHON_ENABLED)
+  LIST(APPEND MACH3_FEATURES_LIST "PYTHON")
 endif()
 
 LIST(APPEND MACH3_FEATURES_LIST ${MaCh3_Fitter_ENABLED})

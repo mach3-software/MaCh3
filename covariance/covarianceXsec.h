@@ -76,6 +76,7 @@ class covarianceXsec : public covarianceBase {
     /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
     const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, kSpline);};
     /// @brief Grab the index of the syst relative to global numbering.
+    /// @param Type Type of syst, for example kNorm, kSpline etc
     const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
 
     /// @brief DB Grab the Number of splines for the relevant DetID
@@ -104,25 +105,28 @@ class covarianceXsec : public covarianceBase {
     /// @brief Get nominal for a given param
     /// @param i parameter index
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
-    /// @brief Is parameter a flux param or not. This might become deprecated in future
+
+    /// @brief Checks if parameter belongs to a given group
     /// @param i parameter index
-    /// @warning Will become deprecated
-    inline bool IsParFlux(const int i){ return isFlux[i]; }
-    /// @brief KS Function to set to nominal flux parameters
-    /// @warning Will become deprecated
-    void setXsecOnlyParameters();
-    /// @brief KS Function to set to nominal flux  parameters
-    /// @warning Will become deprecated
-    void setFluxOnlyParameters();
-    
+    /// @param Group name of group, like Xsec or Flux
+    /// @return bool telling whether param is part of group
+    bool IsParFromGroup(const int i, const std::string& Group);
+
+    /// @brief KS Function to set to prior parameters of a given group
+    /// @param Group name of group, like Xsec or Flux
+    void SetGroupOnlyParameters(const std::string& Group);
+
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
     /// @param Name Name of TFile to which we save stuff
     /// @warning This is mostly used for backward compatibility
     void DumpMatrixToFile(const std::string& Name);
   protected:
-    /// @brief Initialise CovarianceXsec
+    /// @brief Initializes the systematic parameters from the configuration file.
+    /// This function loads parameters like normalizations and splines from the provided YAML file.
+    /// @note This is used internally during the object's initialization process.
     void initParams();
-    /// @brief ETA - trying out the yaml parsing
+    /// @brief Parses the YAML configuration to set up cross-section parameters.
+    /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.
     inline void InitXsecFromConfig();
     /// @brief Get Norm params
     /// @param param Yaml node describing param
@@ -132,10 +136,6 @@ class covarianceXsec : public covarianceBase {
     /// @param param Yaml node describing param
     inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
 
-    /// Is parameter flux or not, This might become deprecated in future
-    /// @warning Will become deprecated
-    std::vector<bool> isFlux;
-
     /// Tells to which samples object param should be applied
     std::vector<int> _fDetID;
     /// Type of parameter like norm, spline etc.
@@ -143,6 +143,10 @@ class covarianceXsec : public covarianceBase {
 
     /// Name of spline in TTree (TBranch),
     std::vector<std::string> _fSplineNames;
+
+    /// KS: Allow to group parameters for example to affect only cross-section or only flux etc.
+    std::vector<std::string> _ParameterGroup;
+
     /// Map between number of given parameter type with global parameter numbering. For example 2nd norm param may be 10-th global param
     std::vector<std::map<int, int>> _fSystToGlobablSystIndexMap;
 
