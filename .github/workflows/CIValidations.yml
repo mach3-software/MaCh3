@@ -48,6 +48,6 @@ jobs:
     - name: Validations
       run: |
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
-        source /opt/MaCh3Validations/build/bin/setup.MaCh3Validations.sh
+        source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
         Apps/${{ matrix.name }}

@@ -110,11 +110,11 @@ You can only specify engines you want to use, and you can in principle use more 
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm  | Need Ext Library |
-|------------|------------------|
-| MR2T2      | No               |
-| MINUIT2    | Yes              |
-| PSO        | No               |
+| Algorithm  | Reference        |Need Ext Lib  |
+|------------|------------------|--------------|
+| MR2T2      | [Ref](https://doi.org/10.1063/1.1699114)       | No       |
+| MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
+| PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
 
 
 ## Debug

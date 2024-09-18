@@ -2,10 +2,6 @@
 
 #include "splines/SplineBase.h"
 
-#ifdef CUDA
-extern void SynchroniseSplines();
-#endif
-
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 class SMonolith : public SplineBase {
@@ -27,13 +23,7 @@ class SMonolith : public SplineBase {
     inline std::string GetName()const {return "SplineMonolith";};
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    inline void SynchroniseMemTransfer()
-    {
-      #ifdef CUDA
-      SynchroniseSplines();
-      #endif
-      return;
-    };
+    void SynchroniseMemTransfer();
 
     /// @brief KS: Get pointer to total weight to make fit faster wrooom!
     /// @param event Name event number in used MC
