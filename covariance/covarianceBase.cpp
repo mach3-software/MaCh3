@@ -831,9 +831,10 @@ void covarianceBase::throwParCurr(const double mag) {
     }
   }
 }
-
+// ********************************************
 // Function to print the nominal values
 void covarianceBase::printNominal() {
+// ********************************************
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
   for (int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), getParInit(i));
@@ -856,8 +857,6 @@ void covarianceBase::printNominalCurrProp() {
   for (int i = 0; i < _fNumPar; ++i) {
     MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
-  //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
-  //std::cout << std::endl;
 }
 
 // ********************************************
@@ -873,6 +872,9 @@ double covarianceBase::CalcLikelihood() {
   #pragma omp parallel for reduction(+:logL)
   #endif
   for(int i = 0; i < _fNumPar; ++i){
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (int j = 0; j <= i; ++j) {
       if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
@@ -1110,6 +1112,9 @@ double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const
 // ********************************************
 
   double Element = 0.0;
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int j = 0; j < Length; ++j) {
     Element += matrix[i][j]*vector[j];
   }
@@ -1139,12 +1144,12 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
 void covarianceBase::printIndivStepScale() {
 // ********************************************
-  std::cout << "============================================================" << std::endl;
-  std::cout << std::setw(PrintLength) << "Parameter:" << " | " << std::setw(11) << "Step scale:" << std::endl;
+  MACH3LOG_INFO("============================================================");
+  MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
   for (int iParam = 0; iParam < _fNumPar; iParam++) {
-    std::cout << std::setw(PrintLength) << _fNames[iParam].c_str() << " | " << std::setw(11) << _fIndivStepScale[iParam] << std::endl;
+    MACH3LOG_INFO("{:<{}} | {:<11}", _fNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
   }
-  std::cout << "============================================================" << std::endl;
+  MACH3LOG_INFO("============================================================");
 }
 
 // ********************************************
@@ -1217,8 +1222,8 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 
   if (covMatrix->GetNrows() != cov->GetNrows()) {
     MACH3LOG_ERROR("Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!");
-    std::cerr << "Stored covariance matrix size:" << covMatrix->GetNrows() << std::endl;
-    std::cerr << "Given matrix size:" << cov->GetNrows() << std::endl;
+    MACH3LOG_ERROR("Stored covariance matrix size: {}", covMatrix->GetNrows());
+    MACH3LOG_ERROR("Given matrix size: {}", cov->GetNrows());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -1385,7 +1390,7 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
   TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);//Not fully sure why this is even needed since symmetric B -> U=V
   //Get norm of transformed
   //  Double_t approx_norm=cov_closest_approx.E2Norm();
-  //std::cout<<"Initial Norm : "<<cov_norm<<" | Norm after transformation : "<<approx_norm<<" | Ratio : "<<cov_norm/approx_norm<<std::endl;
+  //MACH3LOG_INFO("Initial Norm: {:.6f} | Norm after transformation: {:.6f} | Ratio: {:.6f}", cov_norm, approx_norm, cov_norm / approx_norm);
   
   *cov = cov_closest_approx;
   //Now can just add a makeposdef!
