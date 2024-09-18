@@ -8,11 +8,13 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
 {
   (void) pot;
   (void) mc_version;
-  std::cout << "-------------------------------------------------------------------" <<std::endl;
-  std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
-
+  MACH3LOG_INFO("-------------------------------------------------------------------");	
+  MACH3LOG_INFO("Creating samplePDFFDBase object..");
+	
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
+  if(xsec_cov == NULL){
+	  MACH3LOG_ERROR("[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}
 
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
@@ -34,7 +36,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-  std::cout << "I'm deleting samplePDFFDBase" << std::endl;
+  MACH3LOG_INFO("I'm deleting samplePDFFDBase");
 
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
@@ -119,8 +121,8 @@ void samplePDFFDBase::SetupSampleBinning(){
 	set1DBinning(SampleXBins);  
   }
   else if(XVarStr.length() > 0 && YVarStr.length() > 0){
-	std::cout << "Setting Up 2D binning" << std::endl;
-	std::cout << XVarStr << " : " << YVarStr << std::endl;
+	MACH3LOG_INFO("Setting Up 2D binning");
+	MACH3LOG_INFO("{} : {}", XVarStr, YVarStr);  
 	set2DBinning(SampleXBins, SampleYBins);
   }
 }
@@ -253,7 +255,7 @@ void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, doub
 
   if (std::isnan(w[10]))
   {
-    std::cerr << "WARNING: ProbGPU oscillation weight returned NaN! " << w[10] << std::endl;
+    MACH3LOG_ERROR("WARNING: ProbGPU oscillation weight returned NaN! {}", w[10]);
   }
 }
 #endif
@@ -716,13 +718,13 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
 //DB Adding in Oscillator class support for smeared oscillation probabilities
 void samplePDFFDBase::SetOscillator(Oscillator* Osc_) {
 #if defined (USE_PROB3)
-  std::cerr << "Atmospheric Oscillator only defined using CUDAProb3 - USE_PROB3 is defined and indicates that Prob3++/probGPU is being used" << std::endl;
-  throw;
+  MACH3LOG_ERROR("Atmospheric Oscillator only defined using CUDAProb3 - USE_PROB3 is defined and indicates that Prob3++/probGPU is being used");	
+  throw MaCh3Exception(__FILE__ , __LINE__ );
 #endif
 
   Osc = Osc_;
-  std::cout << "Set Oscillator" << std::endl;
-
+  MACH3LOG_INFO("Set Oscillator");
+	
   FindEventOscBin();
 }
 
@@ -732,12 +734,12 @@ void samplePDFFDBase::FindEventOscBin() {
       MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),MCSamples[i].rw_truecz[j]);
     }
   }
-  std::cout << "Set all oscillation pointers to Oscillator" << std::endl;
+  MACH3LOG_INFO("Set all oscillation pointers to Oscillator");
 }
 
 void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
-  std::cout << "SETTING UP XSEC COV!!" << std::endl;
+  MACH3LOG_INFO("SETTING UP XSEC COV!!");
   XsecCov = xsec;
 
   // Get the map between the normalisation parameters index, their name, what mode they should apply to, and what target
@@ -749,9 +751,9 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
-  std::cout << "Found " << xsec_norms.size() << " normalisation parameters" << std::endl;
-  std::cout << "Found " << funcParsNames.size() << " functional parameters" << std::endl;
-
+  MACH3LOG_INFO("Found {} normalisation parameters", xsec_norms.size());
+  MACH3LOG_INFO("Found {} functional parameters", funcParsNames.size());
+	
   return;
 }
 
@@ -768,8 +770,8 @@ void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
 void samplePDFFDBase::SetupNormParameters(){
 
   if(!XsecCov){
-	std::cout << "XsecCov is not setup!" << std::endl;
-	throw;
+	MACH3LOG_ERROR("XsecCov is not setup!");
+	throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Assign xsec norm bins in MCSamples tree
@@ -804,7 +806,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   fdmc_base *fdobj = &MCSamples[iSample];
 
-  std::cout << "FD Object has " << fdobj->nEvents << " events" << std::endl;
+  MACH3LOG_INFO("FD Object has {} events", fdobj->nEvents);
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
@@ -1342,7 +1344,9 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   dathist = NULL;
   dathist2d->Reset();                                                       
 
-  if (GetNDim()!=2) {std::cerr << "Trying to set a 2D 'data' histogram in a 1D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=2) {
+	  MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting");
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}
 
   for (int i = 0; i < int(dataSample2D->size()); i++) {
     dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
@@ -1363,13 +1367,15 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
 }
 
 void samplePDFFDBase::addData(TH1D* Data) {
-  std::cout << "adding 1D data histogram : " << Data->GetName() << " with " << Data->Integral() << " events" << std::endl;
+  MACH3LOG_INFO("Adding 1D data histogram : {} with {} events", Data->GetName(), Data->Integral());
   dathist2d = NULL;
   dathist = Data;
   dataSample = NULL;
   dataSample2D = NULL;
 
-  if (GetNDim()!=1) {std::cerr << "Trying to set a 1D 'data' histogram in a 2D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=1) {
+	  MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}
 
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
@@ -1386,13 +1392,15 @@ void samplePDFFDBase::addData(TH1D* Data) {
 }
 
 void samplePDFFDBase::addData(TH2D* Data) {
-  std::cout << "adding 2D data histogram : " << Data->GetName() << " with " << Data->Integral() << " events" << std::endl;
+  MACH3LOG_INFO("Adding 2D data histogram : {} with {} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
   dathist = NULL;
   dataSample = NULL;
   dataSample2D = NULL;
 
-  if (GetNDim()!=2) {std::cerr << "Trying to set a 2D 'data' histogram in a 1D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=2) {
+	  MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}	
 
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
@@ -1459,7 +1467,7 @@ void samplePDFFDBase::fillSplineBins() {
 double samplePDFFDBase::GetLikelihood()
 {
   if (samplePDFFD_data == NULL) {
-      std::cerr << "data sample is empty!" << std::endl;
+      MACH3LOG_ERROR("data sample is empty!");
       return -1;
   }
 
