@@ -26,11 +26,11 @@ __host__ void SynchroniseSplines();
 /// @param gpu_weights has length = spln_counter * spline_size
 /// @param text_coeff_x array storing info about X coeff, uses texture memory. Has length = n_params * spline_size,
 __global__ void EvalOnGPU_Splines(
-  const short int* __restrict__ gpu_paramNo_arr,
-  const unsigned int* __restrict__ gpu_nKnots_arr,
-  const float* __restrict__ gpu_coeff_many,
-  float *gpu_weights,
-  const cudaTextureObject_t __restrict__ text_coeff_x);
+    const short int* __restrict__ gpu_paramNo_arr,
+    const unsigned int* __restrict__ gpu_nKnots_arr,
+    const float* __restrict__ gpu_coeff_many,
+    float *gpu_weights,
+    const cudaTextureObject_t __restrict__ text_coeff_x);
 
 /// @brief Evaluate the TF1 on the GPU Using 5th order polynomial
 /// @param gpu_coeffs_tf1 coefficients of TF1, has length = tf1 coeef counter
