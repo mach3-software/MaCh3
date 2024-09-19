@@ -2,6 +2,9 @@
 
 #include "splines/SplineBase.h"
 
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class SMonolithGPU;
+
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 class SMonolith : public SplineBase {
@@ -131,54 +134,32 @@ class SMonolith : public SplineBase {
     /// Sum of all coefficients over all TF1
     unsigned int nTF1coeff;
 
-    /// GPU arrays to hold weight for event
-    float *gpu_total_weights;
-
     /// CPU arrays to hold weight for each spline
     float *cpu_weights_var;
-    /// GPU arrays to hold weight for each spline
-    float *gpu_weights;
 
     /// CPU arrays to hold weight for each TF1
     float *cpu_weights_tf1_var;
-    /// GPU arrays to hold weight for each TF1
-    float *gpu_weights_tf1;
 
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent;
-    /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
-    unsigned int *gpu_nParamPerEvent;
 
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
-    /// KS: GPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
-    unsigned int *gpu_nParamPerEvent_tf1;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_spline_handler;
-    /// KS: GPU Number of knots per spline
-    unsigned int *gpu_nKnots_arr;
-    /// KS: GPU arrays to hold X coefficient
-    float *gpu_coeff_x;
-    /// GPU arrays to hold other coefficients
-    float *gpu_coeff_many;
-    /// CW: GPU array with the number of points per spline (not per spline point!)
-    short int *gpu_paramNo_arr;
+
+    /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
+    SMonolithGPU* gpu_spline_handler;
 
     /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;
-    /// GPU arrays to hold TF1 coefficients
-    float *gpu_coeff_TF1_many;
 
     /// CPU arrays to hold number of points
     std::vector<short int> cpu_nPoints_arr;
-    /// GPU arrays to hold number of points
-    short int *gpu_nPoints_arr;
 
     /// CW: CPU array with the number of points per spline (not per spline point!)
     std::vector<short int> cpu_paramNo_TF1_arr;
-    /// CW: GPU array with the number of points per TF1 object
-    short int *gpu_paramNo_TF1_arr;
 
     /// Flag telling whether we are saving spline monolith into handy root file
     bool SaveSplineFile;
