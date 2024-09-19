@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-set(MaCh3_VERSION 1.1.4)
+set(MaCh3_VERSION 1.1.5)
 
 # Try to find CUDA
 find_package(CUDAToolkit QUIET)
@@ -87,6 +87,8 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
     -Wunused                # Warn on anything being unused
+    -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
+    #-Wstrict-aliasing=2    # Helps detect potential aliasing issues that could lead to undefined behavior.
     #-Wuseless-cast         # Warn if you perform a cast to the same type (only in GCC >= 4.8)
     #-Wpadded               # Warn when padding is added to a structure or class for alignment
     #-Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
@@ -322,7 +324,6 @@ set_target_properties(version_header PROPERTIES INCLUDE_DIRECTORIES ${CMAKE_CURR
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     DESTINATION ${CMAKE_INSTALL_PREFIX}/)
-
 
 # uninstall target
 if(NOT TARGET uninstall)

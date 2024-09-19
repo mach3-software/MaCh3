@@ -1,9 +1,5 @@
 #include "SplineMonolith.h"
 
-// All the functions that are declared extern here exist in splines/gpuSplineUtils.cu
-// They are the CUDA code which we use to do the GPU processing
-// For older style (Rich/Asher era) see git commit history previous to 27 Nov 2017
-
 #ifdef CUDA
 #include "splines/gpuSplineUtils.cuh"
 #endif
@@ -290,7 +286,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
       MACH3LOG_WARN("***** BAD X !! *****");
       MACH3LOG_WARN("Indicates some parameter doesn't have a single spline");
       MACH3LOG_WARN("j = {}", j);
-      //throw;
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     if(BadXCounter == 5) MACH3LOG_WARN("There is more unutilised knots although I will stop spamming");
   }
@@ -321,7 +317,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
 void SMonolith::MoveToGPU() {
 // *****************************************
-
   #ifdef CUDA
   unsigned int event_size_max = _max_knots * nParams;
   MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
@@ -541,7 +536,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
         MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
       }
       continue;
-      //throw;
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   MACH3LOG_WARN("In total SplineInfoArray for {} hasn't been initialised", Counter);
@@ -1025,7 +1020,6 @@ void SMonolith::Evaluate() {
 // For ROOT version see root/hist/hist/src/TSpline3.cxx TSpline3::FindX(double)
 void SMonolith::FindSplineSegment() {
 // *************************
-
   // Loop over the splines
   //KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting
   for (_int_ i = 0; i < nParams; ++i)
@@ -1105,7 +1099,6 @@ void SMonolith::FindSplineSegment() {
 //*********************************************************
 void SMonolith::CalcSplineWeights() {
 //*********************************************************
-
   #ifdef MULTITHREAD
   //KS: Open parallel region
   #pragma omp parallel
@@ -1174,7 +1167,7 @@ void SMonolith::ModifyWeights(){
 //*********************************************************
 #ifndef Weight_On_SplineBySpline_Basis
   #ifdef MULTITHREAD
-  #pragma omp parallel for simd
+  #pragma omp parallel for
   #endif
   for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum)
   {
@@ -1185,6 +1178,9 @@ void SMonolith::ModifyWeights(){
     const unsigned int numParams = cpu_nParamPerEvent[2 * EventNum];
 
     // Compute total weight for the current event
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (unsigned int id = 0; id < numParams; ++id) {
       totalWeight *= cpu_weights_var[startIndex + id];
     }
@@ -1194,6 +1190,9 @@ void SMonolith::ModifyWeights(){
     const unsigned int numParams_tf1 = cpu_nParamPerEvent_tf1[2 * EventNum];
 
     // Compute total weight for the current event
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (unsigned int id = 0; id < numParams_tf1; ++id) {
       totalWeight *= cpu_weights_tf1_var[startIndex_tf1 + id];
     }
@@ -1212,7 +1211,6 @@ void SMonolith::ModifyWeights(){
 //KS: Normally it does nothing, in case you want to have weight for each spline it does the mapping, used mostly for debugging
 void SMonolith::ModifyWeights_GPU(){
 //*********************************************************
-
 #ifdef Weight_On_SplineBySpline_Basis
   // Multi-thread here because _numIndex is really quite large!
   #ifdef MULTITHREAD
@@ -1235,7 +1233,6 @@ void SMonolith::ModifyWeights_GPU(){
 //KS: Print info about how much knots etc has been initialised
 void SMonolith::PrintInitialsiation() {
 //*********************************************************
-
   unsigned int event_size_max = _max_knots * nParams;
 
   MACH3LOG_INFO("--- INITIALISED Spline Monolith ---");

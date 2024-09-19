@@ -233,7 +233,7 @@ public:
       std::cerr << "    Class only knows about 5th order polynomial, two superposed linear function, linear function or pseudo Heaviside" << std::endl;
       std::cerr << "    You have tried something else than this, which remains unimplemented" << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     */
   }
@@ -247,7 +247,7 @@ public:
   double GetParameter(_int_ Parameter) {
     if (Parameter > length) {
       std::cerr << "Error: you requested parameter number " << Parameter << " but length is " << length << " parameters" << std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
       return -999.999;
     }
     return Par[Parameter];
@@ -593,7 +593,7 @@ public:
     else
     {
       std::cerr<<"Unsupported interpolations type "<<InterPolation<<std::endl;
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     delete spline;
