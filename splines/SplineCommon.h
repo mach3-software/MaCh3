@@ -45,23 +45,5 @@ struct SplineMonoStruct {
   std::vector<short int> paramNo_arr;
 };
 
-// *******************
-/// @brief KS: Struct storing information for spline monolith
-/// @details This structure holds the X coefficients, other spline coefficients,
-/// the number of knots per spline, and the number of points per spline on the CPU.
-struct SplineMonoStructGPU {
-// *******************
-  /// KS: GPU arrays to hold X coefficient
-  float *coeff_x;
-
-  /// GPU arrays to hold other coefficients
-  float *coeff_many;
-
-  /// KS: GPU Number of knots per spline
-  unsigned int *nKnots_arr;
-
-  /// CW: GPU array with the number of points per spline (not per spline point!)
-  short int *paramNo_arr;
-};
 
 // WARNING KS: Please add stuff here with super caution. This header is being added to gpuSplineUtils.cu. Right now we support most of CUDA even super old. If you add some header with fancy templates it will not compile for older CUDA. This header is a way to use common macros or Enum in CPU and GPU code. For more sophisticated structs please use SplineStructs.h
