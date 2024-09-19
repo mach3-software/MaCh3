@@ -156,14 +156,8 @@ class SMonolith : public SplineBase {
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_spline_handler;
-    /// KS: GPU Number of knots per spline
-    unsigned int *gpu_nKnots_arr;
-    /// KS: GPU arrays to hold X coefficient
-    float *gpu_coeff_x;
-    /// GPU arrays to hold other coefficients
-    float *gpu_coeff_many;
-    /// CW: GPU array with the number of points per spline (not per spline point!)
-    short int *gpu_paramNo_arr;
+    /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
+    SplineMonoStructGPU* gpu_spline_handler;
 
     /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;

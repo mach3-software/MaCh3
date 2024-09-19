@@ -38,10 +38,8 @@ void SMonolith::Initialise() {
   gpu_total_weights = nullptr;
   gpu_nParamPerEvent = nullptr;
   gpu_nPoints_arr = nullptr;
-  gpu_paramNo_arr = nullptr;
-  gpu_nKnots_arr = nullptr;
-  gpu_coeff_x = nullptr;
-  gpu_coeff_many = nullptr;
+
+  gpu_spline_handler = nullptr;
   
   SplineInfoArray = nullptr;
   segments = NULL;
@@ -338,12 +336,12 @@ void SMonolith::MoveToGPU() {
   // Can probably make this a bit prettier but will do for now
   // Could be a lot smaller of a function...
   InitGPU_SplineMonolith(
-    &gpu_coeff_x,
-    &gpu_coeff_many,
+    &gpu_spline_handler->coeff_x,
+    &gpu_spline_handler->coeff_many,
     &gpu_weights,
 
-    &gpu_paramNo_arr,
-    &gpu_nKnots_arr,
+    &gpu_spline_handler->paramNo_arr,
+    &gpu_spline_handler->nKnots_arr,
 
     &gpu_coeff_TF1_many,
     &gpu_weights_tf1,
@@ -367,15 +365,9 @@ void SMonolith::MoveToGPU() {
   // The GPU splines don't actually need declaring but is good for demonstration, kind of
   // fixed by passing const reference
   CopyToGPU_SplineMonolith(
-    gpu_paramNo_arr,
-    gpu_nKnots_arr,
-    gpu_coeff_x,
-    gpu_coeff_many,
+    gpu_spline_handler,
+    cpu_spline_handler,
 
-    cpu_spline_handler->paramNo_arr,
-    cpu_spline_handler->nKnots_arr,
-    cpu_spline_handler->coeff_x,
-    cpu_spline_handler->coeff_many,
     // TFI related now
     gpu_coeff_TF1_many,
     gpu_paramNo_TF1_arr,
@@ -843,11 +835,7 @@ SMonolith::~SMonolith() {
 
   #ifdef CUDA
   CleanupGPU_SplineMonolith(
-    gpu_paramNo_arr,
-    gpu_nKnots_arr,
-
-    gpu_coeff_x,
-    gpu_coeff_many,
+    gpu_spline_handler,
 
     gpu_coeff_TF1_many,
     gpu_paramNo_TF1_arr,
@@ -900,7 +888,8 @@ SMonolith::~SMonolith() {
   cpu_nPoints_arr.clear();
   cpu_nPoints_arr.shrink_to_fit();
 
-  delete cpu_spline_handler;
+  if(cpu_spline_handler != nullptr) delete cpu_spline_handler;
+  if(gpu_spline_handler != nullptr) delete gpu_spline_handler;
 }
 
 // *****************************************
@@ -969,10 +958,7 @@ void SMonolith::Evaluate() {
 
   // The main call to the GPU
   RunGPU_SplineMonolith(
-      gpu_paramNo_arr,
-      gpu_nKnots_arr,
-
-      gpu_coeff_many, 
+      gpu_spline_handler,
 
       gpu_paramNo_TF1_arr,
       gpu_coeff_TF1_many,

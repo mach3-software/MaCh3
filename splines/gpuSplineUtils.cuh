@@ -49,17 +49,10 @@ __host__ void InitGPU_Vals(float **vals);
 
 
 /// @brief Copy to GPU for x array and separate ybcd array
-/// @param gpu_x_array Small array with X coefficients at GPU
 __host__ void CopyToGPU_SplineMonolith(
-                            short int *gpu_paramNo_arr,
-                            unsigned int *gpu_nKnots_arr,
-                            float *gpu_x_array,
-                            float *gpu_many_array,
+                            SplineMonoStructGPU* gpu_spline_handler,
+                            SplineMonoStruct* cpu_spline_handler,
 
-                            std::vector<short int> cpu_paramNo_arr,
-                            std::vector<unsigned int> cpu_nKnots_arr,
-                            std::vector<float> cpu_x_array,
-                            std::vector<float> cpu_many_array,
                             // TFI related now
                             float *gpu_many_TF1_array,
                             short int* gpu_paramNo_arr_TF1,
@@ -89,9 +82,7 @@ __host__ void CopyToGPU_SplineMonolith(
 /// @param gpu_weights has length = spln_counter * spline_size
 /// @param text_coeff_x array storing info about X coeff, uses texture memory. Has length = n_params * spline_size,
 __global__ void EvalOnGPU_Splines(
-    const short int* __restrict__ gpu_paramNo_arr,
-    const unsigned int* __restrict__ gpu_nKnots_arr,
-    const float* __restrict__ gpu_coeff_many,
+    const SplineMonoStructGPU* __restrict__ gpu_spline_handler,
     float *gpu_weights,
     const cudaTextureObject_t __restrict__ text_coeff_x);
 
@@ -124,15 +115,11 @@ __global__ void EvalOnGPU_TotWeight(
 /// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
 /// Pass the segment and the parameter values
 /// (binary search already performed in SplineMonolith::FindSplineSegment()
-/// @param gpu_coeff_many has length = nKnots * 4, stores all coefficients for all splines and knots
 __host__ void RunGPU_SplineMonolith(
-  const short int* gpu_paramNo_arr,
-  const unsigned int* gpu_nKnots_arr,
+  const SplineMonoStructGPU* __restrict__ gpu_spline_handler,
 
-  const float *gpu_coeff_many,
-
-  const short int* gpu_paramNo_tf1_arr,
-  const float *gpu_coeff_many_tf1,
+  const short int* __restrict__ gpu_paramNo_tf1_arr,
+  const float* __restrict__ gpu_coeff_many_tf1,
 
   float* gpu_weights,
   float* gpu_weights_tf1,
@@ -154,14 +141,8 @@ __host__ void RunGPU_SplineMonolith(
 __host__ void SynchroniseSplines();
 
 /// @brief Clean up the {x},{ybcd} arrays
-/// @param gpu_x_array Small array with X coefficients at GPU
-/// @param gpu_many_array has length = nKnots * 4, stores all coefficients for all splines and knots
 __host__ void CleanupGPU_SplineMonolith(
-  short int *gpu_paramNo_arr,
-  unsigned int *gpu_nKnots_arr,
-
-  float *gpu_x_array,
-  float *gpu_many_array,
+  SplineMonoStructGPU* gpu_spline_handler,
 
   float *gpu_many_TF1_array,
   short int* gpu_paramNo_arr_TF1,

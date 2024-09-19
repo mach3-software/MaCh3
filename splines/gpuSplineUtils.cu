@@ -202,15 +202,9 @@ __host__ void InitGPU_Vals(float **vals) {
 // Copy to GPU for x array and separate ybcd array
 __host__ void CopyToGPU_SplineMonolith(
 // ******************************************************
-                            short int *gpu_paramNo_arr,
-                            unsigned int *gpu_nKnots_arr,
-                            float *gpu_x_array,
-                            float *gpu_many_array,
+                            SplineMonoStructGPU* gpu_spline_handler,
+                            SplineMonoStruct* cpu_spline_handler,
 
-                            std::vector<short int> cpu_paramNo_arr,
-                            std::vector<unsigned int> cpu_nKnots_arr,
-                            std::vector<float> cpu_x_array,
-                            std::vector<float> cpu_many_array,
                             // TFI related now
                             float *gpu_many_TF1_array,
                             short int* gpu_paramNo_arr_TF1,
@@ -260,10 +254,10 @@ __host__ void CopyToGPU_SplineMonolith(
   CudaCheckError();
 #endif
   // Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies
-  cudaMemcpy(gpu_many_array, cpu_many_array.data(), sizeof(float)*total_nknots*_nCoeff_, cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_spline_handler->coeff_many, cpu_spline_handler->coeff_many.data(), sizeof(float)*total_nknots*_nCoeff_, cudaMemcpyHostToDevice);
   CudaCheckError();
 
-  cudaMemcpy(gpu_x_array, cpu_x_array.data(), sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_spline_handler->coeff_x, cpu_spline_handler->coeff_x.data(), sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
   CudaCheckError();
 
   //KS: Bind our texture with the GPU variable
@@ -271,7 +265,7 @@ __host__ void CopyToGPU_SplineMonolith(
   struct cudaResourceDesc resDesc_coeff_x;
   memset(&resDesc_coeff_x, 0, sizeof(resDesc_coeff_x));
   resDesc_coeff_x.resType = cudaResourceTypeLinear;
-  resDesc_coeff_x.res.linear.devPtr = gpu_x_array;
+  resDesc_coeff_x.res.linear.devPtr = gpu_spline_handler->coeff_x;
   resDesc_coeff_x.res.linear.desc = cudaCreateChannelDesc<float>();
   resDesc_coeff_x.res.linear.sizeInBytes = sizeof(float)*spline_size*n_params;
 
@@ -285,11 +279,11 @@ __host__ void CopyToGPU_SplineMonolith(
   CudaCheckError();
 
   // Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now
-  cudaMemcpy(gpu_paramNo_arr, cpu_paramNo_arr.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_spline_handler->paramNo_arr, cpu_spline_handler->paramNo_arr.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   // Also copy the knot map for each spline onto the GPU;
-  cudaMemcpy(gpu_nKnots_arr, cpu_nKnots_arr.data(), n_splines*sizeof(unsigned int), cudaMemcpyHostToDevice);
+  cudaMemcpy(gpu_spline_handler->nKnots_arr, cpu_spline_handler->nKnots_arr.data(), n_splines*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
   //Now TF1
@@ -361,9 +355,7 @@ __host__ void CopyToGPU_SplineMonolith(
 // Should be most efficient at cache hitting and memory coalescence
 // But using spline segments rather than the parameter value: avoids doing binary search on GPU
 __global__ void EvalOnGPU_Splines(
-    const short int* __restrict__ gpu_paramNo_arr,
-    const unsigned int* __restrict__ gpu_nKnots_arr,
-    const float* __restrict__ gpu_coeff_many,
+    const SplineMonoStructGPU* __restrict__ gpu_spline_handler,
     float *gpu_weights,
     const cudaTextureObject_t __restrict__ text_coeff_x) {
 //*********************************************************
@@ -376,24 +368,24 @@ __global__ void EvalOnGPU_Splines(
     // This is the segment we want for this parameter variation
     // for this particular splineNum; 0 = MACCQE, 1 = pFC, 2 = EBC, etc
 
-    //CW: Which Parameter we are accesing
-    const short int Param = gpu_paramNo_arr[splineNum];
+    //CW: Which Parameter we are accessing
+    const short int Param = gpu_spline_handler->paramNo_arr[splineNum];
 
     //CW: Avoids doing costly binary search on GPU
     const short int segment = segment_gpu[Param];
 
-    //KS: Segment for coeff_x is simply parameter*max knots + segment as each parmeters has the same spacing
+    //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing
     const short int segment_X = Param*d_spline_size+segment;
 
     //KS: Find knot position in out monolitical structure
-    const unsigned int CurrentKnotPos = gpu_nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
+    const unsigned int CurrentKnotPos = gpu_spline_handler->nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
 
     // We've read the segment straight from CPU and is saved in segment_gpu
     // polynomial parameters from the monolithic splineMonolith
-    const float fY = gpu_coeff_many[CurrentKnotPos];
-    const float fB = gpu_coeff_many[CurrentKnotPos+1];
-    const float fC = gpu_coeff_many[CurrentKnotPos+2];
-    const float fD = gpu_coeff_many[CurrentKnotPos+3];
+    const float fY = gpu_spline_handler->coeff_many[CurrentKnotPos];
+    const float fB = gpu_spline_handler->coeff_many[CurrentKnotPos+1];
+    const float fC = gpu_spline_handler->coeff_many[CurrentKnotPos+2];
+    const float fD = gpu_spline_handler->coeff_many[CurrentKnotPos+3];
     // The is the variation itself (needed to evaluate variation - stored spline point = dx)
     const float dx = val_gpu[Param] - tex1Dfetch<float>(text_coeff_x, segment_X);
 
@@ -488,13 +480,10 @@ __global__ void EvalOnGPU_TotWeight(
 // Pass the segment and the parameter values
 // (binary search already performed in samplePDFND::FindSplineSegment()
 __host__ void RunGPU_SplineMonolith(
-    const short int* gpu_paramNo_arr,
-    const unsigned int* gpu_nKnots_arr,
+    const SplineMonoStructGPU* __restrict__ gpu_spline_handler,
 
-    const float *gpu_coeff_many,
-
-    const short int* gpu_paramNo_tf1_arr,
-    const float *gpu_coeff_many_tf1,
+    const short int* __restrict__ gpu_paramNo_tf1_arr,
+    const float *__restrict__ gpu_coeff_many_tf1,
 
     float* gpu_weights,
     float* gpu_weights_tf1,
@@ -531,10 +520,7 @@ __host__ void RunGPU_SplineMonolith(
   // Set the cache config to prefer L1 for the kernel
   //cudaFuncSetCacheConfig(EvalOnGPU_Splines, cudaFuncCachePreferL1);
   EvalOnGPU_Splines<<<grid_size, block_size>>>(
-      gpu_paramNo_arr,
-      gpu_nKnots_arr,
-
-      gpu_coeff_many,
+      gpu_spline_handler,
 
       gpu_weights,
       text_coeff_x
@@ -600,11 +586,7 @@ __host__ void SynchroniseSplines() {
 // *********************************
 // Clean up the {x},{ybcd} arrays
 __host__ void CleanupGPU_SplineMonolith(
-    short int *gpu_paramNo_arr,
-    unsigned int *gpu_nKnots_arr,
-
-    float *gpu_x_array, 
-    float *gpu_many_array,
+    SplineMonoStructGPU* gpu_spline_handler,
 
     float *gpu_many_TF1_array,
     short int* gpu_paramNo_arr_TF1,
@@ -617,14 +599,14 @@ __host__ void CleanupGPU_SplineMonolith(
     float *gpu_weights,
     float *gpu_weights_tf1) {
 // *********************************
-  cudaFree(gpu_paramNo_arr);
-  cudaFree(gpu_nKnots_arr);
+  cudaFree(gpu_spline_handler->paramNo_arr);
+  cudaFree(gpu_spline_handler->nKnots_arr);
 
   // free the coefficient arrays
   cudaDestroyTextureObject(text_coeff_x);
 
-  cudaFree(gpu_x_array);
-  cudaFree(gpu_many_array);
+  cudaFree(gpu_spline_handler->coeff_x);
+  cudaFree(gpu_spline_handler->coeff_many);
 
   cudaFree(gpu_many_TF1_array);
   cudaFree(gpu_paramNo_arr_TF1);
