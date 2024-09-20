@@ -13,7 +13,6 @@
 #include "manager/gpuUtils.cuh"
 #include "splines/SplineCommon.h"
 
-
 /// @brief Make sure all Cuda threads finished execution
 __host__ void SynchroniseSplines();
 
@@ -68,7 +67,11 @@ class SMonolithGPU
     virtual ~SMonolithGPU();
 
     /// @brief Allocate memory on gpu for spline monolith
-    /// @param gpu_x_array Small array with X coefficients at GPU
+    /// @param cpu_total_weights KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
+    /// @param n_events Number of events, this is necessary to allocate correctly memory
+    /// @param total_nknots Total number of knots in all splines summed
+    /// @param n_splines Total number of spline objects, not knots
+    /// @param n_tf1 Total number of TF1 objects, not coefficients
     __host__ void InitGPU_SplineMonolith(
       #ifndef Weight_On_SplineBySpline_Basis
       float **cpu_total_weights,
@@ -79,7 +82,23 @@ class SMonolithGPU
       unsigned int n_tf1,
       int Eve_size);
 
-    /// @brief Copy to GPU for x array and separate ybcd array
+    /// @brief Copies data from CPU to GPU for the spline monolith.
+    ///
+    /// This function transfers the necessary spline data and parameters from the
+    /// CPU to the GPU, including TF1-related arrays and parameters. This setup
+    /// is crucial for spline evaluations on the GPU.
+    ///
+    /// @param cpu_spline_handler Pointer to the structure managing spline data on the CPU.
+    /// @param cpu_many_array_TF1 Array of TF1 parameters on the CPU.
+    /// @param cpu_paramNo_arr_TF1 Array containing parameter numbers for TF1 objects.
+    /// @param n_events Number of events, necessary for correct data handling.
+    /// @param cpu_nParamPerEvent Array indicating the number of parameters per event.
+    /// @param cpu_nParamPerEvent_TF1 Array indicating the number of parameters per TF1 object.
+    /// @param n_params Total number of parameters across all splines.
+    /// @param n_splines Total number of spline objects.
+    /// @param spline_size Size of each spline object.
+    /// @param total_nknots Total number of knots across all splines.
+    /// @param n_tf1 Total number of TF1 objects.
     __host__ void CopyToGPU_SplineMonolith(
       SplineMonoStruct* cpu_spline_handler,
 
@@ -109,6 +128,26 @@ class SMonolithGPU
     /// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
     /// Pass the segment and the parameter values
     /// (binary search already performed in SplineMonolith::FindSplineSegment()
+
+
+
+    /// @brief Executes the GPU code for calculating spline weights.
+    ///
+    /// This function runs the GPU computation for the spline monolith.
+    /// It assumes that the appropriate segment has already been identified
+    /// through binary search in the `SplineMonolith::FindSplineSegment()`
+    /// function.
+    ///
+    /// @param cpu_weights Pointer to the array of weights on the CPU (used if
+    ///        `Weight_On_SplineBySpline_Basis` is defined).
+    /// @param cpu_weights_tf1 Pointer to the array of TF1 weights (used if
+    ///        `Weight_On_SplineBySpline_Basis` is defined).
+    /// @param cpu_total_weights Pointer to the total weights array (used if
+    ///        `Weight_On_SplineBySpline_Basis` is not defined).
+    /// @param vals Pointer to an array holding the parameter values to be processed.
+    /// @param segment Pointer to an array containing segment indices for parameters.
+    /// @param h_n_splines Total number of spline objects in the GPU context.
+    /// @param h_n_tf1 Total number of TF1 objects in the GPU context.
     __host__ void RunGPU_SplineMonolith(
       #ifdef Weight_On_SplineBySpline_Basis
       float* cpu_weights,
@@ -123,7 +162,12 @@ class SMonolithGPU
       const unsigned int h_n_splines,
       const unsigned int h_n_tf1);
 
-    /// @brief Clean up the {x},{ybcd} arrays
+    /// @brief This function deallocates the resources allocated for the
+    /// separate {x} and {ybcd} arrays in the and TF1 stuff at GPU.
+    ///
+    /// @param cpu_total_weights Pointer to the total weights array
+    ///        on the CPU (used if `Weight_On_SplineBySpline_Basis`
+    ///        is not defined).
     __host__ void CleanupGPU_SplineMonolith(
       #ifndef Weight_On_SplineBySpline_Basis
       float *cpu_total_weights

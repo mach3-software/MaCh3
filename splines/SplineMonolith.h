@@ -12,7 +12,10 @@ class SMonolith : public SplineBase {
     /// @brief Constructor
     /// @param MasterSpline Vector of TSpline3 pointers which we strip back
     /// @param SplineType Whether object is TSpline3 or TF1
-    SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
+    /// @param SaveFlatTree Whether we want to save monolith into speedy flat tree
+    SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
+              const std::vector<RespFuncType> &SplineType,
+              const bool SaveFlatTree = false);
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
     SMonolith(std::string FileName);
