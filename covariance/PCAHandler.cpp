@@ -17,6 +17,10 @@ PCAHandler::~PCAHandler() {
 // ********************************************
 void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA, const char* matrixName) {
 // ********************************************
+  FirstPCAdpar = firstPCAd;
+  LastPCAdpar = lastPCAd;
+  eigen_threshold = eigen_thresh;
+  MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
 
   // Check that covariance matrix exists
   if (covMatrix == NULL) {
@@ -47,10 +51,6 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  FirstPCAdpar = firstPCAd;
-  LastPCAdpar = lastPCAd;
-  eigen_threshold = eigen_thresh;
-  MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
   int numunpcadpars = covMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
   TMatrixDSym submat(covMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
