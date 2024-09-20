@@ -117,7 +117,19 @@ covarianceBase::~covarianceBase(){
 void covarianceBase::ConstructPCA() {
 // ********************************************
 
-  PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA, matrixName);
+  //Check whether first and last pcadpar are set and if not just PCA everything
+  if(FirstPCAdpar == -999 || LastPCAdpar == -999){
+    if(FirstPCAdpar == -999 && LastPCAdpar == -999){
+      FirstPCAdpar = 0;
+      LastPCAdpar = covMatrix->GetNrows()-1;
+    }
+    else{
+      MACH3LOG_ERROR("You must either leave FirstPCAdpar and LastPCAdpar at -999 or set them both to something");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
+  PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA);
   // Make a note that we have now done PCA
   pca = true;
 

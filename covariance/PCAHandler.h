@@ -36,7 +36,7 @@ class PCAHandler{
   ~PCAHandler();
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
-  void ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA, const char* matrixName);
+  void ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA);
 
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
