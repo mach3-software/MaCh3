@@ -68,6 +68,7 @@ if(MaCh3_MINUIT2_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE MaCh3_MINUIT2)
 endif()
 
+
 ######################### python binding ##########################
 # EM: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_PYTHON_ENABLED FALSE)

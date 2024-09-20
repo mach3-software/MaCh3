@@ -30,7 +30,7 @@ void covarianceXsec::InitXsecFromConfig() {
 
   _fDetID = std::vector<int>(_fNumPar);
   _fParamType = std::vector<SystType>(_fNumPar);
-  isFlux.resize(_fNumPar);
+  _ParameterGroup = std::vector<std::string>(_fNumPar);
 
   //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
   NormParams.reserve(_fNumPar);
@@ -44,6 +44,7 @@ void covarianceXsec::InitXsecFromConfig() {
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
     _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
+    _ParameterGroup[i] = (param["Systematic"]["ParameterGroup"].as<std::string>());
 
     //Fill the map to get the correlations later as well
     std::string ParamType = param["Systematic"]["Type"].as<std::string>();
@@ -53,11 +54,11 @@ void covarianceXsec::InitXsecFromConfig() {
       //Set param type
       _fParamType[i] = SystType::kSpline;
       // Fill Spline info
-	  SplineParams.push_back(GetXsecSpline(param["Systematic"]));
+      SplineParams.push_back(GetXsecSpline(param["Systematic"]));
 
-	  if (param["Systematic"]["SplineInformation"]["SplineName"]) {
-		_fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
-	  }
+      if (param["Systematic"]["SplineInformation"]["SplineName"]) {
+        _fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
+      }
 
       //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
       //to the Systematic index i.e. the counter for things like _fDetID and _fDetID
@@ -85,19 +86,15 @@ void covarianceXsec::InitXsecFromConfig() {
       MACH3LOG_ERROR(expectedTypes);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-
-	//ETA - we really should change this... good ol' b for flux...
-    if(_fFancyNames[i].find("b_")==0) isFlux[i] = true;
-    else isFlux[i] = false;
     i++;
   }
 
   //Add a sanity check,
   if(_fSplineNames.size() != ParamCounter[kSpline]){
-	MACH3LOG_ERROR("_fSplineNames is of size {} but found {} spline parameters", _fSplineNames.size(), ParamCounter[kSpline]);
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("_fSplineNames is of size {} but found {} spline parameters", _fSplineNames.size(), ParamCounter[kSpline]);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
- 
+  //KS We resized them above to all params to fight memory fragmentation, now let's resize to fit only allocated memory to save RAM
   NormParams.shrink_to_fit();
   SplineParams.shrink_to_fit();
 
@@ -407,18 +404,21 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
 
   MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobablSystIndexMap[kSpline].size());
-  MACH3LOG_INFO("=========================================================================================================================");
-  MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
-  MACH3LOG_INFO("-------------------------------------------------------------------------------------------------------------------------");
+  MACH3LOG_INFO("=====================================================================================================================================================================");
+  MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
+  MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (auto &pair : _fSystToGlobablSystIndexMap[kSpline]) {
     auto &SplineIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", SplineIndex, "|", GetParFancyName(GlobalIndex), "|",
-                  SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|",
-                  GetParSplineKnotLowerBound(SplineIndex), "|", GetParSplineKnotUpperBound(SplineIndex), "|");
-  }
-  MACH3LOG_INFO("=========================================================================================================================");
 
+    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}",
+                  SplineIndex, "|", GetParFancyName(GlobalIndex), "|",
+                  _fSplineNames[SplineIndex], "|",
+                  SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|",
+                  GetParSplineKnotLowerBound(SplineIndex), "|",
+                  GetParSplineKnotUpperBound(SplineIndex), "|");
+  }
+  MACH3LOG_INFO("=====================================================================================================================================================================");
 
   MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobablSystIndexMap[kFunc].size());
   MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
@@ -430,6 +430,20 @@ void covarianceXsec::Print() {
     MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(FuncIndex), GlobalIndex, GetParFancyName(GlobalIndex));
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  // KS: Create a map to store the counts of unique strings, in principle this could be in header file
+  std::unordered_map<std::string, int> paramCounts;
+
+  std::for_each(_ParameterGroup.begin(), _ParameterGroup.end(),
+                [&paramCounts](const std::string& param) {
+                  paramCounts[param]++;
+                });
+
+  MACH3LOG_INFO("Printing parameter groups");
+  // Output the counts
+  for (const auto& pair : paramCounts) {
+    MACH3LOG_INFO("Found {}: {} params", pair.second, pair.first);
+  }
 
   CheckCorrectInitialisation();
 } // End
@@ -458,31 +472,26 @@ void covarianceXsec::CheckCorrectInitialisation() {
 }
 
 // ********************************************
-// Sets the proposed Flux parameters to the prior values
-void covarianceXsec::setFluxOnlyParameters() {
+// Function to set to prior parameters of a given group
+void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
 // ********************************************
   if(!pca) {
     for (int i = 0; i < _fNumPar; i++) {
-      if(isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
+      if(IsParFromGroup(i, Group)) _fPropVal[i] = _fPreFitValue[i];
     }
   } else {
-    MACH3LOG_ERROR("setFluxOnlyParameters not implemented for PCA");
+    MACH3LOG_ERROR("SetGroupOnlyParameters not implemented for PCA");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
 // ********************************************
-// Sets the proposed Flux parameters to the prior values
-void covarianceXsec::setXsecOnlyParameters() {
+// Checks if parameter belongs to a given group
+bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
-  if(!pca) {
-    for (int i = 0; i < _fNumPar; i++) {
-      if(!isFlux[i]) _fPropVal[i] = _fPreFitValue[i];
-    }
-  } else {
-    MACH3LOG_ERROR("setXsecOnlyParameters not implemented for PCA");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
+
+  if(Group == _ParameterGroup[i]) return true;
+  else return false;
 }
 
 // ********************************************
@@ -501,7 +510,6 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   TVectorD* xsec_param_nom = new TVectorD(_fNumPar);
   TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
   TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
-
 
   TVectorD* xsec_param_knot_weight_lb = new TVectorD(_fNumPar);
   TVectorD* xsec_param_knot_weight_ub = new TVectorD(_fNumPar);

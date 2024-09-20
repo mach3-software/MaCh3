@@ -9,6 +9,7 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   start_adaptive_update = 0;
   end_adaptive_update   = 1;
   adaptive_update_step  = 1000;
+  total_steps = 0;
 
   par_means = {};
   adaptive_covariance = nullptr;
@@ -25,7 +26,25 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 // ********************************************
 bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars) {
 // ********************************************
-  //  setAdaptionDefaults();
+  /*
+   * HW: Idea is that adaption can simply read the YAML config
+   * Options :
+   *         External Info:
+   * UseExternalMatrix [bool]     :    Use an external matrix
+   * ExternalMatrixFileName [str] :    Name of file containing external info
+   * ExternalMatrixName [str]     :    Name of external Matrix
+   * ExternalMeansName [str]      :    Name of external means vector [for updates]
+   *
+   *         General Info:
+   * DoAdaption [bool]            :    Do we want to do adaption?
+   * AdaptionStartThrow [int]     :    Step we start throwing adaptive matrix from
+   * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix
+   * AdaptionStartUpdate [int]    :    Do we skip the first N steps?
+   * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
+   * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
+   */
+
+  // setAdaptionDefaults();
   if(!adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]) {
     MACH3LOG_WARN("Adaptive Settings not found for {}, this is fine if you don't want adaptive MCMC", matrix_name_str);
     return false;
@@ -176,9 +195,11 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int steps_post_burn, const int Npars) {
+void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
 // ********************************************
   std::vector<double> par_means_prev = par_means;
+
+  int steps_post_burn = total_steps - start_adaptive_update;
 
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -210,6 +231,36 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
       (*adaptive_covariance)(irow, icol) = cov_val;
     }
   }
+}
+
+// ********************************************
+bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
+// ********************************************
+  if(total_steps == start_adaptive_throw) return true;
+  else return false;
+}
+
+// ********************************************
+bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
+// ********************************************
+  if(total_steps >= start_adaptive_throw &&
+    (total_steps - start_adaptive_throw)%adaptive_update_step == 0) return true;
+  else return false;
+}
+
+// ********************************************
+bool AdaptiveMCMCHandler::SkipAdaption() {
+// ********************************************
+  if(total_steps > end_adaptive_update ||
+    total_steps< start_adaptive_update) return true;
+  else return false;
+}
+
+// ********************************************
+bool AdaptiveMCMCHandler::AdaptionUpdate() {
+// ********************************************
+  if(total_steps <= start_adaptive_throw) return true;
+  else return false;
 }
 
 // ********************************************

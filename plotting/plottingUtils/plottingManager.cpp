@@ -109,7 +109,7 @@ void PlottingManager::parseInputs(int argc, char **argv) {
     }
     case 'h': {
       usage();
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     case 'l': {
       parseFileLabels(optarg, _fileLabels);

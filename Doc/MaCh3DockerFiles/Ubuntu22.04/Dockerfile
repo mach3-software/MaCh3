@@ -11,6 +11,9 @@ RUN apt install -y --no-install-recommends vim less nano gdb csh tcsh ed quota p
 # Declare the build argument
 ARG MACH3_VERSION
 ENV MACH3_VERSION=${MACH3_VERSION:-develop}
+ARG CMAKE_OPTIONS
+ENV CMAKE_OPTIONS=${CMAKE_OPTIONS:-DMaCh3_PYTHON_ENABLED=ON}
+
 ENV MACH3_WORK_DIR=/opt/MaCh3/
 ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 
@@ -24,7 +27,7 @@ RUN git checkout ${MACH3_VERSION}
 
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
-RUN cmake -DMaCh3_PYTHON_ENABLED=ON ${MACH3_WORK_DIR}
+RUN cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
 RUN make VERBOSE=1
 RUN make install
 

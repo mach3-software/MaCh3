@@ -108,12 +108,12 @@ void MaCh3Modes::PrepareMap() {
     for(size_t i = 0; i < fMode[m].GeneratorMaping.size(); ++i) {
       if(fMode[m].GeneratorMaping[i] < 0) {
         MACH3LOG_ERROR("Negative value of Mode {} for mode {}", fMode[m].GeneratorMaping[i], fMode[m].Name);
-        throw;
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       if(ModeMap[fMode[m].GeneratorMaping[i]] != Mode["UNKNOWN_BAD"])
       {
         MACH3LOG_ERROR("Generator mode {} already defined in mode {} can't do this for mode {}", fMode[m].GeneratorMaping[i], fMode[ModeMap[fMode[m].GeneratorMaping[i]]].Name, fMode[m].Name);
-        throw;
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       ModeMap[fMode[m].GeneratorMaping[i]] = m;
     }
