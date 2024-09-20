@@ -13,8 +13,6 @@ void SMonolith::Initialise() {
   MACH3LOG_INFO("Using GPU version event by event monolith");
   gpu_spline_handler = nullptr;
 #endif
-  //KS: If true it will save spline monolith into huge ROOT file
-  SaveSplineFile = false;
 
   cpu_spline_handler = new SplineMonoStruct();
 
@@ -44,10 +42,12 @@ void SMonolith::Initialise() {
 }
 
 // *****************************************
-SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType)
+SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType, const bool SaveFlatTree)
 : SplineBase() {
 // *****************************************
 
+  //KS: If true it will save spline monolith into huge ROOT file
+  SaveSplineFile = SaveFlatTree;
   Initialise();
   MACH3LOG_INFO("-- GPUING WITH arrays and master spline containing TResponseFunction_red");
 
@@ -676,7 +676,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 // Save SplineMonolith into ROOT file
 void SMonolith::PrepareSplineFile() {
 // *****************************************
-  std::string FileName = "inputs/SplineFile.root";
+  std::string FileName = "SplineFile.root";
   if (std::getenv("MACH3") != NULL) {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
    }
