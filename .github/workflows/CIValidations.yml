@@ -43,7 +43,7 @@ jobs:
     - name: Build MaCh3 Validations
       run: |
         cd /opt/MaCh3Validations/build
-        make install # Build the project
+        make -j4 install # Build the project
 
     - name: Validations
       run: |
