@@ -15,8 +15,37 @@ PCAHandler::~PCAHandler() {
 }
 
 // ********************************************
-void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA) {
+void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA, const char* matrixName) {
 // ********************************************
+
+  // Check that covariance matrix exists
+  if (covMatrix == NULL) {
+    MACH3LOG_ERROR("Covariance matrix for {} has not yet been set", matrixName);
+    MACH3LOG_ERROR("Can not construct PCA until it is set");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  //Check whether first and last pcadpar are set and if not just PCA everything
+  if(FirstPCAdpar == -999 || LastPCAdpar == -999){
+    if(FirstPCAdpar == -999 && LastPCAdpar == -999){
+      FirstPCAdpar = 0;
+      LastPCAdpar = covMatrix->GetNrows()-1;
+    }
+    else{
+      MACH3LOG_ERROR("You must either leave FirstPCAdpar and LastPCAdpar at -999 or set them both to something");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+  if(FirstPCAdpar > covMatrix->GetNrows()-1 || LastPCAdpar>covMatrix->GetNrows()-1){
+    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
+    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, covMatrix->GetNrows()-1);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  if(FirstPCAdpar < 0 || LastPCAdpar < 0){
+    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are less than 0 but not default -999");
+    MACH3LOG_ERROR("first: {} last: {}", FirstPCAdpar, LastPCAdpar);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
 
   FirstPCAdpar = firstPCAd;
   LastPCAdpar = lastPCAd;

@@ -117,36 +117,7 @@ covarianceBase::~covarianceBase(){
 void covarianceBase::ConstructPCA() {
 // ********************************************
 
-  // Check that covariance matrix exists
-  if (covMatrix == NULL) {
-    MACH3LOG_ERROR("Covariance matrix for {} has not yet been set", matrixName);
-    MACH3LOG_ERROR("Can not construct PCA until it is set");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  //Check whether first and last pcadpar are set and if not just PCA everything
-  if(FirstPCAdpar == -999 || LastPCAdpar == -999){
-    if(FirstPCAdpar == -999 && LastPCAdpar == -999){
-      FirstPCAdpar = 0;
-      LastPCAdpar = covMatrix->GetNrows()-1;
-    }
-    else{
-      MACH3LOG_ERROR("You must either leave FirstPCAdpar and LastPCAdpar at -999 or set them both to something");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-  }
-  if(FirstPCAdpar > covMatrix->GetNrows()-1 || LastPCAdpar>covMatrix->GetNrows()-1){
-    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
-    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, covMatrix->GetNrows()-1);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  if(FirstPCAdpar < 0 || LastPCAdpar < 0){
-    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are less than 0 but not default -999");
-    MACH3LOG_ERROR("first: {} last: {}", FirstPCAdpar, LastPCAdpar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA);
+  PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA, matrixName);
   // Make a note that we have now done PCA
   pca = true;
 
@@ -199,7 +170,7 @@ void covarianceBase::init(const char *name, const char *file) {
   }
 
   // Not using adaptive by default
-  setAdaptionDefaults();
+  use_adaptive = false;
   // Set the covariance matrix
   size = CovMat->GetNrows();
   _fNumPar = size;
@@ -267,7 +238,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   _fNumPar = _fYAMLDoc["Systematics"].size();
   size = _fNumPar;
 
-  setAdaptionDefaults();
+  use_adaptive = false;
 
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
@@ -401,7 +372,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
     }
   }
 
-  setAdaptionDefaults();
+  use_adaptive = false;
   setCovMatrix(covMat);
 
   ReserveMemory(_fNumPar);
@@ -649,10 +620,7 @@ void covarianceBase::proposeStep() {
   // Make the random numbers for the step proposal
   randomize();
   CorrelateSteps();
-  if(use_adaptive){
-    updateAdaptiveCovariance();
-    total_steps++;
-  }
+  if(use_adaptive) updateAdaptiveCovariance();
 }
 
 // ************************************************
@@ -1191,7 +1159,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  if(total_steps < 2) {
+  if(AdaptiveHandler.total_steps < 2) {
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
   //DB Resetting warning level
@@ -1228,7 +1196,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   }
 
   throwMatrix = (TMatrixDSym*)cov->Clone();
-  if(use_adaptive && total_steps <= AdaptiveHandler.start_adaptive_throw) makeClosestPosDef(throwMatrix);
+  if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) makeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
@@ -1264,37 +1232,10 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
   setThrowMatrix(cov);
 }
 
-
-// ********************************************
-void covarianceBase::setAdaptionDefaults(){
-// ********************************************
-  // Puts adaptive MCMC default attributes somewhere obvious
-  use_adaptive          = false;
-  total_steps           = 0;
-}
-
 // ********************************************
 // HW : Here be adaption
 void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
-  /*
-    HW: Idea is that adaption can simply read the YAML config
-    Options :
-            External Info:
-              * UseExternalMatrix [bool]     :    Use an external matrix
-              * ExternalMatrixFileName [str] :    Name of file containing external info
-              * ExternalMatrixName [str]     :    Name of external Matrix
-              * ExternalMeansName [str]      :    Name of external means vector [for updates]
-
-            General Info:
-              * DoAdaption [bool]            :    Do we want to do adaption?
-              * AdaptionStartThrow [int]     :    Step we start throwing adaptive matrix from
-              * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix
-              * AdaptionStartUpdate [int]    :    Do we skip the first N steps?
-              * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
-              * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
- */
-
   // need to cast matrixName to string
   std::string matrix_name_str(matrixName);
 
@@ -1331,21 +1272,21 @@ void covarianceBase::updateAdaptiveCovariance(){
   // First we update the total means
 
   // Skip this if we're at a large number of steps
-  if(total_steps>AdaptiveHandler.end_adaptive_update || total_steps<AdaptiveHandler.start_adaptive_update) return;
+  if(AdaptiveHandler.SkipAdaption()) return;
 
-  int steps_post_burn = total_steps - AdaptiveHandler.start_adaptive_update;
   // Call main adaption function
-  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, steps_post_burn, _fNumPar);
+  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
 
   //This is likely going to be the slow bit!
-  if(total_steps == AdaptiveHandler.start_adaptive_throw) {
+  if(AdaptiveHandler.IndivStepScaleAdapt()) {
     resetIndivStepScale();
   }
 
-  if(total_steps >= AdaptiveHandler.start_adaptive_throw && (total_steps-AdaptiveHandler.start_adaptive_throw)%AdaptiveHandler.adaptive_update_step==0) {
+  if(AdaptiveHandler.UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
   }
+  AdaptiveHandler.total_steps++;
 }
 
 // ********************************************
@@ -1441,7 +1382,6 @@ TH2D* covarianceBase::GetCorrelationMatrix() {
 // KS: After step scale, prefit etc. value were modified save this modified config.
 void covarianceBase::SaveUpdatedMatrixConfig() {
 // ********************************************
-
   if (!_fYAMLDoc)
   {
     MACH3LOG_CRITICAL("Yaml node hasn't been initialised for matrix {}, something is not right", matrixName);
