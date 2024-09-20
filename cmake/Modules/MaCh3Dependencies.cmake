@@ -88,7 +88,7 @@ else()
   CPMFindPackage(
     NAME CUDAProb3
     GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-    GIT_TAG "feature_cleanup"
+    GIT_TAG "main"
     DOWNLOAD_ONLY YES
   )
   LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")

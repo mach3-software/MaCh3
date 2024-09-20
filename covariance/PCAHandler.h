@@ -25,6 +25,7 @@
 #endif
 
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
 class PCAHandler{
  public:
 
@@ -35,7 +36,6 @@ class PCAHandler{
   ~PCAHandler();
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
-  /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
   void ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA);
 
   #ifdef DEBUG_PCA

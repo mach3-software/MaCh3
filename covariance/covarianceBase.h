@@ -12,7 +12,6 @@
 #define _LARGE_LOGL_ 1234567890.0
 #endif
 
-
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 class covarianceBase {
@@ -164,30 +163,41 @@ class covarianceBase {
   void updateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
   inline void setNumberOfSteps(const int nsteps) {
-    total_steps = nsteps;
-    if(total_steps >= AdaptiveHandler.start_adaptive_throw) resetIndivStepScale();
+    AdaptiveHandler.total_steps = nsteps;
+    if(AdaptiveHandler.AdaptionUpdate()) resetIndivStepScale();
   }
 
+  /// @brief Get matrix used for step proposal
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
+  /// @brief Get the Cholesky decomposition of the throw matrix
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
+  /// @brief Get the parameter means used in the adaptive handler
   inline std::vector<double> getParameterMeans(){return AdaptiveHandler.par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
+  /// @details This function converts the covariance matrix to a correlation matrix and
+  ///          returns a TH2D object, which can be used for advanced plotting purposes.
+  /// @return A pointer to a TH2D object representing the correlation matrix
   TH2D* GetCorrelationMatrix();
 
-  //========
-  //ETA - This might be a bit squiffy? If the vector gots moved from say a
-  //push_back then the pointer is no longer valid... maybe need a better 
-  //way to deal with this? It was fine before when the return was to an 
-  //element of a new array. There must be a clever C++ way to be careful
-  //========
   /// @brief DB Pointer return to param position
+  ///
+  /// @param iParam The index of the parameter in the vector.
+  /// @return A pointer to the parameter value at the specified index.
+  ///
+  /// @warning ETA - This might be a bit squiffy? If the vector gots moved from say a
+  /// push_back then the pointer is no longer valid... maybe need a better
+  /// way to deal with this? It was fine before when the return was to an
+  /// element of a new array. There must be a clever C++ way to be careful
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
   /// @brief Get total number of parameters
-  inline int    GetNumParams()               {return _fNumPar;}
+  inline int  GetNumParams() {return _fNumPar;}
+  /// @brief Get the nominal array for parameters.
   virtual std::vector<double> getNominalArray();
+  /// @brief Get the pre-fit values of the parameters.
   std::vector<double> getPreFitValues(){return _fPreFitValue;}
+  /// @brief Get the generated values of the parameters.
   std::vector<double> getGeneratedValues(){return _fGenerated;}
   /// @brief Get vector of all proposed parameter values
   std::vector<double> getProposed() const;
@@ -376,9 +386,6 @@ protected:
   /// @brief Handy function to return 1 for any systs
   const double* ReturnUnity(){return &Unity;}
 
-  /// @brief sets default values for adaptive MCMC parameters
-  void setAdaptionDefaults();
-
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
   /// @param matrix_name name of matrix in file
@@ -477,8 +484,6 @@ protected:
 
   /// Are we using AMCMC?
   bool use_adaptive;
-  /// Total number of MCMC steps
-  int total_steps;
 
   /// Struct containing information about PCA
   PCAHandler PCAObj;

@@ -45,13 +45,22 @@ class AdaptiveMCMCHandler{
                               bool& use_adaptive,
                               const int Npars);
 
-
-
-
   /// @brief Method to update adaptive MCMC
   /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
   /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
-  void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int steps_post_burn, const int Npars);
+  void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars);
+
+  /// @brief Tell whether we want reset step scale or not
+  bool IndivStepScaleAdapt();
+
+  /// @brief Tell whether matrix should be updated
+  bool UpdateMatrixAdapt();
+
+  /// @brief To be fair not a clue...
+  bool AdaptionUpdate();
+
+  /// @brief Tell if we are Skipping Adaption
+  bool SkipAdaption();
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -78,6 +87,9 @@ class AdaptiveMCMCHandler{
 
   /// Full adaptive covariance matrix
   TMatrixDSym* adaptive_covariance;
+
+  /// Total number of MCMC steps
+  int total_steps;
 };
 
 } // adaptive_mcmc namespace
