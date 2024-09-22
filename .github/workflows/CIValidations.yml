@@ -59,11 +59,12 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
         ${{ matrix.first_test }}
-        # Perform second test only if exist
-        if [ -n "${{ matrix.second_test }}" ]; then
+        # Run the second test if it is defined
+        if [[ ! -z "${{ matrix.second_test }}" ]]; then
             ${{ matrix.second_test }}
         fi
-        # Perform second test only if exist
-        if [ -n "${{ matrix.third_test }}" ]; then
+
+        # Run the third test if it is defined
+        if [[ ! -z "${{ matrix.third_test }}" ]]; then
             ${{ matrix.third_test }}
         fi
