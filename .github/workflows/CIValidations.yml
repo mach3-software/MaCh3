@@ -21,9 +21,17 @@ jobs:
       fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
-          - name: SplineValidations
-          - name: CovarianceValidations
-          - name: FitterValidations
+          - name: Spline Validations
+            first_test: Apps/SplineValidations
+          - name: Covariance Validations
+            first_test: Apps/CovarianceValidations
+          - name: Fitter Validations
+            first_test: Apps/FitterValidations
+            second_test: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
+            third_test: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
+            #second_test: bin/GetPostfitParamPlots -o Test_Process.root -c Inputs/PlottingConfig.yaml
+            #second_test: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
@@ -50,4 +58,12 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
-        Apps/${{ matrix.name }}
+        ${{ matrix.first_test }}
+        # Perform second test only if exist
+        if [ -n "${{ matrix.second_test }}" ]; then
+            ${{ matrix.second_test }}
+        fi
+        # Perform second test only if exist
+        if [ -n "${{ matrix.third_test }}" ]; then
+            ${{ matrix.third_test }}
+        fi
