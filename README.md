@@ -1,10 +1,10 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the DUNE and HK oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
+The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the [DUNE](https://www.dunescience.org/) and [HK](https://www-sk.icrr.u-tokyo.ac.jp/en/hk/) oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
 
 The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
-[![Release - v1.1.0](https://img.shields.io/badge/Release-v1.1.0-2ea44f)](https://github.com/mach3-software/MaCh3/releases)
+[![Release](https://img.shields.io/github/release/mach3-software/MaCh3.svg)](https://github.com/mach3-software/MaCh3/releases/latest)
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
@@ -23,7 +23,7 @@ MaCh3 follows standard cmake pattern. By default you should get most optimal bui
 mkdir build;
 cd build;
 cmake ../
-make -jN [set number of threads]
+make -jN [Where N is number of threads]
 make install
 ```
 
@@ -148,7 +148,19 @@ Based on several test here are recommended version:
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
 
-# How To Use
+# Help and Guidelines
+- [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
+- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
+- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
+- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
+
+## Plotting and Diagnostic
+Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
+The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.
+
+## How To Use
 This is an example how your executable can look like using MaCh3:
 ```
   manager *fitMan = nullptr; //Manager is responsible for reading from config
@@ -167,14 +179,3 @@ This is an example how your executable can look like using MaCh3:
   markovChain->RunLLHScan(); // can run LLH scan
   markovChain->runMCMC(); //or run actual fit
 ```
-
-## Help and Guidelines
-- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
-- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
-- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
-- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
-- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
-
-### Plotting and Diagnostic
-Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
-The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.
