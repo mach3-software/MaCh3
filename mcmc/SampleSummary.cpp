@@ -7,7 +7,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
 
   MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD
-  std::cout << "with OpenMP and " << omp_get_max_threads() << " threads" << std::endl;
+  MACH3LOG_DEBUG("With OpenMP and {} threads", omp_get_max_threads());
   #endif
   
   StandardFluctuation = true;
@@ -297,10 +297,10 @@ bool SampleSummary::CheckSamples(int Length) {
 // *******************
   bool ok = (nSamples == Length);
   if (!ok) {
-    std::cerr << "Size of SampleVector input != number of defined samples" << std::endl;
-    std::cout << "Size of SampleVector: " << Length << std::endl;
-    std::cout << "Size of defined samples: " << nSamples << std::endl;
-    std::cerr << "Something has gone wrong with making the Samples" << std::endl;
+    MACH3LOG_ERROR("Size of SampleVector input != number of defined samples");
+    MACH3LOG_ERROR("Size of SampleVector:  {}", Length);
+    MACH3LOG_ERROR("Size of defined samples:  {}", nSamples);
+    MACH3LOG_ERROR("Something has gone wrong with making the Samples");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return ok;
@@ -330,8 +330,8 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
         DataHist_ProjectY[i] = ProjectPoly(DataHist[i], false, i);
         maxBins[i] = DataHist[i]->GetNumberOfBins();
       } else {
-        std::cerr<<"Somehow sample "<<SamplePDF->GetSampleName(i)<<"doesn't use TH2Poly"<<std::endl;
-        std::cerr<<"Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future"<<std::endl;
+        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SamplePDF->GetSampleName(i));
+        MACH3LOG_ERROR("Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
@@ -764,7 +764,7 @@ void SampleSummary::Write() {
   timer.Start();
   MakePredictive();
   timer.Stop();
-  std::cout << "Made Prior/Posterior Predictive, it took " << timer.RealTime() << "s" <<", now writing..." << std::endl;
+  MACH3LOG_INFO("Made Prior/Posterior Predictive, it took {}s, now writing...", timer.RealTime());
 
   // Study Bayesian Information Criterion
   StudyBIC();
@@ -1057,8 +1057,7 @@ void SampleSummary::Write() {
     delete W2NomProjectY;
     delete W2MeanProjectY;
     delete W2ModeProjectY;
-    
-    std::cout << std::endl;
+    MACH3LOG_INFO("");
   } //end loop over samples
   delete[] DataHist_ProjectX;
   delete[] DataHist_ProjectY;
@@ -1211,7 +1210,7 @@ void SampleSummary::MakePredictive() {
 
   llh_total = llh_total_temp;
   // Now we have our posterior predictive histogram and it's LLH
-  std::cout << "Prior/Posterior predictive LLH mean (sample only) = " << llh_total << std::endl;
+  MACH3LOG_INFO("Prior/Posterior predictive LLH mean (sample only) = {}", llh_total);
   std::stringstream ss;
   ss << llh_total;
   lnLHist->SetTitle((std::string(lnLHist->GetTitle())+"_"+ss.str()).c_str());
@@ -1516,8 +1515,7 @@ void SampleSummary::MakeChi2Hists() {
   } // End loop over throws
 
   AveragePenalty = AveragePenalty/double(nThrows);
-  std::cout << "Average LLH penalty over toys is " << AveragePenalty << std::endl;
-
+  MACH3LOG_INFO("Average LLH penalty over toys is {:.2f}", AveragePenalty);
   // Calculate exact p-value instead of binned
   unsigned int Accept_PredFluc = 0;
   unsigned int Accept_DrawFluc = 0;
@@ -1529,8 +1527,8 @@ void SampleSummary::MakeChi2Hists() {
   const double pvalue_DrawFluc = double(Accept_DrawFluc)/double(nThrows);
   const double pvalue_PredFluc = double(Accept_PredFluc)/double(nThrows);
 
-  std::cout << "Calculated exact p-value using Fluctuation of Draw: "       << pvalue_DrawFluc << std::endl;
-  std::cout << "Calculated exact p-value using Fluctuation of Prediction: " << pvalue_PredFluc << std::endl;
+  MACH3LOG_INFO("Calculated exact p-value using Fluctuation of Draw: {:.2f}", pvalue_DrawFluc);
+  MACH3LOG_INFO("Calculated exact p-value using Fluctuation of Prediction: {:.2f}", pvalue_PredFluc);
 }
 
 // *******************
@@ -1774,7 +1772,7 @@ void SampleSummary::CalcLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D 
   std::stringstream ss;
   ss << "_2LLH=" << llh;
   MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
-  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << DatHist->Integral() << std::setw(10) << MCHist->Integral() << std::setw(10) << llh << std::endl;
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), DatHist->Integral(), MCHist->Integral(), llh);
 }
 
 // ****************
@@ -1785,7 +1783,7 @@ void SampleSummary::CalcLLH(TH2Poly * const & DatHist, TH2Poly * const & MCHist,
   std::stringstream ss;
   ss << "_2LLH=" << llh;
   MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
-  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << NoOverflowIntegral(DatHist) << std::setw(10) << NoOverflowIntegral(MCHist) << std::setw(10) << llh << std::endl;
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), NoOverflowIntegral(DatHist), NoOverflowIntegral(MCHist), llh);
 }
 
 // ****************
@@ -1826,7 +1824,7 @@ void SampleSummary::PlotBetaParameters() {
   TDirectory *BetaDir = Outputfile->mkdir("BetaParameters");
   BetaDir->cd();
 
-  std::cout<<"Writing Beta parameters"<<std::endl;
+  MACH3LOG_INFO("Writing Beta parameters");
   TDirectory **DirBeta = new TDirectory*[nSamples];
   for (_int_ i = 0; i < nSamples; ++i)
   {
@@ -2385,8 +2383,7 @@ void SampleSummary::StudyKinematicCorrelations() {
   delete CorrDir;
 
   timer.Stop();
-  std::cout << "Calculating correlations took " << timer.RealTime() << "s" << std::endl;
-
+  MACH3LOG_INFO("Calculating correlations took  {:.2f}s", timer.RealTime());
   Outputfile->cd();
 }
 
@@ -2624,11 +2621,11 @@ void SampleSummary::StudyBIC(){
 
   const double EventRateBIC = GetBIC(llh_total, DataRate, nModelParams);
   const double BinBasedBIC = GetBIC(llh_total, BinsRate, nModelParams);
-  std::cout << "******************************" << std::endl;
-  std::cout << "Calculated Bayesian Information Criterion using global number of events: " << EventRateBIC << std::endl;
-  std::cout << "Calculated Bayesian Information Criterion using global number of bins: " << BinBasedBIC << std::endl;
-  std::cout << "Additional info: nModelParams "<<nModelParams<<" DataRate: "<<DataRate<<" BinsRate: "<<BinsRate<<std::endl;
-  std::cout << "******************************" << std::endl;
+  MACH3LOG_INFO("******************************");
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of events: {:.2f}", EventRateBIC);
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of bins: {:.2f}", BinBasedBIC);
+  MACH3LOG_INFO("Additional info: nModelParams {} DataRate: {:.2f} BinsRate: {:.2f}", nModelParams, DataRate, BinsRate);
+  MACH3LOG_INFO("******************************");
 }
 
 // ****************
@@ -2661,10 +2658,9 @@ void SampleSummary::StudyDIC() {
 
   //Actual test stat
   const double DIC_stat = Dhat + 2 * p_D;
-  std::cout<<"Effective number of parameters following DIC formalism is equal to "<< p_D <<std::endl;
-  std::cout<<"DIC test statistic = "<< DIC_stat <<std::endl;
-  std::cout << "******************************" << std::endl;
-
+  MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
+  MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
+  MACH3LOG_INFO("******************************");
   return;
 }
 
