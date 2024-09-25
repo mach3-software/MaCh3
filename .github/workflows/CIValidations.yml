@@ -38,6 +38,11 @@ jobs:
             #fourth_test: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
             #fifth_test: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
 
+          - name: NuMCMC Tools Validations
+            first_test: Apps/NuMCMCvalidations.sh
+            second_test: empty
+            third_test: empty
+
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
