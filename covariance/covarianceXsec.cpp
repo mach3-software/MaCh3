@@ -26,7 +26,7 @@ covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, const c
 // ********************************************
 void covarianceXsec::InitXsecFromConfig() {
 // ********************************************
-  _fSystToGlobablSystIndexMap.resize(kSystTypes);
+  _fSystToGlobalSystIndexMap.resize(kSystTypes);
 
   _fDetID = std::vector<int>(_fNumPar);
   _fParamType = std::vector<SystType>(_fNumPar);
@@ -62,17 +62,17 @@ void covarianceXsec::InitXsecFromConfig() {
 
       //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
       //to the Systematic index i.e. the counter for things like _fDetID and _fDetID
-      _fSystToGlobablSystIndexMap[kSpline].insert(std::make_pair(ParamCounter[kSpline], i));
+      _fSystToGlobalSystIndexMap[kSpline].insert(std::make_pair(ParamCounter[kSpline], i));
       ParamCounter[kSpline]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
       _fParamType[i] = SystType::kNorm;
       NormParams.push_back(GetXsecNorm(param["Systematic"], i));
-      _fSystToGlobablSystIndexMap[kNorm].insert(std::make_pair(ParamCounter[kNorm], i));
+      _fSystToGlobalSystIndexMap[kNorm].insert(std::make_pair(ParamCounter[kNorm], i));
       ParamCounter[kNorm]++;
     }
     else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
       _fParamType[i] = SystType::kFunc;
-      _fSystToGlobablSystIndexMap[kFunc].insert(std::make_pair(ParamCounter[kFunc], i));
+      _fSystToGlobalSystIndexMap[kFunc].insert(std::make_pair(ParamCounter[kFunc], i));
       ParamCounter[kFunc]++;
     }
     else{
@@ -112,7 +112,7 @@ covarianceXsec::~covarianceXsec() {
 const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const int DetID) {
 // ********************************************
   std::vector<std::string> returnVec;
-  for (auto &pair : _fSystToGlobablSystIndexMap[kSpline]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID )){
@@ -129,7 +129,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
   //Should probably just make a std::map<std::string, int> for param name to FD spline index
-  for (auto &pair : _fSystToGlobablSystIndexMap[kSpline]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
@@ -196,13 +196,11 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
 
 // ********************************************
 // Grab the global syst index for the relevant DetID
-// i.e. get a vector of size nSplines where each entry is filled with
-// the global syst number
+// i.e. get a vector of size nSplines where each entry is filled with the global syst number
 const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
-
-  for (auto &pair : _fSystToGlobablSystIndexMap[Type]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
@@ -213,13 +211,11 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int Det
 
 // ********************************************
 // Grab the global syst index for the relevant DetID
-// i.e. get a vector of size nSplines where each entry is filled with
-// the global syst number
+// i.e. get a vector of size nSplines where each entry is filled with the global syst number
 const std::vector<int> covarianceXsec::GetSystIndexFromDetID(int DetID,  const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
-
-  for (auto &pair : _fSystToGlobablSystIndexMap[Type]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
@@ -259,35 +255,26 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const int Det
 // ********************************************
   std::vector<XsecNorms4> returnVec;
   int norm_counter = 0;
-
-  for (int i = 0; i < _fNumPar; ++i) {
-    if (GetParamType(i) == kNorm) { //If parameter is implemented as a normalisation
-      if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-        //KS: Make Copy of XsecNorms4
-        XsecNorms4 Temp = NormParams[norm_counter];
-        //Add this parameter to the vector of parameters
-        returnVec.push_back(Temp);
-      }
+  IterateOverParams(DetID,
+    [&](int i) { return GetParamType(i) == kNorm; }, // Filter condition
+    [&](auto) {
+      XsecNorms4 Temp = NormParams[norm_counter];
+      returnVec.push_back(Temp);
       norm_counter++;
     }
-  }
+  );
   return returnVec;
 }
-
 
 // ********************************************
 // DB Grab the number of parameters for the relevant DetID
 int covarianceXsec::GetNumParamsFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   int returnVal = 0;
-
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (GetParamType(i) == Type) { //If parameter is implemented as a functional parameter
-        returnVal += 1;
-      }
-    }
-  }
+  IterateOverParams(DetID,
+    [&](int i) { return GetParamType(i) == Type; }, // Filter condition
+    [&](int) { returnVal += 1; } // Action to perform if filter passes
+  );
   return returnVal;
 }
 
@@ -296,14 +283,10 @@ int covarianceXsec::GetNumParamsFromDetID(const int DetID, const SystType Type) 
 const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   std::vector<std::string> returnVec;
-
-  for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (GetParamType(i) == Type) { //If parameter is implemented as a functional param
-        returnVec.push_back(GetParFancyName(i));
-      }
-    }
-  }
+  IterateOverParams(DetID,
+    [&](int i) { return GetParamType(i) == Type; }, // Filter condition
+    [&](int i) { returnVec.push_back(GetParFancyName(i)); } // Action to perform if filter passes
+  );
   return returnVec;
 }
 
@@ -312,15 +295,22 @@ const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const int D
 const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const int DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
+  IterateOverParams(DetID,
+    [&](int i) { return GetParamType(i) == Type; }, // Filter condition
+    [&](int i) { returnVec.push_back(i); } // Action to perform if filter passes
+  );
+  return returnVec;
+}
 
+// ********************************************
+template <typename FilterFunc, typename ActionFunc>
+void covarianceXsec::IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action) {
+// ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID)) { //If parameter applies to required DetID
-      if (GetParamType(i) == Type) { //If parameter is implemented as a functional param
-        returnVec.push_back(i);
-      }
+    if ((GetParDetID(i) & DetID) && filter(i)) { // Common filter logic
+      action(i); // Specific action for each function
     }
   }
-  return returnVec;
 }
 
 // ********************************************
@@ -359,6 +349,26 @@ void covarianceXsec::Print() {
   MACH3LOG_INFO("#################################################");
   MACH3LOG_INFO("Printing covarianceXsec:");
 
+  PrintGlobablInfo();
+
+  PrintNormParams();
+
+  PrintSplineParams();
+
+  PrintFunctionalParams();
+
+  PrintParameterGroups();
+
+  MACH3LOG_INFO("Finished");
+  MACH3LOG_INFO("#################################################");
+
+  CheckCorrectInitialisation();
+} // End
+
+
+// ********************************************
+void covarianceXsec::PrintGlobablInfo() {
+// ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
   MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -367,9 +377,14 @@ void covarianceXsec::Print() {
     MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", SystType_ToString(_fParamType[i]));
   }
   MACH3LOG_INFO("============================================================================================================================================================");
+}
 
+// ********************************************
+void covarianceXsec::PrintNormParams() {
+// ********************************************
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
+  if(_fSystToGlobalSystIndexMap[kNorm].size() == 0) return;
 
   //KS: Consider making some class producing table..
   MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────┬────────────────────┐");
@@ -402,12 +417,17 @@ void covarianceXsec::Print() {
     MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
+}
 
-  MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobablSystIndexMap[kSpline].size());
+// ********************************************
+void covarianceXsec::PrintSplineParams() {
+// ********************************************
+  MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobalSystIndexMap[kSpline].size());
+  if(_fSystToGlobalSystIndexMap[kSpline].size() == 0) return;
   MACH3LOG_INFO("=====================================================================================================================================================================");
   MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
   MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-  for (auto &pair : _fSystToGlobablSystIndexMap[kSpline]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[kSpline]) {
     auto &SplineIndex = pair.first;
     auto &GlobalIndex = pair.second;
 
@@ -419,18 +439,27 @@ void covarianceXsec::Print() {
                   GetParSplineKnotUpperBound(SplineIndex), "|");
   }
   MACH3LOG_INFO("=====================================================================================================================================================================");
+}
 
-  MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobablSystIndexMap[kFunc].size());
+// ********************************************
+void covarianceXsec::PrintFunctionalParams() {
+// ********************************************
+  MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[kFunc].size());
+  if(_fSystToGlobalSystIndexMap[kFunc].size() == 0) return;
   MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
   MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
   MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
-  for (auto &pair : _fSystToGlobablSystIndexMap[kFunc]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[kFunc]) {
     auto &FuncIndex = pair.first;
     auto &GlobalIndex = pair.second;
     MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(FuncIndex), GlobalIndex, GetParFancyName(GlobalIndex));
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+}
 
+// ********************************************
+void covarianceXsec::PrintParameterGroups() {
+// ********************************************
   // KS: Create a map to store the counts of unique strings, in principle this could be in header file
   std::unordered_map<std::string, int> paramCounts;
 
@@ -444,14 +473,12 @@ void covarianceXsec::Print() {
   for (const auto& pair : paramCounts) {
     MACH3LOG_INFO("Found {}: {} params", pair.second, pair.first);
   }
-
-  CheckCorrectInitialisation();
-} // End
+}
 
 // ********************************************
 // KS: Check if matrix is correctly initialised
 void covarianceXsec::CheckCorrectInitialisation() {
-  // ********************************************
+// ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
   auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
     std::unordered_map<std::string, int> seenStrings;
@@ -543,7 +570,7 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
     (*xsec_param_knot_weight_ub)[i] = +9999;
   }
 
-  for (auto &pair : _fSystToGlobablSystIndexMap[kSpline]) {
+  for (auto &pair : _fSystToGlobalSystIndexMap[kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
 
@@ -596,4 +623,3 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
 
   MACH3LOG_INFO("Finished dumping covariance object");
 }
-

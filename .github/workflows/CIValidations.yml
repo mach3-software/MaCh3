@@ -27,7 +27,7 @@ jobs:
             third_test: empty
           - name: Covariance Validations
             first_test: Apps/CovarianceValidations
-            second_test: empty
+            second_test: Apps/MaCh3ModeValidations
             third_test: empty
 
           - name: Fitter Validations
