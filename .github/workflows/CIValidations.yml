@@ -22,26 +22,26 @@ jobs:
       matrix:
         include:
           - name: Spline Validations
-            tests: [ "Apps/SplineValidations" ]
+            tests: ["Apps/SplineValidations"]
 
           - name: Covariance Validations
-            tests: [ "Apps/CovarianceValidations",
-                     "Apps/MaCh3ModeValidations" ]
+            tests: ["Apps/CovarianceValidations", "Apps/MaCh3ModeValidations"]
 
           - name: Fitter Validations
-            tests: [ "Apps/FitterValidations",
-                     "./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root",
-                     "./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml",
-                     "./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml",
-                     "./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root",
-                     "./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root"
-                     # TODO
-                     # bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
-                     # bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
-                   ]
+            tests: [
+              "Apps/FitterValidations",
+              "./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root",
+              "./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml",
+              "./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml",
+              "./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root",
+              "./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root"
+              # TODO
+              # bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
+              # bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+            ]
 
           - name: NuMCMC Tools Validations
-            tests: [ "Apps/NuMCMCvalidations.sh" ]
+            tests: ["Apps/NuMCMCvalidations.sh"]
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
@@ -64,14 +64,16 @@ jobs:
         make -j4 install # Build the project
 
     - name: Run Validations
-      shell: bash
       run: |
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
 
+
         # Loop over the tests in matrix and run each one
-        for test in "${{ matrix.tests[@] }}"; do
-          echo "Running Test: $test"
-          eval "$test"
+        for cmd in "${{ matrix.tests }}"; do
+            echo "Running command: $cmd"
+            eval "$cmd"
         done
+
+
