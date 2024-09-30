@@ -37,11 +37,11 @@ jobs:
             test_3: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
             test_4: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
             test_5: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
-            test_7: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
+            test_6: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
 
             # TODO
-            #test_8: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
-            #test_9: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+            #test_7: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
+            #test_8: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
 
           - name: NuMCMC Tools Validations
             ntests: 1
@@ -74,8 +74,10 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
 
-        for i in 1
-          echo "Running test $i: ${{ matrix.test_${{ i }} }}"
-          eval ${{ matrix.test_${{ i }} }}
-        done
+        ${{ matrix.test_1 }}
+
+        #for i in 1
+        #  echo "Running test $i: ${{ matrix.test_${{ i }} }}"
+        #  eval ${{ matrix.test_${{ i }} }}
+        #done
 
