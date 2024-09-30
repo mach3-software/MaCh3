@@ -271,5 +271,5 @@ int main(int argc, char *argv[])
   SetMaCh3LoggerFormat();
   ParseArg(argc, argv);
   CombineChain();
-  return 1;
+  return 0;
 }
