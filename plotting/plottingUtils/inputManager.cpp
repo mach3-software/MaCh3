@@ -427,8 +427,6 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
       double prior, priorError; // <- will be discarded
       inputFileDef.mcmcProc->GetNthParameter(paramIdx, prior, priorError, title);
 
-      std::cout << "      " << title << std::endl;
-
       if ( strEndsWith(title.Data(), specificName) )
       {
         wasFound = true;
