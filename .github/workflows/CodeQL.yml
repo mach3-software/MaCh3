@@ -1,3 +1,5 @@
+# This scans MaCh3 and tries to find vulnerabilities
+
 name: "CodeQL C++ Analysis"
 
 on:

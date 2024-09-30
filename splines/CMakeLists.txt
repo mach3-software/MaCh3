@@ -4,6 +4,7 @@ set(HEADERS
     SplineMonolith.h
     SplineCommon.h
     SplineStructs.h
+    gpuSplineUtils.cuh
 )
 
 add_library(Splines SHARED
@@ -12,6 +13,11 @@ add_library(Splines SHARED
     SplineMonolith.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>
 )
+
+ROOT_GENERATE_DICTIONARY(MaCh3SplineDict
+    ${CMAKE_CURRENT_SOURCE_DIR}/SplineCommon.h
+    LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/MaCh3SplinesLinkDef.h
+    OPTIONS -p)
 
 if(NOT CPU_ONLY)
     set_target_properties(Splines PROPERTIES CUDA_SEPARABLE_COMPILATION ON)

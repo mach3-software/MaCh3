@@ -1,3 +1,5 @@
+# Check if MaCh3 compiles correctly
+
 name: Build CI
 
 # The events that trigger the workflow
@@ -16,23 +18,30 @@ jobs:
       fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
-          - os: Ubuntu22.04
-            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
-            tag: ubuntu22.04latest
           - os: Alma9
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
+          - os: Alma9 Debug
+            file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
+            tag: alma9debuglatest
+            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON
+          - os: Ubuntu22.04
+            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
+            tag: ubuntu22.04latest
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
           - os: Fedora32
             file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
             tag: fedora32latest
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
 
     name: Build CI ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Build the Docker image
-      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION=${{ github.head_ref }}
+      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION=${{ github.head_ref }} --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"

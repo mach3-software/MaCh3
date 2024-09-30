@@ -6,6 +6,7 @@
 
 // C++ includes
 #include <complex>
+#include <cstdio>
 
 // ROOT includes
 #include "TObjArray.h"
@@ -18,7 +19,6 @@
 #include "TString.h"
 #include "TH1.h"
 #include "TH2.h"
-#include "TF1.h"
 #include "TGraphErrors.h"
 #include "TVectorD.h"
 #include "TColor.h"
@@ -40,11 +40,11 @@
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
+class TF1;
 
-// TODO
-// Apply reweighted weight to plotting and Bayes Factor
-// 2D Reweighing like DayaBay
-// Implement Diagnostics/GetPenaltyTerm.cpp here
+/// @todo KS: Apply reweighted weight to plotting and Bayes Factor.
+/// @todo KS: Implement 2D reweighing like DayaBay.
+/// @todo KS: Implement Diagnostics/GetPenaltyTerm.cpp here.
 
 /// KS: Enum for different covariance classes
 enum ParameterEnum {
@@ -79,6 +79,7 @@ class MCMCProcessor {
     /// @param Mute Allow silencing many messages, especially important if we calculate matrix many times
     void MakeCovariance_MP(const bool Mute = false);
     /// @brief Make and Draw SubOptimality
+    /// \cite roberts2009adaptive
     void MakeSubOptimality(const int NIntervals = 10);
 
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
@@ -152,6 +153,12 @@ class MCMCProcessor {
                        const std::vector<double>& NewCentral,
                        const std::vector<double>& NewError);
     
+    /// @brief Make .gif of parameter evolution
+    /// @param ParName Parameter names for which we do .gif
+    /// @param NIntervals Number of intervals for a gif
+    void ParameterEvolution(const std::vector<std::string>& Names,
+                            const std::vector<int>& NIntervals);
+
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     
@@ -177,10 +184,10 @@ class MCMCProcessor {
     inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
-    inline std::vector<std::string> const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    inline std::string const & GetNDCov() const { return CovPos[kNDPar].back(); };
-    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar].back(); };
-    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar].back(); };
+    inline std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
+    inline std::string GetNDCov() const { return CovPos[kNDPar].back(); };
+    inline std::string GetFDCov() const { return CovPos[kFDDetPar].back(); };
+    inline std::vector<std::string> GetOscCov()   const { return CovPos[kOSCPar]; };
 
     /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
@@ -273,23 +280,30 @@ class MCMCProcessor {
     inline void ParamTraces();
     /// @brief KS: Calculate autocorrelations supports both OpenMP and CUDA :)
     inline void AutoCorrelation();
-    /// @brief KS: calc Effective Sample Size Following https://mc-stan.org/docs/2_18/reference-manual/effective-sample-size-section.html
+    /// @brief KS: calc Effective Sample Size
     /// @param nLags Should be the same nLags as used in AutoCorrelation()
     /// @param LagL Value of LagL for each dial and each Lag
     ///
     /// This function computes the Effective Sample Size (ESS) using the autocorrelations
     /// calculated by AutoCorrelation(). Ensure that the parameter nLags here matches
     /// the number of lags used in AutoCorrelation() to obtain accurate results.
+    /// \cite StanManual
+    /// \cite hanson2008mcmc
+    /// \cite gabry2024visual
     inline void CalculateESS(const int nLags, double **LagL);
     /// @brief Get the batched means variance estimation and variable indicating if number of batches is sensible
+    /// \cite chakraborty2019estimating
+    /// \cite rossetti2024batch
     inline void BatchedAnalysis();
     /// @brief CW: Batched means, literally read from an array and chuck into TH1D
     inline void BatchedMeans();
-    /// @brief Geweke Diagnostic based on https://www.math.arizona.edu/~piegorsch/675/GewekeDiagnostics.pdf
+    /// @brief Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011).
+    /// \cite Fang2014GewekeDiagnostics
+    /// \cite karlsbakk2011
     inline void GewekeDiagnostic();
     /// @brief Acceptance Probability
     inline void AcceptanceProbabilities();
-    /// @brief RC: Perform spectral analysis of MCMC based on http://arxiv.org/abs/astro-ph/0405462
+    /// @brief RC: Perform spectral analysis of MCMC based on \cite Dunkley:2004sv
     inline void PowerSpectrumAnalysis();
 
     /// Name of MCMC file

@@ -1,4 +1,4 @@
-# This is a basic workflow to help you get started with Actions
+# This is a basic workflow make doxygen documentation every time develop is updated
 
 name: Doxygen
 
@@ -27,6 +27,18 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+      
+      # Updates the package list to ensure you get the latest version of packages
+      - run: sudo apt-get update
+
+      # Installs texlive for LaTeX support in Doxygen documentation
+      - run: sudo apt-get install -y texlive
+
+      # Installs libjs-mathjax for rendering mathematical notation in Doxygen documentation
+      - run: sudo apt-get install -y libjs-mathjax
+
+      # Install perl for bibtex
+      - run: sudo apt-get install -y perl
 
       # Runs a single command using the runners shell
       - name: Doxygen Action
@@ -35,8 +47,9 @@ jobs:
           doxyfile-path: './Doxyfile'
           working-directory: ./Doc
   
+      # Deploys the generated documentation to GitHub Pages
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./Doc/html

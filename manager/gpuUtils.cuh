@@ -20,9 +20,8 @@
 /// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
 #define _BlockSize_ 1024
 
-//KS: TODO
-// There is plenty of useful stuff here https://github.com/NVIDIA/cuda-samples/blob/master/Samples/1_Utilities/deviceQuery/deviceQuery.cpp
-// We might want to port some of these utilities, for example having bool if there is unified memory etc.
+/// @todo KS: There is plenty of useful stuff here https://github.com/NVIDIA/cuda-samples/blob/master/Samples/1_Utilities/deviceQuery/deviceQuery.cpp
+/// @todo KS: We might want to port some of these utilities, for example having bool if there is unified memory etc.
 
 // CUDA_ERROR_CHECK is now defined in the makefile instead
 //#define CUDA_ERROR_CHECK

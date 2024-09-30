@@ -6,15 +6,20 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
-  std::cout << "-------------------------------------------------------------------" <<std::endl;
-  std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
-
+  (void) pot;
+  (void) mc_version;
+  MACH3LOG_INFO("-------------------------------------------------------------------");	
+  MACH3LOG_INFO("Creating samplePDFFDBase object..");
+	
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
+  if(xsec_cov == NULL){
+	  MACH3LOG_ERROR("[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}
 
-  samplePDFFD_array = NULL;
-  samplePDFFD_data = NULL;
-  
+  samplePDFFD_array = nullptr;
+  samplePDFFD_data = nullptr;
+  oscpars = nullptr;
+
   //KS: For now FD support only one sample
   nSamples = 1;
   SampleName.push_back("FDsample");
@@ -26,23 +31,26 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   //Default values for oscillation-related things
   doubled_angle = true;
   osc_binned = false;
+  Osc = NULL;
 }
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-  std::cout << "I'm deleting samplePDFFDBase" << std::endl;
+  MACH3LOG_INFO("I'm deleting samplePDFFDBase");
 
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
-	if(samplePDFFD_array != NULL){delete[] samplePDFFD_array[yBin];}
-	delete[] samplePDFFD_array_w2[yBin];
-	//ETA - there is a chance that you haven't added any data...
-	if(samplePDFFD_data != NULL){delete[] samplePDFFD_data[yBin];}
+    if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
+    delete[] samplePDFFD_array_w2[yBin];
+    //ETA - there is a chance that you haven't added any data...
+    if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data[yBin];}
   }
 
-  if(samplePDFFD_array != NULL){delete[] samplePDFFD_array;}
+  if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array;}
   delete[] samplePDFFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
-  if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
+  if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
+
+  if(oscpars != nullptr) delete[] oscpars;
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -71,13 +79,14 @@ void samplePDFFDBase::fill2DHist()
   return;
 }
 
+// ************************************************
 /// @function samplePDFFDBase::SetupSampleBinning()
 /// @brief Function to setup the binning of your sample histograms and the underlying 
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
 void samplePDFFDBase::SetupSampleBinning(){
-
+// ************************************************
   TString histname1d = (XVarStr).c_str();
   TString histname2d = (XVarStr+YVarStr).c_str();
   TString histtitle = "";
@@ -112,8 +121,8 @@ void samplePDFFDBase::SetupSampleBinning(){
 	set1DBinning(SampleXBins);  
   }
   else if(XVarStr.length() > 0 && YVarStr.length() > 0){
-	std::cout << "Setting Up 2D binning" << std::endl;
-	std::cout << XVarStr << " : " << YVarStr << std::endl;
+	MACH3LOG_INFO("Setting Up 2D binning");
+	MACH3LOG_INFO("{} : {}", XVarStr, YVarStr);  
 	set2DBinning(SampleXBins, SampleYBins);
   }
 }
@@ -143,20 +152,22 @@ void samplePDFFDBase::UseBinnedOscReweighting(bool ans, int nbins, double *osc_b
   return;
 }
 
-bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
-  
+// ************************************************
+bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
+// ************************************************
+
   double Val;
 
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
     
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
-	//std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
+    //std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that Selection vector is correctly sized
     
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
     if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
-	  return false;
+      return false;
     }
 
   }
@@ -165,15 +176,16 @@ bool samplePDFFDBase::IsEventSelected(int iSample, int iEvent) {
   return true;
 }
 
+// ************************************************
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
+                                      const int iSample, const int iEvent) {
+// ************************************************
 
-
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, int iSample, int iEvent) {
-  
   double Val;
 
-  for (unsigned int iSelection=0;iSelection<SelectionStr.size();iSelection++) {
+  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
  
-	Val = ReturnKinematicParameter(SelectionStr[iSelection], iSample, iEvent);
+	Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
 	//ETA - still need to support other method of you specifying the cut you want in ReturnKinematicParameter
 	//like in Dan's version below from T2K
     //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
@@ -190,24 +202,28 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > SelectionStr, i
   return true;
 }
 
+// ************************************************
 //Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, std::vector< std::vector<double> > &Selection, int iSample, int iEvent) {
-  
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
+                                      const std::vector< std::vector<double> > &SelectionCuts,
+                                      const int iSample, const int iEvent) {
+// ************************************************
+
   double Val;
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
     
     Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
     //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that Selection vector is correctly sized
+    //DB Already checked that SelectionCuts vector is correctly sized
     
-    //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
+    //DB In the case where SelectionCuts[0].size()==3, Only Events with Val >= SelectionCuts[iSelection][1] and Val < SelectionCuts[iSelection][2] are considered Passed
 	//ETA - also check whether we're actually applying a lower or upper cut by checking they aren't -999
-	if(Val >= Selection[iSelection][1] && Selection[iSelection][0] != -999){
-	  //std::cout << "Cutting event as " << Val << " is greater than " << Selection[iSelection][1]
+	if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
+	  //std::cout << "Cutting event as " << Val << " is greater than " << SelectionCuts[iSelection][1]
 	  return false;
 	}
-	else if(Val < Selection[iSelection][0] && Selection[iSelection][1] != -999){
+	else if(Val < SelectionCuts[iSelection][0] && SelectionCuts[iSelection][1] != -999){
 	  return false;
 	}
   }
@@ -221,7 +237,7 @@ bool samplePDFFDBase::IsEventSelected(std::vector< std::string > ParameterStr, s
 double samplePDFFDBase::calcOscWeights(int sample, int nutype, int oscnutype, double en)
 {
   MCSamples[sample].Oscillator->SetMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], en, doubled_angle, nutype);
-  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpars[7], *oscpars[8]); 
+  MCSamples[sample].Oscillator->propagateLinear(nutype , *oscpars[6], *oscpars[7]);
 
   return MCSamples[sample].Oscillator->GetProb(nutype, oscnutype);
 }
@@ -235,13 +251,12 @@ extern "C" void GetProb(int Alpha, int Beta, double Path, double Density, double
 void samplePDFFDBase::calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num)
 {
   setMNS(*oscpars[0], *oscpars[2], *oscpars[1], *oscpars[3], *oscpars[4], *oscpars[5], doubled_angle);
-  GetProb(nutype, oscnutype, &oscpar[7], &oscpar[8], en, num, w);
-
+  GetProb(nutype, oscnutype, *oscpar[6], *oscpar[7], en, num, w);
 
   if (std::isnan(w[10]))
-    {
-      std::cerr << "WARNING: ProbGPU oscillation weight returned NaN! " << w[10] << std::endl;
-    }
+  {
+    MACH3LOG_ERROR("WARNING: ProbGPU oscillation weight returned NaN! {}", w[10]);
+  }
 }
 #endif
 
@@ -296,12 +311,13 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   return;
 }
 
+// ************************************************
 //DB Function which does the core reweighting. This assumes that oscillation weights have already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]
 //This function takes advantage of most of the things called in setupSKMC to reduce reweighting time
 //It also follows the ND code reweighting pretty closely
 //This function fills the samplePDFFD_array array which is binned to match the sample binning, such that bin[1][1] is the equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void samplePDFFDBase::fillArray() {
-
+// ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
@@ -691,10 +707,10 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   //Loop over stored normalisation and function pointers
   for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
   {
-      xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
-      #ifdef DEBUG
-      if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
-      #endif
+    xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+    #ifdef DEBUG
+    if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
+    #endif
   }
   return xsecw;
 }
@@ -702,13 +718,13 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
 //DB Adding in Oscillator class support for smeared oscillation probabilities
 void samplePDFFDBase::SetOscillator(Oscillator* Osc_) {
 #if defined (USE_PROB3)
-  std::cerr << "Atmospheric Oscillator only defined using CUDAProb3 - USE_PROB3 is defined and indicates that Prob3++/probGPU is being used" << std::endl;
-  throw;
+  MACH3LOG_ERROR("Atmospheric Oscillator only defined using CUDAProb3 - USE_PROB3 is defined and indicates that Prob3++/probGPU is being used");	
+  throw MaCh3Exception(__FILE__ , __LINE__ );
 #endif
 
   Osc = Osc_;
-  std::cout << "Set Oscillator" << std::endl;
-
+  MACH3LOG_INFO("Set Oscillator");
+	
   FindEventOscBin();
 }
 
@@ -718,12 +734,12 @@ void samplePDFFDBase::FindEventOscBin() {
       MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),MCSamples[i].rw_truecz[j]);
     }
   }
-  std::cout << "Set all oscillation pointers to Oscillator" << std::endl;
+  MACH3LOG_INFO("Set all oscillation pointers to Oscillator");
 }
 
 void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
-  std::cout << "SETTING UP XSEC COV!!" << std::endl;
+  MACH3LOG_INFO("SETTING UP XSEC COV!!");
   XsecCov = xsec;
 
   // Get the map between the normalisation parameters index, their name, what mode they should apply to, and what target
@@ -735,18 +751,18 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
-  std::cout << "Found " << xsec_norms.size() << " normalisation parameters" << std::endl;
-  std::cout << "Found " << funcParsNames.size() << " functional parameters" << std::endl;
-
+  MACH3LOG_INFO("Found {} normalisation parameters", xsec_norms.size());
+  MACH3LOG_INFO("Found {} functional parameters", funcParsNames.size());
+	
   return;
 }
 
 void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
   OscCov = osc_cov;
-  int nOscPars = OscCov->getProposed().size(); 
+  int nOscPars = OscCov->GetNumParams();
   oscpars = new const double*[nOscPars];
   for(auto osc_par_i = 0; osc_par_i < nOscPars ; ++osc_par_i){
-	oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
+    oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
   } 
   return;
 }
@@ -754,8 +770,8 @@ void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
 void samplePDFFDBase::SetupNormParameters(){
 
   if(!XsecCov){
-	std::cout << "XsecCov is not setup!" << std::endl;
-	throw;
+	MACH3LOG_ERROR("XsecCov is not setup!");
+	throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Assign xsec norm bins in MCSamples tree
@@ -790,7 +806,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   fdmc_base *fdobj = &MCSamples[iSample];
 
-  std::cout << "FD Object has " << fdobj->nEvents << " events" << std::endl;
+  MACH3LOG_INFO("FD Object has {} events", fdobj->nEvents);
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
@@ -1328,7 +1344,9 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   dathist = NULL;
   dathist2d->Reset();                                                       
 
-  if (GetNDim()!=2) {std::cerr << "Trying to set a 2D 'data' histogram in a 1D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=2) {
+	  MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting");
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}
 
   for (int i = 0; i < int(dataSample2D->size()); i++) {
     dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
@@ -1349,13 +1367,15 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
 }
 
 void samplePDFFDBase::addData(TH1D* Data) {
-  std::cout << "adding 1D data histogram : " << Data->GetName() << " with " << Data->Integral() << " events" << std::endl;
+  MACH3LOG_INFO("Adding 1D data histogram : {} with {} events", Data->GetName(), Data->Integral());
   dathist2d = NULL;
   dathist = Data;
   dataSample = NULL;
   dataSample2D = NULL;
 
-  if (GetNDim()!=1) {std::cerr << "Trying to set a 1D 'data' histogram in a 2D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=1) {
+	  MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}
 
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
@@ -1372,13 +1392,15 @@ void samplePDFFDBase::addData(TH1D* Data) {
 }
 
 void samplePDFFDBase::addData(TH2D* Data) {
-  std::cout << "adding 2D data histogram : " << Data->GetName() << " with " << Data->Integral() << " events" << std::endl;
+  MACH3LOG_INFO("Adding 2D data histogram : {} with {} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
   dathist = NULL;
   dataSample = NULL;
   dataSample2D = NULL;
 
-  if (GetNDim()!=2) {std::cerr << "Trying to set a 2D 'data' histogram in a 1D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=2) {
+	  MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
+	  throw MaCh3Exception(__FILE__ , __LINE__ );}	
 
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
@@ -1445,7 +1467,7 @@ void samplePDFFDBase::fillSplineBins() {
 double samplePDFFDBase::GetLikelihood()
 {
   if (samplePDFFD_data == NULL) {
-      std::cerr << "data sample is empty!" << std::endl;
+      MACH3LOG_ERROR("data sample is empty!");
       return -1;
   }
 

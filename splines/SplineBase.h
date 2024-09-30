@@ -46,4 +46,10 @@ class SplineBase {
     virtual void CalcSplineWeights() = 0;
     /// @brief Calc total event weight
     virtual void ModifyWeights() = 0;
+
+    /// @brief CW: Gets the polynomial coefficients for TF1
+    /// @param spl pointer to TF1_red that will be checked
+    /// @param nPoints number of knots
+    /// @param coeffs Array holding coefficients for each knot
+    void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
 };

@@ -110,15 +110,75 @@ struct XsecNorms4 {
     int index;
 };
 
+/// Make an enum of the spline interpolation type
+enum RespFuncType {
+  kTSpline3_red,  //!< Uses TSpline3_red for interpolation
+  kTF1_red,       //!< Uses TF1_red for interpolation
+  kRespFuncTypes  //!< This only enumerates
+};
 
 /// Make an enum of the spline interpolation type
 enum SplineInterpolation {
-  kTSpline3,
-  kLinear,
-  kMonotonic,
-  kAkima,
-  kSplineInterpolations  //This only enumerates
+  kTSpline3,             //!< Default TSpline3 interpolation
+  kLinear,               //!< Linear interpolation between knots
+  kMonotonic,            //!< EM: DOES NOT make the entire spline monotonic, only the segments
+  kAkima,                //!< EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment
+  kLinearFunc,           //!< Liner interpolation using TF1 not spline
+  kSplineInterpolations  //!< This only enumerates
 };
+
+
+// **************************************************
+/// @brief Get function for TF1_red
+/// @param i Interpolation type
+inline std::string GetTF1(const SplineInterpolation i) {
+  // **************************************************
+  std::string Func = "";
+  switch(i) {
+    case kLinearFunc:
+      Func = "([1]+[0]*x)";
+      break;
+    default:
+      std::cerr << "UNKNOWN SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return Func;
+}
+
+// **************************************************
+/// @brief Convert a RespFuncType type to a SplineInterpolation
+/// @param i Interpolation type
+inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation i) {
+// **************************************************
+  RespFuncType Type = kRespFuncTypes;
+  switch(i) {
+    //  TSpline3 (third order spline in ROOT)
+    case kTSpline3:
+      Type = kTSpline3_red;
+      break;
+    case kLinear:
+      Type = kTSpline3_red;
+      break;
+    case kMonotonic:
+      Type = kTSpline3_red;
+      break;
+    //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
+    case kAkima:
+      Type = kTSpline3_red;
+      break;
+    case kLinearFunc:
+      Type = kTF1_red;
+      break;
+    default:
+      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
+      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      throw;
+  }
+  return Type;
+}
 
 // **************************************************
 /// @brief Convert a LLH type to a string
@@ -128,18 +188,21 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
   switch(i) {
     //  TSpline3 (third order spline in ROOT)
     case kTSpline3:
-    name = "TSpline3";
-    break;
+      name = "TSpline3";
+      break;
     case kLinear:
-    name = "Linear";
-    break;
+      name = "Linear";
+      break;
     case kMonotonic:
-    name = "Monotonic";
-    break;
+      name = "Monotonic";
+      break;
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
     case kAkima:
-    name = "Akima";
-    break;
+      name = "Akima";
+      break;
+    case kLinearFunc:
+      name = "LinearFunc";
+      break;
     default:
       std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
       std::cerr << "You gave  " << i << std::endl;
@@ -161,14 +224,17 @@ enum SystType {
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
 struct XsecSplines1 {
-  // *******************
+// *******************
   /// Spline interpolation vector
-  SplineInterpolation SplineInterpolationType;
+  SplineInterpolation _SplineInterpolationType;
+
+  /// Modes to which spline applies (valid only for binned splines)
+  std::vector<int> _fSplineModes;
 
   /// EM: Cap spline knot lower value
-  double SplineKnotLowBound;
+  double _SplineKnotLowBound;
   /// EM: Cap spline knot higher value
-  double SplineKnotUpBound;
+  double _SplineKnotUpBound;
 };
 
 // **************************************************
@@ -198,7 +264,7 @@ inline std::string SystType_ToString(const SystType i) {
 // ***************************
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
-  // ***************************
+// ***************************
 
   // ***************************
   /// @brief Return mass for given PDG
@@ -354,11 +420,11 @@ inline int ProbsToPDG(ProbNu NuType){
 /// Make an enum of the test statistic that we're using
 enum TestStatistic {
   kPoisson,                //!< Standard Poisson likelihood
-  kBarlowBeeston,          //!< Barlow-Beeston following Conway https://cds.cern.ch/record/1333496?
-  kIceCube,                //!< Based on https://arxiv.org/abs/1901.04645
+  kBarlowBeeston,          //!< Barlow-Beeston following Conway \cite Conway:2011in
+  kIceCube,                //!< Based on \cite Arguelles:2019izp
   kPearson,                //!< Standard Pearson likelihood
-  kDembinskiAbdelmottele,  //!< Based on arXiv:2206.12346v2
-  kNTestStatistics         //!< This only enumerates statistic
+  kDembinskiAbdelmottele,  //!< Based on \cite Dembinski:2022ios
+  kNTestStatistics         //!< Number of test statistics
 };
 
 // **************************************************

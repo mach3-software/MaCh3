@@ -8,14 +8,10 @@ foreach(app
     CombineMaCh3Chains
     )
     add_executable(${app} ${app}.cpp)
+    add_dependencies(DiagApps ${app})
     target_link_libraries(${app} MaCh3::All)
 
-    add_dependencies(DiagApps ${app})
-
+    install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
 
-install(FILES
-    Diag_Config.yaml
-    DESTINATION ${CMAKE_BINARY_DIR}/Diagnostics)
-
-install(DIRECTORY Diagnostics_utils DESTINATION ${CMAKE_BINARY_DIR}/Diagnostics)
+install(DIRECTORY Diagnostics_utils DESTINATION Diagnostics USE_SOURCE_PERMISSIONS)

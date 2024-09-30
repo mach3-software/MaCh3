@@ -202,7 +202,7 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
     if (valTags.size() == 0) continue;
 
     // count how many of the specified tags match the tags of the current value 
-    int tagCount = 0;
+    unsigned int tagCount = 0;
     for ( const std::string &tag: tags )
     {
       if ( std::find( valTags.begin(), valTags.end(), tag ) != valTags.end() ) 

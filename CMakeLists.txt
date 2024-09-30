@@ -5,20 +5,20 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-SET(MaCh3_VERSION 1.1.0)
+set(MaCh3_VERSION 1.1.7)
 
 # Try to find CUDA
-find_package(CUDAToolkit)
+find_package(CUDAToolkit QUIET)
 add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
-  SET(MaCh3_GPU_ENABLED TRUE)
-  SET(CPU_ONLY FALSE)
+  set(MaCh3_GPU_ENABLED TRUE)
+  set(CPU_ONLY FALSE)
 else()
   message(STATUS "CUDA not found. Proceeding without CUDA support.")
-  SET(MaCh3_GPU_ENABLED FALSE)
-  SET(CPU_ONLY TRUE)
+  set(MaCh3_GPU_ENABLED FALSE)
+  set(CPU_ONLY TRUE)
 endif()
 
 if(CPU_ONLY)
@@ -49,7 +49,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  SET(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 # KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
@@ -87,6 +87,8 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
     -Wunused                # Warn on anything being unused
+    -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
+    #-Wstrict-aliasing=2    # Helps detect potential aliasing issues that could lead to undefined behavior.
     #-Wuseless-cast         # Warn if you perform a cast to the same type (only in GCC >= 4.8)
     #-Wpadded               # Warn when padding is added to a structure or class for alignment
     #-Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
@@ -108,11 +110,11 @@ DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
-  SET(MaCh3_DEBUG_ENABLED TRUE)
+  set(MaCh3_DEBUG_ENABLED TRUE)
 else()
   #If MaCh3 debug was enable but level not, set it to 1. In very rare cases we want to go beyond 1.
   if(MaCh3_DEBUG_ENABLED)
-    SET(DEBUG_LEVEL 1)
+    set(DEBUG_LEVEL 1)
   endif()
 endif()
 
@@ -127,14 +129,14 @@ else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O3                                  # Optimize code for maximum speed
-    -funroll-loops                       # Unroll loops where possible for performance
-    --param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
-    -finline-limit=100000000             # Increase the limit for inlining functions to improve performance
-    #-flto # FIXME need more testing     # Enable link-time optimization (commented out for now, needs more testing)
+    -O3                                   # Optimize code for maximum speed
+    -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
+    #-funroll-loops                       # Unroll loops where possible for performance
+    #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
+    #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
   #KS: add Link-Time Optimization (LTO)
-  # FIXME previously it wasn't used correctly but would need more testing
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
@@ -162,7 +164,7 @@ if(MaCh3_GPU_ENABLED)
 endif()
 
 if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  SET(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
+  set(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
 endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
@@ -188,6 +190,7 @@ LIST(APPEND ALL_FEATURES
   DEBUG
   MULTITHREAD
   GPU
+  PYTHON
   LOW_MEMORY_STRUCTS
   Oscillator
   Fitter
@@ -214,9 +217,6 @@ add_subdirectory(plotting)
 
 ################################# pybind11 stuff ##################################
 
-# EM: If Debug is not defined disable it by default
-DefineEnabledRequiredSwitch(MaCh3_PYTHON_ENABLED FALSE)
-
 if( MaCh3_PYTHON_ENABLED )
   ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
   pybind11_add_module( 
@@ -230,8 +230,6 @@ if( MaCh3_PYTHON_ENABLED )
   target_link_libraries( pyMaCh3 PUBLIC Plotting )
   install( TARGETS pyMaCh3 DESTINATION pyMaCh3/)
 endif()
-
-
 
 
 #This is to export the target properties of MaCh3
@@ -312,6 +310,7 @@ add_custom_command(
           -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
           -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
           -DROOT_VERSION=${ROOT_VERSION}
+          -DMaCh3_VERSION=${MaCh3_VERSION}
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
@@ -327,7 +326,6 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     DESTINATION ${CMAKE_INSTALL_PREFIX}/)
 
-
 # uninstall target
 if(NOT TARGET uninstall)
   configure_file(
@@ -340,4 +338,4 @@ if(NOT TARGET uninstall)
 endif()
 
 # KS: Configure the Doxygen input file, this is to ensure whenever we update MaCh3 version Doxyfile will have same version.
-configure_file(${CMAKE_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_SOURCE_DIR}/Doc/Doxyfile @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doc/Doxyfile @ONLY)

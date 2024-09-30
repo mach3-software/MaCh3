@@ -87,6 +87,7 @@ class FitterBase {
   /// @param sigmaArrayCentr sigma var hist at prior values
   /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
   /// @param title A tittle for returned object
+  /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
   inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
 
   /// The manager

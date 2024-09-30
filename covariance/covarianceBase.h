@@ -4,16 +4,13 @@
 #include "manager/manager.h"
 #include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
-#include "covariance/ThrowParms.h"
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
-
 
 #ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
 #define _LARGE_LOGL_ 1234567890.0
 #endif
-
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -107,8 +104,6 @@ class covarianceBase {
   void throwParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void throwParameters();
-  /// @brief Throw nominal values
-  void throwNominal(const bool nomValues = false, const int seed = 0);
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
   
@@ -168,30 +163,41 @@ class covarianceBase {
   void updateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
   inline void setNumberOfSteps(const int nsteps) {
-    total_steps = nsteps;
-    if(total_steps >= AdaptiveHandler.start_adaptive_throw) resetIndivStepScale();
+    AdaptiveHandler.total_steps = nsteps;
+    if(AdaptiveHandler.AdaptionUpdate()) resetIndivStepScale();
   }
 
+  /// @brief Get matrix used for step proposal
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
+  /// @brief Get the Cholesky decomposition of the throw matrix
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
+  /// @brief Get the parameter means used in the adaptive handler
   inline std::vector<double> getParameterMeans(){return AdaptiveHandler.par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
+  /// @details This function converts the covariance matrix to a correlation matrix and
+  ///          returns a TH2D object, which can be used for advanced plotting purposes.
+  /// @return A pointer to a TH2D object representing the correlation matrix
   TH2D* GetCorrelationMatrix();
 
-  //========
-  //ETA - This might be a bit squiffy? If the vector gots moved from say a
-  //push_back then the pointer is no longer valid... maybe need a better 
-  //way to deal with this? It was fine before when the return was to an 
-  //element of a new array. There must be a clever C++ way to be careful
-  //========
   /// @brief DB Pointer return to param position
+  ///
+  /// @param iParam The index of the parameter in the vector.
+  /// @return A pointer to the parameter value at the specified index.
+  ///
+  /// @warning ETA - This might be a bit squiffy? If the vector gots moved from say a
+  /// push_back then the pointer is no longer valid... maybe need a better
+  /// way to deal with this? It was fine before when the return was to an
+  /// element of a new array. There must be a clever C++ way to be careful
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   //Some Getters
   /// @brief Get total number of parameters
-  inline int    GetNumParams()               {return _fNumPar;}
+  inline int  GetNumParams() {return _fNumPar;}
+  /// @brief Get the nominal array for parameters.
   virtual std::vector<double> getNominalArray();
+  /// @brief Get the pre-fit values of the parameters.
   std::vector<double> getPreFitValues(){return _fPreFitValue;}
+  /// @brief Get the generated values of the parameters.
   std::vector<double> getGeneratedValues(){return _fGenerated;}
   /// @brief Get vector of all proposed parameter values
   std::vector<double> getProposed() const;
@@ -222,14 +228,14 @@ class covarianceBase {
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParProp_PCA(const int i) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return fParProp_PCA(i);
   }
   
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParCurr_PCA(const int i) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return fParCurr_PCA(i);
   }
 
@@ -241,29 +247,29 @@ class covarianceBase {
   }
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
   inline const TMatrixD getTransferMatrix() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.TransferMat;
   }
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
   inline const TMatrixD getEigenVectors() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.eigen_vectors;
   }
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use getEigenValuesMaster
   inline const TVectorD getEigenValues() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use getEigenValues
   inline const std::vector<double> getEigenValuesMaster() {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj.eigen_values_master;
   }
   /// @brief Set proposed value for parameter in PCA base
   /// @param i Parameter index
   /// @param value new value
   inline void setParProp_PCA(const int i, const double value) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     fParProp_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
@@ -272,7 +278,7 @@ class covarianceBase {
   /// @param i Parameter index
   /// @param value new value
   inline void setParCurr_PCA(const int i, const double value) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     fParCurr_PCA(i) = value;
     // And then transfer back to the parameter basis
     TransferToParam();
@@ -281,10 +287,10 @@ class covarianceBase {
   /// @brief Set values for PCA parameters in PCA base
   /// @param pars vector with new values of PCA params
   inline void setParameters_PCA(const std::vector<double> &pars) {
-    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw; }
+    if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     if (pars.size() != size_t(_fNumParPCA)) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     unsigned int parsSize = pars.size();
     for (unsigned int i = 0; i < parsSize; i++) {
@@ -379,9 +385,6 @@ protected:
 
   /// @brief Handy function to return 1 for any systs
   const double* ReturnUnity(){return &Unity;}
-
-  /// @brief sets default values for adaptive MCMC parameters
-  void setAdaptionDefaults();
 
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
@@ -481,8 +484,6 @@ protected:
 
   /// Are we using AMCMC?
   bool use_adaptive;
-  /// Total number of MCMC steps
-  int total_steps;
 
   /// Struct containing information about PCA
   PCAHandler PCAObj;
