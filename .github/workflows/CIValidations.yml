@@ -49,6 +49,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Get Packages
+      run: dnf install -y jq
+
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
@@ -71,7 +74,7 @@ jobs:
 
 
         # Loop over the tests in matrix and run each one
-        for cmd in "${{ matrix.tests }}"; do
+        for cmd in $(echo "${{ tojson(matrix.tests) }}" | jq -r '.[]'); do
             echo "Running command: $cmd"
             eval "$cmd"
         done
