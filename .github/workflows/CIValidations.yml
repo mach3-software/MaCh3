@@ -22,12 +22,15 @@ jobs:
       matrix:
         include:
           - name: Spline Validations
+            ntests: 1
             tests: ["Apps/SplineValidations"]
 
           - name: Covariance Validations
+            ntests: 2
             tests: ["Apps/CovarianceValidations", "Apps/MaCh3ModeValidations"]
 
           - name: Fitter Validations
+            ntests: 6
             tests: [
               "Apps/FitterValidations",
               "./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root",
@@ -41,6 +44,7 @@ jobs:
             ]
 
           - name: NuMCMC Tools Validations
+            ntests: 1
             tests: ["Apps/NuMCMCvalidations.sh"]
 
     container:
@@ -48,9 +52,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Get Packages
-      run: dnf install -y jq
 
     - name: Get MaCh3 Validations
       run: |
@@ -72,11 +73,11 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
 
-
         # Loop over the tests in matrix and run each one
-        for cmd in $(echo "${{ tojson(matrix.tests) }}" | jq -r '.[]'); do
-            echo "Running command: $cmd"
-            eval "$cmd"
+        for i in $(seq 0 $(( ${{ matrix.ntests }} - 1 )))
+        do
+            echo "Running command: ${matrix.tests[i]}"
+            eval "${matrix.tests[i]}"
         done
 
 
