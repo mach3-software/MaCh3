@@ -18,40 +18,41 @@ jobs:
     name: ${{ matrix.name }}
 
     strategy:
-      fail-fast: false  #KS: Prevents cancellation of remaining jobs if one fails
+      fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
           - name: Spline Validations
             ntests: 1
-            tests: ["Apps/SplineValidations"]
+            test_1: Apps/SplineValidations
 
           - name: Covariance Validations
             ntests: 2
-            tests: ["Apps/CovarianceValidations", "Apps/MaCh3ModeValidations"]
+            test_1: Apps/CovarianceValidations
+            test_2: Apps/MaCh3ModeValidations
 
           - name: Fitter Validations
             ntests: 6
-            tests: [
-              "Apps/FitterValidations",
-              "./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root",
-              "./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml",
-              "./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml",
-              "./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root",
-              "./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root"
-              # TODO
-              # bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
-              # bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
-            ]
+            test_1: Apps/FitterValidations
+            test_2: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
+            test_3: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
+            test_4: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
+            test_5: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
+            test_7: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
+
+            # TODO
+            #test_8: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
+            #test_9: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
 
           - name: NuMCMC Tools Validations
             ntests: 1
-            tests: ["Apps/NuMCMCvalidations.sh"]
+            test_1: Apps/NuMCMCvalidations.sh
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
     - uses: actions/checkout@v4
+
 
     - name: Get MaCh3 Validations
       run: |
@@ -67,17 +68,14 @@ jobs:
         cd /opt/MaCh3Validations/build
         make -j4 install # Build the project
 
-    - name: Run Validations
+    - name: Validations
       run: |
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
 
-        # Loop over the tests in matrix and run each one
-        for i in $(seq 0 $(( ${{ matrix.ntests }} - 1 )))
-        do
-            echo "Running command: ${matrix.tests[i]}"
-            eval "${matrix.tests[i]}"
+        for i in $(seq 1 ${{ matrix.ntests }}); do
+          echo "Running test $i: ${{ matrix.test_${{ i }} }}"
+          eval ${{ matrix.test_${{ i }} }}
         done
-
 
