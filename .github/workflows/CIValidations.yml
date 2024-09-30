@@ -116,5 +116,5 @@ jobs:
         if [[ "${{ matrix.test_6 }}" != "empty" ]]; then
             echo " "
             echo "Performing  test 6"
-            ${{ matrix.test_4 }}
+            ${{ matrix.test_6 }}
         fi
