@@ -63,17 +63,15 @@ jobs:
         cd /opt/MaCh3Validations/build
         make -j4 install # Build the project
 
-    - name: Validations
+    - name: Run Validations
       shell: bash
       run: |
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
 
-        # Loop over specified tests in matrix and start testing jobs
+        # Loop over the tests in matrix and run each one
         for test in "${{ matrix.tests[@] }}"; do
-          if [[ -n "$test" ]]; then
-            echo "Running Test: $test"
-            $test
-          fi
+          echo "Running Test: $test"
+          eval "$test"
         done
