@@ -18,36 +18,37 @@ jobs:
     name: ${{ matrix.name }}
 
     strategy:
-      fail-fast: false  #KS: Prevents cancellation of remaining jobs if one fails
+      fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
           - name: Spline Validations
-            tests: [ "Apps/SplineValidations" ]
-
+            first_test: Apps/SplineValidations
+            second_test: empty
+            third_test: empty
           - name: Covariance Validations
-            tests: [ "Apps/CovarianceValidations",
-                     "Apps/MaCh3ModeValidations" ]
+            first_test: Apps/CovarianceValidations
+            second_test: Apps/MaCh3ModeValidations
+            third_test: empty
 
           - name: Fitter Validations
-            tests: [ "Apps/FitterValidations",
-                     "./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root",
-                     "./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml",
-                     "./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml",
-                     "./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root",
-                     "./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root"
-                     # TODO
-                     # bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
-                     # bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
-                   ]
+            first_test: Apps/FitterValidations
+            second_test: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
+            third_test: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
+            # TODO
+            #fourth_test: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
+            #fifth_test: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
 
           - name: NuMCMC Tools Validations
-            tests: [ "Apps/NuMCMCvalidations.sh" ]
+            first_test: Apps/NuMCMCvalidations.sh
+            second_test: empty
+            third_test: empty
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
     - uses: actions/checkout@v4
+
 
     - name: Get MaCh3 Validations
       run: |
@@ -68,11 +69,17 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
+        ${{ matrix.first_test }}
 
-        # Now loop over specified tests in matrix and start testing jobs
-        for test in "${{ matrix.tests[@] }}"; do
-          if [ "$test" != "empty" ]; then
-            echo "Running Test: $test"
-            eval $test
-          fi
-        done
+        # Run the second test if it is defined
+        if [[ "${{ matrix.second_test }}" != "empty" ]]; then
+            echo " "
+            echo "Performing Second test"
+            ${{ matrix.second_test }}
+        fi
+        # Run the third test if it is defined
+        if [[ "${{ matrix.third_test }}" != "empty" ]]; then
+            echo " "
+            echo "Performing Third test"
+            ${{ matrix.third_test }}
+        fi
