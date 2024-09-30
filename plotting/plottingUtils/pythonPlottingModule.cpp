@@ -60,12 +60,10 @@ void initPlotting(py::module &m){
         .def("get_known_post_fit_parameters", &MaCh3Plotting::InputManager::getKnownPostFitParameters, "Get all the parameters that a file has post fit values and errors for")
         .def("get_known_MCMC_parameters", &MaCh3Plotting::InputManager::getKnownMCMCParameters, "Get all the parameters that a file has MCMC chain entries for")
         .def("get_known_1d_posterior_parameters", &MaCh3Plotting::InputManager::getKnown1dPosteriorParameters, "Get all the parameters that a file has processed 1d posteriors for")
-        .def("get_known_2d_posterior_parameters", &MaCh3Plotting::InputManager::getKnown2dPosteriorParameters, "Get all the parameters that a file has processed 2d posteriors for")
         .def("get_MCMC_entry", &MaCh3Plotting::InputManager::getMCMCentry, "Load up a particular step in the MCMC chain for a particular input file")
         .def("get_MCMC_value", &MaCh3Plotting::InputManager::getMCMCvalue, "Get the value of a particular parameter for the current entry (set by set_MCMC_entry) in the chain for a particular file")
         .def("get_n_MCMC_entries", &MaCh3Plotting::InputManager::getnMCMCentries, "Get the number of entries in the MCMC chain in a particular file")
         .def("get_1d_posterior", &MaCh3Plotting::InputManager::get1dPosterior, "Get the 1d posterior for a particular parameter from a particular file")
-        .def("get_2d_posterior", &MaCh3Plotting::InputManager::get2dPosterior, "Get the 2d posterior for particular parameters from a particular file")
         ;
 
     py::class_<MaCh3Plotting::StyleManager>(m_plotting, "StyleManager")

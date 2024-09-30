@@ -169,8 +169,6 @@ struct InputFile {
   // Stuff relating to MCMC
   /// Whether or not the file has processed 1d posteriors
   bool has1dPosteriors;
-  /// Whether or not the file has processed 2d posteriors
-  bool has2dPosteriors; 
   /// Whether or not the file has unprocessed MCMC chain steps
   bool hasMCMCchain;
 
@@ -180,21 +178,15 @@ struct InputFile {
   /// whether or not specific parameters exist in the MCMC posterior chain
   std::unordered_map<std::string, bool> availableParams_map_MCMCchain;
   std::unordered_map<std::string, bool> availableParams_map_1dPosteriors;
-  std::unordered_map<std::string, std::unordered_map<std::string, bool>> availableParams_map_2dPosteriors;
 
   std::vector<std::string> availableParams_1dPosteriors;
   std::vector<std::string> availableParams_MCMCchain;
-
-  /// All the available pairs of parameters with 2d posteriors
-  /// is organised as a vector of length 2 vectors which have entries like {param1, param2}
-  std::vector<std::vector<std::string>> availableParams_2dPosteriors;
 
   std::unordered_map<std::string, double*> MCMCstepParamsMap;
   std::unordered_map<std::string, int> MCMCstepTreeIndicesMap;
 
   std::unordered_map<std::string, std::shared_ptr<TGraph>> posteriors1d_map;
-  std::unordered_map<std::string, std::unordered_map<std::string, std::shared_ptr<TGraph2D>>> posteriors2d_map;
-
+  
   // EM: almost certainly won't want to load all of these into memory at the start
   bool hasSigmaVars; //!< Whether or not this file contains Sigma variations.
 };
@@ -350,21 +342,6 @@ public:
     }
     return TGraphToVector(*_fileVec[fileNum].posteriors1d_map.at(paramName));
   }
-  
-  /// @brief Get the 2d posterior particular parameter from a particular input file.
-  /// @param fileNum The index of the file you want the data from.
-  /// @param paramName The parameter you want the information about.
-  /// @param paramName2 The other parameter you want the information about.
-  /// @return A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis
-  std::vector<std::vector<float>> get2dPosterior(int fileNum, std::string paramName, std::string paramName2) const {
-    if (!getEnabled2dPosteriors(fileNum, paramName, paramName2))
-    {
-      MACH3LOG_WARN("file at index {} does not have a 2d posterior for parameters {} and {}", fileNum, paramName, paramName2);
-      MACH3LOG_WARN("am returning an empty vector");
-      return std::vector<std::vector<float>>(3);
-    }
-    return TGraphToVector(*_fileVec[fileNum].posteriors2d_map.at(paramName).at(paramName2));
-  }
 
   /// @brief Get the number of entries in the MCMC chain in a particular file.
   /// @param fileNum The index of the file you want the number of steps from.
@@ -473,15 +450,6 @@ public:
     return _fileVec[fileNum].availableParams_map_1dPosteriors.at(paramName);
   }
 
-  /// @brief Get whether or not a particular parameter has MCMC chain entries in a particular input file.
-  /// @param fileNum The index of the file that you would like to know about.
-  /// @param paramName The name of the 1st parameter whose 2d posterior you would like to check for.
-  /// @param paramName2 The name of the other parameter.
-  /// @return true if scan exists, false if not.
-  inline bool getEnabled2dPosteriors(int fileNum, std::string paramName, std::string paramName2) const {
-    return _fileVec[fileNum].availableParams_map_2dPosteriors.at(paramName).at(paramName2);
-  }
-
   /// @brief Get the post fit error for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
   /// @param paramName The name of the parameter whose error you would like.
@@ -550,9 +518,6 @@ public:
   inline const std::vector<std::string> &getKnown1dPosteriorParameters(int fileId) const {
     return _fileVec[fileId].availableParams_1dPosteriors;
   }
-  inline const std::vector<std::vector<std::string>> &getKnown2dPosteriorParameters(int fileId) const {
-    return _fileVec[fileId].availableParams_2dPosteriors;
-  }
   /// @}
 
 private:
@@ -597,9 +562,6 @@ private:
 
   // check the input file for processed 1d posteriors for a particular parameter
   bool find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData = false) const ;
-
-  // check the input file for processed 1d posteriors for a particular parameter
-  bool find2dPosterior(InputFile &inputFileDef, const std::string &parameter, const std::string &parameter2, std::string &fitter, bool setFileData = false) const ;
 
   // fns tp read an input file
   void fillFileInfo(InputFile &inputFileDef, bool printThoughts = true);
