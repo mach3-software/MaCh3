@@ -22,30 +22,26 @@ jobs:
       matrix:
         include:
           - name: Spline Validations
-            ntests: 1
             test_1: Apps/SplineValidations
-
+            test_2: empty
+            test_3: empty
           - name: Covariance Validations
-            ntests: 2
             test_1: Apps/CovarianceValidations
             test_2: Apps/MaCh3ModeValidations
+            test_3: empty
 
           - name: Fitter Validations
-            ntests: 6
             test_1: Apps/FitterValidations
             test_2: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
             test_3: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
-            test_4: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
-            test_5: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
-            test_6: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
-
             # TODO
-            #test_7: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
-            #test_8: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+            #fourth_test: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
+            #fifth_test: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
 
           - name: NuMCMC Tools Validations
-            ntests: 1
             test_1: Apps/NuMCMCvalidations.sh
+            test_2: empty
+            test_3: empty
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
@@ -73,11 +69,17 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
-
         ${{ matrix.test_1 }}
 
-        #for i in 1
-        #  echo "Running test $i: ${{ matrix.test_${{ i }} }}"
-        #  eval ${{ matrix.test_${{ i }} }}
-        #done
-
+        # Run the second test if it is defined
+        if [[ "${{ matrix.test_2 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing Second test"
+            ${{ matrix.test_2 }}
+        fi
+        # Run the third test if it is defined
+        if [[ "${{ matrix.test_3 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing Third test"
+            ${{ matrix.test_3 }}
+        fi
