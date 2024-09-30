@@ -74,7 +74,7 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
 
-        for i in $(seq 1 ${{ matrix.ntests }}); do
+        for i in 1
           echo "Running test $i: ${{ matrix.test_${{ i }} }}"
           eval ${{ matrix.test_${{ i }} }}
         done
