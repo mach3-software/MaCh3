@@ -62,7 +62,7 @@ CPMAddPackage(
   NAME NuOscillator
     VERSION 0.0
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "main"
+    GIT_TAG "feature_fix"
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
