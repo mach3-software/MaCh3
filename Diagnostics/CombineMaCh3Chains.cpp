@@ -17,7 +17,7 @@ std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 
 /// EM: Will compare the version header contained in the two provided files and shout if they don't match
-bool checkSoftwareVersions(TFile *file, TFile *prevFile, std::string ConfigName)
+bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName)
 {
   bool weirdFile = false;
 
