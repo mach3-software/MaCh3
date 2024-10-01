@@ -1,0 +1,27 @@
+# This file annotates code ownership within MaCh3.
+# It's not meant to be a strict - or comprehensive - file, but
+# helpful guidance on who to coordinate with for various areas.
+# This should also help provide suggested reviewers for PRs.
+
+# For more information, see:
+#
+#   - https://github.com/blog/2392-introducing-code-owners
+
+# Inspired by ROOT
+#   - https://github.com/root-project/root/blob/master/.github/CODEOWNERS
+
+/cmake/* @kskwarczynski
+CMakeLists.txt @kskwarczynski
+/*/CMakeLists.txt @kskwarczynski
+/Doc/* @kskwarczynski
+.github/* @kskwarczynski
+*.cu @kskwarczynski
+*.cuh @kskwarczynski
+
+/mcmc/* @kskwarczynski
+
+/samplePDF/samplePDFFDBase* @edatkin @dbarrow257
+
+plotting/* @ewanwm
+*.py @henry-wallace-phys @ewanwm
+py* @henry-wallace-phys @ewanwm
