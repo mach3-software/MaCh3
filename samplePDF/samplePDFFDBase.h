@@ -8,7 +8,7 @@
 #include "TLegend.h"
 
 //MaCh3 includes
-#include "Oscillator/OscillatorBase.h"
+#include "OscProbCalcer/OscProbCalcerBase.h"
 
 #include "splines/splineFDBase.h"
 
@@ -57,6 +57,7 @@ public:
   const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
   void SetOscCov(covarianceOsc* osc_cov);
+
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator(std::string OscillatorYaml);
 
@@ -181,7 +182,7 @@ public:
 
   //===============================================================================
   /// DB Variables required for oscillation
-  OscillatorBase* NuOscillator;
+  std::vector<OscProbCalcerBase*> NuOscProbCalcers;
   
   /// An axis to set binned oscillation weights
   TAxis *osc_binned_axis ;
@@ -233,4 +234,7 @@ public:
   //What gets pulled from config options
   std::vector< std::vector<double> > StoredSelection; 
   //===========================================================================
+
+  double Unity = 1.;
+  double Zero = 0.;
 };

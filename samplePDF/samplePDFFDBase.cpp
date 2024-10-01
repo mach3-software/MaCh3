@@ -1,6 +1,8 @@
 #include "samplePDFFDBase.h"
-#include "Oscillator/OscillatorFactory.h"
-// Constructors for erec-binned errors
+
+#include "OscProbCalcer/OscProbCalcerFactory.h"
+#include "Constants/OscillatorConstants.h"
+#include<algorithm>
 
 samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov)
   : samplePDFBase()
@@ -19,7 +21,6 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceX
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   oscpars = nullptr;
-  NuOscillator = nullptr;
 
   //KS: For now FD support only one sample
   nSamples = 1;
@@ -235,6 +236,18 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
 {
   //KS: Reset the histograms before reweight 
   ResetHistograms();
+  
+  std::vector<_float_> OscVec(OscCov->GetNumParams()+1);
+  for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+    OscVec[iPar] = OscCov->getParCurr(iPar);
+  }
+  OscVec[OscCov->GetNumParams()] = 0.5; //Ye, not currently included in the covarianceOsc
+  for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+    NuOscProbCalcers[iSample]->Reweight(OscVec);
+    //NuOscProbCalcers[iSample]->PrintWeights();
+
+    
+  }
 
   fillArray();
 
@@ -314,32 +327,13 @@ void samplePDFFDBase::fillArray() {
 
       MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
       
-      //DB Set oscillation weights for NC events to 1.0
-      //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupMC
-	  //
-	  //LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
-      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  	MCSamples[iSample].osc_w[iEvent] = 0.0;
-	  	continue;
-      }
-
-	  //ETA - I need to check that this doesn't cause a problem for atmospherics and or tau samples
-      if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	  	MCSamples[iSample].osc_w[iEvent] = 1.0;
-      }
-	  //DB Set oscillation weights for NC events to 1.0
-	  //DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
-	  if (MCSamples[iSample].isNC[iEvent]) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		MCSamples[iSample].osc_w[iEvent] = 1.0;	
-	  }
-      
       //DB Total weight
-	  totalweight = GetEventWeight(iSample,iEvent);
+      totalweight = GetEventWeight(iSample,iEvent);
       //DB Catch negative weights and skip any event with a negative event
       if (totalweight <= 0.){
-		MCSamples[iSample].xsec_w[iEvent] = 0.;
-	   	continue;
-	  }
+	MCSamples[iSample].xsec_w[iEvent] = 0.;
+	continue;
+      }
  
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
@@ -497,17 +491,6 @@ void samplePDFFDBase::fillArray_MP()
 		}
 
 		MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
-
-		//DB Set oscillation weights for NC events to 1.0
-		//DB Another speedup - Why bother storing NC signal events and calculating the oscillation weights when we just throw them out anyway? Therefore they are skipped in setupSKMC
-		//LW Checking if NC event is signal (oscillated or not), if yes: osc_w = 0 || if no: osc_w = 1.0
-		if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		  MCSamples[iSample].osc_w[iEvent] = 0.0;
-		  continue;
-		}
-		if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-		  MCSamples[iSample].osc_w[iEvent] = 1.0;
-		}
 
 		totalweight = GetEventWeight(iSample, iEvent);
 
@@ -1271,52 +1254,81 @@ void samplePDFFDBase::addData(TH2D* Data) {
 }
 
 void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
-  OscillatorFactory *OscFactory = new OscillatorFactory();
-  NuOscillator = OscFactory->CreateOscillator(OscYaml);
+  OscProbCalcerFactory* OscProbCalcFactory = new OscProbCalcerFactory();
 
-  //Check if the Energy and CosineZ evaluation points have been set in the constructor of the object (i.e. Binned where the templates have been picked up by the constructor)
-  //or if we need to set them after the fact (i.e. unbinned where the points may change depending on the events etc.)
-  if (!NuOscillator->EvalPointsSetInConstructor()) {
+  NuOscProbCalcers = std::vector<OscProbCalcerBase*>((int)MCSamples.size());
+  for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+    std::cout << "Setting up NuOscillator::OscProbCalcerBase object in OscillationChannel: " << iSample << "/" << MCSamples.size() << " ====================" << std::endl;
+    NuOscProbCalcers[iSample] = OscProbCalcFactory->CreateOscProbCalcer("NuFASTLinear",OscYaml,0,1);
 
-	MACH3LOG_ERROR("UNSUPPORTED FOR NOW!!!");
-	throw;
-	/*
-	std::vector<_float_> TrueEnuVec(nEvents);
-	for(int i){
-	for(int iEvent = 0 ; iEvent < nEvents ; ++iEvent){
-	  TrueEnuVec[iEvent] = 
+    std::vector<_float_> EnergyArray((int)MCSamples[iSample].nEvents);
+    for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      EnergyArray[iEvent] = *(MCSamples[iSample].rw_etru[iEvent]);
+    }
+    std::sort(EnergyArray.begin(),EnergyArray.end());
 
+    //============================================================================
+    //DB Assuming no atmospherics for the moment
+    NuOscProbCalcers[iSample]->SetEnergyArray(EnergyArray);
+    //============================================================================
+    
+    NuOscProbCalcers[iSample]->Setup();
+
+    for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+	MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
+	continue;
+      } else {
+	
+	int InitFlav = NULL;
+	int FinalFlav = NULL;
+	
+	if (std::abs(MCSamples[iSample].nutype) == 1) {
+	  InitFlav = kElectron;
+	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
+	  InitFlav = kMuon;
+	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
+	  InitFlav = kTau;
 	}
 
-    //It's possible for one Oscillator to have multiple OscProbCalcers, these could be interfaced with individually such that each could have a different Energy and CosineZ array
-    for (int iCalcer=0;iCalcer<Oscillator->ReturnNOscProbCalcers();iCalcer++) {
+	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
+	  FinalFlav = kElectron;
+	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
+	  FinalFlav = kMuon;
+	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
+	  FinalFlav = kTau;
+	}
 
-      Oscillator->SetEnergyArrayInCalcer(FDMC.rw_etru,iCalcer);
+	if (InitFlav == NULL || FinalFlav == NULL) {
+	  std::cerr << "Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator" << std::endl;
+	  std::cerr << "MCSamples[iSample].nutype:" << MCSamples[iSample].nutype << std::endl;
+	  std::cerr << "InitFlav:" << InitFlav << std::endl;
+	  std::cerr << "MCSamples[iSample].oscnutype:" << MCSamples[iSample].oscnutype << std::endl;
+	  std::cerr << "FinalFlav:" << FinalFlav << std::endl;
+	  throw;
+	}
 
-      //Check if we also need to set the CosineZ binning
-      if (!Oscillator->CosineZIgnored()) {
-	Oscillator->SetCosineZArrayInCalcer(CosineZArray,iCalcer);
+	//Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
+	if (MCSamples[iSample].nutype<0) {
+	  InitFlav *= -1;
+	  FinalFlav *= -1;
+	}
+	
+	//============================================================================
+	//DB Assuming no atmospherics for the moment
+	MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnPointerToWeight(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+	//============================================================================	
       }
     }
-	*/
+    
   }
-
-  NuOscillator->Setup();
-
-  std::vector<_float_> OscVec = {3.07e-1, 5.28e-1, 2.18e-2, 7.53e-5, 2.509e-3, -1.601, 290.0, 2.6};
-  NuOscillator->CalculateProbabilities(OscVec);
-  NuOscillator->PrintWeights();
-  throw;
 }
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   //HW : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
-	if(iParam == 2){
-	  std::cout << "------------_" << std::endl;
-	  std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
-	}
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
   }
   return totalweight;

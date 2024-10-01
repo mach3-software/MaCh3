@@ -37,7 +37,7 @@ struct fdmc_base {
   const double* EScale_pointer;
 
   int* ntotal_weight_pointers;
-  double*** total_weight_pointers;
+  const double*** total_weight_pointers;
   double* total_w;
 
   int* XBin;
@@ -59,7 +59,6 @@ struct fdmc_base {
   const double **osc_w_pointer;
   double *rw_truecz;
   
-  double *osc_w; // oscillation weight                                        
   double *flux_w; // not the same as beam systematics weight!                 
   double *xsec_w;
 
