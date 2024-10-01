@@ -12,9 +12,9 @@
 
 /cmake/* @kskwarczynski
 CMakeLists.txt @kskwarczynski
-/*/CMakeLists.txt @kskwarczynski
+
 /Doc/* @kskwarczynski
-.github/* @kskwarczynski
+/.github/* @kskwarczynski
 *.cu @kskwarczynski
 *.cuh @kskwarczynski
 
@@ -22,6 +22,6 @@ CMakeLists.txt @kskwarczynski
 
 /samplePDF/samplePDFFDBase* @edatkin @dbarrow257
 
-plotting/* @ewanwm
+/plotting/* @ewanwm
 *.py @henry-wallace-phys @ewanwm
 py* @henry-wallace-phys @ewanwm
