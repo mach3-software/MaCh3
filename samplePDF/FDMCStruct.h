@@ -25,6 +25,7 @@ struct fdmc_base {
 
   /// DB Speedup bits
   double Unity;
+  int Unity_Int;
   double dummy_value = -999;
 
   int* nxsec_norm_pointers;

@@ -5,8 +5,8 @@ splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
 //****************************************
   if (xsec_ == NULL) {
-    std::cerr << "Trying to create splineSKBase with NULL covariance object" << std::endl;
-    throw;
+    MACH3LOG_ERROR("Trying to create splineSKBase with NULL covariance object");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
 
@@ -43,12 +43,12 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
+bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  Dimensions.push_back(NSplineDimensions);
+  Dimensions.push_back(SplineVarNames.size());
   DimensionLabels.push_back(SplineVarNames);
   DetIDs.push_back(DetID);
 
@@ -65,8 +65,11 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
+  std::cout << "Create SplineModeVecs_Sample" << std::endl;
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  std::cout << "SplineModeVecs_Sample is of size " <<  SplineModeVecs_Sample.size() << std::endl;
   SplineModeVecs.push_back(SplineModeVecs_Sample);
+  std::cout << "SplineModeVecs is of size " << SplineModeVecs.size() << std::endl;
 
  // int counter = 0;
  // std::cout << "Name        |     Spline     |    SplineIndex    |    GlobalIndex " << std::endl;
@@ -75,7 +78,6 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
 //	std::cout << (SplineFileParPrefixNames_Sample.at(spline_i)).c_str() << ",       " << counter << ",     " << SplineParsIndex_Sample_temp.at(spline_i) << ",   " << GlobalSystIndex_Sample.at(spline_i) << std::endl;
 //	counter++;
  // }
-
 
   int nOscChan = OscChanFileNames.size();
   nOscChans.push_back(nOscChan);
@@ -452,9 +454,8 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   {
     if (Dimensions[iSample] != 2)
     {
-      std::cerr << "Trying to load a 2D spline template when nDim=" << Dimensions[iSample] << std::endl;
-      std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-      throw;
+      MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
     Hist2D = (TH2F *)File->Get("dev_tmp_0_0");
   }

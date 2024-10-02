@@ -2,38 +2,98 @@
 
 // Constructors for erec-binned errors
 
-samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov)
+
+samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covarianceXsec* xsec_cov)
   : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
   (void) pot;
-  (void) mc_version;
+
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
-
+  
+  //DB Save the argument value
+  mc_version = mc_version_;
+  
+  char* sample_char = (char*)mc_version.c_str();
+  SampleManager = new manager(sample_char);
+  
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
-
+  SetXsecCov(xsec_cov);
+  
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
-  
-  //KS: For now FD support only one sample
-  nSamples = 1;
-  SampleName.push_back("FDsample");
+  Osc = NULL;
+
+  samplename = SampleManager->raw()["SampleName"].as<std::string>();
+  nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+  for (int i=0;i<nSamples;i++) {
+    struct fdmc_base obj = fdmc_base();
+    MCSamples.push_back(obj);
+  }
 
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   fTestStatistic = kPoisson;
 
-  //Default values for oscillation-related things
-  doubled_angle = true;
-  osc_binned = false;
-  Osc = NULL;
+  nDimensions = 0;
+  //Binning
+  XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
+  SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
+  if(XVarStr.length() > 0){
+	nDimensions++;
+  } else{
+	MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", sample_char);
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
+  SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
+  if(YVarStr.length() > 0){
+	if(XVarStr.length() == 0){
+	  MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", sample_char);
+	  throw MaCh3Exception(__FILE__, __LINE__);
+	}
+	nDimensions++;
+  }
+
+  if(nDimensions == 0){
+	MACH3LOG_ERROR("Error setting up the sample binning");
+	MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
+	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  else{
+	std::cout << "FOUND " << nDimensions << " dimensions for sample binning!!!!!" << std::endl;
+	std::cout << "find me " << __FILE__ << " : " << __LINE__ << std::endl;
+  }
+
+  //Sanity check that some binning has been specified
+  if(SampleXBins.size() == 0 && SampleYBins.size() == 0){
+	MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", sample_char);
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  
+  //FD file info
+  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
+  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
+  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
+  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+
+  for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+    mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
+    spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
+    sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
+    sample_oscnutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>())));
+    sample_signal.push_back(osc_channel["signal"].as<bool>());
+  }
 }
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-  std::cout << "I'm deleting samplePDFFDBase" << std::endl;
+  MACH3LOG_INFO("I'm deleting samplePDFFDBase");
 
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
 	if(samplePDFFD_array != NULL){delete[] samplePDFFD_array[yBin];}
@@ -46,6 +106,27 @@ samplePDFFDBase::~samplePDFFDBase()
   delete[] samplePDFFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
   if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
+}
+
+void samplePDFFDBase::Initialise() {
+  Init();
+
+  int TotalMCEvents = 0;
+  for(unsigned iSample=0 ; iSample < nSamples ; iSample++){
+    MCSamples[iSample].nEvents = setupExperimentMC(iSample);
+	TotalMCEvents += MCSamples[iSample].nEvents;
+    InitialiseSingleFDMCObject(iSample, MCSamples[iSample].nEvents);
+    setupFDMC(iSample);
+  }
+
+  std::cout << "############" << std::endl;
+  std::cout << "Total number of events is " << TotalMCEvents << std::endl;
+  std::cout << "############" << std::endl;
+
+  SetupSampleBinning();
+  SetupSplines();
+  SetupWeightPointers();
+  SetupNormParameters();
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -82,8 +163,9 @@ void samplePDFFDBase::fill2DHist()
 /// This "passing" can be removed. 
 void samplePDFFDBase::SetupSampleBinning(){
 // ************************************************
+  std::cout << "Setting up Sample Binning " << std::endl;
   TString histname1d = (XVarStr).c_str();
-  TString histname2d = (XVarStr+YVarStr).c_str();
+  TString histname2d = (XVarStr+"_"+YVarStr).c_str();
   TString histtitle = "";
 
   //The binning here is arbitrary, now we get info from cfg so the
@@ -98,7 +180,7 @@ void samplePDFFDBase::SetupSampleBinning(){
   XBinEdges.reserve(SampleNXBins);
   YBinEdges.reserve(SampleNYBins);
   std::cout << "XBinning: " << std::endl;
-  for(unsigned XBin_i = 0 ; XBin_i < SampleNXBins ; XBin_i++){
+  for(unsigned XBin_i = 0 ; XBin_i < SampleXBins.size() ; XBin_i++){
 	XBinEdges.push_back(SampleXBins[XBin_i]);
 	std::cout << SampleXBins[XBin_i] << ", ";
   }
@@ -106,7 +188,9 @@ void samplePDFFDBase::SetupSampleBinning(){
 
   //And now the YBin Edges
   std::cout << "YBinning: " << std::endl;
-  for(unsigned YBin_i = 0 ; YBin_i < SampleNYBins ; YBin_i++){
+  std::cout << "Found " << SampleNYBins << std::endl;
+  std::cout << "And SampleYBins is of size " << SampleYBins.size() << std::endl;
+  for(unsigned YBin_i = 0 ; YBin_i < SampleYBins.size() ; YBin_i++){
 	YBinEdges.push_back(SampleYBins[YBin_i]);
 	std::cout << SampleYBins[YBin_i] << ", ";
   }
@@ -119,6 +203,11 @@ void samplePDFFDBase::SetupSampleBinning(){
 	std::cout << "Setting Up 2D binning" << std::endl;
 	std::cout << XVarStr << " : " << YVarStr << std::endl;
 	set2DBinning(SampleXBins, SampleYBins);
+  }
+  else{
+	MACH3LOG_ERROR("You did not specify an XVarStr or YVarStr in your sample config");
+	MACH3LOG_ERROR("So the variable to load is unkown, please add at least one string!");
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
@@ -152,19 +241,15 @@ bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
 // ************************************************
 
   double Val;
-
-  for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
-    
+  for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {  
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
-    //std::cout << "Val returned for selection " << iSelection << " is " << Val << std::endl;
     //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that Selection vector is correctly sized
-    
+    //DB Already checked that Selection vector is correctly sized  
+	//std::cout << Val << " " << Selection[iSelection][1] << " " << Selection[iSelection][2] << std::endl;	
     //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
     if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
       return false;
     }
-
   }
 
   //DB To avoid unneccessary checks, now return false rather than setting bool to true and continuing to check
@@ -342,6 +427,7 @@ void samplePDFFDBase::fillArray() {
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       
+	  
 	  applyShifts(iSample, iEvent);
 
 	  if (!IsEventSelected(iSample, iEvent)) { 
@@ -406,6 +492,8 @@ void samplePDFFDBase::fillArray() {
 		MCSamples[iSample].xsec_w[iEvent] = 0.;
 	   	continue;
 	  }
+
+	  //totalweight = 1.0;
  
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
@@ -422,6 +510,7 @@ void samplePDFFDBase::fillArray() {
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
 	  //ETA- note that nXBins is XBinEdges.size() - 1
       else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
+		std::cout << "Skipping as " << XVar << " >= " << XBinEdges[nXBins] << std::endl;
 		continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
@@ -519,12 +608,12 @@ void samplePDFFDBase::fillArray_MP()
 	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 
         //ETA - generic functions to apply shifts to kinematic variables
-        // Apply this before IsEventSelected is called.
+        // Apply this before IsEventSelected is called.	
 		applyShifts(iSample, iEvent);
 
         //ETA - generic functions to apply shifts to kinematic variable
 		//this is going to be slow right now due to string comps under the hood.
-		//Need to implement a more efficient version of event-by-event cut checks
+		//Need to implement a more efficient version of event-by-event cut checks	
 		if(!IsEventSelected(iSample, iEvent)){
 		  continue;
 		}
@@ -540,6 +629,7 @@ void samplePDFFDBase::fillArray_MP()
 		if(splineFile){
 		  splineweight *= CalcXsecWeightSpline(iSample, iEvent);
 		}
+
 		//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
 		if (splineweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -548,7 +638,6 @@ void samplePDFFDBase::fillArray_MP()
 
         normweight *= CalcXsecWeightNorm(iSample, iEvent);
 		//DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-		//std::cout << "norm weight is " << normweight << std::endl;
 		if (normweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
 		  continue;
@@ -556,7 +645,6 @@ void samplePDFFDBase::fillArray_MP()
 
 		funcweight = CalcXsecWeightFunc(iSample,iEvent);
 		//DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-		//std::cout << "Func weight is " << funcweight << std::endl;
 		if (funcweight <= 0.){
 		  MCSamples[iSample].xsec_w[iEvent] = 0.;
 		  continue;
@@ -571,11 +659,14 @@ void samplePDFFDBase::fillArray_MP()
 		  MCSamples[iSample].osc_w[iEvent] = 0.0;
 		  continue;
 		}
+
 		if (MCSamples[iSample].isNC[iEvent] && !MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 		  MCSamples[iSample].osc_w[iEvent] = 1.0;
 		}
 
 		totalweight = GetEventWeight(iSample, iEvent);
+
+		//totalweight = 1.0;
 
 		//DB Catch negative weights and skip any event with a negative event
 		if (totalweight <= 0.){
@@ -635,7 +726,7 @@ void samplePDFFDBase::fillArray_MP()
           samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
 		}
 		else{
-		  //std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
+		  std::cout << "Not filled samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		}
 
 	  }
@@ -801,15 +892,10 @@ void samplePDFFDBase::SetupNormParameters(){
 void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   fdmc_base *fdobj = &MCSamples[iSample];
-
-  std::cout << "FD Object has " << fdobj->nEvents << " events" << std::endl;
-
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
 	if (XsecCov) {
-	  //std::cout << "Xsec norms is of size " << xsec_norms.size() << std::endl;
 	  for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
-		//std::cout << "Looping over systematic " << (*it).name << std::endl;
 		// Skip oscillated NC events
 		// Not strictly needed, but these events don't get included in oscillated predictions, so
 		// no need to waste our time calculating and storing information about xsec parameters
@@ -853,9 +939,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
 			if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
 			  FlavourUnoscMatch=true;
-			  //std::cout << "DID MATCH " << fdobj->nupdgUnosc << " with " << (*it).preoscpdgs.at(iPDG) << std::endl;
 			}
-			//else{std::cout << "Didn't match " << fdobj->nupdgUnosc << " with " << (*it).preoscpdgs.at(iPDG) << std::endl;}
 		  }
 		}
 		if (!FlavourUnoscMatch){continue;}
@@ -880,9 +964,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		if ((*it).hasKinBounds) {
 		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
 			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
-			  //if((*it).name.find("b_") != std::string::npos){
-			  //  std::cout << "Failed because " << ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) << " is less than " << (*it).Selection[iKinematicParameter][0] << std::endl; 
-			  //}
 			  IsSelected = false;
 			  continue;
 			}
@@ -1118,8 +1199,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	  //Set x_var and y_var values based on XVarStr and YVarStr
       MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
 	  //Give y)_var a dummy value
-      MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);//-9999.;// = dummy;//ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
-
+      MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
 
 	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
@@ -1289,32 +1369,17 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
   return;
 }
 
-//ETA - this can be changed quite easily to check the number of XBins and YBins.
-//We can slowly but surely remove any trace of BinningOpt
-/*int samplePDFFDBase::GetNDim() {
-  switch(BinningOpt) {
-  case 0: 
-  case 1:
-    return 1;
-  case 2:
-  case 3:
-  case 4: 
-    return 2;
-  default:
-	std::cerr << "Error, unrecognsied BinningOpt!!" << std::endl;
-	throw;
-    return 0;
-  }  
-}
-*/
-
 void samplePDFFDBase::addData(std::vector<double> &data) {
   dataSample = new std::vector<double>(data);
   dataSample2D = NULL;
   dathist2d = NULL;
   dathist->Reset(); 
 
-  if (GetNDim()!=1) {std::cerr << "Trying to set a 1D 'data' histogram in a 2D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=1) {
+	MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
+	MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
   for (int i = 0; i < int(dataSample->size()); i++) {
     dathist->Fill(dataSample->at(i));
@@ -1340,7 +1405,11 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   dathist = NULL;
   dathist2d->Reset();                                                       
 
-  if (GetNDim()!=2) {std::cerr << "Trying to set a 2D 'data' histogram in a 1D sample - Quitting" << std::endl; throw;}
+  if (GetNDim()!=2) {
+	MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
+	MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
   for (int i = 0; i < int(dataSample2D->size()); i++) {
     dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
@@ -1408,8 +1477,8 @@ double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   //HW : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
-	//std::cout << "Weight " << iParam << " is " <<  *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
-    totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
+	//std::cout << "WEight " << iParam << " is " << *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
+	totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
   }
   return totalweight;
 }
@@ -1418,12 +1487,9 @@ double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
 /// @brief Finds the binned spline that an event should apply to and stored them in a
 /// a vector for easy evaluation in the fillArray() function.
 void samplePDFFDBase::fillSplineBins() {
-
-  std::cout << "Now in fillSplineBins" << std::endl;
   for (int i = 0; i < (int)MCSamples.size(); ++i) {
 	//Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
-
       std::vector< std::vector<int> > EventSplines;
 	  switch(nDimensions){
 		case 1:
@@ -1433,13 +1499,16 @@ void samplePDFFDBase::fillSplineBins() {
 		  EventSplines = splineFile->GetEventSplines(GetName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
 		  break;
 		default:
-		MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
-		MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
-		MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
-		break;
+		  MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
+		  MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
+		  MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+		  throw MaCh3Exception(__FILE__, __LINE__);
 	  }
 
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
+	  if(MCSamples[i].nxsec_spline_pointers[j] < 0){
+		throw MaCh3Exception(__FILE__, __LINE__);
+	  }
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
  
 	  for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
@@ -1447,18 +1516,19 @@ void samplePDFFDBase::fillSplineBins() {
 		MCSamples[i].xsec_spline_pointers[j][spline] = splineFile->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
 			EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
 	  }
-
 	}
   }
-  std::cout << "Filled spline bins" << std::endl;
+
+  MACH3LOG_INFO("Filled Spline bins");
+
   return;
 }
 
 double samplePDFFDBase::GetLikelihood()
 {
   if (samplePDFFD_data == NULL) {
-      std::cerr << "data sample is empty!" << std::endl;
-      return -1;
+	MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   //This can be done only once and stored
@@ -1469,10 +1539,10 @@ double samplePDFFDBase::GetLikelihood()
   int yBin;
 
   double negLogL = 0.;
+
 #ifdef MULTITHREAD
 #pragma omp parallel for reduction(+:negLogL) private(xBin, yBin)
 #endif
-
   for (xBin = 0; xBin < nXBins; xBin++) 
   {
     for (yBin = 0; yBin < nYBins; yBin++) 
@@ -1506,8 +1576,105 @@ inline cudaprob3::ProbType samplePDFFDBase::SwitchToCUDAProbType(CUDAProb_nu CUD
     case CUDAProb_nu::t_t : return cudaprob3::ProbType::t_t;
     default:
       MACH3LOG_ERROR("Unknown CUDAProbType!");
-      throw;
+      throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 #endif
 
+void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
+  if (iSample < 0 || iSample >= nSamples) {
+    MACH3LOG_ERROR("Invalid iSample index in InitialiseSingleFDMCObject");
+    MACH3LOG_ERROR("Index given is {} and only {} samples found", iSample, nSamples);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  
+  MCSamples[iSample] = fdmc_base();
+  fdmc_base *fdobj = &MCSamples[iSample];
+  
+  fdobj->nEvents = nEvents_;
+  fdobj->nutype = -9;
+  fdobj->oscnutype = -9;
+  fdobj->signal = false;
+  fdobj->Unity = 1.;
+  fdobj->Unity_Int = 1.;
+  
+  fdobj->x_var = new const double*[fdobj->nEvents];
+  fdobj->y_var = new const double*[fdobj->nEvents];
+  fdobj->rw_etru = new const double*[fdobj->nEvents];
+  fdobj->XBin = new int[fdobj->nEvents];
+  fdobj->YBin = new int[fdobj->nEvents];    
+  fdobj->NomXBin = new int[fdobj->nEvents];
+  fdobj->NomYBin = new int[fdobj->nEvents];
+  fdobj->XBin = new int [fdobj->nEvents];
+  fdobj->YBin = new int [fdobj->nEvents];;	 
+  fdobj->rw_lower_xbinedge = new double [fdobj->nEvents];
+  fdobj->rw_lower_lower_xbinedge = new double [fdobj->nEvents];
+  fdobj->rw_upper_xbinedge = new double [fdobj->nEvents];
+  fdobj->rw_upper_upper_xbinedge = new double [fdobj->nEvents];
+  fdobj->mode = new int*[fdobj->nEvents];
+  fdobj->nxsec_norm_pointers = new int[fdobj->nEvents];
+  fdobj->xsec_norm_pointers = new const double**[fdobj->nEvents];
+  fdobj->xsec_norms_bins = new std::list< int >[fdobj->nEvents];
+  fdobj->xsec_w = new double[fdobj->nEvents];
+  fdobj->flux_w = new double[fdobj->nEvents];
+  fdobj->osc_w = new double[fdobj->nEvents];
+  fdobj->isNC = new bool[fdobj->nEvents];
+  fdobj->nxsec_spline_pointers = new int[fdobj->nEvents];
+  fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
+  fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
+  fdobj->total_weight_pointers = new double**[fdobj->nEvents];
+  fdobj->Target = new int*[fdobj->nEvents];
+  fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
+  fdobj->rw_truecz = new double[fdobj->nEvents];
+  
+  for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
+    fdobj->rw_etru[iEvent] = &fdobj->Unity;
+    fdobj->mode[iEvent] = &fdobj->Unity_Int;
+    fdobj->Target[iEvent] = 0;
+    fdobj->NomXBin[iEvent] = -1;
+    fdobj->NomYBin[iEvent] = -1;
+    fdobj->XBin[iEvent] = -1;
+    fdobj->YBin[iEvent] = -1;	 
+    fdobj->rw_lower_xbinedge[iEvent] = -1;
+    fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
+    fdobj->rw_upper_xbinedge[iEvent] = -1;
+    fdobj->rw_upper_upper_xbinedge[iEvent] = -1;
+    fdobj->xsec_w[iEvent] = 1.0;
+    fdobj->osc_w[iEvent] = 1.0;
+    fdobj->isNC[iEvent] = false;
+    fdobj->flux_w[iEvent] = 0.;
+    fdobj->SampleDetID = -1;
+    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
+    fdobj->rw_truecz[iEvent] = -999.;
+    fdobj->x_var[iEvent] = &fdobj->Unity;
+    fdobj->y_var[iEvent] = &fdobj->Unity;
+  }
+
+  //SetupSampleBinning();  
+}
+
+void samplePDFFDBase::InitialiseSplineObject() {
+  std::vector<std::string> spline_filepaths;
+  for(unsigned iSample=0 ; iSample < MCSamples.size() ; iSample++){
+    spline_filepaths.push_back(splineprefix+spline_files[iSample]+splinesuffix);
+  }
+
+  //Keep a track of the spline variables
+  SplineVarNames.push_back("TrueNeutrinoEnergy");
+  if(XVarStr.length() > 0){
+	SplineVarNames.push_back(XVarStr);
+  }
+  if(YVarStr.length() > 0){
+	SplineVarNames.push_back(YVarStr);
+  }
+  
+  splineFile->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
+  splineFile->PrintArrayDimension();
+  splineFile->CountNumberOfLoadedSplines(false, 1);
+  splineFile->TransferToMonolith();
+
+  std::cout << "--------------------------------" <<std::endl;
+  MACH3LOG_INFO("Setup Far Detector splines");
+
+  fillSplineBins();
+}
