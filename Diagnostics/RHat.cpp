@@ -1,12 +1,3 @@
-// C++ includes
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <vector>
-#include <algorithm>
-#include <cmath>
-#include <math.h>
-
 // ROOT includes
 #include "TObjArray.h"
 #include "TChain.h"
@@ -27,11 +18,17 @@
 #include "omp.h"
 #endif
 
+// MaCh3 includes
 #include "manager/manager.h"
 
-
-/// KS: This exe is meant to calculate R hat estimator. For a well converged this distribution should be centred at one.
-/// Based on Gelman et. al. arXiv:1903.08008v5
+/// @file RHat.cpp
+/// @brief This executable calculates the \f$ \hat{R} \f$ estimator for Markov Chain Monte Carlo (MCMC) convergence.
+///
+/// KS: This exe is meant to calculate the \f$ \hat{R} \f$ estimator. For a well-converged chain, this distribution
+/// should be centered at one. The \f$ \hat{R} \f$ statistic is used to assess the convergence of MCMC simulations
+/// and helps determine whether the chains have reached a stable distribution.
+///
+/// @cite gelman2019.
 
 // *******************
 int Ntoys;
