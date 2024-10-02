@@ -17,7 +17,7 @@ set_target_properties( Plotting PROPERTIES
     EXPORT_NAME Plotting
 )
 
-target_link_libraries( Plotting ${ROOT_LIBRARIES} MaCh3::Manager )
+target_link_libraries( Plotting ${ROOT_LIBRARIES} MaCh3::Manager MaCh3::MCMC )
 
 ## to be compiled into python module needs to be compiled as position independent library
 if( MaCh3_PYTHON_ENABLED )
