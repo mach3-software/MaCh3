@@ -182,8 +182,10 @@ public:
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
+  /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting but multithreaded
   void fillArray_MP();
 #endif
+  /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting
   void fillArray();
 
   /// @brief Helper function to reset histograms

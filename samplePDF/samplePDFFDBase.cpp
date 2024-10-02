@@ -392,13 +392,16 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   return;
 }
 
-// ************************************************
-//DB Function which does the core reweighting. This assumes that oscillation weights have already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]
-//This function takes advantage of most of the things called in setupSKMC to reduce reweighting time
-//It also follows the ND code reweighting pretty closely
-//This function fills the samplePDFFD_array array which is binned to match the sample binning, such that bin[1][1] is the equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
+//************************************************
+/// @function samplePDFFDBase::fillArray()
+/// Function which does the core reweighting. This assumes that oscillation weights have 
+/// already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]. This 
+/// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
+/// It also follows the ND code reweighting pretty closely. This function fills the samplePDFFD 
+/// array array which is binned to match the sample binning, such that bin[1][1] is the 
+/// equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
+//************************************************
 void samplePDFFDBase::fillArray() {
-// ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
@@ -426,8 +429,7 @@ void samplePDFFDBase::fillArray() {
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-      
-	  
+       
 	  applyShifts(iSample, iEvent);
 
 	  if (!IsEventSelected(iSample, iEvent)) { 
@@ -493,8 +495,6 @@ void samplePDFFDBase::fillArray() {
 	   	continue;
 	  }
 
-	  //totalweight = 1.0;
- 
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
       double XVar = *(MCSamples[iSample].x_var[iEvent]);
@@ -510,7 +510,6 @@ void samplePDFFDBase::fillArray() {
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
 	  //ETA- note that nXBins is XBinEdges.size() - 1
       else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-		std::cout << "Skipping as " << XVar << " >= " << XBinEdges[nXBins] << std::endl;
 		continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
@@ -533,7 +532,6 @@ void samplePDFFDBase::fillArray() {
 
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
-		//std::cout << "Filling samplePDFFD_array at YBin: " << YBinToFill << " and XBin: " << XBinToFill << std::endl;
 		samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
 		samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
@@ -545,6 +543,9 @@ void samplePDFFDBase::fillArray() {
 }
 
 #ifdef MULTITHREAD
+// ************************************************ 
+/// Multithreaded version of fillArray @see fillArray()
+// ************************************************ 
 void samplePDFFDBase::fillArray_MP() 
 {
   int nXBins = XBinEdges.size()-1;
