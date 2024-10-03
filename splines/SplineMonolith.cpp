@@ -1,5 +1,125 @@
 #include "SplineMonolith.h"
+#define STRING2(x) #x
+#define STRING(x) STRING2(x)
+#pragma message "CHECKME: " STRING(USE_FPGA)
+#ifdef USE_FPGA
+#include <sycl/ext/intel/experimental/task_sequence.hpp>
+#include <sycl/ext/intel/fpga_extensions.hpp>
+#include <sycl/ext/intel/ac_types/ac_int.hpp>
+#include <sycl/sycl.hpp>
 
+// Forward declare the kernel names in the global scope.
+// This FPGA best practice reduces name mangling in the optimization reports.
+class IDOptimized;
+
+// Minimum capacity of a pipe.
+// Set to 0 to allow the compiler to save area if possible.
+constexpr size_t kPipeMinCapacity = 32;
+
+// Pipes
+
+class IDPipeAB;
+using PipeAB = sycl::ext::intel::pipe<IDPipeAB,        // An identifier for the pipe
+                                      float,           // The type of data in the pipe
+                                      kPipeMinCapacity // The capacity of the pipe
+                                      >;
+
+
+//*********************************************************
+[[intel::use_stall_enable_clusters]] 
+void FPGACalcSplineWeights(int nParams, int NSplines_valid, int *param_n_knots, short *SplineSegments, float *coeff_many, float *coeff_x, float *ParamValues) {
+//*********************************************************
+
+  sycl::ext::intel::host_ptr<const int> param_n_knots_host(param_n_knots);
+  sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
+  sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
+  sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
+  sycl::ext::intel::host_ptr<const float> vals_host(ParamValues);
+  // //int _nCoeff_,
+  // //int _max_knots, 
+  // int *param_n_knots, 
+  // int *segments, 
+  // float *coeff_many, 
+  // float *coeff_x, 
+  // float *vals
+
+  // 200 = arbitrary number > nParams
+  // [[intel::fpga_memory("BLOCK_RAM")]] std::array<int, 200> segments_bram;
+  [[intel::fpga_memory("BLOCK_RAM")]] int segments_bram[200];
+
+  // [[intel::max_replicates(4)]] std::array<float, 200> vals_bram;
+  [[intel::max_replicates(4)]] float vals_bram[200];
+
+  //#pragma unroll
+  for (int i = 0; i < nParams; i++) {
+    segments_bram[i] = segments_host[i];
+    vals_bram[i] = vals_host[i];
+  }
+
+  [[intel::initiation_interval(1)]]
+  for (size_t splineNum = 0; splineNum < NSplines_valid; splineNum++) {
+
+    ac_int<8, false> Param = param_n_knots_host[2*splineNum]; // Param range 10e2
+    ac_int<8, false> segment = segments_bram[Param]; // segments range 10e2
+
+    // KS: Segment for coeff_x is simply parameter*max knots + segment as each
+    // parameters has the same spacing
+    ac_int<8, false> segment_X = Param; //* _max_knots + segment;
+
+    // KS: Find knot position in out monolithical structure
+    ac_int<16, false> CurrentKnotPos = param_n_knots_host[2*splineNum+1] + segment; // omitting nCoeff for now
+    //nKnots_arr[splineNum] * _nCoeff_ + segment * _nCoeff_;
+
+    // possibly combine nKnots_arr and  paramNo_arr
+
+    // std::array<float, 4> fX;
+    float fX[4];
+
+    #pragma unroll
+    for (unsigned int knotPos = 0; knotPos < 4; knotPos++) {
+
+      fX[knotPos] = coeff_many_host[CurrentKnotPos+knotPos];
+      // coeff_many = n_splines * n_knots -> large!
+
+    }
+
+    const float dx = vals_bram[Param] - coeff_x_host[segment_X];
+
+    //  optimizations:
+    // combine nknots and paramno as a single object to FPGA DDR
+    // store segments on chip
+    // store coeff_many on FPGA DDR
+
+    float a = dx * fX[3] + fX[2];
+    float b = dx * a + fX[1];
+    float c = dx * b + fX[0];
+    // write to pipe
+    PipeAB::write(c);
+  }
+}
+
+//*********************************************************
+//KS: Calc total event weight on CPU
+[[intel::use_stall_enable_clusters]]
+void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
+//*********************************************************
+  sycl::ext::intel::host_ptr<float> cpu_total_weights_host(cpu_total_weights);
+
+  [[intel::initiation_interval(1)]]
+  for (size_t i = 0; i < NSplines_valid / 4; i++) {
+
+    float sum = 0;
+
+    for (size_t a = 0; a < 4; a++) {
+      float tmp = PipeAB::read();
+      sum += tmp;
+    }
+
+    cpu_total_weights_host[i] = sum;
+  }
+}
+
+#endif
 #ifdef CUDA
 #include "splines/gpuSplineUtils.cuh"
 #endif
@@ -16,7 +136,9 @@ void SMonolith::Initialise() {
   gpu_spline_handler = nullptr;
 #endif
 
+#ifndef USE_FPGA
   cpu_spline_handler = new SplineMonoStruct();
+#endif
 
   nKnots = 0;
   nTF1coeff = 0;
@@ -74,6 +196,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
   MACH3LOG_INFO("Found total {} coeffs in all TF1", nTF1coeff);
   MACH3LOG_INFO("Number of TF1 = {}", NTF1_valid);
+  std::cout<<"CHECK in GPU constructor!!! "<<std::endl;
 
   // Can pass the spline segments to the GPU instead of the values
   // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
@@ -81,9 +204,28 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #ifdef CUDA
   gpu_spline_handler->InitGPU_Segments(&SplineSegments);
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
+  #elif USE_FPGA
+
+    #if FPGA_SIMULATOR
+      auto selector = sycl::ext::intel::fpga_simulator_selector_v;
+    #elif FPGA_HARDWARE
+      auto selector = sycl::ext::intel::fpga_selector_v;
+    #elif FPGA_EMULATOR
+      std::cout<<"CHECK!!! FPGA_EMULATOR active"<<std::endl;
+      auto selector = sycl::ext::intel::fpga_emulator_selector_v;
+    #else
+      auto selector = sycl::default_selector{};
+    #endif
+
+    std::cout<<"CHECK!!! USE_FPGA active"<<std::endl;
+    queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+    //queue = sycl::queue(sycl::default_selector{});
+    //segments = sycl::malloc_shared<short int>(nParams, queue);
+    SplineSegments = sycl::malloc_host<short int>(nParams, queue);
+    ParamValues = sycl::malloc_shared<float>(nParams, queue);
   #else
-  SplineSegments = new short int[nParams];
-  ParamValues = new float[nParams];
+    SplineSegments = new short int[nParams]();
+    ParamValues = new float[nParams]();
   #endif
 
   for (M3::int_t j = 0; j < nParams; j++)
@@ -101,9 +243,27 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Declare the {y,b,c,d} for each knot
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
-  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+  //cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
   //KS: For x coeff we assume that for given dial (MAQE) spacing is identical, here we are sloppy and assume each dial has the same number of knots, not a big problem
-  cpu_spline_handler->coeff_x.resize(event_size_max);
+  //cpu_spline_handler->coeff_x.resize(event_size_max);
+
+
+  #ifdef USE_FPGA
+    cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid);
+    cpu_coeff_TF1_many = sycl::malloc_shared<float>(nTF1coeff, queue);
+    cpu_paramNo_TF1_arr = sycl::malloc_shared<short int>(NTF1_valid, queue);
+    cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
+  #else
+    cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
+    //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
+    cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
+
+    cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+    cpu_spline_handler->coeff_x.resize(event_size_max);
+    cpu_coeff_TF1_many.resize(nTF1coeff);
+    cpu_paramNo_TF1_arr.resize(NTF1_valid);
+  #endif
+
 
   // Set all the big arrays to -999 to keep us safe...
   for (unsigned int j = 0; j < event_size_max; j++) {
@@ -117,7 +277,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   // Also make array with the number of points per spline (not per spline point!)
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
   cpu_nPoints_arr.resize(NTF1_valid);
-  cpu_coeff_TF1_many.resize(nTF1coeff); // *5 because this array holds  a,b,c,d,e parameters
+  //cpu_coeff_TF1_many.resize(nTF1coeff); // *5 because this array holds  a,b,c,d,e parameters
 
   #ifdef Weight_On_SplineBySpline_Basis
   // This holds the index of each spline
@@ -147,10 +307,10 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #endif
 
   // Make array with the number of points per spline (not per spline point!)
-  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
+  //cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
   //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
-  cpu_paramNo_TF1_arr.resize(NTF1_valid);
+  //cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
+  //cpu_paramNo_TF1_arr.resize(NTF1_valid);
 
   // Temporary arrays to hold the coefficients for each spline
   // We get one x, one y, one b,... for each point, so only need to be _max_knots big
@@ -284,10 +444,12 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   cpu_weights_tf1_var = new float[NTF1_valid]();
   #else
     //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
+    #ifndef USE_FPGA
     #ifndef CUDA
     cpu_total_weights = new float[NEvents]();
     cpu_weights_spline_var = new float[NSplines_valid]();
     cpu_weights_tf1_var = new float[NTF1_valid]();
+    #endif
     #endif
   #endif
 
@@ -561,27 +723,66 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 #ifdef CUDA
   gpu_spline_handler->InitGPU_Segments(&SplineSegments);
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
+#elif USE_FPGA
+
+  #if FPGA_SIMULATOR
+    auto selector = sycl::ext::intel::fpga_simulator_selector_v;
+  #elif FPGA_HARDWARE
+   //-Xshardware -fsycl-link=early -DFPGA_HARDWARE
+    auto selector = sycl::ext::intel::fpga_selector_v;
+  #elif FPGA_EMULATOR
+    std::cout<<"CHECK TWO!!! FPGA_EMULATOR active"<<std::endl;
+
+    auto selector = sycl::ext::intel::fpga_emulator_selector_v;
+  #else
+    auto selector = sycl::default_selector{};
+  #endif
+  queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+  //segments = sycl::malloc_shared<short int>(nParams, queue);
+  SplineSegments = sycl::malloc_host<short int>(nParams, queue);
+  ParamValues = sycl::malloc_shared<float>(nParams, queue);
+  
 #else
   SplineSegments = new short int[nParams]();
   ParamValues = new float[nParams]();
 #endif
 
+
+
   cpu_nParamPerEvent.resize(2*NEvents);
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
-  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
-  //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
+  #ifdef USE_FPGA
+    cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid);
+    cpu_coeff_TF1_many = sycl::malloc_shared<float>(nTF1coeff, queue);
+    cpu_paramNo_TF1_arr = sycl::malloc_shared<short int>(NTF1_valid, queue);
+  #else
+    cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
+    //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
+    cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
 
-  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
-  cpu_spline_handler->coeff_x.resize(event_size_max);
+    cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+    cpu_spline_handler->coeff_x.resize(event_size_max);
+    cpu_coeff_TF1_many.resize(nTF1coeff);
+    cpu_paramNo_TF1_arr.resize(NTF1_valid);
+  #endif
 
-  cpu_coeff_TF1_many.resize(nTF1coeff);
+
+  
 
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
 #ifndef CUDA
-  cpu_total_weights = new float[NEvents]();
-  cpu_weights_spline_var = new float[NSplines_valid]();
-  cpu_weights_tf1_var = new float[NTF1_valid]();
+  #ifdef USE_FPGA
+    cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
+    cpu_weights_spline_var = sycl::malloc_shared<float>(NSplines_valid, queue);
+    cpu_weights_tf1_var = sycl::malloc_shared<float>(NTF1_valid, queue);
+  #else
+    cpu_total_weights = new float[NEvents]();
+    cpu_weights_spline_var = new float[NSplines_valid]();
+    cpu_weights_tf1_var = new float[NTF1_valid]();
+  #endif
+
+  
+  
 #endif
 
   float coeff = 0.;
@@ -609,6 +810,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     ParamInfo->GetEntry(i);
     cpu_spline_handler->paramNo_arr[i] = paramNo_arr;
     cpu_spline_handler->nKnots_arr[i] = nKnots_arr;
+    #ifdef USE_FPGA
+    cpu_spline_handler->param_n_knots[2*i] = paramNo_arr;
+    cpu_spline_handler->param_n_knots[2*i+1] = nKnots_arr;
+    #endif
   }
 
   float coeff_x = 0.;
@@ -805,14 +1010,30 @@ SMonolith::~SMonolith() {
 
   delete gpu_spline_handler;
   #else
-  if(SplineSegments != nullptr) delete[] SplineSegments;
-  if(ParamValues != nullptr) delete[] ParamValues;
-  if(cpu_total_weights != nullptr) delete[] cpu_total_weights;
+    #ifdef USE_FPGA
+      if(SplineSegments != nullptr) sycl::free(SplineSegments, queue);
+      if(ParamValues != nullptr) sycl::free(ParamValues, queue);
+      if(cpu_total_weights != nullptr) sycl::free(cpu_total_weights, queue);
+    #else
+      if(SplineSegments != nullptr) delete[] SplineSegments;
+      if(ParamValues != nullptr) delete[] ParamValues;
+      if(cpu_total_weights != nullptr) delete[] cpu_total_weights;
+    #endif
+  
   #endif
 
   if(cpu_weights != nullptr) delete[] cpu_weights;
-  if(cpu_weights_spline_var != nullptr) delete[] cpu_weights_spline_var;
-  if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
+  #ifdef USE_FPGA
+    if(cpu_weights_spline_var != nullptr) sycl::free(cpu_weights_spline_var, queue);
+    if(cpu_weights_tf1_var != nullptr) sycl::free(cpu_weights_tf1_var, queue);
+    sycl::free(cpu_coeff_TF1_many, queue);
+    sycl::free(cpu_paramNo_TF1_arr, queue);
+  #else
+    if(cpu_weights_spline_var != nullptr) delete[] cpu_weights_spline_var;
+    if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
+  #endif
+
+
 
   if(cpu_spline_handler != nullptr) delete cpu_spline_handler;
 }
@@ -904,11 +1125,52 @@ void SMonolith::Evaluate() {
   // Find the spline segments
   FindSplineSegment();
 
-  //KS: Huge MP loop over all valid splines
-  CalcSplineWeights();
+  #ifdef USE_FPGA
 
-  //KS: Huge MP loop over all events calculating total weight
-  ModifyWeights();
+    struct OptimizedKernel {
+      int nParams;
+      unsigned int NSplines_valid;
+      int *param_n_knots;
+      short *SplineSegments;
+      float *coeff_many;
+      float *coeff_x;
+      float *ParamValues;
+
+      float *cpu_total_weights;
+      [[intel::kernel_args_restrict]]
+      void operator()() const {
+        sycl::ext::intel::experimental::task_sequence<FPGACalcSplineWeights> task_a;
+        sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_b;
+
+        task_a.async(nParams,
+                     NSplines_valid,
+                     param_n_knots,
+                     SplineSegments,
+                     coeff_many,
+                     coeff_x,
+                     ParamValues);
+        task_b.async(NSplines_valid, cpu_total_weights);
+      }
+    };
+    // Call the kernel
+    auto e = queue.single_task<IDOptimized>(OptimizedKernel{nParams,
+                                                            NSplines_valid,
+                                                            cpu_spline_handler->param_n_knots,
+                                                            SplineSegments,
+                                                            cpu_spline_handler->coeff_many,
+                                                            cpu_spline_handler->coeff_x,
+                                                            ParamValues,
+                                                            cpu_total_weights});
+
+    e.wait();
+  #else
+    //KS: Huge MP loop over all valid splines
+    CalcSplineWeights();
+
+    //KS: Huge MP loop over all events calculating total weight
+    ModifyWeights();
+  #endif
+  return;
 }
 #endif
 
@@ -928,7 +1190,6 @@ void SMonolith::CalcSplineWeights() {
     {
       //CW: Which Parameter we are accessing
       const short int Param = cpu_spline_handler->paramNo_arr[splineNum];
-
       //CW: Avoids doing costly binary search on GPU
       const short int segment = SplineSegments[Param];
 
