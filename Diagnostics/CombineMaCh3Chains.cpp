@@ -1,3 +1,4 @@
+// ROOT includes
 #include "TList.h"
 #include "TFile.h"
 #include "TMacro.h"
@@ -7,6 +8,7 @@
 #include "TKey.h"
 #include "TROOT.h"
 
+// MaCh3 includes
 #include "manager/manager.h"
 
 std::string OutFileName = "";
@@ -15,7 +17,7 @@ std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 
 /// EM: Will compare the version header contained in the two provided files and shout if they don't match
-bool checkSoftwareVersions(TFile *file, TFile *prevFile, std::string ConfigName)
+bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName)
 {
   bool weirdFile = false;
 
@@ -269,6 +271,7 @@ void ParseArg(int argc, char *argv[]){
 int main(int argc, char *argv[])
 {
   SetMaCh3LoggerFormat();
+  MaCh3Utils::MaCh3Welcome();
   ParseArg(argc, argv);
   CombineChain();
   return 0;
