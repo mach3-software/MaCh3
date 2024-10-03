@@ -1,0 +1,22 @@
+name: Post MaCh3 Newsletter
+
+on:
+  push:
+    branches:
+      - feature_anotherbot
+
+jobs:
+  post_discussion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Discussion
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/discussions \
+          -d '{
+              "category_id": "404",
+              "title": "MaCh3 newsletter",
+              "body": "It's a me MaChio, welcome to the newsletter"
+          }'
