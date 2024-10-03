@@ -25,3 +25,4 @@ jobs:
         run: |
           echo "discussion-id: ${{ steps.create-discussion.outputs.discussion-id }}"
           echo "discussion-url: ${{ steps.create-discussion.outputs.discussion-url }}"
+
