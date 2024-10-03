@@ -18,8 +18,8 @@ jobs:
           title: MaCh3 newsletter
           body: |
             Its a me MaChio, welcome to the newsletter
-          repository-id: ${{ secrets.REPO_ID }}
-          category-id: ${{ secrets.CAT_ID }}
+          repository-id: MDEwOlJlcG9zaXRvcnkzMzEwNDk0MTY=
+          category-id: DIC_kwDOE7tpyM4CgQ7H
 
       - name: Print discussion URL and ID
         run: |
