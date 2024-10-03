@@ -236,17 +236,20 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
 {
   //KS: Reset the histograms before reweight 
   ResetHistograms();
-  
+
+  /*
   std::vector<_float_> OscVec(OscCov->GetNumParams()+1);
   for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
-    OscVec[iPar] = OscCov->getParCurr(iPar);
+    OscVec[iPar] = OscCov->getParProp(iPar);
   }
   OscVec[OscCov->GetNumParams()] = 0.5; //Ye, not currently included in the covarianceOsc
+  */
+  std::vector<_float_> OscVec(OscCov->GetNumParams());
+  for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+    OscVec[iPar] = OscCov->getParProp(iPar);
+  } 
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
     NuOscProbCalcers[iSample]->Reweight(OscVec);
-    //NuOscProbCalcers[iSample]->PrintWeights();
-
-    
   }
 
   fillArray();
@@ -1259,7 +1262,7 @@ void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
   NuOscProbCalcers = std::vector<OscProbCalcerBase*>((int)MCSamples.size());
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
     std::cout << "Setting up NuOscillator::OscProbCalcerBase object in OscillationChannel: " << iSample << "/" << MCSamples.size() << " ====================" << std::endl;
-    NuOscProbCalcers[iSample] = OscProbCalcFactory->CreateOscProbCalcer("NuFASTLinear",OscYaml,0,1);
+    NuOscProbCalcers[iSample] = OscProbCalcFactory->CreateOscProbCalcer("CUDAProb3Linear",OscYaml,0,1);
 
     std::vector<_float_> EnergyArray((int)MCSamples[iSample].nEvents);
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
@@ -1276,9 +1279,12 @@ void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
 
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
-      if (MCSamples[iSample].isNC[iEvent] && MCSamples[iSample].signal) { //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
-	continue;
+      if (MCSamples[iSample].isNC[iEvent]) {
+	if (MCSamples[iSample].signal) {
+	  MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
+	} else {
+	  MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+	}
       } else {
 	
 	int InitFlav = NULL;
@@ -1326,11 +1332,11 @@ void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
 }
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
-  //HW : DON'T EDIT THIS!!!! (Pls make a weights pointer instead ^_^)
   double totalweight = 1.0;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
   }
+
   return totalweight;
 }
 
