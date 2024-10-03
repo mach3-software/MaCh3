@@ -1,6 +1,5 @@
 #pragma once
 
-
 /// @brief constructors are same for all three so put in here
 struct fdmc_base {
   int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
@@ -63,12 +62,4 @@ struct fdmc_base {
   double *xsec_w;
 
   splineFDBase *splineFile; 
-
-#if defined (USE_PROB3) 
-  BargerPropagator *Oscillator; // Prob3++
-#else
-  //cudaprob3::Propagator<double>  *Oscillator; // CUDAProb3
-  //cudaprob3::ProbType  ProbType;
-  //cudaprob3::NeutrinoType  NeutrinoType;
-#endif
 };

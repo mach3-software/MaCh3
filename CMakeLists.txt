@@ -155,10 +155,6 @@ if(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
-if(USE_PROB3)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
-endif()
-
 if(MaCh3_GPU_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
