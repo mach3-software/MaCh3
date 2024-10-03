@@ -81,13 +81,12 @@ cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
 ```
 
 ## CUDA
-If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to CUDA
+If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to [CUDA](https://developer.nvidia.com/cuda-toolkit)
 ```
 mkdir build; cd build;
 cmake ../ -DUSE_CPU=ON
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
-
 
 ## Oscillator
 MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
@@ -124,7 +123,7 @@ There are several debug modes, to enable more detailed but very heavy specific d
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF> -DDEBUG_LEVEL=<1,2,3>
 ```
 ## System Requirements
-Most of external libraries are being handled through CPM. The only external library that is not being handled through CPM and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
+Most of external libraries are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). The only external library that is not being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake) and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
 
 1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 2. [spdlog](https://github.com/gabime/spdlog)
