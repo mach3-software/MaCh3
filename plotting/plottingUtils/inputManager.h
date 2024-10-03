@@ -5,14 +5,12 @@
 #include "manager/YamlHelper.h"
 #include "manager/MaCh3Exception.h"
 #include "mcmc/MCMCProcessor.h"
+#include "samplePDF/Structs.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
 
 namespace MaCh3Plotting {
-
-// EM: will move this somewhere more sensible
-#define BAD_FLOAT -999.999
 
 /// @brief Types of possible file that can be read.
 enum fileTypeEnum {
@@ -322,7 +320,7 @@ public:
     {
       MACH3LOG_WARN("file at index {} does not have an MCMC entry for parameter {}", fileNum, paramName);
       MACH3LOG_WARN("am returning a bad float");
-      return BAD_FLOAT; 
+      return _BAD_DOUBLE_; 
     }
 
     return *_fileVec[fileNum].MCMCstepParamsMap.at(paramName);
