@@ -44,7 +44,7 @@ public:
   /// @brief CW: The light constructor
   XSecStruct(_int_ NumberOfSplines) {
     nParams = NumberOfSplines;
-    Func.reserve(nParams);
+    Func->reserve(nParams);
     for (int i = 0; i < nParams; ++i) {
       Func[i] = NULL;
     }
