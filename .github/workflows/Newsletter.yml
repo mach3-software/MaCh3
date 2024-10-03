@@ -9,14 +9,19 @@ jobs:
   post_discussion:
     runs-on: ubuntu-latest
     steps:
-      - name: Create GitHub Discussion
+      - name: Create a new GitHub Discussion
+        id: create-discussion
+        uses: abirismyname/create-discussion@v1.x
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          title: MaCh3 newsletter
+          body: |
+            Its a me MaChio, welcome to the newsletter
+          repository-id: ${{ secrets.REPO_ID }}
+          category-id: ${{ secrets.CAT_ID }}
+
+      - name: Print discussion URL and ID
         run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/mach3-software/MaCh3/discussions \
-            -d '{
-                "category_id": "42012359",
-                "title": "MaCh3 newsletter",
-                "body": "It'\''s a me MaChio, welcome to the newsletter"
-            }'
+          echo "discussion-id: ${{ steps.create-discussion.outputs.discussion-id }}"
+          echo "discussion-url: ${{ steps.create-discussion.outputs.discussion-url }}"
