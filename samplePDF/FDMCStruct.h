@@ -18,6 +18,7 @@ struct fdmc_base {
   const double** x_var;
   const double** y_var;
   const double **rw_etru;
+  const double **rw_truecz = NULL;
 
   /// xsec bins
   std::list< int > *xsec_norms_bins;
@@ -54,9 +55,7 @@ struct fdmc_base {
 
   int **mode;
   
-  /// DB Atmospheric Parameters
   const double **osc_w_pointer;
-  double *rw_truecz;
   
   double *flux_w; // not the same as beam systematics weight!                 
   double *xsec_w;

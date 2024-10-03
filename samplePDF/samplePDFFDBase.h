@@ -51,8 +51,6 @@ public:
 
   // Setup and config functions
   void UseNonDoubledAngles(bool ans) {doubled_angle = ans;};
-  void UseBinnedOscReweighting(bool ans);
-  void UseBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
   
   const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
@@ -76,19 +74,11 @@ public:
   void FindEventOscBin();
 
  protected:
-  /// @todo - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
   
   splineFDBase *splineFile;
   //===============================================================================
-  //DB Functions relating to sample and exec setup  
-  //ETA - abstracting these core functions
-  //init will setup all the specific variables 
-  //void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
-  //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
-  //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
-
   void fillSplineBins();
 
   //Functions which find the nominal bin and bin edges
@@ -184,13 +174,10 @@ public:
   /// DB Variables required for oscillation
   std::vector<OscProbCalcerBase*> NuOscProbCalcers;
   
-  /// An axis to set binned oscillation weights
-  TAxis *osc_binned_axis ;
   //===============================================================================
   
   //Variables controlling oscillation parameters
   bool doubled_angle;
-  bool osc_binned;
 
   //===============================================================================
   //DB Covariance Objects
