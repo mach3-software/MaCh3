@@ -26,18 +26,63 @@ add_library(MaCh3CompileDefinitions INTERFACE)
 # this saves a few if statements
 add_library(MaCh3GPUCompilerOptions INTERFACE)
 
+#ETA: Add the MaCh3 library here so it's easier to add any specific options based on say compiler etc.
+add_library(MaCh3 INTERFACE)
+
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED)
+if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED AND NOT (USE_CPU OR USE_FPGA))
   cmessage(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED ON)
   enable_language(CUDA)
+  set(CUDA TRUE)
   set(CPU_ONLY FALSE)
 else()
   cmessage(STATUS "CUDA not found. Proceeding without CUDA support.")
   set(MaCh3_GPU_ENABLED OFF)
-  set(CPU_ONLY TRUE)
+  set(CUDA FALSE)
+  if(USE_CPU)  
+    message(STATUS "CPU only mode")
+    set(CPU_ONLY TRUE)
+    set(USE_FPGA FALSE)
+  elseif(USE_FPGA)
+    message(STATUS "FPGA mode") 
+    set(CPU_ONLY FALSE)
+    set(USE_FPGA TRUE)
+  endif()
+
+  message(STATUS "USE_CPU flag: ${USE_CPU}")
+  message(STATUS "USE_FPGA flag: ${USE_FPGA}")
+
 endif()
+
+if(USE_FPGA)
+  if(NOT DEFINED FPGA_DEVICE)
+    set(FPGA_DEVICE "Agilex7")
+    message(STATUS "FPGA_DEVICE was not specified.\
+                    \nConfiguring the design to the default FPGA family target: ${FPGA_DEVICE}\
+                    \nPlease refer to the README for information on target selection.")
+  endif()
+
+  set(USER_FPGA_FLAGS ${USER_FPGA_FLAGS})
+
+  set(EMULATOR_TARGET fpga_emu)
+  set(SIMULATOR_TARGET fpga_sim)
+  set(REPORT_TARGET report)
+  set(FPGA_TARGET fpga)
+
+  # Set the names of the generated files per makefile target
+  set(EMULATOR_OUTPUT_NAME ${TARGET_NAME}.${EMULATOR_TARGET})
+  set(SIMULATOR_OUTPUT_NAME ${TARGET_NAME}.${SIMULATOR_TARGET})
+  set(REPORT_OUTPUT_NAME ${TARGET_NAME}.${REPORT_TARGET})
+  set(FPGA_OUTPUT_NAME ${TARGET_NAME}.${FPGA_TARGET})
+
+  message(STATUS "Additional USER_FPGA_FLAGS=${USER_FPGA_FLAGS}")
+  message(STATUS "Additional USER_FLAGS=${USER_FLAGS}")
+  set(QACTYPES "-qactypes")
+
+endif()
+
 
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -132,6 +177,19 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
 )
 
+if(USE_FPGA)
+  if(WIN32)
+    # add qactypes for Windows
+    set(QACTYPES "-Qactypes")
+    # This is a Windows-specific flag that enables exception handling in host code
+    set(WIN_FLAG "/EHsc")
+  else()
+    # add qactypes for Linux
+    set(QACTYPES "-qactypes")
+  endif()
+endif()
+
+
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
   set(MaCh3_DEBUG_ENABLED TRUE)
@@ -144,7 +202,7 @@ endif()
 
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE
+  target_compile_options(MaCh3CompilerOptions BEFORE INTERFACE
     -O0                                  # Turn off any optimisation to have best debug experience
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
@@ -176,10 +234,22 @@ endif()
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  if(USE_FPGA)
+    target_compile_options(MaCh3CompilerOptions BEFORE INTERFACE -qopenmp)
+  else()
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  endif()
+
   # KS: Not a clue why clang need different...
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+    #ETA: intel icpx requires this I believe
+    cmessage(STATUS "CMAKE_CXX_COMPILER_ID is IntelLLVM!!")
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+      target_link_libraries(MaCh3 INTERFACE OpenMP::OpenMP_CXX)
+    endif()
   else()
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
@@ -190,6 +260,16 @@ if(MaCh3_GPU_ENABLED)
   target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE CUDA)
   target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE GPU_ON)
 endif()
+
+if(CPU_ONLY)
+  target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
+endif()
+
+if(USE_FPGA)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE sycl)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -Wall ${QACTYPES} ${USER_FLAGS})
+endif()
+
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE _LOW_MEMORY_STRUCTS_)
@@ -254,8 +334,12 @@ endif()
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
-add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+#add_library(MaCh3 INTERFACE)
+if (USE_FPGA)
+  target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting spdlog::spdlog)
+else()
+  target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting spdlog::spdlog)
+endif()
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

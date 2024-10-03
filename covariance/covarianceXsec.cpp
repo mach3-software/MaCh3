@@ -383,6 +383,7 @@ void covarianceXsec::PrintGlobablInfo() {
   MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleNames", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
+    #ifndef USE_FPGA
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
     std::string SampleNameString = "";
     for (const auto& SampleName : _fSampleNames[i]) {
@@ -392,6 +393,7 @@ void covarianceXsec::PrintGlobablInfo() {
       SampleNameString += SampleName;
     }
     MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleNameString, "|", SystType_ToString(_fParamType[i]));
+    #endif
   }
   MACH3LOG_INFO("============================================================================================================================================================");
 }

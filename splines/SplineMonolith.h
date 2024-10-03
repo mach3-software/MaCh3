@@ -1,9 +1,14 @@
 #pragma once
+#ifdef USE_FPGA
+#include <sycl/sycl.hpp>
+#include "splines/oneAPIUtils.dp.hpp"
+#endif
 
 #include "splines/SplineBase.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class SMonolithGPU;
+
 
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
@@ -139,20 +144,30 @@ class SMonolith : public SplineBase {
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
 
+    #ifdef USE_FPGA
+    sycl::queue queue;
+    SplineMonoUSM* cpu_spline_handler;
+    float* cpu_coeff_TF1_many;
+
+    short int* cpu_paramNo_TF1_arr;
+    #else
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_spline_handler;
+    /// CPU arrays to hold TF1 coefficients
+    std::vector<float> cpu_coeff_TF1_many;
+    /// CW: CPU array with the number of points per spline (not per spline point!)
+    std::vector<short int> cpu_paramNo_TF1_arr;
+    #endif
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SMonolithGPU* gpu_spline_handler;
 
-    /// CPU arrays to hold TF1 coefficients
-    std::vector<float> cpu_coeff_TF1_many;
+
 
     /// CPU arrays to hold number of points
     std::vector<short int> cpu_nPoints_arr;
 
-    /// CW: CPU array with the number of points per spline (not per spline point!)
-    std::vector<short int> cpu_paramNo_TF1_arr;
+
 
     /// Flag telling whether we are saving spline monolith into handy root file
     bool SaveSplineFile;
