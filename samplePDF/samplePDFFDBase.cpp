@@ -1256,13 +1256,13 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
 }
 
-void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
+void samplePDFFDBase::SetupNuOscillator(std::string OscImplementation,std::string OscYaml) {
   OscProbCalcerFactory* OscProbCalcFactory = new OscProbCalcerFactory();
 
   NuOscProbCalcers = std::vector<OscProbCalcerBase*>((int)MCSamples.size());
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
     std::cout << "Setting up NuOscillator::OscProbCalcerBase object in OscillationChannel: " << iSample << "/" << MCSamples.size() << " ====================" << std::endl;
-    NuOscProbCalcers[iSample] = OscProbCalcFactory->CreateOscProbCalcer("CUDAProb3Linear",OscYaml,0,1);
+    NuOscProbCalcers[iSample] = OscProbCalcFactory->CreateOscProbCalcer(OscImplementation,OscYaml,0,1);
 
     std::vector<_float_> EnergyArray((int)MCSamples[iSample].nEvents);
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
