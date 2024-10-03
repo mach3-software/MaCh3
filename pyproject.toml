@@ -5,3 +5,6 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "pyMaCh3"
 version = "0.0.1"
+
+[tool.scikit-build.cmake]
+args = ["-DMaCh3_PYTHON_ENABLED=ON"]

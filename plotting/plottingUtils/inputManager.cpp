@@ -1,7 +1,5 @@
 #include "inputManager.h"
 
-// EM: will move this somewhere more sensible
-#define BAD_FLOAT -999.999
 
 namespace MaCh3Plotting {
 // this is the constructor with user specified translation config file
@@ -71,14 +69,13 @@ InputManager::InputManager(const std::string &translationConfigName) {
 ///  - Push back a pointer to the InputFile objcet to the vector of files known to this
 ///  InputManager.
 void InputManager::addFile(const std::string &fileName) {
-  InputFile fileInfo(fileName);
+  _fileVec.emplace_back(fileName);
 
   // EM: need to be done in this order since fillFileData needs to know info about the file, e.g.
   // fitter and what things are in it
+  InputFile &fileInfo = _fileVec.back();
   fillFileInfo(fileInfo);
   fillFileData(fileInfo);
-
-  _fileVec.push_back(fileInfo);
 }
 
 /// If printLevel is "summary", will loop through all the files known to this InputManager and call
@@ -135,9 +132,9 @@ float InputManager::getPostFitError(int fileNum, const std::string &paramName,
     return inputFileDef.postFitErrors.at(errorType).at(paramName);
   }
 
-  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, BAD_FLOAT);
+  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, _BAD_DOUBLE_);
 
-  return BAD_FLOAT;
+  return _BAD_DOUBLE_;
 }
 
 float InputManager::getPostFitValue(int fileNum, const std::string &paramName,
@@ -164,9 +161,9 @@ float InputManager::getPostFitValue(int fileNum, const std::string &paramName,
     return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
   
-  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, BAD_FLOAT);
+  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, _BAD_DOUBLE_);
 
-  return BAD_FLOAT;
+  return _BAD_DOUBLE_;
 }
 
 
@@ -238,7 +235,7 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
 
 std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
                                                      fileTypeEnum fileType, const std::string &parameter,
-                                                     const std::string &sample) const {
+                                                     const std::string &sample, const std::string &parameter2) const {
 
   std::string locationString(rawLocationString);
   std::vector<std::string> tokens;
@@ -261,6 +258,15 @@ std::vector<std::string> InputManager::parseLocation(const std::string &rawLocat
   {
     locationString.replace(pos, toReplace.length(),
                            getFitterSpecificSampleName(fitter, fileType, sample));
+  }
+
+  // loop through the raw location string and replace any instance of {PARAMETER2} with the name of
+  // the second specified parameter
+  toReplace = "{PARAMETER2}";
+  while ((pos = locationString.find(toReplace)) != std::string::npos)
+  {
+    locationString.replace(pos, toReplace.length(),
+                           getFitterSpecificParamName(fitter, fileType, parameter2));
   }
 
   // Now we go through and look for ":" and split the location into two parts
@@ -398,6 +404,77 @@ bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &p
   }
 
   return true;
+}
+
+// check the input file for raw MCMC step values for a particular parameter
+bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setInputBranch) const {
+  // we'll assume for now that the chain is in the form of a TTree and the branch names are parameter names
+
+  bool wasFound = false;
+
+  // make sure that the filedef object has all the necessary stuff to read from the posterior tree
+  if ( (inputFileDef.mcmcProc != nullptr) && (inputFileDef.posteriorTree != nullptr) )
+  {
+
+    const std::vector<TString> branchNames = inputFileDef.mcmcProc->GetBranchNames();
+
+    std::string specificName = getFitterSpecificParamName(fitter, kMCMC, parameter);
+
+    // loop over possible parameters and compare names
+    for ( int paramIdx = 0; paramIdx < inputFileDef.mcmcProc->GetNParams() -1 ; paramIdx ++ )
+    {
+      TString title;
+      double prior, priorError; // <- will be discarded
+      inputFileDef.mcmcProc->GetNthParameter(paramIdx, prior, priorError, title);
+
+      if ( strEndsWith(title.Data(), specificName) )
+      {
+        wasFound = true;
+        if ( setInputBranch )
+        {
+          // EM: should probably use MCMCProcessor for this so we can use caching, gpu etc.
+          inputFileDef.MCMCstepParamsMap[parameter] = new double( _BAD_DOUBLE_ ); // <- initialise the parameter step values 
+          inputFileDef.posteriorTree->SetBranchAddress( branchNames[paramIdx], inputFileDef.MCMCstepParamsMap.at(parameter) );
+        }
+
+        break;
+      }
+    }
+  }
+
+  return wasFound;
+
+}
+
+// check the input file for processed 1d posteriors for a particular parameter
+bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData) const {
+  
+  bool wasFound = false;
+  
+  YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
+
+  if ( thisFitterSpec_config["1dPosteriors"] ) {
+    std::vector<std::string> rawLocations = thisFitterSpec_config["1dPosteriors"]["location"].as<std::vector<std::string>>();
+
+    for ( const std::string &rawLoc : rawLocations)
+    {
+      std::shared_ptr<TH1D> posterior1d = std::static_pointer_cast<TH1D>(findRootObject(inputFileDef, parseLocation(rawLoc, fitter, kMCMC, parameter)));
+
+      if ( posterior1d != nullptr )
+      {
+        wasFound = true;
+
+        if ( setFileData )
+        {
+          inputFileDef.posteriors1d_map[parameter] = std::make_shared<TGraph>(posterior1d.get());
+        }
+        break;
+      }
+    }
+
+  }
+
+  return wasFound;
 }
 
 bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::string &parameter,
@@ -616,6 +693,95 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       }
     }
 
+    // ######### Now for the main event: Look for MCMC chains and processed posteriors ###########
+    
+    // EM: if "MCMCsteps" was defined for this fitter, we assume that it is a MaCh3 raw MCMC file
+    // thus it needs an MCMCProcessor to read from it. This isn't super general and it would probably
+    // be good to have some additional "isMaCh3" option that can decide whether or not to use MCMCProcessor
+    // but hey ho it's good enough for now
+    if ( thisFitterSpec_config["MCMCsteps"] )
+    {
+      MACH3LOG_DEBUG("Initialising MCMCProcessor for the input file");
+      std::vector<std::string> posteriorTreeRawLocations = thisFitterSpec_config["MCMCsteps"]["location"].as<std::vector<std::string>>();
+      
+      TTree *postTree = NULL;
+      for ( const std::string &rawLoc: posteriorTreeRawLocations )
+      {
+        MACH3LOG_DEBUG("  - Looking for MCMC chain parameter values at: {}", rawLoc);
+
+        TObject *postTreeObj = inputFileDef.file->Get(rawLoc.c_str());
+
+        if ( postTreeObj != NULL )
+        {
+          postTree = (TTree *) postTreeObj;
+          inputFileDef.mcmcProc = new MCMCProcessor(inputFileDef.fileName);
+          inputFileDef.mcmcProc->Initialise();
+
+          MACH3LOG_DEBUG("  - FOUND!");
+          break;
+        }
+      }
+    
+      if ( postTree != NULL )
+      {
+        inputFileDef.posteriorTree = postTree;
+        inputFileDef.nMCMCentries = postTree->GetEntries();
+      }
+    }
+
+    if (printThoughts)
+    {
+      MACH3LOG_INFO("....Searching for MCMC related things");
+    }
+    
+    size_t num1dPosteriors = 0;
+    std::vector<std::string> enabled1dPosteriorParams;
+
+    size_t numMCMCchainParams = 0;
+    std::vector<std::string> enabledMCMCchainParams;
+
+    for ( const std::string &parameter : _knownParameters )
+    {
+      MACH3LOG_DEBUG("     - for {}", parameter);
+      // check for 1d post processing posterior.q
+      inputFileDef.availableParams_map_1dPosteriors[parameter] = false;
+      if ( thisFitterSpec_config["1dPosteriors"] && find1dPosterior(inputFileDef, parameter, fitter) )
+      {
+        MACH3LOG_DEBUG("       Found 1d processed posterior!");
+        enabled1dPosteriorParams.push_back(parameter);
+        num1dPosteriors++;
+        inputFileDef.availableParams_map_1dPosteriors[parameter] = true;
+      }
+      // now check for parameters in chain 
+      inputFileDef.availableParams_map_MCMCchain[parameter] = false;
+      if ( thisFitterSpec_config["MCMCsteps"] && findRawChainSteps(inputFileDef, parameter, fitter) )
+      {
+        MACH3LOG_DEBUG("       Found raw MCMC steps!");
+        enabledMCMCchainParams.push_back(parameter);
+        numMCMCchainParams++;
+        inputFileDef.availableParams_map_MCMCchain[parameter] = true;
+      }
+    }
+
+    if  (num1dPosteriors > 0 )
+    {
+      foundFitter = true;
+      inputFileDef.has1dPosteriors = true;
+      inputFileDef.availableParams_1dPosteriors = enabled1dPosteriorParams;
+
+      if (printThoughts)
+        MACH3LOG_INFO("........ Found {} 1d processed posteriors", num1dPosteriors);
+    }
+    if ( numMCMCchainParams > 0 )
+    {
+      foundFitter = true;
+      inputFileDef.hasMCMCchain = true;
+      inputFileDef.availableParams_MCMCchain = enabledMCMCchainParams;
+
+      if (printThoughts)
+        MACH3LOG_INFO("........ Found {} parameters in MCMC chain", numMCMCchainParams);
+    }
+
     /*
     switch (i) {
         // any other weird fitter specific conditions/ edge cases should go in here
@@ -731,6 +897,16 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
     {
       findPostFitParamError(inputFileDef, parameter, inputFileDef.fitter, errorType, true);
     }
+  }
+
+  // ########## Get the MCMC related posteriors ###########
+  for (const std::string &parameter : inputFileDef.availableParams_MCMCchain)
+  {
+    findRawChainSteps(inputFileDef, parameter, inputFileDef.fitter, true);
+  }
+  for (const std::string &parameter : inputFileDef.availableParams_1dPosteriors)
+  {
+    find1dPosterior(inputFileDef, parameter, inputFileDef.fitter, true);
   }
 }
 

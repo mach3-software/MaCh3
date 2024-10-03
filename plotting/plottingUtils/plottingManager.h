@@ -66,6 +66,7 @@ public:
   void initialise();
 
   ~PlottingManager() {
+    MACH3LOG_DEBUG("##### Deleting PlottingManager Instance #####");
   }
 
   /// @brief Parse command line arguments.

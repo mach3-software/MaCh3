@@ -80,4 +80,31 @@ std::vector<std::vector<float>> TGraphToVector(TGraph graph) {
   return ret;
 }
 
+
+std::vector<std::vector<float>> TGraphToVector(TGraph2D graph) {
+
+  int nPoints = graph.GetN();
+  std::vector<std::vector<float>> ret(3);
+  std::vector<float> pointsX(nPoints);
+  std::vector<float> pointsY(nPoints);
+  std::vector<float> pointsZ(nPoints);
+
+  // Get the points out
+  Double_t x, y, z;
+
+  for (int pointId = 0; pointId < nPoints; pointId++)
+  {
+    graph.GetPoint(pointId, x, y, z);
+    pointsX[pointId] = x;
+    pointsY[pointId] = y;
+    pointsZ[pointId] = z;
+  }
+
+  ret[0] = pointsX;
+  ret[1] = pointsY;
+  ret[2] = pointsZ;
+
+  return ret;
+}
+
 } // namespace MaCh3Plotting 

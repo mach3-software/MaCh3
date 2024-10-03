@@ -4,6 +4,8 @@
 #include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"
 #include "manager/MaCh3Exception.h"
+#include "mcmc/MCMCProcessor.h"
+#include "samplePDF/Structs.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
@@ -14,7 +16,7 @@ namespace MaCh3Plotting {
 enum fileTypeEnum {
   kLLH,         //!< Log Likelihood scan
   kPostFit,     //!< Processed post fit errors
-  kMarkovChain, //!< MCMC chain
+  kMCMC,        //!< MCMC chain
   kSigmaVar,    //!< Sigma variations
 
   kNFileTypes //!< Number of types of file
@@ -54,14 +56,25 @@ struct InputFile {
     }
   }
 
+  // NO COPYING!!
+  InputFile( const InputFile& ) = delete;
+  // Moving ok
+  InputFile( InputFile&& ) = default;
+  // EM: ^^ there should only really be one instance of an InputFile for each
+  // underlying root file. If copying is allowed then it can lead to bad bad things
+  // like pointers getting deleted and then trying to be accessed by a copied 
+  // InputFile instance
+
   /// @brief Destructor.
   ~InputFile() {
+    MACH3LOG_DEBUG("###### Deleting InputFile Object holding file ######");
     LLHScans_map.clear();
   }
 
   /// @brief Close out the underlying root file
   /// @details Should only be done once this InputFile is *done* with, should only really ever be done by the InputManager that holds this object 
   void Close(){
+    MACH3LOG_DEBUG("[InputFile] closing file {}", fileName);
     file->Close();
   }
 
@@ -91,6 +104,10 @@ struct InputFile {
       MACH3LOG_INFO("  {}", paramName);
     }
   }
+
+  /// ptr to an MCMCProcessor instance to be used if this is a MaCh3 input file
+  MCMCProcessor *mcmcProc;
+  TTree *posteriorTree;
 
   std::shared_ptr<TFile> file;          //!< Pointer to the underlying file for this InputFile instance.
   std::string fileName; //!< The location of the underlying file.
@@ -146,9 +163,28 @@ struct InputFile {
       postFitValues; //!< The post fit values of the parameters, organised as
                      //!< postFitValues.at(errorType).at(parameter).
   std::string defaultErrorType;
-  // TH1D *postFitErrors; //!< Pointer to the TH1D with named bins that contain the post fit value
-  // and errors.
 
+  // Stuff relating to MCMC
+  /// Whether or not the file has processed 1d posteriors
+  bool has1dPosteriors;
+  /// Whether or not the file has unprocessed MCMC chain steps
+  bool hasMCMCchain;
+
+  /// The number of steps in the MCMC chain
+  int nMCMCentries;
+
+  /// whether or not specific parameters exist in the MCMC posterior chain
+  std::unordered_map<std::string, bool> availableParams_map_MCMCchain;
+  std::unordered_map<std::string, bool> availableParams_map_1dPosteriors;
+
+  std::vector<std::string> availableParams_1dPosteriors;
+  std::vector<std::string> availableParams_MCMCchain;
+
+  std::unordered_map<std::string, double*> MCMCstepParamsMap;
+  std::unordered_map<std::string, int> MCMCstepTreeIndicesMap;
+
+  std::unordered_map<std::string, std::shared_ptr<TGraph>> posteriors1d_map;
+  
   // EM: almost certainly won't want to load all of these into memory at the start
   bool hasSigmaVars; //!< Whether or not this file contains Sigma variations.
 };
@@ -195,13 +231,23 @@ public:
   /// @details Close out all the files that the manager is responsible for
   ~InputManager()
   {
-    for (InputFile file: _fileVec)
+    MACH3LOG_DEBUG("##### Deleting InputManager Instance #####");
+    for (InputFile &file: _fileVec)
     {
       file.Close();
     }
 
     _fileVec.clear();
   }
+
+  // NO COPYING!
+  InputManager(const InputManager&) = delete;
+  // moving is ok
+  InputManager(InputManager&&) = default;
+  // EM: ^^ Do this as there should only ever really be one instance of the 
+  // InputManager (should maybe make it a singleton actually)
+  // if copied then it can lead to things being deleted that we really don't
+  // want to be deleted
 
   /// @brief Convert from fileTypeEnum to the name of the file type.
   /// @param fileType The file type ID to convert.
@@ -214,8 +260,8 @@ public:
       return "LLH";
     case kPostFit:
       return "PostFit";
-    case kMarkovChain:
-      return "MarkovChain";
+    case kMCMC:
+      return "MCMC";
     case kSigmaVar:
       return "SigmaVar";
 
@@ -244,6 +290,61 @@ public:
       return std::vector<std::vector<float>>(2); 
     }
     return TGraphToVector(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
+  }
+
+  /// @brief Get the MCMC chain entry in an InputFile.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param entry The entry to get.
+  void getMCMCentry(int fileNum, int entry) const {
+    // EM: the const here is a little bit of a lie since GetEntry will in fact modify 
+    //     the pointers to the stored data for the MCMC chain values but hopefully this should be ok
+    const InputFile &file = _fileVec[fileNum];
+
+    if( entry > file.nMCMCentries )
+    {
+      MACH3LOG_ERROR("Trying to access entries beyond what exist in file {}. No-can-do!", file.fileName);
+    }
+    else
+    {
+      MACH3LOG_TRACE("Getting entry {} in MCMC tree for file at index {}", entry, fileNum);
+      file.posteriorTree->GetEntry(entry);
+      MACH3LOG_TRACE("  Got successfuly");
+    }
+  }
+
+  /// @brief Get the parameter value for the current step for a particular parameter from a particular input file.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param paramName The parameter you want the value of.
+  double getMCMCvalue(int fileNum, std::string paramName) const {
+    if (!getEnabledMCMCchain(fileNum, paramName))
+    {
+      MACH3LOG_WARN("file at index {} does not have an MCMC entry for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning a bad float");
+      return _BAD_DOUBLE_; 
+    }
+
+    return *_fileVec[fileNum].MCMCstepParamsMap.at(paramName);
+
+  }
+
+  /// @brief Get the 1d posterior particular parameter from a particular input file.
+  /// @param fileNum The index of the file you want the data from.
+  /// @param paramName The parameter you want the information about.
+  /// @return A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis
+  std::vector<std::vector<float>> get1dPosterior(int fileNum, std::string paramName) const {
+    if (!getEnabled1dPosteriors(fileNum, paramName))
+    {
+      MACH3LOG_WARN("file at index {} does not have a 1d posterior for parameter {}", fileNum, paramName);
+      MACH3LOG_WARN("am returning an empty vector");
+      return std::vector<std::vector<float>>(2);
+    }
+    return TGraphToVector(*_fileVec[fileNum].posteriors1d_map.at(paramName));
+  }
+
+  /// @brief Get the number of entries in the MCMC chain in a particular file.
+  /// @param fileNum The index of the file you want the number of steps from.
+  int getnMCMCentries(int fileNum) const {
+    return _fileVec[fileNum].nMCMCentries;
   }
 
   /// @brief Get the log likelihood scan for a particular parameter from a particular input file.
@@ -331,6 +432,22 @@ public:
     return _fileVec[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);
   }
 
+  /// @brief Get whether or not a particular parameter has MCMC chain entries in a particular input file.
+  /// @param fileNum The index of the file that you would like to know about.
+  /// @param paramName The name of the parameter whose LLH scan you would like to check for.
+  /// @return true if scan exists, false if not.
+  inline bool getEnabledMCMCchain(int fileNum, std::string paramName) const {
+    return _fileVec[fileNum].availableParams_map_MCMCchain.at(paramName);
+  }
+
+  /// @brief Get whether or not a particular parameter has 1d posteriors in a particular input file.
+  /// @param fileNum The index of the file that you would like to know about.
+  /// @param paramName The name of the parameter whose 1d posterior you would like to check for.
+  /// @return true if scan exists, false if not.
+  inline bool getEnabled1dPosteriors(int fileNum, std::string paramName) const {
+    return _fileVec[fileNum].availableParams_map_1dPosteriors.at(paramName);
+  }
+
   /// @brief Get the post fit error for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
   /// @param paramName The name of the parameter whose error you would like.
@@ -380,7 +497,7 @@ public:
 
   /// @name File Specific Getters
   /// @{
-  inline InputFile getFile(int fileId) const { return _fileVec[fileId]; }
+  inline InputFile const &getFile(int fileId) const { return _fileVec[fileId]; }
   inline std::string translateName(int fileId, fileTypeEnum fileType, std::string paramName) const {
     return getFitterSpecificParamName(_fileVec[fileId].fitter, fileType, paramName);
   }
@@ -392,6 +509,12 @@ public:
   }
   inline const std::vector<std::string> &getKnownPostFitParameters(int fileId) const {
     return _fileVec[fileId].availableParams_postFitErrors;
+  }
+  inline const std::vector<std::string> &getKnownMCMCParameters(int fileId) const {
+    return _fileVec[fileId].availableParams_MCMCchain;
+  }
+  inline const std::vector<std::string> &getKnown1dPosteriorParameters(int fileId) const {
+    return _fileVec[fileId].availableParams_1dPosteriors;
   }
   /// @}
 
@@ -413,7 +536,7 @@ private:
   // look for in that directory
   std::vector<std::string> parseLocation(const std::string &locationString, std::string &fitter,
                                          fileTypeEnum fileType, const std::string &parameter = "",
-                                         const std::string &sample = "") const;
+                                         const std::string &sample = "", const std::string &parameter2 = "") const;
 
   // helper function to look for an object defined by a vector of strings [ (directory to look in),
   // (end of the name of the object) ] this just calls roots TDirectoryFile->Get() function so
@@ -431,6 +554,12 @@ private:
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
   bool findBySampleLLH(InputFile &inputFileDef, const std::string &parameter, std::string &fitter,
                        const std::string &sample, bool setInputFileScan = false);
+
+  // check the input file for raw MCMC step values for a particular parameter
+  bool findRawChainSteps(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setInputBranch = false ) const ;
+
+  // check the input file for processed 1d posteriors for a particular parameter
+  bool find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData = false) const ;
 
   // fns tp read an input file
   void fillFileInfo(InputFile &inputFileDef, bool printThoughts = true);
