@@ -9,7 +9,7 @@ struct fdmc_base {
   bool signal; // true if signue                                              
   int nEvents; // how many MC events are there                              
   std::string flavourName;
-  int *isbound;
+
   int **Target; // target the interaction was on
 
   int SampleDetID;
@@ -33,9 +33,6 @@ struct fdmc_base {
   int* nxsec_spline_pointers;
   const double*** xsec_spline_pointers;
 
-  const double** skdet_pointer;
-  const double* EScale_pointer;
-
   int* ntotal_weight_pointers;
   const double*** total_weight_pointers;
   double* total_w;
@@ -56,9 +53,6 @@ struct fdmc_base {
   int **mode;
   
   const double **osc_w_pointer;
-  
-  double *flux_w; // not the same as beam systematics weight!                 
   double *xsec_w;
-
   splineFDBase *splineFile; 
 };
