@@ -9,6 +9,7 @@
 
 //MaCh3 includes
 #include "OscProbCalcer/OscProbCalcerBase.h"
+#include "Oscillator/OscillatorBase.h"
 
 #include "splines/splineFDBase.h"
 
@@ -57,7 +58,7 @@ public:
   void SetOscCov(covarianceOsc* osc_cov);
 
   ///  @brief including Dan's magic NuOscillator
-  void SetupNuOscillator(std::string OscImplementation, std::string OscillatorYaml);
+  void SetupNuOscillator(std::string OscillatorYaml);
 
   /// @deprecated The `DumpWeights` function is deprecated and should not be used.
   /// It was kept for backwards compatibility in compiling but has no effect.
@@ -172,7 +173,7 @@ public:
 
   //===============================================================================
   /// DB Variables required for oscillation
-  std::vector<OscProbCalcerBase*> NuOscProbCalcers;
+  std::vector<OscillatorBase*> NuOscProbCalcers;
   
   //===============================================================================
   
