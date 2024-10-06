@@ -20,9 +20,18 @@ jobs:
       - name: Count the total number of commits and get top contributors
         run: |
           echo "commit_count=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+
+          # Capture each contributor and handle any potential whitespace issues
           first_contributor=$(git shortlog -n -s | head -n 1 | awk '{$1=""; print $0}' | sed 's/^ *//g')
           second_contributor=$(git shortlog -n -s | head -n 2 | tail -n 1 | awk '{$1=""; print $0}' | sed 's/^ *//g')
           third_contributor=$(git shortlog -n -s | head -n 3 | tail -n 1 | awk '{$1=""; print $0}' | sed 's/^ *//g')
+
+          # Debugging: Print the contributors to verify they are captured correctly
+          echo "First Contributor: $first_contributor"
+          echo "Second Contributor: $second_contributor"
+          echo "Third Contributor: $third_contributor"
+
+          # Set environment variables
           echo "first_contributor=${first_contributor}" >> $GITHUB_ENV
           echo "second_contributor=${second_contributor}" >> $GITHUB_ENV
           echo "third_contributor=${third_contributor}" >> $GITHUB_ENV
