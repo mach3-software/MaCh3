@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history including tags
 
       - name: Count the total number of commits and get top contributors
         run: |
