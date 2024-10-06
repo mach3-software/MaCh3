@@ -56,6 +56,26 @@ jobs:
           tutorial_latest_tag=$(git -C MaCh3Tutorial describe --tags --abbrev=0)
           echo "tutorial_latest_tag=${tutorial_latest_tag}" >> $GITHUB_ENV
 
+      - name: Checkout the MaCh3-PythonUtils repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history including tags
+          repository: mach3-software/MaCh3-PythonUtils
+          path: MaCh3-PythonUtils
+
+      - name: Count the total number of commits in MaCh3-PythonUtils
+        run: |
+          echo "python_utils_commit_count=$(git -C MaCh3-PythonUtils rev-list --count HEAD)" >> $GITHUB_ENV
+
+      - name: Count commits in the last week for MaCh3-PythonUtils
+        run: |
+          echo "python_utils_commits_last_week=$(git -C MaCh3-PythonUtils rev-list --count --since='1 week ago' HEAD)" >> $GITHUB_ENV
+
+      - name: Get the most recent tag for MaCh3-PythonUtils
+        run: |
+          python_utils_latest_tag=$(git -C MaCh3-PythonUtils describe --tags --abbrev=0)
+          echo "python_utils_latest_tag=${python_utils_latest_tag}" >> $GITHUB_ENV
+
       - name: Create a new GitHub Discussion
         uses: abirismyname/create-discussion@v1.x
         env:
@@ -76,6 +96,11 @@ jobs:
             - Total number of commits: ${{ env.tutorial_commit_count }}
             - Total number of commits in the last week: ${{ env.tutorial_commits_last_week }}
             - Most recent tag: ${{ env.tutorial_latest_tag }}
+
+            **MaCh3-PythonUtils Repository**
+            - Total number of commits: ${{ env.python_utils_commit_count }}
+            - Total number of commits in the last week: ${{ env.python_utils_commits_last_week }}
+            - Most recent tag: ${{ env.python_utils_latest_tag }}
 
             Cheers,
             MaCh3-bot
