@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the MaCh3 repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history including tags
           repository: mach3-software/MaCh3
@@ -33,7 +33,7 @@ jobs:
           echo "current_date=${current_date}" >> $GITHUB_ENV
 
       - name: Checkout the MaCh3Tutorial repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history including tags
           repository: mach3-software/MaCh3Tutorial
@@ -53,7 +53,7 @@ jobs:
           echo "tutorial_latest_tag=${tutorial_latest_tag}" >> $GITHUB_ENV
 
       - name: Checkout the MaCh3-PythonUtils repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history including tags
           repository: mach3-software/MaCh3-PythonUtils
