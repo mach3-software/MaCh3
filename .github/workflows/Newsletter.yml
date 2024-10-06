@@ -12,16 +12,17 @@ jobs:
   post_discussion:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone MaCh3
-        run: |
-          git clone https://github.com/mach3-software/MaCh3.git
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history including tags
 
       - name: Count the total number of commits and get top contributors
         run: |
-          cd MaCh3
           echo "commit_count=$(git rev-list --count HEAD)" >> $GITHUB_ENV
 
-          git shortlog -n -s
+          shortlog_output=$(git shortlog -n -s)
+          echo "$shortlog_output"  # Print the output for debugging
 
           # Capture each contributor and handle any potential whitespace issues
           first_contributor=$(git shortlog -n -s | head -n 1 | awk '{$1=""; print $0}' | sed 's/^ *//g')
@@ -35,8 +36,6 @@ jobs:
 
       - name: Get the most recent tag
         run: |
-          cd MaCh3
-
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=${latest_tag}" >> $GITHUB_ENV
 
