@@ -12,13 +12,13 @@ jobs:
   post_discussion:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Fetch all history including tags
+      - name: Clone MaCh3
+        run: |
+          git clone https://github.com/mach3-software/MaCh3.git
 
       - name: Count the total number of commits and get top contributors
         run: |
+          cd MaCh3
           echo "commit_count=$(git rev-list --count HEAD)" >> $GITHUB_ENV
 
           git shortlog -n -s
@@ -35,6 +35,8 @@ jobs:
 
       - name: Get the most recent tag
         run: |
+          cd MaCh3
+
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=${latest_tag}" >> $GITHUB_ENV
 
@@ -44,4 +46,27 @@ jobs:
           current_date=$(date +"%d/%m/%Y")
           echo "current_date=${current_date}" >> $GITHUB_ENV
 
+      - name: Create a new GitHub Discussion
+        uses: abirismyname/create-discussion@v1.x
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          title: MaCh3 Newsletter - ${{ env.current_date }}
+          body: |
+            It's-a me, MaChio! Welcome to the newsletter.
 
+            Date: ${{ env.current_date }}
+
+            Total number of commits in the MaCh3 repository: ${{ env.commit_count }}
+
+            Top contributors:
+            1. ${{ env.first_contributor }}
+            2. ${{ env.second_contributor }}
+            3. ${{ env.third_contributor }}
+
+            Most recent tag: ${{ env.latest_tag }}
+
+            Cheers,
+            MaCh3-bot
+          repository-id: MDEwOlJlcG9zaXRvcnkzMzEwNDk0MTY=
+          category-id: DIC_kwDOE7tpyM4CgQ7H
