@@ -20,8 +20,8 @@ jobs:
       - name: Count the total number of commits and get top contributors
         run: |
           echo "commit_count=$(git rev-list --count HEAD)" >> $GITHUB_ENV
-          top_contributors=$(git shortlog -n -s | head -n 3 | awk '{$1=""; print $0}')
-          echo "top_contributors=${top_contributors}" >> $GITHUB_ENV
+          top_contributors=$(git shortlog -n -s | head -n 3 | awk '{$1=""; print $0}' | sed 's/^ *//g')
+          echo "top_contributors=\"${top_contributors}\"" >> $GITHUB_ENV
 
       - name: Get the most recent tag
         run: |
