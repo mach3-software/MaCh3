@@ -29,20 +29,6 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=${latest_tag}" >> $GITHUB_ENV
 
-      - name: Identify new contributors
-        run: |
-            new_contributors=$(git log --since='1 week ago' --pretty=format:'%an' | sort -u)
-            echo "new_contributors=${new_contributors}" >> $GITHUB_ENV
-
-      - name: Count the number of commits in the last week
-        run: |
-            week_commit_count=$(git rev-list --count --since='1 week ago' HEAD)
-            echo "week_commit_count=${week_commit_count}" >> $GITHUB_ENV
-
-      - name: Identify top contributors in the past week
-        run: |
-            top_contributors_week=$(git log --since='1 week ago' --pretty=format:'%an' | sort | uniq -c | sort -nr | head -n 3 | awk '{$1=""; print $0}')
-            echo "top_contributors_week=${top_contributors_week}" >> $GITHUB_ENV
 
       - name: Get the current date
         run: |
@@ -62,13 +48,7 @@ jobs:
 
             Total number of commits in the MaCh3 repository: ${{ env.commit_count }}
 
-            Number of commits in the last week: ${{ env.week_commit_count }}
-
             Top contributors: ${{ env.top_contributors }}
-
-            New contributors in the past week: ${{ env.new_contributors }}
-
-            Top contributors in the past week: ${{ env.top_contributors_week }}
 
             Most recent tag: ${{ env.latest_tag }}
 
