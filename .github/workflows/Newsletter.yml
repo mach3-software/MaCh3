@@ -1,13 +1,9 @@
 name: Post MaCh3 Newsletter
 
 on:
-  push:
-    branches:
-      - feature_anotherbot
   schedule:
     - cron: '0 0 * * 0' # Every Sunday at midnight
 
-# TODO Add tutorial and Machine learning thingy
 jobs:
   post_discussion:
     runs-on: ubuntu-latest
