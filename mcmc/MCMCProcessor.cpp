@@ -249,6 +249,7 @@ void MCMCProcessor::MakePostfit() {
 
   // Directory for posteriors
   TDirectory *PostDir = OutputFile->mkdir("Post");
+  TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
 
   // We fit with this Gaussian
   Gauss = new TF1("Gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",-5,5);
@@ -374,6 +375,11 @@ void MCMCProcessor::MakePostfit() {
     // cd into params directory in root file
     PostDir->cd();
     Posterior->Write();
+    
+    hpost[i]->SetName(Title);
+    hpost[i]->SetTitle(Title);
+    PostHistDir->cd();
+    hpost[i]->Write();
 
     delete Asimov;
     delete hpd;
