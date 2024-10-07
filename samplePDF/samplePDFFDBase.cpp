@@ -26,8 +26,18 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   samplePDFFD_data = NULL;
   Osc = NULL;
 
-  samplename = SampleManager->raw()["SampleName"].as<std::string>();
-  nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+  if (CheckNodeExists(SampleManager->raw()["SampleName"])) {
+	samplename = SampleManager->raw()["SampleName"].as<std::string>();
+  } else{
+	MACH3LOG_ERROR("SampleName not defined in {}, please add this!", sample_char);
+  }
+
+  if (CheckNodeExists(SampleManager->raw()["NSubSamples"])) {
+	nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+  } else{
+	MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", sample_char);
+  }
+
   for (int i=0;i<nSamples;i++) {
     struct fdmc_base obj = fdmc_base();
     MCSamples.push_back(obj);
@@ -37,8 +47,8 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   fTestStatistic = kPoisson;
 
-  nDimensions = 0;
   //Binning
+  nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
   SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
   if(XVarStr.length() > 0){
@@ -63,8 +73,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
 	MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
 	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
 	throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  else{
+  } else{
 	std::cout << "FOUND " << nDimensions << " dimensions for sample binning!!!!!" << std::endl;
 	std::cout << "find me " << __FILE__ << " : " << __LINE__ << std::endl;
   }
@@ -76,6 +85,9 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   }
   
   //FD file info
+  if (!CheckNodeExists(SampleManager->raw()["InputFiles"]["mtupleprefix"])){
+	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", sample_char);
+  }
   std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
   std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
   std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();

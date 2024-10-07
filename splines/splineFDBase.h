@@ -19,8 +19,10 @@ class splineFDBase : public SplineBase {
   void SetupSplines();
   void SetupSplines(int BinningOpt);
   
+  /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays 
+  /// to store the weights; probably the best one here! Same thing but pass parameter 
+  /// spline segments instead of variations
   void Evaluate();
-  void FindUniqueModes();
   
   //Spline Monolith things
   //Essential methods used externally
@@ -31,7 +33,10 @@ class splineFDBase : public SplineBase {
   
   //Have to define this in your own class 
   virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)=0;
+  /// @brief Check if there are any repeated modes. This is used to reduce the number
+  /// of modes in case many interaction modes get averaged into one spline
   virtual std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector)=0;
+  /// @brief Return the splines which affect a given event
   virtual std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)=0;
   
   std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
