@@ -49,6 +49,26 @@ function add_to_LD_LIBRARY_PATH () {
 
 fi
 
+
+if ! type add_to_PYTHONPATH &> /dev/null; then
+
+### Adapted from ^^
+function add_to_PYTHONPATH () {
+  for d; do
+
+    d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
+    if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
+
+    case ":$PYTHONPATH:" in
+      *":$d:"*) :;;
+      *) export PYTHONPATH=$d:$PYTHONPATH;;
+    esac
+  done
+}
+
+fi
+
+
 #if it was sourced as . setup.sh then you can't scrub off the end... assume that
 #we are in the correct directory.
 if ! echo "${BASH_SOURCE}" | grep "/" --silent; then
@@ -63,5 +83,9 @@ export CUDAProb3_DIR=@CUDAProb3_SOURCE_DIR@
 
 add_to_PATH ${MaCh3_ROOT}/bin
 add_to_LD_LIBRARY_PATH ${MaCh3_ROOT}/lib
+
+if test -d ${MaCh3_ROOT}/pyMaCh3; then
+  add_to_PYTHONPATH ${MaCh3_ROOT}/pyMaCh3
+fi
 
 unset SETUPDIR
