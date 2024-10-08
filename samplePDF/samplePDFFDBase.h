@@ -167,7 +167,8 @@ public:
   virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
+  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
 
   // Function to setup Functional and shift parameters. This isn't idea but
   // do this in your experiment specific code for now as we don't have a 
