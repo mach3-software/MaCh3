@@ -38,6 +38,43 @@ public:
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
   /// @brief Get class name
   inline std::string GetName()const {return "Manager";};
+
+  /// @brief Overrides the configuration settings based on provided arguments.
+  ///
+  /// This function allows you to set configuration options for the manager.
+  /// It accepts either two or three string arguments:
+  /// - For two arguments, the first argument is a key, and the second is the value.
+  /// - For three arguments, the first two arguments are keys, and the third is the value.
+  ///
+  /// @param args The arguments to override the configuration.
+  ///             - When two arguments are provided, they represent the key and value, respectively.
+  ///             - When three arguments are provided, they represent two keys and a value.
+  ///
+  /// @note Example usage:
+  /// @code
+  /// FitManager->OverrideConfig("General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
+  /// @endcode
+  template <typename... Args>
+  void OverrideConfig(Args... args) {
+    static_assert(sizeof...(args) == 2 || sizeof...(args) == 3,
+                  "OverrideConfig accepts either 2 or 3 arguments.");
+
+    auto args_tuple = std::make_tuple(args...); // Create a tuple from the parameter pack
+
+    if constexpr (sizeof...(args) == 2) {
+      std::string blarb1 = std::get<0>(args_tuple); // First argument
+      std::string result = std::get<1>(args_tuple); // Second argument
+
+      config[blarb1] = result;
+    }
+    else if constexpr (sizeof...(args) == 3) {
+      std::string blarb1 = std::get<0>(args_tuple); // First argument
+      std::string blarb2 = std::get<1>(args_tuple); // Second argument
+      std::string result = std::get<2>(args_tuple); // Third argument
+
+      config[blarb1][blarb2] = result;
+    }
+  }
 private:
   /// The YAML node containing the configuration data.
   YAML::Node config;
