@@ -136,7 +136,6 @@ public:
   void SetupSampleBinning();
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
-  unsigned int SampleNXBins, SampleNYBins;
   std::vector<double> SampleXBins;
   std::vector<double> SampleYBins;
   //===============================================================================
@@ -150,8 +149,9 @@ public:
   bool IsEventSelected(const std::vector<std::string>& ParameterStr, const int iSample, const int iEvent);
   bool IsEventSelected(const std::vector<std::string>& ParameterStr, const std::vector<std::vector<double>> &SelectionCuts, const int iSample, const int iEvent);
 
+  /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
-  /// @brief This just gets read in from a yaml file
+  /// @brief Is the sample for when operating in Reverse Horn Current, read in from sample config
   bool GetIsRHC() {return IsRHC;}
   /// @brief Calculate the spline weight for a given event
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
@@ -163,8 +163,9 @@ public:
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
-  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
+
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
 
@@ -235,9 +236,11 @@ public:
   std::string mc_version;
   //=============================================================================== 
 
-  /// keep track of the dimensions of the sample binning
+  /// @brief Keep track of the dimensions of the sample binning
   int nDimensions;
+  /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
   int SampleDetID;
+  /// @breif Is the sample for events collected in Reverse Horn Current. Important for flux systematics
   bool IsRHC;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;

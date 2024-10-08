@@ -38,6 +38,19 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
 	MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", sample_char);
   }
 
+  if (CheckNodeExists(SampleManager->raw()["DetID"])) {
+	SampleDetID = SampleManager->raw()["DetID"].as<int>();
+  } else{
+	MACH3LOG_ERROR("ID not defined in {}, please add this!", sample_char);
+  }
+
+  if (CheckNodeExists(SampleManager->raw()["SampleBools"]["IsRHC"])) {
+	IsRHC = SampleManager->raw()["SampleBools"]["IsRHC"].as<bool>(); 
+  } else{
+	MACH3LOG_ERROR("IsRHC not defined in {}, please add this!", sample_char);
+  }
+
+
   for (int i=0;i<nSamples;i++) {
     struct fdmc_base obj = fdmc_base();
     MCSamples.push_back(obj);
@@ -74,8 +87,7 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
 	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
 	throw MaCh3Exception(__FILE__, __LINE__);
   } else{
-	std::cout << "FOUND " << nDimensions << " dimensions for sample binning!!!!!" << std::endl;
-	std::cout << "find me " << __FILE__ << " : " << __LINE__ << std::endl;
+	MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
   }
 
   //Sanity check that some binning has been specified
@@ -189,38 +201,45 @@ void samplePDFFDBase::SetupSampleBinning(){
   dathist2d = new TH2D("d"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
 
   //Make some arrays so we can initialise _hPDF1D and _hPDF2D with these
-  XBinEdges.reserve(SampleNXBins);
-  YBinEdges.reserve(SampleNYBins);
-  std::cout << "XBinning: " << std::endl;
-  for(unsigned XBin_i = 0 ; XBin_i < SampleXBins.size() ; XBin_i++){
-	XBinEdges.push_back(SampleXBins[XBin_i]);
-	std::cout << SampleXBins[XBin_i] << ", ";
+  XBinEdges.reserve(SampleXBins.size());
+  YBinEdges.reserve(SampleYBins.size());
+
+  //A string to store the binning for a nice print out
+  std::string XBinEdgesStr = "";
+  std::string YBinEdgesStr = "";
+
+  for(auto XBinEdge : SampleXBins){
+    XBinEdges.push_back(XBinEdge);
+	XBinEdgesStr += std::to_string(XBinEdge);
+	XBinEdgesStr += ", ";
   }
-  std::cout << "\n" << std::endl;
+  MACH3LOG_INFO("XBinning:");
+  MACH3LOG_INFO("{}", XBinEdgesStr);
 
   //And now the YBin Edges
-  std::cout << "YBinning: " << std::endl;
-  std::cout << "Found " << SampleNYBins << std::endl;
-  std::cout << "And SampleYBins is of size " << SampleYBins.size() << std::endl;
-  for(unsigned YBin_i = 0 ; YBin_i < SampleYBins.size() ; YBin_i++){
-	YBinEdges.push_back(SampleYBins[YBin_i]);
-	std::cout << SampleYBins[YBin_i] << ", ";
+  for(auto YBinEdge : SampleYBins){
+    YBinEdges.push_back(YBinEdge);
+	YBinEdgesStr += std::to_string(YBinEdge);
+	YBinEdgesStr += ", ";
   }
-  std::cout << "\n" << std::endl;
- 
-  if(XVarStr.length() > 0 && YVarStr.length() == 0){
+  MACH3LOG_INFO("YBinning:");
+  MACH3LOG_INFO("{}", YBinEdgesStr);
+
+  //Check whether you are setting up 1D or 2D binning
+  if(nDimensions == 1){
+	MACH3LOG_INFO("Setting up 1D binning with {}", XVarStr);
 	set1DBinning(SampleXBins);  
   }
-  else if(XVarStr.length() > 0 && YVarStr.length() > 0){
-	std::cout << "Setting Up 2D binning" << std::endl;
-	std::cout << XVarStr << " : " << YVarStr << std::endl;
+  else if(nDimensions == 2){
+	MACH3LOG_INFO("Setting up 2D binning with {} and {}", XVarStr, YVarStr);
 	set2DBinning(SampleXBins, SampleYBins);
   }
   else{
-	MACH3LOG_ERROR("You did not specify an XVarStr or YVarStr in your sample config");
-	MACH3LOG_ERROR("So the variable to load is unkown, please add at least one string!");
+	MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
 	throw MaCh3Exception(__FILE__, __LINE__);
   }
+
+  return; 
 }
 
 void samplePDFFDBase::UseBinnedOscReweighting(bool ans) 
@@ -1663,7 +1682,6 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->y_var[iEvent] = &fdobj->Unity;
   }
 
-  //SetupSampleBinning();  
 }
 
 void samplePDFFDBase::InitialiseSplineObject() {
