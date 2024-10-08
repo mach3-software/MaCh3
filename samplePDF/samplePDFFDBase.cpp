@@ -10,109 +10,21 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   (void) pot;
 
   std::cout << "-------------------------------------------------------------------" <<std::endl;
-  std::cout << "Creating samplePDFFDBase object.." << "\n" << std::endl;
-  
-  //DB Save the argument value
-  mc_version = mc_version_;
-  
-  char* sample_char = (char*)mc_version.c_str();
-  SampleManager = new manager(sample_char);
-  
+  MACH3LOG_INFO("Ceating SamplePDFFDBase object");
+    
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(xsec_cov == NULL){std::cerr << "[ERROR:] You've passed me a NULL xsec covariance matrix... I need this to setup splines!" << std::endl; throw;}
+  if(xsec_cov == NULL){
+	MACH3LOG_ERROR("You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
+   	throw MaCh3Exception(__FILE__, __LINE__);
+  }
   SetXsecCov(xsec_cov);
   
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
   Osc = NULL;
-
-  if (CheckNodeExists(SampleManager->raw()["SampleName"])) {
-	samplename = SampleManager->raw()["SampleName"].as<std::string>();
-  } else{
-	MACH3LOG_ERROR("SampleName not defined in {}, please add this!", sample_char);
-  }
-
-  if (CheckNodeExists(SampleManager->raw()["NSubSamples"])) {
-	nSamples = SampleManager->raw()["NSubSamples"].as<int>();
-  } else{
-	MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", sample_char);
-  }
-
-  if (CheckNodeExists(SampleManager->raw()["DetID"])) {
-	SampleDetID = SampleManager->raw()["DetID"].as<int>();
-  } else{
-	MACH3LOG_ERROR("ID not defined in {}, please add this!", sample_char);
-  }
-
-  if (CheckNodeExists(SampleManager->raw()["SampleBools"]["IsRHC"])) {
-	IsRHC = SampleManager->raw()["SampleBools"]["IsRHC"].as<bool>(); 
-  } else{
-	MACH3LOG_ERROR("IsRHC not defined in {}, please add this!", sample_char);
-  }
-
-
-  for (int i=0;i<nSamples;i++) {
-    struct fdmc_base obj = fdmc_base();
-    MCSamples.push_back(obj);
-  }
-
-  //Default TestStatistic is kPoisson
-  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
-  fTestStatistic = kPoisson;
-
-  //Binning
-  nDimensions = 0;
-  XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
-  SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
-  if(XVarStr.length() > 0){
-	nDimensions++;
-  } else{
-	MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", sample_char);
-	throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
-  SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
-  if(YVarStr.length() > 0){
-	if(XVarStr.length() == 0){
-	  MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", sample_char);
-	  throw MaCh3Exception(__FILE__, __LINE__);
-	}
-	nDimensions++;
-  }
-
-  if(nDimensions == 0){
-	MACH3LOG_ERROR("Error setting up the sample binning");
-	MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
-	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-	throw MaCh3Exception(__FILE__, __LINE__);
-  } else{
-	MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
-  }
-
-  //Sanity check that some binning has been specified
-  if(SampleXBins.size() == 0 && SampleYBins.size() == 0){
-	MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", sample_char);
-	throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  
-  //FD file info
-  if (!CheckNodeExists(SampleManager->raw()["InputFiles"]["mtupleprefix"])){
-	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", sample_char);
-  }
-  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
-  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
-  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
-  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
-
-  for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-    mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
-    spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
-    sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
-    sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
-    sample_oscnutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>())));
-    sample_signal.push_back(osc_channel["signal"].as<bool>());
-  }
+ 
+  char* sample_char = (char*)mc_version_.c_str();
+  SampleManager = new manager(sample_char);
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -132,7 +44,129 @@ samplePDFFDBase::~samplePDFFDBase()
   if(samplePDFFD_data != NULL){delete[] samplePDFFD_data;}
 }
 
+void samplePDFFDBase::ReadSampleConfig() 
+{
+   
+  if (CheckNodeExists(SampleManager->raw(), "SampleName")) {
+	samplename = SampleManager->raw()["SampleName"].as<std::string>();
+  } else{
+	MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
+  }
+
+  if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
+	nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+  } else{
+	MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
+  }
+
+  if (CheckNodeExists(SampleManager->raw(), "DetID")) {
+	SampleDetID = SampleManager->raw()["DetID"].as<int>();
+  } else{
+	MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
+  }
+
+  if (CheckNodeExists(SampleManager->raw(), "SampleBools", "IsRHC")) {
+	IsRHC = SampleManager->raw()["SampleBools"]["IsRHC"].as<bool>(); 
+  } else{
+	MACH3LOG_ERROR("IsRHC not defined in {}, please add this!", SampleManager->GetFileName());
+  }
+
+  for (int i=0;i<nSamples;i++) {
+    struct fdmc_base obj = fdmc_base();
+    MCSamples.push_back(obj);
+  }
+
+  //Default TestStatistic is kPoisson
+  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
+  if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
+	fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
+  } else {
+    MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
+	MACH3LOG_WARN("Defaulting to using a poisson likelihood");
+	fTestStatistic = kPoisson;
+  }
+
+  //Binning
+  nDimensions = 0;
+  XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
+  SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
+  if(XVarStr.length() > 0){
+	nDimensions++;
+  } else{
+	MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
+  SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
+  if(YVarStr.length() > 0){
+	if(XVarStr.length() == 0){
+	  MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+	  throw MaCh3Exception(__FILE__, __LINE__);
+	}
+	nDimensions++;
+  }
+
+  if(nDimensions == 0){
+	MACH3LOG_ERROR("Error setting up the sample binning");
+	MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
+	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
+	throw MaCh3Exception(__FILE__, __LINE__);
+  } else{
+	MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
+  }
+
+  //Sanity check that some binning has been specified
+  if(SampleXBins.size() == 0 && SampleYBins.size() == 0){
+	MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  
+  //FD file info
+  if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
+	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
+  }
+  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
+  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
+  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
+  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+
+  for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+    mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
+    spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
+    sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
+    sample_oscnutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>())));
+    sample_signal.push_back(osc_channel["signal"].as<bool>());
+  }
+
+  //Now get selection cuts
+  double low_bound = 0;
+  double up_bound = 0;
+  double KinematicParamter = 0;
+  std::vector<double> SelectionVec;
+  //Now grab the selection cuts from the manager
+  for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
+	SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
+	SelectionBounds.push_back(SelectionCuts["Bounds"].as<std::vector<double>>());
+	low_bound = SelectionBounds.back().at(0);
+	up_bound = SelectionBounds.back().at(1);
+	KinematicParamter = static_cast<double>(ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>())); 
+	MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), SelectionBounds.back().at(0), SelectionBounds.back().at(1));
+	SelectionVec = {KinematicParamter, low_bound, up_bound};	
+	StoredSelection.push_back(SelectionVec);
+  }
+  NSelections = SelectionStr.size();
+
+  return;
+}
+
 void samplePDFFDBase::Initialise() {
+
+  //First grab all the information from your sample config via your manager
+  ReadSampleConfig();
+
+  //Now initialise all the variables you will need
   Init();
 
   int TotalMCEvents = 0;

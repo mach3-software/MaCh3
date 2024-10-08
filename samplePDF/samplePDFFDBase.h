@@ -87,6 +87,8 @@ public:
   void virtual SetupOscCalc(double PathLength, double Density);
   void SetOscillator(Oscillator* Osc_);
   void FindEventOscBin();
+  ///
+  void ReadSampleConfig();
 
  protected:
   /// @todo - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
@@ -234,7 +236,6 @@ public:
   covarianceXsec *XsecCov;
   covarianceOsc *OscCov;
 
-  std::string mc_version;
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
