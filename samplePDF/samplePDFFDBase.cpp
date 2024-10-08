@@ -850,7 +850,7 @@ void samplePDFFDBase::SetOscillator(Oscillator* Osc_) {
 void samplePDFFDBase::FindEventOscBin() {
   for(int i = 0; i < getNMCSamples(); i++) {
     for (int j = 0;j < getNEventsInSample(i); j++) {
-      MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),MCSamples[i].rw_truecz[j]);
+      MCSamples[i].osc_w_pointer[j] = Osc->retPointer(MCSamples[i].nutype,MCSamples[i].oscnutype,*(MCSamples[i].rw_etru[j]),*(MCSamples[i].rw_truecz[j]));
     }
   }
   std::cout << "Set all oscillation pointers to Oscillator" << std::endl;
@@ -1657,10 +1657,11 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->total_weight_pointers = new double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
   fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
-  fdobj->rw_truecz = new double[fdobj->nEvents];
+  fdobj->rw_truecz = new const double*[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
     fdobj->rw_etru[iEvent] = &fdobj->Unity;
+    fdobj->rw_truecz[iEvent] = &fdobj->Unity;
     fdobj->mode[iEvent] = &fdobj->Unity_Int;
     fdobj->Target[iEvent] = 0;
     fdobj->NomXBin[iEvent] = -1;
@@ -1677,7 +1678,6 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->flux_w[iEvent] = 0.;
     fdobj->SampleDetID = -1;
     fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
-    fdobj->rw_truecz[iEvent] = -999.;
     fdobj->x_var[iEvent] = &fdobj->Unity;
     fdobj->y_var[iEvent] = &fdobj->Unity;
   }
