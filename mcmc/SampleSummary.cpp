@@ -119,7 +119,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
     RandomHist->GetYaxis()->SetTitle(ss.str().c_str());
     RandomHist->SetLineWidth(2);
   }
-  else RandomHist = NULL;
+  else RandomHist = nullptr;
 
   for (_int_ i = 0; i < nSamples; ++i)
   {
@@ -166,7 +166,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
 
   DoByModePlots = false;
   MeanHist_ByMode = NULL;
-  PosteriorHist_ByMode = NULL;
+  PosteriorHist_ByMode = nullptr;
 
   nModelParams = 0;
 
@@ -192,7 +192,7 @@ SampleSummary::~SampleSummary() {
   if(lnLDrawHist != NULL) delete lnLDrawHist;
   if(lnLFlucHist != NULL) delete lnLFlucHist;
   if(lnLDrawHistRate != NULL) delete lnLDrawHistRate;
-  if(RandomHist != NULL)  delete RandomHist;
+  if(RandomHist != nullptr)  delete RandomHist;
 
   if(lnLFlucHist_ProjectX != NULL) delete lnLFlucHist_ProjectX;
   if(DoByModePlots)
@@ -204,7 +204,7 @@ SampleSummary::~SampleSummary() {
       {
         for (int k = 1; k <= maxBins[i]; ++k)
         {
-          if(PosteriorHist_ByMode[i][j][k] != NULL) delete PosteriorHist_ByMode[i][j][k];
+          if(PosteriorHist_ByMode[i][j][k] != nullptr) delete PosteriorHist_ByMode[i][j][k];
         }
         delete[] PosteriorHist_ByMode[i][j];
         if(MeanHist_ByMode[i][j] != NULL) delete MeanHist_ByMode[i][j];
