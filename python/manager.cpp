@@ -17,8 +17,8 @@ void initManager(py::module &m){
     py::class_<manager>(m_manager, "Manager")
         .def(
             py::init<std::string const &>(),
-            "create a Manager object with a specified *output_name",
-            py::arg("output_name")
+            "create a Manager object with a specified *config_file*",
+            py::arg("config_file")
         )
         
         .def(

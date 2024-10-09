@@ -53,9 +53,9 @@ void initFitter(py::module &m){
             "GetName", 
             &FitterBase::GetName, 
             " The name of the algorithm, you should override this with something like \n"
-            "''' \n"
+            "``` \n"
             "return 'mySuperCoolAlgoName' \n"
-            "''' \n"
+            "``` \n"
         )
 
         .def(
@@ -98,7 +98,8 @@ void initFitter(py::module &m){
             "add_sample_PDF",
             &FitterBase::addSamplePDF,
             " This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans. \n"
-            " *sample* A sample PDF object derived from samplePDFBase. "
+            " *sample* A sample PDF object derived from samplePDFBase. ",
+            py::arg("sample")
         )
 
         ;
