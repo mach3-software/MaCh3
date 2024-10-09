@@ -1,19 +1,5 @@
 #pragma once
 
-// C++ includes
-#include <iostream>
-#include <vector>
-
-// ROOT include
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include "TH2Poly.h"
-#include "THStack.h"
-#include "TStyle.h"
-#include "TCanvas.h"
-#include "TApplication.h"
-
 // MaCh3 includes
 #include "samplePDF/samplePDFBase.h"
 #include "mcmc/StatisticalUtils.h"
@@ -75,11 +61,18 @@ class SampleSummary {
     /// @brief KS: Study how correlated are sample or kinematic bins
     inline void StudyKinematicCorrelations();
 
-    // Helper functions to change titles etc of finished plots, calculate pvalues etc
+    /// @brief Make the cut LLH histogram
     inline void MakeCutLLH();
+    // Make the 1D cut distribution and give the 1D p-value
     inline void MakeCutLLH1D(TH1D *Histogram, double llh_ref = -999);
+    /// @brief Make the 2D cut distribution and give the 2D p-value
     inline void MakeCutLLH2D(TH2D *Histogram);
+    /// @brief Make the 1D Event Rate Hist
     inline void MakeCutEventRate(TH1D *Histogram, const double DataRate);
+    /// @brief Make the fluctuated histograms (2D and 1D) for the chi2s
+    /// Essentially taking the MCMC draws and calculating their LLH to the Posterior predictive distribution
+    /// And additionally taking the data histogram and calculating the LLH to the predictive distribution
+    /// Additionally we calculate the chi2 of the draws (fluctuated) of  the MC with the prior/posterior predictive and plot it vs the chi2 from the draws of MCMC and the data
     inline void MakeChi2Hists();
 
     /// @brief Check the length of samples agrees
@@ -170,9 +163,11 @@ class SampleSummary {
     TH1D **DataHist_ProjectY;
     /// The nominal histogram for the selection
     TH2Poly **NominalHist;
-    // The w2 histograms
+    /// Pointer to the w2 histograms (for nominal values).
     TH2Poly **W2NomHist;
+    /// Pointer to the w2 histograms (for mean values).
     TH2Poly **W2MeanHist;
+    /// Pointer to the w2 histograms (for mode values).
     TH2Poly **W2ModeHist;
 
     /// The histogram containing the lnL for each throw
@@ -326,6 +321,7 @@ class SampleSummary {
     bool DoByModePlots;
     /// The posterior predictive distribution in pmu cosmu using the mean
     TH2Poly ***MeanHist_ByMode;
+    /// Histogram which corresponds to each bin in the sample's th2poly
     TH1D ****PosteriorHist_ByMode;
     
     /// Pointer to samplePDF object, mostly used to get sample names, binning etc.
