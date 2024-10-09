@@ -1408,7 +1408,6 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
   {
     //KS: Feel free to update it, if you need updated prefit value etc
     param["Systematic"]["StepScale"]["MCMC"] = std::round(_fIndivStepScale[i] * 100.0) / 100.0; // Round to 2 decimal places
-
     i++;
   }
   // Save the modified node to a file
