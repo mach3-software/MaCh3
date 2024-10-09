@@ -57,7 +57,7 @@ public:
   void SetOscCov(covarianceOsc* osc_cov);
 
   ///  @brief including Dan's magic NuOscillator
-  void SetupNuOscillator(std::string OscillatorYaml);
+  void SetupNuOscillator();
 
   /// @deprecated The `DumpWeights` function is deprecated and should not be used.
   /// It was kept for backwards compatibility in compiling but has no effect.
@@ -195,6 +195,7 @@ public:
   //===============================================================================
   /// DB Variables required for oscillation
   std::vector<OscillatorBase*> NuOscProbCalcers;
+  std::string NuOscillatorConfigFile;
   
   //===============================================================================
   

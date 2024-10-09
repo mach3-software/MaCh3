@@ -54,29 +54,29 @@ void samplePDFFDBase::ReadSampleConfig()
 {
    
   if (CheckNodeExists(SampleManager->raw(), "SampleName")) {
-	samplename = SampleManager->raw()["SampleName"].as<std::string>();
+    samplename = SampleManager->raw()["SampleName"].as<std::string>();
   } else{
-	MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
+    MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
   }
-
+  
   if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-	nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+    nSamples = SampleManager->raw()["NSubSamples"].as<int>();
   } else{
-	MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
+    MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
   }
-
+  
   if (CheckNodeExists(SampleManager->raw(), "DetID")) {
-	SampleDetID = SampleManager->raw()["DetID"].as<int>();
+    SampleDetID = SampleManager->raw()["DetID"].as<int>();
   } else{
-	MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
+    MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
   }
-
-  if (CheckNodeExists(SampleManager->raw(), "SampleBools", "IsRHC")) {
-	IsRHC = SampleManager->raw()["SampleBools"]["IsRHC"].as<bool>(); 
-  } else{
-	MACH3LOG_ERROR("IsRHC not defined in {}, please add this!", SampleManager->GetFileName());
+  
+  if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
+    NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
+  } else {
+    MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
   }
-
+  
   for (int i=0;i<nSamples;i++) {
     struct fdmc_base obj = fdmc_base();
     MCSamples.push_back(obj);
@@ -187,10 +187,11 @@ void samplePDFFDBase::Initialise() {
   std::cout << "Total number of events is " << TotalMCEvents << std::endl;
   std::cout << "############" << std::endl;
 
+  SetupNuOscillator();
   SetupSampleBinning();
   SetupSplines();
-  SetupWeightPointers();
   SetupNormParameters();
+  SetupWeightPointers();
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -1347,14 +1348,14 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
 }
 
-void samplePDFFDBase::SetupNuOscillator(std::string OscYaml) {
+void samplePDFFDBase::SetupNuOscillator() {
   OscProbCalcerFactory* OscProbCalcFactory = new OscProbCalcerFactory();
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   
   NuOscProbCalcers = std::vector<OscillatorBase*>((int)MCSamples.size());
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
     std::cout << "Setting up NuOscillator::Oscillator object in OscillationChannel: " << iSample << "/" << MCSamples.size() << " ====================" << std::endl;
-    NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(OscYaml);
+    NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
 
     std::vector<_float_> EnergyArray((int)MCSamples[iSample].nEvents);
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
