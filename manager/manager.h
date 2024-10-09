@@ -38,6 +38,17 @@ public:
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
   /// @brief Get class name
   inline std::string GetName()const {return "Manager";};
+
+  /// @brief Overrides the configuration settings based on provided arguments.
+  /// @note Example usage:
+  /// @code
+  /// FitManager->OverrideSettings("General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
+  /// @endcode
+  template <typename... Args>
+  void OverrideSettings(Args&&... args) {
+    OverrideConfig(config, std::forward<Args>(args)...);
+  }
+
 private:
   /// The YAML node containing the configuration data.
   YAML::Node config;
