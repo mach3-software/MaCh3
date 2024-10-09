@@ -4,4 +4,4 @@ pyMaCh3
 .. toctree::
    :maxdepth: 4
 
-   plotting
+   plotting.rst

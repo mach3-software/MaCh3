@@ -1,5 +1,7 @@
-plotting module
-===============
+plotting
+========
+
+.. mdinclude:: plotting.md
 
 .. automodapi:: pyMaCh3.plotting
    :members:

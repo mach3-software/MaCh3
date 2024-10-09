@@ -10,8 +10,8 @@ Welcome to pyMaCh3's documentation!
    :maxdepth: 4
    :caption: Contents:
 
+   mainpage
    pyMaCh3
-   ../../mainpage.md
 
 
 Indices and tables

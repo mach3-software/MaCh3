@@ -18,7 +18,8 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
-    "sphinx_automodapi.automodapi"
+    "sphinx_automodapi.automodapi",
+    'sphinx_mdinclude'
     ]
 
 templates_path = ['_templates']
