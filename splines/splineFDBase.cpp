@@ -73,17 +73,6 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   SplineModeVecs.push_back(SplineModeVecs_Sample);
   std::cout << "SplineModeVecs is of size " << SplineModeVecs.size() << std::endl;
 
-<<<<<<< HEAD
- // int counter = 0;
- // std::cout << "Name        |     Spline     |    SplineIndex    |    GlobalIndex " << std::endl;
-  //for(auto splineindex : SplineParsIndex_Sample){
-  //for(int spline_i = 0 ; spline_i < GlobalSystIndex_Sample.size() ; spline_i++){
-//	std::cout << (SplineFileParPrefixNames_Sample.at(spline_i)).c_str() << ",       " << counter << ",     " << SplineParsIndex_Sample_temp.at(spline_i) << ",   " << GlobalSystIndex_Sample.at(spline_i) << std::endl;
-//	counter++;
- // }
-
-=======
->>>>>>> fef25331adfa623158c6e156726d7f3aa524431f
   int nOscChan = OscChanFileNames.size();
   nOscChans.push_back(nOscChan);
 
