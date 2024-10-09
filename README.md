@@ -60,11 +60,9 @@ MaCh3 can be compiled with a python interface by specifying the cmake option
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
-and then adding the path to the installed module to your `PYTHONPATH` environment variable:
-```
-export PYTHONPATH=$PYTHONPATH:<path>/<to>/<MaCh3>/build/python
-```
+
 Currently the python module only contains an interface to the plotting library (see [here](https://github.com/mach3-software/MaCh3/blob/develop/plotting/README.md#python) for more information on how to use it)
+
 
 ### Building with Pip
 
