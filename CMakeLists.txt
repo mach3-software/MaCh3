@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 #KS: Enable language, necessary when using CUDA
 enable_language(CXX)
-set(MaCh3_VERSION 1.1.6)
+set(MaCh3_VERSION 1.1.8)
 
 # Try to find CUDA
 find_package(CUDAToolkit QUIET)
@@ -306,6 +306,7 @@ add_custom_command(
           -DCMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}
           -DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}
           -DROOT_VERSION=${ROOT_VERSION}
+          -DMaCh3_VERSION=${MaCh3_VERSION}
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}

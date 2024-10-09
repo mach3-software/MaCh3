@@ -18,12 +18,6 @@ class covarianceXsec : public covarianceBase {
     /// @brief Destructor
     ~covarianceXsec();
 
-    /// @brief Print information about the whole object once it is set
-    inline void Print();
-
-    /// @brief KS: Check if matrix is correctly initialised
-    void CheckCorrectInitialisation();
-
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     /// @param i parameter index
@@ -115,6 +109,37 @@ class covarianceXsec : public covarianceBase {
     /// @warning This is mostly used for backward compatibility
     void DumpMatrixToFile(const std::string& Name);
   protected:
+    /// @brief Print information about the whole object once it is set
+    void Print();
+    /// @brief Prints general information about the covarianceXsec object.
+    void PrintGlobablInfo();
+    /// @brief Prints normalization parameters.
+    void PrintNormParams();
+    /// @brief Prints spline parameters.
+    void PrintSplineParams();
+    /// @brief Prints functional parameters.
+    void PrintFunctionalParams();
+    /// @brief Prints groups of parameters.
+    void PrintParameterGroups();
+
+    /// @brief KS: Check if matrix is correctly initialised
+    void CheckCorrectInitialisation();
+
+    /// @brief Iterates over parameters and applies a filter and action function.
+    ///
+    /// This template function provides a way to iterate over parameters associated
+    /// with a specific Detector ID (DetID). It applies a filter function to determine
+    /// which parameters to process and an action function to define what to do
+    /// with the selected parameters.
+    ///
+    /// @tparam FilterFunc The type of the filter function used to determine
+    /// which parameters to include.
+    /// @tparam ActionFunc The type of the action function applied to each selected
+    /// parameter.
+    /// @param DetID The Detector ID used to filter parameters.
+    template <typename FilterFunc, typename ActionFunc>
+    void IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action);
+
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.
@@ -142,7 +167,7 @@ class covarianceXsec : public covarianceBase {
     std::vector<std::string> _ParameterGroup;
 
     /// Map between number of given parameter type with global parameter numbering. For example 2nd norm param may be 10-th global param
-    std::vector<std::map<int, int>> _fSystToGlobablSystIndexMap;
+    std::vector<std::map<int, int>> _fSystToGlobalSystIndexMap;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecSplines1> SplineParams;

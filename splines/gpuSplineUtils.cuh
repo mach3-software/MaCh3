@@ -28,7 +28,7 @@ __global__ void EvalOnGPU_Splines(
     const short int* __restrict__ gpu_paramNo_arr,
     const unsigned int* __restrict__ gpu_nKnots_arr,
     const float* __restrict__ gpu_coeff_many,
-    float *gpu_weights,
+    float* __restrict__ gpu_weights,
     const cudaTextureObject_t __restrict__ text_coeff_x);
 
 /// @brief Evaluate the TF1 on the GPU Using 5th order polynomial
@@ -38,7 +38,7 @@ __global__ void EvalOnGPU_Splines(
 __global__ void EvalOnGPU_TF1(
   const float* __restrict__ gpu_coeffs_tf1,
   const short int* __restrict__ gpu_paramNo_arr_tf1,
-  float *gpu_weights_tf1);
+  float* __restrict__ gpu_weights_tf1);
 
 #ifndef Weight_On_SplineBySpline_Basis
 /// @brief KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
@@ -51,7 +51,7 @@ __global__ void EvalOnGPU_TotWeight(
   const float* __restrict__ gpu_weights,
   const float* __restrict__ gpu_weights_tf1,
 
-  float *gpu_total_weights,
+  float* __restrict__ gpu_total_weights,
 
   const cudaTextureObject_t __restrict__ text_nParamPerEvent,
   const cudaTextureObject_t __restrict__ text_nParamPerEvent_TF1);
