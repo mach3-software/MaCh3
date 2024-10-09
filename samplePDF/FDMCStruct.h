@@ -52,7 +52,8 @@ struct fdmc_base {
   double *rw_upper_upper_xbinedge; // upper to check if Eb has moved the erec bin
 
   int **mode;
-  
+
+  const double **osc_w_pointer;
   double *xsec_w;
   splineFDBase *splineFile; 
 };

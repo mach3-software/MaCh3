@@ -26,7 +26,6 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   
   samplePDFFD_array = NULL;
   samplePDFFD_data = NULL;
-  Osc = NULL;
  
   char* sample_char = (char*)mc_version_.c_str();
   SampleManager = new manager(sample_char);
@@ -1557,13 +1556,11 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->xsec_norm_pointers = new const double**[fdobj->nEvents];
   fdobj->xsec_norms_bins = new std::list< int >[fdobj->nEvents];
   fdobj->xsec_w = new double[fdobj->nEvents];
-  fdobj->flux_w = new double[fdobj->nEvents];
-  fdobj->osc_w = new double[fdobj->nEvents];
   fdobj->isNC = new bool[fdobj->nEvents];
   fdobj->nxsec_spline_pointers = new int[fdobj->nEvents];
   fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
   fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
-  fdobj->total_weight_pointers = new double**[fdobj->nEvents];
+  fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
   fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
   fdobj->rw_truecz = new const double*[fdobj->nEvents];
@@ -1582,9 +1579,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->rw_upper_xbinedge[iEvent] = -1;
     fdobj->rw_upper_upper_xbinedge[iEvent] = -1;
     fdobj->xsec_w[iEvent] = 1.0;
-    fdobj->osc_w[iEvent] = 1.0;
     fdobj->isNC[iEvent] = false;
-    fdobj->flux_w[iEvent] = 0.;
     fdobj->SampleDetID = -1;
     fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
     fdobj->x_var[iEvent] = &fdobj->Unity;
