@@ -60,10 +60,7 @@ MaCh3 can be compiled with a python interface by specifying the cmake option
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
-and then adding the path to the installed module to your `PYTHONPATH` environment variable:
-```
-export PYTHONPATH=$PYTHONPATH:<path>/<to>/<MaCh3>/build/python
-```
+
 Currently the python module only contains an interface to the plotting library (see [here](https://github.com/mach3-software/MaCh3/blob/develop/plotting/README.md#python) for more information on how to use it)
 
 
@@ -74,23 +71,6 @@ Additionally you can build just the python module by doing
 pip install -t <install location> .
 ``` 
 The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
-
-
-### Sphinx Documentation
-
-The pyMACh3 module is documented using sphinx. Currently you need to build this documentation yourself if you want it (in future this will be automated). To do this, you will need to install Mach3 with its python extension as described above, then go to the [Doc/sphinx](Doc/sphinx) directory. Then you will need to install sphinx and the necessary extensions which can be done using 
-
-```
-pip install -r requirements.txt
-```
-
-then you can simply do 
-
-```
-make html
-```
-
-and the documentation will be built in the build/html directory which you can open with whatever browser you like.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
