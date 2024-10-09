@@ -1,10 +1,3 @@
-// C++ includes
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <vector>
-#include <algorithm>
-
 // ROOT includes
 #include "TFile.h"
 #include "TBranch.h"
@@ -29,11 +22,14 @@
 
 #include "manager/manager.h"
 
-//KS: Simple script to get whatever penalty term you like, since flux and xsec are on systematic we cannot just directly take it from the chain
-//g++ `root-config --cflags` -std=c++11 -g -o GetPenaltyTerm GetPenaltyTerm.cpp -I`root-config --incdir` `root-config --glibs --libs`
 
-void GetPenaltyTerm(std::string inputFile, std::string configFile);
-void ReadXSecFile(std::string inputFile);
+/// @file GetPenaltyTerm.cpp
+/// @brief KS: This file contains the implementation of the function to extract specific penalty terms from systematic chains.
+///
+/// This script is designed to retrieve penalty terms from various sources, such as flux and cross-section systematic chains.
+/// Since flux and cross-section uncertainties are handled systematically, the penalty term cannot be taken directly from the chain.
+///
+/// @todo KS: This should really be moved to MCMC Processor
 
 std::vector <int> nominal;
 std::vector <bool> isFlat;
@@ -43,24 +39,92 @@ int size;
 
 double** invCovMatrix;
 
-int main(int argc, char *argv[]) 
+void ReadXSecFile(const std::string& inputFile)
 {
-  SetMaCh3LoggerFormat();
-  if (argc != 3 )
-  {
-    MACH3LOG_WARN("Something went wrong ");
-    MACH3LOG_WARN("./GetPenaltyTerm root_file_to_analyse.root ");
+  // Now read the MCMC file
+  TFile *TempFile = new TFile(inputFile.c_str(), "open");
+
+  // Get the matrix
+  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(TempFile->Get("CovarianceFolder/xsec_cov"));
+
+  // Get the settings for the MCMC
+  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  if (Config == nullptr) {
+    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
+    TempFile->ls();
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  std::string filename = argv[1];
-  std::string config = argv[2];
-  GetPenaltyTerm(filename, config);
 
-  return 0;
+  YAML::Node Settings = TMacroToYAML(*Config);
+
+  //CW: Get the xsec Covariance matrix
+  std::vector<std::string> XsecCovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
+  if(XsecCovPos.back() == "none")
+  {
+    MACH3LOG_WARN("Couldn't find XsecCov branch in output");
+    MaCh3Utils::PrintConfig(Settings);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != nullptr) {
+    MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
+    for(unsigned int i = 0; i < XsecCovPos.size(); i++)
+      XsecCovPos[i].insert(0, std::string(std::getenv("MACH3"))+"/");
+  }
+
+  YAML::Node XSecFile;
+  XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < XsecCovPos.size(); i++)
+  {
+    YAML::Node YAMLDocTemp = YAML::LoadFile(XsecCovPos[i]);
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      XSecFile["Systematics"].push_back(item);
+    }
+  }
+
+  size = XSecMatrix->GetNrows();
+
+  auto systematics = XSecFile["Systematics"];
+  for (auto it = systematics.begin(); it != systematics.end(); ++it)
+  {
+    auto const &param = *it;
+
+    ParamNames.push_back(param["Systematic"]["Names"]["FancyName"].as<std::string>());
+    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
+
+    bool flat = false;
+    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
+    isFlat.push_back( flat );
+  }
+
+  XSecMatrix->Invert();
+  //KS: Let's use double as it is faster than TMatrix
+  invCovMatrix = new double*[size];
+  for (int i = 0; i < size; i++)
+  {
+    invCovMatrix[i] = new double[size];
+    for (int j = 0; j < size; ++j)
+    {
+      invCovMatrix[i][j] = -999;
+    }
+  }
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < size; i++)
+  {
+    for (int j = 0; j < size; ++j)
+    {
+      invCovMatrix[i][j] = (*XSecMatrix)(i,j);
+    }
+  }
+
+  TempFile->Close();
+  delete TempFile;
 }
 
-//KS: This should really be moved to MCMC Processor
-void GetPenaltyTerm(std::string inputFile, std::string configFile)
+void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 {
   TCanvas* canvas = new TCanvas("canvas", "canvas", 0, 0, 1024, 1024);
   canvas->SetGrid();
@@ -76,11 +140,6 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
   gStyle->SetPalette(51);
 
   ReadXSecFile(inputFile);
-    
-  // KS: This can reduce time necessary for caching even by half
-  #ifdef MULTITHREAD
-  //ROOT::EnableImplicitMT();
-  #endif
 
   // Open the Chain
   TChain* Chain = new TChain("posteriors","");
@@ -194,7 +253,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
     hLogL[i]->SetLineColor(kBlue);
   }
   double* logL = new double[NSets]();
-  for(int n = 0; n < AllEvents; n++)
+  for(int n = 0; n < AllEvents; ++n)
   {
     if(n%10000 == 0) MaCh3Utils::PrintProgressBar(n, AllEvents);
       
@@ -282,7 +341,7 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
   canvas->Print(Form("%s_PenaltyTerm.pdf[",inputFile.c_str()), "pdf");
   for(int i = 0; i < NSets; i++)
   {
-    double Maximum = hLogL[i]->GetMaximum();
+    const double Maximum = hLogL[i]->GetMaximum();
     hLogL[i]->GetYaxis()->SetRangeUser(0., Maximum*1.2);
     hLogL[i]->SetTitle(FancyTittle[i].c_str());
     hLogL[i]->GetXaxis()->SetTitle("Step");
@@ -308,89 +367,23 @@ void GetPenaltyTerm(std::string inputFile, std::string configFile)
     delete[] invCovMatrix[i];
   }
   delete[] invCovMatrix;
+  OutputFile->Close();
+  delete OutputFile;
 }
 
-void ReadXSecFile(std::string inputFile)
+int main(int argc, char *argv[])
 {
-  // Now read the MCMC file
-  TFile *TempFile = new TFile(inputFile.c_str(), "open");
-
-  // Get the matrix
-  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(TempFile->Get("CovarianceFolder/xsec_cov"));
-
-  // Get the settings for the MCMC
-  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
-  if (Config == nullptr) {
-    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
-    TempFile->ls();
+  SetMaCh3LoggerFormat();
+  MaCh3Utils::MaCh3Welcome();
+  if (argc != 3 )
+  {
+    MACH3LOG_WARN("Something went wrong ");
+    MACH3LOG_WARN("./GetPenaltyTerm root_file_to_analyse.root ");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+  std::string filename = argv[1];
+  std::string config = argv[2];
+  GetPenaltyTerm(filename, config);
 
-  YAML::Node Settings = TMacroToYAML(*Config);
-
-  //CW: Get the xsec Covariance matrix
-  std::vector<std::string> XsecCovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
-  if(XsecCovPos.back() == "none")
-  {
-    MACH3LOG_WARN("Couldn't find XsecCov branch in output");
-    MaCh3Utils::PrintConfig(Settings);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != nullptr) {
-    MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
-    for(unsigned int i = 0; i < XsecCovPos.size(); i++)
-      XsecCovPos[i].insert(0, std::string(std::getenv("MACH3"))+"/");
-  }
-
-  YAML::Node XSecFile;
-  XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < XsecCovPos.size(); i++)
-  {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(XsecCovPos[i]);
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
-      XSecFile["Systematics"].push_back(item);
-    }
-  }
-
-  size = XSecMatrix->GetNrows();
-
-  auto systematics = XSecFile["Systematics"];
-  for (auto it = systematics.begin(); it != systematics.end(); ++it)
-  {
-    auto const &param = *it;
-
-    ParamNames.push_back(param["Systematic"]["Names"]["FancyName"].as<std::string>());
-    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
-
-    bool flat = false;
-    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
-    isFlat.push_back( flat );
-  }
-    
-  XSecMatrix->Invert();
-  //KS: Let's use double as it is faster than TMatrix
-  invCovMatrix = new double*[size];
-  for (int i = 0; i < size; i++) 
-  {
-    invCovMatrix[i] = new double[size];
-    for (int j = 0; j < size; ++j) 
-    {
-      invCovMatrix[i][j] = -999;
-    }
-  }
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
-  for (int i = 0; i < size; i++)
-  {
-    for (int j = 0; j < size; ++j) 
-    {
-      invCovMatrix[i][j] = (*XSecMatrix)(i,j);
-    }
-  }  
-  
-  TempFile->Close();
-  delete TempFile;
+  return 0;
 }

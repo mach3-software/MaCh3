@@ -447,7 +447,11 @@ void FitterBase::DragRace(const int NLaps) {
     MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
-
+  // Get vector of proposed steps. If we want to run LLH scan or something else after we need to revert changes after proposing steps multiple times
+  std::vector<std::vector<double>> StepsValuesBefore(systematics.size());
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    StepsValuesBefore[s] = systematics[s]->getProposed();
+  }
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
@@ -457,6 +461,9 @@ void FitterBase::DragRace(const int NLaps) {
     clockRace.Stop();
     MACH3LOG_INFO("It took {:.4f} s to propose step {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
+  }
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    systematics[s]->setParameters(StepsValuesBefore[s]);
   }
 
   for (size_t s = 0; s < systematics.size(); ++s) {

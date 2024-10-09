@@ -3,7 +3,7 @@ add_compile_definitions(CUDA)
 
 #KS: If Debug is not defined disable it by default
 if(NOT DEFINED MaCh3_DEBUG_ENABLED)
-  SET(MaCh3_DEBUG_ENABLED FALSE)
+  set(MaCh3_DEBUG_ENABLED FALSE)
 endif()
 
 EXECUTE_PROCESS( COMMAND uname -m OUTPUT_VARIABLE OS_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -68,6 +68,17 @@ target_include_directories(MaCh3CompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_
 if(MaCh3_DEBUG_ENABLED)
   include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
 endif()
+
+#KS: We need it to be defined on compiler level,
+if(NOT DEFINED NSplines_GPU)
+   #EM: for OA2024: 160
+  set(NSplines_GPU 160)
+endif()
+
+# Pass NSplines_GPU as a preprocessor definition to the compiler
+target_compile_definitions(MaCh3CompilerOptions INTERFACE NSplines_GPU=${NSplines_GPU})
+
+cmessage(STATUS "Using \"${NSplines_GPU}\" for GPU EventByEvent Splines")
 
 
 #KS: Keep this for backward compatibility

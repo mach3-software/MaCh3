@@ -117,13 +117,6 @@ covarianceBase::~covarianceBase(){
 void covarianceBase::ConstructPCA() {
 // ********************************************
 
-  // Check that covariance matrix exists
-  if (covMatrix == NULL) {
-    MACH3LOG_ERROR("Covariance matrix for {} has not yet been set", matrixName);
-    MACH3LOG_ERROR("Can not construct PCA until it is set");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
   //Check whether first and last pcadpar are set and if not just PCA everything
   if(FirstPCAdpar == -999 || LastPCAdpar == -999){
     if(FirstPCAdpar == -999 && LastPCAdpar == -999){
@@ -134,16 +127,6 @@ void covarianceBase::ConstructPCA() {
       MACH3LOG_ERROR("You must either leave FirstPCAdpar and LastPCAdpar at -999 or set them both to something");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-  }
-  if(FirstPCAdpar > covMatrix->GetNrows()-1 || LastPCAdpar>covMatrix->GetNrows()-1){
-    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
-    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, covMatrix->GetNrows()-1);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  if(FirstPCAdpar < 0 || LastPCAdpar < 0){
-    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are less than 0 but not default -999");
-    MACH3LOG_ERROR("first: {} last: {}", FirstPCAdpar, LastPCAdpar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA);
@@ -199,7 +182,7 @@ void covarianceBase::init(const char *name, const char *file) {
   }
 
   // Not using adaptive by default
-  setAdaptionDefaults();
+  use_adaptive = false;
   // Set the covariance matrix
   size = CovMat->GetNrows();
   _fNumPar = size;
@@ -267,7 +250,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   _fNumPar = _fYAMLDoc["Systematics"].size();
   size = _fNumPar;
 
-  setAdaptionDefaults();
+  use_adaptive = false;
 
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
@@ -401,7 +384,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
     }
   }
 
-  setAdaptionDefaults();
+  use_adaptive = false;
   setCovMatrix(covMat);
 
   ReserveMemory(_fNumPar);
@@ -649,10 +632,7 @@ void covarianceBase::proposeStep() {
   // Make the random numbers for the step proposal
   randomize();
   CorrelateSteps();
-  if(use_adaptive){
-    updateAdaptiveCovariance();
-    total_steps++;
-  }
+  if(use_adaptive) updateAdaptiveCovariance();
 }
 
 // ************************************************
@@ -831,9 +811,10 @@ void covarianceBase::throwParCurr(const double mag) {
     }
   }
 }
-
+// ********************************************
 // Function to print the nominal values
 void covarianceBase::printNominal() {
+// ********************************************
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
   for (int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), getParInit(i));
@@ -856,8 +837,6 @@ void covarianceBase::printNominalCurrProp() {
   for (int i = 0; i < _fNumPar; ++i) {
     MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
-  //KS: "\n" is faster performance wise, keep std::endl at the end to flush just in case, also looks pretty
-  //std::cout << std::endl;
 }
 
 // ********************************************
@@ -873,6 +852,9 @@ double covarianceBase::CalcLikelihood() {
   #pragma omp parallel for reduction(+:logL)
   #endif
   for(int i = 0; i < _fNumPar; ++i){
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (int j = 0; j <= i; ++j) {
       if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
@@ -1094,6 +1076,9 @@ void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _re
   for (int i = 0; i < n; ++i)
   {
     double result = 0.0;
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (int j = 0; j < n; ++j)
     {
       result += matrix[i][j]*vector[j];
@@ -1107,6 +1092,9 @@ double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const
 // ********************************************
 
   double Element = 0.0;
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int j = 0; j < Length; ++j) {
     Element += matrix[i][j]*vector[j];
   }
@@ -1136,12 +1124,12 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
 void covarianceBase::printIndivStepScale() {
 // ********************************************
-  std::cout << "============================================================" << std::endl;
-  std::cout << std::setw(PrintLength) << "Parameter:" << " | " << std::setw(11) << "Step scale:" << std::endl;
+  MACH3LOG_INFO("============================================================");
+  MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
   for (int iParam = 0; iParam < _fNumPar; iParam++) {
-    std::cout << std::setw(PrintLength) << _fNames[iParam].c_str() << " | " << std::setw(11) << _fIndivStepScale[iParam] << std::endl;
+    MACH3LOG_INFO("{:<{}} | {:<11}", _fNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
   }
-  std::cout << "============================================================" << std::endl;
+  MACH3LOG_INFO("============================================================");
 }
 
 // ********************************************
@@ -1183,7 +1171,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  if(total_steps < 2) {
+  if(AdaptiveHandler.total_steps < 2) {
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
   //DB Resetting warning level
@@ -1214,13 +1202,13 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 
   if (covMatrix->GetNrows() != cov->GetNrows()) {
     MACH3LOG_ERROR("Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!");
-    std::cerr << "Stored covariance matrix size:" << covMatrix->GetNrows() << std::endl;
-    std::cerr << "Given matrix size:" << cov->GetNrows() << std::endl;
+    MACH3LOG_ERROR("Stored covariance matrix size: {}", covMatrix->GetNrows());
+    MACH3LOG_ERROR("Given matrix size: {}", cov->GetNrows());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   throwMatrix = (TMatrixDSym*)cov->Clone();
-  if(use_adaptive && total_steps <= AdaptiveHandler.start_adaptive_throw) makeClosestPosDef(throwMatrix);
+  if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) makeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
@@ -1256,37 +1244,10 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
   setThrowMatrix(cov);
 }
 
-
-// ********************************************
-void covarianceBase::setAdaptionDefaults(){
-// ********************************************
-  // Puts adaptive MCMC default attributes somewhere obvious
-  use_adaptive          = false;
-  total_steps           = 0;
-}
-
 // ********************************************
 // HW : Here be adaption
 void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
-  /*
-    HW: Idea is that adaption can simply read the YAML config
-    Options :
-            External Info:
-              * UseExternalMatrix [bool]     :    Use an external matrix
-              * ExternalMatrixFileName [str] :    Name of file containing external info
-              * ExternalMatrixName [str]     :    Name of external Matrix
-              * ExternalMeansName [str]      :    Name of external means vector [for updates]
-
-            General Info:
-              * DoAdaption [bool]            :    Do we want to do adaption?
-              * AdaptionStartThrow [int]     :    Step we start throwing adaptive matrix from
-              * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix
-              * AdaptionStartUpdate [int]    :    Do we skip the first N steps?
-              * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
-              * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
- */
-
   // need to cast matrixName to string
   std::string matrix_name_str(matrixName);
 
@@ -1323,21 +1284,21 @@ void covarianceBase::updateAdaptiveCovariance(){
   // First we update the total means
 
   // Skip this if we're at a large number of steps
-  if(total_steps>AdaptiveHandler.end_adaptive_update || total_steps<AdaptiveHandler.start_adaptive_update) return;
+  if(AdaptiveHandler.SkipAdaption()) return;
 
-  int steps_post_burn = total_steps - AdaptiveHandler.start_adaptive_update;
   // Call main adaption function
-  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, steps_post_burn, _fNumPar);
+  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
 
   //This is likely going to be the slow bit!
-  if(total_steps == AdaptiveHandler.start_adaptive_throw) {
+  if(AdaptiveHandler.IndivStepScaleAdapt()) {
     resetIndivStepScale();
   }
 
-  if(total_steps >= AdaptiveHandler.start_adaptive_throw && (total_steps-AdaptiveHandler.start_adaptive_throw)%AdaptiveHandler.adaptive_update_step==0) {
+  if(AdaptiveHandler.UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
   }
+  AdaptiveHandler.total_steps++;
 }
 
 // ********************************************
@@ -1382,7 +1343,7 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
   TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);//Not fully sure why this is even needed since symmetric B -> U=V
   //Get norm of transformed
   //  Double_t approx_norm=cov_closest_approx.E2Norm();
-  //std::cout<<"Initial Norm : "<<cov_norm<<" | Norm after transformation : "<<approx_norm<<" | Ratio : "<<cov_norm/approx_norm<<std::endl;
+  //MACH3LOG_INFO("Initial Norm: {:.6f} | Norm after transformation: {:.6f} | Ratio: {:.6f}", cov_norm, approx_norm, cov_norm / approx_norm);
   
   *cov = cov_closest_approx;
   //Now can just add a makeposdef!
@@ -1433,7 +1394,6 @@ TH2D* covarianceBase::GetCorrelationMatrix() {
 // KS: After step scale, prefit etc. value were modified save this modified config.
 void covarianceBase::SaveUpdatedMatrixConfig() {
 // ********************************************
-
   if (!_fYAMLDoc)
   {
     MACH3LOG_CRITICAL("Yaml node hasn't been initialised for matrix {}, something is not right", matrixName);
@@ -1448,7 +1408,6 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
   {
     //KS: Feel free to update it, if you need updated prefit value etc
     param["Systematic"]["StepScale"]["MCMC"] = std::round(_fIndivStepScale[i] * 100.0) / 100.0; // Round to 2 decimal places
-
     i++;
   }
   // Save the modified node to a file

@@ -184,10 +184,10 @@ class MCMCProcessor {
     inline TH2D* GetViolinPrior() { return hviolin_prior; };
 
     //Covariance getters
-    inline std::vector<std::string> const & GetXSecCov()  const { return CovPos[kXSecPar]; };
-    inline std::string const & GetNDCov() const { return CovPos[kNDPar].back(); };
-    inline std::string const & GetFDCov()    const { return CovPos[kFDDetPar].back(); };
-    inline std::string const & GetOscCov()   const { return CovPos[kOSCPar].back(); };
+    inline std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
+    inline std::string GetNDCov() const { return CovPos[kNDPar].back(); };
+    inline std::string GetFDCov() const { return CovPos[kFDDetPar].back(); };
+    inline std::vector<std::string> GetOscCov()   const { return CovPos[kOSCPar]; };
 
     /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);

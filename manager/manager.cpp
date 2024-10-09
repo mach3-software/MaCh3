@@ -48,7 +48,6 @@ manager::~manager() {
 // *************************
 
   if(!Modes) delete Modes;
-
 }
 
 // *************************
@@ -101,8 +100,8 @@ void manager::SaveSettings(TFile* const OutputFile) {
 // *************************
 void manager::Print() {
 // *************************
-
   MACH3LOG_INFO("---------------------------------");
-  std::cout << config << "\n";
+  MaCh3Utils::PrintConfig(config);
   MACH3LOG_INFO("---------------------------------");
 }
+

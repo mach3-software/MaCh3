@@ -1,11 +1,5 @@
 #pragma once
 
-// C++ includes
-#include <map>
-
-// ROOT includes
-#include "TList.h"
-
 // MaCh3 includes
 #include "covariance/covarianceBase.h"
 #include "samplePDF/Structs.h"
@@ -23,12 +17,6 @@ class covarianceXsec : public covarianceBase {
     covarianceXsec(const std::vector<std::string>& FileNames, const char *name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     /// @brief Destructor
     ~covarianceXsec();
-
-    /// @brief Print information about the whole object once it is set
-    inline void Print();
-
-    /// @brief KS: Check if matrix is correctly initialised
-    void CheckCorrectInitialisation();
 
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
@@ -76,6 +64,7 @@ class covarianceXsec : public covarianceBase {
     /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
     const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, kSpline);};
     /// @brief Grab the index of the syst relative to global numbering.
+    /// @param Type Type of syst, for example kNorm, kSpline etc
     const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
 
     /// @brief DB Grab the Number of splines for the relevant DetID
@@ -104,25 +93,59 @@ class covarianceXsec : public covarianceBase {
     /// @brief Get nominal for a given param
     /// @param i parameter index
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
-    /// @brief Is parameter a flux param or not. This might become deprecated in future
+
+    /// @brief Checks if parameter belongs to a given group
     /// @param i parameter index
-    /// @warning Will become deprecated
-    inline bool IsParFlux(const int i){ return isFlux[i]; }
-    /// @brief KS Function to set to nominal flux parameters
-    /// @warning Will become deprecated
-    void setXsecOnlyParameters();
-    /// @brief KS Function to set to nominal flux  parameters
-    /// @warning Will become deprecated
-    void setFluxOnlyParameters();
-    
+    /// @param Group name of group, like Xsec or Flux
+    /// @return bool telling whether param is part of group
+    bool IsParFromGroup(const int i, const std::string& Group);
+
+    /// @brief KS Function to set to prior parameters of a given group
+    /// @param Group name of group, like Xsec or Flux
+    void SetGroupOnlyParameters(const std::string& Group);
+
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
     /// @param Name Name of TFile to which we save stuff
     /// @warning This is mostly used for backward compatibility
     void DumpMatrixToFile(const std::string& Name);
   protected:
-    /// @brief Initialise CovarianceXsec
+    /// @brief Print information about the whole object once it is set
+    void Print();
+    /// @brief Prints general information about the covarianceXsec object.
+    void PrintGlobablInfo();
+    /// @brief Prints normalization parameters.
+    void PrintNormParams();
+    /// @brief Prints spline parameters.
+    void PrintSplineParams();
+    /// @brief Prints functional parameters.
+    void PrintFunctionalParams();
+    /// @brief Prints groups of parameters.
+    void PrintParameterGroups();
+
+    /// @brief KS: Check if matrix is correctly initialised
+    void CheckCorrectInitialisation();
+
+    /// @brief Iterates over parameters and applies a filter and action function.
+    ///
+    /// This template function provides a way to iterate over parameters associated
+    /// with a specific Detector ID (DetID). It applies a filter function to determine
+    /// which parameters to process and an action function to define what to do
+    /// with the selected parameters.
+    ///
+    /// @tparam FilterFunc The type of the filter function used to determine
+    /// which parameters to include.
+    /// @tparam ActionFunc The type of the action function applied to each selected
+    /// parameter.
+    /// @param DetID The Detector ID used to filter parameters.
+    template <typename FilterFunc, typename ActionFunc>
+    void IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action);
+
+    /// @brief Initializes the systematic parameters from the configuration file.
+    /// This function loads parameters like normalizations and splines from the provided YAML file.
+    /// @note This is used internally during the object's initialization process.
     void initParams();
-    /// @brief ETA - trying out the yaml parsing
+    /// @brief Parses the YAML configuration to set up cross-section parameters.
+    /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.
     inline void InitXsecFromConfig();
     /// @brief Get Norm params
     /// @param param Yaml node describing param
@@ -132,10 +155,6 @@ class covarianceXsec : public covarianceBase {
     /// @param param Yaml node describing param
     inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
 
-    /// Is parameter flux or not, This might become deprecated in future
-    /// @warning Will become deprecated
-    std::vector<bool> isFlux;
-
     /// Tells to which samples object param should be applied
     std::vector<int> _fDetID;
     /// Type of parameter like norm, spline etc.
@@ -143,8 +162,12 @@ class covarianceXsec : public covarianceBase {
 
     /// Name of spline in TTree (TBranch),
     std::vector<std::string> _fSplineNames;
+
+    /// KS: Allow to group parameters for example to affect only cross-section or only flux etc.
+    std::vector<std::string> _ParameterGroup;
+
     /// Map between number of given parameter type with global parameter numbering. For example 2nd norm param may be 10-th global param
-    std::vector<std::map<int, int>> _fSystToGlobablSystIndexMap;
+    std::vector<std::map<int, int>> _fSystToGlobalSystIndexMap;
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecSplines1> SplineParams;

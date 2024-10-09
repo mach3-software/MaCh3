@@ -1,5 +1,12 @@
 #pragma once
 
+/// @file SplineCommon.h
+/// @brief Contains definitions for spline coefficients and structure used in both CPU and GPU code.
+///
+/// @details This file includes macros and enums for defining spline coefficients.
+/// It is designed to be compatible with older CUDA versions, so be cautious
+/// when adding new features or including other headers.
+
 #ifndef _BAD_SPLINE_
 #define _BAD_SPLINE_ 123456789
 #endif
@@ -12,15 +19,17 @@
 /// HW: Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
 enum SplineSegmentCoeffs
 {
-  kCoeffY = 0,
-  kCoeffB = 1,
-  kCoeffC = 2,
-  kCoeffD = 3
+  kCoeffY = 0, ///< Coefficient Y
+  kCoeffB = 1, ///< Coefficient B
+  kCoeffC = 2, ///< Coefficient C
+  kCoeffD = 3  ///< Coefficient D
 };
 
 
 // *******************
 /// @brief KS: Struct storing information for spline monolith
+/// @details This structure holds the X coefficients, other spline coefficients,
+/// the number of knots per spline, and the number of points per spline on the CPU.
 struct SplineMonoStruct {
 // *******************
   /// KS: CPU arrays to hold X coefficient

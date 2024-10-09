@@ -5,19 +5,19 @@
 SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, samplePDFBase* const sample, const int nSteps) {
 // *******************
 
-  std::cout << "Making sample summary class..." << std::endl;
+  MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD
-  std::cout << "with OpenMP and " << omp_get_max_threads() << " threads" << std::endl;
+  MACH3LOG_DEBUG("With OpenMP and {} threads", omp_get_max_threads());
   #endif
   
   StandardFluctuation = true;
   
-  if(StandardFluctuation) std::cout << "Using standard method of statistical fluctuation" << std::endl;
-  else std::cout << "Using alternative method of statistical fluctuation, which is much slower" << std::endl;
+  if(StandardFluctuation) MACH3LOG_INFO("Using standard method of statistical fluctuation");
+  else MACH3LOG_INFO("Using alternative method of statistical fluctuation, which is much slower");
   
   //KS: If true it will print posterior predictive for every beta parameter it is quite useful but make root big number of plots
   DoBetaParam = true;
-  if(DoBetaParam) std::cout << "I will calculate #beta parameters from Barlow-Beeston formalism" << std::endl;
+  if(DoBetaParam) MACH3LOG_INFO("I will calculate #beta parameters from Barlow-Beeston formalism");
 
   //If true code will normalise each histogram, this way you can calculate shape only error. etc. pvalue will be completely wrong unfortunately
   doShapeOnly = false;
@@ -119,7 +119,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
     RandomHist->GetYaxis()->SetTitle(ss.str().c_str());
     RandomHist->SetLineWidth(2);
   }
-  else RandomHist = NULL;
+  else RandomHist = nullptr;
 
   for (_int_ i = 0; i < nSamples; ++i)
   {
@@ -166,7 +166,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
 
   DoByModePlots = false;
   MeanHist_ByMode = NULL;
-  PosteriorHist_ByMode = NULL;
+  PosteriorHist_ByMode = nullptr;
 
   nModelParams = 0;
 
@@ -179,7 +179,7 @@ SampleSummary::~SampleSummary() {
 // *******************
   Outputfile->cd();
 
-  //ROOT is wierd and once you write TFile claim ownership of histograms. Best is to first delete histograms and then close file
+  //ROOT is weird and once you write TFile claim ownership of histograms. Best is to first delete histograms and then close file
   Outputfile->Close();
   delete Outputfile;
 
@@ -192,7 +192,7 @@ SampleSummary::~SampleSummary() {
   if(lnLDrawHist != NULL) delete lnLDrawHist;
   if(lnLFlucHist != NULL) delete lnLFlucHist;
   if(lnLDrawHistRate != NULL) delete lnLDrawHistRate;
-  if(RandomHist != NULL)  delete RandomHist;
+  if(RandomHist != nullptr)  delete RandomHist;
 
   if(lnLFlucHist_ProjectX != NULL) delete lnLFlucHist_ProjectX;
   if(DoByModePlots)
@@ -204,7 +204,7 @@ SampleSummary::~SampleSummary() {
       {
         for (int k = 1; k <= maxBins[i]; ++k)
         {
-          if(PosteriorHist_ByMode[i][j][k] != NULL) delete PosteriorHist_ByMode[i][j][k];
+          if(PosteriorHist_ByMode[i][j][k] != nullptr) delete PosteriorHist_ByMode[i][j][k];
         }
         delete[] PosteriorHist_ByMode[i][j];
         if(MeanHist_ByMode[i][j] != NULL) delete MeanHist_ByMode[i][j];
@@ -297,12 +297,11 @@ bool SampleSummary::CheckSamples(int Length) {
 // *******************
   bool ok = (nSamples == Length);
   if (!ok) {
-    std::cerr << "Size of SampleVector input != number of defined samples" << std::endl;
-    std::cout << "Size of SampleVector: " << Length << std::endl;
-    std::cout << "Size of defined samples: " << nSamples << std::endl;
-    std::cerr << "Something has gone wrong with making the Samples" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("Size of SampleVector input != number of defined samples");
+    MACH3LOG_ERROR("Size of SampleVector:  {}", Length);
+    MACH3LOG_ERROR("Size of defined samples:  {}", nSamples);
+    MACH3LOG_ERROR("Something has gone wrong with making the Samples");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return ok;
 }
@@ -314,7 +313,7 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
 // *******************
   const int Length = Data.size();
   // Check length of samples are OK
-  if (!CheckSamples(Length)) throw;
+  if (!CheckSamples(Length)) throw MaCh3Exception(__FILE__ , __LINE__ );
   for (int i = 0; i < Length; ++i) {
     if (Data[i] == NULL) {
       DataHist[i] = NULL;
@@ -331,9 +330,9 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
         DataHist_ProjectY[i] = ProjectPoly(DataHist[i], false, i);
         maxBins[i] = DataHist[i]->GetNumberOfBins();
       } else {
-        std::cerr<<"Somehow sample "<<SamplePDF->GetSampleName(i)<<"doesn't use TH2Poly"<<std::endl;
-        std::cerr<<"Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future"<<std::endl;
-        throw;
+        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SamplePDF->GetSampleName(i));
+        MACH3LOG_ERROR("Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
   }
@@ -345,7 +344,7 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
 // *******************
 
   const int Length = Nominal.size();
-  if (!CheckSamples(Length)) throw;
+  if (!CheckSamples(Length)) throw MaCh3Exception(__FILE__ , __LINE__ );
   
   //KS: ROOT is super annoying and you cannot use clone with openMP, hence we have another loop below
   for (int i = 0; i < Length; ++i) 
@@ -498,7 +497,7 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
   if( !isPriorPredictive )RandomHist->Fill(DrawNumber);
 
   const int size = SampleVector.size();
-  if (!CheckSamples(size)) throw;
+  if (!CheckSamples(size)) throw MaCh3Exception(__FILE__ , __LINE__ );
 
   // Push back the throw
   MCVector.push_back(SampleVector);
@@ -541,7 +540,7 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
   }
   first_pass = false;
 
-  // Loop over the sameples
+  // Loop over the samples
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -576,7 +575,7 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
   //KS: This means this is first time
   if(!DoByModePlots)
   {
-    std::cout<< "Turning reaction breadkwon mode, brum brum"<<std::endl;
+    MACH3LOG_INFO("Turning reaction breadkwon mode, brum brum");
     PosteriorHist_ByMode = new TH1D***[nSamples];
     MeanHist_ByMode = new TH2Poly**[nSamples];
 
@@ -759,13 +758,13 @@ void SampleSummary::Write() {
   // Prepare the output tree
   PrepareOutput();
 
-  std::cout << "Summarising " << nThrows << " throws..." << std::endl;
+  MACH3LOG_INFO("Summarising {} throws...", nThrows);
   // After all the throws are added finalise the sample
   TStopwatch timer;
   timer.Start();
   MakePredictive();
   timer.Stop();
-  std::cout << "Made Prior/Posterior Predictive, it took " << timer.RealTime() << "s" <<", now writing..." << std::endl;
+  MACH3LOG_INFO("Made Prior/Posterior Predictive, it took {}s, now writing...", timer.RealTime());
 
   // Study Bayesian Information Criterion
   StudyBIC();
@@ -783,7 +782,7 @@ void SampleSummary::Write() {
   lnLDrawHist->Write();
   lnLFlucHist->Write();
   lnLDrawHistRate->Write();
-  //KS: Only avaible for Posterior Predictive
+  //KS: Only available for Posterior Predictive
   if(!isPriorPredictive) RandomHist->Write();
 
   lnLFlucHist_ProjectX->Write();
@@ -1058,8 +1057,7 @@ void SampleSummary::Write() {
     delete W2NomProjectY;
     delete W2MeanProjectY;
     delete W2ModeProjectY;
-    
-    std::cout << std::endl;
+    MACH3LOG_INFO("");
   } //end loop over samples
   delete[] DataHist_ProjectX;
   delete[] DataHist_ProjectY;
@@ -1067,7 +1065,7 @@ void SampleSummary::Write() {
   if(DoBetaParam) PlotBetaParameters();
 
   StudyKinematicCorrelations();
-  std::cout << "Wrote to " << Outputfile->GetName() << std::endl;
+  MACH3LOG_INFO("Wrote to {}", Outputfile->GetName());
 }
 
 // *******************
@@ -1212,7 +1210,7 @@ void SampleSummary::MakePredictive() {
 
   llh_total = llh_total_temp;
   // Now we have our posterior predictive histogram and it's LLH
-  std::cout << "Prior/Posterior predictive LLH mean (sample only) = " << llh_total << std::endl;
+  MACH3LOG_INFO("Prior/Posterior predictive LLH mean (sample only) = {}", llh_total);
   std::stringstream ss;
   ss << llh_total;
   lnLHist->SetTitle((std::string(lnLHist->GetTitle())+"_"+ss.str()).c_str());
@@ -1231,8 +1229,7 @@ void SampleSummary::MakePredictive() {
 // Additionally we calculate the chi2 of the draws (fluctuated) of  the MC with the prior/posterior predictive and plot it vs the chi2 from the draws of MCMC and the data
 void SampleSummary::MakeChi2Hists() {
 // *******************
-
-  std::cout << "Making the chi2 histograms..." << std::endl;
+  MACH3LOG_INFO("Making the chi2 histograms...");
   // Have this to signify if we're doing the first pass
   first_pass = true;
 
@@ -1249,7 +1246,7 @@ void SampleSummary::MakeChi2Hists() {
   for (unsigned int i = 0; i < nThrows; ++i)
   {
     if (i % (nThrows/10) == 0) {
-      std::cout << "   On throw " << i << "/" << nThrows << " (" << int(double(i)*100.0/double(nThrows)) << "%)"<< std::endl;
+      MaCh3Utils::PrintProgressBar(i, nThrows);
     }
 
     // Set the total LLH to zero to initialise
@@ -1518,8 +1515,7 @@ void SampleSummary::MakeChi2Hists() {
   } // End loop over throws
 
   AveragePenalty = AveragePenalty/double(nThrows);
-  std::cout << "Average LLH penalty over toys is " << AveragePenalty << std::endl;
-
+  MACH3LOG_INFO("Average LLH penalty over toys is {:.2f}", AveragePenalty);
   // Calculate exact p-value instead of binned
   unsigned int Accept_PredFluc = 0;
   unsigned int Accept_DrawFluc = 0;
@@ -1531,8 +1527,8 @@ void SampleSummary::MakeChi2Hists() {
   const double pvalue_DrawFluc = double(Accept_DrawFluc)/double(nThrows);
   const double pvalue_PredFluc = double(Accept_PredFluc)/double(nThrows);
 
-  std::cout << "Calculated exact p-value using Fluctuation of Draw: "       << pvalue_DrawFluc << std::endl;
-  std::cout << "Calculated exact p-value using Fluctuation of Prediction: " << pvalue_PredFluc << std::endl;
+  MACH3LOG_INFO("Calculated exact p-value using Fluctuation of Draw: {:.2f}", pvalue_DrawFluc);
+  MACH3LOG_INFO("Calculated exact p-value using Fluctuation of Prediction: {:.2f}", pvalue_PredFluc);
 }
 
 // *******************
@@ -1677,52 +1673,52 @@ void SampleSummary::MakeCutLLH2D(TH2D *Histogram) {
 // Make the 1D Event Rate Hist
 void SampleSummary::MakeCutEventRate(TH1D *Histogram, const double DataRate) {
 // ****************
-    // For the event rate histogram add a TLine to the data rate
-    TLine *TempLine = new TLine(DataRate, Histogram->GetMinimum(), DataRate, Histogram->GetMaximum());
-    TempLine->SetLineColor(kRed);
-    TempLine->SetLineWidth(2);
-    // Also fit a Gaussian because why not?
-    TF1 *Fitter = new TF1("Fit", "gaus", Histogram->GetBinLowEdge(1), Histogram->GetBinLowEdge(Histogram->GetNbinsX()+1));
-    Histogram->Fit(Fitter, "RQ");
-    Fitter->SetLineColor(kRed-5);
-    // Calculate a p-value
-    double Above = 0.0;
-    for (int z = 0; z < Histogram->GetNbinsX(); ++z) {
-      const double xvalue = Histogram->GetBinCenter(z+1);
-      if (xvalue >= DataRate) {
-        Above += Histogram->GetBinContent(z+1);
-      }
+  // For the event rate histogram add a TLine to the data rate
+  TLine *TempLine = new TLine(DataRate, Histogram->GetMinimum(), DataRate, Histogram->GetMaximum());
+  TempLine->SetLineColor(kRed);
+  TempLine->SetLineWidth(2);
+  // Also fit a Gaussian because why not?
+  TF1 *Fitter = new TF1("Fit", "gaus", Histogram->GetBinLowEdge(1), Histogram->GetBinLowEdge(Histogram->GetNbinsX()+1));
+  Histogram->Fit(Fitter, "RQ");
+  Fitter->SetLineColor(kRed-5);
+  // Calculate a p-value
+  double Above = 0.0;
+  for (int z = 0; z < Histogram->GetNbinsX(); ++z) {
+    const double xvalue = Histogram->GetBinCenter(z+1);
+    if (xvalue >= DataRate) {
+      Above += Histogram->GetBinContent(z+1);
     }
-    const double pvalue = Above/Histogram->Integral();
-    TLegend *Legend = new TLegend(0.4, 0.75, 0.98, 0.90);
-    Legend->SetFillColor(0);
-    Legend->SetFillStyle(0);
-    Legend->SetLineWidth(0);
-    Legend->SetLineColor(0);
-    Legend->AddEntry(TempLine, Form("Data, %.0f, p-value=%.2f", DataRate, pvalue), "l");
-    Legend->AddEntry(Histogram, Form("MC, #mu=%.1f#pm%.1f", Histogram->GetMean(), Histogram->GetRMS()), "l");
-    Legend->AddEntry(Fitter, Form("Gauss, #mu=%.1f#pm%.1f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
-    std::string TempTitle = std::string(Histogram->GetName());
-    TempTitle += "_canv";
-    TCanvas *TempCanvas = new TCanvas(TempTitle.c_str(), TempTitle.c_str(), 1024, 1024);
-    TempCanvas->SetGridx();
-    TempCanvas->SetGridy();
-    TempCanvas->SetRightMargin(0.03);
-    TempCanvas->SetBottomMargin(0.08);
-    TempCanvas->SetLeftMargin(0.10);
-    TempCanvas->SetTopMargin(0.06);
-    TempCanvas->cd();
-    Histogram->Draw();
-    TempLine->Draw("same");
-    Fitter->Draw("same");
-    Legend->Draw("same");
-    TempCanvas->Write();
-    Histogram->Write();
-        
-    delete TempLine;
-    delete TempCanvas;
-    delete Fitter;
-    delete Legend;
+  }
+  const double pvalue = Above/Histogram->Integral();
+  TLegend *Legend = new TLegend(0.4, 0.75, 0.98, 0.90);
+  Legend->SetFillColor(0);
+  Legend->SetFillStyle(0);
+  Legend->SetLineWidth(0);
+  Legend->SetLineColor(0);
+  Legend->AddEntry(TempLine, Form("Data, %.0f, p-value=%.2f", DataRate, pvalue), "l");
+  Legend->AddEntry(Histogram, Form("MC, #mu=%.1f#pm%.1f", Histogram->GetMean(), Histogram->GetRMS()), "l");
+  Legend->AddEntry(Fitter, Form("Gauss, #mu=%.1f#pm%.1f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
+  std::string TempTitle = std::string(Histogram->GetName());
+  TempTitle += "_canv";
+  TCanvas *TempCanvas = new TCanvas(TempTitle.c_str(), TempTitle.c_str(), 1024, 1024);
+  TempCanvas->SetGridx();
+  TempCanvas->SetGridy();
+  TempCanvas->SetRightMargin(0.03);
+  TempCanvas->SetBottomMargin(0.08);
+  TempCanvas->SetLeftMargin(0.10);
+  TempCanvas->SetTopMargin(0.06);
+  TempCanvas->cd();
+  Histogram->Draw();
+  TempLine->Draw("same");
+  Fitter->Draw("same");
+  Legend->Draw("same");
+  TempCanvas->Write();
+  Histogram->Write();
+
+  delete TempLine;
+  delete TempCanvas;
+  delete Fitter;
+  delete Legend;
 }
 
 // ****************
@@ -1776,7 +1772,7 @@ void SampleSummary::CalcLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D 
   std::stringstream ss;
   ss << "_2LLH=" << llh;
   MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
-  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << DatHist->Integral() << std::setw(10) << MCHist->Integral() << std::setw(10) << llh << std::endl;
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), DatHist->Integral(), MCHist->Integral(), llh);
 }
 
 // ****************
@@ -1787,7 +1783,7 @@ void SampleSummary::CalcLLH(TH2Poly * const & DatHist, TH2Poly * const & MCHist,
   std::stringstream ss;
   ss << "_2LLH=" << llh;
   MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
-  std::cout << std::setw(55) << std::left << MCHist->GetName() << std::setw(10) << NoOverflowIntegral(DatHist) << std::setw(10) << NoOverflowIntegral(MCHist) << std::setw(10) << llh << std::endl;
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), NoOverflowIntegral(DatHist), NoOverflowIntegral(MCHist), llh);
 }
 
 // ****************
@@ -1828,7 +1824,7 @@ void SampleSummary::PlotBetaParameters() {
   TDirectory *BetaDir = Outputfile->mkdir("BetaParameters");
   BetaDir->cd();
 
-  std::cout<<"Writing Beta parameters"<<std::endl;
+  MACH3LOG_INFO("Writing Beta parameters");
   TDirectory **DirBeta = new TDirectory*[nSamples];
   for (_int_ i = 0; i < nSamples; ++i)
   {
@@ -1899,8 +1895,7 @@ void SampleSummary::PlotBetaParameters() {
 // Make a projection
 void SampleSummary::StudyKinematicCorrelations() {
 // ****************
-  std::cout<<" Calculating Correlations"<<std::endl;
-
+  MACH3LOG_INFO("Calculating Correlations");
   TStopwatch timer;
   timer.Start();
 
@@ -2228,7 +2223,7 @@ void SampleSummary::StudyKinematicCorrelations() {
   }//end if DoPerKinemBin
   else
   {
-    std::cout<<" Not calculating correlations per each kinematic bin"<<std::endl;
+    MACH3LOG_INFO("Not calculating correlations per each kinematic bin");
   }
 
   if(DoByModePlots)
@@ -2388,8 +2383,7 @@ void SampleSummary::StudyKinematicCorrelations() {
   delete CorrDir;
 
   timer.Stop();
-  std::cout << "Calculating correlations took " << timer.RealTime() << "s" << std::endl;
-
+  MACH3LOG_INFO("Calculating correlations took  {:.2f}s", timer.RealTime());
   Outputfile->cd();
 }
 
@@ -2437,16 +2431,16 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
 void SampleSummary::MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist){
 // ****************
-    if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
-    else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
+  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
+  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
 }
 
 // ****************
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
 void SampleSummary::MakeFluctuatedHistogram(TH2Poly *FluctHist, TH2Poly* PolyHist){
 // ****************
-    if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
-    else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
+  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
+  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
 }
 
 // ****************
@@ -2627,11 +2621,11 @@ void SampleSummary::StudyBIC(){
 
   const double EventRateBIC = GetBIC(llh_total, DataRate, nModelParams);
   const double BinBasedBIC = GetBIC(llh_total, BinsRate, nModelParams);
-  std::cout << "******************************" << std::endl;
-  std::cout << "Calculated Bayesian Information Criterion using global number of events: " << EventRateBIC << std::endl;
-  std::cout << "Calculated Bayesian Information Criterion using global number of bins: " << BinBasedBIC << std::endl;
-  std::cout << "Additional info: nModelParams "<<nModelParams<<" DataRate: "<<DataRate<<" BinsRate: "<<BinsRate<<std::endl;
-  std::cout << "******************************" << std::endl;
+  MACH3LOG_INFO("******************************");
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of events: {:.2f}", EventRateBIC);
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of bins: {:.2f}", BinBasedBIC);
+  MACH3LOG_INFO("Additional info: nModelParams {} DataRate: {:.2f} BinsRate: {:.2f}", nModelParams, DataRate, BinsRate);
+  MACH3LOG_INFO("******************************");
 }
 
 // ****************
@@ -2664,13 +2658,11 @@ void SampleSummary::StudyDIC() {
 
   //Actual test stat
   const double DIC_stat = Dhat + 2 * p_D;
-  std::cout<<"Effective number of parameters following DIC formalism is equal to "<< p_D <<std::endl;
-  std::cout<<"DIC test statistic = "<< DIC_stat <<std::endl;
-  std::cout << "******************************" << std::endl;
-
+  MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
+  MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
+  MACH3LOG_INFO("******************************");
   return;
 }
-
 
 // ****************
 //Fast and thread safe fill of violin histogram, it assumes both histograms have the same binning

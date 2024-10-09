@@ -68,10 +68,10 @@ public:
 
   /// @brief CW: The Printer
   inline void Print() {
-    std::cout << "    Splines: " << std::endl;
+    MACH3LOG_INFO("    Splines:");
     for (int i = 0; i < nParams; ++i) {
       if (!Func[i]) continue;
-      std::cout << "    " << std::left << std::setw(25) << Func[i]->GetName() << std::endl;
+      MACH3LOG_INFO("    {:<25}", Func[i]->GetName());
     }
   }
 
@@ -165,6 +165,8 @@ public:
   virtual double Eval(const double var)=0;
   /// @brief KS: Printer
   virtual void Print()=0;
+  /// @brief DL: Get number of points
+  virtual _int_ GetNp()=0;
 };
 
 // ************************
@@ -227,11 +229,10 @@ public:
     } else if (Type == kPseudoHeaviside) {
       return (var <= 0)*(1+Par[0]*var) + (1 >= var)*(var > 0)*(1+Par[1]*var) + (var > 1)*(Par[3]+Par[2]*var);
     }else {
-      std::cerr << "*** Error in reduced TF1 class!" << std::endl;
-      std::cerr << "    Class only knows about 5th order polynomial, two superposed linear function, linear function or pseudo Heaviside" << std::endl;
-      std::cerr << "    You have tried something else than this, which remains unimplemented" << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("    Class only knows about 5th order polynomial, two superposed linear functions, linear function, or pseudo Heaviside.");
+      MACH3LOG_ERROR("    You have tried something else than this, which remains unimplemented.");
+      MACH3LOG_ERROR("{}: {}", __FILE__, __LINE__);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     */
   }
@@ -244,8 +245,8 @@ public:
   /// @brief Get a parameter value
   double GetParameter(_int_ Parameter) {
     if (Parameter > length) {
-      std::cerr << "Error: you requested parameter number " << Parameter << " but length is " << length << " parameters" << std::endl;
-      throw;
+      MACH3LOG_ERROR("You requested parameter number {} but length is {} parameters", Parameter, length);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
       return -999.999;
     }
     return Par[Parameter];
@@ -260,10 +261,10 @@ public:
   inline int GetSize() { return length; }
   /// @brief Print detailed info
   inline void Print() override {
-    std::cout << "Printing TF1_red: " << std::endl;
-    std::cout << "  Length  = " << length << std::endl;
-    for(int i = 0; i < length; i++) {
-      std::cout << " Coeff " <<i<<"  = " << Par[i] << std::endl;
+    MACH3LOG_INFO("Printing TF1_red:");
+    MACH3LOG_INFO("  Length  = {}", length);
+    for (int i = 0; i < length; i++) {
+      MACH3LOG_INFO("  Coeff {}  = {}", i, Par[i]);
     }
   }
 
@@ -275,6 +276,9 @@ public:
     }
     return func;
   }
+
+  /// @brief DL: Get number of points
+  inline _int_ GetNp() override { return length; }
 
 private:
   /// The parameters
@@ -312,7 +316,7 @@ public:
     XPos = new _float_[nPoints];
     // Save the y response at each knot
     YResp = new _float_[nPoints];
-    for(int j=0; j<N; ++j){
+    for(int j = 0; j < N; ++j){
       Par[j] = new _float_[3];
       Par[j][0] = P[j][0];
       Par[j][1] = P[j][1];
@@ -321,10 +325,10 @@ public:
       YResp[j] = Y[j];
 
       if((Par[j][0] == -999) | (Par[j][1] ==-999) | (Par[j][2] ==-999) | (XPos[j] ==-999) | (YResp[j] ==-999)){
-        std::cerr<<"******************* Bad parameter values when construction TSpline3_red *********************" <<std::endl;
-        std::cerr<<"passed val (i, x, y, b, c, d): "<<j<<", "<<X[j]<<", "<<Y[j]<<", "<<P[j][0]<<", "<<P[j][1]<<", "<<P[j][2]<<std::endl;
-        std::cerr<<"set values (i, x, y, b, c, d): "<<j<<", "<<XPos[j]<<", "<<YResp[j]<<", "<<Par[j][0]<<", "<<Par[j][1]<<", "<<Par[j][2]<<std::endl;
-        std::cerr<<"*********************************************************************************************" <<std::endl;
+        MACH3LOG_ERROR("******************* Bad parameter values when constructing TSpline3_red *********************");
+        MACH3LOG_ERROR("Passed values (i, x, y, b, c, d): {}, {}, {}, {}, {}, {}", j, X[j], Y[j], P[j][0], P[j][1], P[j][2]);
+        MACH3LOG_ERROR("Set values (i, x, y, b, c, d): {}, {}, {}, {}, {}, {}", j, XPos[j], YResp[j], Par[j][0], Par[j][1], Par[j][2]);
+        MACH3LOG_ERROR("*********************************************************************************************");
       }
     }
   }
@@ -500,7 +504,7 @@ public:
         // first pass over knots to calculate the secants
         for (int i = 0; i < nPoints-1; ++i) {
           Secants[i] = (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]);
-          //std::cout<<"secant "<<i<<": "<<Secants[i]<<std::endl;
+          MACH3LOG_TRACE("Secant {}: {}", i, Secants[i]);
         }
 
         Tangents[0] = Secants[0];
@@ -556,11 +560,12 @@ public:
           Par[i][2] = d / (dx * dx * dx);
 
           if((Par[i][0] == -999) | (Par[i][1] == -999) | (Par[i][2] ==-999) | (Par[i][0] == -999.999) | (Par[i][1] == -999.999) | (Par[i][2] ==-999.999)){
-            std::cout<<"bad spline parameters for segment "<<i<<", will cause problems with GPU: (b, c, d) = "<<Par[i][0]<<", "<<Par[i][1]<<", "<<Par[i][2]<<std::endl;
+            MACH3LOG_INFO("Bad spline parameters for segment {}: (b, c, d) = {}, {}, {}. This will cause problems with GPU.",
+                          i, Par[i][0], Par[i][1], Par[i][2]);
           }
-          //std::cout<<"b : "<<b<<std::endl;
-          //std::cout<<"dx: "<<dx<<", x_0: "<<XPos[i]<<", x_1: "<<XPos[i+1]<<std::endl;
-          //std::cout<<"    "<<" , y_0: "<<YResp[i]<<", y_1: "<<YResp[i+1]<<std::endl;
+          MACH3LOG_TRACE("b: {}", b);
+          MACH3LOG_TRACE("dx: {}, x_0: {}, x_1: {}", dx, XPos[i], XPos[i+1]);
+          MACH3LOG_TRACE("    y_0: {}, y_1: {}", YResp[i], YResp[i+1]);
         }
 
         // include params for final "segment" outside of the spline so that par array fits with x and y arrays,
@@ -587,8 +592,8 @@ public:
     }
     else
     {
-      std::cerr<<"Unsupported interpolations type "<<InterPolation<<std::endl;
-      throw;
+      MACH3LOG_ERROR("Unsupported interpolation type {}", static_cast<int>(InterPolation));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
     delete spline;
@@ -660,7 +665,7 @@ public:
   }
 
   /// @brief CW: Get the number of points
-  inline int GetNp() { return nPoints; }
+  inline _int_ GetNp() override { return nPoints; }
   // Get the ith knot's x and y position
   inline void GetKnot(int i, _float_ &xtmp, _float_ &ytmp) {
     xtmp = XPos[i];
@@ -684,10 +689,11 @@ public:
 
   /// @brief Print detailed info
   inline void Print() override {
-    std::cout << "Printing TSpline_red: " << std::endl;
-    std::cout << " Nknots  = " << nPoints << std::endl;
-    for(int i = 0; i < nPoints; ++i) {
-      std::cout<<"  i ="<<i<<" x="<<XPos[i]<<" y"<<YResp[i]<<" b="<<Par[i][0]<<" c="<<Par[i][1]<<" d="<<Par[i][2]<<std::endl;
+    MACH3LOG_INFO("Printing TSpline_red:");
+    MACH3LOG_INFO(" Nknots = {}", nPoints);
+    for (int i = 0; i < nPoints; ++i) {
+      MACH3LOG_INFO("  i = {} x = {} y = {} b = {} c = {} d = {}",
+                    i, XPos[i], YResp[i], Par[i][0], Par[i][1], Par[i][2]);
     }
   }
 
@@ -726,7 +732,7 @@ public:
   }
 
   /// @brief Find the segment relevant to this variation in x
-  /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
+  /// See root/hist/hist/src/TSpline3::FindX(double) or SplineMonolith::FindSplineSegment
   inline int FindX(double x) {
     // The segment we're interested in (klow in ROOT code)
     int segment = 0;

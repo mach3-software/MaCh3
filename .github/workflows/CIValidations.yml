@@ -21,9 +21,42 @@ jobs:
       fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
-          - name: SplineValidations
-          - name: CovarianceValidations
-          - name: FitterValidations
+          - name: Spline Validations
+            test_1: ./Apps/SplineValidations
+            test_2: empty
+            test_3: empty
+            test_4: empty
+            test_5: empty
+            test_6: empty
+
+          - name: Covariance Validations
+            test_1: ./Apps/CovarianceValidations
+            test_2: ./Apps/MaCh3ModeValidations
+            test_3: empty
+            test_4: empty
+            test_5: empty
+            test_6: empty
+
+          - name: Fitter Validations
+            test_1: ./Apps/FitterValidations
+            test_2: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
+            test_3: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
+            test_4: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
+            test_5: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
+            test_6: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
+            # TODO
+            #need fixing config
+            #test_7: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
+            #test_8: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+
+          - name: NuMCMC Tools Validations
+            test_1: ./Apps/NuMCMCvalidations.sh
+            test_2: empty
+            test_3: empty
+            test_4: empty
+            test_5: empty
+            test_6: empty
+
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
@@ -34,7 +67,7 @@ jobs:
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
-        git clone https://github.com/mach3-software/MaCh3Validations.git MaCh3Validations
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
         cd MaCh3Validations
         mkdir build
         cd build
@@ -43,11 +76,45 @@ jobs:
     - name: Build MaCh3 Validations
       run: |
         cd /opt/MaCh3Validations/build
-        make install # Build the project
+        make -j4 install # Build the project
 
     - name: Validations
       run: |
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
-        source /opt/MaCh3Validations/build/bin/setup.MaCh3Validations.sh
+        source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
-        Apps/${{ matrix.name }}
+        ${{ matrix.test_1 }}
+
+        #KS: GHA is stupi when it comes to arrays. I tried something fancy but it was crashing terribly
+        #If you know how to write this better please let me know
+
+        # Run the second test if it is defined
+        if [[ "${{ matrix.test_2 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing Second test"
+            ${{ matrix.test_2 }}
+        fi
+        # Run the third test if it is defined
+        if [[ "${{ matrix.test_3 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing Third test"
+            ${{ matrix.test_3 }}
+        fi
+
+        if [[ "${{ matrix.test_4 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing test 4"
+            ${{ matrix.test_4 }}
+        fi
+
+        if [[ "${{ matrix.test_5 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing test 5"
+            ${{ matrix.test_5 }}
+        fi
+
+        if [[ "${{ matrix.test_6 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 6"
+            ${{ matrix.test_6 }}
+        fi

@@ -29,6 +29,7 @@ void PlottingManager::initialise() {
   /// to find an option at runtime
   _plottingConfig = YAML::LoadFile(_configFileName);
 
+  MACH3LOG_DEBUG("Initialising PlottingManager with plotting congif {}", _configFileName);
   // read options from the config
   YAML::Node managerOptions = _plottingConfig["ManagerOptions"];
 
@@ -36,13 +37,19 @@ void PlottingManager::initialise() {
   if (translationConfig == "")
   {
     translationConfig = DEFAULT_TRANSLATION_CONFIG;
+    MACH3LOG_DEBUG("PlottingManager: Using default translation config file name");
   }
+  
+  MACH3LOG_DEBUG("PlottingManager: Using translation config file: {}", translationConfig);
 
   std::string styleConfig = managerOptions["styleConfig"].as<std::string>();
   if (styleConfig == "")
   {
     styleConfig = DEFAULT_STYLE_CONFIG;
+    MACH3LOG_DEBUG("PlottingManager: Using default style config file name");
   }
+
+  MACH3LOG_DEBUG("PlottingManager: Using style config file: {}", styleConfig);
 
   // create the StyleManager
   _styleMan = std::make_unique<StyleManager>(styleConfig);
@@ -109,7 +116,7 @@ void PlottingManager::parseInputs(int argc, char **argv) {
     }
     case 'h': {
       usage();
-      throw;
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     case 'l': {
       parseFileLabels(optarg, _fileLabels);

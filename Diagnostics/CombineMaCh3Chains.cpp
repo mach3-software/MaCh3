@@ -1,3 +1,4 @@
+// ROOT includes
 #include "TList.h"
 #include "TFile.h"
 #include "TMacro.h"
@@ -7,6 +8,7 @@
 #include "TKey.h"
 #include "TROOT.h"
 
+// MaCh3 includes
 #include "manager/manager.h"
 
 std::string OutFileName = "";
@@ -15,7 +17,7 @@ std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 
 /// EM: Will compare the version header contained in the two provided files and shout if they don't match
-bool checkSoftwareVersions(TFile *file, TFile *prevFile, std::string ConfigName)
+bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName)
 {
   bool weirdFile = false;
 
@@ -197,7 +199,7 @@ void CombineChain()
 void usage(){
   MACH3LOG_INFO("Combine MaCh3 Chains files, very similar to hadd, but will compare embedded version info in the files to avoid accidentally combining files made with different software versions. Also avoids having a hige dump of separate version files in the output that happens with hadd.");
   MACH3LOG_INFO("Cmd line syntax should be:");
-  MACH3LOG_INFO("combineND280Splines [-h] [-c [0-9]] [-f] [-o <output file>] input1.root [input2.root, input3.root ...]");
+  MACH3LOG_INFO("CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o <output file>] input1.root [input2.root, input3.root ...]");
   MACH3LOG_INFO("inputX.root    : names of individual spline files to combine, can specify any number, need at least one");
   MACH3LOG_INFO("output file    : name of combined spline file. optional: if not specified, the app will just use the first input file as the output, the same as hadd'");
   MACH3LOG_INFO("-c             : target compression level for the combined file, default is 1, in line with hadd");
@@ -269,7 +271,8 @@ void ParseArg(int argc, char *argv[]){
 int main(int argc, char *argv[])
 {
   SetMaCh3LoggerFormat();
+  MaCh3Utils::MaCh3Welcome();
   ParseArg(argc, argv);
   CombineChain();
-  return 1;
+  return 0;
 }
