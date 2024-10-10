@@ -1692,7 +1692,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->nxsec_spline_pointers = new int[fdobj->nEvents];
   fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
   fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
-  fdobj->total_weight_pointers = new double**[fdobj->nEvents];
+  fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
   fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
   fdobj->rw_truecz = new const double*[fdobj->nEvents];

@@ -39,7 +39,7 @@ struct fdmc_base {
   const double* EScale_pointer;
 
   int* ntotal_weight_pointers;
-  double*** total_weight_pointers;
+  const double*** total_weight_pointers;
   double* total_w;
 
   int* XBin;
