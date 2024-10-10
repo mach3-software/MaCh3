@@ -1,11 +1,10 @@
+---
 # Lint our code and throw error if something is looking fishy in the changes
 name: Super Linter
 
 on:
   pull_request:
-    branches: [ develop ]
-  push:
-    branches: [ feature_linter ]
+    branches: [develop]
 
 jobs:
   super-linter:
