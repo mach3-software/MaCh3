@@ -2,6 +2,8 @@
 #include <pybind11/stl.h>
 
 #include "mcmc/FitterBase.h"
+#include "mcmc/mcmc.h"
+#include "mcmc/MinuitFit.h"
 
 namespace py = pybind11;
 
@@ -101,9 +103,60 @@ void initFitter(py::module &m){
             " *sample* A sample PDF object derived from samplePDFBase. ",
             py::arg("sample")
         )
+        
+        /* EM: Not sure if these are needed so just leave em commented for now
+        .def(
+            "add_syst_object",
+            &FitterBase::addSystObj,
+            " This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans. \n"
+            " *cov* A pointer to a Covariance object derived from covarianceBase. \n",
+            py::arg("cov")
+        )
 
-        ;
+        .def(
+            "add_osc_handler",
+            py::overload_cast<covarianceOsc *>(&FitterBase::addOscHandler),
+            "  Adds an oscillation handler for covariance objects. \n"
+            " *oscf* A pointer to a covarianceOsc object for forward oscillations. \n",
+            py::arg("oscf")
+        )
+        
+        .def(
+            "add_osc_handler",
+            py::overload_cast<covarianceOsc *, covarianceOsc *>(&FitterBase::addOscHandler),
+            "  Adds an oscillation handler for covariance objects. \n"
+            " *osca* A pointer to a covarianceOsc object for the first oscillation. \n"
+            " *oscb* A pointer to a covarianceOsc object for the second oscillation. \n",
+            py::arg("osca"),
+            py::arg("oscb")
+        )
+        */
+    ; // End of FitterBase class binding
 
     
+    
+    py::class_<mcmc, FitterBase>(m_fitter, "MCMC")
+        .def(py::init<manager* const>())
+        
+        .def(
+            "set_chain_length", 
+            &mcmc::setChainLength, 
+            "Set how long chain should be.",
+            py::arg("length")
+        )
+
+        .def(
+            "set_init_step_num", 
+            &mcmc::setInitialStepNumber, 
+            "Set initial step number, used when starting from another chain.",
+            py::arg("step_num")
+        )
+    ; // end of MCMC class binding
+
+    
+    py::class_<MinuitFit, FitterBase>(m_fitter, "MinuitFit")
+        .def(py::init<manager* const>())
+        
+    ; // end of MinuitFit class binding
 
 }
