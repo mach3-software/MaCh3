@@ -13,7 +13,9 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
     - name: Run Super Linter
       uses: github/super-linter@v7
@@ -22,6 +24,7 @@ jobs:
         VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
         VALIDATE_YAML: true  # Enable YAML linting
         VALIDATE_GITHUB_ACTIONS: true  # Enable GitHub Actions workflow linting
+        VALIDATE_PYTHON: true  # Enable Python linting
         VALIDATE_ALL_CODEBASE: false  # Lint the entire codebase
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for permissions
-        DISABLE_LINTERS: "CPP,PYTHON"  # Disable linting for other languages
+        DISABLE_LINTERS: "CPP"  # Disable linting for other languages
