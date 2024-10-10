@@ -2493,44 +2493,36 @@ void MCMCProcessor::FindInputFiles() {
 
   TMacro *XsecConfig = (TMacro*)(CovarianceFolder->Get("Config_xsec_cov"));
   if (XsecConfig == nullptr) {
-    MACH3LOG_ERROR("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
-    CovarianceFolder->ls();
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_WARN("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
+  } else {
+    CovConfig[kXSecPar] =  TMacroToYAML(*XsecConfig);
   }
-
-  CovConfig[kXSecPar] =  TMacroToYAML(*XsecConfig);
-
   //CW: And the ND Covariance matrix
   CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
-  if(CovPos[kNDPar].back() == "none")
-  {
+  if(CovPos[kNDPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find NDCov branch in output");
     InputNotFound = true;
   }
 
   //CW: And the FD Covariance matrix
   CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
-  if(CovPos[kFDDetPar].back() == "none")
-  {
+  if(CovPos[kFDDetPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find FDCov branch in output");
     InputNotFound = true;
   }
 
   //CW: And the Osc Covariance matrix
   CovPos[kOSCPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["OscCovFile"], {"none"});
-  if(CovPos[kOSCPar].back() == "none")
-  {
+  if(CovPos[kOSCPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find OscCov branch in output");
     InputNotFound = true;
   }
   TMacro *OscConfig = (TMacro*)(CovarianceFolder->Get("Config_osc_cov"));
   if (OscConfig == nullptr) {
-    MACH3LOG_ERROR("Didn't find Config_osc_cov tree in MCMC file! {}", MCMCFile);
-    CovarianceFolder->ls();
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_WARN("Didn't find Config_osc_cov tree in MCMC file! {}", MCMCFile);
+  } else {
+    CovConfig[kOSCPar] =  TMacroToYAML(*OscConfig);
   }
-
-  CovConfig[kOSCPar] =  TMacroToYAML(*OscConfig);
 
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 

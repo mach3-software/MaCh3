@@ -18,7 +18,7 @@ jobs:
     name: ${{ matrix.name }}
 
     strategy:
-      fail-fast: false  # Prevents cancellation of remaining jobs if one fails
+      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
           - name: Spline Validations
@@ -86,7 +86,7 @@ jobs:
         cd /opt/MaCh3Validations/build
         ${{ matrix.test_1 }}
 
-        #KS: GHA is stupi when it comes to arrays. I tried something fancy but it was crashing terribly
+        #KS: GHA is stupid when it comes to arrays. I tried something fancy but it was crashing terribly
         #If you know how to write this better please let me know
 
         # Run the second test if it is defined

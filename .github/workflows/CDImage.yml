@@ -39,16 +39,15 @@ jobs:
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Set MACH3_VERSION
-      run: echo "MACH3_VERSION=${{ github.MACH3_VERSION  }}" >> "$GITHUB_ENV"
-
     - name: Build Docker image
       run: |
         if [ "${{ github.ref_type }}" == 'tag' ]; then
-          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} --build-arg MACH3_VERSION="${MACH3_VERSION}"
+          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} --build-arg MACH3_VERSION=${{ env.GITHUB_HEAD_REF }}"
         else
           docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} --build-arg MACH3_VERSION="develop"
         fi
+      env:
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
 
     - name: Push Docker image
       run: |
