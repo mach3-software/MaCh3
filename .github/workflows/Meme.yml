@@ -1,4 +1,6 @@
+# Add random meme whenever PR is opened
 name: "Random Meme"
+
 on:
   pull_request:
     types: [opened, reopened]

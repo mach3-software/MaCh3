@@ -65,9 +65,7 @@ FitterSpec:
             ## token, {SAMPLE}, which will be expanded to the fitter specific sample name when the code 
             ## is looking for LLH scans for a particular sample
             location: 
-            [
-                "{SAMPLE}_LLH:{PARAMETER}{SAMPLE}",
-            ]
+            ["{SAMPLE}_LLH:{PARAMETER}{SAMPLE}"]
 
 
 

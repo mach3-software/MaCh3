@@ -1,4 +1,4 @@
-### Diagnostic
+# Diagnostic
 **ProcessMCMC** - The main app you want to use for analysing the ND280 chain. It prints posterior distribution after burn-in the cut. Moreover, you can compare two/three different chains. There are a few options you can modify easily inside the app like selection, burn-in cut, and whether to plot xse+flux or only flux. Other functionality
 <ol>
 <li> Produce a covariance matrix with multithreading (which requires lots of RAM due to caching) </li>

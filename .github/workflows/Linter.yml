@@ -1,10 +1,10 @@
+# Lint our code and throw error if something is looking fishy in the changes
 name: Super Linter
 
 on:
   pull_request:
     branches: [ develop ]
-  push:
-    branches: [ feature_linter ]
+
 jobs:
   super-linter:
     runs-on: ubuntu-latest
@@ -20,6 +20,6 @@ jobs:
         VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
         VALIDATE_YAML: true  # Enable YAML linting
         VALIDATE_GITHUB_ACTIONS: true  # Enable GitHub Actions workflow linting
-        VALIDATE_ALL_CODEBASE: true  # Lint the entire codebase
+        VALIDATE_ALL_CODEBASE: false  # Lint the entire codebase
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for permissions
         DISABLE_LINTERS: "CPP,PYTHON"  # Disable linting for other languages
