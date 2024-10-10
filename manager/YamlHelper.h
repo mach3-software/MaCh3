@@ -157,6 +157,7 @@ inline YAML::Node TMacroToYAML(const TMacro& macro) {
 // **********************
 /// @brief Convert a YAML node to a ROOT TMacro object.
 /// @param yaml_node The YAML node to convert to a TMacro.
+/// @param name Name of TMacro that will be saved
 /// @return TMacro The TMacro object constructed from the YAML node.
 inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name) {
 // **********************
