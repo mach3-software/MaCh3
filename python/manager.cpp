@@ -12,9 +12,7 @@ void initManager(py::module &m){
 
     auto m_manager = m.def_submodule("manager");
     m_manager.doc() = 
-        "This module handles the high level stuff like config options and YAML stuff. The main class is the :py:class:`pyMaCh3.manager.Manager` class. \
-        You can read more about the manager and config files on [the wiki page](https://github.com/mach3-software/MaCh3/wiki/01.-Manager-and-config-handling). \
-        Happy managing!";
+        "This is a Python binding of MaCh3s C++ based manager library.";
 
     // Bind some of the cpp-yaml library 
     // shamelessly stolen from stackoverflow: https://stackoverflow.com/questions/62347521/using-pybind11-to-wrap-yaml-cpp-iterator
@@ -35,7 +33,8 @@ void initManager(py::module &m){
                     throw MaCh3Exception(__FILE__, __LINE__, "Attempting to access the data of non-scalar yaml node. This is undefined.");
                 }
                 return node.Scalar();
-            })
+            }, 
+            "Access the data stored in the node. This is only valid if the node is a 'scalar' type, i.e. it is a leaf of the yaml tree structure.")
 
         .def("__getitem__",
             [](const YAML::Node node, const std::string& key){

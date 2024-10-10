@@ -37,9 +37,7 @@ void initFitter(py::module &m){
 
     auto m_fitter = m.def_submodule("fitter");
     m_fitter.doc() = 
-        "This module contains the various MaCh3 fitter algorithms which are available, \
-        as well as the :py:class:`pyMaCh3.fitter.FitterBase` class which you can use to \
-        implement your own!";
+        "This is a Python binding of MaCh3s C++ mcmc library.";
     
     
     py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitter, "FitterBase")
