@@ -19,12 +19,14 @@ struct fdmc_base {
   const double** x_var;
   const double** y_var;
   const double **rw_etru;
-
+  const double **rw_truecz;
+  
   /// xsec bins
   std::list< int > *xsec_norms_bins;
 
   /// DB Speedup bits
   double Unity;
+  int Unity_Int;
   double dummy_value = -999;
 
   int* nxsec_norm_pointers;
@@ -37,7 +39,7 @@ struct fdmc_base {
   const double* EScale_pointer;
 
   int* ntotal_weight_pointers;
-  double*** total_weight_pointers;
+  const double*** total_weight_pointers;
   double* total_w;
 
   int* XBin;
@@ -57,7 +59,6 @@ struct fdmc_base {
   
   /// DB Atmospheric Parameters
   const double **osc_w_pointer;
-  double *rw_truecz;
   
   double *osc_w; // oscillation weight                                        
   double *flux_w; // not the same as beam systematics weight!                 
