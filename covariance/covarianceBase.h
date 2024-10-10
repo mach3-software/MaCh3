@@ -27,19 +27,7 @@ class covarianceBase {
   /// @param name Matrix name
   /// @param file Path to matrix root file
   covarianceBase(const char *name, const char *file);
-  /// @brief "Usual" constructors from root file with seed
-  /// @param name Matrix name
-  /// @param file Path to matrix root file
-  /// @param seed Seed for TRandom3
-  covarianceBase(const char *name, const char *file, int seed);
-  /// @brief Constructor For Eigen Value decomp
-  /// @param name Matrix name
-  /// @param file Path to matrix root file
-  /// @param seed Seed for TRandom3
-  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
-  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
-  /// @param LastPCAdpar First PCA parameter that will be decomposed.
-  covarianceBase(const char *name, const char *file, int seed, double threshold, int FirstPCAdpar, int LastPCAdpar);
+
   /// @brief Destructor
   virtual ~covarianceBase();
   
@@ -355,6 +343,8 @@ class covarianceBase {
   /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
   inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
 
+  /// @brief Getter to return a copy of the YAML node
+  YAML::Node GetConfig() const { return _fYAMLDoc; }
 protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(const char *name, const char *file);

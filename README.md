@@ -1,7 +1,15 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the [DUNE](https://www.dunescience.org/) and [HK](https://www-sk.icrr.u-tokyo.ac.jp/en/hk/) oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
 
-The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
+The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC
+fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has
+now been used for multiple T2K Oscillation analyses at both the Near and Far
+detectors throughout the years. The framework is also utilized by the
+[DUNE](https://www.dunescience.org/) and [HK](https://www-sk.icrr.u-tokyo.ac.jp/en/hk/)
+oscillation analysis groups. Additionally, it supports joint fits between T2K
+and NOvA, as well as T2K and SK's atmospheric data.
+
+The framework has also evolved to allow non-MCMC modules to interrogate the
+likelihoods implemented.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
 [![Release](https://img.shields.io/github/release/mach3-software/MaCh3.svg)](https://github.com/mach3-software/MaCh3/releases/latest)
@@ -70,7 +78,7 @@ Additionally, you can build just the Python module by doing:
 
 ```bash
 pip install -t <install location> .
-``` 
+```
 The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
 
 ## Multithreading

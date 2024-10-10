@@ -155,6 +155,25 @@ inline YAML::Node TMacroToYAML(const TMacro& macro) {
 }
 
 // **********************
+/// @brief Convert a YAML node to a ROOT TMacro object.
+/// @param yaml_node The YAML node to convert to a TMacro.
+/// @return TMacro The TMacro object constructed from the YAML node.
+inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name) {
+// **********************
+  // Convert the YAML node to a string representation
+  std::string macro_string = YAMLtoSTRING(yaml_node);
+
+  std::cout<<macro_string<<std::endl;
+  // Create a TMacro object with the collected lines
+  TMacro macro(name.c_str(), name.c_str());
+  macro.AddLine(macro_string.c_str());
+
+  macro.Print();
+
+  return macro;
+}
+
+// **********************
 /// @brief Overrides the configuration settings based on provided arguments.
 ///
 /// This function allows you to set configuration options in a nested YAML node.

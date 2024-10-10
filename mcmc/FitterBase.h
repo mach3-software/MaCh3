@@ -41,11 +41,6 @@ class FitterBase {
   /// @param oscf A pointer to a covarianceOsc object for forward oscillations.
   void addOscHandler(covarianceOsc* oscf);
 
-  /// @brief Adds two oscillation handlers for covariance objects.
-  /// @param osca A pointer to a covarianceOsc object for the first oscillation.
-  /// @param oscb A pointer to a covarianceOsc object for the second oscillation.
-  void addOscHandler(covarianceOsc* osca, covarianceOsc* oscb);
-
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
 
@@ -125,8 +120,6 @@ class FitterBase {
 
   /// handles oscillation parameters
   covarianceOsc *osc;
-  /// handles oscillation parameters
-  covarianceOsc *osc2;
 
   /// tells global time how long fit took
   TStopwatch* clock;
