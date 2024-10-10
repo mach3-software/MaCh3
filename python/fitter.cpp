@@ -53,10 +53,9 @@ void initFitter(py::module &m){
         .def(
             "GetName", 
             &FitterBase::GetName, 
-            " The name of the algorithm, you should override this with something like \n"
-            "``` \n"
-            "return 'mySuperCoolAlgoName' \n"
-            "``` \n"
+            " The name of the algorithm, you should override this with something like:: \n"
+            "\n"
+            "    return 'mySuperCoolAlgoName' \n"
         )
 
         .def(
