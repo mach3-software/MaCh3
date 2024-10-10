@@ -17,9 +17,9 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 ## Cite
 When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13642670.svg)](https://doi.org/10.5281/zenodo.13642670).
 
-# How to Compile
+## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
-```
+```bash
 mkdir build;
 cd build;
 cmake ../
@@ -28,12 +28,12 @@ make install
 ```
 
 Don't forget to:
-```
+```bash
 source bin/setup.MaCh3.sh
 ```
 ## Building against MaCh3
 To include MaCh3 in your cmake project you can use following syntax
-```
+```cmake
 CPMFindPackage(
   NAME MaCh3
   GIT_TAG "blarb"
@@ -42,12 +42,12 @@ CPMFindPackage(
 ```
 Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
 If you compiled MaCh3 and sourced it you can simply call
-```
+```cmake
 find_package(MaCh3)
 ```
 
 Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows:
-```
+```cmake
 target_link_libraries(blarb MaCh3::All)
 ```
 
@@ -56,7 +56,7 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 ## Python
 
 MaCh3 can be compiled with a python interface by specifying the cmake option
-```
+```bash
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
@@ -66,21 +66,22 @@ Currently the python module only contains an interface to the plotting library (
 
 ### Building with Pip
 
-Additionally you can build just the python module by doing 
-```
+Additionally, you can build just the Python module by doing:
+
+```bash
 pip install -t <install location> .
 ``` 
 The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
-```
+```bash
 cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
 ```
 
 ## CUDA
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to [CUDA](https://developer.nvidia.com/cuda-toolkit)
-```
+```bash
 mkdir build; cd build;
 cmake ../ -DUSE_CPU=ON
 ```
@@ -89,7 +90,7 @@ MaCh3 supports quite a high range of CUDA architectures if something doesn't wor
 ## Oscillator
 MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
 
-```
+```bash
 cmake ../ -DUSE_PROB3=<ON,OFF>
 ```
 Following neutrino oscillation calculators are available:
@@ -112,12 +113,12 @@ The following fitting algorithms are available:
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
-```
+```bash
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF>
 ```
 There are several debug modes, to enable more detailed but very heavy specific debug levels. Level 1 is the default debug activated by the above.
 
-```
+```bash
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF> -DDEBUG_LEVEL=<1,2,3>
 ```
 ## System Requirements
@@ -127,7 +128,7 @@ Most of external libraries are being handled through [CPM](https://github.com/cp
 2. [spdlog](https://github.com/gabime/spdlog)
 
 Based on several test here are recommended version:
-```
+```bash
   GCC: >= 8.5 [lower versions may work]
   CMake: >= 3.14
   ROOT: >= 6.18
@@ -145,7 +146,7 @@ Based on several test here are recommended version:
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
 
-# Help and Guidelines
+## Help and Guidelines
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
@@ -159,7 +160,7 @@ The MaCh3 core plotting library code can be found [here](https://github.com/mach
 
 ## How To Use
 This is an example how your executable can look like using MaCh3:
-```
+```cpp
   manager *fitMan = nullptr; //Manager is responsible for reading from config
 
   std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector

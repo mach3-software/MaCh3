@@ -1,0 +1,16 @@
+# Add random meme whenever PR is opened
+name: "Random Meme"
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  test:
+    name: setup environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Memes
+        uses: deep5050/memes-on-issues-action@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

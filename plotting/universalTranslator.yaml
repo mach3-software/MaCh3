@@ -41,10 +41,7 @@ FitterSpec:
             ## - likelihood_scans/Penalty_LLH/BLEEE_param2_pen
             ## - likelihood_scans/Penalty_LLH/BLOOO_param3_pen
             ## then the following path would correctly find the scans
-            location: 
-            [
-                "likelihood_scans/Penalty_LLH:{PARAMETER}_pen",
-            ]
+            location: ["likelihood_scans/Penalty_LLH:{PARAMETER}_pen"]
             
         total_LLH:
             ## Fitters may split parameters across multiple different directories
@@ -68,11 +65,7 @@ FitterSpec:
             ## token, {SAMPLE}, which will be expanded to the fitter specific sample name when the code 
             ## is looking for LLH scans for a particular sample
             location: 
-            [
-                "{SAMPLE}_LLH:{PARAMETER}{SAMPLE}",
-            ]
-
-
+            ["{SAMPLE}_LLH:{PARAMETER}{SAMPLE}"]
 
         ######################################################################
         ##### Now we specify where to look for processed post-fit errors #####
