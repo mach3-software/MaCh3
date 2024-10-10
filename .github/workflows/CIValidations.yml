@@ -18,7 +18,7 @@ jobs:
     name: ${{ matrix.name }}
 
     strategy:
-      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
+      fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
           - name: Spline Validations
@@ -63,6 +63,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
@@ -70,9 +71,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch="${{ env.GITHUB_HEAD_REF }}"
-      env:
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
+        cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
 
     - name: Build MaCh3 Validations
       run: |
@@ -86,7 +85,7 @@ jobs:
         cd /opt/MaCh3Validations/build
         ${{ matrix.test_1 }}
 
-        #KS: GHA is stupid when it comes to arrays. I tried something fancy but it was crashing terribly
+        #KS: GHA is stupi when it comes to arrays. I tried something fancy but it was crashing terribly
         #If you know how to write this better please let me know
 
         # Run the second test if it is defined

@@ -42,12 +42,10 @@ jobs:
     - name: Build Docker image
       run: |
         if [ "${{ github.ref_type }}" == 'tag' ]; then
-          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} --build-arg MACH3_VERSION=${{ env.GITHUB_HEAD_REF }}"
+          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} --build-arg MACH3_VERSION=${{ github.ref_name }}
         else
-          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} --build-arg MACH3_VERSION="develop"
+          docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} --build-arg MACH3_VERSION=develop
         fi
-      env:
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
 
     - name: Push Docker image
       run: |
