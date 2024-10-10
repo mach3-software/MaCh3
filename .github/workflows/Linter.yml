@@ -4,6 +4,8 @@ name: Super Linter
 on:
   pull_request:
     branches: [ develop ]
+  push:
+    branches: [ feature_linter ]
 
 jobs:
   super-linter:
@@ -14,7 +16,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Run Super Linter
-      uses: github/super-linter@v5
+      uses: github/super-linter@v7
       env:
         VALIDATE_MARKDOWN: true  # Enable Markdown linting
         VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
