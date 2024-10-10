@@ -33,7 +33,7 @@ source bin/setup.MaCh3.sh
 ```
 ## Building against MaCh3
 To include MaCh3 in your cmake project you can use following syntax
-```
+```cmake
 CPMFindPackage(
   NAME MaCh3
   GIT_TAG "blarb"
@@ -42,12 +42,12 @@ CPMFindPackage(
 ```
 Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
 If you compiled MaCh3 and sourced it you can simply call
-```
+```cmake
 find_package(MaCh3)
 ```
 
 Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows:
-```
+```cmake
 target_link_libraries(blarb MaCh3::All)
 ```
 
@@ -66,7 +66,8 @@ Currently the python module only contains an interface to the plotting library (
 
 ### Building with Pip
 
-Additionally you can build just the python module by doing 
+Additionally, you can build just the Python module by doing:
+
 ```bash
 pip install -t <install location> .
 ``` 
@@ -127,7 +128,7 @@ Most of external libraries are being handled through [CPM](https://github.com/cp
 2. [spdlog](https://github.com/gabime/spdlog)
 
 Based on several test here are recommended version:
-```
+```bash
   GCC: >= 8.5 [lower versions may work]
   CMake: >= 3.14
   ROOT: >= 6.18

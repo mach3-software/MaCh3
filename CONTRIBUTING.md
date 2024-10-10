@@ -18,12 +18,12 @@ try
 void Foo(){}
 ```
 After making release or tag please
-```
+```bash
 cd Doc
 doxygen Doxyfile
 ```
 to produce both html and latex file. To produce book like pdf file:
-```
+```bash
 cd latex
 pdflatex refman.tex
 ```
@@ -85,7 +85,7 @@ This way we can ensure error messages are unified and user always get hints wher
 
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
-```
+```bash
 clang-format --assume-filename=/path/to/your/.clang-format=${MaCh3_ROOT}/../.clang-format blarb.cpp
 ```
 Please see [here](https://clang.llvm.org/docs/ClangFormat.html) and [here](https://root.cern/contribute/coding_conventions/) for more details.

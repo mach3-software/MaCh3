@@ -40,7 +40,7 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Set MACH3_VERSION
-      run: echo "MACH3_VERSION=${{ github.head_ref }}" >> $GITHUB_ENV
+      run: echo "MACH3_VERSION=${{ github.head_ref }}" >> "$GITHUB_ENV"
       env:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
 

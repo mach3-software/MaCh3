@@ -67,8 +67,6 @@ FitterSpec:
             location: 
             ["{SAMPLE}_LLH:{PARAMETER}{SAMPLE}"]
 
-
-
         ######################################################################
         ##### Now we specify where to look for processed post-fit errors #####
         ######################################################################
