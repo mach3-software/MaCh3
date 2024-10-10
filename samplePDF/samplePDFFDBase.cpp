@@ -177,21 +177,31 @@ void samplePDFFDBase::Initialise() {
 
   int TotalMCEvents = 0;
   for(unsigned iSample=0 ; iSample < nSamples ; iSample++){
+    std::cout << "=============================================" << std::endl;
+    std::cout << "Initialising sample: " << iSample << "/" << nSamples << std::endl;
     MCSamples[iSample].nEvents = setupExperimentMC(iSample);
-	TotalMCEvents += MCSamples[iSample].nEvents;
+    std::cout << "Number of events processed: " << MCSamples[iSample].nEvents << std::endl;
+    TotalMCEvents += MCSamples[iSample].nEvents;
+    std::cout << "Initialising FDMC object.." << std::endl;
     InitialiseSingleFDMCObject(iSample, MCSamples[iSample].nEvents);
     setupFDMC(iSample);
+    std::cout << "Initialised sample: " << iSample << "/" << nSamples << std::endl;
   }
+  std::cout << "=============================================" << std::endl;
+  std::cout << "Total number of events is: " << TotalMCEvents << std::endl;
 
-  std::cout << "############" << std::endl;
-  std::cout << "Total number of events is " << TotalMCEvents << std::endl;
-  std::cout << "############" << std::endl;
-
+  std::cout << "Setting up NuOscillator.." << std::endl;
   SetupNuOscillator();
+  std::cout << "Setting up Sample Binning.." << std::endl;
   SetupSampleBinning();
+  std::cout << "Setting up Splines.." << std::endl;
   SetupSplines();
+  std::cout << "Setting up Normalisation Pointers.." << std::endl;
   SetupNormParameters();
+  std::cout << "Setting up Weight Pointers.." << std::endl;
   SetupWeightPointers();
+
+  std::cout << "=======================================================" << std::endl;
 }
 
 void samplePDFFDBase::fill1DHist()
