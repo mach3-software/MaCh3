@@ -43,8 +43,5 @@ jobs:
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Set environment variable for MACH3_VERSION
-      run: echo "MACH3_VERSION=${{ github.head_ref }}" >> "$GITHUB_ENV"
-
     - name: Build the Docker image
-      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION=${{ env.MACH3_VERSION }} --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"
+      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION=${{ github.head_ref }} --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"

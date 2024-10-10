@@ -312,6 +312,9 @@ class MCMCProcessor {
     std::string OutputSuffix;
     /// Covariance matrix name position
     std::vector<std::vector<std::string>> CovPos;
+    /// Covariance matrix config
+    std::vector<YAML::Node> CovConfig;
+
 
     /// Main chain storing all steps etc
     TChain *Chain;
