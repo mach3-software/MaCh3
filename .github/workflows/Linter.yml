@@ -17,14 +17,14 @@ jobs:
         with:
           fetch-depth: 0
 
-    - name: Run Super Linter
-      uses: github/super-linter@v7.1.0
-      env:
-        VALIDATE_MARKDOWN: true  # Enable Markdown linting
-        VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
-        VALIDATE_YAML: true  # Enable YAML linting
-        VALIDATE_GITHUB_ACTIONS: true  # Enable GitHub Actions workflow linting
-        VALIDATE_PYTHON: true  # Enable Python linting
-        VALIDATE_ALL_CODEBASE: false  # Lint the entire codebase
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for permissions
-        DISABLE_LINTERS: "CPP"  # Disable linting for other languages
+      - name: Run Super Linter
+        uses: github/super-linter@v7.1.0
+        env:
+          VALIDATE_MARKDOWN: true  # Enable Markdown linting
+          VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
+          VALIDATE_YAML: true  # Enable YAML linting
+          VALIDATE_GITHUB_ACTIONS: true  # Enable GitHub Actions workflow linting
+          VALIDATE_PYTHON: true  # Enable Python linting
+          VALIDATE_ALL_CODEBASE: false  # Lint the entire codebase
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for permissions
+          DISABLE_LINTERS: "CPP"  # Disable linting for other languages
