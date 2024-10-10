@@ -103,7 +103,6 @@ void initFitter(py::module &m){
             py::arg("sample")
         )
         
-        /* EM: Not sure if these are needed so just leave em commented for now
         .def(
             "add_syst_object",
             &FitterBase::addSystObj,
@@ -129,7 +128,7 @@ void initFitter(py::module &m){
             py::arg("osca"),
             py::arg("oscb")
         )
-        */
+        
     ; // End of FitterBase class binding
 
     
