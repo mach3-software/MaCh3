@@ -1374,6 +1374,7 @@ void samplePDFFDBase::SetupNuOscillator() {
     std::sort(EnergyArray.begin(),EnergyArray.end());
 
     if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
+	  std::cout << "Made it through EvalPointsSetInConstructor check" << std::endl;
       NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
       //============================================================================
@@ -1574,11 +1575,11 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
   fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
-  fdobj->rw_truecz = new const double*[fdobj->nEvents];
+  //fdobj->rw_truecz = new const double*[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
     fdobj->rw_etru[iEvent] = &fdobj->Unity;
-    fdobj->rw_truecz[iEvent] = &fdobj->Unity;
+    //fdobj->rw_truecz[iEvent] = &fdobj->Unity;
     fdobj->mode[iEvent] = &fdobj->Unity_Int;
     fdobj->Target[iEvent] = 0;
     fdobj->NomXBin[iEvent] = -1;
