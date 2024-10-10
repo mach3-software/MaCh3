@@ -153,8 +153,6 @@ public:
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
-  /// @brief Is the sample for when operating in Reverse Horn Current, read in from sample config
-  bool GetIsRHC() {return IsRHC;}
   /// @brief Calculate the spline weight for a given event
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
   /// @brief Calculate the norm weight for a given event

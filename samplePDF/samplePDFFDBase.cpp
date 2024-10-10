@@ -68,12 +68,6 @@ void samplePDFFDBase::ReadSampleConfig()
 	MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
   }
 
-  if (CheckNodeExists(SampleManager->raw(), "SampleBools", "IsRHC")) {
-	IsRHC = SampleManager->raw()["SampleBools"]["IsRHC"].as<bool>(); 
-  } else{
-	MACH3LOG_ERROR("IsRHC not defined in {}, please add this!", SampleManager->GetFileName());
-  }
-
   for (int i=0;i<nSamples;i++) {
     struct fdmc_base obj = fdmc_base();
     MCSamples.push_back(obj);
@@ -962,12 +956,7 @@ void samplePDFFDBase::SetupNormParameters(){
 void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   fdmc_base *fdobj = &MCSamples[iSample];
-<<<<<<< HEAD
-=======
 
-  MACH3LOG_INFO("FD Object has {} events", fdobj->nEvents);
-
->>>>>>> fef25331adfa623158c6e156726d7f3aa524431f
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
 	if (XsecCov) {
@@ -1482,15 +1471,10 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   dathist2d->Reset();                                                       
 
   if (GetNDim()!=2) {
-<<<<<<< HEAD
-	MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
-	MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
+    MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-=======
-	  MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting");
-	  throw MaCh3Exception(__FILE__ , __LINE__ );}
->>>>>>> fef25331adfa623158c6e156726d7f3aa524431f
 
   for (int i = 0; i < int(dataSample2D->size()); i++) {
     dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
