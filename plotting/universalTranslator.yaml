@@ -41,10 +41,7 @@ FitterSpec:
             ## - likelihood_scans/Penalty_LLH/BLEEE_param2_pen
             ## - likelihood_scans/Penalty_LLH/BLOOO_param3_pen
             ## then the following path would correctly find the scans
-            location: 
-            [
-                "likelihood_scans/Penalty_LLH:{PARAMETER}_pen",
-            ]
+            location: ["likelihood_scans/Penalty_LLH:{PARAMETER}_pen"]
             
         total_LLH:
             ## Fitters may split parameters across multiple different directories

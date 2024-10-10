@@ -14,12 +14,12 @@
 **DiagMCMC** - Perform MCMC diagnostic like autocorrelation or trace plots.
 
 **RHat** - Performs RHat diagnostic to study if all used chains converged to the same stationary distribution.
-```
+```bash
 ./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]
 ```
 
 **CombineMaCh3Chains** - will combine chains files produced by **MCMC**, enforcing the condition that all the files to combine were made using the exact same software versions and config files
-```
+```bash
 CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o <output file>] file1.root [file2.root, file3.root ...]
 ```
 *fileX.root* are the individual spline files to combine, can specify any number, need at least one
