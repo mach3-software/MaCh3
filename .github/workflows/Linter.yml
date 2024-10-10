@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
     - name: Run Super Linter
-      uses: github/super-linter@v7
+      uses: github/super-linter@v7.1.0
       env:
         VALIDATE_MARKDOWN: true  # Enable Markdown linting
         VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
