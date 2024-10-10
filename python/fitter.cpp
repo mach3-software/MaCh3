@@ -1,6 +1,7 @@
+// pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
+// MaCh3 includes
 #include "mcmc/FitterBase.h"
 #include "mcmc/mcmc.h"
 #include "mcmc/MinuitFit.h"
@@ -74,21 +75,21 @@ void initFitter(py::module &m){
             "run_2d_LLH_scan",
             &FitterBase::Run2DLLHScan,
             " Perform a 2D likelihood scan. \n"
-            " *warning* This operation may take a significant amount of time, especially for complex models."
+            " :param warning: This operation may take a significant amount of time, especially for complex models."
         )
  
         .def(
             "run_sigma_var",
             &FitterBase::RunSigmaVar,
             " Perform a 2D and 1D sigma var for all samples. \n"
-            " *warning* Code uses TH2Poly"
+            " :param warning: Code uses TH2Poly"
         )
 
         .def(
             "drag_race",
             &FitterBase::DragRace,
             " Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan's feature \n"
-            " *NLaps* number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time",
+            " :param NLaps: number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time",
             py::arg("NLaps") = 100
         )
 
@@ -98,7 +99,7 @@ void initFitter(py::module &m){
             "add_sample_PDF",
             &FitterBase::addSamplePDF,
             " This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans. \n"
-            " *sample* A sample PDF object derived from samplePDFBase. ",
+            " :param sample: A sample PDF object derived from samplePDFBase. ",
             py::arg("sample")
         )
         
@@ -107,7 +108,7 @@ void initFitter(py::module &m){
             "add_syst_object",
             &FitterBase::addSystObj,
             " This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans. \n"
-            " *cov* A pointer to a Covariance object derived from covarianceBase. \n",
+            " :param cov: A pointer to a Covariance object derived from covarianceBase. \n",
             py::arg("cov")
         )
 
@@ -115,7 +116,7 @@ void initFitter(py::module &m){
             "add_osc_handler",
             py::overload_cast<covarianceOsc *>(&FitterBase::addOscHandler),
             "  Adds an oscillation handler for covariance objects. \n"
-            " *oscf* A pointer to a covarianceOsc object for forward oscillations. \n",
+            " :param oscf: A pointer to a covarianceOsc object for forward oscillations. \n",
             py::arg("oscf")
         )
         
@@ -123,8 +124,8 @@ void initFitter(py::module &m){
             "add_osc_handler",
             py::overload_cast<covarianceOsc *, covarianceOsc *>(&FitterBase::addOscHandler),
             "  Adds an oscillation handler for covariance objects. \n"
-            " *osca* A pointer to a covarianceOsc object for the first oscillation. \n"
-            " *oscb* A pointer to a covarianceOsc object for the second oscillation. \n",
+            " :param osca: A pointer to a covarianceOsc object for the first oscillation. \n"
+            " :param oscb: A pointer to a covarianceOsc object for the second oscillation. \n",
             py::arg("osca"),
             py::arg("oscb")
         )

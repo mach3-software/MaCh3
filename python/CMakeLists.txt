@@ -10,6 +10,7 @@ if( MaCh3_PYTHON_ENABLED )
     fitter.cpp
     samplePDF.cpp
     manager.cpp
+    covariance.cpp
   )
   ## EM: only works with code compiled with -fPIC enabled.. I think this flag can make things slightly slower
   ## so would be good to find a way around this. 
