@@ -8,6 +8,7 @@ void initFitter(py::module &); // <- defined in python/fitter.cpp
 void initSamplePDF(py::module &); // <- defined in python/samplePDF.cpp
 void initManager(py::module &); // <- defined in python/manager.cpp
 void initCovariance(py::module &); // <- defined in python/covariance.cpp
+void initSplines(py::module &); // <- defined in python/splines.cpp
 
 PYBIND11_MODULE( pyMaCh3, m ) {
     initPlotting(m);
@@ -15,4 +16,5 @@ PYBIND11_MODULE( pyMaCh3, m ) {
     initSamplePDF(m);
     initManager(m);
     initCovariance(m);
+    initSplines(m);
 }
