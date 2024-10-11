@@ -47,6 +47,7 @@ samplePDFFDBase::~samplePDFFDBase()
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
 
   if(oscpars != nullptr) delete[] oscpars;
+  
 }
 
 void samplePDFFDBase::ReadSampleConfig() 
@@ -1448,6 +1449,8 @@ void samplePDFFDBase::SetupNuOscillator() {
     }
     
   }
+
+  delete[] OscillFactory;
 }
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
