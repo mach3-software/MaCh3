@@ -1366,22 +1366,33 @@ void samplePDFFDBase::SetupNuOscillator() {
     std::cout << "Setting up NuOscillator::Oscillator object in OscillationChannel: " << iSample << "/" << MCSamples.size() << " ====================" << std::endl;
     NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
 
-    std::vector<_float_> EnergyArray((int)MCSamples[iSample].nEvents);
+    //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+    int nCCEvents = 0;
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
-      EnergyArray[iEvent] = *(MCSamples[iSample].rw_etru[iEvent]);
+      if (!MCSamples[iSample].isNC[iEvent]) {
+	nCCEvents += 1;
+      }
+    }
+    
+    std::vector<_float_> EnergyArray(nCCEvents);
+    for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      if (!MCSamples[iSample].isNC[iEvent]) {
+	EnergyArray[iEvent] = *(MCSamples[iSample].rw_etru[iEvent]);
+      }
     }
     std::sort(EnergyArray.begin(),EnergyArray.end());
 
     if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-	  std::cout << "Made it through EvalPointsSetInConstructor check" << std::endl;
       NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
       //============================================================================
       //DB Atmospheric only part
       if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	std::vector<_float_> CosineZArray((int)MCSamples[iSample].nEvents);
+	std::vector<_float_> CosineZArray(nCCEvents);
 	for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
-	  CosineZArray[iEvent] = *(MCSamples[iSample].rw_truecz[iEvent]);
+	  if (!MCSamples[iSample].isNC[iEvent]) {
+	    CosineZArray[iEvent] = *(MCSamples[iSample].rw_truecz[iEvent]);
+	  }
 	}
 	std::sort(CosineZArray.begin(),CosineZArray.end());
 	
