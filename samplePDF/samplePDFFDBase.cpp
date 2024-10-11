@@ -1408,19 +1408,19 @@ void samplePDFFDBase::SetupNuOscillator() {
 	int FinalFlav = NULL;
 	
 	if (std::abs(MCSamples[iSample].nutype) == 1) {
-	  InitFlav = kElectron;
+	  InitFlav = NuOscillator::kElectron;
 	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
-	  InitFlav = kMuon;
+	  InitFlav = NuOscillator::kMuon;
 	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
-	  InitFlav = kTau;
+	  InitFlav = NuOscillator::kTau;
 	}
 
 	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-	  FinalFlav = kElectron;
+	  FinalFlav = NuOscillator::kElectron;
 	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-	  FinalFlav = kMuon;
+	  FinalFlav = NuOscillator::kMuon;
 	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-	  FinalFlav = kTau;
+	  FinalFlav = NuOscillator::kTau;
 	}
 
 	if (InitFlav == NULL || FinalFlav == NULL) {
