@@ -1,6 +1,5 @@
 #include "samplePDFFDBase.h"
 
-#include "OscProbCalcer/OscProbCalcerFactory.h"
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
 
@@ -1359,7 +1358,6 @@ void samplePDFFDBase::addData(TH2D* Data) {
 }
 
 void samplePDFFDBase::SetupNuOscillator() {
-  OscProbCalcerFactory* OscProbCalcFactory = new OscProbCalcerFactory();
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   
   NuOscProbCalcers = std::vector<OscillatorBase*>((int)MCSamples.size());
