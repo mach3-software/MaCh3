@@ -57,24 +57,35 @@ void samplePDFFDBase::ReadSampleConfig()
     samplename = SampleManager->raw()["SampleName"].as<std::string>();
   } else{
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
     nSamples = SampleManager->raw()["NSubSamples"].as<int>();
   } else{
     MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   if (CheckNodeExists(SampleManager->raw(), "DetID")) {
     SampleDetID = SampleManager->raw()["DetID"].as<int>();
   } else{
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
+
+  if (CheckNodeExists(SampleManager->raw(), "POT")) {
+    pot = SampleManager->raw()["POT"].as<double>();
+  } else{
+    MACH3LOG_ERROR("POT not defined in {}, please add this!", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
+ 
   if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
   } else {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   for (int i=0;i<nSamples;i++) {
@@ -1609,7 +1620,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
 void samplePDFFDBase::InitialiseSplineObject() {
   std::vector<std::string> spline_filepaths;
   for(unsigned iSample=0 ; iSample < MCSamples.size() ; iSample++){
-    spline_filepaths.push_back(splineprefix+spline_files[iSample]+splinesuffix);
+    spline_filepaths.push_back(spline_files[iSample]);
   }
 
   //Keep a track of the spline variables
