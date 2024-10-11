@@ -16,21 +16,21 @@ jobs:
 
       - name: Count the total number of commits in MaCh3
         run: |
-          echo "commit_count=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "commit_count=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
 
       - name: Count commits in the last week for MaCh3
         run: |
-          echo "commits_last_week=$(git rev-list --count --since='1 week ago' HEAD)" >> $GITHUB_ENV
+          echo "commits_last_week=$(git rev-list --count --since='1 week ago' HEAD)" >> "$GITHUB_ENV"
 
       - name: Get the most recent tag for MaCh3
         run: |
           latest_tag=$(git describe --tags --abbrev=0)
-          echo "latest_tag=${latest_tag}" >> $GITHUB_ENV
+          echo "latest_tag=${latest_tag}" >> "$GITHUB_ENV"
 
       - name: Get the current date
         run: |
           current_date=$(date +"%d/%m/%Y")
-          echo "current_date=${current_date}" >> $GITHUB_ENV
+          echo "current_date=${current_date}" >> "$GITHUB_ENV"
 
       - name: Checkout the MaCh3Tutorial repository
         uses: actions/checkout@v4
@@ -41,16 +41,16 @@ jobs:
 
       - name: Count the total number of commits in MaCh3Tutorial
         run: |
-          echo "tutorial_commit_count=$(git -C MaCh3Tutorial rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "tutorial_commit_count=$(git -C MaCh3Tutorial rev-list --count HEAD)" >> "$GITHUB_ENV"
 
       - name: Count commits in the last week for MaCh3Tutorial
         run: |
-          echo "tutorial_commits_last_week=$(git -C MaCh3Tutorial rev-list --count --since='1 week ago' HEAD)" >> $GITHUB_ENV
+          echo "tutorial_commits_last_week=$(git -C MaCh3Tutorial rev-list --count --since='1 week ago' HEAD)" >> "$GITHUB_ENV"
 
       - name: Get the most recent tag for MaCh3Tutorial
         run: |
           tutorial_latest_tag=$(git -C MaCh3Tutorial describe --tags --abbrev=0)
-          echo "tutorial_latest_tag=${tutorial_latest_tag}" >> $GITHUB_ENV
+          echo "tutorial_latest_tag=${tutorial_latest_tag}" >> "$GITHUB_ENV"
 
       - name: Checkout the MaCh3-PythonUtils repository
         uses: actions/checkout@v4
@@ -61,16 +61,16 @@ jobs:
 
       - name: Count the total number of commits in MaCh3-PythonUtils
         run: |
-          echo "python_utils_commit_count=$(git -C MaCh3-PythonUtils rev-list --count HEAD)" >> $GITHUB_ENV
+          echo "python_utils_commit_count=$(git -C MaCh3-PythonUtils rev-list --count HEAD)" >> "$GITHUB_ENV"
 
       - name: Count commits in the last week for MaCh3-PythonUtils
         run: |
-          echo "python_utils_commits_last_week=$(git -C MaCh3-PythonUtils rev-list --count --since='1 week ago' HEAD)" >> $GITHUB_ENV
+          echo "python_utils_commits_last_week=$(git -C MaCh3-PythonUtils rev-list --count --since='1 week ago' HEAD)" >> "$GITHUB_ENV"
 
       - name: Get the most recent tag for MaCh3-PythonUtils
         run: |
           python_utils_latest_tag=$(git -C MaCh3-PythonUtils describe --tags --abbrev=0)
-          echo "python_utils_latest_tag=${python_utils_latest_tag}" >> $GITHUB_ENV
+          echo "python_utils_latest_tag=${python_utils_latest_tag}" >> "$GITHUB_ENV"
 
       - name: Create a new GitHub Discussion
         uses: abirismyname/create-discussion@v1.x

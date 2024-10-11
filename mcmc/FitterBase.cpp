@@ -295,6 +295,14 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   CorrMatrix->Write((cov->getName() + std::string("_Corr")).c_str());
   delete CorrMatrix;
 
+  // If we have yaml config file for covariance let's save it
+  YAML::Node Config = cov->GetConfig();
+  if(!Config.IsNull())
+  {
+    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + cov->getName()));
+    ConfigSave.Write();
+  }
+
   outputFile->cd();
 
   return;
@@ -324,44 +332,12 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
     outputFile->cd();
   }
 
-  return;
-}
-
-// *************************
-// When using separate oscillations for neutrino and anti-neutrino
-void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
-// *************************
-
-  osc = oscf;
-  osc2 = oscf2;
-
-  if (save_nominal) {
-    CovFolder->cd();
-    std::vector<double> vec = oscf->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(oscf->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
-
-    std::vector<double> vec2 = oscf2->getNominalArray();
-    size_t n2 = vec2.size();
-    double *n_vec2 = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec2[i] = vec2[i];
-    }
-    TVectorT<double> t_vec2(n2, n_vec2);
-    TString nameof2 = TString(oscf2->getName());
-    nameof2 = nameof2.Append("_2_nom");
-    t_vec2.Write(nameof2);
-    delete[] n_vec;
-    delete[] n_vec2;
-
-    outputFile->cd();
+  // If we have yaml config file for covariance let's save it
+  YAML::Node Config = oscf->GetConfig();
+  if(!Config.IsNull())
+  {
+    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + oscf->getName()));
+    ConfigSave.Write();
   }
 
   return;

@@ -74,7 +74,8 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ParamTypeStartPos.resize(kNParameterEnum);
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
-  
+  CovConfig.resize(kNParameterEnum);
+
   for(int i = 0; i < kNParameterEnum; i++)
   {
     ParamTypeStartPos[i] = 0;
@@ -2463,6 +2464,8 @@ void MCMCProcessor::FindInputFiles() {
   // Now read the MCMC file
   TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
 
+  TDirectory* CovarianceFolder = (TDirectory*)TempFile->Get("CovarianceFolder");
+
   // Get the settings for the MCMC
   TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
   if (Config == nullptr) {
@@ -2488,29 +2491,39 @@ void MCMCProcessor::FindInputFiles() {
     InputNotFound = true;
   }
 
+  TMacro *XsecConfig = (TMacro*)(CovarianceFolder->Get("Config_xsec_cov"));
+  if (XsecConfig == nullptr) {
+    MACH3LOG_WARN("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
+  } else {
+    CovConfig[kXSecPar] =  TMacroToYAML(*XsecConfig);
+  }
   //CW: And the ND Covariance matrix
   CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
-  if(CovPos[kNDPar].back() == "none")
-  {
+  if(CovPos[kNDPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find NDCov branch in output");
     InputNotFound = true;
   }
 
   //CW: And the FD Covariance matrix
   CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
-  if(CovPos[kFDDetPar].back() == "none")
-  {
+  if(CovPos[kFDDetPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find FDCov branch in output");
     InputNotFound = true;
   }
 
   //CW: And the Osc Covariance matrix
   CovPos[kOSCPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["OscCovFile"], {"none"});
-  if(CovPos[kOSCPar].back() == "none")
-  {
+  if(CovPos[kOSCPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find OscCov branch in output");
     InputNotFound = true;
   }
+  TMacro *OscConfig = (TMacro*)(CovarianceFolder->Get("Config_osc_cov"));
+  if (OscConfig == nullptr) {
+    MACH3LOG_WARN("Didn't find Config_osc_cov tree in MCMC file! {}", MCMCFile);
+  } else {
+    CovConfig[kOSCPar] =  TMacroToYAML(*OscConfig);
+  }
+
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
   if (std::getenv("MACH3") != nullptr)
@@ -2540,15 +2553,7 @@ void MCMCProcessor::FindInputFiles() {
 // Read the xsec file and get the input central values and errors
 void MCMCProcessor::ReadXSecFile() {
 // ***************
-  YAML::Node XSecFile;
-  XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < CovPos[kXSecPar].size(); i++)
-  {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(CovPos[kXSecPar][i]);
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
-      XSecFile["Systematics"].push_back(item);
-    }
-  }
+  YAML::Node XSecFile = CovConfig[kXSecPar];
 
   auto systematics = XSecFile["Systematics"];
   int i = 0;
@@ -2674,15 +2679,7 @@ void MCMCProcessor::ReadFDFile() {
 void MCMCProcessor::ReadOSCFile() {
 // ***************
 
-  YAML::Node OscFile;
-  OscFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < CovPos[kOSCPar].size(); i++)
-  {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(CovPos[kOSCPar][i]);
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
-      OscFile["Systematics"].push_back(item);
-    }
-  }
+  YAML::Node OscFile = CovConfig[kOSCPar];;
 
   auto systematics = OscFile["Systematics"];
   int i = 0;

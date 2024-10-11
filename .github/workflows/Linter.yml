@@ -1,0 +1,29 @@
+---
+# Lint our code and throw error if something is looking fishy in the changes
+name: Super Linter
+
+on:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  super-linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Super Linter
+        uses: github/super-linter@v7
+        env:
+          VALIDATE_MARKDOWN: true  # Enable Markdown linting
+          VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
+          VALIDATE_YAML: true  # Enable YAML linting
+          VALIDATE_GITHUB_ACTIONS: true  # Enable GitHub Actions workflow linting
+          VALIDATE_PYTHON: true  # Enable Python linting
+          VALIDATE_ALL_CODEBASE: false  # Lint the entire codebase
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for permissions
+          DISABLE_LINTERS: "CPP"  # Disable linting for other languages
