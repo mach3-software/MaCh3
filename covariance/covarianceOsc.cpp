@@ -1,4 +1,4 @@
-#include "covarianceOsc.h"
+#include "covariance/covarianceOsc.h"
 
 // *************************************
 covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const char *name, double threshold, int FirstPCA, int LastPCA)

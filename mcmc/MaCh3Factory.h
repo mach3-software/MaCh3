@@ -9,8 +9,43 @@
 #include "mcmc/MinuitFit.h"
 #endif
 
+#include "covariance/covarianceXsec.h"
+#include "covariance/covarianceOsc.h"
+
+
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
 /// @param fitMan pointer to Manager class
 /// @param Samples vector of Sample PDF which will be used in the fits
 /// @param Covariances vector of Systematic objects which will be used in the fits
+///
+/// @note Example YAML configuration:
+/// @code
+/// General:
+///   FittingAlgorithm: ["MCMC"]
 std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samplePDFBase>& Samples, std::vector<covarianceBase>& Covariances);
+
+
+/// @brief Factory function for creating a covariance matrix for systematic handling.
+///
+/// @param fitMan Pointer to the manager class that holds the configuration settings.
+/// @param name Name of the systematic matrix to initialize. This corresponds to a key in the YAML configuration.
+/// @return Pointer to the initialized covarianceXsec matrix object.
+///
+/// @note Example YAML configuration:
+/// @code
+/// General:
+///   Systematics:
+///     xsec_cov:
+///       CovFile: ["inputs/blarb1.yaml",
+///                 "inputs/blarb2.yaml"]
+///       FixParams: ["Param_0",
+///                   "Param_1"]
+///       PCAThreshold: -1
+///       #PCAThreshold: 0.00001
+///
+///       PCAParams: [-999, -999]
+///       StepScale: 0.0075
+/// @endcode
+///
+/// @todo add adaptive stuff
+covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& name);

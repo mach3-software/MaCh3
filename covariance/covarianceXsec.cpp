@@ -1,4 +1,4 @@
-#include "covarianceXsec.h"
+#include "covariance/covarianceXsec.h"
 
 // ********************************************
 // ETA - YAML constructor
