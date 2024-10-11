@@ -23,8 +23,8 @@ samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covariance
   }
   SetXsecCov(xsec_cov);
   
-  samplePDFFD_array = NULL;
-  samplePDFFD_data = NULL;
+  samplePDFFD_array = nullptr;
+  samplePDFFD_data = nullptr;
  
   char* sample_char = (char*)mc_version_.c_str();
   SampleManager = new manager(sample_char);
@@ -1450,7 +1450,7 @@ void samplePDFFDBase::SetupNuOscillator() {
     
   }
 
-  delete[] OscillFactory;
+  delete OscillFactory;
 }
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
