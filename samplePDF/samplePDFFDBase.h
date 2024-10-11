@@ -266,5 +266,4 @@ public:
   std::string mtuplesuffix;
   std::string splineprefix;
   std::string splinesuffix;
-
 };

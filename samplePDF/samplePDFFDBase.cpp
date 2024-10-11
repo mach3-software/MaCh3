@@ -47,7 +47,10 @@ samplePDFFDBase::~samplePDFFDBase()
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
 
   if(oscpars != nullptr) delete[] oscpars;
-  
+
+  for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
+    delete NuOscProbCalcers[iCalc];
+  }
 }
 
 void samplePDFFDBase::ReadSampleConfig() 
@@ -132,10 +135,10 @@ void samplePDFFDBase::ReadSampleConfig()
   if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
 	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
   }
-  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
-  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
-  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
-  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+  mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
+  mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
+  splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
+  splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
 
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
     mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
