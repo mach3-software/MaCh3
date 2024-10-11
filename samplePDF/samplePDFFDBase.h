@@ -27,7 +27,7 @@ public:
   //######################################### Functions #########################################
 
   samplePDFFDBase(){};
-  samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
+  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov);
   virtual ~samplePDFFDBase();
 
   const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning

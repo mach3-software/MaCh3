@@ -6,13 +6,10 @@
 #include<algorithm>
 
 
-samplePDFFDBase::samplePDFFDBase(double pot, std::string mc_version_, covarianceXsec* xsec_cov)
+samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_cov)
   : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
-  (void) pot;
-
-
   std::cout << "-------------------------------------------------------------------" <<std::endl;
   MACH3LOG_INFO("Ceating SamplePDFFDBase object");
     
