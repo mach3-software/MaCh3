@@ -28,24 +28,28 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samp
 /// @brief Factory function for creating a covariance matrix for systematic handling.
 ///
 /// @param fitMan Pointer to the manager class that holds the configuration settings.
-/// @param name Name of the systematic matrix to initialize. This corresponds to a key in the YAML configuration.
+/// @param name Prefix, for example Xsec, then code will look for XsecCovFile
 /// @return Pointer to the initialized covarianceXsec matrix object.
 ///
 /// @note Example YAML configuration:
 /// @code
+///MaCh3CovarianceFactory(, Xsec)
+///
 /// General:
 ///   Systematics:
-///     xsec_cov:
-///       CovFile: ["inputs/blarb1.yaml",
-///                 "inputs/blarb2.yaml"]
-///       FixParams: ["Param_0",
-///                   "Param_1"]
-///       PCAThreshold: -1
-///       #PCAThreshold: 0.00001
+///       XsecCovName: "xsec_cov"
+///       XsecCovFile: ["inputs/blarb1.yaml",
+///                     "inputs/blarb2.yaml"]
+///       XsecFix: ["Param_0",
+///                 "Param_1"]
+///       XsecPCAThreshold: -1
+///       #XsecPCAThreshold: 0.00001
 ///
-///       PCAParams: [-999, -999]
-///       StepScale: 0.0075
+///       XsecPCAParams: [-999, -999]
+///       XsecStepScale: 0.0075
 /// @endcode
 ///
 /// @todo add adaptive stuff
-covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& name);
+covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& PreFix);
+
+

@@ -36,7 +36,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   AccProbValues = nullptr;
   AccProbBatchedAverages = nullptr;
     
-  //KS: Warning this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
+  //KS: WARNING this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
   PlotJarlskog = false;
   
   //KS:Hardcoded should be a way to get it via config or something
@@ -2485,13 +2485,6 @@ void MCMCProcessor::FindInputFiles() {
   bool InputNotFound = false;
   //CW: Get the xsec Covariance matrix
   CovPos[kXSecPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
-  // If someone used factory approach have this option here
-  if(CovPos[kXSecPar].back() == "none") {
-    // Check if xsec_cov exists first before accessing CovFile
-    if(Settings["General"]["Systematics"]["xsec_cov"]) {
-      CovPos[kXSecPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["xsec_cov"]["CovFile"], {"none"});
-    }
-  }
   if(CovPos[kXSecPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find XsecCov branch in output");

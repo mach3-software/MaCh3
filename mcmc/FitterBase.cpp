@@ -313,9 +313,7 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
 // Similar to systematic really, but handles the oscillation weights
 void FitterBase::addOscHandler(covarianceOsc * const oscf) {
 // *************************
-
   osc = oscf;
-
   if (save_nominal) {
     CovFolder->cd();
     std::vector<double> vec = oscf->getNominalArray();
@@ -339,7 +337,6 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
     TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + oscf->getName()));
     ConfigSave.Write();
   }
-
   return;
 }
 
@@ -347,7 +344,6 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
 // Process the MCMC output to get postfit etc
 void FitterBase::ProcessMCMC() {
 // *******************
-
   if (fitMan == NULL) return;
 
   // Process the MCMC
@@ -383,7 +379,6 @@ void FitterBase::ProcessMCMC() {
       MACH3LOG_INFO("Opening output again to update with means..");
       outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
     }
-
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
     Central_Gauss->Write("Gauss_Means");

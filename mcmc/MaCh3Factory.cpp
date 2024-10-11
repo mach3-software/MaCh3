@@ -35,28 +35,29 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samp
 }
 
 // ********************************************
-covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& name) {
+covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix) {
 // ********************************************
-  MACH3LOG_INFO("Initialising {} matrix", name);
-
   // config for our matrix
-  YAML::Node Settings = fitMan->raw()["General"]["Systematics"][name];
+  YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
+  auto CovMatrixName = Settings[std::string(PreFix) + "CovName"].as<std::string>();
+  MACH3LOG_INFO("Initialising {} matrix", CovMatrixName);
+
   // yaml files initialising out matrix
-  auto CovMatrixFile = Settings["CovFile"].as<std::vector<std::string>>();
+  auto CovMatrixFile = Settings[std::string(PreFix) + "CovFile"].as<std::vector<std::string>>();
 
   // PCA threshold, -1 means no pca
-  auto PCAThreshold = GetFromManager<double>(Settings["PCAThreshold"], -1);
+  auto PCAThreshold = GetFromManager<double>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
   // do we pca whole matrix or only submatrix
-  auto PCAParamRegion = GetFromManager<std::vector<double>>(Settings["PCAParams"], {-999, -999});
+  auto PCAParamRegion = GetFromManager<std::vector<double>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
 
-  // create our glorious matrix
+  /// @todo this massive hack with "xsec_cov" is because we have const char * ... will have to fix it later...
   covarianceXsec* xsec = new covarianceXsec(CovMatrixFile, "xsec_cov", PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
 
   // Fill the parameter values with their nominal values
   // should _ALWAYS_ be done before overriding with fix or flat
   xsec->setParameters();
 
-  auto FixParams = GetFromManager<std::vector<std::string>>(Settings["FixParams"], {});
+  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "FixParams"], {});
 
   // Fixed xsec parameters loop
   if (FixParams.size() == 1 && FixParams.at(0) == "All") {
@@ -69,14 +70,13 @@ covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& name)
     }
   }
   //Global step scale for matrix
-  auto StepScale = Settings["StepScale"].as<double>();
+  auto StepScale = Settings[std::string(PreFix) + "StepScale"].as<double>();
 
-  MACH3LOG_INFO("With Step Scale {:.4f}", StepScale);
   xsec->setStepScale(StepScale);
 
-  // TODO
   // Adaptive MCMC stuff
-  //xsec->initialiseAdaption(FitManager->raw());
+  if(FitManager->raw()["AdaptionOptions"])
+    xsec->initialiseAdaption(FitManager->raw());
 
   MACH3LOG_INFO("Factory successful");
 
