@@ -691,9 +691,9 @@ public:
       xPosDoubles[i] = static_cast<Double_t>(XPos[i]); // Convert float to double
       yPosDoubles[i] = static_cast<Double_t>(YResp[i]); // Convert float to double
     }
-    TSpline3 *spline = new TSpline3("Spline", xPosDoubles.data(), yPosDoubles.data(), static_cast<Int_t>(nPoints));
+    TSpline3 *spline = new TSpline3("Spline", xPosDoubles.data(), yPosDoubles.data(), static_cast<int>(nPoints));
     #else
-    TSpline3 *spline = new TSpline3("Spline", reinterpret_cast<Double_t*>(XPos), reinterpret_cast<Double_t*>(YResp), static_cast<Int_t>(nPoints));
+    TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     #endif
     return spline;
   }
