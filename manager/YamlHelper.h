@@ -164,12 +164,9 @@ inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name)
   // Convert the YAML node to a string representation
   std::string macro_string = YAMLtoSTRING(yaml_node);
 
-  std::cout<<macro_string<<std::endl;
   // Create a TMacro object with the collected lines
   TMacro macro(name.c_str(), name.c_str());
   macro.AddLine(macro_string.c_str());
-
-  macro.Print();
 
   return macro;
 }

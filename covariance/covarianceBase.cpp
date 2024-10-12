@@ -1,4 +1,4 @@
-#include "covarianceBase.h"
+#include "covariance/covarianceBase.h"
 
 // ********************************************
 covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {

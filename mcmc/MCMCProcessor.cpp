@@ -36,7 +36,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   AccProbValues = nullptr;
   AccProbBatchedAverages = nullptr;
     
-  //KS: Warning this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
+  //KS: WARNING this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
   PlotJarlskog = false;
   
   //KS:Hardcoded should be a way to get it via config or something
