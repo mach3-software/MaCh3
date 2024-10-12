@@ -22,18 +22,14 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
-          - os: Alma9 Debug
-            file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
-            tag: alma9debuglatest
-            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON
-          - os: Ubuntu22.04
+          - os: Ubuntu22.04 Debug
             file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
             tag: ubuntu22.04latest
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
-          - os: Fedora32
+            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON
+          - os: Fedora32 Low Memory
             file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
             tag: fedora32latest
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_LOW_MEMORY_STRUCTS_ENABLED=ON
 
     name: Build CI ${{ matrix.os }}
 
