@@ -20,18 +20,18 @@ jobs:
       fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
-          - os: Ubuntu22.04
-            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
-            tag_latest: ubuntu22.04latest
-            installoptions: -j4
-          - os: Alma9
+          - os: alma9
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag_latest: alma9latest
             installoptions: -j4
-          - os: Fedora32
-            file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
-            tag_latest: fedora32latest
-            installoptions: -j4
+#          - os: ubuntu22.04
+#            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
+#            tag_latest: ubuntu22.04latest
+#            installoptions: -j4
+#          - os: fedora32
+#            file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
+#            tag_latest: fedora32latest
+#            installoptions: -j4
 
     name: Image CD ${{ matrix.os }}
 
@@ -65,8 +65,3 @@ jobs:
         else
           docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
         fi
-
-    # Cleanup step to remove old, untagged images
-    - name: Cleanup old images
-      run: |
-        docker image prune -f  # This removes dangling images (images without tags)
