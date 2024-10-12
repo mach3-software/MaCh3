@@ -683,7 +683,18 @@ public:
 
   /// @brief CW: Make a TSpline3 from the reduced splines
   inline TSpline3* ConstructTSpline3() {
-    TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
+    // KS: Sadly ROOT only accepts double...
+    #ifdef _LOW_MEMORY_STRUCTS_
+    std::vector<Double_t> xPosDoubles(nPoints);
+    std::vector<Double_t> yPosDoubles(nPoints);
+    for (Int_t i = 0; i < nPoints; ++i) {
+      xPosDoubles[i] = static_cast<Double_t>(XPos[i]); // Convert float to double
+      yPosDoubles[i] = static_cast<Double_t>(YResp[i]); // Convert float to double
+    }
+    TSpline3 *spline = new TSpline3("Spline", xPosDoubles.data(), yPosDoubles.data(), static_cast<Int_t>(nPoints));
+    #else
+    TSpline3 *spline = new TSpline3("Spline", reinterpret_cast<Double_t*>(XPos), reinterpret_cast<Double_t*>(YResp), static_cast<Int_t>(nPoints));
+    #endif
     return spline;
   }
 

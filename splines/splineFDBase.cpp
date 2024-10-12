@@ -678,8 +678,8 @@ void splineFDBase::PrepForReweight()
     UniqueSystXPts[iSpline].resize(UniqueSystNKnots[iSpline]);
     for (int iKnot = 0; iKnot < UniqueSystNKnots[iSpline]; iKnot++)
     {
-      double xPoint = -999;
-      double yPoint = -999;
+      _float_ xPoint = -999;
+      _float_ yPoint = -999;
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
       if (xPoint == -999 || yPoint == -999)
       {
