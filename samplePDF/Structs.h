@@ -127,7 +127,6 @@ enum SplineInterpolation {
   kSplineInterpolations  //!< This only enumerates
 };
 
-
 // **************************************************
 /// @brief Get function for TF1_red
 /// @param i Interpolation type
@@ -213,6 +212,7 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
 }
 
 /// Make an enum of systematic type recognised by covariance class
+/// @todo KS: Consider using enum class, it is generally recommended as safer. It will require many static_cast
 enum SystType {
   kNorm,      //!< For normalisation parameters
   kSpline,    //!< For splined parameters (1D)
