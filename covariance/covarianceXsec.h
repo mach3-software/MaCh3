@@ -60,25 +60,25 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Grab the Spline Modes for the relevant DetID
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
     /// @brief DB Grab the Spline Indices for the relevant DetID
-    const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}
+    const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, SystType::kSpline);}
     /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
-    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, kSpline);};
+    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, SystType::kSpline);};
     /// @brief Grab the index of the syst relative to global numbering.
     /// @param Type Type of syst, for example kNorm, kSpline etc
     const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
 
     /// @brief DB Grab the Number of splines for the relevant DetID
-    int GetNumSplineParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kSpline);}
+    int GetNumSplineParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, SystType::kSpline);}
 
     /// @brief DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(const int DetID);
 
     /// @brief DB Grab the number of Normalisation parameters for the relevant DetID
-    int GetNumFuncParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kFunc);}
+    int GetNumFuncParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, SystType::kFunc);}
     /// @brief DB Grab the Functional parameter names for the relevant DetID
-    const std::vector<std::string> GetFuncParsNamesFromDetID(const int DetID){return GetParsNamesFromDetID(DetID, kFunc);}
+    const std::vector<std::string> GetFuncParsNamesFromDetID(const int DetID){return GetParsNamesFromDetID(DetID, SystType::kFunc);}
     /// @brief DB Grab the Functional parameter indices for the relevant DetID
-    const std::vector<int> GetFuncParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kFunc);}
+    const std::vector<int> GetFuncParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, SystType::kFunc);}
 
     /// @brief KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
     /// For example Sigma Var are done around nominal in ND280, no idea why though...
