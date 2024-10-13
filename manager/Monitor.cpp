@@ -295,4 +295,5 @@ void MaCh3Usage(int argc, char **argv){
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
-}
+
+} //end namespace
