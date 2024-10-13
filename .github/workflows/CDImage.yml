@@ -65,3 +65,10 @@ jobs:
         else
           docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
         fi
+
+    - uses: actions/delete-package-versions@v5
+      with:
+        package-name: 'mach3'
+        package-type: 'container'
+        min-versions-to-keep: 5
+        delete-only-untagged-versions: 'true'

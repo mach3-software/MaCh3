@@ -7,6 +7,7 @@ LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
 LABEL compiler="GNU 11.4.0"
 LABEL root_version="v6.32.02"
+LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 RUN apt update && apt upgrade -y
 
