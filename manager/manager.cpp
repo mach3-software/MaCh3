@@ -18,7 +18,7 @@ manager::manager(std::string const &filename)
 
   if (config["LikelihoodOptions"])
   {
-    std::string likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
+    auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
     if (likelihood == "Barlow-Beeston")                 mc_stat_llh = TestStatistic(kBarlowBeeston);
     else if (likelihood == "IceCube")                   mc_stat_llh = TestStatistic(kIceCube);
     else if (likelihood == "Poisson")                   mc_stat_llh = TestStatistic(kPoisson);
