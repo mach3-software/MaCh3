@@ -475,7 +475,10 @@ void covarianceBase::throwParameters() {
   // First draw new randParams
   randomize();
 
-  if (!pca) {
+  // KS: We use PCA very rarely on top PCA functionality isn't implemented for this function.
+  // Use __builtin_expect to give compiler a hint which option is more likely, which should help
+  // with better optimisation. This isn't critical but more to have example
+  if (__builtin_expect(!pca, 1)) {
     MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
     #ifdef MULTITHREAD
@@ -515,7 +518,7 @@ void covarianceBase::throwParameters() {
   }
   else
   {
-    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predicitve Code with PCA, which is wrong");
+    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predictive Code with PCA, which is wrong");
     MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }

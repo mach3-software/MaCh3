@@ -127,7 +127,6 @@ enum SplineInterpolation {
   kSplineInterpolations  //!< This only enumerates
 };
 
-
 // **************************************************
 /// @brief Get function for TF1_red
 /// @param i Interpolation type
@@ -135,12 +134,12 @@ inline std::string GetTF1(const SplineInterpolation i) {
   // **************************************************
   std::string Func = "";
   switch(i) {
-    case kLinearFunc:
+    case SplineInterpolation::kLinearFunc:
       Func = "([1]+[0]*x)";
       break;
     default:
       std::cerr << "UNKNOWN SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
   }
@@ -155,25 +154,25 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
   RespFuncType Type = kRespFuncTypes;
   switch(i) {
     //  TSpline3 (third order spline in ROOT)
-    case kTSpline3:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kTSpline3:
+      Type = RespFuncType::kTSpline3_red;
       break;
-    case kLinear:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kLinear:
+      Type = RespFuncType::kTSpline3_red;
       break;
-    case kMonotonic:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kMonotonic:
+      Type = RespFuncType::kTSpline3_red;
       break;
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
-    case kAkima:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kAkima:
+      Type = RespFuncType::kTSpline3_red;
       break;
-    case kLinearFunc:
-      Type = kTF1_red;
+    case SplineInterpolation::kLinearFunc:
+      Type = RespFuncType::kTF1_red;
       break;
     default:
       std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
   }
@@ -187,25 +186,25 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
   std::string name = "";
   switch(i) {
     //  TSpline3 (third order spline in ROOT)
-    case kTSpline3:
+    case SplineInterpolation::kTSpline3:
       name = "TSpline3";
       break;
-    case kLinear:
+    case SplineInterpolation::kLinear:
       name = "Linear";
       break;
-    case kMonotonic:
+    case SplineInterpolation::kMonotonic:
       name = "Monotonic";
       break;
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
-    case kAkima:
+    case SplineInterpolation::kAkima:
       name = "Akima";
       break;
-    case kLinearFunc:
+    case SplineInterpolation::kLinearFunc:
       name = "LinearFunc";
       break;
     default:
       std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
   }
@@ -213,13 +212,13 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
 }
 
 /// Make an enum of systematic type recognised by covariance class
+/// @todo KS: Consider using enum class, it is generally recommended as safer. It will require many static_cast
 enum SystType {
   kNorm,      //!< For normalisation parameters
   kSpline,    //!< For splined parameters (1D)
   kFunc,      //!< For functional parameters
   kSystTypes  //!< This only enumerates
 };
-
 
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
@@ -243,18 +242,18 @@ inline std::string SystType_ToString(const SystType i) {
 // **************************************************
   std::string name = "";
   switch(i) {
-    case kNorm:
+    case SystType::kNorm:
       name = "Norm";
       break;
-    case kSpline:
+    case SystType::kSpline:
       name = "Spline";
       break;
-    case kFunc:
+    case SystType::kFunc:
       name = "Functional";
       break;
     default:
       std::cerr << "UNKNOWN SYST TYPE SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
+      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
       std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
       throw;
   }

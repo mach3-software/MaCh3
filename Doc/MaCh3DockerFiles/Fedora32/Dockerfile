@@ -7,6 +7,7 @@ LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
 LABEL compiler="GNU 10.1.1"
 LABEL root_version="v6.20.06"
+LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
 ARG MACH3_VERSION
