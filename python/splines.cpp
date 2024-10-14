@@ -97,7 +97,7 @@ void initSplines(py::module &m){
             py::init
             (
                 // Just take in some vectors, then build a TSpline3 and pass this to the constructor
-                [](std::vector<double> xVals, std::vector<double> yVals, SplineInterpolation interpType)
+                [](std::vector<double> &xVals, std::vector<double> &yVals, SplineInterpolation interpType)
                 {
                     if ( xVals.size() != yVals.size() )
                     {
@@ -106,9 +106,30 @@ void initSplines(py::module &m){
 
                     int length = xVals.size();
 
-                    TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
+                    if (length == 1)
+                    {
+                        _float_ *pars[3];
+                        pars[0] = new double(0.0);
+                        pars[1] = new double(0.0);
+                        pars[2] = new double(0.0);
+                        return new TSpline3_red(xVals.data(), yVals.data(), 1, pars);
 
-                    return new TSpline3_red(splineTmp, interpType);
+                        delete[] pars;
+                    }
+                    else
+                    {
+                        std::cout << "CALLING TSPline3 Constructor with " << length << " knots!" << std::endl;
+                        for ( int i = 0; i < length; i++)
+                        {
+                            std:: cout << "{" << xVals[i] << ", " << yVals[i] << "} ";
+                        }
+                        std::cout << std::endl;
+
+                        TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
+
+                        std::cout << "Spline constructed successfully!" << std::endl << std::endl;
+                        return new TSpline3_red(splineTmp, interpType);
+                    }
                 }
             )
         )
