@@ -90,7 +90,7 @@ void initSplines(py::module &m){
     // Bind the TSpline3_red class. Decided to go with a clearer name of ResponseFunction for the python binding
     // and make the interface a bit more python-y. Additionally remove passing root stuff so we don't need to deal 
     // with root python binding and can just pass it native python objects.
-    py::class_<TSpline3_red, TResponseFunction_red>(m_splines, "ResponseFunction")
+    py::class_<TSpline3_red, TResponseFunction_red, std::unique_ptr<TSpline3_red, py::nodelete>>(m_splines, "ResponseFunction")
         .def(
             // define a more python friendly constructor that massages the inputs and passes them
             // through to the c++ constructor
@@ -108,7 +108,7 @@ void initSplines(py::module &m){
 
                     TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
 
-                    return std::make_unique<TSpline3_red>(splineTmp, interpType);
+                    return new TSpline3_red(splineTmp, interpType);
                 }
             )
         )
@@ -136,7 +136,7 @@ void initSplines(py::module &m){
                 [](std::vector<std::vector<TResponseFunction_red*>> &responseFns, const bool saveFlatTree)
                 {
                     std::vector<RespFuncType> respFnTypes;
-                    for(int i = 0; i > responseFns.size(); i++)
+                    for(int i = 0; i < responseFns[0].size(); i++)
                     {
                         // ** WARNING **
                         // Right now I'm only pushing back TSpline3_reds as thats all thats supported right now
@@ -145,11 +145,11 @@ void initSplines(py::module &m){
                         // then just read them here and pass through to the constructor
                         respFnTypes.push_back(RespFuncType::kTSpline3_red);
                     }
-                    return std::make_unique<SMonolith>(responseFns, respFnTypes, saveFlatTree);
+                    return new SMonolith(responseFns, respFnTypes, saveFlatTree);
                 }
             ),
             "Create an EventSplineMonolith \n"
-            ":param master_splines: These are the 'knot' values to make splines from. \n"
+            ":param master_splines: These are the 'knot' values to make splines from. This should be an P x E 2D list where P is the number of parameters and E is the number of events. \n"
             ":param save_flat_tree: Whether we want to save monolith into speedy flat tree",
             py::arg("master_splines"),
             py::arg("save_flat_tree") = false
