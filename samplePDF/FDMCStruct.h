@@ -25,6 +25,7 @@ struct fdmc_base {
 
   /// DB Speedup bits
   double Unity;
+  float Unity_F;
   int Unity_Int;
   double dummy_value = -999;
 
@@ -53,7 +54,7 @@ struct fdmc_base {
 
   int **mode;
 
-  const double **osc_w_pointer;
+  const _float_ **osc_w_pointer;
   double *xsec_w;
   splineFDBase *splineFile; 
 };

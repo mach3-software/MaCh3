@@ -67,11 +67,11 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
-  std::cout << "Create SplineModeVecs_Sample" << std::endl;
+  MACH3LOG_INFO("Create SplineModeVecs_Sample");
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
-  std::cout << "SplineModeVecs_Sample is of size " <<  SplineModeVecs_Sample.size() << std::endl;
+  MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
-  std::cout << "SplineModeVecs is of size " << SplineModeVecs.size() << std::endl;
+  MACH3LOG_INFO("SplineModeVecs is of size {}", SplineModeVecs.size());
 
   int nOscChan = OscChanFileNames.size();
   nOscChans.push_back(nOscChan);
@@ -150,12 +150,12 @@ void splineFDBase::TransferToMonolith()
                 if (!foundUniqueSpline)
                 {
                   MACH3LOG_ERROR("Unique spline index not found");
-				  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
-				  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nUniqueSysts);
-				  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
-				  {
-					MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
-				  }//unique syst loop end				
+                  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
+                  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nUniqueSysts);
+                  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+                  {
+                    MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
+                  }//unique syst loop end
                   throw MaCh3Exception(__FILE__ , __LINE__ );
                 }
 
@@ -171,21 +171,19 @@ void splineFDBase::TransferToMonolith()
                   int iCoeff=coeffindexvec[splineindex];
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
 
-                  #ifdef MULTITHREAD
-                  #pragma omp parallel for
-                  #endif
-                  for(int i=0; i<splineKnots; i++){
+                  for(int i = 0; i < splineKnots; i++){
 
                     if(tmpXCoeffArr[i]==-999){
-                      std::cerr<<"ERROR : looks like we've got a bad X, index = "<<i<<std::endl;
+                      MACH3LOG_ERROR("looks like we've got a bad X, index = {}", i);
                       throw MaCh3Exception(__FILE__ , __LINE__ );
                     }
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
                       if(tmpManyCoeffArr[i*4+j]==-999){
-                        std::cerr<<"Bad ybcd, index : "<<i<<", "<<j<<std::endl;
-                        std::cerr<<"Param Values : "<<tmpManyCoeffArr[i*4]<<", "<<tmpManyCoeffArr[i*4+1]<<", "<<tmpManyCoeffArr[i*4+2]<<", "<<tmpManyCoeffArr[i*4+3]<<std::endl;
+                        MACH3LOG_ERROR("Bad ybcd, index: {}, {}", i, j);
+                        MACH3LOG_ERROR("Param Values: {}, {}, {}, {}",
+                                      tmpManyCoeffArr[i*4], tmpManyCoeffArr[i*4+1], tmpManyCoeffArr[i*4+2], tmpManyCoeffArr[i*4+3]);
                         throw MaCh3Exception(__FILE__ , __LINE__ );
                       }
                     manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
@@ -397,13 +395,13 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   TFile *File = new TFile(FileName.c_str());
   if (!File || File->IsZombie())
   {
-    std::cerr << "File " << FileName << " not found" << std::endl;
-    std::cerr << "This is caused by something here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    MACH3LOG_ERROR("File {} not found", FileName);
+    MACH3LOG_ERROR("This is caused by something here! {} : {}", __FILE__, __LINE__);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  std::cout << "Finding binning for:" << std::endl;
-  std::cout << FileName << std::endl;
+  MACH3LOG_INFO("Finding binning for:");
+  spdlog::info("{}", FileName);
 
   bool isHist2D = false;
   bool isHist3D = false;
@@ -417,9 +415,8 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     Obj = File->Get("dev_tmp.0.0");
     if (!Obj)
     {
-      std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
-      std::cerr << "FileName: " << FileName << std::endl;
-      std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
+      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!");
+      MACH3LOG_ERROR("FileName: {}", FileName);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
@@ -437,7 +434,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (!isHist2D && !isHist3D)
   {
-    std::cerr << "Object doesn't inherit from either TH2D and TH3D - Odd A" << std::endl;
+    MACH3LOG_ERROR("Object doesn't inherit from either TH2D and TH3D - Odd A");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -456,7 +453,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
-      std::cerr << "Trying to load a 3D spline template when nDim=" << Dimensions[iSample] << std::endl;
+      MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     Hist3D = (TH3F *)Obj->Clone();
@@ -489,9 +486,8 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
   else
   {
-    std::cerr << "Number of dimensions not valid! Given:" << Dimensions[iSample] << std::endl;
-    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis)
@@ -659,8 +655,8 @@ void splineFDBase::PrepForReweight()
 
         if (!FoundNonFlatSpline)
         {
-		  MACH3LOG_INFO("{} syst has no response in sample {}", SystName, iSample);
-		  MACH3LOG_INFO("Whilst this isn't neccessarily a problem, it seems odd");
+          MACH3LOG_INFO("{} syst has no response in sample {}", SystName, iSample);
+          MACH3LOG_INFO("Whilst this isn't neccessarily a problem, it seems odd");
           continue;
         }
       }
@@ -686,7 +682,7 @@ void splineFDBase::PrepForReweight()
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
       if (xPoint == -999 || yPoint == -999)
       {
-        std::cerr << "Something has gone wrong in the knot finding" << std::endl;
+        MACH3LOG_ERROR("Something has gone wrong in the knot finding");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       UniqueSystXPts[iSpline][iKnot] = xPoint;

@@ -2,12 +2,22 @@
 # KS: Get glorious container from Luke which will work as a base
 FROM picker24/root_v6_26_10:alma9 AS mach3_build
 
+# Add a label for the author
+LABEL maintainer="The MaCh3 Collaboration"
+LABEL website="https://mach3-software.github.io/MaCh3/"
+LABEL compiler="GNU 11.3.1"
+LABEL root_version="v6.26.10"
+LABEL org.opencontainers.image.description="Official MaCh3 container"
+
 # Declare the build argument
 ARG MACH3_VERSION
 ENV MACH3_VERSION=${MACH3_VERSION:-develop}
 
 ARG CMAKE_OPTIONS
 ENV CMAKE_OPTIONS=${CMAKE_OPTIONS:-DMaCh3_PYTHON_ENABLED=ON}
+
+ARG INSTALL_OPTIONS
+ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
 
 ENV MACH3_WORK_DIR=/opt/MaCh3/
 ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
@@ -23,7 +33,7 @@ RUN git checkout ${MACH3_VERSION}
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
 RUN cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
-RUN make VERBOSE=1 && make install
+RUN make ${INSTALL_OPTIONS} && make install
 
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}

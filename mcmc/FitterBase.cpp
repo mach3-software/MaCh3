@@ -28,7 +28,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   #endif
 
   std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
-
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
@@ -313,9 +312,7 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
 // Similar to systematic really, but handles the oscillation weights
 void FitterBase::addOscHandler(covarianceOsc * const oscf) {
 // *************************
-
   osc = oscf;
-
   if (save_nominal) {
     CovFolder->cd();
     std::vector<double> vec = oscf->getNominalArray();
@@ -339,7 +336,6 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
     TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + oscf->getName()));
     ConfigSave.Write();
   }
-
   return;
 }
 
@@ -347,7 +343,6 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
 // Process the MCMC output to get postfit etc
 void FitterBase::ProcessMCMC() {
 // *******************
-
   if (fitMan == NULL) return;
 
   // Process the MCMC
@@ -383,7 +378,6 @@ void FitterBase::ProcessMCMC() {
       MACH3LOG_INFO("Opening output again to update with means..");
       outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
     }
-
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
     Central_Gauss->Write("Gauss_Means");
@@ -872,9 +866,9 @@ void FitterBase::Run2DLLHScan() {
   }
 
   // Number of points we do for each LLH scan
-  const int n_points = 20;
+  constexpr int n_points = 20;
   // We print 5 reweights
-  const int countwidth = double(n_points)/double(5);
+  constexpr int countwidth = double(n_points)/double(5);
 
   bool isxsec = false;
   // Loop over the covariance classes
@@ -1055,15 +1049,15 @@ void FitterBase::RunSigmaVar() {
   MACH3LOG_INFO("Starting Sigma Variation");
 
   // Number of variations we want
-  const int numVar = 5;
+  constexpr int numVar = 5;
   //-3 -1 0 +1 +3 sigma variation
-  const int sigmaArray[numVar] = {-3, -1, 0, 1, 3};
+  constexpr int sigmaArray[numVar] = {-3, -1, 0, 1, 3};
 
   outputFile->cd();
 
   //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
-  const int nRelevantModes = 2;
+  constexpr int nRelevantModes = 2;
   MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
   bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false);
 

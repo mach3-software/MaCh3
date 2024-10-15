@@ -30,7 +30,7 @@ public:
   samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov);
   virtual ~samplePDFFDBase();
 
-  const int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
   std::string GetName(){return samplename;}
 
   //===============================================================================
@@ -70,7 +70,7 @@ public:
   virtual void DumpWeights(std::string outname) {(void)outname; return; };
   //================================================================================
 
-  virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal){};
+  virtual void setupSplines(fdmc_base *skobj, const char *SplineFileName, int nutype, int signal){};
   void ReadSampleConfig();
 
  protected:
@@ -255,6 +255,9 @@ public:
   double Unity = 1.;
   double Zero = 0.;
   
+  float Unity_F = 1.;
+  float Zero_F = 0.;
+
   std::vector<std::string> mtuple_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;

@@ -32,7 +32,7 @@ namespace MaCh3Utils {
   /// @brief KS: Convoluted code to grab output from terminal to string
   /// @param cmd The terminal command to execute.
   /// @return The output of the terminal command as a string.
-  std::string TerminalToString(const char* cmd);
+  std::string TerminalToString(std::string cmd);
   /// @brief KS: Check what CPU you are using
   void EstimateDataTransferRate(TChain* chain, const int entry);
   /// @brief KS: Find out about Disk usage
@@ -50,7 +50,7 @@ namespace MaCh3Utils {
   /// @param Type The type of system information to retrieve (e.g., RAM, CPU usage).
   /// @return The requested system information as an integer.
   /// @details This function fetches system information like RAM usage or other hardware details based on the specified type.
-  int getValue(std::string Type);
+  int getValue(const std::string& Type);
   /// @brief CW: Get memory, which is probably silly
   /// @param line The line of text to parse.
   /// @return The extracted memory value as an integer.

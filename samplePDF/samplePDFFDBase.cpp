@@ -10,13 +10,13 @@ samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_c
   : samplePDFBase()
 //DB Throughout constructor and init, pot is livetime for atmospheric samples
 {
-  std::cout << "-------------------------------------------------------------------" <<std::endl;
+  MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Ceating SamplePDFFDBase object");
     
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){
-	MACH3LOG_ERROR("You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
-   	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   SetXsecCov(xsec_cov);
   
@@ -157,14 +157,14 @@ void samplePDFFDBase::ReadSampleConfig()
   std::vector<double> SelectionVec;
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
-	SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
-	SelectionBounds.push_back(SelectionCuts["Bounds"].as<std::vector<double>>());
-	low_bound = SelectionBounds.back().at(0);
-	up_bound = SelectionBounds.back().at(1);
-	KinematicParamter = static_cast<double>(ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>())); 
-	MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), SelectionBounds.back().at(0), SelectionBounds.back().at(1));
-	SelectionVec = {KinematicParamter, low_bound, up_bound};	
-	StoredSelection.push_back(SelectionVec);
+    SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
+    SelectionBounds.push_back(SelectionCuts["Bounds"].as<std::vector<double>>());
+    low_bound = SelectionBounds.back().at(0);
+    up_bound = SelectionBounds.back().at(1);
+    KinematicParamter = static_cast<double>(ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>()));
+    MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), SelectionBounds.back().at(0), SelectionBounds.back().at(1));
+    SelectionVec = {KinematicParamter, low_bound, up_bound};
+    StoredSelection.push_back(SelectionVec);
   }
   NSelections = SelectionStr.size();
 
@@ -180,32 +180,32 @@ void samplePDFFDBase::Initialise() {
   Init();
 
   int TotalMCEvents = 0;
-  for(unsigned iSample=0 ; iSample < nSamples ; iSample++){
-    std::cout << "=============================================" << std::endl;
-    std::cout << "Initialising sample: " << iSample << "/" << nSamples << std::endl;
+  for(_int_ iSample=0 ; iSample < nSamples ; iSample++){
+    MACH3LOG_INFO("=============================================");
+    MACH3LOG_INFO("Initialising sample: {}/{}", iSample, nSamples);
     MCSamples[iSample].nEvents = setupExperimentMC(iSample);
-    std::cout << "Number of events processed: " << MCSamples[iSample].nEvents << std::endl;
+    MACH3LOG_INFO("Number of events processed: {}", MCSamples[iSample].nEvents);
     TotalMCEvents += MCSamples[iSample].nEvents;
-    std::cout << "Initialising FDMC object.." << std::endl;
+    MACH3LOG_INFO("Initialising FDMC object..");
     InitialiseSingleFDMCObject(iSample, MCSamples[iSample].nEvents);
     setupFDMC(iSample);
-    std::cout << "Initialised sample: " << iSample << "/" << nSamples << std::endl;
+    MACH3LOG_INFO("Initialised sample: {}/{}", iSample, nSamples);
   }
-  std::cout << "=============================================" << std::endl;
-  std::cout << "Total number of events is: " << TotalMCEvents << std::endl;
+  MACH3LOG_INFO("=============================================");
+  MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
-  std::cout << "Setting up NuOscillator.." << std::endl;
+  MACH3LOG_INFO("Setting up NuOscillator..");
   SetupNuOscillator();
-  std::cout << "Setting up Sample Binning.." << std::endl;
+  MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
-  std::cout << "Setting up Splines.." << std::endl;
+  MACH3LOG_INFO("Setting up Splines..");
   SetupSplines();
-  std::cout << "Setting up Normalisation Pointers.." << std::endl;
+  MACH3LOG_INFO("Setting up Normalisation Pointers..");
   SetupNormParameters();
-  std::cout << "Setting up Weight Pointers.." << std::endl;
+  MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
 
-  std::cout << "=======================================================" << std::endl;
+  MACH3LOG_INFO("=======================================================");
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -242,7 +242,7 @@ void samplePDFFDBase::fill2DHist()
 /// This "passing" can be removed. 
 void samplePDFFDBase::SetupSampleBinning(){
 // ************************************************
-  std::cout << "Setting up Sample Binning " << std::endl;
+  MACH3LOG_INFO("Setting up Sample Binning");
   TString histname1d = (XVarStr).c_str();
   TString histname2d = (XVarStr+"_"+YVarStr).c_str();
   TString histtitle = "";
@@ -315,7 +315,7 @@ bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
     }
   }
 
-  //DB To avoid unneccessary checks, now return false rather than setting bool to true and continuing to check
+  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
 
@@ -341,7 +341,7 @@ bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& Paramete
     }
   }
 
-  //DB To avoid unneccessary checks, now return false rather than setting bool to true and continuing to check
+  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
 
@@ -370,7 +370,7 @@ bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& Paramete
     }
   }
   
-  //DB To avoid unneccessary checks, now return false rather than setting bool to true and continuing to check
+  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
 
@@ -424,7 +424,7 @@ void samplePDFFDBase::fillArray() {
 
   PrepFunctionalParameters();
   if(splineFile){
-	splineFile->Evaluate();
+    splineFile->Evaluate();
   }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
@@ -432,7 +432,7 @@ void samplePDFFDBase::fillArray() {
       applyShifts(iSample, iEvent);
       
       if (!IsEventSelected(iSample, iEvent)) { 
-	continue;
+        continue;
       } 
 
       double splineweight = 1.0;
@@ -441,12 +441,12 @@ void samplePDFFDBase::fillArray() {
       double totalweight = 1.0;
       
       if(splineFile){
-	splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
       }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
-	MCSamples[iSample].xsec_w[iEvent] = 0.;
-	continue;
+        MCSamples[iSample].xsec_w[iEvent] = 0.;
+        continue;
       }
       
       //Loop over stored normalisation and function pointers 
@@ -454,15 +454,15 @@ void samplePDFFDBase::fillArray() {
       
       //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (normweight <= 0.){
-	MCSamples[iSample].xsec_w[iEvent] = 0.;
-	continue;
+        MCSamples[iSample].xsec_w[iEvent] = 0.;
+        continue;
       }
       
       funcweight = CalcXsecWeightFunc(iSample,iEvent);
       //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (funcweight <= 0.){          
-	MCSamples[iSample].xsec_w[iEvent] = 0.;
-	continue;
+        MCSamples[iSample].xsec_w[iEvent] = 0.;
+        continue;
       }
       
       MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
@@ -471,8 +471,8 @@ void samplePDFFDBase::fillArray() {
       totalweight = GetEventWeight(iSample,iEvent);
       //DB Catch negative weights and skip any event with a negative event
       if (totalweight <= 0.){
-	MCSamples[iSample].xsec_w[iEvent] = 0.;
-	continue;
+        MCSamples[iSample].xsec_w[iEvent] = 0.;
+        continue;
       }
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
@@ -555,7 +555,7 @@ void samplePDFFDBase::fillArray_MP()
       samplePDFFD_array_private[yBin] = new double[nXBins];
       samplePDFFD_array_private_w2[yBin] = new double[nXBins];
       for (int xBin=0;xBin<nXBins;xBin++) {
-	samplePDFFD_array_private[yBin][xBin] = 0.;
+        samplePDFFD_array_private[yBin][xBin] = 0.;
         samplePDFFD_array_private_w2[yBin][xBin] = 0.;
       }
     }
@@ -1242,9 +1242,9 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 		upper_upper_edge = _DEFAULT_RETURN_VAL_;
 	  }
 	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
-	  if(MCSamples[mc_i].NomYBin[event_i] < 0){ 
-		std::cout << "Nominal YBin PROBLEM, y-bin is " << MCSamples[mc_i].NomYBin[event_i] << std::endl;
-	  }
+      if(MCSamples[mc_i].NomYBin[event_i] < 0){
+        MACH3LOG_INFO("Nominal YBin PROBLEM, y-bin is {}", MCSamples[mc_i].NomYBin[event_i]);
+      }
 	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
 	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
 	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
@@ -1367,16 +1367,16 @@ void samplePDFFDBase::SetupNuOscillator() {
   
   NuOscProbCalcers = std::vector<OscillatorBase*>((int)MCSamples.size());
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
-    std::cout << "Setting up NuOscillator::Oscillator object in OscillationChannel: " << iSample << "/" << MCSamples.size() << " ====================" << std::endl;
+    MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
     NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
 
     if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
       std::vector<_float_> EnergyArray;
       for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
-	//DB Remove NC events from the arrays which are handed to the NuOscillator objects
-	if (!MCSamples[iSample].isNC[iEvent]) {
-	  EnergyArray.push_back(*(MCSamples[iSample].rw_etru[iEvent]));
-	}
+        //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+        if (!MCSamples[iSample].isNC[iEvent]) {
+          EnergyArray.push_back(*(MCSamples[iSample].rw_etru[iEvent]));
+        }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
 
@@ -1403,61 +1403,72 @@ void samplePDFFDBase::SetupNuOscillator() {
     NuOscProbCalcers[iSample]->Setup();
 
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      // KS: Sry but if we use low memory we need to point to float not double...
+      #ifdef _LOW_MEMORY_STRUCTS_
+      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+      #else
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+      #endif
       if (MCSamples[iSample].isNC[iEvent]) {
-	if (MCSamples[iSample].signal) {
-	  MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
-	} else {
-	  MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
-	}
-      } else {
-	
-	int InitFlav = NULL;
-	int FinalFlav = NULL;
-	
-	if (std::abs(MCSamples[iSample].nutype) == 1) {
-	  InitFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
-	  InitFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
-	  InitFlav = NuOscillator::kTau;
-	}
-
-	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-	  FinalFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-	  FinalFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-	  FinalFlav = NuOscillator::kTau;
-	}
-
-	if (InitFlav == NULL || FinalFlav == NULL) {
-	  std::cerr << "Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator" << std::endl;
-	  std::cerr << "MCSamples[iSample].nutype:" << MCSamples[iSample].nutype << std::endl;
-	  std::cerr << "InitFlav:" << InitFlav << std::endl;
-	  std::cerr << "MCSamples[iSample].oscnutype:" << MCSamples[iSample].oscnutype << std::endl;
-	  std::cerr << "FinalFlav:" << FinalFlav << std::endl;
-	  throw;
-	}
-
-	//Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-	if (MCSamples[iSample].nutype<0) {
-	  InitFlav *= -1;
-	  FinalFlav *= -1;
-	}
-	
-	if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	  //Atmospherics
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
-	} else {
-	  //Beam
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
-	}
-	
+        if (MCSamples[iSample].signal) {
+          #ifdef _LOW_MEMORY_STRUCTS_
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
+          #else
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
+          #endif
+        } else {
+          #ifdef _LOW_MEMORY_STRUCTS_
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+          #else
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+          #endif
+        }
       }
-    }
-    
-  }
+      else
+      {
+        int InitFlav = _BAD_INT_;
+        int FinalFlav = _BAD_INT_;
+
+        if (std::abs(MCSamples[iSample].nutype) == 1) {
+          InitFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].nutype) == 2) {
+          InitFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].nutype) == 3) {
+          InitFlav = NuOscillator::kTau;
+        }
+
+        if (std::abs(MCSamples[iSample].oscnutype) == 1) {
+          FinalFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
+          FinalFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
+          FinalFlav = NuOscillator::kTau;
+        }
+
+        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
+          MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
+          MACH3LOG_ERROR("InitFlav: {}", InitFlav);
+          MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
+          MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+
+        //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
+        if (MCSamples[iSample].nutype<0) {
+          InitFlav *= -1;
+          FinalFlav *= -1;
+        }
+        if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+          //Atmospherics
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
+        } else {
+          //Beam
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+        }
+      } // end if NC
+    } // end loop over events
+  }// end loop over channels
 
   delete OscillFactory;
 }
@@ -1501,7 +1512,6 @@ void samplePDFFDBase::fillSplineBins() {
 	MCSamples[i].xsec_spline_pointers[j][spline] = splineFile->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
 									      EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
       }
-      
     }
   }
 
@@ -1584,7 +1594,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
   fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
-  fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
+  fdobj->osc_w_pointer = new const _float_*[fdobj->nEvents];
   //fdobj->rw_truecz = new const double*[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
@@ -1595,7 +1605,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->NomXBin[iEvent] = -1;
     fdobj->NomYBin[iEvent] = -1;
     fdobj->XBin[iEvent] = -1;
-    fdobj->YBin[iEvent] = -1;	 
+    fdobj->YBin[iEvent] = -1;
     fdobj->rw_lower_xbinedge[iEvent] = -1;
     fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
     fdobj->rw_upper_xbinedge[iEvent] = -1;
@@ -1603,7 +1613,12 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->xsec_w[iEvent] = 1.0;
     fdobj->isNC[iEvent] = false;
     fdobj->SampleDetID = -1;
+    #ifdef _LOW_MEMORY_STRUCTS_
+    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity_F);
+    #else
     fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
+    #endif
+
     fdobj->x_var[iEvent] = &fdobj->Unity;
     fdobj->y_var[iEvent] = &fdobj->Unity;
   }

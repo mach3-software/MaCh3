@@ -683,7 +683,18 @@ public:
 
   /// @brief CW: Make a TSpline3 from the reduced splines
   inline TSpline3* ConstructTSpline3() {
+    // KS: Sadly ROOT only accepts double...
+    #ifdef _LOW_MEMORY_STRUCTS_
+    std::vector<Double_t> xPosDoubles(nPoints);
+    std::vector<Double_t> yPosDoubles(nPoints);
+    for (Int_t i = 0; i < nPoints; ++i) {
+      xPosDoubles[i] = static_cast<Double_t>(XPos[i]); // Convert float to double
+      yPosDoubles[i] = static_cast<Double_t>(YResp[i]); // Convert float to double
+    }
+    TSpline3 *spline = new TSpline3("Spline", xPosDoubles.data(), yPosDoubles.data(), static_cast<int>(nPoints));
+    #else
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
+    #endif
     return spline;
   }
 
@@ -706,95 +717,6 @@ public:
     _float_ *XPos;
     /// y-value for each knot
     _float_ *YResp;
-};
-
-// ************************
-/// @brief CW: Truncated spline class
-class Truncated_Spline: public TSpline3_red {
-// ************************
-// cubic spline which is flat (returns y_first or y_last) if x outside of knot range
-public:
-  /// @brief Empty constructor
-  Truncated_Spline()
-  :TSpline3_red()
-  {
-  }
-
-  /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
-  Truncated_Spline(TSpline3* &spline)
-  :TSpline3_red(spline)
-  {
-  }
-
-  /// @brief Empty destructor
-  ~Truncated_Spline()
-  {
-  }
-
-  /// @brief Find the segment relevant to this variation in x
-  /// See root/hist/hist/src/TSpline3::FindX(double) or SplineMonolith::FindSplineSegment
-  inline int FindX(double x) {
-    // The segment we're interested in (klow in ROOT code)
-    int segment = 0;
-    int kHigh = nPoints-1;
-    // If the variation is below the lowest saved spline point
-    if (x <= XPos[0]){
-      segment = -1;
-      // If the variation is above the highest saved spline point
-    } else if (x >= XPos[nPoints-1]) {
-      segment = -2;
-      // If the variation is between the maximum and minimum, perform a binary search
-    } else {
-      // The top point we've got
-      int kHalf = 0;
-      // While there is still a difference in the points (we haven't yet found the segment)
-      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-      while (kHigh - segment > 1) {
-        // Increment the half-step
-        kHalf = (segment + kHigh)/2;
-        // If our variation is above the kHalf, set the segment to kHalf
-        if (x > XPos[kHalf]) {
-          segment = kHalf;
-          // Else move kHigh down
-        } else {
-          kHigh = kHalf;
-        }
-      } // End the while: we've now done our binary search
-    } // End the else: we've now found our point
-    if (segment >= nPoints-1 && nPoints > 1) segment = nPoints-2;
-    return segment;
-  }
-
-  /// @brief Evaluate the weight from a variation
-  inline double Eval(double var) {
-    // Get the segment for this variation
-    int segment = FindX(var);
-    // The get the coefficients for this variation
-    _float_ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
-
-    if(segment >= 0){
-      GetCoeff(segment, x, y, b, c, d);
-    }
-
-    // if var is outside of the defined range, set the coefficients to 0 so that Eval just returns the value at the end point of the spline
-    else if(segment == -1){
-      GetKnot(0, x, y);
-      b = 0.0;
-      c = 0.0;
-      d = 0.0;
-    }
-    else if(segment == -2){
-      GetKnot(nPoints-1, x, y);
-      b = 0.0;
-      c = 0.0;
-      d = 0.0;
-    }
-
-    double dx = var - x;
-    // Evaluate the third order polynomial
-    double weight = y+dx*(b+dx*(c+d*dx));
-    return weight;
-  }
 };
 
 // *****************************************

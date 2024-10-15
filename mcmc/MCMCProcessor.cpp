@@ -36,7 +36,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   AccProbValues = nullptr;
   AccProbBatchedAverages = nullptr;
     
-  //KS: Warning this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
+  //KS: WARNING this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
   PlotJarlskog = false;
   
   //KS:Hardcoded should be a way to get it via config or something
@@ -437,13 +437,14 @@ void MCMCProcessor::MakePostfit() {
 
   PostDir->Close();
   delete PostDir;
+  PostHistDir->Close();
+  delete PostHistDir;
 } // Have now written the postfit projections
 
 // *******************
 //CW: Draw the postfit
 void MCMCProcessor::DrawPostfit() {
 // *******************
-
   if (OutputFile == nullptr) MakeOutputFile();
 
   // Make the prefit plot
@@ -860,7 +861,6 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
   Posterior->SetLeftMargin(LeftMargin);
 }
 
-
 // *********************
 // Make fancy violin plots
 void MCMCProcessor::MakeViolin() {
@@ -884,7 +884,7 @@ void MCMCProcessor::MakeViolin() {
   hviolin = new TH2D("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y);
 
   //KS: Prior has larger errors so we increase range and number of bins
-  const int PriorFactor = 4;
+  constexpr int PriorFactor = 4;
   hviolin_prior = new TH2D("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
 
   TRandom3* rand = new TRandom3(0);
@@ -949,7 +949,7 @@ void MCMCProcessor::MakeViolin() {
   MACH3LOG_INFO("Making Violin plot took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
 
   //KS: Tells how many parameters in one canvas we want
-  const int IntervalsSize = 10;
+  constexpr int IntervalsSize = 10;
   const int NIntervals = nDraw/IntervalsSize;
 
   hviolin->GetYaxis()->SetTitle("Parameter Value");
@@ -1008,7 +1008,6 @@ void MCMCProcessor::MakeViolin() {
 // Make the post-fit covariance matrix in all dimensions
 void MCMCProcessor::MakeCovariance() {
 // *********************
-
   if (OutputFile == nullptr) MakeOutputFile();
 
   bool HaveMadeDiagonal = false;
@@ -1028,15 +1027,12 @@ void MCMCProcessor::MakeCovariance() {
   if (HaveMadeDiagonal == false) {
     MakePostfit();
   }
-
   gStyle->SetPalette(55);
-
-  int covBinning = nDraw;
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
-  for (int i = 0; i < covBinning; ++i) 
+  for (int i = 0; i < nDraw; ++i)
   {
-    if (i % (covBinning/5) == 0) 
-      MaCh3Utils::PrintProgressBar(i, covBinning);
+    if (i % (nDraw/5) == 0)
+      MaCh3Utils::PrintProgressBar(i, nDraw);
 
     TString Title_i = "";
     double Prior_i, PriorError;
@@ -1238,12 +1234,10 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
     
   if(!CacheMCMC) CacheSteps();
   
-  int covBinning = nDraw;
-
   bool HaveMadeDiagonal = false;    
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
-  for (int i = 0; i < covBinning; ++i) {
+  for (int i = 0; i < nDraw; ++i) {
     if ((*Covariance)(i,i) == _UNDEF_) {
       HaveMadeDiagonal = false;
       MACH3LOG_WARN("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
@@ -1263,7 +1257,7 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (int i = 0; i < covBinning; ++i) 
+  for (int i = 0; i < nDraw; ++i)
   {    
     for (int j = 0; j <= i; ++j)
     {
@@ -1309,7 +1303,7 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
   if(printToPDF)
   {
     Posterior->cd();
-    for (int i = 0; i < covBinning; ++i) 
+    for (int i = 0; i < nDraw; ++i)
     {    
       for (int j = 0; j <= i; ++j)
       {
@@ -1416,19 +1410,17 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
 // Make the covariance plots
 void MCMCProcessor::DrawCovariance() {
 // *********************
-    
   const double RightMargin  = Posterior->GetRightMargin();
   Posterior->SetRightMargin(0.15);
 
-  int covBinning = nDraw;
   // The Covariance matrix from the fit
-  TH2D* hCov = new TH2D("hCov", "hCov", covBinning, 0, covBinning, covBinning, 0, covBinning);
+  TH2D* hCov = new TH2D("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCov->GetZaxis()->SetTitle("Covariance");
   // The Covariance matrix square root, with correct sign
-  TH2D* hCovSq = new TH2D("hCovSq", "hCovSq", covBinning, 0, covBinning, covBinning, 0, covBinning);
+  TH2D* hCovSq = new TH2D("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCovSq->GetZaxis()->SetTitle("Covariance");
   // The Correlation
-  TH2D* hCorr = new TH2D("hCorr", "hCorr", covBinning, 0, covBinning, covBinning, 0, covBinning);
+  TH2D* hCorr = new TH2D("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCorr->GetZaxis()->SetTitle("Correlation");
   hCorr->SetMinimum(-1);
   hCorr->SetMaximum(1);
@@ -1440,7 +1432,7 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->GetYaxis()->SetLabelSize(0.015);
 
   // Loop over the Covariance matrix entries
-  for (int i = 0; i < covBinning; ++i)
+  for (int i = 0; i < nDraw; ++i)
   {
     TString titlex = "";
     double nom, err;
@@ -1450,17 +1442,16 @@ void MCMCProcessor::DrawCovariance() {
     hCovSq->GetXaxis()->SetBinLabel(i+1, titlex);
     hCorr->GetXaxis()->SetBinLabel(i+1, titlex);
 
-    for (int j = 0; j < covBinning; ++j) 
+    for (int j = 0; j < nDraw; ++j)
     {
       // The value of the Covariance
-      double cov = (*Covariance)(i,j);
-      double corr = (*Correlation)(i,j);
+      const double cov = (*Covariance)(i,j);
+      const double corr = (*Correlation)(i,j);
 
       hCov->SetBinContent(i+1, j+1, cov);
       hCovSq->SetBinContent(i+1, j+1, ((cov > 0) - (cov < 0))*std::sqrt(std::fabs(cov)));
       hCorr->SetBinContent(i+1, j+1, corr);
 
-      
       TString titley = "";
       double nom_j, err_j;
       GetNthParameter(j, nom_j, err_j, titley);
@@ -1526,10 +1517,10 @@ void MCMCProcessor::DrawCorrelations1D() {
   Posterior->SetBottomMargin(0.2);
   gStyle->SetOptTitle(1);
 
-  const int Nhists = 3;
+  constexpr int Nhists = 3;
   //KS: Highest value is just meant bo be sliglhy higher than 1 to catch >,
-  const double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
-  const Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
+  constexpr double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
+  constexpr Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
 
   //KS: This strore neccesary entires for stripped covariance which strore only "menaingfull correlations
   std::vector<std::vector<double>> CorrOfInterest;
@@ -1622,7 +1613,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     delete leg;
   }
 
-  //KS: Plot only meaninfull correlations
+  //KS: Plot only meaningful correlations
   for(int i = 0; i < nDraw; i++)
   {
     const int size = CorrOfInterest[i].size();
@@ -2752,7 +2743,6 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
   BurnInCut = Cuts;
 }
 
-
 // ***************
 // Pass central value
 void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title){
@@ -3817,9 +3807,9 @@ void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
   TVectorD* SamplingEfficiency = new TVectorD(nDraw);
   double *TempDenominator = new double[nDraw]();
 
-  const int Nhists = 5;
-  const double Thresholds[Nhists+1] = {1, 0.02, 0.005, 0.001, 0.0001, 0.0};
-  const Color_t ESSColours[Nhists] = {kGreen, kGreen+2, kYellow, kOrange, kRed};
+  constexpr int Nhists = 5;
+  constexpr double Thresholds[Nhists + 1] = {1, 0.02, 0.005, 0.001, 0.0001, 0.0};
+  constexpr Color_t ESSColours[Nhists] = {kGreen, kGreen + 2, kYellow, kOrange, kRed};
 
   //KS: This histogram is inspired by the following: @cite gabry2024visual
   TH1D **EffectiveSampleSizeHist = new TH1D*[Nhists]();
@@ -4117,7 +4107,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   const int end = N_Coeffs/2-1;
   const int v_size = end - start;
 
-
   int nPrams = nDraw;
   /// @todo KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
   nPrams = 2;
@@ -4236,12 +4225,12 @@ void MCMCProcessor::GewekeDiagnostic() {
   int* DenomCounterUp = new int[nDraw]();
   const double Threshold = 0.5 * nSteps;
 
-  //KS: Select values betwen which you want to scan, for example 0 means 0% burn in and 1 100% burn in.
-  const double LowerThreshold = 0;
-  const double UpperThreshold = 1.0;
+  //KS: Select values between which you want to scan, for example 0 means 0% burn in and 1 100% burn in.
+  constexpr double LowerThreshold = 0;
+  constexpr double UpperThreshold = 1.0;
   // Tells how many intervals between thresholds we want to check
-  const int NChecks = 100;
-  const double Division = (UpperThreshold - LowerThreshold)/NChecks;
+  constexpr int NChecks = 100;
+  constexpr double Division = (UpperThreshold - LowerThreshold)/NChecks;
 
   TH1D** GewekePlots = new TH1D*[nDraw];
   for (int j = 0; j < nDraw; ++j)
@@ -4410,9 +4399,9 @@ void MCMCProcessor::AcceptanceProbabilities() {
     BatchedAcceptanceProblot->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
   }
   
-#ifdef MULTITHREAD
-#pragma omp parallel for
-#endif
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
   for (int i = 0; i < nEntries; ++i) {
     // Set bin content for the i-th bin to the parameter values
     AcceptanceProbPlot->SetBinContent(i, AccProbValues[i]);
