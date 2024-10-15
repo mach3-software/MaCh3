@@ -73,13 +73,6 @@ void samplePDFFDBase::ReadSampleConfig()
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
 	throw MaCh3Exception(__FILE__, __LINE__);
   }
-
-  if (CheckNodeExists(SampleManager->raw(), "POT")) {
-    pot = SampleManager->raw()["POT"].as<double>();
-  } else{
-    MACH3LOG_ERROR("POT not defined in {}, please add this!", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
-  }
  
   if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
