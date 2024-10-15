@@ -190,6 +190,10 @@ class covarianceBase {
   /// element of a new array. There must be a clever C++ way to be careful
   inline const double* retPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
+  /// @brief Get a reference to the proposed parameter values
+  /// Can be useful if you want to track these without having to copy values using getProposed()
+  inline const std::vector<double> &getParPropVec() {return _fPropVal;}
+
   //Some Getters
   /// @brief Get total number of parameters
   inline int  GetNumParams() {return _fNumPar;}
