@@ -255,6 +255,9 @@ public:
   double Unity = 1.;
   double Zero = 0.;
   
+  float Unity_F = 1.;
+  float Zero_F = 0.;
+
   std::vector<std::string> mtuple_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;

@@ -1410,58 +1410,71 @@ void samplePDFFDBase::SetupNuOscillator() {
     NuOscProbCalcers[iSample]->Setup();
 
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      // KS: Sry but if we use low memory we need to point to float not double...
+      #ifdef _LOW_MEMORY_STRUCTS_
+      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+      #else
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+      #endif
       if (MCSamples[iSample].isNC[iEvent]) {
-	if (MCSamples[iSample].signal) {
-	  MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
-	} else {
-	  MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
-	}
-      } else {
-	
-	int InitFlav = _BAD_INT_;
-	int FinalFlav = _BAD_INT_;
-	
-	if (std::abs(MCSamples[iSample].nutype) == 1) {
-	  InitFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
-	  InitFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
-	  InitFlav = NuOscillator::kTau;
-	}
-
-	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-	  FinalFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-	  FinalFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-	  FinalFlav = NuOscillator::kTau;
-	}
-
-    if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
-      MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
-      MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
-      MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-      MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
-      MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-
-	//Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-	if (MCSamples[iSample].nutype<0) {
-	  InitFlav *= -1;
-	  FinalFlav *= -1;
-	}
-	
-	if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	  //Atmospherics
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
-	} else {
-	  //Beam
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
-	}
+        if (MCSamples[iSample].signal) {
+          #ifdef _LOW_MEMORY_STRUCTS_
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
+          #else
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
+          #endif
+        } else {
+          #ifdef _LOW_MEMORY_STRUCTS_
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+          #else
+          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+          #endif
+        }
       }
-    }
+      else
+      {
+        int InitFlav = _BAD_INT_;
+        int FinalFlav = _BAD_INT_;
+
+        if (std::abs(MCSamples[iSample].nutype) == 1) {
+          InitFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].nutype) == 2) {
+          InitFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].nutype) == 3) {
+          InitFlav = NuOscillator::kTau;
+        }
+
+        if (std::abs(MCSamples[iSample].oscnutype) == 1) {
+          FinalFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
+          FinalFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
+          FinalFlav = NuOscillator::kTau;
+        }
+
+        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
+          MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
+          MACH3LOG_ERROR("InitFlav: {}", InitFlav);
+          MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
+          MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+
+        //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
+        if (MCSamples[iSample].nutype<0) {
+          InitFlav *= -1;
+          FinalFlav *= -1;
+        }
+        if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+          //Atmospherics
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
+        } else {
+          //Beam
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+        }
+      } // end if NC
+    } // end loop over events
   }// end loop over channels
 
   delete OscillFactory;
@@ -1588,7 +1601,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
   fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
-  fdobj->osc_w_pointer = new const double*[fdobj->nEvents];
+  fdobj->osc_w_pointer = new const _float_*[fdobj->nEvents];
   //fdobj->rw_truecz = new const double*[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
@@ -1599,7 +1612,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->NomXBin[iEvent] = -1;
     fdobj->NomYBin[iEvent] = -1;
     fdobj->XBin[iEvent] = -1;
-    fdobj->YBin[iEvent] = -1;	 
+    fdobj->YBin[iEvent] = -1;
     fdobj->rw_lower_xbinedge[iEvent] = -1;
     fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
     fdobj->rw_upper_xbinedge[iEvent] = -1;
@@ -1607,7 +1620,12 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     fdobj->xsec_w[iEvent] = 1.0;
     fdobj->isNC[iEvent] = false;
     fdobj->SampleDetID = -1;
+    #ifdef _LOW_MEMORY_STRUCTS_
+    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity_F);
+    #else
     fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
+    #endif
+
     fdobj->x_var[iEvent] = &fdobj->Unity;
     fdobj->y_var[iEvent] = &fdobj->Unity;
   }
