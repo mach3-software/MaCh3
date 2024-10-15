@@ -118,16 +118,7 @@ void initSplines(py::module &m){
                     }
                     else
                     {
-                        std::cout << "CALLING TSPline3 Constructor with " << length << " knots!" << std::endl;
-                        for ( int i = 0; i < length; i++)
-                        {
-                            std:: cout << "{" << xVals[i] << ", " << yVals[i] << "} ";
-                        }
-                        std::cout << std::endl;
-
                         TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
-
-                        std::cout << "Spline constructed successfully!" << std::endl << std::endl;
                         return new TSpline3_red(splineTmp, interpType);
                     }
                 }

@@ -145,6 +145,15 @@ void initSamplePDF(py::module &m){
         For some more details on this you can see [the wiki page](https://github.com/mach3-software/MaCh3/wiki/04.-Making-a-samplePDF-experiment-class) on this. The code examples there are written using c++ however the general ideas are the same. \
         Happy sampling!";
 
+    // Bind the systematic type enum that lets us set different types of systematics
+    py::enum_<TestStatistic>(m_sample_pdf, "TestStatistic")
+        .value("Poisson", TestStatistic::kPoisson)
+        .value("Barlow_Beeston", TestStatistic::kBarlowBeeston)
+        .value("Ice_Cube", TestStatistic::kIceCube)
+        .value("Pearson", TestStatistic::kPearson)
+        .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmottele)
+        .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
+
     py::class_<samplePDFBase, PySamplePDFBase /* <--- trampoline*/>(m_sample_pdf, "_SamplePDFBase")
         .def(py::init())
         
@@ -170,6 +179,26 @@ void initSamplePDF(py::module &m){
             "fill_2d_hist", 
             &samplePDFBase::fill2DHist, 
             "Do the initial filling of the sample for 2d histogram. You will need to override this."
+        )
+
+        .def(
+            "set_test_stat",
+            &samplePDFBase::SetTestStatistic,
+            "Set the test statistic that should be used when calculating likelihoods. \n\
+            :param test_stat: The new test statistic to use",
+            py::arg("test_stat")
+        )
+
+        .def(
+            "get_bin_LLH",
+            py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH),
+            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:method:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
+            :param data: The data content of the bin. \n\
+            :param mc: The mc content of the bin \n\
+            :param w2: The Sum(w_{i}^2) (sum of weights squared) in the bin, which is sigma^2_{MC stats}",
+            py::arg("data"), 
+            py::arg("mc"), 
+            py::arg("w2")
         )
     ; // End of samplePDFBase binding
 

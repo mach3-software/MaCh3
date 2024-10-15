@@ -93,6 +93,12 @@ void initManager(py::module &m){
             &manager::raw, 
             "Get the raw yaml config."
         )
+
+        .def(
+            "get_test_stat",
+            &manager::GetMCStatLLH,
+            "Get the test statistic that was specified in the config file."
+        )
     ;
 
 }

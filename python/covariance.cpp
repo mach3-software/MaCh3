@@ -209,6 +209,13 @@ void initCovariance(py::module &m){
             :param index: The index of the spline parameter",
             py::arg("index")
         )
+        
+        .def(
+            "get_nominal_par_values",
+            &covarianceXsec::getNominalArray,
+            "Get the nominal values of all the parameters as a list. "
+        )
+
     ; // End of CovarianceXsec binding
     
     py::class_<covarianceOsc, covarianceBase /* <--- trampoline*/>(m_covariance, "CovarianceOsc")
