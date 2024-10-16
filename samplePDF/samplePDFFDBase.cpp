@@ -50,6 +50,33 @@ samplePDFFDBase::~samplePDFFDBase()
   }
 }
 
+std::vector<double> get_bin_edges_from_node(YAML::Node const &ax_node) {
+  // builds a uniform binning from an nbins,start,stop type
+  // specification
+  if (ax_node["Uniform"]) {
+
+    auto const &linspacespec = ax_node["Uniform"].as<std::vector<std::string>>();
+
+    int nbins = std::stol(linspacespec[0]);
+    double start = std::stod(linspacespec[1]);
+    double stop = std::stod(linspacespec[2]);
+
+    double width = (stop - start) / double(nbins);
+    std::vector<double> bin_edges;
+    bin_edges.push_back(start);
+    for (int i = 0; i < nbins; ++i) {
+      bin_edges.push_back(bin_edges.back() + width);
+    }
+    return bin_edges;
+  } else if (ax_node["VarBins"]) {
+    return ax_node["VarBins"].as<std::vector<double>>();
+  } else {
+    throw std::runtime_error(
+        "No valid binning definition found, valid values: "
+        "Uniform: [nbins,lowedge,upedge], VarBins: [edge0, edge1, ....]");
+  }
+}
+
 void samplePDFFDBase::ReadSampleConfig() 
 {
    
@@ -119,44 +146,44 @@ void samplePDFFDBase::ReadSampleConfig()
 
   // try generic binning first
   if (binning_node["Axes"]) {
-    try {
-      int nglobalbins = 1;
-      for (auto const &ax : binning_node["Axes"]) {
-        generic_binning.VarEnums.push_back(ReturnKinematicParameterFromString(ax["VarStr"].as<std::string>()));
-        std::vector<double> bin_edges;
-        // builds a uniform binning from an nbins,start,stop type specification
-        if (ax["Uniform"]) {
+    // allows a single entry sequence or if the writer forgets the '-' sequence
+    // identifier
+    if (binning_node["Axes"].IsScalar() || (binning_node["Axes"].size() == 1)) {
+      auto const &ax_node = binning_node["Axes"].IsScalar()
+                                ? binning_node["Axes"]
+                                : binning_node["Axes"][0];
+      XVarStr = ax_node["VarStr"].as<std::string>();
+      SampleXBins = get_bin_edges_from_node(ax_node);
 
-          auto const &linspacespec =
-              ax["Uniform"].as<std::vector<std::string>>();
-
-          int nbins = std::stol(linspacespec[0]);
-          double start = std::stod(linspacespec[1]);
-          double stop = std::stod(linspacespec[2]);
-
-          double width = (stop - start) / double(nbins);
-          bin_edges.push_back(start);
-          for (int i = 0; i < nbins; ++i) {
-            bin_edges.push_back(bin_edges.back() + width);
-          }
-        } else if (ax["VarBins"]) {
-          bin_edges =
-              ax["VarBins"].as<std::vector<double>>();
-        } else {
-          throw std::runtime_error(
-              "No valid binning definition found, valid values: "
-              "Uniform(nbins,lowedge,upedge), VarBins(edge, edge, ....).");
-        }
-
-        //build a new TAxis
-        generic_binning.Axes.emplace_back(bin_edges.size()-1, bin_edges.data());
-        //note this means our '1D binning' ignores 'flow bins.
-        nglobalbins *= generic_binning.Axes.back().GetNbins();
-        nDimensions++;
+      if (XVarStr.length() > 0) {
+        nDimensions = 1;
+      } else {
+        MACH3LOG_ERROR(
+            "Please specify an X-variable string in sample config {}",
+            SampleManager->GetFileName());
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
 
-      XVarStr = "global_bin_number";
-      // make the integer value of the global bin number correspond to the
+    } else {
+      try {
+        int nglobalbins = 1;
+        for (auto const &ax : binning_node["Axes"]) {
+          generic_binning.VarEnums.push_back(ReturnKinematicParameterFromString(
+              ax["VarStr"].as<std::string>()));
+
+          auto const &bin_edges = get_bin_edges_from_node(ax);
+
+          // build a new TAxis
+          generic_binning.Axes.emplace_back(bin_edges.size() - 1,
+                                            bin_edges.data());
+          // note this means our '1D binning' ignores 'flow bins.
+          nglobalbins *= generic_binning.Axes.back().GetNbins();
+        }
+        //even though we are tracking multiple dimensions, MaCh3 stats bits only needs to know about 1
+        nDimensions = 1;
+
+        XVarStr = "global_bin_number";
+        // make the integer value of the global bin number correspond to the
       // center of a bin
       SampleXBins = {
           -0.5,
@@ -168,10 +195,10 @@ void samplePDFFDBase::ReadSampleConfig()
                                             // keeps the parsing failure local
       MACH3LOG_ERROR("Failed to parse Binning.Axes object with error: {}",
                      e.what());
-      YAML::Dump(binning_node["Axes"]);
-      throw MaCh3Exception(__FILE__, __LINE__);
+        YAML::Dump(binning_node["Axes"]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
     }
-
   } else { // use explicit XVar/YVar format
 
     XVarStr =
@@ -262,6 +289,8 @@ int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
   for (size_t ax_i = 0; ax_i < generic_binning.VarEnums.size(); ++ax_i) {
     int ax_nbins = generic_binning.Axes[ax_i].GetNbins();
 
+    // use the non 'ByReference' version so that we can use calculated 
+    // variables without providing dummy storage
     int ax_bin = generic_binning.Axes[ax_i].FindFixBin(ReturnKinematicParameter(
         generic_binning.VarEnums[ax_i], iSample, iEvent));
 

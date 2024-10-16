@@ -154,7 +154,9 @@ public:
   // will likely cause extreme confusion and the fact we might need this
   // indicates an issue in our abstraction. Parameters defined in
   // implementations of this method can not be used as projection variables,
-  // which are kept as pointers to doubles.
+  // which are kept as pointers to doubles. They can be used as projection 
+  // variables for the 'generic' binning where the pointers are to the global 
+  // bin number array
   virtual double ReturnKinematicParameter(int KinematicParameter, int iSample,
                                           int iEvent) = 0;
 
