@@ -118,16 +118,6 @@ void initFitter(py::module &m){
             py::arg("oscf")
         )
         
-        .def(
-            "add_osc_handler",
-            py::overload_cast<covarianceOsc *, covarianceOsc *>(&FitterBase::addOscHandler),
-            "  Adds an oscillation handler for covariance objects. \n"
-            " :param osca: A pointer to a covarianceOsc object for the first oscillation. \n"
-            " :param oscb: A pointer to a covarianceOsc object for the second oscillation. \n",
-            py::arg("osca"),
-            py::arg("oscb")
-        )
-        
     ; // End of FitterBase class binding
 
     
