@@ -6,6 +6,8 @@
 //MaCh3
 #include "splines/SplineBase.h"
 
+#include <filesystem>
+
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 class splineFDBase : public SplineBase {
@@ -27,12 +29,12 @@ class splineFDBase : public SplineBase {
 	//Spline Monolith things
 	//Essential methods used externally
 	//Move these to splineFDBase in core
-	bool AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
+	bool AddSample(std::string SampleName, int DetID, std::vector<std::filesystem::path> OscChanFileNames, std::vector<std::string> SplineVarNames);
 	void TransferToMonolith();	
 	void cleanUpMemory();
 
 	//Have to define this in your own class 
-	virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)=0;
+	virtual void FillSampleArray(std::string SampleName, std::vector<std::filesystem::path> OscChanFileNames)=0;
 	/// @brief Check if there are any repeated modes. This is used to reduce the number
 	/// of modes in case many interaction modes get averaged into one spline
 	virtual std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector)=0;
@@ -40,7 +42,7 @@ class splineFDBase : public SplineBase {
 	virtual std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)=0;
 
 	/// @brief
-	std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
+	std::vector<TAxis*> FindSplineBinning(std::filesystem::path FileName, std::string SampleName);
 
 	int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
 	int getNDim(int BinningOpt);

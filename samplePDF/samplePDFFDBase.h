@@ -2,6 +2,7 @@
 
 //C++ includes
 #include <list>
+#include <filesystem>
 
 //ROOT includes
 #include "THStack.h"
@@ -277,8 +278,8 @@ public:
   float Unity_F = 1.;
   float Zero_F = 0.;
 
-  std::vector<std::string> mtuple_files;
-  std::vector<std::string> spline_files;
+  std::vector<std::filesystem::path> mtuple_files;
+  std::vector<std::filesystem::path> spline_files;
   std::vector<int> sample_vecno;
   std::vector<int> sample_oscnutype;
   std::vector<int> sample_nutype;

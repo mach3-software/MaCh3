@@ -184,17 +184,17 @@ void samplePDFFDBase::ReadSampleConfig()
 
         XVarStr = "global_bin_number";
         // make the integer value of the global bin number correspond to the
-      // center of a bin
-      SampleXBins = {
-          -0.5,
-      };
-      for (int i = 0; i < nglobalbins; ++i) {
-        SampleXBins.push_back(SampleXBins.back() + 1);
-      }
-    } catch (std::runtime_error const &e) { // try/catch is a bit ugly, but
-                                            // keeps the parsing failure local
-      MACH3LOG_ERROR("Failed to parse Binning.Axes object with error: {}",
-                     e.what());
+        // center of a bin
+        SampleXBins = {
+            -0.5,
+        };
+        for (int i = 0; i < nglobalbins; ++i) {
+          SampleXBins.push_back(SampleXBins.back() + 1);
+        }
+      } catch (std::runtime_error const &e) { // try/catch is a bit ugly, but
+                                              // keeps the parsing failure local
+        MACH3LOG_ERROR("Failed to parse Binning.Axes object with error: {}",
+                       e.what());
         YAML::Dump(binning_node["Axes"]);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -242,14 +242,29 @@ void samplePDFFDBase::ReadSampleConfig()
   if (!CheckNodeExists(config_ydoc, "InputFiles", "mtupleprefix")){
 	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
   }
-  mtupleprefix = config_ydoc["InputFiles"]["mtupleprefix"].as<std::string>();
-  mtuplesuffix = config_ydoc["InputFiles"]["mtuplesuffix"].as<std::string>();
-  splineprefix = config_ydoc["InputFiles"]["splineprefix"].as<std::string>();
-  splinesuffix = config_ydoc["InputFiles"]["splinesuffix"].as<std::string>();
+
+  auto const & input_files = config_ydoc["InputFiles"];
+  mtupleprefix = input_files["mtupleprefix"].as<std::string>();
+  mtuplesuffix = input_files["mtuplesuffix"].as<std::string>();
+  splineprefix = input_files["splineprefix"].as<std::string>("");
+  splinesuffix = input_files["splinesuffix"].as<std::string>("");
 
   for (auto const &osc_channel : config_ydoc["SubSamples"]) {
     mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
-    spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    if(!std::filesystem::exists(mtuple_files.back())){
+      MACH3LOG_ERROR("mtuple file path \"{}\" does not exist.",
+                 mtuple_files.back().native());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    std::filesystem::path spline_filepath = splineprefix+osc_channel["splinefile"].as<std::string>("")+splinesuffix;
+    if(!spline_filepath.empty()){
+      if(!std::filesystem::exists(spline_filepath)){
+        MACH3LOG_ERROR("Spline file path \"{}\" does not exist.",
+                   spline_filepath.native());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      spline_files.push_back(spline_filepath);
+    }
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
     sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
     sample_oscnutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>())));
@@ -1656,7 +1671,6 @@ void samplePDFFDBase::fillSplineBins() {
 double samplePDFFDBase::GetLikelihood()
 {
   if (samplePDFFD_data == NULL) {
-
 	MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
 	throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -1761,7 +1775,21 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
 }
 
 void samplePDFFDBase::InitialiseSplineObject() {
-  std::vector<std::string> spline_filepaths;
+  // either have the same number of paths as samples or no paths
+  if (!spline_files.size()) {
+    return;
+  }
+  if (spline_files.size() != MCSamples.size()) {
+    // really we shouldn't index synch all of these things and should put the
+    // path objects into the MCSamples struct.
+    MACH3LOG_ERROR("In InitialiseSplineObject, have {} spline paths for {} "
+                   "samples, cannot ensure that they are properly synched",
+                   spline_files.size(), MCSamples.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+
+  std::vector<std::filesystem::path> spline_filepaths;
   for(unsigned iSample=0 ; iSample < MCSamples.size() ; iSample++){
     spline_filepaths.push_back(spline_files[iSample]);
   }
