@@ -5,14 +5,11 @@
 
 #include<algorithm>
 
-
-samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_cov)
-  : samplePDFBase()
-//DB Throughout constructor and init, pot is livetime for atmospheric samples
+samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Ceating SamplePDFFDBase object");
-    
+  
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(xsec_cov == NULL){
     MACH3LOG_ERROR("You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
@@ -22,7 +19,7 @@ samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_c
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
- 
+  
   char* sample_char = (char*)mc_version_.c_str();
   SampleManager = new manager(sample_char);
 }
@@ -30,7 +27,7 @@ samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_c
 samplePDFFDBase::~samplePDFFDBase()
 {
   MACH3LOG_INFO("I'm deleting samplePDFFDBase");
-
+  
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
     delete[] samplePDFFD_array_w2[yBin];
@@ -57,90 +54,90 @@ void samplePDFFDBase::ReadSampleConfig()
     samplename = SampleManager->raw()["SampleName"].as<std::string>();
   } else{
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
     nSamples = SampleManager->raw()["NSubSamples"].as<int>();
   } else{
     MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   if (CheckNodeExists(SampleManager->raw(), "DetID")) {
     SampleDetID = SampleManager->raw()["DetID"].as<int>();
   } else{
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
- 
+  
   if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
   } else {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   for (int i=0;i<nSamples;i++) {
     struct fdmc_base obj = fdmc_base();
     MCSamples.push_back(obj);
   }
-
+  
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
-	fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
+    fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
   } else {
     MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
-	MACH3LOG_WARN("Defaulting to using a poisson likelihood");
-	fTestStatistic = kPoisson;
+    MACH3LOG_WARN("Defaulting to using a poisson likelihood");
+    fTestStatistic = kPoisson;
   }
-
+  
   //Binning
   nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
   SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
   if(XVarStr.length() > 0){
-	nDimensions++;
+    nDimensions++;
   } else{
-	MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-
+  
   YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
   SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
   if(YVarStr.length() > 0){
-	if(XVarStr.length() == 0){
-	  MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-	  throw MaCh3Exception(__FILE__, __LINE__);
-	}
-	nDimensions++;
+    if(XVarStr.length() == 0){
+      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    nDimensions++;
   }
-
+  
   if(nDimensions == 0){
-	MACH3LOG_ERROR("Error setting up the sample binning");
-	MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
-	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("Error setting up the sample binning");
+    MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
+    MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
+    throw MaCh3Exception(__FILE__, __LINE__);
   } else{
-	MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
+    MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
   }
-
+  
   //Sanity check that some binning has been specified
   if(SampleXBins.size() == 0 && SampleYBins.size() == 0){
-	MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   //FD file info
   if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
-	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
+    MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
   }
   mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
   mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
   splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
   splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
-
+  
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
     mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
@@ -265,82 +262,67 @@ void samplePDFFDBase::SetupSampleBinning(){
 
   for(auto XBinEdge : SampleXBins){
     XBinEdges.push_back(XBinEdge);
-	XBinEdgesStr += std::to_string(XBinEdge);
-	XBinEdgesStr += ", ";
+    XBinEdgesStr += std::to_string(XBinEdge);
+    XBinEdgesStr += ", ";
   }
   MACH3LOG_INFO("XBinning:");
   MACH3LOG_INFO("{}", XBinEdgesStr);
-
+  
   //And now the YBin Edges
   for(auto YBinEdge : SampleYBins){
     YBinEdges.push_back(YBinEdge);
-	YBinEdgesStr += std::to_string(YBinEdge);
-	YBinEdgesStr += ", ";
+    YBinEdgesStr += std::to_string(YBinEdge);
+    YBinEdgesStr += ", ";
   }
   MACH3LOG_INFO("YBinning:");
   MACH3LOG_INFO("{}", YBinEdgesStr);
-
+  
   //Check whether you are setting up 1D or 2D binning
   if(nDimensions == 1){
-	MACH3LOG_INFO("Setting up 1D binning with {}", XVarStr);
-	set1DBinning(SampleXBins);  
+    MACH3LOG_INFO("Setting up 1D binning with {}", XVarStr);
+    set1DBinning(SampleXBins);  
   }
-
+  
   else if(nDimensions == 2){
-	MACH3LOG_INFO("Setting up 2D binning with {} and {}", XVarStr, YVarStr);
-
-	set2DBinning(SampleXBins, SampleYBins);
+    MACH3LOG_INFO("Setting up 2D binning with {} and {}", XVarStr, YVarStr);
+    set2DBinning(SampleXBins, SampleYBins);
   }
   else{
-	MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-
+  
   return; 
 }
 
 // ************************************************
 bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
-// ************************************************
-
+  // ************************************************
+  
   double Val;
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {  
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
-    //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that Selection vector is correctly sized  
-	//std::cout << Val << " " << Selection[iSelection][1] << " " << Selection[iSelection][2] << std::endl;	
-    //DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
     if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
       return false;
     }
   }
-
+  
   //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
 
 // ************************************************
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
-                                      const int iSample, const int iEvent) {
-// ************************************************
-
+bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr, const int iSample, const int iEvent) {
+  // ************************************************
+  
   double Val;
-
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
- 
-	Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-	//ETA - still need to support other method of you specifying the cut you want in ReturnKinematicParameter
-	//like in Dan's version below from T2K
-    //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
-    //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that Selection vector is correctly sized
-	//DB In the case where Selection[0].size()==3, Only Events with Val >= Selection[iSelection][1] and Val < Selection[iSelection][2] are considered Passed
-
+    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
     if ((Val<SelectionBounds[iSelection][0])||(Val>=SelectionBounds[iSelection][1])) {
-	  return false;
+      return false;
     }
   }
-
+  
   //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
@@ -350,18 +332,12 @@ bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& Paramete
 bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
                                       const std::vector< std::vector<double> > &SelectionCuts,
                                       const int iSample, const int iEvent) {
-// ************************************************
-
+  // ************************************************
+  
   double Val;
-
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
     
     Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    //DB If multiple return values, it will consider each value seperately
-    //DB Already checked that SelectionCuts vector is correctly sized
-    
-    //DB In the case where SelectionCuts[0].size()==3, Only Events with Val >= SelectionCuts[iSelection][1] and Val < SelectionCuts[iSelection][2] are considered Passed
-    //ETA - also check whether we're actually applying a lower or upper cut by checking they aren't -999
     if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
       return false;
     }
@@ -378,7 +354,7 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
 {
   //KS: Reset the histograms before reweight 
   ResetHistograms();
-
+  
   std::vector<_float_> OscVec(OscCov->GetNumParams());
   for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
     OscVec[iPar] = OscCov->getParProp(iPar);
@@ -386,9 +362,9 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
     NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
   }
-
+  
   fillArray();
-
+  
   return;
 }
 
@@ -404,7 +380,7 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
 void samplePDFFDBase::fillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-
+  
   // Call entirely different routine if we're running with openMP
 #ifdef MULTITHREAD
   fillArray_MP();
@@ -826,108 +802,108 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
-	if (XsecCov) {
-	  for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
-		// Skip oscillated NC events
-		// Not strictly needed, but these events don't get included in oscillated predictions, so
-		// no need to waste our time calculating and storing information about xsec parameters
-		// that will never be used.
-		if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-
-		//Now check that the target of an interaction matches with the normalisation parameters
-		bool TargetMatch=false;
-		//If no target specified then apply to all modes
-		if ((*it).targets.size()==0) {
-		  TargetMatch=true;
-		} else {
-		  for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
-			if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
-			  TargetMatch=true;
-			}
-		  }
-		}
-		if (!TargetMatch) {continue;}
-
-		//Now check that the neutrino flavour in an interaction matches with the normalisation parameters
-		bool FlavourMatch=false;
-		//If no mode specified then apply to all modes
-		if ((*it).pdgs.size()==0) {
-		  FlavourMatch=true;
-		} else {
-		  for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
-			if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
-			  FlavourMatch=true;
-			}
-		  }
-		}
-		if (!FlavourMatch){continue;}
-
-		//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
-		bool FlavourUnoscMatch=false;
-		//If no mode specified then apply to all modes
-		if ((*it).preoscpdgs.size()==0) {
-		  FlavourUnoscMatch=true;
-		} else {
-		  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
-			if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
-			  FlavourUnoscMatch=true;
-			}
-		  }
-		}
-		if (!FlavourUnoscMatch){continue;}
-		
-		//Now check that the mode of an interaction matches with the normalisation parameters
-		bool ModeMatch=false;
-		//If no mode specified then apply to all modes
-		if ((*it).modes.size()==0) {
-		  ModeMatch=true;
-		} else {
-		  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
-			if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
-			  ModeMatch=true;
-			}
-		  }
-		}
-		if (!ModeMatch) {continue;}
-
-		//Now check whether the norm has kinematic bounds
-		//i.e. does it only apply to events in a particular kinematic region?
-		bool IsSelected = true;
-		if ((*it).hasKinBounds) {
-		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
-			  IsSelected = false;
-			  continue;
-			}
-			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
-			  IsSelected = false;
-			  continue;
-			}
-		  } 
-		}
-		//Need to then break the event loop 
-		if(!IsSelected){
-		  continue;
-		}
+    if (XsecCov) {
+      for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
+	// Skip oscillated NC events
+	// Not strictly needed, but these events don't get included in oscillated predictions, so
+	// no need to waste our time calculating and storing information about xsec parameters
+	// that will never be used.
+	if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 	
-		// Now set 'index bin' for each normalisation parameter
-		// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
-		int bin = (*it).index;
-
-		//If syst on applies to a particular detector
-		if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
-		  XsecBins.push_back(bin);
-		}
-	  } // end iteration over xsec_norms
-	} // end if (xsecCov)
-	fdobj->xsec_norms_bins[iEvent]=XsecBins;
+	//Now check that the target of an interaction matches with the normalisation parameters
+	bool TargetMatch=false;
+	//If no target specified then apply to all modes
+	if ((*it).targets.size()==0) {
+	  TargetMatch=true;
+	} else {
+	  for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
+	    if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
+	      TargetMatch=true;
+	    }
+	  }
+	}
+	if (!TargetMatch) {continue;}
+	
+	//Now check that the neutrino flavour in an interaction matches with the normalisation parameters
+	bool FlavourMatch=false;
+	//If no mode specified then apply to all modes
+	if ((*it).pdgs.size()==0) {
+	  FlavourMatch=true;
+	} else {
+	  for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
+	    if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
+	      FlavourMatch=true;
+	    }
+	  }
+	}
+	if (!FlavourMatch){continue;}
+	
+	//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
+	bool FlavourUnoscMatch=false;
+	//If no mode specified then apply to all modes
+	if ((*it).preoscpdgs.size()==0) {
+	  FlavourUnoscMatch=true;
+	} else {
+	  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
+	    if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
+	      FlavourUnoscMatch=true;
+	    }
+	  }
+	}
+	if (!FlavourUnoscMatch){continue;}
+	
+	//Now check that the mode of an interaction matches with the normalisation parameters
+	bool ModeMatch=false;
+	//If no mode specified then apply to all modes
+	if ((*it).modes.size()==0) {
+	  ModeMatch=true;
+	} else {
+	  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
+	    if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
+	      ModeMatch=true;
+	    }
+	  }
+	}
+	if (!ModeMatch) {continue;}
+	
+	//Now check whether the norm has kinematic bounds
+	//i.e. does it only apply to events in a particular kinematic region?
+	bool IsSelected = true;
+	if ((*it).hasKinBounds) {
+	  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
+	    if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
+	      IsSelected = false;
+	      continue;
+	    }
+	    else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+	      IsSelected = false;
+	      continue;
+	    }
+	  } 
+	}
+	//Need to then break the event loop 
+	if(!IsSelected){
+	  continue;
+	}
+	
+	// Now set 'index bin' for each normalisation parameter
+	// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
+	int bin = (*it).index;
+	
+	//If syst on applies to a particular detector
+	if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
+	  XsecBins.push_back(bin);
+	}
+      } // end iteration over xsec_norms
+    } // end if (xsecCov)
+    fdobj->xsec_norms_bins[iEvent]=XsecBins;
   }//end loop over events
   return;
 }
 
 //ETA - this is all a bit (less) stupid
 void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
-
+  
   _hPDF1D->Reset();
   _hPDF1D->SetBins(XVec.size()-1, XVec.data());
   dathist->SetBins(XVec.size()-1, XVec.data());
@@ -948,14 +924,14 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-	samplePDFFD_array[yBin] = new double[nXBins];
-	samplePDFFD_array_w2[yBin] = new double[nXBins];
-	for (int xBin=0;xBin<nXBins;xBin++) {
-	  samplePDFFD_array[yBin][xBin] = 0.;
-	  samplePDFFD_array_w2[yBin][xBin] = 0.;
-	}
+    samplePDFFD_array[yBin] = new double[nXBins];
+    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    for (int xBin=0;xBin<nXBins;xBin++) {
+      samplePDFFD_array[yBin][xBin] = 0.;
+      samplePDFFD_array_w2[yBin][xBin] = 0.;
+    }
   }
-
+  
   FindNominalBinAndEdges1D();
 }
 
@@ -1074,49 +1050,49 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
-	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
-
-	  //Set x_var and y_var values based on XVarStr and YVarStr
+    for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
+      
+      //Set x_var and y_var values based on XVarStr and YVarStr
       MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
-	  //Give y)_var a dummy value
+      //Give y)_var a dummy value
       MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);
-	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
-
-	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
-	  if (bin==0) {
-		low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
-	  } else {
-		low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin-1);
-	  }
-
-	  double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
-	  double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
-
-	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
-	  if (bin<(_hPDF1D->GetNbinsX()-2)) {
-		upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
-	  } else {
-		upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
-	  }
-
-	  if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
-		MCSamples[mc_i].NomXBin[event_i] = bin-1;
-	  } else {
-		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = _DEFAULT_RETURN_VAL_;
-		upper_edge = _DEFAULT_RETURN_VAL_;
-		low_lower_edge = _DEFAULT_RETURN_VAL_;
-		upper_upper_edge = _DEFAULT_RETURN_VAL_;
-	  }
-	  MCSamples[mc_i].NomYBin[event_i] = 0;
-
-	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
-	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
-	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
-	  MCSamples[mc_i].rw_upper_upper_xbinedge[event_i] = upper_upper_edge;
-	}
+      int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
+      
+      double low_lower_edge = _DEFAULT_RETURN_VAL_;
+      if (bin==0) {
+	low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
+      } else {
+	low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin-1);
+      }
+      
+      double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
+      double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
+      
+      double upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      if (bin<(_hPDF1D->GetNbinsX()-2)) {
+	upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
+      } else {
+	upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
+      }
+      
+      if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
+	MCSamples[mc_i].NomXBin[event_i] = bin-1;
+      } else {
+	MCSamples[mc_i].NomXBin[event_i] = -1;
+	low_edge = _DEFAULT_RETURN_VAL_;
+	upper_edge = _DEFAULT_RETURN_VAL_;
+	low_lower_edge = _DEFAULT_RETURN_VAL_;
+	upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      }
+      MCSamples[mc_i].NomYBin[event_i] = 0;
+      
+      MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
+      MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
+      MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
+      MCSamples[mc_i].rw_upper_upper_xbinedge[event_i] = upper_upper_edge;
+    }
   }
-
+  
 }
 
 void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
@@ -1137,7 +1113,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   for (int i=0;i<nbins2+1;i++) {
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
-
+  
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
@@ -1195,56 +1171,56 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
-	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
-
-   	  //Set x_var and y_var values based on XVarStr and YVarStr   
+    for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
+      
+      //Set x_var and y_var values based on XVarStr and YVarStr   
       MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
       MCSamples[mc_i].y_var[event_i] = ReturnKinematicParameterByReference(YVarStr, mc_i, event_i);
-
-	  //Global bin number
-	  int bin = _hPDF2D->FindBin(*(MCSamples[mc_i].x_var[event_i]), *(MCSamples[mc_i].y_var[event_i]));
-
-	  int bin_x = -999;
-	  int bin_y = -999;
-	  int bin_z = -999;
-	  _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
-	  //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
-
-	  double low_lower_edge = _DEFAULT_RETURN_VAL_;
-	  if (bin==0) {
-		low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
-	  } else {
-		low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x-1);
-	  }
-
-	  double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
-	  double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
-
-	  double upper_upper_edge = _DEFAULT_RETURN_VAL_;
-	  if (bin<(_hPDF2D->GetNbinsX()-2)) {
-		upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
-	  } else {
-		upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
-	  }
-
-	  if ((bin_x-1) >= 0 && (bin_x-1) < int(XBinEdges.size()-1)) {
-		MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
-	  } else {
-		MCSamples[mc_i].NomXBin[event_i] = -1;
-		low_edge = _DEFAULT_RETURN_VAL_;
-		upper_edge = _DEFAULT_RETURN_VAL_;
-		low_lower_edge = _DEFAULT_RETURN_VAL_;
-		upper_upper_edge = _DEFAULT_RETURN_VAL_;
-	  }
-	  MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
+      
+      //Global bin number
+      int bin = _hPDF2D->FindBin(*(MCSamples[mc_i].x_var[event_i]), *(MCSamples[mc_i].y_var[event_i]));
+      
+      int bin_x = -999;
+      int bin_y = -999;
+      int bin_z = -999;
+      _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
+      //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
+      
+      double low_lower_edge = _DEFAULT_RETURN_VAL_;
+      if (bin==0) {
+	low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
+      } else {
+	low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x-1);
+      }
+      
+      double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
+      double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
+      
+      double upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      if (bin<(_hPDF2D->GetNbinsX()-2)) {
+	upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
+      } else {
+	upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
+      }
+      
+      if ((bin_x-1) >= 0 && (bin_x-1) < int(XBinEdges.size()-1)) {
+	MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
+      } else {
+	MCSamples[mc_i].NomXBin[event_i] = -1;
+	low_edge = _DEFAULT_RETURN_VAL_;
+	upper_edge = _DEFAULT_RETURN_VAL_;
+	low_lower_edge = _DEFAULT_RETURN_VAL_;
+	upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      }
+      MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
       if(MCSamples[mc_i].NomYBin[event_i] < 0){
         MACH3LOG_INFO("Nominal YBin PROBLEM, y-bin is {}", MCSamples[mc_i].NomYBin[event_i]);
       }
-	  MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
-	  MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
-	  MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
-	  MCSamples[mc_i].rw_upper_upper_xbinedge[event_i] = upper_upper_edge;
-	}
+      MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
+      MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
+      MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
+      MCSamples[mc_i].rw_upper_upper_xbinedge[event_i] = upper_upper_edge;
+    }
   }
   return;
 }
@@ -1254,20 +1230,20 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
   dataSample2D = NULL;
   dathist2d = NULL;
   dathist->Reset(); 
-
+  
   if (GetNDim()!=1) {
-	MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
-	MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
+    MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-
+  
   for (int i = 0; i < int(dataSample->size()); i++) {
     dathist->Fill(dataSample->at(i));
   }
-
+  
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
-
+  
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_data[yBin] = new double[nXBins];
@@ -1315,14 +1291,14 @@ void samplePDFFDBase::addData(TH1D* Data) {
   dathist = Data;
   dataSample = NULL;
   dataSample2D = NULL;
-
+  
   if (GetNDim()!=1) {
-	  MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
-	  throw MaCh3Exception(__FILE__ , __LINE__ );}
-
+    MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+    throw MaCh3Exception(__FILE__ , __LINE__ );}
+  
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
-
+  
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
     samplePDFFD_data[yBin] = new double[nXBins];
@@ -1342,9 +1318,9 @@ void samplePDFFDBase::addData(TH2D* Data) {
   dataSample2D = NULL;
 
   if (GetNDim()!=2) {
-	  MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
-	  throw MaCh3Exception(__FILE__ , __LINE__ );}	
-
+    MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
+    throw MaCh3Exception(__FILE__ , __LINE__ );}	
+  
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
 
@@ -1364,7 +1340,7 @@ void samplePDFFDBase::SetupNuOscillator() {
   for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
     MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
     NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
-
+    
     if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
       std::vector<_float_> EnergyArray;
       for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
@@ -1374,7 +1350,7 @@ void samplePDFFDBase::SetupNuOscillator() {
         }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
-
+      
       NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
       //============================================================================
@@ -1399,72 +1375,70 @@ void samplePDFFDBase::SetupNuOscillator() {
 
     for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
-      #ifdef _LOW_MEMORY_STRUCTS_
+#ifdef _LOW_MEMORY_STRUCTS_
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
-      #else
+#else
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
-      #endif
+#endif
       if (MCSamples[iSample].isNC[iEvent]) {
         if (MCSamples[iSample].signal) {
-          #ifdef _LOW_MEMORY_STRUCTS_
+#ifdef _LOW_MEMORY_STRUCTS_
           MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
-          #else
+#else
           MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
-          #endif
+#endif
         } else {
-          #ifdef _LOW_MEMORY_STRUCTS_
+#ifdef _LOW_MEMORY_STRUCTS_
           MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
-          #else
+#else
           MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
-          #endif
+#endif
         }
-      }
-      else
-      {
-        int InitFlav = _BAD_INT_;
-        int FinalFlav = _BAD_INT_;
-
-        if (std::abs(MCSamples[iSample].nutype) == 1) {
-          InitFlav = NuOscillator::kElectron;
-        } else if (std::abs(MCSamples[iSample].nutype) == 2) {
-          InitFlav = NuOscillator::kMuon;
-        } else if (std::abs(MCSamples[iSample].nutype) == 3) {
-          InitFlav = NuOscillator::kTau;
-        }
-
-        if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-          FinalFlav = NuOscillator::kElectron;
-        } else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-          FinalFlav = NuOscillator::kMuon;
-        } else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-          FinalFlav = NuOscillator::kTau;
-        }
-
-        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
-          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
-          MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
-          MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-          MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
-          MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-
-        //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-        if (MCSamples[iSample].nutype<0) {
-          InitFlav *= -1;
-          FinalFlav *= -1;
-        }
-        if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-          //Atmospherics
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
-        } else {
-          //Beam
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
-        }
+      } else {
+	int InitFlav = _BAD_INT_;
+	int FinalFlav = _BAD_INT_;
+	
+	if (std::abs(MCSamples[iSample].nutype) == 1) {
+	  InitFlav = NuOscillator::kElectron;
+	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
+	  InitFlav = NuOscillator::kMuon;
+	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
+	  InitFlav = NuOscillator::kTau;
+	}
+	
+	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
+	  FinalFlav = NuOscillator::kElectron;
+	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
+	  FinalFlav = NuOscillator::kMuon;
+	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
+	  FinalFlav = NuOscillator::kTau;
+	}
+	
+	if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+	  MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
+	  MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
+	  MACH3LOG_ERROR("InitFlav: {}", InitFlav);
+	  MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
+	  MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
+	  throw MaCh3Exception(__FILE__, __LINE__);
+	}
+	
+	//Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
+	if (MCSamples[iSample].nutype<0) {
+	  InitFlav *= -1;
+	  FinalFlav *= -1;
+	}
+	if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+	  //Atmospherics
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
+	} else {
+	  //Beam
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+	}
       } // end if NC
     } // end loop over events
   }// end loop over channels
-
+  
   delete OscillFactory;
 }
 
@@ -1498,9 +1472,9 @@ void samplePDFFDBase::fillSplineBins() {
 	break;
       }
       MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
-	  if(MCSamples[i].nxsec_spline_pointers[j] < 0){
-		throw MaCh3Exception(__FILE__, __LINE__);
-	  }
+      if(MCSamples[i].nxsec_spline_pointers[j] < 0){
+	throw MaCh3Exception(__FILE__, __LINE__);
+      }
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
       for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
 	//Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
@@ -1509,22 +1483,20 @@ void samplePDFFDBase::fillSplineBins() {
       }
     }
   }
-
+  
   return;
 }
 
-double samplePDFFDBase::GetLikelihood()
-{
+double samplePDFFDBase::GetLikelihood() {
   if (samplePDFFD_data == NULL) {
-
-	MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
-	throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-
+  
   //This can be done only once and stored
   int nXBins = XBinEdges.size()-1;
   int nYBins = YBinEdges.size()-1;
-
+  
   int xBin;
   int yBin;
 
@@ -1537,12 +1509,12 @@ double samplePDFFDBase::GetLikelihood()
   {
     for (yBin = 0; yBin < nYBins; yBin++) 
     {
-        double DataVal = samplePDFFD_data[yBin][xBin];
-        double MCPred = samplePDFFD_array[yBin][xBin];
-        double w2 = samplePDFFD_array_w2[yBin][xBin];
-
-        //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
-        negLogL += getTestStatLLH(DataVal, MCPred, w2);
+      double DataVal = samplePDFFD_data[yBin][xBin];
+      double MCPred = samplePDFFD_array[yBin][xBin];
+      double w2 = samplePDFFD_array_w2[yBin][xBin];
+      
+      //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
+      negLogL += getTestStatLLH(DataVal, MCPred, w2);
     }
   }
   return negLogL;
@@ -1629,10 +1601,10 @@ void samplePDFFDBase::InitialiseSplineObject() {
   //Keep a track of the spline variables
   SplineVarNames.push_back("TrueNeutrinoEnergy");
   if(XVarStr.length() > 0){
-	SplineVarNames.push_back(XVarStr);
+    SplineVarNames.push_back(XVarStr);
   }
   if(YVarStr.length() > 0){
-	SplineVarNames.push_back(YVarStr);
+    SplineVarNames.push_back(YVarStr);
   }
   
   splineFile->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
@@ -1640,7 +1612,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
   splineFile->CountNumberOfLoadedSplines(false, 1);
   splineFile->TransferToMonolith();
 
-  std::cout << "--------------------------------" <<std::endl;
+  MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
 
   fillSplineBins();
