@@ -74,6 +74,54 @@ public:
   virtual void setupSplines(fdmc_base *skobj, const char *SplineFileName, int nutype, int signal){};
   void ReadSampleConfig();
 
+struct GenericBinning {
+    //for each axis tells you how many bins to step to get to the next bin
+    std::vector<int> nbins_per_slice;
+    std::vector<std::vector<double>> BinsEdges;
+    // LP - these are the SamplePDFFDBase subclass KineParameter identifiers
+    std::vector<int> VarEnums;
+    std::vector<TAxis> Axes;
+
+    int GetGlobalBinNumber(std::vector<double> const &values) const;
+    std::vector<int> DecomposeGlobalBinNumber(int gbi) const;
+  } generic_binning;
+
+  int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
+
+  // LP - The below functions are meant for making 'pretty' plots and allocate
+  // new histograms, they are not intended to be used in 'tight' loops (such as
+  // per step).
+
+  // LP - if generic binning is 1D, return a nice histogram, if its ND, return
+  // the global bin histogram
+  std::unique_ptr<TH1> GetGenericBinningTH1(std::string const &hname,
+                                            std::string const &htitle = "");
+  // LP - if generic binning is >1D, return a 1D slice from the slice_definition
+  // slice definition is a vector specifying a value along each axis to slice
+  // along, one entry in the vector should be set to SamplePDFFDBase::kSliceVar
+  // to signify the axis to show
+  std::unique_ptr<TH1>
+  GetGenericBinningTH1Slice(std::vector<double> const &slice_definition,
+                            std::string const &hname,
+                            std::string const &htitle = "");
+  // LP - if generic binning is 2D, return a nice histogram, otherwise throw as
+  // there is nothing useful we can do here
+  std::unique_ptr<TH2> GetGenericBinningTH2(std::string const &hname,
+                                            std::string const &htitle = "");
+  // LP - if generic binning is >2D, return a 2D slice from the slice_definition
+  // slice definition is a vector specifying a value along each axis to slice
+  // along, two entries in the vector should be set to
+  // SamplePDFFDBase::kSliceVar to signify the axis to show
+  std::unique_ptr<TH2>
+  GetGenericBinningTH2Slice(std::vector<double> const &slice_definition,
+                            std::string const &hname,
+                            std::string const &htitle = "");
+  // LP - if generic binning is 3D, return a nice histogram, otherwise throw as
+  // there is nothing useful we can do here
+  std::unique_ptr<TH3> GetGenericBinningTH3(std::string const &hname,
+                                            std::string const &htitle = "");
+
+
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
@@ -116,14 +164,6 @@ public:
   std::vector<std::string> SplineVarNames;
   std::vector<double> SampleXBins;
   std::vector<double> SampleYBins;
-
-  struct {
-    //these are the SamplePDFFDBase subclass KineParameter identifiers
-    std::vector<int> VarEnums;
-    std::vector<TAxis> Axes;
-  } generic_binning; 
-
-  int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
 
   //===============================================================================
 

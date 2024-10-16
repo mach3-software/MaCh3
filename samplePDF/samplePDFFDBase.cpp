@@ -71,9 +71,9 @@ std::vector<double> get_bin_edges_from_node(YAML::Node const &ax_node) {
   } else if (ax_node["VarBins"]) {
     return ax_node["VarBins"].as<std::vector<double>>();
   } else {
-    throw std::runtime_error(
-        "No valid binning definition found, valid values: "
-        "Uniform: [nbins,lowedge,upedge], VarBins: [edge0, edge1, ....]");
+    MACH3LOG_ERROR("No valid binning definition found, valid values: Uniform: "
+                   "[nbins,lowedge,upedge], VarBins: [edge0, edge1, ....]");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
@@ -148,7 +148,11 @@ void samplePDFFDBase::ReadSampleConfig()
   if (binning_node["Axes"]) {
     // allows a single entry sequence or if the writer forgets the '-' sequence
     // identifier
-    if (binning_node["Axes"].IsScalar() || (binning_node["Axes"].size() == 1)) {
+    // The ForceGeneric option allows us to force the use of the generic binning
+    // for 1D histograms of calculated variables
+    if (!binning_node["ForceGeneric"].as<bool>(false) &&
+        (binning_node["Axes"].IsScalar() ||
+         (binning_node["Axes"].size() == 1))) {
       auto const &ax_node = binning_node["Axes"].IsScalar()
                                 ? binning_node["Axes"]
                                 : binning_node["Axes"][0];
@@ -167,6 +171,7 @@ void samplePDFFDBase::ReadSampleConfig()
     } else {
       try {
         int nglobalbins = 1;
+        generic_binning.nbins_per_slice = {1,};
         for (auto const &ax : binning_node["Axes"]) {
           generic_binning.VarEnums.push_back(ReturnKinematicParameterFromString(
               ax["VarStr"].as<std::string>()));
@@ -178,8 +183,10 @@ void samplePDFFDBase::ReadSampleConfig()
                                             bin_edges.data());
           // note this means our '1D binning' ignores 'flow bins.
           nglobalbins *= generic_binning.Axes.back().GetNbins();
+          generic_binning.nbins_per_slice.push_back(nglobalbins);
         }
-        //even though we are tracking multiple dimensions, MaCh3 stats bits only needs to know about 1
+        // even though we are tracking multiple dimensions, MaCh3 stats bits
+        // only needs to know about 1
         nDimensions = 1;
 
         XVarStr = "global_bin_number";
@@ -292,6 +299,37 @@ void samplePDFFDBase::ReadSampleConfig()
   return;
 }
 
+int samplePDFFDBase::GenericBinning::GetGlobalBinNumber(
+    std::vector<double> const &values) const {
+  int gbin = 0;
+  for (size_t ax_i = 0; ax_i < Axes.size(); ++ax_i) {
+    int ax_nbins = Axes[ax_i].GetNbins();
+
+    // use the non 'ByReference' version so that we can use calculated
+    // variables without providing dummy storage
+    int ax_bin = Axes[ax_i].FindFixBin(values[ax_i]);
+
+    if ((ax_bin == 0) || (ax_bin == (ax_nbins + 1))) { // flow bin on this axis
+      return -1;                                       // our global flow bin;
+    }
+
+    // the -1 removes the TAxis implicit underflow bin
+    gbin += (ax_bin - 1) * nbins_per_slice[ax_i];
+  }
+  return gbin;
+}
+
+std::vector<int>
+samplePDFFDBase::GenericBinning::DecomposeGlobalBinNumber(int gbi) const {
+  std::vector<int> axis_binning;
+  for(int ax_i = (Axes.size()-1); ax_i >= 0; --ax_i){
+    int ax_bin = gbi / nbins_per_slice[ax_i];
+    axis_binning.insert(axis_binning.begin(), ax_bin);
+    gbi = gbi % nbins_per_slice[ax_i];
+  }
+  return axis_binning;
+}
+
 int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
   if (!generic_binning.VarEnums.size()) {
     MACH3LOG_ERROR(
@@ -299,25 +337,144 @@ int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
         "set up in this SamplePDFFDBase subclass instance.");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  int gbin = 0;
-  int nbins_prev_axes = 1;
+
+  std::vector<double> values; // this might be slow... depends how often we need
+                              // to rebin in a tight loop
   for (size_t ax_i = 0; ax_i < generic_binning.VarEnums.size(); ++ax_i) {
-    int ax_nbins = generic_binning.Axes[ax_i].GetNbins();
 
-    // use the non 'ByReference' version so that we can use calculated 
+    // use the non 'ByReference' version so that we can use calculated
     // variables without providing dummy storage
-    int ax_bin = generic_binning.Axes[ax_i].FindFixBin(ReturnKinematicParameter(
-        generic_binning.VarEnums[ax_i], iSample, iEvent));
-
-    if ((ax_bin == 0) || (ax_bin == (ax_nbins + 1))) { // flow bin on this axis
-      return -1;                                       // our global flow bin;
-    }
-
-    // the -1 removes the TAxis implicit underflow bin
-    gbin += (ax_bin - 1) * nbins_prev_axes;
-    nbins_prev_axes *= ax_nbins;
+    values.push_back(ReturnKinematicParameter(generic_binning.VarEnums[ax_i],
+                                              iSample, iEvent));
   }
-  return gbin;
+  return generic_binning.GetGlobalBinNumber(values);
+}
+
+namespace {
+auto get_bin_edges_from_TAxis(TAxis const &ax){
+  std::vector<double> bin_edges = {ax.GetBinLowEdge(1)};
+  for(int bi = 0; bi < ax.GetNbins(); ++bi){
+    bin_edges.push_back(ax.GetBinUpEdge(bi+1));
+  }
+  return bin_edges;
+}
+}
+
+std::unique_ptr<TH1>
+samplePDFFDBase::GetGenericBinningTH1(std::string const &hname,
+                                      std::string const &htitle) {
+  std::unique_ptr<TH1> hout;
+  // use the 1D hist from the base class so we don't have to repeat where we get
+  // the bin values from
+  auto h1d = get1DHist();
+
+  int naxes = generic_binning.Axes.size();
+  if (naxes == 1) {
+    // this is a bit silly, but ROOT doesn't have constructors that take TAxis
+    // instances. So, really, who's the silly one?
+    auto bin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[0]);
+
+    hout = std::make_unique<TH1D>(hname.c_str(), htitle.c_str(),
+                                  bin_edges.size() - 1, bin_edges.data());
+  } else {
+    hout = std::make_unique<TH1D>(hname.c_str(), htitle.c_str(),
+                                  h1d->GetXaxis()->GetNbins(), -0.5,
+                                  double(h1d->GetXaxis()->GetNbins()) - 0.5);
+  }
+
+  for (int gbi = 0; gbi < h1d->GetXaxis()->GetNbins(); ++gbi) {
+    hout->SetBinContent(gbi + 1, h1d->GetBinContent(gbi + 1));
+    hout->SetBinError(gbi + 1, h1d->GetBinError(gbi + 1));
+  }
+
+  hout->SetDirectory(nullptr);
+  return hout;
+}
+
+std::unique_ptr<TH2>
+samplePDFFDBase::GetGenericBinningTH2(std::string const &hname,
+                                      std::string const &htitle) {
+
+  int naxes = generic_binning.Axes.size();
+  if (naxes != 2) {
+    MACH3LOG_ERROR("Can only use GetGenericBinningTH2 on a 2D histogram, but "
+                   "this one is {}D",
+                   naxes);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  auto h1d = get1DHist();
+
+  // this is a bit silly, but ROOT doesn't have constructors that take TAxis
+  // instances. So, really, who's the silly one?
+  auto xbin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[0]);
+  auto ybin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[1]);
+
+  std::unique_ptr<TH2> hout = std::make_unique<TH2D>(
+      hname.c_str(), htitle.c_str(), xbin_edges.size() - 1, xbin_edges.data(),
+      ybin_edges.size() - 1, ybin_edges.data());
+
+  for (int gbi = 0; gbi < h1d->GetXaxis()->GetNbins(); ++gbi) {
+    auto axis_binning = generic_binning.DecomposeGlobalBinNumber(gbi);
+
+    hout->SetBinContent(axis_binning[0] + 1, axis_binning[1] + 1,
+                        h1d->GetBinContent(gbi + 1));
+    hout->SetBinError(axis_binning[0] + 1, axis_binning[1] + 1,
+                      h1d->GetBinError(gbi + 1));
+  }
+
+  hout->SetDirectory(nullptr);
+  return hout;
+}
+
+std::unique_ptr<TH1> samplePDFFDBase::GetGenericBinningTH1Slice(
+    std::vector<double> const &slice_definition, std::string const &hname,
+    std::string const &htitle) {
+  return nullptr;
+}
+
+std::unique_ptr<TH2> samplePDFFDBase::GetGenericBinningTH2Slice(
+    std::vector<double> const &slice_definition, std::string const &hname,
+    std::string const &htitle) {
+  return nullptr;
+}
+
+std::unique_ptr<TH3>
+samplePDFFDBase::GetGenericBinningTH3(std::string const &hname,
+                                      std::string const &htitle) {
+
+  int naxes = generic_binning.Axes.size();
+  if (naxes != 3) {
+    MACH3LOG_ERROR("Can only use GetGenericBinningTH3 on a 3D histogram, but "
+                   "this one is {}D",
+                   naxes);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  auto h1d = get1DHist();
+
+  // this is a bit silly, but ROOT doesn't have constructors that take TAxis
+  // instances. So, really, who's the silly one?
+  auto xbin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[0]);
+  auto ybin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[1]);
+  auto zbin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[2]);
+
+  std::unique_ptr<TH3> hout = std::make_unique<TH3D>(
+      hname.c_str(), htitle.c_str(), xbin_edges.size() - 1, xbin_edges.data(),
+      ybin_edges.size() - 1, ybin_edges.data(),
+      zbin_edges.size() - 1, zbin_edges.data());
+
+  for (int gbi = 0; gbi < h1d->GetXaxis()->GetNbins(); ++gbi) {
+    auto axis_binning = generic_binning.DecomposeGlobalBinNumber(gbi);
+
+    hout->SetBinContent(axis_binning[0] + 1, axis_binning[1] + 1,
+                        axis_binning[2] + 1, h1d->GetBinContent(gbi + 1));
+    hout->SetBinError(axis_binning[0] + 1, axis_binning[1] + 1,
+                      axis_binning[2] + 1, h1d->GetBinError(gbi + 1));
+  }
+
+  hout->SetDirectory(nullptr);
+  return hout;
 }
 
 void samplePDFFDBase::Initialise() {
