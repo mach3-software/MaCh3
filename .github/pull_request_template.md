@@ -1,7 +1,7 @@
-# Pull request description:
+# Pull request description
 
 
-## Changes or fixes:
+## Changes or fixes
 
 
-## Examples:
+## Examples

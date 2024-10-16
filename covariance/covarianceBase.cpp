@@ -1,4 +1,4 @@
-#include "covarianceBase.h"
+#include "covariance/covarianceBase.h"
 
 // ********************************************
 covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {
@@ -33,56 +33,9 @@ covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, const c
 }
 
 // ********************************************
-covarianceBase::covarianceBase(const char *name, const char *file, int seed) : inputFile(std::string(file)), pca(false) {
-// ********************************************
-
-  #ifdef MULTITHREAD
-  if(seed != 0)
-  {
-    MACH3LOG_WARN("You have set seed to {}", seed);
-    MACH3LOG_WARN("And you are running with MULTITHREAD");
-    MACH3LOG_WARN("TRandom for each thread will have same seed");
-    MACH3LOG_WARN("This is fine if this was your intention");
-  }
-  #endif
-
-  init(name, file);
-  FirstPCAdpar = -999;
-  LastPCAdpar = -999;
-}
-
-// ********************************************
-covarianceBase::covarianceBase(const char *name, const char *file, int seed, double threshold, int firstpcapar, int lastpcapar) : inputFile(std::string(file)), pca(true), eigen_threshold(threshold), FirstPCAdpar(firstpcapar), LastPCAdpar(lastpcapar) {
-// ********************************************
-
-  if (threshold < 0 || threshold >= 1) {
-    MACH3LOG_INFO("NOTE: {} {}", name, file);
-    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
-    MACH3LOG_INFO("Please specify a number between 0 and 1");
-    MACH3LOG_INFO("You specified: ");
-    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
-    pca = false;
-  }
-#ifdef MULTITHREAD
-  if(seed != 0)
-  {
-    MACH3LOG_WARN("You have set seed to {}", seed);
-    MACH3LOG_WARN("And you are running with MULTITHREAD");
-    MACH3LOG_WARN("TRandom for each thread will have same seed");
-    MACH3LOG_WARN("This is fine if this was your intention");
-  }
-#endif
-  MACH3LOG_INFO("Constructing instance of covarianceBase");
-  init(name, file);
-  // Call the innocent helper function
-  if (pca) ConstructPCA();
-}
-
-// ********************************************
 //Destructor
 covarianceBase::~covarianceBase(){
 // ********************************************
-
   _fPreFitValue.clear();
   _fError.clear();
   _fCurrVal.clear();
@@ -522,7 +475,10 @@ void covarianceBase::throwParameters() {
   // First draw new randParams
   randomize();
 
-  if (!pca) {
+  // KS: We use PCA very rarely on top PCA functionality isn't implemented for this function.
+  // Use __builtin_expect to give compiler a hint which option is more likely, which should help
+  // with better optimisation. This isn't critical but more to have example
+  if (__builtin_expect(!pca, 1)) {
     MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
     #ifdef MULTITHREAD
@@ -562,7 +518,7 @@ void covarianceBase::throwParameters() {
   }
   else
   {
-    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predicitve Code with PCA, which is wrong");
+    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predictive Code with PCA, which is wrong");
     MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -846,7 +802,6 @@ void covarianceBase::printNominalCurrProp() {
 //                    false = don't evaluate likelihood (so run without a prior)
 double covarianceBase::CalcLikelihood() {
 // ********************************************
-
   double logL = 0.0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
@@ -869,7 +824,6 @@ double covarianceBase::CalcLikelihood() {
 // ********************************************
 int covarianceBase::CheckBounds() {
 // ********************************************
-
   int NOutside = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:NOutside)
@@ -1353,7 +1307,6 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
 // ********************************************
 std::vector<double> covarianceBase::getNominalArray() {
 // ********************************************
-
   std::vector<double> nominal(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i)
   {

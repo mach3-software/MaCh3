@@ -254,6 +254,7 @@ class MCMCProcessor {
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
     /// @brief Read the output MCMC file and find what inputs were used
+    /// @warning There is bit of hardcoding for names so we should revisit it
     inline void FindInputFiles();
     /// @brief Read the xsec file and get the input central values and errors
     inline void ReadXSecFile();
@@ -312,6 +313,9 @@ class MCMCProcessor {
     std::string OutputSuffix;
     /// Covariance matrix name position
     std::vector<std::vector<std::string>> CovPos;
+    /// Covariance matrix config
+    std::vector<YAML::Node> CovConfig;
+
 
     /// Main chain storing all steps etc
     TChain *Chain;

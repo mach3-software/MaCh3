@@ -28,7 +28,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   #endif
 
   std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
-
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
@@ -295,6 +294,14 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   CorrMatrix->Write((cov->getName() + std::string("_Corr")).c_str());
   delete CorrMatrix;
 
+  // If we have yaml config file for covariance let's save it
+  YAML::Node Config = cov->GetConfig();
+  if(!Config.IsNull())
+  {
+    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + cov->getName()));
+    ConfigSave.Write();
+  }
+
   outputFile->cd();
 
   return;
@@ -305,9 +312,7 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
 // Similar to systematic really, but handles the oscillation weights
 void FitterBase::addOscHandler(covarianceOsc * const oscf) {
 // *************************
-
   osc = oscf;
-
   if (save_nominal) {
     CovFolder->cd();
     std::vector<double> vec = oscf->getNominalArray();
@@ -324,46 +329,13 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
     outputFile->cd();
   }
 
-  return;
-}
-
-// *************************
-// When using separate oscillations for neutrino and anti-neutrino
-void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
-// *************************
-
-  osc = oscf;
-  osc2 = oscf2;
-
-  if (save_nominal) {
-    CovFolder->cd();
-    std::vector<double> vec = oscf->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(oscf->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
-
-    std::vector<double> vec2 = oscf2->getNominalArray();
-    size_t n2 = vec2.size();
-    double *n_vec2 = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec2[i] = vec2[i];
-    }
-    TVectorT<double> t_vec2(n2, n_vec2);
-    TString nameof2 = TString(oscf2->getName());
-    nameof2 = nameof2.Append("_2_nom");
-    t_vec2.Write(nameof2);
-    delete[] n_vec;
-    delete[] n_vec2;
-
-    outputFile->cd();
+  // If we have yaml config file for covariance let's save it
+  YAML::Node Config = oscf->GetConfig();
+  if(!Config.IsNull())
+  {
+    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + oscf->getName()));
+    ConfigSave.Write();
   }
-
   return;
 }
 
@@ -371,7 +343,6 @@ void FitterBase::addOscHandler(covarianceOsc *oscf, covarianceOsc *oscf2) {
 // Process the MCMC output to get postfit etc
 void FitterBase::ProcessMCMC() {
 // *******************
-
   if (fitMan == NULL) return;
 
   // Process the MCMC
@@ -407,7 +378,6 @@ void FitterBase::ProcessMCMC() {
       MACH3LOG_INFO("Opening output again to update with means..");
       outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
     }
-
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
     Central_Gauss->Write("Gauss_Means");
@@ -896,9 +866,9 @@ void FitterBase::Run2DLLHScan() {
   }
 
   // Number of points we do for each LLH scan
-  const int n_points = 20;
+  constexpr int n_points = 20;
   // We print 5 reweights
-  const int countwidth = double(n_points)/double(5);
+  constexpr int countwidth = double(n_points)/double(5);
 
   bool isxsec = false;
   // Loop over the covariance classes
@@ -1079,15 +1049,15 @@ void FitterBase::RunSigmaVar() {
   MACH3LOG_INFO("Starting Sigma Variation");
 
   // Number of variations we want
-  const int numVar = 5;
+  constexpr int numVar = 5;
   //-3 -1 0 +1 +3 sigma variation
-  const int sigmaArray[numVar] = {-3, -1, 0, 1, 3};
+  constexpr int sigmaArray[numVar] = {-3, -1, 0, 1, 3};
 
   outputFile->cd();
 
   //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
-  const int nRelevantModes = 2;
+  constexpr int nRelevantModes = 2;
   MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
   bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false);
 
