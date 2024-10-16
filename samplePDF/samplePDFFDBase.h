@@ -31,7 +31,7 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName(){return samplename;}
+  std::string GetName() const {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -115,6 +115,15 @@ public:
   std::vector<std::string> SplineVarNames;
   std::vector<double> SampleXBins;
   std::vector<double> SampleYBins;
+
+  struct {
+    //these are the SamplePDFFDBase subclass KineParameter identifiers
+    std::vector<int> VarEnums;
+    std::vector<TAxis> Axes;
+  } generic_binning; 
+
+  int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
+
   //===============================================================================
 
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
@@ -137,15 +146,23 @@ public:
   /// @brief Virtual so this can be over-riden in an experiment derived class
   virtual double CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
 
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
-  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
-  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0; 
-  virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual const double &
+  ReturnKinematicParameterByReference(int KinematicParameter, int iSample,
+                                      int iEvent) = 0;
+  // LP - use this to implement kinematic parameters that are not doubles (so we
+  // cannot return the address of one), but can be cast to doubles, note that this
+  // will likely cause extreme confusion and the fact we might need this
+  // indicates an issue in our abstraction. Parameters defined in
+  // implementations of this method can not be used as projection variables,
+  // which are kept as pointers to doubles.
+  virtual double ReturnKinematicParameter(int KinematicParameter, int iSample,
+                                          int iEvent) = 0;
+
+  virtual std::vector<double> ReturnKinematicParameterBinning(int KinematicParameter) = 0; //Returns binning for parameter Var
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual std::string ReturnStringFromKinematicParameter(int KinematicParameter) = 0;
 
   // Function to setup Functional and shift parameters. This isn't idea but
   // do this in your experiment specific code for now as we don't have a 
