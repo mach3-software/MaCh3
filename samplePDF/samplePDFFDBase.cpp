@@ -53,29 +53,38 @@ samplePDFFDBase::~samplePDFFDBase()
 void samplePDFFDBase::ReadSampleConfig() 
 {
    
-  if (CheckNodeExists(SampleManager->raw(), "SampleName")) {
-    samplename = SampleManager->raw()["SampleName"].as<std::string>();
+  auto const & config_ydoc = SampleManager->raw();
+
+  if (CheckNodeExists(config_ydoc, "SampleName")) {
+    samplename = config_ydoc["SampleName"].as<std::string>();
   } else{
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
 	throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-    nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+  if (CheckNodeExists(config_ydoc, "NSubSamples")) {
+    nSamples = config_ydoc["NSubSamples"].as<int>();
   } else{
     MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
 	throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  if (CheckNodeExists(SampleManager->raw(), "DetID")) {
-    SampleDetID = SampleManager->raw()["DetID"].as<int>();
+  if (CheckNodeExists(config_ydoc, "DetID")) {
+    SampleDetID = config_ydoc["DetID"].as<int>();
   } else{
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
 	throw MaCh3Exception(__FILE__, __LINE__);
   }
+
+  if (CheckNodeExists(config_ydoc, "POT")) {
+    pot = config_ydoc["POT"].as<double>();
+  } else{
+    MACH3LOG_ERROR("POT not defined in {}, please add this!", SampleManager->GetFileName());
+	throw MaCh3Exception(__FILE__, __LINE__);
+  }
  
-  if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
-    NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
+  if (CheckNodeExists(config_ydoc, "NuOsc", "NuOscConfigFile")) {
+    NuOscillatorConfigFile = config_ydoc["NuOsc"]["NuOscConfigFile"].as<std::string>();
   } else {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
 	throw MaCh3Exception(__FILE__, __LINE__);
@@ -88,8 +97,8 @@ void samplePDFFDBase::ReadSampleConfig()
 
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
-  if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
-	fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
+  if (CheckNodeExists(config_ydoc, "TestStatistic")) {
+	fTestStatistic = static_cast<TestStatistic>(config_ydoc["TestStatistic"].as<int>());
   } else {
     MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
 	MACH3LOG_WARN("Defaulting to using a poisson likelihood");
@@ -98,50 +107,120 @@ void samplePDFFDBase::ReadSampleConfig()
 
   //Binning
   nDimensions = 0;
-  XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
-  SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
-  if(XVarStr.length() > 0){
-	nDimensions++;
-  } else{
-	MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
+
+  if (!config_ydoc["binning"]) {
+    MACH3LOG_ERROR("Error setting up the sample binning");
+    MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
+    MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
-  SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
-  if(YVarStr.length() > 0){
-	if(XVarStr.length() == 0){
-	  MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-	  throw MaCh3Exception(__FILE__, __LINE__);
-	}
-	nDimensions++;
+  auto const &binning_node = config_ydoc["Binning"];
+
+  // try generic binning first
+  if (binning_node["Axes"]) {
+    try {
+      int nglobalbins = 1;
+      for (auto const &ax : binning_node["Axes"]) {
+        generic_binning.VarEnums.push_back(ReturnKinematicParameterFromString(ax["VarStr"].as<std::string>()));
+        std::vector<double> bin_edges;
+        // builds a uniform binning from an nbins,start,stop type specification
+        if (ax["Uniform"]) {
+
+          auto const &linspacespec =
+              ax["Uniform"].as<std::vector<std::string>>();
+
+          int nbins = std::stol(linspacespec[0]);
+          double start = std::stod(linspacespec[1]);
+          double stop = std::stod(linspacespec[2]);
+
+          double width = (stop - start) / double(nbins);
+          bin_edges.push_back(start);
+          for (int i = 0; i < nbins; ++i) {
+            bin_edges.push_back(bin_edges.back() + width);
+          }
+        } else if (ax["VarBins"]) {
+          bin_edges =
+              ax["VarBins"].as<std::vector<double>>();
+        } else {
+          throw std::runtime_error(
+              "No valid binning definition found, valid values: "
+              "Uniform(nbins,lowedge,upedge), VarBins(edge, edge, ....).");
+        }
+
+        //build a new TAxis
+        generic_binning.Axes.emplace_back(bin_edges.size()-1, bin_edges.data());
+        //note this means our '1D binning' ignores 'flow bins.
+        nglobalbins *= generic_binning.Axes.back().GetNbins();
+        nDimensions++;
+      }
+
+      XVarStr = "global_bin_number";
+      // make the integer value of the global bin number correspond to the
+      // center of a bin
+      SampleXBins = {
+          -0.5,
+      };
+      for (int i = 0; i < nglobalbins; ++i) {
+        SampleXBins.push_back(SampleXBins.back() + 1);
+      }
+    } catch (std::runtime_error const &e) { // try/catch is a bit ugly, but
+                                            // keeps the parsing failure local
+      MACH3LOG_ERROR("Failed to parse Binning.Axes object with error: {}",
+                     e.what());
+      YAML::Dump(binning_node["Axes"]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+  } else { // use explicit XVar/YVar format
+
+    XVarStr =
+        GetFromManager(config_ydoc["Binning"]["XVarStr"], std::string(""));
+    SampleXBins = GetFromManager(config_ydoc["Binning"]["XVarBins"],
+                                 std::vector<double>());
+    if (XVarStr.length() > 0) {
+      nDimensions++;
+    } else {
+      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}",
+                     SampleManager->GetFileName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    YVarStr =
+        GetFromManager(config_ydoc["Binning"]["YVarStr"], std::string(""));
+    SampleYBins = GetFromManager(config_ydoc["Binning"]["YVarBins"],
+                                 std::vector<double>());
+    if (YVarStr.length() > 0) {
+      if (XVarStr.length() == 0) {
+        MACH3LOG_ERROR(
+            "Please specify an X-variable string in sample config {}",
+            SampleManager->GetFileName());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      nDimensions++;
+    }
   }
 
-  if(nDimensions == 0){
-	MACH3LOG_ERROR("Error setting up the sample binning");
-	MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
-	MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-	throw MaCh3Exception(__FILE__, __LINE__);
-  } else{
-	MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
+  MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
+
+  // Sanity check that some binning has been specified
+  if (SampleXBins.size() == 0 && SampleYBins.size() == 0) {
+    MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, "
+                   "please add some binning to the sample config {}",
+                   SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  //Sanity check that some binning has been specified
-  if(SampleXBins.size() == 0 && SampleYBins.size() == 0){
-	MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", SampleManager->GetFileName());
-	throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  
   //FD file info
-  if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
+  if (!CheckNodeExists(config_ydoc, "InputFiles", "mtupleprefix")){
 	MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
   }
-  mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
-  mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
-  splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
-  splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+  mtupleprefix = config_ydoc["InputFiles"]["mtupleprefix"].as<std::string>();
+  mtuplesuffix = config_ydoc["InputFiles"]["mtuplesuffix"].as<std::string>();
+  splineprefix = config_ydoc["InputFiles"]["splineprefix"].as<std::string>();
+  splinesuffix = config_ydoc["InputFiles"]["splinesuffix"].as<std::string>();
 
-  for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+  for (auto const &osc_channel : config_ydoc["SubSamples"]) {
     mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
@@ -156,7 +235,7 @@ void samplePDFFDBase::ReadSampleConfig()
   double KinematicParamter = 0;
   std::vector<double> SelectionVec;
   //Now grab the selection cuts from the manager
-  for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
+  for ( auto const &SelectionCuts : config_ydoc["SelectionCuts"]) {
     SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
     SelectionBounds.push_back(SelectionCuts["Bounds"].as<std::vector<double>>());
     low_bound = SelectionBounds.back().at(0);
@@ -169,6 +248,32 @@ void samplePDFFDBase::ReadSampleConfig()
   NSelections = SelectionStr.size();
 
   return;
+}
+
+int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
+  if (!generic_binning.VarEnums.size()) {
+    MACH3LOG_ERROR(
+        "GetGenericBinningGlobalBinNumber called, but no generic binning was "
+        "set up in this SamplePDFFDBase subclass instance.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  int gbin = 0;
+  int nbins_prev_axes = 1;
+  for (size_t ax_i = 0; ax_i < generic_binning.VarEnums.size(); ++ax_i) {
+    int ax_nbins = generic_binning.Axes[ax_i].GetNbins();
+
+    int ax_bin = generic_binning.Axes[ax_i].FindFixBin(ReturnKinematicParameter(
+        generic_binning.VarEnums[ax_i], iSample, iEvent));
+
+    if ((ax_bin == 0) || (ax_bin == (ax_nbins + 1))) { // flow bin on this axis
+      return -1;                                       // our global flow bin;
+    }
+
+    // the -1 removes the TAxis implicit underflow bin
+    gbin += (ax_bin - 1) * nbins_prev_axes;
+    nbins_prev_axes *= ax_nbins;
+  }
+  return gbin;
 }
 
 void samplePDFFDBase::Initialise() {
@@ -328,7 +433,7 @@ bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& Paramete
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
  
-	Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
+	Val = ReturnKinematicParameter(ReturnKinematicParameterFromString(ParameterStr[iSelection]), iSample, iEvent);
 	//ETA - still need to support other method of you specifying the cut you want in ReturnKinematicParameter
 	//like in Dan's version below from T2K
     //Val = ReturnKinematicParameter(static_cast<KinematicTypes>(Selection[iSelection][0]),iSample,iEvent);
@@ -356,7 +461,7 @@ bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& Paramete
 
   for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
     
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
+    Val = ReturnKinematicParameter(ReturnKinematicParameterFromString(ParameterStr[iSelection]), iSample, iEvent);
     //DB If multiple return values, it will consider each value seperately
     //DB Already checked that SelectionCuts vector is correctly sized
     
@@ -842,11 +947,11 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		//Now check that the target of an interaction matches with the normalisation parameters
 		bool TargetMatch=false;
 		//If no target specified then apply to all modes
-		if ((*it).targets.size()==0) {
+		if (it->targets.size()==0) {
 		  TargetMatch=true;
 		} else {
-		  for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
-			if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
+		  for (unsigned iTarget=0;iTarget<it->targets.size();iTarget++) {
+			if (it->targets.at(iTarget)== *(fdobj->Target[iEvent])) {
 			  TargetMatch=true;
 			}
 		  }
@@ -856,11 +961,11 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		//Now check that the neutrino flavour in an interaction matches with the normalisation parameters
 		bool FlavourMatch=false;
 		//If no mode specified then apply to all modes
-		if ((*it).pdgs.size()==0) {
+		if (it->pdgs.size()==0) {
 		  FlavourMatch=true;
 		} else {
-		  for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
-			if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
+		  for (unsigned iPDG=0;iPDG<it->pdgs.size();iPDG++) {
+			if (it->pdgs.at(iPDG)== fdobj->nupdg) {
 			  FlavourMatch=true;
 			}
 		  }
@@ -870,11 +975,11 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
 		bool FlavourUnoscMatch=false;
 		//If no mode specified then apply to all modes
-		if ((*it).preoscpdgs.size()==0) {
+		if (it->preoscpdgs.size()==0) {
 		  FlavourUnoscMatch=true;
 		} else {
-		  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
-			if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
+		  for (unsigned iPDG=0;iPDG<it->preoscpdgs.size();iPDG++) {
+			if (it->preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
 			  FlavourUnoscMatch=true;
 			}
 		  }
@@ -884,11 +989,11 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		//Now check that the mode of an interaction matches with the normalisation parameters
 		bool ModeMatch=false;
 		//If no mode specified then apply to all modes
-		if ((*it).modes.size()==0) {
+		if (it->modes.size()==0) {
 		  ModeMatch=true;
 		} else {
-		  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
-			if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
+		  for (unsigned imode=0;imode<it->modes.size();imode++) {
+			if (it->modes.at(imode)== *(fdobj->mode[iEvent])) {
 			  ModeMatch=true;
 			}
 		  }
@@ -898,13 +1003,14 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 		//Now check whether the norm has kinematic bounds
 		//i.e. does it only apply to events in a particular kinematic region?
 		bool IsSelected = true;
-		if ((*it).hasKinBounds) {
-		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-			if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
+		if (it->hasKinBounds) {
+		  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < it->KinematicVarStr.size() ; ++iKinematicParameter ) {
+			 auto kinepar = ReturnKinematicParameterFromString(it->KinematicVarStr[iKinematicParameter]);
+      if (ReturnKinematicParameter(kinepar, iSample, iEvent) <= it->Selection[iKinematicParameter][0]) { 
 			  IsSelected = false;
 			  continue;
 			}
-			else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+			else if (ReturnKinematicParameter(kinepar, iSample, iEvent) > it->Selection[iKinematicParameter][1]) {
 			  IsSelected = false;
 			  continue;
 			}
@@ -917,7 +1023,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 	
 		// Now set 'index bin' for each normalisation parameter
 		// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
-		int bin = (*it).index;
+		int bin = it->index;
 
 		//If syst on applies to a particular detector
 		if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
@@ -1082,7 +1188,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
 
 	  //Set x_var and y_var values based on XVarStr and YVarStr
-      MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
+      MCSamples[mc_i].x_var[event_i] = &ReturnKinematicParameterByReference(ReturnKinematicParameterFromString(XVarStr), mc_i, event_i);
 	  //Give y)_var a dummy value
       MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);
 	  int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
@@ -1203,8 +1309,8 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 	for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
 
    	  //Set x_var and y_var values based on XVarStr and YVarStr   
-      MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
-      MCSamples[mc_i].y_var[event_i] = ReturnKinematicParameterByReference(YVarStr, mc_i, event_i);
+      MCSamples[mc_i].x_var[event_i] = &ReturnKinematicParameterByReference(ReturnKinematicParameterFromString(XVarStr), mc_i, event_i);
+      MCSamples[mc_i].y_var[event_i] = &ReturnKinematicParameterByReference(ReturnKinematicParameterFromString(YVarStr), mc_i, event_i);
 
 	  //Global bin number
 	  int bin = _hPDF2D->FindBin(*(MCSamples[mc_i].x_var[event_i]), *(MCSamples[mc_i].y_var[event_i]));

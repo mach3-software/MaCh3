@@ -115,6 +115,15 @@ public:
   std::vector<std::string> SplineVarNames;
   std::vector<double> SampleXBins;
   std::vector<double> SampleYBins;
+
+  struct {
+    //these are the SamplePDFFDBase subclass KineParameter identifiers
+    std::vector<int> VarEnums;
+    std::vector<TAxis> Axes;
+  } generic_binning; 
+
+  int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
+
   //===============================================================================
 
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
