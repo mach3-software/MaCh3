@@ -14,5 +14,5 @@ jobs:
         uses: deep5050/memes-on-issues-action@main
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_msg: 'Hi {{author}}, thank you for contributing to MaCh3! Please wait for MaCh3 developers to review your PR. If no one answers within a week, please message us. While waiting, please enjoy this {{meme}}!'
+          PR_msg: 'Hi {{author}}, thank you for contributing to MaCh3! Please wait for MaCh3 developers to review your PR. If no one answers within a week, please message people from this list: https://github.com/orgs/mach3-software/teams/mach3admin . While waiting, please enjoy this {{meme}}'
 
