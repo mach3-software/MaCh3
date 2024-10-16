@@ -203,7 +203,17 @@ void initSamplePDF(py::module &m){
     ; // End of samplePDFBase binding
 
     py::class_<samplePDFFDBase, PySamplePDFFDBase /* <--- trampoline*/, samplePDFBase>(m_sample_pdf, "SamplePDFFDBase")
-        .def(py::init())
+        .def(
+            py::init<double, std::string, covarianceXsec*>(),
+            "This should never be called directly as samplePDFFDBase is an abstract base class. \n\
+            However when creating a derived class, in the __init__() method, you should call the parent constructor i.e. this one by doing:: \n\
+            \n\
+            \tsuper(<your derived samplePDF class>, self).__init__() \n\
+            \n ",
+            py::arg("pot"),
+            py::arg("mc_version"),
+            py::arg("xsec_cov")
+        )
         
         .def(
             "set_xsec_cov", 
