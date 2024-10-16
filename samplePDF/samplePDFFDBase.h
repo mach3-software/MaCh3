@@ -18,7 +18,6 @@
 
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
-#include "samplePDF/ShiftFunctors.h"
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFFDBase :  public samplePDFBase
