@@ -108,7 +108,7 @@ void samplePDFFDBase::ReadSampleConfig()
   //Binning
   nDimensions = 0;
 
-  if (!config_ydoc["binning"]) {
+  if (!config_ydoc["Binning"]) {
     MACH3LOG_ERROR("Error setting up the sample binning");
     MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
     MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
