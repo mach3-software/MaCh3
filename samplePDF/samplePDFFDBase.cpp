@@ -761,8 +761,6 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
 }
 
 void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
-
-  MACH3LOG_INFO("SETTING UP XSEC COV!!");
   XsecCov = xsec;
 
   // Get the map between the normalisation parameters index, their name, what mode they should apply to, and what target
@@ -774,9 +772,6 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
-  MACH3LOG_INFO("Found {} normalisation parameters", xsec_norms.size());
-  MACH3LOG_INFO("Found {} functional parameters", funcParsNames.size());
-	
   return;
 }
 
