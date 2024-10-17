@@ -3,8 +3,9 @@
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
 
-#include<algorithm>
+#include "spdlog/fmt/bundled/ranges.h"
 
+#include <algorithm>
 
 samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_cov)
   : samplePDFBase()
@@ -178,9 +179,11 @@ void samplePDFFDBase::ReadSampleConfig()
 
           auto const &bin_edges = get_bin_edges_from_node(ax);
 
-          // build a new TAxis
+          // construct a new TAxis in place
           generic_binning.Axes.emplace_back(bin_edges.size() - 1,
                                             bin_edges.data());
+          generic_binning.Axes.back().SetTitle(
+              ax["Title"].as<std::string>("").c_str());
           // note this means our '1D binning' ignores 'flow bins.
           nglobalbins *= generic_binning.Axes.back().GetNbins();
           generic_binning.nbins_per_slice.push_back(nglobalbins);
@@ -300,23 +303,56 @@ void samplePDFFDBase::ReadSampleConfig()
 }
 
 int samplePDFFDBase::GenericBinning::GetGlobalBinNumber(
-    std::vector<double> const &values) const {
+    std::vector<int> const &axis_bin_numbers) const {
+
+  if (axis_bin_numbers.size() != Axes.size()) {
+    MACH3LOG_ERROR("GenericBinning::GetGlobalBinNumber called with "
+                   "axis_bin_numbers: {}, but the binning has {} axes.",
+                   axis_bin_numbers, Axes.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   int gbin = 0;
   for (size_t ax_i = 0; ax_i < Axes.size(); ++ax_i) {
-    int ax_nbins = Axes[ax_i].GetNbins();
 
-    // use the non 'ByReference' version so that we can use calculated
-    // variables without providing dummy storage
-    int ax_bin = Axes[ax_i].FindFixBin(values[ax_i]);
+    int ax_bin = axis_bin_numbers[ax_i];
 
-    if ((ax_bin == 0) || (ax_bin == (ax_nbins + 1))) { // flow bin on this axis
-      return -1;                                       // our global flow bin;
+    // flow bin on this axis. Since we don't track per-axis flow bins, just
+    // check if the bin number is valid and if not return the global flow bin at
+    // gbin = -1
+    if ((ax_bin < 0) || (ax_bin >= Axes[ax_i].GetNbins())) {
+      return -1;
     }
 
-    // the -1 removes the TAxis implicit underflow bin
-    gbin += (ax_bin - 1) * nbins_per_slice[ax_i];
+    gbin += ax_bin * nbins_per_slice[ax_i];
   }
   return gbin;
+}
+
+int samplePDFFDBase::GenericBinning::GetGlobalBinNumber(
+    std::vector<double> const &values) const {
+
+  if (values.size() != Axes.size()) {
+    MACH3LOG_ERROR("GenericBinning::GetGlobalBinNumber called with values: {}, "
+                   "but the binning has {} axes.",
+                   values, Axes.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::vector<int> bin_numbers(values.size());
+
+  for (size_t ax_i = 0; ax_i < Axes.size(); ++ax_i) {
+
+    int ax_bin = Axes[ax_i].FindFixBin(values[ax_i]);
+    // flow bin on this axis. The flow bins here are in ROOT convention
+    if ((ax_bin == 0) || (ax_bin == (Axes[ax_i].GetNbins() + 1))) {
+      return -1;
+    }
+    // get rid of the ROOT underflow along each axis as we have a global
+    // underflow at gbin == -1
+    bin_numbers[ax_i] = ax_bin - 1;
+  }
+  return GetGlobalBinNumber(bin_numbers);
 }
 
 std::vector<int>
@@ -328,6 +364,16 @@ samplePDFFDBase::GenericBinning::DecomposeGlobalBinNumber(int gbi) const {
     gbi = gbi % nbins_per_slice[ax_i];
   }
   return axis_binning;
+}
+
+double samplePDFFDBase::GenericBinning::GetGlobalBinHyperVolume(int gbi) const {
+  double hv = 1;
+  auto ax_bins = DecomposeGlobalBinNumber(gbi);
+  for (size_t axi = 0; axi < GetNDimensions(); ++axi) {
+    hv *= Axes[axi].GetBinWidth(ax_bins[axi] +
+                                1); // back to ROOT underflow convention
+  }
+  return hv;
 }
 
 int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
@@ -348,133 +394,6 @@ int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
                                               iSample, iEvent));
   }
   return generic_binning.GetGlobalBinNumber(values);
-}
-
-namespace {
-auto get_bin_edges_from_TAxis(TAxis const &ax){
-  std::vector<double> bin_edges = {ax.GetBinLowEdge(1)};
-  for(int bi = 0; bi < ax.GetNbins(); ++bi){
-    bin_edges.push_back(ax.GetBinUpEdge(bi+1));
-  }
-  return bin_edges;
-}
-}
-
-std::unique_ptr<TH1>
-samplePDFFDBase::GetGenericBinningTH1(std::string const &hname,
-                                      std::string const &htitle) {
-  std::unique_ptr<TH1> hout;
-  // use the 1D hist from the base class so we don't have to repeat where we get
-  // the bin values from
-  auto h1d = get1DHist();
-
-  int naxes = generic_binning.Axes.size();
-  if (naxes == 1) {
-    // this is a bit silly, but ROOT doesn't have constructors that take TAxis
-    // instances. So, really, who's the silly one?
-    auto bin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[0]);
-
-    hout = std::make_unique<TH1D>(hname.c_str(), htitle.c_str(),
-                                  bin_edges.size() - 1, bin_edges.data());
-  } else {
-    hout = std::make_unique<TH1D>(hname.c_str(), htitle.c_str(),
-                                  h1d->GetXaxis()->GetNbins(), -0.5,
-                                  double(h1d->GetXaxis()->GetNbins()) - 0.5);
-  }
-
-  for (int gbi = 0; gbi < h1d->GetXaxis()->GetNbins(); ++gbi) {
-    hout->SetBinContent(gbi + 1, h1d->GetBinContent(gbi + 1));
-    hout->SetBinError(gbi + 1, h1d->GetBinError(gbi + 1));
-  }
-
-  hout->SetDirectory(nullptr);
-  return hout;
-}
-
-std::unique_ptr<TH2>
-samplePDFFDBase::GetGenericBinningTH2(std::string const &hname,
-                                      std::string const &htitle) {
-
-  int naxes = generic_binning.Axes.size();
-  if (naxes != 2) {
-    MACH3LOG_ERROR("Can only use GetGenericBinningTH2 on a 2D histogram, but "
-                   "this one is {}D",
-                   naxes);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  auto h1d = get1DHist();
-
-  // this is a bit silly, but ROOT doesn't have constructors that take TAxis
-  // instances. So, really, who's the silly one?
-  auto xbin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[0]);
-  auto ybin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[1]);
-
-  std::unique_ptr<TH2> hout = std::make_unique<TH2D>(
-      hname.c_str(), htitle.c_str(), xbin_edges.size() - 1, xbin_edges.data(),
-      ybin_edges.size() - 1, ybin_edges.data());
-
-  for (int gbi = 0; gbi < h1d->GetXaxis()->GetNbins(); ++gbi) {
-    auto axis_binning = generic_binning.DecomposeGlobalBinNumber(gbi);
-
-    hout->SetBinContent(axis_binning[0] + 1, axis_binning[1] + 1,
-                        h1d->GetBinContent(gbi + 1));
-    hout->SetBinError(axis_binning[0] + 1, axis_binning[1] + 1,
-                      h1d->GetBinError(gbi + 1));
-  }
-
-  hout->SetDirectory(nullptr);
-  return hout;
-}
-
-std::unique_ptr<TH1> samplePDFFDBase::GetGenericBinningTH1Slice(
-    std::vector<double> const &slice_definition, std::string const &hname,
-    std::string const &htitle) {
-  return nullptr;
-}
-
-std::unique_ptr<TH2> samplePDFFDBase::GetGenericBinningTH2Slice(
-    std::vector<double> const &slice_definition, std::string const &hname,
-    std::string const &htitle) {
-  return nullptr;
-}
-
-std::unique_ptr<TH3>
-samplePDFFDBase::GetGenericBinningTH3(std::string const &hname,
-                                      std::string const &htitle) {
-
-  int naxes = generic_binning.Axes.size();
-  if (naxes != 3) {
-    MACH3LOG_ERROR("Can only use GetGenericBinningTH3 on a 3D histogram, but "
-                   "this one is {}D",
-                   naxes);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  auto h1d = get1DHist();
-
-  // this is a bit silly, but ROOT doesn't have constructors that take TAxis
-  // instances. So, really, who's the silly one?
-  auto xbin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[0]);
-  auto ybin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[1]);
-  auto zbin_edges = get_bin_edges_from_TAxis(generic_binning.Axes[2]);
-
-  std::unique_ptr<TH3> hout = std::make_unique<TH3D>(
-      hname.c_str(), htitle.c_str(), xbin_edges.size() - 1, xbin_edges.data(),
-      ybin_edges.size() - 1, ybin_edges.data(),
-      zbin_edges.size() - 1, zbin_edges.data());
-
-  for (int gbi = 0; gbi < h1d->GetXaxis()->GetNbins(); ++gbi) {
-    auto axis_binning = generic_binning.DecomposeGlobalBinNumber(gbi);
-
-    hout->SetBinContent(axis_binning[0] + 1, axis_binning[1] + 1,
-                        axis_binning[2] + 1, h1d->GetBinContent(gbi + 1));
-    hout->SetBinError(axis_binning[0] + 1, axis_binning[1] + 1,
-                      axis_binning[2] + 1, h1d->GetBinError(gbi + 1));
-  }
-
-  hout->SetDirectory(nullptr);
-  return hout;
 }
 
 void samplePDFFDBase::Initialise() {

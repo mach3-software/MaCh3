@@ -82,45 +82,15 @@ struct GenericBinning {
     std::vector<int> VarEnums;
     std::vector<TAxis> Axes;
 
+    //the axis bin numbers passed in here do not include the ROOT underflow at bin 0, so bin 0 is the first real bin
+    int GetGlobalBinNumber(std::vector<int> const &axis_bin_numbers) const;
     int GetGlobalBinNumber(std::vector<double> const &values) const;
     std::vector<int> DecomposeGlobalBinNumber(int gbi) const;
+    int GetNDimensions() const { return Axes.size(); }
+    double GetGlobalBinHyperVolume(int gbi) const;
   } generic_binning;
 
   int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
-
-  // LP - The below functions are meant for making 'pretty' plots and allocate
-  // new histograms, they are not intended to be used in 'tight' loops (such as
-  // per step).
-
-  // LP - if generic binning is 1D, return a nice histogram, if its ND, return
-  // the global bin histogram
-  std::unique_ptr<TH1> GetGenericBinningTH1(std::string const &hname,
-                                            std::string const &htitle = "");
-  // LP - if generic binning is >1D, return a 1D slice from the slice_definition
-  // slice definition is a vector specifying a value along each axis to slice
-  // along, one entry in the vector should be set to SamplePDFFDBase::kSliceVar
-  // to signify the axis to show
-  std::unique_ptr<TH1>
-  GetGenericBinningTH1Slice(std::vector<double> const &slice_definition,
-                            std::string const &hname,
-                            std::string const &htitle = "");
-  // LP - if generic binning is 2D, return a nice histogram, otherwise throw as
-  // there is nothing useful we can do here
-  std::unique_ptr<TH2> GetGenericBinningTH2(std::string const &hname,
-                                            std::string const &htitle = "");
-  // LP - if generic binning is >2D, return a 2D slice from the slice_definition
-  // slice definition is a vector specifying a value along each axis to slice
-  // along, two entries in the vector should be set to
-  // SamplePDFFDBase::kSliceVar to signify the axis to show
-  std::unique_ptr<TH2>
-  GetGenericBinningTH2Slice(std::vector<double> const &slice_definition,
-                            std::string const &hname,
-                            std::string const &htitle = "");
-  // LP - if generic binning is 3D, return a nice histogram, otherwise throw as
-  // there is nothing useful we can do here
-  std::unique_ptr<TH3> GetGenericBinningTH3(std::string const &hname,
-                                            std::string const &htitle = "");
-
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!

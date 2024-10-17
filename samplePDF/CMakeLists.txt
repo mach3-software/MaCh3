@@ -4,12 +4,14 @@ set(HEADERS
     Structs.h
     ShiftFunctors.h
     FDMCStruct.h
+    GenericBinningTools.h
 )
 
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
     Structs.cpp
+    GenericBinningTools.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu.cu>
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu2.cu>
