@@ -48,13 +48,16 @@ public:
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
   
+
   void SetXsecCov(covarianceXsec* xsec_cov);
+
+  /// @brief setup the Oscillation covariance object to get values to calculate probailities from
   void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  virtual void setupSplines(fdmc_base *skobj, const char *SplineFileName, int nutype, int signal){};
+  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
   void ReadSampleConfig();
 
  protected:
@@ -122,8 +125,8 @@ public:
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
-  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0; 
-  virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
+  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
   virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
@@ -169,20 +172,14 @@ public:
 
   //===============================================================================
   //MC variables
-  std::vector<struct fdmc_base> MCSamples;
-  TFile *_sampleFile;
-  TTree *_data;
+  std::vector<fdmc_base> MCSamples;
   //===============================================================================
 
   //===============================================================================
   /// DB Variables required for oscillation
   std::vector<OscillatorBase*> NuOscProbCalcers;
-  std::string NuOscillatorConfigFile;
-  
-  //===============================================================================
-  
-  //Variables controlling oscillation parameters
-  bool doubled_angle;
+  std::string NuOscillatorConfigFile; 
+  //=============================================================================== 
 
   //===============================================================================
   //DB Covariance Objects
@@ -240,15 +237,10 @@ public:
   float Unity_F = 1.;
   float Zero_F = 0.;
 
-  std::vector<std::string> mtuple_files;
+  std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;
   std::vector<int> sample_oscnutype;
   std::vector<int> sample_nutype;
   std::vector<bool> sample_signal;
-
-  std::string mtupleprefix;
-  std::string mtuplesuffix;
-  std::string splineprefix;
-  std::string splinesuffix;
 };

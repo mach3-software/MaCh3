@@ -5,7 +5,7 @@
 
 #include<algorithm>
 
-samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_cov) : samplePDFBase()
+samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Ceating SamplePDFFDBase object");
@@ -20,8 +20,7 @@ samplePDFFDBase::samplePDFFDBase(std::string mc_version_, covarianceXsec* xsec_c
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   
-  char* sample_char = (char*)mc_version_.c_str();
-  SampleManager = new manager(sample_char);
+  SampleManager = new manager(ConfigFileName.c_str());
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -131,13 +130,13 @@ void samplePDFFDBase::ReadSampleConfig()
   if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
     MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
   }
-  mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
-  mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
-  splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
-  splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
+  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
+  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
+  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
   
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-    mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
+    mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
     sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
@@ -1041,7 +1040,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
       
       //Set x_var and y_var values based on XVarStr and YVarStr
-      MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
+      MCSamples[mc_i].x_var[event_i] = GetPointerToKinematicParameter(XVarStr, mc_i, event_i);
       //Give y)_var a dummy value
       MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);
       int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
@@ -1162,8 +1161,8 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
       
       //Set x_var and y_var values based on XVarStr and YVarStr   
-      MCSamples[mc_i].x_var[event_i] = ReturnKinematicParameterByReference(XVarStr, mc_i, event_i);
-      MCSamples[mc_i].y_var[event_i] = ReturnKinematicParameterByReference(YVarStr, mc_i, event_i);
+      MCSamples[mc_i].x_var[event_i] = GetPointerToKinematicParameter(XVarStr, mc_i, event_i);
+      MCSamples[mc_i].y_var[event_i] = GetPointerToKinematicParameter(YVarStr, mc_i, event_i);
       
       //Global bin number
       int bin = _hPDF2D->FindBin(*(MCSamples[mc_i].x_var[event_i]), *(MCSamples[mc_i].y_var[event_i]));
