@@ -2,7 +2,6 @@ set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
     Structs.h
-    ShiftFunctors.h
     FDMCStruct.h
 )
 
@@ -10,18 +9,9 @@ add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
     Structs.cpp
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu.cu>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu2.cu>
 )
 
-target_link_libraries(SamplePDF Splines Covariance MaCh3CompilerOptions)
-
-if(USE_PROB3)
-    target_link_libraries(SamplePDF Prob3plusplus)
-else()
-    target_link_libraries(SamplePDF OscClass)
-endif()
+target_link_libraries(SamplePDF Splines NuOscillator Covariance MaCh3CompilerOptions)
 
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
@@ -43,5 +33,3 @@ install(TARGETS SamplePDF
         PUBLIC_HEADER DESTINATION include/samplePDF)
 
 add_library(MaCh3::SamplePDF ALIAS SamplePDF)
-
-

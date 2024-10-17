@@ -75,32 +75,6 @@ if(MaCh3_MINUIT2_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE MaCh3_MINUIT2)
 endif()
 
-################################## Oscillation ################################
-#KS: All of these should be moved to separate cmake and be handled by osc class, keep it for now
-#If USE_PROB3 not defined turn it off by default
-DefineEnabledRequiredSwitch(USE_PROB3 FALSE)
-
-# Oscillation calculation
-# In the future which osc calc we use might be set with a flag
-set(MaCh3_Oscillator_ENABLED "")
-if (USE_PROB3)
-  CPMFindPackage(
-    NAME Prob3plusplus
-    VERSION 3.10.3
-    GITHUB_REPOSITORY "mach3-software/Prob3plusplus"
-    GIT_TAG v3.10.3
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3++")
-else()
-  CPMFindPackage(
-    NAME CUDAProb3
-    GITHUB_REPOSITORY "mach3-software/CUDAProb3"
-    GIT_TAG "main"
-    DOWNLOAD_ONLY YES
-  )
-  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
-endif()
-#dump_cmake_variables(Prob3plusplus)
 
 ######################### python binding ##########################
 # EM: If Debug is not defined disable it by default
