@@ -494,7 +494,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
   for (_int_ i = 0; i < numParams; ++i)
   {
     // KS: We don't find segment for TF1, so ignore this
-    if (SplineType[numParams] == kTF1_red) continue;
+    if (SplineType[i] == kTF1_red) continue;
 
     const _int_ nPoints = SplineInfoArray[i].nPts;
     const _float_* xArray = SplineInfoArray[i].xPts;
