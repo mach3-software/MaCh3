@@ -9,7 +9,7 @@ function add_to_PATH () {
     d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
     if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
 
-    if [ "$d" == "/usr/bin" ] || [ "$d" == "/usr/bin64" ] || [ "$d" == "/usr/local/bin" ] || [ "$d" == "/usr/local/bin64" ]; then
+    if [[ "$d" == "/usr/bin" ]] || [[ "$d" == "/usr/bin64" ]] || [[ "$d" == "/usr/local/bin" ]] || [[ "$d" == "/usr/local/bin64" ]]; then
       case ":$PATH:" in
         *":$d:"*) :;;
         *) export PATH=$PATH:$d;;
@@ -33,7 +33,7 @@ function add_to_LD_LIBRARY_PATH () {
     d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
     if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
 
-    if [ "$d" == "/usr/lib" ] || [ "$d" == "/usr/lib64" ] || [ "$d" == "/usr/local/lib" ] || [ "$d" == "/usr/local/lib64" ]; then
+    if [[ "$d" == "/usr/lib" ]] || [[ "$d" == "/usr/lib64" ]] || [[ "$d" == "/usr/local/lib" ]] || [[ "$d" == "/usr/local/lib64" ]]; then
       case ":$LD_LIBRARY_PATH:" in
         *":$d:"*) :;;
         *) export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$d;;
