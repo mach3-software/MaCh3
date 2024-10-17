@@ -263,3 +263,39 @@ void mcmc::PrintProgress() {
   }
   #endif
 }
+
+// *******************
+void mcmc::StartFromPreviousFit(const std::string& FitName) {
+// *******************
+  MACH3LOG_INFO("Getting starting position from {}", FitName);
+
+  TFile *infile = new TFile(FitName.c_str(), "READ");
+  TTree *posts = (TTree*)infile->Get("posteriors");
+  int step_val = 0;
+  double log_val = _LARGE_LOGL_;
+  posts->SetBranchAddress("step",&step_val);
+  posts->SetBranchAddress("LogL",&log_val);
+
+  for (size_t s = 0; s < systematics.size(); ++s)
+  {
+    std::vector<double> branch_vals(systematics[s]->GetNumParams());
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
+    }
+    posts->GetEntry(posts->GetEntries()-1);
+
+    systematics[s]->setParameters(branch_vals);
+    systematics[s]->acceptStep();
+  }
+  stepStart = step_val;
+  logLCurr = log_val;
+
+  infile->Close();
+  delete infile;
+
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    if(systematics[s]->getDoAdaption()){ //Use separate throw matrix for xsec
+      systematics[s]->setNumberOfSteps(step_val);
+    }
+  }
+}
