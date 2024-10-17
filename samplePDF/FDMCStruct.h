@@ -7,7 +7,8 @@ struct fdmc_base {
   int nupdg;
   int nupdgUnosc;
   bool signal; // true if signue                                              
-  int nEvents; // how many MC events are there                              
+  int nEvents; // how many MC events are there
+  double ChannelIndex;
   std::string flavourName;
 
   int **Target; // target the interaction was on
@@ -52,7 +53,7 @@ struct fdmc_base {
   double *rw_upper_xbinedge; // upper to check if Eb has moved the erec bin
   double *rw_upper_upper_xbinedge; // upper to check if Eb has moved the erec bin
 
-  int **mode;
+  double **mode;
 
   const _float_ **osc_w_pointer;
   double *xsec_w;
