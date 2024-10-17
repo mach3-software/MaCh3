@@ -39,9 +39,7 @@ samplePDFFDBase::~samplePDFFDBase()
   delete[] samplePDFFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
-
-  if(oscpars != nullptr) delete[] oscpars;
-
+ 
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
     delete NuOscProbCalcers[iCalc];
   }
@@ -748,16 +746,6 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
   funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
-  return;
-}
-
-void samplePDFFDBase::SetOscCov(covarianceOsc* osc_cov){
-  OscCov = osc_cov;
-  int nOscPars = OscCov->GetNumParams();
-  oscpars = new const double*[nOscPars];
-  for(auto osc_par_i = 0; osc_par_i < nOscPars ; ++osc_par_i){
-    oscpars[osc_par_i] = OscCov->retPointer(osc_par_i);
-  } 
   return;
 }
 
