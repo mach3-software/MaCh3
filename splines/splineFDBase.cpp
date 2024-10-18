@@ -176,20 +176,10 @@ void splineFDBase::TransferToMonolith()
 
                   for(int i = 0; i < splineKnots; i++){
 
-                    if(tmpXCoeffArr[i]==-999){
-                      MACH3LOG_ERROR("looks like we've got a bad X, index = {}", i);
-                      throw MaCh3Exception(__FILE__ , __LINE__ );
-                    }
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
-                      if(tmpManyCoeffArr[i*4+j]==-999){
-                        MACH3LOG_ERROR("Bad ybcd, index: {}, {}", i, j);
-                        MACH3LOG_ERROR("Param Values: {}, {}, {}, {}",
-                                      tmpManyCoeffArr[i*4], tmpManyCoeffArr[i*4+1], tmpManyCoeffArr[i*4+2], tmpManyCoeffArr[i*4+3]);
-                        throw MaCh3Exception(__FILE__ , __LINE__ );
-                      }
-                    manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+					  manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
                   delete tmpXCoeffArr;
@@ -404,7 +394,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   std::vector<TAxis *> ReturnVec;
   int iSample=getSampleIndex(SampleName);
 
-  TFile *File = new TFile(FileName.c_str());
+  auto File = std::unique_ptr<TFile>(TFile::Open(FileName.c_str(), "READ"));
   if (!File || File->IsZombie())
   {
     MACH3LOG_ERROR("File {} not found", FileName);
@@ -516,7 +506,6 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
 
   File->Close();
-  delete File;
   delete DummyAxis;
   return ReturnVec;
 }
@@ -689,14 +678,9 @@ void splineFDBase::PrepForReweight()
     UniqueSystXPts[iSpline].resize(UniqueSystNKnots[iSpline]);
     for (int iKnot = 0; iKnot < UniqueSystNKnots[iSpline]; iKnot++)
     {
-      M3::float_t xPoint = -999;
-      M3::float_t yPoint = -999;
+      M3::float_t xPoint;
+      M3::float_t yPoint;
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
-      if (xPoint == -999 || yPoint == -999)
-      {
-        MACH3LOG_ERROR("Something has gone wrong in the knot finding");
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
       UniqueSystXPts[iSpline][iKnot] = xPoint;
     }
 	//ETA - let this just be set as the first segment by default
@@ -705,8 +689,7 @@ void splineFDBase::PrepForReweight()
   }
   
 
-  std::cout << "nUniqueSysts:" << nUniqueSysts << " -----------------" << std::endl;
-  std::cout << std::endl;
+  MACH3LOG_INFO("nUniqueSysts: {}", nUniqueSysts);
 
   std::cout << std::setw(15) << "Spline Index"
             << " | " << std::setw(20) << "Syst Name"
@@ -762,6 +745,7 @@ void splineFDBase::PrepForReweight()
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
 void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
 //****************************************
+
   // Initialise all arrays to 1.0
   int nPoints;
   //No point evaluating a flat spline
@@ -776,29 +760,24 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray,
 
   for(int i=0; i<nPoints; i++){
     // Spline coefficients to be
+	// M3::float_t type is defined by the LOW_MEMORY_STRUCTS compiler flag
+	// so M3::float_t can be double or float depending on this
     M3::float_t x = M3::float_t(-999.99);
     M3::float_t y = M3::float_t(-999.99);
     M3::float_t b = M3::float_t(-999.99);
     M3::float_t c = M3::float_t(-999.99);
     M3::float_t d = M3::float_t(-999.99);
     splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
-    //Let's save some memory and store them as floats! (It's a surprise tool that will help with GPU later)
-    xArray[i]= x;
 
-    //Might as well copy ND here and 
-    xArray[i] =  x;
-    manyArray[i*4] =  y; // 4 because manyArray stores y,b,c,d
-    manyArray[i*4+1] =  b;
-    manyArray[i*4+2] =  c;
-    manyArray[i*4+3] =  d;
-    
-    if((xArray[i] == -999) | (manyArray[i*4] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*4+2] == -999) | (manyArray[i*4+3] == -999)){
-      MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
-      MACH3LOG_ERROR("pre cast to M3::float_t (x, y, b, c, d) = {}, {}, {}, {}, {}",x, y, b, c, d);
-      MACH3LOG_ERROR("post cast to float (x, y, b, c, d) = {}, {}, {}, {}, {}",xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*4+3]);	    
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+	// Store the coefficients for each knot contiguously in memory
+	// 4 because manyArray stores y,b,c,d
+    xArray[i] = x;
+    manyArray[i*4] = y; 
+    manyArray[i*4+1] = b;
+    manyArray[i*4+2] = c;
+    manyArray[i*4+3] = d;    
   }
+
   //We now clean up the splines!
   delete splinevec_Monolith[splineindex];
   splinevec_Monolith[splineindex] = NULL;
