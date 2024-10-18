@@ -1,7 +1,7 @@
 #pragma once
 
 /// @brief constructors are same for all three so put in here
-struct fdmc_base {
+struct FarDetectorCoreInfo {
   int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
   int oscnutype;    
   int nupdg;
@@ -19,7 +19,7 @@ struct fdmc_base {
   const double** x_var;
   const double** y_var;
   const double **rw_etru;
-  const double **rw_truecz = NULL;
+  const double **rw_truecz = nullptr;
 
   /// xsec bins
   std::list< int > *xsec_norms_bins;

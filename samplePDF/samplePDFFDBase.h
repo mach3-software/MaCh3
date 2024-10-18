@@ -14,7 +14,7 @@
 #include "covariance/covarianceOsc.h"
 
 #include "samplePDF/samplePDFBase.h"
-#include "samplePDF/FDMCStruct.h"
+#include "samplePDF/FarDetectorCoreInfoStruct.h"
 
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;
@@ -106,6 +106,7 @@ public:
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
   
+  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
   std::unique_ptr<splineFDBase> SplineHandler;
   //===============================================================================
   void fillSplineBins();
