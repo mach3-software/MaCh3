@@ -79,7 +79,7 @@ void samplePDFFDBase::ReadSampleConfig()
   }
   
   for (int i=0;i<nSamples;i++) {
-    struct fdmc_base obj = fdmc_base();
+    struct FarDetectorCoreInfo obj = FarDetectorCoreInfo();
     MCSamples.push_back(obj);
   }
   
@@ -402,8 +402,8 @@ void samplePDFFDBase::fillArray() {
   }
 
   PrepFunctionalParameters();
-  if(splineFile){
-    splineFile->Evaluate();
+  if(SplineHandler){
+    SplineHandler->Evaluate();
   }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
@@ -419,7 +419,7 @@ void samplePDFFDBase::fillArray() {
       double funcweight = 1.0;
       double totalweight = 1.0;
       
-      if(splineFile){
+      if(SplineHandler){
         splineweight *= CalcXsecWeightSpline(iSample, iEvent);
       }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
@@ -558,8 +558,8 @@ void samplePDFFDBase::fillArray_MP()
     PrepFunctionalParameters();
     //==================================================
     //Calc Weights and fill Array
-    if(splineFile){
-      splineFile->Evaluate();
+    if(SplineHandler){
+      SplineHandler->Evaluate();
     }
     
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
@@ -585,7 +585,7 @@ void samplePDFFDBase::fillArray_MP()
 	//DB SKDet Syst
 	//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 	
-	if(splineFile){
+	if(SplineHandler){
 	  splineweight *= CalcXsecWeightSpline(iSample, iEvent);
 	}
 	//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
@@ -791,7 +791,7 @@ void samplePDFFDBase::SetupNormParameters(){
 //A way to check whether a normalisation parameter applies to an event or not
 void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
-  fdmc_base *fdobj = &MCSamples[iSample];
+  FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::list< int > XsecBins = {};
@@ -1453,10 +1453,10 @@ void samplePDFFDBase::fillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
       case 1:
-	EventSplines = splineFile->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+	EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
 	break;
       case 2:
-	EventSplines = splineFile->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+	EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
 	break;
       default:
 	MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
@@ -1471,7 +1471,7 @@ void samplePDFFDBase::fillSplineBins() {
       MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
       for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
 	//Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-	MCSamples[i].xsec_spline_pointers[j][spline] = splineFile->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
+	MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
 									      EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
       }
     }
@@ -1520,8 +1520,8 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  MCSamples[iSample] = fdmc_base();
-  fdmc_base *fdobj = &MCSamples[iSample];
+  MCSamples[iSample] = FarDetectorCoreInfo();
+  FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
   fdobj->nutype = -9;
@@ -1600,10 +1600,10 @@ void samplePDFFDBase::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  splineFile->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
-  splineFile->PrintArrayDimension();
-  splineFile->CountNumberOfLoadedSplines(false, 1);
-  splineFile->TransferToMonolith();
+  SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
+  SplineHandler->PrintArrayDimension();
+  SplineHandler->CountNumberOfLoadedSplines(false, 1);
+  SplineHandler->TransferToMonolith();
 
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
