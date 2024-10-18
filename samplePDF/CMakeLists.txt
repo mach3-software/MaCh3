@@ -2,7 +2,6 @@ set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
     Structs.h
-    ShiftFunctors.h
     FDMCStruct.h
     GenericBinningTools.h
 )
@@ -12,9 +11,6 @@ add_library(SamplePDF SHARED
     samplePDFFDBase.cpp
     Structs.cpp
     GenericBinningTools.cpp
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:probGpu.cu>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu.cu>
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:kdeGpu2.cu>
 )
 
 target_link_libraries(SamplePDF Splines NuOscillator Covariance MaCh3CompilerOptions)

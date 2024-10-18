@@ -19,7 +19,6 @@
 
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
-#include "samplePDF/ShiftFunctors.h"
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFFDBase :  public samplePDFBase
@@ -49,29 +48,17 @@ public:
 
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
-
-  // Setup and config functions
-  void UseNonDoubledAngles(bool ans) {doubled_angle = ans;};
   
-  const double **oscpars;
+
   void SetXsecCov(covarianceXsec* xsec_cov);
-  void SetOscCov(covarianceOsc* osc_cov);
+
+  /// @brief setup the Oscillation covariance object to get values to calculate probailities from
+  void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  /// @deprecated The `DumpWeights` function is deprecated and should not be used.
-  /// It was kept for backwards compatibility in compiling but has no effect.
-  ///
-  /// @note This function was marked for deprecation as of 14/01/2015 by KD.
-  ///       - DB (27/08/2020): The function is incredibly hardcoded.
-  ///       - DB Consider using 'LetsPrintSomeWeights' to achieve the same functionality.
-  ///
-  /// @param outname The name of the output file.
-  virtual void DumpWeights(std::string outname) {(void)outname; return; };
-  //================================================================================
-
-  virtual void setupSplines(fdmc_base *skobj, const char *SplineFileName, int nutype, int signal){};
+  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
   void ReadSampleConfig();
 
 struct GenericBinning {
@@ -104,13 +91,13 @@ struct GenericBinning {
   // @brief Initialise any variables that your experiment specific samplePDF needs
   virtual void Init() = 0;
 
-  //DB Experiment specific setup, returns the number of events which were loaded
+  /// @brief Experiment specific setup, returns the number of events which were loaded
   virtual int setupExperimentMC(int iSample) = 0;
 
-  //DB Function which translates experiment struct into core struct
+  /// @brief Function which translates experiment struct into core struct
   virtual void setupFDMC(int iSample) = 0;
 
-  //DB Function which does a lot of the lifting regarding the workflow in creating different MC objects
+  /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
   
   splineFDBase *splineFile;
@@ -148,8 +135,6 @@ struct GenericBinning {
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
-  /// @brief Is the sample for when operating in Reverse Horn Current, read in from sample config
-  bool GetIsRHC() {return IsRHC;}
   /// @brief Calculate the spline weight for a given event
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
   /// @brief Calculate the norm weight for a given event
@@ -217,20 +202,14 @@ struct GenericBinning {
 
   //===============================================================================
   //MC variables
-  std::vector<struct fdmc_base> MCSamples;
-  TFile *_sampleFile;
-  TTree *_data;
+  std::vector<fdmc_base> MCSamples;
   //===============================================================================
 
   //===============================================================================
   /// DB Variables required for oscillation
   std::vector<OscillatorBase*> NuOscProbCalcers;
-  std::string NuOscillatorConfigFile;
-  
-  //===============================================================================
-  
-  //Variables controlling oscillation parameters
-  bool doubled_angle;
+  std::string NuOscillatorConfigFile; 
+  //=============================================================================== 
 
   //===============================================================================
   //DB Covariance Objects
@@ -245,15 +224,15 @@ struct GenericBinning {
   int nDimensions;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
   int SampleDetID;
-  /// @breif Is the sample for events collected in Reverse Horn Current. Important for flux systematics
-  bool IsRHC;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
+  /// @brief the name of this sample e.g."muon-like"
   std::string samplename;
 
-  /// Information to store for normalisation pars
+  /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
+  /// @brief the total number of function parameters found in the xsec model
   int nFuncParams;
   std::vector<std::string> funcParsNames;
   std::vector<int> funcParsIndex;
@@ -294,9 +273,4 @@ struct GenericBinning {
   std::vector<int> sample_oscnutype;
   std::vector<int> sample_nutype;
   std::vector<bool> sample_signal;
-
-  std::string mtupleprefix;
-  std::string mtuplesuffix;
-  std::string splineprefix;
-  std::string splinesuffix;
 };
