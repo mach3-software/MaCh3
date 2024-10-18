@@ -6,6 +6,7 @@ pyMaCh3
 
    manager.rst
    sample-pdf.rst
+   splines.rst
    fitter.rst
    covariance.rst
    plotting.rst
