@@ -2,6 +2,7 @@
 
 //C++ includes
 #include <list>
+#include <filesystem>
 
 //ROOT includes
 #include "THStack.h"
@@ -30,7 +31,7 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName(){return samplename;}
+  std::string GetName() const {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -59,6 +60,24 @@ public:
 
   virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
   void ReadSampleConfig();
+
+struct GenericBinning {
+    //for each axis tells you how many bins to step to get to the next bin
+    std::vector<int> nbins_per_slice;
+    std::vector<std::vector<double>> BinsEdges;
+    // LP - these are the SamplePDFFDBase subclass KineParameter identifiers
+    std::vector<int> VarEnums;
+    std::vector<TAxis> Axes;
+
+    //the axis bin numbers passed in here do not include the ROOT underflow at bin 0, so bin 0 is the first real bin
+    int GetGlobalBinNumber(std::vector<int> const &axis_bin_numbers) const;
+    int GetGlobalBinNumber(std::vector<double> const &values) const;
+    std::vector<int> DecomposeGlobalBinNumber(int gbi) const;
+    int GetNDimensions() const { return Axes.size(); }
+    double GetGlobalBinHyperVolume(int gbi) const;
+  } generic_binning;
+
+  int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
@@ -102,6 +121,7 @@ public:
   std::vector<std::string> SplineVarNames;
   std::vector<double> SampleXBins;
   std::vector<double> SampleYBins;
+
   //===============================================================================
 
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
@@ -122,15 +142,25 @@ public:
   /// @brief Virtual so this can be over-riden in an experiment derived class
   virtual double CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
 
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
-  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
-  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
-  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual const double &
+  ReturnKinematicParameterByReference(int KinematicParameter, int iSample,
+                                      int iEvent) = 0;
+  // LP - use this to implement kinematic parameters that are not doubles (so we
+  // cannot return the address of one), but can be cast to doubles, note that this
+  // will likely cause extreme confusion and the fact we might need this
+  // indicates an issue in our abstraction. Parameters defined in
+  // implementations of this method can not be used as projection variables,
+  // which are kept as pointers to doubles. They can be used as projection 
+  // variables for the 'generic' binning where the pointers are to the global 
+  // bin number array
+  virtual double ReturnKinematicParameter(int KinematicParameter, int iSample,
+                                          int iEvent) = 0;
+
+  virtual std::vector<double> ReturnKinematicParameterBinning(int KinematicParameter) = 0; //Returns binning for parameter Var
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual std::string ReturnStringFromKinematicParameter(int KinematicParameter) = 0;
 
   // Function to setup Functional and shift parameters. This isn't idea but
   // do this in your experiment specific code for now as we don't have a 
@@ -237,8 +267,8 @@ public:
   float Unity_F = 1.;
   float Zero_F = 0.;
 
-  std::vector<std::string> mc_files;
-  std::vector<std::string> spline_files;
+  std::vector<std::filesystem::path> mc_files;
+  std::vector<std::filesystem::path> spline_files;
   std::vector<int> sample_vecno;
   std::vector<int> sample_oscnutype;
   std::vector<int> sample_nutype;
