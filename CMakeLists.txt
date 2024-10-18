@@ -41,9 +41,10 @@ find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
-################################## Dependencies ################################
 #KS: Store some handy cmake functions
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Utils.cmake)
+
+################################## Dependencies ################################
 #Loads all dependencies
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
@@ -64,7 +65,7 @@ if(ROOT_CXX_STANDARD LESS 14 AND ROOT_VERSION VERSION_LESS 6.32.00)
 endif()
 
 ############################  Setting Flags  ####################################
-# Check the where to install 
+# Check the where to install
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 
 # add cmake script files
@@ -154,10 +155,6 @@ if(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
-if(USE_PROB3)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
-endif()
-
 if(MaCh3_GPU_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
@@ -178,6 +175,9 @@ install(TARGETS MaCh3CompilerOptions
 
 #Include logger
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)
+#Setup NuOscillator, this has to be here as it requires all flags to be setup
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/NuOscillatorSetup.cmake)
+
 ################################# Features ##################################
 #KS: Retrieve and print the compile options and link libraries for maximal verbose
 get_target_property(compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
@@ -206,9 +206,6 @@ endforeach()
 add_subdirectory(manager)
 add_subdirectory(covariance)
 add_subdirectory(splines)
-if (NOT USE_PROB3)
-  add_subdirectory(OscClass)
-endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
@@ -222,7 +219,7 @@ endif()
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
+target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

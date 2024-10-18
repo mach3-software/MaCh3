@@ -113,7 +113,7 @@ cmessage(STATUS "Using \"${NSplines_GPU}\" for GPU EventByEvent Splines")
 #  add_compile_definitions(DEBUG_DUMP DEBUG_CUDA_ND280 DEBUG)
 
 #if(CUDAToolkit_VERSION GREATER_EQUAL 11)
-#  add_compile_options( 
+#  add_compile_options(
 #  	"$<$<COMPILE_LANGUAGE:CUDA>:-arch=sm_52>"
 #  	"$<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_35,code=sm_35>"
 #  	"$<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_52,code=sm_52>"
@@ -140,4 +140,3 @@ cmessage(STATUS "Using \"${NSplines_GPU}\" for GPU EventByEvent Splines")
 #  	"$<$<COMPILE_LANGUAGE:CUDA>:-gencode=arch=compute_35,code=compute_35>"
  # 	)
 #endif()
-  

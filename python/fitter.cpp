@@ -5,6 +5,7 @@
 #include "mcmc/FitterBase.h"
 #include "mcmc/mcmc.h"
 #include "mcmc/MinuitFit.h"
+#include "mcmc/PSO.h"
 
 namespace py = pybind11;
 
@@ -16,20 +17,37 @@ public:
 
     /* Trampoline (need one for each virtual function) */
     void runMCMC() override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             void,        /* Return type */
             FitterBase,  /* Parent class */
-            runMCMC,     /* Name of function in C++ (must match Python name) */
-                         /* Argument(s) */
+            "run",       /* Python name*/
+            runMCMC      /* Name of function in C++ (must match Python name) */
         );
     }
 
     std::string GetName() const override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             std::string, /* Return type */
             FitterBase,  /* Parent class */
-            GetName,     /* Name of function in C++ (must match Python name) */
-                         /* Argument(s) */
+            "get_name",  /* Python name*/
+            GetName      /* Name of function in C++ (must match Python name) */
+        );
+    }
+};
+
+// As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into python
+class PyLikelihoodFit : public LikelihoodFit {
+public:
+    /* Inherit the constructors */
+    using LikelihoodFit::LikelihoodFit;
+
+    /* Trampoline (need one for each virtual function) */
+    void runMCMC() override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,        /* Return type */
+            LikelihoodFit,/* Parent class */
+            "run",       /* Python name*/
+            runMCMC      /* Name of function in C++ (must match Python name) */
         );
     }
 };
@@ -45,13 +63,13 @@ void initFitter(py::module &m){
         .def(py::init<manager* const>())
         
         .def(
-            "runMCMC", 
+            "run", 
             &FitterBase::runMCMC, 
             "The implementation of the fitter, you should override this with your own desired fitting algorithm"
         )
 
         .def(
-            "GetName", 
+            "get_name", 
             &FitterBase::GetName, 
             " The name of the algorithm, you should override this with something like:: \n"
             "\n"
@@ -120,8 +138,6 @@ void initFitter(py::module &m){
         
     ; // End of FitterBase class binding
 
-    
-    
     py::class_<mcmc, FitterBase>(m_fitter, "MCMC")
         .def(py::init<manager* const>())
         
@@ -140,10 +156,41 @@ void initFitter(py::module &m){
         )
     ; // end of MCMC class binding
 
-    
-    py::class_<MinuitFit, FitterBase>(m_fitter, "MinuitFit")
+    py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitter, "LikelihoodFit")
+        .def(py::init<manager* const>())
+        
+        .def(
+            "caluclate_chi2",
+            [](LikelihoodFit &self, const std::vector<double> &parameterVals)
+            {
+                return self.CalcChi2(parameterVals.data());
+            },
+            "Get the Chi2 calculation over all included samples and syst objects for the specified parameter_values \n\
+            :param parameter_valuse: The location to evaluate the chi2 at.",
+            py::arg("parameter_values")
+        )
+
+        .def(
+            "get_n_params",
+            &LikelihoodFit::GetNPars,
+            "Get The total number of parameters across all known covariance objects associated with this LikelihoodFit object."
+        )
+    ; // end of LikelihoodFit class binding
+
+    py::class_<MinuitFit, LikelihoodFit>(m_fitter, "MinuitFit")
         .def(py::init<manager* const>())
         
     ; // end of MinuitFit class binding
+
+    py::class_<PSO, LikelihoodFit>(m_fitter, "PSO")
+        .def(py::init<manager* const>())
+
+        .def(
+            "init",
+            &PSO::init,
+            "Initialise the fitter"
+        )
+        
+    ; // end of PSO class binding
 
 }

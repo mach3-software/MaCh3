@@ -8,7 +8,8 @@
 #include "TLegend.h"
 
 //MaCh3 includes
-#include "OscClass/OscClass_CUDAProb3.h"
+#include "OscProbCalcer/OscProbCalcerBase.h"
+#include "Oscillator/OscillatorBase.h"
 
 #include "splines/splineFDBase.h"
 
@@ -17,7 +18,6 @@
 
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
-#include "samplePDF/ShiftFunctors.h"
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFFDBase :  public samplePDFBase
@@ -26,13 +26,11 @@ public:
   //######################################### Functions #########################################
 
   samplePDFFDBase(){};
-  samplePDFFDBase(double pot, std::string mc_version, covarianceXsec* xsec_cov);
+  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov);
   virtual ~samplePDFFDBase();
 
-  inline int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-
-  /// @brief Returns binning options
-  inline int GetBinningOpt(){return BinningOpt;}
+  int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  std::string GetName(){return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -49,61 +47,42 @@ public:
 
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
-
-  // Setup and config functions
-  void UseNonDoubledAngles(bool ans) {doubled_angle = ans;};
-  void UseBinnedOscReweighting(bool ans);
-  void UseBinnedOscReweighting(bool ans, int nbins, double *osc_bins);
   
-#if defined (USE_PROB3) && defined (CPU_ONLY)
-  inline double calcOscWeights(int sample, int nutype, int oscnutype, double en);
-#endif
 
-#if defined (USE_PROB3) && not defined (CPU_ONLY)
-  void calcOscWeights(int nutype, int oscnutype, double *en, double *w, int num);
-#endif
-
-#if not defined (USE_PROB3)
-  void calcOscWeights(int sample, int nutype, double *w);
-#endif
-
-  inline std::string GetName() const override { return samplename; }
-
-  const double **oscpars;
   void SetXsecCov(covarianceXsec* xsec_cov);
-  void SetOscCov(covarianceOsc* osc_cov);
 
-  /// @deprecated The `DumpWeights` function is deprecated and should not be used.
-  /// It was kept for backwards compatibility in compiling but has no effect.
-  ///
-  /// @note This function was marked for deprecation as of 14/01/2015 by KD.
-  ///       - DB (27/08/2020): The function is incredibly hardcoded.
-  ///       - DB Consider using 'LetsPrintSomeWeights' to achieve the same functionality.
-  ///
-  /// @param outname The name of the output file.
-  virtual void DumpWeights(std::string outname) {(void)outname; return; };
-  //================================================================================
+  /// @brief setup the Oscillation covariance object to get values to calculate probailities from
+  void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
 
-  virtual void setupSplines(fdmc_base *skobj, const char *splineFileName, int nutype, int signal){(void)skobj; (void)splineFileName; (void)nutype; (void)signal;};
-  /// @brief LW - Setup Osc
-  void virtual SetupOscCalc(double PathLength, double Density);
-  void SetOscillator(Oscillator* Osc_);
-  void FindEventOscBin();
+  ///  @brief including Dan's magic NuOscillator
+  void SetupNuOscillator();
+
+  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
+  void ReadSampleConfig();
 
  protected:
-  /// @todo - I think this will be tricky to abstract. fdmc_base will have to contain the pointers to the appropriate weights, can probably pass the number of these weights to constructor?
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
+
+  /// @todo abstract the spline initialisation completely to core
+  /// @brief initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up
+  virtual void SetupSplines() = 0;
+
+  //DB Require all objects to have a function which reads in the MC
+  // @brief Initialise any variables that your experiment specific samplePDF needs
+  virtual void Init() = 0;
+
+  /// @brief Experiment specific setup, returns the number of events which were loaded
+  virtual int setupExperimentMC(int iSample) = 0;
+
+  /// @brief Function which translates experiment struct into core struct
+  virtual void setupFDMC(int iSample) = 0;
+
+  /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
+  void Initialise();
   
   splineFDBase *splineFile;
   //===============================================================================
-  //DB Functions relating to sample and exec setup  
-  //ETA - abstracting these core functions
-  //init will setup all the specific variables 
-  //void init(double pot, std::string mc_version, covarianceXsec *xsec_cov){return;};
-  //void setupMC(manager* sample_manager, const char *sampleInputFile, const char *splineFile, fdmc_base *fdobj, double pot, int nutype, int oscnutype, bool signal, int iSample, bool hasfloats=false){std::cout << "SAMPLEPDFFDBase::setupMC " << std::endl; return;};
-  //virtual void setupSplines(fdmc_base *skobj, const char *splineFile, int nutype, int signal);
-
   void fillSplineBins();
 
   //Functions which find the nominal bin and bin edges
@@ -120,7 +99,7 @@ public:
   void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
   void SetupSampleBinning();
   std::string XVarStr, YVarStr;
-  unsigned int SampleNXBins, SampleNYBins;
+  std::vector<std::string> SplineVarNames;
   std::vector<double> SampleXBins;
   std::vector<double> SampleYBins;
   //===============================================================================
@@ -134,9 +113,8 @@ public:
   bool IsEventSelected(const std::vector<std::string>& ParameterStr, const int iSample, const int iEvent);
   bool IsEventSelected(const std::vector<std::string>& ParameterStr, const std::vector<std::vector<double>> &SelectionCuts, const int iSample, const int iEvent);
 
+  /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
-  /// @brief This just gets read in from a yaml file
-  bool GetIsRHC() {return IsRHC;}
   /// @brief Calculate the spline weight for a given event
   double CalcXsecWeightSpline(const int iSample, const int iEvent);
   /// @brief Calculate the norm weight for a given event
@@ -147,10 +125,12 @@ public:
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
-  virtual const double* ReturnKinematicParameterByReference(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual const double* ReturnKinematicParameterByReference(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
+  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  //virtual double StringToKinematicVar(std::string kinematic_str) = 0;
+  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
 
   // Function to setup Functional and shift parameters. This isn't idea but
   // do this in your experiment specific code for now as we don't have a 
@@ -166,16 +146,15 @@ public:
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
+  /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting but multithreaded
   void fillArray_MP();
 #endif
+  /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting
   void fillArray();
 
   /// @brief Helper function to reset histograms
   inline void ResetHistograms();
   
-#ifndef USE_PROB3
-  inline cudaprob3::ProbType SwitchToCUDAProbType(CUDAProb_nu CUDAProb_nu);  
-#endif
   //===============================================================================
   //DB Variables required for GetLikelihood
   //
@@ -193,22 +172,14 @@ public:
 
   //===============================================================================
   //MC variables
-  std::vector<struct fdmc_base> MCSamples;
-  TFile *_sampleFile;
-  TTree *_data;
+  std::vector<fdmc_base> MCSamples;
   //===============================================================================
 
   //===============================================================================
   /// DB Variables required for oscillation
-  Oscillator *Osc;
-
-  /// An axis to set binned oscillation weights
-  TAxis *osc_binned_axis;
-  //===============================================================================
-  
-  //Variables controlling oscillation parameters
-  bool doubled_angle;
-  bool osc_binned;
+  std::vector<OscillatorBase*> NuOscProbCalcers;
+  std::string NuOscillatorConfigFile; 
+  //=============================================================================== 
 
   //===============================================================================
   //DB Covariance Objects
@@ -216,21 +187,22 @@ public:
   //these should be added to samplePDFBase to be honest
   covarianceXsec *XsecCov;
   covarianceOsc *OscCov;
+
   //=============================================================================== 
 
-  //ETA - binning opt can probably go soon...
-  int BinningOpt;
-  /// keep track of the dimensions of the sample binning
+  /// @brief Keep track of the dimensions of the sample binning
   int nDimensions;
+  /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
   int SampleDetID;
-  bool IsRHC;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
+  /// @brief the name of this sample e.g."muon-like"
   std::string samplename;
 
-  /// Information to store for normalisation pars
+  /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
+  /// @brief the total number of function parameters found in the xsec model
   int nFuncParams;
   std::vector<std::string> funcParsNames;
   std::vector<int> funcParsIndex;
@@ -238,18 +210,37 @@ public:
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
-  std::vector< std::string > SelectionStr; 
-  std::vector< std::vector<double> > Selection; //The enum, then the bounds corresponding to the string
-
-  // like in XsecNorms but for events in sample. Read in from sample yaml file
-  // in samplePDFExperimentBase.cpp
-  std::vector< std::vector<double> > SelectionBounds;
-
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
-  //std::vector< std::vector<double> > Selection;
+  /// @brief the Number of selections in the 
   int NSelections;
-  //What gets pulled from config options
-  std::vector< std::vector<double> > StoredSelection; 
-  //===========================================================================
+  
+  /// @brief What gets pulled from config options, these are constant after loading in
+  /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
+  std::vector< std::vector<double> > StoredSelection;
+  /// @brief the strings grabbed from the sample config specifying the selections
+  std::vector< std::string > SelectionStr; 
+  /// @brief the bounds for each selection lower and upper
+  std::vector< std::vector<double> > SelectionBounds;
+  /// @brief a way to store selection cuts which you may push back in the get1DVar functions
+  /// most of the time this is just the same as StoredSelection
+  std::vector< std::vector<double> > Selection;
+   //===========================================================================
+
+  manager* SampleManager;
+  void InitialiseSingleFDMCObject(int iSample, int nEvents);
+  void InitialiseSplineObject();
+
+  double Unity = 1.;
+  double Zero = 0.;
+  
+  float Unity_F = 1.;
+  float Zero_F = 0.;
+
+  std::vector<std::string> mc_files;
+  std::vector<std::string> spline_files;
+  std::vector<int> sample_vecno;
+  std::vector<int> sample_oscnutype;
+  std::vector<int> sample_nutype;
+  std::vector<bool> sample_signal;
 };
