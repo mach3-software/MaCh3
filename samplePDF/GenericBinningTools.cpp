@@ -36,10 +36,12 @@ std::unique_ptr<TH1> GetGenericBinningTH1(samplePDFFDBase &sample,
 
     hout = std::make_unique<TH1D>(hname.c_str(), htitle.c_str(),
                                   bin_edges.size() - 1, bin_edges.data());
+    hout->GetXaxis()->SetTitle(binning.Axes[0].GetTitle());
   } else {
     hout = std::make_unique<TH1D>(
         hname.c_str(), htitle.c_str(), flathist->GetXaxis()->GetNbins(), -0.5,
         double(flathist->GetXaxis()->GetNbins()) - 0.5);
+    hout->GetXaxis()->SetTitle("Global bin number");
   }
 
   for (int gbi = 0; gbi < flathist->GetXaxis()->GetNbins(); ++gbi) {
@@ -49,8 +51,6 @@ std::unique_ptr<TH1> GetGenericBinningTH1(samplePDFFDBase &sample,
     hout->SetBinContent(gbi + 1, flathist->GetBinContent(gbi + 1) * bw);
     hout->SetBinError(gbi + 1, flathist->GetBinError(gbi + 1) * bw);
   }
-
-  hout->GetXaxis()->SetTitle(binning.Axes[0].GetTitle());
 
   if (htitle.size()) {
     hout->SetTitle(htitle.c_str());
@@ -376,25 +376,92 @@ std::vector<std::unique_ptr<TH1>> GetGenericBinningTH1Slices(
 
   if (binning.GetNDimensions() < 2) {
     MACH3LOG_ERROR(
-        "GetGenericBinningTH1XSlices passed a samplePDFFDBase that isn't "
+        "GetGenericBinningTH1Slices passed a samplePDFFDBase that isn't "
         "using a generic binning of dimension >1 dimension = {}",
         binning.GetNDimensions());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  std::vector<std::unique_ptr<TH1>> out;
+    if (slice_ax >= binning.GetNDimensions()) {
+      MACH3LOG_ERROR("GetGenericBinningTH1Slices passed a invalid slice_ax = "
+                     "{}, for a generic binning with dimension = {}",
+                     slice_ax, binning.GetNDimensions());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    std::vector<std::unique_ptr<TH1>> out;
+
+    // loop through all global bins
+    for (int gbi = 0; gbi < binning.nbins_per_slice.back(); ++gbi) {
+      // only want one output per slice, so skip all global bins where ax_bin !=
+      // 0
+      auto axis_bins = binning.DecomposeGlobalBinNumber(gbi);
+      if (axis_bins[slice_ax] != 0) {
+        continue;
+      }
+
+      std::stringstream ss;
+      ss << fmt::format("ax{}slice_", slice_ax);
+      // build the slice definition for this bin, could do it directly with bin
+      // numbers, but this uses the existing public interface and isn't much
+      // extra work.
+      std::vector<double> slice_definition(axis_bins.size());
+      for (int axi = 0; axi < binning.Axes.size(); ++axi) {
+        slice_definition[axi] =
+            binning.Axes[axi].GetBinCenter(axis_bins[axi] + 1);
+        ss << (axi == slice_ax) ? fmt::format("along{}", axi)
+                                : fmt::format("bin{}", axis_bins[axi]);
+      }
+      slice_definition[slice_ax] = kSliceAx;
+
+      out.push_back(GetGenericBinningTH1Slice(
+          sample, slice_definition, fmt::format("{}_{}", hname_pat, ss.str()),
+          htitle, divide_by_ND_hypervolume));
+    }
+
+    return out;
+}
+
+std::vector<std::unique_ptr<TH2>> GetGenericBinningTH2Slices(
+    samplePDFFDBase &sample, std::array<size_t, 2> slice_axes,
+    std::string const &hname_pat, std::string const &htitle,
+    bool divide_by_ND_hypervolume) {
+  auto const &binning = sample.generic_binning;
+
+  if (binning.GetNDimensions() < 3) {
+    MACH3LOG_ERROR(
+        "GetGenericBinningTH2Slices passed a samplePDFFDBase that isn't "
+        "using a generic binning of dimension >2 dimension = {}",
+        binning.GetNDimensions());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if ((slice_axes[0] == slice_axes[1]) ||
+      (slice_axes[0] >= binning.GetNDimensions()) ||
+      (slice_axes[1] >= binning.GetNDimensions())) {
+    MACH3LOG_ERROR("GetGenericBinningTH2Slices passed a invalid slice_axes: "
+                   "{}, for a generic binning with dimension = {}",
+                   slice_axes, binning.GetNDimensions());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (slice_axes[0] > slice_axes[1]) {
+    std::swap(slice_axes[0], slice_axes[1]);
+  }
+
+  std::vector<std::unique_ptr<TH2>> out;
 
   // loop through all global bins
   for (int gbi = 0; gbi < binning.nbins_per_slice.back(); ++gbi) {
     // only want one output per slice, so skip all global bins where ax_bin !=
     // 0
     auto axis_bins = binning.DecomposeGlobalBinNumber(gbi);
-    if (axis_bins[slice_ax] != 0) {
+    if ((axis_bins[slice_axes[0]] != 0) || (axis_bins[slice_axes[1]] != 0)) {
       continue;
     }
 
     std::stringstream ss;
-    ss << fmt::format("ax{}slice_", slice_ax);
+    ss << fmt::format("ax{}ax{}slice_", slice_axes[0], slice_axes[1]);
     // build the slice definition for this bin, could do it directly with bin
     // numbers, but this uses the existing public interface and isn't much extra
     // work.
@@ -402,12 +469,14 @@ std::vector<std::unique_ptr<TH1>> GetGenericBinningTH1Slices(
     for (int axi = 0; axi < binning.Axes.size(); ++axi) {
       slice_definition[axi] =
           binning.Axes[axi].GetBinCenter(axis_bins[axi] + 1);
-      ss << (axi == slice_ax) ? fmt::format("along{}", axi)
-                              : fmt::format("bin{}", axis_bins[axi]);
+      ss << ((axi == slice_axes[0]) || (axi == slice_axes[1]))
+          ? fmt::format("along{}", axi)
+          : fmt::format("bin{}", axis_bins[axi]);
     }
-    slice_definition[slice_ax] = kSliceAx;
+    slice_definition[slice_axes[0]] = kSliceAx;
+    slice_definition[slice_axes[1]] = kSliceAx;
 
-    out.push_back(GetGenericBinningTH1Slice(
+    out.push_back(GetGenericBinningTH2Slice(
         sample, slice_definition, fmt::format("{}_{}", hname_pat, ss.str()),
         htitle, divide_by_ND_hypervolume));
   }

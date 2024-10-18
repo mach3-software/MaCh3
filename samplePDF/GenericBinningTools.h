@@ -60,4 +60,9 @@ std::vector<std::unique_ptr<TH1>> GetGenericBinningTH1Slices(
     samplePDFFDBase &sample, size_t slice_ax, std::string const &hname_pat,
     std::string const &htitle = "", bool divide_by_ND_hypervolume = true);
 
+std::vector<std::unique_ptr<TH2>> GetGenericBinningTH2Slices(
+    samplePDFFDBase &sample, std::array<size_t, 2> slice_axes,
+    std::string const &hname_pat, std::string const &htitle = "",
+    bool divide_by_ND_hypervolume = true);
+
 constexpr double kSliceAx = 0xdeadbeef;
