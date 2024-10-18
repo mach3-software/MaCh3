@@ -253,10 +253,10 @@ void samplePDFFDBase::ReadSampleConfig()
   auto const &splinesuffix = input_files["splinesuffix"].as<std::string>("");
 
   for (auto const &osc_channel : config_ydoc["SubSamples"]) {
-    mtuple_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
-    if(!std::filesystem::exists(mtuple_files.back())){
+    mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
+    if(!std::filesystem::exists(mc_files.back())){
       MACH3LOG_ERROR("mtuple file path \"{}\" does not exist.",
-                 mtuple_files.back().native());
+                 mc_files.back().native());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     

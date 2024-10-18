@@ -267,7 +267,7 @@ struct GenericBinning {
   float Unity_F = 1.;
   float Zero_F = 0.;
 
-  std::vector<std::filesystem::path> mtuple_files;
+  std::vector<std::filesystem::path> mc_files;
   std::vector<std::filesystem::path> spline_files;
   std::vector<int> sample_vecno;
   std::vector<int> sample_oscnutype;
