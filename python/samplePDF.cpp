@@ -70,6 +70,70 @@ public:
         );
     }
 
+    /* Trampoline (need one for each virtual function) */
+    void SetupSplines() override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,            /* Return type */
+            samplePDFFDBase, /* Parent class */
+            "setup_splines", /*python name*/
+            SetupSplines,     /* Name of function in C++ */
+                             /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    void Init() override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,            /* Return type */
+            samplePDFFDBase, /* Parent class */
+            "init",          /*python name*/
+            Init,            /* Name of function in C++ */
+                             /* Argument(s) */
+        );
+    }
+    
+    /* Trampoline (need one for each virtual function) */
+    int setupExperimentMC(int) override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            int,             /* Return type */
+            samplePDFFDBase, /* Parent class */
+            "setup_experiment_MC", /*python name*/
+            setupExperimentMC,     /* Name of function in C++ */
+            py::arg("sample_id")   /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    void setupFDMC(int) override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,            /* Return type */
+            samplePDFFDBase, /* Parent class */
+            "setup_FD_MC",   /*python name*/
+            setupFDMC,       /* Name of function in C++ */
+            py::arg("sample_id") /* Argument(s) */
+        );
+    }
+
+    int ReturnKinematicParameterFromString(std::string) override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            int,                     /* Return type */
+            samplePDFFDBase,            /* Parent class */
+            "get_kinematic_by_name",    /* python name*/
+            ReturnKinematicParameterFromString, /* Name of function in C++ (must match Python name) */
+            py::arg("variable_name")
+        );
+    }
+    
+    std::string ReturnStringFromKinematicParameter(int) override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            std::string,                /* Return type */
+            samplePDFFDBase,            /* Parent class */
+            "get_kinematic_name",       /* python name*/
+            ReturnStringFromKinematicParameter, /* Name of function in C++ (must match Python name) */
+            py::arg("variable_id")
+        );
+    }
+
     double ReturnKinematicParameter(std::string, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
@@ -81,6 +145,7 @@ public:
             py::arg("event")            /* Argument(s) */
         );
     }
+
     double ReturnKinematicParameter(double, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
@@ -93,23 +158,23 @@ public:
         );
     }
 
-    const double *ReturnKinematicParameterByReference(std::string, int, int) override {
+    const double *GetPointerToKinematicParameter(std::string, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
             samplePDFFDBase,            /* Parent class */
             "get_event_kinematic_value_reference",/* python name*/
-            ReturnKinematicParameterByReference, /* Name of function in C++ (must match Python name) */
+            GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
             py::arg("sample"),
             py::arg("event")            /* Argument(s) */
         );
     }
-    const double *ReturnKinematicParameterByReference(double, int, int) override {
+    const double *GetPointerToKinematicParameter(double, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
             samplePDFFDBase,            /* Parent class */
             "get_event_kinematic_value_reference",/* python name*/
-            ReturnKinematicParameterByReference, /* Name of function in C++ (must match Python name) */
+            GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
             py::arg("sample"),
             py::arg("event")            /* Argument(s) */
@@ -151,7 +216,7 @@ void initSamplePDF(py::module &m){
         .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmottele)
         .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
 
-    py::class_<samplePDFBase, PySamplePDFBase /* <--- trampoline*/>(m_sample_pdf, "_SamplePDFBase")
+    py::class_<samplePDFBase, PySamplePDFBase /* <--- trampoline*/>(m_sample_pdf, "SamplePDFBase")
         .def(py::init())
         
         .def(
@@ -201,13 +266,12 @@ void initSamplePDF(py::module &m){
 
     py::class_<samplePDFFDBase, PySamplePDFFDBase /* <--- trampoline*/, samplePDFBase>(m_sample_pdf, "SamplePDFFDBase")
         .def(
-            py::init<double, std::string, covarianceXsec*>(),
+            py::init<std::string, covarianceXsec*>(),
             "This should never be called directly as samplePDFFDBase is an abstract base class. \n\
             However when creating a derived class, in the __init__() method, you should call the parent constructor i.e. this one by doing:: \n\
             \n\
-            \tsuper(<your derived samplePDF class>, self).__init__() \n\
+            \tsuper(<your derived samplePDF class>, self).__init__(*args) \n\
             \n ",
-            py::arg("pot"),
             py::arg("mc_version"),
             py::arg("xsec_cov")
         )
