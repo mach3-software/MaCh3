@@ -189,7 +189,7 @@ void initCovariance(py::module &m){
         .def(
             "get_par_type",
             &covarianceXsec::GetParamType,
-            "Get what type of systematic this parameters is (see :py:enum:`pyMaCh3.covarianc.SystematicType` for possible types). \n\
+            "Get what type of systematic this parameters is (see :py:enum:`pyMaCh3.covariance.SystematicType` for possible types). \n\
             :param index: The global index of the parameter",
             py::arg("index")
         )
