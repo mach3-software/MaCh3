@@ -280,12 +280,27 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
   {
     std::vector<double> branch_vals(systematics[s]->GetNumParams());
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      branch_vals[i] = _BAD_DOUBLE_;
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
     }
     posts->GetEntry(posts->GetEntries()-1);
 
+    // TODO maybe print parameters which are stored in MCMC file this will help with verbose
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      if(branch_vals[i] == _BAD_DOUBLE_)
+      {
+        MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
+        MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);
+
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+
     systematics[s]->setParameters(branch_vals);
     systematics[s]->acceptStep();
+
+    MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
+    systematics[s]->printNominalCurrProp();
   }
   stepStart = step_val;
   logLCurr = log_val;
