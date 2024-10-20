@@ -45,7 +45,7 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
+bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::filesystem::path> OscChanFileNames, std::vector<std::string> SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
@@ -386,22 +386,27 @@ void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
 }
 
 //****************************************
-std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::string SampleName)
+std::vector<TAxis *> splineFDBase::FindSplineBinning(std::filesystem::path FileName, std::string SampleName)
 //****************************************
 {
+
+  if(!std::filesystem::exists(FileName)){
+    MACH3LOG_ERROR("File: \"{}\" does not exist", FileName.native());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
   std::vector<TAxis *> ReturnVec;
   int iSample=getSampleIndex(SampleName);
 
   TFile *File = new TFile(FileName.c_str());
   if (!File || File->IsZombie())
   {
-    MACH3LOG_ERROR("File {} not found", FileName);
-    MACH3LOG_ERROR("This is caused by something here! {} : {}", __FILE__, __LINE__);
+    MACH3LOG_ERROR("ROOT failed to open file: \"{}\" not found", FileName.native());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   MACH3LOG_INFO("Finding binning for:");
-  spdlog::info("{}", FileName);
+  spdlog::info("{}", FileName.native());
 
   bool isHist2D = false;
   bool isHist3D = false;
@@ -416,7 +421,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     if (!Obj)
     {
       MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!");
-      MACH3LOG_ERROR("FileName: {}", FileName);
+      MACH3LOG_ERROR("FileName: {}", FileName.native());
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }

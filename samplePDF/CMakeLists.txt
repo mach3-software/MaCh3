@@ -3,12 +3,14 @@ set(HEADERS
     samplePDFFDBase.h
     Structs.h
     FDMCStruct.h
+    GenericBinningTools.h
 )
 
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
     Structs.cpp
+    GenericBinningTools.cpp
 )
 
 target_link_libraries(SamplePDF Splines NuOscillator Covariance MaCh3CompilerOptions)
