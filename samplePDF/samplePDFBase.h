@@ -26,7 +26,7 @@ class samplePDFBase
   virtual ~samplePDFBase();
 
   virtual inline _int_ GetNsamples(){ return nSamples; };
-  virtual inline std::string GetName()const {return "samplePDF";};
+  virtual std::string GetName() const {return "samplePDF";};
   virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
