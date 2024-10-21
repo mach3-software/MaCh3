@@ -20,6 +20,11 @@ class mcmc : public FitterBase {
   /// @brief Set initial step number, used when starting from another chain
   inline void setInitialStepNumber(const unsigned int stepNum = 0){stepStart = stepNum;};
   
+  /// @brief Allow to start from previous fit/chain
+  /// @param FitName Name of previous chain
+  /// @todo implement some check that number of params matches etc
+  void StartFromPreviousFit(const std::string& FitName);
+
   /// @brief Get name of class
   inline std::string GetName()const {return "MCMC";};
  private:
