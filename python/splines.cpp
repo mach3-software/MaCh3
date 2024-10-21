@@ -108,13 +108,20 @@ void initSplines(py::module &m){
 
                     if (length == 1)
                     {
-                        _float_ *pars[3];
-                        pars[0] = new double(0.0);
-                        pars[1] = new double(0.0);
-                        pars[2] = new double(0.0);
-                        return new TSpline3_red(xVals.data(), yVals.data(), 1, pars);
+                        _float_ xKnot = xVals[0];
+                        _float_ yKnot = yVals[0];
 
-                        delete[] pars;
+                        std::vector<_float_ *> pars;
+                        pars.resize(3);
+                        pars[0] = new _float_(0.0);
+                        pars[1] = new _float_(0.0);
+                        pars[2] = new _float_(0.0);
+
+                        return new TSpline3_red(&xKnot, &yKnot, 1, pars.data());
+
+                        delete pars[0];
+                        delete pars[1];
+                        delete pars[2];
                     }
                     else
                     {
@@ -148,7 +155,7 @@ void initSplines(py::module &m){
                 [](std::vector<std::vector<TResponseFunction_red*>> &responseFns, const bool saveFlatTree)
                 {
                     std::vector<RespFuncType> respFnTypes;
-                    for(int i = 0; i < responseFns[0].size(); i++)
+                    for(uint i = 0; i < responseFns[0].size(); i++)
                     {
                         // ** WARNING **
                         // Right now I'm only pushing back TSpline3_reds as thats all thats supported right now
