@@ -9,6 +9,8 @@ You can find additional documentation on our [Wiki](https://github.com/mach3-sof
 
 If you are new we recommend to start from our [Tutorial](https://github.com/mach3-software/MaCh3Validations)
 
+MaCh3 also comes with a Python interface. You can find out more about this in the dedicated [pyMaCh3 documentation](./python/mainpage)
+
 If something is unclear please contact us via
 - [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
