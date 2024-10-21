@@ -32,6 +32,9 @@ class covarianceXsec : public covarianceBase {
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
+    /// @brief Get the name of the spline associated with the spline at index i
+    /// @param i spline parameter index, not to be confused with global index
+    std::string GetParSplineName(const int i) {return _fSplineNames[i];}
 
     //DB Get spline parameters depending on given DetID
     const std::vector<int> GetGlobalSystIndexFromDetID(const int DetID, const SystType Type);

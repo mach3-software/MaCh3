@@ -81,8 +81,9 @@ class samplePDFBase
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
   double getTestStatLLH(const double data, const double mc, const double w2);
-  // Provide a setter for the test-statistic
-  //void SetTestStatistic(TestStatistic test_stat);
+  /// @brief Set the test statistic to be used when calculating the binned likelihoods 
+  /// @param testStat The test statistic to use.
+  inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
 
   virtual void fill1DHist()=0;
   virtual void fill2DHist()=0;
