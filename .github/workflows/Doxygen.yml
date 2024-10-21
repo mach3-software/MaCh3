@@ -49,18 +49,17 @@ jobs:
 
       ## EM: In order to build the python documentation we first need to build the pyMaCh3 module
       - name: Install Python dependencies
-        uses: py-actions/py-dependency-install@v4
-        with:
-          path: "requirements.txt"
+        run: pip install -r "requirements.txt"
         
       - name: Build pyMaCh3
         run: pip install .
 
       ## EM: Now generate the sphinx documentation
-      - name: Sphinx Build              
-        uses: ammaraskar/sphinx-action@0.4
-        with:
-          docs-folder: "Doc/sphinx"
+      - name: Sphinx Build    
+        working-directory: Doc/sphinx
+        run: | 
+          pip install -r requirements.txt
+          make
 
       ## EM: Move the generated sphinx docs into the final html folder
       - name: Move Sphinx Docs
