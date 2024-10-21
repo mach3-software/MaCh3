@@ -67,7 +67,7 @@ jobs:
           mkdir Doc/html/pyMaCh3
           mv Doc/sphinx/* Doc/html/pyMaCh3/
         
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: DocumentationHTML
           path: Doc/html
