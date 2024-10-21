@@ -13,14 +13,11 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow two jobs, one called "Build-Docs" and one called "Deploy"
+  # This workflow contains a single job called "Doxygen"
   
-  Build-Docs:
+  Doxygen:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    container:
-      image: ghcr.io/mach3-software/mach3:alma9latest
 
     permissions:
       contents: write
@@ -53,8 +50,23 @@ jobs:
       - name: Upload Doxygen Artifact
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: DoxygenHTML
           path: Doc/html
+
+  Sphinx:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    needs: Doxygen
+
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+      
+    steps:
+    
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
     
       ## EM: In order to build the python documentation we first need to build the pyMaCh3 module        
       - name: Build pyMaCh3
@@ -65,28 +77,35 @@ jobs:
         working-directory: Doc/sphinx
         run: | 
           pip install -r requirements.txt
-          make
-
+          make html
+      
+      - name: Download Doxygen Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: DoxygenHTML
+          location: to-upload/html
+          
       ## EM: Move the generated sphinx docs into the final html folder
       - name: Move Sphinx Docs
         run: |
-          mkdir Doc/html/pyMaCh3
-          mv Doc/sphinx/* Doc/html/pyMaCh3/
-
-  Deploy:
-    runs-on: ubuntu-latest
-    needs: Build-Docs
-    
-    steps:
+          ls
+          ls Doc
+          mkdir to-upload/html/pyMaCh3
+          mv Doc/sphinx/* to-upload/html/pyMaCh3/
+          
       - uses: actions/upload-artifact@v4
         with:
+          retention-days: 1
           name: DocumentationHTML
-          path: Doc/html
+          path: to-upload/html
+
+  #Deploy:
+  #  runs-on: ubuntu-latest
+  #  needs: [Doxygen, Sphinx]
         
       # Deploys the generated documentation to GitHub Pages
       #- name: Deploy
       #  uses: peaceiris/actions-gh-pages@v4
       #  with:
       #    github_token: ${{ secrets.GITHUB_TOKEN }}
-      #    publish_dir: ./Doc/html
-
+      #    publish_dir: ./to-upload/html
