@@ -67,14 +67,21 @@ jobs:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+
+      - name: Make Python Venv
+        run: |
+          python -m venv sphinx_env
+          source sphinx_env/bin/activate
       
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-    
-      ## EM: In order to build the python documentation we first need to build the pyMaCh3 module        
-      - name: Build pyMaCh3
-        run: pip install .
+      ## EM: In order to build the python documentation we first need to build the pyMaCh3 module  
+      - name: Build MaCh3
+        run: | 
+          mkdir build
+          cd build
+          cmake -DMaCh3_PYTHON_ENABLED=ON ../ 
+          make 
+          make install
+          source bin/setup.MaCh3.sh
 
       ## EM: Now generate the sphinx documentation
       - name: Sphinx Build    
