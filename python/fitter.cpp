@@ -124,16 +124,16 @@ void initFitter(py::module &m){
             "add_syst_object",
             &FitterBase::addSystObj,
             " This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans. \n"
-            " :param cov: A pointer to a Covariance object derived from covarianceBase. \n",
+            " :param cov: A Covariance object derived from covarianceBase. ",
             py::arg("cov")
         )
 
         .def(
             "add_osc_handler",
             py::overload_cast<covarianceOsc *>(&FitterBase::addOscHandler),
-            "  Adds an oscillation handler for covariance objects. \n"
-            " :param oscf: A pointer to a covarianceOsc object for forward oscillations. \n",
-            py::arg("oscf")
+            " Adds an oscillation handler for covariance objects. \n"
+            " :param oscf: An oscillation handler object for dealing with neutrino oscillation calculations. ",
+            py::arg("osc")
         )
         
     ; // End of FitterBase class binding

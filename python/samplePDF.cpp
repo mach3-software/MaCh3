@@ -19,33 +19,34 @@ public:
         PYBIND11_OVERRIDE_PURE(
             void,          /* Return type */
             samplePDFBase, /* Parent class */
-            reweight,      /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
+            reweight       /* Name of function in C++ (must match Python name) */
         );
     }
 
     double GetLikelihood() override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             double,        /* Return type */
             samplePDFBase, /* Parent class */
-            GetLikelihood, /* Name of function in C++ (must match Python name) */
+            "get_likelihood", /* Python name*/
+            GetLikelihood  /* Name of function in C++ (must match Python name) */
                            /* Argument(s) */
         );
     }
     
     void fill1DHist() override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             void,          /* Return type */
             samplePDFBase, /* Parent class */
-            fill1DHist,    /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
+            "fill_1d_hist", /* Python Name */
+            fill1DHist     /* Name of function in C++ (must match Python name) */
         );
     }
     
     void fill2DHist() override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             void,          /* Return type */
             samplePDFBase, /* Parent class */
+            "fill_2d_hist",/* Python name*/
             fill2DHist     /* Name of function in C++ (must match Python name) */
                            /* Argument(s) */
         );
@@ -254,7 +255,7 @@ void initSamplePDF(py::module &m){
         .def(
             "get_bin_LLH",
             py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH),
-            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:method:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
+            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
             :param data: The data content of the bin. \n\
             :param mc: The mc content of the bin \n\
             :param w2: The Sum(w_{i}^2) (sum of weights squared) in the bin, which is sigma^2_{MC stats}",

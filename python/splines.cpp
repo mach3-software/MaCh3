@@ -74,12 +74,12 @@ void initSplines(py::module &m){
 
     // Bind the interpolation type enum that lets us set different interpolation types for our splines
     py::enum_<SplineInterpolation>(m_splines, "InterpolationType")
-            .value("Linear", SplineInterpolation::kLinear)
-            .value("Linear_Func", SplineInterpolation::kLinearFunc)
-            .value("Cubic_TSpline3", SplineInterpolation::kTSpline3)
-            .value("Cubic_Monotonic", SplineInterpolation::kMonotonic)
-            .value("Cubic_Akima", SplineInterpolation::kAkima)
-            .value("N_Interpolation_Types", SplineInterpolation::kSplineInterpolations);
+            .value("Linear", SplineInterpolation::kLinear, "Linear interpolation between the knots")
+            .value("Linear_Func", SplineInterpolation::kLinearFunc, "Same as 'Linear'")
+            .value("Cubic_TSpline3", SplineInterpolation::kTSpline3, "Use same coefficients as `ROOT's TSpline3 <https://root.cern.ch/doc/master/classTSpline3.html>`_ implementation")
+            .value("Cubic_Monotonic", SplineInterpolation::kMonotonic, "Coefficients are calculated such that the segments between knots are forced to be monotonic. The implementation we use is based on `this method <https://www.jstor.org/stable/2156610>`_ by Fritsch and Carlson.")
+            .value("Cubic_Akima", SplineInterpolation::kAkima, "The second derivative is not required to be continuous at the knots. This means that these splines are useful if the second derivative is rapidly varying. The implementation we used is based on `this paper <http://www.leg.ufpr.br/lib/exe/fetch.php/wiki:internas:biblioteca:akima.pdf>`_ by Akima.")
+            .value("N_Interpolation_Types", SplineInterpolation::kSplineInterpolations, "This is only to be used when iterating and is not a valid interpolation type.");
 
     
     py::class_<SplineBase, PySplineBase /* <--- trampoline*/>(m_splines, "SplineBase");

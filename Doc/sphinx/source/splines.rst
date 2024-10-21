@@ -5,7 +5,7 @@ This module provides the utility for dealing with spline parameters. For some ba
 
 The main class which represents individual spline functions is :py:class:`pyMaCh3.splines.ResponseFunction`. 
 This is an abstract representation which covers multiple different types of interpolation, where the type of interpolation is specified at the time of construction.
-The available interpolation types are defined by :any:`pyMaCh3.splines.InterpolationType`. Here are some examples
+The available interpolation types are defined by :py:class:`pyMaCh3.splines.InterpolationType`. Here are some examples
 
 .. image:: spline-examples.png
   :width: 400
@@ -21,7 +21,7 @@ To construct a ResponseFunction you must specify the x and y positions of the kn
     TSpline3_response_2 = splines.ResponseFunction([0.0, 1.0, 2.0], [2.0, 3.0, 0.0], splines.InterpolationType.Cubic_TSpline3)
     linear_response_2 = splines.ResponseFunction([10.0, 11.0, 12.0], [3.0, 0.0, 4.5], splines.InterpolationType.Linear)
 
-Another important part of this module is the :any:`pyMaCh3.splines.EventSplineMonolith` class which allows you to easily and speedily deal with event-by-event splines in your analysis.
+Another important part of this module is the :py:class:`pyMaCh3.splines.EventSplineMonolith` class which allows you to easily and speedily deal with event-by-event splines in your analysis.
 To build this you first need to construct a response function for each event-by-event spline parameter for each of your events as in the example above.
 
 Let's take those example responses and build a simple EventSplineMonolith::
