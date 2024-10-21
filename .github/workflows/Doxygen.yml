@@ -46,11 +46,37 @@ jobs:
         with:
           doxyfile-path: './Doxyfile'
           working-directory: ./Doc
-  
-      # Deploys the generated documentation to GitHub Pages
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+
+      ## EM: In order to build the python documentation we first need to build the pyMaCh3 module
+      - name: Install Python dependencies
+        uses: py-actions/py-dependency-install@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./Doc/html
-    
+          path: "requirements.txt"
+        
+      - name: Build pyMaCh3
+        run: pip install .
+
+      ## EM: Now generate the sphinx documentation
+      - name: Sphinx Build              
+        uses: ammaraskar/sphinx-action@0.4
+        with:
+          docs-folder: "Doc/sphinx"
+
+      ## EM: Move the generated sphinx docs into the final html folder
+      - name: Move Sphinx Docs
+        run: |
+          mkdir Doc/html/pyMaCh3
+          mv Doc/sphinx/* Doc/html/pyMaCh3/
+        
+      - uses: actions/upload-artifact@v1
+        with:
+          name: DocumentationHTML
+          path: Doc/html
+        
+      # Deploys the generated documentation to GitHub Pages
+      #- name: Deploy
+      #  uses: peaceiris/actions-gh-pages@v4
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    publish_dir: ./Doc/html
+
