@@ -28,6 +28,9 @@ class SMonolith : public SplineBase {
     /// @brief Get class name
     inline std::string GetName()const {return "SplineMonolith";};
 
+    /// @brief Get number of spline parameters
+    short int GetNParams()const {return nParams;};
+
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     void SynchroniseMemTransfer();
 

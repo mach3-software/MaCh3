@@ -4,10 +4,10 @@
 #include <vector>
 #include <string>
 
-#include "plottingUtils.h"
-#include "plottingManager.h"
-#include "styleManager.h"
-#include "inputManager.h"
+#include "plotting/plottingUtils/plottingUtils.h"
+#include "plotting/plottingUtils/plottingManager.h"
+#include "plotting/plottingUtils/styleManager.h"
+#include "plotting/plottingUtils/inputManager.h"
 
 namespace py = pybind11;
 
@@ -15,7 +15,7 @@ namespace py = pybind11;
 void initPlotting(py::module &m){
 
     auto m_plotting = m.def_submodule("plotting");
-    m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library Library";
+    m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library.";
 
     py::class_<MaCh3Plotting::PlottingManager>(m_plotting, "PlottingManager")
         .def(

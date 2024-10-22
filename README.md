@@ -96,18 +96,23 @@ cmake ../ -DUSE_CPU=ON
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
 ## Oscillator
-MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
+MaCh3 uses several neutrino oscillation calculators.
+
+Following neutrino oscillation calculators are available:
+|Oscillator        | Hardware   | Source     | Reference  |
+|------------------|------------|------------|------------|
+| CUDAProb3Linear  | CPU/GPU    | Beam       |            |
+| CUDAProb3        | CPU/GPU    | Atm        | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
+| ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
+| Prob3++Linear    | CPU        | Beam       |            |
+| NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
+
+If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
-cmake ../ -DUSE_PROB3=<ON,OFF>
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
 ```
-Following neutrino oscillation calculators are available:
-
-|Oscillator  | Hardware   | Source     |
-|------------|------------|------------|
-| CUDAProb3  | CPU/GPU    | Beam/Atm   |
-| Prob3++    | CPU        | Beam       |
-| probGPU    | GPU        | Beam       |
+You can only specify engines you want to use, and you can in principle use more than one.
 
 ## Fitting algorithms
 The following fitting algorithms are available:

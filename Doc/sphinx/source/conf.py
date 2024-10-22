@@ -17,7 +17,8 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_automodapi.automodapi",
-    'sphinx_mdinclude'
+    "sphinx_mdinclude",
+    "enum_tools.autoenum"
     ]
 
 templates_path = ['_templates']
