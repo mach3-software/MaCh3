@@ -60,6 +60,30 @@ public:
   virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
   void ReadSampleConfig();
 
+  int getNMCSamples() {return MCSamples.size();}
+
+  int getNEventsInSample(int iSample) {
+    if (iSample < 0 || iSample > getNMCSamples()) {
+      MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
+      throw MaCh3Exception(__FILE__ , __LINE__);
+    }
+    return MCSamples[iSample].nEvents;
+  }
+  
+  std::string getFlavourName(int iSample) {
+    if (iSample < 0 || iSample > getNMCSamples()) {
+      MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
+      throw MaCh3Exception(__FILE__ , __LINE__);      
+    }
+    return MCSamples[iSample].flavourName;
+  }
+
+  TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
+
+  //ETA - new function to generically convert a string from xsec cov to a kinematic type
+  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
@@ -127,10 +151,6 @@ public:
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
-
-  //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
 
   // Function to setup Functional and shift parameters. This isn't idea but
   // do this in your experiment specific code for now as we don't have a 
