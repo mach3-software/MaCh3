@@ -60,6 +60,8 @@ jobs:
     
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
+
+    needs: Doxygen
       
     steps:
     
@@ -69,6 +71,17 @@ jobs:
       - name: Check Python 
         run: python3 --version
 
+      - name: Download Doxygen Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: DoxygenHTML
+          path: to-upload/
+
+      ## EM: Now we delete the artifact so it doesn't use up our allowance
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: DoxygenHTML
+          
       - name: Build MaCh3
         run: | 
           mkdir build
@@ -81,28 +94,15 @@ jobs:
       - name: Sphinx Build    
         working-directory: Doc/sphinx
         run: | 
-          echo BUILD DIR:
-          ls ../../build
-          echo
-          echo pyMaCh3 DIR:
-          ls ../../build/pyMaCh3
           source ../../build/bin/setup.MaCh3.sh
           python3 -m venv sphinx_env 
           source sphinx_env/bin/activate 
           pip install -r requirements.txt 
           make html
-      
-      - name: Download Doxygen Artifact
-        uses: actions/download-artifact@master
-        with:
-          name: DoxygenHTML
-          location: to-upload/
           
       ## EM: Move the generated sphinx docs into the final html folder
       - name: Move Sphinx Docs
         run: |
-          ls Doc
-          ls Doc/sphinx
           mkdir to-upload/pyMaCh3
           mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
           
