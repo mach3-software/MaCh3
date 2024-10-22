@@ -53,13 +53,11 @@ jobs:
           retention-days: 1
           name: DoxygenHTML
           path: Doc/html
-
+          
   Sphinx:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    needs: Doxygen
-
+    
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
       
@@ -68,47 +66,51 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      - name: Make Python Venv
-        run: |
-          python -m venv sphinx_env
-          source sphinx_env/bin/activate
-      
-      ## EM: In order to build the python documentation we first need to build the pyMaCh3 module  
+      - name: Check Python 
+        run: python3 --version
+
       - name: Build MaCh3
         run: | 
           mkdir build
-          cd build
-          cmake -DMaCh3_PYTHON_ENABLED=ON ../ 
+          cd build 
+          cmake -DMaCh3_PYTHON_ENABLED=ON ../
           make 
           make install
-          source bin/setup.MaCh3.sh
-
+          
       ## EM: Now generate the sphinx documentation
       - name: Sphinx Build    
         working-directory: Doc/sphinx
         run: | 
-          pip install -r requirements.txt
+          echo BUILD DIR:
+          ls ../../build
+          echo
+          echo pyMaCh3 DIR:
+          ls ../../build/pyMaCh3
+          source ../../build/bin/setup.MaCh3.sh
+          python3 -m venv sphinx_env 
+          source sphinx_env/bin/activate 
+          pip install -r requirements.txt 
           make html
       
       - name: Download Doxygen Artifact
         uses: actions/download-artifact@master
         with:
           name: DoxygenHTML
-          location: to-upload/html
+          location: to-upload/
           
       ## EM: Move the generated sphinx docs into the final html folder
       - name: Move Sphinx Docs
         run: |
-          ls
           ls Doc
-          mkdir to-upload/html/pyMaCh3
-          mv Doc/sphinx/* to-upload/html/pyMaCh3/
+          ls Doc/sphinx
+          mkdir to-upload/pyMaCh3
+          mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
           
       - uses: actions/upload-artifact@v4
         with:
           retention-days: 1
           name: DocumentationHTML
-          path: to-upload/html
+          path: to-upload
 
   #Deploy:
   #  runs-on: ubuntu-latest
