@@ -22,6 +22,9 @@ ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
 ENV MACH3_WORK_DIR=/opt/MaCh3/
 ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 
+RUN apt-get update
+RUN apt-get install -y python3
+
 RUN mkdir -p ${MACH3_WORK_DIR}
 
 WORKDIR /opt/

@@ -11,6 +11,8 @@ LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 RUN apt update && apt upgrade -y
 
+RUN apt-get install -y python3
+
 RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
 RUN apt install -y --no-install-recommends vim less nano gdb csh tcsh ed quota python3 python3-dev cvs procmail ca-certificates
