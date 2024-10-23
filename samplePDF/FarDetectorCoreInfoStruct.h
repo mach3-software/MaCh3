@@ -11,15 +11,15 @@ struct FarDetectorCoreInfo {
   double ChannelIndex;
   std::string flavourName;
 
-  int **Target; // target the interaction was on
+  std::vector<int*> Target; // target the interaction was on
 
   int SampleDetID;
 
   //THe x_var and y_vars that you're binning in
-  const double** x_var;
-  const double** y_var;
-  const double **rw_etru;
-  const double **rw_truecz = nullptr;
+  std::vector<const double*> x_var;
+  std::vector<const double*> y_var;
+  std::vector<const double*> rw_etru;
+  std::vector<const double*> rw_truecz;
 
   /// xsec bins
   std::list< int > *xsec_norms_bins;
@@ -30,32 +30,32 @@ struct FarDetectorCoreInfo {
   int Unity_Int;
   double dummy_value = -999;
 
-  int* nxsec_norm_pointers;
-  const double*** xsec_norm_pointers;
+  std::vector<int> nxsec_norm_pointers;
+  std::vector<std::vector<const double*>> xsec_norm_pointers;
 
-  int* nxsec_spline_pointers;
-  const double*** xsec_spline_pointers;
+  std::vector<int> nxsec_spline_pointers;
+  std::vector<std::vector<const double*>> xsec_spline_pointers;
 
-  int* ntotal_weight_pointers;
-  const double*** total_weight_pointers;
-  double* total_w;
+  std::vector<int> ntotal_weight_pointers;
+  std::vector<std::vector<const double*>> total_weight_pointers;
+  std::vector<double> total_w;
 
-  int* XBin;
-  int* YBin;
-  int* NomXBin;
-  int* NomYBin;
+  std::vector<int> XBin;
+  std::vector<int> YBin;
+  std::vector<int> NomXBin;
+  std::vector<int> NomYBin;
 
   bool *isNC;
 
   // histo pdf bins
-  double *rw_lower_xbinedge; // lower to check if Eb has moved the erec bin
-  double *rw_lower_lower_xbinedge; // lower to check if Eb has moved the erec bin
-  double *rw_upper_xbinedge; // upper to check if Eb has moved the erec bin
-  double *rw_upper_upper_xbinedge; // upper to check if Eb has moved the erec bin
+  std::vector<double> rw_lower_xbinedge; // lower to check if Eb has moved the erec bin
+  std::vector<double> rw_lower_lower_xbinedge; // lower to check if Eb has moved the erec bin
+  std::vector<double> rw_upper_xbinedge; // upper to check if Eb has moved the erec bin
+  std::vector<double> rw_upper_upper_xbinedge; // upper to check if Eb has moved the erec bin
 
-  double **mode;
+  std::vector<double*> mode;
 
-  const M3::float_t **osc_w_pointer;
-  double *xsec_w;
-  splineFDBase *splineFile; 
+  std::vector<const M3::float_t*> osc_w_pointer;
+  std::vector<double> xsec_w;
+
 };

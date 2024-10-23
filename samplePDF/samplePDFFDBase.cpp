@@ -775,7 +775,7 @@ void samplePDFFDBase::SetupNormParameters(){
 	  counter = 0;
 
 	  MCSamples[iSample].nxsec_norm_pointers[iEvent] = int(MCSamples[iSample].xsec_norms_bins[iEvent].size());
-	  MCSamples[iSample].xsec_norm_pointers[iEvent] = new const double*[MCSamples[iSample].nxsec_norm_pointers[iEvent]];
+	  MCSamples[iSample].xsec_norm_pointers[iEvent].resize(MCSamples[iSample].nxsec_norm_pointers[iEvent]);
 
 	  for(std::list< int >::iterator lit = MCSamples[iSample].xsec_norms_bins[iEvent].begin();lit!=MCSamples[iSample].xsec_norms_bins[iEvent].end();lit++) {
 		MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = XsecCov->retPointer(*lit);
@@ -1069,14 +1069,14 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       }
       
       if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
-	MCSamples[mc_i].NomXBin[event_i] = bin-1;
-      } else {
-	MCSamples[mc_i].NomXBin[event_i] = -1;
-	low_edge = _DEFAULT_RETURN_VAL_;
-	upper_edge = _DEFAULT_RETURN_VAL_;
-	low_lower_edge = _DEFAULT_RETURN_VAL_;
-	upper_upper_edge = _DEFAULT_RETURN_VAL_;
-      }
+		  MCSamples[mc_i].NomXBin[event_i] = bin-1;
+	  } else {
+		  MCSamples[mc_i].NomXBin[event_i] = -1;
+		  low_edge = _DEFAULT_RETURN_VAL_;
+		  upper_edge = _DEFAULT_RETURN_VAL_;
+		  low_lower_edge = _DEFAULT_RETURN_VAL_;
+		  upper_upper_edge = _DEFAULT_RETURN_VAL_;
+	  }
       MCSamples[mc_i].NomYBin[event_i] = 0;
       
       MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
@@ -1348,9 +1348,9 @@ void samplePDFFDBase::SetupNuOscillator() {
 
       //============================================================================
       //DB Atmospheric only part
-      if (MCSamples[iSample].rw_truecz != nullptr) { //Can only happen if truecz has been initialised within the experiment specific code
+      if (MCSamples[iSample].rw_truecz.size() > 0 && MCSamples[iSample].rw_truecz.size() == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
 	std::vector<M3::float_t> CosineZArray;
-	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+	for (int iEvent=0;iEvent<int(MCSamples[iSample].nEvents);iEvent++) {
 	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
 	  if (!MCSamples[iSample].isNC[iEvent]) {
 	    CosineZArray.push_back(float(*(MCSamples[iSample].rw_truecz[iEvent])));
@@ -1421,7 +1421,7 @@ void samplePDFFDBase::SetupNuOscillator() {
 	  InitFlav *= -1;
 	  FinalFlav *= -1;
 	}
-	if (MCSamples[iSample].rw_truecz != nullptr) { //Can only happen if truecz has been initialised within the experiment specific code
+	if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
 	  //Atmospherics
 	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
 	} else {
@@ -1452,31 +1452,31 @@ void samplePDFFDBase::fillSplineBins() {
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
-      case 1:
-	EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
-	break;
-      case 2:
-	EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
-	break;
-      default:
-	MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
-	MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
-	MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
-	break;
+        case 1:
+          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          break;
+        case 2:
+          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          break;
+        default:
+          MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
+          MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
+          MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+          break;
       }
       MCSamples[i].nxsec_spline_pointers[j] = int(EventSplines.size());
       if(MCSamples[i].nxsec_spline_pointers[j] < 0){
-	throw MaCh3Exception(__FILE__, __LINE__);
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
-      MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
+      MCSamples[i].xsec_spline_pointers[j].resize(MCSamples[i].nxsec_spline_pointers[j]);
       for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
-	//Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-	MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
-									      EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
+        //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
+        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
+            EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
       }
     }
   }
-  
+
   return;
 }
 
@@ -1530,31 +1530,30 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->Unity = 1.;
   fdobj->Unity_Int = 1.;
   
-  fdobj->x_var = new const double*[fdobj->nEvents];
-  fdobj->y_var = new const double*[fdobj->nEvents];
-  fdobj->rw_etru = new const double*[fdobj->nEvents];
-  fdobj->XBin = new int[fdobj->nEvents];
-  fdobj->YBin = new int[fdobj->nEvents];    
-  fdobj->NomXBin = new int[fdobj->nEvents];
-  fdobj->NomYBin = new int[fdobj->nEvents];
-  fdobj->XBin = new int [fdobj->nEvents];
-  fdobj->YBin = new int [fdobj->nEvents];;	 
-  fdobj->rw_lower_xbinedge = new double [fdobj->nEvents];
-  fdobj->rw_lower_lower_xbinedge = new double [fdobj->nEvents];
-  fdobj->rw_upper_xbinedge = new double [fdobj->nEvents];
-  fdobj->rw_upper_upper_xbinedge = new double [fdobj->nEvents];
-  fdobj->mode = new double*[fdobj->nEvents];
-  fdobj->nxsec_norm_pointers = new int[fdobj->nEvents];
-  fdobj->xsec_norm_pointers = new const double**[fdobj->nEvents];
+  int nEvents = fdobj->nEvents;
+  fdobj->x_var.resize(fdobj->nEvents);
+  fdobj->y_var.resize(fdobj->nEvents);
+  fdobj->rw_etru.resize(fdobj->nEvents);
+  fdobj->XBin.resize(nEvents);
+  fdobj->YBin.resize(nEvents);
+  fdobj->NomXBin.resize(nEvents);
+  fdobj->NomYBin.resize(nEvents);
+  fdobj->rw_lower_xbinedge.resize(nEvents);
+  fdobj->rw_lower_lower_xbinedge.resize(nEvents);
+  fdobj->rw_upper_xbinedge.resize(nEvents);
+  fdobj->rw_upper_upper_xbinedge.resize(nEvents);
+  fdobj->mode.resize(nEvents);// = new int*[fdobj->nEvents];
+  fdobj->nxsec_norm_pointers.resize(fdobj->nEvents);
+  fdobj->xsec_norm_pointers.resize(nEvents);// = new const double**[fdobj->nEvents];
   fdobj->xsec_norms_bins = new std::list< int >[fdobj->nEvents];
-  fdobj->xsec_w = new double[fdobj->nEvents];
+  fdobj->xsec_w.resize(nEvents);// = new double[fdobj->nEvents];
   fdobj->isNC = new bool[fdobj->nEvents];
-  fdobj->nxsec_spline_pointers = new int[fdobj->nEvents];
-  fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
-  fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
-  fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
-  fdobj->Target = new int*[fdobj->nEvents];
-  fdobj->osc_w_pointer = new const M3::float_t*[fdobj->nEvents];
+  fdobj->nxsec_spline_pointers.resize(fdobj->nEvents);
+  fdobj->xsec_spline_pointers.resize(nEvents);// = new const double**[fdobj->nEvents];
+  fdobj->ntotal_weight_pointers.resize(fdobj->nEvents);
+  fdobj->total_weight_pointers.resize(fdobj->nEvents);
+  fdobj->Target.resize(nEvents);
+  fdobj->osc_w_pointer.resize(nEvents);// = new const _float_*[fdobj->nEvents];
   //fdobj->rw_truecz = new const double*[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
@@ -1562,11 +1561,11 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     //fdobj->rw_truecz[iEvent] = &fdobj->Unity;
     fdobj->mode[iEvent] = &fdobj->Unity;
     fdobj->Target[iEvent] = 0;
-    fdobj->NomXBin[iEvent] = -1;
-    fdobj->NomYBin[iEvent] = -1;
-    fdobj->XBin[iEvent] = -1;
-    fdobj->YBin[iEvent] = -1;
-    fdobj->rw_lower_xbinedge[iEvent] = -1;
+    fdobj->NomXBin.emplace_back(-1);
+    fdobj->NomYBin.emplace_back(-1);
+    fdobj->XBin.emplace_back(-1);
+    fdobj->YBin.emplace_back(-1);
+    fdobj->rw_lower_xbinedge.emplace_back(-1);
     fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
     fdobj->rw_upper_xbinedge[iEvent] = -1;
     fdobj->rw_upper_upper_xbinedge[iEvent] = -1;
