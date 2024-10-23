@@ -5,7 +5,6 @@
 // Now we can dump manager settings to the output file
 mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
-
   // Beginning step number
   stepStart = 0;
 
@@ -29,40 +28,10 @@ mcmc::~mcmc() {
 
 }
 
-// *************************
-// Load starting positions from the end of a previous chain
-void mcmc::ReadParsFromFile(std::string file) {
-// *************************
-  MACH3LOG_INFO("MCMC getting starting position from {}", file);
-
-  TFile *infile = new TFile(file.c_str(), "READ");
-  TTree *posts = (TTree*)infile->Get("posteriors");
-  TObjArray* brlis = (TObjArray*)posts->GetListOfBranches();
-  int nbr = brlis->GetEntries();
-  TString* branch_names = new TString[nbr];
-  double* branch_vals = new double[nbr];
-
-  for (int i = 0; i < nbr; ++i) {
-    TBranch *br = (TBranch*)brlis->At(i);
-    TString bname = br->GetName();
-    branch_names[i] = bname;
-    std::cout << " * Loading " << bname << std::endl;
-    posts->SetBranchAddress(branch_names[i], &branch_vals[i]);
-  }
-
-  posts->GetEntry(posts->GetEntries()-1);
-
-  delete[] branch_names;
-  delete[] branch_vals;
-  infile->Close();
-  delete infile;
-}
-
 // **********************
 // Do we accept the proposed step for all the parameters?
 void mcmc::CheckStep() {
 // **********************
-
   bool accept = false;
 
   // Set the acceptance probability to zero
@@ -214,7 +183,7 @@ void mcmc::ProposeStep() {
     // But since sample reweight is multi-threaded it's probably better to do that
     for (size_t i = 0; i < samples.size(); ++i)
     {
-        samples[i]->reweight(); 
+      samples[i]->reweight();
     }
 
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
@@ -312,7 +281,6 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
-
     systematics[s]->setParameters(branch_vals);
     systematics[s]->acceptStep();
 

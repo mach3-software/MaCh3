@@ -179,17 +179,18 @@ void PlottingManager::addUserOption() {
 
 std::string PlottingManager::getUserOption(std::string option) {
   /// @todo Implement this.
+  (void) option;
   return "";
 }
 
 void PlottingManager::usage() {
-  /// @todo Inplement this.
+  /// @todo Implement this.
   /// @todo could add some function to allow user to specify the help message for their particular
   /// script, then auto generate what the cmd line syntax looks like based on user specified
   /// options?
 }
 
-/// Will check the provided saveName for file extenstions, if it is one of .pdf or .eps, then just
+/// Will check the provided saveName for file extensions, if it is one of .pdf or .eps, then just
 /// use the provided string as the full output name. If no file extension is specified, append .pdf
 /// so plots will be saved as pdf. if some other file extension is specified, replace with .pdf as
 /// only .pdf and .eps support printing multiple plots to one file in root.

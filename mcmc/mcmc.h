@@ -37,9 +37,6 @@ class mcmc : public FitterBase {
   /// @brief Print the progress
   inline void PrintProgress();
 
-  /// @brief Load starting positions from the end of a previous chain
-  inline void ReadParsFromFile(std::string file);
-
   /// Do we reject based on hitting boundaries in systs
   bool reject;
   /// number of steps in chain
