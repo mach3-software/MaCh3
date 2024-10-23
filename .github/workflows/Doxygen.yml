@@ -1,17 +1,21 @@
-# This is a basic workflow make doxygen documentation every time develop is updated
+---
+# This is a basic workflow make doxygen documentation 
+# every time develop is updated
 
 name: Doxygen
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
+  # Triggers the workflow on push or pull request events 
+  # but only for the develop branch
   push:
-    branches: [ develop ]
+    branches: [develop]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# A workflow run is made up of one or more jobs that can run 
+# sequentially or in parallel
 jobs:
   # This workflow contains a single job called "Doxygen"
   
@@ -23,9 +27,11 @@ jobs:
       contents: write
       id-token: write
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps represent a sequence of tasks that will be executed
+    # as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out your repository under $GITHUB_WORKSPACE, 
+      # so your job can access it
       - uses: actions/checkout@v4
       
       # Updates the package list to ensure you get the latest version of packages
@@ -34,7 +40,8 @@ jobs:
       # Installs texlive for LaTeX support in Doxygen documentation
       - run: sudo apt-get install -y texlive
 
-      # Installs libjs-mathjax for rendering mathematical notation in Doxygen documentation
+      # Installs libjs-mathjax for rendering mathematical notation 
+      # in Doxygen documentation
       - run: sudo apt-get install -y libjs-mathjax
 
       # Install perl for bibtex
@@ -65,7 +72,8 @@ jobs:
       
     steps:
     
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out your repository under $GITHUB_WORKSPACE, 
+      # so your job can access it
       - uses: actions/checkout@v4
 
       - name: Check Python 
