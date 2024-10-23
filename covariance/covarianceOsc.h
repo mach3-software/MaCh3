@@ -27,8 +27,6 @@ class covarianceOsc : public covarianceBase
 
   /// @brief KS: Print all useful information's after initialization
   void Print();
-  /// @brief KS: Currently prob3++/probgpu requires particular order so we need to check this is the case
-  void CheckOrderOfParams();
 
  protected:
 
