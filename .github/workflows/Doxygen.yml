@@ -114,11 +114,29 @@ jobs:
           mkdir to-upload/pyMaCh3
           mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
           
+      - uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: DocumentationHTML
+          path: to-upload
+
+          
   Deploy:
     runs-on: ubuntu-latest
     needs: [Doxygen, Sphinx]
 
     steps:
+
+      - name: Download Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: DocumentationHTML
+          path: to-upload/
+          
+      ## EM: Now we delete the artifact so it doesn't use up our allowance
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: DocumentationHTML
     
       # Deploys the generated documentation to GitHub Pages
       - name: Deploy
