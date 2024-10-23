@@ -464,9 +464,9 @@ double OverflowIntegral(TH2Poly* poly);
 double NoOverflowIntegral(TH2Poly* poly);
 
 /// @brief WP: Poly Projectors
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
+TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors = false);
 /// @brief WP: Poly Projectors
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
+TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors = false);
 
 /// @brief KS: Convert TH2D to TH2Poly
 TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *TH2Dhist);

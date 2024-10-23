@@ -96,39 +96,37 @@ namespace MaCh3Utils {
 // However if you use ROOT6 and have ROOT6 file exactly the same code will work. Something have changed with how TH2Poly bins are stored in TFile
 void CheckTH2PolyFileVersion(TFile *file) {
 // **************************************************
+  int FileROOTVersion = file->GetVersion();
+  int MainFileROOTVersion = FileROOTVersion;
 
-    int FileROOTVersion = file->GetVersion();
-    int MainFileROOTVersion = FileROOTVersion;
+  // Remove last digit from number
+  // till only one digit is left
+  while (MainFileROOTVersion >= 10)
+      MainFileROOTVersion /= 10;
 
-    // Remove last digit from number
-    // till only one digit is left
-    while (MainFileROOTVersion >= 10)
-        MainFileROOTVersion /= 10;
+  std::string SystemROOTVersion = std::string(ROOT_RELEASE);
+  int MainSystemROOTVersion = SystemROOTVersion.at(0)  - '0';
 
-    std::string SystemROOTVersion = std::string(ROOT_RELEASE);
-    int MainSystemROOTVersion = SystemROOTVersion.at(0)  - '0';
-
-    if(MainFileROOTVersion != MainSystemROOTVersion)
-    {
-        std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
-        std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
-        std::cerr<<"For some docuemntation please visit me"<<std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
-    }
+  if(MainFileROOTVersion != MainSystemROOTVersion)
+  {
+    std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
+    std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
+    std::cerr<<"For some docuemntation please visit me"<<std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    throw;
+  }
 }
 
 // **************************************************
 //WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly) {
 // **************************************************
-
-  double overflow = 0;
+  double overflow = 0.;
   //TH2Polys have 9 overflow bins
   for(int iOverflow = -1; iOverflow > -10; iOverflow--)
-    {
-      overflow+=poly->GetBinContent(iOverflow);
-    }
+  {
+    overflow += poly->GetBinContent(iOverflow);
+  }
   double IntegralUn = NoOverflowIntegral(poly) + overflow;
 
   return IntegralUn;
@@ -139,8 +137,7 @@ double OverflowIntegral(TH2Poly* poly) {
 //WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
 double NoOverflowIntegral(TH2Poly* poly) {
 // **************************************************
-
-  double integral = 0;
+  double integral = 0.;
 
   for(int i=1; i < poly->GetNumberOfBins()+1; i++)
   {
@@ -153,18 +150,16 @@ double NoOverflowIntegral(TH2Poly* poly) {
 
 // **************************************************
 //WP: Helper function for projecting TH2Poly onto the X axis
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors) {
+TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors) {
 // **************************************************
-
-  TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(),xbins.size()-1,&xbins[0]);
+  TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), xbins.size()-1, &xbins[0]);
 
   //KS: Temp Histogram to store error, use double as this is thread safe
-  double *hProjX_Error = new double[hProjX->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hProjX->GetXaxis()->GetNbins(); ++i) {hProjX_Error[i] = 0;}
-  double xlow, xup, frac=0;
+  std::vector<double> hProjX_Error(hProjX->GetXaxis()->GetNbins() + 1, 0.0);
+  double xlow, xup, frac = 0.;
 
   //loop over bins in the poly
-  for(int i = 0; i<((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
   {
     //get bin and its edges
     TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
@@ -196,16 +191,16 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
       }
       else
       {
-        frac=0;
+        frac = 0;
       }
       hProjX->SetBinContent(dx+1,hProjX->GetBinContent(dx+1)+frac*bin->GetContent());
       //KS: Follow ROOT implementation and sum up the variance
       if(computeErrors)
       {
-          //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
-          //but numbering of GetBinError is differnt than GetBins...
-          double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
-          hProjX_Error[dx+1] += Temp_Err;
+        //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
+        //but numbering of GetBinError is different than GetBins...
+        const double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+        hProjX_Error[dx+1] += Temp_Err;
       }
     }
   }
@@ -214,25 +209,22 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> x
   {
     for (int i = 1; i <= hProjX->GetXaxis()->GetNbins(); ++i)
     {
-      double Error = TMath::Sqrt(hProjX_Error[i]);
+      const double Error = TMath::Sqrt(hProjX_Error[i]);
       hProjX->SetBinError(i, Error);
     }
   }
-  delete[] hProjX_Error;
   return hProjX;
 } // end project poly X function
 
 // **************************************************
 //WP: Helper function for projecting TH2Poly onto the Y axis
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors) {
+TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
 
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),ybins.size()-1,&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
-  double *hProjY_Error = new double[hProjY->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hProjY->GetXaxis()->GetNbins(); ++i) {hProjY_Error[i] = 0;}
-
-  double ylow, yup, frac=0;
+  std::vector<double> hProjY_Error(hProjY->GetXaxis()->GetNbins() + 1, 0.0);
+  double ylow, yup, frac = 0.;
 
   //loop over bins in the poly
   for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
@@ -267,15 +259,15 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
       }
       else
       {
-        frac=0;
+        frac = 0;
       }
       hProjY->SetBinContent(dy+1,hProjY->GetBinContent(dy+1)+frac*bin->GetContent());
       //KS: Follow ROOT implementation and sum up the variance
       if(computeErrors)
       {
         //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
-        //but numbering of GetBinError is differnt than GetBins...
-        double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+        //but numbering of GetBinError is different than GetBins...
+        const double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
         hProjY_Error[dy+1] += Temp_Err;
       }
     }
@@ -285,11 +277,10 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
   {
     for (int i = 1; i <= hProjY->GetXaxis()->GetNbins(); ++i)
     {
-      double Error = TMath::Sqrt(hProjY_Error[i]);
+      const double Error = TMath::Sqrt(hProjY_Error[i]);
       hProjY->SetBinError(i, Error);
     }
   }
-  delete[] hProjY_Error;
   return hProjY;
 } // end project poly Y function
 
@@ -297,7 +288,6 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> y
 //WP: Normalise a th2poly
 TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 // ****************
-
   TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
   double IntegralWidth = PolyIntegralWidth(HistCopy);
   HistCopy = PolyScaleWidth(HistCopy, IntegralWidth);
@@ -392,7 +382,6 @@ TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
 //WP: Scale a TH2Poly and divide by bin width
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 // ****************
-
   TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
   double xlow, xup, ylow, yup, area;
 
@@ -414,7 +403,6 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 //WP: Integral of TH2Poly multiplied by bin width
 double PolyIntegralWidth(TH2Poly *Histogram) {
 // ****************
-
   double integral = 0;
   double xlow, xup, ylow, yup, area;
 
