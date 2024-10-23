@@ -46,6 +46,14 @@ Logger by default will print whole float. Normally to show only several signific
 ```cpp
 MACH3LOG_INFO("Here is full LLH but I only show 2 significant figures {:.2f}", LLH);
 ```
+If you want to mimic std::setw<<10
+```cpp
+MACH3LOG_INFO("Some break {:<10}", blarb);
+```
+Laslty if you want combine precision and std::setw like format
+```cpp
+MACH3LOG_INFO("Some break {:<10.2f}", blarb);
+```
 
 ## Config Syntax
 MaCh3 currently uses yaml as config handler. To help unify syntax over the code there are several YamlHelper function available [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/YamlHelper.h). Most important is `GetFromManager`. For code below which checks if config entry exist and if doesn't set some default value
