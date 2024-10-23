@@ -1,5 +1,3 @@
-\mainpage %MaCh3 Reference Documentation
-
 ## Introduction
 Welcome to %MaCh3!
 
