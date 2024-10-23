@@ -87,7 +87,7 @@ jobs:
           mkdir build
           cd build 
           cmake -DMaCh3_PYTHON_ENABLED=ON ../
-          make 
+          make -j4
           make install
           
       ## EM: Now generate the sphinx documentation
