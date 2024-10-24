@@ -111,7 +111,7 @@ void CheckTH2PolyFileVersion(TFile *file) {
   {
     std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
     std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
-    std::cerr<<"For some docuemntation please visit me"<<std::endl;
+    std::cerr<<"For some documentation please visit me"<<std::endl;
     std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
     throw;
   }
@@ -130,7 +130,6 @@ double OverflowIntegral(TH2Poly* poly) {
   double IntegralUn = NoOverflowIntegral(poly) + overflow;
 
   return IntegralUn;
-
 } // end function
 
 // **************************************************
@@ -138,14 +137,12 @@ double OverflowIntegral(TH2Poly* poly) {
 double NoOverflowIntegral(TH2Poly* poly) {
 // **************************************************
   double integral = 0.;
-
-  for(int i=1; i < poly->GetNumberOfBins()+1; i++)
+  for(int i = 1; i < poly->GetNumberOfBins()+1; i++)
   {
     integral += poly->GetBinContent(i);
   }
 
   return integral;
-
 } // end function
 
 // **************************************************
@@ -159,10 +156,10 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
   double xlow, xup, frac = 0.;
 
   //loop over bins in the poly
-  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for (int i = 0; i < static_cast<TH2Poly*>(poly)->GetNumberOfBins(); i++)
   {
     //get bin and its edges
-    TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
+    TH2PolyBin* bin = static_cast<TH2PolyBin*>(static_cast<TH2Poly*>(poly)->GetBins()->At(i));
     xlow = bin->GetXMin();
     xup = bin->GetXMax();
 
@@ -173,19 +170,19 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
       {
         frac = 0;
       }
-      else if(xbins[dx]<=xlow && xbins[dx+1] >= xup)
+      else if(xbins[dx] <= xlow && xbins[dx+1] >= xup)
       {
         frac = 1;
       }
-      else if(xbins[dx]<=xlow && xbins[dx+1] <= xup)
+      else if(xbins[dx] <= xlow && xbins[dx+1] <= xup)
       {
         frac = (xbins[dx+1]-xlow)/(xup-xlow);
       }
-      else if(xbins[dx]>=xlow && xbins[dx+1] >= xup)
+      else if(xbins[dx] >= xlow && xbins[dx+1] >= xup)
       {
         frac = (xup-xbins[dx])/(xup-xlow);
       }
-      else if(xbins[dx]>=xlow && xbins[dx+1] <= xup)
+      else if(xbins[dx] >= xlow && xbins[dx+1] <= xup)
       {
         frac = (xbins[dx+1]-xbins[dx])/(xup-xlow);
       }
@@ -199,7 +196,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
       {
         //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
         //but numbering of GetBinError is different than GetBins...
-        const double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+        const double Temp_Err = frac*static_cast<TH2Poly*>(poly)->GetBinError(i+1)*frac*static_cast<TH2Poly*>(poly)->GetBinError(i+1);
         hProjX_Error[dx+1] += Temp_Err;
       }
     }
@@ -209,7 +206,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
   {
     for (int i = 1; i <= hProjX->GetXaxis()->GetNbins(); ++i)
     {
-      const double Error = TMath::Sqrt(hProjX_Error[i]);
+      const double Error = std::sqrt(hProjX_Error[i]);
       hProjX->SetBinError(i, Error);
     }
   }
@@ -227,10 +224,10 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<dou
   double ylow, yup, frac = 0.;
 
   //loop over bins in the poly
-  for(int i = 0; i < ((TH2Poly*)poly)->GetNumberOfBins(); i++)
+  for (int i = 0; i < static_cast<TH2Poly*>(poly)->GetNumberOfBins(); i++)
   {
     //get bin and its edges
-    TH2PolyBin* bin = (TH2PolyBin*)((TH2Poly*)poly)->GetBins()->At(i);
+    TH2PolyBin* bin = static_cast<TH2PolyBin*>(static_cast<TH2Poly*>(poly)->GetBins()->At(i));
     ylow = bin->GetYMin();
     yup = bin->GetYMax();
 
@@ -267,7 +264,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<dou
       {
         //KS: TH2PolyBin doesn't have GetError so we have to use TH2Poly,
         //but numbering of GetBinError is different than GetBins...
-        const double Temp_Err = frac*((TH2Poly*)poly)->GetBinError(i+1) * frac*((TH2Poly*)poly)->GetBinError(i+1);
+        const double Temp_Err = frac*static_cast<TH2Poly*>(poly)->GetBinError(i+1)*frac*static_cast<TH2Poly*>(poly)->GetBinError(i+1);
         hProjY_Error[dy+1] += Temp_Err;
       }
     }
@@ -277,7 +274,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<dou
   {
     for (int i = 1; i <= hProjY->GetXaxis()->GetNbins(); ++i)
     {
-      const double Error = TMath::Sqrt(hProjY_Error[i]);
+      const double Error = std::sqrt(hProjY_Error[i]);
       hProjY->SetBinError(i, Error);
     }
   }
@@ -288,7 +285,7 @@ TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<dou
 //WP: Normalise a th2poly
 TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 // ****************
-  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  TH2Poly* HistCopy = static_cast<TH2Poly*>(Histogram->Clone());
   double IntegralWidth = PolyIntegralWidth(HistCopy);
   HistCopy = PolyScaleWidth(HistCopy, IntegralWidth);
   std::string title = std::string(HistCopy->GetName())+"_norm";
@@ -387,7 +384,7 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 
   for(int i = 1; i < HistCopy->GetNumberOfBins()+1; i++)
   {
-    TH2PolyBin* bin = (TH2PolyBin*)HistCopy->GetBins()->At(i-1);
+    TH2PolyBin* bin = static_cast<TH2PolyBin*>(Histogram->GetBins()->At(i - 1));
     xlow = bin->GetXMin();
     xup = bin->GetXMax();
     ylow = bin->GetYMin();
@@ -408,7 +405,7 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
 
   for(int i = 1; i < Histogram->GetNumberOfBins()+1; i++)
   {
-    TH2PolyBin* bin = (TH2PolyBin*)Histogram->GetBins()->At(i-1);
+    TH2PolyBin* bin = static_cast<TH2PolyBin*>(Histogram->GetBins()->At(i - 1));
     xlow = bin->GetXMin();
     xup = bin->GetXMax();
     ylow = bin->GetYMin();
