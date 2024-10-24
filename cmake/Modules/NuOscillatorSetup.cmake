@@ -53,7 +53,7 @@ get_target_property(compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIO
 # Join the compile options list into a space-separated string
 string(REPLACE ";" " " compile_options_string "${compile_options}")
 
-#KS this may look hacky however CPM isn't build for passing stuff like this. If CMAKE_CUDA_ARCHITECTURES is passed CPM it will be string not list. Thus we convert it to list
+#KS: This may seem hacky, but when CMAKE_CUDA_ARCHITECTURES is passed, it's treated as a string rather than a list. Since CMake uses semi-colon-delimited strings to represent lists, we convert it to a proper list to handle CUDA architectures correctly.
 set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 

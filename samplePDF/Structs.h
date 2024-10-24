@@ -62,6 +62,9 @@
 #include "omp.h"
 #endif
 
+#include "manager/MaCh3Exception.h"
+#include "manager/MaCh3Logger.h"
+
 // *******************
 /// @brief Template to make vector out of an array of any length
 template< typename T, size_t N >
@@ -360,59 +363,57 @@ inline int PDGToProbs(NuPDG pdg){
 
   switch (pdg){
     case kNue:
-	  ReturnProbNu = kProbNue;
-	  break;
+      ReturnProbNu = kProbNue;
+      break;
     case kNumu:
-	  ReturnProbNu = kProbNumu;
-	  break;
+      ReturnProbNu = kProbNumu;
+      break;
     case kNutau:
-	  ReturnProbNu = kProbNutau;
-	  break;
+      ReturnProbNu = kProbNutau;
+      break;
     case kNueBar:
-	  ReturnProbNu = kProbNueBar;
-	  break;
-	case kNumuBar:
-	  ReturnProbNu = kProbNumuBar;
-	  break;
-	case kNutauBar:
-	  ReturnProbNu = kProbNutauBar;
-	  break;
-	default:
-	  std::cout << "Unrecognised pdg for the neutrino so can't map this to an int for Prob3++" << std::endl;
-	  break;
+      ReturnProbNu = kProbNueBar;
+      break;
+    case kNumuBar:
+      ReturnProbNu = kProbNumuBar;
+      break;
+    case kNutauBar:
+      ReturnProbNu = kProbNutauBar;
+      break;
+    default:
+      MACH3LOG_WARN("Unrecognised pdg for the neutrino so can't map this to an int for Prob3++");
+      break;
   }
 
   return ReturnProbNu;
 }
 
 inline int ProbsToPDG(ProbNu NuType){
-
   int ReturnNuPDG = -999;
 
   switch (NuType){
-	case kProbNue:
-	  ReturnNuPDG = static_cast<int>(kNue);
-	  break;
-	case kProbNumu:
-	  ReturnNuPDG = static_cast<int>(kNumu);
-	  break;
-	case kProbNutau:
-	  ReturnNuPDG = static_cast<int>(kNutau);
-	  break;
-	case kProbNueBar:
-	  ReturnNuPDG = static_cast<int>(kNueBar);
-	  break;
-	case kProbNumuBar:
-	  ReturnNuPDG = static_cast<int>(kNumuBar);
-	  break;
-	case kProbNutauBar:
-	  ReturnNuPDG = static_cast<int>(kNutauBar);
-	  break;
-	default:
-	  std::cout << "Unrecognised NuType for the neutrino so can't map this to a PDG code" << std::endl;
-	  break;
+    case kProbNue:
+      ReturnNuPDG = static_cast<int>(kNue);
+      break;
+    case kProbNumu:
+      ReturnNuPDG = static_cast<int>(kNumu);
+      break;
+    case kProbNutau:
+      ReturnNuPDG = static_cast<int>(kNutau);
+      break;
+    case kProbNueBar:
+      ReturnNuPDG = static_cast<int>(kNueBar);
+      break;
+    case kProbNumuBar:
+      ReturnNuPDG = static_cast<int>(kNumuBar);
+      break;
+    case kProbNutauBar:
+      ReturnNuPDG = static_cast<int>(kNutauBar);
+      break;
+    default:
+      MACH3LOG_WARN("Unrecognised NuType for the neutrino so can't map this to a PDG code");
+      break;
   }
-
   return ReturnNuPDG;
 }
 
@@ -464,9 +465,9 @@ double OverflowIntegral(TH2Poly* poly);
 double NoOverflowIntegral(TH2Poly* poly);
 
 /// @brief WP: Poly Projectors
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
+TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors = false);
 /// @brief WP: Poly Projectors
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
+TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors = false);
 
 /// @brief KS: Convert TH2D to TH2Poly
 TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *TH2Dhist);

@@ -161,18 +161,16 @@ int main(int argc, char *argv[]) {
 // Load chain and prepare toys
 void PrepareChains() {
 // *******************
-
-  TRandom3 *rnd = new TRandom3(0);
+  auto rnd = std::make_unique<TRandom3>(0);
 
   MACH3LOG_INFO("Generating {}", Ntoys);
 
   TStopwatch clock;
   clock.Start();
 
-  int *BurnIn = new int[Nchains]();
-  int *nEntries = new int[Nchains]();
-  int *nBranches = new int[Nchains]();
-
+  std::vector<int> BurnIn(Nchains);
+  std::vector<int> nEntries(Nchains);
+  std::vector<int> nBranches(Nchains);
   std::vector<int> step(Nchains);
 
   Draws = new double**[Nchains]();
@@ -325,7 +323,7 @@ void PrepareChains() {
   for(int j = 0; j < nDraw; j++)
   {
     MedianArr[j] = 0.;
-    double* TempDraws = new double[Ntoys*Nchains]();
+    std::vector<double> TempDraws(Ntoys * Nchains);
     for(int m = 0; m < Nchains; m++)
     {
       for(int i = 0; i < Ntoys; i++)
@@ -334,8 +332,7 @@ void PrepareChains() {
         TempDraws[im] = Draws[m][i][j];
       }
     }
-    MedianArr[j] = CalcMedian(TempDraws, Ntoys*Nchains);
-    delete[] TempDraws;
+    MedianArr[j] = CalcMedian(TempDraws.data(), Ntoys*Nchains);
   }
 
   #ifdef MULTITHREAD
@@ -351,12 +348,6 @@ void PrepareChains() {
       }
     }
   }
-  delete rnd;
-
-  delete[] BurnIn;
-  delete[] nEntries;
-  delete[] nBranches;
-
   clock.Stop();
   MACH3LOG_INFO("Finished calculating Toys, it took {:.2f}s to finish", clock.RealTime());
 }

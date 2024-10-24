@@ -93,9 +93,8 @@ FitterBase::~FitterBase() {
   clock = nullptr;
   if(stepClock != nullptr) delete stepClock;
   stepClock = nullptr;
-  MACH3LOG_INFO("Closing MaCh3 Fitter Engine");
+  MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
 }
-
 
 // *******************
 // Prepare the output tree
@@ -1134,8 +1133,8 @@ void FitterBase::RunSigmaVar() {
       TH1D ***sigmaArray_y_norm = new TH1D**[numVar]();
 
       // Set up for single mode
-      TH1D ****sigmaArray_mode_x = NULL;
-      TH1D ****sigmaArray_mode_y = NULL;
+      TH1D ****sigmaArray_mode_x = nullptr;
+      TH1D ****sigmaArray_mode_y = nullptr;
       if (DoByMode)
       {
         sigmaArray_mode_x = new TH1D***[numVar]();

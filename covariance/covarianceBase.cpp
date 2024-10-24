@@ -48,9 +48,9 @@ covarianceBase::~covarianceBase(){
   delete[] randParams;
   delete[] corr_throw;
 
-  if (covMatrix != NULL) delete covMatrix;
-  if (invCovMatrix != NULL) delete invCovMatrix;
-  if (throwMatrix_CholDecomp != NULL) delete throwMatrix_CholDecomp;
+  if (covMatrix != nullptr) delete covMatrix;
+  if (invCovMatrix != nullptr) delete invCovMatrix;
+  if (throwMatrix_CholDecomp != nullptr) delete throwMatrix_CholDecomp;
 
   for(int i = 0; i < _fNumPar; i++)
   {
@@ -63,7 +63,7 @@ covarianceBase::~covarianceBase(){
   const int nThreads = MaCh3Utils::GetNThreads();
   for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
   delete[] random_number;
-  if (throwMatrix != NULL) delete throwMatrix;
+  if (throwMatrix != nullptr) delete throwMatrix;
 }
 
 // ********************************************
@@ -118,7 +118,7 @@ void covarianceBase::init(const char *name, const char *file) {
 
   // Should put in a 
   TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name));
-  if (CovMat == NULL) {
+  if (CovMat == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -349,7 +349,7 @@ void covarianceBase::init(TMatrixDSym* covMat) {
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 // ********************************************
-  if (cov == NULL) {
+  if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setCovMatrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -1149,7 +1149,7 @@ void covarianceBase::resetIndivStepScale() {
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 // ********************************************
-   if (cov == NULL) {
+   if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setThrowMatrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -1192,9 +1192,9 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 // ********************************************
   delete throwMatrix;
-  throwMatrix = NULL;
+  throwMatrix = nullptr;
   delete throwMatrix_CholDecomp;
-  throwMatrix_CholDecomp = NULL;
+  throwMatrix_CholDecomp = nullptr;
   setThrowMatrix(cov);
 }
 
