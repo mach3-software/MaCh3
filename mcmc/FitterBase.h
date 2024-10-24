@@ -8,7 +8,6 @@
 // MaCh3 Includes
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
-#include "covariance/covarianceOsc.h"
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
 
@@ -36,10 +35,6 @@ class FitterBase {
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from covarianceBase.
   void addSystObj(covarianceBase* cov);
-
-  /// @brief Adds an oscillation handler for covariance objects.
-  /// @param oscf A pointer to a covarianceOsc object for forward oscillations.
-  void addOscHandler(covarianceOsc* oscf);
 
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
@@ -102,9 +97,6 @@ class FitterBase {
   /// counts accepted steps
   int accCount;
 
-  /// LLH for samples/syst objects
-  /// oscillation covariance llh
-  double osc_llh;
   /// store the llh breakdowns
   double *sample_llh;
   /// systematic llh breakdowns
@@ -117,9 +109,6 @@ class FitterBase {
 
   /// Systematic holder
   std::vector<covarianceBase*> systematics;
-
-  /// handles oscillation parameters
-  covarianceOsc *osc;
 
   /// tells global time how long fit took
   TStopwatch* clock;

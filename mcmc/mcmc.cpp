@@ -60,10 +60,6 @@ void mcmc::CheckStep() {
   if (accept && !reject) {
     logLCurr = logLProp;
 
-    if (osc) {
-      osc->acceptStep();
-    }
-    
     // Loop over systematics and accept
     for (size_t s = 0; s < systematics.size(); ++s) {
       systematics[s]->acceptStep();
@@ -135,21 +131,6 @@ void mcmc::ProposeStep() {
 
   // Initiate to false
   reject = false;
-
-  // Propose steps for the oscillation handlers
-  if (osc) {
-    osc->proposeStep();
-
-    // Now get the likelihoods for the oscillation
-    osc_llh = osc->GetLikelihood();
-    
-    // Add the oscillation likelihoods to the reconfigure likelihoods
-    llh += osc_llh;
-
-    #ifdef DEBUG
-    if (debug) debugFile << "LLH for oscillation handler: " << llh << std::endl;
-    #endif
-  }
 
   // Loop over the systematics and propose the initial step
   for (size_t s = 0; s < systematics.size(); ++s) {

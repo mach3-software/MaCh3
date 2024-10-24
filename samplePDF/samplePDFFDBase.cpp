@@ -741,9 +741,9 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   //DB Now get this information using the DetID from the config
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
-  nFuncParams = XsecCov->GetNumFuncParamsFromDetID(SampleDetID);
-  funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
-  funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
+  nFuncParams = XsecCov->GetNumParamsFromDetID(SampleDetID, SystType::kFunc);
+  funcParsNames = XsecCov->GetParsNamesFromDetID(SampleDetID, SystType::kFunc);
+  funcParsIndex = XsecCov->GetParsIndexFromDetID(SampleDetID, SystType::kFunc);
 
   return;
 }
