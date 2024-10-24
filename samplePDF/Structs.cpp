@@ -63,12 +63,11 @@ namespace MaCh3Utils {
       return 0.0;
       break;
     default:
-      std::cerr << "Haven't got a saved mass for PDG " << PDG << std::endl;
-      std::cerr << "Please implement me! " << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("Haven't got a saved mass for PDG: {}", PDG);
+      MACH3LOG_ERROR("Please implement me!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     } // End switch
-    
-    std::cerr << "Warning, didn't catch a saved mass" << std::endl;
+    MACH3LOG_ERROR("Warning, didn't catch a saved mass");
     return 0;
   }
 
@@ -109,11 +108,10 @@ void CheckTH2PolyFileVersion(TFile *file) {
 
   if(MainFileROOTVersion != MainSystemROOTVersion)
   {
-    std::cerr<<"File was produced with: "<<FileROOTVersion<<" ROOT version"<<std::endl;
-    std::cerr<<"Found: "<<SystemROOTVersion<<" ROOT version in the system"<<std::endl;
-    std::cerr<<"For some documentation please visit me"<<std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("File was produced with: {} ROOT version", FileROOTVersion);
+    MACH3LOG_ERROR("Found: {} ROOT version in the system", SystemROOTVersion);
+    MACH3LOG_ERROR("For some documentation please visit me");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
@@ -322,7 +320,8 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
     xbin = hist->GetXaxis()->FindBin(xlow+(xup-xlow)/2);
     ybin = hist->GetYaxis()->FindBin(ylow+(yup-ylow)/2);
 
-    //std::cout << "Poly bin " << i << ", xlow: " << xlow << ", xup: " << xup << ", ylow: " << ylow << ", yup: " << yup << ". Finding bin for (" << (xlow+(xup-xlow)/2) << "," << (ylow+(yup-ylow)/2) << ")" << ". Found Bin (" << xbin << "," << ybin << ") with content " << polybin->GetContent() << ". But Poly content: " << poly->GetBinContent(i) << std::endl;
+    MACH3LOG_TRACE("Poly bin {}, xlow: {}, xup: {}, ylow: {}, yup: {}. Finding bin for ({}, {}). Found Bin ({}, {}) with content {}. But Poly content: {}",
+                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin->GetContent(), poly->GetBinContent(i));
     hist->SetBinContent(xbin, ybin, polybin->GetContent());
   }
   return hist;
