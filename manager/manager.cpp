@@ -61,9 +61,8 @@ void manager::SaveSettings(TFile* const OutputFile) {
   OutputFile->cd();
 
   // EM: embed the config used for this app
-  TMacro MaCh3Config("MaCh3_Config", "MaCh3_Config");
-  MaCh3Config.ReadFile(FileName.c_str());
-  MaCh3Config.Write();
+  TMacro ConfigSave = YAMLtoTMacro(config, "MaCh3_Config");
+  ConfigSave.Write();
 
   // The Branch!
   TTree *SaveBranch = new TTree("Settings", "Settings");

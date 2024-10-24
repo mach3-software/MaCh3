@@ -2463,7 +2463,7 @@ void MCMCProcessor::FindInputFiles() {
   if (XsecConfig == nullptr) {
     MACH3LOG_WARN("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
   } else {
-    CovConfig[kXSecPar] =  TMacroToYAML(*XsecConfig);
+    CovConfig[kXSecPar] = TMacroToYAML(*XsecConfig);
   }
   //CW: And the ND Covariance matrix
   CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
@@ -2511,8 +2511,12 @@ void MCMCProcessor::FindInputFiles() {
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
   delete Config;
+  delete XsecConfig;
+  delete OscConfig;
 
   // Delete the MCMCFile pointer we're reading
+  CovarianceFolder->Close();
+  delete CovarianceFolder;
   TempFile->Close();
   delete TempFile;
 }

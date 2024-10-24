@@ -5,7 +5,6 @@
 // Now we can dump manager settings to the output file
 mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
-
   // Beginning step number
   stepStart = 0;
 
@@ -29,40 +28,10 @@ mcmc::~mcmc() {
 
 }
 
-// *************************
-// Load starting positions from the end of a previous chain
-void mcmc::ReadParsFromFile(std::string file) {
-// *************************
-  MACH3LOG_INFO("MCMC getting starting position from {}", file);
-
-  TFile *infile = new TFile(file.c_str(), "READ");
-  TTree *posts = (TTree*)infile->Get("posteriors");
-  TObjArray* brlis = (TObjArray*)posts->GetListOfBranches();
-  int nbr = brlis->GetEntries();
-  TString* branch_names = new TString[nbr];
-  double* branch_vals = new double[nbr];
-
-  for (int i = 0; i < nbr; ++i) {
-    TBranch *br = (TBranch*)brlis->At(i);
-    TString bname = br->GetName();
-    branch_names[i] = bname;
-    std::cout << " * Loading " << bname << std::endl;
-    posts->SetBranchAddress(branch_names[i], &branch_vals[i]);
-  }
-
-  posts->GetEntry(posts->GetEntries()-1);
-
-  delete[] branch_names;
-  delete[] branch_vals;
-  infile->Close();
-  delete infile;
-}
-
 // **********************
 // Do we accept the proposed step for all the parameters?
 void mcmc::CheckStep() {
 // **********************
-
   bool accept = false;
 
   // Set the acceptance probability to zero
@@ -214,7 +183,7 @@ void mcmc::ProposeStep() {
     // But since sample reweight is multi-threaded it's probably better to do that
     for (size_t i = 0; i < samples.size(); ++i)
     {
-        samples[i]->reweight(); 
+      samples[i]->reweight();
     }
 
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
@@ -262,4 +231,74 @@ void mcmc::PrintProgress() {
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
   }
   #endif
+}
+
+// *******************
+void mcmc::StartFromPreviousFit(const std::string& FitName) {
+// *******************
+  MACH3LOG_INFO("Getting starting position from {}", FitName);
+
+  TFile *infile = new TFile(FitName.c_str(), "READ");
+  TTree *posts = (TTree*)infile->Get("posteriors");
+  int step_val = 0;
+  double log_val = _LARGE_LOGL_;
+  posts->SetBranchAddress("step",&step_val);
+  posts->SetBranchAddress("LogL",&log_val);
+
+  for (size_t s = 0; s < systematics.size(); ++s)
+  {
+    TDirectory* CovarianceFolder = (TDirectory*)infile->Get("CovarianceFolder");
+
+    std::string ConfigName = "Config_" + std::string(systematics[s]->getName());
+    TMacro *ConfigCov = (TMacro*)(CovarianceFolder->Get(ConfigName.c_str()));
+    // KS: Not every covariance uses yaml, if it uses yaml make sure they are identical
+    if (ConfigCov != nullptr) {
+      // Config which was in MCMC from which we are starting
+      YAML::Node CovSettings = TMacroToYAML(*ConfigCov);
+      // Config from currently used cov object
+      YAML::Node ConfigCurrent = systematics[s]->GetConfig();
+
+      if (!compareYAMLNodes(CovSettings, ConfigCurrent))
+      {
+        MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+    if(ConfigCov == nullptr) delete ConfigCov;
+
+    std::vector<double> branch_vals(systematics[s]->GetNumParams());
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      branch_vals[i] = _BAD_DOUBLE_;
+      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
+    }
+    posts->GetEntry(posts->GetEntries()-1);
+
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      if(branch_vals[i] == _BAD_DOUBLE_)
+      {
+        MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
+        MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+    systematics[s]->setParameters(branch_vals);
+    systematics[s]->acceptStep();
+
+    MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
+    systematics[s]->printNominalCurrProp();
+
+    CovarianceFolder->Close();
+    delete CovarianceFolder;
+  }
+  stepStart = step_val;
+  logLCurr = log_val;
+
+  infile->Close();
+  delete infile;
+
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    if(systematics[s]->getDoAdaption()){ //Use separate throw matrix for xsec
+      systematics[s]->setNumberOfSteps(step_val);
+    }
+  }
 }

@@ -172,6 +172,56 @@ inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name)
 }
 
 // **********************
+/// @brief Compare if yaml nodes are identical
+/// @param node1 The first YAML node to compare.
+/// @param node2 The second YAML node to compare.
+/// @return true If the two nodes are equivalent in type and content.
+/// @return false If the two nodes differ in structure or content.
+inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
+// **********************
+  // Check if the types of the nodes match
+  if (node1.Type() != node2.Type()) {
+    return false;
+  }
+
+  // Compare scalar types (like strings, numbers)
+  if (node1.IsScalar() && node2.IsScalar()) {
+    return node1.as<std::string>() == node2.as<std::string>();
+  }
+
+  // Compare sequences (like YAML lists)
+  if (node1.IsSequence() && node2.IsSequence()) {
+    if (node1.size() != node2.size()) {
+      return false;
+    }
+    for (std::size_t i = 0; i < node1.size(); ++i) {
+      if (!compareYAMLNodes(node1[i], node2[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Compare maps (like YAML dictionaries)
+  if (node1.IsMap() && node2.IsMap()) {
+    if (node1.size() != node2.size()) {
+      return false;
+    }
+    for (auto it1 = node1.begin(); it1 != node1.end(); ++it1) {
+      auto key = it1->first.as<std::string>();
+      if (!node2[key] || !compareYAMLNodes(it1->second, node2[key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Default case: if it's neither scalar, sequence, nor map, consider it unequal
+  return false;
+}
+
+
+// **********************
 /// @brief Overrides the configuration settings based on provided arguments.
 ///
 /// This function allows you to set configuration options in a nested YAML node.

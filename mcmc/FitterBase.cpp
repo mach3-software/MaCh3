@@ -338,6 +338,7 @@ void FitterBase::addOscHandler(covarianceOsc * const oscf) {
   return;
 }
 
+
 // *******************
 // Process the MCMC output to get postfit etc
 void FitterBase::ProcessMCMC() {
