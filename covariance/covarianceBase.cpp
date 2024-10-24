@@ -1,7 +1,7 @@
 #include "covariance/covarianceBase.h"
 
 // ********************************************
-covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {
+covarianceBase::covarianceBase(std::string name, std::string file) : inputFile(std::string(file)), pca(false) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of covarianceBase");
   init(name, file);
@@ -9,7 +9,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   LastPCAdpar = -999;
 }
 // ********************************************
-covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, const char *name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
+covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
 
   MACH3LOG_INFO("Constructing instance of covarianceBase using ");
@@ -105,11 +105,11 @@ void covarianceBase::ConstructPCA() {
 }
 
 // ********************************************
-void covarianceBase::init(const char *name, const char *file) {
+void covarianceBase::init(std::string name, std::string file) {
 // ********************************************
 
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
-  TFile *infile = new TFile(file, "READ");
+  TFile *infile = new TFile(file.c_str(), "READ");
   if (infile->IsZombie()) {
     MACH3LOG_ERROR("Could not open input covariance ROOT file {} !!!", file);
     MACH3LOG_ERROR("Was about to retrieve matrix with name {}", name);
@@ -117,7 +117,7 @@ void covarianceBase::init(const char *name, const char *file) {
   }
 
   // Should put in a 
-  TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name));
+  TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name.c_str()));
   if (CovMat == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
@@ -1319,7 +1319,7 @@ std::vector<double> covarianceBase::getNominalArray() {
 // KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
 TH2D* covarianceBase::GetCorrelationMatrix() {
 // ********************************************
-  TH2D* hMatrix = new TH2D(getName(), getName(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
+  TH2D* hMatrix = new TH2D(getName().c_str(), getName().c_str(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
 
   for(int i = 0; i < _fNumPar; i++)
   {

@@ -66,7 +66,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Clear the samples and systematics
   samples.clear();
   systematics.clear();
-  osc = nullptr;
 
   sample_llh = nullptr;
   syst_llh = nullptr;
@@ -182,11 +181,6 @@ void FitterBase::PrepareOutput() {
       (*it)->SetBranches(*outTree, SaveProposal);
     }
 
-    if (osc) {
-      osc->SetBranches(*outTree, SaveProposal);
-      outTree->Branch("LogL_osc", &osc_llh, "LogL_osc/D");
-    }
-
     outTree->Branch("LogL", &logLCurr, "LogL/D");
     outTree->Branch("accProb", &accProb, "accProb/D");
     outTree->Branch("step", &step, "step/I");
@@ -287,7 +281,7 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   t_vec.Write((std::string(cov->getName()) + "_prior").c_str());
   delete[] n_vec;
 
-  cov->getCovMatrix()->Write(cov->getName());
+  cov->getCovMatrix()->Write(cov->getName().c_str());
 
   TH2D* CorrMatrix = cov->GetCorrelationMatrix();
   CorrMatrix->Write((cov->getName() + std::string("_Corr")).c_str());
@@ -305,39 +299,6 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
 
   return;
 }
-
-// *************************
-// Add an oscillation handler
-// Similar to systematic really, but handles the oscillation weights
-void FitterBase::addOscHandler(covarianceOsc * const oscf) {
-// *************************
-  osc = oscf;
-  if (save_nominal) {
-    CovFolder->cd();
-    std::vector<double> vec = oscf->getNominalArray();
-    size_t n = vec.size();
-    double *n_vec = new double[n];
-    for (size_t i = 0; i < n; ++i) {
-      n_vec[i] = vec[i];
-    }
-    TVectorT<double> t_vec(n, n_vec);
-    TString nameof = TString(oscf->getName());
-    nameof = nameof.Append("_nom");
-    t_vec.Write(nameof);
-    delete[] n_vec;
-    outputFile->cd();
-  }
-
-  // If we have yaml config file for covariance let's save it
-  YAML::Node Config = oscf->GetConfig();
-  if(!Config.IsNull())
-  {
-    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + oscf->getName()));
-    ConfigSave.Write();
-  }
-  return;
-}
-
 
 // *******************
 // Process the MCMC output to get postfit etc
