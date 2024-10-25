@@ -50,33 +50,29 @@ samplePDFFDBase::~samplePDFFDBase()
 void samplePDFFDBase::ReadSampleConfig() 
 {
    
-  if (CheckNodeExists(SampleManager->raw(), "SampleName")) {
-    samplename = SampleManager->raw()["SampleName"].as<std::string>();
-  } else{
+  if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  samplename = SampleManager->raw()["SampleName"].as<std::string>();
   
-  if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-    nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
-  } else{
+  if (!CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
     MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
   
-  if (CheckNodeExists(SampleManager->raw(), "DetID")) {
-    SampleDetID = SampleManager->raw()["DetID"].as<int>();
-  } else{
+  if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  SampleDetID = SampleManager->raw()["DetID"].as<int>();
   
-  if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
-    NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
-  } else {
+  if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
   
   for (int i=0;i<nSamples;i++) {
     struct FarDetectorCoreInfo obj = FarDetectorCoreInfo();
