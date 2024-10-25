@@ -57,5 +57,4 @@ struct FarDetectorCoreInfo {
 
   std::vector<const M3::float_t*> osc_w_pointer;
   std::vector<double> xsec_w;
-
 };
