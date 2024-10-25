@@ -128,14 +128,6 @@ void initFitter(py::module &m){
             py::arg("cov")
         )
 
-        .def(
-            "add_osc_handler",
-            py::overload_cast<covarianceOsc *>(&FitterBase::addOscHandler),
-            " Adds an oscillation handler for covariance objects. \n"
-            " :param oscf: An oscillation handler object for dealing with neutrino oscillation calculations. ",
-            py::arg("osc")
-        )
-        
     ; // End of FitterBase class binding
 
     py::class_<mcmc, FitterBase>(m_fitter, "MCMC")

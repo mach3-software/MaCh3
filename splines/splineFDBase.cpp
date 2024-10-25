@@ -54,11 +54,11 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   DimensionLabels.push_back(SplineVarNames);
   DetIDs.push_back(DetID);
 
-  int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
+  int nSplineParam = xsec->GetNumParamsFromDetID(DetID, SystType::kSpline);
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, kSpline);
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 

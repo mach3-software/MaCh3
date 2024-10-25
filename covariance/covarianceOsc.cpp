@@ -1,7 +1,7 @@
 #include "covariance/covarianceOsc.h"
 
 // *************************************
-covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const char *name, double threshold, int FirstPCA, int LastPCA)
+covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
 : covarianceBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // *************************************
 
@@ -25,12 +25,7 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const cha
     _fPropVal[io] = _fCurrVal[io];
   }
 
-  /// WARNING HARDCODED
-  MACH3LOG_CRITICAL("Fixing baseline and density, it is hardcoded sry");
-  toggleFixParameter("baseline");
-  toggleFixParameter("density");
-
-  /// @todo KS: Technically if we would like to use PCA we have ot initialise parts here...
+  /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
   flipdelM = false;
 
   randomize();
