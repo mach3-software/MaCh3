@@ -23,7 +23,7 @@ class mcmc : public FitterBase {
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain
   /// @todo implement some check that number of params matches etc
-  void StartFromPreviousFit(const std::string& FitName);
+  void StartFromPreviousFit(const std::string& FitName) override;
 
   /// @brief Get name of class
   inline std::string GetName()const {return "MCMC";};
