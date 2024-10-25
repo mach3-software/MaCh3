@@ -22,7 +22,7 @@ jobs:
       matrix:
         include:
           - name: Spline Validations
-            test_1: ./Apps/SplineValidations
+            test_1: ./CIValidations/SplineValidations
             test_2: empty
             test_3: empty
             test_4: empty
@@ -30,15 +30,15 @@ jobs:
             test_6: empty
 
           - name: Covariance Validations
-            test_1: ./Apps/CovarianceValidations
-            test_2: ./Apps/MaCh3ModeValidations
+            test_1: ./CIValidations/CovarianceValidations
+            test_2: ./CIValidations/MaCh3ModeValidations
             test_3: empty
             test_4: empty
             test_5: empty
             test_6: empty
 
           - name: Fitter Validations
-            test_1: ./Apps/FitterValidations
+            test_1: ./CIValidations/FitterValidations
             test_2: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
             test_3: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
             test_4: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
@@ -50,7 +50,7 @@ jobs:
             #test_8: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
 
           - name: NuMCMC Tools Validations
-            test_1: ./Apps/NuMCMCvalidations.sh
+            test_1: ./CIValidations/NuMCMCvalidations.sh
             test_2: empty
             test_3: empty
             test_4: empty
