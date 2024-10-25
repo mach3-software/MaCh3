@@ -2,7 +2,7 @@ set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
     Structs.h
-    FDMCStruct.h
+	FarDetectorCoreInfoStruct.h
 )
 
 add_library(SamplePDF SHARED
