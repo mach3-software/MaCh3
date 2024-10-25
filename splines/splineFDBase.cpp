@@ -7,8 +7,8 @@
 splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
 //****************************************
-  if (xsec_ == NULL) {
-    MACH3LOG_ERROR("Trying to create splineSKBase with NULL covariance object");
+  if (!xsec_) {
+    MACH3LOG_ERROR("Trying to create splineSKBase with null covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
@@ -394,6 +394,9 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   std::vector<TAxis *> ReturnVec;
   int iSample=getSampleIndex(SampleName);
 
+  TH2F* Hist2D = nullptr;
+  TH3F* Hist3D = nullptr;
+
   auto File = std::unique_ptr<TFile>(TFile::Open(FileName.c_str(), "READ"));
   if (!File || File->IsZombie())
   {
@@ -408,21 +411,20 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   bool isHist2D = false;
   bool isHist3D = false;
 
-  TH2F *Hist2D = NULL;
-  TH3F *Hist3D = NULL;
-
   TObject *Obj = File->Get("dev_tmp_0_0");
+  //If you can't find dev_tmp_0_0 then this will cause a problem
   if (!Obj)
   {
     Obj = File->Get("dev_tmp.0.0");
     if (!Obj)
     {
-      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!");
+      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning cannot be set!");
       MACH3LOG_ERROR("FileName: {}", FileName);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
 
+  //Now check if dev_tmp_0_0 is a TH2 i.e. specifying the dimensions of the splines is 2D
   if (Obj->IsA() == TH2F::Class())
   {
     isHist2D = true;
@@ -452,20 +454,17 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (isHist3D)
   {
+    Hist3D = File->Get<TH3F>(("dev_tmp_0_0"));
 
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
       MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    Hist3D = static_cast<TH3F *>(Obj->Clone());
   }
 
-  int nDummyBins = 1;
-  double *DummyEdges = new double[2];
-  DummyEdges[0] = -1e15;
-  DummyEdges[1] = 1e15;
-  TAxis *DummyAxis = new TAxis(nDummyBins, DummyEdges);
+  double DummyEdges[2] = {-1e-15, 1e15};
+  auto DummyAxis = std::unique_ptr<TAxis>(new TAxis(1, DummyEdges));
 
   if (Dimensions[iSample] == 2)
   {
@@ -498,15 +497,11 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
-  //This could be NULL if 2D
-  if(isHist2D){
-	delete Hist2D;
-  } else {
-    delete Hist3D;
-  }
 
+  //Make sure these actually get deleted
+  delete Hist2D;
+  delete Hist3D;
   File->Close();
-  delete DummyAxis;
   return ReturnVec;
 }
 
@@ -780,7 +775,7 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray,
 
   //We now clean up the splines!
   delete splinevec_Monolith[splineindex];
-  splinevec_Monolith[splineindex] = NULL;
+  splinevec_Monolith[splineindex] = nullptr;
 }
 
 //****************************************
