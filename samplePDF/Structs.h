@@ -57,6 +57,7 @@
 #include "TObjString.h"
 #include "TH2Poly.h"
 #include "TFile.h"
+#include "TGraphAsymmErrors.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
@@ -141,10 +142,9 @@ inline std::string GetTF1(const SplineInterpolation i) {
       Func = "([1]+[0]*x)";
       break;
     default:
-      std::cerr << "UNKNOWN SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return Func;
 }
@@ -174,10 +174,9 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
       Type = RespFuncType::kTF1_red;
       break;
     default:
-      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return Type;
 }
@@ -206,10 +205,9 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
       name = "LinearFunc";
       break;
     default:
-      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
@@ -255,10 +253,9 @@ inline std::string SystType_ToString(const SystType i) {
       name = "Functional";
       break;
     default:
-      std::cerr << "UNKNOWN SYST TYPE SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SYST TYPE SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
@@ -450,10 +447,9 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
     name = "DembinskiAbdelmottele";
     break;
     default:
-      std::cerr << "UNKNOWN LIKELHOOD SPECIFIED!" << std::endl;
-      std::cerr << "You gave test-statistic " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN LIKELIHOOD SPECIFIED!");
+      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
@@ -490,20 +486,28 @@ void CheckTH2PolyFileVersion(TFile *file);
 /// @brief KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, const std::string& name);
 
+/// @brief Used by sigma variation, check how 1 sigma changes spectra
+/// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
+/// @param sigmaArrayCentr sigma var hist at prior values
+/// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
+/// @param title A tittle for returned object
+/// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
+TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+
 /// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {
   std::ifstream infile(filename.c_str());
   if (!infile.good()) {
-    std::cerr << "*** ERROR ***" << std::endl;
-    std::cerr << "File " << filename << " does not exist" << std::endl;
-    std::cerr << "Please try again" << std::endl;
-    std::cerr << "*************" << std::endl;
-    throw;
+    MACH3LOG_ERROR("*** ERROR ***");
+    MACH3LOG_ERROR("File {} does not exist", filename);
+    MACH3LOG_ERROR("Please try again");
+    MACH3LOG_ERROR("*************");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
   return filename;
 }
-/// @brief DB Get the Cernekov momentum threshold in MeV
+
+/// @brief DB Get the Cherenkov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG);
 
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);

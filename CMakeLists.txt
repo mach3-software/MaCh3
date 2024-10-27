@@ -131,6 +131,7 @@ else()
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
     -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
     # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage

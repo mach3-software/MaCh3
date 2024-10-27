@@ -13,21 +13,20 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 
   //Get mach3 modes from manager
   Modes = fitMan->GetMaCh3Modes();
-
-  random = new TRandom3(fitMan->raw()["General"]["Seed"].as<int>());
+  random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
   accCount = 0;
   step = 0;
 
-  clock = new TStopwatch;
-  stepClock = new TStopwatch;
+  clock = std::make_unique<TStopwatch>();
+  stepClock = std::make_unique<TStopwatch>();
   #ifdef DEBUG
   // Fit summary and debug info
   debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false);
   #endif
 
-  std::string outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
+  auto outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
@@ -63,13 +62,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   if (debug) debugFile.open((outfile+".log").c_str());
   #endif
 
-  // Clear the samples and systematics
-  samples.clear();
-  systematics.clear();
-
-  sample_llh = nullptr;
-  syst_llh = nullptr;
-
   TotalNSamples = 0;
   fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false);
 }
@@ -80,18 +72,8 @@ FitterBase::~FitterBase() {
 // *************************
   SaveOutput();
 
-  if(random != nullptr) delete random;
-  random = nullptr;
-  if(sample_llh != nullptr) delete[] sample_llh;
-  sample_llh = nullptr;
-  if(syst_llh != nullptr) delete[] syst_llh;
-  syst_llh = nullptr;
   if(outputFile != nullptr) delete outputFile;
   outputFile = nullptr;
-  if(clock != nullptr) delete clock;
-  clock = nullptr;
-  if(stepClock != nullptr) delete stepClock;
-  stepClock = nullptr;
   MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
 }
 
@@ -99,7 +81,6 @@ FitterBase::~FitterBase() {
 // Prepare the output tree
 void FitterBase::SaveSettings() {
 // *******************
-
   if(SettingsSaved) return;
 
   outputFile->cd();
@@ -188,8 +169,8 @@ void FitterBase::PrepareOutput() {
 
     // Store individual likelihood components
     // Using double means double as large output file!
-    sample_llh = new double[samples.size()];
-    syst_llh = new double[systematics.size()];
+    sample_llh.resize(samples.size());
+    syst_llh.resize(systematics.size());
 
     for (size_t i = 0; i < samples.size(); ++i) {
       std::stringstream oss, oss2;
@@ -231,7 +212,6 @@ void FitterBase::PrepareOutput() {
 // *******************
 void FitterBase::SaveOutput() {
 // *******************
-
   if(FileSaved) return;
   //Stop Clock
   clock->Stop();
@@ -268,18 +248,16 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // Add flux systematics, cross-section systematics, ND systematics to the chain
 void FitterBase::addSystObj(covarianceBase * const cov) {
 // *************************
-
   MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->getName(), cov->GetNumParams());
   systematics.push_back(cov);
 
   CovFolder->cd();
-  double *n_vec = new double[cov->GetNumParams()];
+  std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i)
     n_vec[i] = cov->getParInit(i);
 
-  TVectorT<double> t_vec(cov->GetNumParams(), n_vec);
+  TVectorT<double> t_vec(cov->GetNumParams(), n_vec.data());
   t_vec.Write((std::string(cov->getName()) + "_prior").c_str());
-  delete[] n_vec;
 
   cov->getCovMatrix()->Write(cov->getName().c_str());
 
@@ -304,7 +282,7 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
 // Process the MCMC output to get postfit etc
 void FitterBase::ProcessMCMC() {
 // *******************
-  if (fitMan == NULL) return;
+  if (fitMan == nullptr) return;
 
   // Process the MCMC
   if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
@@ -452,10 +430,10 @@ void FitterBase::RunLLHScan() {
   TDirectory *Sample_LLH = outputFile->mkdir("Sample_LLH");
   TDirectory *Total_LLH = outputFile->mkdir("Total_LLH");
 
-  TDirectory **SampleSplit_LLH = nullptr;
+  std::vector<TDirectory *>SampleSplit_LLH;
   if(PlotAllNDsamplesLLH)
   {
-    SampleSplit_LLH = new TDirectory*[TotalNSamples];
+    SampleSplit_LLH.resize(TotalNSamples);
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
     {
@@ -520,12 +498,11 @@ void FitterBase::RunLLHScan() {
       if (IsPCA) {
         lower = prior - nSigma*sqrt(((*it)->getEigenValues())(i));
         upper = prior + nSigma*sqrt(((*it)->getEigenValues())(i));
-
-        std::cout << "eval " << i << " = " << (*it)->getEigenValues()(i) << std::endl;
-        std::cout << "prior " << i << " = " << prior << std::endl;
-        std::cout << "lower " << i << " = " << lower << std::endl;
-        std::cout << "upper " << i << " = " << upper << std::endl;
-        std::cout << "nSigma " << nSigma << std::endl;
+        MACH3LOG_INFO("eval {} = {:.2f}", i, (*it)->getEigenValues()(i));
+        MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
+        MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
+        MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
+        MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
       }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
@@ -538,15 +515,14 @@ void FitterBase::RunLLHScan() {
       MACH3LOG_INFO("Scanning {} with {} steps, from {:.2f} - {:.2f}, prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
-      TH1D *hScan = new TH1D((name+"_full").c_str(), (name+"_full").c_str(), n_points, lower, upper);
+      std::unique_ptr<TH1D> hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
       hScan->SetTitle(std::string(std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
 
-      TH1D *hScanSam = new TH1D((name+"_sam").c_str(), (name+"_sam").c_str(), n_points, lower, upper);
+      std::unique_ptr<TH1D> hScanSam = std::make_unique<TH1D>((name + "_sam").c_str(), (name + "_sam").c_str(), n_points, lower, upper);
       hScanSam->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
 
-
-      TH1D **hScanSample = new TH1D*[samples.size()];
-      double *nSamLLH = new double[samples.size()];
+      std::vector<TH1D*> hScanSample(samples.size());
+      std::vector<double> nSamLLH(samples.size());
       for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
         std::string NameTemp = samples[ivs]->GetName();
@@ -555,8 +531,8 @@ void FitterBase::RunLLHScan() {
         nSamLLH[ivs] = 0.;
       }
 
-      TH1D **hScanCov = new TH1D*[systematics.size()];
-      double *nCovLLH = new double[systematics.size()];
+      std::vector<TH1D*> hScanCov(systematics.size());
+      std::vector<double> nCovLLH(systematics.size());
       for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
       {
         std::string NameTemp = systematics[ivc]->getName();
@@ -567,18 +543,18 @@ void FitterBase::RunLLHScan() {
         nCovLLH[ivc] = 0.;
       }
 
-      TH1D **hScanSamSplit = nullptr;
-      double *sampleSplitllh = nullptr;
+      std::vector<TH1D *> hScanSamSplit;
+      std::vector<double> sampleSplitllh;
       if(PlotAllNDsamplesLLH)
       {
         int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
-          hScanSamSplit = new TH1D*[TotalNSamples];
-          sampleSplitllh = new double[TotalNSamples];
+          hScanSamSplit.resize(TotalNSamples);
+          sampleSplitllh.resize(TotalNSamples);
           for(_int_ is = 0; is < samples[ivs]->GetNsamples(); is++ )
           {
-            hScanSamSplit[SampleIterator] = new TH1D( (name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper );
+            hScanSamSplit[SampleIterator] = new TH1D((name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper);
             hScanSamSplit[SampleIterator]->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
             SampleIterator++;
           }
@@ -675,25 +651,10 @@ void FitterBase::RunLLHScan() {
         hScanSample[ivs]->Write();
         delete hScanSample[ivs];
       }
-
       Sample_LLH->cd();
       hScanSam->Write();
       Total_LLH->cd();
       hScan->Write();
-
-      delete[] hScanCov;
-      delete[] nCovLLH;
-      delete[] hScanSample;
-      delete[] nSamLLH;
-      delete hScanSam;
-      delete hScan;
-
-      hScanCov = nullptr;
-      nCovLLH = nullptr;
-      hScanSample = nullptr;
-      nSamLLH = nullptr;
-      hScanSam = nullptr;
-      hScan = nullptr;
 
       if(PlotAllNDsamplesLLH)
       {
@@ -708,7 +669,6 @@ void FitterBase::RunLLHScan() {
             SampleIterator++;
           }
         }
-        delete[] hScanSamSplit;
       }
 
       // Reset the parameters to their prior central values
@@ -757,8 +717,7 @@ void FitterBase::RunLLHScan() {
 //LLH scan is good first estimate of step scale
 void FitterBase::GetStepScaleBasedOnLLHScan() {
 // *************************
-  TDirectory *Sample_LLH = (TDirectory*) outputFile->Get("Sample_LLH");
-
+  TDirectory *Sample_LLH = static_cast<TDirectory*>(outputFile->Get("Sample_LLH"));
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
   if(Sample_LLH->IsZombie())
@@ -780,8 +739,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
       if (isxsec) name = (*it)->GetParFancyName(i);
 
       StepScale[i] = (*it)->GetIndivStepScale(i);
-      TH1D* LLHScan = (TH1D*) Sample_LLH->Get((name+"_sam").c_str());
-
+      TH1D* LLHScan = static_cast<TH1D*>(Sample_LLH->Get((name + "_sam").c_str()));
       if(LLHScan == nullptr)
       {
         MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
@@ -866,14 +824,13 @@ void FitterBase::Run2DLLHScan() {
       double upper_x = prior_x + nSigma*(*it)->getDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower_x = prior_x - nSigma*sqrt(((*it)->getEigenValues())(i));
-        upper_x = prior_x + nSigma*sqrt(((*it)->getEigenValues())(i));
-
-        std::cout << "eval " << i << " = " << (*it)->getEigenValues()(i) << std::endl;
-        std::cout << "prior " << i << " = " << prior_x << std::endl;
-        std::cout << "lower " << i << " = " << lower_x << std::endl;
-        std::cout << "upper " << i << " = " << upper_x << std::endl;
-        std::cout << "nSigma " << nSigma << std::endl;
+        lower_x = prior_x - nSigma*std::sqrt(((*it)->getEigenValues())(i));
+        upper_x = prior_x + nSigma*std::sqrt(((*it)->getEigenValues())(i));
+        MACH3LOG_INFO("eval {} = {:.2f}", i, (*it)->getEigenValues()(i));
+        MACH3LOG_INFO("prior {} = {:.2f}", i, prior_x);
+        MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
+        MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
+        MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
       }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
@@ -924,12 +881,11 @@ void FitterBase::Run2DLLHScan() {
         if (IsPCA) {
           lower_y = prior_y - nSigma*sqrt(((*it)->getEigenValues())(j));
           upper_y = prior_y + nSigma*sqrt(((*it)->getEigenValues())(j));
-
-          std::cout << "eval " << j << " = " << (*it)->getEigenValues()(j) << std::endl;
-          std::cout << "prior " << j << " = " << prior_y << std::endl;
-          std::cout << "lower " << j << " = " << lower_y << std::endl;
-          std::cout << "upper " << j << " = " << upper_y << std::endl;
-          std::cout << "nSigma " << nSigma << std::endl;
+          MACH3LOG_INFO("eval {} = {:.2f}", i, (*it)->getEigenValues()(j));
+          MACH3LOG_INFO("prior {} = {:.2f}", i, prior_y);
+          MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
+          MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
+          MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
         }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
@@ -942,7 +898,8 @@ void FitterBase::Run2DLLHScan() {
         MACH3LOG_INFO("Scanning X {} with {} steps, from {} - {}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
         MACH3LOG_INFO("Scanning Y {} with {} steps, from {} - {}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
 
-        TH2D *hScanSam = new TH2D((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+        auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
+                                                n_points, lower_x, upper_x, n_points, lower_y, upper_y);
         hScanSam->GetXaxis()->SetTitle(name_x.c_str());
         hScanSam->GetYaxis()->SetTitle(name_y.c_str());
         hScanSam->GetZaxis()->SetTitle("2LLH_sam");
@@ -982,10 +939,6 @@ void FitterBase::Run2DLLHScan() {
 
         Sample_2DLLH->cd();
         hScanSam->Write();
-
-        delete hScanSam;
-        hScanSam = nullptr;
-
         // Reset the parameters to their prior central values
         if (IsPCA) {
           (*it)->setParProp_PCA(i, prior_x);
@@ -1033,14 +986,13 @@ void FitterBase::RunSigmaVar() {
   }
 
   bool isxsec = false;
-
   for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
     TMatrixDSym *Cov = (*it)->getCovMatrix();
 
     if((*it)->IsPCA())
     {
-      MACH3LOG_ERROR("Usin PCAed matrix not implemented within simga var code, I am sorry :(");
+      MACH3LOG_ERROR("Using PCAed matrix not implemented within sigma var code, I am sorry :(");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
@@ -1148,7 +1100,7 @@ void FitterBase::RunSigmaVar() {
             std::string parVarTitle = std::string(name) + "_" + ss.str();
 
             // This is a TH2D
-            TH2Poly* currSamp = (TH2Poly*)(samples[ivs]->getPDF(k))->Clone();
+            TH2Poly* currSamp = static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone());
             currSamp->SetDirectory(0);
             // Set a descriptiv-ish title
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
@@ -1165,11 +1117,11 @@ void FitterBase::RunSigmaVar() {
               sigmaArray_mode_x[j][SampleIterator] = new TH1D*[nRelevantModes]();
               sigmaArray_mode_y[j][SampleIterator] = new TH1D*[nRelevantModes]();
               // Now get the TH2D mode variations
-              TH2Poly** currSampMode; currSampMode = new TH2Poly*[nRelevantModes]();
+              TH2Poly** currSampMode = new TH2Poly*[nRelevantModes]();
               std::string mode_title_long;
               for(int ir = 0; ir < nRelevantModes; ir++)
               {
-                currSampMode[ir] = (TH2Poly*)(samples[ivs]->getPDFMode(k, RelevantModes[ir]))->Clone();
+                currSampMode[ir] = static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone());
                 currSampMode[ir]->SetDirectory(0);
 
                 mode_title_long = title_long + "_" + Modes->GetMaCh3ModeName(RelevantModes[ir]);
@@ -1186,18 +1138,17 @@ void FitterBase::RunSigmaVar() {
               delete[] currSampMode;
             }
 
-            //KS: This will give different results depending if data or asimov, both have their uses
+            //KS: This will give different results depending if data or Asimov, both have their uses
             if (PlotLLHperBin)
             {
-              TH2Poly* currLLHSamp = (TH2Poly*)(samples[ivs]->getPDF(k))->Clone();
+              TH2Poly* currLLHSamp = static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone());
               currLLHSamp->SetDirectory(0);
               currLLHSamp->Reset("");
               currLLHSamp->Fill(0.0, 0.0, 0.0);
 
-              TH2Poly* MCpdf = (TH2Poly*)(samples[ivs]->getPDF(k));
-              TH2Poly* Datapdf = (TH2Poly*)(samples[ivs]->getData(k));
-              TH2Poly* W2pdf = (TH2Poly*)(samples[ivs]->getW2(k));
-
+              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->getPDF(k));
+              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->getData(k));
+              TH2Poly* W2pdf = static_cast<TH2Poly*>(samples[ivs]->getW2(k));
               for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; bin++)
               {
                 const double mc = MCpdf->GetBinContent(bin);
@@ -1219,10 +1170,10 @@ void FitterBase::RunSigmaVar() {
             sigmaArray_y[j][SampleIterator]->SetDirectory(0);
             sigmaArray_y[j][SampleIterator]->GetXaxis()->SetTitle(currSamp->GetYaxis()->GetTitle());
 
-            sigmaArray_x_norm[j][SampleIterator] = (TH1D*)sigmaArray_x[j][SampleIterator]->Clone();
+            sigmaArray_x_norm[j][SampleIterator] = static_cast<TH1D*>(sigmaArray_x[j][SampleIterator]->Clone());
             sigmaArray_x_norm[j][SampleIterator]->SetDirectory(0);
             sigmaArray_x_norm[j][SampleIterator]->Scale(1., "width");
-            sigmaArray_y_norm[j][SampleIterator] = (TH1D*)sigmaArray_y[j][SampleIterator]->Clone();
+            sigmaArray_y_norm[j][SampleIterator] = static_cast<TH1D*>(sigmaArray_y[j][SampleIterator]->Clone());
             sigmaArray_y_norm[j][SampleIterator]->SetDirectory(0);
             sigmaArray_y_norm[j][SampleIterator]->Scale(1., "width");
 
@@ -1348,36 +1299,4 @@ void FitterBase::RunSigmaVar() {
       }
     } // end looping over xsec parameters (i)
   } // end looping over covarianceBase objects
-}
-
-// *************************
-TGraphAsymmErrors* FitterBase::MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
-// *************************
-
-  TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
-  var->SetNameTitle((title).c_str(), (title).c_str());
-
-  // Need to draw TGraphs to set axes labels
-  var->Draw("AP");
-  var->GetXaxis()->SetTitle(sigmaArrayCentr->GetXaxis()->GetTitle());
-  var->GetYaxis()->SetTitle("Number of events/bin");
-
-  for (int m = 0; m < var->GetN(); ++m)
-  {
-    double xlow = sigmaArrayLeft->GetBinContent(m+1);
-    double xhigh = sigmaArrayRight->GetBinContent(m+1);
-    double xtemp;
-
-    // Figure out which variation is larger so we set the error correctly
-    if (xlow > xhigh)
-    {
-      xtemp = xlow;
-      xlow = xhigh;
-      xhigh = xtemp;
-    }
-
-    var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
-    var->SetPointEYlow(m, var->GetY()[m] - xlow);
-  }
-  return var;
 }
