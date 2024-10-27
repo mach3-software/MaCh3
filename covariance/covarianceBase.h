@@ -352,8 +352,6 @@ class covarianceBase {
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
-  /// @brief initialise TRandom3 from which we throw
-  void SetRandom();
 
   /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
   void randomize();

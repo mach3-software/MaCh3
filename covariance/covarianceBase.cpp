@@ -126,8 +126,13 @@ void covarianceBase::init(std::string name, std::string file) {
 
   PrintLength = 35;
 
-  SetRandom();
-
+  const int nThreads = MaCh3Utils::GetNThreads();
+  //KS: set Random numbers for each thread so each thread has different seed
+  //or for one thread if without MULTITHREAD
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
+    random_number[iThread] = new TRandom3(0);
+  }
   // Not using adaptive by default
   use_adaptive = false;
   // Set the covariance matrix
@@ -182,7 +187,13 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     }
   }
 
-  SetRandom();
+  const int nThreads = MaCh3Utils::GetNThreads();
+  //KS: set Random numbers for each thread so each thread has different seed
+  //or for one thread if without MULTITHREAD
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
+    random_number[iThread] = new TRandom3(0);
+  }
   PrintLength = 35;
 
   // Set the covariance matrix
@@ -384,20 +395,6 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
   }
 
   _fGlobalStepScale = 1.0;
-}
-
-// ********************************************
-void covarianceBase::SetRandom() {
-// ********************************************
-  if(random_number != nullptr) return;
-
-  const int nThreads = MaCh3Utils::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
-  }
 }
 
 // ********************************************
