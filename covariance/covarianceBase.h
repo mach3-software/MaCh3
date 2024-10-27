@@ -285,8 +285,6 @@ class covarianceBase {
     //KS: Transfer to normal base
     TransferToParam();
   }
-  /// @brief Get number of params in normal Base, if you want something which will work with PCA as well please use getNpars()
-  inline int getSize() { return _fNumPar; }
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   inline int getNpars() {
     if (pca) return _fNumParPCA;
@@ -343,7 +341,7 @@ class covarianceBase {
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
-protected:
+ protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
   /// @brief Initialisation of the class using config
@@ -354,6 +352,8 @@ protected:
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
+  /// @brief initialise TRandom3 from which we throw
+  void SetRandom();
 
   /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
   void randomize();
@@ -387,8 +387,6 @@ protected:
   /// The input root file we read in
   const std::string inputFile;
 
-  /// Total number of params, deprecated, please don't use it
-  int size;
   /// Name of cov matrix
   std::string matrixName;
   /// The covariance matrix

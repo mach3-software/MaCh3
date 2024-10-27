@@ -61,7 +61,7 @@ covarianceBase::~covarianceBase(){
   delete[] throwMatrixCholDecomp;
   
   const int nThreads = MaCh3Utils::GetNThreads();
-  for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
+  for (int iThread = 0;iThread < nThreads; iThread++) delete random_number[iThread];
   delete[] random_number;
   if (throwMatrix != nullptr) delete throwMatrix;
 }
@@ -126,19 +126,12 @@ void covarianceBase::init(std::string name, std::string file) {
 
   PrintLength = 35;
 
-  const int nThreads = MaCh3Utils::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
-  }
+  SetRandom();
 
   // Not using adaptive by default
   use_adaptive = false;
   // Set the covariance matrix
-  size = CovMat->GetNrows();
-  _fNumPar = size;
+  _fNumPar = CovMat->GetNrows();
     
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
@@ -189,20 +182,11 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     }
   }
 
-  const int nThreads = MaCh3Utils::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
-  }
-
+  SetRandom();
   PrintLength = 35;
 
   // Set the covariance matrix
   _fNumPar = _fYAMLDoc["Systematics"].size();
-  size = _fNumPar;
-
   use_adaptive = false;
 
   InvertCovMatrix = new double*[_fNumPar]();
@@ -321,8 +305,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 // ********************************************
 void covarianceBase::init(TMatrixDSym* covMat) {
 // ********************************************
-  size = covMat->GetNrows();
-  _fNumPar = size;
+  _fNumPar = covMat->GetNrows();
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
@@ -401,6 +384,20 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
   }
 
   _fGlobalStepScale = 1.0;
+}
+
+// ********************************************
+void covarianceBase::SetRandom() {
+// ********************************************
+  if(random_number != nullptr) return;
+
+  const int nThreads = MaCh3Utils::GetNThreads();
+  //KS: set Random numbers for each thread so each thread has different seed
+  //or for one thread if without MULTITHREAD
+  random_number = new TRandom3*[nThreads]();
+  for (int iThread = 0; iThread < nThreads; iThread++) {
+    random_number[iThread] = new TRandom3(0);
+  }
 }
 
 // ********************************************
