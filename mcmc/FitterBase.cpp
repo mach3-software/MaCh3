@@ -515,10 +515,10 @@ void FitterBase::RunLLHScan() {
       MACH3LOG_INFO("Scanning {} with {} steps, from {:.2f} - {:.2f}, prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
-      std::unique_ptr<TH1D> hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+      auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
       hScan->SetTitle(std::string(std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
 
-      std::unique_ptr<TH1D> hScanSam = std::make_unique<TH1D>((name + "_sam").c_str(), (name + "_sam").c_str(), n_points, lower, upper);
+      auto hScanSam = std::make_unique<TH1D>((name + "_sam").c_str(), (name + "_sam").c_str(), n_points, lower, upper);
       hScanSam->SetTitle(std::string(std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
 
       std::vector<TH1D*> hScanSample(samples.size());
