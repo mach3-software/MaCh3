@@ -3,13 +3,14 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-#KS: Enable language, necessary when using CUDA
-enable_language(CXX)
-set(MaCh3_VERSION 1.2.0)
+project(MaCh3 VERSION 1.2.0 LANGUAGES CXX)
+set(MaCh3_VERSION ${PROJECT_VERSION})
+
+#LP - This option name is confusing, but I wont change it now.
+option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
 
 # Try to find CUDA
 find_package(CUDAToolkit QUIET)
-add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
@@ -21,10 +22,8 @@ else()
   set(CPU_ONLY TRUE)
 endif()
 
-if(CPU_ONLY)
-  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
-else()
-  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
+if(NOT CPU_ONLY)
+  enable_language(CUDA)
 endif()
 
 # Changes default install path to be a subdirectory of the build dir.
@@ -50,18 +49,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  set(CMAKE_CXX_STANDARD 14)
-endif()
-
-# KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
-if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
-endif()
-cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
-
-# KS: ROOT changed cmake in 6.32, we should move avay from using Luke's hack, keep it for due to compatibility
-if(ROOT_CXX_STANDARD LESS 14 AND ROOT_VERSION VERSION_LESS 6.32.00)
-  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
@@ -78,11 +66,10 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # KS: Compile and link options for more see https://github.com/cpp-best-practices/cppbestpractices/tree/master
-target_compile_options(MaCh3CompilerOptions INTERFACE
-    -g                      # Generate debug information
+add_library(MaCh3Warnings INTERFACE)
+target_compile_options(MaCh3Warnings INTERFACE
     -Wextra                 # Enable extra warning flags
     -Wall                   # Enable all standard warning flags
-    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
     -Wshadow                # Warn when a variable declaration shadows one from an outer scope
     -Wuninitialized         # Warn about uninitialized variables
     -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
@@ -90,14 +77,21 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -Wformat=2              # Warn on security issues around functions that format output (ie printf)
     -Wunused                # Warn on anything being unused
     -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
-    #-Wstrict-aliasing=2    # Helps detect potential aliasing issues that could lead to undefined behavior.
-    #-Wuseless-cast         # Warn if you perform a cast to the same type (only in GCC >= 4.8)
-    #-Wpadded               # Warn when padding is added to a structure or class for alignment
-    #-Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
-    #-Wold-style-cast       # Warn for c-style casts
-    #-Wconversion           # Warn on type conversions that may lose data
-    #-Werror                # Treat Warnings as Errors
+    -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
+    -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+    # -Wpadded               # Warn when padding is added to a structure or class for alignment
+    -Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
+    -Wold-style-cast       # Warn for c-style casts
+    -Wconversion           # Warn on type conversions that may lose data
+    -Werror                # Treat Warnings as Errors
 )
+
+add_library(MaCh3CompilerOptions INTERFACE)
+target_compile_options(MaCh3CompilerOptions INTERFACE
+    -g                      # Generate debug information
+    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
+)
+
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   target_compile_options(MaCh3CompilerOptions INTERFACE

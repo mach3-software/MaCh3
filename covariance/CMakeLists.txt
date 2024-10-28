@@ -26,7 +26,9 @@ if(NOT CPU_ONLY)
     set_property(TARGET Covariance PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-target_link_libraries(Covariance Manager MaCh3CompilerOptions)
+target_link_libraries(Covariance PUBLIC Manager)
+target_link_libraries(Covariance PRIVATE MaCh3Warnings)
+
 target_include_directories(Covariance PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)

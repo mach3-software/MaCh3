@@ -12,9 +12,9 @@
 #endif
 
 /// KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
-#define _nCoeff_ 4
+constexpr inline ushort nCoeff = 4;
 /// KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track
-#define _nTF1Coeff_ 2
+constexpr inline ushort nTF1Coeff = 2;
 
 /// HW: Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])
 enum SplineSegmentCoeffs

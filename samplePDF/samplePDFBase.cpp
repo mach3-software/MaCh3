@@ -99,7 +99,7 @@ void samplePDFBase::addData(TH2D* binneddata)
 std::vector<double> samplePDFBase::generate()
 {
   std::vector<double> data;
-  TH1D *pdf = (TH1D*)get1DHist();
+  TH1D *pdf = get1DHist();
   double evrate = getEventRate();
   int num = rnd->Poisson(evrate);
   std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
@@ -136,7 +136,7 @@ std::vector<double> samplePDFBase::generate()
 std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 {
   std::vector< std::vector <double> > data;
-  if(!pdf) pdf = (TH2D*)get2DHist();
+  if(!pdf) pdf = get2DHist();
 
   if(MCthrow)
   {
@@ -316,7 +316,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       const long double a = mc*b+1;
       const long double k = data;
       // Use C99's implementation of log of gamma function to not be C++11 dependent
-      stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
+      stat = double(-1*(a * logl(b) + lgammal(k+a) - lgammal(k+1) - ((k+a)*log1pl(b)) - lgammal(a)));
 
       // Return the statistical contribution and penalty
       return stat;

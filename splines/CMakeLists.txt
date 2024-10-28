@@ -29,7 +29,8 @@ set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
 
-target_link_libraries(Splines Manager MaCh3CompilerOptions)
+target_link_libraries(Splines PUBLIC Manager)
+target_link_libraries(Splines PRIVATE MaCh3Warnings)
 
 target_include_directories(Splines PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

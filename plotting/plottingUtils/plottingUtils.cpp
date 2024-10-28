@@ -57,12 +57,12 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
 }
 
 
-std::vector<std::vector<float>> TGraphToVector(TGraph graph) {
+std::vector<std::vector<double>> TGraphToVector(TGraph graph) {
 
   int nPoints = graph.GetN();
-  std::vector<std::vector<float>> ret(2);
-  std::vector<float> pointsX(nPoints);
-  std::vector<float> pointsY(nPoints);
+  std::vector<std::vector<double>> ret(2);
+  std::vector<double> pointsX(nPoints);
+  std::vector<double> pointsY(nPoints);
 
   // Get the points out
   Double_t x, y;
@@ -81,13 +81,13 @@ std::vector<std::vector<float>> TGraphToVector(TGraph graph) {
 }
 
 
-std::vector<std::vector<float>> TGraphToVector(TGraph2D graph) {
+std::vector<std::vector<double>> TGraphToVector(TGraph2D graph) {
 
   int nPoints = graph.GetN();
-  std::vector<std::vector<float>> ret(3);
-  std::vector<float> pointsX(nPoints);
-  std::vector<float> pointsY(nPoints);
-  std::vector<float> pointsZ(nPoints);
+  std::vector<std::vector<double>> ret(3);
+  std::vector<double> pointsX(nPoints);
+  std::vector<double> pointsY(nPoints);
+  std::vector<double> pointsZ(nPoints);
 
   // Get the points out
   Double_t x, y, z;

@@ -2,34 +2,17 @@
 # download CPM.cmake
 file(
   DOWNLOAD
-  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.38.8/CPM.cmake
+  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.40.2/CPM.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake
 )
 include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
-
-#Luke's handing cmake modules which Neutrino hep experiments might want
-CPMFindPackage(
-      NAME CMakeModules
-      GIT_TAG stable
-      GITHUB_REPOSITORY NuHepMC/CMakeModules
-      DOWNLOAD_ONLY
-  )
-include(${CMakeModules_SOURCE_DIR}/NuHepMCModules.cmake)
-include(NuHepMCUtils)
 
 # Check if CUDA was found
 if(MaCh3_GPU_ENABLED)
   include(${CMAKE_CURRENT_LIST_DIR}/CUDASetup.cmake)
 endif()
 
-include(ROOT)
-if(NOT TARGET ROOT::ROOT)
-  cmessage(FATAL_ERROR "MaCh3 Expected dependency target: ROOT::ROOT")
-endif()
-
-if(ROOT_VERSION VERSION_LESS 6.18.00)
-  cmessage(FATAL_ERROR "Using ROOT version smaller than 6.18.0, this may lead to unexpected results")
-endif()
+find_package(ROOT 6.18 REQUIRED)
 
 # KS: Since ROOT 6.32.0 Minuit is turned on by default
 set(MaCh3_MINUIT2_ENABLED FALSE)
@@ -38,13 +21,12 @@ if(ROOT_VERSION GREATER_EQUAL 6.32.00 OR ROOT_CXX_FLAGS MATCHES "-DMINUIT2_ENABL
 endif()
 
 #YAML for reading in config files
-set(YAML_CPP_VERSION 0.7.0) #KS: We need it for version.h file also define this number olny once
-set(YAML_CPP_GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}")
+set(YAML_CPP_VERSION 0.8.0) #KS: We need it for version.h file also define this number only once
 CPMAddPackage(
     NAME yaml-cpp
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG "${YAML_CPP_GIT_TAG}"
+    GIT_TAG "${YAML_CPP_VERSION}"
     OPTIONS
       "YAML_BUILD_SHARED_LIBS ON"
 )

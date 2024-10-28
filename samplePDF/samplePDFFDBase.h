@@ -30,7 +30,7 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName(){return samplename;}
+  std::string GetName() const {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -57,10 +57,10 @@ public:
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
+  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal) = 0;
   void ReadSampleConfig();
 
-  int getNMCSamples() {return MCSamples.size();}
+  int getNMCSamples() {return int(MCSamples.size());}
 
   int getNEventsInSample(int iSample) {
     if (iSample < 0 || iSample > getNMCSamples()) {
@@ -81,8 +81,8 @@ public:
   TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
@@ -225,7 +225,7 @@ public:
   /// @brief the total number of function parameters found in the xsec model
   int nFuncParams;
   std::vector<std::string> funcParsNames;
-  std::vector<int> funcParsIndex;
+  std::vector<size_t> funcParsIndex;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply

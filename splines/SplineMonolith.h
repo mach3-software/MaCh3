@@ -43,7 +43,7 @@ class SMonolith : public SplineBase {
     /// @param spline_ParsPointers Vector of pointers to spline params
     inline void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
       splineParsPointer = spline_ParsPointers;
-      for (_int_ i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
+      for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
     /// The returned gpu weights, read by the GPU

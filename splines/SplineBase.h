@@ -51,5 +51,5 @@ class SplineBase {
     /// @param spl pointer to TF1_red that will be checked
     /// @param nPoints number of knots
     /// @param coeffs Array holding coefficients for each knot
-    void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
+    void getTF1Coeff(TF1_red* &spl, short &nPoints, float *&coeffs);
 };

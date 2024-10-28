@@ -86,7 +86,7 @@ class SampleSummary {
     /// @brief Helper to project TH2D onto axis
     inline TH1D* ProjectHist(TH2D* Histogram, const bool ProjectX);
     /// @brief Helper to project TH2Poly onto axis
-    inline TH1D* ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const _int_ selection, const bool MakeErrorHist = false);
+    inline TH1D* ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const int selection, const bool MakeErrorHist = false);
 
     /// @brief Make Poisson fluctuation of TH1D hist
     inline void MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist);
@@ -140,7 +140,7 @@ class SampleSummary {
     std::vector<double> WeightVector;
 
     /// Number of samples
-    _int_ nSamples;
+    int nSamples;
 
     /// name for each sample
     std::vector<std::string> SampleNames;
@@ -337,5 +337,5 @@ class SampleSummary {
     int nModelParams;
 
     /// Tells Debug level to save additional histograms
-    _int_ Debug;
+    int Debug;
 };

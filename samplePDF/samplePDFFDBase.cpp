@@ -160,7 +160,7 @@ void samplePDFFDBase::ReadSampleConfig()
     SelectionVec = {KinematicParamter, low_bound, up_bound};
     StoredSelection.push_back(SelectionVec);
   }
-  NSelections = SelectionStr.size();
+  NSelections = int(SelectionStr.size());
 
   return;
 }
@@ -174,7 +174,7 @@ void samplePDFFDBase::Initialise() {
   Init();
 
   int TotalMCEvents = 0;
-  for(_int_ iSample=0 ; iSample < nSamples ; iSample++){
+  for(M3::int_t iSample=0 ; iSample < nSamples ; iSample++){
     MACH3LOG_INFO("=============================================");
     MACH3LOG_INFO("Initialising sample: {}/{}", iSample, nSamples);
     MCSamples[iSample].nEvents = setupExperimentMC(iSample);
@@ -352,11 +352,11 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
-  std::vector<_float_> OscVec(OscCov->GetNumParams());
+  std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
   for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
     OscVec[iPar] = OscCov->getParProp(iPar);
   } 
-  for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+  for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
     NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
   }
   
@@ -384,8 +384,8 @@ void samplePDFFDBase::fillArray() {
 #else
 
   //ETA we should probably store this in samplePDFFDBase
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -500,12 +500,12 @@ void samplePDFFDBase::fillArray() {
 // ************************************************ 
 void samplePDFFDBase::fillArray_MP() 
 {
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  size_t nXBins = int(XBinEdges.size()-1);
+  size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    for (int xBin=0;xBin<nXBins;xBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
       samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
@@ -524,10 +524,10 @@ void samplePDFFDBase::fillArray_MP()
     // ETA - maybe we can use parallel firstprivate to initialise these?
     samplePDFFD_array_private = new double*[nYBins];
     samplePDFFD_array_private_w2 = new double*[nYBins];
-    for (int yBin=0;yBin<nYBins;yBin++) {
+    for (size_t yBin=0;yBin<nYBins;yBin++) {
       samplePDFFD_array_private[yBin] = new double[nXBins];
       samplePDFFD_array_private_w2[yBin] = new double[nXBins];
-      for (int xBin=0;xBin<nXBins;xBin++) {
+      for (size_t xBin=0;xBin<nXBins;xBin++) {
         samplePDFFD_array_private[yBin][xBin] = 0.;
         samplePDFFD_array_private_w2[yBin][xBin] = 0.;
       }
@@ -666,8 +666,8 @@ void samplePDFFDBase::fillArray_MP()
     //End of Calc Weights and fill Array
     //==================================================
     // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in GetLikelihood
-    for (int yBin=0;yBin<nYBins;yBin++) {
-      for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t yBin=0;yBin<nYBins;yBin++) {
+      for (size_t xBin=0;xBin<nXBins;xBin++) {
 #pragma omp atomic
 	samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
 #pragma omp atomic    
@@ -675,7 +675,7 @@ void samplePDFFDBase::fillArray_MP()
       }
     }
     
-    for (int yBin=0;yBin<nYBins;yBin++) {
+    for (size_t yBin=0;yBin<nYBins;yBin++) {
       delete[] samplePDFFD_array_private[yBin];
       delete[] samplePDFFD_array_private_w2[yBin];
     }
@@ -691,12 +691,12 @@ void samplePDFFDBase::fillArray_MP()
 void samplePDFFDBase::ResetHistograms() {
 // **************************************************
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  size_t nXBins = int(XBinEdges.size()-1);
+  size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
-  for (int yBin = 0; yBin < nYBins; yBin++) {
-    for (int xBin = 0; xBin < nXBins; xBin++) {
+  for (size_t yBin = 0; yBin < nYBins; yBin++) {
+    for (size_t xBin = 0; xBin < nXBins; xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
     }
   }
@@ -756,7 +756,7 @@ void samplePDFFDBase::SetupNormParameters(){
   }
 
   // Assign xsec norm bins in MCSamples tree
-  for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
+  for (int iSample = 0; iSample < int(MCSamples.size()); ++iSample) {
 	CalcXsecNormsBins(iSample);
   }
 
@@ -764,11 +764,11 @@ void samplePDFFDBase::SetupNormParameters(){
   //Attempt at reducing impact of covarianceXsec::calcReweight()
   int counter;
 
-  for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
+  for (int iSample = 0; iSample < int(MCSamples.size()); ++iSample) {
 	for (int iEvent = 0; iEvent < MCSamples[iSample].nEvents; ++iEvent) {
 	  counter = 0;
 
-	  MCSamples[iSample].nxsec_norm_pointers[iEvent] = MCSamples[iSample].xsec_norms_bins[iEvent].size();
+	  MCSamples[iSample].nxsec_norm_pointers[iEvent] = int(MCSamples[iSample].xsec_norms_bins[iEvent].size());
 	  MCSamples[iSample].xsec_norm_pointers[iEvent] = new const double*[MCSamples[iSample].nxsec_norm_pointers[iEvent]];
 
 	  for(std::list< int >::iterator lit = MCSamples[iSample].xsec_norms_bins[iEvent].begin();lit!=MCSamples[iSample].xsec_norms_bins[iEvent].end();lit++) {
@@ -892,8 +892,8 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(XVec.size()-1, XVec.data());
-  dathist->SetBins(XVec.size()-1, XVec.data());
+  _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
+  dathist->SetBins(int(XVec.size()-1), XVec.data());
 
   //This will overwrite XBinEdges with whatever you pass this function
   XBinEdges = XVec;
@@ -902,11 +902,11 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   YBinEdges[1] = 1e8;
 
   _hPDF2D->Reset();
-  _hPDF2D  ->SetBins(XVec.size()-1, XVec.data(), YBinEdges.size()-1, YBinEdges.data());
-  dathist2d->SetBins(XVec.size()-1, XVec.data(), YBinEdges.size()-1, YBinEdges.data());
+  _hPDF2D  ->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
+  dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -926,19 +926,19 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
 void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
 {
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(XVec.size()-1, XVec.data());
-  dathist->SetBins(XVec.size()-1, XVec.data());
+  _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
+  dathist->SetBins(int(XVec.size()-1), XVec.data());
 
   _hPDF2D->Reset();
-  _hPDF2D->SetBins(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());
-  dathist2d->SetBins(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());
+  _hPDF2D->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
+  dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
 
   //XBinEdges = XVec;
   //YBinEdges = YVec;
 
   //ETA - maybe need to be careful here
-  int nXBins = XVec.size()-1;
-  int nYBins = YVec.size()-1;
+  int nXBins = int(XVec.size()-1);
+  int nYBins = int(YVec.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -981,8 +981,8 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   _hPDF2D->SetBins(nbins,boundaries,1,YBinEdges_Arr);
   dathist2d->SetBins(nbins,boundaries,1,YBinEdges_Arr);
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1016,8 +1016,8 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   _hPDF2D->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
   dathist2d->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1036,7 +1036,7 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
 void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
+  for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
       
       //Set x_var and y_var values based on XVarStr and YVarStr
@@ -1101,8 +1101,8 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1137,8 +1137,8 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1157,7 +1157,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
 void samplePDFFDBase::FindNominalBinAndEdges2D() {
 
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
+  for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
       
       //Set x_var and y_var values based on XVarStr and YVarStr   
@@ -1228,8 +1228,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
     dathist->Fill(dataSample->at(i));
   }
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
   
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1258,8 +1258,8 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
     dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
   }
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1283,8 +1283,8 @@ void samplePDFFDBase::addData(TH1D* Data) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
     throw MaCh3Exception(__FILE__ , __LINE__ );}
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
   
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1308,8 +1308,8 @@ void samplePDFFDBase::addData(TH2D* Data) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
     throw MaCh3Exception(__FILE__ , __LINE__ );}	
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1323,14 +1323,14 @@ void samplePDFFDBase::addData(TH2D* Data) {
 void samplePDFFDBase::SetupNuOscillator() {
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   
-  NuOscProbCalcers = std::vector<OscillatorBase*>((int)MCSamples.size());
-  for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+  NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
+  for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
     MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
     NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
     
     if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-      std::vector<_float_> EnergyArray;
-      for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      std::vector<M3::float_t> EnergyArray;
+      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
         //DB Remove NC events from the arrays which are handed to the NuOscillator objects
         if (!MCSamples[iSample].isNC[iEvent]) {
           EnergyArray.push_back(*(MCSamples[iSample].rw_etru[iEvent]));
@@ -1343,8 +1343,8 @@ void samplePDFFDBase::SetupNuOscillator() {
       //============================================================================
       //DB Atmospheric only part
       if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	std::vector<_float_> CosineZArray;
-	for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+	std::vector<M3::float_t> CosineZArray;
+	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
 	  if (!MCSamples[iSample].isNC[iEvent]) {
 	    CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
@@ -1360,7 +1360,7 @@ void samplePDFFDBase::SetupNuOscillator() {
     
     NuOscProbCalcers[iSample]->Setup();
 
-    for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+    for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
 #ifdef _LOW_MEMORY_STRUCTS_
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
@@ -1441,16 +1441,16 @@ double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
 /// @brief Finds the binned spline that an event should apply to and stored them in a
 /// a vector for easy evaluation in the fillArray() function.
 void samplePDFFDBase::fillSplineBins() {
-  for (int i = 0; i < (int)MCSamples.size(); ++i) {
+  for (int i = 0; i < int(MCSamples.size()); ++i) {
     //Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
       case 1:
-	EventSplines = splineFile->GetEventSplines(GetName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+	EventSplines = splineFile->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
 	break;
       case 2:
-	EventSplines = splineFile->GetEventSplines(GetName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+	EventSplines = splineFile->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
 	break;
       default:
 	MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
@@ -1458,7 +1458,7 @@ void samplePDFFDBase::fillSplineBins() {
 	MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
 	break;
       }
-      MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
+      MCSamples[i].nxsec_spline_pointers[j] = int(EventSplines.size());
       if(MCSamples[i].nxsec_spline_pointers[j] < 0){
 	throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -1481,8 +1481,8 @@ double samplePDFFDBase::GetLikelihood() {
   }
   
   //This can be done only once and stored
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
   
   int xBin;
   int yBin;
@@ -1548,7 +1548,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
   fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
   fdobj->Target = new int*[fdobj->nEvents];
-  fdobj->osc_w_pointer = new const _float_*[fdobj->nEvents];
+  fdobj->osc_w_pointer = new const M3::float_t*[fdobj->nEvents];
   //fdobj->rw_truecz = new const double*[fdobj->nEvents];
   
   for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
@@ -1606,6 +1606,8 @@ void samplePDFFDBase::InitialiseSplineObject() {
 }
 
 TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+  (void)WeightStyle;
+
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
@@ -1616,17 +1618,17 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   std::vector< std::vector<double> > SelectionVecToApply;
 
   //DB Add all the predefined selections to the selection vector which will be applied
-  for (int iSelec=0;iSelec<Selection.size();iSelec++) {
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
     SelectionVecToApply.emplace_back(Selection[iSelec]);
   }
 
   //DB Add all requested cuts from the arguement to the selection vector which will be applied
-  for (int iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
     SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
 
   //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
-  for (int iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
+  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
     if (SelectionVecToApply[iSelec].size()!=3) {
       MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1641,10 +1643,8 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   if (Axis) {
     _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
   } else {
-    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
-    double xbin_edges[xBinEdges.size()];
-    for (unsigned int i=0;i<xBinEdges.size();i++) {xbin_edges[i] = xBinEdges[i];}
-    _h1DVar = new TH1D("", "", xBinEdges.size()-1, xbin_edges);
+    std::vector<double> const & xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
+    _h1DVar = new TH1D("", "", int(xBinEdges.size()-1), xBinEdges.data());
   }
 
   //DB Loop over all events

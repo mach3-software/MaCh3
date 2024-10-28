@@ -92,15 +92,15 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
   adapt_block_matrix_indices = std::vector<int>(Npars, 0);
 
   // Should also make a matrix of block sizes
-  adapt_block_sizes = std::vector<int>((int)block_indices.size()+1, 0);
+  adapt_block_sizes = std::vector<int>(block_indices.size()+1, 0);
   adapt_block_sizes[0] = Npars;
 
   if(block_indices.size()==0 || block_indices[0].size()==0) return;
 
   // Now we loop over our blocks
-  for(int iblock=0; iblock<(int)block_indices.size(); iblock++){
+  for(int iblock=0; iblock<int(block_indices.size()); iblock++){
     // Loop over blocks in the block
-    for(int isubblock=0; isubblock<(int)block_indices[iblock].size()-1; isubblock+=2){
+    for(int isubblock=0; isubblock<int(block_indices[iblock].size())-1; isubblock+=2){
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
@@ -127,8 +127,8 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const TString& outFileName, const T
     MACH3LOG_ERROR("Couldn't find {}", outFileName);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  TVectorD* outMeanVec = new TVectorD((int)par_means.size());
-  for(int i = 0; i < (int)par_means.size(); i++){
+  TVectorD* outMeanVec = new TVectorD(int(par_means.size()));
+  for(int i = 0; i < int(par_means.size()); i++){
     (*outMeanVec)(i) = par_means[i];
   }
   outFile->cd();

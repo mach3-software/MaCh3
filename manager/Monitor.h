@@ -34,14 +34,14 @@ namespace MaCh3Utils {
   /// @return The output of the terminal command as a string.
   std::string TerminalToString(std::string cmd);
   /// @brief KS: Check what CPU you are using
-  void EstimateDataTransferRate(TChain* chain, const int entry);
+  void EstimateDataTransferRate(TChain* chain, const Long64_t entry);
   /// @brief KS: Find out about Disk usage
   void GetDiskUsage();
   /// @brief KS: Simply print progress bar
   /// @param Done The number of tasks completed.
   /// @param All The total number of tasks.
   /// @details This function prints a progress bar to the terminal, indicating the percentage of tasks completed.
-  void PrintProgressBar(const int Done, const int All);
+  void PrintProgressBar(const Long64_t Done, const Long64_t All);
   /// @brief KS: Get version of MaCh3
   /// @return The current MaCh3 version as a string.
   /// @details This function fetches and returns the version of the MaCh3 software being used.

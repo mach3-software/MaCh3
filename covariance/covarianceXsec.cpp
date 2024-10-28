@@ -160,7 +160,7 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
   int NumKinematicCuts = 0;
   if(param["KinematicCuts"]){
 
-    NumKinematicCuts = param["KinematicCuts"].size();
+    NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
     std::vector<std::vector<double>> TempKinematicBounds;
@@ -196,9 +196,9 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
 // ********************************************
 // Grab the global syst index for the relevant DetID
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int DetID, const SystType Type) {
+const std::vector<size_t> covarianceXsec::GetGlobalSystIndexFromDetID(const int DetID, const SystType Type) {
 // ********************************************
-  std::vector<int> returnVec;
+  std::vector<size_t> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
     if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
@@ -211,9 +211,9 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int Det
 // ********************************************
 // Grab the global syst index for the relevant DetID
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> covarianceXsec::GetSystIndexFromDetID(int DetID,  const SystType Type) {
+const std::vector<size_t> covarianceXsec::GetSystIndexFromDetID(int DetID,  const SystType Type) {
 // ********************************************
-  std::vector<int> returnVec;
+  std::vector<size_t> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
@@ -237,7 +237,7 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
         Spline._SplineInterpolationType = SplineInterpolation(InterpType);
     }
   } else { //KS: By default use TSpline3
-    Spline._SplineInterpolationType = SplineInterpolation(kTSpline3);
+    Spline._SplineInterpolationType = kTSpline3;
   }
   Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999);
   Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999);
@@ -291,12 +291,12 @@ const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const int D
 
 // ********************************************
 // DB DB Grab the parameter indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const int DetID, const SystType Type) {
+const std::vector<size_t> covarianceXsec::GetParsIndexFromDetID(const int DetID, const SystType Type) {
 // ********************************************
-  std::vector<int> returnVec;
+  std::vector<size_t> returnVec;
   IterateOverParams(DetID,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
-    [&](int i) { returnVec.push_back(i); } // Action to perform if filter passes
+    [&](int i) { returnVec.push_back(size_t(i)); } // Action to perform if filter passes
   );
   return returnVec;
 }
@@ -480,11 +480,11 @@ void covarianceXsec::CheckCorrectInitialisation() {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
   auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
-    std::unordered_map<std::string, int> seenStrings;
+    std::unordered_map<std::string, size_t> seenStrings;
     for (size_t i = 0; i < names.size(); ++i) {
       const auto& name = names[i];
       if (seenStrings.find(name) != seenStrings.end()) {
-        int firstIndex = seenStrings[name];
+        size_t firstIndex = seenStrings[name];
         MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
         throw MaCh3Exception(__FILE__, __LINE__);
       }

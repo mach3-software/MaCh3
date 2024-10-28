@@ -50,7 +50,7 @@ class splineFDBase : public SplineBase {
 
 	void BuildSampleIndexingArray(std::string SampleName);
 	void PrepForReweight();
-	void getSplineCoeff_SepMany(int splineindex, _float_ *& xArray, _float_ *&manyArray);
+	void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
 	void PrintBinning(TAxis* Axis);
 	void PrintSampleDetails(std::string SampleName);
 	void PrintArrayDetails(std::string SampleName);
@@ -90,14 +90,14 @@ class splineFDBase : public SplineBase {
 	/// @brief This holds the global spline index and is used to grab the current parameter value
 	/// to evaluate splines at. Each internal vector will be of size of the number of spline
 	/// systematics which affect that sample.
-	std::vector< std::vector<int> > GlobalSystIndex;
+	std::vector< std::vector<size_t> > GlobalSystIndex;
 
 	int nUniqueSysts;
 	std::vector<std::string> UniqueSystNames;
 	std::vector<int> UniqueSystIndices;
 	std::vector<int> UniqueSystNKnots;
 	std::vector<int> UniqueSystCurrSegment;
-	std::vector< std::vector<_float_> > UniqueSystXPts;
+	std::vector< std::vector<M3::float_t> > UniqueSystXPts;
 
 	/// @brief Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
@@ -111,10 +111,10 @@ class splineFDBase : public SplineBase {
 	int CoeffIndex;
 
 	//Probably need to clear these arrays up at some point
-	_float_ *xVarArray;
+	M3::float_t *xVarArray;
 	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
-	_float_ *xcoeff_arr;    //x coefficients for each spline
-	_float_ *manycoeff_arr; //ybcd coefficients for each spline
+	M3::float_t *xcoeff_arr;    //x coefficients for each spline
+	M3::float_t *manycoeff_arr; //ybcd coefficients for each spline
 
 	std::vector<double> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;
