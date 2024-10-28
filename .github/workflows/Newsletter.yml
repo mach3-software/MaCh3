@@ -2,7 +2,7 @@ name: Post MaCh3 Newsletter
 
 on:
   schedule:
-    - cron: '0 0 * * 0' # Every Sunday at midnight
+    - cron: '0 0 * * 1' # Every Monday at midnight
 
 jobs:
   post_discussion:
