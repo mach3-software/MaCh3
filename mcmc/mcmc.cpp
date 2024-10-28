@@ -217,69 +217,18 @@ void mcmc::PrintProgress() {
 // *******************
 void mcmc::StartFromPreviousFit(const std::string& FitName) {
 // *******************
-  MACH3LOG_INFO("Getting starting position from {}", FitName);
+  // Use base class
+  FitterBase::StartFromPreviousFit(FitName);
 
+  // For MCMC we also need to set stepStart
   TFile *infile = new TFile(FitName.c_str(), "READ");
   TTree *posts = (TTree*)infile->Get("posteriors");
   int step_val = 0;
-  double log_val = _LARGE_LOGL_;
+
   posts->SetBranchAddress("step",&step_val);
-  posts->SetBranchAddress("LogL",&log_val);
+  posts->GetEntry(posts->GetEntries()-1);
 
-  for (size_t s = 0; s < systematics.size(); ++s)
-  {
-    TDirectory* CovarianceFolder = (TDirectory*)infile->Get("CovarianceFolder");
-
-    std::string ConfigName = "Config_" + std::string(systematics[s]->getName());
-    TMacro *ConfigCov = (TMacro*)(CovarianceFolder->Get(ConfigName.c_str()));
-    // KS: Not every covariance uses yaml, if it uses yaml make sure they are identical
-    if (ConfigCov != nullptr) {
-      // Config which was in MCMC from which we are starting
-      YAML::Node CovSettings = TMacroToYAML(*ConfigCov);
-      // Config from currently used cov object
-      YAML::Node ConfigCurrent = systematics[s]->GetConfig();
-
-      if (!compareYAMLNodes(CovSettings, ConfigCurrent))
-      {
-        MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
-    if(ConfigCov == nullptr) delete ConfigCov;
-
-    std::vector<double> branch_vals(systematics[s]->GetNumParams());
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      branch_vals[i] = _BAD_DOUBLE_;
-      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
-    }
-    posts->GetEntry(posts->GetEntries()-1);
-
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      if(branch_vals[i] == _BAD_DOUBLE_)
-      {
-        MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
-        MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
-    systematics[s]->setParameters(branch_vals);
-    systematics[s]->acceptStep();
-
-    MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
-    systematics[s]->printNominalCurrProp();
-
-    CovarianceFolder->Close();
-    delete CovarianceFolder;
-  }
   stepStart = step_val;
-  logLCurr = log_val;
-
   infile->Close();
   delete infile;
-
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    if(systematics[s]->getDoAdaption()){ //Use separate throw matrix for xsec
-      systematics[s]->setNumberOfSteps(step_val);
-    }
-  }
 }
