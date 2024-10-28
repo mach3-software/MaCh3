@@ -717,7 +717,7 @@ void FitterBase::RunLLHScan() {
 //LLH scan is good first estimate of step scale
 void FitterBase::GetStepScaleBasedOnLLHScan() {
 // *************************
-  TDirectory *Sample_LLH = static_cast<TDirectory*>(outputFile->Get("Sample_LLH"));
+  TDirectory *Sample_LLH = outputFile->Get<TDirectory>("Sample_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
   if(Sample_LLH->IsZombie())
