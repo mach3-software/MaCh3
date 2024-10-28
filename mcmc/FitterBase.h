@@ -57,6 +57,11 @@ class FitterBase {
   /// @warning Code uses TH2Poly
   void RunSigmaVar();
 
+  /// @brief Allow to start from previous fit/chain
+  /// @param FitName Name of previous chain
+  /// @todo implement some check that number of params matches etc
+  virtual void StartFromPreviousFit(const std::string& FitName);
+
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
  protected:
