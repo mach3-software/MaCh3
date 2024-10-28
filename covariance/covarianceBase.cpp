@@ -117,7 +117,7 @@ void covarianceBase::init(std::string name, std::string file) {
   }
 
   // Should put in a 
-  TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name.c_str()));
+  TMatrixDSym *CovMat = static_cast<TMatrixDSym*>(infile->Get(name.c_str()));
   if (CovMat == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
@@ -348,7 +348,7 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   covMatrix = cov;
-  invCovMatrix = (TMatrixDSym*)cov->Clone();
+  invCovMatrix = static_cast<TMatrixDSym*>(cov->Clone());
   invCovMatrix->Invert();
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   for (int i = 0; i < _fNumPar; i++)
@@ -899,7 +899,7 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
   // When running PCA, also save PCA parameters
   if (pca) {
     for (int i = 0; i < _fNumParPCA; ++i) {
-      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
+      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), static_cast<double*>(&fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
 
@@ -912,7 +912,7 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
     // When running PCA, also save PCA parameters
     if (pca) {
       for (int i = 0; i < _fNumParPCA; ++i) {
-        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), (double*)&(fParProp_PCA.GetMatrixArray()[i]), Form("%s_PCA_Prop/D", _fNames[i].c_str()));
+        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), static_cast<double*>(&fParProp_PCA.GetMatrixArray()[i]), Form("%s_PCA_Prop/D", _fNames[i].c_str()));
       }
     }
   }
@@ -1155,7 +1155,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  throwMatrix = (TMatrixDSym*)cov->Clone();
+  throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
   if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) makeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
@@ -1274,11 +1274,11 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   
-  TMatrixD cov_sym_v = (TMatrixD)cov_sym_svd.GetV();
+  TMatrixD cov_sym_v = static_cast<TMatrixD>(cov_sym_svd.GetV());
   TMatrixD cov_sym_vt = cov_sym_v;
   cov_sym_vt.T();
   //SVD returns as vector (grrr) so need to get into matrix form for multiplying!
-  TVectorD cov_sym_sigvect = (TVectorD)cov_sym_svd.GetSig();
+  TVectorD cov_sym_sigvect = static_cast<TVectorD>(cov_sym_svd.GetSig());
   const Int_t nCols = cov_sym_v.GetNcols(); //square so only need rows hence lack of cols
   TMatrixDSym cov_sym_sig(nCols);
   TMatrixDDiag cov_sym_sig_diag(cov_sym_sig);

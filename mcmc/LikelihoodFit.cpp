@@ -54,10 +54,10 @@ double LikelihoodFit::CalcChi2(const double* x) {
     if(!(*it)->IsPCA())
     {
       std::vector<double> pars;
-      const int Size = (*it)->GetNumParams();
+      const int NumPar = (*it)->GetNumParams();
       //KS: Avoid push back as they are slow
-      pars.resize(Size);
-      for(int i = 0; i < Size; ++i, ++ParCounter)
+      pars.resize(NumPar);
+      for(int i = 0; i < NumPar; ++i, ++ParCounter)
       {
         double ParVal = x[ParCounter];
         //KS: Basically apply mirroring for parameters out of bounds
@@ -79,10 +79,10 @@ double LikelihoodFit::CalcChi2(const double* x) {
     else
     {
       std::vector<double> pars;
-      const int Size = (*it)->getNpars();
+      const int NumPar = (*it)->getNpars();
       //KS: Avoid push back as they are slow
-      pars.resize(Size);
-      for(int i = 0; i < Size; ++i, ++ParCounter)
+      pars.resize(NumPar);
+      for(int i = 0; i < NumPar; ++i, ++ParCounter)
       {
         double ParVal = x[ParCounter];
         //KS: Basically apply mirroring for parameters out of bounds

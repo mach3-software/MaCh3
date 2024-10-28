@@ -491,3 +491,44 @@ inline double GetIQR(TH1D *Hist) {
 
   return quartiles[2] - quartiles[0];
 }
+
+// ********************
+/// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
+///
+/// @param DataPoly Pointer to the data histogram (TH2Poly).
+/// @param PolyMC Pointer to the Monte Carlo histogram (TH2Poly).
+/// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.
+inline double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
+// *********************
+  double klDivergence = 0.0;
+  double DataIntegral = NoOverflowIntegral(DataPoly);
+  double MCIntegral = NoOverflowIntegral(PolyMC);
+  for (int i = 1; i < DataPoly->GetNumberOfBins()+1; ++i)
+  {
+    if (DataPoly->GetBinContent(i) > 0 && PolyMC->GetBinContent(i) > 0) {
+      klDivergence += DataPoly->GetBinContent(i) / DataIntegral *
+      std::log((DataPoly->GetBinContent(i) / DataIntegral) / ( PolyMC->GetBinContent(i) / MCIntegral));
+    }
+  }
+  return klDivergence;
+}
+// ********************
+/// @brief KS: Combine p-values using Fisher's method.
+///
+/// @param pvalues A vector of individual p-values to combine.
+/// @return The combined p-value, representing the overall significance.
+inline double FisherCombinedPValue(const std::vector<double>& pvalues) {
+// ********************
+
+  double testStatistic = 0;
+  for(size_t i = 0; i < pvalues.size(); i++)
+  {
+    const double pval = std::max(0.00001, pvalues[i]);
+    testStatistic += -2.0 * std::log(pval);
+  }
+  // Degrees of freedom is twice the number of p-values
+  int degreesOfFreedom = 2 * pvalues.size();
+  double pValue = TMath::Prob(testStatistic, degreesOfFreedom);
+
+  return pValue;
+}

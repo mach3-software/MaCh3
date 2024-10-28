@@ -391,7 +391,6 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
     area = (xup-xlow)*(yup-ylow);
     HistCopy->SetBinContent(i, Histogram->GetBinContent(i)/(area*scale));
   }
-
   return HistCopy;
 }
 
@@ -412,7 +411,6 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
     area = (xup-xlow)*(yup-ylow);
     integral += Histogram->GetBinContent(i)*area;
   }
-
   return integral;
 }
 
@@ -426,6 +424,37 @@ void RemoveFitter(TH1D* hist, const std::string& name) {
 
   listOfFunctions->Remove(fitter);
   delete fitter;
+}
+
+// *************************
+TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
+// *************************
+  TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
+  var->SetNameTitle((title).c_str(), (title).c_str());
+
+  // Need to draw TGraphs to set axes labels
+  var->Draw("AP");
+  var->GetXaxis()->SetTitle(sigmaArrayCentr->GetXaxis()->GetTitle());
+  var->GetYaxis()->SetTitle("Number of events/bin");
+
+  for (int m = 0; m < var->GetN(); ++m)
+  {
+    double xlow = sigmaArrayLeft->GetBinContent(m+1);
+    double xhigh = sigmaArrayRight->GetBinContent(m+1);
+    double xtemp;
+
+    // Figure out which variation is larger so we set the error correctly
+    if (xlow > xhigh)
+    {
+      xtemp = xlow;
+      xlow = xhigh;
+      xhigh = xtemp;
+    }
+
+    var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
+    var->SetPointEYlow(m, var->GetY()[m] - xlow);
+  }
+  return var;
 }
 
 // ****************
@@ -442,7 +471,6 @@ double returnCherenkovThresholdMomentum(int PDG) {
 // Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
-
   const double MLep = 0.10565837;
 
   // Caluclate muon energy
@@ -458,12 +486,10 @@ double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
   return Q2Upd - InitialQ2;
 }
 
-
 // **************************************************************************
 // Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
 double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
 // ***************************************************************************
-
   double mNeff = 0.93956536 - Eb / 1000.;
   double mNoth = 0.93827203;
 
@@ -478,5 +504,4 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
 
   return Enu;
-
 }

@@ -217,7 +217,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
   // Need some MC
   if (mc == 0) return 0.0;
 
-  // The MC used in the likeliihood calculation
+  // The MC used in the likelihood calculation
   // Is allowed to be changed by Barlow Beeston beta parameters
   double newmc = mc;
 
@@ -226,7 +226,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     //CW: Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
     // Assume the MC has a Gaussian distribution around generated
     // As in https://arxiv.org/abs/1103.0354 eq 10, 11
-    //CW: Calculate the Barlow-Beeston likelhood contribution from MC statistics
+    //CW: Calculate the Barlow-Beeston likelihood contribution from MC statistics
     // Assumes the beta scaling parameters are Gaussian distributed
     // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
     // Essentially solves equation 11
@@ -241,9 +241,8 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       // b^2 - 4ac in quadratic equation
       const double temp2 = temp*temp + 4*data*fractional*fractional;
       if (temp2 < 0) {
-        std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        MACH3LOG_ERROR("Negative square root in Barlow Beeston coefficient calculation!");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       // Solve for the positive beta
       const double beta = (-1*temp+sqrt(temp2))/2.;
@@ -312,7 +311,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
 
         return stat;
       }
-      // Auxillary variables
+      // Auxiliary variables
       const long double b = mc/w2;
       const long double a = mc*b+1;
       const long double k = data;
@@ -335,16 +334,15 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     break;
     case (kPoisson):
     {
-	  //Just call getTestStatLLH which doesn't take in weights
-	  //and is a poisson likelihood comparison.
+      //Just call getTestStatLLH which doesn't take in weights
+      //and is a Poisson likelihood comparison.
       return getTestStatLLH(data, mc);//stat;
     }
     break;
 
     default:
     std::cerr << "Couldn't find TestStatistic " << fTestStatistic << " exiting!" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   } // end switch
 }
 
