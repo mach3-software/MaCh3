@@ -23,7 +23,7 @@ jobs:
         include:
           - name: Spline Validations
             test_1: ./CIValidations/SplineValidations
-            test_2: empty
+            test_2: ./CIValidations/SamplePDFValidations
             test_3: empty
             test_4: empty
             test_5: empty
