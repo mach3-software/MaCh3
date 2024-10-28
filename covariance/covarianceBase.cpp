@@ -61,7 +61,7 @@ covarianceBase::~covarianceBase(){
   delete[] throwMatrixCholDecomp;
   
   const int nThreads = MaCh3Utils::GetNThreads();
-  for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
+  for (int iThread = 0;iThread < nThreads; iThread++) delete random_number[iThread];
   delete[] random_number;
   if (throwMatrix != nullptr) delete throwMatrix;
 }
@@ -133,12 +133,10 @@ void covarianceBase::init(std::string name, std::string file) {
   for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
-
   // Not using adaptive by default
   use_adaptive = false;
   // Set the covariance matrix
-  size = CovMat->GetNrows();
-  _fNumPar = size;
+  _fNumPar = CovMat->GetNrows();
     
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
@@ -196,13 +194,10 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number[iThread] = new TRandom3(0);
   }
-
   PrintLength = 35;
 
   // Set the covariance matrix
   _fNumPar = _fYAMLDoc["Systematics"].size();
-  size = _fNumPar;
-
   use_adaptive = false;
 
   InvertCovMatrix = new double*[_fNumPar]();
@@ -321,8 +316,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 // ********************************************
 void covarianceBase::init(TMatrixDSym* covMat) {
 // ********************************************
-  size = covMat->GetNrows();
-  _fNumPar = size;
+  _fNumPar = covMat->GetNrows();
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
