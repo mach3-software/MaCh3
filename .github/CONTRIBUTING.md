@@ -15,6 +15,7 @@ void Foo(){}
 try
 ```cpp
 /// @brief I like comments
+/// @details anything longer than ~80 should go in a details
 void Foo(){}
 ```
 After making release or tag please
@@ -63,7 +64,7 @@ bool AsimovFit = false;
 
 if(config[AsimovFit])
 {
-  AsimovFit = config[AsimovFit].as<bool>;
+  AsimovFit = config[AsimovFit].as<bool>();
 }
 ```
 This can be replaced with:
@@ -75,17 +76,18 @@ bool AsimovFit = GetFromManager<bool>(config[AsimovFit], false);
 Some fits require a lot of RAM. The easiest and fastest solution to reduce RAM
 is to use `float` instead of `double`.
 
-MaCh3 has a custom type defined as `_float_`, which is usually a `double`
+MaCh3 has a custom type defined as `M3::float_t`, which is usually a `double`
 unless the `_LOW_MEMORY_STRUCTS_` directive is defined at the compilation
-level. When defined, `_float_` will be an actual `float`.
+level. When defined, `M3::float_t` will be an actual `float`.
 
-By using `_float_`, one can flexibly change between these types. During
+By using `M3::float_t`, one can flexibly change between these types. During
 development, it is advised to use these data types unless specific data
 types are necessary due to desired precision, code safety, etc.
 
 ## Error handling
 MaCh3 uses custom error handling implemented [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/MaCh3Exception.h)
-Instead of throw
+
+Never ever ever bare throw. Always throw an exception, preferably one that subclasses one defined by the standard library in `<stdexcept>`.
 ```cpp
 throw;
 ```
@@ -98,7 +100,35 @@ or
 ```cpp
 throw MaCh3Exception(__FILE__ , __LINE__ );
 ```
-This way we can ensure error messages are unified and user always get hints where in the code problem occurred. If current MaCh3Exception is not sufficient consider implementing new or expanding current exceptions in MaCh3Exception.h.
+This way we can ensure error messages are unified and user always get hints where in the code problem occurred. If current `MaCh3Exception` is not sufficient consider implementing new or expanding current exceptions in MaCh3Exception.h.
+
+## Compiler warning levels getting you down?
+
+If you are trying to compile some new development and it is failing because of some innocuous warning that has been elevated to an error by the compiler flags, please don't just turn off the flags. A much better approach is to disable the diagnostic locally. This makes it easier to keep most of the code stringently checked, while giving you, the developer, the ability to stay in flow. It also allows for later 'fixing' of these warnings, if they need to be fixed, to be done systematically by greping for the relevant directives.
+
+The way to turn off diagnostics is, as below:
+
+```c++
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+```
+
+N.B. that clang also understands these directives, so don't panic that they have GCC in the directive.
+
+This will disable that diagnostic for the rest of the compilation unit (usually a .cc file). Note that this means if you include these in headerfiles, they will disable diagnostics more widely, please try and disable the diagnostics over as little code as possible.
+
+### An example
+
+We got this compiler error:
+
+```
+```
+
+for this code:
+
+```c++
+```
+
+We might update it to the below to disable the diagnostic just for the relevant line.
 
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
