@@ -38,9 +38,6 @@ if(NOT COMMAND SwitchLogic)
 endif()
 
 if(NOT COMMAND cmessage)
-
-  message(STATUS "Setting up colored messages...")
-
   function(cmessage)
     if(NOT WIN32)
       string(ASCII 27 Esc)

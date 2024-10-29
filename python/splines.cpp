@@ -104,7 +104,7 @@ void initSplines(py::module &m){
                         throw MaCh3Exception(__FILE__, __LINE__, "Different number of x values and y values!");
                     }
 
-                    int length = xVals.size();
+                    int length = int(xVals.size());
 
                     if (length == 1)
                     {
@@ -116,18 +116,15 @@ void initSplines(py::module &m){
                         pars[0] = new M3::float_t(0.0);
                         pars[1] = new M3::float_t(0.0);
                         pars[2] = new M3::float_t(0.0);
-
-                        return new TSpline3_red(&xKnot, &yKnot, 1, pars.data());
-
                         delete pars[0];
                         delete pars[1];
                         delete pars[2];
+
+                        return new TSpline3_red(&xKnot, &yKnot, 1, pars.data());
                     }
-                    else
-                    {
-                        TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
-                        return new TSpline3_red(splineTmp, interpType);
-                    }
+
+                    TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
+                    return new TSpline3_red(splineTmp, interpType);
                 }
             )
         )

@@ -8,7 +8,7 @@
 #include "mcmc/gpuMCMCProcessorUtils.cuh"
 #endif
 
-//this file is choc full of usage of a root interface that only takes floats, turn this warning off for this CU for now
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // ****************************

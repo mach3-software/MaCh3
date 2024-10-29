@@ -45,10 +45,10 @@ void ReadXSecFile(const std::string& inputFile)
   TFile *TempFile = new TFile(inputFile.c_str(), "open");
 
   // Get the matrix
-  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(TempFile->Get("CovarianceFolder/xsec_cov"));
+  TMatrixDSym *XSecMatrix = TempFile->Get<TMatrixDSym>("CovarianceFolder/xsec_cov");
 
   // Get the settings for the MCMC
-  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
   if (Config == nullptr) {
     MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
     TempFile->ls();
@@ -91,7 +91,7 @@ void ReadXSecFile(const std::string& inputFile)
     auto const &param = *it;
 
     ParamNames.push_back(param["Systematic"]["Names"]["FancyName"].as<std::string>());
-    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
+    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<int>() );
 
     bool flat = false;
     if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
@@ -130,10 +130,11 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   canvas->SetGrid();
   canvas->SetTickx();
   canvas->SetTicky();
-  canvas->SetBottomMargin(0.1);
-  canvas->SetTopMargin(0.02);
-  canvas->SetRightMargin(0.08);
-  canvas->SetLeftMargin(0.15);
+
+  canvas->SetBottomMargin(0.1f);
+  canvas->SetTopMargin(0.02f);
+  canvas->SetRightMargin(0.08f);
+  canvas->SetLeftMargin(0.15f);
 
   gStyle->SetOptTitle(0); 
   gStyle->SetOptStat(0); 
@@ -146,7 +147,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   Chain->Add(inputFile.c_str()); 
     
   // Get the list of branches
-  TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
+  TObjArray* brlis = Chain->GetListOfBranches();
 
   // Get the number of branches
   int nBranches = brlis->GetEntries();
@@ -154,7 +155,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   for (int i = 0; i < nBranches; i++) 
   {
     // Get the TBranch and its name
-    TBranch* br = (TBranch*)brlis->At(i);
+    TBranch* br = static_cast<TBranch*>(brlis->At(i));
     TString bname = br->GetName();
 
     // If we're on beam systematics
@@ -197,7 +198,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     FancyTittle.push_back(Set[2].as<std::string>());
   }
 
-  const int NSets = SetsNames.size();
+  const int NSets = int(SetsNames.size());
 
   isRelevantParam.resize(NSets);
   //Loop over sets in the config
@@ -244,7 +245,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     MACH3LOG_INFO(" Found {} params for set {}", counter, SetsNames[i]);
   }
 
-  int AllEvents = Chain->GetEntries();
+  int AllEvents = int(Chain->GetEntries());
   TH1D **hLogL = new TH1D *[NSets];
   for(int i = 0; i < NSets; i++)
   {
@@ -346,7 +347,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     hLogL[i]->SetTitle(FancyTittle[i].c_str());
     hLogL[i]->GetXaxis()->SetTitle("Step");
     hLogL[i]->GetYaxis()->SetTitle(FancyTittle[i].c_str());
-    hLogL[i]->GetYaxis()->SetTitleOffset(1.4);
+    hLogL[i]->GetYaxis()->SetTitleOffset(1.4f);
 
     hLogL[i]->Draw("");
 

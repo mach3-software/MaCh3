@@ -25,7 +25,7 @@ if(NOT CPU_ONLY)
     set_property(TARGET Manager PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-target_link_libraries(Manager PUBLIC MaCh3CompilerOptions ROOT::ROOT yaml-cpp spdlog)
+target_link_libraries(Manager PUBLIC MaCh3CompilerOptions ROOT::Tree ROOT::Hist yaml-cpp spdlog)
 target_link_libraries(Manager PRIVATE MaCh3Warnings)
 
 target_include_directories(Manager PUBLIC
