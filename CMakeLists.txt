@@ -48,7 +48,14 @@ include(MaCh3Dependencies)
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   set(CMAKE_CXX_STANDARD 14)
+  cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
 endif()
+
+if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+  cmessage(STATUS "Set CXX standard due to ROOT: \"${ROOT_CXX_STANDARD}\"")
+endif()
+cmessage(STATUS "CMAKE_CXX_STANDARD: \"${CMAKE_CXX_STANDARD}\"")
 
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
