@@ -42,6 +42,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 include(MaCh3Utils)
 
 ################################## Dependencies ################################
+add_library(MaCh3CompileDefinitions INTERFACE)
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
@@ -92,6 +93,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 add_library(MaCh3CompilerOptions INTERFACE)
+target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
 target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
     -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
@@ -115,7 +117,7 @@ if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0                                  # Turn off any optimisation to have best debug experience
   )
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
@@ -140,16 +142,16 @@ DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE CPU_ONLY)
 endif()
 
 if(MaCh3_GPU_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE CUDA)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE GPU_ON)
 endif()
 
 if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
@@ -157,11 +159,11 @@ if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
 endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE _LOW_MEMORY_STRUCTS_)
 endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
-install(TARGETS MaCh3CompilerOptions
+install(TARGETS MaCh3CompilerOptions MaCh3CompileDefinitions
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
