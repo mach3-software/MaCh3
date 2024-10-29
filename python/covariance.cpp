@@ -35,7 +35,7 @@ public:
         );
     }
     
-    double getNominal(int i) override {
+    double getNominal(size_t i) override {
         PYBIND11_OVERRIDE_NAME(
             double,          /* Return type */
             covarianceBase,  /* Parent class */

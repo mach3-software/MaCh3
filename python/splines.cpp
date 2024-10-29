@@ -108,14 +108,14 @@ void initSplines(py::module &m){
 
                     if (length == 1)
                     {
-                        _float_ xKnot = xVals[0];
-                        _float_ yKnot = yVals[0];
+                        M3::float_t xKnot = xVals[0];
+                        M3::float_t yKnot = yVals[0];
 
-                        std::vector<_float_ *> pars;
+                        std::vector<M3::float_t *> pars;
                         pars.resize(3);
-                        pars[0] = new _float_(0.0);
-                        pars[1] = new _float_(0.0);
-                        pars[2] = new _float_(0.0);
+                        pars[0] = new M3::float_t(0.0);
+                        pars[1] = new M3::float_t(0.0);
+                        pars[2] = new M3::float_t(0.0);
 
                         return new TSpline3_red(&xKnot, &yKnot, 1, pars.data());
 

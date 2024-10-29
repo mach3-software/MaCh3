@@ -83,6 +83,20 @@ public:
     }
 
     /* Trampoline (need one for each virtual function) */
+    void setupSplines(fdmc_base *,const char *,int,int) override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,            /* Return type */
+            samplePDFFDBase, /* Parent class */
+            "setup_splines", /*python name*/
+            setupSplines,     /* Name of function in C++ */
+            py::arg("FDObj"),   /* Argument(s) */
+            py::arg("SplineFileName"),
+            py::arg("nutype"),
+            py::arg("signal")
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
     void Init() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
