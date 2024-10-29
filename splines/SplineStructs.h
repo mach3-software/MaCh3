@@ -4,6 +4,8 @@
 #include "covariance/covarianceXsec.h"
 #include "samplePDF/Structs.h"
 
+#include <cmath>
+
 // *******************
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
@@ -431,8 +433,8 @@ public:
       }
 
       for(int i =2; i<=nPoints+2; i++){
-        if (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]) != 0.0){
-          svals[i-2] = (abs(mvals[i+1] - mvals[i]) * mvals[i-1] + abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]));
+        if (std::abs(mvals[i+1] - mvals[i]) + std::abs(mvals[i-1] - mvals[i-2]) != 0.0){
+          svals[i-2] = (std::abs(mvals[i+1] - mvals[i]) * mvals[i-1] + std::abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (std::abs(mvals[i+1] - mvals[i]) + std::abs(mvals[i-1] - mvals[i-2]));
         }
         else{svals[i-2] = mvals[i];}
       }
