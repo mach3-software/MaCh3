@@ -10,9 +10,9 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Ceating SamplePDFFDBase object");
   
-  //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(xsec_cov == NULL){
-    MACH3LOG_ERROR("You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
+  //ETA - safety feature so you can't pass a nullptr xsec_cov
+  if(xsec_cov == nullptr){
+    MACH3LOG_ERROR("You've passed me a nullptr xsec covariance matrix... I need this to setup splines!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   SetXsecCov(xsec_cov);
@@ -514,8 +514,8 @@ void samplePDFFDBase::fillArray_MP()
   //reconfigureFuncPars();
   
   //This is stored as [y][x] due to shifts only occuring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses 
-  double** samplePDFFD_array_private = NULL;
-  double** samplePDFFD_array_private_w2 = NULL;
+  double** samplePDFFD_array_private = nullptr;
+  double** samplePDFFD_array_private_w2 = nullptr;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
 #pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
@@ -1214,8 +1214,8 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 
 void samplePDFFDBase::addData(std::vector<double> &data) {
   dataSample = new std::vector<double>(data);
-  dataSample2D = NULL;
-  dathist2d = NULL;
+  dataSample2D = nullptr;
+  dathist2d = nullptr;
   dathist->Reset(); 
   
   if (GetNDim()!=1) {
@@ -1244,8 +1244,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
 
 void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   dataSample2D = new std::vector< std::vector <double> >(data);
-  dataSample = NULL;
-  dathist = NULL;
+  dataSample = nullptr;
+  dathist = nullptr;
   dathist2d->Reset();                                                       
 
   if (GetNDim()!=2) {
@@ -1274,10 +1274,10 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
 
 void samplePDFFDBase::addData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram : {} with {} events", Data->GetName(), Data->Integral());
-  dathist2d = NULL;
+  dathist2d = nullptr;
   dathist = Data;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  dataSample = nullptr;
+  dataSample2D = nullptr;
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
@@ -1300,9 +1300,9 @@ void samplePDFFDBase::addData(TH1D* Data) {
 void samplePDFFDBase::addData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram : {} with {} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
-  dathist = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  dathist = nullptr;
+  dataSample = nullptr;
+  dataSample2D = nullptr;
 
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
@@ -1342,7 +1342,7 @@ void samplePDFFDBase::SetupNuOscillator() {
 
       //============================================================================
       //DB Atmospheric only part
-      if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+      if (MCSamples[iSample].rw_truecz != nullptr) { //Can only happen if truecz has been initialised within the experiment specific code
 	std::vector<M3::float_t> CosineZArray;
 	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
@@ -1415,7 +1415,7 @@ void samplePDFFDBase::SetupNuOscillator() {
 	  InitFlav *= -1;
 	  FinalFlav *= -1;
 	}
-	if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+	if (MCSamples[iSample].rw_truecz != nullptr) { //Can only happen if truecz has been initialised within the experiment specific code
 	  //Atmospherics
 	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
 	} else {
@@ -1475,7 +1475,7 @@ void samplePDFFDBase::fillSplineBins() {
 }
 
 double samplePDFFDBase::GetLikelihood() {
-  if (samplePDFFD_data == NULL) {
+  if (samplePDFFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
