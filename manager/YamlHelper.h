@@ -225,48 +225,22 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 /// @brief Overrides the configuration settings based on provided arguments.
 ///
 /// This function allows you to set configuration options in a nested YAML node.
-/// It accepts two, three, or four string arguments:
-/// - For two arguments, the first argument is a key, and the second is the value.
-/// - For three arguments, the first two arguments are keys (for nested configuration), and the third is the value.
-/// - For four arguments, the first three arguments are keys (for deeper nested configuration), and the fourth is the value.
-///
 /// @param node YAML node that will be modified
-/// @param args The arguments to override the configuration.
-///             - When two arguments are provided, they represent the key and value, respectively.
-///             - When three arguments are provided, they represent two keys and a value.
-///             - When four arguments are provided, they represent three keys and a value.
+/// @param args The arguments to override the configuration. The last argument
+///             will be used as the value
 ///
 /// @note Example usage:
 /// @code
 /// OverrideConfig(config, "General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
+/// OverrideConfig(config, "General", "MyDouble", 5.3);
 /// @endcode
-template <typename... Args>
-void OverrideConfig(YAML::Node& node, Args... args) {
+template <typename TValue>
+void OverrideConfig(YAML::Node &node, std::string const &key, TValue val) {
 // **********************
-  static_assert(sizeof...(args) == 2 || sizeof...(args) == 3 || sizeof...(args) == 4,
-                "OverrideConfig accepts either 2, 3, or 4 arguments.");
-
-  auto args_tuple = std::make_tuple(args...); // Create a tuple from the parameter pack
-
-  if constexpr (sizeof...(args) == 2) {
-    std::string blarb1 = std::get<0>(args_tuple); // First argument
-    std::string result = std::get<1>(args_tuple); // Second argument
-
-    node[blarb1] = result;
-  }
-  else if constexpr (sizeof...(args) == 3) {
-    std::string blarb1 = std::get<0>(args_tuple); // First argument
-    std::string blarb2 = std::get<1>(args_tuple); // Second argument
-    std::string result = std::get<2>(args_tuple); // Third argument
-
-    node[blarb1][blarb2] = result;
-  }
-  else if constexpr (sizeof...(args) == 4) {
-    std::string blarb1 = std::get<0>(args_tuple); // First argument
-    std::string blarb2 = std::get<1>(args_tuple); // Second argument
-    std::string blarb3 = std::get<2>(args_tuple); // Third argument
-    std::string result = std::get<3>(args_tuple); // Fourth argument
-
-    node[blarb1][blarb2][blarb3] = result;
-  }
+  node[key] = val;
+}
+template <typename... Args>
+void OverrideConfig(YAML::Node &node, std::string const &key, Args... args) {
+// **********************
+  OverrideConfig(node[key], args...);
 }

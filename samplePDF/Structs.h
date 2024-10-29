@@ -36,10 +36,10 @@ using uint_t = unsigned;
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
 
-constexpr inline double _BAD_DOUBLE_ = -999.99;
-constexpr inline int _BAD_INT_ = -999;
+constexpr static const double _BAD_DOUBLE_ = -999.99;
+constexpr static const int _BAD_INT_ = -999;
 
-constexpr inline double _DEFAULT_RETURN_VAL_ = -999999.123456;
+constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
 
 // C++ includes
 #include <sstream>

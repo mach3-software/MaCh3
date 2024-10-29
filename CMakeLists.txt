@@ -47,7 +47,7 @@ include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})

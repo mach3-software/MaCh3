@@ -331,11 +331,11 @@ void splineFDBase::CalcSplineWeights()
 
     //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
     M3::float_t weight = 0;
-    if constexpr(std::is_same_v<M3::float_t,float>){
+#ifdef _LOW_MEMORY_STRUCTS_
       weight = std::fmaf(dx, std::fmaf(dx, std::fmaf(dx, d, c), b), y);
-    } else {
+#else
       weight = std::fma(dx, std::fma(dx, std::fma(dx, d, c), b), y);
-    }
+#endif
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
 
 
