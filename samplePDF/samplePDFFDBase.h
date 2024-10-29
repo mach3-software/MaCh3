@@ -57,7 +57,7 @@ public:
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal) = 0;
+  virtual void setupSplines(fdmc_base *, const char *, int , int ){};
   void ReadSampleConfig();
 
   int getNMCSamples() {return int(MCSamples.size());}
