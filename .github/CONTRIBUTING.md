@@ -104,7 +104,8 @@ This way we can ensure error messages are unified and user always get hints wher
 
 ## Compiler warning levels getting you down?
 
-If you are trying to compile some new development and it is failing because of some innocuous warning that has been elevated to an error by the compiler flags, please don't just turn off the flags. A much better approach is to disable the diagnostic locally. This makes it easier to keep most of the code stringently checked, while giving you, the developer, the ability to stay in flow. It also allows for later 'fixing' of these warnings, if they need to be fixed, to be done systematically by greping for the relevant directives.
+If you are trying to compile some new development and it is failing because of some innocuous warning that has been elevated to an error by the compiler flags, please don't just turn off the flags. A much better approach is to disable the diagnostic locally. This makes it easier to keep most of the code stringently checked, while giving you, the developer, the ability to stay in flow.
+It also allows for later 'fixing' of these warnings, if they need to be fixed, to be done systematically by greping for the relevant directives.
 
 The way to turn off diagnostics is, as below:
 
@@ -120,7 +121,7 @@ This will disable that diagnostic for the rest of the compilation unit (usually 
 
 We got this compiler error:
 
-```
+```shell
 /root/software/MaCh3/MaCh3_splitpr/splines/splineFDBase.cpp: In member function ‘virtual void splineFDBase::CalcSplineWeights()’:
 /root/software/MaCh3/MaCh3_splitpr/splines/splineFDBase.cpp:349:35: error: useless cast to type ‘double’ [-Werror=useless-cast]
   349 |     weightvec_Monolith[iSpline] = double(weight);
@@ -134,7 +135,8 @@ for this code:
     weightvec_Monolith[iSpline] = double(weight);
 ```
 
-The compiler is right, that this is a useless cast, but `weight` can sometimes be a float, in which case we would get a conversion warning/error, so it seems like a no-win situation. We can 'save' the current diagnostics with `#pragma GCC diagnostic push`, disable the relevant one as above, and then revert to the saved set of diagnostics with `#pragma GCC diagnostic pop`. Putting it all together might look like:
+The compiler is right, that this is a useless cast, but `weight` can sometimes be a float, in which case we would get a conversion warning/error, so it seems like a no-win situation. We can 'save' the current diagnostics with `#pragma GCC diagnostic push`, disable the relevant one as above, and then revert to the saved set of diagnostics with `#pragma GCC diagnostic pop`.
+Putting it all together might look like:
 
 ```c++
 #pragma GCC diagnostic push
