@@ -16,15 +16,12 @@ find_package(CUDAToolkit QUIET)
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED TRUE)
+  enable_language(CUDA)
   set(CPU_ONLY FALSE)
 else()
   message(STATUS "CUDA not found. Proceeding without CUDA support.")
   set(MaCh3_GPU_ENABLED FALSE)
   set(CPU_ONLY TRUE)
-endif()
-
-if(NOT CPU_ONLY)
-  enable_language(CUDA)
 endif()
 
 # Changes default install path to be a subdirectory of the build dir.
@@ -40,13 +37,12 @@ endif()
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
-LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Utils.cmake)
+include(MaCh3Utils)
 
 ################################## Dependencies ################################
-#Loads all dependencies
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
+include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
@@ -86,21 +82,20 @@ target_compile_options(MaCh3Warnings INTERFACE
     -Wconversion           # Warn on type conversions that may lose data
     -Werror                # Treat Warnings as Errors
 )
+# KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  target_compile_options(MaCh3Warnings INTERFACE
+    -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
+    -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
+    -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
+  )
+endif()
 
 add_library(MaCh3CompilerOptions INTERFACE)
 target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
     -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
 )
-
-# KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  target_compile_options(MaCh3CompilerOptions INTERFACE
-    -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
-    -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
-    -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
-  )
-endif()
 
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
