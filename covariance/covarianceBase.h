@@ -178,7 +178,7 @@ class covarianceBase {
 
   //Some Getters
   /// @brief Get total number of parameters
-  inline int GetNumParams() {return _fNumPar;}
+  inline int  GetNumParams() {return _fNumPar;}
   /// @brief Get the nominal array for parameters.
   virtual std::vector<double> getNominalArray();
   /// @brief Get the pre-fit values of the parameters.
@@ -189,28 +189,28 @@ class covarianceBase {
   std::vector<double> getProposed() const;
   /// @brief Get proposed parameter value
   /// @param i Parameter index
-  inline double getParProp(const size_t i) { return _fPropVal[i]; }
+  inline double getParProp(const int i) { return _fPropVal[i]; }
   /// @brief Get current parameter value
   /// @param i Parameter index
-  inline double getParCurr(const size_t i) { return _fCurrVal[i]; }
+  inline double getParCurr(const int i) { return _fCurrVal[i]; }
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  inline double getParInit(const size_t i) { return _fPreFitValue[i]; }
+  inline double getParInit(const int i) { return _fPreFitValue[i]; }
   /// @brief Return generated value, although is virtual so class inheriting might actual get nominal not generated.
   /// @param i Parameter index
-  virtual double getNominal(const size_t i) { return getParInit(i); }
+  virtual double getNominal(const int i) { return getParInit(i); }
   /// @brief Return generated value for a given parameter
   /// @param i Parameter index
-  inline double GetGenerated(const size_t i) { return _fGenerated[i];}
+  inline double GetGenerated(const int i) { return _fGenerated[i];}
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetUpperBound(const size_t i){ return _fUpBound[i];}
+  inline double GetUpperBound(const int i){ return _fUpBound[i];}
   /// @brief Get lower parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetLowerBound(const size_t i){ return _fLowBound[i]; }
+  inline double GetLowerBound(const int i){ return _fLowBound[i]; }
   /// @brief Get individual step scale for selected parameter
   /// @param ParameterIndex Parameter index
-  inline double GetIndivStepScale(const size_t ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  inline double GetIndivStepScale(const int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParProp_PCA(const int i) {
@@ -227,7 +227,7 @@ class covarianceBase {
 
   /// @brief Is parameter fixed in PCA base or not
   /// @param i Parameter index
-  inline bool isParameterFixedPCA(const size_t i) {
+  inline bool isParameterFixedPCA(const int i) {
     if (fParSigma_PCA[i] < 0) { return true;  }
     else                      { return false; }
   }
@@ -285,6 +285,8 @@ class covarianceBase {
     //KS: Transfer to normal base
     TransferToParam();
   }
+  /// @brief Get number of params in normal Base, if you want something which will work with PCA as well please use getNpars()
+  inline int getSize() { return _fNumPar; }
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   inline int getNpars() {
     if (pca) return _fNumParPCA;
@@ -341,7 +343,7 @@ class covarianceBase {
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
- protected:
+protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
   /// @brief Initialisation of the class using config
@@ -385,6 +387,8 @@ class covarianceBase {
   /// The input root file we read in
   const std::string inputFile;
 
+  /// Total number of params, deprecated, please don't use it
+  int size;
   /// Name of cov matrix
   std::string matrixName;
   /// The covariance matrix
@@ -405,7 +409,7 @@ class covarianceBase {
   double _fGlobalStepScale;
 
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
-  size_t PrintLength;
+  int PrintLength;
 
   /// ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;

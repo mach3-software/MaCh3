@@ -90,7 +90,7 @@ class splineFDBase : public SplineBase {
 	/// @brief This holds the global spline index and is used to grab the current parameter value
 	/// to evaluate splines at. Each internal vector will be of size of the number of spline
 	/// systematics which affect that sample.
-	std::vector< std::vector<size_t> > GlobalSystIndex;
+	std::vector< std::vector<int> > GlobalSystIndex;
 
 	int nUniqueSysts;
 	std::vector<std::string> UniqueSystNames;

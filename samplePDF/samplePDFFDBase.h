@@ -225,7 +225,7 @@ public:
   /// @brief the total number of function parameters found in the xsec model
   int nFuncParams;
   std::vector<std::string> funcParsNames;
-  std::vector<size_t> funcParsIndex;
+  std::vector<int> funcParsIndex;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply

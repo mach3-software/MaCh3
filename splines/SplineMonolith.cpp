@@ -179,7 +179,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   for(unsigned int EventCounter = 0; EventCounter < MasterSpline.size(); ++EventCounter) {
     // Structure of MasterSpline is std::vector<std::vector<TSpline3*>>
     // A conventional iterator to count which parameter a given spline should be applied to
-    for(unsigned short ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
+    for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
 
       // If NULL we don't have this spline for the event, so move to next spline
       if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
@@ -207,9 +207,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
           }
         }
         // Set the parameter number for this spline
-        cpu_spline_handler->paramNo_arr[NSplinesCounter] = ParamNumber;
+        cpu_spline_handler->paramNo_arr[NSplinesCounter] = short(ParamNumber);
         //KS: Fill map when each spline starts
-        cpu_spline_handler->nKnots_arr[NSplinesCounter] = ushort(KnotCounter);
+        cpu_spline_handler->nKnots_arr[NSplinesCounter] = KnotCounter;
         KnotCounter += nPoints_tmp;
 
         #ifdef Weight_On_SplineBySpline_Basis
@@ -224,7 +224,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
       else if (SplineType[ParamNumber] == kTF1_red)
       {
         // Don't actually use this ever -- we give each spline the maximum number of points found in all splines
-        short nPoints_tmp = 0;
+        int nPoints_tmp = 0;
         // Get a pointer to the current spline for this event
         TF1_red* CurrSpline = dynamic_cast<TF1_red*>(MasterSpline[EventCounter][ParamNumber]);
 
@@ -234,11 +234,11 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
           cpu_coeff_TF1_many[TF1PointsCounter+j] = temp_coeffs[j];
         }
         // Save the number of points for this spline
-        cpu_nPoints_arr[TF1sCounter] = nPoints_tmp;
+        cpu_nPoints_arr[TF1sCounter] = short(nPoints_tmp);
 
         TF1PointsCounter += nPoints_tmp;
         // Set the parameter number for this spline
-        cpu_paramNo_TF1_arr[TF1sCounter] = ParamNumber;
+        cpu_paramNo_TF1_arr[TF1sCounter] = short(ParamNumber);
         #ifdef Weight_On_SplineBySpline_Basis
         // Set the index of the spline so we can tell apart from flat splines
         index_TF1_cpu[EventCounter*nParams + ParamNumber] = TF1sCounter;

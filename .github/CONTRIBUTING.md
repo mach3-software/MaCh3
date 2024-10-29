@@ -121,11 +121,26 @@ This will disable that diagnostic for the rest of the compilation unit (usually 
 We got this compiler error:
 
 ```
+/root/software/MaCh3/MaCh3_splitpr/splines/splineFDBase.cpp: In member function ‘virtual void splineFDBase::CalcSplineWeights()’:
+/root/software/MaCh3/MaCh3_splitpr/splines/splineFDBase.cpp:349:35: error: useless cast to type ‘double’ [-Werror=useless-cast]
+  349 |     weightvec_Monolith[iSpline] = double(weight);
+      |                                   ^~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors
 ```
 
 for this code:
 
 ```c++
+    weightvec_Monolith[iSpline] = double(weight);
+```
+
+The compiler is right, that this is a useless cast, but `weight` can sometimes be a float, in which case we would get a conversion warning/error, so it seems like a no-win situation. We can 'save' the current diagnostics with `#pragma GCC diagnostic push`, disable the relevant one as above, and then revert to the saved set of diagnostics with `#pragma GCC diagnostic pop`. Putting it all together might look like:
+
+```c++
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+    weightvec_Monolith[iSpline] = double(weight);
+#pragma GCC diagnostic pop
 ```
 
 We might update it to the below to disable the diagnostic just for the relevant line.

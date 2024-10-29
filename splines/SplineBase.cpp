@@ -20,16 +20,16 @@ SplineBase::~SplineBase() {
 // Get the spline coefficients from the TSpline3 so that we can load ONLY these onto the GPU, not the whole TSpline3 object
 // This loads up coefficients into two arrays: one x array and one yabcd array
 // This should maximize our cache hits!
-void SplineBase::getTF1Coeff(TF1_red* &spl, short &nPoints, float *& coeffs) {
+void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
 // *****************************************
 
   // Initialise all arrays to 1.0
-  for (ushort i = 0; i < _nTF1Coeff_; ++i) {
+  for (int i = 0; i < _nTF1Coeff_; ++i) {
     coeffs[i] = 0.0;
   }
 
   // Get number of points in spline
-  nPoints = short(spl->GetSize());
+  nPoints = spl->GetSize();
 
   if(nPoints > _nTF1Coeff_)
   {

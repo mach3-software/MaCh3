@@ -58,7 +58,7 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<size_t> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
@@ -312,8 +312,8 @@ void splineFDBase::CalcSplineWeights()
   {
 
     int iSpline = uniquecoeffindices[iCoeff];
-    int uniqueIndex=uniquesplinevec_Monolith[iSpline];
-    int currentsegment=UniqueSystCurrSegment[uniqueIndex];
+    short int uniqueIndex=short(uniquesplinevec_Monolith[iSpline]);
+    short int currentsegment=short(UniqueSystCurrSegment[uniqueIndex]);
 
     int segCoeff = coeffindexvec[iSpline]+currentsegment;
 
@@ -371,13 +371,13 @@ void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
       for (int iMode = 0; iMode < nModesInSyst; iMode++)
       { // Loop over modes
         std::vector<std::vector<std::vector<int >>> indexvec_Var1;
-        for (int iVar1 = 0; iVar1 < SplineBinning[iSample][iOscChan][0]->GetNbins(); iVar1++)
+        for (int iVar1 = 0; iVar1 < (SplineBinning[iSample][iOscChan][0])->GetNbins(); iVar1++)
         { // Loop over first dimension
           std::vector<std::vector<int >> indexvec_Var2;
-          for (int iVar2 = 0; iVar2 < SplineBinning[iSample][iOscChan][1]->GetNbins(); iVar2++)
+          for (int iVar2 = 0; iVar2 < (SplineBinning[iSample][iOscChan][1])->GetNbins(); iVar2++)
           { // Loop over second dimension
             std::vector<int> indexvec_Var3;
-            for (int iVar3 = 0; iVar3 < SplineBinning[iSample][iOscChan][2]->GetNbins(); iVar3++)
+            for (int iVar3 = 0; iVar3 < (SplineBinning[iSample][iOscChan][2])->GetNbins(); iVar3++)
             { // Loop over third dimension
               indexvec_Var3.push_back(0); //Don't start counting yet!
             } // end iVar3 loop
@@ -629,7 +629,7 @@ void splineFDBase::PrepForReweight()
                   if (splinevec_Monolith[splineindex] != NULL)
                   {
                     UniqueSystSplines.push_back(splinevec_Monolith[splineindex]);
-                    UniqueSystIndices.push_back(int(GlobalSystIndex[iSample][iSyst]));
+                    UniqueSystIndices.push_back(GlobalSystIndex[iSample][iSyst]);
                     FoundNonFlatSpline = true;
                   }
                   if (FoundNonFlatSpline)
