@@ -24,14 +24,14 @@ void SplineBase::getTF1Coeff(TF1_red* &spl, short &nPoints, float *& coeffs) {
 // *****************************************
 
   // Initialise all arrays to 1.0
-  for (ushort i = 0; i < nTF1Coeff; ++i) {
+  for (ushort i = 0; i < _nTF1Coeff_; ++i) {
     coeffs[i] = 0.0;
   }
 
   // Get number of points in spline
   nPoints = short(spl->GetSize());
 
-  if(nPoints > nTF1Coeff)
+  if(nPoints > _nTF1Coeff_)
   {
     MACH3LOG_ERROR("Too big number of points for TF1");
     throw MaCh3Exception(__FILE__ , __LINE__ );

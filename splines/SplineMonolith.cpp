@@ -108,7 +108,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Declare the {y,b,c,d} for each knot
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
-  cpu_spline_handler->coeff_many.resize(nKnots*nCoeff); // *4 because we store y,b,c,d parameters in this array
+  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
   //KS: For x coeff we assume that for given dial (MAQE) spacing is identical, here we are sloppy and assume each dial has the same number of knots, not a big problem
   cpu_spline_handler->coeff_x.resize(event_size_max);
 
@@ -163,8 +163,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   // We get one x, one y, one b,... for each point, so only need to be _max_knots big
   //KS: Some params has less splines but this is all right main array will get proper number while this temp will be deleted
   float *x_tmp = new float[_max_knots]();
-  float *many_tmp = new float[_max_knots*nCoeff]();
-  float *temp_coeffs = new float[nTF1Coeff]();
+  float *many_tmp = new float[_max_knots*_nCoeff_]();
+  float *temp_coeffs = new float[_nTF1Coeff_]();
 
   // Count the number of events
   unsigned int KnotCounter = 0;
@@ -202,8 +202,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         }
         //KS: Contrary to X coeff we keep for other coeff only filled knots, there is no much gain for doing so for x coeff
         for (int j = 0; j < nPoints_tmp; ++j) {
-          for (int k = 0; k < nCoeff; k++) {
-            cpu_spline_handler->coeff_many[KnotCounter*nCoeff + j*nCoeff + k] = many_tmp[j*nCoeff+k];
+          for (int k = 0; k < _nCoeff_; k++) {
+            cpu_spline_handler->coeff_many[KnotCounter*_nCoeff_ + j*_nCoeff_ + k] = many_tmp[j*_nCoeff_+k];
           }
         }
         // Set the parameter number for this spline
@@ -230,7 +230,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
         // If the number of knots are greater than 2 the spline is not a dummy and we should extract coefficients to load onto the GPU
         getTF1Coeff(CurrSpline, nPoints_tmp, temp_coeffs);
-        for (int j = 0; j < nTF1Coeff; ++j) {
+        for (int j = 0; j < _nTF1Coeff_; ++j) {
           cpu_coeff_TF1_many[TF1PointsCounter+j] = temp_coeffs[j];
         }
         // Save the number of points for this spline
@@ -313,10 +313,10 @@ void SMonolith::MoveToGPU() {
   #ifdef CUDA
   unsigned int event_size_max = _max_knots * nParams;
   MACH3LOG_INFO("Total size = {:.2f} MB memory on CPU to move to GPU",
-                (double(sizeof(float) * nKnots * nCoeff) + double(sizeof(float) * event_size_max) / 1.E6 +
+                (double(sizeof(float) * nKnots * _nCoeff_) + double(sizeof(float) * event_size_max) / 1.E6 +
                 double(sizeof(short int) * NSplines_valid)) / 1.E6);
   MACH3LOG_INFO("Total TF1 size = {:.2f} MB memory on CPU to move to GPU",
-                double(sizeof(float) * NTF1_valid * nTF1Coeff) / 1.E6);
+                double(sizeof(float) * NTF1_valid * _nTF1Coeff_) / 1.E6);
   MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * (NSplines_valid + NTF1_valid) / 1.E6));
   #ifndef Weight_On_SplineBySpline_Basis
   MACH3LOG_INFO("Since you are running Total event weight mode then GPU weight array (GPU->CPU every step) = {:.2f} MB",
@@ -585,7 +585,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
   cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
 
-  cpu_spline_handler->coeff_many.resize(nKnots*nCoeff); // *4 because we store y,b,c,d parameters in this array
+  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
   cpu_spline_handler->coeff_x.resize(event_size_max);
 
   cpu_coeff_TF1_many.resize(nTF1coeff);
@@ -599,7 +599,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
   float coeff = 0.;
   Monolith->SetBranchAddress("cpu_coeff_many", &coeff);
-  for(unsigned int i = 0; i < nKnots*nCoeff; i++)
+  for(unsigned int i = 0; i < nKnots*_nCoeff_; i++)
   {
     Monolith->GetEntry(i);
     cpu_spline_handler->coeff_many[i] = coeff;
@@ -713,7 +713,7 @@ void SMonolith::PrepareSplineFile() {
 
   float coeff = 0.;
   Monolith->Branch("cpu_coeff_many", &coeff, "cpu_coeff_many/F");
-  for(unsigned int i = 0; i < nKnots*nCoeff; i++)
+  for(unsigned int i = 0; i < nKnots*_nCoeff_; i++)
   {
     coeff = cpu_spline_handler->coeff_many[i];
     Monolith->Fill();
@@ -875,8 +875,8 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
   // Initialise all arrays to 1.0
   for (int i = 0; i < _max_knots; ++i) {
     xArray[i] = 1.0;
-    for (int j = 0; j < nCoeff; j++) {
-      manyArray[i*nCoeff+j] = 1.0;
+    for (int j = 0; j < _nCoeff_; j++) {
+      manyArray[i*_nCoeff_+j] = 1.0;
     }
   }
   // Get number of points in spline
@@ -901,14 +901,14 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
     spl->GetCoeff(i, x, y, b, c, d);
     // Write the arrays
     xArray[i] = float(x);
-    manyArray[i*nCoeff] = float(y); // 4 because manyArray stores y,b,c,d
-    manyArray[i*nCoeff+1] = float(b);
-    manyArray[i*nCoeff+2] = float(c);
-    manyArray[i*nCoeff+3] = float(d);
-    if((xArray[i] == -999) || (manyArray[i*nCoeff] == -999) || (manyArray[i*4+1] == -999) || (manyArray[i*nCoeff+2] == -999) || (manyArray[i*nCoeff+3] == -999)){
+    manyArray[i*_nCoeff_] = float(y); // 4 because manyArray stores y,b,c,d
+    manyArray[i*_nCoeff_+1] = float(b);
+    manyArray[i*_nCoeff_+2] = float(c);
+    manyArray[i*_nCoeff_+3] = float(d);
+    if((xArray[i] == -999) || (manyArray[i*_nCoeff_] == -999) || (manyArray[i*4+1] == -999) || (manyArray[i*_nCoeff_+2] == -999) || (manyArray[i*_nCoeff_+3] == -999)){
       MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
       MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", x, y, b, c, d);
-      MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*nCoeff+3]);
+      MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*_nCoeff_+3]);
       MACH3LOG_ERROR("This will cause problems when preparing for GPU");
       MACH3LOG_ERROR("***************************************************************");
     }
@@ -1075,7 +1075,7 @@ void SMonolith::CalcSplineWeights() {
       const short int segment_X = short(Param*_max_knots+segment);
 
       //KS: Find knot position in out monolithical structure
-      const unsigned int CurrentKnotPos = cpu_spline_handler->nKnots_arr[splineNum]*nCoeff+segment*nCoeff;
+      const unsigned int CurrentKnotPos = cpu_spline_handler->nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
 
       // We've read the segment straight from CPU and is saved in segment_gpu
       // polynomial parameters from the monolithic splineMonolith
@@ -1101,8 +1101,8 @@ void SMonolith::CalcSplineWeights() {
       const float x = vals[cpu_paramNo_TF1_arr[tf1Num]];
 
       // Read the coefficients
-      const float a = cpu_coeff_TF1_many[tf1Num*nTF1Coeff];
-      const float b = cpu_coeff_TF1_many[tf1Num*nTF1Coeff+1];
+      const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
+      const float b = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_+1];
 
       cpu_weights_tf1_var[tf1Num] = fmaf(a, x, b);
       // cpu_weights_tf1_var[tf1Num] = a*x + b;
@@ -1194,11 +1194,11 @@ void SMonolith::PrintInitialsiation() {
   MACH3LOG_INFO("{} events with {} splines", NEvents, NSplines_valid);
   MACH3LOG_INFO("On average {:.2f} splines per event ({}/{})", float(NSplines_valid)/float(NEvents), NSplines_valid, NEvents);
   MACH3LOG_INFO("Size of x array = {:.4f} MB", double(sizeof(float)*event_size_max)/1.E6);
-  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*nCoeff)/1.E6);
+  MACH3LOG_INFO("Size of coefficient (y,b,c,d) array = {:.2f} MB", double(sizeof(float)*nKnots*_nCoeff_)/1.E6);
   MACH3LOG_INFO("Size of parameter # array = {:.2f} MB", double(sizeof(short int)*NSplines_valid)/1.E6);
 
   MACH3LOG_INFO("On average {:.2f} TF1 per event ({}/{})", float(NTF1_valid)/float(NEvents), NTF1_valid, NEvents);
-  MACH3LOG_INFO("Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB", double(sizeof(float)*NTF1_valid*nTF1Coeff)/1.E6);
+  MACH3LOG_INFO("Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB", double(sizeof(float)*NTF1_valid*_nTF1Coeff_)/1.E6);
 
   return;
 }
