@@ -8,6 +8,7 @@ set(MaCh3_VERSION ${PROJECT_VERSION})
 
 #LP - This option name is confusing, but I wont change it now.
 option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
+option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 
 # Try to find CUDA
 find_package(CUDAToolkit QUIET)
