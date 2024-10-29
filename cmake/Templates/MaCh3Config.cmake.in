@@ -22,13 +22,7 @@ enable_language(CXX)
 
 set(MaCh3_FOUND TRUE)
 
-include(ROOT)
-
-if(NOT TARGET ROOT::ROOT)
-  cmessage(WARNING "Expected MaCh3 to set up dependency target: ROOT::ROOT")
-  set(MaCh3_FOUND FALSE)
-  return()
-endif()
+find_package(ROOT 6.18 REQUIRED)
 
 #Fancy NuOscillator
 find_package(NuOscillator @NUOSCILLATOR_VERSION@ REQUIRED)
