@@ -76,6 +76,7 @@ CPMAddPackage(
 
     "NuOscillator_Compiler_Flags ${compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
+    "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 
 if(NOT TARGET NuOscillator)
