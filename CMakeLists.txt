@@ -65,6 +65,7 @@ if(ROOT_CXX_STANDARD LESS 14 AND ROOT_VERSION VERSION_LESS 6.32.00)
 endif()
 
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 ############################  Setting Flags  ####################################
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 
