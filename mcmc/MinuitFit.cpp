@@ -37,7 +37,7 @@ void MinuitFit::runMCMC() {
   //KS: add config or something
   minuit->SetPrintLevel(2);
   minuit->SetTolerance(0.01);
-  minuit->SetMaxFunctionCalls(fitMan->raw()["General"]["Minuit2"]["NSteps"].as<double>());
+  minuit->SetMaxFunctionCalls(fitMan->raw()["General"]["Minuit2"]["NSteps"].as<unsigned>());
   minuit->SetMaxIterations(10000);
 
   MACH3LOG_INFO("Preparing Minuit");
