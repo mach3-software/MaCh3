@@ -113,9 +113,21 @@ The way to turn off diagnostics is, as below:
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 ```
 
-N.B. that clang also understands these directives, so don't panic that they have GCC in the directive.
+N.B. that clang also understands these directives, so don't panic that they have `GCC` in them.
 
 This will disable that diagnostic for the rest of the compilation unit (usually a .cc file). Note that this means if you include these in headerfiles, they will disable diagnostics more widely, please try and disable the diagnostics over as little code as possible.
+
+If a specific error is really getting you down and its showing up everywhere, the nuclear option is to disable it repo-wide by modifying the `MaCh3Warnings` interface target, defined in the top-level project [CMakeLists.txt](../CMakeLists.txt) like so:
+
+```cmake
+target_compile_options(MaCh3Warnings INTERFACE
+    # ...
+    -Wno-conversion
+    # ...
+)
+```
+
+Please attempt more localised options before reaching for this, but sometimes this represents the best way to proceed with development without 'fixing' innocuous warnings.
 
 ### An example
 
@@ -145,7 +157,7 @@ Putting it all together might look like:
 #pragma GCC diagnostic pop
 ```
 
-We might update it to the below to disable the diagnostic just for the relevant line.
+This allows us to disable the diagnostic just for the relevant line.
 
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
