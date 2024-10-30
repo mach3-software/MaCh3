@@ -235,12 +235,12 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 /// OverrideConfig(config, "General", "MyDouble", 5.3);
 /// @endcode
 template <typename TValue>
-void OverrideConfig(YAML::Node &node, std::string const &key, TValue val) {
+void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
 // **********************
   node[key] = val;
 }
 template <typename... Args>
-void OverrideConfig(YAML::Node &node, std::string const &key, Args... args) {
+void OverrideConfig(YAML::Node node, std::string const &key, Args... args) {
 // **********************
   OverrideConfig(node[key], args...);
 }
