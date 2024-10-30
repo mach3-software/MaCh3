@@ -1,6 +1,7 @@
 #include "splines/SplineBase.h"
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // *****************************************
 SplineBase::SplineBase() {

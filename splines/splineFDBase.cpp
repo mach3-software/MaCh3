@@ -1,6 +1,7 @@
 #include "splineFDBase.h"
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_)

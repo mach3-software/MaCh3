@@ -11,6 +11,7 @@
 #include "TSpline.h"
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 namespace py = pybind11;
 

@@ -5,6 +5,7 @@
 #endif
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // *****************************************
 //Set everything to NULL or 0

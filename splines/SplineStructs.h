@@ -8,6 +8,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // *******************
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
