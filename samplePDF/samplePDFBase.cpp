@@ -103,7 +103,7 @@ std::vector<double> samplePDFBase::generate()
   double evrate = getEventRate();
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignore "-Wconversion"
+#pragma GCC diagnostic ignored "-Wconversion"
   int num = rnd->Poisson(evrate);
 #pragma GCC diagnostic pop
   std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
@@ -155,7 +155,7 @@ std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 
   double evrate = pdf->Integral();
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignore "-Wconversion"
+#pragma GCC diagnostic ignored "-Wconversion"
   int num = rnd->Poisson(evrate);
 #pragma GCC diagnostic pop
   std::cout << "sampling " << num << " events from " << evrate << std::endl;
