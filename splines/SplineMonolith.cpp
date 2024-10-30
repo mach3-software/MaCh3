@@ -4,6 +4,8 @@
 #include "splines/gpuSplineUtils.cuh"
 #endif
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 // *****************************************
 //Set everything to NULL or 0
 void SMonolith::Initialise() {
@@ -468,8 +470,8 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
           SplineInfoArray[ParamNumber].xPts = new M3::float_t[SplineInfoArray[ParamNumber].nPts];
           for (M3::int_t k = 0; k < SplineInfoArray[ParamNumber].nPts; ++k)
           {
-            M3::float_t xtemp = -999.99;
-            M3::float_t ytemp = -999.99;
+            M3::float_t xtemp = M3::float_t(-999.99);
+            M3::float_t ytemp = M3::float_t(-999.99);
             CurrSpline->GetKnot(k, xtemp, ytemp);
             SplineInfoArray[ParamNumber].xPts[k] = xtemp;
           }
@@ -784,12 +786,7 @@ void SMonolith::PrepareSplineFile() {
 
     for (M3::int_t k = 0; k < SplineInfoArray[i].nPts; ++k)
     {
-
-// LP - ignore the diagnostic here as it is only useless if M3::float_t = double
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
       xtemp[k] = float(SplineInfoArray[i].xPts[k]);
-#pragma GCC diagnostic pop
     }
     FastSplineInfoTree->Fill();
   }
@@ -980,10 +977,7 @@ void SMonolith::FindSplineSegment() {
     const M3::float_t* xArray = SplineInfoArray[i].xPts;
 
     // Get the variation for this reconfigure for the ith parameter
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
     const float xvar = float(*SplineInfoArray[i].splineParsPointer);
-#pragma GCC diagnostic pop
     vals[i] = xvar;
 
     // EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here
@@ -1015,7 +1009,7 @@ void SMonolith::FindSplineSegment() {
       // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
       while (kHigh - segment > 1) {
         // Increment the half-step
-        kHalf = (segment + kHigh)/2;
+        kHalf = M3::int_t((segment + kHigh)/2);
         // If our variation is above the kHalf, set the segment to kHalf
         if (xvar > xArray[kHalf]) {
           segment = kHalf;

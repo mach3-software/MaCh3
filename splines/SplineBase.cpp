@@ -1,5 +1,6 @@
 #include "splines/SplineBase.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 
 // *****************************************
 SplineBase::SplineBase() {
@@ -39,7 +40,7 @@ void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
   // TSpline3 can only take doubles, not floats
   // But our GPU is slow with doubles, so need to cast to float
   for (int i = 0; i < nPoints; i++) {
-    coeffs[i] = float(spl->GetParameter(i));
+    coeffs[i] = float(spl->GetParameter(M3::int_t(i)));
   }
   // The structure is now coeffs  = {a,b,c,d,e}
 }

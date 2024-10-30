@@ -10,6 +10,8 @@
 // ROOT includes
 #include "TSpline.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 namespace py = pybind11;
 
 // As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
@@ -108,8 +110,8 @@ void initSplines(py::module &m){
 
                     if (length == 1)
                     {
-                        M3::float_t xKnot = xVals[0];
-                        M3::float_t yKnot = yVals[0];
+                        M3::float_t xKnot = M3::float_t(xVals[0]);
+                        M3::float_t yKnot = M3::float_t(yVals[0]);
 
                         std::vector<M3::float_t *> pars;
                         pars.resize(3);

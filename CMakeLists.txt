@@ -330,7 +330,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_C
 
 
 if(MaCh3_TESTS_ENABLED)
-  find_package(Catch2)
+  find_package(Catch2 QUIET)
   if(NOT Catch2_FOUND)
     CPMAddPackage("gh:catchorg/Catch2@3.5.2")
     LIST(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)

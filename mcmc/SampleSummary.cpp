@@ -2,6 +2,7 @@
 
 //this file is choc full of usage of a root interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 
 // *******************
 // The constructor
@@ -432,7 +433,7 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
       std::vector<double> xbins;
       std::vector<double> ybins;
 
-      SamplePDF->SetupBinning(i, xbins, ybins);
+      SamplePDF->SetupBinning(M3::int_t(i), xbins, ybins);
       
       //KS: Y axis is number of events to get estimate of maximal number we use integral
       const int MaxBinning = doShapeOnly ? 1 : int(NoOverflowIntegral(NominalHist[i])/4);
@@ -2415,7 +2416,7 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
   std::vector<double> xbins;
   std::vector<double> ybins;
 
-  SamplePDF->SetupBinning(selection, xbins, ybins);
+  SamplePDF->SetupBinning(M3::int_t(selection), xbins, ybins);
   TH1D* Projection = NULL;
   std::string name;
   if (ProjectX) {

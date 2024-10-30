@@ -10,7 +10,7 @@ using float_t = float;
 /// Custom integer (int or short int)
 using int_t = short;
 /// Custom unsigned integer (unsigned short int or unsigned int)
-using uint_t = ushort;
+using uint_t = unsigned short;
 #else
 using float_t = double;
 using int_t = int;

@@ -6,6 +6,9 @@
 
 #include <cmath>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 // *******************
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
@@ -206,11 +209,11 @@ public:
 
   /// @brief Set the function
   inline void SetFunc(TF1* &Func) {
-    length = Func->GetNpar();
+    length = M3::int_t(Func->GetNpar());
     if (Par != NULL) delete[] Par;
     Par = new M3::float_t[length];
     for (int i = 0; i < length; ++i) {
-      Par[i] = Func->GetParameter(i);
+      Par[i] = M3::float_t(Func->GetParameter(i));
     }
     delete Func;
     Func = NULL;
@@ -336,7 +339,7 @@ public:
   }
   /// @brief Set the function
   inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
-    nPoints = spline->GetNp();
+    nPoints = M3::int_t(spline->GetNp());
     if (Par != NULL) {
       for (int i = 0; i < nPoints; ++i) {
         delete[] Par[i];
@@ -362,11 +365,11 @@ public:
         Par[i] = new M3::float_t[3];
         double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
         spline->GetCoeff(i, x, y, b, c, d);
-        XPos[i]   = x;
-        YResp[i]  = y;
-        Par[i][0] = b;
-        Par[i][1] = c;
-        Par[i][2] = d;
+        XPos[i]   = M3::float_t(x);
+        YResp[i]  = M3::float_t(y);
+        Par[i][0] = M3::float_t(b);
+        Par[i][1] = M3::float_t(c);
+        Par[i][2] = M3::float_t(d);
       }
     }
     //CW: Reduce to use linear spline interpolation for certain parameters
@@ -385,11 +388,11 @@ public:
         spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
         double tempb = (y2-y1)/(x2-x1);
 
-        XPos[k]   = x1;
-        YResp[k]  = y1;
-        Par[k][0] = tempb;
-        Par[k][1] = 0;
-        Par[k][2] = 0;
+        XPos[k]   = M3::float_t(x1);
+        YResp[k]  = M3::float_t(y1);
+        Par[k][0] = M3::float_t(tempb);
+        Par[k][1] = M3::float_t(0);
+        Par[k][2] = M3::float_t(0);
       }
     }
     //EM: Akima spline is similar to regular cubic spline but is allowed to be discontinuous in 2nd derivative and coefficients in any segment
@@ -404,8 +407,8 @@ public:
         double x = -999.99, y = -999.99;
         spline->GetKnot(i, x, y);
 
-        XPos[i]   = x;
-        YResp[i]  = y;
+        XPos[i]   = M3::float_t(x);
+        YResp[i]  = M3::float_t(y);
       }
 
       M3::float_t* mvals = new M3::float_t[nPoints + 3];
@@ -415,16 +418,16 @@ public:
         // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
         // need to estimate the values for additinal points which would lie outside of the spline
         if(i ==-2){
-          mvals[i+2] = 3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
+          mvals[i+2] = M3::float_t(3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]));
         }
         else if(i==-1){
-          mvals[i+2] = 2.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - (YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
+          mvals[i+2] = M3::float_t(2.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - (YResp[2] - YResp[1]) / (XPos[2] - XPos[1]));
         }
         else if(i==nPoints){
-          mvals[i+2] = 3.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - 2.0*(YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
+          mvals[i+2] = M3::float_t(3.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - 2.0*(YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]));
         }
         else if(i == nPoints - 1){
-          mvals[i+2] = 2.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - (YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
+          mvals[i+2] = M3::float_t(2.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - (YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]));
         }
         //standard internal segment
         else{
@@ -441,11 +444,11 @@ public:
 
       // calculate the coefficients for the spline
       for(int i = 0; i <nPoints; i++){
-        M3::float_t b, c, d = -999.999;
+        M3::float_t b, c, d = M3::float_t(-999.999);
 
         b = svals[i];
-        c = (3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
-        d = ((svals[i + 1] +svals[i]) - 2.0*(YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i])) / ((XPos[i+1] - XPos[i]) * (XPos[i+1] - XPos[i]));
+        c = M3::float_t(3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
+        d = M3::float_t((svals[i + 1] +svals[i]) - 2.0*(YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i])) / ((XPos[i+1] - XPos[i]) * (XPos[i+1] - XPos[i]));
 
         Par[i][0] = b;
         Par[i][1] = c;
@@ -459,9 +462,9 @@ public:
         spline->GetCoeff(i, x, y, b, c, d);
 
         if((c == 0.0 && d == 0.0)){
-          Par[i][0] = b;
-          Par[i][1] = 0.0;
-          Par[i][2] = 0.0;
+          Par[i][0] = M3::float_t(b);
+          Par[i][1] = M3::float_t(0.0);
+          Par[i][2] = M3::float_t(0.0);
         }
       }
       delete[] mvals;
@@ -484,8 +487,8 @@ public:
         double x = -999.99, y = -999.99;
         spline->GetKnot(i, x, y);
 
-        XPos[i]   = x;
-        YResp[i]  = y;
+        XPos[i]   = M3::float_t(x);
+        YResp[i]  = M3::float_t(y);
 
         Tangents[i] = 0.0;
       }
@@ -518,7 +521,7 @@ public:
         // second pass over knots to calculate tangents
         for (int i = 1; i < nPoints-1; ++i) {
           if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
-            Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
+            Tangents[i] = M3::float_t((Secants[i-1] + Secants[i]) /2.0);
           }
         }
 
@@ -541,7 +544,7 @@ public:
             }
 
             if (alpha * alpha + beta * beta >9.0){
-              M3::float_t tau = 3.0 / sqrt(alpha * alpha + beta * beta);
+              M3::float_t tau = M3::float_t(3.0 / std::sqrt(alpha * alpha + beta * beta));
               Tangents[i]   = tau * alpha * Secants[i];
               Tangents[i+1] = tau * beta  * Secants[i];
             }
@@ -550,12 +553,12 @@ public:
         // fourth pass over knots to calculate the coefficients for the spline
         M3::float_t dx;
         for(int i = 0; i <nPoints-1; i++){
-          M3::float_t b, c, d = -999.999;
+          M3::float_t b, c, d = M3::float_t(-999.999);
           dx = XPos[i+1] - XPos[i];
 
           b = Tangents[i] * dx;
-          c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
-          d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
+          c = M3::float_t(3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1]);
+          d = M3::float_t(2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]));
 
           Par[i][0] = b /  dx;
           Par[i][1] = c / (dx * dx);
@@ -583,7 +586,7 @@ public:
           spline->GetCoeff(i, x, y, b, c, d);
 
           if((c == 0.0 && d == 0.0)){
-            Par[i][0] = b;
+            Par[i][0] = M3::float_t(b);
             Par[i][1] = 0.0;
             Par[i][2] = 0.0;
           }
@@ -658,7 +661,7 @@ public:
     // Get the segment for this variation
     int segment = FindX(var);
     // The get the coefficients for this variation
-    M3::float_t x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+    M3::float_t x = M3::float_t(-999.99), y = M3::float_t(-999.99), b = M3::float_t(-999.99), c = M3::float_t(-999.99), d = M3::float_t(-999.99);
     GetCoeff(segment, x, y, b, c, d);
     double dx = var - x;
     // Evaluate the third order polynomial
@@ -815,3 +818,6 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
   // Now have the reduced vector
   return ReducedVector;
 }
+
+#pragma GCC diagnostic pop
+

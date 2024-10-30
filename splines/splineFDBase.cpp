@@ -1,5 +1,7 @@
 #include "splineFDBase.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
@@ -242,15 +244,15 @@ void splineFDBase::FindSplineSegment()
     // Get the variation for this reconfigure for the ith parameter
     int GlobalIndex = UniqueSystIndices[iSyst];
 
-    M3::float_t xvar = xsec->getParProp(GlobalIndex);
+    M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
 
     xVarArray[iSyst]=xvar;
     
     M3::int_t segment = 0;
-	  M3::int_t kHigh = nPoints - 1;
+	  M3::int_t kHigh = M3::int_t(nPoints - 1);
 
     //KS: We expect new segment is very close to previous
-    const M3::int_t PreviousSegment = UniqueSystCurrSegment[iSyst];
+    const M3::int_t PreviousSegment = M3::int_t(UniqueSystCurrSegment[iSyst]);
     //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
     if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
     // If the variation is below the lowest saved spline point
@@ -268,7 +270,7 @@ void splineFDBase::FindSplineSegment()
       // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
       while (kHigh - segment > 1) {
         // Increment the half-step
-        kHalf = (segment + kHigh)/2;
+        kHalf = M3::int_t((segment + kHigh)/2);
         // If our variation is above the kHalf, set the segment to kHalf
         if (xvar > xArray[kHalf]) {
           segment = kHalf;
@@ -279,7 +281,7 @@ void splineFDBase::FindSplineSegment()
       } // End the while: we've now done our binary search
     } // End the else: we've now found our point
 
-    if (segment >= nPoints-1 && nPoints > 1){segment = nPoints-2;}
+    if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
     UniqueSystCurrSegment[iSyst] = segment; 
       
 //#ifdef DEBUG
@@ -773,11 +775,11 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray,
 
   for(int i=0; i<nPoints; i++){
     // Spline coefficients to be
-    M3::float_t x = -999.99;
-    M3::float_t y = -999.99;
-    M3::float_t b = -999.99;
-    M3::float_t c = -999.99;
-    M3::float_t d = -999.99;
+    M3::float_t x = M3::float_t(-999.99);
+    M3::float_t y = M3::float_t(-999.99);
+    M3::float_t b = M3::float_t(-999.99);
+    M3::float_t c = M3::float_t(-999.99);
+    M3::float_t d = M3::float_t(-999.99);
     splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
     //Let's save some memory and store them as floats! (It's a surprise tool that will help with GPU later)
     xArray[i]= x;

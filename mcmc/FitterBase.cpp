@@ -5,6 +5,8 @@
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 // *************************
 // Initialise the manager and make it an object of FitterBase class
 // Now we can dump manager settings to the output file
@@ -1182,7 +1184,7 @@ void FitterBase::RunSigmaVar() {
             //Get the 1d binning we want. Let's just use SetupBinning to get this as it already exists
             std::vector<double> xbins;
             std::vector<double> ybins;
-            samples[ivs]->SetupBinning(k, xbins, ybins);
+            samples[ivs]->SetupBinning(M3::int_t(k), xbins, ybins);
 
             //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
             if (DoByMode)

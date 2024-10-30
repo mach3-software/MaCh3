@@ -31,7 +31,7 @@
 ///
 /// @todo KS: This should really be moved to MCMC Processor
 
-std::vector <int> nominal;
+std::vector <double> nominal;
 std::vector <bool> isFlat;
 std::vector<TString> BranchNames;
 std::vector<std::string> ParamNames;
@@ -91,7 +91,7 @@ void ReadXSecFile(const std::string& inputFile)
     auto const &param = *it;
 
     ParamNames.push_back(param["Systematic"]["Names"]["FancyName"].as<std::string>());
-    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<int>() );
+    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
 
     bool flat = false;
     if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }

@@ -1,7 +1,10 @@
 #include "samplePDFFDBase.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
+#pragma GCC diagnostic pop
 
 #include<algorithm>
 
@@ -55,7 +58,7 @@ void samplePDFFDBase::ReadSampleConfig()
   }
   
   if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-    nSamples = SampleManager->raw()["NSubSamples"].as<int>();
+    nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
   } else{
     MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -354,7 +357,7 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   
   std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
   for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
-    OscVec[iPar] = OscCov->getParProp(iPar);
+    OscVec[iPar] = float(OscCov->getParProp(iPar));
   } 
   for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
     NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
@@ -1333,7 +1336,7 @@ void samplePDFFDBase::SetupNuOscillator() {
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
         //DB Remove NC events from the arrays which are handed to the NuOscillator objects
         if (!MCSamples[iSample].isNC[iEvent]) {
-          EnergyArray.push_back(*(MCSamples[iSample].rw_etru[iEvent]));
+          EnergyArray.push_back(float(*(MCSamples[iSample].rw_etru[iEvent])));
         }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
@@ -1347,7 +1350,7 @@ void samplePDFFDBase::SetupNuOscillator() {
 	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
 	  if (!MCSamples[iSample].isNC[iEvent]) {
-	    CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
+	    CosineZArray.push_back(float(*(MCSamples[iSample].rw_truecz[iEvent])));
 	  }
 	}
 	std::sort(CosineZArray.begin(),CosineZArray.end());
@@ -1417,10 +1420,10 @@ void samplePDFFDBase::SetupNuOscillator() {
 	}
 	if (MCSamples[iSample].rw_truecz != nullptr) { //Can only happen if truecz has been initialised within the experiment specific code
 	  //Atmospherics
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
 	} else {
 	  //Beam
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
 	}
       } // end if NC
     } // end loop over events

@@ -8,9 +8,6 @@
 #include "TLegend.h"
 
 //MaCh3 includes
-#include "OscProbCalcer/OscProbCalcerBase.h"
-#include "Oscillator/OscillatorBase.h"
-
 #include "splines/splineFDBase.h"
 
 #include "covariance/covarianceXsec.h"
@@ -18,6 +15,9 @@
 
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
+
+//forward declare so we don't bleed NuOscillator headers
+class OscillatorBase;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFFDBase :  public samplePDFBase
