@@ -38,9 +38,11 @@ endif()
 
 cmessage(STATUS "ROOT_CXX_FLAGS: \"${ROOT_CXX_FLAGS}\" -> ROOT_CXX_STANDARD: ${ROOT_CXX_STANDARD}")
 
-execute_process (COMMAND root-config --features 
+execute_process(COMMAND root-config --features
   OUTPUT_VARIABLE ROOT_CONFIG_FEATURES OUTPUT_STRIP_TRAILING_WHITESPACE)
-list (FIND ROOT_CONFIG_FEATURES "minuit2" ROOT_CONFIG_MINUIT2)
+string(REPLACE " " ";" ROOT_FEATURES_LIST "${ROOT_CONFIG_FEATURES}")
+# Check if "minuit2" is in the list of ROOT features
+list(FIND ROOT_FEATURES_LIST "minuit2" ROOT_CONFIG_MINUIT2)
 
 # KS: Since ROOT 6.32.0 Minuit is turned on by default
 set(MaCh3_MINUIT2_ENABLED FALSE)
@@ -56,6 +58,7 @@ CPMAddPackage(
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
     GIT_TAG "${YAML_CPP_VERSION}"
+    GIT_SHALLOW YES
     OPTIONS
       "YAML_CPP_INSTALL ON"
       "YAML_CPP_BUILD_TESTS OFF"
@@ -100,6 +103,7 @@ if( MaCh3_PYTHON_ENABLED )
       NAME pybind11
       VERSION 2.13.5
       GITHUB_REPOSITORY "pybind/pybind11"
+      GIT_SHALLOW YES
       GIT_TAG v2.13.5
     )
 endif()

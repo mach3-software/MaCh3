@@ -18,16 +18,13 @@ try
 /// @details anything longer than ~80 should go in a details
 void Foo(){}
 ```
-After making release or tag please
-```bash
-cd Doc
-doxygen Doxyfile
+You can
+```cpp
+/// @param blarb this is parameter needed for function
+/// @return returning some fancy number
+int Fool(int blarb){}
 ```
-to produce both html and latex file. To produce book like pdf file:
-```bash
-cd latex
-pdflatex refman.tex
-```
+Doxygen documentation will be updated after each commit to develop.
 
 ## Logger
 MaCh3 is using spdlog logger see [here](https://github.com/gabime/spdlog/tree/master). And wraps it around MaCh3 names [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/MaCh3Logger.h)
