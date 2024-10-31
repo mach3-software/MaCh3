@@ -739,9 +739,9 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   //DB Now get this information using the DetID from the config
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
-  nFuncParams = XsecCov->GetNumFuncParamsFromDetID(SampleDetID);
-  funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
-  funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
+  nFuncParams = XsecCov->GetNumParamsFromDetID(SampleDetID, SystType::kFunc);
+  funcParsNames = XsecCov->GetParsNamesFromDetID(SampleDetID, SystType::kFunc);
+  funcParsIndex = XsecCov->GetParsIndexFromDetID(SampleDetID, SystType::kFunc);
 
   return;
 }
@@ -1533,7 +1533,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
-  fdobj->mode.resize(nEvents, &fdobj->Unity_Int);
+  fdobj->mode.resize(nEvents, &fdobj->Unity);
   fdobj->nxsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
