@@ -1342,7 +1342,7 @@ void samplePDFFDBase::SetupNuOscillator() {
       //DB Atmospheric only part
       if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
 	std::vector<M3::float_t> CosineZArray;
-	for (int iEvent=0;iEvent<int(MCSamples[iSample].nEvents);iEvent++) {
+	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
 	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
 	  if (!MCSamples[iSample].isNC[iEvent]) {
 	    CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
