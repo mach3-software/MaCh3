@@ -21,19 +21,10 @@ jobs:
       fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
-          - name: Spline Validations
+          - name: Reweight Validations
             test_1: ./CIValidations/SplineValidations
             test_2: ./CIValidations/SamplePDFValidations
-            test_3: empty
-            test_4: empty
-            test_5: empty
-            test_6: empty
-            test_7: empty
-
-          - name: Oscillation Validations
-            test_1: ./CIValidations/NuOscillatorInterfaceValidations
-            test_2: empty
-            test_3: empty
+            test_3: ./CIValidations/NuOscillatorInterfaceValidations
             test_4: empty
             test_5: empty
             test_6: empty
@@ -42,7 +33,7 @@ jobs:
           - name: Covariance Validations
             test_1: ./CIValidations/CovarianceValidations
             test_2: ./CIValidations/MaCh3ModeValidations
-            test_3: empty
+            test_3: ./CIValidations/UnitTests/manager_tests
             test_4: empty
             test_5: empty
             test_6: empty
@@ -84,7 +75,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+        cmake ../ -DMaCh3_Branch=${{ github.head_ref }} -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
     - name: Build MaCh3 Validations
       run: |
