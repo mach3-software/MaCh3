@@ -61,8 +61,8 @@ string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 CPMAddPackage(
   NAME NuOscillator
     VERSION 1.0.1
-    GITHUB_REPOSITORY "luketpickering/NuOscillator"
-    GIT_TAG "feature/root_cmake_find_package"
+    GITHUB_REPOSITORY "dbarrow257/NuOscillator"
+    GIT_TAG "v1.0.1"
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
