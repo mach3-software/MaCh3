@@ -2163,6 +2163,10 @@ void MCMCProcessor::ScanInput() {
   {
     // Get the TBranch and its name
     TBranch* br = static_cast<TBranch*>(brlis->At(i));
+    if(!br){
+      MACH3LOG_ERROR("Invalid branch at position {}", i);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     TString bname = br->GetName();
 
     //KS: Exclude parameter types

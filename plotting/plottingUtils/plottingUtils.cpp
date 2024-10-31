@@ -22,6 +22,10 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
     title = newTitle;
 
   int nPoints = graph.GetN();
+  if(nPoints < 2){
+    MACH3LOG_ERROR("Too few points in the graph.");
+    throw MaCh3Exception(__FILE__,__LINE__);
+  }
   std::vector<double> pointsX(nPoints);
   std::vector<double> pointsY(nPoints);
 

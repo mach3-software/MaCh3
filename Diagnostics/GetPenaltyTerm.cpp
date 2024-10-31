@@ -156,6 +156,10 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   {
     // Get the TBranch and its name
     TBranch* br = static_cast<TBranch*>(brlis->At(i));
+    if(!br){
+      MACH3LOG_ERROR("Invalid branch at position {}", i);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     TString bname = br->GetName();
 
     // If we're on beam systematics
