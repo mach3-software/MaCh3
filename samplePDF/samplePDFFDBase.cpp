@@ -73,11 +73,7 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
-  
-  for (int i=0;i<nSamples;i++) {
-    struct FarDetectorCoreInfo obj = FarDetectorCoreInfo();
-    MCSamples.push_back(obj);
-  }
+  MCSamples.resize(nSamples);
   
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
@@ -743,9 +739,9 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   //DB Now get this information using the DetID from the config
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
-  nFuncParams = XsecCov->GetNumParamsFromDetID(SampleDetID, SystType::kFunc);
-  funcParsNames = XsecCov->GetParsNamesFromDetID(SampleDetID, SystType::kFunc);
-  funcParsIndex = XsecCov->GetParsIndexFromDetID(SampleDetID, SystType::kFunc);
+  nFuncParams = XsecCov->GetNumFuncParamsFromDetID(SampleDetID);
+  funcParsNames = XsecCov->GetFuncParsNamesFromDetID(SampleDetID);
+  funcParsIndex = XsecCov->GetFuncParsIndexFromDetID(SampleDetID);
 
   return;
 }
@@ -773,8 +769,8 @@ void samplePDFFDBase::SetupNormParameters(){
 	  MCSamples[iSample].nxsec_norm_pointers[iEvent] = int(MCSamples[iSample].xsec_norms_bins[iEvent].size());
 	  MCSamples[iSample].xsec_norm_pointers[iEvent].resize(MCSamples[iSample].nxsec_norm_pointers[iEvent]);
 
-	  for(std::list< int >::iterator lit = MCSamples[iSample].xsec_norms_bins[iEvent].begin();lit!=MCSamples[iSample].xsec_norms_bins[iEvent].end();lit++) {
-		MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = XsecCov->retPointer(*lit);
+	  for(auto const & norm_bin: MCSamples[iSample].xsec_norms_bins[iEvent]) {
+		MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = XsecCov->retPointer(norm_bin);
 		counter += 1;
 	  }
 
@@ -790,7 +786,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
-    std::list< int > XsecBins = {};
+    std::vector< int > XsecBins = {};
     if (XsecCov) {
       for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
 	// Skip oscillated NC events
@@ -1335,7 +1331,7 @@ void samplePDFFDBase::SetupNuOscillator() {
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
         //DB Remove NC events from the arrays which are handed to the NuOscillator objects
         if (!MCSamples[iSample].isNC[iEvent]) {
-          EnergyArray.push_back(float(*(MCSamples[iSample].rw_etru[iEvent])));
+          EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
         }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
@@ -1344,12 +1340,12 @@ void samplePDFFDBase::SetupNuOscillator() {
 
       //============================================================================
       //DB Atmospheric only part
-      if (MCSamples[iSample].rw_truecz.size() > 0 && MCSamples[iSample].rw_truecz.size() == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+      if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
 	std::vector<M3::float_t> CosineZArray;
 	for (int iEvent=0;iEvent<int(MCSamples[iSample].nEvents);iEvent++) {
 	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
 	  if (!MCSamples[iSample].isNC[iEvent]) {
-	    CosineZArray.push_back(float(*(MCSamples[iSample].rw_truecz[iEvent])));
+	    CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
 	  }
 	}
 	std::sort(CosineZArray.begin(),CosineZArray.end());
@@ -1516,7 +1512,6 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  MCSamples[iSample] = FarDetectorCoreInfo();
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
@@ -1527,57 +1522,40 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->Unity_Int = 1.;
   
   int nEvents = fdobj->nEvents;
-  fdobj->x_var.resize(fdobj->nEvents);
-  fdobj->y_var.resize(fdobj->nEvents);
-  fdobj->rw_etru.resize(fdobj->nEvents);
-  fdobj->XBin.resize(nEvents);
-  fdobj->YBin.resize(nEvents);
-  fdobj->NomXBin.resize(nEvents);
-  fdobj->NomYBin.resize(nEvents);
-  fdobj->rw_lower_xbinedge.resize(nEvents);
-  fdobj->rw_lower_lower_xbinedge.resize(nEvents);
-  fdobj->rw_upper_xbinedge.resize(nEvents);
-  fdobj->rw_upper_upper_xbinedge.resize(nEvents);
-  fdobj->mode.resize(nEvents);// = new int*[fdobj->nEvents];
-  fdobj->nxsec_norm_pointers.resize(fdobj->nEvents);
-  fdobj->xsec_norm_pointers.resize(nEvents);// = new const double**[fdobj->nEvents];
-  fdobj->xsec_norms_bins = new std::list< int >[fdobj->nEvents];
-  fdobj->xsec_w.resize(nEvents);// = new double[fdobj->nEvents];
-  fdobj->isNC = new bool[fdobj->nEvents];
-  fdobj->nxsec_spline_pointers.resize(fdobj->nEvents);
-  fdobj->xsec_spline_pointers.resize(nEvents);// = new const double**[fdobj->nEvents];
-  fdobj->ntotal_weight_pointers.resize(fdobj->nEvents);
-  fdobj->total_weight_pointers.resize(fdobj->nEvents);
-  fdobj->Target.resize(nEvents);
-  fdobj->osc_w_pointer.resize(nEvents);// = new const _float_*[fdobj->nEvents];
-  //fdobj->rw_truecz = new const double*[fdobj->nEvents];
-  
-  for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
-    fdobj->rw_etru[iEvent] = &fdobj->Unity;
-    //fdobj->rw_truecz[iEvent] = &fdobj->Unity;
-    fdobj->mode[iEvent] = &fdobj->Unity;
-    fdobj->Target[iEvent] = 0;
-    fdobj->NomXBin.emplace_back(-1);
-    fdobj->NomYBin.emplace_back(-1);
-    fdobj->XBin.emplace_back(-1);
-    fdobj->YBin.emplace_back(-1);
-    fdobj->rw_lower_xbinedge.emplace_back(-1);
-    fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
-    fdobj->rw_upper_xbinedge[iEvent] = -1;
-    fdobj->rw_upper_upper_xbinedge[iEvent] = -1;
-    fdobj->xsec_w[iEvent] = 1.0;
-    fdobj->isNC[iEvent] = false;
-    fdobj->SampleDetID = -1;
-    #ifdef _LOW_MEMORY_STRUCTS_
-    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity_F);
-    #else
-    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
-    #endif
+  fdobj->x_var.resize(nEvents, &fdobj->Unity);
+  fdobj->y_var.resize(nEvents, &fdobj->Unity);
+  fdobj->rw_etru.resize(nEvents, &fdobj->Unity);
+  fdobj->XBin.resize(nEvents, -1);
+  fdobj->YBin.resize(nEvents, -1);
+  fdobj->NomXBin.resize(nEvents, -1);
+  fdobj->NomYBin.resize(nEvents, -1);
+  fdobj->rw_lower_xbinedge.resize(nEvents, -1);
+  fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
+  fdobj->rw_upper_xbinedge.resize(nEvents, -1);
+  fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
+  fdobj->mode.resize(nEvents, &fdobj->Unity_Int);
+  fdobj->nxsec_norm_pointers.resize(nEvents);
+  fdobj->xsec_norm_pointers.resize(nEvents);
+  fdobj->xsec_norms_bins.resize(nEvents);
+  fdobj->xsec_w.resize(nEvents, 1.0);
+  fdobj->isNC = new bool[nEvents];
+  fdobj->nxsec_spline_pointers.resize(nEvents);
+  fdobj->xsec_spline_pointers.resize(nEvents);
+  fdobj->ntotal_weight_pointers.resize(nEvents);
+  fdobj->total_weight_pointers.resize(nEvents);
+  fdobj->Target.resize(nEvents, 0);
+#ifdef _LOW_MEMORY_STRUCTS_
+  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity_F);
+#else
+  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity); 
+#endif
+  fdobj->SampleDetID = -1;
 
-    fdobj->x_var[iEvent] = &fdobj->Unity;
-    fdobj->y_var[iEvent] = &fdobj->Unity;
+  for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
+    fdobj->isNC[iEvent] = false;
   }
 
+  return;
 }
 
 void samplePDFFDBase::InitialiseSplineObject() {
@@ -1604,63 +1582,4 @@ void samplePDFFDBase::InitialiseSplineObject() {
   MACH3LOG_INFO("Setup Far Detector splines");
 
   fillSplineBins();
-}
-
-TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
-  (void)WeightStyle;
-
-  //DB Grab the associated enum with the argument string
-  int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
-
-  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
-  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
-  std::vector< std::vector<double> > tmp_Selection = Selection;
-
-  std::vector< std::vector<double> > SelectionVecToApply;
-
-  //DB Add all the predefined selections to the selection vector which will be applied
-  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
-    SelectionVecToApply.emplace_back(Selection[iSelec]);
-  }
-
-  //DB Add all requested cuts from the arguement to the selection vector which will be applied
-  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
-  }
-
-  //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
-  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
-    if (SelectionVecToApply[iSelec].size()!=3) {
-      MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
-
-  //DB Set the member variable to be the cuts to apply
-  Selection = SelectionVecToApply;
-
-  //DB Define the histogram which will be returned
-  TH1D* _h1DVar;
-  if (Axis) {
-    _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
-  } else {
-    std::vector<double> const & xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
-    _h1DVar = new TH1D("", "", int(xBinEdges.size()-1), xBinEdges.data());
-  }
-
-  //DB Loop over all events
-  for (int iSample=0;iSample<getNMCSamples();iSample++) {
-    for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
-      if (IsEventSelected(iSample,iEvent)) {
-	double Weight = GetEventWeight(iSample,iEvent);
-	double Var = ReturnKinematicParameter(ProjectionVar_Int,iSample,iEvent);
-	_h1DVar->Fill(Var,Weight);
-      }
-    }
-  }
-  
-  //DB Reset the saved selection
-  Selection = tmp_Selection;
-
-  return _h1DVar;
 }

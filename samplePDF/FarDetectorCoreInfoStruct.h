@@ -2,6 +2,14 @@
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
+  FarDetectorCoreInfo() : isNC{nullptr} {}
+  FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
+  FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
+  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
+  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
+
+  ~FarDetectorCoreInfo(){ delete [] isNC; }
+
   int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
   int oscnutype;    
   int nupdg;
@@ -22,7 +30,7 @@ struct FarDetectorCoreInfo {
   std::vector<const double*> rw_truecz;
 
   /// xsec bins
-  std::list< int > *xsec_norms_bins;
+  std::vector< std::vector< int > > xsec_norms_bins;
 
   /// DB Speedup bits
   double Unity;
