@@ -357,7 +357,10 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   
   std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
   for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
-    OscVec[iPar] = float(OscCov->getParProp(iPar));
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wuseless-cast"
+    OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
+    #pragma GCC diagnostic pop
   } 
   for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
     NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
