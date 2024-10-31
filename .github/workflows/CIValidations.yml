@@ -30,6 +30,15 @@ jobs:
             test_6: empty
             test_7: empty
 
+          - name: Oscillation Validations
+            test_1: ./CIValidations/NuOscillatorInterfaceValidations
+            test_2: empty
+            test_3: empty
+            test_4: empty
+            test_5: empty
+            test_6: empty
+            test_7: empty
+
           - name: Covariance Validations
             test_1: ./CIValidations/CovarianceValidations
             test_2: ./CIValidations/MaCh3ModeValidations
