@@ -455,29 +455,30 @@ void samplePDFFDBase::fillArray() {
       
       //DB - First, check to see if the event is still in the nominal bin
       if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
-	XBinToFill = MCSamples[iSample].NomXBin[iEvent];
+        XBinToFill = MCSamples[iSample].NomXBin[iEvent];
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
       //ETA- note that nXBins is XBinEdges.size() - 1
       else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-	continue;
+        continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
       //Shifted down one bin from the event bin at nominal
       else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
-	XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
+        XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
       }
       //Shifted up one bin from the event bin at nominal
       else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
-	XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
+        XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
       }
       //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
       else {
-	for (unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-	  if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-	    XBinToFill = iBin;
-	  }
-	}
+        for (unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++)
+        {
+          if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
+            XBinToFill = iBin;
+          }
+        }
       }
       
       //DB Fill relevant part of thread array
@@ -1429,6 +1430,9 @@ void samplePDFFDBase::SetupNuOscillator() {
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   double totalweight = 1.0;
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
   }
