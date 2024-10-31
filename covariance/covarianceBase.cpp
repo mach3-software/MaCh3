@@ -1,7 +1,7 @@
 #include "covariance/covarianceBase.h"
 
 // ********************************************
-covarianceBase::covarianceBase(std::string name, std::string file) : inputFile(std::string(file)), pca(false) {
+covarianceBase::covarianceBase(std::string name, std::string file) : inputFile(file), pca(false) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of covarianceBase");
   init(name, file);
@@ -116,8 +116,9 @@ void covarianceBase::init(std::string name, std::string file) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  // Should put in a 
-  TMatrixDSym *CovMat = static_cast<TMatrixDSym*>(infile->Get(name.c_str()));
+
+  TMatrixDSym *CovMat = infile->Get<TMatrixDSym>(name.c_str());
+
   if (CovMat == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
@@ -197,7 +198,8 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   PrintLength = 35;
 
   // Set the covariance matrix
-  _fNumPar = _fYAMLDoc["Systematics"].size();
+  _fNumPar = int(_fYAMLDoc["Systematics"].size());
+
   use_adaptive = false;
 
   InvertCovMatrix = new double*[_fNumPar]();
@@ -348,7 +350,8 @@ void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   covMatrix = cov;
-  invCovMatrix = static_cast<TMatrixDSym*>(cov->Clone());
+
+  invCovMatrix = static_cast<TMatrixDSym *>(cov->Clone());
   invCovMatrix->Invert();
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   for (int i = 0; i < _fNumPar; i++)
@@ -870,8 +873,8 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    unsigned int parsSize = pars.size();
-    for (unsigned int i = 0; i < parsSize; i++) {
+    int parsSize = int(pars.size());
+    for (int i = 0; i < parsSize; i++) {
       //Make sure that you are actually passing a number to set the parameter to
       if(std::isnan(pars[i])) {
         MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
@@ -899,7 +902,8 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
   // When running PCA, also save PCA parameters
   if (pca) {
     for (int i = 0; i < _fNumParPCA; ++i) {
-      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), static_cast<double*>(&fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
+
+      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &fParCurr_PCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
 
@@ -912,7 +916,8 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
     // When running PCA, also save PCA parameters
     if (pca) {
       for (int i = 0; i < _fNumParPCA; ++i) {
-        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), static_cast<double*>(&fParProp_PCA.GetMatrixArray()[i]), Form("%s_PCA_Prop/D", _fNames[i].c_str()));
+
+        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &fParProp_PCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
       }
     }
   }
@@ -1052,7 +1057,7 @@ double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const
 // ********************************************
 void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
-  if ((int)stepscale.size() != _fNumPar)
+  if (int(stepscale.size()) != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
     MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
@@ -1274,11 +1279,13 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   
-  TMatrixD cov_sym_v = static_cast<TMatrixD>(cov_sym_svd.GetV());
+
+  TMatrixD cov_sym_v = cov_sym_svd.GetV();
   TMatrixD cov_sym_vt = cov_sym_v;
   cov_sym_vt.T();
   //SVD returns as vector (grrr) so need to get into matrix form for multiplying!
-  TVectorD cov_sym_sigvect = static_cast<TVectorD>(cov_sym_svd.GetSig());
+  TVectorD cov_sym_sigvect = cov_sym_svd.GetSig();
+
   const Int_t nCols = cov_sym_v.GetNcols(); //square so only need rows hence lack of cols
   TMatrixDSym cov_sym_sig(nCols);
   TMatrixDDiag cov_sym_sig_diag(cov_sym_sig);

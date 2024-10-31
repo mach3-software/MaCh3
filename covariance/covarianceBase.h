@@ -274,17 +274,18 @@ class covarianceBase {
   /// @param pars vector with new values of PCA params
   inline void setParameters_PCA(const std::vector<double> &pars) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    if (pars.size() != size_t(_fNumParPCA)) {
+    if (int(pars.size()) != _fNumParPCA) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    unsigned int parsSize = pars.size();
-    for (unsigned int i = 0; i < parsSize; i++) {
+    int parsSize = int(pars.size());
+    for (int i = 0; i < parsSize; i++) {
       fParProp_PCA(i) = pars[i];
     }
     //KS: Transfer to normal base
     TransferToParam();
   }
+
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   inline int getNpars() {
     if (pca) return _fNumParPCA;
@@ -341,7 +342,7 @@ class covarianceBase {
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
- protected:
+protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
   /// @brief Initialisation of the class using config
@@ -405,7 +406,7 @@ class covarianceBase {
   double _fGlobalStepScale;
 
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
-  unsigned int PrintLength;
+  int PrintLength;
 
   /// ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;

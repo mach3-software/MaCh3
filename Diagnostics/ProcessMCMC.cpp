@@ -150,7 +150,7 @@ void MultipleProcessMCMC()
 
   const Color_t PosteriorColor[] = {kBlue-1, kRed, kGreen+2};
   //const Style_t PosteriorStyle[] = {kSolid, kDashed, kDotted};
-  nFiles = FileNames.size();
+  nFiles = int(FileNames.size());
   MCMCProcessor** Processor; 
   Processor = new MCMCProcessor*[nFiles];
   for (int ik = 0; ik < nFiles;  ik++)
@@ -183,10 +183,10 @@ void MultipleProcessMCMC()
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
   Posterior->SetGrid();
-  Posterior->SetBottomMargin(0.1);
-  Posterior->SetTopMargin(0.05);
-  Posterior->SetRightMargin(0.03);
-  Posterior->SetLeftMargin(0.10);
+  Posterior->SetBottomMargin(0.1f);
+  Posterior->SetTopMargin(0.05f);
+  Posterior->SetRightMargin(0.03f);
+  Posterior->SetLeftMargin(0.10f);
 
   FileNames[0] = FileNames[0].substr(0, FileNames[0].find(".root")-1);
   TString canvasname = FileNames[0];
@@ -210,7 +210,7 @@ void MultipleProcessMCMC()
     // This holds the posterior density
     TH1D **hpost = new TH1D*[nFiles];
     TLine **hpd = new TLine*[nFiles];
-    hpost[0] = (TH1D *) (Processor[0]->GetHpost(i))->Clone();
+    hpost[0] = static_cast<TH1D *>(Processor[0]->GetHpost(i)->Clone());
 
     bool Skip = false;
     for (int ik = 1 ; ik < nFiles;  ik++)
@@ -222,7 +222,7 @@ void MultipleProcessMCMC()
         Skip = true;
         break;
       }
-      hpost[ik] = (TH1D *)(Processor[ik]->GetHpost(Index))->Clone();
+      hpost[ik] = static_cast<TH1D *>(Processor[ik]->GetHpost(Index)->Clone());
     }
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
@@ -261,7 +261,7 @@ void MultipleProcessMCMC()
 
     // Make a nice little TLegend
     TLegend *leg = new TLegend(0.12, 0.7, 0.6, 0.97);
-    leg->SetTextSize(0.03);
+    leg->SetTextSize(0.03f);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
     leg->SetLineColor(0);
@@ -427,10 +427,10 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
   gStyle->SetOptTitle(0);
   Canvas->SetTickx();
   Canvas->SetTicky();
-  Canvas->SetBottomMargin(0.1);
-  Canvas->SetTopMargin(0.05);
-  Canvas->SetRightMargin(0.15);
-  Canvas->SetLeftMargin(0.10);
+  Canvas->SetBottomMargin(0.1f);
+  Canvas->SetTopMargin(0.05f);
+  Canvas->SetRightMargin(0.15f);
+  Canvas->SetLeftMargin(0.10f);
   
   //KS: Fancy colours
   const int NRGBs = 10;
@@ -450,7 +450,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
-  const int entries = Processor->GetnSteps();
+  const int entries = int(Processor->GetnSteps());
   const int NIntervals = GetFromManager<int>(Settings["NIntervals"], 5);
   const int IntervalsSize = entries/NIntervals;
   //We start with burn from 0 (no burn in at all)
@@ -489,8 +489,8 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
     CovarianceHist = TMatrixIntoTH2D(Covariance, "Covariance"); 
     CorrelationHist = TMatrixIntoTH2D(Correlation, "Correlation");
             
-    TH2D *CovarianceDiff = (TH2D*)CovarianceHist->Clone("Covariance_Ratio");
-    TH2D *CorrelationDiff = (TH2D*)CorrelationHist->Clone("Correlation_Ratio");
+    TH2D *CovarianceDiff = static_cast<TH2D*>(CovarianceHist->Clone("Covariance_Ratio"));
+    TH2D *CorrelationDiff = static_cast<TH2D*>(CorrelationHist->Clone("Correlation_Ratio"));
     
     //KS: Bit messy but quite often covariance is 0 is divided by 0 is problematic so
     #ifdef MULTITHREAD
@@ -530,10 +530,10 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
       CorrelationDiff->GetXaxis()->SetBinLabel(j+1, Title);
       CorrelationDiff->GetYaxis()->SetBinLabel(j+1, Title);
     }
-    CovarianceDiff->GetXaxis()->SetLabelSize(0.015);
-    CovarianceDiff->GetYaxis()->SetLabelSize(0.015);
-    CorrelationDiff->GetXaxis()->SetLabelSize(0.015);
-    CorrelationDiff->GetYaxis()->SetLabelSize(0.015);
+    CovarianceDiff->GetXaxis()->SetLabelSize(0.015f);
+    CovarianceDiff->GetYaxis()->SetLabelSize(0.015f);
+    CorrelationDiff->GetXaxis()->SetLabelSize(0.015f);
+    CorrelationDiff->GetYaxis()->SetLabelSize(0.015f);
     
     std::stringstream ss;
     ss << "BCut_";
@@ -562,9 +562,9 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
         
     //KS: Current hist become previous as we need it for further comparison
     delete CovariancePreviousHist;
-    CovariancePreviousHist = (TH2D*)CovarianceHist->Clone();
+    CovariancePreviousHist = static_cast<TH2D*>(CovarianceHist->Clone());
     delete CorrelationPreviousHist;
-    CorrelationPreviousHist = (TH2D*)CorrelationHist->Clone();;
+    CorrelationPreviousHist = static_cast<TH2D*>(CorrelationHist->Clone());
     
     delete CovarianceHist;
     CovarianceHist = nullptr;
@@ -654,8 +654,8 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
           break;
         }
       }
-      hpost[ik] = (TH1D*) (Processor[ik]->GetHpost(Index))->Clone();
-      CumulativeDistribution[ik] = (TH1D*) (Processor[ik]->GetHpost(Index))->Clone();
+      hpost[ik] = static_cast<TH1D*>(Processor[ik]->GetHpost(Index)->Clone());
+      CumulativeDistribution[ik] = static_cast<TH1D*>(Processor[ik]->GetHpost(Index)->Clone());
       CumulativeDistribution[ik]->Fill(0., 0.);
       CumulativeDistribution[ik]->Reset();
       CumulativeDistribution[ik]->SetMaximum(1.);
@@ -733,7 +733,7 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       CumulativeDistribution[ik]->Draw("SAME");
     
     TLegend *leg = new TLegend(0.15, 0.7, 0.5, 0.90);
-    leg->SetTextSize(0.04);
+    leg->SetTextSize(0.04f);
     for (int ik = 0; ik < nFiles;  ik++)
       leg->AddEntry(CumulativeDistribution[ik], TitleNames[ik].c_str(), "l");
     for (int ik = 1; ik < nFiles;  ik++)

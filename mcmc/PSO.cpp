@@ -1,5 +1,7 @@
 #include "PSO.h"
 
+#include <cmath>
+
 PSO::PSO(manager *man) : LikelihoodFit(man) {
 
   fConstriction = fitMan->raw()["General"]["PSO"]["Constriction"].as<double>();
@@ -165,7 +167,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         value_list[2] = value_list[1];
         value_list[1] = new_val;
         position_list[1] = new_bisect_position;
-        res = abs(position[2]-position[0]);
+        res = std::abs(position[2]-position[0]);
       }
       else{
         std::vector<double> new_bisect_position = position_list[1];new_bisect_position[i] += (position_list[2][i]-position_list[1][i])/2;
@@ -174,7 +176,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         value_list[0] = value_list[1];
         value_list[1] = new_val;
         position_list[1] = new_bisect_position;
-        res = abs(position_list[2][i]-position_list[1][i]);
+        res = std::abs(position_list[2][i]-position_list[1][i]);
       }
     }
     //do the same thing for position uncertainty
@@ -197,8 +199,8 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         value_list_p[2] = value_list_p[1];
         value_list_p[1] = new_val_p;
         position_list_p[1] = new_bisect_position_p;
-        res = abs(position[2]-position[0]);
-        res_p = abs(position_list_p[1][i]-position_list_p[0][i]);
+        res = std::abs(position[2]-position[0]);
+        res_p = std::abs(position_list_p[1][i]-position_list_p[0][i]);
         //std::cout << "Pos midpoint is " << position_list_p[1][i] << std::endl;
       }
       else{
@@ -208,11 +210,11 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         value_list_p[0] = value_list_p[1];
         value_list_p[1] = new_val_p;
         position_list_p[1] = new_bisect_position_p;
-        res_p = abs(position_list_p[2][i]-position_list_p[1][i]);
+        res_p = std::abs(position_list_p[2][i]-position_list_p[1][i]);
         //std::cout << "Pos midpoint is " << position_list_p[1][i] << std::endl;
       }
     }
-    uncertainties_list.push_back({abs(position[i]-position_list[1][i]),abs(position[i]-position_list_p[1][i])});
+    uncertainties_list.push_back({std::abs(position[i]-position_list[1][i]),std::abs(position[i]-position_list_p[1][i])});
     std::cout << "Uncertainty finished for d = "<< i << std::endl;
     std::cout << std::setprecision(10)<< "LLR values for ± positive and negative uncertainties are " << CalcChi(position_list[1]) << " and " << CalcChi(position_list_p[1]) << std::endl;
   }
@@ -244,9 +246,9 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
     pos[i] = curr_ival;
 
     int closest_index = 0;
-    double closest_value = abs(y[0]); // Initialize with the first element
+    double closest_value = std::abs(y[0]); // Initialize with the first element
     for (unsigned int ii = 1; ii < y.size(); ++ii) {
-      double abs_y = abs(y[ii]);
+      double abs_y = std::abs(y[ii]);
       if (abs_y < closest_value) {
         closest_index = ii;
         closest_value = abs_y;
@@ -267,9 +269,9 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
     }
     pos[i] = curr_ival;
     closest_index = 0;
-    closest_value = abs(y[0]); // Initialize with the first element
+    closest_value = std::abs(y[0]); // Initialize with the first element
     for (unsigned int ii = 1; ii < y.size(); ++ii) {
-      double abs_y = abs(y[ii]);
+      double abs_y = std::abs(y[ii]);
       if (abs_y < closest_value) {
         closest_index = ii;
         closest_value = abs_y;

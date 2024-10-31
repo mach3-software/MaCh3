@@ -188,13 +188,13 @@ void PrepareChains() {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    nEntries[m] = Chain->GetEntries();
+    nEntries[m] = int(Chain->GetEntries());
 
     // Set the step cut to be 20%
     BurnIn[m] = nEntries[m]/5;
 
     // Get the list of branches
-    TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
+    TObjArray* brlis = Chain->GetListOfBranches();
 
     // Get the number of branches
     nBranches[m] = brlis->GetEntries();
@@ -209,7 +209,11 @@ void PrepareChains() {
     for (int i = 0; i < nBranches[m]; i++)
     {
       // Get the TBranch and its name
-      TBranch* br = (TBranch*)brlis->At(i);
+      TBranch* br = static_cast<TBranch *>(brlis->At(i));
+      if(!br){
+        MACH3LOG_ERROR("Invalid branch at position {}", i);
+        throw MaCh3Exception(__FILE__,__LINE__);
+      }
       TString bname = br->GetName();
 
       // Read in the step
@@ -243,7 +247,7 @@ void PrepareChains() {
       }
     }
 
-    if(m == 0) nDraw = BranchNames.size();
+    if(m == 0) nDraw = int(BranchNames.size());
 
     //TN: Qualitatively faster sanity check, with the very same outcome (all chains have the same #branches)
     if(m > 0)
@@ -283,7 +287,7 @@ void PrepareChains() {
     for (int i = 0; i < Ntoys; i++)
     {
       // Get a random entry after burn in
-      int entry = (int)(nEntries[m]*rnd->Rndm());
+      int entry = int(nEntries[m]*rnd->Rndm());
 
       Chain->GetEntry(entry);
 
@@ -576,6 +580,8 @@ void CalcRhat() {
 // *******************
 void SaveResults() {
 // *******************    
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
   std::string NameTemp = "";
   //KS: If we run over many many chains there is danger that name will be so absurdly long we run over system limit and job will be killed :(
   if(Nchains < 5)
@@ -830,8 +836,8 @@ double CalcMedian(double arr[], const int size) {
 // *******************   
   std::sort(arr, arr+size);
   if (size % 2 != 0)
-    return (double)arr[size/2];
-  return (double)(arr[(size-1)/2] + arr[size/2])/2.0;
+    return arr[size/2];
+  return (arr[(size-1)/2] + arr[size/2])/2.0;
 }
 
 

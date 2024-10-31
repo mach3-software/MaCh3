@@ -15,6 +15,7 @@ void Foo(){}
 try
 ```cpp
 /// @brief I like comments
+/// @details anything longer than ~80 should go in a details
 void Foo(){}
 ```
 After making release or tag please
@@ -63,7 +64,7 @@ bool AsimovFit = false;
 
 if(config[AsimovFit])
 {
-  AsimovFit = config[AsimovFit].as<bool>;
+  AsimovFit = config[AsimovFit].as<bool>();
 }
 ```
 This can be replaced with:
@@ -75,17 +76,18 @@ bool AsimovFit = GetFromManager<bool>(config[AsimovFit], false);
 Some fits require a lot of RAM. The easiest and fastest solution to reduce RAM
 is to use `float` instead of `double`.
 
-MaCh3 has a custom type defined as `_float_`, which is usually a `double`
+MaCh3 has a custom type defined as `M3::float_t`, which is usually a `double`
 unless the `_LOW_MEMORY_STRUCTS_` directive is defined at the compilation
-level. When defined, `_float_` will be an actual `float`.
+level. When defined, `M3::float_t` will be an actual `float`.
 
-By using `_float_`, one can flexibly change between these types. During
+By using `M3::float_t`, one can flexibly change between these types. During
 development, it is advised to use these data types unless specific data
 types are necessary due to desired precision, code safety, etc.
 
 ## Error handling
 MaCh3 uses custom error handling implemented [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/MaCh3Exception.h)
-Instead of throw
+
+Never ever ever bare throw. Always throw an exception, preferably one that subclasses one defined by the standard library in `<stdexcept>`.
 ```cpp
 throw;
 ```
@@ -98,7 +100,64 @@ or
 ```cpp
 throw MaCh3Exception(__FILE__ , __LINE__ );
 ```
-This way we can ensure error messages are unified and user always get hints where in the code problem occurred. If current MaCh3Exception is not sufficient consider implementing new or expanding current exceptions in MaCh3Exception.h.
+This way we can ensure error messages are unified and user always get hints where in the code problem occurred. If current `MaCh3Exception` is not sufficient consider implementing new or expanding current exceptions in MaCh3Exception.h.
+
+## Compiler warning levels getting you down?
+
+If you are trying to compile some new development and it is failing because of some innocuous warning that has been elevated to an error by the compiler flags, please don't just turn off the flags. A much better approach is to disable the diagnostic locally. This makes it easier to keep most of the code stringently checked, while giving you, the developer, the ability to stay in flow.
+It also allows for later 'fixing' of these warnings, if they need to be fixed, to be done systematically by greping for the relevant directives.
+
+The way to turn off diagnostics is, as below:
+
+```c++
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+```
+
+N.B. that clang also understands these directives, so don't panic that they have `GCC` in them.
+
+This will disable that diagnostic for the rest of the compilation unit (usually a .cc file). Note that this means if you include these in headerfiles, they will disable diagnostics more widely, please try and disable the diagnostics over as little code as possible.
+
+If a specific error is really getting you down and its showing up everywhere, the nuclear option is to disable it repo-wide by modifying the `MaCh3Warnings` interface target, defined in the top-level project [CMakeLists.txt](../CMakeLists.txt) like so:
+
+```cmake
+target_compile_options(MaCh3Warnings INTERFACE
+    # ...
+    -Wno-conversion
+    # ...
+)
+```
+
+Please attempt more localised options before reaching for this, but sometimes this represents the best way to proceed with development without 'fixing' innocuous warnings.
+
+### An example
+
+We got this compiler error:
+
+```shell
+/root/software/MaCh3/MaCh3_splitpr/splines/splineFDBase.cpp: In member function ‘virtual void splineFDBase::CalcSplineWeights()’:
+/root/software/MaCh3/MaCh3_splitpr/splines/splineFDBase.cpp:349:35: error: useless cast to type ‘double’ [-Werror=useless-cast]
+  349 |     weightvec_Monolith[iSpline] = double(weight);
+      |                                   ^~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors
+```
+
+for this code:
+
+```c++
+    weightvec_Monolith[iSpline] = double(weight);
+```
+
+The compiler is right, that this is a useless cast, but `weight` can sometimes be a float, in which case we would get a conversion warning/error, so it seems like a no-win situation. We can 'save' the current diagnostics with `#pragma GCC diagnostic push`, disable the relevant one as above, and then revert to the saved set of diagnostics with `#pragma GCC diagnostic pop`.
+Putting it all together might look like:
+
+```c++
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+    weightvec_Monolith[iSpline] = double(weight);
+#pragma GCC diagnostic pop
+```
+
+This allows us to disable the diagnostic just for the relevant line.
 
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.

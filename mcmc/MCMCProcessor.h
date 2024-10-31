@@ -205,9 +205,9 @@ class MCMCProcessor {
     /// @brief Get parameter number based on name
     int GetParamIndexFromName(const std::string& Name);
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
-    inline int GetnEntries(){return nEntries;};
+    inline Long64_t GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
-    inline int GetnSteps(){return nSteps;};
+    inline Long64_t GetnSteps(){return nSteps;};
     
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value

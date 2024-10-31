@@ -46,9 +46,9 @@ covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& P
   auto CovMatrixFile = Settings[std::string(PreFix) + "CovFile"].as<std::vector<std::string>>();
 
   // PCA threshold, -1 means no pca
-  auto PCAThreshold = GetFromManager<double>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
+  auto PCAThreshold = GetFromManager<int>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
   // do we pca whole matrix or only submatrix
-  auto PCAParamRegion = GetFromManager<std::vector<double>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
+  auto PCAParamRegion = GetFromManager<std::vector<int>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
 
   /// @todo this massive hack with "xsec_cov" is because we have const char * ... will have to fix it later...
   covarianceXsec* xsec = new covarianceXsec(CovMatrixFile, "xsec_cov", PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);

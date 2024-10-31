@@ -55,7 +55,7 @@ struct fdmc_base {
 
   double **mode;
 
-  const _float_ **osc_w_pointer;
+  const M3::float_t **osc_w_pointer;
   double *xsec_w;
   splineFDBase *splineFile; 
 };

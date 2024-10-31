@@ -4,6 +4,12 @@
 #include "covariance/covarianceXsec.h"
 #include "samplePDF/Structs.h"
 
+#include <cmath>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 // *******************
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
 struct FastSplineInfo {
@@ -23,13 +29,13 @@ struct FastSplineInfo {
   }
 
   /// Number of points in spline
-  _int_ nPts;
+  M3::int_t nPts;
 
   /// Array of the knots positions
-  _float_ *xPts;
+  M3::float_t *xPts;
 
   /// Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration
-  _int_ CurrSegment;
+  M3::int_t CurrSegment;
 
   /// Array of the knots positions
   const double* splineParsPointer;
@@ -42,7 +48,7 @@ class XSecStruct {
 // ********************************************
 public:
   /// @brief CW: The light constructor
-  XSecStruct(_int_ NumberOfSplines) {
+  XSecStruct(M3::int_t NumberOfSplines) {
     nParams = NumberOfSplines;
     Func.reserve(nParams);
     for (int i = 0; i < nParams; ++i) {
@@ -64,7 +70,7 @@ public:
   }
 
   /// @brief CW: Get number of splines
-  inline _int_ GetNumberOfParams() { return nParams; }
+  inline M3::int_t GetNumberOfParams() { return nParams; }
 
   /// @brief CW: The Printer
   inline void Print() {
@@ -76,17 +82,17 @@ public:
   }
 
   /// @brief CW: Set the number of splines for this event
-  inline void SetSplineNumber(const _int_ NumberOfSplines) {
+  inline void SetSplineNumber(const M3::int_t NumberOfSplines) {
     nParams = NumberOfSplines;
     Func = new T[nParams];
   }
 
   /// @brief CW: Get the function for the nth spline
-  inline T GetFunc(const _int_ nSpline) { return Func[nSpline]; }
+  inline T GetFunc(const M3::int_t nSpline) { return Func[nSpline]; }
   /// @brief CW: Set the function for the nth spline
-  inline void SetFunc(const _int_ nSpline, T Function) { Func[nSpline] = Function; }
+  inline void SetFunc(const M3::int_t nSpline, T Function) { Func[nSpline] = Function; }
   /// @brief CW: Eval the current variation
-  inline double Eval(const _int_ nSpline, const _float_ variation) {
+  inline double Eval(const M3::int_t nSpline, const M3::float_t variation) {
     // Some will be NULL, check this
     if (Func[nSpline]) {
       return Func[nSpline]->Eval(variation);
@@ -96,7 +102,7 @@ public:
   }
 private:
   /// Number of parameters
-  _int_ nParams;
+  M3::int_t nParams;
   /// The function
   T* Func;
 };
@@ -166,7 +172,7 @@ public:
   /// @brief KS: Printer
   virtual void Print()=0;
   /// @brief DL: Get number of points
-  virtual _int_ GetNp()=0;
+  virtual M3::int_t GetNp()=0;
 };
 
 // ************************
@@ -189,7 +195,7 @@ public:
   }
 
   /// @brief The useful constructor with deep copy
-  TF1_red(_int_ nSize, _float_* Array) : TResponseFunction_red() {
+  TF1_red(M3::int_t nSize, M3::float_t* Array) : TResponseFunction_red() {
     length = nSize;
     for (int i = 0; i < length; ++i) {
       Par[i] = Array[i];
@@ -204,11 +210,11 @@ public:
 
   /// @brief Set the function
   inline void SetFunc(TF1* &Func) {
-    length = Func->GetNpar();
+    length = M3::int_t(Func->GetNpar());
     if (Par != NULL) delete[] Par;
-    Par = new _float_[length];
+    Par = new M3::float_t[length];
     for (int i = 0; i < length; ++i) {
-      Par[i] = Func->GetParameter(i);
+      Par[i] = M3::float_t(Func->GetParameter(i));
     }
     delete Func;
     Func = NULL;
@@ -238,12 +244,12 @@ public:
   }
 
   /// @brief Set a parameter to a value
-  inline void SetParameter(_int_ Parameter, _float_ Value) {
+  inline void SetParameter(M3::int_t Parameter, M3::float_t Value) {
     Par[Parameter] = Value;
   }
 
   /// @brief Get a parameter value
-  double GetParameter(_int_ Parameter) {
+  double GetParameter(M3::int_t Parameter) {
     if (Parameter > length) {
       MACH3LOG_ERROR("You requested parameter number {} but length is {} parameters", Parameter, length);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -253,9 +259,9 @@ public:
   }
 
   /// @brief Set the size
-  inline void SetSize(_int_ nSpline) {
+  inline void SetSize(M3::int_t nSpline) {
     length = nSpline;
-    Par = new _float_[length];
+    Par = new M3::float_t[length];
   }
   /// @brief Get the size
   inline int GetSize() { return length; }
@@ -278,12 +284,12 @@ public:
   }
 
   /// @brief DL: Get number of points
-  inline _int_ GetNp() override { return length; }
+  inline M3::int_t GetNp() override { return length; }
 
 private:
   /// The parameters
-  _float_* Par;
-  _int_ length;
+  M3::float_t* Par;
+  M3::int_t length;
 };
 
 // ************************
@@ -308,16 +314,16 @@ public:
   }
 
   /// @brief constructor taking parameters
-  TSpline3_red(_float_ *X, _float_ *Y, _int_ N, _float_ **P) : TResponseFunction_red() {
+  TSpline3_red(M3::float_t *X, M3::float_t *Y, M3::int_t N, M3::float_t **P) : TResponseFunction_red() {
     nPoints = N;
     // Save the parameters for each knot
-    Par = new _float_*[nPoints];
+    Par = new M3::float_t*[nPoints];
     // Save the positions of the knots
-    XPos = new _float_[nPoints];
+    XPos = new M3::float_t[nPoints];
     // Save the y response at each knot
-    YResp = new _float_[nPoints];
+    YResp = new M3::float_t[nPoints];
     for(int j = 0; j < N; ++j){
-      Par[j] = new _float_[3];
+      Par[j] = new M3::float_t[3];
       Par[j][0] = P[j][0];
       Par[j][1] = P[j][1];
       Par[j][2] = P[j][2];
@@ -334,7 +340,7 @@ public:
   }
   /// @brief Set the function
   inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
-    nPoints = spline->GetNp();
+    nPoints = M3::int_t(spline->GetNp());
     if (Par != NULL) {
       for (int i = 0; i < nPoints; ++i) {
         delete[] Par[i];
@@ -346,25 +352,25 @@ public:
     if (XPos != NULL) delete[] XPos;
     if (YResp != NULL) delete[] YResp;
     // Save the parameters for each knot
-    Par = new _float_*[nPoints];
+    Par = new M3::float_t*[nPoints];
     // Save the positions of the knots
-    XPos = new _float_[nPoints];
+    XPos = new M3::float_t[nPoints];
     // Save the y response at each knot
-    YResp = new _float_[nPoints];
+    YResp = new M3::float_t[nPoints];
 
     //KS: Default TSpline3 ROOT implementation
     if(InterPolation == kTSpline3)
     {
       for (int i = 0; i < nPoints; ++i) {
         // 3 is the size of the TSpline3 coefficients
-        Par[i] = new _float_[3];
+        Par[i] = new M3::float_t[3];
         double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
         spline->GetCoeff(i, x, y, b, c, d);
-        XPos[i]   = x;
-        YResp[i]  = y;
-        Par[i][0] = b;
-        Par[i][1] = c;
-        Par[i][2] = d;
+        XPos[i]   = M3::float_t(x);
+        YResp[i]  = M3::float_t(y);
+        Par[i][0] = M3::float_t(b);
+        Par[i][1] = M3::float_t(c);
+        Par[i][2] = M3::float_t(d);
       }
     }
     //CW: Reduce to use linear spline interpolation for certain parameters
@@ -377,17 +383,17 @@ public:
     {
       for (int k = 0; k < nPoints; ++k) {
         // 3 is the size of the TSpline3 coefficients
-        Par[k] = new _float_[3];
+        Par[k] = new M3::float_t[3];
         Double_t x1, y1, b1, c1, d1, x2, y2, b2, c2, d2 = 0;
         spline->GetCoeff(k, x1, y1, b1, c1, d1);
         spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
         double tempb = (y2-y1)/(x2-x1);
 
-        XPos[k]   = x1;
-        YResp[k]  = y1;
-        Par[k][0] = tempb;
-        Par[k][1] = 0;
-        Par[k][2] = 0;
+        XPos[k]   = M3::float_t(x1);
+        YResp[k]  = M3::float_t(y1);
+        Par[k][0] = M3::float_t(tempb);
+        Par[k][1] = M3::float_t(0);
+        Par[k][2] = M3::float_t(0);
       }
     }
     //EM: Akima spline is similar to regular cubic spline but is allowed to be discontinuous in 2nd derivative and coefficients in any segment
@@ -397,32 +403,32 @@ public:
       // get the knot values for the spline
       for (int i = 0; i < nPoints; ++i) {
         // 3 is the size of the TSpline3 coefficients
-        Par[i] = new _float_[3];
+        Par[i] = new M3::float_t[3];
 
         double x = -999.99, y = -999.99;
         spline->GetKnot(i, x, y);
 
-        XPos[i]   = x;
-        YResp[i]  = y;
+        XPos[i]   = M3::float_t(x);
+        YResp[i]  = M3::float_t(y);
       }
 
-      _float_* mvals = new _float_[nPoints + 3];
-      _float_* svals = new _float_[nPoints + 1];
+      M3::float_t* mvals = new M3::float_t[nPoints + 3];
+      M3::float_t* svals = new M3::float_t[nPoints + 1];
 
       for (int i = -2; i <= nPoints; ++i) {
         // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
         // need to estimate the values for additinal points which would lie outside of the spline
         if(i ==-2){
-          mvals[i+2] = 3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
+          mvals[i+2] = M3::float_t(3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]));
         }
         else if(i==-1){
-          mvals[i+2] = 2.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - (YResp[2] - YResp[1]) / (XPos[2] - XPos[1]);
+          mvals[i+2] = M3::float_t(2.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - (YResp[2] - YResp[1]) / (XPos[2] - XPos[1]));
         }
         else if(i==nPoints){
-          mvals[i+2] = 3.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - 2.0*(YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
+          mvals[i+2] = M3::float_t(3.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - 2.0*(YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]));
         }
         else if(i == nPoints - 1){
-          mvals[i+2] = 2.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - (YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]);
+          mvals[i+2] = M3::float_t(2.0 * (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]) - (YResp[nPoints-2] - YResp[nPoints-3]) / (XPos[nPoints-2] - XPos[nPoints-3]));
         }
         //standard internal segment
         else{
@@ -431,19 +437,19 @@ public:
       }
 
       for(int i =2; i<=nPoints+2; i++){
-        if (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]) != 0.0){
-          svals[i-2] = (abs(mvals[i+1] - mvals[i]) * mvals[i-1] + abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (abs(mvals[i+1] - mvals[i]) + abs(mvals[i-1] - mvals[i-2]));
+        if (std::abs(mvals[i+1] - mvals[i]) + std::abs(mvals[i-1] - mvals[i-2]) != 0.0){
+          svals[i-2] = (std::abs(mvals[i+1] - mvals[i]) * mvals[i-1] + std::abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (std::abs(mvals[i+1] - mvals[i]) + std::abs(mvals[i-1] - mvals[i-2]));
         }
         else{svals[i-2] = mvals[i];}
       }
 
       // calculate the coefficients for the spline
       for(int i = 0; i <nPoints; i++){
-        _float_ b, c, d = -999.999;
+        M3::float_t b, c, d = M3::float_t(-999.999);
 
         b = svals[i];
-        c = (3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
-        d = ((svals[i + 1] +svals[i]) - 2.0*(YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i])) / ((XPos[i+1] - XPos[i]) * (XPos[i+1] - XPos[i]));
+        c = M3::float_t(3.0* (YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i]) -2.0 *svals[i] - svals[i +1]) /(XPos[i+1] - XPos[i]);
+        d = M3::float_t((svals[i + 1] +svals[i]) - 2.0*(YResp[i+1] - YResp[i]) / (XPos[i+1] - XPos[i])) / ((XPos[i+1] - XPos[i]) * (XPos[i+1] - XPos[i]));
 
         Par[i][0] = b;
         Par[i][1] = c;
@@ -457,9 +463,9 @@ public:
         spline->GetCoeff(i, x, y, b, c, d);
 
         if((c == 0.0 && d == 0.0)){
-          Par[i][0] = b;
-          Par[i][1] = 0.0;
-          Par[i][2] = 0.0;
+          Par[i][0] = M3::float_t(b);
+          Par[i][1] = M3::float_t(0.0);
+          Par[i][2] = M3::float_t(0.0);
         }
       }
       delete[] mvals;
@@ -470,20 +476,20 @@ public:
     else if(InterPolation == kMonotonic)
     {
       // values of the secants at each point (for calculating monotone spline)
-      _float_ * Secants = new _float_[nPoints -1];
+      M3::float_t * Secants = new M3::float_t[nPoints -1];
       // values of the tangens at each point (for calculating monotone spline)
-      _float_ *  Tangents = new _float_[nPoints];
+      M3::float_t *  Tangents = new M3::float_t[nPoints];
 
       // get the knot values for the spline
       for (int i = 0; i < nPoints; ++i) {
         // 3 is the size of the TSpline3 coefficients
-        Par[i] = new _float_[3];
+        Par[i] = new M3::float_t[3];
 
         double x = -999.99, y = -999.99;
         spline->GetKnot(i, x, y);
 
-        XPos[i]   = x;
-        YResp[i]  = y;
+        XPos[i]   = M3::float_t(x);
+        YResp[i]  = M3::float_t(y);
 
         Tangents[i] = 0.0;
       }
@@ -510,13 +516,13 @@ public:
         Tangents[0] = Secants[0];
         Tangents[nPoints-1] = Secants[nPoints -2];
 
-        _float_ alpha;
-        _float_ beta;
+        M3::float_t alpha;
+        M3::float_t beta;
 
         // second pass over knots to calculate tangents
         for (int i = 1; i < nPoints-1; ++i) {
           if ((Secants[i-1] >= 0.0 && Secants[i] >= 0.0) | (Secants[i-1] < 0.0 && Secants[i] < 0.0)){ //check for same sign
-            Tangents[i] = (Secants[i-1] + Secants[i]) /2.0;
+            Tangents[i] = M3::float_t((Secants[i-1] + Secants[i]) /2.0);
           }
         }
 
@@ -539,21 +545,21 @@ public:
             }
 
             if (alpha * alpha + beta * beta >9.0){
-              _float_ tau = 3.0 / sqrt(alpha * alpha + beta * beta);
+              M3::float_t tau = M3::float_t(3.0 / std::sqrt(alpha * alpha + beta * beta));
               Tangents[i]   = tau * alpha * Secants[i];
               Tangents[i+1] = tau * beta  * Secants[i];
             }
           }
         } // finished rescaling tangents
         // fourth pass over knots to calculate the coefficients for the spline
-        _float_ dx;
+        M3::float_t dx;
         for(int i = 0; i <nPoints-1; i++){
-          _float_ b, c, d = -999.999;
+          M3::float_t b, c, d = M3::float_t(-999.999);
           dx = XPos[i+1] - XPos[i];
 
           b = Tangents[i] * dx;
-          c = 3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1];
-          d = 2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]);
+          c = M3::float_t(3.0* (YResp[i+1] - YResp[i]) -2.0 *dx * Tangents[i] - dx * Tangents[i +1]);
+          d = M3::float_t(2.0* (YResp[i] - YResp[i+1]) + dx * (Tangents[i] + Tangents[i+1]));
 
           Par[i][0] = b /  dx;
           Par[i][1] = c / (dx * dx);
@@ -581,7 +587,7 @@ public:
           spline->GetCoeff(i, x, y, b, c, d);
 
           if((c == 0.0 && d == 0.0)){
-            Par[i][0] = b;
+            Par[i][0] = M3::float_t(b);
             Par[i][1] = 0.0;
             Par[i][2] = 0.0;
           }
@@ -656,7 +662,7 @@ public:
     // Get the segment for this variation
     int segment = FindX(var);
     // The get the coefficients for this variation
-    _float_ x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
+    M3::float_t x = M3::float_t(-999.99), y = M3::float_t(-999.99), b = M3::float_t(-999.99), c = M3::float_t(-999.99), d = M3::float_t(-999.99);
     GetCoeff(segment, x, y, b, c, d);
     double dx = var - x;
     // Evaluate the third order polynomial
@@ -665,15 +671,15 @@ public:
   }
 
   /// @brief CW: Get the number of points
-  inline _int_ GetNp() override { return nPoints; }
+  inline M3::int_t GetNp() override { return nPoints; }
   // Get the ith knot's x and y position
-  inline void GetKnot(int i, _float_ &xtmp, _float_ &ytmp) {
+  inline void GetKnot(int i, M3::float_t &xtmp, M3::float_t &ytmp) {
     xtmp = XPos[i];
     ytmp = YResp[i];
   }
 
   /// @brief CW: Get the coefficient of a given segment
-  inline void GetCoeff(int segment, _float_ &x, _float_ &y, _float_ &b, _float_ &c, _float_ &d) {
+  inline void GetCoeff(int segment, M3::float_t &x, M3::float_t &y, M3::float_t &b, M3::float_t &c, M3::float_t &d) {
     b = Par[segment][0];
     c = Par[segment][1];
     d = Par[segment][2];
@@ -710,13 +716,13 @@ public:
 
   protected: //changed to protected from private so can be accessed by derived classes
     /// Number of points/knot in TSpline3
-    _int_ nPoints;
+    M3::int_t nPoints;
     /// Always uses a third order polynomial, so hard-code the number of coefficients in implementation
-    _float_ **Par;
+    M3::float_t **Par;
     /// Positions of each x for each knot
-    _float_ *XPos;
+    M3::float_t *XPos;
     /// y-value for each knot
-    _float_ *YResp;
+    M3::float_t *YResp;
 };
 
 // *****************************************
@@ -725,7 +731,7 @@ public:
 inline bool isFlat(TSpline3_red* &spl) {
 // *****************************************
   int Np = spl->GetNp();
-  _float_ x, y, b, c, d;
+  M3::float_t x, y, b, c, d;
   // Go through spline segment parameters,
   // Get y values for each spline knot,
   // Every knot must evaluate to 1.0 to create a flat spline
@@ -813,3 +819,6 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
   // Now have the reduced vector
   return ReducedVector;
 }
+
+#pragma GCC diagnostic pop
+

@@ -8,9 +8,6 @@
 #include "TLegend.h"
 
 //MaCh3 includes
-#include "OscProbCalcer/OscProbCalcerBase.h"
-#include "Oscillator/OscillatorBase.h"
-
 #include "splines/splineFDBase.h"
 
 #include "covariance/covarianceXsec.h"
@@ -18,6 +15,9 @@
 
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FDMCStruct.h"
+
+//forward declare so we don't bleed NuOscillator headers
+class OscillatorBase;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFFDBase :  public samplePDFBase
@@ -30,7 +30,7 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName(){return samplename;}
+  std::string GetName() const {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -57,10 +57,10 @@ public:
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
+  virtual void setupSplines(fdmc_base *, const char *, int , int ){};
   void ReadSampleConfig();
 
-  int getNMCSamples() {return MCSamples.size();}
+  int getNMCSamples() {return int(MCSamples.size());}
 
   int getNEventsInSample(int iSample) {
     if (iSample < 0 || iSample > getNMCSamples()) {
@@ -81,8 +81,8 @@ public:
   TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!

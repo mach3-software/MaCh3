@@ -31,7 +31,7 @@
 ///
 /// @todo KS: This should really be moved to MCMC Processor
 
-std::vector <int> nominal;
+std::vector <double> nominal;
 std::vector <bool> isFlat;
 std::vector<TString> BranchNames;
 std::vector<std::string> ParamNames;
@@ -45,10 +45,10 @@ void ReadXSecFile(const std::string& inputFile)
   TFile *TempFile = new TFile(inputFile.c_str(), "open");
 
   // Get the matrix
-  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(TempFile->Get("CovarianceFolder/xsec_cov"));
+  TMatrixDSym *XSecMatrix = TempFile->Get<TMatrixDSym>("CovarianceFolder/xsec_cov");
 
   // Get the settings for the MCMC
-  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
   if (Config == nullptr) {
     MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
     TempFile->ls();
@@ -130,10 +130,11 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   canvas->SetGrid();
   canvas->SetTickx();
   canvas->SetTicky();
-  canvas->SetBottomMargin(0.1);
-  canvas->SetTopMargin(0.02);
-  canvas->SetRightMargin(0.08);
-  canvas->SetLeftMargin(0.15);
+
+  canvas->SetBottomMargin(0.1f);
+  canvas->SetTopMargin(0.02f);
+  canvas->SetRightMargin(0.08f);
+  canvas->SetLeftMargin(0.15f);
 
   gStyle->SetOptTitle(0); 
   gStyle->SetOptStat(0); 
@@ -146,7 +147,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   Chain->Add(inputFile.c_str()); 
     
   // Get the list of branches
-  TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
+  TObjArray* brlis = Chain->GetListOfBranches();
 
   // Get the number of branches
   int nBranches = brlis->GetEntries();
@@ -154,7 +155,11 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   for (int i = 0; i < nBranches; i++) 
   {
     // Get the TBranch and its name
-    TBranch* br = (TBranch*)brlis->At(i);
+    TBranch* br = static_cast<TBranch*>(brlis->At(i));
+    if(!br){
+      MACH3LOG_ERROR("Invalid branch at position {}", i);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     TString bname = br->GetName();
 
     // If we're on beam systematics
@@ -197,7 +202,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     FancyTittle.push_back(Set[2].as<std::string>());
   }
 
-  const int NSets = SetsNames.size();
+  const int NSets = int(SetsNames.size());
 
   isRelevantParam.resize(NSets);
   //Loop over sets in the config
@@ -244,7 +249,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     MACH3LOG_INFO(" Found {} params for set {}", counter, SetsNames[i]);
   }
 
-  int AllEvents = Chain->GetEntries();
+  int AllEvents = int(Chain->GetEntries());
   TH1D **hLogL = new TH1D *[NSets];
   for(int i = 0; i < NSets; i++)
   {
@@ -346,7 +351,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     hLogL[i]->SetTitle(FancyTittle[i].c_str());
     hLogL[i]->GetXaxis()->SetTitle("Step");
     hLogL[i]->GetYaxis()->SetTitle(FancyTittle[i].c_str());
-    hLogL[i]->GetYaxis()->SetTitleOffset(1.4);
+    hLogL[i]->GetYaxis()->SetTitleOffset(1.4f);
 
     hLogL[i]->Draw("");
 

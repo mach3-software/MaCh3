@@ -21,8 +21,8 @@ bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& Conf
 {
   bool weirdFile = false;
 
-  TMacro *versionHeader = (TMacro*)file->Get(ConfigName.c_str());
-  TMacro *prevVersionHeader = (TMacro*)prevFile->Get(ConfigName.c_str());
+  TMacro *versionHeader = file->Get<TMacro>(ConfigName.c_str());
+  TMacro *prevVersionHeader = prevFile->Get<TMacro>(ConfigName.c_str());
 
   // EM: compare the digest of the version header file in this file, with the previous one
   if((versionHeader == NULL) && (prevVersionHeader == NULL)){
@@ -58,12 +58,12 @@ void CopyDir(TDirectory *source) {
   //copy all objects and subdirs of directory source as a subdir of the current directory
   source->ls();
   TDirectory *savdir = gDirectory;
-  TDirectory *adir = (TDirectory*)savdir->Get(source->GetName());
+  TDirectory *adir = savdir->Get<TDirectory>(source->GetName());
   adir->cd();
   //loop on all entries of this directory
   TKey *key;
   TIter nextkey(source->GetListOfKeys());
-  while ((key = (TKey*)nextkey())) {
+  while ((key = static_cast<TKey*>(nextkey()))) {
     const char *classname = key->GetClassName();
     TClass *cl = gROOT->GetClass(classname);
     if (!cl) continue;
@@ -74,7 +74,7 @@ void CopyDir(TDirectory *source) {
       CopyDir(subdir);
       adir->cd();
     } else if (cl->InheritsFrom("TTree")) {
-      TTree *T = (TTree*)source->Get(key->GetName());
+      TTree *T = source->Get<TTree>(key->GetName());
       adir->cd();
       TTree *newT = T->CloneTree();
       newT->Write();
@@ -165,7 +165,7 @@ void CombineChain()
   outputFile->cd();
 
   // EM: write out the version and config files to the combined file
-  TMacro *MaCh3_Config = (TMacro*)prevFile->Get("MaCh3_Config");
+  TMacro *MaCh3_Config = prevFile->Get<TMacro>("MaCh3_Config");
 
   if(MaCh3_Config != NULL) MaCh3_Config->Write();
   delete MaCh3_Config;
@@ -184,8 +184,8 @@ void CombineChain()
   outputFile = new TFile(OutFileName.c_str(), "UPDATE");
 
   // Get the source directory
-  TDirectory *MaCh3EngineDir = (TDirectory*)prevFile->Get("MaCh3Engine");
-  TDirectory *CovarianceFolderDir = (TDirectory*)prevFile->Get("CovarianceFolder");
+  TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");
+  TDirectory *CovarianceFolderDir = prevFile->Get<TDirectory>("CovarianceFolder");
 
   outputFile->cd();
   CopyDir(MaCh3EngineDir);

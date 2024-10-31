@@ -10,6 +10,9 @@
 // ROOT includes
 #include "TSpline.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 namespace py = pybind11;
 
 // As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
@@ -104,30 +107,27 @@ void initSplines(py::module &m){
                         throw MaCh3Exception(__FILE__, __LINE__, "Different number of x values and y values!");
                     }
 
-                    int length = xVals.size();
+                    int length = int(xVals.size());
 
                     if (length == 1)
                     {
-                        _float_ xKnot = xVals[0];
-                        _float_ yKnot = yVals[0];
+                        M3::float_t xKnot = M3::float_t(xVals[0]);
+                        M3::float_t yKnot = M3::float_t(yVals[0]);
 
-                        std::vector<_float_ *> pars;
+                        std::vector<M3::float_t *> pars;
                         pars.resize(3);
-                        pars[0] = new _float_(0.0);
-                        pars[1] = new _float_(0.0);
-                        pars[2] = new _float_(0.0);
-
-                        return new TSpline3_red(&xKnot, &yKnot, 1, pars.data());
-
+                        pars[0] = new M3::float_t(0.0);
+                        pars[1] = new M3::float_t(0.0);
+                        pars[2] = new M3::float_t(0.0);
                         delete pars[0];
                         delete pars[1];
                         delete pars[2];
+
+                        return new TSpline3_red(&xKnot, &yKnot, 1, pars.data());
                     }
-                    else
-                    {
-                        TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
-                        return new TSpline3_red(splineTmp, interpType);
-                    }
+
+                    TSpline3 *splineTmp = new TSpline3( "spline_tmp", xVals.data(), yVals.data(), length );
+                    return new TSpline3_red(splineTmp, interpType);
                 }
             )
         )

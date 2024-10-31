@@ -8,7 +8,7 @@
 *.Plo
 lib/*
 
-build/
+build*/
 install/
 Doc/latex/
 Doc/html/

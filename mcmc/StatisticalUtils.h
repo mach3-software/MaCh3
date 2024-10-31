@@ -89,7 +89,7 @@ inline double GetBIC(const double llh, const int data, const int nPars){
     MACH3LOG_ERROR("You haven't passed number of model parameters as it is still zero");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const double BIC = nPars * logl(data) + llh;
+  const double BIC = double(nPars * logl(data) + llh);
 
   return BIC;
 }
@@ -120,9 +120,9 @@ inline void CheckBonferoniCorrectedpValue(const std::vector<std::string>& Sample
     MACH3LOG_ERROR("Size of vectors do not match");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const int NumberOfStatisticalTests = SampleNameVec.size();
+  const size_t NumberOfStatisticalTests = SampleNameVec.size();
   //KS: 0.05 or 5% is value used by T2K.
-  const double StatisticalSignificanceDown = Threshold / NumberOfStatisticalTests;
+  const double StatisticalSignificanceDown = Threshold / double(NumberOfStatisticalTests);
   const double StatisticalSignificanceUp = 1 - StatisticalSignificanceDown;
   MACH3LOG_INFO("Bonferroni-corrected statistical significance level: {:.2f}", StatisticalSignificanceDown);
 
@@ -527,7 +527,7 @@ inline double FisherCombinedPValue(const std::vector<double>& pvalues) {
     testStatistic += -2.0 * std::log(pval);
   }
   // Degrees of freedom is twice the number of p-values
-  int degreesOfFreedom = 2 * pvalues.size();
+  int degreesOfFreedom = int(2 * pvalues.size());
   double pValue = TMath::Prob(testStatistic, degreesOfFreedom);
 
   return pValue;
