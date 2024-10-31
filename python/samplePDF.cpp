@@ -2,9 +2,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include "samplePDF/samplePDFBase.h"
 #include "samplePDF/samplePDFFDBase.h"
-#include "samplePDF/FDMCStruct.h"
 
 namespace py = pybind11;
 

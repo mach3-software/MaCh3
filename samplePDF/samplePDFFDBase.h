@@ -14,7 +14,7 @@
 #include "covariance/covarianceOsc.h"
 
 #include "samplePDF/samplePDFBase.h"
-#include "samplePDF/FDMCStruct.h"
+#include "samplePDF/FarDetectorCoreInfoStruct.h"
 
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;
@@ -57,7 +57,8 @@ public:
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  virtual void setupSplines(fdmc_base *, const char *, int , int ){};
+  virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
+
   void ReadSampleConfig();
 
   int getNMCSamples() {return int(MCSamples.size());}
@@ -105,7 +106,8 @@ public:
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
   
-  splineFDBase *splineFile;
+  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
+  std::unique_ptr<splineFDBase> SplineHandler;
   //===============================================================================
   void fillSplineBins();
 
@@ -192,7 +194,7 @@ public:
 
   //===============================================================================
   //MC variables
-  std::vector<fdmc_base> MCSamples;
+  std::vector<FarDetectorCoreInfo> MCSamples;
   //===============================================================================
 
   //===============================================================================
