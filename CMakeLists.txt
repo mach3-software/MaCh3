@@ -245,6 +245,7 @@ install(EXPORT MaCh3-targets
         NAMESPACE MaCh3::
         DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
+install(DIRECTORY cmake DESTINATION ${CMAKE_BINARY_DIR})
 
 #KS: Options to print dependency graph
 DefineEnabledRequiredSwitch(MaCh3_DependancyGraph FALSE)

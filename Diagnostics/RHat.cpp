@@ -36,18 +36,18 @@ int Nchains;
 
 int nDraw;
 
-std::vector<TString> BranchNames;  
-std::vector<std::string> MCMCFile;  
+std::vector<TString> BranchNames;
+std::vector<std::string> MCMCFile;
 std::vector<bool> ValidPar;
 
 double ***Draws;
 
 double** Mean;
 double** StandardDeviation;
-    
+
 double* MeanGlobal;
 double* StandardDeviationGlobal;
-    
+
 double* BetweenChainVariance;
 double* MarginalPosteriorVariance;
 double* RHat;
@@ -58,10 +58,10 @@ double* MedianArr;
 
 double** MeanFolded;
 double** StandardDeviationFolded;
-    
+
 double* MeanGlobalFolded;
 double* StandardDeviationGlobalFolded;
-    
+
 double* BetweenChainVarianceFolded;
 double* MarginalPosteriorVarianceFolded;
 double* RHatFolded;
@@ -81,7 +81,7 @@ void CapVariable(double var, double cap);
 
 // *******************
 int main(int argc, char *argv[]) {
-// *******************    
+  // *******************
 
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 // *******************
 // Load chain and prepare toys
 void PrepareChains() {
-// *******************
+  // *******************
   auto rnd = std::make_unique<TRandom3>(0);
 
   MACH3LOG_INFO("Generating {}", Ntoys);
@@ -359,7 +359,7 @@ void PrepareChains() {
 // *******************
 // Create all arrays we are going to use later
 void InitialiseArrays() {
-// *******************
+  // *******************
 
   MACH3LOG_INFO("Initialising arrays");
   Mean = new double*[Nchains]();
@@ -420,7 +420,7 @@ void InitialiseArrays() {
 
 // *******************
 void RunDiagnostic() {
-// *******************    
+  // *******************
   CalcRhat();
   //In case in future we expand this
 }
@@ -429,18 +429,18 @@ void RunDiagnostic() {
 //KS: Based on Gelman et. al. arXiv:1903.08008v5
 // Probably most of it could be moved cleverly to MCMC Processor, keep it separate for now
 void CalcRhat() {
-// *******************
-    
+  // *******************
+
   TStopwatch clock;
   clock.Start();
 
-//KS: Start parallel region
-// If we would like to do this for thousands of chains we might consider using GPU for this
+  //KS: Start parallel region
+  // If we would like to do this for thousands of chains we might consider using GPU for this
   #ifdef MULTITHREAD
   #pragma omp parallel
   {
-  #endif
-    
+    #endif
+
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
     #endif
@@ -479,7 +479,7 @@ void CalcRhat() {
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
     #endif
-      //Calculate the standard deviation for each parameter within each considered chain
+    //Calculate the standard deviation for each parameter within each considered chain
     for (int m = 0; m < Nchains; ++m)
     {
       for (int j = 0; j < nDraw; ++j)
@@ -568,7 +568,7 @@ void CalcRhat() {
       CapVariable(EffectiveSampleSize[j], 0);
       CapVariable(EffectiveSampleSizeFolded[j], 0);
     }
-  #ifdef MULTITHREAD
+    #ifdef MULTITHREAD
   } //End parallel region
   #endif
 
@@ -576,10 +576,11 @@ void CalcRhat() {
   MACH3LOG_INFO("Finished calculating RHat, it took {:.2f}s to finish", clock.RealTime());
 }
 
+
 // *******************
 void SaveResults() {
-// *******************    
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
+  // *******************
+  #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
   std::string NameTemp = "";
   //KS: If we run over many many chains there is danger that name will be so absurdly long we run over system limit and job will be killed :(
@@ -590,7 +591,7 @@ void SaveResults() {
       std::string temp = MCMCFile[i];
 
       while (temp.find(".root") != std::string::npos) {
-          temp = temp.substr(0, temp.find(".root"));
+        temp = temp.substr(0, temp.find(".root"));
       }
 
       NameTemp = NameTemp + temp + "_";
@@ -605,20 +606,20 @@ void SaveResults() {
 
   DiagFile->cd();
 
-  auto StandardDeviationGlobalPlot = std::make_unique<TH1D>("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", 200, 0, 2);
-  auto BetweenChainVariancePlot = std::make_unique<TH1D>("BetweenChainVariancePlot", "BetweenChainVariancePlot", 200, 0, 2);
-  auto MarginalPosteriorVariancePlot = std::make_unique<TH1D>("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", 200, 0, 2);
-  auto RhatPlot = std::make_unique<TH1D>("RhatPlot", "RhatPlot", 200, 0, 2);
-  auto EffectiveSampleSizePlot = std::make_unique<TH1D>("EffectiveSampleSizePlot", "EffectiveSampleSizePlot", 400, 0, 10000);
+  TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", 200, 0, 2);
+  TH1D *BetweenChainVariancePlot = new TH1D("BetweenChainVariancePlot", "BetweenChainVariancePlot", 200, 0, 2);
+  TH1D *MarginalPosteriorVariancePlot = new TH1D("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", 200, 0, 2);
+  TH1D *RhatPlot = new TH1D("RhatPlot", "RhatPlot", 200, 0, 2);
+  TH1D *EffectiveSampleSizePlot = new TH1D("EffectiveSampleSizePlot", "EffectiveSampleSizePlot", 400, 0, 10000);
 
-  auto StandardDeviationGlobalFoldedPlot = std::make_unique<TH1D>("StandardDeviationGlobalFoldedPlot", "StandardDeviationGlobalFoldedPlot", 200, 0, 2);
-  auto BetweenChainVarianceFoldedPlot = std::make_unique<TH1D>("BetweenChainVarianceFoldedPlot", "BetweenChainVarianceFoldedPlot", 200, 0, 2);
-  auto MarginalPosteriorVarianceFoldedPlot = std::make_unique<TH1D>("MarginalPosteriorVarianceFoldedPlot", "MarginalPosteriorVarianceFoldedPlot", 200, 0, 2);
-  auto RhatFoldedPlot = std::make_unique<TH1D>("RhatFoldedPlot", "RhatFoldedPlot", 200, 0, 2);
-  auto EffectiveSampleSizeFoldedPlot = std::make_unique<TH1D>("EffectiveSampleSizeFoldedPlot", "EffectiveSampleSizeFoldedPlot", 400, 0, 10000);
+  TH1D *StandardDeviationGlobalFoldedPlot = new TH1D("StandardDeviationGlobalFoldedPlot", "StandardDeviationGlobalFoldedPlot", 200, 0, 2);
+  TH1D *BetweenChainVarianceFoldedPlot = new TH1D("BetweenChainVarianceFoldedPlot", "BetweenChainVarianceFoldedPlot", 200, 0, 2);
+  TH1D *MarginalPosteriorVarianceFoldedPlot = new TH1D("MarginalPosteriorVarianceFoldedPlot", "MarginalPosteriorVarianceFoldedPlot", 200, 0, 2);
+  TH1D *RhatFoldedPlot = new TH1D("RhatFoldedPlot", "RhatFoldedPlot", 200, 0, 2);
+  TH1D *EffectiveSampleSizeFoldedPlot = new TH1D("EffectiveSampleSizeFoldedPlot", "EffectiveSampleSizeFoldedPlot", 400, 0, 10000);
 
-  auto RhatLogPlot = std::make_unique<TH1D>("RhatLogPlot", "RhatLogPlot", 200, 0, 2);
-  auto RhatFoldedLogPlot = std::make_unique<TH1D>("RhatFoldedLogPlot", "RhatFoldedLogPlot", 200, 0, 2);
+  TH1D *RhatLogPlot = new TH1D("RhatLogPlot", "RhatLogPlot", 200, 0, 2);
+  TH1D *RhatFoldedLogPlot = new TH1D("RhatFoldedLogPlot", "RhatFoldedLogPlot", 200, 0, 2);
 
   int Criterium = 0;
   int CiteriumFolded = 0;
@@ -696,8 +697,8 @@ void SaveResults() {
   Legend->SetLineColor(0);
 
   Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
-  Legend->AddEntry(RhatPlot.get(), "Rhat Gelman 2013", "l");
-  Legend->AddEntry(RhatFoldedPlot.get(), "Rhat-Folded Gelman 2021", "l");
+  Legend->AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
+  Legend->AddEntry(RhatFoldedPlot, "Rhat-Folded Gelman 2021", "l");
 
   RhatPlot->Draw();
   RhatFoldedPlot->Draw("same");
@@ -721,8 +722,8 @@ void SaveResults() {
   Legend->SetLineColor(0);
 
   Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
-  Legend->AddEntry(RhatLogPlot.get(), "Rhat Gelman 2013", "l");
-  Legend->AddEntry(RhatFoldedLogPlot.get(), "Rhat-Folded Gelman 2021", "l");
+  Legend->AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
+  Legend->AddEntry(RhatFoldedLogPlot, "Rhat-Folded Gelman 2021", "l");
 
   RhatLogPlot->Draw();
   RhatFoldedLogPlot->Draw("same");
@@ -749,15 +750,31 @@ void SaveResults() {
   const double RMS2 = EffectiveSampleSizeFoldedPlot->GetRMS();
 
   Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
-  Legend->AddEntry(EffectiveSampleSizePlot.get(), Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
-  Legend->AddEntry(EffectiveSampleSizeFoldedPlot.get(), Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f",Mean2 ,RMS2), "l");
+  Legend->AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
+  Legend->AddEntry(EffectiveSampleSizeFoldedPlot, Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f",Mean2 ,RMS2), "l");
 
   EffectiveSampleSizePlot->Draw();
   EffectiveSampleSizeFoldedPlot->Draw("same");
   Legend->Draw("same");
   TempCanvas->Write("EffectiveSampleSize");
 
+  //Fancy memory cleaning
+  delete StandardDeviationGlobalPlot;
+  delete BetweenChainVariancePlot;
+  delete MarginalPosteriorVariancePlot;
+  delete RhatPlot;
+  delete EffectiveSampleSizePlot;
+
+  delete StandardDeviationGlobalFoldedPlot;
+  delete BetweenChainVarianceFoldedPlot;
+  delete MarginalPosteriorVarianceFoldedPlot;
+  delete RhatFoldedPlot;
+  delete EffectiveSampleSizeFoldedPlot;
+
   delete Legend;
+
+  delete RhatLogPlot;
+  delete RhatFoldedLogPlot;
 
   DiagFile->Close();
   delete DiagFile;
@@ -768,8 +785,8 @@ void SaveResults() {
 // *******************
 //KS: Pseudo destructor
 void DestroyArrays() {
-// *******************
-    
+  // *******************
+
   MACH3LOG_INFO("Killing all arrays");
   delete[] MeanGlobal;
   delete[] StandardDeviationGlobal;
@@ -810,10 +827,11 @@ void DestroyArrays() {
   delete[] StandardDeviationFolded;
 }
 
+
 // *******************
 //calculate median
 double CalcMedian(double arr[], const int size) {
-// *******************   
+  // *******************
   std::sort(arr, arr+size);
   if (size % 2 != 0)
     return arr[size/2];
@@ -824,7 +842,7 @@ double CalcMedian(double arr[], const int size) {
 // *******************
 //calculate median
 void CapVariable(double var, const double cap) {
-// *******************   
+  // *******************
 
   if(std::isnan(var) || !std::isfinite(var)) var = cap;
 }
