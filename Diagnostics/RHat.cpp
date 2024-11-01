@@ -576,7 +576,6 @@ void CalcRhat() {
   MACH3LOG_INFO("Finished calculating RHat, it took {:.2f}s to finish", clock.RealTime());
 }
 
-
 // *******************
 void SaveResults() {
 // *******************    
@@ -606,20 +605,20 @@ void SaveResults() {
 
   DiagFile->cd();
 
-  TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", 200, 0, 2);
-  TH1D *BetweenChainVariancePlot = new TH1D("BetweenChainVariancePlot", "BetweenChainVariancePlot", 200, 0, 2);
-  TH1D *MarginalPosteriorVariancePlot = new TH1D("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", 200, 0, 2);
-  TH1D *RhatPlot = new TH1D("RhatPlot", "RhatPlot", 200, 0, 2);
-  TH1D *EffectiveSampleSizePlot = new TH1D("EffectiveSampleSizePlot", "EffectiveSampleSizePlot", 400, 0, 10000);
+  auto StandardDeviationGlobalPlot = std::make_unique<TH1D>("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", 200, 0, 2);
+  auto BetweenChainVariancePlot = std::make_unique<TH1D>("BetweenChainVariancePlot", "BetweenChainVariancePlot", 200, 0, 2);
+  auto MarginalPosteriorVariancePlot = std::make_unique<TH1D>("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", 200, 0, 2);
+  auto RhatPlot = std::make_unique<TH1D>("RhatPlot", "RhatPlot", 200, 0, 2);
+  auto EffectiveSampleSizePlot = std::make_unique<TH1D>("EffectiveSampleSizePlot", "EffectiveSampleSizePlot", 400, 0, 10000);
 
-  TH1D *StandardDeviationGlobalFoldedPlot = new TH1D("StandardDeviationGlobalFoldedPlot", "StandardDeviationGlobalFoldedPlot", 200, 0, 2);
-  TH1D *BetweenChainVarianceFoldedPlot = new TH1D("BetweenChainVarianceFoldedPlot", "BetweenChainVarianceFoldedPlot", 200, 0, 2);
-  TH1D *MarginalPosteriorVarianceFoldedPlot = new TH1D("MarginalPosteriorVarianceFoldedPlot", "MarginalPosteriorVarianceFoldedPlot", 200, 0, 2);
-  TH1D *RhatFoldedPlot = new TH1D("RhatFoldedPlot", "RhatFoldedPlot", 200, 0, 2);
-  TH1D *EffectiveSampleSizeFoldedPlot = new TH1D("EffectiveSampleSizeFoldedPlot", "EffectiveSampleSizeFoldedPlot", 400, 0, 10000);
+  auto StandardDeviationGlobalFoldedPlot = std::make_unique<TH1D>("StandardDeviationGlobalFoldedPlot", "StandardDeviationGlobalFoldedPlot", 200, 0, 2);
+  auto BetweenChainVarianceFoldedPlot = std::make_unique<TH1D>("BetweenChainVarianceFoldedPlot", "BetweenChainVarianceFoldedPlot", 200, 0, 2);
+  auto MarginalPosteriorVarianceFoldedPlot = std::make_unique<TH1D>("MarginalPosteriorVarianceFoldedPlot", "MarginalPosteriorVarianceFoldedPlot", 200, 0, 2);
+  auto RhatFoldedPlot = std::make_unique<TH1D>("RhatFoldedPlot", "RhatFoldedPlot", 200, 0, 2);
+  auto EffectiveSampleSizeFoldedPlot = std::make_unique<TH1D>("EffectiveSampleSizeFoldedPlot", "EffectiveSampleSizeFoldedPlot", 400, 0, 10000);
 
-  TH1D *RhatLogPlot = new TH1D("RhatLogPlot", "RhatLogPlot", 200, 0, 2);
-  TH1D *RhatFoldedLogPlot = new TH1D("RhatFoldedLogPlot", "RhatFoldedLogPlot", 200, 0, 2);
+  auto RhatLogPlot = std::make_unique<TH1D>("RhatLogPlot", "RhatLogPlot", 200, 0, 2);
+  auto RhatFoldedLogPlot = std::make_unique<TH1D>("RhatFoldedLogPlot", "RhatFoldedLogPlot", 200, 0, 2);
 
   int Criterium = 0;
   int CiteriumFolded = 0;
@@ -674,13 +673,13 @@ void SaveResults() {
   RhatFoldedLogPlot->Write();
 
   //KS: Now we make fancy canvases, consider some function to have less copy pasting
-  TCanvas *TempCanvas = new TCanvas("Canvas", "Canvas", 1024, 1024);
+  auto TempCanvas = std::make_unique<TCanvas>("Canvas", "Canvas", 1024, 1024);
   gStyle->SetOptStat(0);
   TempCanvas->SetGridx();
   TempCanvas->SetGridy();
 
   // Random line to write useful information to TLegend
-  TLine *TempLine = new TLine(0 , 0, 0, 0);
+  auto TempLine = std::make_unique<TLine>(0, 0, 0, 0);
   TempLine->SetLineColor(kBlack);
 
   RhatPlot->GetXaxis()->SetTitle("R hat");
@@ -696,9 +695,9 @@ void SaveResults() {
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
 
-  Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
-  Legend->AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
-  Legend->AddEntry(RhatFoldedPlot, "Rhat-Folded Gelman 2021", "l");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(RhatPlot.get(), "Rhat Gelman 2013", "l");
+  Legend->AddEntry(RhatFoldedPlot.get(), "Rhat-Folded Gelman 2021", "l");
 
   RhatPlot->Draw();
   RhatFoldedPlot->Draw("same");
@@ -721,9 +720,9 @@ void SaveResults() {
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
 
-  Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
-  Legend->AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
-  Legend->AddEntry(RhatFoldedLogPlot, "Rhat-Folded Gelman 2021", "l");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(RhatLogPlot.get(), "Rhat Gelman 2013", "l");
+  Legend->AddEntry(RhatFoldedLogPlot.get(), "Rhat-Folded Gelman 2021", "l");
 
   RhatLogPlot->Draw();
   RhatFoldedLogPlot->Draw("same");
@@ -749,34 +748,16 @@ void SaveResults() {
   const double Mean2 = EffectiveSampleSizeFoldedPlot->GetMean();
   const double RMS2 = EffectiveSampleSizeFoldedPlot->GetRMS();
 
-  Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
-  Legend->AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
-  Legend->AddEntry(EffectiveSampleSizeFoldedPlot, Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f",Mean2 ,RMS2), "l");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(EffectiveSampleSizePlot.get(), Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
+  Legend->AddEntry(EffectiveSampleSizeFoldedPlot.get(), Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f",Mean2 ,RMS2), "l");
 
   EffectiveSampleSizePlot->Draw();
   EffectiveSampleSizeFoldedPlot->Draw("same");
   Legend->Draw("same");
   TempCanvas->Write("EffectiveSampleSize");
 
-  //Fancy memory cleaning
-  delete StandardDeviationGlobalPlot;
-  delete BetweenChainVariancePlot;
-  delete MarginalPosteriorVariancePlot;
-  delete RhatPlot;
-  delete EffectiveSampleSizePlot;
-
-  delete StandardDeviationGlobalFoldedPlot;
-  delete BetweenChainVarianceFoldedPlot;
-  delete MarginalPosteriorVarianceFoldedPlot;
-  delete RhatFoldedPlot;
-  delete EffectiveSampleSizeFoldedPlot;
-
   delete Legend;
-  delete TempCanvas;
-  delete TempLine;
-
-  delete RhatLogPlot;
-  delete RhatFoldedLogPlot;
 
   DiagFile->Close();
   delete DiagFile;
@@ -828,7 +809,6 @@ void DestroyArrays() {
   delete[] MeanFolded;
   delete[] StandardDeviationFolded;
 }
-
 
 // *******************
 //calculate median

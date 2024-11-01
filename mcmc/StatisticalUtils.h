@@ -12,6 +12,9 @@
 #include "samplePDF/Structs.h"
 #include "manager/manager.h"
 
+/// @file StatisticalUtils.h
+/// @brief Utility functions for statistical interpretations in MaCh3
+
 // **************************
 /// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
 /// @param BayesFactor Obtained value of Bayes factor
