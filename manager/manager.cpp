@@ -1,4 +1,5 @@
 #include "TFile.h"
+#include "TMD5.h"
 
 #include "manager/manager.h"
 
@@ -7,11 +8,22 @@ manager::manager(std::string const &filename)
     : config(YAML::LoadFile(filename)) {
 // *************************
 
+  TMD5 config_digest;
+  std::stringstream config_stream;
+  config_stream << config;
+  std::vector<UChar_t> config_bytes;
+  for(char c : config_stream.str()){
+    config_bytes.push_back(UChar_t(c));
+  }
+  config_digest.Update(config_bytes.data(), UInt_t(config_bytes.size()));
+  config_digest.Final();
+  md5 = config_digest.AsString();
+
   FileName = filename;
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
 
-  MACH3LOG_INFO("Setting config to be: {}", filename);
+  MACH3LOG_INFO("Setting config to be: {} (MD5: {})", filename, md5);
 
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);

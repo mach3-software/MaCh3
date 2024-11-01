@@ -49,6 +49,8 @@ public:
     OverrideConfig(config, std::forward<Args>(args)...);
   }
 
+  std::string md5;
+
 private:
   /// The YAML node containing the configuration data.
   YAML::Node config;
