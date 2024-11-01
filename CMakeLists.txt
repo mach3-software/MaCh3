@@ -92,7 +92,6 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
   -Wold-style-cast       # Warn for c-style casts
   -Wconversion           # Warn on type conversions that may lose data
-  # -Werror                # Treat Warnings as Errors
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
