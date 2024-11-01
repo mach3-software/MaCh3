@@ -12,6 +12,8 @@ option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 
 # Try to find CUDA
+add_library(MaCh3CompileDefinitions INTERFACE)
+
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
@@ -43,7 +45,6 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 include(MaCh3Utils)
 
 ################################## Dependencies ################################
-add_library(MaCh3CompileDefinitions INTERFACE)
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
@@ -91,7 +92,6 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
   -Wold-style-cast       # Warn for c-style casts
   -Wconversion           # Warn on type conversions that may lose data
-  -Werror                # Treat Warnings as Errors
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")

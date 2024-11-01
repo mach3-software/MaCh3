@@ -107,7 +107,7 @@ Following neutrino oscillation calculators are available:
 | Prob3++Linear    | CPU        | Beam       |            |
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 
-If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
+If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
 cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
