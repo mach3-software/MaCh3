@@ -12,6 +12,8 @@ option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 
 # Try to find CUDA
+add_library(MaCh3CompileDefinitions INTERFACE)
+
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
@@ -43,7 +45,6 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 include(MaCh3Utils)
 
 ################################## Dependencies ################################
-add_library(MaCh3CompileDefinitions INTERFACE)
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
