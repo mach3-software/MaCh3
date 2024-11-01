@@ -81,7 +81,7 @@ void CapVariable(double var, double cap);
 
 // *******************
 int main(int argc, char *argv[]) {
-  // *******************
+// *******************
 
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 // *******************
 // Load chain and prepare toys
 void PrepareChains() {
-  // *******************
+// *******************
   auto rnd = std::make_unique<TRandom3>(0);
 
   MACH3LOG_INFO("Generating {}", Ntoys);
@@ -359,7 +359,7 @@ void PrepareChains() {
 // *******************
 // Create all arrays we are going to use later
 void InitialiseArrays() {
-  // *******************
+// *******************
 
   MACH3LOG_INFO("Initialising arrays");
   Mean = new double*[Nchains]();
@@ -420,7 +420,7 @@ void InitialiseArrays() {
 
 // *******************
 void RunDiagnostic() {
-  // *******************
+// *******************
   CalcRhat();
   //In case in future we expand this
 }
@@ -429,7 +429,7 @@ void RunDiagnostic() {
 //KS: Based on Gelman et. al. arXiv:1903.08008v5
 // Probably most of it could be moved cleverly to MCMC Processor, keep it separate for now
 void CalcRhat() {
-  // *******************
+// *******************
 
   TStopwatch clock;
   clock.Start();
@@ -579,7 +579,7 @@ void CalcRhat() {
 
 // *******************
 void SaveResults() {
-  // *******************
+// *******************
   #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
   std::string NameTemp = "";
@@ -785,7 +785,7 @@ void SaveResults() {
 // *******************
 //KS: Pseudo destructor
 void DestroyArrays() {
-  // *******************
+// *******************
 
   MACH3LOG_INFO("Killing all arrays");
   delete[] MeanGlobal;
@@ -831,7 +831,7 @@ void DestroyArrays() {
 // *******************
 //calculate median
 double CalcMedian(double arr[], const int size) {
-  // *******************
+// *******************
   std::sort(arr, arr+size);
   if (size % 2 != 0)
     return arr[size/2];
@@ -842,7 +842,7 @@ double CalcMedian(double arr[], const int size) {
 // *******************
 //calculate median
 void CapVariable(double var, const double cap) {
-  // *******************
+// *******************
 
   if(std::isnan(var) || !std::isfinite(var)) var = cap;
 }
