@@ -114,7 +114,7 @@ N.B. that clang also understands these directives, so don't panic that they have
 
 This will disable that diagnostic for the rest of the compilation unit (usually a .cc file). Note that this means if you include these in headerfiles, they will disable diagnostics more widely, please try and disable the diagnostics over as little code as possible.
 
-If a specific error is really getting you down and its showing up everywhere, the nuclear option is to disable it repo-wide by modifying the `MaCh3Warnings` interface target, defined in the top-level project [CMakeLists.txt](../CMakeLists.txt) like so:
+If a specific error is really getting you down and its showing up everywhere, the serious option is to disable it repo-wide by modifying the `MaCh3Warnings` interface target, defined in the top-level project [CMakeLists.txt](../CMakeLists.txt) like so:
 
 ```cmake
 target_compile_options(MaCh3Warnings INTERFACE
@@ -125,6 +125,8 @@ target_compile_options(MaCh3Warnings INTERFACE
 ```
 
 Please attempt more localised options before reaching for this, but sometimes this represents the best way to proceed with development without 'fixing' innocuous warnings.
+
+The really serious option is to configure with: `-DMaCh3_WERROR_ENABLED=OFF`, which will disable the `-Werror` flag.
 
 ### An example
 

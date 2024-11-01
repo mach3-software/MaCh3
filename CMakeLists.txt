@@ -9,6 +9,7 @@ set(MaCh3_VERSION ${PROJECT_VERSION})
 #LP - This option name is confusing, but I wont change it now.
 option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
+option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 
 # Try to find CUDA
 find_package(CUDAToolkit QUIET)
@@ -75,22 +76,22 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # KS: Compile and link options for more see https://github.com/cpp-best-practices/cppbestpractices/tree/master
 add_library(MaCh3Warnings INTERFACE)
 target_compile_options(MaCh3Warnings INTERFACE
-    -Wextra                 # Enable extra warning flags
-    -Wall                   # Enable all standard warning flags
-    -Wshadow                # Warn when a variable declaration shadows one from an outer scope
-    -Wuninitialized         # Warn about uninitialized variables
-    -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
-    -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
-    -Wformat=2              # Warn on security issues around functions that format output (ie printf)
-    -Wunused                # Warn on anything being unused
-    -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
-    -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
-    -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
-    # -Wpadded               # Warn when padding is added to a structure or class for alignment
-    -Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
-    -Wold-style-cast       # Warn for c-style casts
-    -Wconversion           # Warn on type conversions that may lose data
-    -Werror                # Treat Warnings as Errors
+  -Wextra                 # Enable extra warning flags
+  -Wall                   # Enable all standard warning flags
+  -Wshadow                # Warn when a variable declaration shadows one from an outer scope
+  -Wuninitialized         # Warn about uninitialized variables
+  -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
+  -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
+  -Wformat=2              # Warn on security issues around functions that format output (ie printf)
+  -Wunused                # Warn on anything being unused
+  -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
+  -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
+  -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+  # -Wpadded               # Warn when padding is added to a structure or class for alignment
+  -Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
+  -Wold-style-cast       # Warn for c-style casts
+  -Wconversion           # Warn on type conversions that may lose data
+  -Werror                # Treat Warnings as Errors
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -99,6 +100,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
   )
+endif()
+if(MaCh3_WERROR_ENABLED)
+target_compile_options(MaCh3Warnings INTERFACE
+  -Werror                # Treat Warnings as Errors
+)
 endif()
 
 add_library(MaCh3CompilerOptions INTERFACE)
