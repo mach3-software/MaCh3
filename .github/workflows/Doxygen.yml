@@ -87,9 +87,9 @@ jobs:
           path: to-upload/
 
       ## EM: Now we delete the artifact so it doesn't use up our allowance
-      - uses: geekyeggo/delete-artifact@v5
-        with:
-          name: DoxygenHTML
+      #- uses: geekyeggo/delete-artifact@v5
+      #  with:
+      #    name: DoxygenHTML
           
       - name: Build MaCh3
         run: | 
