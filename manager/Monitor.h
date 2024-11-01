@@ -20,6 +20,9 @@
 #include "manager/MaCh3Exception.h"
 #include "manager/YamlHelper.h"
 
+/// @file Monitor.h
+/// @brief System and monitoring utilities for printing system information and status updates.
+
 namespace MaCh3Utils {
   /// @brief KS: Prints welcome message with MaCh3 logo
   void MaCh3Welcome();

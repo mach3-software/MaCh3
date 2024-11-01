@@ -13,6 +13,9 @@
 // yaml Includes
 #include "yaml-cpp/yaml.h"
 
+/// @file YamlHelper.h
+/// @brief Utility functions for handling YAML nodes
+
 // **********************
 /// @brief Get content of config file if node is not found take default value specified
 /// @param node Yaml node

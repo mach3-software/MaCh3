@@ -110,7 +110,7 @@ void ReadXSecFile(const std::string& inputFile)
     }
   }
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for (int i = 0; i < size; i++)
   {
@@ -126,7 +126,7 @@ void ReadXSecFile(const std::string& inputFile)
 
 void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 {
-  TCanvas* canvas = new TCanvas("canvas", "canvas", 0, 0, 1024, 1024);
+  auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
   canvas->SetGrid();
   canvas->SetTickx();
   canvas->SetTicky();
@@ -173,7 +173,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
   
-  double* fParProp = new double[RelevantBranches];
+  std::vector<double> fParProp(RelevantBranches);
   // Turn on the branches which we want for parameters
   for (int i = 0; i < RelevantBranches; ++i) 
   {
@@ -250,14 +250,13 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   }
 
   int AllEvents = int(Chain->GetEntries());
-  TH1D **hLogL = new TH1D *[NSets];
-  for(int i = 0; i < NSets; i++)
-  {
+  std::vector<std::unique_ptr<TH1D>> hLogL(NSets);
+  for (int i = 0; i < NSets; i++) {
     std::string NameTemp = "LogL_" + SetsNames[i];
-    hLogL[i] = new TH1D(NameTemp.c_str(), NameTemp.c_str(), AllEvents, 0 , AllEvents);
+    hLogL[i] = std::make_unique<TH1D>(NameTemp.c_str(), NameTemp.c_str(), AllEvents, 0, AllEvents);
     hLogL[i]->SetLineColor(kBlue);
   }
-  double* logL = new double[NSets]();
+  std::vector<double> logL(NSets, 0.0);
   for(int n = 0; n < AllEvents; ++n)
   {
     if(n%10000 == 0) MaCh3Utils::PrintProgressBar(n, AllEvents);
@@ -337,7 +336,6 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     }
   }//End loop over steps
 
-  delete[] logL;
   // Directory for posteriors
   std::string OutputName = inputFile + "_PenaltyTerm" +".root";
   TFile* OutputFile = new TFile(OutputName.c_str(), "recreate");
@@ -359,13 +357,9 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     hLogL[i]->Write();
 
     canvas->Print(Form("%s_PenaltyTerm.pdf",inputFile.c_str()), "pdf");
-    delete hLogL[i];
   }
   canvas->Print(Form("%s_PenaltyTerm.pdf]",inputFile.c_str()), "pdf");
-  delete[] hLogL;
-  delete[] fParProp;
   delete Chain;
-  delete canvas;
 
   for (int i = 0; i < size; i++)
   {
