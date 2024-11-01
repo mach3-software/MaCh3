@@ -1,12 +1,16 @@
 #pragma once
 
+
 // C i/o  for printf and others
 #include <stdio.h>
 #include <vector>
 
 // CUDA specifics
-
+// Because CUDA is cuda, need to make sure we don't check C-style floats...
+#pragma GCC diagnostic push
+#pragma GCC diagnostics ignored "-Wold-style-cast"
 #include <cuda_runtime.h>
+#pragma GCC diagnostic pop
 
 #ifdef CUDA_ERROR_CHECK
 #include <helper_functions.h>

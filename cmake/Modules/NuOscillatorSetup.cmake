@@ -12,8 +12,8 @@ if (NOT CUDAProb3Linear_ENABLED AND
     NOT CUDAProb3_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
     NOT Prob3ppLinear_ENABLED AND
-    NOT NuFastLinear_ENABLED)
-    set(CUDAProb3Linear_ENABLED TRUE)
+    NOT CUDAProb3Linear_ENABLED)
+    set(NuFastLinear_ENABLED TRUE)
 endif()
 
 #KS: Save which oscillators are being used
