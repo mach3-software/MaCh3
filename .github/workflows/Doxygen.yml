@@ -60,7 +60,7 @@ jobs:
         with:
           retention-days: 1
           name: DoxygenHTML
-          path: Doc/html/*
+          path: Doc/html
 
   Sphinx:
     # The type of runner that the job will run on

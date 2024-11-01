@@ -4,6 +4,8 @@
 
 build*/
 install/
+Doc/html
+Doc/latex
 
 # Ignore emacs/vim stuff
 *#* 
