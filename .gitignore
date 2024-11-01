@@ -2,16 +2,8 @@
 *.o
 *.sif
 
-#ignore some stuff in libconfig
-*.lo
-*.la
-*.Plo
-lib/*
-
 build*/
 install/
-Doc/latex/
-Doc/html/
 
 # Ignore emacs/vim stuff
 *#* 
