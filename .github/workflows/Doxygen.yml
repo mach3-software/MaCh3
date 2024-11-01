@@ -48,12 +48,14 @@ jobs:
       - run: sudo apt-get install -y perl
 
       # Runs a single command using the runners shell
-      - uses: DenverCoder1/doxygen-github-pages-action@v1.3.0
+      - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           folder: Doc/html
           config_file: Doc/Doxyfile
 
+
+      - run: ls -R Doc/html
 
       - name: Upload Doxygen Artifact
         uses: actions/upload-artifact@v4
@@ -87,9 +89,9 @@ jobs:
           path: to-upload/
 
       ## EM: Now we delete the artifact so it doesn't use up our allowance
-      #- uses: geekyeggo/delete-artifact@v5
-      #  with:
-      #    name: DoxygenHTML
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: DoxygenHTML
           
       - name: Build MaCh3
         run: | 
