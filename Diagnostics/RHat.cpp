@@ -439,7 +439,7 @@ void CalcRhat() {
   #ifdef MULTITHREAD
   #pragma omp parallel
   {
-    #endif
+  #endif
 
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
@@ -568,7 +568,7 @@ void CalcRhat() {
       CapVariable(EffectiveSampleSize[j], 0);
       CapVariable(EffectiveSampleSizeFolded[j], 0);
     }
-    #ifdef MULTITHREAD
+  #ifdef MULTITHREAD
   } //End parallel region
   #endif
 
@@ -827,7 +827,6 @@ void DestroyArrays() {
   delete[] StandardDeviationFolded;
 }
 
-
 // *******************
 //calculate median
 double CalcMedian(double arr[], const int size) {
@@ -838,11 +837,9 @@ double CalcMedian(double arr[], const int size) {
   return (arr[(size-1)/2] + arr[size/2])/2.0;
 }
 
-
 // *******************
 //calculate median
 void CapVariable(double var, const double cap) {
 // *******************
-
   if(std::isnan(var) || !std::isfinite(var)) var = cap;
 }
