@@ -58,28 +58,34 @@ covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& PreFi
 /// @param SampleConfig Path to sample config.
 /// @param xsec A pointer to a covarianceXsec object for cross-section systematic settings.
 /// @param osc (Optional) A pointer to a covarianceOsc object for oscillation systematic settings.
-/// @return A pointer to the created SampleType object, initialized and ready for use.
+/// @return Vector of SampleType object, initialized and ready for use.
 ///
 /// @example
 /// ```cpp
-/// samplePDFTutorial* mySample = MaCh3SamplePDFFactory<samplePDFTutorial>(SampleConfig, xsec, osc);
+/// auto mySamples = MaCh3SamplePDFFactory<samplePDFTutorial>(SampleConfig, xsec, osc);
 /// ```
 template <typename SampleType>
-SampleType* MaCh3SamplePDFFactory(const std::string& SampleConfig, covarianceXsec* xsec, covarianceOsc* osc = nullptr)
+std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& SampleConfig,
+                                               covarianceXsec* xsec,
+                                               covarianceOsc* osc = nullptr)
 {
-  // Instantiate the sample using the specified class type
-  SampleType* Sample = new SampleType(SampleConfig[0], xsec);
-  Sample->SetXsecCov(xsec);
-  if (osc != nullptr) Sample->SetOscCov(osc);
-  Sample->reweight();
+  std::vector<SampleType*> PDFs(SampleConfig.size());
+  for (size_t i = 0; i < SampleConfig.size(); ++i)
+  {
+    // Instantiate the sample using the specified class type
+    SampleType* Sample = new SampleType(SampleConfig[0], xsec);
+    Sample->SetXsecCov(xsec);
+    if (osc != nullptr) Sample->SetOscCov(osc);
+    Sample->reweight();
 
-  // Obtain sample name and create a TString version for histogram naming
-  std::string name = Sample->GetName();
-  TString NameTString = TString(name.c_str());
+    // Obtain sample name and create a TString version for histogram naming
+    std::string name = Sample->GetName();
+    TString NameTString = TString(name.c_str());
 
-  // Clone the 1D histogram with a modified name
-  TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->get1DHist()->Clone(NameTString + "_Prior"));
-  Sample->addData(SampleHistogramPrior);
-
-  return Sample;
+    // Clone the 1D histogram with a modified name
+    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->get1DHist()->Clone(NameTString + "_Prior"));
+    Sample->addData(SampleHistogramPrior);
+    PDFs[i] = Sample;
+  }
+  return PDFs;
 }
