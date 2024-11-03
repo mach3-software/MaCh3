@@ -7,10 +7,8 @@
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
 
-#ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
-#define _LARGE_LOGL_ 1234567890.0
-#endif
+constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -98,7 +96,7 @@ class covarianceBase {
   /// @brief Check if parameters were proposed outside physical boundary
   virtual int CheckBounds();
   /// @brief Calc penalty term based on inverted covariance matrix
-  double CalcLikelihood();
+  double CalcLikelihood() _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
 
@@ -336,9 +334,9 @@ class covarianceBase {
   /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
   /// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
   /// @param n this is size of matrix and vector, we assume matrix is symmetric
-  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n);
+  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const;
   /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
-  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
+  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const;
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }

@@ -311,8 +311,6 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
   MACH3LOG_INFO("----------------");
-
-  return;
 }
 
 // ********************************************
@@ -797,7 +795,7 @@ void covarianceBase::printNominalCurrProp() {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::CalcLikelihood() {
+double covarianceBase::CalcLikelihood() _noexcept_ {
 // ********************************************
   double logL = 0.0;
   #ifdef MULTITHREAD
@@ -854,7 +852,6 @@ void covarianceBase::printPars() {
   for(int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("{:s} current: \t{:.5f}   \tproposed: \t{:.5f}", _fNames[i], _fCurrVal[i], _fPropVal[i]);
   }
-  return;
 }
 
 // ********************************************
@@ -889,7 +886,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
     TransferToPCA();
     TransferToParam();
   }
-  return;
 }
 
 // ********************************************
@@ -945,7 +941,6 @@ void covarianceBase::toggleFixAllParameters() {
   } else{
      for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
   }
-  return;
 }
 
 // ********************************************
@@ -973,7 +968,6 @@ void covarianceBase::toggleFixParameter(const int i) {
       MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
     }
   }
-  return;
 }
 
 // ********************************************
@@ -1021,7 +1015,7 @@ void covarianceBase::setFlatPrior(const int i, const bool eL) {
 
 // ********************************************
 //KS: Custom function to perform multiplication of matrix and vector with multithreading
-void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) {
+void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const {
 // ********************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -1041,9 +1035,8 @@ void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _re
 }
 
 // ********************************************
-double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) {
+double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const {
 // ********************************************
-
   double Element = 0.0;
   #ifdef MULTITHREAD
   #pragma omp simd
@@ -1068,10 +1061,7 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
   for (int iParam = 0 ; iParam < _fNumPar; iParam++) {
     _fIndivStepScale[iParam] = stepscale[iParam];
   }
-
   printIndivStepScale();
-
-  return;
 }
 
 // ********************************************
@@ -1129,8 +1119,6 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   }
   //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
-
-  return;
 }
 
 // ********************************************
@@ -1313,7 +1301,7 @@ std::vector<double> covarianceBase::getNominalArray() {
   {
     nominal[i] = _fPreFitValue[i];
   }
- return nominal;
+  return nominal;
 }
 
 // ********************************************
