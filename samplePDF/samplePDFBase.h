@@ -75,12 +75,12 @@ class samplePDFBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
-  double getTestStatLLH(double data, double mc);
+  double getTestStatLLH(double data, double mc) const;
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-  double getTestStatLLH(const double data, const double mc, const double w2);
+  double getTestStatLLH(const double data, const double mc, const double w2) const;
   /// @brief Set the test statistic to be used when calculating the binned likelihoods 
   /// @param testStat The test statistic to use.
   inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }

@@ -458,10 +458,10 @@ TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH
 }
 
 // ****************
-//DB Get the Cernekov momentum threshold in MeV
+//DB Get the Cherenkov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {
 // ****************
-  double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
+  constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
@@ -471,7 +471,7 @@ double returnCherenkovThresholdMomentum(int PDG) {
 // Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
-  const double MLep = 0.10565837;
+  constexpr double MLep = 0.10565837;
 
   // Caluclate muon energy
   double ELep = sqrt((MLep*MLep)+(PLep*PLep));

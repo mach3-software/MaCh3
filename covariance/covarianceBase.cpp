@@ -60,9 +60,6 @@ covarianceBase::~covarianceBase(){
   delete[] InvertCovMatrix;
   delete[] throwMatrixCholDecomp;
   
-  const int nThreads = MaCh3Utils::GetNThreads();
-  for (int iThread = 0;iThread < nThreads; iThread++) delete random_number[iThread];
-  delete[] random_number;
   if (throwMatrix != nullptr) delete throwMatrix;
 }
 
@@ -130,9 +127,9 @@ void covarianceBase::init(std::string name, std::string file) {
   const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
+  random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
   // Not using adaptive by default
   use_adaptive = false;
@@ -191,9 +188,9 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
+  random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
   PrintLength = 35;
 
@@ -311,8 +308,6 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
   MACH3LOG_INFO("----------------");
-
-  return;
 }
 
 // ********************************************
@@ -592,7 +587,7 @@ void covarianceBase::proposeStep() {
 // "Randomize" the parameters in the covariance class for the proposed step
 // Used the proposal kernel and the current parameter value to set proposed step
 // Also get a new random number for the randParams
-void covarianceBase::randomize() {
+void covarianceBase::randomize() _noexcept_ {
 // ************************************************
   if (!pca) {
 //KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit      
@@ -636,7 +631,7 @@ void covarianceBase::randomize() {
 
 // ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
-void covarianceBase::CorrelateSteps() {
+void covarianceBase::CorrelateSteps() _noexcept_ {
 // ************************************************
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
   MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
@@ -684,7 +679,7 @@ void covarianceBase::CorrelateSteps() {
 }
 // ********************************************
 // Update so that current step becomes the previously proposed step
-void covarianceBase::acceptStep() {
+void covarianceBase::acceptStep() _noexcept_ {
 // ********************************************
   if (!pca) {
     #ifdef MULTITHREAD
@@ -797,7 +792,7 @@ void covarianceBase::printNominalCurrProp() {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::CalcLikelihood() {
+double covarianceBase::CalcLikelihood() _noexcept_ {
 // ********************************************
   double logL = 0.0;
   #ifdef MULTITHREAD
@@ -854,7 +849,6 @@ void covarianceBase::printPars() {
   for(int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("{:s} current: \t{:.5f}   \tproposed: \t{:.5f}", _fNames[i], _fCurrVal[i], _fPropVal[i]);
   }
-  return;
 }
 
 // ********************************************
@@ -889,7 +883,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
     TransferToPCA();
     TransferToParam();
   }
-  return;
 }
 
 // ********************************************
@@ -945,7 +938,6 @@ void covarianceBase::toggleFixAllParameters() {
   } else{
      for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
   }
-  return;
 }
 
 // ********************************************
@@ -973,7 +965,6 @@ void covarianceBase::toggleFixParameter(const int i) {
       MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
     }
   }
-  return;
 }
 
 // ********************************************
@@ -1021,7 +1012,7 @@ void covarianceBase::setFlatPrior(const int i, const bool eL) {
 
 // ********************************************
 //KS: Custom function to perform multiplication of matrix and vector with multithreading
-void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) {
+void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const {
 // ********************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -1041,9 +1032,8 @@ void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _re
 }
 
 // ********************************************
-double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) {
+double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const {
 // ********************************************
-
   double Element = 0.0;
   #ifdef MULTITHREAD
   #pragma omp simd
@@ -1068,10 +1058,7 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
   for (int iParam = 0 ; iParam < _fNumPar; iParam++) {
     _fIndivStepScale[iParam] = stepscale[iParam];
   }
-
   printIndivStepScale();
-
-  return;
 }
 
 // ********************************************
@@ -1129,8 +1116,6 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   }
   //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
-
-  return;
 }
 
 // ********************************************
@@ -1313,7 +1298,7 @@ std::vector<double> covarianceBase::getNominalArray() {
   {
     nominal[i] = _fPreFitValue[i];
   }
- return nominal;
+  return nominal;
 }
 
 // ********************************************

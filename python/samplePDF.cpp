@@ -252,7 +252,7 @@ void initSamplePDF(py::module &m){
 
         .def(
             "get_bin_LLH",
-            py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH),
+            py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH, py::const_),
             "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
             :param data: The data content of the bin. \n\
             :param mc: The mc content of the bin \n\

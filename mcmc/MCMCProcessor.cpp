@@ -2709,7 +2709,6 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
   Prior = ParamCentral[ParType][ParamNo];
   PriorError = ParamErrors[ParType][ParamNo];
   Title = ParamNames[ParType][ParamNo];
-  return;
 }
 
 // ***************
@@ -2887,7 +2886,6 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
     MACH3LOG_INFO("Following Dunne-Kaboth Scale = ", DunneKabothScale);
     std::cout<<std::endl;
   }
-  return;
 }
 
 // **************************
