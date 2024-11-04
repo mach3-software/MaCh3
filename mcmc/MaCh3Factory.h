@@ -60,7 +60,7 @@ covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& PreFi
 /// @param osc (Optional) A pointer to a covarianceOsc object for oscillation systematic settings.
 /// @return Vector of SampleType object, initialized and ready for use.
 ///
-/// @example
+/// @note Example
 /// ```cpp
 /// auto mySamples = MaCh3SamplePDFFactory<samplePDFTutorial>(SampleConfig, xsec, osc);
 /// ```
