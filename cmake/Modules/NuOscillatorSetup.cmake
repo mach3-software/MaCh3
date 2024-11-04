@@ -12,7 +12,7 @@ if (NOT CUDAProb3Linear_ENABLED AND
     NOT CUDAProb3_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
     NOT Prob3ppLinear_ENABLED AND
-    NOT CUDAProb3Linear_ENABLED)
+    NOT NuFastLinear_ENABLED)
     set(NuFastLinear_ENABLED TRUE)
 endif()
 
