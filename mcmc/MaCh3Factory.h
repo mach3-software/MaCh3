@@ -73,7 +73,7 @@ std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& S
   for (size_t i = 0; i < SampleConfig.size(); ++i)
   {
     // Instantiate the sample using the specified class type
-    SampleType* Sample = new SampleType(SampleConfig[0], xsec);
+    SampleType* Sample = new SampleType(SampleConfig[i], xsec);
     Sample->SetXsecCov(xsec);
     if (osc != nullptr) Sample->SetOscCov(osc);
     Sample->reweight();
