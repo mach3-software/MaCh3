@@ -301,7 +301,7 @@ class covarianceBase {
   /// @brief Generate a new proposed state
   virtual void proposeStep();
   /// @brief Accepted this step
-  void acceptStep();
+  void acceptStep() _noexcept_;
 
   /// @brief fix parameters at prior values
   void toggleFixAllParameters();
@@ -353,9 +353,9 @@ protected:
   void ReserveMemory(const int size);
 
   /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
-  void randomize();
+  void randomize() _noexcept_;
   /// @brief Use Cholesky throw matrix for better step proposal
-  void CorrelateSteps();
+  void CorrelateSteps() _noexcept_;
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   /// @param cov Matrix which we evaluate Positive Definitiveness

@@ -420,8 +420,6 @@ inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double
   {
     if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hist->GetBinContent(i));
   }
-
-  return;
 }
 
 // ***************
@@ -476,8 +474,6 @@ inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827
     Contour[0] = max_entries;
   }
   hist2D->SetContour(1, Contour);
-
-  return;
 }
 
 // *********************

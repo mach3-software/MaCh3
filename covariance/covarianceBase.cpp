@@ -590,7 +590,7 @@ void covarianceBase::proposeStep() {
 // "Randomize" the parameters in the covariance class for the proposed step
 // Used the proposal kernel and the current parameter value to set proposed step
 // Also get a new random number for the randParams
-void covarianceBase::randomize() {
+void covarianceBase::randomize() _noexcept_ {
 // ************************************************
   if (!pca) {
 //KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit      
@@ -634,7 +634,7 @@ void covarianceBase::randomize() {
 
 // ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
-void covarianceBase::CorrelateSteps() {
+void covarianceBase::CorrelateSteps() _noexcept_ {
 // ************************************************
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
   MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
@@ -682,7 +682,7 @@ void covarianceBase::CorrelateSteps() {
 }
 // ********************************************
 // Update so that current step becomes the previously proposed step
-void covarianceBase::acceptStep() {
+void covarianceBase::acceptStep() _noexcept_ {
 // ********************************************
   if (!pca) {
     #ifdef MULTITHREAD

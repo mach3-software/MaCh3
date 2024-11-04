@@ -200,7 +200,7 @@ double samplePDFBase::getEventRate()
 
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double samplePDFBase::getTestStatLLH(const double data, const double mc) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Need some MC
   if(mc == 0) return 0.;
@@ -218,7 +218,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) {
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
 
   // Need some MC
