@@ -60,9 +60,6 @@ covarianceBase::~covarianceBase(){
   delete[] InvertCovMatrix;
   delete[] throwMatrixCholDecomp;
   
-  const int nThreads = MaCh3Utils::GetNThreads();
-  for (int iThread = 0;iThread < nThreads; iThread++) delete random_number[iThread];
-  delete[] random_number;
   if (throwMatrix != nullptr) delete throwMatrix;
 }
 
@@ -130,9 +127,9 @@ void covarianceBase::init(std::string name, std::string file) {
   const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
+  random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
   // Not using adaptive by default
   use_adaptive = false;
@@ -191,9 +188,9 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
+  random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
   PrintLength = 35;
 

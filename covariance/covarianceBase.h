@@ -394,7 +394,7 @@ protected:
   double **InvertCovMatrix;
     
   /// KS: Set Random numbers for each thread so each thread has different seed
-  TRandom3 **random_number;
+  std::vector<std::unique_ptr<TRandom3>> random_number;
 
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
