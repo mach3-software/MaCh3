@@ -3156,8 +3156,10 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
     const int IntervalsSize = nSteps/NIntervals[k];
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
-    system(fmt::format("rm {}.gif",Names[k]).c_str());
-
+    int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
+    if (ret != 0){
+      MACH3LOG_WARN("Error: system call to delete {} failed with code {}", Names[k], ret);
+    }
     // This holds the posterior density
     const double maxi = Chain->GetMaximum(BranchNames[ParamNo]);
     const double mini = Chain->GetMinimum(BranchNames[ParamNo]);
