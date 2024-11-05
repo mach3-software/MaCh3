@@ -301,7 +301,7 @@ void PrepareChains() {
 
       // Output some info for the user
       if (Ntoys > 10 && i % (Ntoys/10) == 0) {
-        MaCh3Utils::PrintProgressBar(i+m*Ntoys, Ntoys*Nchains);
+        MaCh3Utils::PrintProgressBar(i+m*Ntoys, static_cast<Long64_t>(Ntoys)*Nchains);
         MACH3LOG_DEBUG("Getting random entry {}", entry);
       }
 
