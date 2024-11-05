@@ -327,7 +327,7 @@ void PrepareChains() {
   for(int j = 0; j < nDraw; j++)
   {
     MedianArr[j] = 0.;
-    std::vector<double> TempDraws(Ntoys * Nchains);
+    std::vector<double> TempDraws(static_cast<size_t>(Ntoys) * Nchains);
     for(int m = 0; m < Nchains; m++)
     {
       for(int i = 0; i < Ntoys; i++)
