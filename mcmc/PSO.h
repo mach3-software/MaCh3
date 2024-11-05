@@ -98,7 +98,10 @@ class PSO : public LikelihoodFit {
     double swarmIterate();
 
     std::vector<double> vector_multiply(std::vector<double> velocity, double mul){
-      transform(velocity.begin(),velocity.end(),velocity.begin(),std::bind1st(std::multiplies<double>(),mul));
+      // std::bind1st deprecated since C++11, removed in c++17
+      // transform(velocity.begin(),velocity.end(),velocity.begin(),std::bind1st(std::multiplies<double>(),mul));
+      std::transform(velocity.begin(), velocity.end(), velocity.begin(),
+                      std::bind(std::multiplies<double>(), mul, std::placeholders::_1));
       return velocity;
     };
 
