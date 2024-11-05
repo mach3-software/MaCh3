@@ -27,10 +27,17 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=${latest_tag}" >> "$GITHUB_ENV"
 
-      - name: Get the current date
+      - name: Get the most active author in the last week for MaCh3
         run: |
-          current_date=$(date +"%d/%m/%Y")
-          echo "current_date=${current_date}" >> "$GITHUB_ENV"
+          most_active_author=$(git log --since='1 week ago' --pretty=format:"%an" | sort | uniq -c | sort -nr | head -n 1)
+          echo "most_active_author=${most_active_author}" >> "$GITHUB_ENV"
+
+      - name: Get the author with most commits (count and name)
+        run: |
+          COUNT=$(echo $most_active_author | awk '{print $1}')
+          NAME=$(echo $most_active_author | cut -d ' ' -f2-)
+          echo "maCh3_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
+          echo "maCh3_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
       - name: Checkout the MaCh3Tutorial repository
         uses: actions/checkout@v4
@@ -52,6 +59,18 @@ jobs:
           tutorial_latest_tag=$(git -C MaCh3Tutorial describe --tags --abbrev=0)
           echo "tutorial_latest_tag=${tutorial_latest_tag}" >> "$GITHUB_ENV"
 
+      - name: Get the most active author in the last week for MaCh3Tutorial
+        run: |
+          most_active_author=$(git -C MaCh3Tutorial log --since='1 week ago' --pretty=format:"%an" | sort | uniq -c | sort -nr | head -n 1)
+          echo "tutorial_most_active_author=${most_active_author}" >> "$GITHUB_ENV"
+
+      - name: Get the author with most commits for MaCh3Tutorial (count and name)
+        run: |
+          COUNT=$(echo $tutorial_most_active_author | awk '{print $1}')
+          NAME=$(echo $tutorial_most_active_author | cut -d ' ' -f2-)
+          echo "maCh3Tutorial_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
+          echo "maCh3Tutorial_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
+
       - name: Checkout the MaCh3-PythonUtils repository
         uses: actions/checkout@v4
         with:
@@ -72,6 +91,18 @@ jobs:
           python_utils_latest_tag=$(git -C MaCh3-PythonUtils describe --tags --abbrev=0)
           echo "python_utils_latest_tag=${python_utils_latest_tag}" >> "$GITHUB_ENV"
 
+      - name: Get the most active author in the last week for MaCh3-PythonUtils
+        run: |
+          most_active_author=$(git -C MaCh3-PythonUtils log --since='1 week ago' --pretty=format:"%an" | sort | uniq -c | sort -nr | head -n 1)
+          echo "python_utils_most_active_author=${most_active_author}" >> "$GITHUB_ENV"
+
+      - name: Get the author with most commits for MaCh3-PythonUtils (count and name)
+        run: |
+          COUNT=$(echo $python_utils_most_active_author | awk '{print $1}')
+          NAME=$(echo $python_utils_most_active_author | cut -d ' ' -f2-)
+          echo "maCh3PythonUtils_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
+          echo "maCh3PythonUtils_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
+
       - name: Create a new GitHub Discussion
         uses: abirismyname/create-discussion@v1.x
         env:
@@ -87,18 +118,21 @@ jobs:
             - Total number of commits: ${{ env.commit_count }}
             - Total number of commits in the last week: ${{ env.commits_last_week }}
             - Most recent tag: ${{ env.latest_tag }}
+            - Most active author in the last week: ${{ env.maCh3_most_active_author_name }} (Commits: ${{ env.maCh3_most_active_author_count }})
 
             **MaCh3Tutorial Repository**
             - Total number of commits: ${{ env.tutorial_commit_count }}
             - Total number of commits in the last week: ${{ env.tutorial_commits_last_week }}
             - Most recent tag: ${{ env.tutorial_latest_tag }}
+            - Most active author in the last week: ${{ env.maCh3Tutorial_most_active_author_name }} (Commits: ${{ env.maCh3Tutorial_most_active_author_count }})
 
             **MaCh3-PythonUtils Repository**
             - Total number of commits: ${{ env.python_utils_commit_count }}
             - Total number of commits in the last week: ${{ env.python_utils_commits_last_week }}
             - Most recent tag: ${{ env.python_utils_latest_tag }}
+            - Most active author in the last week: ${{ env.maCh3PythonUtils_most_active_author_name }} (Commits: ${{ env.maCh3PythonUtils_most_active_author_count }})
 
             Cheers,
             MaCh3-bot
-          repository-id: MDEwOlJlcG9zaXRvcnkzMzEwNDk0MTY=
+          repository-id: MDEwOlJlcG9zaXRvcmkzMzEwNDk0MTY=
           category-id: DIC_kwDOE7tpyM4CgQ7H
