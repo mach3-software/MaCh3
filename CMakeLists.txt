@@ -88,10 +88,14 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
   -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
   -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
-  # -Wpadded               # Warn when padding is added to a structure or class for alignment
-  -Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
-  -Wold-style-cast       # Warn for c-style casts
-  -Wconversion           # Warn on type conversions that may lose data
+  -Wnull-dereference      # Warn if a null dereference is detected (only in GCC >= 6.0)
+  -Wold-style-cast        # Warn for c-style casts
+  -Wconversion            # Warn on type conversions that may lose data
+  -Wformat-security       # Warn on functions that are potentially insecure for formatting
+  -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
+  #-Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  #-Wfloat-equal          # Warn if floating-point values are compared directly
+  #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -222,8 +226,6 @@ add_subdirectory(plotting)
 if (MaCh3_PYTHON_ENABLED)
   add_subdirectory(python)
 endif()
-
-
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties

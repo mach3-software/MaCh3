@@ -201,7 +201,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int Det
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
     }
   }
@@ -216,8 +216,8 @@ const std::vector<int> covarianceXsec::GetSystIndexFromDetID(int DetID,  const S
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
-    auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    auto &systIndex = pair.second;
+    if (AppliesToDetID(systIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -306,7 +306,7 @@ template <typename FilterFunc, typename ActionFunc>
 void covarianceXsec::IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID) && filter(i)) { // Common filter logic
+    if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }
@@ -515,9 +515,14 @@ void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
 // Checks if parameter belongs to a given group
 bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
+  std::string groupLower = Group;
+  std::string paramGroupLower = _ParameterGroup[i];
 
-  if(Group == _ParameterGroup[i]) return true;
-  else return false;
+  // KS: Convert both strings to lowercase, this way comparison will be case insensitive
+  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);
+  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
+
+  return groupLower == paramGroupLower;
 }
 
 // ********************************************
