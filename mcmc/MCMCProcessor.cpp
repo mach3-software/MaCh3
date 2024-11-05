@@ -3158,7 +3158,7 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
     int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
     if (ret != 0){
-      MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+      MACH3LOG_WARN("Error: system call to delete {} failed with code {}", Names[k], ret);
     }
     // This holds the posterior density
     const double maxi = Chain->GetMaximum(BranchNames[ParamNo]);
