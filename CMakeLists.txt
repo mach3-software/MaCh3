@@ -11,21 +11,57 @@ set(MaCh3_VERSION 1.1.7)
 find_package(CUDAToolkit QUIET)
 add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND AND NOT(USE_CPU))
+
+message(STATUS "USE_CPU flag: ${USE_CPU}")
+message(STATUS "USE_FPGA flag: ${USE_FPGA}")
+
+if(CUDAToolkit_FOUND AND NOT(USE_CPU OR USE_FPGA))
   message(STATUS "CUDA found. Adding CUDA support.")
+  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
   set(MaCh3_GPU_ENABLED TRUE)
+  set(CUDA TRUE)
   set(CPU_ONLY FALSE)
 else()
-  message(STATUS "CUDA not found. Proceeding without CUDA support.")
-  set(MaCh3_GPU_ENABLED FALSE)
-  set(CPU_ONLY TRUE)
+  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
+  if(USE_CPU)  
+    message(STATUS "CPU only mode, disabling CUDA")
+    set(CPU_ONLY TRUE)
+    set(USE_FPGA FALSE)
+  elseif(USE_FPGA)
+    message(STATUS "FPGA mode, disabling CUDA") 
+    set(MaCh3_GPU_ENABLED FALSE)
+    set(CUDA FALSE)
+    set(CPU_ONLY FALSE)
+  endif()
 endif()
 
-if(CPU_ONLY)
-  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
-else()
-  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
+if(USE_FPGA)
+  if(NOT DEFINED FPGA_DEVICE)
+    set(FPGA_DEVICE "Agilex7")
+    message(STATUS "FPGA_DEVICE was not specified.\
+                    \nConfiguring the design to the default FPGA family target: ${FPGA_DEVICE}\
+                    \nPlease refer to the README for information on target selection.")
+  endif()
+
+  set(USER_FPGA_FLAGS ${USER_FPGA_FLAGS})
+
+  set(EMULATOR_TARGET fpga_emu)
+  set(SIMULATOR_TARGET fpga_sim)
+  set(REPORT_TARGET report)
+  set(FPGA_TARGET fpga)
+
+  # Set the names of the generated files per makefile target
+  set(EMULATOR_OUTPUT_NAME ${TARGET_NAME}.${EMULATOR_TARGET})
+  set(SIMULATOR_OUTPUT_NAME ${TARGET_NAME}.${SIMULATOR_TARGET})
+  set(REPORT_OUTPUT_NAME ${TARGET_NAME}.${REPORT_TARGET})
+  set(FPGA_OUTPUT_NAME ${TARGET_NAME}.${FPGA_TARGET})
+
+  message(STATUS "Additional USER_FPGA_FLAGS=${USER_FPGA_FLAGS}")
+  message(STATUS "Additional USER_FLAGS=${USER_FLAGS}")
+  set(QACTYPES "-qactypes")
+
 endif()
+
 
 # Changes default install path to be a subdirectory of the build dir.
 # Can set build dir at configure time with -DCMAKE_INSTALL_PREFIX=/install/path
@@ -105,6 +141,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   )
 endif()
 
+if(USE_FPGA)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -DUSE_FPGA              # preprocessor directive to switch on FPGA code
+  )
+endif()
+
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
@@ -145,13 +187,21 @@ DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  if(USE_FPGA)
+    target_compile_options(MaCh3CompilerOptions INTERFACE -qopenmp)
+  else()
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  endif()
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
+endif()
+
+if(USE_FPGA)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -Wall ${QACTYPES} ${USER_FLAGS})
 endif()
 
 if(USE_PROB3)
