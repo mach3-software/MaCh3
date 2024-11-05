@@ -1075,43 +1075,26 @@ void SMonolith::FindSplineSegment() {
 //*********************************************************
 void SMonolith::CalcSplineWeights() {
 //*********************************************************
-  #ifdef MULTITHREAD
-  //KS: Open parallel region
-  #pragma omp parallel
-  {
-  #endif
-    //KS: First we calculate
-    #ifdef MULTITHREAD
-    #pragma omp for simd nowait
-    #endif
-    for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
-    {
-      //CW: Which Parameter we are accessing
+
+    
+  queue.submit([&](sycl::handler& cgh) {
+    cgh.parallel_for(sycl::range<1>(NSplines_valid), [=](sycl::id<1> idx) {
+      unsigned int splineNum = idx[0];
+
       const short int Param = cpu_spline_handler->paramNo_arr[splineNum];
-
-      //CW: Avoids doing costly binary search on GPU
       const short int segment = segments[Param];
-
-      //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing
       const short int segment_X = Param*_max_knots+segment;
-
-      //KS: Find knot position in out monolithical structure
       const unsigned int CurrentKnotPos = cpu_spline_handler->nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
 
-      // We've read the segment straight from CPU and is saved in segment_gpu
-      // polynomial parameters from the monolithic splineMonolith
       const float fY = cpu_spline_handler->coeff_many[CurrentKnotPos];
       const float fB = cpu_spline_handler->coeff_many[CurrentKnotPos+1];
       const float fC = cpu_spline_handler->coeff_many[CurrentKnotPos+2];
       const float fD = cpu_spline_handler->coeff_many[CurrentKnotPos+3];
-      // The is the variation itself (needed to evaluate variation - stored spline point = dx)
       const float dx = vals[Param] - cpu_spline_handler->coeff_x[segment_X];
 
-      //CW: Wooow, let's use some fancy intrinsic and pull down the processing time by <1% from normal multiplication! HURRAY
-      cpu_weights_var[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
-      // Or for the more "easy to read" version:
-      //cpu_weights_var[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
-    }
+      cpu_weights_var[splineNum] = sycl::fma(dx, sycl::fma(dx, sycl::fma(dx, fD, fC), fB), fY);
+    });
+  }).wait();
 
     #ifdef MULTITHREAD
     #pragma omp for simd
@@ -1130,10 +1113,7 @@ void SMonolith::CalcSplineWeights() {
 
       //cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
     }
-  #ifdef MULTITHREAD
-  //KS: End parallel region
-  }
-  #endif
+
   return;
 }
 
