@@ -14,7 +14,9 @@ void SMonolith::Initialise() {
   gpu_spline_handler = nullptr;
 #endif
 
+#ifndef USE_FPGA
   cpu_spline_handler = new SplineMonoStruct();
+#endif
 
   nKnots = 0;
   nTF1coeff = 0;
@@ -574,26 +576,43 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 #ifdef CUDA
   gpu_spline_handler->InitGPU_Segments(&segments);
   gpu_spline_handler->InitGPU_Vals(&vals);
+#elif USE_FPGA
+  queue = sycl::queue(sycl::default_selector{})
+  segments = sycl::malloc_shared<short int>(nParams, queue);
+  vals = new float[nParams]();
 #else
   segments = new short int[nParams]();
   vals = new float[nParams]();
 #endif
 
+
+
   cpu_nParamPerEvent.resize(2*NEvents);
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
-  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
-  //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
+  #ifdef USE_FPGA
+    cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid);
+  #else
+    cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
+    //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
+    cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
 
-  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
-  cpu_spline_handler->coeff_x.resize(event_size_max);
+    cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+    cpu_spline_handler->coeff_x.resize(event_size_max);
+  #endif
+
 
   cpu_coeff_TF1_many.resize(nTF1coeff);
 
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
 #ifndef CUDA
   cpu_total_weights = new float[NEvents]();
-  cpu_weights_var = new float[NSplines_valid]();
+  #ifdef USE_FPGA
+    cpu_weights_var = sycl::malloc_shared<float>(NSplines_valid, queue);
+  #else
+    cpu_weights_var = new float[NSplines_valid]();
+  #endif
+
+  
   cpu_weights_tf1_var = new float[NTF1_valid]();
 #endif
 
@@ -821,30 +840,40 @@ SMonolith::~SMonolith() {
 
   delete gpu_spline_handler;
   #else
-  if(segments != nullptr) delete[] segments;
+    #ifdef USE_FPGA
+      if(segments != nullptr) sycl::free(segments, queue);
+    #else
+      if(segments != nullptr) delete[] segments;
+    #endif
   if(vals != nullptr) delete[] vals;
   if(cpu_total_weights != nullptr) delete[] cpu_total_weights;
   #endif
 
   if(SplineInfoArray != nullptr) delete[] SplineInfoArray;
   if(cpu_weights != nullptr) delete[] cpu_weights;
-  if(cpu_weights_var != nullptr) delete[] cpu_weights_var;
+  #ifdef USE_FPGA
+    if(cpu_weights_var != nullptr) sycl::free(cpu_weights_var, queue);
+  #else
+    if(cpu_weights_var != nullptr) delete[] cpu_weights_var;
+  #endif
   if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
   if(index_cpu != nullptr) delete[] index_cpu;
   if(index_TF1_cpu != nullptr) delete[] index_TF1_cpu;
 
   //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL
-  if(cpu_spline_handler != nullptr)
-  {
-    cpu_spline_handler->coeff_x.clear();
-    cpu_spline_handler->coeff_x.shrink_to_fit();
-    cpu_spline_handler->coeff_many.clear();
-    cpu_spline_handler->coeff_many.shrink_to_fit();
-    cpu_spline_handler->paramNo_arr.clear();
-    cpu_spline_handler->paramNo_arr.shrink_to_fit();
-    cpu_spline_handler->nKnots_arr.clear();
-    cpu_spline_handler->nKnots_arr.shrink_to_fit();
-  }
+  #ifndef USE_FPGA
+    if(cpu_spline_handler != nullptr)
+    {
+      cpu_spline_handler->coeff_x.clear();
+      cpu_spline_handler->coeff_x.shrink_to_fit();
+      cpu_spline_handler->coeff_many.clear();
+      cpu_spline_handler->coeff_many.shrink_to_fit();
+      cpu_spline_handler->paramNo_arr.clear();
+      cpu_spline_handler->paramNo_arr.shrink_to_fit();
+      cpu_spline_handler->nKnots_arr.clear();
+      cpu_spline_handler->nKnots_arr.shrink_to_fit();
+    }
+  #endif
   cpu_coeff_TF1_many.clear();
   cpu_coeff_TF1_many.shrink_to_fit();
   cpu_paramNo_TF1_arr.clear();

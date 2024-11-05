@@ -1,0 +1,24 @@
+#pragma once
+#include <CL/sycl.hpp>
+#include <dpct/dpct.hpp>
+
+struct SplineMonoUSM {
+
+    SplineMonoUSM(sycl::queue, queue, int coeff_x_size, int coeff_many_size, int nKnots_arr_size, int nKnots_arr_size);
+    ~SplineMonoUSM();
+
+    sycl::queue& m_queue;
+
+    // *******************
+    /// CPU arrays to hold X coefficient
+    float* coeff_x_usm;
+
+    /// CPU arrays to hold other coefficients
+    float* coeff_many_usm;
+
+    /// CPU Number of knots per spline
+    unsigned int* nKnots_arr_usm;
+
+    /// CPU array with the number of points per spline (not per spline point!)
+    short int* paramNo_arr_usm;
+};

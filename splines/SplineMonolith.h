@@ -1,4 +1,8 @@
 #pragma once
+#ifdef USE_FPGA
+#include <sycl/sycl.hpp>
+#include <dpct/dpct.hpp>
+#endif
 
 #include "splines/SplineBase.h"
 
@@ -149,8 +153,13 @@ class SMonolith : public SplineBase {
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
 
+    #ifdef USE_FPGA
+    sycl::queue queue;
+    SplineMonoUSM* cpu_spline_handler;
+    #else
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_spline_handler;
+    #endif
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SMonolithGPU* gpu_spline_handler;

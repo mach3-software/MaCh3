@@ -28,16 +28,16 @@ elseif(USE_FPGA)
         SplineMonolith.h
         SplineCommon.h
         SplineStructs.h
-        oneAPISplineUtils.dp.hpp
+        oneAPIUtils.dp.hpp
     )
     
     add_library(Splines SHARED
         SplineBase.cpp
         splineFDBase.cpp
         SplineMonolith.cpp
-        oneAPISplineUtils.dp.cpp
+        oneAPIUtils.dp.cpp
     )
-    set_source_files_properties(oneAPISplineUtils.dp.cpp PROPERTIES COMPILE_FLAGS "-fsycl -fintelfpga")
+    set_source_files_properties(oneAPIUtils.dp.cpp PROPERTIES COMPILE_FLAGS "-fsycl -fintelfpga")
 
 elseif(CPU_ONLY)
     set(HEADERS
