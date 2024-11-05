@@ -515,9 +515,14 @@ void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
 // Checks if parameter belongs to a given group
 bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
+  std::string groupLower = Group;
+  std::string paramGroupLower = _ParameterGroup[i];
 
-  if(Group == _ParameterGroup[i]) return true;
-  else return false;
+  // KS: Convert both strings to lowercase, this way comparison will be case insensitive
+  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);
+  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
+
+  return groupLower == paramGroupLower;
 }
 
 // ********************************************
