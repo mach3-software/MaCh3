@@ -201,7 +201,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int Det
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
     }
   }
@@ -216,8 +216,8 @@ const std::vector<int> covarianceXsec::GetSystIndexFromDetID(int DetID,  const S
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
-    auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    auto &systIndex = pair.second;
+    if (AppliesToDetID(systIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -306,7 +306,7 @@ template <typename FilterFunc, typename ActionFunc>
 void covarianceXsec::IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID) && filter(i)) { // Common filter logic
+    if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }
