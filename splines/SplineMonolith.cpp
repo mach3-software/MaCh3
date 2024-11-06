@@ -579,7 +579,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 #elif USE_FPGA
   queue = sycl::queue(sycl::default_selector{})
   segments = sycl::malloc_shared<short int>(nParams, queue);
-  vals = new float[nParams]();
+  vals = sycl::malloc_shared<float>(nParams, queue);
 #else
   segments = new short int[nParams]();
   vals = new float[nParams]();
@@ -591,6 +591,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
   #ifdef USE_FPGA
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid);
+    cpu_coeff_TF1_many = sycl::malloc_shared<float>(nTF1coeff, queue);
+    cpu_paramNo_TF1_arr = sycl::malloc_shared<short int>(NTF1_valid, queue);
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
     //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
@@ -598,22 +600,26 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
     cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
     cpu_spline_handler->coeff_x.resize(event_size_max);
+    cpu_coeff_TF1_many.resize(nTF1coeff);
+    cpu_paramNo_TF1_arr.resize(NTF1_valid);
   #endif
 
 
-  cpu_coeff_TF1_many.resize(nTF1coeff);
+  
 
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
 #ifndef CUDA
   cpu_total_weights = new float[NEvents]();
   #ifdef USE_FPGA
     cpu_weights_var = sycl::malloc_shared<float>(NSplines_valid, queue);
+    cpu_weights_tf1_var = sycl::malloc_shared<float>(NTF1_valid, queue);
   #else
     cpu_weights_var = new float[NSplines_valid]();
+    cpu_weights_tf1_var = new float[NTF1_valid]();
   #endif
 
   
-  cpu_weights_tf1_var = new float[NTF1_valid]();
+  
 #endif
 
   float coeff = 0.;
@@ -842,10 +848,12 @@ SMonolith::~SMonolith() {
   #else
     #ifdef USE_FPGA
       if(segments != nullptr) sycl::free(segments, queue);
+      if(vals != nullptr) sycl::free(vals, queue);
     #else
       if(segments != nullptr) delete[] segments;
+      if(vals != nullptr) delete[] vals;
     #endif
-  if(vals != nullptr) delete[] vals;
+  
   if(cpu_total_weights != nullptr) delete[] cpu_total_weights;
   #endif
 
@@ -853,10 +861,12 @@ SMonolith::~SMonolith() {
   if(cpu_weights != nullptr) delete[] cpu_weights;
   #ifdef USE_FPGA
     if(cpu_weights_var != nullptr) sycl::free(cpu_weights_var, queue);
+      if(cpu_weights_tf1_var != nullptr) sycl::free(cpu_weights_tf1_var, queue);
   #else
     if(cpu_weights_var != nullptr) delete[] cpu_weights_var;
+      if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
   #endif
-  if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
+
   if(index_cpu != nullptr) delete[] index_cpu;
   if(index_TF1_cpu != nullptr) delete[] index_TF1_cpu;
 
@@ -873,11 +883,17 @@ SMonolith::~SMonolith() {
       cpu_spline_handler->nKnots_arr.clear();
       cpu_spline_handler->nKnots_arr.shrink_to_fit();
     }
+    cpu_coeff_TF1_many.clear();
+    cpu_coeff_TF1_many.shrink_to_fit();
+    cpu_paramNo_TF1_arr.clear();
+    cpu_paramNo_TF1_arr.shrink_to_fit();
+  #else
+    sycl::free(cpu_coeff_TF1_many, queue);
+    sycl::free(cpu_paramNo_TF1_arr, queue);
+
   #endif
-  cpu_coeff_TF1_many.clear();
-  cpu_coeff_TF1_many.shrink_to_fit();
-  cpu_paramNo_TF1_arr.clear();
-  cpu_paramNo_TF1_arr.shrink_to_fit();
+
+
   #ifndef Weight_On_SplineBySpline_Basis
   cpu_nParamPerEvent.clear();
   cpu_nParamPerEvent.shrink_to_fit();
@@ -1096,24 +1112,18 @@ void SMonolith::CalcSplineWeights() {
     });
   }).wait();
 
-    #ifdef MULTITHREAD
-    #pragma omp for simd
-    #endif
-    for (unsigned int tf1Num = 0; tf1Num < NTF1_valid; ++tf1Num)
-    {
-      // The is the variation itself (needed to evaluate variation - stored spline point = dx)
-      const float x = vals[cpu_paramNo_TF1_arr[tf1Num]];
+  queue.submit([&](sycl::handler& cgh) {
+    cgh.parallel_for(sycl::range<1>(NTF1_valid), [=](sycl::id<1> idx) {
+      unsigned int tf1Num = idx[0];
 
-      // Read the coefficients
+      const float x = vals[cpu_paramNo_TF1_arr[tf1Num]];
       const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
       const float b = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_+1];
 
-      cpu_weights_tf1_var[tf1Num] = fmaf(a, x, b);
-      // cpu_weights_tf1_var[tf1Num] = a*x + b;
-
-      //cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
-    }
-
+      cpu_weights_tf1_var[tf1Num] = sycl::fma(a, x, b);
+    });
+  }).wait();
+  
   return;
 }
 
