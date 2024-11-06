@@ -554,7 +554,7 @@ inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  TTree *inTree = static_cast<TTree*>(inFile->Get("posteriors"));
+  TTree *inTree = inFile->Get<TTree>("posteriors");
   if (!inTree) {
     MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
     inFile->ls();
