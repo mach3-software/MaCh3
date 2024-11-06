@@ -2,8 +2,9 @@
 
 #include <cmath>
 
+// ***************
 PSO::PSO(manager *man) : LikelihoodFit(man) {
-
+// ***************
   fConstriction = fitMan->raw()["General"]["PSO"]["Constriction"].as<double>();
   fInertia = fitMan->raw()["General"]["PSO"]["Inertia"].as<double>()*fConstriction;
   fOne = fitMan->raw()["General"]["PSO"]["One"].as<double>()*fConstriction;
@@ -20,8 +21,9 @@ PSO::PSO(manager *man) : LikelihoodFit(man) {
   }
 }
 
+// ***************
 void PSO::runMCMC(){
-
+// ***************
   PrepareFit();
 
   if(fTestLikelihood){
@@ -41,17 +43,16 @@ void PSO::runMCMC(){
   return;
 }
 
-
+// *************************
 void PSO::init(){
-
+// *************************
   fBestValue = 1234567890.0;
 
   //KS: For none PCA this will be eqaul to normal parameters
   //const int NparsPSOFull = NPars;
   //const int NparsPSO = NParsPCA;
 
-  std::cout << "Preparing PSO" << std::endl;
-
+  MACH3LOG_INFO("Preparing PSO");
   // Initialise bounds on parameters
   if(fTestLikelihood){
     for (int i = 0; i < fDim; i++){
@@ -105,9 +106,9 @@ void PSO::init(){
     }
   }
 
-  std::cout << "Printing Minimums and Maximums of Variables to be minimised" << std::endl;
-  for (int i =0; i<fDim; i++){
-    std::cout << "Variable "<< i<<" :" << ranges_min[i] << ", "<< ranges_max[i] << std::endl;
+  MACH3LOG_INFO("Printing Minimums and Maximums of Variables to be minimized");
+  for (int i = 0; i < fDim; i++){
+    MACH3LOG_INFO("Variable {} : {:.2f}, {:.2f}", i, ranges_min[i], ranges_max[i]);
   }
 
   // Initialise particle positions
@@ -143,10 +144,12 @@ void PSO::init(){
   }
 }
 
+// *************************
 std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,double minimum, double range, double precision){
+// *************************
   std::vector<std::vector<double>> uncertainties_list;
-  for (unsigned int i = 0; i< position.size(); ++i){
-    std::cout << i << std::endl;
+  for (unsigned int i = 0; i< position.size(); ++i) {
+    MACH3LOG_INFO("{}", i);
     //std::vector<double> uncertainties;
     std::vector<double> new_position = position; new_position[i] = position[i]-range;
     double val_1 = CalcChi(new_position)-minimum-1.0;
@@ -201,7 +204,8 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         position_list_p[1] = new_bisect_position_p;
         res = std::abs(position[2]-position[0]);
         res_p = std::abs(position_list_p[1][i]-position_list_p[0][i]);
-        //std::cout << "Pos midpoint is " << position_list_p[1][i] << std::endl;
+        MACH3LOG_TRACE("Pos midpoint is {:.2f}", position_list_p[1][i]);
+
       }
       else{
         std::vector<double> new_bisect_position_p = position_list_p[1];new_bisect_position_p[i] += (position_list_p[2][i]-position_list_p[1][i])/2;
@@ -211,17 +215,20 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         value_list_p[1] = new_val_p;
         position_list_p[1] = new_bisect_position_p;
         res_p = std::abs(position_list_p[2][i]-position_list_p[1][i]);
-        //std::cout << "Pos midpoint is " << position_list_p[1][i] << std::endl;
+        MACH3LOG_TRACE("Pos midpoint is {:.2f}", position_list_p[1][i]);
       }
     }
     uncertainties_list.push_back({std::abs(position[i]-position_list[1][i]),std::abs(position[i]-position_list_p[1][i])});
-    std::cout << "Uncertainty finished for d = "<< i << std::endl;
-    std::cout << std::setprecision(10)<< "LLR values for ± positive and negative uncertainties are " << CalcChi(position_list[1]) << " and " << CalcChi(position_list_p[1]) << std::endl;
+    MACH3LOG_INFO("Uncertainty finished for d = {}", i);
+    MACH3LOG_INFO("LLR values for ± positive and negative uncertainties are {:<10.2f} and {:<10.2f}",
+                  CalcChi(position_list[1]), CalcChi(position_list_p[1]));
   }
   return uncertainties_list;
 }
 
-std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>position,double minimum) {
+// *************************
+std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>position, double minimum) {
+// *************************
   std::vector<double> pos_uncertainty(position.size());
   std::vector<double> neg_uncertainty(position.size());
   int num = 200;
@@ -255,7 +262,7 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
       }
     }
     neg_uncertainty[i] = x[closest_index];
-    std::cout << "Neg" << std::endl;
+    MACH3LOG_INFO("Neg");
     x.assign(num, 0);
     y.assign(num, 0);
     StepPoint = (pos_stop-start) / (num - 1);
@@ -283,11 +290,13 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
   return res;
 }
 
+// *************************
 void PSO::uncertainty_check(std::vector<double> previous_pos){
+// *************************
   std::vector<std::vector<double >> x_list;
   std::vector<std::vector<double >> y_list;
   std::vector<double> position = previous_pos;
-  int num = 5000;
+  constexpr int num = 5000;
   for (unsigned int i = 0;i<previous_pos.size();++i){
     double curr_ival = position[i];
     double start = previous_pos[i] - 1e-1;
@@ -296,8 +305,8 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
     std::vector<double> y(num);
     double StepPoint = (stop - start) / (num - 1);
     double value = start;
-    // std::cout << "result for fDim " << 1 << std::endl;
-    for (int j =0;j< num; ++j){
+    MACH3LOG_TRACE("result for fDim: {}", 1);
+    for (int j = 0;j < num; ++j) {
       position[i] = value;
       double LLR = CalcChi(position);
       x[j] = value;
@@ -305,21 +314,24 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
       value += StepPoint;
     }
     position[i] = curr_ival;
-    std::cout << " " << std::endl;
-    std::cout << "For fDim" << i+1  << " x list is " ;
-    for (unsigned int k= 0;k<x.size(); ++k){
-      std::cout << x[k] << " , " ;
-    } std::cout << " " << std::endl;
-    std::cout << "  " << std::endl;
-    std::cout << "For fDim" << i+1 << " y list is " ;
-    for (unsigned int k= 0;k<x.size(); ++k){
-      std::cout << y[k] << " , " ;
-    } std::cout <<  " " << std::endl;
-    std::cout << " " <<std::endl;
+    MACH3LOG_INFO("");
+    MACH3LOG_INFO("For fDim{} x list is", i+1);
+    for (unsigned int k = 0;k<x.size(); ++k){
+      MACH3LOG_INFO("  {}", x[k]);
+    }
+    MACH3LOG_INFO("");
+    MACH3LOG_INFO("For fDim{} y list is", i+1);
+    for (unsigned int k = 0; k < x.size(); ++k){
+      MACH3LOG_INFO("  {}", y[k]);
+    }
+    MACH3LOG_INFO("");
   }
 }
 
+// *************************
 double PSO::swarmIterate(){
+// *************************
+
   std::vector<double> total_pos(fDim,0.0);
 
   for (int i = 0; i < fParticles; ++i) {
@@ -398,11 +410,11 @@ void PSO::run() {
     accCount++;
 
     if (i%100 == 0){
-      std::cout << "Mean Dist Sq = " << mean_dist_sq <<std::endl;
-      std::cout << "Current LLR = " << fBestValue << std::endl;
-      std::cout << "Position = " <<std::endl;
-      for (int j = 0; j< fDim; ++j){
-        std::cout << "    Dim " << j << " = " << std::setprecision(10) << get_best_particle()->get_personal_best_position()[j] << std::endl;
+      MACH3LOG_INFO("Mean Dist Sq = {:.2f}", mean_dist_sq);
+      MACH3LOG_INFO("Current LLR = {:.2f}", fBestValue);
+      MACH3LOG_INFO("Position:");
+      for (int j = 0; j < fDim; ++j){
+        MACH3LOG_INFO("    Dim {} = {:<10.2f}", j, get_best_particle()->get_personal_best_position()[j]);
       }
     }
     if(fConvergence > 0.0){
@@ -411,18 +423,20 @@ void PSO::run() {
       }
     }
   }
-  std::cout << "Finished after " << iter <<" runs out of "<< fIterations << std::endl;
-  std::cout << "Mean Dist " << mean_dist_sq <<std::endl;
-  std::cout << "Best LLR " << get_best_particle()->get_personal_best_value() << std::endl;
-
+  MACH3LOG_INFO("Finished after {} runs out of {}", iter, fIterations);
+  MACH3LOG_INFO("Mean Dist: {:.2f}", mean_dist_sq);
+  MACH3LOG_INFO("Best LLR: {:.2f}", get_best_particle()->get_personal_best_value());
   uncertainties = bisection(get_best_particle()->get_personal_best_position(),get_best_particle()->get_personal_best_value(),0.5,0.005);
-  std::cout << "Position for Global Minimum = "<<std::endl;
+  MACH3LOG_INFO("Position for Global Minimum = ");
   for (int i = 0; i< fDim; ++i){
-    std::cout << "    Dim " << i << " = " << std::setprecision(10) << get_best_particle()->get_personal_best_position()[i]  << " +" << uncertainties[i][1] << ", -" <<  uncertainties[i][0] << std::endl;
+    MACH3LOG_INFO("    Dim {} = {:<10.2f} +{:.2f}, -{:.2f}", i, get_best_particle()->get_personal_best_position()[i], uncertainties[i][1], uncertainties[i][0]);
   }
 }
 
+// *************************
 void PSO::WriteOutput(){
+// *************************
+
   outputFile->cd();
 
   TVectorD* PSOParValue = new TVectorD(fDim);
