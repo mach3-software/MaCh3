@@ -246,7 +246,7 @@ class SampleSummary {
     /// Output filename
     TFile *Outputfile;
     /// Directory for each sample
-    TDirectory **Dir;
+    std::vector<TDirectory*> Dir;
 
     /// TTree which we save useful information to
     TTree *OutputTree;
@@ -258,29 +258,29 @@ class SampleSummary {
     std::vector<double> llh_predfluc_draw;
 
     /// Data vs Draw using rate only
-    double *llh_rate_data_draw;
+    std::vector<double> llh_rate_data_draw;
     /// Fluctuated Predictive vs Draw using rate only
-    double *llh_rate_predfluc_draw;
+    std::vector<double> llh_rate_predfluc_draw;
 
     /// Data vs Fluctuated Draw
-    double *llh_data_drawfluc;
+    std::vector<double> llh_data_drawfluc;
     /// Data vs Fluctuated Predictive
-    double *llh_data_predfluc;
+    std::vector<double> llh_data_predfluc;
     /// Draw vs Predictive
-    double *llh_draw_pred;
+    std::vector<double> llh_draw_pred;
     /// Fluctuated Draw vs Predictive
-    double *llh_drawfluc_pred;
+    std::vector<double> llh_drawfluc_pred;
 
     /// Fluctuated Predictive vs Predictive
-    double *llh_predfluc_pred;
+    std::vector<double> llh_predfluc_pred;
     /// Fluctuated Draw vs Fluctuated Predictive
-    double *llh_drawfluc_predfluc;
+    std::vector<double> llh_drawfluc_predfluc;
     /// Fluctuated Data vs Draw
-    double *llh_datafluc_draw;
+    std::vector<double> llh_datafluc_draw;
 
     /// Projection X (most likely muon momentum) of LLH
-    double *llh_data_draw_ProjectX;
-    double *llh_drawfluc_draw_ProjectX;
+    std::vector<double> llh_data_draw_ProjectX;
+    std::vector<double> llh_drawfluc_draw_ProjectX;
 
     /// LLH penalty for each throw
     double llh_penalty;
