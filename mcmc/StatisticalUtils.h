@@ -557,6 +557,7 @@ inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
   TTree *inTree = static_cast<TTree*>(inFile->Get("posteriors"));
   if (!inTree) {
     MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    inFile->ls();
     inFile->Close();
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -566,6 +567,8 @@ inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
 
   // Loop over entries and apply thinning
   Long64_t nEntries = inTree->GetEntries();
+  double retainedPercentage = (double(nEntries) / ThinningCut) / double(nEntries) * 100;
+  MACH3LOG_INFO("Thinning will retain {:.2f}% of chains", retainedPercentage);
   for (Long64_t i = 0; i < nEntries; i++) {
     if (i % (nEntries/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, nEntries);
@@ -578,7 +581,6 @@ inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
   inFile->WriteTObject(outTree, "posteriors", "kOverwrite");
   inFile->Close();
   delete inFile;
-  delete outTree;
 
   MACH3LOG_INFO("Thinned TTree saved and overwrote original in: {}", TempFilePath);
 }
