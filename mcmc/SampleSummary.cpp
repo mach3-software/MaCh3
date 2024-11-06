@@ -44,7 +44,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
   OutputTree = nullptr;
   Dir = nullptr;
 
-  rnd = new TRandom3();
+  rnd = std::make_unique<TRandom3>();
 
   DataHist = new TH2Poly*[nSamples];
   DataHist_ProjectX = new TH1D*[nSamples];
@@ -60,7 +60,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
   if(DoBetaParam) BetaHist = new TH1D**[nSamples];
   else BetaHist = nullptr;
 
-  maxBins = new int[nSamples];
+  maxBins.resize(nSamples);
   
   lnLHist_Mean = new TH2Poly*[nSamples];
   lnLHist_Mode = new TH2Poly*[nSamples];
@@ -152,10 +152,6 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
     lnLHist_Sample_DrawflucDraw[i] = NULL;
     lnLHist_Sample_PredflucDraw[i] = NULL;
   }//end loop over samples
-  
-  llh_data_draw = NULL;
-  llh_drawfluc_draw = NULL;
-  llh_predfluc_draw = NULL;
   llh_rate_data_draw = NULL;
   llh_rate_predfluc_draw = NULL;
 
@@ -186,8 +182,6 @@ SampleSummary::~SampleSummary() {
   //ROOT is weird and once you write TFile claim ownership of histograms. Best is to first delete histograms and then close file
   Outputfile->Close();
   delete Outputfile;
-
-  if(rnd != nullptr) delete rnd;
   
   if(lnLHist != NULL) delete lnLHist;
   if(lnLHist_drawdata != NULL) delete lnLHist_drawdata;
@@ -271,14 +265,11 @@ SampleSummary::~SampleSummary() {
   delete[] lnLHist_Sample_DrawData;
   delete[] lnLHist_Sample_DrawflucDraw;
   delete[] lnLHist_Sample_PredflucDraw;
-  
-  delete[] maxBins;
-      
+
   delete[] PosteriorHist;
   delete[] w2Hist;
   if(DoBetaParam) delete[] BetaHist;
 
-  delete[] llh_data_draw;
   delete[] llh_data_drawfluc;
   delete[] llh_data_predfluc;
   delete[] llh_rate_data_draw;
@@ -286,9 +277,7 @@ SampleSummary::~SampleSummary() {
   delete[] llh_draw_pred;
   delete[] llh_drawfluc_pred;
   delete[] llh_drawfluc_predfluc;
-  delete[] llh_drawfluc_draw;
   delete[] llh_predfluc_pred;
-  delete[] llh_predfluc_draw;
   delete[] llh_datafluc_draw;
   
   delete[] llh_data_draw_ProjectX;
@@ -653,11 +642,11 @@ void SampleSummary::PrepareOutput() {
 
   // The array of doubles we write to the TTree
   // Data vs Draw
-  llh_data_draw = new double[nSamples];
+  llh_data_draw.resize(nSamples);
   // Fluctuated Draw vs Draw
-  llh_drawfluc_draw = new double[nSamples];
+  llh_drawfluc_draw.resize(nSamples);
   // Fluctuated Predicitve vs Draw
-  llh_predfluc_draw = new double[nSamples];
+  llh_predfluc_draw.resize(nSamples);
 
   // Data vs Draw using Rate
   llh_rate_data_draw = new double[nSamples];

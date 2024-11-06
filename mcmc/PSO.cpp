@@ -389,8 +389,9 @@ double PSO::swarmIterate(){
   return mean_dist_sq;
 }
 
+// *************************
 void PSO::run() {
-
+// *************************
   double mean_dist_sq = 0;
 
   int iter = 0;
