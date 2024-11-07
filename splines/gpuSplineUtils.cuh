@@ -113,7 +113,7 @@ class SMonolithGPU
       #endif
       int n_params,
       unsigned int n_splines,
-      int spline_size,
+      short int spline_size,
       unsigned int total_nknots,
       unsigned int n_tf1);
 
