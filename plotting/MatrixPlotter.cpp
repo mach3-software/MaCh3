@@ -12,6 +12,10 @@
 #include "plottingUtils/plottingUtils.h"
 #include "plottingUtils/plottingManager.h"
 
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wconversion"
+
 TH2D* GetSubMatrix(TH2D *MatrixFull, const std::string& Title, const std::vector<std::string>& Params)
 {
   std::vector<int> ParamIndex(Params.size(), -999);
