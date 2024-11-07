@@ -8,7 +8,7 @@
 samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
-  MACH3LOG_INFO("Ceating SamplePDFFDBase object");
+  MACH3LOG_INFO("Creating SamplePDFFDBase object");
   
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(!xsec_cov){
@@ -166,9 +166,6 @@ void samplePDFFDBase::ReadSampleConfig()
 }
 
 void samplePDFFDBase::Initialise() {
-
- // //
- // SetXsecCov(xsec_cov);
 
   //First grab all the information from your sample config via your manager
   ReadSampleConfig();
@@ -743,7 +740,7 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   return xsecw;
 }
 
-void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
+/*void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   XsecCov = xsec;
   std::cout << "Setting up XsecCov is " << __FUNCTION__ << std::endl;
@@ -762,6 +759,7 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
 
   return;
 }
+*/
 
 void samplePDFFDBase::SetupNormParameters(){
   

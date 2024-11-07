@@ -47,9 +47,6 @@ public:
 
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
-  
-
-  void SetXsecCov(covarianceXsec* xsec_cov);
 
   /// @brief setup the Oscillation covariance object to get values to calculate probailities from
   void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
@@ -220,10 +217,6 @@ public:
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
-  /// @brief the total number of function parameters found in the xsec model
-  int nFuncParams;
-  std::vector<std::string> funcParsNames;
-  std::vector<int> funcParsIndex;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
