@@ -740,27 +740,6 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   return xsecw;
 }
 
-/*void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
-
-  XsecCov = xsec;
-  std::cout << "Setting up XsecCov is " << __FUNCTION__ << std::endl;
-  std::cout << "DetID is " << SampleDetID << std::endl;
-
-  // Get the map between the normalisation parameters index, their name, what mode they should apply to, and what target
-  //This information is used later in CalcXsecNormsBins to decide if a parameter applies to an event
-
-  //DB Now get this information using the DetID from the config
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
-  nFuncParams = XsecCov->GetNumParamsFromDetID(SampleDetID, SystType::kFunc);
-  funcParsNames = XsecCov->GetParsNamesFromDetID(SampleDetID, SystType::kFunc);
-  funcParsIndex = XsecCov->GetParsIndexFromDetID(SampleDetID, SystType::kFunc);
-
-  std::cout << "funcParsIndex is of size " << funcParsIndex.size() << std::endl;
-
-  return;
-}
-*/
-
 void samplePDFFDBase::SetupNormParameters(){
   
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
