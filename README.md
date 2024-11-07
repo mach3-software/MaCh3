@@ -150,6 +150,7 @@ Based on several test here are recommended version:
 | Name        | Status |
 |-------------|--------|
 | Alma9       | ✅     |
+| Rocky9      | ✅     |
 | Ubuntu22.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
