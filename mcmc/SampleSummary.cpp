@@ -42,9 +42,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
   first_pass = true;
   Outputfile = nullptr;
   OutputTree = nullptr;
-  Dir = nullptr;
-
-  rnd = new TRandom3();
+  rnd = std::make_unique<TRandom3>();
 
   DataHist = new TH2Poly*[nSamples];
   DataHist_ProjectX = new TH1D*[nSamples];
@@ -60,7 +58,7 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
   if(DoBetaParam) BetaHist = new TH1D**[nSamples];
   else BetaHist = nullptr;
 
-  maxBins = new int[nSamples];
+  maxBins.resize(nSamples);
   
   lnLHist_Mean = new TH2Poly*[nSamples];
   lnLHist_Mode = new TH2Poly*[nSamples];
@@ -152,21 +150,6 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
     lnLHist_Sample_DrawflucDraw[i] = NULL;
     lnLHist_Sample_PredflucDraw[i] = NULL;
   }//end loop over samples
-  
-  llh_data_draw = NULL;
-  llh_drawfluc_draw = NULL;
-  llh_predfluc_draw = NULL;
-  llh_rate_data_draw = NULL;
-  llh_rate_predfluc_draw = NULL;
-
-  llh_data_drawfluc = NULL;
-  llh_data_predfluc = NULL;
-  llh_draw_pred = NULL;
-  llh_drawfluc_pred = NULL;
-
-  llh_predfluc_pred = NULL;
-  llh_drawfluc_predfluc = NULL;
-  llh_datafluc_draw = NULL;
 
   DoByModePlots = false;
   MeanHist_ByMode = NULL;
@@ -186,8 +169,6 @@ SampleSummary::~SampleSummary() {
   //ROOT is weird and once you write TFile claim ownership of histograms. Best is to first delete histograms and then close file
   Outputfile->Close();
   delete Outputfile;
-
-  if(rnd != nullptr) delete rnd;
   
   if(lnLHist != NULL) delete lnLHist;
   if(lnLHist_drawdata != NULL) delete lnLHist_drawdata;
@@ -271,28 +252,10 @@ SampleSummary::~SampleSummary() {
   delete[] lnLHist_Sample_DrawData;
   delete[] lnLHist_Sample_DrawflucDraw;
   delete[] lnLHist_Sample_PredflucDraw;
-  
-  delete[] maxBins;
-      
+
   delete[] PosteriorHist;
   delete[] w2Hist;
   if(DoBetaParam) delete[] BetaHist;
-
-  delete[] llh_data_draw;
-  delete[] llh_data_drawfluc;
-  delete[] llh_data_predfluc;
-  delete[] llh_rate_data_draw;
-  delete[] llh_rate_predfluc_draw;
-  delete[] llh_draw_pred;
-  delete[] llh_drawfluc_pred;
-  delete[] llh_drawfluc_predfluc;
-  delete[] llh_drawfluc_draw;
-  delete[] llh_predfluc_pred;
-  delete[] llh_predfluc_draw;
-  delete[] llh_datafluc_draw;
-  
-  delete[] llh_data_draw_ProjectX;
-  delete[] llh_drawfluc_draw_ProjectX;
 }
 
 // *******************
@@ -375,9 +338,9 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
       W2NomHist[i] = static_cast<TH2Poly*>(NomW2[i]->Clone());
       
       lnLHist_Mean[i] = static_cast<TH2Poly*>(NominalHist[i]->Clone());
-      lnLHist_Mean[i]->SetDirectory(0);
+      lnLHist_Mean[i]->SetDirectory(nullptr);
       lnLHist_Mode[i] = static_cast<TH2Poly*>(NominalHist[i]->Clone());
-      lnLHist_Mode[i]->SetDirectory(0);
+      lnLHist_Mode[i]->SetDirectory(nullptr);
       lnLHist_Mean_ProjectX[i] = static_cast<TH1D*>(DataHist_ProjectX[i]->Clone());
       MeanHist[i] = static_cast<TH2Poly*>(NominalHist[i]->Clone());
       if(DoBetaParam) MeanHistCorrected[i] = static_cast<TH2Poly*>(NominalHist[i]->Clone());
@@ -440,12 +403,12 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
       ViolinHists_ProjectX[i] = new TH2D((name+"_Violin_ProjectX").c_str(), (name+"_Violin_ProjectX").c_str(), int(xbins.size()-1), &xbins[0] , 400, 0, MaxBinning);
       ViolinHists_ProjectX[i]->GetYaxis()->SetTitle("Events");
       ViolinHists_ProjectX[i]->GetXaxis()->SetTitle(std::string(NominalHist[i]->GetXaxis()->GetTitle()).c_str() );
-      ViolinHists_ProjectX[i]->SetDirectory(0);
+      ViolinHists_ProjectX[i]->SetDirectory(nullptr);
 
       ViolinHists_ProjectY[i] = new TH2D((name+"_Violin_ProjectY").c_str(), (name+"_Violin_ProjectY").c_str(), int(ybins.size()-1), &ybins[0] , 400, 0, MaxBinning);
       ViolinHists_ProjectY[i]->GetYaxis()->SetTitle("Events");
       ViolinHists_ProjectY[i]->GetXaxis()->SetTitle(std::string(NominalHist[i]->GetYaxis()->GetTitle()).c_str());
-      ViolinHists_ProjectY[i]->SetDirectory(0);
+      ViolinHists_ProjectY[i]->SetDirectory(nullptr);
 
       ModeHist[i]->SetNameTitle((name+"_mode").c_str(), (name+"_mode").c_str());
       ModeHist[i]->Reset("");
@@ -529,9 +492,9 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
         ss2 << " cos#theta_{#mu} (" << bin->GetYMin() << "-" << bin->GetYMax() << ")";
 
         PosteriorHist[SampleNum][i] = new TH1D(ss2.str().c_str(), ss2.str().c_str(),nXBins, 1, -1);
-        PosteriorHist[SampleNum][i]->SetDirectory(0);
+        PosteriorHist[SampleNum][i]->SetDirectory(nullptr);
         w2Hist[SampleNum][i] = new TH1D(("w2_"+ss2.str()).c_str(), ("w2_"+ss2.str()).c_str(),nXBins, 1, -1);
-        w2Hist[SampleNum][i]->SetDirectory(0);
+        w2Hist[SampleNum][i]->SetDirectory(nullptr);
         if(DoBetaParam)
         {
           std::string betaName = "#beta_param_";
@@ -592,7 +555,7 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
       for (int j = 0; j < Modes->GetNModes()+1; j++)
       {
         PosteriorHist_ByMode[SampleNum][j] = new TH1D*[maxBins[SampleNum]+1];
-        const int nXBins = 500;
+        constexpr int nXBins = 500;
 
         std::string name = std::string(NominalHist[SampleNum]->GetName());
         name = name.substr(0, name.find("_nom"));
@@ -653,36 +616,36 @@ void SampleSummary::PrepareOutput() {
 
   // The array of doubles we write to the TTree
   // Data vs Draw
-  llh_data_draw = new double[nSamples];
+  llh_data_draw.resize(nSamples);
   // Fluctuated Draw vs Draw
-  llh_drawfluc_draw = new double[nSamples];
+  llh_drawfluc_draw.resize(nSamples);
   // Fluctuated Predicitve vs Draw
-  llh_predfluc_draw = new double[nSamples];
+  llh_predfluc_draw.resize(nSamples);
 
   // Data vs Draw using Rate
-  llh_rate_data_draw = new double[nSamples];
+  llh_rate_data_draw.resize(nSamples);
   // Data vs Fluctuated Predictive using Rate
-  llh_rate_predfluc_draw = new double[nSamples];
+  llh_rate_predfluc_draw.resize(nSamples);
 
   // Data vs Fluctuated Draw
-  llh_data_drawfluc = new double[nSamples];
+  llh_data_drawfluc.resize(nSamples);
   // Data vs Fluctuated Predictive
-  llh_data_predfluc = new double[nSamples];
+  llh_data_predfluc.resize(nSamples);
   // Draw vs Predictive
-  llh_draw_pred = new double[nSamples];
+  llh_draw_pred.resize(nSamples);
   // Fluctuated Draw vs Predictive
-  llh_drawfluc_pred = new double[nSamples];
+  llh_drawfluc_pred.resize(nSamples);
   // Fluctuated Draw vs Fluctuated Predictive
-  llh_drawfluc_predfluc = new double[nSamples];
+  llh_drawfluc_predfluc.resize(nSamples);
 
   // Fluctuated Predictive vs Predictive
-  llh_predfluc_pred = new double[nSamples];
+  llh_predfluc_pred.resize(nSamples);
   // Fluctuated Data vs Draw
-  llh_datafluc_draw = new double[nSamples];
+  llh_datafluc_draw.resize(nSamples);
   
   // Data vs Draw for 1D projection
-  llh_data_draw_ProjectX = new double[nSamples];
-  llh_drawfluc_draw_ProjectX = new double[nSamples];
+  llh_data_draw_ProjectX.resize(nSamples);
+  llh_drawfluc_draw_ProjectX.resize(nSamples);
     
   // The output tree we're going to write to
   OutputTree = new TTree("LLH_draws", "LLH_draws");
@@ -746,7 +709,7 @@ void SampleSummary::PrepareOutput() {
   OutputTree->Branch("total_llh_drawfluc_draw_ProjectX", &total_llh_drawfluc_draw_ProjectX);
 
   Outputfile->cd();
-  Dir = new TDirectory*[nSamples];
+  Dir.resize(nSamples);
   for (int i = 0; i < nSamples; ++i)
   {
     // Make a new directory
@@ -943,11 +906,13 @@ void SampleSummary::Write() {
         PosteriorHist[i][b]->Write();
         std::string Title = PosteriorHist[i][b]->GetName();
 
-        TLine *TempLine = new TLine(NominalHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMinimum(), NominalHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMaximum());
+        auto TempLine = std::make_unique<TLine>(NominalHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMinimum(),
+                                                NominalHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMaximum());
         TempLine->SetLineColor(kRed);
         TempLine->SetLineWidth(2);
 
-        TLine *TempLineData = new TLine(DataHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMinimum(), DataHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMaximum());
+        auto TempLineData = std::make_unique<TLine>(DataHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMinimum(),
+                                                    DataHist[i]->GetBinContent(b), PosteriorHist[i][b]->GetMaximum());
         TempLineData->SetLineColor(kGreen);
         TempLineData->SetLineWidth(2);
 
@@ -956,13 +921,13 @@ void SampleSummary::Write() {
         PosteriorHist[i][b]->Fit(Fitter, "RQ");
         Fitter->SetLineColor(kRed-5);
 
-        TLegend *Legend = new TLegend(0.4, 0.75, 0.98, 0.90);
+        auto Legend = std::make_unique<TLegend>(0.4, 0.75, 0.98, 0.90);
         Legend->SetFillColor(0);
         Legend->SetFillStyle(0);
         Legend->SetLineWidth(0);
         Legend->SetLineColor(0);
-        Legend->AddEntry(TempLineData, Form("Data #mu=%.2f", DataHist[i]->GetBinContent(b)), "l");
-        Legend->AddEntry(TempLine, Form("Prior #mu=%.2f", NominalHist[i]->GetBinContent(b)), "l");
+        Legend->AddEntry(TempLineData.get(), Form("Data #mu=%.2f", DataHist[i]->GetBinContent(b)), "l");
+        Legend->AddEntry(TempLine.get(), Form("Prior #mu=%.2f", NominalHist[i]->GetBinContent(b)), "l");
         Legend->AddEntry(PosteriorHist[i][b], Form("Post, #mu=%.2f#pm%.2f", PosteriorHist[i][b]->GetMean(), PosteriorHist[i][b]->GetRMS()), "l");
         Legend->AddEntry(Fitter, Form("Gauss, #mu=%.2f#pm%.2f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
         std::string TempTitle = std::string(PosteriorHist[i][b]->GetName());
@@ -983,11 +948,8 @@ void SampleSummary::Write() {
         Legend->Draw("same");
         TempCanvas->Write();
 
-        delete TempLine;
-        delete TempLineData;
         delete TempCanvas;
         delete Fitter;
-        delete Legend;
         //This isn't useful check only in desperation
         if(Debug > 1) w2Hist[i][b]->Write();
       }
@@ -1576,7 +1538,7 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
   Histogram->SetTitle((std::string(Histogram->GetTitle())+"_"+ss.str()).c_str());
 
   // Write a TCanvas and make a line and a filled histogram
-  TLine *TempLine = new TLine(llh_reference , Histogram->GetMinimum(), llh_reference, Histogram->GetMaximum());
+  auto TempLine = std::make_unique<TLine>(llh_reference , Histogram->GetMinimum(), llh_reference, Histogram->GetMaximum());
   TempLine->SetLineColor(kBlack);
   TempLine->SetLineWidth(2);
 
@@ -1592,12 +1554,12 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
     }
   }
 
-  TLegend *Legend = new TLegend(0.6, 0.6, 0.9, 0.9);
+  auto Legend = std::make_unique<TLegend>(0.6, 0.6, 0.9, 0.9);
   Legend->SetFillColor(0);
   Legend->SetFillStyle(0);
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
-  Legend->AddEntry(TempLine, Form("Reference LLH, %.0f, p-value=%.2f", llh_reference, pvalue), "l");
+  Legend->AddEntry(TempLine.get(), Form("Reference LLH, %.0f, p-value=%.2f", llh_reference, pvalue), "l");
   Legend->AddEntry(Histogram, Form("LLH, #mu=%.1f#pm%.1f", Histogram->GetMean(), Histogram->GetRMS()), "l");
   std::string Title = Histogram->GetName();
   Title += "_canv";
@@ -1611,17 +1573,14 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
 
   TempCanvas->Write();
 
-  delete TempLine;
   delete TempHistogram;
   delete TempCanvas;
-  delete Legend;
 }
 
 // ****************
 // Make the 2D cut distribution and give the 2D p-value
 void SampleSummary::MakeCutLLH2D(TH2D *Histogram) {
 // ****************
-
   const double TotalIntegral = Histogram->Integral();
   // Count how many fills are above y=x axis
   // This is the 2D p-value
@@ -1653,7 +1612,7 @@ void SampleSummary::MakeCutLLH2D(TH2D *Histogram) {
     maximum += Histogram->GetYaxis()->GetBinWidth(Histogram->GetYaxis()->GetNbins());
   }
   else maximum += Histogram->GetXaxis()->GetBinWidth(Histogram->GetXaxis()->GetNbins());
-  TLine *TempLine = new TLine(minimum, minimum, maximum, maximum);
+  auto TempLine = std::make_unique<TLine>(minimum, minimum, maximum, maximum);
   TempLine->SetLineColor(kRed);
   TempLine->SetLineWidth(2);
 
@@ -1669,7 +1628,6 @@ void SampleSummary::MakeCutLLH2D(TH2D *Histogram) {
   TempLine->Draw("same");
 
   TempCanvas->Write();
-  delete TempLine;
   delete TempCanvas;
 }
 
@@ -1678,7 +1636,7 @@ void SampleSummary::MakeCutLLH2D(TH2D *Histogram) {
 void SampleSummary::MakeCutEventRate(TH1D *Histogram, const double DataRate) {
 // ****************
   // For the event rate histogram add a TLine to the data rate
-  TLine *TempLine = new TLine(DataRate, Histogram->GetMinimum(), DataRate, Histogram->GetMaximum());
+  auto TempLine = std::make_unique<TLine>(DataRate, Histogram->GetMinimum(), DataRate, Histogram->GetMaximum());
   TempLine->SetLineColor(kRed);
   TempLine->SetLineWidth(2);
   // Also fit a Gaussian because why not?
@@ -1694,12 +1652,12 @@ void SampleSummary::MakeCutEventRate(TH1D *Histogram, const double DataRate) {
     }
   }
   const double pvalue = Above/Histogram->Integral();
-  TLegend *Legend = new TLegend(0.4, 0.75, 0.98, 0.90);
+  auto Legend = std::make_unique<TLegend>(0.4, 0.75, 0.98, 0.90);
   Legend->SetFillColor(0);
   Legend->SetFillStyle(0);
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
-  Legend->AddEntry(TempLine, Form("Data, %.0f, p-value=%.2f", DataRate, pvalue), "l");
+  Legend->AddEntry(TempLine.get(), Form("Data, %.0f, p-value=%.2f", DataRate, pvalue), "l");
   Legend->AddEntry(Histogram, Form("MC, #mu=%.1f#pm%.1f", Histogram->GetMean(), Histogram->GetRMS()), "l");
   Legend->AddEntry(Fitter, Form("Gauss, #mu=%.1f#pm%.1f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
   std::string TempTitle = std::string(Histogram->GetName());
@@ -1719,10 +1677,8 @@ void SampleSummary::MakeCutEventRate(TH1D *Histogram, const double DataRate) {
   TempCanvas->Write();
   Histogram->Write();
 
-  delete TempLine;
   delete TempCanvas;
   delete Fitter;
-  delete Legend;
 }
 
 // ****************
@@ -1854,7 +1810,7 @@ void SampleSummary::PlotBetaParameters() {
       BetaHist[i][j]->Fit(Fitter, "RQ");
       Fitter->SetLineColor(kRed-5);
 
-      TLegend *Legend = new TLegend(0.4, 0.75, 0.98, 0.90);
+      auto Legend = std::make_unique<TLegend>(0.4, 0.75, 0.98, 0.90);
       Legend->SetFillColor(0);
       Legend->SetFillStyle(0);
       Legend->SetLineWidth(0);
@@ -1883,7 +1839,6 @@ void SampleSummary::PlotBetaParameters() {
       delete TempLine;
       delete TempCanvas;
       delete Fitter;
-      delete Legend;
     }
     DirBeta[i]->Write();
     delete DirBeta[i];
@@ -1904,7 +1859,7 @@ void SampleSummary::StudyKinematicCorrelations() {
   timer.Start();
 
     // Data vs Draw for 1D projection
-  double* NEvents_Sample = new double[nSamples];
+  std::vector<double> NEvents_Sample(nSamples);
   double event_rate = 0.;
 
   // The output tree we're going to write to
@@ -1930,7 +1885,6 @@ void SampleSummary::StudyKinematicCorrelations() {
 
   // Holds the event rate for the distribution
   TH1D **SumHist = new TH1D*[nSamples];
-
   for (int i = 0; i < nSamples; ++i)
   {
     std::string name = std::string(NominalHist[i]->GetName());
@@ -1985,14 +1939,13 @@ void SampleSummary::StudyKinematicCorrelations() {
     MakeCutEventRate(SumHist[SampleNum], NoOverflowIntegral(DataHist[SampleNum]));
   }
 
-  // Make a new direcotry
+  // Make a new directory
   TDirectory *CorrDir = Outputfile->mkdir("Correlations");
   CorrDir->cd();
 
   TMatrixDSym* SampleCorrelation = new TMatrixDSym(nSamples);
 
   TH2D*** SamCorr = new TH2D**[nSamples]();
-
   for (int i = 0; i < nSamples; ++i)
   {
     SamCorr[i] = new TH2D*[nSamples]();
@@ -2008,7 +1961,7 @@ void SampleSummary::StudyKinematicCorrelations() {
 
       // TH2D to hold the Correlation
       SamCorr[i][j] = new TH2D(Form("SamCorr_%i_%i",i,j), Form("SamCorr_%i_%i",i,j), 70, Min_i, Max_i, 70, Min_j, Max_j);
-      SamCorr[i][j]->SetDirectory(0);
+      SamCorr[i][j]->SetDirectory(nullptr);
       SamCorr[i][j]->SetMinimum(0);
       SamCorr[i][j]->GetXaxis()->SetTitle(SampleNames[i].c_str());
       SamCorr[i][j]->GetYaxis()->SetTitle(SampleNames[j].c_str());
@@ -2041,7 +1994,7 @@ void SampleSummary::StudyKinematicCorrelations() {
   }// End i loop
 
   TH2D* hSamCorr = new TH2D("Sample Correlation", "Sample Correlation", nSamples, 0, nSamples, nSamples, 0, nSamples);
-  hSamCorr->SetDirectory(0);
+  hSamCorr->SetDirectory(nullptr);
   hSamCorr->GetZaxis()->SetTitle("Correlation");
   hSamCorr->SetMinimum(-1);
   hSamCorr->SetMaximum(1);
@@ -2121,7 +2074,7 @@ void SampleSummary::StudyKinematicCorrelations() {
 
           // TH2D to hold the Correlation
           KinCorr[i][j] = new TH2D(Form("Kin_%i_%i_%i",SampleNum,i,j), Form("Kin_%i_%i_%i",SampleNum,i,j), 70, Min_i, Max_i, 70, Min_j, Max_j);
-          KinCorr[i][j]->SetDirectory(0);
+          KinCorr[i][j]->SetDirectory(nullptr);
           KinCorr[i][j]->SetMinimum(0);
 
           KinCorr[i][j]->GetXaxis()->SetTitle(ss2.str().c_str());
@@ -2162,7 +2115,7 @@ void SampleSummary::StudyKinematicCorrelations() {
 
 
       TH2D* hKinCorr = new TH2D(SampleNames[SampleNum].c_str(), SampleNames[SampleNum].c_str(), maxBins[SampleNum], 0, maxBins[SampleNum], maxBins[SampleNum], 0, maxBins[SampleNum]);
-      hKinCorr->SetDirectory(0);
+      hKinCorr->SetDirectory(nullptr);
       hKinCorr->GetZaxis()->SetTitle("Correlation");
       hKinCorr->SetMinimum(-1);
       hKinCorr->SetMaximum(1);
@@ -2233,8 +2186,7 @@ void SampleSummary::StudyKinematicCorrelations() {
   if(DoByModePlots)
   {
     // Holds the total event rate by mode
-    TH1D ** EventHist_ByMode = new TH1D*[Modes->GetNModes()+1];
-
+    std::vector<TH1D*> EventHist_ByMode(Modes->GetNModes()+1);
     for (int j = 0; j < Modes->GetNModes()+1; j++)
     {
       std::string ModeName = Modes->GetMaCh3ModeName(j);
@@ -2284,7 +2236,7 @@ void SampleSummary::StudyKinematicCorrelations() {
 
         // TH2D to hold the Correlation
         ModeCorr[i][j] = new TH2D(Form("ModeCorr_%i_%i",i,j), Form("ModeCorr_%i_%i",i,j), 70, Min_i, Max_i, 70, Min_j, Max_j);
-        ModeCorr[i][j]->SetDirectory(0);
+        ModeCorr[i][j]->SetDirectory(nullptr);
         ModeCorr[i][j]->SetMinimum(0);
         ModeCorr[i][j]->GetXaxis()->SetTitle(Modes->GetMaCh3ModeName(i).c_str());
         ModeCorr[i][j]->GetYaxis()->SetTitle(Modes->GetMaCh3ModeName(j).c_str());
@@ -2324,7 +2276,7 @@ void SampleSummary::StudyKinematicCorrelations() {
     }// End i loop
 
     TH2D* hModeCorr = new TH2D("Mode Correlation", "Mode Correlation", Modes->GetNModes()+1, 0, Modes->GetNModes()+1, Modes->GetNModes()+1, 0, Modes->GetNModes()+1);
-    hModeCorr->SetDirectory(0);
+    hModeCorr->SetDirectory(nullptr);
     hModeCorr->GetZaxis()->SetTitle("Correlation");
     hModeCorr->SetMinimum(-1);
     hModeCorr->SetMaximum(1);
@@ -2374,7 +2326,6 @@ void SampleSummary::StudyKinematicCorrelations() {
     {
       delete EventHist_ByMode[j];
     }
-    delete[] EventHist_ByMode;
   }
 
   for (int i = 0; i < nSamples; ++i)
@@ -2665,7 +2616,6 @@ void SampleSummary::StudyDIC() {
   MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
   MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
   MACH3LOG_INFO("******************************");
-  return;
 }
 
 // ****************
@@ -2677,5 +2627,4 @@ void SampleSummary::FastViolinFill(TH2D* violin, TH1D* hist_1d){
     const double y = violin->GetYaxis()->FindBin(hist_1d->GetBinContent(x+1));
     violin->SetBinContent(x+1, y,  violin->GetBinContent(x+1, y)+1);
   }
-  return;
 }

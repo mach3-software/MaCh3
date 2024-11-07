@@ -1,9 +1,5 @@
 #pragma once
-//
-// Created by Emily Ip on 24/2/2023.
-//
-// Created by Emily Ip on 26/1/2023.
-//
+
 // C++ includes
 #include <algorithm>
 #include <functional>
@@ -15,6 +11,7 @@
 
 /// @brief Class particle - stores the position, velocity and personal best
 /// With functions which move particle and update velocity
+/// @note Created by Emily Ip on 24/2/2023.
 class particle{
   public:
       particle(){};
@@ -72,6 +69,7 @@ class particle{
  /// @brief Class PSO, consist of a vector of object Class Particle and global best
  /// Takes in the size (number of particle) and number of iteration
  /// functions includes: finding global best, updating velocity, actual minimisation function
+/// @note Created by Emily Ip on 24/2/2023.
 class PSO : public LikelihoodFit {
   public:
     /// @brief constructor
