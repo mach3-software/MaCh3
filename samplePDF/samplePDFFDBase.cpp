@@ -11,11 +11,11 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   MACH3LOG_INFO("Ceating SamplePDFFDBase object");
   
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(xsec_cov == NULL){
-    MACH3LOG_ERROR("You've passed me a NULL xsec covariance matrix... I need this to setup splines!");
+  if(!xsec_cov){
+    MACH3LOG_ERROR("You've passed me a nullptr to a covarianceXsec... I need this to setup splines!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  SetXsecCov(xsec_cov);
+  XsecCov = xsec_cov;
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
@@ -64,7 +64,7 @@ void samplePDFFDBase::ReadSampleConfig()
   if (CheckNodeExists(SampleManager->raw(), "DetID")) {
     SampleDetID = SampleManager->raw()["DetID"].as<int>();
   } else{
-    MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
+    MACH3LOG_ERROR("DetID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
@@ -167,6 +167,9 @@ void samplePDFFDBase::ReadSampleConfig()
 
 void samplePDFFDBase::Initialise() {
 
+ // //
+ // SetXsecCov(xsec_cov);
+
   //First grab all the information from your sample config via your manager
   ReadSampleConfig();
 
@@ -196,8 +199,11 @@ void samplePDFFDBase::Initialise() {
   SetupSplines();
   MACH3LOG_INFO("Setting up Normalisation Pointers..");
   SetupNormParameters();
+  MACH3LOG_INFO("Setting up Functional Pointers..");
+  SetupFunctionalParameters();
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
+
 
   MACH3LOG_INFO("=======================================================");
 }
@@ -408,6 +414,8 @@ void samplePDFFDBase::fillArray() {
         continue;
       } 
 
+      std::cout << "Event passed selection, here we go!!" << std::endl;
+
       double splineweight = 1.0;
       double normweight = 1.0;
       double funcweight = 1.0;
@@ -557,109 +565,111 @@ void samplePDFFDBase::fillArray_MP()
     }
     
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
-#pragma omp for
+      #pragma omp for
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-	
+
         //ETA - generic functions to apply shifts to kinematic variables
         // Apply this before IsEventSelected is called.
-	applyShifts(iSample, iEvent);
-	
+        applyShifts(iSample, iEvent);
+
         //ETA - generic functions to apply shifts to kinematic variable
-	//this is going to be slow right now due to string comps under the hood.
-	//Need to implement a more efficient version of event-by-event cut checks
-	if(!IsEventSelected(iSample, iEvent)){
-	  continue;
-	}
-	
-	double splineweight = 1.0;
-	double normweight = 1.0;
-	double funcweight = 1.0;
-	double totalweight = 1.0;
-	
-	//DB SKDet Syst
-	//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-	
-	if(splineFile){
-	  splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-	}
-	//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-	if (splineweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
+        //this is going to be slow right now due to string comps under the hood.
+        //Need to implement a more efficient version of event-by-event cut checks
+        if(!IsEventSelected(iSample, iEvent)){
+          continue;
+        }
+
+        double splineweight = 1.0;
+        double normweight = 1.0;
+        double funcweight = 1.0;
+        double totalweight = 1.0;
+
+        //DB SKDet Syst
+        //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
+
+        if(splineFile){
+          splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+        }
+        //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
+        if (splineweight <= 0.){
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
         normweight *= CalcXsecWeightNorm(iSample, iEvent);
-	//DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-	if (normweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
-	funcweight = CalcXsecWeightFunc(iSample,iEvent);
-	//DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-	if (funcweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
-	MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
-	
-	totalweight = GetEventWeight(iSample, iEvent);
-	
-	//DB Catch negative weights and skip any event with a negative event
-	if (totalweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
-	//DB Switch on BinningOpt to allow different binning options to be implemented
-	//The alternative would be to have inheritance based on BinningOpt
-	double XVar = (*(MCSamples[iSample].x_var[iEvent]));
-	
-	//DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-	//double YVar = MCSamples[iSample].rw_theta[iEvent];
-	//ETA - this would actually be with (*(MCSamples[iSample].y_var[iEvent])) and done extremely
-	//similarly to XVar now
-	
-	//DB Find the relevant bin in the PDF for each event
-	int XBinToFill = -1;
-	int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
-	
-	//DB Check to see if momentum shift has moved bins
-	//DB - First, check to see if the event is still in the nominal bin	
-	if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
-	  XBinToFill = MCSamples[iSample].NomXBin[iEvent];
-	}
-	//DB - Second, check to see if the event is outside of the binning range and skip event if it is
-	else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-	  continue;
-	}
-	//DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-	//Shifted down one bin from the event bin at nominal
-	else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
-	  XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
-	}
-	//Shifted up one bin from the event bin at nominal
-	else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
-	  XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
-	}
-	//DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-	else {
-	  for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-	    if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-	      XBinToFill = iBin;
-	    }
-	  }
-	}
-	
-	//ETA - we can probably remove this final if check on the -1? 
-	//Maybe we can add an overflow bin to the array and assign any events to this bin?
-	//Might save us an extra if call?
-	//DB Fill relevant part of thread array
-	if (XBinToFill != -1 && YBinToFill != -1) {
+        //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
+        if (normweight <= 0.){
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
+        funcweight = CalcXsecWeightFunc(iSample,iEvent);
+        //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
+        if (funcweight <= 0.){
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
+        MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
+
+        totalweight = GetEventWeight(iSample, iEvent);
+
+        //DB Catch negative weights and skip any event with a negative event
+        if (totalweight <= 0.){
+          //std::cout << "NEGATIVE WEIGHT!!" << std::endl;
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
+        //DB Switch on BinningOpt to allow different binning options to be implemented
+        //The alternative would be to have inheritance based on BinningOpt
+        double XVar = (*(MCSamples[iSample].x_var[iEvent]));
+
+        //DB Commented out by default but if we ever want to consider shifts in theta this will be needed
+        //double YVar = MCSamples[iSample].rw_theta[iEvent];
+        //ETA - this would actually be with (*(MCSamples[iSample].y_var[iEvent])) and done extremely
+        //similarly to XVar now
+
+        //DB Find the relevant bin in the PDF for each event
+        int XBinToFill = -1;
+        int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
+
+        //DB Check to see if momentum shift has moved bins
+        //DB - First, check to see if the event is still in the nominal bin	
+        if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
+          XBinToFill = MCSamples[iSample].NomXBin[iEvent];
+        }
+        //DB - Second, check to see if the event is outside of the binning range and skip event if it is
+        else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
+          std::cout << "XVAR BEYOND BIN EDGES!!" << std::endl;
+          continue;
+        }
+        //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
+        //Shifted down one bin from the event bin at nominal
+        else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
+          XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
+        }
+        //Shifted up one bin from the event bin at nominal
+        else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
+          XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
+        }
+        //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
+        else {
+          for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
+            if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
+              XBinToFill = iBin;
+            }
+          }
+        }
+
+        //ETA - we can probably remove this final if check on the -1? 
+        //Maybe we can add an overflow bin to the array and assign any events to this bin?
+        //Might save us an extra if call?
+        //DB Fill relevant part of thread array
+        if (XBinToFill != -1 && YBinToFill != -1) {
           samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
           samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
-	}
+        }
       }
     }    
     
@@ -734,7 +744,10 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
 }
 
 void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
+
   XsecCov = xsec;
+  std::cout << "Setting up XsecCov is " << __FUNCTION__ << std::endl;
+  std::cout << "DetID is " << SampleDetID << std::endl;
 
   // Get the map between the normalisation parameters index, their name, what mode they should apply to, and what target
   //This information is used later in CalcXsecNormsBins to decide if a parameter applies to an event
@@ -745,10 +758,14 @@ void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
   funcParsNames = XsecCov->GetParsNamesFromDetID(SampleDetID, SystType::kFunc);
   funcParsIndex = XsecCov->GetParsIndexFromDetID(SampleDetID, SystType::kFunc);
 
+  std::cout << "funcParsIndex is of size " << funcParsIndex.size() << std::endl;
+
   return;
 }
 
 void samplePDFFDBase::SetupNormParameters(){
+  
+  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
 
   if(!XsecCov){
 	MACH3LOG_ERROR("XsecCov is not setup!");
@@ -1431,9 +1448,13 @@ void samplePDFFDBase::SetupNuOscillator() {
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   double totalweight = 1.0;
+  //std::cout << "~~~~~~~" << std::endl;
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
+    //std::cout << "Weight " << iParam << " is " << *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
   }
+  //std::cout << "~~~~~~~" << std::endl;
+  
   return totalweight;
 }
 

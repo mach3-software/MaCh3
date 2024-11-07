@@ -129,6 +129,8 @@ public:
   //===============================================================================
 
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
+  virtual void SetupFunctionalParameters(){};
+  /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
@@ -152,10 +154,6 @@ public:
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
 
-  // Function to setup Functional and shift parameters. This isn't idea but
-  // do this in your experiment specific code for now as we don't have a 
-  // generic treatment for func and shift pars yet
-  virtual void SetupFuncParameters(){return;};
   void SetupNormParameters();
 
   //===============================================================================
