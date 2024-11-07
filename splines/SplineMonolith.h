@@ -1,7 +1,7 @@
 #pragma once
 #ifdef USE_FPGA
 #include <sycl/sycl.hpp>
-#include <dpct/dpct.hpp>
+#include "splines/oneAPIUtils.dp.hpp"
 #endif
 
 #include "splines/SplineBase.h"

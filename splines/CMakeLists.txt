@@ -37,7 +37,11 @@ elseif(USE_FPGA)
         SplineMonolith.cpp
         oneAPIUtils.dp.cpp
     )
-    set_source_files_properties(oneAPIUtils.dp.cpp PROPERTIES COMPILE_FLAGS "-fsycl -fintelfpga")
+
+    target_compile_options(Splines PUBLIC
+        -fsycl
+        -fintelfpga
+    )
 
 elseif(CPU_ONLY)
     set(HEADERS
@@ -70,6 +74,7 @@ target_link_libraries(Splines Manager MaCh3CompilerOptions)
 target_include_directories(Splines PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
+    /opt/intel/oneapi/2024.2/include
 )
 
 install(TARGETS Splines

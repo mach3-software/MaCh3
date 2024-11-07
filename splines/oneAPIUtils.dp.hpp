@@ -1,10 +1,13 @@
 #pragma once
-#include <CL/sycl.hpp>
-#include <dpct/dpct.hpp>
+#include <sycl/sycl.hpp>
 
 struct SplineMonoUSM {
 
-    SplineMonoUSM(sycl::queue, queue, int coeff_x_size, int coeff_many_size, int nKnots_arr_size, int nKnots_arr_size);
+    SplineMonoUSM(sycl::queue& queue,
+                  int coeff_x_size,
+                  int coeff_many_size,
+                  int nKnots_arr_size,
+                  int paramNo_arr_size);
     ~SplineMonoUSM();
 
     sycl::queue& m_queue;
