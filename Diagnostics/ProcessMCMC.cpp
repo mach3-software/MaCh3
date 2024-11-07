@@ -93,7 +93,11 @@ void ProcessMCMC(const std::string& inputFile)
   Processor->SetPost2DPlotThreshold(GetFromManager<double>(Settings["Post2DPlotThreshold"], 0.2));
 
   Processor->Initialise();
-  
+  if(Settings["Thinning"])
+  {
+    bool DoThin = Settings["Thinning"][0].as<bool>();
+    if(DoThin) Processor->ThinMCMC(Settings["Thinning"][1].as<int>());
+  }
   // Make the postfit
   Processor->MakePostfit();
   Processor->DrawPostfit();

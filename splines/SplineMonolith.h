@@ -66,7 +66,7 @@ class SMonolith : public SplineBase {
     /// @param nTF1Valid Total number of valid (not null) TF1
     inline void ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
                                  unsigned int &nEvents,
-                                 int &MaxPoints,
+                                 short int &MaxPoints,
                                  short int &numParams,
                                  int &nSplines,
                                  unsigned int &NSplinesValid,
@@ -121,7 +121,7 @@ class SMonolith : public SplineBase {
     /// Number of NIWG parameters that have splines
     short int nParams;
     /// Max knots for production
-    int _max_knots;
+    short int _max_knots;
     /// holds the index for good splines; don't do unsigned since starts with negative value!
     std::vector<int> index_spline_cpu;
     /// holds the index for good TF1; don't do unsigned since starts with negative value!
