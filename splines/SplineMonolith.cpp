@@ -391,7 +391,7 @@ void SMonolith::MoveToGPU() {
 // Scan the master spline to get the maximum number of knots in any of the TSpline3*
 void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
                                  unsigned int &nEvents,
-                                 int &MaxPoints,
+                                 short int &MaxPoints,
                                  short int &numParams,
                                  int &nSplines,
                                  unsigned int &NSplinesValid,
@@ -449,7 +449,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
         TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(TespFunc);
         int nPoints = CurrSpline->GetNp();
         if (nPoints > MaxPoints) {
-          MaxPoints = nPoints;
+          MaxPoints = static_cast<short int>(nPoints);
         }
         numKnots += nPoints;
         nSplines_SingleEvent++;
@@ -559,7 +559,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
   NEvents = NEvents_temp;
   nParams = nParams_temp;
-  _max_knots = _max_knots_temp;
+  _max_knots = static_cast<short int>(_max_knots_temp);
   nKnots = nKnots_temp;
   NSplines_valid = NSplines_valid_temp;
   NTF1_valid = nTF1Valid_temp;
