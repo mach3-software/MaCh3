@@ -159,6 +159,10 @@ class MCMCProcessor {
     void ParameterEvolution(const std::vector<std::string>& Names,
                             const std::vector<int>& NIntervals);
 
+    /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
+    /// @param ThinningCut every which entry you want to thin
+    inline void ThinMCMC(const int ThinningCut) {ThinningMCMC(MCMCFile+".root", ThinningCut);};
+
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     
