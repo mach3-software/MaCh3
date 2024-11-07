@@ -63,10 +63,9 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 ## Python
 
-MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface 
-(see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
+MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
 
-You can tell the build system to set up the pyMaCh3 interface by specifying 
+You can tell the build system to set up the pyMaCh3 interface by specifying
 
 ```bash
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
