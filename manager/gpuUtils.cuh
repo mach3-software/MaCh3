@@ -1,12 +1,16 @@
 #pragma once
 
+
 // C i/o  for printf and others
 #include <stdio.h>
 #include <vector>
 
 // CUDA specifics
-
+// Because CUDA is cuda, need to make sure we don't check C-style floats...
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <cuda_runtime.h>
+#pragma GCC diagnostic pop
 
 #ifdef CUDA_ERROR_CHECK
 #include <helper_functions.h>
@@ -20,11 +24,13 @@
 /// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
 #define _BlockSize_ 1024
 
+
+/// @file gpuUtils.cuh
+/// @brief Common CUDA utilities and definitions for shared GPU functionality.
+
 /// @todo KS: There is plenty of useful stuff here https://github.com/NVIDIA/cuda-samples/blob/master/Samples/1_Utilities/deviceQuery/deviceQuery.cpp
 /// @todo KS: We might want to port some of these utilities, for example having bool if there is unified memory etc.
 
-// CUDA_ERROR_CHECK is now defined in the makefile instead
-//#define CUDA_ERROR_CHECK
 
 // **************************************************
 //             ERROR CHECKING ROUTINES

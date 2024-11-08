@@ -8,6 +8,9 @@
 #include "mcmc/gpuMCMCProcessorUtils.cuh"
 #endif
 
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 // ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   Chain(nullptr), StepCut(""), MadePostfit(false) {
@@ -181,7 +184,7 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
   MakePostfit();
 
   // Loop over the loaded param types
-  const int ParamTypeSize = ParamType.size();
+  const int ParamTypeSize = int(ParamType.size());
   int ParamNumber = 0;
   for (int i = 0; i < ParamTypeSize; ++i) {
     if (ParamType[i] != kParam) continue;
@@ -197,8 +200,8 @@ void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 // ***************
   if (CacheMCMC) MakeCovariance_MP();
   else MakeCovariance();
-  Cov = (TMatrixDSym*)Covariance->Clone();
-  Corr = (TMatrixDSym*)Correlation->Clone();
+  Cov = static_cast<TMatrixDSym*>(Covariance->Clone());
+  Corr = static_cast<TMatrixDSym*>(Correlation->Clone());
 }
 
 // ***************
@@ -217,11 +220,12 @@ void MCMCProcessor::MakeOutputFile() {
   gStyle->SetOptTitle(0);
   Posterior->SetTickx();
   Posterior->SetTicky();
+
   Posterior->SetBottomMargin(0.1);
   Posterior->SetTopMargin(0.05);
   Posterior->SetRightMargin(0.03);
   Posterior->SetLeftMargin(0.15);
-  
+
   //To avoid TCanvas::Print> messages
   gErrorIgnoreLevel = kWarning;
   
@@ -463,7 +467,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot->SetMarkerSize(prefit->GetMarkerSize());
 
   // Same but with Gaussian output
-  TH1D *paramPlot_Gauss = (TH1D*)(paramPlot->Clone());
+  TH1D *paramPlot_Gauss = static_cast<TH1D*>(paramPlot->Clone());
   paramPlot_Gauss->SetMarkerColor(kOrange-5);
   paramPlot_Gauss->SetMarkerStyle(23);
   paramPlot_Gauss->SetLineWidth(2);
@@ -473,7 +477,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot_Gauss->SetLineColor(paramPlot_Gauss->GetMarkerColor());
 
   // Same but with Gaussian output
-  TH1D *paramPlot_HPD = (TH1D*)(paramPlot->Clone());
+  TH1D *paramPlot_HPD = static_cast<TH1D*>(paramPlot->Clone());
   paramPlot_HPD->SetMarkerColor(kBlack);
   paramPlot_HPD->SetMarkerStyle(25);
   paramPlot_HPD->SetLineWidth(2);
@@ -719,19 +723,18 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
     }
   }
 
-  const int nCredible = CredibleIntervals.size();
-  TH1D** hpost_copy = new TH1D*[nDraw];
-  TH1D*** hpost_cl = new TH1D**[nDraw];
+  const int nCredible = int(CredibleIntervals.size());
+  std::vector<TH1D*> hpost_copy(nDraw);
+  std::vector<std::vector<TH1D*>> hpost_cl(nDraw);
 
   //KS: Copy all histograms to be thread safe
   for (int i = 0; i < nDraw; ++i)
   {
-    hpost_copy[i] = (TH1D*) hpost[i]->Clone(Form("hpost_copy_%i", i));
-    hpost_cl[i] = new TH1D*[nCredible];
-
+    hpost_copy[i] = static_cast<TH1D*>(hpost[i]->Clone(Form("hpost_copy_%i", i)));
+    hpost_cl[i].resize(nCredible);
     for (int j = 0; j < nCredible; ++j)
     {
-      hpost_cl[i][j] = (TH1D*) hpost[i]->Clone( Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j]));
+      hpost_cl[i][j] = static_cast<TH1D*>(hpost[i]->Clone(Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j])));
 
       //KS: Reset to get rid to TF1 otherwise we run into segfault :(
       hpost_cl[i][j]->Reset("");
@@ -755,7 +758,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
       if(CredibleInSigmas)
       {
         //KS: Convert sigmas into percentage
-        const double CredInter = GetSigmaValue((int)std::round(CredibleIntervals[j]));
+        const double CredInter = GetSigmaValue(int(std::round(CredibleIntervals[j])));
         GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredInter);
       }
       else
@@ -826,17 +829,12 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
   }
 
   //KS: Remove histograms
-  for (int i = 0; i < nDraw; ++i)
-  {
+  for (int i = 0; i < nDraw; ++i) {
     delete hpost_copy[i];
-    for (int j = 0; j < nCredible; ++j)
-    {
+    for (int j = 0; j < nCredible; ++j) {
       delete hpost_cl[i][j];
     }
-    delete[] hpost_cl[i];
   }
-  delete[] hpost_copy;
-  delete[] hpost_cl;
 
   CredibleDir->Close();
   delete CredibleDir;
@@ -1054,8 +1052,7 @@ void MCMCProcessor::MakeCovariance() {
       const double min_j = Chain->GetMinimum(BranchNames[j]);
 
       // TH2F to hold the Correlation 
-      TH2D *hpost_2D = new TH2D(DrawMe, DrawMe, nBins, min_i, max_i, nBins, min_j, max_j);
-
+      std::unique_ptr<TH2D> hpost_2D = std::make_unique<TH2D>(DrawMe, DrawMe, nBins, min_i, max_i, nBins, min_j, max_j);
       hpost_2D->SetMinimum(0);
       hpost_2D->GetXaxis()->SetTitle(Title_i);
       hpost_2D->GetYaxis()->SetTitle(Title_j);
@@ -1090,8 +1087,6 @@ void MCMCProcessor::MakeCovariance() {
       // Write it to root file
       //OutputFile->cd();
       //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) hpost_2D->Write();
-
-      delete hpost_2D;
     } // End j loop
   } // End i loop
   OutputFile->cd();
@@ -1116,7 +1111,7 @@ void MCMCProcessor::CacheSteps() {
   }
 
   MACH3LOG_INFO("Caching input tree...");
-  MACH3LOG_INFO("Allocating {:.2f} MB", (sizeof(double)*nDraw*nEntries)/1.E6);
+  MACH3LOG_INFO("Allocating {:.2f} MB", double(sizeof(double)*nDraw*nEntries)/1.E6);
   TStopwatch clock;
   clock.Start();
   
@@ -1148,10 +1143,10 @@ void MCMCProcessor::CacheSteps() {
   }
   Chain->SetBranchStatus("step", true);
 
-  const int countwidth = nEntries/10;
+  const Long64_t countwidth = nEntries/10;
   // Loop over the entries
   //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
-  for (int j = 0; j < nEntries; ++j) 
+  for (Long64_t j = 0; j < nEntries; ++j) 
   {
     if (j % countwidth == 0)
         MaCh3Utils::PrintProgressBar(j, nEntries);
@@ -1213,7 +1208,6 @@ void MCMCProcessor::CacheSteps() {
 // Make the post-fit covariance matrix in all dimensions
 void MCMCProcessor::MakeCovariance_MP(bool Mute) {
 // *********************
-    
   if (OutputFile == nullptr) MakeOutputFile();
     
   if(!CacheMCMC) CacheSteps();
@@ -1340,7 +1334,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   TStopwatch clock;
   clock.Start();
 
-  TH1D* SubOptimality = new TH1D("Suboptimality", "Suboptimality", NIntervals, MinStep, MaxStep);
+  std::unique_ptr<TH1D> SubOptimality = std::make_unique<TH1D>("Suboptimality", "Suboptimality", NIntervals, MinStep, MaxStep);
   SubOptimality->GetXaxis()->SetTitle("Step");
   SubOptimality->GetYaxis()->SetTitle("Suboptimality");
   SubOptimality->SetLineWidth(2);
@@ -1386,8 +1380,6 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   // Write it to root file
   OutputFile->cd();
   Posterior->Write();
-
-  delete SubOptimality;
 }
 
 // *********************
@@ -1398,13 +1390,13 @@ void MCMCProcessor::DrawCovariance() {
   Posterior->SetRightMargin(0.15);
 
   // The Covariance matrix from the fit
-  TH2D* hCov = new TH2D("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  std::unique_ptr<TH2D> hCov = std::make_unique<TH2D>("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCov->GetZaxis()->SetTitle("Covariance");
   // The Covariance matrix square root, with correct sign
-  TH2D* hCovSq = new TH2D("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  std::unique_ptr<TH2D> hCovSq = std::make_unique<TH2D>("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCovSq->GetZaxis()->SetTitle("Covariance");
   // The Correlation
-  TH2D* hCorr = new TH2D("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  std::unique_ptr<TH2D> hCorr = std::make_unique<TH2D>("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCorr->GetZaxis()->SetTitle("Correlation");
   hCorr->SetMinimum(-1);
   hCorr->SetMaximum(1);
@@ -1480,10 +1472,6 @@ void MCMCProcessor::DrawCovariance() {
   
   //Back to normal
   Posterior->SetRightMargin(RightMargin);
-  delete hCov;
-  delete hCovSq;
-  delete hCorr;
-
   DrawCorrelations1D();
 }
 
@@ -1491,7 +1479,6 @@ void MCMCProcessor::DrawCovariance() {
 //KS: Make the 1D projections of Correlations inspired by Henry's slides (page 28) https://www.t2k.org/asg/oagroup/meeting/2023/2023-07-10-oa-pre-meeting/MaCh3FDUpdate
 void MCMCProcessor::DrawCorrelations1D() {
 // *********************
-
   //KS: Store it as we go back to them at the end
   const double TopMargin  = Posterior->GetTopMargin();
   const double BottomMargin  = Posterior->GetBottomMargin();
@@ -1512,7 +1499,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   std::vector<std::vector<std::string>> NameCorrOfInterest;
   NameCorrOfInterest.resize(nDraw);
 
-  TH1D ***Corr1DHist = new TH1D**[nDraw]();
+  std::vector<std::vector<std::unique_ptr<TH1D>>> Corr1DHist(nDraw);
   //KS: Initialising ROOT objects is never safe in MP loop
   for(int i = 0; i < nDraw; ++i)
   {
@@ -1521,10 +1508,10 @@ void MCMCProcessor::DrawCorrelations1D() {
     double PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
 
-    Corr1DHist[i] = new TH1D*[Nhists]();
+    Corr1DHist[i].resize(Nhists);
     for(int j = 0; j < Nhists; ++j)
     {
-      Corr1DHist[i][j] = new TH1D(Form("Corr1DHist_%i_%i", i, j), Form("Corr1DHist_%i_%i", i, j), nDraw, 0, nDraw);
+      Corr1DHist[i][j] = std::make_unique<TH1D>(Form("Corr1DHist_%i_%i", i, j), Form("Corr1DHist_%i_%i", i, j), nDraw, 0, nDraw);
       Corr1DHist[i][j]->SetTitle(Form("%s",Title.Data()));
       Corr1DHist[i][j]->GetYaxis()->SetTitle("Correlation");
       Corr1DHist[i][j]->SetFillColor(CorrColours[j]);
@@ -1583,7 +1570,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     leg->SetTextSize(0.02);
     for(int k = 0; k < Nhists; k++)
     {
-      leg->AddEntry(Corr1DHist[i][k], Form("%.2f > |Corr| >= %.2f", Thresholds[k+1], Thresholds[k]), "f");
+      leg->AddEntry(Corr1DHist[i][k].get(), Form("%.2f > |Corr| >= %.2f", Thresholds[k+1], Thresholds[k]), "f");
     }
     leg->SetLineColor(0);
     leg->SetLineStyle(0);
@@ -1598,7 +1585,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   //KS: Plot only meaningful correlations
   for(int i = 0; i < nDraw; i++)
   {
-    const int size = CorrOfInterest[i].size();
+    const int size = int(CorrOfInterest[i].size());
 
     if(size == 0) continue;
     TH1D* Corr1DHist_Reduced = new TH1D("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
@@ -1624,16 +1611,6 @@ void MCMCProcessor::DrawCorrelations1D() {
 
     delete Corr1DHist_Reduced;
   }
-
-  for(int i = 0; i < nDraw; i++)
-  {
-    for(int k = 1; k < Nhists; k++)
-    {
-      delete Corr1DHist[i][k];
-    }
-    delete[] Corr1DHist[i];
-  }
-  delete[] Corr1DHist;
 
   CorrDir->Close();
   delete CorrDir;
@@ -1661,23 +1638,23 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
     MACH3LOG_ERROR("Size of  CredibleRegions is not equat to size of CredibleRegionStyle");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const int nCredible = CredibleRegions.size();
-  TH2D*** hpost_2D_copy = new TH2D**[nDraw];
-  TH2D**** hpost_2D_cl = new TH2D***[nDraw];
+  const int nCredible = int(CredibleRegions.size());
 
+
+  std::vector<std::vector<TH2D*>> hpost_2D_copy(nDraw);
+  std::vector<std::vector<std::vector<TH2D*>>> hpost_2D_cl(nDraw);
   //KS: Copy all histograms to be thread safe
   for (int i = 0; i < nDraw; ++i)
   {
-    hpost_2D_copy[i] = new TH2D*[nDraw];
-    hpost_2D_cl[i] = new TH2D**[nDraw];
+    hpost_2D_copy[i].resize(nDraw);
+    hpost_2D_cl[i].resize(nDraw);
     for (int j = 0; j <= i; ++j)
     {
-      hpost_2D_copy[i][j] = (TH2D*) hpost2D[i][j]->Clone( Form("hpost_copy_%i_%i", i, j));
-
-      hpost_2D_cl[i][j] = new TH2D*[nCredible];
+      hpost_2D_copy[i][j] = static_cast<TH2D*>(hpost2D[i][j]->Clone(Form("hpost_copy_%i_%i", i, j)));
+      hpost_2D_cl[i][j].resize(nCredible);
       for (int k = 0; k < nCredible; ++k)
       {
-        hpost_2D_cl[i][j][k] = (TH2D*)hpost2D[i][j]->Clone( Form("hpost_copy_%i_%i_CL_%f", i, j, CredibleRegions[k]));;
+        hpost_2D_cl[i][j][k] = static_cast<TH2D*>(hpost2D[i][j]->Clone(Form("hpost_copy_%i_%i_CL_%f", i, j, CredibleRegions[k])));
       }
     }
   }
@@ -1695,7 +1672,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
         if(CredibleInSigmas)
         {
           //KS: Convert sigmas into percentage
-          double CredReg = GetSigmaValue((int)std::round(CredibleRegions[k]));
+          double CredReg = GetSigmaValue(int(std::round(CredibleRegions[k])));
           GetCredibleRegion(hpost_2D_cl[i][j][k], CredReg);
         }
         else
@@ -1728,7 +1705,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       legend->SetBorderSize(0);
 
       //Get Best point
-      TGraph *bestfitM = new TGraph(1);
+      auto bestfitM = std::make_unique<TGraph>(1);
       const int MaxBin = hpost_2D_copy[i][j]->GetMaximumBin();
       int Mbx, Mby, Mbz;
       hpost_2D_copy[i][j]->GetBinXYZ(MaxBin, Mbx, Mby, Mbz);
@@ -1739,7 +1716,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       bestfitM->SetMarkerStyle(22);
       bestfitM->SetMarkerSize(1);
       bestfitM->SetMarkerColor(kMagenta);
-      legend->AddEntry(bestfitM,"Best Fit","p");
+      legend->AddEntry(bestfitM.get(),"Best Fit","p");
 
       //Plot default 2D posterior
       hpost_2D_copy[i][j]->Draw("COLZ");
@@ -1754,7 +1731,6 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
         else
           legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
       }
-
       legend->Draw("SAME");
       bestfitM->Draw("SAME.P");
 
@@ -1767,8 +1743,6 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       // Write it to root file
       //OutputFile->cd();
       //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) Posterior->Write();
-
-      delete bestfitM;
     }
   }
 
@@ -1783,13 +1757,8 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       {
         delete hpost_2D_cl[i][j][k];
       }
-      delete[] hpost_2D_cl[i][j];
     }
-    delete[] hpost_2D_copy[i];
-    delete[] hpost_2D_cl[i];
   }
-  delete[] hpost_2D_copy;
-  delete[] hpost_2D_cl;
 }
 
 // *********************
@@ -1809,7 +1778,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   if(hpost2D == nullptr) MakeCovariance_MP();
   MACH3LOG_INFO("Making Triangle Plot");
 
-  const int nParamPlot = ParNames.size();
+  const int nParamPlot = int(ParNames.size());
   std::vector<int> ParamNumber;
   for(int j = 0; j < nParamPlot; ++j)
   {
@@ -1888,8 +1857,8 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
-  const int nCredibleIntervals = CredibleIntervals.size();
-  const int nCredibleRegions = CredibleRegions.size();
+  const int nCredibleIntervals = int(CredibleIntervals.size());
+  const int nCredibleRegions = int(CredibleRegions.size());
 
   //KS: Initialise Tpad histograms etc we will need
   TPad** TrianglePad = new TPad*[Npad];
@@ -1964,13 +1933,13 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       //KS:if diagonal plot main posterior
       if(x == y)
       {
-        hpost_copy[counterPost] = (TH1D*) hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x]));
+        hpost_copy[counterPost] = static_cast<TH1D*>(hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x])));
         hpost_cl[counterPost] = new TH1D*[nCredibleIntervals];
         /// Scale the histograms so it shows the posterior probability
         hpost_copy[counterPost]->Scale(1. / hpost_copy[counterPost]->Integral());
         for (int j = 0; j < nCredibleIntervals; ++j)
         {
-          hpost_cl[counterPost][j] = (TH1D*) hpost[ParamNumber[x]]->Clone( Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleIntervals[j]));
+          hpost_cl[counterPost][j] = static_cast<TH1D*>(hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleIntervals[j])));
           //KS: Reset to get rid to TF1 otherwise we run into segfault :(
           hpost_cl[counterPost][j]->Reset("");
           hpost_cl[counterPost][j]->Fill(0.0, 0.0);
@@ -1981,7 +1950,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
           if(CredibleInSigmas)
           {
             //KS: Convert sigmas into percentage
-            const double CredReg = GetSigmaValue((int)std::round(CredibleIntervals[j]));
+            const double CredReg = GetSigmaValue(int(std::round(CredibleIntervals[j])));
             GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredReg);
           }
           else
@@ -2016,17 +1985,18 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       //KS: Here we plot 2D credible regions
       else
       {
-        hpost_2D_copy[counter2DPost] = (TH2D*) hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y]));
+        hpost_2D_copy[counter2DPost] = static_cast<TH2D*>(hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone(
+          Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y])));
         hpost_2D_cl[counter2DPost] = new TH2D*[nCredibleRegions];
         //KS: Now copy for every credible region
         for (int k = 0; k < nCredibleRegions; ++k)
         {
-          hpost_2D_cl[counter2DPost][k] = (TH2D*)hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone( Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k]));
-
+          hpost_2D_cl[counter2DPost][k] = static_cast<TH2D*>(hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone(
+            Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k])));
           if(CredibleInSigmas)
           {
             //KS: Convert sigmas into percentage
-            const double CredReg = GetSigmaValue((int)std::round(CredibleRegions[k]));
+            const double CredReg = GetSigmaValue(int(std::round(CredibleRegions[k])));
             GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredReg);
           }
           else
@@ -2141,7 +2111,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     }
     delete[] hpost_2D_cl[i];
   }
-
   delete[] hpost_copy;
   delete[] hpost_cl;
   delete[] hpost_2D_copy;
@@ -2169,13 +2138,14 @@ void MCMCProcessor::ScanInput() {
   Chain = new TChain("posteriors","posteriors");
   Chain->Add(MCMCFile.c_str());
 
-  nEntries = Chain->GetEntries();
+  nEntries = int(Chain->GetEntries());
   
   //Only is suboptimality we might want to change it, therefore set it high enough so it doesn't affect other functionality
   UpperCut = nEntries+1;
 
   // Get the list of branches
-  TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
+
+  TObjArray* brlis = Chain->GetListOfBranches();
 
   // Get the number of branches
   nBranches = brlis->GetEntries();
@@ -2192,7 +2162,11 @@ void MCMCProcessor::ScanInput() {
   for (int i = 0; i < nBranches; i++)
   {
     // Get the TBranch and its name
-    TBranch* br = (TBranch*)brlis->At(i);
+    TBranch* br = static_cast<TBranch*>(brlis->At(i));
+    if(!br){
+      MACH3LOG_ERROR("Invalid branch at position {}", i);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     TString bname = br->GetName();
 
     //KS: Exclude parameter types
@@ -2250,7 +2224,7 @@ void MCMCProcessor::ScanInput() {
       nSysts++;
     }
   }
-  nDraw = BranchNames.size();
+  nDraw = int(BranchNames.size());
   // Read the input Covariances
   ReadInputCov();
   
@@ -2290,7 +2264,7 @@ void MCMCProcessor::SetupOutput() {
   CanvasName.ReplaceAll("[","");
 
   // We fit with this Gaussian
-  Gauss = new TF1("gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",   -5, 5);
+  Gauss = new TF1("gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])", -5, 5);
 
   // Declare the TVectors
   Covariance = new TMatrixDSym(nDraw);
@@ -2431,11 +2405,11 @@ void MCMCProcessor::FindInputFiles() {
 // **************************
   // Now read the MCMC file
   TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
-
-  TDirectory* CovarianceFolder = (TDirectory*)TempFile->Get("CovarianceFolder");
+  TDirectory* CovarianceFolder = TempFile->Get<TDirectory>("CovarianceFolder");
 
   // Get the settings for the MCMC
-  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
+
   if (Config == nullptr) {
     MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
     TempFile->ls();
@@ -2459,7 +2433,8 @@ void MCMCProcessor::FindInputFiles() {
     InputNotFound = true;
   }
 
-  TMacro *XsecConfig = (TMacro*)(CovarianceFolder->Get("Config_xsec_cov"));
+
+  TMacro *XsecConfig = CovarianceFolder->Get<TMacro>("Config_xsec_cov");
   if (XsecConfig == nullptr) {
     MACH3LOG_WARN("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
   } else {
@@ -2485,7 +2460,7 @@ void MCMCProcessor::FindInputFiles() {
     MACH3LOG_WARN("Couldn't find OscCov branch in output");
     InputNotFound = true;
   }
-  TMacro *OscConfig = (TMacro*)(CovarianceFolder->Get("Config_osc_cov"));
+  TMacro *OscConfig = CovarianceFolder->Get<TMacro>("Config_osc_cov");
   if (OscConfig == nullptr) {
     MACH3LOG_WARN("Didn't find Config_osc_cov tree in MCMC file! {}", MCMCFile);
   } else {
@@ -2494,19 +2469,19 @@ void MCMCProcessor::FindInputFiles() {
 
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
-  if (std::getenv("MACH3") != nullptr)
+  if (const char * mach3_env = std::getenv("MACH3"))
   {
-    for(unsigned int i = 0; i < CovPos[kXSecPar].size(); i++)
-      CovPos[kXSecPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+    for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
+      CovPos[kXSecPar][i].insert(0, std::string(mach3_env)+"/");
 
-    for(unsigned int i = 0; i < CovPos[kNDPar].size(); i++)
-      CovPos[kNDPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+    for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
+      CovPos[kNDPar][i].insert(0, std::string(mach3_env)+"/");
 
-    for(unsigned int i = 0; i < CovPos[kFDDetPar].size(); i++)
-      CovPos[kFDDetPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+    for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
+      CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
 
-    for(unsigned int i = 0; i < CovPos[kOSCPar].size(); i++)
-      CovPos[kOSCPar][i].insert(0, std::string(std::getenv("MACH3"))+"/");
+    for(size_t i = 0; i < CovPos[kOSCPar].size(); i++)
+      CovPos[kOSCPar][i].insert(0, std::string(mach3_env)+"/");
   }
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
@@ -2580,9 +2555,9 @@ void MCMCProcessor::ReadNDFile() {
   }
   NDdetFile->cd();
 
-  TMatrixDSym *NDdetMatrix = (TMatrixDSym*)(NDdetFile->Get("nddet_cov"));
-  TVectorD *NDdetNominal = (TVectorD*)(NDdetFile->Get("det_weights"));
-  TDirectory *BinningDirectory = (TDirectory*)NDdetFile->Get("Binning")->Clone();
+  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>("nddet_cov");
+  TVectorD *NDdetNominal = NDdetFile->Get<TVectorD>("det_weights");
+  TDirectory *BinningDirectory = NDdetFile->Get<TDirectory>("Binning");
 
   for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
   {
@@ -2597,12 +2572,11 @@ void MCMCProcessor::ReadNDFile() {
 
   TIter next(BinningDirectory->GetListOfKeys());
   TKey *key = nullptr;
-
   // Loop through all entries
-  while ((key = (TKey*)next()))
+  while ((key = static_cast<TKey*>(next())))
   {
     std::string name = std::string(key->GetName());
-    TH2Poly* RefPoly = (TH2Poly*)BinningDirectory->Get((name).c_str())->Clone();
+    TH2Poly* RefPoly = BinningDirectory->Get<TH2Poly>((name).c_str());
     int size = RefPoly->GetNumberOfBins();
     NDSamplesBins.push_back(size);
     NDSamplesNames.push_back(RefPoly->GetTitle());
@@ -2624,7 +2598,7 @@ void MCMCProcessor::ReadFDFile() {
   }
   FDdetFile->cd();
 
-  TMatrixDSym *FDdetMatrix = (TMatrixDSym*)(FDdetFile->Get("SKJointError_Erec_Total"));
+  TMatrixDSym *FDdetMatrix = FDdetFile->Get<TMatrixDSym>("SKJointError_Erec_Total");
 
   for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
   {
@@ -2735,7 +2709,6 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
   Prior = ParamCentral[ParType][ParamNo];
   PriorError = ParamErrors[ParType][ParamNo];
   Title = ParamNames[ParType][ParamNo];
-  return;
 }
 
 // ***************
@@ -2829,7 +2802,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
       y_val[ipt] = hpost[ParamNo]->GetBinContent(ipt+1)/Integral;
     }
 
-    TGraphPolar* PolarGraph = new TGraphPolar(nBins, x_val.data(), y_val.data());
+    auto PolarGraph = std::make_unique<TGraphPolar>(nBins, x_val.data(), y_val.data());
     PolarGraph->SetLineWidth(2);
     PolarGraph->SetFillStyle(3001);
     PolarGraph->SetLineColor(kRed);
@@ -2843,8 +2816,6 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 
     Posterior->Print(CanvasName);
     Posterior->Write(Title);
-
-    delete PolarGraph;
   } //End loop over parameters
 
   PolarDir->Close();
@@ -2915,7 +2886,6 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
     MACH3LOG_INFO("Following Dunne-Kaboth Scale = ", DunneKabothScale);
     std::cout<<std::endl;
   }
-  return;
 }
 
 // **************************
@@ -2959,7 +2929,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
     FlatPrior = ParamFlat[ParType][ParamTemp];
     
-    TH1D* PosteriorHist = (TH1D*) hpost[ParamNo]->Clone(Title);
+    TH1D* PosteriorHist = static_cast<TH1D *>(hpost[ParamNo]->Clone(Title));
     RemoveFitter(PosteriorHist, "Gauss");
             
     TH1D* PriorHist = nullptr;
@@ -2982,7 +2952,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     }
     else //KS: Otherwise throw from Gaussian
     {
-      PriorHist = (TH1D*) PosteriorHist->Clone("Prior");
+      PriorHist = static_cast<TH1D*>(PosteriorHist->Clone("Prior"));
       PriorHist->Reset("");
       PriorHist->Fill(0.0, 0.0);
       
@@ -3025,13 +2995,13 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     
     std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
     //Get Best point
-    TGraph *PostPoint = new TGraph(1);
+    std::unique_ptr<TGraph> PostPoint(new TGraph(1));
     PostPoint->SetPoint(0, EvaluationPoint[k], ProbPosterior);
     PostPoint->SetMarkerStyle(20);
     PostPoint->SetMarkerSize(1);
     PostPoint->Draw("P same");
     
-    TGraph *PriorPoint = new TGraph(1);
+    std::unique_ptr<TGraph> PriorPoint(new TGraph(1));
     PriorPoint->SetPoint(0, EvaluationPoint[k], ProbPrior);
     PriorPoint->SetMarkerStyle(20);
     PriorPoint->SetMarkerSize(1);
@@ -3041,7 +3011,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     legend->SetTextSize(0.04);
     legend->AddEntry(PriorHist, "Prior", "l");
     legend->AddEntry(PosteriorHist, "Posterior", "l");
-    legend->AddEntry(PostPoint, Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
+    legend->AddEntry(PostPoint.get(), Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
     legend->SetLineColor(0);
     legend->SetLineStyle(0);
     legend->SetFillColor(0);
@@ -3054,8 +3024,6 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     
     delete PosteriorHist;
     delete PriorHist;
-    delete PostPoint;
-    delete PriorPoint;
   } //End loop over parameters
 
   SavageDickeyDir->Close();
@@ -3120,7 +3088,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
   OutputChain->cd();
-  TTree *post = (TTree *)OutputChain->Get("posteriors");
+  TTree *post = OutputChain->Get<TTree>("posteriors");
 
   double Weight = 1.;
 
@@ -3188,8 +3156,10 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
     const int IntervalsSize = nSteps/NIntervals[k];
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
-    std::remove(std::string(Names[k]+".gif").c_str());
-
+    int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
+    if (ret != 0){
+      MACH3LOG_WARN("Error: system call to delete {} failed with code {}", Names[k], ret);
+    }
     // This holds the posterior density
     const double maxi = Chain->GetMaximum(BranchNames[ParamNo]);
     const double mini = Chain->GetMinimum(BranchNames[ParamNo]);
@@ -3227,8 +3197,8 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
       text->SetNDC(true);
       text->Draw("SAME");
 
-      if(i == 0) Posterior->Print((std::string(Names[k] + ".gif++20").c_str())); // produces infinite loop animated GIF
-      else Posterior->Print((std::string(Names[k]+".gif+20").c_str())); // add picture to .gif
+      if(i == 0) Posterior->Print(((Names[k] + ".gif++20").c_str())); // produces infinite loop animated GIF
+      else Posterior->Print(((Names[k]+".gif+20").c_str())); // add picture to .gif
 
       delete EvePlot;
       delete text;
@@ -3420,7 +3390,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   #pragma omp parallel for
   #endif
   for (int i = 0; i < nDraw; ++i) {
-    ParamSums[i] /= nEntries;
+    ParamSums[i] /= double(nEntries);
     for (int j = 0; j < nBatches; ++j) {
       // Divide by the total number of events in the batch
       BatchedAverages[j][i] /= BatchLength;
@@ -3501,7 +3471,7 @@ void MCMCProcessor::ParamTraces() {
   TraceDir->cd();
   for (int j = 0; j < nDraw; ++j) {
     // Fit a linear function to the traces
-    TF1 *Fitter = new TF1("Fitter","[0]", int(nEntries/2), nEntries);
+    TF1 *Fitter = new TF1("Fitter","[0]", nEntries/2, nEntries);
     Fitter->SetLineColor(kRed);
     TraceParamPlots[j]->Fit("Fitter","Rq");
     TraceParamPlots[j]->Write();
@@ -3819,7 +3789,7 @@ void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
-    (*EffectiveSampleSize)(j) = nEntries/TempDenominator[j];
+    (*EffectiveSampleSize)(j) = double(nEntries)/TempDenominator[j];
     // 100 because we convert to percentage
     (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
 
@@ -3828,7 +3798,7 @@ void MCMCProcessor::CalculateESS(const int nLags, double** LagL) {
       EffectiveSampleSizeHist[i]->SetBinContent(j+1, 0);
       EffectiveSampleSizeHist[i]->SetBinError(j+1, 0);
 
-      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / nEntries;
+      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / double(nEntries);
       if(Thresholds[i] >= TempEntry && TempEntry > Thresholds[i+1])
       {
         if( std::isnan((*EffectiveSampleSize)(j)) ) continue;
@@ -3934,7 +3904,6 @@ void MCMCProcessor::BatchedMeans() {
 // Get the batched means variance estimation and variable indicating if number of batches is sensible
 void MCMCProcessor::BatchedAnalysis() {
 // **************************
-
   if(BatchedAverages == nullptr)
   {
     MACH3LOG_ERROR("BatchedAverages haven't been initialises or have been deleted something is wrong");
@@ -4097,7 +4066,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
         std::complex<double> exp_temp(0, two_pi_over_N * jj * n);
         a_j += ParStep[j][n] * std::exp(exp_temp);
       }
-      a_j /= float(std::sqrt(float(_N)));
+      a_j /= std::sqrt(float(_N));
       const int _c = jj - start;
 
       k_j[j][_c] = two_pi_over_N * jj;
@@ -4193,7 +4162,7 @@ void MCMCProcessor::GewekeDiagnostic() {
   constexpr int NChecks = 100;
   constexpr double Division = (UpperThreshold - LowerThreshold)/NChecks;
 
-  TH1D** GewekePlots = new TH1D*[nDraw];
+  std::vector<std::unique_ptr<TH1D>> GewekePlots(nDraw);
   for (int j = 0; j < nDraw; ++j)
   {
     TString Title = "";
@@ -4201,7 +4170,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     double PriorError = 1.0;
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Geweke", Title.Data(), BranchNames[j].Data());
-    GewekePlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100*UpperThreshold);
+    GewekePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100 * UpperThreshold);
     GewekePlots[j]->GetXaxis()->SetTitle("Burn-In (%)");
     GewekePlots[j]->GetYaxis()->SetTitle("Geweke T score");
   }
@@ -4283,7 +4252,6 @@ void MCMCProcessor::GewekeDiagnostic() {
     for (int j = 0; j < nDraw; ++j)
     {
       double T_score = std::fabs((MeanDown[j] - MeanUp[j])/std::sqrt(SpectralVarianceDown[j]/DenomCounterDown[j] + SpectralVarianceUp[j]/DenomCounterUp[j]));
-
       GewekePlots[j]->SetBinContent(k, T_score);
     }
   } //end loop over intervals
@@ -4298,9 +4266,7 @@ void MCMCProcessor::GewekeDiagnostic() {
   {
     GewekeDir->cd();
     GewekePlots[j]->Write();
-    delete GewekePlots[j];
   }
-  delete[] GewekePlots;
   for (int i = 0; i < nDraw; ++i) {
     delete[] ParStep[i];
   }

@@ -13,7 +13,7 @@ covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, std::st
   for (int i = 0; i < _fNumPar; i++)
   {
     // Sort out the print length
-    if(_fNames[i].length() > PrintLength) PrintLength = _fNames[i].length();
+    if(int(_fNames[i].length()) > PrintLength) PrintLength = int(_fNames[i].length());
   } // end the for loop
 
   MACH3LOG_DEBUG("Constructing instance of covarianceXsec");
@@ -160,7 +160,7 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
   int NumKinematicCuts = 0;
   if(param["KinematicCuts"]){
 
-    NumKinematicCuts = param["KinematicCuts"].size();
+    NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
     std::vector<std::vector<double>> TempKinematicBounds;
@@ -201,7 +201,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int Det
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
     }
   }
@@ -216,8 +216,8 @@ const std::vector<int> covarianceXsec::GetSystIndexFromDetID(int DetID,  const S
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
-    auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    auto &systIndex = pair.second;
+    if (AppliesToDetID(systIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -237,7 +237,7 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
         Spline._SplineInterpolationType = SplineInterpolation(InterpType);
     }
   } else { //KS: By default use TSpline3
-    Spline._SplineInterpolationType = SplineInterpolation(kTSpline3);
+    Spline._SplineInterpolationType = kTSpline3;
   }
   Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999);
   Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999);
@@ -306,7 +306,7 @@ template <typename FilterFunc, typename ActionFunc>
 void covarianceXsec::IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID) && filter(i)) { // Common filter logic
+    if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }
@@ -480,11 +480,11 @@ void covarianceXsec::CheckCorrectInitialisation() {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
   auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
-    std::unordered_map<std::string, int> seenStrings;
+    std::unordered_map<std::string, size_t> seenStrings;
     for (size_t i = 0; i < names.size(); ++i) {
       const auto& name = names[i];
       if (seenStrings.find(name) != seenStrings.end()) {
-        int firstIndex = seenStrings[name];
+        size_t firstIndex = seenStrings[name];
         MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -515,9 +515,14 @@ void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
 // Checks if parameter belongs to a given group
 bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
+  std::string groupLower = Group;
+  std::string paramGroupLower = _ParameterGroup[i];
 
-  if(Group == _ParameterGroup[i]) return true;
-  else return false;
+  // KS: Convert both strings to lowercase, this way comparison will be case insensitive
+  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);
+  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
+
+  return groupLower == paramGroupLower;
 }
 
 // ********************************************

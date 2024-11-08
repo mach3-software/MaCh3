@@ -168,7 +168,7 @@ std::string TerminalToString(std::string cmd) {
 
 // ************************
 //KS: Simple to retrieve speed of get entry inspired by
-void EstimateDataTransferRate(TChain* chain, const int entry){
+void EstimateDataTransferRate(TChain* chain, const Long64_t entry){
 // ************************
 
   TStopwatch timer;
@@ -186,15 +186,15 @@ void EstimateDataTransferRate(TChain* chain, const int entry){
 
 // ************************
 //KS: Simply print progress bar
-void PrintProgressBar(const int Done, const int All){
+void PrintProgressBar(const Long64_t Done, const Long64_t All){
 // ************************
 
-  double progress = double((double(Done)/double(All)));
+  double progress = double(Done)/double(All);
   const int barWidth = 20;
   std::ostringstream progressBar;
 
   progressBar << "[";
-  int pos = barWidth * progress;
+  int pos = int(barWidth * progress);
   for (int i = 0; i < barWidth; ++i) {
     if (i < pos)
       progressBar << "=";

@@ -23,7 +23,7 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13642670.svg)](https://doi.org/10.5281/zenodo.13642670).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
 
 ## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
@@ -107,7 +107,7 @@ Following neutrino oscillation calculators are available:
 | Prob3++Linear    | CPU        | Beam       |            |
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 
-If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
+If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
 cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
@@ -150,6 +150,7 @@ Based on several test here are recommended version:
 | Name        | Status |
 |-------------|--------|
 | Alma9       | ✅     |
+| Rocky9      | ✅     |
 | Ubuntu22.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |

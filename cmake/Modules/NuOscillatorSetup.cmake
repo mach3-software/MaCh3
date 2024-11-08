@@ -13,7 +13,7 @@ if (NOT CUDAProb3Linear_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
     NOT Prob3ppLinear_ENABLED AND
     NOT NuFastLinear_ENABLED)
-    set(CUDAProb3Linear_ENABLED TRUE)
+    set(NuFastLinear_ENABLED TRUE)
 endif()
 
 #KS: Save which oscillators are being used
@@ -60,9 +60,10 @@ string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 #Try adding Oscillator Class
 CPMAddPackage(
   NAME NuOscillator
-    VERSION 1.0.0
+    VERSION 1.0.1
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "tags/v1.0.0"
+    GIT_TAG "v1.0.1"
+    GIT_SHALLOW YES
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
@@ -76,6 +77,7 @@ CPMAddPackage(
 
     "NuOscillator_Compiler_Flags ${compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
+    "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 
 if(NOT TARGET NuOscillator)
