@@ -1,3 +1,4 @@
+---
 # Update MaCh3 container image registry with newest updates
 name: Image CD
 
@@ -24,7 +25,7 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag_latest: alma9latest
             installoptions: -j4
-            - os: rocky9cuda
+          - os: rocky9cuda
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag_latest: rocky9cudalatest
             installoptions: -j4
@@ -40,40 +41,40 @@ jobs:
     name: Image CD ${{ matrix.os }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+        - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Log in to GitHub Container Registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Build Docker image
-      run: |
-        if [ "${{ github.ref_type }}" == 'tag' ]; then
-          docker build . \
-            --file ${{ matrix.file }} \
-            --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} \
-            --build-arg MACH3_VERSION=${{ github.ref_name }} \
-            --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
-        else
-          docker build . \
-            --file ${{ matrix.file }} \
-            --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} \
-            --build-arg MACH3_VERSION=develop \
-            --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
-        fi
+        - name: Build Docker image
+        run: |
+            if [ "${{ github.ref_type }}" == 'tag' ]; then
+            docker build . \
+                --file ${{ matrix.file }} \
+                --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} \
+                --build-arg MACH3_VERSION=${{ github.ref_name }} \
+                --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
+            else
+            docker build . \
+                --file ${{ matrix.file }} \
+                --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} \
+                --build-arg MACH3_VERSION=develop \
+                --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
+            fi
 
-    - name: Push Docker image
-      run: |
-        if [ "${{ github.ref_type }}" == 'tag' ]; then
-          docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }}
-        else
-          docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
-        fi
+        - name: Push Docker image
+        run: |
+            if [ "${{ github.ref_type }}" == 'tag' ]; then
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }}
+            else
+            docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
+            fi
 
-    - name: Delete old images
-      uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'mach3'
-        package-type: 'container'
-        min-versions-to-keep: 5
-        delete-only-untagged-versions: 'true'
+        - name: Delete old images
+        uses: actions/delete-package-versions@v5
+        with:
+            package-name: 'mach3'
+            package-type: 'container'
+            min-versions-to-keep: 5
+            delete-only-untagged-versions: 'true'
