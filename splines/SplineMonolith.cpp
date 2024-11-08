@@ -577,7 +577,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   gpu_spline_handler->InitGPU_Segments(&segments);
   gpu_spline_handler->InitGPU_Vals(&vals);
 #elif USE_FPGA
-  queue = sycl::queue(sycl::default_selector{})
+  queue = sycl::queue(sycl::default_selector{});
   segments = sycl::malloc_shared<short int>(nParams, queue);
   vals = sycl::malloc_shared<float>(nParams, queue);
 #else
