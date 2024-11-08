@@ -48,15 +48,15 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
         - name: Build Docker image
-        run: |
+          run: |
             if [ "${{ github.ref_type }}" == 'tag' ]; then
-            docker build . \
+              docker build . \
                 --file ${{ matrix.file }} \
                 --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }} \
                 --build-arg MACH3_VERSION=${{ github.ref_name }} \
                 --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
             else
-            docker build . \
+              docker build . \
                 --file ${{ matrix.file }} \
                 --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }} \
                 --build-arg MACH3_VERSION=develop \
@@ -66,9 +66,9 @@ jobs:
         - name: Push Docker image
         run: |
             if [ "${{ github.ref_type }}" == 'tag' ]; then
-            docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }}
+              docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }}
             else
-            docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
+              docker push ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}
             fi
 
         - name: Delete old images
