@@ -40,7 +40,7 @@ ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
-pip install .
+RUN pip install .
 
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}
