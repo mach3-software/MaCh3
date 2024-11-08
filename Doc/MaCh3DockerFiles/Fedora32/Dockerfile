@@ -38,5 +38,9 @@ ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
 ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
     LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
 
+# pip install pyMaCh3
+WORKDIR ${MACH3_WORK_DIR}
+pip install .
+
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}

@@ -24,6 +24,10 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag_latest: alma9latest
             installoptions: -j4
+            - os: rocky9cuda
+            file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
+            tag_latest: rocky9cudalatest
+            installoptions: -j4
 #          - os: ubuntu22.04
 #            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
 #            tag_latest: ubuntu22.04latest
