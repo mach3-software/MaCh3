@@ -13,7 +13,7 @@ RUN apt update && apt upgrade -y
 
 RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
-RUN apt install -y --no-install-recommends vim less nano gdb csh tcsh ed quota python3 python3-dev cvs procmail ca-certificates
+RUN apt install -y --no-install-recommends vim less nano gdb csh tcsh ed quota python3 python3-dev python3-pip cvs procmail ca-certificates
 
 # Declare the build argument
 ARG MACH3_VERSION
@@ -43,6 +43,10 @@ RUN make ${INSTALL_OPTIONS} && make install
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
 ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
     LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+
+# pip install pyMaCh3
+WORKDIR ${MACH3_WORK_DIR}
+RUN pip install .
 
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}
