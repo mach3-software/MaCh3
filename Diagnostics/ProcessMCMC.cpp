@@ -16,7 +16,7 @@ inline void ReweightPrior(MCMCProcessor* Processor);
 /// @brief KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
 inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
 /// @brief KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
-inline void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TString canvasname);
+inline void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor, TCanvas* Posterior, TString canvasname);
 
 int nFiles;
 std::vector <std::string> FileNames;
@@ -96,7 +96,9 @@ void ProcessMCMC(const std::string& inputFile)
   if(Settings["Thinning"])
   {
     bool DoThin = Settings["Thinning"][0].as<bool>();
-    if(DoThin) Processor->ThinMCMC(Settings["Thinning"][1].as<int>());
+    if(DoThin){
+      Processor->ThinMCMC(Settings["Thinning"][1].as<int>(), GetFromManager<bool>(Settings["Average"], false));
+    }
   }
   // Make the postfit
   Processor->MakePostfit();
@@ -152,16 +154,15 @@ void MultipleProcessMCMC()
   YAML::Node card_yaml = YAML::LoadFile(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
-  const Color_t PosteriorColor[] = {kBlue-1, kRed, kGreen+2};
-  //const Style_t PosteriorStyle[] = {kSolid, kDashed, kDotted};
+  constexpr Color_t PosteriorColor[] = {kBlue-1, kRed, kGreen+2};
+  //constexpr Style_t PosteriorStyle[] = {kSolid, kDashed, kDotted};
   nFiles = int(FileNames.size());
-  MCMCProcessor** Processor; 
-  Processor = new MCMCProcessor*[nFiles];
+  std::vector<std::unique_ptr<MCMCProcessor>> Processor(nFiles);
   for (int ik = 0; ik < nFiles;  ik++)
   {
     MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
-    Processor[ik] = new MCMCProcessor(FileNames[ik]);
+    Processor[ik] = std::make_unique<MCMCProcessor>(FileNames[ik]);
     Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
 
     Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {""}));
@@ -212,8 +213,8 @@ void MultipleProcessMCMC()
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
     // This holds the posterior density
-    TH1D **hpost = new TH1D*[nFiles];
-    TLine **hpd = new TLine*[nFiles];
+    std::vector<TH1D*> hpost(nFiles);
+    std::vector<TLine*> hpd(nFiles);
     hpost[0] = static_cast<TH1D *>(Processor[0]->GetHpost(i)->Clone());
 
     bool Skip = false;
@@ -235,8 +236,6 @@ void MultipleProcessMCMC()
       for (int ik = 0; ik < nFiles;  ik++)
         delete hpost[ik];
 
-      delete[] hpost;
-      delete[] hpd;
       continue;
     }
     for (int ik = 0; ik < nFiles;  ik++)
@@ -258,20 +257,20 @@ void MultipleProcessMCMC()
     Processor[0]->GetNthParameter(i, Prior, PriorError, Title);
 
     // Now make the TLine for the Asimov
-    TLine *Asimov = new TLine(Prior,  hpost[0]->GetMinimum(), Prior,  hpost[0]->GetMaximum());
+    auto Asimov = std::make_unique<TLine>(Prior, hpost[0]->GetMinimum(), Prior, hpost[0]->GetMaximum());
     Asimov->SetLineColor(kRed-3);
     Asimov->SetLineWidth(2);
     Asimov->SetLineStyle(kDashed);
 
     // Make a nice little TLegend
-    TLegend *leg = new TLegend(0.12, 0.7, 0.6, 0.97);
+    auto leg = std::make_unique<TLegend>(0.12, 0.7, 0.6, 0.97);
     leg->SetTextSize(0.03f);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
     leg->SetLineColor(0);
     leg->SetLineStyle(0);
     TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
-    leg->AddEntry(Asimov, asimovLeg, "l");
+    leg->AddEntry(Asimov.get(), asimovLeg, "l");
 
     for (int ik = 0; ik < nFiles;  ik++)
     {
@@ -296,16 +295,11 @@ void MultipleProcessMCMC()
     leg->Draw("same");
     Posterior->cd();
     Posterior->Print(canvasname);
-
-    delete Asimov;
-    delete leg;
     for (int ik = 0; ik < nFiles;  ik++)
     {
       delete hpost[ik];
       delete hpd[ik];
     }
-    delete[] hpost;
-    delete[] hpd;
   }//End loop over parameters
     
   // Finally draw the parameter plot onto the PDF
@@ -321,8 +315,6 @@ void MultipleProcessMCMC()
   Posterior->Print(canvasname);
   
   delete Posterior;
-  for (int ik = 0; ik < nFiles;  ik++) delete Processor[ik];
-  delete[] Processor;
 }
 
 // KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
@@ -627,7 +619,7 @@ TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
 }
 
 //KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
-void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TString canvasname)
+void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor, TCanvas* Posterior, TString canvasname)
 {
   const Color_t CumulativeColor[] = {kBlue-1, kRed, kGreen+2};
   const Style_t CumulativeStyle[] = {kSolid, kDashed, kDotted};
@@ -702,12 +694,9 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
       CumulativeDistribution[ik]->SetBinContent(NumberOfBins+1, 1.);
     }
     
-    int* TestStatBin = new int[nFiles];
-    double* TestStatD = new double[nFiles];
-    TLine **LineD = new TLine*[nFiles];
-
-    for (int ik = 0 ; ik < nFiles;  ik++) { TestStatBin[ik] = 0; TestStatD[ik] = -999;}
-
+    std::vector<int> TestStatBin(nFiles, 0);
+    std::vector<double> TestStatD(nFiles, -999);
+    std::vector<TLine *> LineD(nFiles);
     //Find KS statistic
     for (int ik = 1 ; ik < nFiles;  ik++)
     {
@@ -736,7 +725,7 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     for (int ik = 0 ; ik < nFiles;  ik++)
       CumulativeDistribution[ik]->Draw("SAME");
     
-    TLegend *leg = new TLegend(0.15, 0.7, 0.5, 0.90);
+    auto leg = std::make_unique<TLegend>(0.15, 0.7, 0.5, 0.90);
     leg->SetTextSize(0.04f);
     for (int ik = 0; ik < nFiles;  ik++)
       leg->AddEntry(CumulativeDistribution[ik], TitleNames[ik].c_str(), "l");
@@ -755,7 +744,6 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     Posterior->cd();
     Posterior->Print(canvasname);
     
-    delete leg;
     for (int ik = 0; ik < nFiles;  ik++)
     {
       delete hpost[ik];
@@ -764,8 +752,5 @@ void KolmogorovSmirnovTest(MCMCProcessor** Processor, TCanvas* Posterior, TStrin
     }
     delete[] hpost;
     delete[] CumulativeDistribution;
-    delete[] LineD;
-    delete[] TestStatBin;
-    delete[] TestStatD;
   } //End loop over parameter
 }

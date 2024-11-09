@@ -263,8 +263,7 @@ void MCMCProcessor::MakePostfit() {
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
   {
-    if (i % (nDraw/5) == 0)
-    {
+    if (i % (nDraw/5) == 0) {
       MaCh3Utils::PrintProgressBar(i, nDraw);
     }
     OutputFile->cd();

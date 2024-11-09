@@ -584,3 +584,92 @@ inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
 
   MACH3LOG_INFO("Thinned TTree saved and overwrote original in: {}", TempFilePath);
 }
+
+
+// ********************
+/// @brief Average MCMC Chain entries, to reduce autocorrelation and improve estimate stability.
+///
+/// @param FilePath Path to the MCMC chain you want to average
+/// @param AveragingCut Number of consecutive entries to average
+/// @cite nesterov2009primal
+/// @warning Averaging is done over entries, so this may not work well for merged chains or non-sequential entries.
+/// @note The resulting file overwrites the original file.
+inline void AveragingMCMC(const std::string& FilePath, const int AveragingCut) {
+// ********************
+  if (AveragingCut <= 1) {
+    MACH3LOG_WARN("Invalid AveragingCut value ({}). It must be greater than 1.", AveragingCut);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  // Define the path for the temporary averaged file
+  std::string TempFilePath = "Averaged_" + FilePath;
+  int ret = system(("cp " + FilePath + " " + TempFilePath).c_str());
+  if (ret != 0) {
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+  }
+
+  TFile *inFile = TFile::Open(TempFilePath.c_str(), "UPDATE");
+  if (!inFile || inFile->IsZombie()) {
+    MACH3LOG_ERROR("Error opening file: {}", TempFilePath);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TTree *inTree = inFile->Get<TTree>("posteriors");
+  if (!inTree) {
+    MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    inFile->ls();
+    inFile->Close();
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  // Clone the structure without data
+  TTree *outTree = inTree->CloneTree(0);
+  Long64_t nEntries = inTree->GetEntries();
+  int nBranches = inTree->GetNbranches();
+
+  std::vector<double> AvgValues(nBranches, 0.0);
+  std::vector<double> BranchData(nBranches, 0.0);
+
+  // Loop over branches and set up data pointers
+  TObjArray *branches = inTree->GetListOfBranches();
+  for (int b = 0; b < branches->GetEntries(); ++b) {
+    TBranch *branch = static_cast<TBranch*>(branches->At(b));
+    inTree->SetBranchAddress(branch->GetName(), &BranchData[b]);
+  }
+
+  MACH3LOG_INFO("Averaging every {} entries. Total entries: {}", AveragingCut, nEntries);
+
+  int batchCount = 0;
+  for (Long64_t i = 0; i < nEntries; i += AveragingCut) {
+    // Reset to 0
+    std::fill(AvgValues.begin(), AvgValues.end(), 0.0);
+
+    /// @todo Here we perform normal mean. But in literature there are available weighted means and more complex operations
+    int entriesInBatch = 0;
+    for (int j = 0; j < AveragingCut && (i + j) < nEntries; ++j) {
+      inTree->GetEntry(i + j);
+      for (int b = 0; b < branches->GetEntries(); ++b) {
+        AvgValues[b] += BranchData[b];
+      }
+      ++entriesInBatch;
+    }
+    for (int b = 0; b < branches->GetEntries(); ++b) {
+      AvgValues[b] /= entriesInBatch;
+      BranchData[b] = AvgValues[b];
+    }
+
+    outTree->Fill();
+
+    if (i % (nEntries/10) == 0) {
+      MaCh3Utils::PrintProgressBar(batchCount, nEntries / AveragingCut);
+    }
+    ++batchCount;
+  }
+
+  // Write the averaged tree back to the file
+  inFile->WriteTObject(outTree, "posteriors", "kOverwrite");
+  inFile->Close();
+  delete inFile;
+
+  MACH3LOG_INFO("Averaged TTree saved and overwrote original in: {}", TempFilePath);
+}

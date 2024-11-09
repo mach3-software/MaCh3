@@ -12,8 +12,7 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
   YAML::Node Settings = YAML::LoadFile(config);
 
   // Make the processor
-  MCMCProcessor* Processor = new MCMCProcessor(inputFile);
-
+  auto Processor = std::make_unique<MCMCProcessor>(inputFile);
   Processor->SetOutputSuffix("_MCMC_Diag");
   //KS:Turn off plotting detector and some other setting
   Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedTypes"], {""}));
@@ -27,8 +26,6 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
 
   //KS: finally call main method
   Processor->DiagMCMC();
-
-  delete Processor;
 }
 
 int main(int argc, char *argv[]) {
