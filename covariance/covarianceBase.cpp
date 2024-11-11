@@ -1,7 +1,7 @@
-#include "covarianceBase.h"
+#include "covariance/covarianceBase.h"
 
 // ********************************************
-covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(std::string(file)), pca(false) {
+covarianceBase::covarianceBase(std::string name, std::string file) : inputFile(file), pca(false) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of covarianceBase");
   init(name, file);
@@ -9,7 +9,7 @@ covarianceBase::covarianceBase(const char *name, const char *file) : inputFile(s
   LastPCAdpar = -999;
 }
 // ********************************************
-covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, const char *name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
+covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
 
   MACH3LOG_INFO("Constructing instance of covarianceBase using ");
@@ -33,56 +33,9 @@ covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, const c
 }
 
 // ********************************************
-covarianceBase::covarianceBase(const char *name, const char *file, int seed) : inputFile(std::string(file)), pca(false) {
-// ********************************************
-
-  #ifdef MULTITHREAD
-  if(seed != 0)
-  {
-    MACH3LOG_WARN("You have set seed to {}", seed);
-    MACH3LOG_WARN("And you are running with MULTITHREAD");
-    MACH3LOG_WARN("TRandom for each thread will have same seed");
-    MACH3LOG_WARN("This is fine if this was your intention");
-  }
-  #endif
-
-  init(name, file);
-  FirstPCAdpar = -999;
-  LastPCAdpar = -999;
-}
-
-// ********************************************
-covarianceBase::covarianceBase(const char *name, const char *file, int seed, double threshold, int firstpcapar, int lastpcapar) : inputFile(std::string(file)), pca(true), eigen_threshold(threshold), FirstPCAdpar(firstpcapar), LastPCAdpar(lastpcapar) {
-// ********************************************
-
-  if (threshold < 0 || threshold >= 1) {
-    MACH3LOG_INFO("NOTE: {} {}", name, file);
-    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
-    MACH3LOG_INFO("Please specify a number between 0 and 1");
-    MACH3LOG_INFO("You specified: ");
-    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
-    pca = false;
-  }
-#ifdef MULTITHREAD
-  if(seed != 0)
-  {
-    MACH3LOG_WARN("You have set seed to {}", seed);
-    MACH3LOG_WARN("And you are running with MULTITHREAD");
-    MACH3LOG_WARN("TRandom for each thread will have same seed");
-    MACH3LOG_WARN("This is fine if this was your intention");
-  }
-#endif
-  MACH3LOG_INFO("Constructing instance of covarianceBase");
-  init(name, file);
-  // Call the innocent helper function
-  if (pca) ConstructPCA();
-}
-
-// ********************************************
 //Destructor
 covarianceBase::~covarianceBase(){
 // ********************************************
-
   _fPreFitValue.clear();
   _fError.clear();
   _fCurrVal.clear();
@@ -95,9 +48,9 @@ covarianceBase::~covarianceBase(){
   delete[] randParams;
   delete[] corr_throw;
 
-  if (covMatrix != NULL) delete covMatrix;
-  if (invCovMatrix != NULL) delete invCovMatrix;
-  if (throwMatrix_CholDecomp != NULL) delete throwMatrix_CholDecomp;
+  if (covMatrix != nullptr) delete covMatrix;
+  if (invCovMatrix != nullptr) delete invCovMatrix;
+  if (throwMatrix_CholDecomp != nullptr) delete throwMatrix_CholDecomp;
 
   for(int i = 0; i < _fNumPar; i++)
   {
@@ -107,10 +60,7 @@ covarianceBase::~covarianceBase(){
   delete[] InvertCovMatrix;
   delete[] throwMatrixCholDecomp;
   
-  const int nThreads = MaCh3Utils::GetNThreads();
-  for (int iThread = 0;iThread < nThreads; iThread++)  delete random_number[iThread];
-  delete[] random_number;
-  if (throwMatrix != NULL) delete throwMatrix;
+  if (throwMatrix != nullptr) delete throwMatrix;
 }
 
 // ********************************************
@@ -152,20 +102,21 @@ void covarianceBase::ConstructPCA() {
 }
 
 // ********************************************
-void covarianceBase::init(const char *name, const char *file) {
+void covarianceBase::init(std::string name, std::string file) {
 // ********************************************
 
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
-  TFile *infile = new TFile(file, "READ");
+  TFile *infile = new TFile(file.c_str(), "READ");
   if (infile->IsZombie()) {
     MACH3LOG_ERROR("Could not open input covariance ROOT file {} !!!", file);
     MACH3LOG_ERROR("Was about to retrieve matrix with name {}", name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  // Should put in a 
-  TMatrixDSym *CovMat = (TMatrixDSym*)(infile->Get(name));
-  if (CovMat == NULL) {
+
+  TMatrixDSym *CovMat = infile->Get<TMatrixDSym>(name.c_str());
+
+  if (CovMat == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -176,16 +127,14 @@ void covarianceBase::init(const char *name, const char *file) {
   const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
+  random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
-
   // Not using adaptive by default
   use_adaptive = false;
   // Set the covariance matrix
-  size = CovMat->GetNrows();
-  _fNumPar = size;
+  _fNumPar = CovMat->GetNrows();
     
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
@@ -239,16 +188,14 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   const int nThreads = MaCh3Utils::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
-  random_number = new TRandom3*[nThreads]();
+  random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number[iThread] = new TRandom3(0);
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
-
   PrintLength = 35;
 
   // Set the covariance matrix
-  _fNumPar = _fYAMLDoc["Systematics"].size();
-  size = _fNumPar;
+  _fNumPar = int(_fYAMLDoc["Systematics"].size());
 
   use_adaptive = false;
 
@@ -361,15 +308,12 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
   MACH3LOG_INFO("----------------");
-
-  return;
 }
 
 // ********************************************
 void covarianceBase::init(TMatrixDSym* covMat) {
 // ********************************************
-  size = covMat->GetNrows();
-  _fNumPar = size;
+  _fNumPar = covMat->GetNrows();
   InvertCovMatrix = new double*[_fNumPar]();
   throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
@@ -396,12 +340,13 @@ void covarianceBase::init(TMatrixDSym* covMat) {
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 // ********************************************
-  if (cov == NULL) {
+  if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setCovMatrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   covMatrix = cov;
-  invCovMatrix = (TMatrixDSym*)cov->Clone();
+
+  invCovMatrix = static_cast<TMatrixDSym *>(cov->Clone());
   invCovMatrix->Invert();
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   for (int i = 0; i < _fNumPar; i++)
@@ -522,7 +467,10 @@ void covarianceBase::throwParameters() {
   // First draw new randParams
   randomize();
 
-  if (!pca) {
+  // KS: We use PCA very rarely on top PCA functionality isn't implemented for this function.
+  // Use __builtin_expect to give compiler a hint which option is more likely, which should help
+  // with better optimisation. This isn't critical but more to have example
+  if (__builtin_expect(!pca, 1)) {
     MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
     #ifdef MULTITHREAD
@@ -562,7 +510,7 @@ void covarianceBase::throwParameters() {
   }
   else
   {
-    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predicitve Code with PCA, which is wrong");
+    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predictive Code with PCA, which is wrong");
     MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -639,7 +587,7 @@ void covarianceBase::proposeStep() {
 // "Randomize" the parameters in the covariance class for the proposed step
 // Used the proposal kernel and the current parameter value to set proposed step
 // Also get a new random number for the randParams
-void covarianceBase::randomize() {
+void covarianceBase::randomize() _noexcept_ {
 // ************************************************
   if (!pca) {
 //KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit      
@@ -683,7 +631,7 @@ void covarianceBase::randomize() {
 
 // ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
-void covarianceBase::CorrelateSteps() {
+void covarianceBase::CorrelateSteps() _noexcept_ {
 // ************************************************
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
   MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
@@ -731,7 +679,7 @@ void covarianceBase::CorrelateSteps() {
 }
 // ********************************************
 // Update so that current step becomes the previously proposed step
-void covarianceBase::acceptStep() {
+void covarianceBase::acceptStep() _noexcept_ {
 // ********************************************
   if (!pca) {
     #ifdef MULTITHREAD
@@ -844,9 +792,8 @@ void covarianceBase::printNominalCurrProp() {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::CalcLikelihood() {
+double covarianceBase::CalcLikelihood() _noexcept_ {
 // ********************************************
-
   double logL = 0.0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
@@ -869,7 +816,6 @@ double covarianceBase::CalcLikelihood() {
 // ********************************************
 int covarianceBase::CheckBounds() {
 // ********************************************
-
   int NOutside = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:NOutside)
@@ -903,7 +849,6 @@ void covarianceBase::printPars() {
   for(int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("{:s} current: \t{:.5f}   \tproposed: \t{:.5f}", _fNames[i], _fCurrVal[i], _fPropVal[i]);
   }
-  return;
 }
 
 // ********************************************
@@ -922,8 +867,8 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    unsigned int parsSize = pars.size();
-    for (unsigned int i = 0; i < parsSize; i++) {
+    int parsSize = int(pars.size());
+    for (int i = 0; i < parsSize; i++) {
       //Make sure that you are actually passing a number to set the parameter to
       if(std::isnan(pars[i])) {
         MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
@@ -938,7 +883,6 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
     TransferToPCA();
     TransferToParam();
   }
-  return;
 }
 
 // ********************************************
@@ -951,7 +895,8 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
   // When running PCA, also save PCA parameters
   if (pca) {
     for (int i = 0; i < _fNumParPCA; ++i) {
-      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), (double*)&(fParCurr_PCA.GetMatrixArray()[i]), Form("%s_PCA/D", _fNames[i].c_str()));
+
+      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &fParCurr_PCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
 
@@ -964,7 +909,8 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
     // When running PCA, also save PCA parameters
     if (pca) {
       for (int i = 0; i < _fNumParPCA; ++i) {
-        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), (double*)&(fParProp_PCA.GetMatrixArray()[i]), Form("%s_PCA_Prop/D", _fNames[i].c_str()));
+
+        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &fParProp_PCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
       }
     }
   }
@@ -992,7 +938,6 @@ void covarianceBase::toggleFixAllParameters() {
   } else{
      for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
   }
-  return;
 }
 
 // ********************************************
@@ -1020,7 +965,6 @@ void covarianceBase::toggleFixParameter(const int i) {
       MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
     }
   }
-  return;
 }
 
 // ********************************************
@@ -1068,7 +1012,7 @@ void covarianceBase::setFlatPrior(const int i, const bool eL) {
 
 // ********************************************
 //KS: Custom function to perform multiplication of matrix and vector with multithreading
-void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) {
+void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const {
 // ********************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -1088,9 +1032,8 @@ void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _re
 }
 
 // ********************************************
-double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) {
+double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const {
 // ********************************************
-
   double Element = 0.0;
   #ifdef MULTITHREAD
   #pragma omp simd
@@ -1104,7 +1047,7 @@ double covarianceBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const
 // ********************************************
 void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
-  if ((int)stepscale.size() != _fNumPar)
+  if (int(stepscale.size()) != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
     MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
@@ -1115,10 +1058,7 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
   for (int iParam = 0 ; iParam < _fNumPar; iParam++) {
     _fIndivStepScale[iParam] = stepscale[iParam];
   }
-
   printIndivStepScale();
-
-  return;
 }
 
 // ********************************************
@@ -1176,8 +1116,6 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   }
   //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
-
-  return;
 }
 
 // ********************************************
@@ -1195,7 +1133,7 @@ void covarianceBase::resetIndivStepScale() {
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 // ********************************************
-   if (cov == NULL) {
+   if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to setThrowMatrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -1207,7 +1145,7 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  throwMatrix = (TMatrixDSym*)cov->Clone();
+  throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
   if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) makeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
@@ -1238,9 +1176,9 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
 void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 // ********************************************
   delete throwMatrix;
-  throwMatrix = NULL;
+  throwMatrix = nullptr;
   delete throwMatrix_CholDecomp;
-  throwMatrix_CholDecomp = NULL;
+  throwMatrix_CholDecomp = nullptr;
   setThrowMatrix(cov);
 }
 
@@ -1326,11 +1264,13 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   
-  TMatrixD cov_sym_v = (TMatrixD)cov_sym_svd.GetV();
+
+  TMatrixD cov_sym_v = cov_sym_svd.GetV();
   TMatrixD cov_sym_vt = cov_sym_v;
   cov_sym_vt.T();
   //SVD returns as vector (grrr) so need to get into matrix form for multiplying!
-  TVectorD cov_sym_sigvect = (TVectorD)cov_sym_svd.GetSig();
+  TVectorD cov_sym_sigvect = cov_sym_svd.GetSig();
+
   const Int_t nCols = cov_sym_v.GetNcols(); //square so only need rows hence lack of cols
   TMatrixDSym cov_sym_sig(nCols);
   TMatrixDDiag cov_sym_sig_diag(cov_sym_sig);
@@ -1353,20 +1293,19 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
 // ********************************************
 std::vector<double> covarianceBase::getNominalArray() {
 // ********************************************
-
   std::vector<double> nominal(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i)
   {
     nominal[i] = _fPreFitValue[i];
   }
- return nominal;
+  return nominal;
 }
 
 // ********************************************
 // KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
 TH2D* covarianceBase::GetCorrelationMatrix() {
 // ********************************************
-  TH2D* hMatrix = new TH2D(getName(), getName(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
+  TH2D* hMatrix = new TH2D(getName().c_str(), getName().c_str(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
 
   for(int i = 0; i < _fNumPar; i++)
   {
@@ -1408,7 +1347,6 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
   {
     //KS: Feel free to update it, if you need updated prefit value etc
     param["Systematic"]["StepScale"]["MCMC"] = std::round(_fIndivStepScale[i] * 100.0) / 100.0; // Round to 2 decimal places
-
     i++;
   }
   // Save the modified node to a file

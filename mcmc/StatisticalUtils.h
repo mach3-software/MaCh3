@@ -12,6 +12,9 @@
 #include "samplePDF/Structs.h"
 #include "manager/manager.h"
 
+/// @file StatisticalUtils.h
+/// @brief Utility functions for statistical interpretations in MaCh3
+
 // **************************
 /// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
 /// @param BayesFactor Obtained value of Bayes factor
@@ -29,7 +32,6 @@ inline std::string GetJeffreysScale(const double BayesFactor){
   return JeffreysScale;
 }
 
-
 // **************************
 /// @brief  KS: Based on Table 1 in https://www.t2k.org/docs/technotes/435
 /// @param BayesFactor Obtained value of Bayes factor
@@ -38,10 +40,10 @@ inline std::string GetDunneKaboth(const double BayesFactor){
   std::string DunneKaboth = "";
   //KS: Get fancy DunneKaboth Scale as I am to lazy to look into table every time
 
-  if(2.125 > BayesFactor)    DunneKaboth = "< 1 #sigma";
-  else if( 20.74 > BayesFactor)  DunneKaboth = "> 1 #sigma";
-  else if( 369.4 > BayesFactor) DunneKaboth = "> 2 #sigma";
-  else if( 15800 > BayesFactor) DunneKaboth = "> 3 #sigma";
+  if(2.125 > BayesFactor)         DunneKaboth = "< 1 #sigma";
+  else if( 20.74 > BayesFactor)   DunneKaboth = "> 1 #sigma";
+  else if( 369.4 > BayesFactor)   DunneKaboth = "> 2 #sigma";
+  else if( 15800 > BayesFactor)   DunneKaboth = "> 3 #sigma";
   else if( 1745000 > BayesFactor) DunneKaboth = "> 4 #sigma";
   else DunneKaboth = "> 5 #sigma";
 
@@ -81,18 +83,16 @@ inline double GetSigmaValue(const int sigma) {
   return width;
 }
 
-
 // ****************
 /// @brief Get the Bayesian Information Criterion (BIC) or Schwarz information criterion (also SIC, SBC, SBIC)
 inline double GetBIC(const double llh, const int data, const int nPars){
 // ****************
-
   if(nPars == 0)
   {
     MACH3LOG_ERROR("You haven't passed number of model parameters as it is still zero");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const double BIC = nPars * logl(data) + llh;
+  const double BIC = double(nPars * logl(data) + llh);
 
   return BIC;
 }
@@ -102,7 +102,6 @@ inline double GetBIC(const double llh, const int data, const int nPars){
 /// \cite press1992numerical
 inline double GetNeffective(const int N1, const int N2) {
 // ****************
-
   const double Nominator = (N1+N2);
   const double Denominator = (N1*N2);
   const double N_e = Nominator/Denominator;
@@ -118,42 +117,40 @@ inline void CheckBonferoniCorrectedpValue(const std::vector<std::string>& Sample
                                           const std::vector<double>& PValVec,
                                           const double Threshold = 0.05) {
 // ****************
-
-  std::cout<<""<<std::endl;
-
+  MACH3LOG_INFO("");
   if(SampleNameVec.size() != PValVec.size())
   {
     MACH3LOG_ERROR("Size of vectors do not match");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const int NumberOfStatisticalTests = SampleNameVec.size();
+  const size_t NumberOfStatisticalTests = SampleNameVec.size();
   //KS: 0.05 or 5% is value used by T2K.
-  const double StatisticalSignificanceDown = Threshold / NumberOfStatisticalTests;
+  const double StatisticalSignificanceDown = Threshold / double(NumberOfStatisticalTests);
   const double StatisticalSignificanceUp = 1 - StatisticalSignificanceDown;
-  std::cout<<"Bonferroni-corrected statistical significance level "<<StatisticalSignificanceDown<<std::endl;
+  MACH3LOG_INFO("Bonferroni-corrected statistical significance level: {:.2f}", StatisticalSignificanceDown);
+
   int Counter = 0;
   for(unsigned int i = 0; i < SampleNameVec.size(); i++)
   {
     if(  (PValVec[i] < 0.5 && PValVec[i] < StatisticalSignificanceDown) )
     {
-      std::cout<<"Sample "<<SampleNameVec[i]<<" indicates of any disagreement between the model predictions and the data"<<std::endl;
-      std::cout<<"Bonferroni-corrected statistical significance level "<<StatisticalSignificanceDown<<" p-value "<<PValVec[i]<<std::endl;
+      MACH3LOG_INFO("Sample {} indicates disagreement between the model predictions and the data", SampleNameVec[i]);
+      MACH3LOG_INFO("Bonferroni-corrected statistical significance level: {:.2f} p-value: {:.2f}", StatisticalSignificanceDown, PValVec[i]);
       Counter++;
     }
     else if( (PValVec[i] > 0.5 && PValVec[i] > StatisticalSignificanceUp) )
     {
-      std::cout<<"Sample "<<SampleNameVec[i]<<" indicates of any disagreement between the model predictions and the data"<<std::endl;
-      std::cout<<"Bonferroni-corrected statistical significance level "<<StatisticalSignificanceUp<<" p-value "<<PValVec[i]<<std::endl;
+      MACH3LOG_INFO("Sample {} indicates disagreement between the model predictions and the data", SampleNameVec[i]);
+      MACH3LOG_INFO("Bonferroni-corrected statistical significance level: {:.2f} p-value: {:.2f}", StatisticalSignificanceUp, PValVec[i]);
       Counter++;
     }
   }
-
   if(Counter == 0) {
     MACH3LOG_INFO("Every sample passed Bonferroni-corrected statistical significance level test");
   } else {
     MACH3LOG_WARN("{} samples didn't pass Bonferroni-corrected statistical significance level test", Counter);
   }
-  std::cout<<""<<std::endl;
+  MACH3LOG_INFO("");
 }
 
 // ****************
@@ -168,12 +165,10 @@ inline double GetAndersonDarlingTestStat(const double CumulativeData, const doub
   return ADstat;
 }
 
-
 // ****************
 /// @brief KS: https://esjeevanand.uccollege.edu.in/wp-content/uploads/sites/114/2020/08/NON-PARAMTERIC-TEST-6.pdf
 inline int GetNumberOfRuns(const std::vector<int>& GroupClasifier) {
 // ****************
-
   int NumberOfRuns = 0;
   int PreviousGroup = -999;
 
@@ -373,8 +368,6 @@ inline void GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_
   Error_m = sigma_m;
 }
 
-
-
 // ***************
 /// @brief KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
 /// @param hist histograms based on which we calculate credible interval
@@ -391,8 +384,8 @@ inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double
   hpost_copy->Fill(0.0, 0.0);
 
   //KS: Temporary structure to be thread save
-  double *hist_copy = new double[hist->GetXaxis()->GetNbins()+1];
-  bool *hist_copy_fill = new bool[hist->GetXaxis()->GetNbins()+1];
+  std::vector<double> hist_copy(hist->GetXaxis()->GetNbins()+1);
+  std::vector<bool> hist_copy_fill(hist->GetXaxis()->GetNbins()+1);
   for (int i = 0; i <= hist->GetXaxis()->GetNbins(); ++i)
   {
     hist_copy[i] = hist->GetBinContent(i);
@@ -427,11 +420,6 @@ inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double
   {
     if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hist->GetBinContent(i));
   }
-
-  delete[] hist_copy;
-  delete[] hist_copy_fill;
-
-  return;
 }
 
 // ***************
@@ -447,13 +435,11 @@ inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827
   }
 
   //KS: Temporary structure to be thread save
-  double **hist_copy = new double*[hist2D->GetXaxis()->GetNbins()+1];
-  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
-  {
-    hist_copy[i] = new double[hist2D->GetYaxis()->GetNbins()+1];
-    for (int j = 0; j <= hist2D->GetYaxis()->GetNbins(); ++j)
-    {
-      hist_copy[i][j] = hist2D->GetBinContent(i,j);
+  std::vector<std::vector<double>> hist_copy(hist2D->GetXaxis()->GetNbins()+1,
+                                             std::vector<double>(hist2D->GetYaxis()->GetNbins()+1));
+  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i) {
+    for (int j = 0; j <= hist2D->GetYaxis()->GetNbins(); ++j) {
+      hist_copy[i][j] = hist2D->GetBinContent(i, j);
     }
   }
 
@@ -488,15 +474,6 @@ inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827
     Contour[0] = max_entries;
   }
   hist2D->SetContour(1, Contour);
-
-  //Delete temporary arrays
-  for (int i = 0; i <= hist2D->GetXaxis()->GetNbins(); ++i)
-  {
-    delete[] hist_copy[i];
-  }
-  delete[] hist_copy;
-
-  return;
 }
 
 // *********************
@@ -504,13 +481,106 @@ inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827
 /// @param hist histograms from which we IQR
 inline double GetIQR(TH1D *Hist) {
 // *********************
-
   if(Hist->Integral() == 0) return 0.0;
 
-  double quartiles_x[3] = {0.25, 0.5, 0.75};
+  constexpr double quartiles_x[3] = {0.25, 0.5, 0.75};
   double quartiles[3];
 
   Hist->GetQuantiles(3, quartiles, quartiles_x);
 
   return quartiles[2] - quartiles[0];
+}
+
+// ********************
+/// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
+///
+/// @param DataPoly Pointer to the data histogram (TH2Poly).
+/// @param PolyMC Pointer to the Monte Carlo histogram (TH2Poly).
+/// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.
+inline double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
+// *********************
+  double klDivergence = 0.0;
+  double DataIntegral = NoOverflowIntegral(DataPoly);
+  double MCIntegral = NoOverflowIntegral(PolyMC);
+  for (int i = 1; i < DataPoly->GetNumberOfBins()+1; ++i)
+  {
+    if (DataPoly->GetBinContent(i) > 0 && PolyMC->GetBinContent(i) > 0) {
+      klDivergence += DataPoly->GetBinContent(i) / DataIntegral *
+      std::log((DataPoly->GetBinContent(i) / DataIntegral) / ( PolyMC->GetBinContent(i) / MCIntegral));
+    }
+  }
+  return klDivergence;
+}
+// ********************
+/// @brief KS: Combine p-values using Fisher's method.
+///
+/// @param pvalues A vector of individual p-values to combine.
+/// @return The combined p-value, representing the overall significance.
+inline double FisherCombinedPValue(const std::vector<double>& pvalues) {
+// ********************
+
+  double testStatistic = 0;
+  for(size_t i = 0; i < pvalues.size(); i++)
+  {
+    const double pval = std::max(0.00001, pvalues[i]);
+    testStatistic += -2.0 * std::log(pval);
+  }
+  // Degrees of freedom is twice the number of p-values
+  int degreesOfFreedom = int(2 * pvalues.size());
+  double pValue = TMath::Prob(testStatistic, degreesOfFreedom);
+
+  return pValue;
+}
+
+// ********************
+/// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
+///
+/// @param FilePath Path to MCMC chain you want to thin
+/// @param ThinningCut every which entry you want to thin
+/// @cite 2011ThinningMCMC
+/// @warning Thinning is done over entry not steps, it may now work very well for merged chains
+inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
+// ********************
+  // Define the path for the temporary thinned file
+  std::string TempFilePath = "Thinned_" + FilePath;
+  int ret = system(("cp " + FilePath + " " + TempFilePath).c_str());
+  if (ret != 0) {
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+  }
+
+  TFile *inFile = TFile::Open(TempFilePath.c_str(), "UPDATE");
+  if (!inFile || inFile->IsZombie()) {
+    MACH3LOG_ERROR("Error opening file: {}", TempFilePath);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TTree *inTree = inFile->Get<TTree>("posteriors");
+  if (!inTree) {
+    MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    inFile->ls();
+    inFile->Close();
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  // Clone the structure without data
+  TTree *outTree = inTree->CloneTree(0);
+
+  // Loop over entries and apply thinning
+  Long64_t nEntries = inTree->GetEntries();
+  double retainedPercentage = (double(nEntries) / ThinningCut) / double(nEntries) * 100;
+  MACH3LOG_INFO("Thinning will retain {:.2f}% of chains", retainedPercentage);
+  for (Long64_t i = 0; i < nEntries; i++) {
+    if (i % (nEntries/10) == 0) {
+      MaCh3Utils::PrintProgressBar(i, nEntries);
+    }
+    if (i % ThinningCut == 0) {
+      inTree->GetEntry(i);
+      outTree->Fill();
+    }
+  }
+  inFile->WriteTObject(outTree, "posteriors", "kOverwrite");
+  inFile->Close();
+  delete inFile;
+
+  MACH3LOG_INFO("Thinned TTree saved and overwrote original in: {}", TempFilePath);
 }

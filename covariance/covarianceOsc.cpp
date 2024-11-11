@@ -1,7 +1,7 @@
-#include "covarianceOsc.h"
+#include "covariance/covarianceOsc.h"
 
 // *************************************
-covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const char *name, double threshold, int FirstPCA, int LastPCA)
+covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
 : covarianceBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // *************************************
 
@@ -25,18 +25,12 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, const cha
     _fPropVal[io] = _fCurrVal[io];
   }
 
-  /// WARNING HARDCODED
-  MACH3LOG_CRITICAL("Fixing baseline and density, it is hardcoded sry");
-  toggleFixParameter("baseline");
-  toggleFixParameter("density");
-
-  /// @todo KS: Technically if we would like to use PCA we have ot initialise parts here...
+  /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
   flipdelM = false;
 
   randomize();
 
   Print();
-  CheckOrderOfParams();
 
   MACH3LOG_INFO("Created oscillation parameter handler");
 }
@@ -104,33 +98,5 @@ void covarianceOsc::Print() {
   for(int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("{:<5} | {:<25} | {:<10.4f} | {:<15.2f} | {:<15.4f} | {:<10}",
                   i, _fNames[i].c_str(), _fPreFitValue[i], _fIndivStepScale[i], _fError[i], _fFlatPrior[i]);
-  }
-}
-
-// *************************************
-//KS: Currently prob3++/probgpu requires particular order so we need to check this is the case
-void covarianceOsc::CheckOrderOfParams() {
-// *************************************
-
-  std::vector<int> wrongParam;
-  bool wrongMatrix = false;
-  if(_fNames[0] != "sin2th_12"){wrongParam.push_back(0); wrongMatrix = true;};
-  if(_fNames[1] != "sin2th_23"){wrongParam.push_back(1); wrongMatrix = true;};
-  if(_fNames[2] != "sin2th_13"){wrongParam.push_back(2); wrongMatrix = true;};
-  if(_fNames[3] != "delm2_12") {wrongParam.push_back(3); wrongMatrix = true;};
-  if(_fNames[4] != "delm2_23") {wrongParam.push_back(4); wrongMatrix = true;};
-  if(_fNames[5] != "delta_cp") {wrongParam.push_back(5); wrongMatrix = true;};
-  if(_fNames[6] != "baseline") {wrongParam.push_back(6); wrongMatrix = true;};
-  if(_fNames[7] != "density") {wrongParam.push_back(7); wrongMatrix = true;};
-
-  if(wrongMatrix)
-  {
-    for(unsigned int i = 0; i < wrongParam.size(); i++ )
-    {
-      MACH3LOG_ERROR("Osc Parameter  {} isn't in good order", _fNames[wrongParam[i]].c_str());
-    }
-    MACH3LOG_ERROR("Currently prob3++/probgp requires particular order");
-    MACH3LOG_ERROR("Please modify your cov osc config");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 }

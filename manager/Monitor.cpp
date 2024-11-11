@@ -150,12 +150,11 @@ void GetDiskUsage() {
 
 // ************************
 // KS: Convoluted code to grab output from terminal to string
-std::string TerminalToString(const char* cmd) {
+std::string TerminalToString(std::string cmd) {
 // ************************
-
   std::array<char, 128> buffer;
   std::string result;
-  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
   if (!pipe) {
     throw MaCh3Exception(__FILE__, __LINE__, "popen() failed!");
   }
@@ -169,7 +168,7 @@ std::string TerminalToString(const char* cmd) {
 
 // ************************
 //KS: Simple to retrieve speed of get entry inspired by
-void EstimateDataTransferRate(TChain* chain, const int entry){
+void EstimateDataTransferRate(TChain* chain, const Long64_t entry){
 // ************************
 
   TStopwatch timer;
@@ -187,15 +186,15 @@ void EstimateDataTransferRate(TChain* chain, const int entry){
 
 // ************************
 //KS: Simply print progress bar
-void PrintProgressBar(const int Done, const int All){
+void PrintProgressBar(const Long64_t Done, const Long64_t All){
 // ************************
 
-  double progress = double((double(Done)/double(All)));
+  double progress = double(Done)/double(All);
   const int barWidth = 20;
   std::ostringstream progressBar;
 
   progressBar << "[";
-  int pos = barWidth * progress;
+  int pos = int(barWidth * progress);
   for (int i = 0; i < barWidth; ++i) {
     if (i < pos)
       progressBar << "=";
@@ -211,7 +210,7 @@ void PrintProgressBar(const int Done, const int All){
 
 // ***************************************************************************
 //CW: Get memory, which is probably silly
-int getValue(std::string Type){ //Note: this value is in KB!
+int getValue(const std::string& Type){ //Note: this value is in KB!
 // ***************************************************************************
   std::ifstream file("/proc/self/status");
   int result = -1;
@@ -295,4 +294,5 @@ void MaCh3Usage(int argc, char **argv){
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
-}
+
+} //end namespace

@@ -31,7 +31,7 @@
 ///
 /// @todo KS: This should really be moved to MCMC Processor
 
-std::vector <int> nominal;
+std::vector <double> nominal;
 std::vector <bool> isFlat;
 std::vector<TString> BranchNames;
 std::vector<std::string> ParamNames;
@@ -45,10 +45,10 @@ void ReadXSecFile(const std::string& inputFile)
   TFile *TempFile = new TFile(inputFile.c_str(), "open");
 
   // Get the matrix
-  TMatrixDSym *XSecMatrix = (TMatrixDSym*)(TempFile->Get("CovarianceFolder/xsec_cov"));
+  TMatrixDSym *XSecMatrix = TempFile->Get<TMatrixDSym>("CovarianceFolder/xsec_cov");
 
   // Get the settings for the MCMC
-  TMacro *Config = (TMacro*)(TempFile->Get("MaCh3_Config"));
+  TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
   if (Config == nullptr) {
     MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile);
     TempFile->ls();
@@ -110,7 +110,7 @@ void ReadXSecFile(const std::string& inputFile)
     }
   }
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for (int i = 0; i < size; i++)
   {
@@ -126,14 +126,15 @@ void ReadXSecFile(const std::string& inputFile)
 
 void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 {
-  TCanvas* canvas = new TCanvas("canvas", "canvas", 0, 0, 1024, 1024);
+  auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
   canvas->SetGrid();
   canvas->SetTickx();
   canvas->SetTicky();
-  canvas->SetBottomMargin(0.1);
-  canvas->SetTopMargin(0.02);
-  canvas->SetRightMargin(0.08);
-  canvas->SetLeftMargin(0.15);
+
+  canvas->SetBottomMargin(0.1f);
+  canvas->SetTopMargin(0.02f);
+  canvas->SetRightMargin(0.08f);
+  canvas->SetLeftMargin(0.15f);
 
   gStyle->SetOptTitle(0); 
   gStyle->SetOptStat(0); 
@@ -146,7 +147,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   Chain->Add(inputFile.c_str()); 
     
   // Get the list of branches
-  TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
+  TObjArray* brlis = Chain->GetListOfBranches();
 
   // Get the number of branches
   int nBranches = brlis->GetEntries();
@@ -154,7 +155,11 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   for (int i = 0; i < nBranches; i++) 
   {
     // Get the TBranch and its name
-    TBranch* br = (TBranch*)brlis->At(i);
+    TBranch* br = static_cast<TBranch*>(brlis->At(i));
+    if(!br){
+      MACH3LOG_ERROR("Invalid branch at position {}", i);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     TString bname = br->GetName();
 
     // If we're on beam systematics
@@ -168,7 +173,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
   
-  double* fParProp = new double[RelevantBranches];
+  std::vector<double> fParProp(RelevantBranches);
   // Turn on the branches which we want for parameters
   for (int i = 0; i < RelevantBranches; ++i) 
   {
@@ -197,7 +202,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     FancyTittle.push_back(Set[2].as<std::string>());
   }
 
-  const int NSets = SetsNames.size();
+  const int NSets = int(SetsNames.size());
 
   isRelevantParam.resize(NSets);
   //Loop over sets in the config
@@ -244,15 +249,14 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     MACH3LOG_INFO(" Found {} params for set {}", counter, SetsNames[i]);
   }
 
-  int AllEvents = Chain->GetEntries();
-  TH1D **hLogL = new TH1D *[NSets];
-  for(int i = 0; i < NSets; i++)
-  {
+  int AllEvents = int(Chain->GetEntries());
+  std::vector<std::unique_ptr<TH1D>> hLogL(NSets);
+  for (int i = 0; i < NSets; i++) {
     std::string NameTemp = "LogL_" + SetsNames[i];
-    hLogL[i] = new TH1D(NameTemp.c_str(), NameTemp.c_str(), AllEvents, 0 , AllEvents);
+    hLogL[i] = std::make_unique<TH1D>(NameTemp.c_str(), NameTemp.c_str(), AllEvents, 0, AllEvents);
     hLogL[i]->SetLineColor(kBlue);
   }
-  double* logL = new double[NSets]();
+  std::vector<double> logL(NSets, 0.0);
   for(int n = 0; n < AllEvents; ++n)
   {
     if(n%10000 == 0) MaCh3Utils::PrintProgressBar(n, AllEvents);
@@ -332,7 +336,6 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     }
   }//End loop over steps
 
-  delete[] logL;
   // Directory for posteriors
   std::string OutputName = inputFile + "_PenaltyTerm" +".root";
   TFile* OutputFile = new TFile(OutputName.c_str(), "recreate");
@@ -346,7 +349,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     hLogL[i]->SetTitle(FancyTittle[i].c_str());
     hLogL[i]->GetXaxis()->SetTitle("Step");
     hLogL[i]->GetYaxis()->SetTitle(FancyTittle[i].c_str());
-    hLogL[i]->GetYaxis()->SetTitleOffset(1.4);
+    hLogL[i]->GetYaxis()->SetTitleOffset(1.4f);
 
     hLogL[i]->Draw("");
 
@@ -354,13 +357,9 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     hLogL[i]->Write();
 
     canvas->Print(Form("%s_PenaltyTerm.pdf",inputFile.c_str()), "pdf");
-    delete hLogL[i];
   }
   canvas->Print(Form("%s_PenaltyTerm.pdf]",inputFile.c_str()), "pdf");
-  delete[] hLogL;
-  delete[] fParProp;
   delete Chain;
-  delete canvas;
 
   for (int i = 0; i < size; i++)
   {

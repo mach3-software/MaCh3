@@ -1,7 +1,15 @@
 # MaCh3 <img src="Doc/mach3logo.png" alt="MaCh3" align="center" width="100"/>
-The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the [DUNE](https://www.dunescience.org/) and [HK](https://www-sk.icrr.u-tokyo.ac.jp/en/hk/) oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
 
-The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
+The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC
+fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has
+now been used for multiple T2K Oscillation analyses at both the Near and Far
+detectors throughout the years. The framework is also utilized by the
+[DUNE](https://www.dunescience.org/) and [HK](https://www-sk.icrr.u-tokyo.ac.jp/en/hk/)
+oscillation analysis groups. Additionally, it supports joint fits between T2K
+and NOvA, as well as T2K and SK's atmospheric data.
+
+The framework has also evolved to allow non-MCMC modules to interrogate the
+likelihoods implemented.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
 [![Release](https://img.shields.io/github/release/mach3-software/MaCh3.svg)](https://github.com/mach3-software/MaCh3/releases/latest)
@@ -15,11 +23,11 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13642670.svg)](https://doi.org/10.5281/zenodo.13642670).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
 
-# How to Compile
+## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
-```
+```bash
 mkdir build;
 cd build;
 cmake ../
@@ -28,12 +36,12 @@ make install
 ```
 
 Don't forget to:
-```
+```bash
 source bin/setup.MaCh3.sh
 ```
 ## Building against MaCh3
 To include MaCh3 in your cmake project you can use following syntax
-```
+```cmake
 CPMFindPackage(
   NAME MaCh3
   GIT_TAG "blarb"
@@ -42,12 +50,12 @@ CPMFindPackage(
 ```
 Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
 If you compiled MaCh3 and sourced it you can simply call
-```
+```cmake
 find_package(MaCh3)
 ```
 
 Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows:
-```
+```cmake
 target_link_libraries(blarb MaCh3::All)
 ```
 
@@ -56,51 +64,55 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 ## Python
 
 MaCh3 can be compiled with a python interface by specifying the cmake option
-```
+```bash
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
-and then adding the path to the installed module to your `PYTHONPATH` environment variable:
-```
-export PYTHONPATH=$PYTHONPATH:<path>/<to>/<MaCh3>/build/python
-```
+
 Currently the python module only contains an interface to the plotting library (see [here](https://github.com/mach3-software/MaCh3/blob/develop/plotting/README.md#python) for more information on how to use it)
+
 
 ### Building with Pip
 
-Additionally you can build just the python module by doing 
-```
+Additionally, you can build just the Python module by doing:
+
+```bash
 pip install -t <install location> .
-``` 
+```
 The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
-```
+```bash
 cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
 ```
 
 ## CUDA
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to [CUDA](https://developer.nvidia.com/cuda-toolkit)
-```
+```bash
 mkdir build; cd build;
 cmake ../ -DUSE_CPU=ON
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
 ## Oscillator
-MaCh3 uses several neutrino oscillation calculators. By default, CUDAProb3 is used. If you would like to use Prob3++
+MaCh3 uses several neutrino oscillation calculators.
 
-```
-cmake ../ -DUSE_PROB3=<ON,OFF>
-```
 Following neutrino oscillation calculators are available:
+|Oscillator        | Hardware   | Source     | Reference  |
+|------------------|------------|------------|------------|
+| CUDAProb3Linear  | CPU/GPU    | Beam       |            |
+| CUDAProb3        | CPU/GPU    | Atm        | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
+| ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
+| Prob3++Linear    | CPU        | Beam       |            |
+| NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 
-|Oscillator  | Hardware   | Source     |
-|------------|------------|------------|
-| CUDAProb3  | CPU/GPU    | Beam/Atm   |
-| Prob3++    | CPU        | Beam       |
-| probGPU    | GPU        | Beam       |
+If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
+
+```bash
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
+```
+You can only specify engines you want to use, and you can in principle use more than one.
 
 ## Fitting algorithms
 The following fitting algorithms are available:
@@ -114,12 +126,12 @@ The following fitting algorithms are available:
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
-```
+```bash
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF>
 ```
 There are several debug modes, to enable more detailed but very heavy specific debug levels. Level 1 is the default debug activated by the above.
 
-```
+```bash
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF> -DDEBUG_LEVEL=<1,2,3>
 ```
 ## System Requirements
@@ -129,7 +141,7 @@ Most of external libraries are being handled through [CPM](https://github.com/cp
 2. [spdlog](https://github.com/gabime/spdlog)
 
 Based on several test here are recommended version:
-```
+```bash
   GCC: >= 8.5 [lower versions may work]
   CMake: >= 3.14
   ROOT: >= 6.18
@@ -138,6 +150,7 @@ Based on several test here are recommended version:
 | Name        | Status |
 |-------------|--------|
 | Alma9       | ✅     |
+| Rocky9      | ✅     |
 | Ubuntu22.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
@@ -147,7 +160,7 @@ Based on several test here are recommended version:
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
 
-# Help and Guidelines
+## Help and Guidelines
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
@@ -161,7 +174,7 @@ The MaCh3 core plotting library code can be found [here](https://github.com/mach
 
 ## How To Use
 This is an example how your executable can look like using MaCh3:
-```
+```cpp
   manager *fitMan = nullptr; //Manager is responsible for reading from config
 
   std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector

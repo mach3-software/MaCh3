@@ -1,17 +1,21 @@
-# This is a basic workflow make doxygen documentation every time develop is updated
+---
+# This is a basic workflow make doxygen documentation 
+# every time develop is updated
 
 name: Doxygen
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
+  # Triggers the workflow on push or pull request events 
+  # but only for the develop branch
   push:
-    branches: [ develop ]
+    branches: [develop]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# A workflow run is made up of one or more jobs that can run 
+# sequentially or in parallel
 jobs:
   # This workflow contains a single job called "Doxygen"
   
@@ -23,9 +27,11 @@ jobs:
       contents: write
       id-token: write
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps represent a sequence of tasks that will be executed
+    # as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out your repository under $GITHUB_WORKSPACE, 
+      # so your job can access it
       - uses: actions/checkout@v4
       
       # Updates the package list to ensure you get the latest version of packages
@@ -34,23 +40,108 @@ jobs:
       # Installs texlive for LaTeX support in Doxygen documentation
       - run: sudo apt-get install -y texlive
 
-      # Installs libjs-mathjax for rendering mathematical notation in Doxygen documentation
+      # Installs libjs-mathjax for rendering mathematical notation 
+      # in Doxygen documentation
       - run: sudo apt-get install -y libjs-mathjax
 
       # Install perl for bibtex
       - run: sudo apt-get install -y perl
 
       # Runs a single command using the runners shell
-      - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@1.9.8
+      - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
         with:
-          doxyfile-path: './Doxyfile'
-          working-directory: ./Doc
-  
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          folder: Doc/html
+          branch: gh-pages
+          config_file: Doc/Doxyfile
+
+      - name: Upload Doxygen Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: DoxygenHTML
+          path: Doc/html
+
+  Sphinx:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
+    needs: Doxygen
+      
+    steps:
+    
+      # Checks-out your repository under $GITHUB_WORKSPACE, 
+      # so your job can access it
+      - uses: actions/checkout@v4
+
+      - name: Check Python 
+        run: python3 --version
+
+      - name: Download Doxygen Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: DoxygenHTML
+          path: to-upload/
+
+      ## EM: Now we delete the artifact so it doesn't use up our allowance
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: DoxygenHTML
+          
+      - name: Build MaCh3
+        run: | 
+          mkdir build
+          cd build 
+          cmake -DMaCh3_PYTHON_ENABLED=ON ../
+          make -j4
+          make install
+          
+      ## EM: Now generate the sphinx documentation
+      - name: Sphinx Build    
+        working-directory: Doc/sphinx
+        run: | 
+          source ../../build/bin/setup.MaCh3.sh
+          python3 -m venv sphinx_env 
+          source sphinx_env/bin/activate 
+          pip install -r requirements.txt 
+          make html
+          
+      ## EM: Move the generated sphinx docs into the final html folder
+      - name: Move Sphinx Docs
+        run: |
+          mkdir to-upload/pyMaCh3
+          mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
+          
+      - uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: DocumentationHTML
+          path: to-upload
+
+
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: [Doxygen, Sphinx]
+
+    steps:
+
+      - name: Download Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: DocumentationHTML
+          path: to-upload/
+          
+      ## EM: Now we delete the artifact so it doesn't use up our allowance
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: DocumentationHTML
+    
       # Deploys the generated documentation to GitHub Pages
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./Doc/html
-    
+          publish_dir: ./to-upload

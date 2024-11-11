@@ -1,19 +1,5 @@
 #pragma once
 
-// C++ includes
-#include <iostream>
-#include <vector>
-
-// ROOT include
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include "TH2Poly.h"
-#include "THStack.h"
-#include "TStyle.h"
-#include "TCanvas.h"
-#include "TApplication.h"
-
 // MaCh3 includes
 #include "samplePDF/samplePDFBase.h"
 #include "mcmc/StatisticalUtils.h"
@@ -75,11 +61,18 @@ class SampleSummary {
     /// @brief KS: Study how correlated are sample or kinematic bins
     inline void StudyKinematicCorrelations();
 
-    // Helper functions to change titles etc of finished plots, calculate pvalues etc
+    /// @brief Make the cut LLH histogram
     inline void MakeCutLLH();
+    // Make the 1D cut distribution and give the 1D p-value
     inline void MakeCutLLH1D(TH1D *Histogram, double llh_ref = -999);
+    /// @brief Make the 2D cut distribution and give the 2D p-value
     inline void MakeCutLLH2D(TH2D *Histogram);
+    /// @brief Make the 1D Event Rate Hist
     inline void MakeCutEventRate(TH1D *Histogram, const double DataRate);
+    /// @brief Make the fluctuated histograms (2D and 1D) for the chi2s
+    /// Essentially taking the MCMC draws and calculating their LLH to the Posterior predictive distribution
+    /// And additionally taking the data histogram and calculating the LLH to the predictive distribution
+    /// Additionally we calculate the chi2 of the draws (fluctuated) of  the MC with the prior/posterior predictive and plot it vs the chi2 from the draws of MCMC and the data
     inline void MakeChi2Hists();
 
     /// @brief Check the length of samples agrees
@@ -93,7 +86,7 @@ class SampleSummary {
     /// @brief Helper to project TH2D onto axis
     inline TH1D* ProjectHist(TH2D* Histogram, const bool ProjectX);
     /// @brief Helper to project TH2Poly onto axis
-    inline TH1D* ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const _int_ selection, const bool MakeErrorHist = false);
+    inline TH1D* ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const int selection, const bool MakeErrorHist = false);
 
     /// @brief Make Poisson fluctuation of TH1D hist
     inline void MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist);
@@ -127,7 +120,7 @@ class SampleSummary {
     inline void NormaliseTH2Poly(TH2Poly* Histogram);
 
     /// Random number generator
-    TRandom3* rnd;
+    std::unique_ptr<TRandom3> rnd;
     /// KS: Hacky flag to let us know if this is first toy
     bool first_pass;
 
@@ -147,7 +140,7 @@ class SampleSummary {
     std::vector<double> WeightVector;
 
     /// Number of samples
-    _int_ nSamples;
+    int nSamples;
 
     /// name for each sample
     std::vector<std::string> SampleNames;
@@ -170,9 +163,11 @@ class SampleSummary {
     TH1D **DataHist_ProjectY;
     /// The nominal histogram for the selection
     TH2Poly **NominalHist;
-    // The w2 histograms
+    /// Pointer to the w2 histograms (for nominal values).
     TH2Poly **W2NomHist;
+    /// Pointer to the w2 histograms (for mean values).
     TH2Poly **W2MeanHist;
+    /// Pointer to the w2 histograms (for mode values).
     TH2Poly **W2ModeHist;
 
     /// The histogram containing the lnL for each throw
@@ -241,7 +236,7 @@ class SampleSummary {
     unsigned int nThrows;
 
     /// Max Number of Bins per each sample
-    int* maxBins;
+    std::vector<int> maxBins;
 
     /// Total LLH for the posterior predictive distribution
     double llh_total;
@@ -251,41 +246,41 @@ class SampleSummary {
     /// Output filename
     TFile *Outputfile;
     /// Directory for each sample
-    TDirectory **Dir;
+    std::vector<TDirectory*> Dir;
 
     /// TTree which we save useful information to
     TTree *OutputTree;
     /// Data vs Draw
-    double *llh_data_draw;
+    std::vector<double> llh_data_draw;
     /// Fluctuated Draw vs Draw
-    double *llh_drawfluc_draw;
+    std::vector<double> llh_drawfluc_draw;
     /// Fluctuated Predictive vs Draw
-    double *llh_predfluc_draw;
+    std::vector<double> llh_predfluc_draw;
 
     /// Data vs Draw using rate only
-    double *llh_rate_data_draw;
+    std::vector<double> llh_rate_data_draw;
     /// Fluctuated Predictive vs Draw using rate only
-    double *llh_rate_predfluc_draw;
+    std::vector<double> llh_rate_predfluc_draw;
 
     /// Data vs Fluctuated Draw
-    double *llh_data_drawfluc;
+    std::vector<double> llh_data_drawfluc;
     /// Data vs Fluctuated Predictive
-    double *llh_data_predfluc;
+    std::vector<double> llh_data_predfluc;
     /// Draw vs Predictive
-    double *llh_draw_pred;
+    std::vector<double> llh_draw_pred;
     /// Fluctuated Draw vs Predictive
-    double *llh_drawfluc_pred;
+    std::vector<double> llh_drawfluc_pred;
 
     /// Fluctuated Predictive vs Predictive
-    double *llh_predfluc_pred;
+    std::vector<double> llh_predfluc_pred;
     /// Fluctuated Draw vs Fluctuated Predictive
-    double *llh_drawfluc_predfluc;
+    std::vector<double> llh_drawfluc_predfluc;
     /// Fluctuated Data vs Draw
-    double *llh_datafluc_draw;
+    std::vector<double> llh_datafluc_draw;
 
     /// Projection X (most likely muon momentum) of LLH
-    double *llh_data_draw_ProjectX;
-    double *llh_drawfluc_draw_ProjectX;
+    std::vector<double> llh_data_draw_ProjectX;
+    std::vector<double> llh_drawfluc_draw_ProjectX;
 
     /// LLH penalty for each throw
     double llh_penalty;
@@ -326,6 +321,7 @@ class SampleSummary {
     bool DoByModePlots;
     /// The posterior predictive distribution in pmu cosmu using the mean
     TH2Poly ***MeanHist_ByMode;
+    /// Histogram which corresponds to each bin in the sample's th2poly
     TH1D ****PosteriorHist_ByMode;
     
     /// Pointer to samplePDF object, mostly used to get sample names, binning etc.
@@ -341,5 +337,5 @@ class SampleSummary {
     int nModelParams;
 
     /// Tells Debug level to save additional histograms
-    _int_ Debug;
+    int Debug;
 };

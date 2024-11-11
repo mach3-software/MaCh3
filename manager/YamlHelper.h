@@ -13,6 +13,9 @@
 // yaml Includes
 #include "yaml-cpp/yaml.h"
 
+/// @file YamlHelper.h
+/// @brief Utility functions for handling YAML nodes
+
 // **********************
 /// @brief Get content of config file if node is not found take default value specified
 /// @param node Yaml node
@@ -154,3 +157,93 @@ inline YAML::Node TMacroToYAML(const TMacro& macro) {
   return yaml_node;
 }
 
+// **********************
+/// @brief Convert a YAML node to a ROOT TMacro object.
+/// @param yaml_node The YAML node to convert to a TMacro.
+/// @param name Name of TMacro that will be saved
+/// @return TMacro The TMacro object constructed from the YAML node.
+inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name) {
+// **********************
+  // Convert the YAML node to a string representation
+  std::string macro_string = YAMLtoSTRING(yaml_node);
+
+  // Create a TMacro object with the collected lines
+  TMacro macro(name.c_str(), name.c_str());
+  macro.AddLine(macro_string.c_str());
+
+  return macro;
+}
+
+// **********************
+/// @brief Compare if yaml nodes are identical
+/// @param node1 The first YAML node to compare.
+/// @param node2 The second YAML node to compare.
+/// @return true If the two nodes are equivalent in type and content.
+/// @return false If the two nodes differ in structure or content.
+inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
+// **********************
+  // Check if the types of the nodes match
+  if (node1.Type() != node2.Type()) {
+    return false;
+  }
+
+  // Compare scalar types (like strings, numbers)
+  if (node1.IsScalar() && node2.IsScalar()) {
+    return node1.as<std::string>() == node2.as<std::string>();
+  }
+
+  // Compare sequences (like YAML lists)
+  if (node1.IsSequence() && node2.IsSequence()) {
+    if (node1.size() != node2.size()) {
+      return false;
+    }
+    for (std::size_t i = 0; i < node1.size(); ++i) {
+      if (!compareYAMLNodes(node1[i], node2[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Compare maps (like YAML dictionaries)
+  if (node1.IsMap() && node2.IsMap()) {
+    if (node1.size() != node2.size()) {
+      return false;
+    }
+    for (auto it1 = node1.begin(); it1 != node1.end(); ++it1) {
+      auto key = it1->first.as<std::string>();
+      if (!node2[key] || !compareYAMLNodes(it1->second, node2[key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Default case: if it's neither scalar, sequence, nor map, consider it unequal
+  return false;
+}
+
+
+// **********************
+/// @brief Overrides the configuration settings based on provided arguments.
+///
+/// This function allows you to set configuration options in a nested YAML node.
+/// @param node YAML node that will be modified
+/// @param args The arguments to override the configuration. The last argument
+///             will be used as the value
+///
+/// @note Example usage:
+/// @code
+/// OverrideConfig(config, "General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
+/// OverrideConfig(config, "General", "MyDouble", 5.3);
+/// @endcode
+template <typename TValue>
+void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
+// **********************
+  node[key] = val;
+}
+template <typename... Args>
+void OverrideConfig(YAML::Node node, std::string const &key, Args... args) {
+// **********************
+  OverrideConfig(node[key], args...);
+}

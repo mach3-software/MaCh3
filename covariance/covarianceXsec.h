@@ -14,7 +14,7 @@ class covarianceXsec : public covarianceBase {
     /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
     /// @param FirstPCAdpar First PCA parameter that will be decomposed.
     /// @param LastPCAdpar First PCA parameter that will be decomposed.
-    covarianceXsec(const std::vector<std::string>& FileNames, const char *name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+    covarianceXsec(const std::vector<std::string>& FileNames, std::string name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     /// @brief Destructor
     ~covarianceXsec();
 
@@ -32,6 +32,9 @@ class covarianceXsec : public covarianceBase {
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
+    /// @brief Get the name of the spline associated with the spline at index i
+    /// @param i spline parameter index, not to be confused with global index
+    std::string GetParSplineName(const int i) {return _fSplineNames[i];}
 
     //DB Get spline parameters depending on given DetID
     const std::vector<int> GetGlobalSystIndexFromDetID(const int DetID, const SystType Type);
@@ -59,26 +62,11 @@ class covarianceXsec : public covarianceBase {
 
     /// @brief DB Grab the Spline Modes for the relevant DetID
     const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
-    /// @brief DB Grab the Spline Indices for the relevant DetID
-    const std::vector<int> GetSplineParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kSpline);}
-    /// @brief ETA Grab the index of the spline relative to the _fSplineNames vector.
-    const std::vector<int> GetSplineSystIndexFromDetID(const int DetID){return GetSystIndexFromDetID(DetID, kSpline);};
     /// @brief Grab the index of the syst relative to global numbering.
     /// @param Type Type of syst, for example kNorm, kSpline etc
     const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
-
-    /// @brief DB Grab the Number of splines for the relevant DetID
-    int GetNumSplineParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kSpline);}
-
     /// @brief DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(const int DetID);
-
-    /// @brief DB Grab the number of Normalisation parameters for the relevant DetID
-    int GetNumFuncParamsFromDetID(const int DetID){return GetNumParamsFromDetID(DetID, kFunc);}
-    /// @brief DB Grab the Functional parameter names for the relevant DetID
-    const std::vector<std::string> GetFuncParsNamesFromDetID(const int DetID){return GetParsNamesFromDetID(DetID, kFunc);}
-    /// @brief DB Grab the Functional parameter indices for the relevant DetID
-    const std::vector<int> GetFuncParsIndexFromDetID(const int DetID){return GetParsIndexFromDetID(DetID, kFunc);}
 
     /// @brief KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
     /// For example Sigma Var are done around nominal in ND280, no idea why though...
@@ -139,7 +127,12 @@ class covarianceXsec : public covarianceBase {
     /// @param DetID The Detector ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
     void IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action);
-
+    /// @brief Check if parameter is affecting given det ID
+    /// @param SystIndex number of parameter
+    /// @param DetID The Detector ID used to filter parameters.
+    bool AppliesToDetID(const int SystIndex, const int DetID) const {
+      return (GetParDetID(SystIndex) & DetID) != 0;
+    }
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.

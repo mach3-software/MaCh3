@@ -25,10 +25,10 @@ jobs:
           cd MaCh3Tutorial/
 
           # Extract the tag name from GITHUB_REF
-          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
 
           # Create the new tag
-          git tag $TAG_NAME
+          git tag "$TAG_NAME"
 
           # Push the tag to the MaCh3Tutorial repository
-          git push https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Tutorial.git $TAG_NAME
+          git push https://${{ secrets.MACH3_VALIDATIONS_PAT }}@github.com/mach3-software/MaCh3Tutorial.git "$TAG_NAME"

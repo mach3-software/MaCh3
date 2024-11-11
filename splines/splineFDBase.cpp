@@ -1,12 +1,15 @@
 #include "splineFDBase.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
 //****************************************
-  if (xsec_ == NULL) {
-    MACH3LOG_ERROR("Trying to create splineSKBase with NULL covariance object");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+  if (!xsec_) {
+    MACH3LOG_ERROR("Trying to create splineSKBase with null covariance object");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
 
@@ -45,20 +48,20 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
+bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  Dimensions.push_back(NSplineDimensions);
+  Dimensions.push_back(int(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
   DetIDs.push_back(DetID);
 
-  int nSplineParam = xsec->GetNumSplineParamsFromDetID(DetID);
+  int nSplineParam = xsec->GetNumParamsFromDetID(DetID, SystType::kSpline);
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, kSpline);
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
@@ -67,10 +70,13 @@ bool splineFDBase::AddSample(std::string SampleName, int NSplineDimensions, int 
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
+  MACH3LOG_INFO("Create SplineModeVecs_Sample");
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
+  MACH3LOG_INFO("SplineModeVecs is of size {}", SplineModeVecs.size());
 
-  int nOscChan = OscChanFileNames.size();
+  int nOscChan = int(OscChanFileNames.size());
   nOscChans.push_back(nOscChan);
 
   PrintSampleDetails(SampleName);
@@ -114,8 +120,8 @@ void splineFDBase::TransferToMonolith()
   weightvec_Monolith.resize(MonolithSize);
   isflatarray = new bool[MonolithSize];
   
-  xcoeff_arr = new _float_[CoeffIndex];
-  manycoeff_arr = new _float_[CoeffIndex*4];
+  xcoeff_arr = new M3::float_t[CoeffIndex];
+  manycoeff_arr = new M3::float_t[CoeffIndex*4];
 
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over sample
@@ -147,12 +153,12 @@ void splineFDBase::TransferToMonolith()
                 if (!foundUniqueSpline)
                 {
                   MACH3LOG_ERROR("Unique spline index not found");
-				  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
-				  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nUniqueSysts);
-				  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
-				  {
-					MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
-				  }//unique syst loop end				
+                  MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
+                  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nUniqueSysts);
+                  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+                  {
+                    MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
+                  }//unique syst loop end
                   throw MaCh3Exception(__FILE__ , __LINE__ );
                 }
 
@@ -162,30 +168,18 @@ void splineFDBase::TransferToMonolith()
                   splineKnots=splinevec_Monolith[splineindex]->GetNp();
 
                   //Now to fill up our coefficient arrayss
-                  _float_* tmpXCoeffArr = new _float_[splineKnots];
-                  _float_* tmpManyCoeffArr = new _float_[splineKnots*4];
+                  M3::float_t* tmpXCoeffArr = new M3::float_t[splineKnots];
+                  M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*4];
 
                   int iCoeff=coeffindexvec[splineindex];
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
 
-                  #ifdef MULTITHREAD
-                  #pragma omp parallel for
-                  #endif
-                  for(int i=0; i<splineKnots; i++){
+                  for(int i = 0; i < splineKnots; i++){
 
-                    if(tmpXCoeffArr[i]==-999){
-                      std::cerr<<"ERROR : looks like we've got a bad X, index = "<<i<<std::endl;
-                      throw MaCh3Exception(__FILE__ , __LINE__ );
-                    }
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
-                      if(tmpManyCoeffArr[i*4+j]==-999){
-                        std::cerr<<"Bad ybcd, index : "<<i<<", "<<j<<std::endl;
-                        std::cerr<<"Param Values : "<<tmpManyCoeffArr[i*4]<<", "<<tmpManyCoeffArr[i*4+1]<<", "<<tmpManyCoeffArr[i*4+2]<<", "<<tmpManyCoeffArr[i*4+3]<<std::endl;
-                        throw MaCh3Exception(__FILE__ , __LINE__ );
-                      }
-                    manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+					  manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
                   delete tmpXCoeffArr;
@@ -236,20 +230,20 @@ void splineFDBase::FindSplineSegment()
   for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++)
   {
     int nPoints = UniqueSystNKnots[iSyst];
-    std::vector<_float_> xArray = UniqueSystXPts[iSyst];
+    std::vector<M3::float_t> xArray = UniqueSystXPts[iSyst];
 
     // Get the variation for this reconfigure for the ith parameter
     int GlobalIndex = UniqueSystIndices[iSyst];
 
-    _float_ xvar=_float_(xsec->getParProp(GlobalIndex));
+    M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
 
     xVarArray[iSyst]=xvar;
     
-    _int_ segment = 0;
-	_int_ kHigh = nPoints - 1;
+    M3::int_t segment = 0;
+	  M3::int_t kHigh = M3::int_t(nPoints - 1);
 
     //KS: We expect new segment is very close to previous
-    const _int_ PreviousSegment = UniqueSystCurrSegment[iSyst];
+    const M3::int_t PreviousSegment = M3::int_t(UniqueSystCurrSegment[iSyst]);
     //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
     if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
     // If the variation is below the lowest saved spline point
@@ -262,12 +256,12 @@ void splineFDBase::FindSplineSegment()
 	  //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
 	} else {
       // The top point we've got
-      _int_ kHalf = 0;
+      M3::int_t kHalf = 0;
       // While there is still a difference in the points (we haven't yet found the segment)
       // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
       while (kHigh - segment > 1) {
         // Increment the half-step
-        kHalf = (segment + kHigh)/2;
+        kHalf = M3::int_t((segment + kHigh)/2);
         // If our variation is above the kHalf, set the segment to kHalf
         if (xvar > xArray[kHalf]) {
           segment = kHalf;
@@ -278,7 +272,7 @@ void splineFDBase::FindSplineSegment()
       } // End the while: we've now done our binary search
     } // End the else: we've now found our point
 
-    if (segment >= nPoints-1 && nPoints > 1){segment = nPoints-2;}
+    if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
     UniqueSystCurrSegment[iSyst] = segment; 
       
 //#ifdef DEBUG
@@ -290,7 +284,7 @@ void splineFDBase::FindSplineSegment()
 //      std::cerr << "Found segment   = " << segment << std::endl;
 //      std::cerr << "Doing variation = " << xvar << std::endl;
 //      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
-//      for (__int__ j = 0; j < SplineInfoArray[j].nPts; ++j) {
+//      for (_M3::int_t_ j = 0; j < SplineInfoArray[j].nPts; ++j) {
 //        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
 //      }
 //      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
@@ -311,25 +305,30 @@ void splineFDBase::CalcSplineWeights()
   {
 
     int iSpline = uniquecoeffindices[iCoeff];
-    short int uniqueIndex=uniquesplinevec_Monolith[iSpline];
-    short int currentsegment=UniqueSystCurrSegment[uniqueIndex];
+    short int uniqueIndex=short(uniquesplinevec_Monolith[iSpline]);
+    short int currentsegment=short(UniqueSystCurrSegment[uniqueIndex]);
 
     int segCoeff = coeffindexvec[iSpline]+currentsegment;
 
     // These are what we can extract from the TSpline3
-    _float_ x = xcoeff_arr[segCoeff];
-    _float_ y = manycoeff_arr[(segCoeff)*4+kCoeffY];
-    _float_ b = manycoeff_arr[(segCoeff)*4+kCoeffB];
-    _float_ c = manycoeff_arr[(segCoeff)*4+kCoeffC];
-    _float_ d = manycoeff_arr[(segCoeff)*4+kCoeffD];
+    M3::float_t x = xcoeff_arr[segCoeff];
+    M3::float_t y = manycoeff_arr[(segCoeff)*4+kCoeffY];
+    M3::float_t b = manycoeff_arr[(segCoeff)*4+kCoeffB];
+    M3::float_t c = manycoeff_arr[(segCoeff)*4+kCoeffC];
+    M3::float_t d = manycoeff_arr[(segCoeff)*4+kCoeffD];
 
     // Get the variation for this reconfigure for the ith parameter
-    _float_ xvar = xVarArray[uniqueIndex];
+    M3::float_t xvar = xVarArray[uniqueIndex];
     // The Delta(x)
-    _float_ dx = xvar - x;
+    M3::float_t dx = xvar - x;
 
     //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
-    _float_ weight = fmaf(dx, fmaf(dx, fmaf(dx, d, c), b), y);
+    M3::float_t weight = 0;
+#ifdef _LOW_MEMORY_STRUCTS_
+      weight = std::fmaf(dx, std::fmaf(dx, std::fmaf(dx, d, c), b), y);
+#else
+      weight = std::fma(dx, std::fma(dx, std::fma(dx, d, c), b), y);
+#endif
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
 
 
@@ -337,7 +336,11 @@ void splineFDBase::CalcSplineWeights()
     //possible with the fmaf line above?
     if(weight<0){weight=0;}  //Stops is getting negative weights
 
-    weightvec_Monolith[iSpline]=double(weight);
+// LP - ignore the diagnostic here as it is only useless if M3::float_t = double
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+    weightvec_Monolith[iSpline] = double(weight);
+#pragma GCC diagnostic pop
   }
 }
 
@@ -357,7 +360,7 @@ void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
     for (int iSyst = 0; iSyst < nSplineSysts; iSyst++)
     { // Loop over systematics
       std::vector<std::vector<std::vector<std::vector<int >>>> indexvec_Mode;
-      int nModesInSyst = SplineModeVecs[iSample][iSyst].size();
+      int nModesInSyst = int(SplineModeVecs[iSample][iSyst].size());
       for (int iMode = 0; iMode < nModesInSyst; iMode++)
       { // Loop over modes
         std::vector<std::vector<std::vector<int >>> indexvec_Var1;
@@ -391,36 +394,37 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   std::vector<TAxis *> ReturnVec;
   int iSample=getSampleIndex(SampleName);
 
-  TFile *File = new TFile(FileName.c_str());
+  TH2F* Hist2D = nullptr;
+  TH3F* Hist3D = nullptr;
+
+  auto File = std::unique_ptr<TFile>(TFile::Open(FileName.c_str(), "READ"));
   if (!File || File->IsZombie())
   {
-    std::cerr << "File " << FileName << " not found" << std::endl;
-    std::cerr << "This is caused by something here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    MACH3LOG_ERROR("File {} not found", FileName);
+    MACH3LOG_ERROR("This is caused by something here! {} : {}", __FILE__, __LINE__);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  std::cout << "Finding binning for:" << std::endl;
-  std::cout << FileName << std::endl;
+  MACH3LOG_INFO("Finding binning for:");
+  spdlog::info("{}", FileName);
 
   bool isHist2D = false;
   bool isHist3D = false;
 
-  TH2F *Hist2D = NULL;
-  TH3F *Hist3D = NULL;
-
   TObject *Obj = File->Get("dev_tmp_0_0");
+  //If you can't find dev_tmp_0_0 then this will cause a problem
   if (!Obj)
   {
     Obj = File->Get("dev_tmp.0.0");
     if (!Obj)
     {
-      std::cerr << "Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!" << std::endl;
-      std::cerr << "FileName: " << FileName << std::endl;
-      std::cerr << "0_0, I'm here! "<<__FILE__<<" : "<<__LINE__<<std::endl;
+      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning cannot be set!");
+      MACH3LOG_ERROR("FileName: {}", FileName);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
 
+  //Now check if dev_tmp_0_0 is a TH2 i.e. specifying the dimensions of the splines is 2D
   if (Obj->IsA() == TH2F::Class())
   {
     isHist2D = true;
@@ -434,7 +438,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (!isHist2D && !isHist3D)
   {
-    std::cerr << "Object doesn't inherit from either TH2D and TH3D - Odd A" << std::endl;
+    MACH3LOG_ERROR("Object doesn't inherit from either TH2D and TH3D - Odd A");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -442,53 +446,49 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   {
     if (Dimensions[iSample] != 2)
     {
-      std::cerr << "Trying to load a 2D spline template when nDim=" << Dimensions[iSample] << std::endl;
-      throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
-    Hist2D = (TH2F *)File->Get("dev_tmp_0_0");
+    Hist2D = File->Get<TH2F>("dev_tmp_0_0");
   }
 
   if (isHist3D)
   {
+    Hist3D = File->Get<TH3F>(("dev_tmp_0_0"));
 
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
-      std::cerr << "Trying to load a 3D spline template when nDim=" << Dimensions[iSample] << std::endl;
+      MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    Hist3D = (TH3F *)Obj->Clone();
   }
 
-  int nDummyBins = 1;
-  double *DummyEdges = new double[2];
-  DummyEdges[0] = -1e15;
-  DummyEdges[1] = 1e15;
-  TAxis *DummyAxis = new TAxis(nDummyBins, DummyEdges);
+  double DummyEdges[2] = {-1e-15, 1e15};
+  auto DummyAxis = std::unique_ptr<TAxis>(new TAxis(1, DummyEdges));
 
   if (Dimensions[iSample] == 2)
   {
 	if(isHist2D){
-	  ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
+	  ReturnVec.push_back(static_cast<TAxis *>(Hist2D->GetXaxis()->Clone()));
+	  ReturnVec.push_back(static_cast<TAxis *>(Hist2D->GetYaxis()->Clone()));
+	  ReturnVec.push_back(static_cast<TAxis *>(DummyAxis->Clone()));
 	}
 	else if(isHist3D){
-	  ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
+	  ReturnVec.push_back(static_cast<TAxis *>(Hist3D->GetXaxis()->Clone()));
+	  ReturnVec.push_back(static_cast<TAxis *>(Hist3D->GetYaxis()->Clone()));
+	  ReturnVec.push_back(static_cast<TAxis *>(DummyAxis->Clone()));
 	}
   }
   else if (Dimensions[iSample] == 3)
   {
-    ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
-    ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
-    ReturnVec.push_back((TAxis *)(Hist3D->GetZaxis())->Clone());
+    ReturnVec.push_back(static_cast<TAxis *>(Hist3D->GetXaxis()->Clone()));
+    ReturnVec.push_back(static_cast<TAxis *>(Hist3D->GetYaxis()->Clone()));
+    ReturnVec.push_back(static_cast<TAxis *>(Hist3D->GetZaxis()->Clone()));
   }
   else
   {
-    std::cerr << "Number of dimensions not valid! Given:" << Dimensions[iSample] << std::endl;
-    std::cerr << __FILE__<<" : "<<__LINE__<<std::endl;
-    throw;
+    MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis)
@@ -497,16 +497,11 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
-  //This could be NULL if 2D
-  if(isHist2D){
-	delete Hist2D;
-  } else {
-    delete Hist3D;
-  }
 
+  //Make sure these actually get deleted
+  delete Hist2D;
+  delete Hist3D;
   File->Close();
-  delete File;
-  delete DummyAxis;
   return ReturnVec;
 }
 
@@ -656,21 +651,21 @@ void splineFDBase::PrepForReweight()
 
         if (!FoundNonFlatSpline)
         {
-		  MACH3LOG_INFO("{} syst has no response in sample {}", SystName, iSample);
-		  MACH3LOG_INFO("Whilst this isn't neccessarily a problem, it seems odd");
+          MACH3LOG_INFO("{} syst has no response in sample {}", SystName, iSample);
+          MACH3LOG_INFO("Whilst this isn't neccessarily a problem, it seems odd");
           continue;
         }
       }
     }//Syst loop end
   }
   
-  nUniqueSysts = UniqueSystSplines.size();
+  nUniqueSysts = int(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
   UniqueSystNKnots.resize(nUniqueSysts);
   UniqueSystCurrSegment.resize(nUniqueSysts);
   UniqueSystXPts.resize(nUniqueSysts);
-  xVarArray=new _float_[nUniqueSysts];
+  xVarArray=new M3::float_t[nUniqueSysts];
 
   for (int iSpline = 0; iSpline < nUniqueSysts; iSpline++)
   {
@@ -678,14 +673,9 @@ void splineFDBase::PrepForReweight()
     UniqueSystXPts[iSpline].resize(UniqueSystNKnots[iSpline]);
     for (int iKnot = 0; iKnot < UniqueSystNKnots[iSpline]; iKnot++)
     {
-      double xPoint = -999;
-      double yPoint = -999;
+      M3::float_t xPoint;
+      M3::float_t yPoint;
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
-      if (xPoint == -999 || yPoint == -999)
-      {
-        std::cerr << "Something has gone wrong in the knot finding" << std::endl;
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
       UniqueSystXPts[iSpline][iKnot] = xPoint;
     }
 	//ETA - let this just be set as the first segment by default
@@ -694,8 +684,7 @@ void splineFDBase::PrepForReweight()
   }
   
 
-  std::cout << "nUniqueSysts:" << nUniqueSysts << " -----------------" << std::endl;
-  std::cout << std::endl;
+  MACH3LOG_INFO("nUniqueSysts: {}", nUniqueSysts);
 
   std::cout << std::setw(15) << "Spline Index"
             << " | " << std::setw(20) << "Syst Name"
@@ -749,8 +738,9 @@ void splineFDBase::PrepForReweight()
 
 //****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _float_* &manyArray){
+void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
 //****************************************
+
   // Initialise all arrays to 1.0
   int nPoints;
   //No point evaluating a flat spline
@@ -765,32 +755,27 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _fl
 
   for(int i=0; i<nPoints; i++){
     // Spline coefficients to be
-    _float_ x = -999.99;
-    _float_ y = -999.99;
-    _float_ b = -999.99;
-    _float_ c = -999.99;
-    _float_ d = -999.99;
+	// M3::float_t type is defined by the LOW_MEMORY_STRUCTS compiler flag
+	// so M3::float_t can be double or float depending on this
+    M3::float_t x = M3::float_t(-999.99);
+    M3::float_t y = M3::float_t(-999.99);
+    M3::float_t b = M3::float_t(-999.99);
+    M3::float_t c = M3::float_t(-999.99);
+    M3::float_t d = M3::float_t(-999.99);
     splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
-    //Let's save some memory and store them as floats! (It's a surprise tool that will help with GPU later)
-    xArray[i]=_float_(x);
 
-    //Might as well copy ND here and 
-    xArray[i] = _float_(x);
-    manyArray[i*4] = _float_(y); // 4 because manyArray stores y,b,c,d
-    manyArray[i*4+1] = _float_(b);
-    manyArray[i*4+2] = _float_(c);
-    manyArray[i*4+3] = _float_(d);
-    
-    if((xArray[i] == -999) | (manyArray[i*4] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*4+2] == -999) | (manyArray[i*4+3] == -999)){
-      MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
-      MACH3LOG_ERROR("pre cast to _float_ (x, y, b, c, d) = {}, {}, {}, {}, {}",x, y, b, c, d);
-      MACH3LOG_ERROR("post cast to float (x, y, b, c, d) = {}, {}, {}, {}, {}",xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*4+3]);	    
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+	// Store the coefficients for each knot contiguously in memory
+	// 4 because manyArray stores y,b,c,d
+    xArray[i] = x;
+    manyArray[i*4] = y; 
+    manyArray[i*4+1] = b;
+    manyArray[i*4+2] = c;
+    manyArray[i*4+3] = d;    
   }
+
   //We now clean up the splines!
   delete splinevec_Monolith[splineindex];
-  splinevec_Monolith[splineindex] = NULL;
+  splinevec_Monolith[splineindex] = nullptr;
 }
 
 //****************************************
@@ -845,12 +830,12 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
-  int nOscChannels = indexvec[iSample].size();
+  int nOscChannels = int(indexvec[iSample].size());
   MACH3LOG_INFO("Sample {} has {} oscillation channels", iSample, nOscChannels);	
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
-    int nSysts = indexvec[iSample][iOscChan].size();
+    int nSysts = int(indexvec[iSample][iOscChan].size());
     MACH3LOG_INFO("Oscillation channel {} has {} systematics", iOscChan, nSysts);	  
   }
 }
@@ -916,43 +901,43 @@ bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int 
   int iSample=getSampleIndex(SampleName);
   bool isValid = true;
 
-  if (iSample < 0 || iSample >= (int)indexvec.size())
+  if (iSample < 0 || iSample >= int(indexvec.size()))
   {
     MACH3LOG_ERROR("Sample index is invalid! 0 <= Index < {} ", indexvec.size());
     isValid = false;
   }
 
-  if (iOscChan < 0 || iOscChan >= (int)indexvec[iSample].size())
+  if (iOscChan < 0 || iOscChan >= int(indexvec[iSample].size()))
   {
     MACH3LOG_ERROR("OscChan index is invalid! 0 <= Index < {} ", indexvec[iSample].size());
     isValid = false;
   }
 
-  if (iSyst < 0 || iSyst >= (int)indexvec[iSample][iOscChan].size())
+  if (iSyst < 0 || iSyst >= int(indexvec[iSample][iOscChan].size()))
   {
     MACH3LOG_ERROR("Syst index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan].size());
     isValid = false;
   }
 
-  if (iMode < 0 || iMode >= (int)indexvec[iSample][iOscChan][iSyst].size())
+  if (iMode < 0 || iMode >= int(indexvec[iSample][iOscChan][iSyst].size()))
   {
     MACH3LOG_ERROR("Mode index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst].size());
     isValid = false;
   }
 
-  if (iVar1 < 0 || iVar1 >= (int)indexvec[iSample][iOscChan][iSyst][iMode].size())
+  if (iVar1 < 0 || iVar1 >= int(indexvec[iSample][iOscChan][iSyst][iMode].size()))
   {
     MACH3LOG_ERROR("Var1 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode].size());	  
     isValid = false;
   }
 
-  if (iVar2 < 0 || iVar2 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size())
+  if (iVar2 < 0 || iVar2 >= int(indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size()))
   {
     MACH3LOG_ERROR("Var2 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size());
     isValid = false;
   }
 
-  if (iVar3 < 0 || iVar3 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size())
+  if (iVar3 < 0 || iVar3 >= int(indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size()))
   {
     MACH3LOG_ERROR("Var3 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size());
     isValid = false;

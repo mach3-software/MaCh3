@@ -8,7 +8,7 @@ class covarianceOsc : public covarianceBase
 {
  public:
   /// @brief Constructor
-  covarianceOsc(const std::vector<std::string>& FileNames, const char *name = "osc_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  covarianceOsc(const std::vector<std::string>& FileNames, std::string name = "osc_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief Destructor
   virtual ~covarianceOsc();
   /// @brief Checks if parameter didn't go outside of physical bounds
@@ -27,8 +27,6 @@ class covarianceOsc : public covarianceBase
 
   /// @brief KS: Print all useful information's after initialization
   void Print();
-  /// @brief KS: Currently prob3++/probgpu requires particular order so we need to check this is the case
-  void CheckOrderOfParams();
 
  protected:
 

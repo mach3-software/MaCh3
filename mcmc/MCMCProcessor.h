@@ -159,6 +159,10 @@ class MCMCProcessor {
     void ParameterEvolution(const std::vector<std::string>& Names,
                             const std::vector<int>& NIntervals);
 
+    /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
+    /// @param ThinningCut every which entry you want to thin
+    inline void ThinMCMC(const int ThinningCut) {ThinningMCMC(MCMCFile+".root", ThinningCut);};
+
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     
@@ -205,9 +209,9 @@ class MCMCProcessor {
     /// @brief Get parameter number based on name
     int GetParamIndexFromName(const std::string& Name);
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
-    inline int GetnEntries(){return nEntries;};
+    inline Long64_t GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
-    inline int GetnSteps(){return nSteps;};
+    inline Long64_t GetnSteps(){return nSteps;};
     
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
@@ -254,6 +258,7 @@ class MCMCProcessor {
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
     /// @brief Read the output MCMC file and find what inputs were used
+    /// @warning There is bit of hardcoding for names so we should revisit it
     inline void FindInputFiles();
     /// @brief Read the xsec file and get the input central values and errors
     inline void ReadXSecFile();
@@ -312,6 +317,9 @@ class MCMCProcessor {
     std::string OutputSuffix;
     /// Covariance matrix name position
     std::vector<std::vector<std::string>> CovPos;
+    /// Covariance matrix config
+    std::vector<YAML::Node> CovConfig;
+
 
     /// Main chain storing all steps etc
     TChain *Chain;

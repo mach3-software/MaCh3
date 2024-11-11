@@ -3,28 +3,28 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-#KS: Enable language, necessary when using CUDA
-enable_language(CXX)
-set(MaCh3_VERSION 1.1.7)
+project(MaCh3 VERSION 1.2.0 LANGUAGES CXX)
+set(MaCh3_VERSION ${PROJECT_VERSION})
+
+#LP - This option name is confusing, but I wont change it now.
+option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
+option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
+option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 
 # Try to find CUDA
+add_library(MaCh3CompileDefinitions INTERFACE)
+
 find_package(CUDAToolkit QUIET)
-add_library(MaCh3CompilerOptions INTERFACE)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED TRUE)
+  enable_language(CUDA)
   set(CPU_ONLY FALSE)
 else()
   message(STATUS "CUDA not found. Proceeding without CUDA support.")
   set(MaCh3_GPU_ENABLED FALSE)
   set(CPU_ONLY TRUE)
-endif()
-
-if(CPU_ONLY)
-  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX)
-else()
-  project(MaCh3 VERSION ${MaCh3_VERSION} LANGUAGES CXX CUDA)
 endif()
 
 # Changes default install path to be a subdirectory of the build dir.
@@ -40,31 +40,30 @@ endif()
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
 
-LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
+#KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
+include(MaCh3Utils)
+
 ################################## Dependencies ################################
-#KS: Store some handy cmake functions
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Utils.cmake)
-#Loads all dependencies
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/MaCh3Dependencies.cmake)
+include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   set(CMAKE_CXX_STANDARD 14)
+  cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
 endif()
 
-# KS: If C++ standard is lower than C++ standard used for ROOT compilation things will go terribly wrong
-if(DEFINED ROOT_CXX_STANDARD AND ROOT_CXX_STANDARD GREATER CMAKE_CXX_STANDARD)
+if(DEFINED ROOT_CXX_STANDARD AND NOT ROOT_CXX_STANDARD EQUAL CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+  cmessage(STATUS "Set CXX standard due to ROOT: \"${ROOT_CXX_STANDARD}\"")
 endif()
-cmessage(STATUS "CMAKE CXX Standard: ${CMAKE_CXX_STANDARD}")
+cmessage(STATUS "CMAKE_CXX_STANDARD: \"${CMAKE_CXX_STANDARD}\"")
+set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 
-# KS: ROOT changed cmake in 6.32, we should move avay from using Luke's hack, keep it for due to compatibility
-if(ROOT_CXX_STANDARD LESS 14 AND ROOT_VERSION VERSION_LESS 6.32.00)
-  cmessage(WARNING "ROOT CXX STANDARD: ${ROOT_CXX_STANDARD}")
-endif()
-
+set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 ############################  Setting Flags  ####################################
-# Check the where to install 
 cmessage(STATUS "CMAKE_INSTALL_PREFIX: \"${CMAKE_INSTALL_PREFIX}\"")
 
 # add cmake script files
@@ -76,34 +75,48 @@ endif()
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # KS: Compile and link options for more see https://github.com/cpp-best-practices/cppbestpractices/tree/master
-target_compile_options(MaCh3CompilerOptions INTERFACE
-    -g                      # Generate debug information
-    -Wextra                 # Enable extra warning flags
-    -Wall                   # Enable all standard warning flags
-    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
-    -Wshadow                # Warn when a variable declaration shadows one from an outer scope
-    -Wuninitialized         # Warn about uninitialized variables
-    -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
-    -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
-    -Wformat=2              # Warn on security issues around functions that format output (ie printf)
-    -Wunused                # Warn on anything being unused
-    -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
-    #-Wstrict-aliasing=2    # Helps detect potential aliasing issues that could lead to undefined behavior.
-    #-Wuseless-cast         # Warn if you perform a cast to the same type (only in GCC >= 4.8)
-    #-Wpadded               # Warn when padding is added to a structure or class for alignment
-    #-Wnull-dereference     # Warn if a null dereference is detected (only in GCC >= 6.0)
-    #-Wold-style-cast       # Warn for c-style casts
-    #-Wconversion           # Warn on type conversions that may lose data
-    #-Werror                # Treat Warnings as Errors
+add_library(MaCh3Warnings INTERFACE)
+target_compile_options(MaCh3Warnings INTERFACE
+  -Wextra                 # Enable extra warning flags
+  -Wall                   # Enable all standard warning flags
+  -Wshadow                # Warn when a variable declaration shadows one from an outer scope
+  -Wuninitialized         # Warn about uninitialized variables
+  -Wnon-virtual-dtor      # Warn when a class with virtual functions has a non-virtual destructor
+  -Woverloaded-virtual    # Warn when a function declaration hides a virtual function from a base class
+  -Wformat=2              # Warn on security issues around functions that format output (ie printf)
+  -Wunused                # Warn on anything being unused
+  -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
+  -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
+  -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+  -Wnull-dereference      # Warn if a null dereference is detected (only in GCC >= 6.0)
+  -Wold-style-cast        # Warn for c-style casts
+  -Wconversion            # Warn on type conversions that may lose data
+  -Wformat-security       # Warn on functions that are potentially insecure for formatting
+  -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
+  #-Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  #-Wfloat-equal          # Warn if floating-point values are compared directly
+  #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  target_compile_options(MaCh3CompilerOptions INTERFACE
+  target_compile_options(MaCh3Warnings INTERFACE
     -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
   )
 endif()
+if(MaCh3_WERROR_ENABLED)
+target_compile_options(MaCh3Warnings INTERFACE
+  -Werror                # Treat Warnings as Errors
+)
+endif()
+
+add_library(MaCh3CompilerOptions INTERFACE)
+target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
+target_compile_options(MaCh3CompilerOptions INTERFACE
+    -g                      # Generate debug information
+    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
+)
 
 #KS: If Debug is not defined disable it by default
 DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
@@ -123,7 +136,7 @@ if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0                                  # Turn off any optimisation to have best debug experience
   )
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
@@ -131,6 +144,7 @@ else()
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
     -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
     # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
@@ -147,20 +161,16 @@ DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE MULTITHREAD)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
 endif()
 
 if(CPU_ONLY)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
-endif()
-
-if(USE_PROB3)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE USE_PROB3)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE CPU_ONLY)
 endif()
 
 if(MaCh3_GPU_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE CUDA)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE GPU_ON)
 endif()
 
 if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
@@ -168,16 +178,19 @@ if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
 endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE _LOW_MEMORY_STRUCTS_)
 endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
-install(TARGETS MaCh3CompilerOptions
+install(TARGETS MaCh3CompilerOptions MaCh3CompileDefinitions
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
 #Include logger
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)
+#Setup NuOscillator, this has to be here as it requires all flags to be setup
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/NuOscillatorSetup.cmake)
+
 ################################# Features ##################################
 #KS: Retrieve and print the compile options and link libraries for maximal verbose
 get_target_property(compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
@@ -206,36 +219,18 @@ endforeach()
 add_subdirectory(manager)
 add_subdirectory(covariance)
 add_subdirectory(splines)
-if (NOT USE_PROB3)
-  add_subdirectory(OscClass)
-endif()
 add_subdirectory(samplePDF)
 add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
 add_subdirectory(plotting)
-
-
-################################# pybind11 stuff ##################################
-
-if( MaCh3_PYTHON_ENABLED )
-  ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
-  pybind11_add_module( 
-    pyMaCh3 MODULE 
-    pyMaCh3.cpp 
-    plotting/plottingUtils/pythonPlottingModule.cpp
-  )
-  ## EM: only works with code compiled with -fPIC enabled.. I think this flag can things slightly slower
-  ## so would be good to find a way around this. 
-  set_property( TARGET pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
-  target_link_libraries( pyMaCh3 PUBLIC Plotting )
-  install( TARGETS pyMaCh3 DESTINATION pyMaCh3/)
+if (MaCh3_PYTHON_ENABLED)
+  add_subdirectory(python)
 endif()
-
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC OscClass SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
+target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -252,6 +247,7 @@ install(EXPORT MaCh3-targets
         NAMESPACE MaCh3::
         DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
+install(DIRECTORY cmake DESTINATION ${CMAKE_BINARY_DIR})
 
 #KS: Options to print dependency graph
 DefineEnabledRequiredSwitch(MaCh3_DependancyGraph FALSE)
