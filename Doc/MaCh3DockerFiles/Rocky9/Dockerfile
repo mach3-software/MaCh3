@@ -1,25 +1,19 @@
 #To run use:  docker build -t mach3 .
-# KS: Get glorious container from ROOT which will work as a base
-FROM rootproject/root:6.32.02-ubuntu22.04 AS mach3_build
+# KS: Get glorious container from Kamil which will work as a base
+FROM kamilskwarczynski/nukamil:latest AS mach3_build
 
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
-LABEL compiler="GNU 11.4.0"
-LABEL root_version="v6.32.02"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
-
-RUN apt update && apt upgrade -y
-
-RUN apt-get install -y nlohmann-json3-dev
-#MISC_SW
-RUN apt install -y --no-install-recommends vim less nano gdb csh tcsh ed quota python3 python3-dev python3-pip cvs procmail ca-certificates
 
 # Declare the build argument
 ARG MACH3_VERSION
 ENV MACH3_VERSION=${MACH3_VERSION:-develop}
+
 ARG CMAKE_OPTIONS
 ENV CMAKE_OPTIONS=${CMAKE_OPTIONS:-DMaCh3_PYTHON_ENABLED=ON}
+
 ARG INSTALL_OPTIONS
 ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
 

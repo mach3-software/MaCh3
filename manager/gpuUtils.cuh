@@ -8,7 +8,7 @@
 // CUDA specifics
 // Because CUDA is cuda, need to make sure we don't check C-style floats...
 #pragma GCC diagnostic push
-#pragma GCC diagnostics ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <cuda_runtime.h>
 #pragma GCC diagnostic pop
 

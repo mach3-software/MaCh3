@@ -531,3 +531,56 @@ inline double FisherCombinedPValue(const std::vector<double>& pvalues) {
 
   return pValue;
 }
+
+// ********************
+/// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
+///
+/// @param FilePath Path to MCMC chain you want to thin
+/// @param ThinningCut every which entry you want to thin
+/// @cite 2011ThinningMCMC
+/// @warning Thinning is done over entry not steps, it may now work very well for merged chains
+inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
+// ********************
+  // Define the path for the temporary thinned file
+  std::string TempFilePath = "Thinned_" + FilePath;
+  int ret = system(("cp " + FilePath + " " + TempFilePath).c_str());
+  if (ret != 0) {
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+  }
+
+  TFile *inFile = TFile::Open(TempFilePath.c_str(), "UPDATE");
+  if (!inFile || inFile->IsZombie()) {
+    MACH3LOG_ERROR("Error opening file: {}", TempFilePath);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TTree *inTree = inFile->Get<TTree>("posteriors");
+  if (!inTree) {
+    MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    inFile->ls();
+    inFile->Close();
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  // Clone the structure without data
+  TTree *outTree = inTree->CloneTree(0);
+
+  // Loop over entries and apply thinning
+  Long64_t nEntries = inTree->GetEntries();
+  double retainedPercentage = (double(nEntries) / ThinningCut) / double(nEntries) * 100;
+  MACH3LOG_INFO("Thinning will retain {:.2f}% of chains", retainedPercentage);
+  for (Long64_t i = 0; i < nEntries; i++) {
+    if (i % (nEntries/10) == 0) {
+      MaCh3Utils::PrintProgressBar(i, nEntries);
+    }
+    if (i % ThinningCut == 0) {
+      inTree->GetEntry(i);
+      outTree->Fill();
+    }
+  }
+  inFile->WriteTObject(outTree, "posteriors", "kOverwrite");
+  inFile->Close();
+  delete inFile;
+
+  MACH3LOG_INFO("Thinned TTree saved and overwrote original in: {}", TempFilePath);
+}
