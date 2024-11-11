@@ -426,12 +426,12 @@ void covarianceXsec::PrintNormParams() {
   MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
   for (unsigned int i = 0; i < NormParams.size(); ++i)
     {
-      const unsigned int ncuts = NormParams[i].KinematicVarStr.size();
+      const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
       
       //skip parameters with no KinematicCuts
       if(ncuts == 0) continue;
 
-      for(unsigned int icut = 0; icut < ncuts; icut++) {
+      for(long unsigned int icut = 0; icut < ncuts; icut++) {
 	std::string kinematicCutValueString;
 	for(const auto & value : NormParams[i].Selection[icut]) {
 	  kinematicCutValueString += std::to_string(value);
