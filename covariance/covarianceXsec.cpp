@@ -417,6 +417,33 @@ void covarianceXsec::PrintNormParams() {
     MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
+
+  MACH3LOG_INFO("Normalisation parameters KinematicCuts information");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:40}│", "#", "Global #", "Name", "KinematicCut", "Value");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
+  for (unsigned int i = 0; i < NormParams.size(); ++i)
+    {
+      const unsigned int ncuts = NormParams[i].KinematicVarStr.size();
+      
+      //skip parameters with no KinematicCuts
+      if(ncuts == 0) continue;
+
+      for(unsigned int icut = 0; icut < ncuts; icut++) {
+	std::string kinematicCutValueString;
+	for(const auto & value : NormParams[i].Selection[icut]) {
+	  kinematicCutValueString += std::to_string(value);
+	  kinematicCutValueString += " ";
+	}
+
+	if(icut == 0)
+	  MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+	else
+	  MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+      }//icut
+    }//i
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────────────────────────┘");
+  
 }
 
 // ********************************************
