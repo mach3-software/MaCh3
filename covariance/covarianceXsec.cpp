@@ -172,9 +172,12 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
-        std::vector<double> bounds = it->second.as<std::vector<double>>();
       }
-    }
+      if(TempKinematicStrings.size() == 0) {
+	MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+	throw;
+      }
+    }//KinVar_i
     norm.KinematicVarStr = TempKinematicStrings;
     norm.Selection = TempKinematicBounds;
   }
