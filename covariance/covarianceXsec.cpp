@@ -174,7 +174,7 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
       }
       if(TempKinematicStrings.size() == 0) {
 	MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-	throw;
+	throw MaCh3Exception(__FILE__, __LINE__);
       }
     }//KinVar_i
     norm.KinematicVarStr = TempKinematicStrings;
