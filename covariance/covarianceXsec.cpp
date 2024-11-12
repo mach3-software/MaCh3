@@ -432,7 +432,7 @@ void covarianceXsec::PrintNormParams() {
     for (unsigned int i = 0; i < NormParams.size(); ++i)
       {
 	//skip parameters with no KinematicCuts
-	if(NormParams[i].hasKinBounds) continue;
+	if(!NormParams[i].hasKinBounds) continue;
 
 	const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
       	for(long unsigned int icut = 0; icut < ncuts; icut++) {
