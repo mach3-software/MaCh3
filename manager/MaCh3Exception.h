@@ -22,7 +22,9 @@ public:
 
     errorMessage = ((Message.empty()) ? "Terminating MaCh3" : Message);
     // KS: Set logger format where we only have have "information type", line would be confusing
-    spdlog::set_pattern("[%^%l%$] %v");
+    #ifndef USE_FPGA
+      spdlog::set_pattern("[%^%l%$] %v");
+    #endif
     MACH3LOG_ERROR("Find me here: {}::{}", fileName, Line);
   }
 

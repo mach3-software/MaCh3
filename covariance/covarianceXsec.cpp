@@ -373,8 +373,10 @@ void covarianceXsec::PrintGlobablInfo() {
   MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
-    std::string ErrString = fmt::format("{:.2f}", _fError[i]);
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", SystType_ToString(_fParamType[i]));
+    #ifndef USE_FPGA
+      std::string ErrString = fmt::format("{:.2f}", _fError[i]);
+      MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", _fDetID[i], "|", SystType_ToString(_fParamType[i]));
+    #endif
   }
   MACH3LOG_INFO("============================================================================================================================================================");
 }
