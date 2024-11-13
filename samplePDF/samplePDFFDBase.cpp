@@ -943,7 +943,7 @@ void samplePDFFDBase::SetupOscCalc(double PathLength, double Density)
 	// CUDAProb3 takes probType and antineutrino/neutrino separately
     if (MCSamples[iSample].nutype < 0) {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Antineutrino;}
     else {MCSamples[iSample].NeutrinoType = cudaprob3::NeutrinoType::Neutrino;}
-#if defined (CPU_ONLY)
+#if defined (CPU_ONLY) || defined (USE_FPGA)
 //if we just want to use CUDAProb3 CPU then setup BeamCpuPropagator object
 #if defined (MULTITHREAD)
 //if we want to multithread then get number of threads from OMP_NUM_THREADS env variable

@@ -38,6 +38,9 @@ elseif(USE_FPGA)
         oneAPIUtils.dp.cpp
     )
 
+    #set_source_files_properties(oneAPIUtils.dp.cpp PROPERTIES COMPILE_FLAGS "-fsycl -fintelfpga")
+    #set_source_files_properties(SplineMonolith.cpp PROPERTIES COMPILE_FLAGS "-fsycl -fintelfpga")
+    
     target_compile_options(Splines PUBLIC
         -fsycl
         -fintelfpga

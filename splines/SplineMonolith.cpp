@@ -90,9 +90,13 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #ifdef CUDA
   gpu_spline_handler->InitGPU_Segments(&segments);
   gpu_spline_handler->InitGPU_Vals(&vals);
+  #elif USE_FPGA
+    queue = sycl::queue(sycl::default_selector{});
+    segments = sycl::malloc_shared<short int>(nParams, queue);
+    vals = sycl::malloc_shared<float>(nParams, queue);
   #else
-  segments = new short int[nParams]();
-  vals = new float[nParams]();
+    segments = new short int[nParams]();
+    vals = new float[nParams]();
   #endif
 
   for (_int_ j = 0; j < nParams; j++)
@@ -110,9 +114,26 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Declare the {y,b,c,d} for each knot
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
-  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+  //cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
   //KS: For x coeff we assume that for given dial (MAQE) spacing is identical, here we are sloppy and assume each dial has the same number of knots, not a big problem
-  cpu_spline_handler->coeff_x.resize(event_size_max);
+  //cpu_spline_handler->coeff_x.resize(event_size_max);
+
+
+  #ifdef USE_FPGA
+    cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid);
+    cpu_coeff_TF1_many = sycl::malloc_shared<float>(nTF1coeff, queue);
+    cpu_paramNo_TF1_arr = sycl::malloc_shared<short int>(NTF1_valid, queue);
+  #else
+    cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
+    //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
+    cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
+
+    cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+    cpu_spline_handler->coeff_x.resize(event_size_max);
+    cpu_coeff_TF1_many.resize(nTF1coeff);
+    cpu_paramNo_TF1_arr.resize(NTF1_valid);
+  #endif
+
 
   // Set all the big arrays to -999 to keep us safe...
   for (unsigned int j = 0; j < event_size_max; j++) {
@@ -126,7 +147,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   // Also make array with the number of points per spline (not per spline point!)
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
   cpu_nPoints_arr.resize(NTF1_valid);
-  cpu_coeff_TF1_many.resize(nTF1coeff); // *5 because this array holds  a,b,c,d,e parameters
+  //cpu_coeff_TF1_many.resize(nTF1coeff); // *5 because this array holds  a,b,c,d,e parameters
 
   #ifdef Weight_On_SplineBySpline_Basis
   // This holds the index of each spline
@@ -156,10 +177,10 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #endif
 
   // Make array with the number of points per spline (not per spline point!)
-  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
+  //cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
   //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
-  cpu_paramNo_TF1_arr.resize(NTF1_valid);
+  //cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
+  //cpu_paramNo_TF1_arr.resize(NTF1_valid);
 
   // Temporary arrays to hold the coefficients for each spline
   // We get one x, one y, one b,... for each point, so only need to be _max_knots big
@@ -1091,6 +1112,15 @@ void SMonolith::FindSplineSegment() {
 //*********************************************************
 void SMonolith::CalcSplineWeights() {
 //*********************************************************
+
+  auto cpu_spline_handler = this->cpu_spline_handler;
+  auto segments = this->segments;
+  auto vals = this->vals;
+  auto _max_knots = this->_max_knots;
+  auto cpu_paramNo_TF1_arr = this->cpu_paramNo_TF1_arr;
+  auto cpu_coeff_TF1_many = this->cpu_coeff_TF1_many;
+  auto cpu_weights_var = this->cpu_weights_var;
+  auto cpu_weights_tf1_var = this->cpu_weights_tf1_var;
 
     
   queue.submit([&](sycl::handler& cgh) {

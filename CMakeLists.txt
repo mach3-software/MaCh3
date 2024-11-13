@@ -201,6 +201,7 @@ if(CPU_ONLY)
 endif()
 
 if(USE_FPGA)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE sycl)
   target_compile_options(MaCh3CompilerOptions INTERFACE -Wall ${QACTYPES} ${USER_FLAGS})
 endif()
 
