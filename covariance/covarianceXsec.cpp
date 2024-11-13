@@ -171,9 +171,12 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
-        std::vector<double> bounds = it->second.as<std::vector<double>>();
       }
-    }
+      if(TempKinematicStrings.size() == 0) {
+	MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+	throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }//KinVar_i
     norm.KinematicVarStr = TempKinematicStrings;
     norm.Selection = TempKinematicBounds;
   }
@@ -385,6 +388,8 @@ void covarianceXsec::PrintNormParams() {
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
   if(_fSystToGlobalSystIndexMap[SystType::kNorm].size() == 0) return;
 
+  bool have_parameter_with_kin_bounds = false;
+
   //KS: Consider making some class producing table..
   MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────┬────────────────────┐");
   MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:20}│{5:20}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
@@ -414,8 +419,39 @@ void covarianceXsec::PrintNormParams() {
     if (NormParams[i].pdgs.empty()) pdgString += "all";
 
     MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+
+    if(NormParams[i].hasKinBounds) have_parameter_with_kin_bounds = true;
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
+
+  if(have_parameter_with_kin_bounds) {
+    MACH3LOG_INFO("Normalisation parameters KinematicCuts information");
+    MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────────────────────────┐");
+    MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:40}│", "#", "Global #", "Name", "KinematicCut", "Value");
+    MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
+    for (unsigned int i = 0; i < NormParams.size(); ++i)
+      {
+	//skip parameters with no KinematicCuts
+	if(!NormParams[i].hasKinBounds) continue;
+
+	const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
+      	for(long unsigned int icut = 0; icut < ncuts; icut++) {
+	  std::string kinematicCutValueString;
+	  for(const auto & value : NormParams[i].Selection[icut]) {
+	    kinematicCutValueString += std::to_string(value);
+	    kinematicCutValueString += " ";
+	  }
+
+	  if(icut == 0)
+	    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+	  else
+	    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+	}//icut
+      }//i
+    MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────────────────────────┘");
+  }
+  else
+    MACH3LOG_INFO("No normalisation parameters have KinematicCuts defined");
 }
 
 // ********************************************
