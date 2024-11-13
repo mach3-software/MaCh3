@@ -143,6 +143,7 @@ endif()
 
 if(USE_FPGA)
   target_compile_options(MaCh3CompilerOptions INTERFACE
+    -DFPGA_EMULATOR
     -DUSE_FPGA              # preprocessor directive to switch on FPGA code
   )
 endif()

@@ -1,5 +1,7 @@
 #include "SplineMonolith.h"
-
+#ifdef USE_FPGA
+#include <sycl/ext/intel/fpga_extensions.hpp>
+#endif
 #ifdef CUDA
 #include "splines/gpuSplineUtils.cuh"
 #endif
@@ -91,7 +93,18 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   gpu_spline_handler->InitGPU_Segments(&segments);
   gpu_spline_handler->InitGPU_Vals(&vals);
   #elif USE_FPGA
-    queue = sycl::queue(sycl::default_selector{});
+    #if FPGA_SIMULATOR
+      auto selector = sycl::ext::intel::fpga_simulator_selector_v;
+    #elif FPGA_HARDWARE
+      auto selector = sycl::ext::intel::fpga_selector_v;
+    #elif FPGA_EMULATOR
+      auto selector = sycl::ext::intel::fpga_emulator_selector_v;
+    #else
+      auto selector = sycl::default_selector{};
+    #endif
+
+    queue = sycl::queue(selector);
+    //queue = sycl::queue(sycl::default_selector{});
     segments = sycl::malloc_shared<short int>(nParams, queue);
     vals = sycl::malloc_shared<float>(nParams, queue);
   #else
