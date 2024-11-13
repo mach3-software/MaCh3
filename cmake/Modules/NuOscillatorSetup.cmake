@@ -68,7 +68,7 @@ CPMAddPackage(
   NAME NuOscillator
     VERSION 1.0.02
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "feature_OscProbEngine"
+    GIT_TAG "main"
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
