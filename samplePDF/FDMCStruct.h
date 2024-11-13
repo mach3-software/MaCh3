@@ -2,10 +2,8 @@
 
 /// @brief constructors are same for all three so put in here
 struct fdmc_base {
-  int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
-  int oscnutype;    
-  int nupdg;
-  int nupdgUnosc;
+  //int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
+  //int oscnutype;    
   bool signal; // true if signue                                              
   int nEvents; // how many MC events are there
   double ChannelIndex;
@@ -14,6 +12,10 @@ struct fdmc_base {
   int **Target; // target the interaction was on
 
   int SampleDetID;
+
+  //Neutrino flavours before and after oscillations
+  int *nupdg;
+  int *nupdgunosc;
 
   //THe x_var and y_vars that you're binning in
   const double** x_var;
