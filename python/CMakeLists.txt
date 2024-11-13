@@ -14,7 +14,7 @@ pybind11_add_module(
 ## EM: only works with code compiled with -fPIC enabled.. I think this flag can make things slightly slower
 ## so would be good to find a way around this.
 set_property( TARGET _pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
-target_link_libraries( _pyMaCh3 PUBLIC MaCh3::All )
+target_link_libraries( _pyMaCh3 PRIVATE MaCh3::All NuOscillator yaml-cpp::yaml-cpp )
 target_link_libraries( _pyMaCh3 PRIVATE MaCh3Warnings )
-install( DIRECTORY pyMaCh3 DESTINATION ./)
-install( TARGETS _pyMaCh3 DESTINATION pyMaCh3/)
+install( DIRECTORY pyMaCh3 DESTINATION ./ )
+install( TARGETS _pyMaCh3 DESTINATION pyMaCh3/ )
