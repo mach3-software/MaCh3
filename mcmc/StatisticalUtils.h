@@ -593,6 +593,7 @@ inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
 /// @param AveragingCut Number of consecutive entries to average
 /// @cite nesterov2009primal
 /// @warning Averaging is done over entries, so this may not work well for merged chains or non-sequential entries.
+/// @warning Impact on tails in very long chains haven't been checked, thus be carefull
 /// @note The resulting file overwrites the original file.
 inline void AveragingMCMC(const std::string& FilePath, const int AveragingCut) {
 // ********************
