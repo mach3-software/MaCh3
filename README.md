@@ -63,14 +63,16 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 ## Python
 
-MaCh3 can be compiled with a python interface by specifying the cmake option
+MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
+
+You can tell the build system to set up the pyMaCh3 interface by specifying
+
 ```bash
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
 
-Currently the python module only contains an interface to the plotting library (see [here](https://github.com/mach3-software/MaCh3/blob/develop/plotting/README.md#python) for more information on how to use it)
-
+when building
 
 ### Building with Pip
 
@@ -79,7 +81,7 @@ Additionally, you can build just the Python module by doing:
 ```bash
 pip install -t <install location> .
 ```
-The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
+The (optional) -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
