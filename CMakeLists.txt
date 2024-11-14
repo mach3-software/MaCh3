@@ -224,6 +224,7 @@ add_subdirectory(mcmc)
 add_subdirectory(Diagnostics)
 add_subdirectory(plotting)
 if (MaCh3_PYTHON_ENABLED)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
   add_subdirectory(python)
 endif()
 
