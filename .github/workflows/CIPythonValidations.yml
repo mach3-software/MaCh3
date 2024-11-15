@@ -1,0 +1,40 @@
+# Performs unit and integration testing
+
+name: Validations Python CI 
+
+# The events that trigger the workflow
+on:
+  pull_request:
+    branches: [ develop ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get MaCh3 Validations
+      run: |
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+        cd MaCh3Validations
+
+    - name: Install pytest
+      run: pip install -r CIValidations/PythonTests/requirements.txt -t python-test-modules/
+
+    - name: Validations
+      run: |
+        source /opt/root/v6-26-10/bin/thisroot.sh
+        export PYTHONPATH=$PYTHONPATH:$PWD/python-modules/
+        export MACH3=$PWD
+        
+        python3 -m pytest --config Inputs/ManagerTest.yaml CIValidations/PythonTests
+        
