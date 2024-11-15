@@ -25,14 +25,15 @@ jobs:
       run: |
         cd /opt/
         git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
-        cd MaCh3Validations
 
     - name: Install pytest
+      working-directory: /opt/MaCh3Validations
       run: |
         mkdir python-test-modules
-        pip install -r CIValidations/PythonTests/requirements.txt -t python-test-modules/
+        pip install -r ./CIValidations/PythonTests/requirements.txt -t python-test-modules/
 
     - name: Validations
+      working-directory: /opt/MaCh3Validations
       run: |
         source /opt/root/v6-26-10/bin/thisroot.sh
         export PYTHONPATH=$PYTHONPATH:$PWD/python-modules/
