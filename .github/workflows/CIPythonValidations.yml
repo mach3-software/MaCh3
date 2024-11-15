@@ -28,7 +28,9 @@ jobs:
         cd MaCh3Validations
 
     - name: Install pytest
-      run: pip install -r CIValidations/PythonTests/requirements.txt -t python-test-modules/
+      run: |
+        mkdir python-test-modules
+        pip install -r CIValidations/PythonTests/requirements.txt -t python-test-modules/
 
     - name: Validations
       run: |
