@@ -99,9 +99,8 @@ void ProcessMCMC(const std::string& inputFile)
   Processor->Initialise();
   if(Settings["Thinning"])
   {
-    bool DoThin = Settings["Thinning"][0].as<bool>();
-    if(DoThin){
-      Processor->ThinMCMC(Settings["Thinning"][1].as<int>(), GetFromManager<bool>(Settings["Average"], false));
+    if(Settings["Thinning"][0].as<bool>()){
+      Processor->ThinMCMC(Settings["Thinning"][1].as<int>());
     }
   }
   // Make the postfit

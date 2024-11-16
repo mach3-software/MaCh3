@@ -162,13 +162,7 @@ class MCMCProcessor {
     /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
     /// @param ThinningCut every which entry you want to thin
     /// @param Average If true will perform MCMC averaging instead of thinning
-    inline void ThinMCMC(const int ThinningCut, const bool Average = false) {
-      if(Average){
-        AveragingMCMC(MCMCFile+".root", ThinningCut);
-      } else {
-        ThinningMCMC(MCMCFile+".root", ThinningCut);
-      }
-    };
+    inline void ThinMCMC(const int ThinningCut) { ThinningMCMC(MCMCFile+".root", ThinningCut); };
 
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
