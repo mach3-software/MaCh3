@@ -161,7 +161,8 @@ class MCMCProcessor {
 
     /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
     /// @param ThinningCut every which entry you want to thin
-    inline void ThinMCMC(const int ThinningCut) {ThinningMCMC(MCMCFile+".root", ThinningCut);};
+    /// @param Average If true will perform MCMC averaging instead of thinning
+    inline void ThinMCMC(const int ThinningCut) { ThinningMCMC(MCMCFile+".root", ThinningCut); };
 
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
@@ -246,6 +247,7 @@ class MCMCProcessor {
     
     /// @brief Sett output suffix, this way jobs using the same file will have different names
     inline void SetOutputSuffix(const std::string Suffix){OutputSuffix = Suffix; };
+    /// @brief Allow to set addtional cuts based on ROOT TBrowser cut, for to only affect one mass ordering
     inline void SetPosterior1DCut(const std::string Cut){Posterior1DCut = Cut; };
   private:
     /// @brief Prepare prefit histogram for parameter overlay plot
@@ -295,7 +297,7 @@ class MCMCProcessor {
     /// \cite StanManual
     /// \cite hanson2008mcmc
     /// \cite gabry2024visual
-    inline void CalculateESS(const int nLags, double **LagL);
+    inline void CalculateESS(const int nLags, const std::vector<std::vector<double>>& LagL);
     /// @brief Get the batched means variance estimation and variable indicating if number of batches is sensible
     /// \cite chakraborty2019estimating
     /// \cite rossetti2024batch
@@ -308,7 +310,8 @@ class MCMCProcessor {
     inline void GewekeDiagnostic();
     /// @brief Acceptance Probability
     inline void AcceptanceProbabilities();
-    /// @brief RC: Perform spectral analysis of MCMC based on \cite Dunkley:2004sv
+    /// @brief RC: Perform spectral analysis of MCMC
+    /// \cite Dunkley:2004sv
     inline void PowerSpectrumAnalysis();
 
     /// Name of MCMC file
@@ -319,7 +322,6 @@ class MCMCProcessor {
     std::vector<std::vector<std::string>> CovPos;
     /// Covariance matrix config
     std::vector<YAML::Node> CovConfig;
-
 
     /// Main chain storing all steps etc
     TChain *Chain;
@@ -442,7 +444,7 @@ class MCMCProcessor {
     TMatrixDSym *Correlation;
 
     /// Holds 1D Posterior Distributions
-    TH1D **hpost;
+    std::vector<TH1D*> hpost;
     /// Holds 2D Posterior Distributions
     TH2D ***hpost2D;
     /// Holds violin plot for all dials
