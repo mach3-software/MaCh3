@@ -35,7 +35,7 @@ jobs:
       - name: Get the author with most commits (count and name)
         run: |
           COUNT=$(echo "$most_active_author" | awk '{print $1}')
-          NAME=$(echo "$most_active_author" | cut -d ' ' -f2-)
+          NAME=$(echo "$most_active_author" | awk '{$1=""; sub(/^ /, ""); print}')
           echo "maCh3_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
@@ -67,7 +67,7 @@ jobs:
       - name: Get the author with most commits for MaCh3Tutorial (count and name)
         run: |
           COUNT=$(echo "$tutorial_most_active_author" | awk '{print $1}')
-          NAME=$(echo "$tutorial_most_active_author" | cut -d ' ' -f2-)
+          NAME=$(echo "$tutorial_most_active_author" | awk '{$1=""; sub(/^ /, ""); print}')
           echo "maCh3Tutorial_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3Tutorial_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
@@ -99,7 +99,7 @@ jobs:
       - name: Get the author with most commits for MaCh3-PythonUtils (count and name)
         run: |
           COUNT=$(echo "$python_utils_most_active_author" | awk '{print $1}')
-          NAME=$(echo "$python_utils_most_active_author" | cut -d ' ' -f2-)
+          NAME=$(echo "$python_utils_most_active_author" | awk '{$1=""; sub(/^ /, ""); print}')
           echo "maCh3PythonUtils_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3PythonUtils_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
