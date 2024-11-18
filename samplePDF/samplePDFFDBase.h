@@ -200,15 +200,15 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
-  covarianceXsec *XsecCov;
-  covarianceOsc *OscCov;
+  covarianceXsec *XsecCov = nullptr;
+  covarianceOsc *OscCov = nullptr;
 
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
-  int nDimensions;
+  int nDimensions = _BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  int SampleDetID;
+  int SampleDetID = _BAD_INT_;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
@@ -224,7 +224,7 @@ public:
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
   /// @brief the Number of selections in the 
-  int NSelections;
+  int NSelections = _BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound

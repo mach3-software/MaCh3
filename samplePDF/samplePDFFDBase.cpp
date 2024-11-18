@@ -747,8 +747,8 @@ void samplePDFFDBase::SetupNormParameters(){
   std::cout << "FOUND " << xsec_norms.size() << " norm parameters that affect this sample" << std::endl;
 
   if(!XsecCov){
-	MACH3LOG_ERROR("XsecCov is not setup!");
-	throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_ERROR("XsecCov is not setup!");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Assign xsec norm bins in MCSamples tree
@@ -1333,25 +1333,25 @@ void samplePDFFDBase::SetupNuOscillator() {
         }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
-      
+
       NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
       //============================================================================
       //DB Atmospheric only part
       if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	std::vector<_float_> CosineZArray;
-	for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
-	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-	  if (!MCSamples[iSample].isNC[iEvent]) {
-	    CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
-	  }
-	}
-	std::sort(CosineZArray.begin(),CosineZArray.end());
-	
-	NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+        std::vector<_float_> CosineZArray;
+        for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+          if (!MCSamples[iSample].isNC[iEvent]) {
+            CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
+          }
+        }
+        std::sort(CosineZArray.begin(),CosineZArray.end());
+
+        NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
       }
       //============================================================================
-      
+
     }
     
     NuOscProbCalcers[iSample]->Setup();
@@ -1407,7 +1407,7 @@ void samplePDFFDBase::SetupNuOscillator() {
         }
 
         //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-        if (MCSamples[iSample].nupdgunosc[iEvent]<0) {
+        if (static_cast<int>(MCSamples[iSample].nupdgunosc[iEvent]) < 0) {
           InitFlav *= -1;
           FinalFlav *= -1;
         }
@@ -1598,6 +1598,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
   splineFile->PrintArrayDimension();
   splineFile->CountNumberOfLoadedSplines(false, 1);
   splineFile->TransferToMonolith();
+  //splineFile->cleanUpMemory();
 
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
