@@ -5,8 +5,9 @@
 #include "samplePDF/Structs.h"
 
 #include<algorithm>
+#include <memory>
 
-samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov) : samplePDFBase()
+samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
@@ -17,11 +18,16 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   XsecCov = xsec_cov;
+
+  if(!osc_cov){
+    MACH3LOG_WARN("You have pass a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
+  }
+  OscCov = osc_cov;
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   
-  SampleManager = new manager(ConfigFileName.c_str());
+  SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -355,13 +361,17 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
-  std::vector<_float_> OscVec(OscCov->GetNumParams());
-  for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
-    OscVec[iPar] = OscCov->getParProp(iPar);
-  } 
+  //You only need to do these things if OscCov has been initialised
+  //if not then you're not considering oscillations
+  if (OscCov) {
+    std::vector<_float_> OscVec(OscCov->GetNumParams());
+    for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+      OscVec[iPar] = OscCov->getParProp(iPar);
+    } 
 
-  for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
-    NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+    for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+      NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+    }
   }
   
   fillArray();

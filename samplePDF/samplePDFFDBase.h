@@ -1,12 +1,5 @@
 #pragma once
 
-//C++ includes
-#include <list>
-
-//ROOT includes
-#include "THStack.h"
-#include "TLegend.h"
-
 //MaCh3 includes
 #include "OscProbCalcer/OscProbCalcerBase.h"
 #include "Oscillator/OscillatorBase.h"
@@ -26,11 +19,11 @@ public:
   //######################################### Functions #########################################
 
   samplePDFFDBase(){};
-  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov);
+  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName(){return samplename;}
+  std::string GetName() {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -47,9 +40,6 @@ public:
 
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
-
-  /// @brief setup the Oscillation covariance object to get values to calculate probailities from
-  void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
@@ -238,7 +228,7 @@ public:
   std::vector< std::vector<double> > Selection;
    //===========================================================================
 
-  manager* SampleManager;
+  std::unique_ptr<manager> SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 
