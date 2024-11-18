@@ -50,7 +50,12 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samp
 /// @endcode
 ///
 /// @todo add adaptive stuff
-covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& PreFix);
+template <typename CovType>
+CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix);
+
+/// @brief Factory function for creating a covariance class for systematic handling.
+covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix);
+
 
 /// @brief Factory function for creating SamplePDF and initialisation with systematic.
 ///

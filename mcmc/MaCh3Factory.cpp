@@ -35,8 +35,10 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samp
 }
 
 // ********************************************
-covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix) {
+template <typename CovType>
+CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
 // ********************************************
+
   // config for our matrix
   YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
   auto CovMatrixName = Settings[std::string(PreFix) + "CovName"].as<std::string>();
@@ -51,34 +53,41 @@ covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& P
   auto PCAParamRegion = GetFromManager<std::vector<int>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
 
   /// @todo this massive hack with "xsec_cov" is because we have const char * ... will have to fix it later...
-  covarianceXsec* xsec = new covarianceXsec(CovMatrixFile, "xsec_cov", PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
+  CovType* CovObject = new CovType(CovMatrixFile, "xsec_cov", PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
 
   // Fill the parameter values with their nominal values
   // should _ALWAYS_ be done before overriding with fix or flat
-  xsec->setParameters();
+  CovObject->setParameters();
 
   auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "FixParams"], {});
 
-  // Fixed xsec parameters loop
+  // Fixed CovObject parameters loop
   if (FixParams.size() == 1 && FixParams.at(0) == "All") {
-    for (int j = 0; j < xsec->GetNumParams(); j++) {
-      xsec->toggleFixParameter(j);
+    for (int j = 0; j < CovObject->GetNumParams(); j++) {
+      CovObject->toggleFixParameter(j);
     }
   } else {
     for (unsigned int j = 0; j < FixParams.size(); j++) {
-      xsec->toggleFixParameter(FixParams.at(j));
+      CovObject->toggleFixParameter(FixParams.at(j));
     }
   }
   //Global step scale for matrix
   auto StepScale = Settings[std::string(PreFix) + "StepScale"].as<double>();
 
-  xsec->setStepScale(StepScale);
+  CovObject->setStepScale(StepScale);
 
   // Adaptive MCMC stuff
   if(FitManager->raw()["AdaptionOptions"])
-    xsec->initialiseAdaption(FitManager->raw());
+    CovObject->initialiseAdaption(FitManager->raw());
 
   MACH3LOG_INFO("Factory successful");
 
-  return xsec;
+  return CovObject;
+}
+
+
+// ********************************************
+covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix) {
+// ********************************************
+  return MaCh3CovarianceFactory<covarianceXsec>(FitManager, PreFix);
 }
