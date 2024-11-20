@@ -66,9 +66,9 @@ string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 #Try adding Oscillator Class
 CPMAddPackage(
   NAME NuOscillator
-    VERSION 1.0.02
+    VERSION 1.0.3
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "main"
+    GIT_TAG "v1.0.3"
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
