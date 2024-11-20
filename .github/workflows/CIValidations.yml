@@ -29,6 +29,8 @@ jobs:
             test_5: empty
             test_6: empty
             test_7: empty
+            test_8: empty
+            test_9: empty
 
           - name: Covariance Validations
             test_1: ./CIValidations/CovarianceValidations
@@ -38,6 +40,8 @@ jobs:
             test_5: empty
             test_6: empty
             test_7: empty
+            test_8: empty
+            test_9: empty
 
           - name: Fitter Validations
             test_1: ./CIValidations/FitterValidations
@@ -47,10 +51,8 @@ jobs:
             test_5: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
             test_6: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
             test_7: ./bin/MatrixPlotter bin/TutorialDiagConfig.yaml MCMC_Test_drawCorr.root
-            # TODO
-            #need fixing config
-            #test_8: bin/GetPostfitParamPlots -o MCMC_Test_drawCorr.root -c Inputs/PlottingConfig.yaml
-            #test_9: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+            test_8: bin/GetPostfitParamPlots MCMC_Test_drawCorr.root
+            test_9: bin/PlotLLH MCMC_Test.root
 
           - name: NuMCMC Tools Validations
             test_1: ./CIValidations/NuMCMCvalidations.sh
@@ -60,6 +62,8 @@ jobs:
             test_5: empty
             test_6: empty
             test_7: empty
+            test_8: empty
+            test_9: empty
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
@@ -128,3 +132,16 @@ jobs:
             echo "Performing  test 7"
             ${{ matrix.test_7 }}
         fi
+
+        if [[ "${{ matrix.test_8 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 8"
+            ${{ matrix.test_8 }}
+        fi
+
+        if [[ "${{ matrix.test_9 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 9"
+            ${{ matrix.test_9 }}
+        fi
+
