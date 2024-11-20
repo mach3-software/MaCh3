@@ -1,5 +1,6 @@
 #include "splineFDBase.h"
 #include <memory>
+#include "samplePDF/Structs.h"
 
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_)
@@ -66,6 +67,10 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
+
+  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromDetID(DetID);
+  // Keep track of this for all samples
+  SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
 
   //std::vector<int> SplineParsIndex_Sample_temp = xsec->GetSplineParsIndexFromDetID(DetID);
 
@@ -257,7 +262,7 @@ void splineFDBase::FindSplineSegment()
     xVarArray[iSyst]=xvar;
     
     _int_ segment = 0;
-	_int_ kHigh = nPoints - 1;
+    _int_ kHigh = nPoints - 1;
 
     //KS: We expect new segment is very close to previous
     const _int_ PreviousSegment = UniqueSystCurrSegment[iSyst];

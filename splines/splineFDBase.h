@@ -4,6 +4,7 @@
 #include "TH3F.h"
 
 //MaCh3
+#include "samplePDF/Structs.h"
 #include "splines/SplineBase.h"
 
 /// @brief Bin-by-bin class calculating response for spline parameters.
@@ -91,6 +92,9 @@ class splineFDBase : public SplineBase {
 	/// to evaluate splines at. Each internal vector will be of size of the number of spline
 	/// systematics which affect that sample.
 	std::vector< std::vector<int> > GlobalSystIndex;
+    /// @brief spline interpolation types for each sample. These vectors are from
+    /// a call to GetSplineInterpolationFromDetID()
+    std::vector< std::vector<SplineInterpolation> > SplineInterpolationTypes;
 
 	int nUniqueSysts;
 	std::vector<std::string> UniqueSystNames;
