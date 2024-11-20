@@ -36,18 +36,18 @@ int Nchains;
 
 int nDraw;
 
-std::vector<TString> BranchNames;  
-std::vector<std::string> MCMCFile;  
+std::vector<TString> BranchNames;
+std::vector<std::string> MCMCFile;
 std::vector<bool> ValidPar;
 
 double ***Draws;
 
 double** Mean;
 double** StandardDeviation;
-    
+
 double* MeanGlobal;
 double* StandardDeviationGlobal;
-    
+
 double* BetweenChainVariance;
 double* MarginalPosteriorVariance;
 double* RHat;
@@ -58,10 +58,10 @@ double* MedianArr;
 
 double** MeanFolded;
 double** StandardDeviationFolded;
-    
+
 double* MeanGlobalFolded;
 double* StandardDeviationGlobalFolded;
-    
+
 double* BetweenChainVarianceFolded;
 double* MarginalPosteriorVarianceFolded;
 double* RHatFolded;
@@ -81,7 +81,7 @@ void CapVariable(double var, double cap);
 
 // *******************
 int main(int argc, char *argv[]) {
-// *******************    
+// *******************
 
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -188,13 +188,13 @@ void PrepareChains() {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    nEntries[m] = Chain->GetEntries();
+    nEntries[m] = int(Chain->GetEntries());
 
     // Set the step cut to be 20%
     BurnIn[m] = nEntries[m]/5;
 
     // Get the list of branches
-    TObjArray* brlis = (TObjArray*)(Chain->GetListOfBranches());
+    TObjArray* brlis = Chain->GetListOfBranches();
 
     // Get the number of branches
     nBranches[m] = brlis->GetEntries();
@@ -209,7 +209,11 @@ void PrepareChains() {
     for (int i = 0; i < nBranches[m]; i++)
     {
       // Get the TBranch and its name
-      TBranch* br = (TBranch*)brlis->At(i);
+      TBranch* br = static_cast<TBranch *>(brlis->At(i));
+      if(!br){
+        MACH3LOG_ERROR("Invalid branch at position {}", i);
+        throw MaCh3Exception(__FILE__,__LINE__);
+      }
       TString bname = br->GetName();
 
       // Read in the step
@@ -243,7 +247,7 @@ void PrepareChains() {
       }
     }
 
-    if(m == 0) nDraw = BranchNames.size();
+    if(m == 0) nDraw = int(BranchNames.size());
 
     //TN: Qualitatively faster sanity check, with the very same outcome (all chains have the same #branches)
     if(m > 0)
@@ -283,7 +287,7 @@ void PrepareChains() {
     for (int i = 0; i < Ntoys; i++)
     {
       // Get a random entry after burn in
-      int entry = (int)(nEntries[m]*rnd->Rndm());
+      int entry = int(nEntries[m]*rnd->Rndm());
 
       Chain->GetEntry(entry);
 
@@ -297,7 +301,7 @@ void PrepareChains() {
 
       // Output some info for the user
       if (Ntoys > 10 && i % (Ntoys/10) == 0) {
-        MaCh3Utils::PrintProgressBar(i+m*Ntoys, Ntoys*Nchains);
+        MaCh3Utils::PrintProgressBar(i+m*Ntoys, static_cast<Long64_t>(Ntoys)*Nchains);
         MACH3LOG_DEBUG("Getting random entry {}", entry);
       }
 
@@ -323,7 +327,7 @@ void PrepareChains() {
   for(int j = 0; j < nDraw; j++)
   {
     MedianArr[j] = 0.;
-    std::vector<double> TempDraws(Ntoys * Nchains);
+    std::vector<double> TempDraws(static_cast<size_t>(Ntoys) * Nchains);
     for(int m = 0; m < Nchains; m++)
     {
       for(int i = 0; i < Ntoys; i++)
@@ -416,7 +420,7 @@ void InitialiseArrays() {
 
 // *******************
 void RunDiagnostic() {
-// *******************    
+// *******************
   CalcRhat();
   //In case in future we expand this
 }
@@ -426,17 +430,17 @@ void RunDiagnostic() {
 // Probably most of it could be moved cleverly to MCMC Processor, keep it separate for now
 void CalcRhat() {
 // *******************
-    
+
   TStopwatch clock;
   clock.Start();
 
-//KS: Start parallel region
-// If we would like to do this for thousands of chains we might consider using GPU for this
+  //KS: Start parallel region
+  // If we would like to do this for thousands of chains we might consider using GPU for this
   #ifdef MULTITHREAD
   #pragma omp parallel
   {
   #endif
-    
+
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
     #endif
@@ -475,7 +479,7 @@ void CalcRhat() {
     #ifdef MULTITHREAD
     #pragma omp for collapse(2)
     #endif
-      //Calculate the standard deviation for each parameter within each considered chain
+    //Calculate the standard deviation for each parameter within each considered chain
     for (int m = 0; m < Nchains; ++m)
     {
       for (int j = 0; j < nDraw; ++j)
@@ -575,7 +579,9 @@ void CalcRhat() {
 
 // *******************
 void SaveResults() {
-// *******************    
+// *******************
+  #pragma GCC diagnostic ignored "-Wfloat-conversion"
+
   std::string NameTemp = "";
   //KS: If we run over many many chains there is danger that name will be so absurdly long we run over system limit and job will be killed :(
   if(Nchains < 5)
@@ -585,7 +591,7 @@ void SaveResults() {
       std::string temp = MCMCFile[i];
 
       while (temp.find(".root") != std::string::npos) {
-          temp = temp.substr(0, temp.find(".root"));
+        temp = temp.substr(0, temp.find(".root"));
       }
 
       NameTemp = NameTemp + temp + "_";
@@ -668,13 +674,13 @@ void SaveResults() {
   RhatFoldedLogPlot->Write();
 
   //KS: Now we make fancy canvases, consider some function to have less copy pasting
-  TCanvas *TempCanvas = new TCanvas("Canvas", "Canvas", 1024, 1024);
+  auto TempCanvas = std::make_unique<TCanvas>("Canvas", "Canvas", 1024, 1024);
   gStyle->SetOptStat(0);
   TempCanvas->SetGridx();
   TempCanvas->SetGridy();
 
   // Random line to write useful information to TLegend
-  TLine *TempLine = new TLine(0 , 0, 0, 0);
+  auto TempLine = std::make_unique<TLine>(0, 0, 0, 0);
   TempLine->SetLineColor(kBlack);
 
   RhatPlot->GetXaxis()->SetTitle("R hat");
@@ -690,7 +696,7 @@ void SaveResults() {
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
 
-  Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
   Legend->AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
   Legend->AddEntry(RhatFoldedPlot, "Rhat-Folded Gelman 2021", "l");
 
@@ -715,7 +721,7 @@ void SaveResults() {
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
 
-  Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
   Legend->AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
   Legend->AddEntry(RhatFoldedLogPlot, "Rhat-Folded Gelman 2021", "l");
 
@@ -743,7 +749,7 @@ void SaveResults() {
   const double Mean2 = EffectiveSampleSizeFoldedPlot->GetMean();
   const double RMS2 = EffectiveSampleSizeFoldedPlot->GetRMS();
 
-  Legend->AddEntry(TempLine, Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
   Legend->AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
   Legend->AddEntry(EffectiveSampleSizeFoldedPlot, Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f",Mean2 ,RMS2), "l");
 
@@ -766,8 +772,6 @@ void SaveResults() {
   delete EffectiveSampleSizeFoldedPlot;
 
   delete Legend;
-  delete TempCanvas;
-  delete TempLine;
 
   delete RhatLogPlot;
   delete RhatFoldedLogPlot;
@@ -782,7 +786,7 @@ void SaveResults() {
 //KS: Pseudo destructor
 void DestroyArrays() {
 // *******************
-    
+
   MACH3LOG_INFO("Killing all arrays");
   delete[] MeanGlobal;
   delete[] StandardDeviationGlobal;
@@ -823,22 +827,19 @@ void DestroyArrays() {
   delete[] StandardDeviationFolded;
 }
 
-
 // *******************
 //calculate median
 double CalcMedian(double arr[], const int size) {
-// *******************   
+// *******************
   std::sort(arr, arr+size);
   if (size % 2 != 0)
-    return (double)arr[size/2];
-  return (double)(arr[(size-1)/2] + arr[size/2])/2.0;
+    return arr[size/2];
+  return (arr[(size-1)/2] + arr[size/2])/2.0;
 }
-
 
 // *******************
 //calculate median
 void CapVariable(double var, const double cap) {
-// *******************   
-
+// *******************
   if(std::isnan(var) || !std::isfinite(var)) var = cap;
 }

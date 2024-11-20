@@ -43,7 +43,7 @@ class SMonolith : public SplineBase {
     /// @param spline_ParsPointers Vector of pointers to spline params
     inline void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
       splineParsPointer = spline_ParsPointers;
-      for (_int_ i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
+      for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
     /// The returned gpu weights, read by the GPU
@@ -66,7 +66,7 @@ class SMonolith : public SplineBase {
     /// @param nTF1Valid Total number of valid (not null) TF1
     inline void ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
                                  unsigned int &nEvents,
-                                 int &MaxPoints,
+                                 short int &MaxPoints,
                                  short int &numParams,
                                  int &nSplines,
                                  unsigned int &NSplinesValid,
@@ -108,11 +108,11 @@ class SMonolith : public SplineBase {
 
     /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
     /// Method identical to TSpline3::Eval(double) but faster because less operations
-    FastSplineInfo *SplineInfoArray;
+    std::vector<FastSplineInfo> SplineInfoArray;
     /// Store currently found segment they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
     short int *segments;
     /// Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
-    float *vals;
+    float *ParamValues;
     /// This holds pointer to parameter position which we later copy paste it to GPU
     std::vector< const double* > splineParsPointer;
 
@@ -121,11 +121,11 @@ class SMonolith : public SplineBase {
     /// Number of NIWG parameters that have splines
     short int nParams;
     /// Max knots for production
-    int _max_knots;
+    short int _max_knots;
     /// holds the index for good splines; don't do unsigned since starts with negative value!
-    int *index_cpu;
+    std::vector<int> index_spline_cpu;
     /// holds the index for good TF1; don't do unsigned since starts with negative value!
-    int *index_TF1_cpu;
+    std::vector<int> index_TF1_cpu;
 
     /// Number of valid splines
     unsigned int NSplines_valid;
@@ -141,8 +141,7 @@ class SMonolith : public SplineBase {
     unsigned int nTF1coeff;
 
     /// CPU arrays to hold weight for each spline
-    float *cpu_weights_var;
-
+    float *cpu_weights_spline_var;
     /// CPU arrays to hold weight for each TF1
     float *cpu_weights_tf1_var;
 

@@ -86,7 +86,7 @@ namespace MaCh3Utils {
       {7,512},  //Atm MultiGeV mu-like
 	  });
 	
-  int nKnownDetIDs = KnownDetIDsMap.size();
+  int nKnownDetIDs = int(KnownDetIDsMap.size());
 
 }
 
@@ -147,7 +147,7 @@ double NoOverflowIntegral(TH2Poly* poly) {
 //WP: Helper function for projecting TH2Poly onto the X axis
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors) {
 // **************************************************
-  TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), xbins.size()-1, &xbins[0]);
+  TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), int(xbins.size()-1), &xbins[0]);
 
   //KS: Temp Histogram to store error, use double as this is thread safe
   std::vector<double> hProjX_Error(hProjX->GetXaxis()->GetNbins() + 1, 0.0);
@@ -216,7 +216,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
 
-  TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),ybins.size()-1,&ybins[0]);
+  TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),int(ybins.size()-1),&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
   std::vector<double> hProjY_Error(hProjY->GetXaxis()->GetNbins() + 1, 0.0);
   double ylow, yup, frac = 0.;
@@ -300,7 +300,7 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
 
   HistTempName += "_";
   //make the th2d
-  TH2D *hist = (TH2D*) h2dhist->Clone();
+  TH2D *hist = static_cast<TH2D*>(h2dhist->Clone());
   hist->SetNameTitle(HistTempName.c_str(), HistTempName.c_str());
 
   for(int ix = 0; ix < hist->GetNbinsX() + 2; ix++) {
@@ -310,19 +310,19 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
   }
   //Loop over poly bins, find the corresponding th2d and setbincontent!
   for(int i = 0; i< poly->GetNumberOfBins(); i++){
-    TH2PolyBin* polybin = (TH2PolyBin*) (poly->GetBins()->At(i)->Clone());
-    xlow = polybin->GetXMin();
-    xup = polybin->GetXMax();
-    ylow = polybin->GetYMin();
-    yup = polybin->GetYMax();
+    TH2PolyBin & polybin = static_cast<TH2PolyBin &>(*poly->GetBins()->At(i));
+    xlow = polybin.GetXMin();
+    xup = polybin.GetXMax();
+    ylow = polybin.GetYMin();
+    yup = polybin.GetYMax();
     int xbin, ybin;
 
     xbin = hist->GetXaxis()->FindBin(xlow+(xup-xlow)/2);
     ybin = hist->GetYaxis()->FindBin(ylow+(yup-ylow)/2);
 
     MACH3LOG_TRACE("Poly bin {}, xlow: {}, xup: {}, ylow: {}, yup: {}. Finding bin for ({}, {}). Found Bin ({}, {}) with content {}. But Poly content: {}",
-                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin->GetContent(), poly->GetBinContent(i));
-    hist->SetBinContent(xbin, ybin, polybin->GetContent());
+                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin.GetContent(), poly->GetBinContent(i));
+    hist->SetBinContent(xbin, ybin, polybin.GetContent());
   }
   return hist;
 }
@@ -378,7 +378,7 @@ TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
 //WP: Scale a TH2Poly and divide by bin width
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 // ****************
-  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  TH2Poly* HistCopy = static_cast<TH2Poly*>(Histogram->Clone());
   double xlow, xup, ylow, yup, area;
 
   for(int i = 1; i < HistCopy->GetNumberOfBins()+1; i++)
@@ -458,10 +458,10 @@ TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH
 }
 
 // ****************
-//DB Get the Cernekov momentum threshold in MeV
+//DB Get the Cherenkov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {
 // ****************
-  double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
+  constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
@@ -471,7 +471,7 @@ double returnCherenkovThresholdMomentum(int PDG) {
 // Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
-  const double MLep = 0.10565837;
+  constexpr double MLep = 0.10565837;
 
   // Caluclate muon energy
   double ELep = sqrt((MLep*MLep)+(PLep*PLep));

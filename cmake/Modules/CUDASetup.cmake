@@ -47,7 +47,7 @@ string(REPLACE ";" " " CUDA_ARCHITECTURES_STR "${CMAKE_CUDA_ARCHITECTURES}")
 cmessage(STATUS "Using following CUDA architectures: ${CUDA_ARCHITECTURES_STR}")
 
 if(NOT MaCh3_DEBUG_ENABLED)
-    target_compile_options(MaCh3CompilerOptions INTERFACE
+    target_compile_options(MaCh3CompileDefinitions INTERFACE
         "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-O3;-Werror;cross-execution-space-call;-w>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
@@ -55,15 +55,15 @@ if(NOT MaCh3_DEBUG_ENABLED)
 else()
 #CW: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
 #-pxtas-options=-v, -maxregcount=N
-    target_compile_options(MaCh3CompilerOptions INTERFACE
+    target_compile_options(MaCh3CompileDefinitions INTERFACE
         "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-Werror;cross-execution-space-call;-w>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-g;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-dlcm=ca;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills;-Xptxas=-v;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
     )
 
-    target_compile_definitions(MaCh3CompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
+    target_compile_definitions(MaCh3CompileDefinitions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
-target_include_directories(MaCh3CompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
+target_include_directories(MaCh3CompileDefinitions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
 
 if(MaCh3_DEBUG_ENABLED)
   include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
@@ -76,7 +76,7 @@ if(NOT DEFINED NSplines_GPU)
 endif()
 
 # Pass NSplines_GPU as a preprocessor definition to the compiler
-target_compile_definitions(MaCh3CompilerOptions INTERFACE NSplines_GPU=${NSplines_GPU})
+target_compile_definitions(MaCh3CompileDefinitions INTERFACE NSplines_GPU=${NSplines_GPU})
 
 cmessage(STATUS "Using \"${NSplines_GPU}\" for GPU EventByEvent Splines")
 

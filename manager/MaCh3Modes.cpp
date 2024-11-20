@@ -41,7 +41,7 @@ void MaCh3Modes::Print() {
   MACH3LOG_INFO("Printing MaCh3 Modes Called: {}", Title);
 
   MACH3LOG_INFO("========================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<20} {:2} {:<20} {:2} {:<30}", "#", "|", "Name", "|", "FancyName", "|", std::string(Generator+" Modes"));
+  MACH3LOG_INFO("{:<5} {:2} {:<20} {:2} {:<20} {:2} {:<30}", "#", "|", "Name", "|", "FancyName", "|", Generator+" Modes");
   MACH3LOG_INFO("------------------------------------------------------------------------");
   for(int i = 0; i < NModes; ++i) {
     auto Name = fMode[i].Name;
@@ -57,7 +57,7 @@ void MaCh3Modes::Print() {
   MACH3LOG_INFO("========================================================================");
 
   MACH3LOG_INFO("==========================");
-  MACH3LOG_INFO("{:<10} {:2} {:<30}", std::string(Generator + " Modes"), "|", "Name");
+  MACH3LOG_INFO("{:<10} {:2} {:<30}", Generator + " Modes", "|", "Name");
   MACH3LOG_INFO("--------------------------");
   for (size_t i = 0; i < ModeMap.size(); ++i) {
     MACH3LOG_INFO("{:<10} {:2} {:<30}", i, "|", fMode[ModeMap[i]].Name);
@@ -71,7 +71,7 @@ MaCh3Modes_t MaCh3Modes::EnsureModeNameRegistered(std::string const &name) {
   if (Mode.count(name)) {
     return Mode[name];
   }
-  MaCh3Modes_t index = Mode.size();
+  MaCh3Modes_t index = MaCh3Modes_t(Mode.size());
   Mode[name] = index;
   return index;
 }

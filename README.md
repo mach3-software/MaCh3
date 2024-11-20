@@ -23,7 +23,7 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13642670.svg)](https://doi.org/10.5281/zenodo.13642670).
+When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
 
 ## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
@@ -63,14 +63,16 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 ## Python
 
-MaCh3 can be compiled with a python interface by specifying the cmake option
+MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
+
+You can tell the build system to set up the pyMaCh3 interface by specifying
+
 ```bash
 cmake ../ -DMaCh3_PYTHON_ENABLED=ON
 make && make install
 ```
 
-Currently the python module only contains an interface to the plotting library (see [here](https://github.com/mach3-software/MaCh3/blob/develop/plotting/README.md#python) for more information on how to use it)
-
+when building
 
 ### Building with Pip
 
@@ -79,7 +81,7 @@ Additionally, you can build just the Python module by doing:
 ```bash
 pip install -t <install location> .
 ```
-The -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
+The (optional) -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
@@ -107,7 +109,7 @@ Following neutrino oscillation calculators are available:
 | Prob3++Linear    | CPU        | Beam       |            |
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 
-If nothing is specified in cmake build then CUDAProb3Linear will be used. To control which oscillation calculators you want to use here is syntax:
+If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
 cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
@@ -150,6 +152,7 @@ Based on several test here are recommended version:
 | Name        | Status |
 |-------------|--------|
 | Alma9       | ✅     |
+| Rocky9      | ✅     |
 | Ubuntu22.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |

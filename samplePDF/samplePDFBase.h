@@ -25,7 +25,7 @@ class samplePDFBase
   /// @brief destructor
   virtual ~samplePDFBase();
 
-  virtual inline _int_ GetNsamples(){ return nSamples; };
+  virtual inline M3::int_t GetNsamples(){ return nSamples; };
   virtual inline std::string GetName()const {return "samplePDF";};
   virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
@@ -65,7 +65,7 @@ class samplePDFBase
   virtual void setMCMCBranches(TTree *outtree) {(void)outtree;};
 
   // WARNING KS: Needed for sigma var
-  virtual void SetupBinning(const _int_ Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
+  virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
     (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
   virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
@@ -75,12 +75,12 @@ class samplePDFBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
-  double getTestStatLLH(double data, double mc);
+  double getTestStatLLH(double data, double mc) const;
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-  double getTestStatLLH(const double data, const double mc, const double w2);
+  double getTestStatLLH(const double data, const double mc, const double w2) const;
   /// @brief Set the test statistic to be used when calculating the binned likelihoods 
   /// @param testStat The test statistic to use.
   inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
@@ -110,7 +110,7 @@ protected:
   std::vector< std::vector <double> >* dataSample2D;
 
   /// Contains how many samples we've got
-  _int_ nSamples;
+  M3::int_t nSamples;
   /// KS: number of dimension for this sample
   int nDims;
   /// Name of Sample

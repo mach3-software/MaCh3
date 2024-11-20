@@ -282,12 +282,12 @@ public:
   /// @param paramName The parameter you want the information about.
   /// @param LLHType The type of log likelihood scan you want (e.g. total, penalty, etc.)
   /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis
-  std::vector<std::vector<float>> getLLHScan(int fileNum, std::string paramName, std::string LLHType) const {
+  std::vector<std::vector<double>> getLLHScan(int fileNum, std::string paramName, std::string LLHType) const {
     if (!getEnabledLLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
       MACH3LOG_WARN("am returning an empty vector");
-      return std::vector<std::vector<float>>(2); 
+      return std::vector<std::vector<double>>(2); 
     }
     return TGraphToVector(*_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName));
   }
@@ -331,12 +331,12 @@ public:
   /// @param fileNum The index of the file you want the data from.
   /// @param paramName The parameter you want the information about.
   /// @return A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis
-  std::vector<std::vector<float>> get1dPosterior(int fileNum, std::string paramName) const {
+  std::vector<std::vector<double>> get1dPosterior(int fileNum, std::string paramName) const {
     if (!getEnabled1dPosteriors(fileNum, paramName))
     {
       MACH3LOG_WARN("file at index {} does not have a 1d posterior for parameter {}", fileNum, paramName);
       MACH3LOG_WARN("am returning an empty vector");
-      return std::vector<std::vector<float>>(2);
+      return std::vector<std::vector<double>>(2);
     }
     return TGraphToVector(*_fileVec[fileNum].posteriors1d_map.at(paramName));
   }
@@ -380,12 +380,12 @@ public:
   /// @param paramName The name of the parameter whose LLH scan you would like.
   /// @param sample The sample that you would like the LLH scan for.
   /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis.
-  std::vector<std::vector<float>> getSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
+  std::vector<std::vector<double>> getSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
     if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
       MACH3LOG_WARN("am returning an empty vector");
-      return std::vector<std::vector<float>>(2); 
+      return std::vector<std::vector<double>>(2); 
     }
     return TGraphToVector(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
   }
@@ -455,7 +455,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The error on the specified parameter.
-  float getPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  double getPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @brief Get the post fit value for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
@@ -464,13 +464,13 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The value of the specified parameter.
-  float getPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  double getPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @name General Getters
   /// @{
   inline const std::vector<std::string> &getKnownParameters() const { return _knownParameters; }
   inline const std::vector<std::string> &getKnownSamples() const { return _knownSamples; }
-  inline int getNInputFiles() const { return _fileVec.size(); }
+  inline size_t getNInputFiles() const { return _fileVec.size(); }
 
   /// @brief Get all parameters which have some set of tags
   /// @param tags The tags to check for 
@@ -636,7 +636,7 @@ private:
 
   // helper fn to test if string "str" ends with other string "ending"
   inline bool strEndsWith(std::string str, std::string ending) const {
-    uint pos = str.find(ending);
+    size_t pos = str.find(ending);
     return (pos == str.length() - ending.length());
   }
 
