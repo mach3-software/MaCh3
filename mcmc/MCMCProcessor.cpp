@@ -3130,6 +3130,8 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
                                        const std::vector<int>& NIntervals) {
 // **************************
+  Int_t oldLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kError;  // Suppress warnings  
   MACH3LOG_INFO("Parameter Evolution gif");
 
   //KS: First we need to find parameter number based on name
@@ -3192,6 +3194,8 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
       Counter++;
     }
   }
+  // Restore the original level
+  gErrorIgnoreLevel = oldLevel;
 }
 
 // **************************
