@@ -1587,3 +1587,63 @@ void samplePDFFDBase::InitialiseSplineObject() {
 
   fillSplineBins();
 }
+
+TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+  //DB Grab the associated enum with the argument string
+  int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
+
+
+  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
+  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
+  std::vector< std::vector<double> > tmp_Selection = Selection;
+  std::vector< std::vector<double> > SelectionVecToApply;
+
+  //DB Add all the predefined selections to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
+    SelectionVecToApply.emplace_back(Selection[iSelec]);
+  }
+
+  //DB Add all requested cuts from the arguement to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  }
+
+  //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
+  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
+    if (SelectionVecToApply[iSelec].size()!=3) {
+      MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  //DB Set the member variable to be the cuts to apply
+  Selection = SelectionVecToApply;
+
+  //DB Define the histogram which will be returned
+  TH1D* _h1DVar;
+  if (Axis) {
+    _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
+  } else {
+    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
+    _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
+  }
+
+  //DB Loop over all events
+  for (int iSample=0;iSample<getNMCSamples();iSample++) {
+    for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
+      if (IsEventSelected(iSample,iEvent)) {
+	double Weight = GetEventWeight(iSample,iEvent);
+	if (WeightStyle==1) {
+	  Weight = 1.;
+	}
+	double Var = ReturnKinematicParameter(ProjectionVar_Int,iSample,iEvent);
+	_h1DVar->Fill(Var,Weight);
+      }
+    }
+  }
+  
+  //DB Reset the saved selection
+  Selection = tmp_Selection;
+
+  return _h1DVar;
+}
