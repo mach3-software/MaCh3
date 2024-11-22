@@ -76,7 +76,7 @@ CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
   // should _ALWAYS_ be done before overriding with fix or flat
   CovObject->setParameters();
 
-  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "FixParams"], {});
+  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "Fix"], {});
 
   // Fixed CovObject parameters loop
   if (FixParams.size() == 1 && FixParams.at(0) == "All") {

@@ -106,8 +106,8 @@ struct InputFile {
   }
 
   /// ptr to an MCMCProcessor instance to be used if this is a MaCh3 input file
-  MCMCProcessor *mcmcProc;
-  TTree *posteriorTree;
+  MCMCProcessor *mcmcProc = nullptr;
+  TTree *posteriorTree = nullptr;
 
   std::shared_ptr<TFile> file;          //!< Pointer to the underlying file for this InputFile instance.
   std::string fileName; //!< The location of the underlying file.
@@ -635,9 +635,11 @@ private:
   }
 
   // helper fn to test if string "str" ends with other string "ending"
-  inline bool strEndsWith(std::string str, std::string ending) const {
-    size_t pos = str.find(ending);
-    return (pos == str.length() - ending.length());
+  inline bool strEndsWith(const std::string& str, const std::string& ending) const {
+    if (str.size() >= ending.size()) {
+      return str.compare(str.size() - ending.size(), ending.size(), ending) == 0;
+    }
+    return false;
   }
 
 

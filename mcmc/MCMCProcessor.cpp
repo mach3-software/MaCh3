@@ -3144,11 +3144,13 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
     }
 
     const int IntervalsSize = nSteps/NIntervals[k];
+
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
     int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
     if (ret != 0){
       MACH3LOG_WARN("Error: system call to delete {} failed with code {}", Names[k], ret);
     }
+
     // This holds the posterior density
     const double maxi = Chain->GetMaximum(BranchNames[ParamNo]);
     const double mini = Chain->GetMinimum(BranchNames[ParamNo]);
@@ -3157,8 +3159,7 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
     for(int i = NIntervals[k]-1; i >= 0; --i)
     {
       // This holds the posterior density
-      auto EvePlot = std::make_unique<TH1D>(BranchNames[ParamNo], BranchNames[ParamNo], nBins, mini, maxi);
-      EvePlot->SetDirectory(nullptr);
+      TH1D* EvePlot = new TH1D(BranchNames[ParamNo], BranchNames[ParamNo], nBins, mini, maxi);
       EvePlot->SetMinimum(0);
       EvePlot->GetYaxis()->SetTitle("PDF");
       EvePlot->GetYaxis()->SetNoExponent(false);
@@ -3178,7 +3179,6 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
       if(ApplySmoothing) EvePlot->Smooth();
 
       EvePlot->Scale(1. / EvePlot->Integral());
-
       EvePlot->Draw("HIST");
 
       TText text(0.3, 0.8, TextTitle.c_str());
@@ -3187,8 +3187,10 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
       text.SetNDC(true);
       text.Draw("SAME");
 
-      if(i == 0) Posterior->Print(((Names[k] + ".gif++20").c_str())); // produces infinite loop animated GIF
-      else Posterior->Print(((Names[k]+".gif+20").c_str())); // add picture to .gif
+      if(i == 0) Posterior->Print((Names[k] + ".gif++20").c_str()); // produces infinite loop animated GIF
+      else Posterior->Print((Names[k] + ".gif+20").c_str()); // add picture to .gif
+
+      delete EvePlot;
       Counter++;
     }
   }
