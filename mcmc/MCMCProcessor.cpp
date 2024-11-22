@@ -3491,6 +3491,111 @@ void MCMCProcessor::ParamTraces() {
 }
 
 // *********************************
+// MJR: Calculate autocorrelations using the FFT algorithm.
+//      Fast, even on CPU, and get all lags for free.
+void MCMCProcessor::AutoCorrelation_FFT() {
+// *********************************
+  if (ParStep == nullptr) PrepareDiagMCMC();
+
+  TStopwatch clock;
+  clock.Start();
+  const int nLags = AutoCorrLag;
+  MACH3LOG_INFO("Making auto-correlations for nLags = {}", nLags);
+
+  // Prep outputs
+  OutputFile->cd();
+  TDirectory* AutoCorrDir = OutputFile->mkdir("Auto_corr");
+  std::vector<TH1D*> LagKPlots(nDraw);
+  std::vector<std::vector<double>> LagL(nDraw);
+
+  // Arrays needed to perform FFT using ROOT
+  double* ACFFT = new double[nEntries](); // Main autocorrelation array
+  double* ParVals = new double[nEntries](); // Param values for full chain
+  double* ParValsFFTR = new double[nEntries](); // FFT Real part
+  double* ParValsFFTI = new double[nEntries](); // FFT Imaginary part
+  double* ParValsFFTSquare = new double[nEntries](); // FFT Absolute square
+  double* ParValsComplex = new double[nEntries](); // Input Imaginary values (0)
+
+  // Create forward and reverse FFT objects. I don't love using ROOT here,
+  // but it works so I can't complain
+  TVirtualFFT* fftf = TVirtualFFT::FFT(1, &nEntries, "C2CFORWARD");
+  TVirtualFFT* fftb = TVirtualFFT::FFT(1, &nEntries, "C2CBACKWARD");
+
+  // Loop over all pars and calculate the full autocorrelation function using FFT
+  for (int j = 0; j < nDraw; ++j) {
+    // Initialize
+    LagL[j].resize(nLags);
+    for (int i = 0; i < nEntries; ++i) {
+      ParVals[i] = ParStep[j][i]-ParamSums[j]; // Subtract the mean to make it numerically tractable
+      ParValsComplex[i] = 0.; // Reset dummy array
+    }
+
+    // Transform
+    fftf->SetPointsComplex(ParVals, ParValsComplex);
+    fftf->Transform();
+    fftf->GetPointsComplex(ParValsFFTR, ParValsFFTI);
+
+    // Square the results to get the power spectrum
+    for (int i = 0; i < nEntries; ++i) {
+      ParValsFFTSquare[i] = ParValsFFTR[i]*ParValsFFTR[i] + ParValsFFTI[i]*ParValsFFTI[i];
+    }
+
+    // Transforming back gives the autocovariance
+    fftb->SetPointsComplex(ParValsFFTSquare, ParValsComplex);
+    fftb->Transform();
+    fftb->GetPointsComplex(ACFFT, ParValsComplex);
+
+    // Divide by norm to get autocorrelation
+    double normAC = ACFFT[0];
+    for (int i = 0; i < nEntries; ++ientry) {
+      ACFFT[i] /= normAC;
+    }
+
+    // Get plotting info
+    TString Title = "";
+    double Prior = 1.0;
+    double PriorError = 1.0;
+    GetNthParameter(j, Prior, PriorError, Title);
+    std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
+
+    // Initialize Lag plot
+    LagKPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
+    LagKPlots[j]->GetXaxis()->SetTitle("Lag");
+    LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
+
+    // Fill plot
+    for (int k = 0; k < nLags; ++k) {
+      LagL[j][k] = ACFFT[k];
+      LagKPlots[j]->SetBinContent(k, ACFFT[k]);
+    }
+
+    // Write and clean up
+    AutoCorrDir>cd();
+    LagKPlots[j]->Write();
+    delete LagKPlots[j];
+  }
+
+  //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
+  CalculateESS(nLags, LagL);
+
+  // Clean up
+  delete[] ACFFT;
+  delete[] ParVals;
+  delete[] ParValsFFTR;
+  delete[] ParValsFFTI;
+  delete[] ParValsFFTSquare;
+  delete[] ParValsComplex;
+
+  AutoCorrDir->Close();
+  delete AutoCorrDir;
+
+  OutputFile->cd();
+
+  clock.Stop();
+  MACH3LOG_INFO("Making auto-correlations took {:.2f}s", clock.RealTime());
+}
+
+// *********************************
 //KS: Calculate autocorrelations supports both OpenMP and CUDA :)
 void MCMCProcessor::AutoCorrelation() {
 // *********************************

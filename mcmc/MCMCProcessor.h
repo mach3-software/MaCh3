@@ -34,6 +34,7 @@
 #include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
+#include "TVirtualFFT.h"
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
