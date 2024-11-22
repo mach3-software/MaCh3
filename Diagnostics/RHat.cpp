@@ -102,12 +102,14 @@ int main(int argc, char *argv[]) {
   if (argc < 2)
   {
     MACH3LOG_ERROR("Wrong arguments");
-    MACH3LOG_ERROR("./RHat MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]");
+    MACH3LOG_ERROR("./RHat NThin MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
+  NThin = atoi(argv[1]);
+
   //KS Gelman suggests to diagnose on more than one chain
-  for (int i = 1; i < argc; i++)
+  for (int i = 2; i < argc; i++)
   {
     MCMCFile.push_back(std::string(argv[i]));
     MACH3LOG_INFO("Adding file: {}", MCMCFile.back());
@@ -166,7 +168,7 @@ void PrepareChains() {
     Chain->Add(MCMCFile[m].c_str());
 
     nEntries[m] = int(Chain->GetEntries());
-    Ntoys[m] = nEntries[m];
+    Ntoys[m] = nEntries[m]/NThin;
     TotToys += Ntoys[m];
 
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
@@ -283,7 +285,7 @@ void PrepareChains() {
     for (int i = 0; i < Ntoys[m]; i++)
     {
       // This is here as a placeholder in case we want to do some thinning later
-      int entry = i;
+      int entry = i*NThin;
 
       Chain->GetEntry(entry);
 
