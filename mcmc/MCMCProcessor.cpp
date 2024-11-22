@@ -3547,7 +3547,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
 
     // Divide by norm to get autocorrelation
     double normAC = ACFFT[0];
-    for (int i = 0; i < nEntries; ++ientry) {
+    for (int i = 0; i < nEntries; ++i) {
       ACFFT[i] /= normAC;
     }
 
@@ -3570,7 +3570,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     }
 
     // Write and clean up
-    AutoCorrDir>cd();
+    AutoCorrDir->cd();
     LagKPlots[j]->Write();
     delete LagKPlots[j];
   }
