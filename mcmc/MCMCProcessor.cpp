@@ -50,6 +50,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ApplySmoothing = true;
   FancyPlotNames = true;
   doDiagMCMC = false;
+  useFFTAutoCorrelation = true;
   OutputSuffix = "_Process";
   Post2DPlotThreshold = 1.e-5;
 
@@ -3211,7 +3212,11 @@ void MCMCProcessor::DiagMCMC() {
   BatchedMeans();
 
   // Draw the auto-correlations
-  AutoCorrelation();
+  if (useFFTAutoCorrelation) {
+    AutoCorrelation_FFT();
+  } else {
+    AutoCorrelation();
+  }
 
   // Calculate Power Spectrum for each param
   PowerSpectrumAnalysis();
