@@ -274,6 +274,14 @@ void PrepareChains() {
       }
     }
 
+    // MJR: array to hold branch values; SetBranchAddress in every step is very
+    //      expensive, so doing it once only here saves time
+    double* branch_values = new double[nDraw]();
+    for (int j = 0; j < nDraw; ++j)
+    {
+      Chain->SetBranchAddress(BranchNames[j].Data(), &branch_values[j]);
+    }
+
     //TN: move looping over toys here, so we don't need to loop over chains more than once
     if(BurnIn[m] >= nEntries[m])
     {
@@ -308,9 +316,8 @@ void PrepareChains() {
       // Set the branch addresses for params
       for (int j = 0; j < nDraw; ++j)
       {
-        Chain->SetBranchAddress(BranchNames[j].Data(), &Draws[m][i][j]);
+        Draws[m][i][j] = branch_values[j];
       }
-      Chain->GetEntry(entry);
 
     }//end loop over toys
 
