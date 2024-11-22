@@ -392,6 +392,7 @@ void CalcRhat() {
     #endif
     //KS: loop over chains and draws are independent so might as well collapse for sweet cache hits
     //Calculate the mean for each parameter within each considered chain
+    // MJR: Calculate using running totals to massively save on time and memory
     for (int m = 0; m < Nchains; ++m)
     {
       for (int j = 0; j < nDraw; ++j)
