@@ -106,8 +106,6 @@ int main(int argc, char *argv[]) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  Ntoys = atoi(argv[1]);
-
   //KS Gelman suggests to diagnose on more than one chain
   for (int i = 1; i < argc; i++)
   {
@@ -172,7 +170,7 @@ void PrepareChains() {
     TotToys += Ntoys[m];
 
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    MACH3LOG_INFO("Generating {}", Ntoys);
+    MACH3LOG_INFO("Generating {}", Ntoys[m]);
 
     // Set the step cut to be 20%
     BurnIn[m] = nEntries[m]/5;
@@ -298,8 +296,8 @@ void PrepareChains() {
       }
 
       // Output some info for the user
-      if (Ntoys > 10 && i % (Ntoys/10) == 0) {
-        MaCh3Utils::PrintProgressBar(i+m*Ntoys, static_cast<Long64_t>(Ntoys)*Nchains);
+      if (Ntoys[m] > 10 && i % (Ntoys[m]/10) == 0) {
+        MaCh3Utils::PrintProgressBar(i+m*Ntoys[m], static_cast<Long64_t>(Ntoys[m])*Nchains);
         MACH3LOG_DEBUG("Getting random entry {}", entry);
       }
 
@@ -398,8 +396,8 @@ void CalcRhat() {
     {
       for (int j = 0; j < nDraw; ++j)
       {
-        Mean[m][j] += S1_chain[m][j] / (double)Ntoys[m];
-        StandardDeviation[m][j] = S2_chain[m][j]/(double)Ntoys[m] - Mean[m][j]*Mean[m][j];
+        Mean[m][j] += S1_chain[m][j] / static_cast<double>(Ntoys[m]);
+        StandardDeviation[m][j] = S2_chain[m][j]/static_cast<double>(Ntoys[m]) - Mean[m][j]*Mean[m][j];
       }
     }
 
@@ -417,8 +415,8 @@ void CalcRhat() {
         }
         StandardDeviationGlobal[j] += StandardDeviation[m][j];
       }
-      MeanGlobal[j] = S1_global[j] / (double)TotToys;
-      StandardDeviationGlobal[j] = StandardDeviationGlobal[j] / (double)Nchains;
+      MeanGlobal[j] = S1_global[j] / static_cast<double>(TotToys);
+      StandardDeviationGlobal[j] = StandardDeviationGlobal[j] / static_cast<double>(Nchains);
     }
 
     #ifdef MULTITHREAD
@@ -575,7 +573,7 @@ void SaveResults() {
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
 
-  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
   Legend->AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
 
   RhatPlot->Draw();
@@ -596,7 +594,7 @@ void SaveResults() {
   Legend->SetLineWidth(0);
   Legend->SetLineColor(0);
 
-  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
   Legend->AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
 
   RhatLogPlot->Draw();
@@ -619,7 +617,7 @@ void SaveResults() {
   const double Mean1 = EffectiveSampleSizePlot->GetMean();
   const double RMS1 = EffectiveSampleSizePlot->GetRMS();
 
-  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", Ntoys, Nchains), "");
+  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
   Legend->AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
 
   EffectiveSampleSizePlot->Draw();
