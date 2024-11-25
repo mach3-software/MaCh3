@@ -636,17 +636,17 @@ void SaveResults() {
     //KS: Fill only valid parameters
     if(ValidPar[j])
     {
-      StandardDeviationGlobalPlot->Fill(StandardDeviationGlobal[j]);
-      BetweenChainVariancePlot->Fill(BetweenChainVariance[j]);
-      MarginalPosteriorVariancePlot->Fill(MarginalPosteriorVariance[j]);
+      StandardDeviationGlobalPlot->Fill(j,StandardDeviationGlobal[j]);
+      BetweenChainVariancePlot->Fill(j,BetweenChainVariance[j]);
+      MarginalPosteriorVariancePlot->Fill(j,MarginalPosteriorVariance[j]);
       RhatPlot->Fill(RHat[j]);
       EffectiveSampleSizePlot->Fill(EffectiveSampleSize[j]);
       if(RHat[j] > 1.1) Criterium++;
 
 
-      StandardDeviationGlobalFoldedPlot->Fill(StandardDeviationGlobalFolded[j]);
-      BetweenChainVarianceFoldedPlot->Fill(BetweenChainVarianceFolded[j]);
-      MarginalPosteriorVarianceFoldedPlot->Fill(MarginalPosteriorVarianceFolded[j]);
+      StandardDeviationGlobalFoldedPlot->Fill(j,StandardDeviationGlobalFolded[j]);
+      BetweenChainVarianceFoldedPlot->Fill(j,BetweenChainVarianceFolded[j]);
+      MarginalPosteriorVarianceFoldedPlot->Fill(j,MarginalPosteriorVarianceFolded[j]);
       RhatFoldedPlot->Fill(RHatFolded[j]);
       EffectiveSampleSizeFoldedPlot->Fill(EffectiveSampleSizeFolded[j]);
       if(RHatFolded[j] > 1.1) CiteriumFolded++;
