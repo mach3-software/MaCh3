@@ -323,6 +323,7 @@ void PrepareChains() {
 
     //TN: There, we now don't need to keep the chain in memory anymore
     delete Chain;
+    delete[] branch_values;
   }
 
   //KS: Now prepare folded draws, quoting Gelman
