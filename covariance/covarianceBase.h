@@ -24,7 +24,7 @@ class covarianceBase {
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
   /// @param file Path to matrix root file
-  covarianceBase(std::string name, std::string file);
+  covarianceBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
 
   /// @brief Destructor
   virtual ~covarianceBase();

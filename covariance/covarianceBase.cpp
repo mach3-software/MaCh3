@@ -1,17 +1,26 @@
 #include "covariance/covarianceBase.h"
 
 // ********************************************
-covarianceBase::covarianceBase(std::string name, std::string file) : inputFile(file), pca(false) {
+covarianceBase::covarianceBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false),
+eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of covarianceBase");
+  if (threshold < 0 || threshold >= 1) {
+    MACH3LOG_INFO("NOTE: {} {}", name, file);
+    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
+    MACH3LOG_INFO("Please specify a number between 0 and 1");
+    MACH3LOG_INFO("You specified: ");
+    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
+    pca = false;
+  }
   init(name, file);
-  FirstPCAdpar = -999;
-  LastPCAdpar = -999;
+
+  // Call the innocent helper function
+  if (pca) ConstructPCA();
 }
 // ********************************************
 covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
-
   MACH3LOG_INFO("Constructing instance of covarianceBase using ");
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
