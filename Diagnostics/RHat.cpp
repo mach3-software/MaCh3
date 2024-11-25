@@ -512,9 +512,9 @@ void SaveResults() {
 
   DiagFile->cd();
 
-  TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", 200, 0, 2);
-  TH1D *BetweenChainVariancePlot = new TH1D("BetweenChainVariancePlot", "BetweenChainVariancePlot", 200, 0, 2);
-  TH1D *MarginalPosteriorVariancePlot = new TH1D("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", 200, 0, 2);
+  TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", nDraw, 0, nDraw);
+  TH1D *BetweenChainVariancePlot = new TH1D("BetweenChainVariancePlot", "BetweenChainVariancePlot", nDraw, 0, nDraw);
+  TH1D *MarginalPosteriorVariancePlot = new TH1D("MarginalPosteriorVariancePlot", "MarginalPosteriorVariancePlot", nDraw, 0, nDraw);
   TH1D *RhatPlot = new TH1D("RhatPlot", "RhatPlot", 200, 0, 2);
   TH1D *EffectiveSampleSizePlot = new TH1D("EffectiveSampleSizePlot", "EffectiveSampleSizePlot", 400, 0, 10000);
 
@@ -526,9 +526,9 @@ void SaveResults() {
     //KS: Fill only valid parameters
     if(ValidPar[j])
     {
-      StandardDeviationGlobalPlot->Fill(StandardDeviationGlobal[j]);
-      BetweenChainVariancePlot->Fill(BetweenChainVariance[j]);
-      MarginalPosteriorVariancePlot->Fill(MarginalPosteriorVariance[j]);
+      StandardDeviationGlobalPlot->Fill(j,StandardDeviationGlobal[j]);
+      BetweenChainVariancePlot->Fill(j,BetweenChainVariance[j]);
+      MarginalPosteriorVariancePlot->Fill(j,MarginalPosteriorVariance[j]);
       RhatPlot->Fill(RHat[j]);
       EffectiveSampleSizePlot->Fill(EffectiveSampleSize[j]);
       if(RHat[j] > 1.1) Criterium++;
