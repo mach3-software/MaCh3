@@ -40,7 +40,8 @@
 ///
 
 // *******************
-int* Ntoys;
+int* Ntoys_requested;
+int* Ntoys_filled;
 int TotToys;
 int NThin;
 int Nchains;
@@ -145,7 +146,8 @@ void PrepareChains() {
   TStopwatch clock;
   clock.Start();
 
-  Ntoys = new int[Nchains]();
+  Ntoys_requested = new int[Nchains]();
+  Ntoys_filled = new int[Nchains]();
   TotToys = 0;
   std::vector<int> BurnIn(Nchains);
   std::vector<int> nEntries(Nchains);
@@ -168,11 +170,11 @@ void PrepareChains() {
     Chain->Add(MCMCFile[m].c_str());
 
     nEntries[m] = int(Chain->GetEntries());
-    Ntoys[m] = nEntries[m]/NThin;
-    TotToys += Ntoys[m];
+    Ntoys_requested[m] = nEntries[m]/NThin;
+    Ntoys_filled[m] = 0;
 
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    MACH3LOG_INFO("Generating {}", Ntoys[m]);
+    MACH3LOG_INFO("Generating {} Toys", Ntoys_requested[m]);
 
     // Set the step cut to be 20%
     BurnIn[m] = nEntries[m]/5;
@@ -282,7 +284,7 @@ void PrepareChains() {
     }
 
     MACH3LOG_INFO("Loading chain {} / {}...", m, Nchains);
-    for (int i = 0; i < Ntoys[m]; i++)
+    for (int i = 0; i < Ntoys_requested[m]; i++)
     {
       // This is here as a placeholder in case we want to do some thinning later
       int entry = i*NThin;
@@ -293,13 +295,12 @@ void PrepareChains() {
       // Note, entry is not necessarily the same as the step due to merged ROOT files, so can't choose an entry in the range BurnIn - nEntries :(
       if (step[m] < BurnIn[m])
       {
-        Ntoys[m]--;
         continue;
       }
 
       // Output some info for the user
-      if (Ntoys[m] > 10 && i % (Ntoys[m]/10) == 0) {
-        MaCh3Utils::PrintProgressBar(i+m*Ntoys[m], static_cast<Long64_t>(Ntoys[m])*Nchains);
+      if (Ntoys_requested[m] > 10 && i % (Ntoys_requested[m]/10) == 0) {
+        MaCh3Utils::PrintProgressBar(i+m*Ntoys_requested[m], static_cast<Long64_t>(Ntoys_requested[m])*Nchains);
         MACH3LOG_DEBUG("Getting random entry {}", entry);
       }
 
@@ -313,6 +314,10 @@ void PrepareChains() {
         S1_chain[m][j] += branch_values[j];
         S2_chain[m][j] += branch_values[j]*branch_values[j];
       }
+
+      // Increment counters
+      Ntoys_filled[m]++;
+      TotToys++;
 
     }//end loop over toys
 
@@ -399,8 +404,8 @@ void CalcRhat() {
     {
       for (int j = 0; j < nDraw; ++j)
       {
-        Mean[m][j] += S1_chain[m][j] / static_cast<double>(Ntoys[m]);
-        StandardDeviation[m][j] = S2_chain[m][j]/static_cast<double>(Ntoys[m]) - Mean[m][j]*Mean[m][j];
+        Mean[m][j] = S1_chain[m][j] / static_cast<double>(Ntoys_filled[m]);
+        StandardDeviation[m][j] = S2_chain[m][j]/static_cast<double>(Ntoys_filled[m]) - Mean[m][j]*Mean[m][j];
       }
     }
 
@@ -412,10 +417,6 @@ void CalcRhat() {
     {
       for (int m = 0; m < Nchains; ++m)
       {
-        if (m == 0)
-        {
-          StandardDeviationGlobal[j] = 0.0;
-        }
         StandardDeviationGlobal[j] += StandardDeviation[m][j];
       }
       MeanGlobal[j] = S1_global[j] / static_cast<double>(TotToys);
@@ -436,7 +437,7 @@ void CalcRhat() {
       {
         for (int m = 0; m < Nchains; ++m)
         {
-          BetweenChainVariance[j] += ( Mean[m][j] - MeanGlobal[j])*( Mean[m][j] - MeanGlobal[j]) * Ntoys[m];
+          BetweenChainVariance[j] += ( Mean[m][j] - MeanGlobal[j])*( Mean[m][j] - MeanGlobal[j]) * Ntoys_filled[m];
         }
         BetweenChainVariance[j] = BetweenChainVariance[j]/(Nchains-1);
       }
@@ -671,7 +672,8 @@ void DestroyArrays() {
   delete[] S1_global;
   delete[] S2_global;
 
-  delete[] Ntoys;
+  delete[] Ntoys_requested;
+  delete[] Ntoys_filled;
 }
 
 // *******************
