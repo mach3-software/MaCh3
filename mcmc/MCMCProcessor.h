@@ -34,6 +34,7 @@
 #include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
+#include "TVirtualFFT.h"
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
@@ -234,6 +235,8 @@ class MCMCProcessor {
     /// @brief Code will only plot 2D posteriors if Correlation are larger than defined threshold
     /// @param Threshold This threshold is compared with correlation value
     inline void SetPost2DPlotThreshold(const double Threshold){Post2DPlotThreshold = Threshold; };
+    /// @brief Toggle using the FFT-based autocorrelation calculator
+    inline void SetUseFFTAutoCorrelation(const bool useFFT){useFFTAutoCorrelation = useFFT; };
 
     /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like xsec_, then passing "xsec_" will
     /// @param Batches Vector with parameters type names we want to exclude
@@ -287,6 +290,8 @@ class MCMCProcessor {
     inline void ParamTraces();
     /// @brief KS: Calculate autocorrelations supports both OpenMP and CUDA :)
     inline void AutoCorrelation();
+    /// @brief MJR: Autocorrelation function using FFT algorithm for extra speed
+    inline void AutoCorrelation_FFT();
     /// @brief KS: calc Effective Sample Size
     /// @param nLags Should be the same nLags as used in AutoCorrelation()
     /// @param LagL Value of LagL for each dial and each Lag
@@ -405,6 +410,8 @@ class MCMCProcessor {
     bool ApplySmoothing;
     /// KS: Set Threshold when to plot 2D posterior as by default we get a LOT of plots
     double Post2DPlotThreshold;
+    /// MJR: Use FFT-based autocorrelation algorithm (save time & resources)?
+    bool useFFTAutoCorrelation;
 
     std::vector< int > NDSamplesBins;
     std::vector< std::string > NDSamplesNames;

@@ -3,6 +3,7 @@ add_custom_target(DiagApps)
 foreach(app
     DiagMCMC
     RHat
+    RHat_HighMem
     GetPenaltyTerm
     ProcessMCMC
     CombineMaCh3Chains
