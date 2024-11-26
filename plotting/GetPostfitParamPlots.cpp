@@ -556,7 +556,7 @@ void MakeXsecRidgePlots()
     auto blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // the directory of histograms
-    TDirectoryFile *posteriorDir = man->input().getFile(0).file->Get<TDirectoryFile>("Post");
+    TDirectoryFile *posteriorDir = man->input().getFile(0).file->Get<TDirectoryFile>("Post_1d_hists");
 
     // get num of params in the block
     int nParams = static_cast<int>(blockContents.size());
@@ -579,12 +579,10 @@ void MakeXsecRidgePlots()
     // use this to set the limits and also to plot the x axis and grid
     TH1D *axisPlot = new TH1D("axis plot", "", 1, blockLimits[0], blockLimits[1]);
 
-    for(int parId = 0; parId < nParams; parId++){
+    for(int parId = 0; parId < nParams; parId++) {
       std::string paramName = blockContents[parId];
 
-      TCanvas *posteriorDistCanv = nullptr;
       TH1D *posteriorDist = nullptr;
-
       // get the list of objects in the directory
       TIter next(posteriorDir->GetListOfKeys());
       while (TKey* key = static_cast<TKey*>(next())) {
@@ -595,13 +593,12 @@ void MakeXsecRidgePlots()
         bool foundPar = (pos == str.length() - name.length());
 
         if(foundPar){
-          posteriorDistCanv = posteriorDir->Get<TCanvas>(key->GetName());
-          posteriorDist = static_cast<TH1D*>(posteriorDistCanv->GetPrimitive(key->GetName()));
+          posteriorDist = posteriorDir->Get<TH1D>(key->GetName());
         }
       }
 
       if(posteriorDist == nullptr){
-        MACH3LOG_WARN("Couldnt find parameter {} when making ridgeline plots", paramName);
+        MACH3LOG_WARN("Couldn't find parameter {} when making ridgeline plots", paramName);
         continue;
       }
       
@@ -758,6 +755,20 @@ void GetPostfitParamPlots()
     postFitHist_tmp->SetLineWidth(man->getOption<int>("plotLineWidth"));
     leg->AddEntry(postFitHist_tmp, man->getFileLabel(fileId).c_str(), "lpf");
   }
+  /// @todo this is temporary hack
+  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++)
+  {
+    TH1D *Hist = static_cast<TH1D*>((man->input().getFile(fileId).file->Get( ("param_xsec_"+plotType).c_str()))->Clone());
+
+    Hist->SetMarkerColor(TColor::GetColorPalette(fileId));
+    Hist->SetLineColor(TColor::GetColorPalette(fileId));
+    Hist->SetMarkerStyle(7);
+    Hist->SetLineStyle(1+fileId);
+    Hist->SetLineWidth(man->getOption<int>("plotLineWidth"));
+
+    PostfitHistVec.push_back(Hist);
+  }
+
   canv->cd();
   canv->Clear();
   leg->Draw();

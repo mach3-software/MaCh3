@@ -39,5 +39,5 @@ jobs:
         export PYTHONPATH=$PYTHONPATH:$PWD/python-test-modules/
         export MACH3=$PWD
         
-        python3 -m pytest --config Inputs/ManagerTest.yaml CIValidations/PythonTests
+        python3 -m pytest --config Inputs/FitterConfig.yaml CIValidations/PythonTests
         
