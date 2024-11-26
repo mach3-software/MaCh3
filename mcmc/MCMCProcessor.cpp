@@ -1131,38 +1131,37 @@ void MCMCProcessor::CacheSteps() {
 
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
-  
+  int stepBranch = 0;
+  double* ParValBranch = new double[nEntries]();
   // Turn on the branches which we want for parameters
-  for (int i = 0; i < nDraw; ++i) 
+  for (int i = 0; i < nDraw; ++i)
   {
     Chain->SetBranchStatus(BranchNames[i].Data(), true);
+    Chain->SetBranchAddress(BranchNames[i].Data(), &ParValBranch[i]);
   }
   Chain->SetBranchStatus("step", true);
-
+  Chain->SetBranchAddress("step", &stepBranch);
   const Long64_t countwidth = nEntries/10;
+
   // Loop over the entries
   //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
   for (Long64_t j = 0; j < nEntries; ++j) 
   {
-    if (j % countwidth == 0)
+    if (j % countwidth == 0) {
         MaCh3Utils::PrintProgressBar(j, nEntries);
-
-    Chain->SetBranchAddress("step", &StepNumber[j]);
+        MaCh3Utils::EstimateDataTransferRate(Chain, j);
+    } else {
+      Chain->GetEntry(j);
+    }
+    StepNumber[j] = stepBranch;
     // Set the branch addresses for params
     for (int i = 0; i < nDraw; ++i) 
     {
-      Chain->SetBranchAddress(BranchNames[i].Data(), &ParStep[i][j]);
+      ParStep[i][j] = ParValBranch[i];
     }
-    
-    if (j % countwidth == 0) {
-      MaCh3Utils::EstimateDataTransferRate(Chain, j);
-    } else {
-      // Fill up the ParStep array
-      Chain->GetEntry(j);
-    }
-
   }
-  
+  delete[] ParValBranch;
+
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
   
@@ -3289,27 +3288,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
 
-  // Turn on the branches which we want for parameters
-  for (int i = 0; i < nDraw; ++i) {
-    Chain->SetBranchStatus(BranchNames[i].Data(), true);
-  }
-  
-  // Turn on the branches which we want for LogL sample
-  for (int i = 0; i < nSamples; ++i) {
-    Chain->SetBranchStatus(SampleName_v[i].Data(), true);
-  }
-
-  // Turn on the branches which we want for LogL systs
-  for (int i = 0; i < nSysts; ++i) {
-    Chain->SetBranchStatus(SystName_v[i].Data(), true);
-  }
-
-  // Turn on the branches which we want for acc prob
-  Chain->SetBranchStatus("accProb", true);
-  
-  // Only needed for Geweke right now
-  Chain->SetBranchStatus("step", true);
-
   // 10 entries output
   const int countwidth = nEntries/10;
 
@@ -3325,36 +3303,58 @@ void MCMCProcessor::PrepareDiagMCMC() {
       BatchedAverages[i][j] = 0.0;
     }
   }
+  double* ParStepBranch = new double[nDraw];
+  double* SampleValuesBranch = new double[nSamples];
+  double* SystValuesBranch = new double[nSysts];
+  int StepNumberBranch = 0;
+  double AccProbValuesBranch = 0;
+  // Set the branch addresses for params
+  for (int j = 0; j < nDraw; ++j) {
+    Chain->SetBranchStatus(BranchNames[j].Data(), true);
+    Chain->SetBranchAddress(BranchNames[j].Data(), &ParStepBranch[j]);
+  }
+  // Set the branch addresses for samples
+  for (int j = 0; j < nSamples; ++j) {
+    Chain->SetBranchStatus(SampleName_v[j].Data(), true);
+    Chain->SetBranchAddress(SampleName_v[j].Data(), &SampleValuesBranch[j]);
+  }
+  // Set the branch addresses for systematics
+  for (int j = 0; j < nSysts; ++j) {
+    Chain->SetBranchStatus(SystName_v[j].Data(), true);
+    Chain->SetBranchAddress(SystName_v[j].Data(), &SystValuesBranch[j]);
+  }
+  // Only needed for Geweke right now
+  Chain->SetBranchStatus("step", true);
+  Chain->SetBranchAddress("step", &StepNumberBranch);
+  // Turn on the branches which we want for acc prob
+  Chain->SetBranchStatus("accProb", true);
+  Chain->SetBranchAddress("accProb", &AccProbValuesBranch);
 
   // Loop over the entries
   //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
   for (int i = 0; i < nEntries; ++i) {
+    // Fill up the arrays
+    Chain->GetEntry(i);
 
     if (i % countwidth == 0)
       MaCh3Utils::PrintProgressBar(i, nEntries);
 
     // Set the branch addresses for params
     for (int j = 0; j < nDraw; ++j) {
-      Chain->SetBranchAddress(BranchNames[j].Data(), &ParStep[j][i]);
+      ParStep[j][i] = ParStepBranch[j];
     }
-
     // Set the branch addresses for samples
     for (int j = 0; j < nSamples; ++j) {
-      Chain->SetBranchAddress(SampleName_v[j].Data(), &SampleValues[i][j]);
+      SampleValues[i][j] = SampleValuesBranch[j];
     }
-
     // Set the branch addresses for systematics
     for (int j = 0; j < nSysts; ++j) {
-      Chain->SetBranchAddress(SystName_v[j].Data(), &SystValues[i][j]);
+      SystValues[i][j] = SystValuesBranch[j];
     }
       
     // Set the branch addresses for Acceptance Probability
-    Chain->SetBranchAddress("accProb", &AccProbValues[i]);
-
-    Chain->SetBranchAddress("step", &StepNumber[i]);
-
-    // Fill up the arrays
-    Chain->GetEntry(i);
+    AccProbValues[i] = AccProbValuesBranch;
+    StepNumber[i] = StepNumberBranch;
 
     // Find which batch the event belongs in
     int BatchNumber = -1;
@@ -3365,7 +3365,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
         break;
       }
     }
-
     // Fill up the sum for each j param
     for (int j = 0; j < nDraw; ++j) {
       ParamSums[j] += ParStep[j][i];
@@ -3375,7 +3374,9 @@ void MCMCProcessor::PrepareDiagMCMC() {
     //KS: Could easily add this to above loop but I accProb is different beast so better keep it like this
     AccProbBatchedAverages[BatchNumber] += AccProbValues[i];
   }
-
+  delete[] ParStepBranch;
+  delete[] SampleValuesBranch;
+  delete[] SystValuesBranch;
   clock.Stop();
   MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nEntries);
 
