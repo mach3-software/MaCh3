@@ -35,8 +35,8 @@ jobs:
           - name: Covariance Validations
             test_1: ./CIValidations/CovarianceValidations
             test_2: ./CIValidations/MaCh3ModeValidations
-            test_3: ./CIValidations/UnitTests/manager_tests
-            test_4: empty
+            test_3: ./CIValidations/pValueValidations 
+            test_4: ./CIValidations/UnitTests/manager_tests
             test_5: empty
             test_6: empty
             test_7: empty
