@@ -135,6 +135,12 @@ public:
   // LW - Setup Osc 
   void virtual SetupOscCalc(double PathLength, double Density);
 
+  //get1DVarHist and get2DVarHist functions
+  virtual TH1D* get1DVarHist(std::string KinematicVar1, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) = 0; 
+  virtual TH1D* get1DVarHist(std::string KinematicVar1,std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) = 0; 
+  virtual TH2D* get2DVarHist(std::string KinematicVar1,std::string KinematicVar2, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis, TAxis* Axis2) = 0; 
+  virtual TH2D* get2DVarHist(std::string KinematicVar1,std::string KinematicVar2,std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis, TAxis* Axis2) = 0; 
+
  protected:
 
 
@@ -196,6 +202,7 @@ public:
   void fill1DHist();
   void fill2DHist();
 
+  
   //DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
   void fillArray_MP();
