@@ -26,6 +26,11 @@ jobs:
         run: |
           latest_tag=$(git describe --tags --abbrev=0)
           echo "latest_tag=${latest_tag}" >> "$GITHUB_ENV"
+          
+      - name: Get the current date
+        run: |
+          current_date=$(date +"%d/%m/%Y")
+          echo "current_date=${current_date}" >> $GITHUB_ENV
 
       - name: Get the most active author in the last week for MaCh3
         run: |
