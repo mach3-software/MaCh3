@@ -12,6 +12,7 @@ build/
 install/
 Doc/latex/
 Doc/html/
+.cache/
 
 # Ignore emacs/vim stuff
 *#* 

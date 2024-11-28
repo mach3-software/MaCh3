@@ -200,8 +200,8 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
-  covarianceXsec *XsecCov;
-  covarianceOsc *OscCov;
+  covarianceXsec *XsecCov = nullptr;
+  covarianceOsc *OscCov = nullptr;
 
   //=============================================================================== 
 
