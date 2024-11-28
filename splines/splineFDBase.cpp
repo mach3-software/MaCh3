@@ -1,11 +1,13 @@
 #include "splineFDBase.h"
+#include <memory>
+#include "samplePDF/Structs.h"
 
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
 //****************************************
-  if (xsec_ == NULL) {
-    MACH3LOG_ERROR("Trying to create splineSKBase with NULL covariance object");
+  if (!xsec_) {
+    MACH3LOG_ERROR("Trying to create splineSKBase with uninitialised covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
@@ -39,6 +41,10 @@ void splineFDBase::cleanUpMemory() {
   GlobalSystIndex.shrink_to_fit();
   UniqueSystNames.clear();
   UniqueSystNames.shrink_to_fit();
+  //Really make sure all the memory is cleared
+  for(auto Spline : splinevec_Monolith){
+    if(Spline){delete Spline;}
+  }
   splinevec_Monolith.clear();
   splinevec_Monolith.shrink_to_fit();
   if(isflatarray != nullptr) delete isflatarray;
@@ -62,6 +68,10 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
+  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromDetID(DetID);
+  // Keep track of this for all samples
+  SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
+
   //std::vector<int> SplineParsIndex_Sample_temp = xsec->GetSplineParsIndexFromDetID(DetID);
 
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
@@ -71,6 +81,11 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
+  // for(auto SplineMode : SplineModeVecs_Sample){
+  //   std::cout << SplineMode << ",";
+  // }
+  std::cout << "/n" << std::endl;
+
   MACH3LOG_INFO("SplineModeVecs is of size {}", SplineModeVecs.size());
 
   int nOscChan = OscChanFileNames.size();
@@ -160,7 +175,7 @@ void splineFDBase::TransferToMonolith()
                 }
 
                 int splineKnots;
-                if(splinevec_Monolith[splineindex]!=NULL){
+                if(splinevec_Monolith[splineindex]){
                   isflatarray[splineindex]=false;
                   splineKnots=splinevec_Monolith[splineindex]->GetNp();
 
@@ -189,8 +204,8 @@ void splineFDBase::TransferToMonolith()
                     manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
-                  delete tmpXCoeffArr;
-                  delete tmpManyCoeffArr;
+                  delete[] tmpXCoeffArr;
+                  delete[] tmpManyCoeffArr;
                 }
                 else {
                     isflatarray[splineindex]=true;
@@ -247,14 +262,14 @@ void splineFDBase::FindSplineSegment()
     xVarArray[iSyst]=xvar;
     
     _int_ segment = 0;
-	_int_ kHigh = nPoints - 1;
+    _int_ kHigh = nPoints - 1;
 
     //KS: We expect new segment is very close to previous
     const _int_ PreviousSegment = UniqueSystCurrSegment[iSyst];
     //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
     if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
     // If the variation is below the lowest saved spline point
-	else if (xvar <= xArray[0]) {
+	  else if (xvar <= xArray[0]) {
 	  segment = 0;
 	  // If the variation is above the highest saved spline point
 	} else if (xvar >= xArray[nPoints-1]) {
@@ -392,7 +407,17 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   std::vector<TAxis *> ReturnVec;
   int iSample=getSampleIndex(SampleName);
 
-  TFile *File = new TFile(FileName.c_str());
+  //Try declaring these outside of TFile so they aren't owned by File
+  int nDummyBins = 1;
+  double DummyEdges[2];
+  DummyEdges[0] = -1e15;
+  DummyEdges[1] = 1e15;
+  TAxis* DummyAxis = new TAxis(nDummyBins, DummyEdges);
+
+  TH2F* Hist2D = nullptr;
+  TH3F* Hist3D = nullptr;
+
+  auto File = std::unique_ptr<TFile>(TFile::Open(FileName.c_str(), "READ"));
   if (!File || File->IsZombie())
   {
     MACH3LOG_ERROR("File {} not found", FileName);
@@ -401,18 +426,17 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
 
   MACH3LOG_INFO("Finding binning for:");
-  spdlog::info("{}", FileName);
+  MACH3LOG_INFO("{}", FileName);
 
   bool isHist2D = false;
   bool isHist3D = false;
 
-  TH2F *Hist2D = NULL;
-  TH3F *Hist3D = NULL;
-
-  TObject *Obj = File->Get("dev_tmp_0_0");
+  std::string TemplateName = "dev_tmp_0_0";
+  TObject *Obj = File->Get(TemplateName.c_str());
   if (!Obj)
   {
-    Obj = File->Get("dev_tmp.0.0");
+    TemplateName = "dev_tmp.0.0";
+    Obj = File->Get(TemplateName.c_str());
     if (!Obj)
     {
       MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!");
@@ -445,7 +469,8 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
       MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    Hist2D = (TH2F *)File->Get("dev_tmp_0_0");
+    //Hist2D = std::unique_ptr<TH2F>(File->Get<TH2F>("dev_tmp_0_0"));
+    Hist2D = File->Get<TH2F>(TemplateName.c_str());
   }
 
   if (isHist3D)
@@ -456,36 +481,24 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
       MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    Hist3D = (TH3F *)Obj->Clone();
+    Hist3D = File->Get<TH3F>(TemplateName.c_str());
   }
 
-  int nDummyBins = 1;
-  double *DummyEdges = new double[2];
-  DummyEdges[0] = -1e15;
-  DummyEdges[1] = 1e15;
-  TAxis *DummyAxis = new TAxis(nDummyBins, DummyEdges);
-
-  if (Dimensions[iSample] == 2)
-  {
-	if(isHist2D){
-	  ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
-	}
-	else if(isHist3D){
-	  ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
-	  ReturnVec.push_back((TAxis *)(DummyAxis)->Clone());
-	}
-  }
-  else if (Dimensions[iSample] == 3)
-  {
+  if (Dimensions[iSample] == 2) {
+    if(isHist2D){
+      ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
+      ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
+      ReturnVec.push_back((TAxis*)(DummyAxis)->Clone());
+    } else if (isHist3D) {
+      ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
+      ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
+      ReturnVec.push_back((TAxis*)(DummyAxis)->Clone());
+    }
+  } else if (Dimensions[iSample] == 3) {
     ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
     ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
     ReturnVec.push_back((TAxis *)(Hist3D->GetZaxis())->Clone());
-  }
-  else
-  {
+  } else {
     MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -496,16 +509,9 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   }
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
-  //This could be NULL if 2D
-  if(isHist2D){
-	delete Hist2D;
-  } else {
-    delete Hist3D;
-  }
-
-  File->Close();
-  delete File;
   delete DummyAxis;
+  File->Close();
+
   return ReturnVec;
 }
 
@@ -538,7 +544,7 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
                 if (isValidSplineIndex(SampleName, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
                 {
                   int splineindex = indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
-                  if (splinevec_Monolith[splineindex] != NULL)
+                  if (splinevec_Monolith[splineindex])
                   {
                     SampleCounter_NonFlat += 1;
                   }
@@ -617,7 +623,7 @@ void splineFDBase::PrepForReweight()
                 for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
                 { // Loop over third dimension
                   int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
-                  if (splinevec_Monolith[splineindex] != NULL)
+                  if (splinevec_Monolith[splineindex])
                   {
                     UniqueSystSplines.push_back(splinevec_Monolith[splineindex]);
                     UniqueSystIndices.push_back(GlobalSystIndex[iSample][iSyst]);
@@ -710,7 +716,7 @@ void splineFDBase::PrepForReweight()
   //Isn't this just doing what CountNumberOfLoadedSplines() does?
   int nCombinations_FlatSplines = 0;
   int nCombinations_All = 0;
-  // DB Now actually loop over splines to determine which are all NULL
+  // DB Now actually loop over splines to determine which are all null i.e. flat
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over systematics
 	for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
@@ -727,7 +733,7 @@ void splineFDBase::PrepForReweight()
 			  for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
 			  { // Loop over third dimension
 				int splineindex=indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
-				if (splinevec_Monolith[splineindex] != NULL)
+				if (splinevec_Monolith[splineindex])
 				{
 				  nCombinations_All += 1;
 				} else{
@@ -789,7 +795,7 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _fl
   }
   //We now clean up the splines!
   delete splinevec_Monolith[splineindex];
-  splinevec_Monolith[splineindex] = NULL;
+  splinevec_Monolith[splineindex] = nullptr;
 }
 
 //****************************************

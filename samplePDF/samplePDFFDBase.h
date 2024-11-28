@@ -1,12 +1,5 @@
 #pragma once
 
-//C++ includes
-#include <list>
-
-//ROOT includes
-#include "THStack.h"
-#include "TLegend.h"
-
 //MaCh3 includes
 #include "OscProbCalcer/OscProbCalcerBase.h"
 #include "Oscillator/OscillatorBase.h"
@@ -26,11 +19,11 @@ public:
   //######################################### Functions #########################################
 
   samplePDFFDBase(){};
-  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov);
+  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName(){return samplename;}
+  std::string GetName() {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -47,9 +40,6 @@ public:
 
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
-
-  /// @brief setup the Oscillation covariance object to get values to calculate probailities from
-  void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
@@ -206,9 +196,9 @@ public:
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
-  int nDimensions;
+  int nDimensions = _BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  int SampleDetID;
+  int SampleDetID = _BAD_INT_;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
@@ -224,7 +214,7 @@ public:
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
   /// @brief the Number of selections in the 
-  int NSelections;
+  int NSelections = _BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
@@ -238,7 +228,7 @@ public:
   std::vector< std::vector<double> > Selection;
    //===========================================================================
 
-  manager* SampleManager;
+  std::unique_ptr<manager> SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 
@@ -251,7 +241,7 @@ public:
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;
-  std::vector<int> sample_oscnutype;
-  std::vector<int> sample_nutype;
+  std::vector<int> sample_nupdg;
+  std::vector<int> sample_nupdgunosc;
   std::vector<bool> sample_signal;
 };

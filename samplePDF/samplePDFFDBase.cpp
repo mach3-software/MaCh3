@@ -2,10 +2,12 @@
 
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
+#include "samplePDF/Structs.h"
 
 #include<algorithm>
+#include <memory>
 
-samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov) : samplePDFBase()
+samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
@@ -16,11 +18,16 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   XsecCov = xsec_cov;
+
+  if(!osc_cov){
+    MACH3LOG_WARN("You have pass a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
+  }
+  OscCov = osc_cov;
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   
-  SampleManager = new manager(ConfigFileName.c_str());
+  SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -139,8 +146,8 @@ void samplePDFFDBase::ReadSampleConfig()
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
-    sample_nutype.push_back(osc_channel["nutype"].as<int>());
-    sample_oscnutype.push_back(osc_channel["oscnutype"].as<int>());
+    sample_nupdgunosc.push_back(static_cast<NuPDG>(osc_channel["nutype"].as<int>()));
+    sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
     sample_signal.push_back(osc_channel["signal"].as<bool>());
   }
 
@@ -203,7 +210,6 @@ void samplePDFFDBase::Initialise() {
   SetupFunctionalParameters();
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
-
 
   MACH3LOG_INFO("=======================================================");
 }
@@ -357,16 +363,16 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
 {
   //KS: Reset the histograms before reweight 
   ResetHistograms();
-
+  
+  //You only need to do these things if OscCov has been initialised
+  //if not then you're not considering oscillations
   if (OscCov) {
     std::vector<_float_> OscVec(OscCov->GetNumParams());
-    for (int iPar = 0; iPar < OscCov->GetNumParams(); iPar++)
-    {
+    for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
       OscVec[iPar] = OscCov->getParProp(iPar);
-    }
-    for (int iSample = 0; iSample < (int)MCSamples.size(); iSample++)
-    {
-      // HH TODO: this crashes for some reason if we do oscillation.
+    } 
+
+    for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
       NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
     }
   }
@@ -750,15 +756,16 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
 void samplePDFFDBase::SetupNormParameters(){
   
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
+  std::cout << "FOUND " << xsec_norms.size() << " norm parameters that affect this sample" << std::endl;
 
   if(!XsecCov){
-	MACH3LOG_ERROR("XsecCov is not setup!");
-	throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_ERROR("XsecCov is not setup!");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Assign xsec norm bins in MCSamples tree
   for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
-	CalcXsecNormsBins(iSample);
+    CalcXsecNormsBins(iSample);
   }
 
   //DB
@@ -789,132 +796,89 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample)
 
   fdmc_base *fdobj = &MCSamples[iSample];
 
-  for (int iEvent = 0; iEvent < fdobj->nEvents; ++iEvent)
-  {
-    std::list<int> XsecBins = {};
-    if (XsecCov)
-    {
-      for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it)
-      {
+  for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
+    std::list< int > XsecBins = {};
+    if (XsecCov) {
+      for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
         // Skip oscillated NC events
         // Not strictly needed, but these events don't get included in oscillated predictions, so
         // no need to waste our time calculating and storing information about xsec parameters
         // that will never be used.
-        if (fdobj->isNC[iEvent] && fdobj->signal)
-        {
-          continue;
-        } // DB Abstract check on MaCh3Modes to determine which apply to neutral current
+        if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
 
-        // Now check that the target of an interaction matches with the normalisation parameters
-        bool TargetMatch = false;
-        // If no target specified then apply to all modes
-        if ((*it).targets.size() == 0)
-        {
-          TargetMatch = true;
-        }
-        else
-        {
-          for (unsigned iTarget = 0; iTarget < (*it).targets.size(); iTarget++)
-          {
-            if ((*it).targets.at(iTarget) == *(fdobj->Target[iEvent]))
-            {
-              TargetMatch = true;
+        //Now check that the target of an interaction matches with the normalisation parameters
+        bool TargetMatch=false;
+        //If no target specified then apply to all modes
+        if ((*it).targets.size()==0) {
+          TargetMatch=true;
+        } else {
+          for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
+            if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
+              TargetMatch=true;
             }
           }
         }
-        if (!TargetMatch)
-        {
-          continue;
-        }
+        if (!TargetMatch) {continue;}
 
-        // Now check that the neutrino flavour in an interaction matches with the normalisation parameters
-        bool FlavourMatch = false;
-        // If no mode specified then apply to all modes
-        if ((*it).pdgs.size() == 0)
-        {
-          FlavourMatch = true;
-        }
-        else
-        {
-          for (unsigned iPDG = 0; iPDG < (*it).pdgs.size(); iPDG++)
-          {
-            if ((*it).pdgs.at(iPDG) == fdobj->nupdg)
-            {
-              FlavourMatch = true;
+        //Now check that the neutrino flavour in an interaction matches with the normalisation parameters
+        bool FlavourMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).pdgs.size()==0) {
+          FlavourMatch=true;
+        } else {
+          for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
+            if ((*it).pdgs.at(iPDG)== fdobj->nupdg[iEvent]) {
+              FlavourMatch=true;
             }
           }
         }
-        if (!FlavourMatch)
-        {
-          continue;
-        }
+        if (!FlavourMatch){continue;}
 
-        // Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
-        bool FlavourUnoscMatch = false;
-        // If no mode specified then apply to all modes
-        if ((*it).preoscpdgs.size() == 0)
-        {
-          FlavourUnoscMatch = true;
-        }
-        else
-        {
-          for (unsigned iPDG = 0; iPDG < (*it).preoscpdgs.size(); iPDG++)
-          {
-            if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc)
-            {
-              FlavourUnoscMatch = true;
+        //Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
+        bool FlavourUnoscMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).preoscpdgs.size()==0) {
+          FlavourUnoscMatch=true;
+        } else {
+          for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
+            if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgunosc[iEvent]) {
+              FlavourUnoscMatch=true;
             }
           }
         }
-        if (!FlavourUnoscMatch)
-        {
-          continue;
-        }
+        if (!FlavourUnoscMatch){continue;}
 
-        // Now check that the mode of an interaction matches with the normalisation parameters
-        bool ModeMatch = false;
-        // If no mode specified then apply to all modes
-        if ((*it).modes.size() == 0)
-        {
-          ModeMatch = true;
-        }
-        else
-        {
-          for (unsigned imode = 0; imode < (*it).modes.size(); imode++)
-          {
-            if ((*it).modes.at(imode) == *(fdobj->mode[iEvent]))
-            {
-              ModeMatch = true;
+        //Now check that the mode of an interaction matches with the normalisation parameters
+        bool ModeMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).modes.size()==0) {
+          ModeMatch=true;
+        } else {
+          for (unsigned imode=0;imode<(*it).modes.size();imode++) {
+            if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
+              ModeMatch=true;
             }
           }
         }
-        if (!ModeMatch)
-        {
-          continue;
-        }
+        if (!ModeMatch) {continue;}
 
-        // Now check whether the norm has kinematic bounds
-        // i.e. does it only apply to events in a particular kinematic region?
+        //Now check whether the norm has kinematic bounds
+        //i.e. does it only apply to events in a particular kinematic region?
         bool IsSelected = true;
-        if ((*it).hasKinBounds)
-        {
-          for (unsigned int iKinematicParameter = 0; iKinematicParameter < (*it).KinematicVarStr.size(); ++iKinematicParameter)
-          {
-            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0])
-            {
+        if ((*it).hasKinBounds) {
+          for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
               IsSelected = false;
               continue;
             }
-            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1])
-            {
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
               IsSelected = false;
               continue;
             }
-          }
+          } 
         }
-        // Need to then break the event loop
-        if (!IsSelected)
-        {
+        //Need to then break the event loop 
+        if(!IsSelected){
           continue;
         }
 
@@ -922,9 +886,8 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample)
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
         int bin = (*it).index;
 
-        // If syst on applies to a particular detector
-        if ((XsecCov->GetParDetID(bin) & SampleDetID) == SampleDetID)
-        {
+        //If syst on applies to a particular detector
+        if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
           XsecBins.push_back(bin);
         }
       } // end iteration over xsec_norms
@@ -1383,25 +1346,25 @@ void samplePDFFDBase::SetupNuOscillator() {
         }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
-      
+
       NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
       //============================================================================
       //DB Atmospheric only part
       if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	std::vector<_float_> CosineZArray;
-	for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
-	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-	  if (!MCSamples[iSample].isNC[iEvent]) {
-	    CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
-	  }
-	}
-	std::sort(CosineZArray.begin(),CosineZArray.end());
-	
-	NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+        std::vector<_float_> CosineZArray;
+        for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+          if (!MCSamples[iSample].isNC[iEvent]) {
+            CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
+          }
+        }
+        std::sort(CosineZArray.begin(),CosineZArray.end());
+
+        NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
       }
       //============================================================================
-      
+
     }
     
     NuOscProbCalcers[iSample]->Setup();
@@ -1428,46 +1391,46 @@ void samplePDFFDBase::SetupNuOscillator() {
 #endif
         }
       } else {
-	int InitFlav = _BAD_INT_;
-	int FinalFlav = _BAD_INT_;
-	
-	if (std::abs(MCSamples[iSample].nutype) == 1) {
-	  InitFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
-	  InitFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
-	  InitFlav = NuOscillator::kTau;
-	}
-	
-	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-	  FinalFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-	  FinalFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-	  FinalFlav = NuOscillator::kTau;
-	}
-	
-	if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
-	  MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
-	  MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
-	  MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-	  MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
-	  MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
-	  throw MaCh3Exception(__FILE__, __LINE__);
-	}
-	
-	//Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-	if (MCSamples[iSample].nutype<0) {
-	  InitFlav *= -1;
-	  FinalFlav *= -1;
-	}
-	if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-	  //Atmospherics
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
-	} else {
-	  //Beam
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
-	}
+        int InitFlav = _BAD_INT_;
+        int FinalFlav = _BAD_INT_;
+
+        if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNue) {
+          InitFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNumu) {
+          InitFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNutau) {
+          InitFlav = NuOscillator::kTau;
+        }
+
+        if (std::abs(MCSamples[iSample].nupdg[iEvent]) == NuPDG::kNue) {
+          FinalFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].nupdg[iEvent]) == NuPDG::kNumu) {
+          FinalFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].nupdg[iEvent]) == NuPDG::kNutau) {
+          FinalFlav = NuOscillator::kTau;
+        }
+
+        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nupdg and the enum used within NuOscillator");
+          MACH3LOG_ERROR("MCSamples[iSample].nupdgunosc: {}", MCSamples[iSample].nupdgunosc[iEvent]);
+          MACH3LOG_ERROR("InitFlav: {}", InitFlav);
+          MACH3LOG_ERROR("MCSamples[iSample].nupdg: {}", MCSamples[iSample].nupdg[iEvent]);
+          MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+
+        //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
+        if (static_cast<int>(MCSamples[iSample].nupdgunosc[iEvent]) < 0) {
+          InitFlav *= -1;
+          FinalFlav *= -1;
+        }
+        if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+          //Atmospherics
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
+        } else {
+          //Beam
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+        }
       } // end if NC
     } // end loop over events
   }// end loop over channels
@@ -1568,11 +1531,11 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdmc_base *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
-  fdobj->nutype = -9;
-  fdobj->oscnutype = -9;
   fdobj->signal = false;
   fdobj->Unity = 1.;
   fdobj->Unity_Int = 1.;
+  fdobj->nupdg = new int[fdobj->nEvents];
+  fdobj->nupdgunosc = new int[fdobj->nEvents];
   
   fdobj->x_var = new const double*[fdobj->nEvents];
   fdobj->y_var = new const double*[fdobj->nEvents];
@@ -1648,6 +1611,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
   splineFile->PrintArrayDimension();
   splineFile->CountNumberOfLoadedSplines(false, 1);
   splineFile->TransferToMonolith();
+  //splineFile->cleanUpMemory();
 
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
