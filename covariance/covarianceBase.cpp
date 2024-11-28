@@ -1243,6 +1243,45 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 
   if(AdaptiveHandler.UpdateMatrixAdapt()) {
+    #ifdef DEBUG
+    std::cout << "==== Updating throw matrix ====" << std::endl;
+    std::cout << "Current step:" << AdaptiveHandler.total_steps << std::endl;
+    std::cout << "Cov matrix: " << std::endl;
+    for (int i = 0; i < covMatrix->GetNrows(); ++i) {
+        std::cout << (*covMatrix)(i, i) << " ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "Old matrix: " << std::endl;
+    for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
+        std::cout << (*throwMatrix)(i, i) << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "New matrix: " << std::endl;
+    for (int i = 0; i < AdaptiveHandler.adaptive_covariance->GetNrows(); ++i) {
+        std::cout << (*AdaptiveHandler.adaptive_covariance)(i, i) << " ";
+    }
+    std::cout << std::endl;
+    std::string total_steps_str = std::to_string(AdaptiveHandler.total_steps);
+    std::string outFileName = "adacov.root";
+    TFile* outFile = new TFile(outFileName.c_str(), "UPDATE");
+    if(outFile->IsZombie()){
+      MACH3LOG_ERROR("Couldn't find {}", outFileName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    TVectorD* outMeanVec = new TVectorD((int) AdaptiveHandler.par_means.size());
+    for(int i = 0; i < (int)AdaptiveHandler.par_means.size(); i++){
+      (*outMeanVec)(i) = AdaptiveHandler.par_means[i];
+    }
+    outFile->cd();
+    AdaptiveHandler.adaptive_covariance->Write((total_steps_str+std::string ("_postfit_matrix")).c_str());
+    outMeanVec->Write((total_steps_str+std::string ("_mean_vec")).c_str());
+    outFile->Close();
+    delete outMeanVec;
+    delete outFile;
+    std::cout << "===============================" << std::endl;
+    #endif
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
   }
