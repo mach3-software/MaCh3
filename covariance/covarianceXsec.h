@@ -129,7 +129,12 @@ class covarianceXsec : public covarianceBase {
     /// @param DetID The Detector ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
     void IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action);
-
+    /// @brief Check if parameter is affecting given det ID
+    /// @param SystIndex number of parameter
+    /// @param DetID The Detector ID used to filter parameters.
+    bool AppliesToDetID(const int SystIndex, const int DetID) const {
+      return (GetParDetID(SystIndex) & DetID) != 0;
+    }
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.

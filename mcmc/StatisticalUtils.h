@@ -12,6 +12,9 @@
 #include "samplePDF/Structs.h"
 #include "manager/manager.h"
 
+/// @file StatisticalUtils.h
+/// @brief Utility functions for statistical interpretations in MaCh3
+
 // **************************
 /// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
 /// @param BayesFactor Obtained value of Bayes factor
@@ -89,7 +92,7 @@ inline double GetBIC(const double llh, const int data, const int nPars){
     MACH3LOG_ERROR("You haven't passed number of model parameters as it is still zero");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const double BIC = nPars * logl(data) + llh;
+  const double BIC = double(nPars * logl(data) + llh);
 
   return BIC;
 }
@@ -120,9 +123,9 @@ inline void CheckBonferoniCorrectedpValue(const std::vector<std::string>& Sample
     MACH3LOG_ERROR("Size of vectors do not match");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  const int NumberOfStatisticalTests = SampleNameVec.size();
+  const size_t NumberOfStatisticalTests = SampleNameVec.size();
   //KS: 0.05 or 5% is value used by T2K.
-  const double StatisticalSignificanceDown = Threshold / NumberOfStatisticalTests;
+  const double StatisticalSignificanceDown = Threshold / double(NumberOfStatisticalTests);
   const double StatisticalSignificanceUp = 1 - StatisticalSignificanceDown;
   MACH3LOG_INFO("Bonferroni-corrected statistical significance level: {:.2f}", StatisticalSignificanceDown);
 
@@ -417,8 +420,6 @@ inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double
   {
     if(hist_copy_fill[i]) hpost_copy->SetBinContent(i, hist->GetBinContent(i));
   }
-
-  return;
 }
 
 // ***************
@@ -473,8 +474,6 @@ inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827
     Contour[0] = max_entries;
   }
   hist2D->SetContour(1, Contour);
-
-  return;
 }
 
 // *********************
@@ -490,4 +489,98 @@ inline double GetIQR(TH1D *Hist) {
   Hist->GetQuantiles(3, quartiles, quartiles_x);
 
   return quartiles[2] - quartiles[0];
+}
+
+// ********************
+/// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
+///
+/// @param DataPoly Pointer to the data histogram (TH2Poly).
+/// @param PolyMC Pointer to the Monte Carlo histogram (TH2Poly).
+/// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.
+inline double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
+// *********************
+  double klDivergence = 0.0;
+  double DataIntegral = NoOverflowIntegral(DataPoly);
+  double MCIntegral = NoOverflowIntegral(PolyMC);
+  for (int i = 1; i < DataPoly->GetNumberOfBins()+1; ++i)
+  {
+    if (DataPoly->GetBinContent(i) > 0 && PolyMC->GetBinContent(i) > 0) {
+      klDivergence += DataPoly->GetBinContent(i) / DataIntegral *
+      std::log((DataPoly->GetBinContent(i) / DataIntegral) / ( PolyMC->GetBinContent(i) / MCIntegral));
+    }
+  }
+  return klDivergence;
+}
+// ********************
+/// @brief KS: Combine p-values using Fisher's method.
+///
+/// @param pvalues A vector of individual p-values to combine.
+/// @return The combined p-value, representing the overall significance.
+inline double FisherCombinedPValue(const std::vector<double>& pvalues) {
+// ********************
+
+  double testStatistic = 0;
+  for(size_t i = 0; i < pvalues.size(); i++)
+  {
+    const double pval = std::max(0.00001, pvalues[i]);
+    testStatistic += -2.0 * std::log(pval);
+  }
+  // Degrees of freedom is twice the number of p-values
+  int degreesOfFreedom = int(2 * pvalues.size());
+  double pValue = TMath::Prob(testStatistic, degreesOfFreedom);
+
+  return pValue;
+}
+
+// ********************
+/// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
+///
+/// @param FilePath Path to MCMC chain you want to thin
+/// @param ThinningCut every which entry you want to thin
+/// @cite 2011ThinningMCMC
+/// @warning Thinning is done over entry not steps, it may now work very well for merged chains
+inline void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
+// ********************
+  // Define the path for the temporary thinned file
+  std::string TempFilePath = "Thinned_" + FilePath;
+  int ret = system(("cp " + FilePath + " " + TempFilePath).c_str());
+  if (ret != 0) {
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+  }
+
+  TFile *inFile = TFile::Open(TempFilePath.c_str(), "UPDATE");
+  if (!inFile || inFile->IsZombie()) {
+    MACH3LOG_ERROR("Error opening file: {}", TempFilePath);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TTree *inTree = inFile->Get<TTree>("posteriors");
+  if (!inTree) {
+    MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    inFile->ls();
+    inFile->Close();
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  // Clone the structure without data
+  TTree *outTree = inTree->CloneTree(0);
+
+  // Loop over entries and apply thinning
+  Long64_t nEntries = inTree->GetEntries();
+  double retainedPercentage = (double(nEntries) / ThinningCut) / double(nEntries) * 100;
+  MACH3LOG_INFO("Thinning will retain {:.2f}% of chains", retainedPercentage);
+  for (Long64_t i = 0; i < nEntries; i++) {
+    if (i % (nEntries/10) == 0) {
+      MaCh3Utils::PrintProgressBar(i, nEntries);
+    }
+    if (i % ThinningCut == 0) {
+      inTree->GetEntry(i);
+      outTree->Fill();
+    }
+  }
+  inFile->WriteTObject(outTree, "posteriors", "kOverwrite");
+  inFile->Close();
+  delete inFile;
+
+  MACH3LOG_INFO("Thinned TTree saved and overwrote original in: {}", TempFilePath);
 }

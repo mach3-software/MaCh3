@@ -1,8 +1,10 @@
 #include "samplePDFFDBase.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
-#include "samplePDF/Structs.h"
+#pragma GCC diagnostic pop
 
 #include<algorithm>
 #include <memory>
@@ -54,38 +56,29 @@ samplePDFFDBase::~samplePDFFDBase()
 void samplePDFFDBase::ReadSampleConfig() 
 {
    
-  if (CheckNodeExists(SampleManager->raw(), "SampleName")) {
-    samplename = SampleManager->raw()["SampleName"].as<std::string>();
-  } else{
+  if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  samplename = SampleManager->raw()["SampleName"].as<std::string>();
   
-  if (CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-    nSamples = SampleManager->raw()["NSubSamples"].as<int>();
-  } else{
+  if (!CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
     MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
-  if (CheckNodeExists(SampleManager->raw(), "DetID")) {
-    SampleDetID = SampleManager->raw()["DetID"].as<int>();
-  } else{
-    MACH3LOG_ERROR("DetID not defined in {}, please add this!", SampleManager->GetFileName());
+  nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
+  if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
+    MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  SampleDetID = SampleManager->raw()["DetID"].as<int>();
   
-  if (CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
-    NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
-  } else {
+  if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
-  for (int i=0;i<nSamples;i++) {
-    struct fdmc_base obj = fdmc_base();
-    MCSamples.push_back(obj);
-  }
+  NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
+  MCSamples.resize(nSamples);
   
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
@@ -167,7 +160,7 @@ void samplePDFFDBase::ReadSampleConfig()
     SelectionVec = {KinematicParamter, low_bound, up_bound};
     StoredSelection.push_back(SelectionVec);
   }
-  NSelections = SelectionStr.size();
+  NSelections = int(SelectionStr.size());
 
   return;
 }
@@ -181,7 +174,7 @@ void samplePDFFDBase::Initialise() {
   Init();
 
   int TotalMCEvents = 0;
-  for(_int_ iSample=0 ; iSample < nSamples ; iSample++){
+  for(M3::int_t iSample=0 ; iSample < nSamples ; iSample++){
     MACH3LOG_INFO("=============================================");
     MACH3LOG_INFO("Initialising sample: {}/{}", iSample, nSamples);
     MCSamples[iSample].nEvents = setupExperimentMC(iSample);
@@ -364,12 +357,14 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   //You only need to do these things if OscCov has been initialised
   //if not then you're not considering oscillations
   if (OscCov) {
-    std::vector<_float_> OscVec(OscCov->GetNumParams());
+    std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
     for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
-      OscVec[iPar] = OscCov->getParProp(iPar);
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wuseless-cast"
+      OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
+      #pragma GCC diagnostic pop
     } 
-
-    for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+    for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
       NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
     }
   }
@@ -398,8 +393,8 @@ void samplePDFFDBase::fillArray() {
 #else
 
   //ETA we should probably store this in samplePDFFDBase
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   //DB Reset values stored in PDF array to 0.
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -410,8 +405,8 @@ void samplePDFFDBase::fillArray() {
   }
 
   PrepFunctionalParameters();
-  if(splineFile){
-    splineFile->Evaluate();
+  if(SplineHandler){
+    SplineHandler->Evaluate();
   }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
@@ -429,7 +424,7 @@ void samplePDFFDBase::fillArray() {
       double funcweight = 1.0;
       double totalweight = 1.0;
       
-      if(splineFile){
+      if(SplineHandler){
         splineweight *= CalcXsecWeightSpline(iSample, iEvent);
       }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
@@ -473,29 +468,30 @@ void samplePDFFDBase::fillArray() {
       
       //DB - First, check to see if the event is still in the nominal bin
       if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
-	XBinToFill = MCSamples[iSample].NomXBin[iEvent];
+        XBinToFill = MCSamples[iSample].NomXBin[iEvent];
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
       //ETA- note that nXBins is XBinEdges.size() - 1
       else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-	continue;
+        continue;
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
       //Shifted down one bin from the event bin at nominal
       else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
-	XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
+        XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
       }
       //Shifted up one bin from the event bin at nominal
       else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
-	XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
+        XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
       }
       //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
       else {
-	for (unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-	  if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-	    XBinToFill = iBin;
-	  }
-	}
+        for (unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++)
+        {
+          if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
+            XBinToFill = iBin;
+          }
+        }
       }
       
       //DB Fill relevant part of thread array
@@ -516,12 +512,12 @@ void samplePDFFDBase::fillArray() {
 // ************************************************ 
 void samplePDFFDBase::fillArray_MP() 
 {
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  size_t nXBins = int(XBinEdges.size()-1);
+  size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    for (int xBin=0;xBin<nXBins;xBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
       samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
@@ -530,8 +526,8 @@ void samplePDFFDBase::fillArray_MP()
   //reconfigureFuncPars();
   
   //This is stored as [y][x] due to shifts only occuring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses 
-  double** samplePDFFD_array_private = NULL;
-  double** samplePDFFD_array_private_w2 = NULL;
+  double** samplePDFFD_array_private = nullptr;
+  double** samplePDFFD_array_private_w2 = nullptr;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
 #pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
@@ -540,10 +536,10 @@ void samplePDFFDBase::fillArray_MP()
     // ETA - maybe we can use parallel firstprivate to initialise these?
     samplePDFFD_array_private = new double*[nYBins];
     samplePDFFD_array_private_w2 = new double*[nYBins];
-    for (int yBin=0;yBin<nYBins;yBin++) {
+    for (size_t yBin=0;yBin<nYBins;yBin++) {
       samplePDFFD_array_private[yBin] = new double[nXBins];
       samplePDFFD_array_private_w2[yBin] = new double[nXBins];
-      for (int xBin=0;xBin<nXBins;xBin++) {
+      for (size_t xBin=0;xBin<nXBins;xBin++) {
         samplePDFFD_array_private[yBin][xBin] = 0.;
         samplePDFFD_array_private_w2[yBin][xBin] = 0.;
       }
@@ -568,8 +564,8 @@ void samplePDFFDBase::fillArray_MP()
     PrepFunctionalParameters();
     //==================================================
     //Calc Weights and fill Array
-    if(splineFile){
-      splineFile->Evaluate();
+    if(SplineHandler){
+      SplineHandler->Evaluate();
     }
     
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
@@ -595,7 +591,7 @@ void samplePDFFDBase::fillArray_MP()
         //DB SKDet Syst
         //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
-        if(splineFile){
+        if(SplineHandler){
           splineweight *= CalcXsecWeightSpline(iSample, iEvent);
         }
         //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
@@ -684,8 +680,8 @@ void samplePDFFDBase::fillArray_MP()
     //End of Calc Weights and fill Array
     //==================================================
     // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in GetLikelihood
-    for (int yBin=0;yBin<nYBins;yBin++) {
-      for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t yBin=0;yBin<nYBins;yBin++) {
+      for (size_t xBin=0;xBin<nXBins;xBin++) {
 #pragma omp atomic
 	samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
 #pragma omp atomic    
@@ -693,7 +689,7 @@ void samplePDFFDBase::fillArray_MP()
       }
     }
     
-    for (int yBin=0;yBin<nYBins;yBin++) {
+    for (size_t yBin=0;yBin<nYBins;yBin++) {
       delete[] samplePDFFD_array_private[yBin];
       delete[] samplePDFFD_array_private_w2[yBin];
     }
@@ -709,12 +705,12 @@ void samplePDFFDBase::fillArray_MP()
 void samplePDFFDBase::ResetHistograms() {
 // **************************************************
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  size_t nXBins = int(XBinEdges.size()-1);
+  size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
-  for (int yBin = 0; yBin < nYBins; yBin++) {
-    for (int xBin = 0; xBin < nXBins; xBin++) {
+  for (size_t yBin = 0; yBin < nYBins; yBin++) {
+    for (size_t xBin = 0; xBin < nXBins; xBin++) {
       samplePDFFD_array[yBin][xBin] = 0.;
     }
   }
@@ -770,15 +766,15 @@ void samplePDFFDBase::SetupNormParameters(){
   //Attempt at reducing impact of covarianceXsec::calcReweight()
   int counter;
 
-  for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
+  for (int iSample = 0; iSample < int(MCSamples.size()); ++iSample) {
 	for (int iEvent = 0; iEvent < MCSamples[iSample].nEvents; ++iEvent) {
 	  counter = 0;
 
-	  MCSamples[iSample].nxsec_norm_pointers[iEvent] = MCSamples[iSample].xsec_norms_bins[iEvent].size();
-	  MCSamples[iSample].xsec_norm_pointers[iEvent] = new const double*[MCSamples[iSample].nxsec_norm_pointers[iEvent]];
+	  MCSamples[iSample].nxsec_norm_pointers[iEvent] = int(MCSamples[iSample].xsec_norms_bins[iEvent].size());
+	  MCSamples[iSample].xsec_norm_pointers[iEvent].resize(MCSamples[iSample].nxsec_norm_pointers[iEvent]);
 
-	  for(std::list< int >::iterator lit = MCSamples[iSample].xsec_norms_bins[iEvent].begin();lit!=MCSamples[iSample].xsec_norms_bins[iEvent].end();lit++) {
-		MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = XsecCov->retPointer(*lit);
+	  for(auto const & norm_bin: MCSamples[iSample].xsec_norms_bins[iEvent]) {
+		MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = XsecCov->retPointer(norm_bin);
 		counter += 1;
 	  }
 
@@ -791,10 +787,10 @@ void samplePDFFDBase::SetupNormParameters(){
 //A way to check whether a normalisation parameter applies to an event or not
 void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
-  fdmc_base *fdobj = &MCSamples[iSample];
+  FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
 
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
-    std::list< int > XsecBins = {};
+    std::vector< int > XsecBins = {};
     if (XsecCov) {
       for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
         // Skip oscillated NC events
@@ -898,8 +894,8 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(XVec.size()-1, XVec.data());
-  dathist->SetBins(XVec.size()-1, XVec.data());
+  _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
+  dathist->SetBins(int(XVec.size()-1), XVec.data());
 
   //This will overwrite XBinEdges with whatever you pass this function
   XBinEdges = XVec;
@@ -908,11 +904,11 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   YBinEdges[1] = 1e8;
 
   _hPDF2D->Reset();
-  _hPDF2D  ->SetBins(XVec.size()-1, XVec.data(), YBinEdges.size()-1, YBinEdges.data());
-  dathist2d->SetBins(XVec.size()-1, XVec.data(), YBinEdges.size()-1, YBinEdges.data());
+  _hPDF2D  ->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
+  dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -932,19 +928,19 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
 void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
 {
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(XVec.size()-1, XVec.data());
-  dathist->SetBins(XVec.size()-1, XVec.data());
+  _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
+  dathist->SetBins(int(XVec.size()-1), XVec.data());
 
   _hPDF2D->Reset();
-  _hPDF2D->SetBins(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());
-  dathist2d->SetBins(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());
+  _hPDF2D->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
+  dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
 
   //XBinEdges = XVec;
   //YBinEdges = YVec;
 
   //ETA - maybe need to be careful here
-  int nXBins = XVec.size()-1;
-  int nYBins = YVec.size()-1;
+  int nXBins = int(XVec.size()-1);
+  int nYBins = int(YVec.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -987,8 +983,8 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   _hPDF2D->SetBins(nbins,boundaries,1,YBinEdges_Arr);
   dathist2d->SetBins(nbins,boundaries,1,YBinEdges_Arr);
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1022,8 +1018,8 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   _hPDF2D->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
   dathist2d->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1042,7 +1038,7 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
 void samplePDFFDBase::FindNominalBinAndEdges1D() {
 
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
+  for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
       
       //Set x_var and y_var values based on XVarStr and YVarStr
@@ -1069,14 +1065,14 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       }
       
       if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
-	MCSamples[mc_i].NomXBin[event_i] = bin-1;
-      } else {
-	MCSamples[mc_i].NomXBin[event_i] = -1;
-	low_edge = _DEFAULT_RETURN_VAL_;
-	upper_edge = _DEFAULT_RETURN_VAL_;
-	low_lower_edge = _DEFAULT_RETURN_VAL_;
-	upper_upper_edge = _DEFAULT_RETURN_VAL_;
-      }
+		  MCSamples[mc_i].NomXBin[event_i] = bin-1;
+	  } else {
+		  MCSamples[mc_i].NomXBin[event_i] = -1;
+		  low_edge = _DEFAULT_RETURN_VAL_;
+		  upper_edge = _DEFAULT_RETURN_VAL_;
+		  low_lower_edge = _DEFAULT_RETURN_VAL_;
+		  upper_upper_edge = _DEFAULT_RETURN_VAL_;
+	  }
       MCSamples[mc_i].NomYBin[event_i] = 0;
       
       MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
@@ -1107,8 +1103,8 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1143,8 +1139,8 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_array = new double*[nYBins];
   samplePDFFD_array_w2 = new double*[nYBins];
@@ -1163,7 +1159,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
 void samplePDFFDBase::FindNominalBinAndEdges2D() {
 
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(int mc_i = 0 ; mc_i < (int)MCSamples.size() ; mc_i++){
+  for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
       
       //Set x_var and y_var values based on XVarStr and YVarStr   
@@ -1220,8 +1216,8 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
 
 void samplePDFFDBase::addData(std::vector<double> &data) {
   dataSample = new std::vector<double>(data);
-  dataSample2D = NULL;
-  dathist2d = NULL;
+  dataSample2D = nullptr;
+  dathist2d = nullptr;
   dathist->Reset(); 
   
   if (GetNDim()!=1) {
@@ -1234,8 +1230,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
     dathist->Fill(dataSample->at(i));
   }
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
   
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1250,8 +1246,8 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
 
 void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   dataSample2D = new std::vector< std::vector <double> >(data);
-  dataSample = NULL;
-  dathist = NULL;
+  dataSample = nullptr;
+  dathist = nullptr;
   dathist2d->Reset();                                                       
 
   if (GetNDim()!=2) {
@@ -1264,8 +1260,8 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
     dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]);
   }
 
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1280,17 +1276,17 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
 
 void samplePDFFDBase::addData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram : {} with {} events", Data->GetName(), Data->Integral());
-  dathist2d = NULL;
+  dathist2d = nullptr;
   dathist = Data;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  dataSample = nullptr;
+  dataSample2D = nullptr;
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
     throw MaCh3Exception(__FILE__ , __LINE__ );}
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
   
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1306,16 +1302,16 @@ void samplePDFFDBase::addData(TH1D* Data) {
 void samplePDFFDBase::addData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram : {} with {} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
-  dathist = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
+  dathist = nullptr;
+  dataSample = nullptr;
+  dataSample2D = nullptr;
 
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
     throw MaCh3Exception(__FILE__ , __LINE__ );}	
   
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
 
   samplePDFFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
@@ -1329,31 +1325,30 @@ void samplePDFFDBase::addData(TH2D* Data) {
 void samplePDFFDBase::SetupNuOscillator() {
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   
-  NuOscProbCalcers = std::vector<OscillatorBase*>((int)MCSamples.size());
-  for (int iSample=0;iSample<(int)MCSamples.size();iSample++) {
+  NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
+  for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
     MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
     NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
     
     if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-      std::vector<_float_> EnergyArray;
-      for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      std::vector<M3::float_t> EnergyArray;
+      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
         //DB Remove NC events from the arrays which are handed to the NuOscillator objects
         if (!MCSamples[iSample].isNC[iEvent]) {
-          EnergyArray.push_back(*(MCSamples[iSample].rw_etru[iEvent]));
+          EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
         }
       }
       std::sort(EnergyArray.begin(),EnergyArray.end());
-
       NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
       //============================================================================
       //DB Atmospheric only part
-      if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
-        std::vector<_float_> CosineZArray;
-        for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+      if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+        std::vector<M3::float_t> CosineZArray;
+        for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
           //DB Remove NC events from the arrays which are handed to the NuOscillator objects
           if (!MCSamples[iSample].isNC[iEvent]) {
-            CosineZArray.push_back(*(MCSamples[iSample].rw_truecz[iEvent]));
+            CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
           }
         }
         std::sort(CosineZArray.begin(),CosineZArray.end());
@@ -1361,12 +1356,11 @@ void samplePDFFDBase::SetupNuOscillator() {
         NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
       }
       //============================================================================
-
     }
     
     NuOscProbCalcers[iSample]->Setup();
 
-    for (int iEvent=0;iEvent<(int)MCSamples[iSample].nEvents;iEvent++) {
+    for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
 #ifdef _LOW_MEMORY_STRUCTS_
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
@@ -1407,26 +1401,27 @@ void samplePDFFDBase::SetupNuOscillator() {
           FinalFlav = NuOscillator::kTau;
         }
 
+
         if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
-          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nupdg and the enum used within NuOscillator");
-          MACH3LOG_ERROR("MCSamples[iSample].nupdgunosc: {}", MCSamples[iSample].nupdgunosc[iEvent]);
+          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
+          MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
           MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-          MACH3LOG_ERROR("MCSamples[iSample].nupdg: {}", MCSamples[iSample].nupdg[iEvent]);
+          MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
           MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
         //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-        if (static_cast<int>(MCSamples[iSample].nupdgunosc[iEvent]) < 0) {
+        if (MCSamples[iSample].nutype<0) {
           InitFlav *= -1;
           FinalFlav *= -1;
         }
-        if (MCSamples[iSample].rw_truecz != NULL) { //Can only happen if truecz has been initialised within the experiment specific code
+        if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
           //Atmospherics
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]),*(MCSamples[iSample].rw_truecz[iEvent]));
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
         } else {
           //Beam
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,*(MCSamples[iSample].rw_etru[iEvent]));
+          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
         }
       } // end if NC
     } // end loop over events
@@ -1437,7 +1432,9 @@ void samplePDFFDBase::SetupNuOscillator() {
 
 double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   double totalweight = 1.0;
-  //std::cout << "~~~~~~~" << std::endl;
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
     //std::cout << "Weight " << iParam << " is " << *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
@@ -1451,48 +1448,48 @@ double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
 /// @brief Finds the binned spline that an event should apply to and stored them in a
 /// a vector for easy evaluation in the fillArray() function.
 void samplePDFFDBase::fillSplineBins() {
-  for (int i = 0; i < (int)MCSamples.size(); ++i) {
+  for (int i = 0; i < int(MCSamples.size()); ++i) {
     //Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
-      case 1:
-	EventSplines = splineFile->GetEventSplines(GetName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
-	break;
-      case 2:
-	EventSplines = splineFile->GetEventSplines(GetName(), i, *(MCSamples[i].mode[j]), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
-	break;
-      default:
-	MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
-	MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
-	MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
-	break;
+        case 1:
+          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          break;
+        case 2:
+          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          break;
+        default:
+          MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
+          MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
+          MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+          break;
       }
-      MCSamples[i].nxsec_spline_pointers[j] = EventSplines.size();
+      MCSamples[i].nxsec_spline_pointers[j] = int(EventSplines.size());
       if(MCSamples[i].nxsec_spline_pointers[j] < 0){
-	throw MaCh3Exception(__FILE__, __LINE__);
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
-      MCSamples[i].xsec_spline_pointers[j] = new const double*[MCSamples[i].nxsec_spline_pointers[j]];
+      MCSamples[i].xsec_spline_pointers[j].resize(MCSamples[i].nxsec_spline_pointers[j]);
       for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
-	//Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-	MCSamples[i].xsec_spline_pointers[j][spline] = splineFile->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
-									      EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
+        //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
+        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
+            EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
       }
     }
   }
-  
+
   return;
 }
 
 double samplePDFFDBase::GetLikelihood() {
-  if (samplePDFFD_data == NULL) {
+  if (samplePDFFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
   //This can be done only once and stored
-  int nXBins = XBinEdges.size()-1;
-  int nYBins = YBinEdges.size()-1;
+  int nXBins = int(XBinEdges.size()-1);
+  int nYBins = int(YBinEdges.size()-1);
   
   int xBin;
   int yBin;
@@ -1524,8 +1521,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  MCSamples[iSample] = fdmc_base();
-  fdmc_base *fdobj = &MCSamples[iSample];
+  FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
   fdobj->signal = false;
@@ -1534,59 +1530,41 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->nupdg = new int[fdobj->nEvents];
   fdobj->nupdgunosc = new int[fdobj->nEvents];
   
-  fdobj->x_var = new const double*[fdobj->nEvents];
-  fdobj->y_var = new const double*[fdobj->nEvents];
-  fdobj->rw_etru = new const double*[fdobj->nEvents];
-  fdobj->XBin = new int[fdobj->nEvents];
-  fdobj->YBin = new int[fdobj->nEvents];    
-  fdobj->NomXBin = new int[fdobj->nEvents];
-  fdobj->NomYBin = new int[fdobj->nEvents];
-  fdobj->XBin = new int [fdobj->nEvents];
-  fdobj->YBin = new int [fdobj->nEvents];;	 
-  fdobj->rw_lower_xbinedge = new double [fdobj->nEvents];
-  fdobj->rw_lower_lower_xbinedge = new double [fdobj->nEvents];
-  fdobj->rw_upper_xbinedge = new double [fdobj->nEvents];
-  fdobj->rw_upper_upper_xbinedge = new double [fdobj->nEvents];
-  fdobj->mode = new double*[fdobj->nEvents];
-  fdobj->nxsec_norm_pointers = new int[fdobj->nEvents];
-  fdobj->xsec_norm_pointers = new const double**[fdobj->nEvents];
-  fdobj->xsec_norms_bins = new std::list< int >[fdobj->nEvents];
-  fdobj->xsec_w = new double[fdobj->nEvents];
-  fdobj->isNC = new bool[fdobj->nEvents];
-  fdobj->nxsec_spline_pointers = new int[fdobj->nEvents];
-  fdobj->xsec_spline_pointers = new const double**[fdobj->nEvents];
-  fdobj->ntotal_weight_pointers = new int[fdobj->nEvents];
-  fdobj->total_weight_pointers = new const double**[fdobj->nEvents];
-  fdobj->Target = new int*[fdobj->nEvents];
-  fdobj->osc_w_pointer = new const _float_*[fdobj->nEvents];
-  //fdobj->rw_truecz = new const double*[fdobj->nEvents];
-  
-  for(int iEvent = 0 ;iEvent < fdobj->nEvents ; ++iEvent){
-    fdobj->rw_etru[iEvent] = &fdobj->Unity;
-    //fdobj->rw_truecz[iEvent] = &fdobj->Unity;
-    fdobj->mode[iEvent] = &fdobj->Unity;
-    fdobj->Target[iEvent] = 0;
-    fdobj->NomXBin[iEvent] = -1;
-    fdobj->NomYBin[iEvent] = -1;
-    fdobj->XBin[iEvent] = -1;
-    fdobj->YBin[iEvent] = -1;
-    fdobj->rw_lower_xbinedge[iEvent] = -1;
-    fdobj->rw_lower_lower_xbinedge[iEvent] = -1;
-    fdobj->rw_upper_xbinedge[iEvent] = -1;
-    fdobj->rw_upper_upper_xbinedge[iEvent] = -1;
-    fdobj->xsec_w[iEvent] = 1.0;
-    fdobj->isNC[iEvent] = false;
-    fdobj->SampleDetID = -1;
-    #ifdef _LOW_MEMORY_STRUCTS_
-    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity_F);
-    #else
-    fdobj->osc_w_pointer[iEvent] = &(fdobj->Unity);
-    #endif
+  int nEvents = fdobj->nEvents;
+  fdobj->x_var.resize(nEvents, &fdobj->Unity);
+  fdobj->y_var.resize(nEvents, &fdobj->Unity);
+  fdobj->rw_etru.resize(nEvents, &fdobj->Unity);
+  fdobj->XBin.resize(nEvents, -1);
+  fdobj->YBin.resize(nEvents, -1);
+  fdobj->NomXBin.resize(nEvents, -1);
+  fdobj->NomYBin.resize(nEvents, -1);
+  fdobj->rw_lower_xbinedge.resize(nEvents, -1);
+  fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
+  fdobj->rw_upper_xbinedge.resize(nEvents, -1);
+  fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
+  fdobj->mode.resize(nEvents, &fdobj->Unity);
+  fdobj->nxsec_norm_pointers.resize(nEvents);
+  fdobj->xsec_norm_pointers.resize(nEvents);
+  fdobj->xsec_norms_bins.resize(nEvents);
+  fdobj->xsec_w.resize(nEvents, 1.0);
+  fdobj->isNC = new bool[nEvents];
+  fdobj->nxsec_spline_pointers.resize(nEvents);
+  fdobj->xsec_spline_pointers.resize(nEvents);
+  fdobj->ntotal_weight_pointers.resize(nEvents);
+  fdobj->total_weight_pointers.resize(nEvents);
+  fdobj->Target.resize(nEvents, 0);
+#ifdef _LOW_MEMORY_STRUCTS_
+  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity_F);
+#else
+  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity); 
+#endif
+  fdobj->SampleDetID = -1;
 
-    fdobj->x_var[iEvent] = &fdobj->Unity;
-    fdobj->y_var[iEvent] = &fdobj->Unity;
+  for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
+    fdobj->isNC[iEvent] = false;
   }
 
+  return;
 }
 
 void samplePDFFDBase::InitialiseSplineObject() {
@@ -1604,40 +1582,41 @@ void samplePDFFDBase::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  splineFile->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
-  splineFile->PrintArrayDimension();
-  splineFile->CountNumberOfLoadedSplines(false, 1);
-  splineFile->TransferToMonolith();
-  //splineFile->cleanUpMemory();
+  SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
+  SplineHandler->PrintArrayDimension();
+  SplineHandler->CountNumberOfLoadedSplines(false, 1);
+  SplineHandler->TransferToMonolith();
 
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
 
   fillSplineBins();
+
+  SplineHandler->cleanUpMemory();
 }
 
 TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
+
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< std::vector<double> > tmp_Selection = Selection;
-
   std::vector< std::vector<double> > SelectionVecToApply;
 
   //DB Add all the predefined selections to the selection vector which will be applied
-  for (int iSelec=0;iSelec<Selection.size();iSelec++) {
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
     SelectionVecToApply.emplace_back(Selection[iSelec]);
   }
 
   //DB Add all requested cuts from the arguement to the selection vector which will be applied
-  for (int iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
     SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
 
   //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
-  for (int iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
+  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
     if (SelectionVecToApply[iSelec].size()!=3) {
       MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1653,9 +1632,7 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
     _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
   } else {
     std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
-    double xbin_edges[xBinEdges.size()];
-    for (unsigned int i=0;i<xBinEdges.size();i++) {xbin_edges[i] = xBinEdges[i];}
-    _h1DVar = new TH1D("", "", xBinEdges.size()-1, xbin_edges);
+    _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
 
   //DB Loop over all events
@@ -1663,6 +1640,9 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
     for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
       if (IsEventSelected(iSample,iEvent)) {
 	double Weight = GetEventWeight(iSample,iEvent);
+	if (WeightStyle==1) {
+	  Weight = 1.;
+	}
 	double Var = ReturnKinematicParameter(ProjectionVar_Int,iSample,iEvent);
 	_h1DVar->Fill(Var,Weight);
       }

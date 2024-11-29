@@ -121,9 +121,13 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
 }
 
 #ifdef DEBUG_PCA
+
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 // ********************************************
 //KS: Let's dump all useful matrices to properly validate PCA
 void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar) {
+
 // ********************************************
   (void)submat;//This is used if DEBUG_PCA==2, this hack is to avoid compiler warnings
   TFile *PCA_Debug = new TFile("Debug_PCA.root", "RECREATE");
@@ -133,9 +137,9 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   //KS: If we have more than 200 plot becomes unreadable :(
   if(NumPar > 200) PlotText = false;
 
-  TH1D* heigen_values = new TH1D("eigen_values", "Eigen Values", (int)eigen_values.GetNrows(), 0.0, (int)eigen_values.GetNrows());
-  TH1D* heigen_cumulative = new TH1D("heigen_cumulative", "heigen_cumulative", (int)eigen_values.GetNrows(), 0.0, (int)eigen_values.GetNrows());
-  TH1D* heigen_frac = new TH1D("heigen_fractional", "heigen_fractional", (int)eigen_values.GetNrows(), 0.0, (int)eigen_values.GetNrows());
+  TH1D* heigen_values = new TH1D("eigen_values", "Eigen Values", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  TH1D* heigen_cumulative = new TH1D("heigen_cumulative", "heigen_cumulative", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  TH1D* heigen_frac = new TH1D("heigen_fractional", "heigen_fractional", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
   heigen_values->GetXaxis()->SetTitle("Eigen Vector");
   heigen_values->GetYaxis()->SetTitle("Eigen Value");
 

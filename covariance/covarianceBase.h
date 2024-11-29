@@ -7,10 +7,8 @@
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
 
-#ifndef _LARGE_LOGL_
 /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
-#define _LARGE_LOGL_ 1234567890.0
-#endif
+constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -26,7 +24,7 @@ class covarianceBase {
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
   /// @param file Path to matrix root file
-  covarianceBase(std::string name, std::string file);
+  covarianceBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
 
   /// @brief Destructor
   virtual ~covarianceBase();
@@ -98,7 +96,7 @@ class covarianceBase {
   /// @brief Check if parameters were proposed outside physical boundary
   virtual int CheckBounds();
   /// @brief Calc penalty term based on inverted covariance matrix
-  double CalcLikelihood();
+  double CalcLikelihood() _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
 
@@ -274,17 +272,18 @@ class covarianceBase {
   /// @param pars vector with new values of PCA params
   inline void setParameters_PCA(const std::vector<double> &pars) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    if (pars.size() != size_t(_fNumParPCA)) {
+    if (int(pars.size()) != _fNumParPCA) {
       MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    unsigned int parsSize = pars.size();
-    for (unsigned int i = 0; i < parsSize; i++) {
+    int parsSize = int(pars.size());
+    for (int i = 0; i < parsSize; i++) {
       fParProp_PCA(i) = pars[i];
     }
     //KS: Transfer to normal base
     TransferToParam();
   }
+
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   inline int getNpars() {
     if (pca) return _fNumParPCA;
@@ -302,7 +301,7 @@ class covarianceBase {
   /// @brief Generate a new proposed state
   virtual void proposeStep();
   /// @brief Accepted this step
-  void acceptStep();
+  void acceptStep() _noexcept_;
 
   /// @brief fix parameters at prior values
   void toggleFixAllParameters();
@@ -335,13 +334,13 @@ class covarianceBase {
   /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
   /// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
   /// @param n this is size of matrix and vector, we assume matrix is symmetric
-  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n);
+  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const;
   /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
-  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i);
+  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const;
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
- protected:
+protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
   /// @brief Initialisation of the class using config
@@ -354,9 +353,9 @@ class covarianceBase {
   void ReserveMemory(const int size);
 
   /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
-  void randomize();
+  void randomize() _noexcept_;
   /// @brief Use Cholesky throw matrix for better step proposal
-  void CorrelateSteps();
+  void CorrelateSteps() _noexcept_;
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   /// @param cov Matrix which we evaluate Positive Definitiveness
@@ -395,7 +394,7 @@ class covarianceBase {
   double **InvertCovMatrix;
     
   /// KS: Set Random numbers for each thread so each thread has different seed
-  TRandom3 **random_number;
+  std::vector<std::unique_ptr<TRandom3>> random_number;
 
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
@@ -405,7 +404,7 @@ class covarianceBase {
   double _fGlobalStepScale;
 
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
-  unsigned int PrintLength;
+  int PrintLength;
 
   /// ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;

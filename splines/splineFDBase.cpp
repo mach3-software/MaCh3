@@ -2,12 +2,15 @@
 #include <memory>
 #include "samplePDF/Structs.h"
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_)
               : SplineBase() {
 //****************************************
   if (!xsec_) {
-    MACH3LOG_ERROR("Trying to create splineSKBase with uninitialised covariance object");
+    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
@@ -56,7 +59,7 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  Dimensions.push_back(SplineVarNames.size());
+  Dimensions.push_back(int(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
   DetIDs.push_back(DetID);
 
@@ -88,7 +91,7 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
 
   MACH3LOG_INFO("SplineModeVecs is of size {}", SplineModeVecs.size());
 
-  int nOscChan = OscChanFileNames.size();
+  int nOscChan = int(OscChanFileNames.size());
   nOscChans.push_back(nOscChan);
 
   PrintSampleDetails(SampleName);
@@ -132,8 +135,8 @@ void splineFDBase::TransferToMonolith()
   weightvec_Monolith.resize(MonolithSize);
   isflatarray = new bool[MonolithSize];
   
-  xcoeff_arr = new _float_[CoeffIndex];
-  manycoeff_arr = new _float_[CoeffIndex*4];
+  xcoeff_arr = new M3::float_t[CoeffIndex];
+  manycoeff_arr = new M3::float_t[CoeffIndex*4];
 
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over sample
@@ -180,28 +183,18 @@ void splineFDBase::TransferToMonolith()
                   splineKnots=splinevec_Monolith[splineindex]->GetNp();
 
                   //Now to fill up our coefficient arrayss
-                  _float_* tmpXCoeffArr = new _float_[splineKnots];
-                  _float_* tmpManyCoeffArr = new _float_[splineKnots*4];
+                  M3::float_t* tmpXCoeffArr = new M3::float_t[splineKnots];
+                  M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*4];
 
                   int iCoeff=coeffindexvec[splineindex];
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
 
                   for(int i = 0; i < splineKnots; i++){
 
-                    if(tmpXCoeffArr[i]==-999){
-                      MACH3LOG_ERROR("looks like we've got a bad X, index = {}", i);
-                      throw MaCh3Exception(__FILE__ , __LINE__ );
-                    }
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
-                      if(tmpManyCoeffArr[i*4+j]==-999){
-                        MACH3LOG_ERROR("Bad ybcd, index: {}, {}", i, j);
-                        MACH3LOG_ERROR("Param Values: {}, {}, {}, {}",
-                                      tmpManyCoeffArr[i*4], tmpManyCoeffArr[i*4+1], tmpManyCoeffArr[i*4+2], tmpManyCoeffArr[i*4+3]);
-                        throw MaCh3Exception(__FILE__ , __LINE__ );
-                      }
-                    manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+					  manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
                   delete[] tmpXCoeffArr;
@@ -250,70 +243,70 @@ void splineFDBase::FindSplineSegment()
   #pragma omp parallel //for schedule(dynamic)
   #endif
   for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++)
-  {
-    int nPoints = UniqueSystNKnots[iSyst];
-    std::vector<_float_> xArray = UniqueSystXPts[iSyst];
+    {
+      int nPoints = UniqueSystNKnots[iSyst];
+      std::vector<M3::float_t> xArray = UniqueSystXPts[iSyst];
 
-    // Get the variation for this reconfigure for the ith parameter
-    int GlobalIndex = UniqueSystIndices[iSyst];
+      // Get the variation for this reconfigure for the ith parameter
+      int GlobalIndex = UniqueSystIndices[iSyst];
 
-    _float_ xvar=_float_(xsec->getParProp(GlobalIndex));
+      M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
 
-    xVarArray[iSyst]=xvar;
-    
-    _int_ segment = 0;
-    _int_ kHigh = nPoints - 1;
+      xVarArray[iSyst]=xvar;
 
-    //KS: We expect new segment is very close to previous
-    const _int_ PreviousSegment = UniqueSystCurrSegment[iSyst];
-    //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-    if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
-    // If the variation is below the lowest saved spline point
-	  else if (xvar <= xArray[0]) {
-	  segment = 0;
-	  // If the variation is above the highest saved spline point
-	} else if (xvar >= xArray[nPoints-1]) {
-	  //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
-	  segment = kHigh;
-	  //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-	} else {
-      // The top point we've got
-      _int_ kHalf = 0;
-      // While there is still a difference in the points (we haven't yet found the segment)
-      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-      while (kHigh - segment > 1) {
-        // Increment the half-step
-        kHalf = (segment + kHigh)/2;
-        // If our variation is above the kHalf, set the segment to kHalf
-        if (xvar > xArray[kHalf]) {
-          segment = kHalf;
-          // Else move kHigh down
-        } else {
-          kHigh = kHalf;
-        }
-      } // End the while: we've now done our binary search
-    } // End the else: we've now found our point
+      M3::int_t segment = 0;
+      M3::int_t kHigh = M3::int_t(nPoints - 1);
 
-    if (segment >= nPoints-1 && nPoints > 1){segment = nPoints-2;}
-    UniqueSystCurrSegment[iSyst] = segment; 
-      
-//#ifdef DEBUG
-//    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
-//      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
-//      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
-//      std::cerr << "Spline: "<< i << std::endl;
-//
-//      std::cerr << "Found segment   = " << segment << std::endl;
-//      std::cerr << "Doing variation = " << xvar << std::endl;
-//      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
-//      for (__int__ j = 0; j < SplineInfoArray[j].nPts; ++j) {
-//        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
-//      }
-//      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-//      throw;
-//    }
-//#endif
-  } //end loop over params
+      //KS: We expect new segment is very close to previous
+      const M3::int_t PreviousSegment = M3::int_t(UniqueSystCurrSegment[iSyst]);
+      //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
+      if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
+      // If the variation is below the lowest saved spline point
+    else if (xvar <= xArray[0]) {
+        segment = 0;
+        // If the variation is above the highest saved spline point
+      } else if (xvar >= xArray[nPoints-1]) {
+        //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
+        segment = kHigh;
+        //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
+      } else {
+        // The top point we've got
+        M3::int_t kHalf = 0;
+        // While there is still a difference in the points (we haven't yet found the segment)
+        // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
+        while (kHigh - segment > 1) {
+          // Increment the half-step
+          kHalf = M3::int_t((segment + kHigh)/2);
+          // If our variation is above the kHalf, set the segment to kHalf
+          if (xvar > xArray[kHalf]) {
+            segment = kHalf;
+            // Else move kHigh down
+          } else {
+            kHigh = kHalf;
+          }
+        } // End the while: we've now done our binary search
+      } // End the else: we've now found our point
+
+      if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
+      UniqueSystCurrSegment[iSyst] = segment; 
+
+      //#ifdef DEBUG
+      //    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
+      //      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
+      //      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
+      //      std::cerr << "Spline: "<< i << std::endl;
+      //
+      //      std::cerr << "Found segment   = " << segment << std::endl;
+      //      std::cerr << "Doing variation = " << xvar << std::endl;
+      //      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
+      //      for (_M3::int_t_ j = 0; j < SplineInfoArray[j].nPts; ++j) {
+      //        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
+      //      }
+      //      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+      //      throw;
+      //    }
+      //#endif
+    } //end loop over params
 }
 
 //****************************************
@@ -327,25 +320,30 @@ void splineFDBase::CalcSplineWeights()
   {
 
     int iSpline = uniquecoeffindices[iCoeff];
-    short int uniqueIndex=uniquesplinevec_Monolith[iSpline];
-    short int currentsegment=UniqueSystCurrSegment[uniqueIndex];
+    short int uniqueIndex=short(uniquesplinevec_Monolith[iSpline]);
+    short int currentsegment=short(UniqueSystCurrSegment[uniqueIndex]);
 
     int segCoeff = coeffindexvec[iSpline]+currentsegment;
 
     // These are what we can extract from the TSpline3
-    _float_ x = xcoeff_arr[segCoeff];
-    _float_ y = manycoeff_arr[(segCoeff)*4+kCoeffY];
-    _float_ b = manycoeff_arr[(segCoeff)*4+kCoeffB];
-    _float_ c = manycoeff_arr[(segCoeff)*4+kCoeffC];
-    _float_ d = manycoeff_arr[(segCoeff)*4+kCoeffD];
+    M3::float_t x = xcoeff_arr[segCoeff];
+    M3::float_t y = manycoeff_arr[(segCoeff)*4+kCoeffY];
+    M3::float_t b = manycoeff_arr[(segCoeff)*4+kCoeffB];
+    M3::float_t c = manycoeff_arr[(segCoeff)*4+kCoeffC];
+    M3::float_t d = manycoeff_arr[(segCoeff)*4+kCoeffD];
 
     // Get the variation for this reconfigure for the ith parameter
-    _float_ xvar = xVarArray[uniqueIndex];
+    M3::float_t xvar = xVarArray[uniqueIndex];
     // The Delta(x)
-    _float_ dx = xvar - x;
+    M3::float_t dx = xvar - x;
 
     //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
-    _float_ weight = fmaf(dx, fmaf(dx, fmaf(dx, d, c), b), y);
+    M3::float_t weight = 0;
+#ifdef _LOW_MEMORY_STRUCTS_
+      weight = std::fmaf(dx, std::fmaf(dx, std::fmaf(dx, d, c), b), y);
+#else
+      weight = std::fma(dx, std::fma(dx, std::fma(dx, d, c), b), y);
+#endif
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
 
 
@@ -353,7 +351,11 @@ void splineFDBase::CalcSplineWeights()
     //possible with the fmaf line above?
     if(weight<0){weight=0;}  //Stops is getting negative weights
 
-    weightvec_Monolith[iSpline]=double(weight);
+// LP - ignore the diagnostic here as it is only useless if M3::float_t = double
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+    weightvec_Monolith[iSpline] = double(weight);
+#pragma GCC diagnostic pop
   }
 }
 
@@ -373,7 +375,7 @@ void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
     for (int iSyst = 0; iSyst < nSplineSysts; iSyst++)
     { // Loop over systematics
       std::vector<std::vector<std::vector<std::vector<int >>>> indexvec_Mode;
-      int nModesInSyst = SplineModeVecs[iSample][iSyst].size();
+      int nModesInSyst = int(SplineModeVecs[iSample][iSyst].size());
       for (int iMode = 0; iMode < nModesInSyst; iMode++)
       { // Loop over modes
         std::vector<std::vector<std::vector<int >>> indexvec_Var1;
@@ -413,7 +415,6 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
   DummyEdges[0] = -1e15;
   DummyEdges[1] = 1e15;
   TAxis* DummyAxis = new TAxis(nDummyBins, DummyEdges);
-
   TH2F* Hist2D = nullptr;
   TH3F* Hist3D = nullptr;
 
@@ -433,18 +434,20 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   std::string TemplateName = "dev_tmp_0_0";
   TObject *Obj = File->Get(TemplateName.c_str());
+  //If you can't find dev_tmp_0_0 then this will cause a problem
   if (!Obj)
   {
     TemplateName = "dev_tmp.0.0";
     Obj = File->Get(TemplateName.c_str());
     if (!Obj)
     {
-      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning will not be set!");
+      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning cannot be set!");
       MACH3LOG_ERROR("FileName: {}", FileName);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
 
+  //Now check if dev_tmp_0_0 is a TH2 i.e. specifying the dimensions of the splines is 2D
   if (Obj->IsA() == TH2F::Class())
   {
     isHist2D = true;
@@ -467,14 +470,15 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     if (Dimensions[iSample] != 2)
     {
       MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
-      throw MaCh3Exception(__FILE__, __LINE__);
     }
+      throw MaCh3Exception(__FILE__, __LINE__);
     //Hist2D = std::unique_ptr<TH2F>(File->Get<TH2F>("dev_tmp_0_0"));
     Hist2D = File->Get<TH2F>(TemplateName.c_str());
   }
 
   if (isHist3D)
   {
+    Hist3D = File->Get<TH3F>(("dev_tmp_0_0"));
 
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
@@ -503,8 +507,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis)
-  {
+  for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis) {
     PrintBinning(ReturnVec[iAxis]);
   }
 
@@ -669,13 +672,13 @@ void splineFDBase::PrepForReweight()
     }//Syst loop end
   }
   
-  nUniqueSysts = UniqueSystSplines.size();
+  nUniqueSysts = int(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
   UniqueSystNKnots.resize(nUniqueSysts);
   UniqueSystCurrSegment.resize(nUniqueSysts);
   UniqueSystXPts.resize(nUniqueSysts);
-  xVarArray=new _float_[nUniqueSysts];
+  xVarArray=new M3::float_t[nUniqueSysts];
 
   for (int iSpline = 0; iSpline < nUniqueSysts; iSpline++)
   {
@@ -683,14 +686,9 @@ void splineFDBase::PrepForReweight()
     UniqueSystXPts[iSpline].resize(UniqueSystNKnots[iSpline]);
     for (int iKnot = 0; iKnot < UniqueSystNKnots[iSpline]; iKnot++)
     {
-      _float_ xPoint = -999;
-      _float_ yPoint = -999;
+      M3::float_t xPoint;
+      M3::float_t yPoint;
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
-      if (xPoint == -999 || yPoint == -999)
-      {
-        MACH3LOG_ERROR("Something has gone wrong in the knot finding");
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
       UniqueSystXPts[iSpline][iKnot] = xPoint;
     }
 	//ETA - let this just be set as the first segment by default
@@ -699,8 +697,7 @@ void splineFDBase::PrepForReweight()
   }
   
 
-  std::cout << "nUniqueSysts:" << nUniqueSysts << " -----------------" << std::endl;
-  std::cout << std::endl;
+  MACH3LOG_INFO("nUniqueSysts: {}", nUniqueSysts);
 
   std::cout << std::setw(15) << "Spline Index"
             << " | " << std::setw(20) << "Syst Name"
@@ -754,8 +751,9 @@ void splineFDBase::PrepForReweight()
 
 //****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _float_* &manyArray){
+void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
 //****************************************
+
   // Initialise all arrays to 1.0
   int nPoints;
   //No point evaluating a flat spline
@@ -770,29 +768,24 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, _float_* &xArray, _fl
 
   for(int i=0; i<nPoints; i++){
     // Spline coefficients to be
-    _float_ x = -999.99;
-    _float_ y = -999.99;
-    _float_ b = -999.99;
-    _float_ c = -999.99;
-    _float_ d = -999.99;
+	// M3::float_t type is defined by the LOW_MEMORY_STRUCTS compiler flag
+	// so M3::float_t can be double or float depending on this
+    M3::float_t x = M3::float_t(-999.99);
+    M3::float_t y = M3::float_t(-999.99);
+    M3::float_t b = M3::float_t(-999.99);
+    M3::float_t c = M3::float_t(-999.99);
+    M3::float_t d = M3::float_t(-999.99);
     splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
-    //Let's save some memory and store them as floats! (It's a surprise tool that will help with GPU later)
-    xArray[i]=_float_(x);
 
-    //Might as well copy ND here and 
-    xArray[i] = _float_(x);
-    manyArray[i*4] = _float_(y); // 4 because manyArray stores y,b,c,d
-    manyArray[i*4+1] = _float_(b);
-    manyArray[i*4+2] = _float_(c);
-    manyArray[i*4+3] = _float_(d);
-    
-    if((xArray[i] == -999) | (manyArray[i*4] == -999) | (manyArray[i*4+1] == -999) | (manyArray[i*4+2] == -999) | (manyArray[i*4+3] == -999)){
-      MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
-      MACH3LOG_ERROR("pre cast to _float_ (x, y, b, c, d) = {}, {}, {}, {}, {}",x, y, b, c, d);
-      MACH3LOG_ERROR("post cast to float (x, y, b, c, d) = {}, {}, {}, {}, {}",xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*4+3]);	    
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+	// Store the coefficients for each knot contiguously in memory
+	// 4 because manyArray stores y,b,c,d
+    xArray[i] = x;
+    manyArray[i*4] = y; 
+    manyArray[i*4+1] = b;
+    manyArray[i*4+2] = c;
+    manyArray[i*4+3] = d;    
   }
+
   //We now clean up the splines!
   delete splinevec_Monolith[splineindex];
   splinevec_Monolith[splineindex] = nullptr;
@@ -850,12 +843,12 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
-  int nOscChannels = indexvec[iSample].size();
+  int nOscChannels = int(indexvec[iSample].size());
   MACH3LOG_INFO("Sample {} has {} oscillation channels", iSample, nOscChannels);	
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
-    int nSysts = indexvec[iSample][iOscChan].size();
+    int nSysts = int(indexvec[iSample][iOscChan].size());
     MACH3LOG_INFO("Oscillation channel {} has {} systematics", iOscChan, nSysts);	  
   }
 }
@@ -921,43 +914,43 @@ bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int 
   int iSample=getSampleIndex(SampleName);
   bool isValid = true;
 
-  if (iSample < 0 || iSample >= (int)indexvec.size())
+  if (iSample < 0 || iSample >= int(indexvec.size()))
   {
     MACH3LOG_ERROR("Sample index is invalid! 0 <= Index < {} ", indexvec.size());
     isValid = false;
   }
 
-  if (iOscChan < 0 || iOscChan >= (int)indexvec[iSample].size())
+  if (iOscChan < 0 || iOscChan >= int(indexvec[iSample].size()))
   {
     MACH3LOG_ERROR("OscChan index is invalid! 0 <= Index < {} ", indexvec[iSample].size());
     isValid = false;
   }
 
-  if (iSyst < 0 || iSyst >= (int)indexvec[iSample][iOscChan].size())
+  if (iSyst < 0 || iSyst >= int(indexvec[iSample][iOscChan].size()))
   {
     MACH3LOG_ERROR("Syst index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan].size());
     isValid = false;
   }
 
-  if (iMode < 0 || iMode >= (int)indexvec[iSample][iOscChan][iSyst].size())
+  if (iMode < 0 || iMode >= int(indexvec[iSample][iOscChan][iSyst].size()))
   {
     MACH3LOG_ERROR("Mode index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst].size());
     isValid = false;
   }
 
-  if (iVar1 < 0 || iVar1 >= (int)indexvec[iSample][iOscChan][iSyst][iMode].size())
+  if (iVar1 < 0 || iVar1 >= int(indexvec[iSample][iOscChan][iSyst][iMode].size()))
   {
     MACH3LOG_ERROR("Var1 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode].size());	  
     isValid = false;
   }
 
-  if (iVar2 < 0 || iVar2 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size())
+  if (iVar2 < 0 || iVar2 >= int(indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size()))
   {
     MACH3LOG_ERROR("Var2 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size());
     isValid = false;
   }
 
-  if (iVar3 < 0 || iVar3 >= (int)indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size())
+  if (iVar3 < 0 || iVar3 >= int(indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size()))
   {
     MACH3LOG_ERROR("Var3 index is invalid! 0 <= Index < {} ", indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size());
     isValid = false;

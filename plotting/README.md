@@ -86,3 +86,6 @@ options:
     -o the name of the output pdf
 
     -d a string specifying additional drawing options to pass to the histogram draw calls, e.g. `-d "C"` will plot smooth curves through the histogram bins. See https://root.cern/doc/master/classTHistPainter.html#HP01a for possible options.
+
+
+**MatrixPlotter** - As input you need output from `ProcessMCMC`, keep in mind you need to run it with `PlotCorr`. The executable allows to plot submatrices and whatever combination of parameters you like.
