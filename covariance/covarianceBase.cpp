@@ -1263,23 +1263,6 @@ void covarianceBase::updateAdaptiveCovariance(){
         std::cout << (*AdaptiveHandler.adaptive_covariance)(i, i) << " ";
     }
     std::cout << std::endl;
-    std::string total_steps_str = std::to_string(AdaptiveHandler.total_steps);
-    std::string outFileName = "adacov.root";
-    TFile* outFile = new TFile(outFileName.c_str(), "UPDATE");
-    if(outFile->IsZombie()){
-      MACH3LOG_ERROR("Couldn't find {}", outFileName);
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-    TVectorD* outMeanVec = new TVectorD((int) AdaptiveHandler.par_means.size());
-    for(int i = 0; i < (int)AdaptiveHandler.par_means.size(); i++){
-      (*outMeanVec)(i) = AdaptiveHandler.par_means[i];
-    }
-    outFile->cd();
-    AdaptiveHandler.adaptive_covariance->Write((total_steps_str+std::string ("_postfit_matrix")).c_str());
-    outMeanVec->Write((total_steps_str+std::string ("_mean_vec")).c_str());
-    outFile->Close();
-    delete outMeanVec;
-    delete outFile;
     std::cout << "===============================" << std::endl;
     #endif
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());

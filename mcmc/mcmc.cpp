@@ -137,6 +137,29 @@ void mcmc::ProposeStep() {
     // Could throw the initial value here to do MCMC stability studies
     // Propose the steps for the systematics
     systematics[s]->proposeStep();
+    if (systematics[s]->getUseAdaptive()) {
+      adaptive_mcmc::AdaptiveMCMCHandler *AdaptiveHandler = systematics[s]->getAdaptiveHandler();
+      if (AdaptiveHandler->UpdateMatrixAdapt()) {
+        // HH: Save the adaptive throw matrix and mean vector
+        AdaptiveFolder->cd();
+        std::string total_steps_str = std::to_string(AdaptiveHandler->total_steps);
+        std::string syst_name_str = systematics[s]->getName();
+        TVectorD* outMeanVec = new TVectorD((int) AdaptiveHandler->par_means.size());
+        for(int i = 0; i < (int)AdaptiveHandler->par_means.size(); i++){
+          (*outMeanVec)(i) = AdaptiveHandler->par_means[i];
+        }
+        AdaptiveHandler->adaptive_covariance->Write((total_steps_str+'_'+syst_name_str+std::string ("_throw_matrix")).c_str());
+        outMeanVec->Write((total_steps_str+'_'+syst_name_str+std::string ("_mean_vec")).c_str());
+        delete outMeanVec;
+        std::cout << "Saving adaptive throw matrix at step " << step << " for systematic " << systematics[s]->getName() << std::endl;
+        TMatrixDSym *throwMatrix = systematics[s]->getThrowMatrix();
+        for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
+            std::cout << (*throwMatrix)(i, i) << " ";
+        }
+        std::cout << std::endl;
+      }
+      
+    }
 
     // Get the likelihood from the systematics
     syst_llh[s] = systematics[s]->GetLikelihood();

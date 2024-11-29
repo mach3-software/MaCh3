@@ -341,6 +341,15 @@ class covarianceBase {
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
+
+  // HH: Getter for AdaptiveHandler
+  /// @brief Get pointer for AdaptiveHandler
+  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() { return &AdaptiveHandler; }
+
+  // HH: Getter for use_adaptive
+  /// @brief Get bool for whether we are using adaptive MCMC
+  inline bool getUseAdaptive() { return use_adaptive; }
+
  protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
