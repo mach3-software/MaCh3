@@ -67,6 +67,7 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
+
   if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1385,6 +1386,7 @@ void samplePDFFDBase::SetupNuOscillator() {
         int InitFlav = _BAD_INT_;
         int FinalFlav = _BAD_INT_;
 
+<<<<<<< HEAD
         if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNue) {
           InitFlav = NuOscillator::kElectron;
         } else if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNumu) {
@@ -1402,6 +1404,24 @@ void samplePDFFDBase::SetupNuOscillator() {
         }
 
 
+=======
+        if (std::abs(MCSamples[iSample].nutype) == 1) {
+          InitFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].nutype) == 2) {
+          InitFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].nutype) == 3) {
+          InitFlav = NuOscillator::kTau;
+        }
+
+        if (std::abs(MCSamples[iSample].oscnutype) == 1) {
+          FinalFlav = NuOscillator::kElectron;
+        } else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
+          FinalFlav = NuOscillator::kMuon;
+        } else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
+          FinalFlav = NuOscillator::kTau;
+        }
+
+>>>>>>> 192e77b0b3a64765d734488e1a4c3345b37a2ddb
         if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
           MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
           MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
@@ -1439,7 +1459,6 @@ double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
     //std::cout << "Weight " << iParam << " is " << *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
   }
-  //std::cout << "~~~~~~~" << std::endl;
   
   return totalweight;
 }
