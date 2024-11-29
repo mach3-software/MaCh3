@@ -67,8 +67,6 @@ int nBins;
 TCanvas *canv;
 
 std::string SaveName;
-TPad *p1;
-TPad *p2;
 
 TPad *p3;
 TPad *p4;
@@ -117,12 +115,12 @@ void PrettifyTitles(TH2D *Hist) {
 void ReadSettings(std::shared_ptr<TFile> File1)
 {
   MACH3LOG_DEBUG("Reading settings for file {}", File1->GetName());
+  #ifdef DEBUG
   File1->ls();
+  #endif
   TTree *Settings = (File1->Get<TTree>("Settings"));
   MACH3LOG_DEBUG("Got settings tree");
   Settings->Print();
-
-  std::cout << CrossSectionParameters << std::endl;
 
   Settings->SetBranchAddress("CrossSectionParameters", &CrossSectionParameters);
   MACH3LOG_DEBUG("XSec params: {}", CrossSectionParameters);
@@ -216,7 +214,7 @@ inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
     return Ratio;
 }
 
-inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
+inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<TH1D*>& PostfitVec, TPad *mainPad, TPad *ratioPad) {
   // Draw!
   plotCanv->cd();
   mainPad->Draw();
@@ -333,7 +331,7 @@ void MakeXsecPlots()
       TH1D *blockHist_postfit = new TH1D((blockName + man->getFileName(fileId)).c_str(),
                                          blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams));
 
-      // loop throught all the parameters in this block and set the contents in the blocks TH1
+      // loop through all the parameters in this block and set the contents in the blocks TH1
       for(int localBin=0; localBin < nParams; localBin ++){
         // the "local" bin is the params index within the group of parameters
         std::string paramName = blockContents[localBin];
@@ -350,12 +348,30 @@ void MakeXsecPlots()
     PrettifyTitles(blockHist_prefit);
 
     DrawPlots(canv, blockHist_prefit, blockHist_postfit_Vec, p3, p4);
+    delete blockHist_prefit;
+    for (auto hist : blockHist_postfit_Vec) {
+      delete hist;
+    }
     blockHist_postfit_Vec.clear();
-   }
+  }
 }
 
 void MakeFluxPlots()
 {
+  // these for non named params where we dont need as much space
+  TPad* p1 = new TPad("p1", "p1", 0.0, 0.3, 1.0, 1.0);
+  TPad* p2 = new TPad("p2", "p2", 0.0, 0.0, 1.0, 0.3);
+  p1->SetLeftMargin(canv->GetLeftMargin());
+  p1->SetRightMargin(canv->GetRightMargin());
+  p1->SetTopMargin(canv->GetTopMargin());
+  p1->SetBottomMargin(0);
+  p1->SetGrid();
+  p2->SetLeftMargin(canv->GetLeftMargin());
+  p2->SetRightMargin(canv->GetRightMargin());
+  p2->SetTopMargin(0);
+  p2->SetBottomMargin(0.25);
+  p2->SetGrid();
+
   p1->SetLogx(true);
   p2->SetLogx(true);
   
@@ -423,17 +439,37 @@ void MakeFluxPlots()
     blockHist_prefit->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]); 
 
     DrawPlots(canv, blockHist_prefit, blockHist_postfit_Vec, p1, p2);
+    delete blockHist_prefit;
+    for (auto hist : blockHist_postfit_Vec) {
+      delete hist;
+    }
     blockHist_postfit_Vec.clear();
   }
 
   canv->cd();
   canv->SetLogx(false);
   canv->SetBottomMargin(canv->GetBottomMargin()*1.7);
+  delete p1;
+  delete p2;
 }
 
 void MakeNDDetPlots()
 {
+  MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
+
+  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
+  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
+  pTop->SetLeftMargin(canv->GetLeftMargin());
+  pTop->SetRightMargin(canv->GetRightMargin());
+  pTop->SetTopMargin(canv->GetTopMargin());
+  pTop->SetBottomMargin(0);
+  pTop->SetGrid();
+  pDown->SetLeftMargin(canv->GetLeftMargin());
+  pDown->SetRightMargin(canv->GetRightMargin());
+  pDown->SetTopMargin(0);
+  pDown->SetBottomMargin(0.75);
+  pDown->SetGrid();
 
   int NDbinCounter = NDParametersStartingPos;
   int Start = NDbinCounter;
@@ -477,15 +513,31 @@ void MakeNDDetPlots()
     
     Start += NDSamplesBins[i];
 
-    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, p3, p4);
+    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, pTop, pDown);
     canv->Update();
   }
+  delete pTop;
+  delete pDown;
 }
 
 void MakeFDDetPlots()
 {
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
   
+  // these for named parameters where we need a nice big gap at the bottom to fit the names
+  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
+  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
+  pTop->SetLeftMargin(canv->GetLeftMargin());
+  pTop->SetRightMargin(canv->GetRightMargin());
+  pTop->SetTopMargin(canv->GetTopMargin());
+  pTop->SetBottomMargin(0);
+  pTop->SetGrid();
+  pDown->SetLeftMargin(canv->GetLeftMargin());
+  pDown->SetRightMargin(canv->GetRightMargin());
+  pDown->SetTopMargin(0);
+  pDown->SetBottomMargin(0.75);
+  pDown->SetGrid();
+
   int FDbinCounter = FDParametersStartingPos;
   int Start = FDbinCounter;
   //KS: WARNING This is hardcoded
@@ -510,25 +562,42 @@ void MakeFDDetPlots()
     
     Start = FDParametersStartingPos + FDSamplesBins[i];
 
-    DrawPlots(canv, Prefit, PostfitHistVec, p3, p4);
+    DrawPlots(canv, Prefit, PostfitHistVec, pTop, pDown);
     canv->Update();
    }
+   delete pTop;
+   delete pDown;
 }
 
 void MakeOscPlots()
 {
+  // these for named parameters where we need a nice big gap at the bottom to fit the names
+  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
+  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
+  pTop->SetLeftMargin(canv->GetLeftMargin());
+  pTop->SetRightMargin(canv->GetRightMargin());
+  pTop->SetTopMargin(canv->GetTopMargin());
+  pTop->SetBottomMargin(0);
+  pTop->SetGrid();
+  pDown->SetLeftMargin(canv->GetLeftMargin());
+  pDown->SetRightMargin(canv->GetRightMargin());
+  pDown->SetTopMargin(0);
+  pDown->SetBottomMargin(0.75);
+  pDown->SetGrid();
+
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
   
   canv->cd();
-  Prefit->SetTitle("Oscilation Parameters");
+  Prefit->SetTitle("Oscillation Parameters");
   Prefit->GetXaxis()->SetRangeUser(OscParametersStartingPos, OscParametersStartingPos+OscParameters);
 
-    Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("oscParYRange_low"), man->getOption<double>("oscParYRange_high"));
+  Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("oscParYRange_low"), man->getOption<double>("oscParYRange_high"));
   Prefit->Draw("e2");
 
-  DrawPlots(canv, Prefit, PostfitHistVec, p3, p4);
+  DrawPlots(canv, Prefit, PostfitHistVec, pTop, pDown);
+  delete pTop;
+  delete pDown;
 }
-
 
 void MakeXsecRidgePlots()
 {  
@@ -648,7 +717,6 @@ void MakeXsecRidgePlots()
       ridgeCanv->cd();
       label->DrawLatexNDC(0.29, padBottom + 0.005, man->style().prettifyParamName(paramName).c_str());
       line->DrawLine(0.1, padBottom, 0.9, padBottom);
-
     }
 
     ridgeCanv->cd();
@@ -683,8 +751,10 @@ void MakeXsecRidgePlots()
 
     ridgeCanv->SaveAs("RidgePlots.pdf");
     delete ridgeCanv;
+    delete axisPlot;
   }
   blankCanv->SaveAs("RidgePlots.pdf]");
+  delete blankCanv;
 }
 
 void GetPostfitParamPlots()
@@ -708,20 +778,6 @@ void GetPostfitParamPlots()
   canv->SetRightMargin(0.04);
 
   canv->Print((SaveName+"[").c_str());
-
-  // these for non named params where we dont need as much space
-  p1 = new TPad("p1", "p1", 0.0, 0.3, 1.0, 1.0);
-  p2 = new TPad("p2", "p2", 0.0, 0.0, 1.0, 0.3);
-  p1->SetLeftMargin(canv->GetLeftMargin());
-  p1->SetRightMargin(canv->GetRightMargin());
-  p1->SetTopMargin(canv->GetTopMargin());
-  p1->SetBottomMargin(0);
-  p1->SetGrid();
-  p2->SetLeftMargin(canv->GetLeftMargin());
-  p2->SetRightMargin(canv->GetRightMargin());
-  p2->SetTopMargin(0);
-  p2->SetBottomMargin(0.25);
-  p2->SetGrid();
 
   // these for named parameters where we need a nice big gap at the botto to fit the names
   p3 = new TPad("p3", "p3", 0.0, 0.4, 1.0, 1.0);
@@ -765,7 +821,6 @@ void GetPostfitParamPlots()
     Hist->SetMarkerStyle(7);
     Hist->SetLineStyle(1+fileId);
     Hist->SetLineWidth(man->getOption<int>("plotLineWidth"));
-
     PostfitHistVec.push_back(Hist);
   }
 
@@ -779,7 +834,6 @@ void GetPostfitParamPlots()
   MakeFluxPlots();
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
-  MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
   if(NDParameters > 0) MakeNDDetPlots();
   
   //KS: Same as above but for FD parameters,
@@ -794,7 +848,6 @@ void GetPostfitParamPlots()
   delete canv;
   delete Prefit;
 }
-
 
 inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
 {
@@ -812,7 +865,7 @@ inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
   //KS: I am tempted to multithread this...
   for(int i = 0; i < nBins; ++i)
   {
-    //KS: We are extrcting value from three object each having different numbering scheme, I have checked carefully so this is correct please don't cahnge all these +1 +0.5 etc. it just work...
+    //KS: We are extracting value from three object each having different numbering scheme, I have checked carefully so this is correct please don't change all these +1 +0.5 etc. it just work...
     x[i] = i + 0.5;
     y[i] = PostHist->GetBinContent(i+1);
 
@@ -1065,12 +1118,15 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
 int main(int argc, char *argv[]) 
 {
   SetMaCh3LoggerFormat();
+  // Avoid Info in <TCanvas::Print>
+  gErrorIgnoreLevel = kWarning;
 
   man = new MaCh3Plotting::PlottingManager();
   man->parseInputs(argc, argv);
+  #ifdef DEBUG
   std::cout << std::endl << std::endl << "====================" << std::endl;
   man->input().getFile(0).file->ls();
-
+  #endif
   man->setExec("GetPostfitParamPlots");
 
   man->style().setPalette(man->getOption<std::string>("colorPalette"));
@@ -1101,9 +1157,9 @@ int main(int argc, char *argv[])
     std::string filename1 = argv[1];
     std::string filename2 = argv[2];
     std::string filename3 = argv[3];
-    //KS: Violin plot currently not supported by three file veriosn although it should be super easy to adapt
+    //KS: Violin plot currently not supported by three file version although it should be super easy to adapt
   }
-    
+
+  delete man;
   return 0;
 }
-
