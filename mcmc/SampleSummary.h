@@ -8,6 +8,15 @@
 #include "mcmc/StatisticalUtils.h"
 #include "mcmc/MCMCProcessor.h"
 
+namespace M3 {
+  /// @brief KS: Different Information Criterion tests mostly based Gelman paper
+  enum kInfCrit {
+    kBIC,      //!< Bayesian Information Criterion
+    kDIC,      //!< Deviance Information Criterion
+    kWAIC,     //!< Watanabe-Akaike information criterion
+    kInfCrits  //!< This only enumerates
+  };
+}
 // *******************
 /// @brief Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff \cite gelman1996posterior
 /// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
@@ -49,13 +58,25 @@ class SampleSummary {
     inline void PrepareOutput();
 
     /// @brief Helper functions to calculate likelihoods using TH2Poly, will modify MC hist tittle to include LLH
+    /// @param Data histogram with data distribution for a single sample
+    /// @param MC histogram with MC distribution for a single sample
+    /// @param W2 histogram with W2 distribution for a single sample
     inline void CalcLLH(TH2Poly * const & Data, TH2Poly * const & MC, TH2Poly * const & W2);
     /// @brief Helper functions to calculate likelihoods using TH1D, will modify MC hist tittle to include LLH
+    /// @param Data histogram with data distribution for a single sample
+    /// @param MC histogram with MC distribution for a single sample
+    /// @param W2 histogram with W2 distribution for a single sample
     inline void CalcLLH(TH1D * const & Data, TH1D * const & MC, TH1D * const & W2);
 
     /// @brief Helper functions to calculate likelihoods using TH2Poly
+    /// @param Data histogram with data distribution for a single sample
+    /// @param MC histogram with MC distribution for a single sample
+    /// @param W2 histogram with W2 distribution for a single sample
     inline double GetLLH(TH2Poly * const & Data, TH2Poly * const & MC, TH2Poly * const & W2);
     /// @brief Helper functions to calculate likelihoods using TH1D
+    /// @param Data histogram with data distribution for a single sample
+    /// @param MC histogram with MC distribution for a single sample
+    /// @param W2 histogram with W2 distribution for a single sample
     inline double GetLLH(TH1D * const & Data, TH1D * const & MC, TH1D * const & W2);
 
     /// @brief KS: In Barlow Beeston we have Beta Parameters which scale generated MC
@@ -106,14 +127,21 @@ class SampleSummary {
     inline void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist);
         
     /// @brief KS: Fill Violin histogram with entry from a toy
+    /// @param violin hist that will be filled
+    /// @param hist_1d refence hist from which we take entries to be filled
     inline void FastViolinFill(TH2D* violin, TH1D* hist_1d);
-    /// @brief Return 2 random numbers along axis x and y distributed according to the cell-contents
+    /// @brief KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on [link](https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e)
     inline int GetRandomPoly2(const TH2Poly* PolyHist);
 
     /// @brief Get the mode error from a TH1D
+    /// @param hpost hist from which we extract mode error
     inline double GetModeError(TH1D* hpost);
 
+    /// @brief Information Criterion
+    inline void StudyInformationCriterion(M3::kInfCrit Criterion);
+
     /// @brief Study Bayesian Information Criterion (BIC)
+    /// @cite Gelman2014
     inline void StudyBIC();
 
     /// @brief KS: Get the Deviance Information Criterion (DIC)
@@ -123,9 +151,11 @@ class SampleSummary {
 
     /// @brief KS: Get the Watanabe-Akaike information criterion (WAIC)
     /// @cite Gelman2014
+    /// @cite Hartig2024WAIC
     inline void StudyWAIC();
 
     /// @brief Helper to Normalise histograms
+    /// @param Histogram hist which we normalise
     inline void NormaliseTH2Poly(TH2Poly* Histogram);
 
     /// Random number generator
@@ -155,9 +185,9 @@ class SampleSummary {
     std::vector<std::string> SampleNames;
 
     /// The posterior predictive for the whole selection: this gets built after adding in the toys. Now an array of Th1ds, 1 for each poly bin, for each sample
-    std::vector<std::vector<TH1D*>> PosteriorHist;
+    std::vector<std::vector<std::unique_ptr<TH1D>>> PosteriorHist;
     /// The posterior predictive for the whole selection: this gets built after adding in the toys. Now an array of Th1ds, 1 for each poly bin, for each sample for W2
-    std::vector<std::vector<TH1D*>> w2Hist;
+    std::vector<std::vector<std::unique_ptr<TH1D>>> w2Hist;
 
     /// Posterior predictive but for X projection but as a violin plot
     std::vector<TH2D*> ViolinHists_ProjectX;
@@ -180,22 +210,22 @@ class SampleSummary {
     std::vector<TH2Poly*> W2ModeHist;
 
     /// The histogram containing the lnL for each throw
-    TH1D *lnLHist;
+    std::unique_ptr<TH1D> lnLHist;
     /// The lnLhist for the draw vs MC fluctuated
-    TH1D *lnLHist_drawfluc;
+    std::unique_ptr<TH1D> lnLHist_drawfluc;
     /// The lnLhist for the draw vs draw fluctuated
-    TH1D *lnLHist_drawflucdraw;
+    std::unique_ptr<TH1D> lnLHist_drawflucdraw;
     /// The lnLhist for the draw vs data
-    TH1D *lnLHist_drawdata;
+    std::unique_ptr<TH1D> lnLHist_drawdata;
     /// The 2D lnLhist, showing (draw vs data) and (draw vs fluct), anything above y=x axis is the p-value
-    TH2D *lnLDrawHist;
+    std::unique_ptr<TH2D> lnLDrawHist;
     /// The 2D lnLHist, showing (draw vs data) and (draw vs draw fluct), anything above y=x axis is the p-value
-    TH2D *lnLFlucHist;
+    std::unique_ptr<TH2D> lnLFlucHist;
 
     /// The 2D lnLhist, showing (draw vs data) and (draw vs fluct), using rate, anything above y=x axis is the p-value
-    TH2D *lnLDrawHistRate;
+    std::unique_ptr<TH2D> lnLDrawHistRate;
     /// The 2D lnLHist but for ProjectionX histogram (pmu), showing (draw vs data) and (draw vs draw fluct), anything above y=x axis is the p-value
-    TH2D *lnLFlucHist_ProjectX;
+    std::unique_ptr<TH2D> lnLFlucHist_ProjectX;
 
     /// The histogram containing the lnL (draw vs data) for each throw for each sample
     std::vector<TH1D*> lnLHist_Sample_DrawData;
@@ -228,7 +258,7 @@ class SampleSummary {
     std::unique_ptr<TH1D> RandomHist;
 
     /// Distribution of beta parameters in Barlow Beeston formalisms
-    std::vector<std::vector<TH1D*>> BetaHist;
+    std::vector<std::vector<std::unique_ptr<TH1D>>> BetaHist;
     /// Are we making Beta Histograms
     bool DoBetaParam;
 

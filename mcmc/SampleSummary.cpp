@@ -8,7 +8,6 @@
 // The constructor
 SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, samplePDFBase* const sample, const int nSteps) {
 // *******************
-
   MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD
   MACH3LOG_DEBUG("With OpenMP and {} threads", omp_get_max_threads());
@@ -75,36 +74,44 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
     
   //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
   // https://root.cern.ch/doc/master/classTH1.html#auto-bin
-  lnLHist = new TH1D("lnLHist_predpredfluc", "lnLHist_predpredfluc", 100, 1, -1);
+  lnLHist = std::make_unique<TH1D>("lnLHist_predpredfluc", "lnLHist_predpredfluc", 100, 1, -1);
+  lnLHist->SetDirectory(nullptr);
   lnLHist->GetXaxis()->SetTitle("-2LLH (Pred Fluc, Pred)");
   lnLHist->GetYaxis()->SetTitle("Counts");
 
-  lnLHist_drawdata = new TH1D("lnLHist_drawdata", "lnLHist_drawdata", 100, 1, -1);
+  lnLHist_drawdata = std::make_unique<TH1D>("lnLHist_drawdata", "lnLHist_drawdata", 100, 1, -1);
+  lnLHist_drawdata->SetDirectory(nullptr);
   lnLHist_drawdata->GetXaxis()->SetTitle("-2LLH (Data, Draw)");
   lnLHist_drawdata->GetYaxis()->SetTitle("Counts");
 
-  lnLHist_drawfluc = new TH1D("lnLHist_drawpredfluc", "lnLHist_drawpredfluc", 100, 1, -1);
+  lnLHist_drawfluc = std::make_unique<TH1D>("lnLHist_drawpredfluc", "lnLHist_drawpredfluc", 100, 1, -1);
+  lnLHist_drawfluc->SetDirectory(nullptr);
   lnLHist_drawfluc->GetXaxis()->SetTitle("-2LLH (Pred Fluc, Draw)");
   lnLHist_drawfluc->GetYaxis()->SetTitle("Counts");
 
-  lnLHist_drawflucdraw = new TH1D("lnLHist_drawflucdraw", "lnLHist_drawflucdraw", 100, 1, -1);
+  lnLHist_drawflucdraw = std::make_unique<TH1D>("lnLHist_drawflucdraw", "lnLHist_drawflucdraw", 100, 1, -1);
+  lnLHist_drawflucdraw->SetDirectory(nullptr);
   lnLHist_drawflucdraw->GetXaxis()->SetTitle("-2LLH (Draw Fluc, Draw)");
   lnLHist_drawflucdraw->GetYaxis()->SetTitle("Counts");
 
-  lnLDrawHist = new TH2D("lnLDrawHist", "lnLDrawHist", 50, 1, -1, 50, 1, -1);
+  lnLDrawHist = std::make_unique<TH2D>("lnLDrawHist", "lnLDrawHist", 50, 1, -1, 50, 1, -1);
+  lnLDrawHist->SetDirectory(nullptr);
   lnLDrawHist->GetXaxis()->SetTitle("-2LLH_{Pred Fluc, Draw}");
   lnLDrawHist->GetYaxis()->SetTitle("-2LLH_{Data, Draw}");
 
-  lnLFlucHist = new TH2D("lnLFlucHist", "lnLFlucHist", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist = std::make_unique<TH2D>("lnLFlucHist", "lnLFlucHist", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist->SetDirectory(nullptr);
   lnLFlucHist->GetXaxis()->SetTitle("-2LLH_{Draw Fluc, Draw}");
   lnLFlucHist->GetYaxis()->SetTitle("-2LLH_{Data, Draw}");
 
-  lnLDrawHistRate = new TH2D("lnLDrawHistRate", "lnLDrawHistRate", 50, 1, -1, 50, 1, -1);
+  lnLDrawHistRate = std::make_unique<TH2D>("lnLDrawHistRate", "lnLDrawHistRate", 50, 1, -1, 50, 1, -1);
+  lnLDrawHistRate->SetDirectory(nullptr);
   lnLDrawHistRate->GetXaxis()->SetTitle("-2LLH_{Pred Fluc, Draw}");
   lnLDrawHistRate->GetYaxis()->SetTitle("-2LLH_{Data, Draw}");
 
   //KS: This is silly as it assumes all samples uses same kinematics
-  lnLFlucHist_ProjectX = new TH2D("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist_ProjectX = std::make_unique<TH2D>("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist_ProjectX->SetDirectory(nullptr);
   lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SamplePDF->GetKinVarLabel(0, 0)).c_str());
   lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SamplePDF->GetKinVarLabel(0, 0)).c_str());
   
@@ -161,16 +168,7 @@ SampleSummary::~SampleSummary() {
   //ROOT is weird and once you write TFile claim ownership of histograms. Best is to first delete histograms and then close file
   Outputfile->Close();
   delete Outputfile;
-  
-  if(lnLHist != nullptr) delete lnLHist;
-  if(lnLHist_drawdata != nullptr) delete lnLHist_drawdata;
-  if(lnLHist_drawfluc != nullptr) delete lnLHist_drawfluc;
-  if(lnLHist_drawflucdraw != nullptr) delete lnLHist_drawflucdraw;
-  if(lnLDrawHist != nullptr) delete lnLDrawHist;
-  if(lnLFlucHist != nullptr) delete lnLFlucHist;
-  if(lnLDrawHistRate != nullptr) delete lnLDrawHistRate;
 
-  if(lnLFlucHist_ProjectX != nullptr) delete lnLFlucHist_ProjectX;
   if(DoByModePlots)
   {
     for (int i = 0; i < nSamples; ++i)
@@ -214,13 +212,6 @@ SampleSummary::~SampleSummary() {
     if(lnLHist_Sample_DrawData[i] != nullptr) delete lnLHist_Sample_DrawData[i];
     if(lnLHist_Sample_DrawflucDraw[i] != nullptr) delete lnLHist_Sample_DrawflucDraw[i];
     if(lnLHist_Sample_PredflucDraw[i] != nullptr) delete lnLHist_Sample_PredflucDraw[i];
-
-    for (int j = 1; j <= maxBins[i]; ++j)
-    {
-      if(PosteriorHist[i][j] != nullptr) delete PosteriorHist[i][j];
-      if(w2Hist[i][j] != nullptr) delete w2Hist[i][j];
-      if(DoBetaParam && BetaHist[i][j] != nullptr) delete BetaHist[i][j];
-    }
   }
 }
 
@@ -453,14 +444,15 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
         ss2 << "p_{#mu} (" << bin->GetXMin() << "-" << bin->GetXMax() << ")";
         ss2 << " cos#theta_{#mu} (" << bin->GetYMin() << "-" << bin->GetYMax() << ")";
 
-        PosteriorHist[SampleNum][i] = new TH1D(ss2.str().c_str(), ss2.str().c_str(),nXBins, 1, -1);
+        PosteriorHist[SampleNum][i] = std::make_unique<TH1D>(ss2.str().c_str(), ss2.str().c_str(),nXBins, 1, -1);
         PosteriorHist[SampleNum][i]->SetDirectory(nullptr);
-        w2Hist[SampleNum][i] = new TH1D(("w2_"+ss2.str()).c_str(), ("w2_"+ss2.str()).c_str(),nXBins, 1, -1);
+        w2Hist[SampleNum][i] = std::make_unique<TH1D>(("w2_"+ss2.str()).c_str(), ("w2_"+ss2.str()).c_str(),nXBins, 1, -1);
         w2Hist[SampleNum][i]->SetDirectory(nullptr);
         if(DoBetaParam)
         {
           std::string betaName = "#beta_param_";
-          BetaHist[SampleNum][i] = new TH1D((betaName+ss2.str()).c_str(), (betaName+ss2.str()).c_str(), 70, 1, -1);
+          BetaHist[SampleNum][i] = std::make_unique<TH1D>((betaName + ss2.str()).c_str(), (betaName + ss2.str()).c_str(), 70, 1, -1);
+          BetaHist[SampleNum][i]->SetDirectory(nullptr);
           BetaHist[SampleNum][i]->GetXaxis()->SetTitle("#beta parameter value");
           BetaHist[SampleNum][i]->GetYaxis()->SetTitle("Counts");
         }
@@ -693,16 +685,10 @@ void SampleSummary::Write() {
   timer.Start();
   MakePredictive();
   timer.Stop();
-  MACH3LOG_INFO("Made Prior/Posterior Predictive, it took {}s, now writing...", timer.RealTime());
+  MACH3LOG_INFO("Made Prior/Posterior Predictive, it took {:.2f}s, now writing...", timer.RealTime());
 
-  // Study Bayesian Information Criterion
-  StudyBIC();
-
-  // Study Deviance Information Criterion
-  StudyDIC();
-
-  // Study Watanabe-Akaike information criterion (WAIC)
-  StudyWAIC();
+  // Studying information criterion
+  StudyInformationCriterion(M3::kWAIC);
 
   OutputTree->Write();
 
@@ -893,7 +879,7 @@ void SampleSummary::Write() {
         Legend->SetLineColor(0);
         Legend->AddEntry(TempLineData.get(), Form("Data #mu=%.2f", DataHist[i]->GetBinContent(b)), "l");
         Legend->AddEntry(TempLine.get(), Form("Prior #mu=%.2f", NominalHist[i]->GetBinContent(b)), "l");
-        Legend->AddEntry(PosteriorHist[i][b], Form("Post, #mu=%.2f#pm%.2f", PosteriorHist[i][b]->GetMean(), PosteriorHist[i][b]->GetRMS()), "l");
+        Legend->AddEntry(PosteriorHist[i][b].get(), Form("Post, #mu=%.2f#pm%.2f", PosteriorHist[i][b]->GetMean(), PosteriorHist[i][b]->GetRMS()), "l");
         Legend->AddEntry(Fitter, Form("Gauss, #mu=%.2f#pm%.2f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
         std::string TempTitle = std::string(PosteriorHist[i][b]->GetName());
 
@@ -1019,8 +1005,8 @@ void SampleSummary::MakePredictive() {
     // Loop over each pmu cosmu bin
     for (int j = 1; j < maxBins[SampleNum]+1; ++j)
     {
-      TH1D *Projection = PosteriorHist[SampleNum][j];
-      TH1D *W2Projection = w2Hist[SampleNum][j];
+      TH1D *Projection = PosteriorHist[SampleNum][j].get();
+      TH1D *W2Projection = w2Hist[SampleNum][j].get();
 
       // Data content for the j,kth bin
       const double nData = DataHist[SampleNum]->GetBinContent(j);
@@ -1054,7 +1040,7 @@ void SampleSummary::MakePredictive() {
 
       if(DoBetaParam)
       {
-        TH1D *BetaTemp = BetaHist[SampleNum][j];
+        TH1D *BetaTemp = BetaHist[SampleNum][j].get();
         const double nBetaMean = BetaTemp->GetMean();
         const double nBetaMeanError = BetaTemp->GetRMS();
         //KS: Here we modify predictions by beta parameter from Barlow-Beeston
@@ -1137,7 +1123,7 @@ void SampleSummary::MakePredictive() {
 
   llh_total = llh_total_temp;
   // Now we have our posterior predictive histogram and it's LLH
-  MACH3LOG_INFO("Prior/Posterior predictive LLH mean (sample only) = {}", llh_total);
+  MACH3LOG_INFO("Prior/Posterior predictive LLH mean (sample only) = {:.2f}", llh_total);
   std::stringstream ss;
   ss << llh_total;
   lnLHist->SetTitle((std::string(lnLHist->GetTitle())+"_"+ss.str()).c_str());
@@ -1200,17 +1186,17 @@ void SampleSummary::MakeChi2Hists() {
     AveragePenalty += llh_penalty;
 
     // Make the Poisson fluctuated hist
-    TH2Poly **FluctHist = new TH2Poly*[nSamples];
+    std::vector<TH2Poly*> FluctHist(nSamples);
     // Also Poisson fluctuate the drawn MCMC hist
-    TH2Poly **FluctDrawHist = new TH2Poly*[nSamples];
+    std::vector<TH2Poly*> FluctDrawHist(nSamples);
     // Finally Poisson fluctuate the data histogram
-    TH2Poly **DataFlucHist = new TH2Poly*[nSamples];
+    std::vector<TH2Poly*> DataFlucHist(nSamples);
 
     // Finally Poisson fluctuate the data histogram
-    TH1D **FluctDrawHistProjectX = new TH1D*[nSamples];
-    TH1D **DrawHistProjectX = new TH1D*[nSamples];
-    TH1D **DrawHistProjectY = new TH1D*[nSamples];
-    TH1D **DrawW2HistProjectX = new TH1D*[nSamples];
+    std::vector<TH1D*> FluctDrawHistProjectX(nSamples);
+    std::vector<TH1D*> DrawHistProjectX(nSamples);
+    std::vector<TH1D*> DrawHistProjectY(nSamples);
+    std::vector<TH1D*> DrawW2HistProjectX(nSamples);
 
     //KS: We have to clone histograms here to avoid cloning in MP loop, we have to make sure binning matches, content doesn't have to
     for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
@@ -1378,13 +1364,6 @@ void SampleSummary::MakeChi2Hists() {
       delete DrawHistProjectY[SampleNum];
       delete DrawW2HistProjectX[SampleNum];
     }
-    delete[] FluctHist;
-    delete[] FluctDrawHist;
-    delete[] DataFlucHist;
-    delete[] FluctDrawHistProjectX;
-    delete[] DrawHistProjectX;
-    delete[] DrawHistProjectY;
-    delete[] DrawW2HistProjectX;
 
     total_llh_data_draw = total_llh_data_draw_temp;
     total_llh_drawfluc_draw = total_llh_drawfluc_draw_temp;
@@ -1463,15 +1442,15 @@ void SampleSummary::MakeChi2Hists() {
 void SampleSummary::MakeCutLLH() {
 // *******************
   Outputfile->cd();
-  MakeCutLLH1D(lnLHist);
-  MakeCutLLH1D(lnLHist_drawfluc);
-  MakeCutLLH1D(lnLHist_drawdata);
-  MakeCutLLH1D(lnLHist_drawflucdraw);
+  MakeCutLLH1D(lnLHist.get());
+  MakeCutLLH1D(lnLHist_drawfluc.get());
+  MakeCutLLH1D(lnLHist_drawdata.get());
+  MakeCutLLH1D(lnLHist_drawflucdraw.get());
   
-  MakeCutLLH2D(lnLDrawHist);
-  MakeCutLLH2D(lnLFlucHist);
-  MakeCutLLH2D(lnLDrawHistRate);
-  MakeCutLLH2D(lnLFlucHist_ProjectX);
+  MakeCutLLH2D(lnLDrawHist.get());
+  MakeCutLLH2D(lnLFlucHist.get());
+  MakeCutLLH2D(lnLDrawHistRate.get());
+  MakeCutLLH2D(lnLFlucHist_ProjectX.get());
 }
 
 // ****************
@@ -1507,10 +1486,8 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
   TH1D *TempHistogram = static_cast<TH1D*>(Histogram->Clone());
   TempHistogram->SetFillStyle(1001);
   TempHistogram->SetFillColor(kRed);
-  for (int i = 0; i < TempHistogram->GetNbinsX(); ++i) 
-  {
-    if (TempHistogram->GetBinCenter(i+1) < llh_reference) 
-    {
+  for (int i = 0; i < TempHistogram->GetNbinsX(); ++i) {
+    if (TempHistogram->GetBinCenter(i+1) < llh_reference) {
       TempHistogram->SetBinContent(i+1, 0.0);
     }
   }
@@ -1778,7 +1755,7 @@ void SampleSummary::PlotBetaParameters() {
       Legend->SetLineWidth(0);
       Legend->SetLineColor(0);
       Legend->AddEntry(TempLine.get(), Form("Prior #mu=%.4f, N_{data}=%.0f", BetaPrior, data), "l");
-      Legend->AddEntry(BetaHist[i][j], Form("Post, #mu=%.4f#pm%.4f", BetaHist[i][j]->GetMean(), BetaHist[i][j]->GetRMS()), "l");
+      Legend->AddEntry(BetaHist[i][j].get(), Form("Post, #mu=%.4f#pm%.4f", BetaHist[i][j]->GetMean(), BetaHist[i][j]->GetRMS()), "l");
       Legend->AddEntry(Fitter, Form("Gauss, #mu=%.4f#pm%.4f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
       std::string TempTitle = std::string(BetaHist[i][j]->GetName());
 
@@ -2484,6 +2461,32 @@ double SampleSummary::GetModeError(TH1D* hpost){
 }
 
 // ****************
+void SampleSummary::StudyInformationCriterion(M3::kInfCrit Criterion) {
+// ****************
+  MACH3LOG_INFO("******************************");
+  switch(Criterion) {
+    //  TSpline3 (third order spline in ROOT)
+    case M3::kInfCrit::kBIC:
+      // Study Bayesian Information Criterion
+      StudyBIC();
+      break;
+    case M3::kInfCrit::kDIC:
+      // Study Deviance Information Criterion
+      StudyDIC();
+      break;
+    case M3::kInfCrit::kWAIC:
+      // Study Watanabe-Akaike information criterion (WAIC)
+      StudyWAIC();
+      break;
+    default:
+      MACH3LOG_ERROR("UNKNOWN Information Criterion SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(Criterion));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  MACH3LOG_INFO("******************************");
+}
+
+// ****************
 void SampleSummary::StudyBIC(){
 // ****************
   //make fancy event rate histogram
@@ -2501,18 +2504,15 @@ void SampleSummary::StudyBIC(){
 
   const double EventRateBIC = GetBIC(llh_total, DataRate, nModelParams);
   const double BinBasedBIC = GetBIC(llh_total, BinsRate, nModelParams);
-  MACH3LOG_INFO("******************************");
   MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of events: {:.2f}", EventRateBIC);
   MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of bins: {:.2f}", BinBasedBIC);
   MACH3LOG_INFO("Additional info: nModelParams {} DataRate: {:.2f} BinsRate: {:.2f}", nModelParams, DataRate, BinsRate);
-  MACH3LOG_INFO("******************************");
 }
 
 // ****************
 // Get the Deviance Information Criterion (DIC)
 void SampleSummary::StudyDIC() {
 // ****************
-
   //The posterior mean of the deviance
   double Dbar = 0.;
 
@@ -2524,6 +2524,7 @@ void SampleSummary::StudyDIC() {
     double LLH_temp = 0.;
     for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
     {
+      // Get -2*log-likelihood
       LLH_temp += GetLLH(DataHist[SampleNum], MCVector[i][SampleNum], W2MCVector[i][SampleNum]);
     }
     Dbar += LLH_temp;
@@ -2540,7 +2541,6 @@ void SampleSummary::StudyDIC() {
   const double DIC_stat = Dhat + 2 * p_D;
   MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
   MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
-  MACH3LOG_INFO("******************************");
 }
 
 // ****************
@@ -2559,26 +2559,33 @@ void SampleSummary::StudyWAIC() {
     int nBins = maxBins[SampleNum];
     for (int i = 1; i <= nBins; ++i) {
       double mean_llh = 0.;
+      double sum_exp_llh = 0;
       double mean_llh_squared = 0.;
 
       for (unsigned int s = 0; s < nThrows; ++s) {
-        double data = DataHist[SampleNum]->GetBinContent(i);
-        double mc = MCVector[s][SampleNum]->GetBinContent(i);
-        double w2 = W2MCVector[s][SampleNum]->GetBinContent(i);
+        const double data = DataHist[SampleNum]->GetBinContent(i);
+        const double mc = MCVector[s][SampleNum]->GetBinContent(i);
+        const double w2 = W2MCVector[s][SampleNum]->GetBinContent(i);
 
-        // Get the log-likelihood for this sample and bin
-        double LLH_temp = SamplePDF->getTestStatLLH(data, mc, w2);
+        // Get the -log-likelihood for this sample and bin
+        double neg_LLH_temp = SamplePDF->getTestStatLLH(data, mc, w2);
+
+        // Negate the negative log-likelihood to get the actual log-likelihood
+        double LLH_temp = -neg_LLH_temp;
 
         mean_llh += LLH_temp;
         mean_llh_squared += LLH_temp * LLH_temp;
+        sum_exp_llh += std::exp(LLH_temp);
       }
 
       // Compute the mean log-likelihood and the squared mean
       mean_llh /= nThrows;
       mean_llh_squared /= nThrows;
+      sum_exp_llh /= nThrows;
+      sum_exp_llh = std::log(sum_exp_llh);
 
-      // Log pointwise predictive density based on Eq. 5
-      lppd += mean_llh;
+      // Log pointwise predictive density based on Eq. 4
+      lppd += sum_exp_llh;
 
       // Compute the effective number of parameters for WAIC
       p_WAIC += mean_llh_squared - (mean_llh * mean_llh);
@@ -2589,7 +2596,6 @@ void SampleSummary::StudyWAIC() {
   double WAIC = -2 * (lppd - p_WAIC);
   MACH3LOG_INFO("Effective number of parameters following WAIC formalism is equal to: {:.2f}", p_WAIC);
   MACH3LOG_INFO("WAIC = {:.2f}", WAIC);
-  MACH3LOG_INFO("******************************");
 }
 
 // ****************
