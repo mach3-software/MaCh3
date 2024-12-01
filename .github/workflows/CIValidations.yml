@@ -150,8 +150,7 @@ jobs:
 
     - name: Install gcovr
       run: |
-        dnf update -y
-        dnf install -y gcovr
+        pip3 install gcovr
 
     - name: Generate Coverage Report
       working-directory: /opt/MaCh3Validations/build
