@@ -154,7 +154,7 @@ jobs:
 
     - name: Generate Coverage Report
       working-directory: /opt/MaCh3Validations/build
-      run: gcovr --json -o MaCh3_coverage.json -r .. -f "../MaCh3/*"
+      run: gcovr --json -o MaCh3_coverage.json -r .. -f "../CIValidations/*"
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
