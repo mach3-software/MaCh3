@@ -149,12 +149,11 @@ jobs:
         fi
 
     - name: Install gcovr
-    run: |
+      run: |
         apt-get update
         apt-get install -y gcovr
 
     - name: Generate Coverage Report
-      # only need to do this for one combination of OS and compiler
       working-directory: /opt/MaCh3Validations/build
       run: gcovr --json -o MaCh3_coverage.json -r .. -f "../MaCh3/*"
 
