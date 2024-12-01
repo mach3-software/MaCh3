@@ -6,8 +6,6 @@ name: Validations CI
 on:
   pull_request:
     branches: [ develop ]
-  push:
-    branches: [ feature_codecov ]
 
 permissions:
   contents: read
@@ -79,10 +77,9 @@ jobs:
         cd /opt/
         git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
         cd MaCh3Validations
-        git checkout feature_codecov # delete!!!!!!
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch=feature_codecov -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE -DMaCh3Tutorial_Coverage_ENABLED=TRUE
+        cmake ../ -DMaCh3_Branch=${{ github.head_ref }} -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE -DMaCh3Tutorial_Coverage_ENABLED=TRUE
 
     - name: Build MaCh3 Validations
       run: |
@@ -162,7 +159,6 @@ jobs:
       uses: codecov/codecov-action@v4.0.1
       with:
         verbose: true
-        service: github-actions
         files: /opt/MaCh3Validations/build/MaCh3_coverage.json
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
