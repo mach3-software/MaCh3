@@ -150,8 +150,8 @@ jobs:
 
     - name: Install gcovr
       run: |
-        apt-get update
-        apt-get install -y gcovr
+        dnf update -y
+        dnf install -y gcovr
 
     - name: Generate Coverage Report
       working-directory: /opt/MaCh3Validations/build
