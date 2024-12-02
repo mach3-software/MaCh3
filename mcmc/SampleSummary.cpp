@@ -2465,7 +2465,6 @@ void SampleSummary::StudyInformationCriterion(M3::kInfCrit Criterion) {
 // ****************
   MACH3LOG_INFO("******************************");
   switch(Criterion) {
-    //  TSpline3 (third order spline in ROOT)
     case M3::kInfCrit::kBIC:
       // Study Bayesian Information Criterion
       StudyBIC();
@@ -2584,7 +2583,7 @@ void SampleSummary::StudyWAIC() {
       sum_exp_llh /= nThrows;
       sum_exp_llh = std::log(sum_exp_llh);
 
-      // Log pointwise predictive density based on Eq. 4
+      // Log pointwise predictive density based on Eq. 4 in Gelman2014
       lppd += sum_exp_llh;
 
       // Compute the effective number of parameters for WAIC
@@ -2592,7 +2591,7 @@ void SampleSummary::StudyWAIC() {
     }
   }
 
-  // Compute WAIC, see Eq. 13
+  // Compute WAIC, see Eq. 13 in Gelman2014
   double WAIC = -2 * (lppd - p_WAIC);
   MACH3LOG_INFO("Effective number of parameters following WAIC formalism is equal to: {:.2f}", p_WAIC);
   MACH3LOG_INFO("WAIC = {:.2f}", WAIC);
