@@ -19,7 +19,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   SetXsecCov(xsec_cov);
-  
+
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   
@@ -49,7 +49,7 @@ samplePDFFDBase::~samplePDFFDBase()
 
 void samplePDFFDBase::ReadSampleConfig() 
 {
-   
+
   if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -67,7 +67,7 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   SampleDetID = SampleManager->raw()["DetID"].as<int>();
-  
+
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -786,104 +786,116 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
 
+  std::vector<int> VerboseCounter(xsec_norms.size(), 0);
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::vector< int > XsecBins = {};
     if (XsecCov) {
       for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
-	// Skip oscillated NC events
-	// Not strictly needed, but these events don't get included in oscillated predictions, so
-	// no need to waste our time calculating and storing information about xsec parameters
-	// that will never be used.
-	if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	
-	//Now check that the target of an interaction matches with the normalisation parameters
-	bool TargetMatch=false;
-	//If no target specified then apply to all modes
-	if ((*it).targets.size()==0) {
-	  TargetMatch=true;
-	} else {
-	  for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
-	    if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
-	      TargetMatch=true;
-	    }
-	  }
-	}
-	if (!TargetMatch) {continue;}
-	
-	//Now check that the neutrino flavour in an interaction matches with the normalisation parameters
-	bool FlavourMatch=false;
-	//If no mode specified then apply to all modes
-	if ((*it).pdgs.size()==0) {
-	  FlavourMatch=true;
-	} else {
-	  for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
-	    if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
-	      FlavourMatch=true;
-	    }
-	  }
-	}
-	if (!FlavourMatch){continue;}
-	
-	//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
-	bool FlavourUnoscMatch=false;
-	//If no mode specified then apply to all modes
-	if ((*it).preoscpdgs.size()==0) {
-	  FlavourUnoscMatch=true;
-	} else {
-	  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
-	    if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
-	      FlavourUnoscMatch=true;
-	    }
-	  }
-	}
-	if (!FlavourUnoscMatch){continue;}
-	
-	//Now check that the mode of an interaction matches with the normalisation parameters
-	bool ModeMatch=false;
-	//If no mode specified then apply to all modes
-	if ((*it).modes.size()==0) {
-	  ModeMatch=true;
-	} else {
-	  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
-	    if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
-	      ModeMatch=true;
-	    }
-	  }
-	}
-	if (!ModeMatch) {continue;}
-	
-	//Now check whether the norm has kinematic bounds
-	//i.e. does it only apply to events in a particular kinematic region?
-	bool IsSelected = true;
-	if ((*it).hasKinBounds) {
-	  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-	    if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
-	      IsSelected = false;
-	      continue;
-	    }
-	    else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
-	      IsSelected = false;
-	      continue;
-	    }
-	  } 
-	}
-	//Need to then break the event loop 
-	if(!IsSelected){
-	  continue;
-	}
-	
-	// Now set 'index bin' for each normalisation parameter
-	// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
-	int bin = (*it).index;
-	
-	//If syst on applies to a particular detector
-	if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
-	  XsecBins.push_back(bin);
-	}
+        // Skip oscillated NC events
+        // Not strictly needed, but these events don't get included in oscillated predictions, so
+        // no need to waste our time calculating and storing information about xsec parameters
+        // that will never be used.
+        if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+
+        //Now check that the target of an interaction matches with the normalisation parameters
+        bool TargetMatch=false;
+        //If no target specified then apply to all modes
+        if ((*it).targets.size()==0) {
+          TargetMatch=true;
+        } else {
+          for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
+            if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
+              TargetMatch=true;
+            }
+          }
+        }
+        if (!TargetMatch) {continue;}
+
+        //Now check that the neutrino flavour in an interaction matches with the normalisation parameters
+        bool FlavourMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).pdgs.size()==0) {
+          FlavourMatch=true;
+        } else {
+          for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
+            if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
+              FlavourMatch=true;
+            }
+          }
+        }
+        if (!FlavourMatch){continue;}
+
+        //Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
+        bool FlavourUnoscMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).preoscpdgs.size()==0) {
+          FlavourUnoscMatch=true;
+        } else {
+          for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
+            if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
+              FlavourUnoscMatch=true;
+            }
+          }
+        }
+        if (!FlavourUnoscMatch){continue;}
+
+        //Now check that the mode of an interaction matches with the normalisation parameters
+        bool ModeMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).modes.size()==0) {
+          ModeMatch=true;
+        } else {
+          for (unsigned imode=0;imode<(*it).modes.size();imode++) {
+            if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
+              ModeMatch=true;
+            }
+          }
+        }
+        if (!ModeMatch) {continue;}
+
+        //Now check whether the norm has kinematic bounds
+        //i.e. does it only apply to events in a particular kinematic region?
+        bool IsSelected = true;
+        if ((*it).hasKinBounds) {
+          for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) {
+              IsSelected = false;
+              continue;
+            }
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+              IsSelected = false;
+              continue;
+            }
+          }
+        }
+        //Need to then break the event loop
+        if(!IsSelected){
+          continue;
+        }
+
+        // Now set 'index bin' for each normalisation parameter
+        // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
+        int bin = (*it).index;
+
+        //If syst on applies to a particular detector
+        if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
+          XsecBins.push_back(bin);
+          VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
+        }
       } // end iteration over xsec_norms
     } // end if (xsecCov)
     fdobj->xsec_norms_bins[iEvent]=XsecBins;
   }//end loop over events
+  MACH3LOG_INFO("Channel {}", iSample);
+  MACH3LOG_INFO("┌──────────────────────────────────────────────────────────┐");
+  for (std::size_t i = 0; i < xsec_norms.size(); ++i) {
+    const auto& norm = xsec_norms[i];
+    double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
+
+    MACH3LOG_INFO("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
+                  XsecCov->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
+  }
+  MACH3LOG_INFO("└──────────────────────────────────────────────────────────┘");
   return;
 }
 
