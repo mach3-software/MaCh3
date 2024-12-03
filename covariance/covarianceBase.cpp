@@ -75,7 +75,6 @@ covarianceBase::~covarianceBase(){
 // ********************************************
 void covarianceBase::ConstructPCA() {
 // ********************************************
-
   //Check whether first and last pcadpar are set and if not just PCA everything
   if(FirstPCAdpar == -999 || LastPCAdpar == -999){
     if(FirstPCAdpar == -999 && LastPCAdpar == -999){
@@ -121,7 +120,6 @@ void covarianceBase::init(std::string name, std::string file) {
     MACH3LOG_ERROR("Was about to retrieve matrix with name {}", name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
 
   TMatrixDSym *CovMat = infile->Get<TMatrixDSym>(name.c_str());
 
@@ -250,6 +248,10 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     //ETA - now for parameters which are optional and have default values
     _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false);
 
+    // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
+    if(GetFromManager<bool>(param["Systematic"]["FixParam"], false)) {
+      toggleFixParameter(_fFancyNames[i]);
+    }
     //Fill the map to get the correlations later as well
     CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
 
@@ -531,7 +533,7 @@ void covarianceBase::throwParameters() {
 void covarianceBase::RandomConfiguration() {
 // *************************************
   // Have the 1 sigma for each parameter in each covariance class, sweet!
-  // Don't want to change the nominal array because that's what determines our likelihood
+  // Don't want to change the prior array because that's what determines our likelihood
   // Want to change the fParProp, fParCurr, fParInit
   // fParInit and the others will already be set
   for (int i = 0; i < _fNumPar; ++i) {
@@ -769,7 +771,7 @@ void covarianceBase::throwParCurr(const double mag) {
   }
 }
 // ********************************************
-// Function to print the nominal values
+// Function to print the prior values
 void covarianceBase::printNominal() {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
@@ -779,7 +781,7 @@ void covarianceBase::printNominal() {
 }
 
 // ********************************************
-// Function to print the nominal, current and proposed values
+// Function to print the prior, current and proposed values
 void covarianceBase::printNominalCurrProp() {
 // ********************************************
   MACH3LOG_INFO("Printing parameters for {}", getName());
@@ -861,12 +863,12 @@ void covarianceBase::printPars() {
 }
 
 // ********************************************
-// Sets the proposed parameters to the nominal values
+// Sets the proposed parameters to the prior values
 void covarianceBase::setParameters(const std::vector<double>& pars) {
 // ********************************************
-  // If empty, set the proposed to nominal
+  // If empty, set the proposed to prior
   if (pars.empty()) {
-    // For xsec this means setting to the prior (because nominal is the prior)
+    // For xsec this means setting to the prior (because prior is the prior)
     for (int i = 0; i < _fNumPar; i++) {
       _fPropVal[i] = _fPreFitValue[i];
     }
@@ -1273,7 +1275,6 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   
-
   TMatrixD cov_sym_v = cov_sym_svd.GetV();
   TMatrixD cov_sym_vt = cov_sym_v;
   cov_sym_vt.T();
@@ -1302,12 +1303,12 @@ void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
 // ********************************************
 std::vector<double> covarianceBase::getNominalArray() {
 // ********************************************
-  std::vector<double> nominal(_fNumPar);
+  std::vector<double> prior(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i)
   {
-    nominal[i] = _fPreFitValue[i];
+    prior[i] = _fPreFitValue[i];
   }
-  return nominal;
+  return prior;
 }
 
 // ********************************************

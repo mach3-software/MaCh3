@@ -177,7 +177,7 @@ class covarianceBase {
   //Some Getters
   /// @brief Get total number of parameters
   inline int  GetNumParams() {return _fNumPar;}
-  /// @brief Get the nominal array for parameters.
+  /// @brief Get the prior array for parameters.
   virtual std::vector<double> getNominalArray();
   /// @brief Get the pre-fit values of the parameters.
   std::vector<double> getPreFitValues(){return _fPreFitValue;}
@@ -194,7 +194,7 @@ class covarianceBase {
   /// @brief Get prior parameter value
   /// @param i Parameter index
   inline double getParInit(const int i) { return _fPreFitValue[i]; }
-  /// @brief Return generated value, although is virtual so class inheriting might actual get nominal not generated.
+  /// @brief Return generated value, although is virtual so class inheriting might actual get prior not generated.
   /// @param i Parameter index
   virtual double getNominal(const int i) { return getParInit(i); }
   /// @brief Return generated value for a given parameter
@@ -290,9 +290,9 @@ class covarianceBase {
     else return _fNumPar;
   }
 
-  /// @brief Print nominal value for every parameter
+  /// @brief Print prior value for every parameter
   void printNominal();
-  /// @brief Print nominal, current and proposed value for each parameter
+  /// @brief Print prior, current and proposed value for each parameter
   void printNominalCurrProp();
   void printPars();
   /// @brief Print step scale for each parameter
