@@ -29,7 +29,11 @@ set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
 
-target_link_libraries(Splines Manager MaCh3CompilerOptions)
+if(NOT CPU_ONLY)
+  target_link_libraries(Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+else()
+  target_link_libraries(Splines Manager MaCh3CompilerOptions)
+endif()
 
 target_include_directories(Splines PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

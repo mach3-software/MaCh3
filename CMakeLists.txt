@@ -15,6 +15,8 @@ if(CUDAToolkit_FOUND AND NOT(USE_CPU))
   message(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED TRUE)
   set(CPU_ONLY FALSE)
+  #Create a seperate target for GPU compiler options
+  add_library(MaCh3GPUCompilerOptions INTERFACE)
 else()
   message(STATUS "CUDA not found. Proceeding without CUDA support.")
   set(MaCh3_GPU_ENABLED FALSE)
@@ -154,9 +156,9 @@ if(CPU_ONLY)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE CPU_ONLY)
 endif()
 
-if(MaCh3_GPU_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE CUDA)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE GPU_ON)
+if(MaCh3_GPU_ENABLED) 
+  target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE CUDA)
+  target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE GPU_ON)
 endif()
 
 if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
@@ -165,12 +167,22 @@ endif()
 
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
+  # ETA - think the _LOW_MEMORY_STRUCTS_ also needs this definition
+  target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
 endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
-install(TARGETS MaCh3CompilerOptions
+if(MaCh3_GPU_ENABLED)
+  set_target_properties(MaCh3GPUCompilerOptions PROPERTIES EXPORT_NAME GPUCompilerOptions)
+  #If GPU enable then install both the CPU and GPU options
+  install(TARGETS MaCh3CompilerOptions MaCh3GPUCompilerOptions
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
+else()
+  install(TARGETS MaCh3CompilerOptions
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/)
+endif()
 
 #Include logger
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/Logger.cmake)
@@ -184,6 +196,15 @@ get_target_property(link_libraries MaCh3CompilerOptions INTERFACE_LINK_LIBRARIES
 
 cmessage(STATUS "Compile options for MaCh3CompilerOptions: ${compile_options}")
 cmessage(STATUS "Link libraries for MaCh3CompilerOptions: ${link_libraries}")
+
+if(MaCh3_GPU_ENABLED)
+  #KS: Retrieve and print the compile options and link libraries for maximal verbose for GPU
+  get_target_property(gpu_compile_options MaCh3GPUCompilerOptions INTERFACE_COMPILE_OPTIONS)
+  get_target_property(gpu_link_libraries MaCh3GPUCompilerOptions INTERFACE_LINK_LIBRARIES)
+  #Nice print out of the GPU options if GPU is enabled
+  cmessage(STATUS "Compile options for MaCh3GPUCompilerOptions: ${gpu_compile_options}")
+  cmessage(STATUS "Link libraries for MaCh3GPUCompilerOptions: ${gpu_link_libraries}")
+endif()
 
 LIST(APPEND ALL_FEATURES
   DEBUG
@@ -219,6 +240,10 @@ endif()
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
 target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
+if(MaCh3_GPU_ENABLED)
+  #If GPU is enabled also link this to the MaCh3 target
+  target_link_libraries(MaCh3 INTERFACE Splines MaCh3GPUCompilerOptions)
+endif()
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

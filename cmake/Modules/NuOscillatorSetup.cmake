@@ -47,20 +47,22 @@ IsTrue(MaCh3_MULTITHREAD_ENABLED DAN_USE_MULTITHREAD)
 IsTrue(MaCh3_LOW_MEMORY_STRUCTS_ENABLED DAN_DOUBLE)
 SwitchLogic(DAN_DOUBLE)
 
-# Get the compile options for MaCh3CompilerOptions
-get_target_property(compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
+# Get the CPU compile options for MaCh3CompilerOptions
+get_target_property(cpu_compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
 
 # Join the compile options list into a space-separated string
-string(REPLACE ";" " " compile_options_string "${compile_options}")
+string(REPLACE ";" " " compile_options_string "${cpu_compile_options}")
+
 
 #KS: This may seem hacky, but when CMAKE_CUDA_ARCHITECTURES is passed, it's treated as a string rather than a list. Since CMake uses semi-colon-delimited strings to represent lists, we convert it to a proper list to handle CUDA architectures correctly.
 set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
-string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
+#string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
+string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 #Try adding Oscillator Class
 CPMAddPackage(
   NAME NuOscillator
-    VERSION 1.0.0
+    VERSION 1.0.3
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
     GIT_TAG "tags/v1.0.0"
     OPTIONS
@@ -74,7 +76,7 @@ CPMAddPackage(
     "UseProb3ppLinear ${USE_Prob3ppLinear}"
     "UseNuFASTLinear  ${USE_NuFastLiner}"
 
-    "NuOscillator_Compiler_Flags ${compile_options_string}"
+    "NuOscillator_Compiler_Flags ${cpu_compile_options}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
 )
 
