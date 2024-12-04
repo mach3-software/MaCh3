@@ -1,4 +1,5 @@
 #include "samplePDFFDBase.h"
+#include "samplePDF/Structs.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
@@ -759,7 +760,7 @@ void samplePDFFDBase::SetupNormParameters(){
   }
 
   // Assign xsec norm bins in MCSamples tree
-  for (int iSample = 0; iSample < (int)MCSamples.size(); ++iSample) {
+  for (unsigned int iSample = 0; iSample < MCSamples.size(); ++iSample) {
     CalcXsecNormsBins(iSample);
   }
 
@@ -821,7 +822,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
           FlavourMatch=true;
         } else {
           for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
-            if ((*it).pdgs.at(iPDG)== fdobj->nupdg[iEvent]) {
+            if ((*it).pdgs.at(iPDG)== (*fdobj->nupdg[iEvent])) {
               FlavourMatch=true;
             }
           }
@@ -835,7 +836,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
           FlavourUnoscMatch=true;
         } else {
           for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
-            if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgunosc[iEvent]) {
+            if ((*it).preoscpdgs.at(iPDG) == (*fdobj->nupdgUnosc[iEvent])) {
               FlavourUnoscMatch=true;
             }
           }
@@ -1386,53 +1387,33 @@ void samplePDFFDBase::SetupNuOscillator() {
         int InitFlav = _BAD_INT_;
         int FinalFlav = _BAD_INT_;
 
-<<<<<<< HEAD
-        if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNue) {
+        if (std::abs((*MCSamples[iSample].nupdgUnosc[iEvent])) == NuPDG::kNue) {
           InitFlav = NuOscillator::kElectron;
-        } else if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNumu) {
+        } else if (std::abs((*MCSamples[iSample].nupdgUnosc[iEvent])) == NuPDG::kNumu) {
           InitFlav = NuOscillator::kMuon;
-        } else if (std::abs(MCSamples[iSample].nupdgunosc[iEvent]) == NuPDG::kNutau) {
+        } else if (std::abs((*MCSamples[iSample].nupdgUnosc[iEvent])) == NuPDG::kNutau) {
           InitFlav = NuOscillator::kTau;
         }
 
-        if (std::abs(MCSamples[iSample].nupdg[iEvent]) == NuPDG::kNue) {
+        if (std::abs((*MCSamples[iSample].nupdg[iEvent])) == NuPDG::kNue) {
           FinalFlav = NuOscillator::kElectron;
-        } else if (std::abs(MCSamples[iSample].nupdg[iEvent]) == NuPDG::kNumu) {
+        } else if (std::abs((*MCSamples[iSample].nupdg[iEvent])) == NuPDG::kNumu) {
           FinalFlav = NuOscillator::kMuon;
-        } else if (std::abs(MCSamples[iSample].nupdg[iEvent]) == NuPDG::kNutau) {
+        } else if (std::abs((*MCSamples[iSample].nupdg[iEvent])) == NuPDG::kNutau) {
           FinalFlav = NuOscillator::kTau;
         }
 
-
-=======
-        if (std::abs(MCSamples[iSample].nutype) == 1) {
-          InitFlav = NuOscillator::kElectron;
-        } else if (std::abs(MCSamples[iSample].nutype) == 2) {
-          InitFlav = NuOscillator::kMuon;
-        } else if (std::abs(MCSamples[iSample].nutype) == 3) {
-          InitFlav = NuOscillator::kTau;
-        }
-
-        if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-          FinalFlav = NuOscillator::kElectron;
-        } else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-          FinalFlav = NuOscillator::kMuon;
-        } else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-          FinalFlav = NuOscillator::kTau;
-        }
-
->>>>>>> 192e77b0b3a64765d734488e1a4c3345b37a2ddb
         if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
           MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
-          MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
+          MACH3LOG_ERROR("MCSamples[iSample].nupdgUnosc: {}", (*MCSamples[iSample].nupdgUnosc[iEvent]));
           MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-          MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
+          MACH3LOG_ERROR("MCSamples[iSample].nupdg: {}", (*MCSamples[iSample].nupdg[iEvent]));
           MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
         //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-        if (MCSamples[iSample].nutype<0) {
+        if ((*MCSamples[iSample].nupdg[iEvent])<0) {
           InitFlav *= -1;
           FinalFlav *= -1;
         }
@@ -1546,8 +1527,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->signal = false;
   fdobj->Unity = 1.;
   fdobj->Unity_Int = 1.;
-  fdobj->nupdg = new int[fdobj->nEvents];
-  fdobj->nupdgunosc = new int[fdobj->nEvents];
+
   
   int nEvents = fdobj->nEvents;
   fdobj->x_var.resize(nEvents, &fdobj->Unity);
@@ -1566,6 +1546,8 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
   fdobj->xsec_w.resize(nEvents, 1.0);
+  fdobj->nupdg.resize(nEvents);
+  fdobj->nupdgUnosc.resize(nEvents);
   fdobj->isNC = new bool[nEvents];
   fdobj->nxsec_spline_pointers.resize(nEvents);
   fdobj->xsec_spline_pointers.resize(nEvents);
