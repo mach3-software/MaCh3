@@ -206,7 +206,7 @@ void mcmc::PrintProgress() {
       cov->printNominalCurrProp();
     }
   }
-  #ifdef DEBUF
+  #ifdef DEBUG
   if (debug) {
     debugFile << "\n-------------------------------------------------------" << std::endl;
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
