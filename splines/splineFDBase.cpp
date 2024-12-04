@@ -242,71 +242,71 @@ void splineFDBase::FindSplineSegment()
   #ifdef MULTITHREAD
   #pragma omp parallel //for schedule(dynamic)
   #endif
-  for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++)
-    {
-      int nPoints = UniqueSystNKnots[iSyst];
-      std::vector<M3::float_t> xArray = UniqueSystXPts[iSyst];
+  for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++) {
+    int nPoints = UniqueSystNKnots[iSyst];
+    std::vector<M3::float_t> xArray = UniqueSystXPts[iSyst];
 
-      // Get the variation for this reconfigure for the ith parameter
-      int GlobalIndex = UniqueSystIndices[iSyst];
+    // Get the variation for this reconfigure for the ith parameter
+    int GlobalIndex = UniqueSystIndices[iSyst];
 
-      M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
+    M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
 
-      xVarArray[iSyst]=xvar;
+    xVarArray[iSyst]=xvar;
 
-      M3::int_t segment = 0;
-      M3::int_t kHigh = M3::int_t(nPoints - 1);
+    M3::int_t segment = 0;
+    M3::int_t kHigh = M3::int_t(nPoints - 1);
 
-      //KS: We expect new segment is very close to previous
-      const M3::int_t PreviousSegment = M3::int_t(UniqueSystCurrSegment[iSyst]);
+    //KS: We expect new segment is very close to previous
+    const M3::int_t PreviousSegment = M3::int_t(UniqueSystCurrSegment[iSyst]);
+    //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
+    if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ) {
+      segment = PreviousSegment;
+    } else if (xvar <= xArray[0]) {
+    // If the variation is below the lowest saved spline point
+      segment = 0;
+      // If the variation is above the highest saved spline point
+    } else if (xvar >= xArray[nPoints-1]) {
+      //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
+      segment = kHigh;
       //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-      if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ){segment = PreviousSegment;}
-      // If the variation is below the lowest saved spline point
-    else if (xvar <= xArray[0]) {
-        segment = 0;
-        // If the variation is above the highest saved spline point
-      } else if (xvar >= xArray[nPoints-1]) {
-        //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
-        segment = kHigh;
-        //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-      } else {
-        // The top point we've got
-        M3::int_t kHalf = 0;
-        // While there is still a difference in the points (we haven't yet found the segment)
-        // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-        while (kHigh - segment > 1) {
-          // Increment the half-step
-          kHalf = M3::int_t((segment + kHigh)/2);
-          // If our variation is above the kHalf, set the segment to kHalf
-          if (xvar > xArray[kHalf]) {
-            segment = kHalf;
-            // Else move kHigh down
-          } else {
-            kHigh = kHalf;
-          }
-        } // End the while: we've now done our binary search
-      } // End the else: we've now found our point
+    } else {
+      // The top point we've got
+      M3::int_t kHalf = 0;
+      // While there is still a difference in the points (we haven't yet found the segment)
+      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
+      while (kHigh - segment > 1) {
+        // Increment the half-step
+        kHalf = M3::int_t((segment + kHigh)/2);
+        // If our variation is above the kHalf, set the segment to kHalf
+        if (xvar > xArray[kHalf]) {
+          segment = kHalf;
+          // Else move kHigh down
+        } else {
+          kHigh = kHalf;
+        }
+      } // End the while: we've now done our binary search
+    } // End the else: we've now found our point
 
-      if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
-      UniqueSystCurrSegment[iSyst] = segment; 
+    if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
+    UniqueSystCurrSegment[iSyst] = segment; 
 
-      //#ifdef DEBUG
-      //    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
-      //      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
-      //      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
-      //      std::cerr << "Spline: "<< i << std::endl;
-      //
-      //      std::cerr << "Found segment   = " << segment << std::endl;
-      //      std::cerr << "Doing variation = " << xvar << std::endl;
-      //      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
-      //      for (_M3::int_t_ j = 0; j < SplineInfoArray[j].nPts; ++j) {
-      //        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
-      //      }
-      //      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      //      throw;
-      //    }
-      //#endif
-    } //end loop over params
+    //#ifdef DEBUG
+    //    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
+    //      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
+    //      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
+    //      std::cerr << "Spline: "<< i << std::endl;
+    //
+    //      std::cerr << "Found segment   = " << segment << std::endl;
+    //      std::cerr << "Doing variation = " << xvar << std::endl;
+    //      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
+    //      for (_M3::int_t_ j = 0; j < SplineInfoArray[j].nPts; ++j) {
+    //        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
+    //      }
+    //      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+    //      throw;
+    //    }
+    //#endif
+  } //end loop over params
 }
 
 //****************************************
