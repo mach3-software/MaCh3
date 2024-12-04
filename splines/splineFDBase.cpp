@@ -490,18 +490,18 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (Dimensions[iSample] == 2) {
     if(isHist2D){
-      ReturnVec.push_back((TAxis *)(Hist2D->GetXaxis())->Clone());
-      ReturnVec.push_back((TAxis *)(Hist2D->GetYaxis())->Clone());
-      ReturnVec.push_back((TAxis*)(DummyAxis)->Clone());
+      ReturnVec.push_back(static_cast<TAxis*>(Hist2D->GetXaxis()->Clone()));
+      ReturnVec.push_back(static_cast<TAxis*>(Hist2D->GetYaxis()->Clone()));
+      ReturnVec.push_back(static_cast<TAxis*>(DummyAxis->Clone()));
     } else if (isHist3D) {
-      ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
-      ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
-      ReturnVec.push_back((TAxis*)(DummyAxis)->Clone());
+      ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetXaxis()->Clone()));
+      ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetYaxis()->Clone()));
+      ReturnVec.push_back(static_cast<TAxis*>(DummyAxis->Clone()));
     }
   } else if (Dimensions[iSample] == 3) {
-    ReturnVec.push_back((TAxis *)(Hist3D->GetXaxis())->Clone());
-    ReturnVec.push_back((TAxis *)(Hist3D->GetYaxis())->Clone());
-    ReturnVec.push_back((TAxis *)(Hist3D->GetZaxis())->Clone());
+    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetXaxis()->Clone()));
+    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetYaxis()->Clone()));
+    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetZaxis()->Clone()));
   } else {
     MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
