@@ -28,7 +28,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
 
 samplePDFFDBase::~samplePDFFDBase()
 {
-  MACH3LOG_INFO("I'm deleting samplePDFFDBase");
+  MACH3LOG_DEBUG("I'm deleting samplePDFFDBase");
   
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
