@@ -115,9 +115,10 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID )){
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
+
   }
   return returnVec;
 }
@@ -127,9 +128,14 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID )){
+
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
+
+    // if ((GetParDetID(SystIndex) & DetID )){
+    //   returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
+    // }
   }
 
   return returnVec;
