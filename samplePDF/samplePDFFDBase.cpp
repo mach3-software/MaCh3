@@ -1387,21 +1387,8 @@ void samplePDFFDBase::SetupNuOscillator() {
         int InitFlav = _BAD_INT_;
         int FinalFlav = _BAD_INT_;
 
-        if (std::abs((*MCSamples[iSample].nupdgUnosc[iEvent])) == NuPDG::kNue) {
-          InitFlav = NuOscillator::kElectron;
-        } else if (std::abs((*MCSamples[iSample].nupdgUnosc[iEvent])) == NuPDG::kNumu) {
-          InitFlav = NuOscillator::kMuon;
-        } else if (std::abs((*MCSamples[iSample].nupdgUnosc[iEvent])) == NuPDG::kNutau) {
-          InitFlav = NuOscillator::kTau;
-        }
-
-        if (std::abs((*MCSamples[iSample].nupdg[iEvent])) == NuPDG::kNue) {
-          FinalFlav = NuOscillator::kElectron;
-        } else if (std::abs((*MCSamples[iSample].nupdg[iEvent])) == NuPDG::kNumu) {
-          FinalFlav = NuOscillator::kMuon;
-        } else if (std::abs((*MCSamples[iSample].nupdg[iEvent])) == NuPDG::kNutau) {
-          FinalFlav = NuOscillator::kTau;
-        }
+        InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdgUnosc[iEvent]));
+        FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdg[iEvent]));
 
         if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
           MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
@@ -1412,11 +1399,6 @@ void samplePDFFDBase::SetupNuOscillator() {
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
-        //Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-        if ((*MCSamples[iSample].nupdg[iEvent])<0) {
-          InitFlav *= -1;
-          FinalFlav *= -1;
-        }
         if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
           //Atmospherics
           MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
