@@ -125,7 +125,6 @@ std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& S
   {
     // Instantiate the sample using the specified class type
     SampleType* Sample = new SampleType(SampleConfig[i], xsec, osc);
-    if (osc != nullptr) Sample->SetOscCov(osc);
     Sample->reweight();
 
     // Obtain sample name and create a TString version for histogram naming
