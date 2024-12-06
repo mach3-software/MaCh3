@@ -10,16 +10,14 @@ struct FarDetectorCoreInfo {
 
   ~FarDetectorCoreInfo(){ delete [] isNC; }
 
-  int nutype; // 2 = numu/signue | -2 = numub | 1 = nue | -1 = nueb           
-  int oscnutype;    
-  int nupdg;
-  int nupdgUnosc;
   bool signal; // true if signue                                              
   int nEvents; // how many MC events are there
   double ChannelIndex;
   std::string flavourName;
 
   std::vector<int*> Target; // target the interaction was on
+  std::vector<const int*> nupdg;
+  std::vector<const int*> nupdgUnosc;
 
   int SampleDetID;
 

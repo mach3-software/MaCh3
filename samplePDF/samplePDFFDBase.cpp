@@ -1,4 +1,5 @@
 #include "samplePDFFDBase.h"
+#include "samplePDF/Structs.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
@@ -7,23 +8,29 @@
 #pragma GCC diagnostic pop
 
 #include<algorithm>
+#include <memory>
 
-samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov) : samplePDFBase()
+samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
-  MACH3LOG_INFO("Ceating SamplePDFFDBase object");
+  MACH3LOG_INFO("Creating SamplePDFFDBase object");
   
-  //ETA - safety feature so you can't pass a nullptr xsec_cov
-  if(xsec_cov == nullptr){
-    MACH3LOG_ERROR("You've passed me a nullptr xsec covariance matrix... I need this to setup splines!");
+  //ETA - safety feature so you can't pass a NULL xsec_cov
+  if(!xsec_cov){
+    MACH3LOG_ERROR("You've passed me a nullptr to a covarianceXsec... I need this to setup splines!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  SetXsecCov(xsec_cov);
+  XsecCov = xsec_cov;
+
+  if(!osc_cov){
+    MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
+  }
+  OscCov = osc_cov;
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   
-  SampleManager = new manager(ConfigFileName.c_str());
+  SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -61,7 +68,7 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
-  
+
   if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -134,8 +141,8 @@ void samplePDFFDBase::ReadSampleConfig()
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
-    sample_nutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["nutype"].as<int>())));
-    sample_oscnutype.push_back(PDGToProbs(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>())));
+    sample_nupdgunosc.push_back(static_cast<NuPDG>(osc_channel["nutype"].as<int>()));
+    sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
     sample_signal.push_back(osc_channel["signal"].as<bool>());
   }
 
@@ -184,13 +191,15 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
   MACH3LOG_INFO("Setting up NuOscillator..");
-  SetupNuOscillator();
+  SetupNuOscillator(); 
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
   MACH3LOG_INFO("Setting up Splines..");
   SetupSplines();
   MACH3LOG_INFO("Setting up Normalisation Pointers..");
   SetupNormParameters();
+  MACH3LOG_INFO("Setting up Functional Pointers..");
+  SetupFunctionalParameters();
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
 
@@ -347,15 +356,19 @@ void samplePDFFDBase::reweight() // Reweight function - Depending on Osc Calcula
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
-  std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
-  for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wuseless-cast"
-    OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
-    #pragma GCC diagnostic pop
-  } 
-  for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
-    NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+  //You only need to do these things if OscCov has been initialised
+  //if not then you're not considering oscillations
+  if (OscCov) {
+    std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
+    for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wuseless-cast"
+      OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
+      #pragma GCC diagnostic pop
+    } 
+    for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
+      NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+    }
   }
   
   fillArray();
@@ -405,6 +418,8 @@ void samplePDFFDBase::fillArray() {
       if (!IsEventSelected(iSample, iEvent)) { 
         continue;
       } 
+
+      std::cout << "Event passed selection, here we go!!" << std::endl;
 
       double splineweight = 1.0;
       double normweight = 1.0;
@@ -556,109 +571,111 @@ void samplePDFFDBase::fillArray_MP()
     }
     
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
-#pragma omp for
+      #pragma omp for
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-	
+
         //ETA - generic functions to apply shifts to kinematic variables
         // Apply this before IsEventSelected is called.
-	applyShifts(iSample, iEvent);
-	
+        applyShifts(iSample, iEvent);
+
         //ETA - generic functions to apply shifts to kinematic variable
-	//this is going to be slow right now due to string comps under the hood.
-	//Need to implement a more efficient version of event-by-event cut checks
-	if(!IsEventSelected(iSample, iEvent)){
-	  continue;
-	}
-	
-	double splineweight = 1.0;
-	double normweight = 1.0;
-	double funcweight = 1.0;
-	double totalweight = 1.0;
-	
-	//DB SKDet Syst
-	//As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-	
-	if(SplineHandler){
-	  splineweight *= CalcXsecWeightSpline(iSample, iEvent);
-	}
-	//DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-	if (splineweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
+        //this is going to be slow right now due to string comps under the hood.
+        //Need to implement a more efficient version of event-by-event cut checks
+        if(!IsEventSelected(iSample, iEvent)){
+          continue;
+        }
+
+        double splineweight = 1.0;
+        double normweight = 1.0;
+        double funcweight = 1.0;
+        double totalweight = 1.0;
+
+        //DB SKDet Syst
+        //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
+
+        if(SplineHandler){
+          splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+        }
+        //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
+        if (splineweight <= 0.){
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
         normweight *= CalcXsecWeightNorm(iSample, iEvent);
-	//DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-	if (normweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
-	funcweight = CalcXsecWeightFunc(iSample,iEvent);
-	//DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-	if (funcweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
-	MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
-	
-	totalweight = GetEventWeight(iSample, iEvent);
-	
-	//DB Catch negative weights and skip any event with a negative event
-	if (totalweight <= 0.){
-	  MCSamples[iSample].xsec_w[iEvent] = 0.;
-	  continue;
-	}
-	
-	//DB Switch on BinningOpt to allow different binning options to be implemented
-	//The alternative would be to have inheritance based on BinningOpt
-	double XVar = (*(MCSamples[iSample].x_var[iEvent]));
-	
-	//DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-	//double YVar = MCSamples[iSample].rw_theta[iEvent];
-	//ETA - this would actually be with (*(MCSamples[iSample].y_var[iEvent])) and done extremely
-	//similarly to XVar now
-	
-	//DB Find the relevant bin in the PDF for each event
-	int XBinToFill = -1;
-	int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
-	
-	//DB Check to see if momentum shift has moved bins
-	//DB - First, check to see if the event is still in the nominal bin	
-	if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
-	  XBinToFill = MCSamples[iSample].NomXBin[iEvent];
-	}
-	//DB - Second, check to see if the event is outside of the binning range and skip event if it is
-	else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-	  continue;
-	}
-	//DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-	//Shifted down one bin from the event bin at nominal
-	else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
-	  XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
-	}
-	//Shifted up one bin from the event bin at nominal
-	else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
-	  XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
-	}
-	//DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-	else {
-	  for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-	    if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-	      XBinToFill = iBin;
-	    }
-	  }
-	}
-	
-	//ETA - we can probably remove this final if check on the -1? 
-	//Maybe we can add an overflow bin to the array and assign any events to this bin?
-	//Might save us an extra if call?
-	//DB Fill relevant part of thread array
-	if (XBinToFill != -1 && YBinToFill != -1) {
+        //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
+        if (normweight <= 0.){
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
+        funcweight = CalcXsecWeightFunc(iSample,iEvent);
+        //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
+        if (funcweight <= 0.){
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
+        MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
+
+        totalweight = GetEventWeight(iSample, iEvent);
+
+        //DB Catch negative weights and skip any event with a negative event
+        if (totalweight <= 0.){
+          //std::cout << "NEGATIVE WEIGHT!!" << std::endl;
+          MCSamples[iSample].xsec_w[iEvent] = 0.;
+          continue;
+        }
+
+        //DB Switch on BinningOpt to allow different binning options to be implemented
+        //The alternative would be to have inheritance based on BinningOpt
+        double XVar = (*(MCSamples[iSample].x_var[iEvent]));
+
+        //DB Commented out by default but if we ever want to consider shifts in theta this will be needed
+        //double YVar = MCSamples[iSample].rw_theta[iEvent];
+        //ETA - this would actually be with (*(MCSamples[iSample].y_var[iEvent])) and done extremely
+        //similarly to XVar now
+
+        //DB Find the relevant bin in the PDF for each event
+        int XBinToFill = -1;
+        int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
+
+        //DB Check to see if momentum shift has moved bins
+        //DB - First, check to see if the event is still in the nominal bin	
+        if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
+          XBinToFill = MCSamples[iSample].NomXBin[iEvent];
+        }
+        //DB - Second, check to see if the event is outside of the binning range and skip event if it is
+        else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
+          std::cout << "XVAR BEYOND BIN EDGES!!" << std::endl;
+          continue;
+        }
+        //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
+        //Shifted down one bin from the event bin at nominal
+        else if (XVar < MCSamples[iSample].rw_lower_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_lower_xbinedge[iEvent]) {
+          XBinToFill = MCSamples[iSample].NomXBin[iEvent]-1;
+        }
+        //Shifted up one bin from the event bin at nominal
+        else if (XVar < MCSamples[iSample].rw_upper_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_upper_xbinedge[iEvent]) {
+          XBinToFill = MCSamples[iSample].NomXBin[iEvent]+1;
+        }
+        //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
+        else {
+          for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
+            if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
+              XBinToFill = iBin;
+            }
+          }
+        }
+
+        //ETA - we can probably remove this final if check on the -1? 
+        //Maybe we can add an overflow bin to the array and assign any events to this bin?
+        //Might save us an extra if call?
+        //DB Fill relevant part of thread array
+        if (XBinToFill != -1 && YBinToFill != -1) {
           samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
           samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
-	}
+        }
       }
     }    
     
@@ -732,31 +749,19 @@ double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) 
   return xsecw;
 }
 
-void samplePDFFDBase::SetXsecCov(covarianceXsec *xsec){
-  XsecCov = xsec;
-
-  // Get the map between the normalisation parameters index, their name, what mode they should apply to, and what target
-  //This information is used later in CalcXsecNormsBins to decide if a parameter applies to an event
-
-  //DB Now get this information using the DetID from the config
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
-  nFuncParams = XsecCov->GetNumParamsFromDetID(SampleDetID, SystType::kFunc);
-  funcParsNames = XsecCov->GetParsNamesFromDetID(SampleDetID, SystType::kFunc);
-  funcParsIndex = XsecCov->GetParsIndexFromDetID(SampleDetID, SystType::kFunc);
-
-  return;
-}
-
 void samplePDFFDBase::SetupNormParameters(){
+  
+  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
+  std::cout << "FOUND " << xsec_norms.size() << " norm parameters that affect this sample" << std::endl;
 
   if(!XsecCov){
-	MACH3LOG_ERROR("XsecCov is not setup!");
-	throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_ERROR("XsecCov is not setup!");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Assign xsec norm bins in MCSamples tree
-  for (int iSample = 0; iSample < int(MCSamples.size()); ++iSample) {
-	CalcXsecNormsBins(iSample);
+  for (unsigned int iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    CalcXsecNormsBins(iSample);
   }
 
   //DB
@@ -790,96 +795,96 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
     std::vector< int > XsecBins = {};
     if (XsecCov) {
       for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
-	// Skip oscillated NC events
-	// Not strictly needed, but these events don't get included in oscillated predictions, so
-	// no need to waste our time calculating and storing information about xsec parameters
-	// that will never be used.
-	if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-	
-	//Now check that the target of an interaction matches with the normalisation parameters
-	bool TargetMatch=false;
-	//If no target specified then apply to all modes
-	if ((*it).targets.size()==0) {
-	  TargetMatch=true;
-	} else {
-	  for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
-	    if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
-	      TargetMatch=true;
-	    }
-	  }
-	}
-	if (!TargetMatch) {continue;}
-	
-	//Now check that the neutrino flavour in an interaction matches with the normalisation parameters
-	bool FlavourMatch=false;
-	//If no mode specified then apply to all modes
-	if ((*it).pdgs.size()==0) {
-	  FlavourMatch=true;
-	} else {
-	  for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
-	    if ((*it).pdgs.at(iPDG)== fdobj->nupdg) {
-	      FlavourMatch=true;
-	    }
-	  }
-	}
-	if (!FlavourMatch){continue;}
-	
-	//Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
-	bool FlavourUnoscMatch=false;
-	//If no mode specified then apply to all modes
-	if ((*it).preoscpdgs.size()==0) {
-	  FlavourUnoscMatch=true;
-	} else {
-	  for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
-	    if ((*it).preoscpdgs.at(iPDG) == fdobj->nupdgUnosc) {
-	      FlavourUnoscMatch=true;
-	    }
-	  }
-	}
-	if (!FlavourUnoscMatch){continue;}
-	
-	//Now check that the mode of an interaction matches with the normalisation parameters
-	bool ModeMatch=false;
-	//If no mode specified then apply to all modes
-	if ((*it).modes.size()==0) {
-	  ModeMatch=true;
-	} else {
-	  for (unsigned imode=0;imode<(*it).modes.size();imode++) {
-	    if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
-	      ModeMatch=true;
-	    }
-	  }
-	}
-	if (!ModeMatch) {continue;}
-	
-	//Now check whether the norm has kinematic bounds
-	//i.e. does it only apply to events in a particular kinematic region?
-	bool IsSelected = true;
-	if ((*it).hasKinBounds) {
-	  for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-	    if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
-	      IsSelected = false;
-	      continue;
-	    }
-	    else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
-	      IsSelected = false;
-	      continue;
-	    }
-	  } 
-	}
-	//Need to then break the event loop 
-	if(!IsSelected){
-	  continue;
-	}
-	
-	// Now set 'index bin' for each normalisation parameter
-	// All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
-	int bin = (*it).index;
-	
-	//If syst on applies to a particular detector
-	if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
-	  XsecBins.push_back(bin);
-	}
+        // Skip oscillated NC events
+        // Not strictly needed, but these events don't get included in oscillated predictions, so
+        // no need to waste our time calculating and storing information about xsec parameters
+        // that will never be used.
+        if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
+
+        //Now check that the target of an interaction matches with the normalisation parameters
+        bool TargetMatch=false;
+        //If no target specified then apply to all modes
+        if ((*it).targets.size()==0) {
+          TargetMatch=true;
+        } else {
+          for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
+            if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
+              TargetMatch=true;
+            }
+          }
+        }
+        if (!TargetMatch) {continue;}
+
+        //Now check that the neutrino flavour in an interaction matches with the normalisation parameters
+        bool FlavourMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).pdgs.size()==0) {
+          FlavourMatch=true;
+        } else {
+          for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
+            if ((*it).pdgs.at(iPDG)== (*fdobj->nupdg[iEvent])) {
+              FlavourMatch=true;
+            }
+          }
+        }
+        if (!FlavourMatch){continue;}
+
+        //Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
+        bool FlavourUnoscMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).preoscpdgs.size()==0) {
+          FlavourUnoscMatch=true;
+        } else {
+          for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
+            if ((*it).preoscpdgs.at(iPDG) == (*fdobj->nupdgUnosc[iEvent])) {
+              FlavourUnoscMatch=true;
+            }
+          }
+        }
+        if (!FlavourUnoscMatch){continue;}
+
+        //Now check that the mode of an interaction matches with the normalisation parameters
+        bool ModeMatch=false;
+        //If no mode specified then apply to all modes
+        if ((*it).modes.size()==0) {
+          ModeMatch=true;
+        } else {
+          for (unsigned imode=0;imode<(*it).modes.size();imode++) {
+            if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
+              ModeMatch=true;
+            }
+          }
+        }
+        if (!ModeMatch) {continue;}
+
+        //Now check whether the norm has kinematic bounds
+        //i.e. does it only apply to events in a particular kinematic region?
+        bool IsSelected = true;
+        if ((*it).hasKinBounds) {
+          for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
+              IsSelected = false;
+              continue;
+            }
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+              IsSelected = false;
+              continue;
+            }
+          } 
+        }
+        //Need to then break the event loop 
+        if(!IsSelected){
+          continue;
+        }
+
+        // Now set 'index bin' for each normalisation parameter
+        // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
+        int bin = (*it).index;
+
+        //If syst on applies to a particular detector
+        if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
+          XsecBins.push_back(bin);
+        }
       } // end iteration over xsec_norms
     } // end if (xsecCov)
     fdobj->xsec_norms_bins[iEvent]=XsecBins;
@@ -1320,44 +1325,44 @@ void samplePDFFDBase::addData(TH2D* Data) {
 }
 
 void samplePDFFDBase::SetupNuOscillator() {
-  OscillatorFactory* OscillFactory = new OscillatorFactory();
-  
+  OscillatorFactory* OscillFactory = new OscillatorFactory();  
+
   NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
-    MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
-    NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
-    
-    if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-      std::vector<M3::float_t> EnergyArray;
-      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-        //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-        if (!MCSamples[iSample].isNC[iEvent]) {
-          EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
-        }
-      }
-      std::sort(EnergyArray.begin(),EnergyArray.end());
-      
-      NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
+    if(OscCov){
+      MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
+      NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
 
-      //============================================================================
-      //DB Atmospheric only part
-      if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
-	std::vector<M3::float_t> CosineZArray;
-	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-	  if (!MCSamples[iSample].isNC[iEvent]) {
-	    CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
-	  }
-	}
-	std::sort(CosineZArray.begin(),CosineZArray.end());
-	
-	NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+      if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
+        std::vector<M3::float_t> EnergyArray;
+        for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+          if (!MCSamples[iSample].isNC[iEvent]) {
+            EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
+          }
+        }
+        std::sort(EnergyArray.begin(),EnergyArray.end());
+        NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
+
+        //============================================================================
+        //DB Atmospheric only part
+        if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+          std::vector<M3::float_t> CosineZArray;
+          for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+            //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+            if (!MCSamples[iSample].isNC[iEvent]) {
+              CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
+            }
+          }
+          std::sort(CosineZArray.begin(),CosineZArray.end());
+
+          NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+        }
+        //============================================================================
       }
-      //============================================================================
-      
-    }
-    
-    NuOscProbCalcers[iSample]->Setup();
+
+      NuOscProbCalcers[iSample]->Setup();
+    } 
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
@@ -1381,46 +1386,30 @@ void samplePDFFDBase::SetupNuOscillator() {
 #endif
         }
       } else {
-	int InitFlav = _BAD_INT_;
-	int FinalFlav = _BAD_INT_;
-	
-	if (std::abs(MCSamples[iSample].nutype) == 1) {
-	  InitFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].nutype) == 2) {
-	  InitFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].nutype) == 3) {
-	  InitFlav = NuOscillator::kTau;
-	}
-	
-	if (std::abs(MCSamples[iSample].oscnutype) == 1) {
-	  FinalFlav = NuOscillator::kElectron;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 2) {
-	  FinalFlav = NuOscillator::kMuon;
-	} else if (std::abs(MCSamples[iSample].oscnutype) == 3) {
-	  FinalFlav = NuOscillator::kTau;
-	}
-	
-	if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
-	  MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
-	  MACH3LOG_ERROR("MCSamples[iSample].nutype: {}", MCSamples[iSample].nutype);
-	  MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-	  MACH3LOG_ERROR("MCSamples[iSample].oscnutype: {}", MCSamples[iSample].oscnutype);
-	  MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
-	  throw MaCh3Exception(__FILE__, __LINE__);
-	}
-	
-	//Assuming that if the generated neutrino is antineutrino, the detected flavour will also be antineutrino
-	if (MCSamples[iSample].nutype<0) {
-	  InitFlav *= -1;
-	  FinalFlav *= -1;
-	}
-	if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
-	  //Atmospherics
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
-	} else {
-	  //Beam
-	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
-	}
+        int InitFlav = _BAD_INT_;
+        int FinalFlav = _BAD_INT_;
+
+        InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdgUnosc[iEvent]));
+        FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdg[iEvent]));
+
+        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+          MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
+          MACH3LOG_ERROR("MCSamples[iSample].nupdgUnosc: {}", (*MCSamples[iSample].nupdgUnosc[iEvent]));
+          MACH3LOG_ERROR("InitFlav: {}", InitFlav);
+          MACH3LOG_ERROR("MCSamples[iSample].nupdg: {}", (*MCSamples[iSample].nupdg[iEvent]));
+          MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+
+        if(OscCov){
+          if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
+            //Atmospherics
+            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
+          } else {
+            //Beam
+            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
+          }
+        }
       } // end if NC
     } // end loop over events
   }// end loop over channels
@@ -1435,7 +1424,9 @@ double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
   #endif
   for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
+    //std::cout << "Weight " << iParam << " is " << *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
   }
+  
   return totalweight;
 }
 
@@ -1519,11 +1510,10 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
-  fdobj->nutype = -9;
-  fdobj->oscnutype = -9;
   fdobj->signal = false;
   fdobj->Unity = 1.;
   fdobj->Unity_Int = 1.;
+
   
   int nEvents = fdobj->nEvents;
   fdobj->x_var.resize(nEvents, &fdobj->Unity);
@@ -1542,6 +1532,8 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
   fdobj->xsec_w.resize(nEvents, 1.0);
+  fdobj->nupdg.resize(nEvents);
+  fdobj->nupdgUnosc.resize(nEvents);
   fdobj->isNC = new bool[nEvents];
   fdobj->nxsec_spline_pointers.resize(nEvents);
   fdobj->xsec_spline_pointers.resize(nEvents);
@@ -1586,6 +1578,8 @@ void samplePDFFDBase::InitialiseSplineObject() {
   MACH3LOG_INFO("Setup Far Detector splines");
 
   fillSplineBins();
+
+  SplineHandler->cleanUpMemory();
 }
 
 TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {

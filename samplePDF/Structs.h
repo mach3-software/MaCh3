@@ -270,6 +270,13 @@ namespace MaCh3Utils {
   /// @brief Return mass for given PDG
   double GetMassFromPDG(int PDG);
   // ***************************
+  
+  // ***************************
+  /// @brief Convert from PDG flavour to NuOscillator type
+  /// beware that in the case of anti-neutrinos the NuOscillator
+  /// type simply gets multiplied by -1
+  int PDGToNuOscillatorFlavour(int PDG);
+  // ***************************
 
   extern std::unordered_map<int,int> KnownDetIDsMap;
   extern int nKnownDetIDs;

@@ -1,12 +1,5 @@
 #pragma once
 
-//C++ includes
-#include <list>
-
-//ROOT includes
-#include "THStack.h"
-#include "TLegend.h"
-
 //MaCh3 includes
 #include "splines/splineFDBase.h"
 
@@ -26,7 +19,7 @@ public:
   //######################################### Functions #########################################
 
   samplePDFFDBase(){};
-  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov);
+  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
@@ -47,12 +40,6 @@ public:
 
   void reweight();
   double GetEventWeight(int iSample, int iEntry);
-  
-
-  void SetXsecCov(covarianceXsec* xsec_cov);
-
-  /// @brief setup the Oscillation covariance object to get values to calculate probailities from
-  void SetOscCov(covarianceOsc* osc_cov){OscCov = osc_cov;};
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
@@ -131,6 +118,8 @@ public:
   //===============================================================================
 
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
+  virtual void SetupFunctionalParameters(){};
+  /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
@@ -154,10 +143,6 @@ public:
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
 
-  // Function to setup Functional and shift parameters. This isn't idea but
-  // do this in your experiment specific code for now as we don't have a 
-  // generic treatment for func and shift pars yet
-  virtual void SetupFuncParameters(){return;};
   void SetupNormParameters();
 
   //===============================================================================
@@ -207,15 +192,15 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
-  covarianceXsec *XsecCov;
-  covarianceOsc *OscCov;
+  covarianceXsec *XsecCov = nullptr;
+  covarianceOsc *OscCov = nullptr;
 
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
-  int nDimensions;
+  int nDimensions = _BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  int SampleDetID;
+  int SampleDetID = _BAD_INT_;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
@@ -224,10 +209,6 @@ public:
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
-  /// @brief the total number of function parameters found in the xsec model
-  int nFuncParams;
-  std::vector<std::string> funcParsNames;
-  std::vector<int> funcParsIndex;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
@@ -235,7 +216,7 @@ public:
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
   /// @brief the Number of selections in the 
-  int NSelections;
+  int NSelections = _BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
@@ -249,7 +230,7 @@ public:
   std::vector< std::vector<double> > Selection;
    //===========================================================================
 
-  manager* SampleManager;
+  std::unique_ptr<manager> SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 
@@ -262,7 +243,7 @@ public:
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;
-  std::vector<int> sample_oscnutype;
-  std::vector<int> sample_nutype;
+  std::vector<int> sample_nupdg;
+  std::vector<int> sample_nupdgunosc;
   std::vector<bool> sample_signal;
 };

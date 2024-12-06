@@ -274,19 +274,6 @@ void initSamplePDF(py::module &m){
             py::arg("mc_version"),
             py::arg("xsec_cov")
         )
-        
-        .def(
-            "set_xsec_cov", 
-            &samplePDFFDBase::SetXsecCov, 
-            "Set the cross section covariance matrix object."
-        )
-        
-        .def(
-            "set_osc_cov", 
-            &samplePDFFDBase::SetOscCov, 
-            "Set the oscillation parameter covariance matrix object."
-        )
-        
     ;
 
     /* Not sure if this will be needed in future versions of MaCh3 so leaving commented for now
