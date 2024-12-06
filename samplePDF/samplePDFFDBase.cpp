@@ -23,7 +23,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   XsecCov = xsec_cov;
 
   if(!osc_cov){
-    MACH3LOG_WARN("You have pass a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
+    MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
   }
   OscCov = osc_cov;
   
@@ -191,7 +191,7 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
   MACH3LOG_INFO("Setting up NuOscillator..");
-  SetupNuOscillator();
+  SetupNuOscillator(); 
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -1325,42 +1325,44 @@ void samplePDFFDBase::addData(TH2D* Data) {
 }
 
 void samplePDFFDBase::SetupNuOscillator() {
-  OscillatorFactory* OscillFactory = new OscillatorFactory();
-  
+  OscillatorFactory* OscillFactory = new OscillatorFactory();  
+
   NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
-    MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
-    NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
-    
-    if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-      std::vector<M3::float_t> EnergyArray;
-      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-        //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-        if (!MCSamples[iSample].isNC[iEvent]) {
-          EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
-        }
-      }
-      std::sort(EnergyArray.begin(),EnergyArray.end());
-      NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
+    if(OscCov){
+      MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
+      NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
 
-      //============================================================================
-      //DB Atmospheric only part
-      if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
-        std::vector<M3::float_t> CosineZArray;
+      if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
+        std::vector<M3::float_t> EnergyArray;
         for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
           //DB Remove NC events from the arrays which are handed to the NuOscillator objects
           if (!MCSamples[iSample].isNC[iEvent]) {
-            CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
+            EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
           }
         }
-        std::sort(CosineZArray.begin(),CosineZArray.end());
+        std::sort(EnergyArray.begin(),EnergyArray.end());
+        NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
 
-        NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+        //============================================================================
+        //DB Atmospheric only part
+        if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+          std::vector<M3::float_t> CosineZArray;
+          for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+            //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+            if (!MCSamples[iSample].isNC[iEvent]) {
+              CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
+            }
+          }
+          std::sort(CosineZArray.begin(),CosineZArray.end());
+
+          NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+        }
+        //============================================================================
       }
-      //============================================================================
-    }
-    
-    NuOscProbCalcers[iSample]->Setup();
+
+      NuOscProbCalcers[iSample]->Setup();
+    } 
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
@@ -1399,12 +1401,14 @@ void samplePDFFDBase::SetupNuOscillator() {
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
-        if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
-          //Atmospherics
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
-        } else {
-          //Beam
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
+        if(OscCov){
+          if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
+            //Atmospherics
+            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
+          } else {
+            //Beam
+            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
+          }
         }
       } // end if NC
     } // end loop over events
