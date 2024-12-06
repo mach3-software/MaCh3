@@ -1,5 +1,9 @@
 #include "samplePDF/Structs.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 #include "Constants/OscillatorConstants.h"
+#pragma GCC diagnostic pop
 
 #include "TList.h"
 #include "TObjArray.h"
