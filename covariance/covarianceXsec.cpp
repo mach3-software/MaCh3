@@ -392,7 +392,7 @@ void covarianceXsec::Print() {
 void covarianceXsec::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
@@ -594,7 +594,7 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
-  TVectorD* xsec_param_nom = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_generated = new TVectorD(_fNumPar);
   TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
   TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
 
@@ -616,7 +616,7 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
     xsec_spline_names->AddLast(splineName);
 
     (*xsec_param_prior)[i] = _fPreFitValue[i];
-    (*xsec_param_nom)[i] = _fGenerated[i];
+    (*xsec_param_generated)[i] = _fGenerated[i];
     (*xsec_flat_prior)[i] = _fFlatPrior[i];
     (*xsec_stepscale)[i] = _fIndivStepScale[i];
     (*xsec_error)[i] = _fError[i];
@@ -656,8 +656,8 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   delete xsec_flat_prior;
   xsec_stepscale->Write("xsec_stepscale");
   delete xsec_stepscale;
-  xsec_param_nom->Write("xsec_param_nom");
-  delete xsec_param_nom;
+  xsec_param_generated->Write("xsec_param_nom");
+  delete xsec_param_generated;
   xsec_param_lb->Write("xsec_param_lb");
   delete xsec_param_lb;
   xsec_param_ub->Write("xsec_param_ub");

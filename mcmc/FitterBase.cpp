@@ -280,7 +280,6 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   return;
 }
 
-
 // *******************
 void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 // *******************
@@ -402,7 +401,6 @@ void FitterBase::ProcessMCMC() {
 // Run Drag Race
 void FitterBase::DragRace(const int NLaps) {
 // *************************
-
   MACH3LOG_INFO("Let the Race Begin!");
   // Reweight the MC
   for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
@@ -464,7 +462,6 @@ void FitterBase::DragRace(const int NLaps) {
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************
-
   // Save the settings into the output file
   SaveSettings();
 
@@ -1138,11 +1135,7 @@ void FitterBase::RunSigmaVar() {
         double paramVal = cov->getParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));
 
         // Check the bounds on the parameter
-        if (paramVal > cov->GetUpperBound(i)) {
-          paramVal = cov->GetUpperBound(i);
-        } else if (paramVal < cov->GetLowerBound(i)) {
-          paramVal = cov->GetLowerBound(i);
-        }
+        paramVal = std::max(cov->GetLowerBound(i), std::min(paramVal, cov->GetUpperBound(i)));
 
         // Set the parameter
         cov->setParProp(i, paramVal);

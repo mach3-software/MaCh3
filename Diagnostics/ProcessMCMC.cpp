@@ -79,8 +79,8 @@ void ProcessMCMC(const std::string& inputFile)
 
   const bool PlotCorr = GetFromManager<bool>(Settings["PlotCorr"], false);
 
-  Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {""}));
-  Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {""}));
+  Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
+  Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
   //Apply additional cuts to 1D posterior
   Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
 
@@ -166,8 +166,8 @@ void MultipleProcessMCMC()
     Processor[ik] = std::make_unique<MCMCProcessor>(FileNames[ik]);
     Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
 
-    Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {""}));
-    Processor[ik]->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {""}));
+    Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
+    Processor[ik]->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
 
     //Apply additional cuts to 1D posterior
     Processor[ik]->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));

@@ -7,7 +7,6 @@
 
 #include "TList.h"
 #include "TObjArray.h"
-#include "manager/MaCh3Logger.h"
 
 namespace MaCh3Utils {
 

@@ -7,7 +7,7 @@
 #include "Constants/OscillatorConstants.h"
 #pragma GCC diagnostic pop
 
-#include<algorithm>
+#include <algorithm>
 #include <memory>
 
 samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
@@ -56,7 +56,7 @@ samplePDFFDBase::~samplePDFFDBase()
 
 void samplePDFFDBase::ReadSampleConfig() 
 {
-   
+
   if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -74,7 +74,7 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   SampleDetID = SampleManager->raw()["DetID"].as<int>();
-  
+
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -498,8 +498,8 @@ void samplePDFFDBase::fillArray() {
       
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
-	samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-	samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
+        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
     }
   }
@@ -790,7 +790,9 @@ void samplePDFFDBase::SetupNormParameters(){
 void samplePDFFDBase::CalcXsecNormsBins(int iSample){
 
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
-
+  #ifdef DEBUG
+  std::vector<int> VerboseCounter(xsec_norms.size(), 0);
+  #endif
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::vector< int > XsecBins = {};
     if (XsecCov) {
@@ -876,7 +878,6 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
         if(!IsSelected){
           continue;
         }
-
         // Now set 'index bin' for each normalisation parameter
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
         int bin = (*it).index;
@@ -884,11 +885,27 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
         //If syst on applies to a particular detector
         if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
           XsecBins.push_back(bin);
+          #ifdef DEBUG
+          VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
+          #endif
         }
       } // end iteration over xsec_norms
     } // end if (xsecCov)
     fdobj->xsec_norms_bins[iEvent]=XsecBins;
   }//end loop over events
+  #ifdef DEBUG
+  MACH3LOG_INFO("Channel {}", iSample);
+  MACH3LOG_INFO("┌──────────────────────────────────────────────────────────┐");
+  for (std::size_t i = 0; i < xsec_norms.size(); ++i) {
+    const auto& norm = xsec_norms[i];
+    double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
+
+    MACH3LOG_INFO("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
+                  XsecCov->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
+  }
+  MACH3LOG_INFO("└──────────────────────────────────────────────────────────┘");
+  #endif
+
   return;
 }
 
@@ -937,8 +954,6 @@ void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double
   _hPDF2D->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
   dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
 
-  //XBinEdges = XVec;
-  //YBinEdges = YVec;
 
   //ETA - maybe need to be careful here
   int nXBins = int(XVec.size()-1);
@@ -1051,9 +1066,9 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       
       double low_lower_edge = _DEFAULT_RETURN_VAL_;
       if (bin==0) {
-	low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
+        low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
       } else {
-	low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin-1);
+        low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin-1);
       }
       
       double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
@@ -1061,9 +1076,9 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       
       double upper_upper_edge = _DEFAULT_RETURN_VAL_;
       if (bin<(_hPDF1D->GetNbinsX()-2)) {
-	upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
+        upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
       } else {
-	upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
+        upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
       }
       
       if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
@@ -1179,9 +1194,9 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
       
       double low_lower_edge = _DEFAULT_RETURN_VAL_;
       if (bin==0) {
-	low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
+        low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
       } else {
-	low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x-1);
+        low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x-1);
       }
       
       double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
@@ -1189,19 +1204,19 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
       
       double upper_upper_edge = _DEFAULT_RETURN_VAL_;
       if (bin<(_hPDF2D->GetNbinsX()-2)) {
-	upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
+        upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
       } else {
-	upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
+        upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
       }
       
       if ((bin_x-1) >= 0 && (bin_x-1) < int(XBinEdges.size()-1)) {
-	MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
+        MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
       } else {
-	MCSamples[mc_i].NomXBin[event_i] = -1;
-	low_edge = _DEFAULT_RETURN_VAL_;
-	upper_edge = _DEFAULT_RETURN_VAL_;
-	low_lower_edge = _DEFAULT_RETURN_VAL_;
-	upper_upper_edge = _DEFAULT_RETURN_VAL_;
+        MCSamples[mc_i].NomXBin[event_i] = -1;
+        low_edge = _DEFAULT_RETURN_VAL_;
+        upper_edge = _DEFAULT_RETURN_VAL_;
+        low_lower_edge = _DEFAULT_RETURN_VAL_;
+        upper_upper_edge = _DEFAULT_RETURN_VAL_;
       }
       MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
       if(MCSamples[mc_i].NomYBin[event_i] < 0){
@@ -1493,7 +1508,7 @@ double samplePDFFDBase::GetLikelihood() {
       double MCPred = samplePDFFD_array[yBin][xBin];
       double w2 = samplePDFFD_array_w2[yBin][xBin];
       
-      //KS: Calcaualte likelihood using Barlow-Beestion Poisson or even IceCube
+      //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
       negLogL += getTestStatLLH(DataVal, MCPred, w2);
     }
   }
@@ -1597,7 +1612,7 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
     SelectionVecToApply.emplace_back(Selection[iSelec]);
   }
 
-  //DB Add all requested cuts from the arguement to the selection vector which will be applied
+  //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
     SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
@@ -1626,12 +1641,12 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   for (int iSample=0;iSample<getNMCSamples();iSample++) {
     for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
       if (IsEventSelected(iSample,iEvent)) {
-	double Weight = GetEventWeight(iSample,iEvent);
-	if (WeightStyle==1) {
-	  Weight = 1.;
-	}
-	double Var = ReturnKinematicParameter(ProjectionVar_Int,iSample,iEvent);
-	_h1DVar->Fill(Var,Weight);
+        double Weight = GetEventWeight(iSample,iEvent);
+        if (WeightStyle==1) {
+          Weight = 1.;
+        }
+        double Var = ReturnKinematicParameter(ProjectionVar_Int,iSample,iEvent);
+        _h1DVar->Fill(Var,Weight);
       }
     }
   }
