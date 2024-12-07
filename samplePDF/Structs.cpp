@@ -1,5 +1,10 @@
 #include "samplePDF/Structs.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#include "Constants/OscillatorConstants.h"
+#pragma GCC diagnostic pop
+
 #include "TList.h"
 #include "TObjArray.h"
 
@@ -69,6 +74,31 @@ namespace MaCh3Utils {
     } // End switch
     MACH3LOG_ERROR("Warning, didn't catch a saved mass");
     return 0;
+  }
+
+  int PDGToNuOscillatorFlavour(int NuPdg){
+    int NuOscillatorFlavour = _BAD_INT_;
+    switch(std::abs(NuPdg)){
+      case NuPDG::kNue:
+        NuOscillatorFlavour = NuOscillator::kElectron;
+        break;
+      case NuPDG::kNumu:
+        NuOscillatorFlavour = NuOscillator::kMuon;
+        break;
+      case NuPDG::kNutau:
+        NuOscillatorFlavour = NuOscillator::kTau;
+        break;
+      default:
+        MACH3LOG_ERROR("Unknown Nuetrino PDG {}, cannot convert to NuOscillator type", NuPdg);
+        break;
+    }
+
+    //This is very cheeky but if the PDG is negative then multiply the PDG by -1
+    // This is consistent with the treatment that NuOscillator expects as enums only
+    // exist for the generic matter flavour and not the anti-matter version
+    if(NuPdg < 0){NuOscillatorFlavour *= -1;}
+
+    return NuOscillatorFlavour;
   }
 
  

@@ -8,7 +8,6 @@
 // The constructor
 SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, samplePDFBase* const sample, const int nSteps) {
 // *******************
-
   MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD
   MACH3LOG_DEBUG("With OpenMP and {} threads", omp_get_max_threads());
@@ -44,76 +43,83 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
   OutputTree = nullptr;
   rnd = std::make_unique<TRandom3>();
 
-  DataHist = new TH2Poly*[nSamples];
-  DataHist_ProjectX = new TH1D*[nSamples];
-  DataHist_ProjectY = new TH1D*[nSamples];
-  NominalHist = new TH2Poly*[nSamples];
-  PosteriorHist = new TH1D**[nSamples];
-  W2NomHist = new TH2Poly*[nSamples];
-  w2Hist = new TH1D**[nSamples];
+  DataHist.resize(nSamples);
+  DataHist_ProjectX.resize(nSamples);
+  DataHist_ProjectY.resize(nSamples);
+  NominalHist.resize(nSamples);
+  PosteriorHist.resize(nSamples);
+  W2NomHist.resize(nSamples);
+  w2Hist.resize(nSamples);
 
-  ViolinHists_ProjectX = new TH2D*[nSamples];
-  ViolinHists_ProjectY = new TH2D*[nSamples];
+  ViolinHists_ProjectX.resize(nSamples);
+  ViolinHists_ProjectY.resize(nSamples);
     
-  if(DoBetaParam) BetaHist = new TH1D**[nSamples];
-  else BetaHist = nullptr;
+  if(DoBetaParam) BetaHist.resize(nSamples);
 
   maxBins.resize(nSamples);
   
-  lnLHist_Mean = new TH2Poly*[nSamples];
-  lnLHist_Mode = new TH2Poly*[nSamples];
-  lnLHist_Mean_ProjectX = new TH1D*[nSamples];
-  MeanHist = new TH2Poly*[nSamples];
-  if(DoBetaParam) MeanHistCorrected = new TH2Poly*[nSamples];
-  else MeanHistCorrected = NULL;
-  ModeHist = new TH2Poly*[nSamples];
-  W2MeanHist = new TH2Poly*[nSamples];
-  W2ModeHist = new TH2Poly*[nSamples];
-  lnLHist_Mean1D = new TH1D*[nSamples];
-  lnLHist_Mode1D = new TH1D*[nSamples];
-  lnLHist_Sample_DrawData = new TH1D*[nSamples];
-  lnLHist_Sample_DrawflucDraw = new TH1D*[nSamples];
-  lnLHist_Sample_PredflucDraw = new TH1D*[nSamples];
+  lnLHist_Mean.resize(nSamples);
+  lnLHist_Mode.resize(nSamples);
+  lnLHist_Mean_ProjectX.resize(nSamples);
+  MeanHist.resize(nSamples);;
+  if(DoBetaParam) MeanHistCorrected.resize(nSamples);;
+  ModeHist.resize(nSamples);
+  W2MeanHist.resize(nSamples);
+  W2ModeHist.resize(nSamples);
+  lnLHist_Mean1D.resize(nSamples);
+  lnLHist_Mode1D.resize(nSamples);
+  lnLHist_Sample_DrawData.resize(nSamples);
+  lnLHist_Sample_DrawflucDraw.resize(nSamples);
+  lnLHist_Sample_PredflucDraw.resize(nSamples);
     
   //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
   // https://root.cern.ch/doc/master/classTH1.html#auto-bin
-  lnLHist = new TH1D("lnLHist_predpredfluc", "lnLHist_predpredfluc", 100, 1, -1);
+  lnLHist = std::make_unique<TH1D>("lnLHist_predpredfluc", "lnLHist_predpredfluc", 100, 1, -1);
+  lnLHist->SetDirectory(nullptr);
   lnLHist->GetXaxis()->SetTitle("-2LLH (Pred Fluc, Pred)");
   lnLHist->GetYaxis()->SetTitle("Counts");
 
-  lnLHist_drawdata = new TH1D("lnLHist_drawdata", "lnLHist_drawdata", 100, 1, -1);
+  lnLHist_drawdata = std::make_unique<TH1D>("lnLHist_drawdata", "lnLHist_drawdata", 100, 1, -1);
+  lnLHist_drawdata->SetDirectory(nullptr);
   lnLHist_drawdata->GetXaxis()->SetTitle("-2LLH (Data, Draw)");
   lnLHist_drawdata->GetYaxis()->SetTitle("Counts");
 
-  lnLHist_drawfluc = new TH1D("lnLHist_drawpredfluc", "lnLHist_drawpredfluc", 100, 1, -1);
+  lnLHist_drawfluc = std::make_unique<TH1D>("lnLHist_drawpredfluc", "lnLHist_drawpredfluc", 100, 1, -1);
+  lnLHist_drawfluc->SetDirectory(nullptr);
   lnLHist_drawfluc->GetXaxis()->SetTitle("-2LLH (Pred Fluc, Draw)");
   lnLHist_drawfluc->GetYaxis()->SetTitle("Counts");
 
-  lnLHist_drawflucdraw = new TH1D("lnLHist_drawflucdraw", "lnLHist_drawflucdraw", 100, 1, -1);
+  lnLHist_drawflucdraw = std::make_unique<TH1D>("lnLHist_drawflucdraw", "lnLHist_drawflucdraw", 100, 1, -1);
+  lnLHist_drawflucdraw->SetDirectory(nullptr);
   lnLHist_drawflucdraw->GetXaxis()->SetTitle("-2LLH (Draw Fluc, Draw)");
   lnLHist_drawflucdraw->GetYaxis()->SetTitle("Counts");
 
-  lnLDrawHist = new TH2D("lnLDrawHist", "lnLDrawHist", 50, 1, -1, 50, 1, -1);
+  lnLDrawHist = std::make_unique<TH2D>("lnLDrawHist", "lnLDrawHist", 50, 1, -1, 50, 1, -1);
+  lnLDrawHist->SetDirectory(nullptr);
   lnLDrawHist->GetXaxis()->SetTitle("-2LLH_{Pred Fluc, Draw}");
   lnLDrawHist->GetYaxis()->SetTitle("-2LLH_{Data, Draw}");
 
-  lnLFlucHist = new TH2D("lnLFlucHist", "lnLFlucHist", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist = std::make_unique<TH2D>("lnLFlucHist", "lnLFlucHist", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist->SetDirectory(nullptr);
   lnLFlucHist->GetXaxis()->SetTitle("-2LLH_{Draw Fluc, Draw}");
   lnLFlucHist->GetYaxis()->SetTitle("-2LLH_{Data, Draw}");
 
-  lnLDrawHistRate = new TH2D("lnLDrawHistRate", "lnLDrawHistRate", 50, 1, -1, 50, 1, -1);
+  lnLDrawHistRate = std::make_unique<TH2D>("lnLDrawHistRate", "lnLDrawHistRate", 50, 1, -1, 50, 1, -1);
+  lnLDrawHistRate->SetDirectory(nullptr);
   lnLDrawHistRate->GetXaxis()->SetTitle("-2LLH_{Pred Fluc, Draw}");
   lnLDrawHistRate->GetYaxis()->SetTitle("-2LLH_{Data, Draw}");
 
   //KS: This is silly as it assumes all samples uses same kinematics
-  lnLFlucHist_ProjectX = new TH2D("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist_ProjectX = std::make_unique<TH2D>("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
+  lnLFlucHist_ProjectX->SetDirectory(nullptr);
   lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SamplePDF->GetKinVarLabel(0, 0)).c_str());
   lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SamplePDF->GetKinVarLabel(0, 0)).c_str());
   
   // Holds the hist of random number draws, only works for posterior predictive
   if(!isPriorPredictive)
   {
-    RandomHist = new TH1D("RandomHist", "RandomHist", 100, 0, nChainSteps);
+    RandomHist = std::make_unique<TH1D>("RandomHist", "RandomHist", 100, 0, nChainSteps);
+    RandomHist->SetDirectory(nullptr);
     RandomHist->GetXaxis()->SetTitle("Step");
     const double binwidth = nChainSteps/RandomHist->GetNbinsX();
     std::stringstream ss;
@@ -125,34 +131,27 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
 
   for (int i = 0; i < nSamples; ++i)
   {
-    PosteriorHist[i] = NULL;
-    w2Hist[i] = NULL;
-      
-    if(DoBetaParam) BetaHist[i] = nullptr;
-    DataHist[i] = NULL;
-    DataHist_ProjectX[i] = NULL;
-    DataHist_ProjectY[i] = NULL;
-    NominalHist[i] = NULL;
+    DataHist[i] = nullptr;
+    DataHist_ProjectX[i] = nullptr;
+    DataHist_ProjectY[i] = nullptr;
+    NominalHist[i] = nullptr;
     
-    ViolinHists_ProjectX[i] = NULL;
-    ViolinHists_ProjectY[i] = NULL;
-
-    MeanHist[i] = NULL;
-    if(DoBetaParam) MeanHistCorrected[i] = NULL;
-    W2MeanHist[i] = NULL;
-    W2ModeHist[i] = NULL;
-    lnLHist_Mean[i] = NULL;
-    lnLHist_Mode[i] = NULL;
-    lnLHist_Mean_ProjectX[i] = NULL;
-    lnLHist_Mean1D[i] = NULL;
-    lnLHist_Mode1D[i] = NULL;
-    lnLHist_Sample_DrawData[i] = NULL;
-    lnLHist_Sample_DrawflucDraw[i] = NULL;
-    lnLHist_Sample_PredflucDraw[i] = NULL;
+    MeanHist[i] = nullptr;
+    if(DoBetaParam) MeanHistCorrected[i] = nullptr;
+    W2MeanHist[i] = nullptr;
+    W2ModeHist[i] = nullptr;
+    lnLHist_Mean[i] = nullptr;
+    lnLHist_Mode[i] = nullptr;
+    lnLHist_Mean_ProjectX[i] = nullptr;
+    lnLHist_Mean1D[i] = nullptr;
+    lnLHist_Mode1D[i] = nullptr;
+    lnLHist_Sample_DrawData[i] = nullptr;
+    lnLHist_Sample_DrawflucDraw[i] = nullptr;
+    lnLHist_Sample_PredflucDraw[i] = nullptr;
   }//end loop over samples
 
   DoByModePlots = false;
-  MeanHist_ByMode = NULL;
+  MeanHist_ByMode = nullptr;
   PosteriorHist_ByMode = nullptr;
 
   nModelParams = 0;
@@ -169,22 +168,12 @@ SampleSummary::~SampleSummary() {
   //ROOT is weird and once you write TFile claim ownership of histograms. Best is to first delete histograms and then close file
   Outputfile->Close();
   delete Outputfile;
-  
-  if(lnLHist != NULL) delete lnLHist;
-  if(lnLHist_drawdata != NULL) delete lnLHist_drawdata;
-  if(lnLHist_drawfluc != NULL) delete lnLHist_drawfluc;
-  if(lnLHist_drawflucdraw != NULL) delete lnLHist_drawflucdraw;
-  if(lnLDrawHist != NULL) delete lnLDrawHist;
-  if(lnLFlucHist != NULL) delete lnLFlucHist;
-  if(lnLDrawHistRate != NULL) delete lnLDrawHistRate;
-  if(RandomHist != nullptr)  delete RandomHist;
 
-  if(lnLFlucHist_ProjectX != NULL) delete lnLFlucHist_ProjectX;
   if(DoByModePlots)
   {
     for (int i = 0; i < nSamples; ++i)
     {
-      if(DataHist[i] == NULL) continue;
+      if(DataHist[i] == nullptr) continue;
       for (int j = 0; j < Modes->GetNModes()+1; j++)
       {
         for (int k = 1; k <= maxBins[i]; ++k)
@@ -192,7 +181,7 @@ SampleSummary::~SampleSummary() {
           if(PosteriorHist_ByMode[i][j][k] != nullptr) delete PosteriorHist_ByMode[i][j][k];
         }
         delete[] PosteriorHist_ByMode[i][j];
-        if(MeanHist_ByMode[i][j] != NULL) delete MeanHist_ByMode[i][j];
+        if(MeanHist_ByMode[i][j] != nullptr) delete MeanHist_ByMode[i][j];
       }
       delete[] PosteriorHist_ByMode[i];
       delete[] MeanHist_ByMode[i];
@@ -203,59 +192,27 @@ SampleSummary::~SampleSummary() {
 
   for (int i = 0; i < nSamples; ++i)
   {
-    if(DataHist[i] == NULL) continue;
-    if(DataHist[i] != NULL) delete DataHist[i];
-    if(NominalHist[i] != NULL) delete NominalHist[i];
-    if(MeanHist[i] != NULL) delete MeanHist[i];
-    if(DoBetaParam && MeanHistCorrected[i] != NULL) delete MeanHistCorrected[i];
-    if(W2MeanHist[i] != NULL) delete W2MeanHist[i];
-    if(W2ModeHist[i] != NULL) delete W2ModeHist[i];
+    if(DataHist[i] == nullptr) continue;
+    if(DataHist[i] != nullptr) delete DataHist[i];
+    if(NominalHist[i] != nullptr) delete NominalHist[i];
+    if(MeanHist[i] != nullptr) delete MeanHist[i];
+    if(ModeHist[i] != nullptr) delete ModeHist[i];
+    if(DoBetaParam && MeanHistCorrected[i] != nullptr) delete MeanHistCorrected[i];
+    if(W2MeanHist[i] != nullptr) delete W2MeanHist[i];
+    if(W2ModeHist[i] != nullptr) delete W2ModeHist[i];
     
-    if(ViolinHists_ProjectX[i] != NULL) delete ViolinHists_ProjectX[i];
-    if(ViolinHists_ProjectY[i] != NULL) delete ViolinHists_ProjectY[i];
+    if(ViolinHists_ProjectX[i] != nullptr) delete ViolinHists_ProjectX[i];
+    if(ViolinHists_ProjectY[i] != nullptr) delete ViolinHists_ProjectY[i];
     
-    if(lnLHist_Mean[i] != NULL) delete lnLHist_Mean[i];
-    if(lnLHist_Mode[i] != NULL) delete lnLHist_Mode[i];
-    if(lnLHist_Mean_ProjectX[i] != NULL) delete lnLHist_Mean_ProjectX[i];
-    if(lnLHist_Mean1D[i] != NULL) delete lnLHist_Mean1D[i];
-    if(lnLHist_Mode1D[i] != NULL) delete lnLHist_Mode1D[i];
-    if(lnLHist_Sample_DrawData[i] != NULL) delete lnLHist_Sample_DrawData[i];
-    if(lnLHist_Sample_DrawflucDraw[i] != NULL) delete lnLHist_Sample_DrawflucDraw[i];
-    if(lnLHist_Sample_PredflucDraw[i] != NULL) delete lnLHist_Sample_PredflucDraw[i];
-
-    for (int j = 1; j <= maxBins[i]; ++j)
-    {
-      if(PosteriorHist[i][j] != NULL) delete PosteriorHist[i][j];
-      if(w2Hist[i][j] != NULL) delete w2Hist[i][j];
-      if(DoBetaParam && BetaHist[i][j] != NULL) delete BetaHist[i][j];
-    }
-    delete[] PosteriorHist[i];
-    delete[] w2Hist[i];
-    if(DoBetaParam) delete[] BetaHist[i];
+    if(lnLHist_Mean[i] != nullptr) delete lnLHist_Mean[i];
+    if(lnLHist_Mode[i] != nullptr) delete lnLHist_Mode[i];
+    if(lnLHist_Mean_ProjectX[i] != nullptr) delete lnLHist_Mean_ProjectX[i];
+    if(lnLHist_Mean1D[i] != nullptr) delete lnLHist_Mean1D[i];
+    if(lnLHist_Mode1D[i] != nullptr) delete lnLHist_Mode1D[i];
+    if(lnLHist_Sample_DrawData[i] != nullptr) delete lnLHist_Sample_DrawData[i];
+    if(lnLHist_Sample_DrawflucDraw[i] != nullptr) delete lnLHist_Sample_DrawflucDraw[i];
+    if(lnLHist_Sample_PredflucDraw[i] != nullptr) delete lnLHist_Sample_PredflucDraw[i];
   }
-
-  delete[] DataHist;
-  delete[] NominalHist;
-  delete[] MeanHist;
-  if(DoBetaParam) delete[] MeanHistCorrected;
-  delete[] W2MeanHist;
-  delete[] W2ModeHist;
-
-  delete[] ViolinHists_ProjectX;
-  delete[] ViolinHists_ProjectY;
-      
-  delete[] lnLHist_Mean;
-  delete[] lnLHist_Mode;
-  delete[] lnLHist_Mean_ProjectX;
-  delete[] lnLHist_Mean1D;
-  delete[] lnLHist_Mode1D;
-  delete[] lnLHist_Sample_DrawData;
-  delete[] lnLHist_Sample_DrawflucDraw;
-  delete[] lnLHist_Sample_PredflucDraw;
-
-  delete[] PosteriorHist;
-  delete[] w2Hist;
-  if(DoBetaParam) delete[] BetaHist;
 }
 
 // *******************
@@ -282,10 +239,10 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
   // Check length of samples are OK
   if (!CheckSamples(Length)) throw MaCh3Exception(__FILE__ , __LINE__ );
   for (int i = 0; i < Length; ++i) {
-    if (Data[i] == NULL) {
-      DataHist[i] = NULL;
-      DataHist_ProjectX[i] = NULL;
-      DataHist_ProjectY[i] = NULL;
+    if (Data[i] == nullptr) {
+      DataHist[i] = nullptr;
+      DataHist_ProjectX[i] = nullptr;
+      DataHist_ProjectY[i] = nullptr;
       maxBins[i] = 0;
     } else {
       std::string classname = std::string(DataHist[i]->Class_Name());
@@ -316,22 +273,21 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
   //KS: ROOT is super annoying and you cannot use clone with openMP, hence we have another loop below
   for (int i = 0; i < Length; ++i) 
   {
-    if (Nominal[i] == NULL) {
-      PosteriorHist[i] = NULL;
-      NominalHist[i] = NULL;
-      W2NomHist[i] = NULL;
-      lnLHist_Mean[i] = NULL;
-      lnLHist_Mode[i] = NULL;
-      lnLHist_Mean_ProjectX[i] = NULL;
-      MeanHist[i] = NULL;
-      if(DoBetaParam) MeanHistCorrected[i] = NULL;
-      ModeHist[i] = NULL;
-      W2MeanHist[i] = NULL;
-      W2ModeHist[i] = NULL;
-      lnLHist_Sample_DrawData[i] = NULL;
-      lnLHist_Sample_DrawflucDraw[i] = NULL;
-      lnLHist_Sample_PredflucDraw[i] = NULL;
-    // If not NULL it indicates the selection was turned on, so initialise the privates
+    if (Nominal[i] == nullptr) {
+      NominalHist[i] = nullptr;
+      W2NomHist[i] = nullptr;
+      lnLHist_Mean[i] = nullptr;
+      lnLHist_Mode[i] = nullptr;
+      lnLHist_Mean_ProjectX[i] = nullptr;
+      MeanHist[i] = nullptr;
+      if(DoBetaParam) MeanHistCorrected[i] = nullptr;
+      ModeHist[i] = nullptr;
+      W2MeanHist[i] = nullptr;
+      W2ModeHist[i] = nullptr;
+      lnLHist_Sample_DrawData[i] = nullptr;
+      lnLHist_Sample_DrawflucDraw[i] = nullptr;
+      lnLHist_Sample_PredflucDraw[i] = nullptr;
+    // If not nullptr it indicates the selection was turned on, so initialise the privates
     } else {
       NominalHist[i] = static_cast<TH2Poly*>(Nominal[i]->Clone());
       if(doShapeOnly) NormaliseTH2Poly(NominalHist[i]);
@@ -354,22 +310,19 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
   //KS: Don't multithread, mostly due to fact that we initialise histograms
   for (int i = 0; i < Length; ++i) {
   // If NULL it indicates the selection was turned off, so initialise all the hists to NULL
-    if (Nominal[i] != NULL) 
+    if (Nominal[i] != nullptr)
     {
       std::string name = std::string(NominalHist[i]->GetName());
       name = name.substr(0, name.find("_nom"));
 
-      PosteriorHist[i] = new TH1D*[maxBins[i]+1];
-      w2Hist[i] = new TH1D*[maxBins[i]+1];
+      PosteriorHist[i].resize(maxBins[i]+1);
+      w2Hist[i].resize(maxBins[i]+1);
 
-      if(DoBetaParam) BetaHist[i] = new TH1D*[maxBins[i]+1];
+      if(DoBetaParam) BetaHist[i].resize(maxBins[i]+1);
 
       for (int j = 0; j <= maxBins[i]; ++j)
       {
-        PosteriorHist[i][j] = NULL;
-        w2Hist[i][j] = NULL;
-
-        if(DoBetaParam) BetaHist[i][j] = nullptr;
+        PosteriorHist[i][j] = nullptr;
       }
       lnLHist_Mean[i]->SetNameTitle((name+"_MeanlnL").c_str(), (name+"_MeanlnL").c_str());
       lnLHist_Mean[i]->Reset("");
@@ -491,14 +444,15 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
         ss2 << "p_{#mu} (" << bin->GetXMin() << "-" << bin->GetXMax() << ")";
         ss2 << " cos#theta_{#mu} (" << bin->GetYMin() << "-" << bin->GetYMax() << ")";
 
-        PosteriorHist[SampleNum][i] = new TH1D(ss2.str().c_str(), ss2.str().c_str(),nXBins, 1, -1);
+        PosteriorHist[SampleNum][i] = std::make_unique<TH1D>(ss2.str().c_str(), ss2.str().c_str(),nXBins, 1, -1);
         PosteriorHist[SampleNum][i]->SetDirectory(nullptr);
-        w2Hist[SampleNum][i] = new TH1D(("w2_"+ss2.str()).c_str(), ("w2_"+ss2.str()).c_str(),nXBins, 1, -1);
+        w2Hist[SampleNum][i] = std::make_unique<TH1D>(("w2_"+ss2.str()).c_str(), ("w2_"+ss2.str()).c_str(),nXBins, 1, -1);
         w2Hist[SampleNum][i]->SetDirectory(nullptr);
         if(DoBetaParam)
         {
           std::string betaName = "#beta_param_";
-          BetaHist[SampleNum][i] = new TH1D((betaName+ss2.str()).c_str(), (betaName+ss2.str()).c_str(), 70, 1, -1);
+          BetaHist[SampleNum][i] = std::make_unique<TH1D>((betaName + ss2.str()).c_str(), (betaName + ss2.str()).c_str(), 70, 1, -1);
+          BetaHist[SampleNum][i]->SetDirectory(nullptr);
           BetaHist[SampleNum][i]->GetXaxis()->SetTitle("#beta parameter value");
           BetaHist[SampleNum][i]->GetYaxis()->SetTitle("Counts");
         }
@@ -513,7 +467,7 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
   #endif
   for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
   {
-    if (SampleVector[SampleNum] == NULL) continue;
+    if (SampleVector[SampleNum] == nullptr) continue;
     if(doShapeOnly) NormaliseTH2Poly(SampleVector[SampleNum]);
     // Loop over the distribution and fill the prior/posterior predictive
     for (int i = 1; i <= maxBins[SampleNum]; ++i) {
@@ -548,7 +502,7 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
 
     for (int SampleNum = 0;  SampleNum < nSamples; SampleNum++)
     {
-      if (DataHist[SampleNum] == NULL) continue;
+      if (DataHist[SampleNum] == nullptr) continue;
 
       PosteriorHist_ByMode[SampleNum] = new TH1D**[Modes->GetNModes()+1];
       MeanHist_ByMode[SampleNum] = new TH2Poly*[Modes->GetNModes()+1];
@@ -589,7 +543,7 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
   #endif
   for (int SampleNum = 0;  SampleNum < nSamples; SampleNum++)
   {
-    if (DataHist[SampleNum] == NULL) continue;
+    if (DataHist[SampleNum] == nullptr) continue;
     
     for (int j = 0; j < Modes->GetNModes()+1; j++)
     {
@@ -731,13 +685,10 @@ void SampleSummary::Write() {
   timer.Start();
   MakePredictive();
   timer.Stop();
-  MACH3LOG_INFO("Made Prior/Posterior Predictive, it took {}s, now writing...", timer.RealTime());
+  MACH3LOG_INFO("Made Prior/Posterior Predictive, it took {:.2f}s, now writing...", timer.RealTime());
 
-  // Study Bayesian Information Criterion
-  StudyBIC();
-
-  // Study Deviance Information Criterion
-  StudyDIC();
+  // Studying information criterion
+  StudyInformationCriterion(M3::kWAIC);
 
   OutputTree->Write();
 
@@ -759,7 +710,7 @@ void SampleSummary::Write() {
   for (int i = 0; i < nSamples; ++i)
   {
      // Skip the null histograms
-    if (DataHist[i] == NULL || NoOverflowIntegral(DataHist[i]) == 0) continue;
+    if (DataHist[i] == nullptr || NoOverflowIntegral(DataHist[i]) == 0) continue;
     Dir[i]->cd();
 
     // Make the data/MC ratio histogram
@@ -780,9 +731,9 @@ void SampleSummary::Write() {
     TH1D *ModeProjectX = ProjectPoly(ModeHist[i], true, i, true);
     TH1D *ModeProjectY = ProjectPoly(ModeHist[i], false, i, true);
 
-    TH1D *MeanHistCorrectedProjectX = NULL;
+    TH1D *MeanHistCorrectedProjectX = nullptr;
     if(DoBetaParam) MeanHistCorrectedProjectX = ProjectPoly(MeanHistCorrected[i], true, i, true);
-    TH1D *MeanHistCorrectedProjectY = NULL;
+    TH1D *MeanHistCorrectedProjectY = nullptr;
     if(DoBetaParam) MeanHistCorrectedProjectY = ProjectPoly(MeanHistCorrected[i], false, i, true);
 
     TH1D *W2MeanProjectX = ProjectPoly(W2MeanHist[i], true, i);
@@ -928,7 +879,7 @@ void SampleSummary::Write() {
         Legend->SetLineColor(0);
         Legend->AddEntry(TempLineData.get(), Form("Data #mu=%.2f", DataHist[i]->GetBinContent(b)), "l");
         Legend->AddEntry(TempLine.get(), Form("Prior #mu=%.2f", NominalHist[i]->GetBinContent(b)), "l");
-        Legend->AddEntry(PosteriorHist[i][b], Form("Post, #mu=%.2f#pm%.2f", PosteriorHist[i][b]->GetMean(), PosteriorHist[i][b]->GetRMS()), "l");
+        Legend->AddEntry(PosteriorHist[i][b].get(), Form("Post, #mu=%.2f#pm%.2f", PosteriorHist[i][b]->GetMean(), PosteriorHist[i][b]->GetRMS()), "l");
         Legend->AddEntry(Fitter, Form("Gauss, #mu=%.2f#pm%.2f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
         std::string TempTitle = std::string(PosteriorHist[i][b]->GetName());
 
@@ -1025,9 +976,6 @@ void SampleSummary::Write() {
     delete W2ModeProjectY;
     MACH3LOG_INFO("");
   } //end loop over samples
-  delete[] DataHist_ProjectX;
-  delete[] DataHist_ProjectY;
-
   if(DoBetaParam) PlotBetaParameters();
 
   StudyKinematicCorrelations();
@@ -1038,7 +986,6 @@ void SampleSummary::Write() {
 // Make the posterior predictive distributions: fit Poissons etc
 void SampleSummary::MakePredictive() {
 // *******************
-
   // First make the projection on the z axis of the TH3D* for every pmu cosmu bin
   double llh_total_temp = 0.0;
 
@@ -1049,7 +996,7 @@ void SampleSummary::MakePredictive() {
   for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
   {
     // Skip disabled samples
-    if (DataHist[SampleNum] == NULL || NoOverflowIntegral(DataHist[SampleNum]) == 0) continue;
+    if (DataHist[SampleNum] == nullptr || NoOverflowIntegral(DataHist[SampleNum]) == 0) continue;
 
     // Count the -2LLH for each histogram
     double negLogL_Mean = 0.0;
@@ -1058,8 +1005,8 @@ void SampleSummary::MakePredictive() {
     // Loop over each pmu cosmu bin
     for (int j = 1; j < maxBins[SampleNum]+1; ++j)
     {
-      TH1D *Projection = PosteriorHist[SampleNum][j];
-      TH1D *W2Projection = w2Hist[SampleNum][j];
+      TH1D *Projection = PosteriorHist[SampleNum][j].get();
+      TH1D *W2Projection = w2Hist[SampleNum][j].get();
 
       // Data content for the j,kth bin
       const double nData = DataHist[SampleNum]->GetBinContent(j);
@@ -1093,7 +1040,7 @@ void SampleSummary::MakePredictive() {
 
       if(DoBetaParam)
       {
-        TH1D *BetaTemp = BetaHist[SampleNum][j];
+        TH1D *BetaTemp = BetaHist[SampleNum][j].get();
         const double nBetaMean = BetaTemp->GetMean();
         const double nBetaMeanError = BetaTemp->GetRMS();
         //KS: Here we modify predictions by beta parameter from Barlow-Beeston
@@ -1150,7 +1097,7 @@ void SampleSummary::MakePredictive() {
   for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
   {
     // Skip disabled samples
-    if (DataHist[SampleNum] == NULL || NoOverflowIntegral(DataHist[SampleNum]) == 0) continue;
+    if (DataHist[SampleNum] == nullptr || NoOverflowIntegral(DataHist[SampleNum]) == 0) continue;
 
     //KS:: Might consider caching it as we use it once agian much later
     TH1D *MeanProjectX = ProjectPoly(MeanHist[SampleNum], true, SampleNum, true);
@@ -1176,7 +1123,7 @@ void SampleSummary::MakePredictive() {
 
   llh_total = llh_total_temp;
   // Now we have our posterior predictive histogram and it's LLH
-  MACH3LOG_INFO("Prior/Posterior predictive LLH mean (sample only) = {}", llh_total);
+  MACH3LOG_INFO("Prior/Posterior predictive LLH mean (sample only) = {:.2f}", llh_total);
   std::stringstream ss;
   ss << llh_total;
   lnLHist->SetTitle((std::string(lnLHist->GetTitle())+"_"+ss.str()).c_str());
@@ -1239,17 +1186,17 @@ void SampleSummary::MakeChi2Hists() {
     AveragePenalty += llh_penalty;
 
     // Make the Poisson fluctuated hist
-    TH2Poly **FluctHist = new TH2Poly*[nSamples];
+    std::vector<TH2Poly*> FluctHist(nSamples);
     // Also Poisson fluctuate the drawn MCMC hist
-    TH2Poly **FluctDrawHist = new TH2Poly*[nSamples];
+    std::vector<TH2Poly*> FluctDrawHist(nSamples);
     // Finally Poisson fluctuate the data histogram
-    TH2Poly **DataFlucHist = new TH2Poly*[nSamples];
+    std::vector<TH2Poly*> DataFlucHist(nSamples);
 
     // Finally Poisson fluctuate the data histogram
-    TH1D **FluctDrawHistProjectX = new TH1D*[nSamples];
-    TH1D **DrawHistProjectX = new TH1D*[nSamples];
-    TH1D **DrawHistProjectY = new TH1D*[nSamples];
-    TH1D **DrawW2HistProjectX = new TH1D*[nSamples];
+    std::vector<TH1D*> FluctDrawHistProjectX(nSamples);
+    std::vector<TH1D*> DrawHistProjectX(nSamples);
+    std::vector<TH1D*> DrawHistProjectY(nSamples);
+    std::vector<TH1D*> DrawW2HistProjectX(nSamples);
 
     //KS: We have to clone histograms here to avoid cloning in MP loop, we have to make sure binning matches, content doesn't have to
     for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
@@ -1280,7 +1227,7 @@ void SampleSummary::MakeChi2Hists() {
       TH2Poly *DrawHist = MCVector[i][SampleNum];
       TH2Poly *DrawW2Hist = W2MCVector[i][SampleNum];
       // Skip empty samples
-      if (DrawHist == NULL) continue;
+      if (DrawHist == nullptr) continue;
 
       // Add LLH penalties from the systematics to the LLH that use the drawn histogram
       // Data vs Draw
@@ -1417,13 +1364,6 @@ void SampleSummary::MakeChi2Hists() {
       delete DrawHistProjectY[SampleNum];
       delete DrawW2HistProjectX[SampleNum];
     }
-    delete[] FluctHist;
-    delete[] FluctDrawHist;
-    delete[] DataFlucHist;
-    delete[] FluctDrawHistProjectX;
-    delete[] DrawHistProjectX;
-    delete[] DrawHistProjectY;
-    delete[] DrawW2HistProjectX;
 
     total_llh_data_draw = total_llh_data_draw_temp;
     total_llh_drawfluc_draw = total_llh_drawfluc_draw_temp;
@@ -1502,15 +1442,15 @@ void SampleSummary::MakeChi2Hists() {
 void SampleSummary::MakeCutLLH() {
 // *******************
   Outputfile->cd();
-  MakeCutLLH1D(lnLHist);
-  MakeCutLLH1D(lnLHist_drawfluc);
-  MakeCutLLH1D(lnLHist_drawdata);
-  MakeCutLLH1D(lnLHist_drawflucdraw);
+  MakeCutLLH1D(lnLHist.get());
+  MakeCutLLH1D(lnLHist_drawfluc.get());
+  MakeCutLLH1D(lnLHist_drawdata.get());
+  MakeCutLLH1D(lnLHist_drawflucdraw.get());
   
-  MakeCutLLH2D(lnLDrawHist);
-  MakeCutLLH2D(lnLFlucHist);
-  MakeCutLLH2D(lnLDrawHistRate);
-  MakeCutLLH2D(lnLFlucHist_ProjectX);
+  MakeCutLLH2D(lnLDrawHist.get());
+  MakeCutLLH2D(lnLFlucHist.get());
+  MakeCutLLH2D(lnLDrawHistRate.get());
+  MakeCutLLH2D(lnLFlucHist_ProjectX.get());
 }
 
 // ****************
@@ -1546,10 +1486,8 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
   TH1D *TempHistogram = static_cast<TH1D*>(Histogram->Clone());
   TempHistogram->SetFillStyle(1001);
   TempHistogram->SetFillColor(kRed);
-  for (int i = 0; i < TempHistogram->GetNbinsX(); ++i) 
-  {
-    if (TempHistogram->GetBinCenter(i+1) < llh_reference) 
-    {
+  for (int i = 0; i < TempHistogram->GetNbinsX(); ++i) {
+    if (TempHistogram->GetBinCenter(i+1) < llh_reference) {
       TempHistogram->SetBinContent(i+1, 0.0);
     }
   }
@@ -1686,7 +1624,6 @@ void SampleSummary::MakeCutEventRate(TH1D *Histogram, const double DataRate) {
 template<class HistType>
 HistType* SampleSummary::RatioHists(HistType *NumHist, HistType *DenomHist) {
 // ****************
-
   HistType *NumCopy = static_cast<HistType*>(NumHist->Clone());
   std::string title = std::string(DenomHist->GetName()) + "_ratio";
   NumCopy->SetNameTitle(title.c_str(), title.c_str());
@@ -1699,7 +1636,6 @@ HistType* SampleSummary::RatioHists(HistType *NumHist, HistType *DenomHist) {
 // Make a ratio th2poly
 TH2Poly* SampleSummary::RatioPolys(TH2Poly *NumHist, TH2Poly *DenomHist) {
 // ****************
-
   TH2Poly *NumCopy = static_cast<TH2Poly*>(NumHist->Clone());
   std::string title = std::string(DenomHist->GetName()) + "_ratio";
   NumCopy->SetNameTitle(title.c_str(), title.c_str());
@@ -1717,7 +1653,6 @@ TH2Poly* SampleSummary::RatioPolys(TH2Poly *NumHist, TH2Poly *DenomHist) {
 void SampleSummary::NormaliseTH2Poly(TH2Poly* Histogram){
 // ****************
   const double Integral = NoOverflowIntegral(Histogram);
-
   for(int j = 1; j < Histogram->GetNumberOfBins()+1; j++)
   {
     Histogram->SetBinContent(j, Histogram->GetBinContent(j)/Integral);
@@ -1779,13 +1714,17 @@ double SampleSummary::GetLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D
 // ****************
 void SampleSummary::PlotBetaParameters() {
 // ****************
-
   // Make a new directory
   TDirectory *BetaDir = Outputfile->mkdir("BetaParameters");
   BetaDir->cd();
 
+  int originalErrorLevel = gErrorIgnoreLevel;
+
+  //To avoid Warning in <Fit>: Fit data is empty
+  gErrorIgnoreLevel = kFatal;
+
   MACH3LOG_INFO("Writing Beta parameters");
-  TDirectory **DirBeta = new TDirectory*[nSamples];
+  std::vector<TDirectory *> DirBeta(nSamples);
   for (int i = 0; i < nSamples; ++i)
   {
     // Make a new directory
@@ -1801,7 +1740,7 @@ void SampleSummary::PlotBetaParameters() {
 
       const double BetaPrior = GetBetaParameter(data, mc, w2, likelihood);
 
-      TLine *TempLine = new TLine(BetaPrior, BetaHist[i][j]->GetMinimum(), BetaPrior, BetaHist[i][j]->GetMaximum());
+      auto TempLine = std::unique_ptr<TLine>(new TLine(BetaPrior, BetaHist[i][j]->GetMinimum(), BetaPrior, BetaHist[i][j]->GetMaximum()));
       TempLine->SetLineColor(kRed);
       TempLine->SetLineWidth(2);
 
@@ -1815,8 +1754,8 @@ void SampleSummary::PlotBetaParameters() {
       Legend->SetFillStyle(0);
       Legend->SetLineWidth(0);
       Legend->SetLineColor(0);
-      Legend->AddEntry(TempLine, Form("Prior #mu=%.4f, N_{data}=%.0f", BetaPrior, data), "l");
-      Legend->AddEntry(BetaHist[i][j], Form("Post, #mu=%.4f#pm%.4f", BetaHist[i][j]->GetMean(), BetaHist[i][j]->GetRMS()), "l");
+      Legend->AddEntry(TempLine.get(), Form("Prior #mu=%.4f, N_{data}=%.0f", BetaPrior, data), "l");
+      Legend->AddEntry(BetaHist[i][j].get(), Form("Post, #mu=%.4f#pm%.4f", BetaHist[i][j]->GetMean(), BetaHist[i][j]->GetRMS()), "l");
       Legend->AddEntry(Fitter, Form("Gauss, #mu=%.4f#pm%.4f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
       std::string TempTitle = std::string(BetaHist[i][j]->GetName());
 
@@ -1836,17 +1775,16 @@ void SampleSummary::PlotBetaParameters() {
       TempCanvas->Write();
       BetaHist[i][j]->Write();
 
-      delete TempLine;
       delete TempCanvas;
       delete Fitter;
     }
     DirBeta[i]->Write();
     delete DirBeta[i];
   }
-  delete[] DirBeta;
   BetaDir->Write();
   delete BetaDir;
 
+  gErrorIgnoreLevel = originalErrorLevel;
   Outputfile->cd();
 }
 
@@ -1878,19 +1816,20 @@ void SampleSummary::StudyKinematicCorrelations() {
   }
 
   // Holds the total event rate
-  TH1D *EventHist = new TH1D("EventHist", "Total Event Rate", 100, 1, -1);
+  auto EventHist = std::make_unique<TH1D>("EventHist", "Total Event Rate", 100, 1, -1);
+  EventHist->SetDirectory(nullptr);
   EventHist->GetXaxis()->SetTitle("Total event rate");
   EventHist->GetYaxis()->SetTitle("Counts");
   EventHist->SetLineWidth(2);
 
   // Holds the event rate for the distribution
-  TH1D **SumHist = new TH1D*[nSamples];
+  std::vector<std::unique_ptr<TH1D>> SumHist(nSamples);
   for (int i = 0; i < nSamples; ++i)
   {
     std::string name = std::string(NominalHist[i]->GetName());
     name = name.substr(0, name.find("_nom"));
 
-    SumHist[i] = new TH1D((name+"_sum").c_str(),(name+"_sum").c_str(), 100, 1, -1);
+    SumHist[i] = std::make_unique<TH1D>((name+"_sum").c_str(),(name+"_sum").c_str(), 100, 1, -1);
     SumHist[i]->GetXaxis()->SetTitle("N_{events}");
     SumHist[i]->GetYaxis()->SetTitle("Counts");
     double Integral = NoOverflowIntegral(DataHist[i]);
@@ -1929,14 +1868,13 @@ void SampleSummary::StudyKinematicCorrelations() {
   {
     DataRate += NoOverflowIntegral(DataHist[i]);
   }
-  MakeCutEventRate(EventHist, DataRate);
-  delete EventHist;
+  MakeCutEventRate(EventHist.get(), DataRate);
 
   for (int SampleNum = 0; SampleNum < nSamples; ++SampleNum)
   {
     Dir[SampleNum]->cd();
     //Make fancy event rate histogram
-    MakeCutEventRate(SumHist[SampleNum], NoOverflowIntegral(DataHist[SampleNum]));
+    MakeCutEventRate(SumHist[SampleNum].get(), NoOverflowIntegral(DataHist[SampleNum]));
   }
 
   // Make a new directory
@@ -1944,14 +1882,12 @@ void SampleSummary::StudyKinematicCorrelations() {
   CorrDir->cd();
 
   TMatrixDSym* SampleCorrelation = new TMatrixDSym(nSamples);
-
-  TH2D*** SamCorr = new TH2D**[nSamples]();
+  std::vector<std::vector<std::unique_ptr<TH2D>>> SamCorr(nSamples);
   for (int i = 0; i < nSamples; ++i)
   {
-    SamCorr[i] = new TH2D*[nSamples]();
+    SamCorr[i].resize(nSamples);
 
     (*SampleCorrelation)(i,i) = 1.0;
-
     const double Min_i = SumHist[i]->GetXaxis()->GetBinLowEdge(1);
     const double Max_i = SumHist[i]->GetXaxis()->GetBinUpEdge(SumHist[i]->GetNbinsX()+1);
     for (int j = 0; j < nSamples; ++j)
@@ -1960,7 +1896,7 @@ void SampleSummary::StudyKinematicCorrelations() {
       const double Max_j = SumHist[j]->GetXaxis()->GetBinUpEdge(SumHist[j]->GetNbinsX()+1);
 
       // TH2D to hold the Correlation
-      SamCorr[i][j] = new TH2D(Form("SamCorr_%i_%i",i,j), Form("SamCorr_%i_%i",i,j), 70, Min_i, Max_i, 70, Min_j, Max_j);
+      SamCorr[i][j] = std::make_unique<TH2D>(Form("SamCorr_%i_%i", i, j), Form("SamCorr_%i_%i", i, j), 70, Min_i, Max_i, 70, Min_j, Max_j);
       SamCorr[i][j]->SetDirectory(nullptr);
       SamCorr[i][j]->SetMinimum(0);
       SamCorr[i][j]->GetXaxis()->SetTitle(SampleNames[i].c_str());
@@ -1993,7 +1929,7 @@ void SampleSummary::StudyKinematicCorrelations() {
     }// End j loop
   }// End i loop
 
-  TH2D* hSamCorr = new TH2D("Sample Correlation", "Sample Correlation", nSamples, 0, nSamples, nSamples, 0, nSamples);
+  auto hSamCorr = std::make_unique<TH2D>("Sample Correlation", "Sample Correlation", nSamples, 0, nSamples, nSamples, 0, nSamples);
   hSamCorr->SetDirectory(nullptr);
   hSamCorr->GetZaxis()->SetTitle("Correlation");
   hSamCorr->SetMinimum(-1);
@@ -2014,10 +1950,8 @@ void SampleSummary::StudyKinematicCorrelations() {
       hSamCorr->SetBinContent(i+1, j+1, corr);
     }
   }
-
   hSamCorr->Draw("colz");
   hSamCorr->Write("Sample_Corr");
-  delete hSamCorr;
 
   SampleCorrelation->Write("Sample_Correlation");
   delete SampleCorrelation;
@@ -2032,16 +1966,6 @@ void SampleSummary::StudyKinematicCorrelations() {
     }// End j loop
   }// End i loop
 
-  for (int i = 0; i < nSamples; ++i)
-  {
-    for (int j = 0; j < nSamples; ++j)
-    {
-      delete SamCorr[i][j];
-    }
-    delete[] SamCorr[i];
-  }
-  delete[] SamCorr;
-
   //KS: This can take ages so better turn it off by default
   bool DoPerKinemBin = false;
   if(DoPerKinemBin)
@@ -2050,11 +1974,10 @@ void SampleSummary::StudyKinematicCorrelations() {
     for (int SampleNum = 0; SampleNum < nSamples; ++SampleNum)
     {
       TMatrixDSym* KinCorrelation = new TMatrixDSym(maxBins[SampleNum]);
-
-      TH2D*** KinCorr = new TH2D**[maxBins[SampleNum]]();
+      std::vector<std::vector<std::unique_ptr<TH2D>>> KinCorr(maxBins[SampleNum]);
       for (int i = 0; i < maxBins[SampleNum]; ++i)
       {
-        KinCorr[i] = new TH2D*[maxBins[SampleNum]]();
+        KinCorr[i].resize(maxBins[SampleNum]);
         (*KinCorrelation)(i,i) = 1.0;
 
         const double Min_i = PosteriorHist[SampleNum][i+1]->GetXaxis()->GetBinLowEdge(1);
@@ -2073,7 +1996,8 @@ void SampleSummary::StudyKinematicCorrelations() {
           const double Max_j = PosteriorHist[SampleNum][j+1]->GetXaxis()->GetBinUpEdge(PosteriorHist[SampleNum][j+1]->GetNbinsX()+1);
 
           // TH2D to hold the Correlation
-          KinCorr[i][j] = new TH2D(Form("Kin_%i_%i_%i",SampleNum,i,j), Form("Kin_%i_%i_%i",SampleNum,i,j), 70, Min_i, Max_i, 70, Min_j, Max_j);
+          KinCorr[i][j] = std::make_unique<TH2D>( Form("Kin_%i_%i_%i", SampleNum, i, j),
+                    Form("Kin_%i_%i_%i", SampleNum, i, j), 70, Min_i, Max_i, 70, Min_j, Max_j);
           KinCorr[i][j]->SetDirectory(nullptr);
           KinCorr[i][j]->SetMinimum(0);
 
@@ -2085,7 +2009,6 @@ void SampleSummary::StudyKinematicCorrelations() {
           ss3 << "p_{#mu} (" << bin->GetXMin() << "-" << bin->GetXMax() << ")";
           ss3 << " cos#theta_{#mu} (" << bin->GetYMin() << "-" << bin->GetYMax() << ")";
           KinCorr[i][j]->GetYaxis()->SetTitle(ss3.str().c_str());
-
           KinCorr[i][j]->GetZaxis()->SetTitle("Events");
         }
       }
@@ -2113,8 +2036,8 @@ void SampleSummary::StudyKinematicCorrelations() {
         }// End j loop
       }// End i loop
 
-
-      TH2D* hKinCorr = new TH2D(SampleNames[SampleNum].c_str(), SampleNames[SampleNum].c_str(), maxBins[SampleNum], 0, maxBins[SampleNum], maxBins[SampleNum], 0, maxBins[SampleNum]);
+      auto hKinCorr = std::make_unique<TH2D>(SampleNames[SampleNum].c_str(), SampleNames[SampleNum].c_str(),
+                                          maxBins[SampleNum], 0, maxBins[SampleNum], maxBins[SampleNum], 0, maxBins[SampleNum]);
       hKinCorr->SetDirectory(nullptr);
       hKinCorr->GetZaxis()->SetTitle("Correlation");
       hKinCorr->SetMinimum(-1);
@@ -2148,10 +2071,8 @@ void SampleSummary::StudyKinematicCorrelations() {
           hKinCorr->SetBinContent(i+1, j+1, corr);
         }
       }
-
       hKinCorr->Draw("colz");
       hKinCorr->Write((SampleNames[SampleNum] + "_Corr").c_str());
-      delete hKinCorr;
 
       KinCorrelation->Write((SampleNames[SampleNum] + "_Correlation").c_str());
       delete KinCorrelation;
@@ -2167,15 +2088,6 @@ void SampleSummary::StudyKinematicCorrelations() {
         }// End j loop
       }// End i loop
       */
-      for (int i = 0; i < maxBins[SampleNum]; ++i)
-      {
-        for (int j = 0; j < maxBins[SampleNum]; ++j)
-        {
-          delete KinCorr[i][j];
-        }
-        delete[] KinCorr[i];
-      }
-      delete[] KinCorr;
     }//end loop over samples
   }//end if DoPerKinemBin
   else
@@ -2328,12 +2240,6 @@ void SampleSummary::StudyKinematicCorrelations() {
     }
   }
 
-  for (int i = 0; i < nSamples; ++i)
-  {
-    delete SumHist[i];
-  }
-  delete[] SumHist;
-
   CorrDir->Close();
   delete CorrDir;
 
@@ -2344,10 +2250,9 @@ void SampleSummary::StudyKinematicCorrelations() {
 
 // ****************
 // Make a projection
-TH1D* SampleSummary::ProjectHist(TH2D* Histogram, bool ProjectX) {
+TH1D* SampleSummary::ProjectHist(TH2D* Histogram, const bool ProjectX) {
 // ****************
-
-  TH1D* Projection = NULL;
+  TH1D* Projection = nullptr;
   std::string name;
   if (ProjectX) {
     name = std::string(Histogram->GetName()) + "_x";
@@ -2356,7 +2261,6 @@ TH1D* SampleSummary::ProjectHist(TH2D* Histogram, bool ProjectX) {
     name = std::string(Histogram->GetName()) + "_y";
     Projection = Histogram->ProjectionY(name.c_str(), 1, Histogram->GetXaxis()->GetNbins(), "e");
   }
-
   return Projection;
 }
 
@@ -2368,17 +2272,15 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
   std::vector<double> ybins;
 
   SamplePDF->SetupBinning(M3::int_t(selection), xbins, ybins);
-  TH1D* Projection = NULL;
+  TH1D* Projection = nullptr;
   std::string name;
   if (ProjectX) {
     name = std::string(Histogram->GetName()) + "_x";
     Projection = PolyProjectionX(Histogram, name.c_str(), xbins, MakeErrorHist);
-  } 
-  else {
+  }  else {
     name = std::string(Histogram->GetName()) + "_y";
     Projection = PolyProjectionY(Histogram, name.c_str(), ybins, MakeErrorHist);
   }
-
   return Projection;
 }
 
@@ -2559,6 +2461,31 @@ double SampleSummary::GetModeError(TH1D* hpost){
 }
 
 // ****************
+void SampleSummary::StudyInformationCriterion(M3::kInfCrit Criterion) {
+// ****************
+  MACH3LOG_INFO("******************************");
+  switch(Criterion) {
+    case M3::kInfCrit::kBIC:
+      // Study Bayesian Information Criterion
+      StudyBIC();
+      break;
+    case M3::kInfCrit::kDIC:
+      // Study Deviance Information Criterion
+      StudyDIC();
+      break;
+    case M3::kInfCrit::kWAIC:
+      // Study Watanabe-Akaike information criterion (WAIC)
+      StudyWAIC();
+      break;
+    default:
+      MACH3LOG_ERROR("UNKNOWN Information Criterion SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(Criterion));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  MACH3LOG_INFO("******************************");
+}
+
+// ****************
 void SampleSummary::StudyBIC(){
 // ****************
   //make fancy event rate histogram
@@ -2569,25 +2496,22 @@ void SampleSummary::StudyBIC(){
   #endif
   for (int i = 0; i < nSamples; ++i)
   {
-    if (DataHist[i] == NULL) continue;
+    if (DataHist[i] == nullptr) continue;
     DataRate += NoOverflowIntegral(DataHist[i]);
     BinsRate += maxBins[i];
   }
 
   const double EventRateBIC = GetBIC(llh_total, DataRate, nModelParams);
   const double BinBasedBIC = GetBIC(llh_total, BinsRate, nModelParams);
-  MACH3LOG_INFO("******************************");
   MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of events: {:.2f}", EventRateBIC);
   MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of bins: {:.2f}", BinBasedBIC);
   MACH3LOG_INFO("Additional info: nModelParams {} DataRate: {:.2f} BinsRate: {:.2f}", nModelParams, DataRate, BinsRate);
-  MACH3LOG_INFO("******************************");
 }
 
 // ****************
-// Get the Deviance Information Criterion (DIC), for more see https://doi.org/10.1111/1467-9868.00353 or https://search.r-project.org/CRAN/refmans/BRugs/html/dic.html
+// Get the Deviance Information Criterion (DIC)
 void SampleSummary::StudyDIC() {
 // ****************
-
   //The posterior mean of the deviance
   double Dbar = 0.;
 
@@ -2599,6 +2523,7 @@ void SampleSummary::StudyDIC() {
     double LLH_temp = 0.;
     for (int SampleNum = 0;  SampleNum < nSamples; ++SampleNum)
     {
+      // Get -2*log-likelihood
       LLH_temp += GetLLH(DataHist[SampleNum], MCVector[i][SampleNum], W2MCVector[i][SampleNum]);
     }
     Dbar += LLH_temp;
@@ -2615,7 +2540,61 @@ void SampleSummary::StudyDIC() {
   const double DIC_stat = Dhat + 2 * p_D;
   MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
   MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
-  MACH3LOG_INFO("******************************");
+}
+
+// ****************
+// Get the Watanabe-Akaike information criterion (WAIC)
+void SampleSummary::StudyWAIC() {
+// ****************
+  // log pointwise predictive density
+  double lppd = 0.;
+  // effective number of parameters
+  double p_WAIC = 0.;
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:lppd, p_WAIC)
+  #endif
+  for (int SampleNum = 0; SampleNum < nSamples; ++SampleNum) {
+    int nBins = maxBins[SampleNum];
+    for (int i = 1; i <= nBins; ++i) {
+      double mean_llh = 0.;
+      double sum_exp_llh = 0;
+      double mean_llh_squared = 0.;
+
+      for (unsigned int s = 0; s < nThrows; ++s) {
+        const double data = DataHist[SampleNum]->GetBinContent(i);
+        const double mc = MCVector[s][SampleNum]->GetBinContent(i);
+        const double w2 = W2MCVector[s][SampleNum]->GetBinContent(i);
+
+        // Get the -log-likelihood for this sample and bin
+        double neg_LLH_temp = SamplePDF->getTestStatLLH(data, mc, w2);
+
+        // Negate the negative log-likelihood to get the actual log-likelihood
+        double LLH_temp = -neg_LLH_temp;
+
+        mean_llh += LLH_temp;
+        mean_llh_squared += LLH_temp * LLH_temp;
+        sum_exp_llh += std::exp(LLH_temp);
+      }
+
+      // Compute the mean log-likelihood and the squared mean
+      mean_llh /= nThrows;
+      mean_llh_squared /= nThrows;
+      sum_exp_llh /= nThrows;
+      sum_exp_llh = std::log(sum_exp_llh);
+
+      // Log pointwise predictive density based on Eq. 4 in Gelman2014
+      lppd += sum_exp_llh;
+
+      // Compute the effective number of parameters for WAIC
+      p_WAIC += mean_llh_squared - (mean_llh * mean_llh);
+    }
+  }
+
+  // Compute WAIC, see Eq. 13 in Gelman2014
+  double WAIC = -2 * (lppd - p_WAIC);
+  MACH3LOG_INFO("Effective number of parameters following WAIC formalism is equal to: {:.2f}", p_WAIC);
+  MACH3LOG_INFO("WAIC = {:.2f}", WAIC);
 }
 
 // ****************
