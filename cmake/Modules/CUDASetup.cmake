@@ -60,11 +60,9 @@ else()
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-g;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-dlcm=ca;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills;-Xptxas=-v;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
     )
-
     target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
 target_include_directories(MaCh3GPUCompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
-
 if(MaCh3_DEBUG_ENABLED)
   include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
 endif()
@@ -77,7 +75,6 @@ endif()
 
 # Pass NSplines_GPU as a preprocessor definition to the compiler
 target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE NSplines_GPU=${NSplines_GPU})
-
 cmessage(STATUS "Using \"${NSplines_GPU}\" for GPU EventByEvent Splines")
 
 

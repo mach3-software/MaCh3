@@ -85,7 +85,7 @@ add_to_PATH ${MaCh3_ROOT}/bin
 add_to_LD_LIBRARY_PATH ${MaCh3_ROOT}/lib
 
 if test -d ${MaCh3_ROOT}/pyMaCh3; then
-  add_to_PYTHONPATH ${MaCh3_ROOT}/pyMaCh3
+  add_to_PYTHONPATH ${MaCh3_ROOT}
 fi
 
 unset SETUPDIR

@@ -70,17 +70,16 @@ class covarianceXsec : public covarianceBase {
     /// @brief DB Get norm/func parameters depending on given DetID
     const std::vector<XsecNorms4> GetNormParsFromDetID(const int DetID);
 
-    /// @brief KS: For most covariances nominal and fparInit (prior) are the same, however for Xsec those can be different
-    /// For example Sigma Var are done around nominal in ND280, no idea why though...
+    /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> getNominalArray() override
     {
-      std::vector<double> nominal(_fNumPar);
+      std::vector<double> prior(_fNumPar);
       for (int i = 0; i < _fNumPar; i++) {
-        nominal[i] = _fPreFitValue.at(i);
+        prior[i] = _fPreFitValue.at(i);
       }
-      return nominal;
+      return prior;
     }
-    /// @brief Get nominal for a given param
+    /// @brief Get prior for a given param
     /// @param i parameter index
     inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
 
@@ -129,7 +128,12 @@ class covarianceXsec : public covarianceBase {
     /// @param DetID The Detector ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
     void IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action);
-
+    /// @brief Check if parameter is affecting given det ID
+    /// @param SystIndex number of parameter
+    /// @param DetID The Detector ID used to filter parameters.
+    bool AppliesToDetID(const int SystIndex, const int DetID) const {
+      return (GetParDetID(SystIndex) & DetID) != 0;
+    }
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.

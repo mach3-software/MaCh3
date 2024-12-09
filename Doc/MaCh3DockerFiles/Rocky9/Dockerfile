@@ -1,19 +1,19 @@
 #To run use:  docker build -t mach3 .
-# KS: Get glorious container from ROOT which will work as a base
-FROM rootproject/root:6.20.06-fedora32 AS mach3_build
+# KS: Get glorious container from Kamil which will work as a base
+FROM kamilskwarczynski/nukamil:latest AS mach3_build
 
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
-LABEL compiler="GNU 10.1.1"
-LABEL root_version="v6.20.06"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
 ARG MACH3_VERSION
 ENV MACH3_VERSION=${MACH3_VERSION:-develop}
+
 ARG CMAKE_OPTIONS
 ENV CMAKE_OPTIONS=${CMAKE_OPTIONS:-DMaCh3_PYTHON_ENABLED=ON}
+
 ARG INSTALL_OPTIONS
 ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
 

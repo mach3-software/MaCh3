@@ -36,6 +36,10 @@
 ///
 /// @note Originally written by Clarence, with changes by Will, updates by Kamil, and converted to a generic plotter by Ewan.
 
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wconversion"
+
 MaCh3Plotting::PlottingManager *man;
 TH1D *Prefit;
 
@@ -63,8 +67,6 @@ int nBins;
 TCanvas *canv;
 
 std::string SaveName;
-TPad *p1;
-TPad *p2;
 
 TPad *p3;
 TPad *p4;
@@ -113,12 +115,12 @@ void PrettifyTitles(TH2D *Hist) {
 void ReadSettings(std::shared_ptr<TFile> File1)
 {
   MACH3LOG_DEBUG("Reading settings for file {}", File1->GetName());
+  #ifdef DEBUG
   File1->ls();
-  TTree *Settings = (TTree*)(File1->Get("Settings"));
+  #endif
+  TTree *Settings = (File1->Get<TTree>("Settings"));
   MACH3LOG_DEBUG("Got settings tree");
   Settings->Print();
-
-  std::cout << CrossSectionParameters << std::endl;
 
   Settings->SetBranchAddress("CrossSectionParameters", &CrossSectionParameters);
   MACH3LOG_DEBUG("XSec params: {}", CrossSectionParameters);
@@ -146,7 +148,7 @@ void ReadSettings(std::shared_ptr<TFile> File1)
 
 inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
   // set up the ratio hist
-  TH1D *Ratio = (TH1D*)PrefitCopy->Clone();
+  TH1D* Ratio = static_cast<TH1D*>(PrefitCopy->Clone());
   Ratio->GetYaxis()->SetTitle("(x_{Post}-#mu_{Prior})/#sigma_{Prior}");
   Ratio->SetMinimum(-3.7);
   Ratio->SetMaximum(3.7);    
@@ -212,7 +214,7 @@ inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
     return Ratio;
 }
 
-inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>PostfitVec, TPad *mainPad, TPad *ratioPad) {
+inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<TH1D*>& PostfitVec, TPad *mainPad, TPad *ratioPad) {
   // Draw!
   plotCanv->cd();
   mainPad->Draw();
@@ -224,7 +226,7 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>Po
   PrefitCopy->GetYaxis()->SetTitleOffset(1.3);
   PrefitCopy->Draw("e2");
 
-  for(int fileId=0; fileId < (int)PostfitVec.size(); fileId++){
+  for (int fileId = 0; fileId < static_cast<int>(PostfitVec.size()); fileId++) {
     TH1D *postFitHist = PostfitVec[fileId];
     
     postFitHist->SetMarkerColor(TColor::GetColorPalette(fileId));
@@ -254,7 +256,7 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, std::vector<TH1D *>Po
   ratioHists.push_back(makeRatio(PrefitCopy, PostfitVec[0], true));
 
   ratioHists[0]->Draw("p");
-  for(int postFitIdx = 1; postFitIdx < (int)PostfitVec.size(); postFitIdx++){
+  for(int postFitIdx = 1; postFitIdx < static_cast<int>(PostfitVec.size()); postFitIdx++){
     ratioHists.push_back(makeRatio(PrefitCopy, PostfitVec[postFitIdx], true));
     
     ratioHists[postFitIdx]->SetMarkerColor(TColor::GetColorPalette(postFitIdx));
@@ -295,7 +297,7 @@ void MakeXsecPlots()
 {  
   // get the names of the blocks of parameters to group together
   std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
-  const int XsecPlots = (int)blockNames.size();
+  const int XsecPlots = static_cast<int>(blockNames.size());
 
   for (int i = 0; i < XsecPlots; i++) 
   {
@@ -307,10 +309,11 @@ void MakeXsecPlots()
     std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // get num of params in the block
-    int nParams = (int)blockContents.size();
+    const int nParams = static_cast<int>(blockContents.size());
 
     // set some plot things
-    TH1D *blockHist_prefit = new TH1D(blockName.c_str(), blockTitle.c_str(), nParams, 0.0, (double)nParams);
+    TH1D *blockHist_prefit = new TH1D(blockName.c_str(),
+                                      blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams));
     
     man->style().setTH1Style(blockHist_prefit, man->getOption<std::string>("prefitHistStyle"));
 
@@ -323,11 +326,12 @@ void MakeXsecPlots()
 
     // now set for the postfit blocks for all files
     std::vector <TH1D *> blockHist_postfit_Vec;
-    for(int fileId = 0; fileId < man->getNFiles(); fileId++){
+    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
 
-      TH1D *blockHist_postfit = new TH1D((blockName + man->getFileName(fileId)).c_str(), blockTitle.c_str(), nParams, 0.0, (double)nParams);
+      TH1D *blockHist_postfit = new TH1D((blockName + man->getFileName(fileId)).c_str(),
+                                         blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams));
 
-      // loop throught all the parameters in this block and set the contents in the blocks TH1
+      // loop through all the parameters in this block and set the contents in the blocks TH1
       for(int localBin=0; localBin < nParams; localBin ++){
         // the "local" bin is the params index within the group of parameters
         std::string paramName = blockContents[localBin];
@@ -344,12 +348,30 @@ void MakeXsecPlots()
     PrettifyTitles(blockHist_prefit);
 
     DrawPlots(canv, blockHist_prefit, blockHist_postfit_Vec, p3, p4);
+    delete blockHist_prefit;
+    for (auto hist : blockHist_postfit_Vec) {
+      delete hist;
+    }
     blockHist_postfit_Vec.clear();
-   }
+  }
 }
 
 void MakeFluxPlots()
 {
+  // these for non named params where we dont need as much space
+  TPad* p1 = new TPad("p1", "p1", 0.0, 0.3, 1.0, 1.0);
+  TPad* p2 = new TPad("p2", "p2", 0.0, 0.0, 1.0, 0.3);
+  p1->SetLeftMargin(canv->GetLeftMargin());
+  p1->SetRightMargin(canv->GetRightMargin());
+  p1->SetTopMargin(canv->GetTopMargin());
+  p1->SetBottomMargin(0);
+  p1->SetGrid();
+  p2->SetLeftMargin(canv->GetLeftMargin());
+  p2->SetRightMargin(canv->GetRightMargin());
+  p2->SetTopMargin(0);
+  p2->SetBottomMargin(0.25);
+  p2->SetGrid();
+
   p1->SetLogx(true);
   p2->SetLogx(true);
   
@@ -357,7 +379,7 @@ void MakeFluxPlots()
   std::vector<std::string> const fluxBlockNames = man->getOption<std::vector<std::string>>("fluxGroups");
   auto const fluxBinningTable = man->getOption("FluxBinning");
 
-  const int FluxPlots = (int)fluxBlockNames.size();
+  const int FluxPlots = static_cast<int>(fluxBlockNames.size());
 
   for (int i = 0; i < FluxPlots; i++) 
   {
@@ -380,7 +402,7 @@ void MakeFluxPlots()
       MACH3LOG_CRITICAL("  Should have the form [<low index>, <up index>]");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    if(nParams != (int)binning.size() -1){
+    if (nParams != static_cast<int>(binning.size()) - 1) {
       MACH3LOG_CRITICAL("Binning provided for flux param block {} does not match the number of parameters specified for the block", fluxBlockName);
       MACH3LOG_CRITICAL("  Provided {} parameters but {} bins", nParams, binning.size() -1);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -400,7 +422,7 @@ void MakeFluxPlots()
 
     // now set for the postfit blocks for all files
     std::vector <TH1D *> blockHist_postfit_Vec;
-    for(int fileId = 0; fileId < man->getNFiles(); fileId++){
+    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
       TH1D *blockHist_postfit = new TH1D(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binning.data());
 
       for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
@@ -417,17 +439,37 @@ void MakeFluxPlots()
     blockHist_prefit->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]); 
 
     DrawPlots(canv, blockHist_prefit, blockHist_postfit_Vec, p1, p2);
+    delete blockHist_prefit;
+    for (auto hist : blockHist_postfit_Vec) {
+      delete hist;
+    }
     blockHist_postfit_Vec.clear();
   }
 
   canv->cd();
   canv->SetLogx(false);
   canv->SetBottomMargin(canv->GetBottomMargin()*1.7);
+  delete p1;
+  delete p2;
 }
 
 void MakeNDDetPlots()
 {
+  MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
+
+  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
+  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
+  pTop->SetLeftMargin(canv->GetLeftMargin());
+  pTop->SetRightMargin(canv->GetRightMargin());
+  pTop->SetTopMargin(canv->GetTopMargin());
+  pTop->SetBottomMargin(0);
+  pTop->SetGrid();
+  pDown->SetLeftMargin(canv->GetLeftMargin());
+  pDown->SetRightMargin(canv->GetRightMargin());
+  pDown->SetTopMargin(0);
+  pDown->SetBottomMargin(0.75);
+  pDown->SetGrid();
 
   int NDbinCounter = NDParametersStartingPos;
   int Start = NDbinCounter;
@@ -440,7 +482,7 @@ void MakeNDDetPlots()
     NDbinCounter += NDSamplesBins[i];
 
     std::vector<TH1D*> PostfitNDDetHistVec(man->getNFiles());
-    TH1D *PreFitNDDetHist = (TH1D*)man->input().getFile(0).file->Get(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
+    TH1D *PreFitNDDetHist = man->input().getFile(0).file->Get<TH1D>(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
     man->style().setTH1Style(PreFitNDDetHist, man->getOption<std::string>("prefitHistStyle"));
 
     std::string temp = NDSamplesNames[i].c_str();
@@ -452,8 +494,8 @@ void MakeNDDetPlots()
     
     MACH3LOG_DEBUG("  Start bin: {} :: End bin: {}", Start, NDbinCounter);
     // set the x range for the postfits
-    for(int fileId = 0; fileId < man->getNFiles(); fileId++){
-      PostfitNDDetHistVec[fileId] = (TH1D*)man->input().getFile(fileId).file->Get(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
+    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
+      PostfitNDDetHistVec[fileId] = man->input().getFile(fileId).file->Get<TH1D>(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str()));
     }
 
     //KS: We dont' need name for every nd param
@@ -471,15 +513,31 @@ void MakeNDDetPlots()
     
     Start += NDSamplesBins[i];
 
-    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, p3, p4);
+    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, pTop, pDown);
     canv->Update();
   }
+  delete pTop;
+  delete pDown;
 }
 
 void MakeFDDetPlots()
 {
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
   
+  // these for named parameters where we need a nice big gap at the bottom to fit the names
+  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
+  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
+  pTop->SetLeftMargin(canv->GetLeftMargin());
+  pTop->SetRightMargin(canv->GetRightMargin());
+  pTop->SetTopMargin(canv->GetTopMargin());
+  pTop->SetBottomMargin(0);
+  pTop->SetGrid();
+  pDown->SetLeftMargin(canv->GetLeftMargin());
+  pDown->SetRightMargin(canv->GetRightMargin());
+  pDown->SetTopMargin(0);
+  pDown->SetBottomMargin(0.75);
+  pDown->SetGrid();
+
   int FDbinCounter = FDParametersStartingPos;
   int Start = FDbinCounter;
   //KS: WARNING This is hardcoded
@@ -504,30 +562,45 @@ void MakeFDDetPlots()
     
     Start = FDParametersStartingPos + FDSamplesBins[i];
 
-    DrawPlots(canv, Prefit, PostfitHistVec, p3, p4);
+    DrawPlots(canv, Prefit, PostfitHistVec, pTop, pDown);
     canv->Update();
    }
+   delete pTop;
+   delete pDown;
 }
 
 void MakeOscPlots()
 {
+  // these for named parameters where we need a nice big gap at the bottom to fit the names
+  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
+  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
+  pTop->SetLeftMargin(canv->GetLeftMargin());
+  pTop->SetRightMargin(canv->GetRightMargin());
+  pTop->SetTopMargin(canv->GetTopMargin());
+  pTop->SetBottomMargin(0);
+  pTop->SetGrid();
+  pDown->SetLeftMargin(canv->GetLeftMargin());
+  pDown->SetRightMargin(canv->GetRightMargin());
+  pDown->SetTopMargin(0);
+  pDown->SetBottomMargin(0.75);
+  pDown->SetGrid();
+
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
   
   canv->cd();
-  Prefit->SetTitle("Oscilation Parameters");
+  Prefit->SetTitle("Oscillation Parameters");
   Prefit->GetXaxis()->SetRangeUser(OscParametersStartingPos, OscParametersStartingPos+OscParameters);
 
-    Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("oscParYRange_low"), man->getOption<double>("oscParYRange_high"));
+  Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("oscParYRange_low"), man->getOption<double>("oscParYRange_high"));
   Prefit->Draw("e2");
 
-  DrawPlots(canv, Prefit, PostfitHistVec, p3, p4);
+  DrawPlots(canv, Prefit, PostfitHistVec, pTop, pDown);
+  delete pTop;
+  delete pDown;
 }
-
 
 void MakeXsecRidgePlots()
 {  
-  
-  
   gStyle->SetPalette(51);
 
   TCanvas *blankCanv = new TCanvas ("blankCanv", "blankCanv", 2048, 2048);
@@ -535,7 +608,7 @@ void MakeXsecRidgePlots()
 
   // get the names of the blocks of parameters to group together
   std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
-  const int XsecPlots = (int)blockNames.size();
+  const int XsecPlots = static_cast<int>(blockNames.size());
 
   double padTopMargin = 0.9;
   double padBottomMargin = 0.1;
@@ -544,47 +617,44 @@ void MakeXsecRidgePlots()
 
   for (int i = 0; i < XsecPlots; i++) 
   {
-    
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
     auto const &paramBlock = man->getOption(blockName);
-    std::string blockTitle                 = paramBlock[0].as<std::string>();
-    std::vector<double>      blockLimits   = paramBlock[1].as<std::vector<double>>();
-    std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
+    auto blockTitle    = paramBlock[0].as<std::string>();
+    auto blockLimits   = paramBlock[1].as<std::vector<double>>();
+    auto blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // the directory of histograms
-    TDirectoryFile *posteriorDir = (TDirectoryFile *)man->input().getFile(0).file->Get("Post");
+    TDirectoryFile *posteriorDir = man->input().getFile(0).file->Get<TDirectoryFile>("Post_1d_hists");
 
     // get num of params in the block
-    int nParams = (int)blockContents.size();
+    int nParams = static_cast<int>(blockContents.size());
     TCanvas *ridgeCanv = new TCanvas ("RidgePlotCanv", "RidgePlotCanv", 2048, 2048);
     ridgeCanv->Divide(1,1+nParams, 0.01, 0.0);
 
-    TLatex *title = new TLatex();
+    auto title = std::make_unique<TLatex>();
     title->SetTextAlign(21);
     title->SetTextSize(0.03);
     title->DrawLatex(0.5, 0.95, blockTitle.c_str());
 
-    TLatex *label = new TLatex();
+    auto label = std::make_unique<TLatex>();
     label->SetTextAlign(31);
     label->SetTextSize(0.02);
     
-    TLine *line = new TLine();
+    auto line = std::make_unique<TLine>();
     line->SetLineColor(kBlack);
     line->SetLineWidth(ridgeLineWidth);
 
     // use this to set the limits and also to plot the x axis and grid
     TH1D *axisPlot = new TH1D("axis plot", "", 1, blockLimits[0], blockLimits[1]);
 
-    for(int parId=0; parId < nParams; parId++){
+    for(int parId = 0; parId < nParams; parId++) {
       std::string paramName = blockContents[parId];
 
-      TCanvas *posteriorDistCanv = NULL;
-      TH1D *posteriorDist = NULL;
-
+      TH1D *posteriorDist = nullptr;
       // get the list of objects in the directory
       TIter next(posteriorDir->GetListOfKeys());
-      while(TKey *key = (TKey*) next()){ 
+      while (TKey* key = static_cast<TKey*>(next())) {
         // check if the end of the param name matches with the MaCh3 name, do this so we exclude things like nds_ at the start of the name
         std::string str(key->GetTitle());
         std::string name = man->input().translateName(0, MaCh3Plotting::kPostFit, paramName);
@@ -592,19 +662,19 @@ void MakeXsecRidgePlots()
         bool foundPar = (pos == str.length() - name.length());
 
         if(foundPar){
-          posteriorDistCanv = (TCanvas*)posteriorDir->Get(key->GetName());
-          posteriorDist = (TH1D*)posteriorDistCanv->GetPrimitive(key->GetName());
+          posteriorDist = posteriorDir->Get<TH1D>(key->GetName());
         }
       }
 
-      if(posteriorDist == NULL){
-        MACH3LOG_WARN("Couldnt find parameter {} when making ridgeline plots", paramName);
+      if(posteriorDist == nullptr){
+        MACH3LOG_WARN("Couldn't find parameter {} when making ridgeline plots", paramName);
         continue;
       }
       
       // EM: do some funky scaling so that we always get evenly spaced pads in the range [bottomMargin, TopMargin] with the specified overlap
-      double padAnchor = padBottomMargin + ((float)(nParams - parId -1) / (float)(nParams -1)) * (padTopMargin - padBottomMargin);
-      double padWidth = ((padTopMargin - padBottomMargin) / (float)(nParams));
+      double padAnchor = padBottomMargin + (static_cast<double>(nParams - parId - 1) /
+                                  static_cast<double>(nParams - 1)) * (padTopMargin - padBottomMargin);
+      double padWidth = (padTopMargin - padBottomMargin) / static_cast<double>(nParams);
       double norm = (padTopMargin - padBottomMargin);
 
       double padTop = padWidth * (1.0 + padOverlap) * (padTopMargin - padAnchor) / norm + padAnchor;
@@ -627,13 +697,14 @@ void MakeXsecRidgePlots()
       posteriorDist->SetTitle("");
       posteriorDist->SetLineWidth(ridgeLineWidth);
       
-      TH1D *axisPlot_tmp = (TH1D*)axisPlot->Clone(Form("AxisPlot_%s", paramName.c_str()));
+      TH1D* axisPlot_tmp = static_cast<TH1D*>(axisPlot->Clone(Form("AxisPlot_%s", paramName.c_str())));
       axisPlot_tmp->Draw("A");
       posteriorDist->Draw("H SAME");
     
       axisPlot_tmp->GetYaxis()->SetRangeUser(0.0, 0.7 *posteriorDist->GetMaximum());
       posteriorDist->SetLineColor(kWhite);
-      posteriorDist->SetFillColorAlpha(TColor::GetColorPalette(floor((float)parId * TColor::GetNumberOfColors()/ (float)nParams)), 0.85);
+      posteriorDist->SetFillColorAlpha(TColor::GetColorPalette(floor(static_cast<float>(parId) *
+                                          TColor::GetNumberOfColors() / static_cast<float>(nParams))), 0.85);
       
       posteriorDist->GetXaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
       posteriorDist->GetYaxis()->SetTitle(paramName.c_str());
@@ -646,12 +717,11 @@ void MakeXsecRidgePlots()
       ridgeCanv->cd();
       label->DrawLatexNDC(0.29, padBottom + 0.005, man->style().prettifyParamName(paramName).c_str());
       line->DrawLine(0.1, padBottom, 0.9, padBottom);
-
     }
 
     ridgeCanv->cd();
     ridgeCanv->SetGrid(1,1);
-    TPad *axisPad = new TPad("AxisPad", "", 0.3, 0.0, 0.9, 1.0, -1, 0, -1); 
+    TPad *axisPad = new TPad("AxisPad", "", 0.3, 0.0, 0.9, 1.0, -1, 0, -1);
     axisPad->SetLeftMargin(0.0);
     axisPad->SetRightMargin(0.0);
     axisPad->Draw();
@@ -681,9 +751,10 @@ void MakeXsecRidgePlots()
 
     ridgeCanv->SaveAs("RidgePlots.pdf");
     delete ridgeCanv;
+    delete axisPlot;
   }
-  
   blankCanv->SaveAs("RidgePlots.pdf]");
+  delete blankCanv;
 }
 
 void GetPostfitParamPlots()
@@ -708,20 +779,6 @@ void GetPostfitParamPlots()
 
   canv->Print((SaveName+"[").c_str());
 
-  // these for non named params where we dont need as much space
-  p1 = new TPad("p1", "p1", 0.0, 0.3, 1.0, 1.0);
-  p2 = new TPad("p2", "p2", 0.0, 0.0, 1.0, 0.3);
-  p1->SetLeftMargin(canv->GetLeftMargin());
-  p1->SetRightMargin(canv->GetRightMargin());
-  p1->SetTopMargin(canv->GetTopMargin());
-  p1->SetBottomMargin(0);
-  p1->SetGrid();
-  p2->SetLeftMargin(canv->GetLeftMargin());
-  p2->SetRightMargin(canv->GetRightMargin());
-  p2->SetTopMargin(0);
-  p2->SetBottomMargin(0.25);
-  p2->SetGrid();
-
   // these for named parameters where we need a nice big gap at the botto to fit the names
   p3 = new TPad("p3", "p3", 0.0, 0.4, 1.0, 1.0);
   p4 = new TPad("p4", "p4", 0.0, 0.0, 1.0, 0.4);
@@ -737,14 +794,13 @@ void GetPostfitParamPlots()
   p4->SetGrid();
 
   // Make a Legend page
-  TLegend *leg = new TLegend(0.0, 0.0, 1.0, 1.0);
-
+  auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
   // make a dummy TH1 to set out legend
   Prefit = new TH1D();
   man->style().setTH1Style(Prefit, man->getOption<std::string>("prefitHistStyle"));
   leg->AddEntry(Prefit, "Prior", "lpf");
 
-  for(int fileId = 0; fileId < man->getNFiles(); fileId++){
+  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
     TH1D *postFitHist_tmp = new TH1D();
     postFitHist_tmp->SetBit(kCanDelete);
     
@@ -755,18 +811,29 @@ void GetPostfitParamPlots()
     postFitHist_tmp->SetLineWidth(man->getOption<int>("plotLineWidth"));
     leg->AddEntry(postFitHist_tmp, man->getFileLabel(fileId).c_str(), "lpf");
   }
+  /// @todo this is temporary hack
+  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++)
+  {
+    TH1D *Hist = static_cast<TH1D*>((man->input().getFile(fileId).file->Get( ("param_xsec_"+plotType).c_str()))->Clone());
+
+    Hist->SetMarkerColor(TColor::GetColorPalette(fileId));
+    Hist->SetLineColor(TColor::GetColorPalette(fileId));
+    Hist->SetMarkerStyle(7);
+    Hist->SetLineStyle(1+fileId);
+    Hist->SetLineWidth(man->getOption<int>("plotLineWidth"));
+    PostfitHistVec.push_back(Hist);
+  }
+
   canv->cd();
   canv->Clear();
   leg->Draw();
   canv->Print((SaveName).c_str());
-  delete leg;
 
   MakeXsecPlots();
 
   MakeFluxPlots();
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
-  MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
   if(NDParameters > 0) MakeNDDetPlots();
   
   //KS: Same as above but for FD parameters,
@@ -782,25 +849,23 @@ void GetPostfitParamPlots()
   delete Prefit;
 }
 
-
 inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
 {
-  double* x =   new double[nBins];
-  double* y =   new double[nBins];
-  double* exl = new double[nBins];
-  double* eyl = new double[nBins];
-  double* exh = new double[nBins];
-  double* eyh = new double[nBins];
+  std::vector<double> x(nBins);
+  std::vector<double> y(nBins);
+  std::vector<double> exl(nBins);
+  std::vector<double> eyl(nBins);
+  std::vector<double> exh(nBins);
+  std::vector<double> eyh(nBins);
 
-  TH1D* PostHist = (TH1D*)File->Get( ("param_xsec_"+plotType).c_str() )->Clone();
+  TH1D* PostHist = static_cast<TH1D*>(File->Get( ("param_xsec_"+plotType).c_str() )->Clone());
 
-  TVectorD* Errors_HPD_Positive = (TVectorD*)File->Get( "Errors_HPD_Positive" )->Clone();
-  TVectorD* Errors_HPD_Negative = (TVectorD*)File->Get( "Errors_HPD_Negative" )->Clone();
-
-  //KS: I am tempted to multithred this...
+  TVectorD* Errors_HPD_Positive = static_cast<TVectorD*>(File->Get( "Errors_HPD_Positive" )->Clone());
+  TVectorD* Errors_HPD_Negative = static_cast<TVectorD*>(File->Get( "Errors_HPD_Negative" )->Clone());
+  //KS: I am tempted to multithread this...
   for(int i = 0; i < nBins; ++i)
   {
-    //KS: We are extrcting value from three object each having different numbering scheme, I have checked carefully so this is correct please don't cahnge all these +1 +0.5 etc. it just work...
+    //KS: We are extracting value from three object each having different numbering scheme, I have checked carefully so this is correct please don't change all these +1 +0.5 etc. it just work...
     x[i] = i + 0.5;
     y[i] = PostHist->GetBinContent(i+1);
 
@@ -810,18 +875,12 @@ inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
     eyh[i] = (*Errors_HPD_Positive)(i);
     eyl[i] = (*Errors_HPD_Negative)(i);
   }
-  TGraphAsymmErrors* PostGraph = new TGraphAsymmErrors(nBins,x,y,exl,exh,eyl,eyh);
+  TGraphAsymmErrors* PostGraph = new TGraphAsymmErrors(nBins, x.data(), y.data(), exl.data(), exh.data(), eyl.data(), eyh.data());
   PostGraph->SetTitle("");
 
   delete PostHist;
   delete Errors_HPD_Positive;
   delete Errors_HPD_Negative;
-  delete[] x;
-  delete[] y;
-  delete[] exl;
-  delete[] eyl;
-  delete[] exh;
-  delete[] eyh;
 
   return PostGraph;
 }
@@ -847,7 +906,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   if(PlotAssym) SaveName += "_Assym";
    
   std::shared_ptr<TFile> File1 = std::make_shared<TFile>(FileName1.c_str());
-  std::shared_ptr<TFile> File2 = NULL;
+  std::shared_ptr<TFile> File2 = nullptr;
   if(FileName2 != "") File2 = std::make_shared<TFile>(FileName2.c_str());
   
   canv = new TCanvas("canv", "canv", 1024, 1024);
@@ -864,10 +923,10 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   canv->Print((SaveName+".pdf[").c_str());
   canv->SetGrid();
 
-  Violin = NULL;
-  ViolinPre = (TH2D*)File1->Get( "param_violin_prior" );
-  Violin = (TH2D*)File1->Get( "param_violin" );
-  if(Violin == NULL)
+  Violin = nullptr;
+  ViolinPre = File1->Get<TH2D>( "param_violin_prior" );
+  Violin = File1->Get<TH2D>( "param_violin" );
+  if(Violin == nullptr)
   {
     MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
     return;
@@ -889,7 +948,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   Violin->SetMarkerStyle(20);
   Violin->SetMarkerSize(0.5);
     
-  TH1D* Postfit = (TH1D*)File1->Get( ("param_xsec_"+plotType).c_str() );
+  TH1D* Postfit = File1->Get<TH1D>( ("param_xsec_"+plotType).c_str() );
   Postfit->SetMarkerColor(kRed);
   Postfit->SetLineColor(kRed);
   Postfit->SetMarkerStyle(7);
@@ -900,9 +959,9 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   PostGraph->SetMarkerStyle(7);
   PostGraph->SetLineWidth(2);
   PostGraph->SetLineStyle(kSolid);
- if(File2 != NULL)
+ if(File2 != nullptr)
   {
-    Violin2 = (TH2D*)File2->Get( "param_violin" );
+    Violin2 = File2->Get<TH2D>( "param_violin" );
     Violin2->SetMarkerColor(kGreen);
     Violin2->SetLineColor(kGreen);
     Violin2->SetFillColor(kGreen);
@@ -910,18 +969,17 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   }
   
   // Make a Legend page
-  TLegend *leg = new TLegend(0.0, 0.0, 1.0, 1.0);
-  if (ViolinPre != NULL) leg->AddEntry(ViolinPre, "Prior", "lpf");
-  if (Violin != NULL) leg->AddEntry(Violin, "Posterior", "lpf");
-  if (Violin2 != NULL) leg->AddEntry(Violin2, "Second Violin", "lpf");
-  if(PlotAssym) leg->AddEntry(PostGraph, "HPD Assym", "lp");
-  else leg->AddEntry(Postfit, "HPD", "lpf");
+  auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
+  if (ViolinPre != nullptr) leg->AddEntry(ViolinPre, "Prior", "lpf");
+  if (Violin != nullptr)    leg->AddEntry(Violin, "Posterior", "lpf");
+  if (Violin2 != nullptr)   leg->AddEntry(Violin2, "Second Violin", "lpf");
+  if(PlotAssym)             leg->AddEntry(PostGraph, "HPD Assym", "lp");
+  else                      leg->AddEntry(Postfit, "HPD", "lpf");
 
   canv->cd();
   canv->Clear();
   leg->Draw();
   canv->Print((SaveName+".pdf").c_str());
-  delete leg;
   
    // Do some fancy replacements
   PrettifyTitles(ViolinPre);
@@ -939,47 +997,47 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
 
     Violin->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
     Violin->GetYaxis()->SetRangeUser(-1.5, 2.5);
-    if(File2 != NULL) Violin2->GetYaxis()->SetRangeUser(-1.5, 2.5);
+    if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-1.5, 2.5);
     
     std::string name = ViolinPre->GetTitle();
     if (name.find("SPP") != std::string::npos)
     { 
       ViolinPre->GetYaxis()->SetRangeUser(-5., 25.); //For RES Eb we need huge range
       Violin->GetYaxis()->SetRangeUser(-5., 25.);
-      if(File2 != NULL) Violin2->GetYaxis()->SetRangeUser(-5., 25.);
+      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-5., 25.);
     }
     else if (name.find("CCQE Binding Energy") != std::string::npos)   
     {
       ViolinPre->GetYaxis()->SetRangeUser(-10., 16.); //For Eb we need bigger range
       Violin->GetYaxis()->SetRangeUser(-10., 16.); //For Eb we need bigger range
-      if(File2 != NULL) Violin2->GetYaxis()->SetRangeUser(-10., 16.);
+      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-10., 16.);
     }
     else if (name.find("FSI") != std::string::npos)   
     {
       ViolinPre->GetYaxis()->SetRangeUser(-0.5, 2.8);
       Violin->GetYaxis()->SetRangeUser(-0.5, 2.8);
-      if(File2 != NULL) Violin2->GetYaxis()->SetRangeUser(-0.5, 2.8);
+      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-0.5, 2.8);
     }
     else if (name.find("CCQE") != std::string::npos)   
     {
       ViolinPre->GetYaxis()->SetRangeUser(-2., 3.);
       Violin->GetYaxis()->SetRangeUser(-2., 3.);
-      if(File2 != NULL) Violin2->GetYaxis()->SetRangeUser(-2., 3.);
+      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-2., 3.);
     }
     //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
     ViolinPre->Draw("violinX(03100300)");
     Violin->Draw("violinX(03100300) SAME");
-    if(File2 != NULL)
+    if(File2 != nullptr)
     {
       Violin2->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
       Violin2->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
       Violin2->Draw("violinX(03100300) SAME");
     }
-    if (Postfit != NULL) {
+    if (Postfit != nullptr) {
       Postfit->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
       if(!PlotAssym) Postfit->Draw("SAME");
     }
-    if (PostGraph != NULL) {
+    if (PostGraph != nullptr) {
       PostGraph->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
       if(PlotAssym) PostGraph->Draw("P SAME");
     }
@@ -1008,7 +1066,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
       //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
       ViolinPre->Draw("violinX(03100300)");
       Violin->Draw("violinX(03100300) SAME");
-      if(File2 != NULL)
+      if(File2 != nullptr)
       {
         Violin2->GetYaxis()->SetRangeUser(0.7, 1.3);
         Violin2->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
@@ -1033,7 +1091,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
   ViolinPre->Draw("violinX(03100300)");
   Violin->Draw("violinX(03100300) SAME");
-  if(File2 != NULL)
+  if(File2 != nullptr)
   {
     Violin2->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
     Violin2->GetYaxis()->SetRangeUser(-3.4, 3.4);
@@ -1047,11 +1105,11 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   delete canv;
   delete ViolinPre;
   delete Violin;
-  if(Violin2 != NULL) delete Violin2;
+  if(Violin2 != nullptr) delete Violin2;
   delete Postfit;
   delete PostGraph;
   File1->Close();
-  if(File2 != NULL)
+  if(File2 != nullptr)
   {
     File2->Close();
   }
@@ -1059,46 +1117,49 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
 
 int main(int argc, char *argv[]) 
 {
-    SetMaCh3LoggerFormat();
-    
-    man = new MaCh3Plotting::PlottingManager();
-    man->parseInputs(argc, argv);
-    std::cout << std::endl << std::endl << "====================" << std::endl;
-    man->input().getFile(0).file->ls();
-    
-    man->setExec("GetPostfitParamPlots");
+  SetMaCh3LoggerFormat();
+  // Avoid Info in <TCanvas::Print>
+  gErrorIgnoreLevel = kWarning;
 
-    man->style().setPalette(man->getOption<std::string>("colorPalette"));
+  man = new MaCh3Plotting::PlottingManager();
+  man->parseInputs(argc, argv);
+  #ifdef DEBUG
+  std::cout << std::endl << std::endl << "====================" << std::endl;
+  man->input().getFile(0).file->ls();
+  #endif
+  man->setExec("GetPostfitParamPlots");
 
-    GetPostfitParamPlots();
+  man->style().setPalette(man->getOption<std::string>("colorPalette"));
 
-    if (argc != 2 && argc != 3 && argc !=4) 
-    {
-        MACH3LOG_CRITICAL("Invalid command line options specified");
-        MACH3LOG_CRITICAL("How to use: {} <MCMC_Processor_Output>.root", argv[0]);
-        MACH3LOG_CRITICAL("You can add up to 3 different files");
-        throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  
-    if (argc == 2) 
-    {
-        std::string filename = argv[1];
-        GetViolinPlots(filename);
-    } 
-    else if (argc == 3) 
-    {
-        std::string filename1 = argv[1];
-        std::string filename2 = argv[2];
-        GetViolinPlots(filename1, filename2);
-    }
-    else if (argc == 4) 
-    {
-        std::string filename1 = argv[1];
-        std::string filename2 = argv[2];
-        std::string filename3 = argv[3];
-        //KS: Violin plot currently not supported by three file veriosn although it should be super easy to adapt
-    }
-    
+  GetPostfitParamPlots();
+
+  if (argc != 2 && argc != 3 && argc !=4)
+  {
+    MACH3LOG_CRITICAL("Invalid command line options specified");
+    MACH3LOG_CRITICAL("How to use: {} <MCMC_Processor_Output>.root", argv[0]);
+    MACH3LOG_CRITICAL("You can add up to 3 different files");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (argc == 2)
+  {
+    std::string filename = argv[1];
+    GetViolinPlots(filename);
+  }
+  else if (argc == 3)
+  {
+    std::string filename1 = argv[1];
+    std::string filename2 = argv[2];
+    GetViolinPlots(filename1, filename2);
+  }
+  else if (argc == 4)
+  {
+    std::string filename1 = argv[1];
+    std::string filename2 = argv[2];
+    std::string filename3 = argv[3];
+    //KS: Violin plot currently not supported by three file version although it should be super easy to adapt
+  }
+
+  delete man;
   return 0;
 }
-

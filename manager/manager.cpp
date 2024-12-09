@@ -19,11 +19,11 @@ manager::manager(std::string const &filename)
   if (config["LikelihoodOptions"])
   {
     auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
-    if (likelihood == "Barlow-Beeston")                 mc_stat_llh = TestStatistic(kBarlowBeeston);
-    else if (likelihood == "IceCube")                   mc_stat_llh = TestStatistic(kIceCube);
-    else if (likelihood == "Poisson")                   mc_stat_llh = TestStatistic(kPoisson);
-    else if (likelihood == "Pearson")                   mc_stat_llh = TestStatistic(kPearson);
-    else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
+    if (likelihood == "Barlow-Beeston")                 mc_stat_llh = kBarlowBeeston;
+    else if (likelihood == "IceCube")                   mc_stat_llh = kIceCube;
+    else if (likelihood == "Poisson")                   mc_stat_llh = kPoisson;
+    else if (likelihood == "Pearson")                   mc_stat_llh = kPearson;
+    else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = kDembinskiAbdelmottele;
     else {
       MACH3LOG_ERROR("Wrong form of test-statistic specified!");
       MACH3LOG_ERROR("You gave {} and I only support:", likelihood);

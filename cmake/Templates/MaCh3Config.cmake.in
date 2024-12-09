@@ -11,22 +11,21 @@ set(MaCh3_MULTITHREAD_ENABLED @MaCh3_MULTITHREAD_ENABLED@)
 set(MaCh3_GPU_ENABLED @MaCh3_GPU_ENABLED@)
 set(MaCh3_PYTHON_ENABLED @MaCh3_PYTHON_ENABLED@)
 set(MaCh3_MINUIT2_ENABLED @MaCh3_MINUIT2_ENABLED@)
+set(MACH3_CXX_STANDARD @MACH3_CXX_STANDARD@)
+set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 
 get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${MaCh3_CMAKE_DIR}/cmake/Modules")
 
 enable_language(CXX)
 
 set(MaCh3_FOUND TRUE)
 
-include(ROOT)
+include(MaCh3Utils)
 
-if(NOT TARGET ROOT::ROOT)
-  cmessage(WARNING "Expected MaCh3 to set up dependency target: ROOT::ROOT")
-  set(MaCh3_FOUND FALSE)
-  return()
-endif()
+find_package(ROOT 6.18 REQUIRED)
 
 #Fancy NuOscillator
 find_package(NuOscillator @NUOSCILLATOR_VERSION@ REQUIRED)

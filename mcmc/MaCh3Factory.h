@@ -22,10 +22,14 @@
 /// @code
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samplePDFBase>& Samples, std::vector<covarianceBase>& Covariances);
+std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan);
+
+/// @brief Factory function for creating a covariance class for systematic handling.
+covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix);
 
 
-/// @brief Factory function for creating a covariance matrix for systematic handling.
+// ********************************************
+/// @brief Factory function for creating a covariance class for systematic handling.
 ///
 /// @param fitMan Pointer to the manager class that holds the configuration settings.
 /// @param name Prefix, for example Xsec, then code will look for XsecCovFile
@@ -50,6 +54,87 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samp
 /// @endcode
 ///
 /// @todo add adaptive stuff
-covarianceXsec* MaCh3CovarianceFactory(manager *fitMan, const std::string& PreFix);
+template <typename CovType>
+CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
+// ********************************************
+  // config for our matrix
+  YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
+  auto CovMatrixName = Settings[std::string(PreFix) + "CovName"].as<std::string>();
+  MACH3LOG_INFO("Initialising {} matrix", CovMatrixName);
 
+  // yaml files initialising out matrix
+  auto CovMatrixFile = Settings[std::string(PreFix) + "CovFile"].as<std::vector<std::string>>();
 
+  // PCA threshold, -1 means no pca
+  auto PCAThreshold = GetFromManager<int>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
+  // do we pca whole matrix or only submatrix
+  auto PCAParamRegion = GetFromManager<std::vector<int>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
+
+  CovType* CovObject = new CovType(CovMatrixFile, CovMatrixName, PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
+
+  // Fill the parameter values with their nominal values
+  // should _ALWAYS_ be done before overriding with fix or flat
+  CovObject->setParameters();
+
+  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "Fix"], {});
+
+  // Fixed CovObject parameters loop
+  if (FixParams.size() == 1 && FixParams.at(0) == "All") {
+    for (int j = 0; j < CovObject->GetNumParams(); j++) {
+      CovObject->toggleFixParameter(j);
+    }
+  } else {
+    for (unsigned int j = 0; j < FixParams.size(); j++) {
+      CovObject->toggleFixParameter(FixParams.at(j));
+    }
+  }
+  //Global step scale for matrix
+  auto StepScale = Settings[std::string(PreFix) + "StepScale"].as<double>();
+
+  CovObject->setStepScale(StepScale);
+
+  // Adaptive MCMC stuff
+  if(FitManager->raw()["AdaptionOptions"])
+    CovObject->initialiseAdaption(FitManager->raw());
+
+  MACH3LOG_INFO("Factory successful");
+
+  return CovObject;
+}
+
+// ********************************************
+/// @brief Factory function for creating SamplePDF and initialisation with systematic.
+///
+/// @tparam SampleType The class type of the sample to create, e.g., `samplePDFTutorial`.
+/// @param SampleConfig Path to sample config.
+/// @param xsec A pointer to a covarianceXsec object for cross-section systematic settings.
+/// @param osc (Optional) A pointer to a covarianceOsc object for oscillation systematic settings.
+/// @return Vector of SampleType object, initialized and ready for use.
+///
+/// @note Example
+/// ```cpp
+/// auto mySamples = MaCh3SamplePDFFactory<samplePDFTutorial>(SampleConfig, xsec, osc);
+/// ```
+template <typename SampleType>
+std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& SampleConfig,
+                                               covarianceXsec* xsec,
+                                               covarianceOsc* osc = nullptr) {
+// ********************************************
+  std::vector<SampleType*> PDFs(SampleConfig.size());
+  for (size_t i = 0; i < SampleConfig.size(); ++i)
+  {
+    // Instantiate the sample using the specified class type
+    SampleType* Sample = new SampleType(SampleConfig[i], xsec, osc);
+    Sample->reweight();
+
+    // Obtain sample name and create a TString version for histogram naming
+    std::string name = Sample->GetName();
+    TString NameTString = TString(name.c_str());
+
+    // Clone the 1D histogram with a modified name
+    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->get1DHist()->Clone(NameTString + "_Prior"));
+    Sample->addData(SampleHistogramPrior);
+    PDFs[i] = Sample;
+  }
+  return PDFs;
+}

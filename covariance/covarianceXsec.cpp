@@ -14,7 +14,7 @@ covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, std::st
   for (int i = 0; i < _fNumPar; i++)
   {
     // Sort out the print length
-    if(_fNames[i].length() > PrintLength) PrintLength = _fNames[i].length();
+    if(int(_fNames[i].length()) > PrintLength) PrintLength = int(_fNames[i].length());
   } // end the for loop
 
   MACH3LOG_DEBUG("Constructing instance of covarianceXsec");
@@ -115,9 +115,10 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID )){
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
+
   }
   return returnVec;
 }
@@ -127,9 +128,14 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID )){
+
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
+
+    // if ((GetParDetID(SystIndex) & DetID )){
+    //   returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
+    // }
   }
 
   return returnVec;
@@ -174,7 +180,7 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
   int NumKinematicCuts = 0;
   if(param["KinematicCuts"]){
 
-    NumKinematicCuts = param["KinematicCuts"].size();
+    NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
     std::vector<std::vector<double>> TempKinematicBounds;
@@ -185,9 +191,12 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
-        std::vector<double> bounds = it->second.as<std::vector<double>>();
       }
-    }
+      if(TempKinematicStrings.size() == 0) {
+	MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+	throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }//KinVar_i
     norm.KinematicVarStr = TempKinematicStrings;
     norm.Selection = TempKinematicBounds;
   }
@@ -215,7 +224,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const int Det
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
     }
   }
@@ -230,8 +239,8 @@ const std::vector<int> covarianceXsec::GetSystIndexFromDetID(int DetID,  const S
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
-    auto &SystIndex = pair.second;
-    if ((GetParDetID(SystIndex) & DetID)) { //If parameter applies to required DetID
+    auto &systIndex = pair.second;
+    if (AppliesToDetID(systIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -251,7 +260,7 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
         Spline._SplineInterpolationType = SplineInterpolation(InterpType);
     }
   } else { //KS: By default use TSpline3
-    Spline._SplineInterpolationType = SplineInterpolation(kTSpline3);
+    Spline._SplineInterpolationType = kTSpline3;
   }
   Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999);
   Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999);
@@ -320,7 +329,7 @@ template <typename FilterFunc, typename ActionFunc>
 void covarianceXsec::IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((GetParDetID(i) & DetID) && filter(i)) { // Common filter logic
+    if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }
@@ -383,7 +392,7 @@ void covarianceXsec::Print() {
 void covarianceXsec::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Nom.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<5} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
@@ -398,6 +407,8 @@ void covarianceXsec::PrintNormParams() {
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
   if(_fSystToGlobalSystIndexMap[SystType::kNorm].size() == 0) return;
+
+  bool have_parameter_with_kin_bounds = false;
 
   //KS: Consider making some class producing table..
   MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────┬────────────────────┐");
@@ -428,8 +439,39 @@ void covarianceXsec::PrintNormParams() {
     if (NormParams[i].pdgs.empty()) pdgString += "all";
 
     MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+
+    if(NormParams[i].hasKinBounds) have_parameter_with_kin_bounds = true;
   }
   MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
+
+  if(have_parameter_with_kin_bounds) {
+    MACH3LOG_INFO("Normalisation parameters KinematicCuts information");
+    MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────────────────────────┐");
+    MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:40}│", "#", "Global #", "Name", "KinematicCut", "Value");
+    MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
+    for (unsigned int i = 0; i < NormParams.size(); ++i)
+      {
+	//skip parameters with no KinematicCuts
+	if(!NormParams[i].hasKinBounds) continue;
+
+	const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
+      	for(long unsigned int icut = 0; icut < ncuts; icut++) {
+	  std::string kinematicCutValueString;
+	  for(const auto & value : NormParams[i].Selection[icut]) {
+	    kinematicCutValueString += std::to_string(value);
+	    kinematicCutValueString += " ";
+	  }
+
+	  if(icut == 0)
+	    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+	  else
+	    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+	}//icut
+      }//i
+    MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────────────────────────┘");
+  }
+  else
+    MACH3LOG_INFO("No normalisation parameters have KinematicCuts defined");
 }
 
 // ********************************************
@@ -494,11 +536,11 @@ void covarianceXsec::CheckCorrectInitialisation() {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
   auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
-    std::unordered_map<std::string, int> seenStrings;
+    std::unordered_map<std::string, size_t> seenStrings;
     for (size_t i = 0; i < names.size(); ++i) {
       const auto& name = names[i];
       if (seenStrings.find(name) != seenStrings.end()) {
-        int firstIndex = seenStrings[name];
+        size_t firstIndex = seenStrings[name];
         MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -529,9 +571,14 @@ void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
 // Checks if parameter belongs to a given group
 bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
+  std::string groupLower = Group;
+  std::string paramGroupLower = _ParameterGroup[i];
 
-  if(Group == _ParameterGroup[i]) return true;
-  else return false;
+  // KS: Convert both strings to lowercase, this way comparison will be case insensitive
+  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);
+  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
+
+  return groupLower == paramGroupLower;
 }
 
 // ********************************************
@@ -547,7 +594,7 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
-  TVectorD* xsec_param_nom = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_generated = new TVectorD(_fNumPar);
   TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
   TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
 
@@ -569,7 +616,7 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
     xsec_spline_names->AddLast(splineName);
 
     (*xsec_param_prior)[i] = _fPreFitValue[i];
-    (*xsec_param_nom)[i] = _fGenerated[i];
+    (*xsec_param_generated)[i] = _fGenerated[i];
     (*xsec_flat_prior)[i] = _fFlatPrior[i];
     (*xsec_stepscale)[i] = _fIndivStepScale[i];
     (*xsec_error)[i] = _fError[i];
@@ -609,8 +656,8 @@ void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
   delete xsec_flat_prior;
   xsec_stepscale->Write("xsec_stepscale");
   delete xsec_stepscale;
-  xsec_param_nom->Write("xsec_param_nom");
-  delete xsec_param_nom;
+  xsec_param_generated->Write("xsec_param_nom");
+  delete xsec_param_generated;
   xsec_param_lb->Write("xsec_param_lb");
   delete xsec_param_lb;
   xsec_param_ub->Write("xsec_param_ub");

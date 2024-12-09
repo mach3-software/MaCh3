@@ -3,18 +3,20 @@
 /// Run low or high memory versions of structs
 /// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 /// KS: Need more testing on FD
+namespace M3 {
 #ifdef _LOW_MEMORY_STRUCTS_
 /// Custom floating point (float or double)
-#define _float_ float
+using float_t = float;
 /// Custom integer (int or short int)
-#define _int_ short int
+using int_t = short;
 /// Custom unsigned integer (unsigned short int or unsigned int)
-#define _unsigned_int_ unsigned short int
+using uint_t = unsigned short;
 #else
-#define _float_ double
-#define _int_ int
-#define _unsigned_int_ unsigned int
+using float_t = double;
+using int_t = int;
+using uint_t = unsigned;
 #endif
+}
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
 //#define SafeException
@@ -34,11 +36,10 @@
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
 
-/// Include some healthy defines for constructors
-#define _BAD_DOUBLE_ -999.99
-#define _BAD_INT_ -999
+constexpr static const double _BAD_DOUBLE_ = -999.99;
+constexpr static const int _BAD_INT_ = -999;
 
-#define _DEFAULT_RETURN_VAL_ -999999.123456
+constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
 
 // C++ includes
 #include <sstream>
@@ -57,6 +58,7 @@
 #include "TObjString.h"
 #include "TH2Poly.h"
 #include "TFile.h"
+#include "TGraphAsymmErrors.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
@@ -141,10 +143,9 @@ inline std::string GetTF1(const SplineInterpolation i) {
       Func = "([1]+[0]*x)";
       break;
     default:
-      std::cerr << "UNKNOWN SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return Func;
 }
@@ -174,10 +175,9 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
       Type = RespFuncType::kTF1_red;
       break;
     default:
-      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return Type;
 }
@@ -206,10 +206,9 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
       name = "LinearFunc";
       break;
     default:
-      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
@@ -255,10 +254,9 @@ inline std::string SystType_ToString(const SystType i) {
       name = "Functional";
       break;
     default:
-      std::cerr << "UNKNOWN SYST TYPE SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << static_cast<int>(i) << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SYST TYPE SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
@@ -271,6 +269,13 @@ namespace MaCh3Utils {
   // ***************************
   /// @brief Return mass for given PDG
   double GetMassFromPDG(int PDG);
+  // ***************************
+  
+  // ***************************
+  /// @brief Convert from PDG flavour to NuOscillator type
+  /// beware that in the case of anti-neutrinos the NuOscillator
+  /// type simply gets multiplied by -1
+  int PDGToNuOscillatorFlavour(int PDG);
   // ***************************
 
   extern std::unordered_map<int,int> KnownDetIDsMap;
@@ -450,10 +455,9 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
     name = "DembinskiAbdelmottele";
     break;
     default:
-      std::cerr << "UNKNOWN LIKELHOOD SPECIFIED!" << std::endl;
-      std::cerr << "You gave test-statistic " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN LIKELIHOOD SPECIFIED!");
+      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
@@ -490,20 +494,28 @@ void CheckTH2PolyFileVersion(TFile *file);
 /// @brief KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, const std::string& name);
 
+/// @brief Used by sigma variation, check how 1 sigma changes spectra
+/// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
+/// @param sigmaArrayCentr sigma var hist at prior values
+/// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
+/// @param title A tittle for returned object
+/// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
+TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+
 /// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {
   std::ifstream infile(filename.c_str());
   if (!infile.good()) {
-    std::cerr << "*** ERROR ***" << std::endl;
-    std::cerr << "File " << filename << " does not exist" << std::endl;
-    std::cerr << "Please try again" << std::endl;
-    std::cerr << "*************" << std::endl;
-    throw;
+    MACH3LOG_ERROR("*** ERROR ***");
+    MACH3LOG_ERROR("File {} does not exist", filename);
+    MACH3LOG_ERROR("Please try again");
+    MACH3LOG_ERROR("*************");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
   return filename;
 }
-/// @brief DB Get the Cernekov momentum threshold in MeV
+
+/// @brief DB Get the Cherenkov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG);
 
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);

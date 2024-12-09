@@ -10,7 +10,7 @@ void initManager(py::module &); // <- defined in python/manager.cpp
 void initCovariance(py::module &); // <- defined in python/covariance.cpp
 void initSplines(py::module &); // <- defined in python/splines.cpp
 
-PYBIND11_MODULE( pyMaCh3, m ) {
+PYBIND11_MODULE( _pyMaCh3, m ) {
     initPlotting(m);
     initFitter(m);
     initSamplePDF(m);

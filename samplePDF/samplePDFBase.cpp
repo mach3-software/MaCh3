@@ -99,9 +99,13 @@ void samplePDFBase::addData(TH2D* binneddata)
 std::vector<double> samplePDFBase::generate()
 {
   std::vector<double> data;
-  TH1D *pdf = (TH1D*)get1DHist();
+  TH1D *pdf = get1DHist();
   double evrate = getEventRate();
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
   int num = rnd->Poisson(evrate);
+#pragma GCC diagnostic pop
   std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
 
   // rejection sampling
@@ -136,7 +140,7 @@ std::vector<double> samplePDFBase::generate()
 std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
 {
   std::vector< std::vector <double> > data;
-  if(!pdf) pdf = (TH2D*)get2DHist();
+  if(!pdf) pdf = get2DHist();
 
   if(MCthrow)
   {
@@ -150,7 +154,10 @@ std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
   }
 
   double evrate = pdf->Integral();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
   int num = rnd->Poisson(evrate);
+#pragma GCC diagnostic pop
   std::cout << "sampling " << num << " events from " << evrate << std::endl;
 
   std::vector<double> var1;
@@ -193,7 +200,7 @@ double samplePDFBase::getEventRate()
 
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double samplePDFBase::getTestStatLLH(const double data, const double mc) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Need some MC
   if(mc == 0) return 0.;
@@ -211,13 +218,13 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) {
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
 
   // Need some MC
   if (mc == 0) return 0.0;
 
-  // The MC used in the likeliihood calculation
+  // The MC used in the likelihood calculation
   // Is allowed to be changed by Barlow Beeston beta parameters
   double newmc = mc;
 
@@ -226,7 +233,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     //CW: Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
     // Assume the MC has a Gaussian distribution around generated
     // As in https://arxiv.org/abs/1103.0354 eq 10, 11
-    //CW: Calculate the Barlow-Beeston likelhood contribution from MC statistics
+    //CW: Calculate the Barlow-Beeston likelihood contribution from MC statistics
     // Assumes the beta scaling parameters are Gaussian distributed
     // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
     // Essentially solves equation 11
@@ -241,9 +248,8 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       // b^2 - 4ac in quadratic equation
       const double temp2 = temp*temp + 4*data*fractional*fractional;
       if (temp2 < 0) {
-        std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        MACH3LOG_ERROR("Negative square root in Barlow Beeston coefficient calculation!");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       // Solve for the positive beta
       const double beta = (-1*temp+sqrt(temp2))/2.;
@@ -312,12 +318,12 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
 
         return stat;
       }
-      // Auxillary variables
+      // Auxiliary variables
       const long double b = mc/w2;
       const long double a = mc*b+1;
       const long double k = data;
       // Use C99's implementation of log of gamma function to not be C++11 dependent
-      stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
+      stat = double(-1*(a * logl(b) + lgammal(k+a) - lgammal(k+1) - ((k+a)*log1pl(b)) - lgammal(a)));
 
       // Return the statistical contribution and penalty
       return stat;
@@ -335,16 +341,15 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     break;
     case (kPoisson):
     {
-	  //Just call getTestStatLLH which doesn't take in weights
-	  //and is a poisson likelihood comparison.
+      //Just call getTestStatLLH which doesn't take in weights
+      //and is a Poisson likelihood comparison.
       return getTestStatLLH(data, mc);//stat;
     }
     break;
 
     default:
     std::cerr << "Couldn't find TestStatistic " << fTestStatistic << " exiting!" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   } // end switch
 }
 

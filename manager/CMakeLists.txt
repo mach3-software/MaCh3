@@ -24,12 +24,13 @@ if(NOT CPU_ONLY)
     #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
     set_property(TARGET Manager PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
     #If compiling with GPU link both CPU and GPU compiler options
-    target_link_libraries(Manager yaml-cpp spdlog ROOT::ROOT MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+    target_link_libraries(Manager PUBLIC MaCh3CompilerOptions MaCh3GPUCompilerOptions yaml-cpp spdlog ROOT::Tree ROOT::Hist)
 else()
-  target_link_libraries(Manager yaml-cpp spdlog ROOT::ROOT MaCh3CompilerOptions)
+  target_link_libraries(Manager PUBLIC MaCh3CompilerOptions yaml-cpp spdlog ROOT::Tree ROOT::Hist)
 endif()
 
-#target_link_libraries(Manager yaml-cpp spdlog ROOT::ROOT MaCh3CompilerOptions)
+target_link_libraries(Manager PRIVATE MaCh3Warnings)
+
 target_include_directories(Manager PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)
