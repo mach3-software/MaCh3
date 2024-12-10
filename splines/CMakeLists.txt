@@ -30,12 +30,7 @@ set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
 
-if(NOT CPU_ONLY)
-  target_link_libraries(Splines PUBLIC Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions)
-else()
-  target_link_libraries(Splines PUBLIC Manager MaCh3CompilerOptions)
-endif()
-
+target_link_libraries(Splines PUBLIC Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 target_link_libraries(Splines PRIVATE MaCh3Warnings)
 
 target_include_directories(Splines PUBLIC
