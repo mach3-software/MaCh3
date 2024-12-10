@@ -369,6 +369,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
 
   canv->SaveAs(outputFileName.c_str());
 
+  delete label;
   delete baseSplitSamplesStack;
   delete baseSplitSamplesLegend;
 }
@@ -379,7 +380,7 @@ int PlotLLH() {
 
   // make the canvas and other plotting stuff
   TCanvas *canv = new TCanvas("canv", "", 1024, 1024);
-
+  gStyle->SetOptTitle(2);
   // split up the canvas so can have side by side plots, one for each file
   TCanvas *splitSamplesCanv = new TCanvas("splitSampCanv", "", 4096 * man->getNFiles(), 4096);
 
@@ -437,7 +438,10 @@ int PlotLLH() {
   if (man->getSplitBySample())
     canv->SaveAs((man->getOutputName("_bySample") + "]").c_str());
 
+  delete LLHPad;
+  delete ratioPad;
   delete canv;
+  if(man != nullptr) delete man;
 
   return 0;
 }
