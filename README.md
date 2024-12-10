@@ -12,6 +12,7 @@ The framework has also evolved to allow non-MCMC modules to interrogate the
 likelihoods implemented.
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://github.com/mach3-software/MaCh3/blob/develop/LICENSE.txt)
+[![DOI](https://zenodo.org/badge/331049416.svg)](https://doi.org/10.5281/zenodo.7608367)
 [![Release](https://img.shields.io/github/release/mach3-software/MaCh3.svg)](https://github.com/mach3-software/MaCh3/releases/latest)
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
 [![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
@@ -23,7 +24,7 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
 
 ## Cite
-When citing MaCh3, please use [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
+When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
 
 ## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
