@@ -22,10 +22,11 @@ set_target_properties(Manager PROPERTIES
 if(NOT CPU_ONLY)
     set_target_properties(Manager PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
-    set_property(TARGET Manager PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+    set_property(TARGET Manager PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES}) 
 endif()
 
-target_link_libraries(Manager PUBLIC MaCh3CompilerOptions ROOT::Tree ROOT::Hist yaml-cpp spdlog)
+#If compiling with GPU is not enabled MaCh3GPUCompilerOptions will be empty
+target_link_libraries(Manager PUBLIC MaCh3CompilerOptions MaCh3GPUCompilerOptions yaml-cpp spdlog ROOT::Tree ROOT::Hist)
 target_link_libraries(Manager PRIVATE MaCh3Warnings)
 
 target_include_directories(Manager PUBLIC
