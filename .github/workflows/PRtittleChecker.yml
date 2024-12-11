@@ -12,10 +12,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-
-      - name: Debug PR context
-        run: echo "Pull request event: ${{ github.event_name }}, PR title: ${{ github.event.pull_request.title }}"
-
       - uses: thehanimo/pr-title-checker@v1.4.3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
