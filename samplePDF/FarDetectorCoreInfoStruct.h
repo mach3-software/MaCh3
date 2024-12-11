@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <string>
+#include "samplePDF/Structs.h"
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
@@ -30,21 +33,15 @@ struct FarDetectorCoreInfo {
   /// xsec bins
   std::vector< std::vector< int > > xsec_norms_bins;
 
-  /// DB Speedup bits
-  double Unity;
-  float Unity_F;
-  int Unity_Int;
-  double dummy_value = -999;
-
   std::vector<int> nxsec_norm_pointers;
   std::vector<std::vector<const double*>> xsec_norm_pointers;
 
   std::vector<int> nxsec_spline_pointers;
-  std::vector<std::vector<const double*>> xsec_spline_pointers;
+  std::vector<std::vector<const M3::float_t*>> xsec_spline_pointers;
 
   std::vector<int> ntotal_weight_pointers;
-  std::vector<std::vector<const double*>> total_weight_pointers;
-  std::vector<double> total_w;
+  std::vector<std::vector<const M3::float_t*>> total_weight_pointers;
+  std::vector<M3::float_t> total_w;
 
   std::vector<int> XBin;
   std::vector<int> YBin;
@@ -62,5 +59,5 @@ struct FarDetectorCoreInfo {
   std::vector<double*> mode;
 
   std::vector<const M3::float_t*> osc_w_pointer;
-  std::vector<double> xsec_w;
+  std::vector<M3::float_t> xsec_w;
 };

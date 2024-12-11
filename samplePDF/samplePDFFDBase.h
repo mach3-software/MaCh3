@@ -39,7 +39,7 @@ public:
   //===============================================================================
 
   void reweight();
-  double GetEventWeight(int iSample, int iEntry);
+  M3::float_t GetEventWeight(int iSample, int iEntry);
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
@@ -131,11 +131,11 @@ public:
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
-  double CalcXsecWeightSpline(const int iSample, const int iEvent);
+  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent);
   /// @brief Calculate the norm weight for a given event
-  double CalcXsecWeightNorm(const int iSample, const int iEvent);
+  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent);
   /// @brief Virtual so this can be over-riden in an experiment derived class
-  virtual double CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
+  virtual M3::float_t CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;

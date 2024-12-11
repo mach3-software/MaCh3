@@ -57,7 +57,7 @@ class splineFDBase : public SplineBase {
 	void PrintArrayDetails(std::string SampleName);
 	void PrintArrayDimension();
 
-	const double* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
+	const M3::float_t* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
 	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
 	  return &weightvec_Monolith[index];
 	}
@@ -120,6 +120,6 @@ class splineFDBase : public SplineBase {
 	M3::float_t *xcoeff_arr;    //x coefficients for each spline
 	M3::float_t *manycoeff_arr; //ybcd coefficients for each spline
 
-	std::vector<double> weightvec_Monolith;
+	std::vector<M3::float_t> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;
 };
