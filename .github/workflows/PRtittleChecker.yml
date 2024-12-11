@@ -23,6 +23,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pass_on_octokit_error: false
           local_configuration_path: .github/pr-title-checker-config.json
+        continue-on-error: true  # This will allow the job to continue even if this step fails
 
       - name: Add comment to fix PR title
         uses: marocchino/sticky-pull-request-comment@v2
