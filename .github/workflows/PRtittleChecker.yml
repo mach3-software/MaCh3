@@ -1,6 +1,15 @@
 name: "PR Title Checker"
-on: [pull_request_target]
-
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - labeled
+      - unlabeled
+  pull_request:
+    branches:
+      - develop
 jobs:
   check:
     runs-on: ubuntu-latest
