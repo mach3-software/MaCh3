@@ -8,9 +8,6 @@ on:
       - synchronize
       - labeled
       - unlabeled
-  pull_request:
-    branches:
-      - develop
   workflow_dispatch:  # This allows the workflow to be triggered manually
 
 jobs:
