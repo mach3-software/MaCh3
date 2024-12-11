@@ -11,6 +11,8 @@ on:
   pull_request:
     branches:
       - develop
+  workflow_dispatch:  # This allows the workflow to be triggered manually
+
 jobs:
   check:
     runs-on: ubuntu-latest
