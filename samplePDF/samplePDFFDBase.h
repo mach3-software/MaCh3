@@ -240,6 +240,8 @@ public:
   float Unity_F = 1.;
   float Zero_F = 0.;
 
+  int Unity_Int = 1;
+
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;

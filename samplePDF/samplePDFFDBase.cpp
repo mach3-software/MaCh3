@@ -1531,9 +1531,9 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->signal = false;
   
   int nEvents = fdobj->nEvents;
-  fdobj->x_var.resize(nEvents, &fdobj->Unity);
-  fdobj->y_var.resize(nEvents, &fdobj->Unity);
-  fdobj->rw_etru.resize(nEvents, &fdobj->Unity);
+  fdobj->x_var.resize(nEvents, &Unity);
+  fdobj->y_var.resize(nEvents, &Unity);
+  fdobj->rw_etru.resize(nEvents, &Unity);
   fdobj->XBin.resize(nEvents, -1);
   fdobj->YBin.resize(nEvents, -1);
   fdobj->NomXBin.resize(nEvents, -1);
@@ -1542,7 +1542,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
-  fdobj->mode.resize(nEvents, &fdobj->Unity);
+  fdobj->mode.resize(nEvents, &Unity);
   fdobj->nxsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
@@ -1556,9 +1556,9 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->total_weight_pointers.resize(nEvents);
   fdobj->Target.resize(nEvents, 0);
 #ifdef _LOW_MEMORY_STRUCTS_
-  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity_F);
+  fdobj->osc_w_pointer.resize(nEvents, &Unity_F);
 #else
-  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity); 
+  fdobj->osc_w_pointer.resize(nEvents, &Unity); 
 #endif
   fdobj->SampleDetID = -1;
 
