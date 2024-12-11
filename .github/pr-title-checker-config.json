@@ -1,0 +1,17 @@
+{
+  "LABEL": {
+    "name": "title needs formatting",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "prefixes": ["feat: ", "bugfix: ", "tidy: ", "breaking: "],
+    "regexp": "^(feat|bugfix|tidy|breaking): .+",
+    "regexpFlags": "i",
+    "ignoreLabels" : ["dont-check-PRs-with-this-label", "meta"]
+  },
+  "MESSAGES": {
+    "success": "### ✅ PR Title Formatted Correctly",
+    "failure": "### 🚨 PR Title Needs Formatting\n\nThe title of this PR needs to be formatted correctly.\nPlease update the title to match the format `type: description`. For more details, see CONTRIBUTING.md.\n\n#### Examples:\n- `bugfix: fix typo in README.md AB#123`\n- `tidy: update dependencies AB#456`\n- `feat: add new feature AB#789`\n- `breaking: big change`\n",
+    "notice": ""
+  }
+}
