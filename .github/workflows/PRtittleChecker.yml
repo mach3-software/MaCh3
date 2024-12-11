@@ -15,11 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Debug PR context
-        run: |
-          echo "Pull request event: GRUMPY"
-          echo "PR title: GRUMPY"
-
       - uses: actions/checkout@v3
 
       - uses: thehanimo/pr-title-checker@v1.4.3
@@ -27,3 +22,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pass_on_octokit_error: false
           local_configuration_path: .github/pr-title-checker-config.json
+
+      - name: Add comment to fix PR title
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{ steps.pr_title_checker.outputs.success == 'false' }}  # Adjusted output reference
+        with:
+          header: 'PR Title Check'
+          recreate: true
+          message: |
+              ### 🚨 PR Title Needs Formatting
+
+              The title of this PR needs to be formatted correctly.
+              Please update the title to match the format `type: description`.
+              For more details, see CONTRIBUTING.md.
+
+              #### Examples:
+              - `bugfix: fix typo in README.md AB#123`
+              - `tidy: update dependencies AB#456`
+              - `feat: add new feature AB#789`
+              - `breaking: big change`
