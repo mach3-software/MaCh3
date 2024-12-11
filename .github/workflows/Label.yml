@@ -6,7 +6,14 @@
 # https://github.com/actions/labeler
 
 name: Labeler
-on: [pull_request_target]
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - labeled
+      - unlabeled
 
 jobs:
   label:
@@ -20,3 +27,10 @@ jobs:
     - uses: actions/labeler@v5
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+    - uses: thehanimo/pr-title-checker@v1.4.0
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        pass_on_octokit_error: false
+        configuration_path: .github/pr-title-checker-config.json  # Optional, check if the file exists
+
