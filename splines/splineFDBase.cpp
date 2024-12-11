@@ -478,7 +478,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (isHist3D)
   {
-    Hist3D = File->Get<TH3F>(("dev_tmp_0_0"));
+    Hist3D = File->Get<TH3F>((TemplateName.c_str()));
 
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
