@@ -1,3 +1,4 @@
+# This workflow make sure PR tittles obeys Contributing guide
 name: "PR Title Checker"
 on:
   pull_request_target:
