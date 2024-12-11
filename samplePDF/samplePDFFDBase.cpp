@@ -585,10 +585,10 @@ void samplePDFFDBase::fillArray_MP()
           continue;
         }
 
-        double splineweight = 1.0;
-        double normweight = 1.0;
-        double funcweight = 1.0;
-        double totalweight = 1.0;
+        M3::float_t splineweight = 1.0;
+        M3::float_t normweight = 1.0;
+        M3::float_t funcweight = 1.0;
+        M3::float_t totalweight = 1.0;
 
         //DB SKDet Syst
         //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
@@ -720,10 +720,10 @@ void samplePDFFDBase::ResetHistograms() {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-double samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) {
+M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) {
 // ***************************************************************************
 
-  double xsecw = 1.0;
+  M3::float_t xsecw = 1.0;
   //DB Xsec syst
   //Loop over stored spline pointers
   for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
@@ -734,14 +734,17 @@ double samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent
 
 // ***************************************************************************
 // Calculate the normalisation weight for one event
-double samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) {
+M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) {
 // ***************************************************************************
 
-  double xsecw = 1.0;
+  M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
   for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
   {
-    xsecw *= *(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+    xsecw *= static_cast<M3::float_t>(*(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]));
+#pragma GCC diagnostic pop
     #ifdef DEBUG
     if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
     #endif
@@ -1060,8 +1063,8 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       
       //Set x_var and y_var values based on XVarStr and YVarStr
       MCSamples[mc_i].x_var[event_i] = GetPointerToKinematicParameter(XVarStr, mc_i, event_i);
-      //Give y)_var a dummy value
-      MCSamples[mc_i].y_var[event_i] = &(MCSamples[mc_i].dummy_value);
+      //Give y_var _BAD_DOUBLE_ value for the 1D case since this won't be used
+      MCSamples[mc_i].y_var[event_i] = &(_BAD_DOUBLE_);
       int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
       
       double low_lower_edge = _DEFAULT_RETURN_VAL_;
@@ -1432,8 +1435,8 @@ void samplePDFFDBase::SetupNuOscillator() {
   delete OscillFactory;
 }
 
-double samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
-  double totalweight = 1.0;
+M3::float_t samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
+  M3::float_t totalweight = 1.0;
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
@@ -1526,14 +1529,11 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   
   fdobj->nEvents = nEvents_;
   fdobj->signal = false;
-  fdobj->Unity = 1.;
-  fdobj->Unity_Int = 1.;
-
   
   int nEvents = fdobj->nEvents;
-  fdobj->x_var.resize(nEvents, &fdobj->Unity);
-  fdobj->y_var.resize(nEvents, &fdobj->Unity);
-  fdobj->rw_etru.resize(nEvents, &fdobj->Unity);
+  fdobj->x_var.resize(nEvents, &Unity);
+  fdobj->y_var.resize(nEvents, &Unity);
+  fdobj->rw_etru.resize(nEvents, &Unity);
   fdobj->XBin.resize(nEvents, -1);
   fdobj->YBin.resize(nEvents, -1);
   fdobj->NomXBin.resize(nEvents, -1);
@@ -1542,7 +1542,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
-  fdobj->mode.resize(nEvents, &fdobj->Unity);
+  fdobj->mode.resize(nEvents, &Unity);
   fdobj->nxsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
@@ -1556,9 +1556,9 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->total_weight_pointers.resize(nEvents);
   fdobj->Target.resize(nEvents, 0);
 #ifdef _LOW_MEMORY_STRUCTS_
-  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity_F);
+  fdobj->osc_w_pointer.resize(nEvents, &Unity_F);
 #else
-  fdobj->osc_w_pointer.resize(nEvents, &fdobj->Unity); 
+  fdobj->osc_w_pointer.resize(nEvents, &Unity); 
 #endif
   fdobj->SampleDetID = -1;
 
