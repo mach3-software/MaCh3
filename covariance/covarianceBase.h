@@ -346,8 +346,6 @@ protected:
   /// @brief Initialisation of the class using config
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
   void init(const std::vector<std::string>& YAMLFile);
-  /// @brief Initialisation of the class using only TMatrix
-  void init(TMatrixDSym* covMat);
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
