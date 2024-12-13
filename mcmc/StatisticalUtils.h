@@ -423,8 +423,26 @@ inline void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double
 }
 
 // ***************
+/// @brief KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
+/// @param hist histograms based on which we calculate credible interval
+/// @param CredibleInSigmas Whether interval is in sigmas or percentage
+/// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
+inline void GetCredibleIntervalSig(TH1D* const hist, TH1D* hpost_copy, const bool CredibleInSigmas, const double coverage = 0.6827) {
+  // ***************
+  //KS: Slightly different approach depending if intervals are in percentage or sigmas
+  if(CredibleInSigmas) {
+    //KS: Convert sigmas into percentage
+    const double CredReg = GetSigmaValue(int(std::round(coverage)));
+    GetCredibleInterval(hist, hpost_copy, CredReg);
+  } else {
+    GetCredibleInterval(hist, hpost_copy, coverage);
+  }
+}
+
+// ***************
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
+/// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827) {
 // ***************
@@ -474,6 +492,21 @@ inline void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827
     Contour[0] = max_entries;
   }
   hist2D->SetContour(1, Contour);
+}
+
+// ***************
+/// @brief KS: Set 2D contour within some coverage
+/// @param hist2D histograms based on which we calculate credible regions
+/// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
+inline void GetCredibleRegionSig(TH2D* const hist2D, const bool CredibleInSigmas, const double coverage = 0.6827) {
+  // ***************
+  if(CredibleInSigmas) {
+    //KS: Convert sigmas into percentage
+    const double CredReg = GetSigmaValue(int(std::round(coverage)));
+    GetCredibleRegion(hist2D, CredReg);
+  } else {
+    GetCredibleRegion(hist2D, coverage);
+  }
 }
 
 // *********************

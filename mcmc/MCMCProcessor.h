@@ -129,6 +129,22 @@ class MCMCProcessor {
                           // Other
                           const bool CredibleInSigmas = false
                           );
+
+    /// @brief Checks the order and size consistency of the `CredibleIntervals` and `CredibleIntervalsColours` vectors.
+    /// @param CredibleIntervals A vector of credible interval values.
+    /// @param CredibleIntervalsColours A vector of colors associated with each credible interval.
+    /// @throws MaCh3Exception If the sizes are not equal or the intervals are not in decreasing order.
+    void CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours);
+
+    /// @brief Checks the order and size consistency of the `CredibleRegions`, `CredibleRegionStyle`, and `CredibleRegionColor` vectors.
+    /// @param CredibleRegions A vector of credible region values.
+    /// @param CredibleRegionStyle A vector of styles associated with each credible region.
+    /// @param CredibleRegionColor A vector of colors associated with each credible region.
+    /// @throws MaCh3Exception If the sizes are not equal or the regions are not in decreasing order.
+    void CheckCredibleRegionsOrder(const std::vector<double>& CredibleRegions,
+                                   const std::vector<Style_t>& CredibleRegionStyle,
+                                   const std::vector<Color_t>& CredibleRegionColor);
+
     /// @brief Make funny polar plot
     /// @param ParNames Vector with parameter names for which Polar Plot will be made
     void GetPolarPlot(const std::vector<std::string>& ParNames);
