@@ -10,8 +10,8 @@ set(MaCh3_VERSION ${PROJECT_VERSION})
 option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
+option(MaCh3_LOW_MEMORY_STRUCTS_ENABLED "This will use float/short string for many structures" OFF)
 
-# Try to find CUDA
 add_library(MaCh3CompileDefinitions INTERFACE)
 #Create a seperate target for GPU compiler options
 #if GPU is not enabled nothing will be added to this and it will be empty
@@ -177,13 +177,9 @@ if(MaCh3_GPU_ENABLED)
   target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE GPU_ON)
 endif()
 
-if(NOT DEFINED MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  set(MaCh3_LOW_MEMORY_STRUCTS_ENABLED FALSE)
-endif()
-
 if(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
-  target_compile_definitions(MaCh3CompilerOptions INTERFACE _LOW_MEMORY_STRUCTS_)
-endif(MaCh3_LOW_MEMORY_STRUCTS_ENABLED)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE _LOW_MEMORY_STRUCTS_)
+endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 set_target_properties(MaCh3GPUCompilerOptions PROPERTIES EXPORT_NAME GPUCompilerOptions)
