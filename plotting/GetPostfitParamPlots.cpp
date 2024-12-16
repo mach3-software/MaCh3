@@ -79,7 +79,7 @@ std::vector <TH1D *> PostfitHistVec;
 
 void copyParToBlockHist(int localBin, std::string paramName, TH1D*blockHist, std::string type, int fileId, bool setLabels = true){
   // Set the values in the sub-histograms
-  MACH3LOG_DEBUG("copyin data from at local bin {}: for parameter {}", localBin, paramName);
+  MACH3LOG_DEBUG("copying data from at local bin {}: for parameter {}", localBin, paramName);
   MACH3LOG_DEBUG("  Fitter specific name: {}", man->input().translateName(fileId, MaCh3Plotting::kPostFit, paramName));
   MACH3LOG_DEBUG("  value: {}", man->input().getPostFitValue(fileId, paramName, type));
   MACH3LOG_DEBUG("  error: {}", man->input().getPostFitError(fileId, paramName, type));
@@ -91,6 +91,58 @@ void copyParToBlockHist(int localBin, std::string paramName, TH1D*blockHist, std
     blockHist->GetXaxis()->SetBinLabel(localBin +1, paramName.c_str());
     blockHist->GetXaxis()->LabelsOption("v");
   }
+}
+
+inline void InitializePads(TCanvas* canvas, TPad*& pad3, TPad*& pad4) {
+  // Initialize TPad p3
+  pad3 = new TPad("Top", "Top", 0.0, 0.4, 1.0, 1.0);
+  pad3->SetLeftMargin(canvas->GetLeftMargin());
+  pad3->SetRightMargin(canvas->GetRightMargin());
+  pad3->SetTopMargin(canvas->GetTopMargin());
+  pad3->SetBottomMargin(0);
+  pad3->SetGrid();
+
+  // Initialize TPad p4
+  pad4 = new TPad("Bottom", "Bottom", 0.0, 0.0, 1.0, 0.4);
+  pad4->SetLeftMargin(canvas->GetLeftMargin());
+  pad4->SetRightMargin(canvas->GetRightMargin());
+  pad4->SetTopMargin(0);
+  pad4->SetBottomMargin(0.75);
+  pad4->SetGrid();
+}
+
+void CopyViolinToBlock(TH2D* FullViolin, TH2D* ReducedViolin, const std::vector<std::string>& ParamNames) {
+  for(unsigned int i = 0; i < ParamNames.size(); i++)
+  {
+    int ParamBinId = -999;
+    for (int ix = 0; ix < FullViolin->GetXaxis()->GetNbins(); ++ix) {
+      if(FullViolin->GetXaxis()->GetBinLabel(ix+1) == ParamNames[i])
+      {
+        ParamBinId = ix+1;
+        break;
+      }
+    }
+    if(ParamBinId == -999) {
+      MACH3LOG_WARN("Didn't find param {}", ParamNames[i]);
+      continue;
+    }
+    //KS Fill content of reduced violin
+    for (int iy = 0; iy < FullViolin->GetYaxis()->GetNbins(); ++iy) {
+      ReducedViolin->SetBinContent(i+1, iy+1, FullViolin->GetBinContent(ParamBinId, iy+1));
+      ReducedViolin->GetXaxis()->SetBinLabel(i+1, ParamNames[i].c_str());
+    }
+  }
+  ReducedViolin->SetFillColor(FullViolin->GetFillColor());
+  ReducedViolin->SetFillColorAlpha(FullViolin->GetMarkerColor(), 0.35);
+  ReducedViolin->SetLineColor(FullViolin->GetMarkerColor());
+
+  ReducedViolin->SetMarkerColor(FullViolin->GetMarkerColor());
+  ReducedViolin->SetMarkerStyle(FullViolin->GetMarkerStyle());
+  ReducedViolin->SetMarkerSize(FullViolin->GetMarkerSize());
+
+  ReducedViolin->GetYaxis()->SetTitleOffset(FullViolin->GetTitleOffset());
+  ReducedViolin->GetYaxis()->SetTitle(FullViolin->GetYaxis()->GetTitle());
+  ReducedViolin->GetXaxis()->LabelsOption("v");
 }
 
 void PrettifyTitles(TH1D *Hist) {
@@ -458,18 +510,9 @@ void MakeNDDetPlots()
   MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
 
-  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
-  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
-  pTop->SetLeftMargin(canv->GetLeftMargin());
-  pTop->SetRightMargin(canv->GetRightMargin());
-  pTop->SetTopMargin(canv->GetTopMargin());
-  pTop->SetBottomMargin(0);
-  pTop->SetGrid();
-  pDown->SetLeftMargin(canv->GetLeftMargin());
-  pDown->SetRightMargin(canv->GetRightMargin());
-  pDown->SetTopMargin(0);
-  pDown->SetBottomMargin(0.75);
-  pDown->SetGrid();
+  TPad* pTop = nullptr;
+  TPad* pDown = nullptr;
+  InitializePads(canv, pTop, pDown);
 
   int NDbinCounter = NDParametersStartingPos;
   int Start = NDbinCounter;
@@ -525,18 +568,9 @@ void MakeFDDetPlots()
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
   
   // these for named parameters where we need a nice big gap at the bottom to fit the names
-  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
-  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
-  pTop->SetLeftMargin(canv->GetLeftMargin());
-  pTop->SetRightMargin(canv->GetRightMargin());
-  pTop->SetTopMargin(canv->GetTopMargin());
-  pTop->SetBottomMargin(0);
-  pTop->SetGrid();
-  pDown->SetLeftMargin(canv->GetLeftMargin());
-  pDown->SetRightMargin(canv->GetRightMargin());
-  pDown->SetTopMargin(0);
-  pDown->SetBottomMargin(0.75);
-  pDown->SetGrid();
+  TPad* pTop = nullptr;
+  TPad* pDown = nullptr;
+  InitializePads(canv, pTop, pDown);
 
   int FDbinCounter = FDParametersStartingPos;
   int Start = FDbinCounter;
@@ -550,7 +584,7 @@ void MakeFDDetPlots()
     canv->cd();
     Prefit->SetTitle(FDSamplesNames[i].c_str());
     Prefit->GetXaxis()->SetRangeUser(Start, FDbinCounter);
-    //KS: We dont' need name for every FD param
+    //KS: We don't' need name for every FD param
     for(int j = 0; j < FDSamplesBins[i]; ++j)
     {
       //bool ProductOfTen = false;
@@ -572,18 +606,9 @@ void MakeFDDetPlots()
 void MakeOscPlots()
 {
   // these for named parameters where we need a nice big gap at the bottom to fit the names
-  TPad* pTop = new TPad("pTop", "pTop", 0.0, 0.4, 1.0, 1.0);
-  TPad* pDown = new TPad("pDown", "pDown", 0.0, 0.0, 1.0, 0.4);
-  pTop->SetLeftMargin(canv->GetLeftMargin());
-  pTop->SetRightMargin(canv->GetRightMargin());
-  pTop->SetTopMargin(canv->GetTopMargin());
-  pTop->SetBottomMargin(0);
-  pTop->SetGrid();
-  pDown->SetLeftMargin(canv->GetLeftMargin());
-  pDown->SetRightMargin(canv->GetRightMargin());
-  pDown->SetTopMargin(0);
-  pDown->SetBottomMargin(0.75);
-  pDown->SetGrid();
+  TPad* pTop = nullptr;
+  TPad* pDown = nullptr;
+  InitializePads(canv, pTop, pDown);
 
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
   
@@ -780,18 +805,7 @@ void GetPostfitParamPlots()
   canv->Print((SaveName+"[").c_str());
 
   // these for named parameters where we need a nice big gap at the botto to fit the names
-  p3 = new TPad("p3", "p3", 0.0, 0.4, 1.0, 1.0);
-  p4 = new TPad("p4", "p4", 0.0, 0.0, 1.0, 0.4);
-  p3->SetLeftMargin(canv->GetLeftMargin());
-  p3->SetRightMargin(canv->GetRightMargin());
-  p3->SetTopMargin(canv->GetTopMargin());
-  p3->SetBottomMargin(0);
-  p3->SetGrid();
-  p4->SetLeftMargin(canv->GetLeftMargin());
-  p4->SetRightMargin(canv->GetRightMargin());
-  p4->SetTopMargin(0);
-  p4->SetBottomMargin(0.75);
-  p4->SetGrid();
+  InitializePads(canv, p3, p4);
 
   // Make a Legend page
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
@@ -849,38 +863,36 @@ void GetPostfitParamPlots()
   delete Prefit;
 }
 
-inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
+inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File,  std::vector<int> Index = {})
 {
-  std::vector<double> x(nBins);
-  std::vector<double> y(nBins);
-  std::vector<double> exl(nBins);
-  std::vector<double> eyl(nBins);
-  std::vector<double> exh(nBins);
-  std::vector<double> eyh(nBins);
+  int GraphBins = Index.size() == 0 ? nBins : Index.size();
+  std::vector<double> x(GraphBins);
+  std::vector<double> y(GraphBins);
+  std::vector<double> exl(GraphBins);
+  std::vector<double> eyl(GraphBins);
+  std::vector<double> exh(GraphBins);
+  std::vector<double> eyh(GraphBins);
 
-  TH1D* PostHist = static_cast<TH1D*>(File->Get( ("param_xsec_"+plotType).c_str() )->Clone());
+  TH1D* PostHist = static_cast<TH1D*>(File->Get( ("param_xsec_"+plotType).c_str() ));
 
-  TVectorD* Errors_HPD_Positive = static_cast<TVectorD*>(File->Get( "Errors_HPD_Positive" )->Clone());
-  TVectorD* Errors_HPD_Negative = static_cast<TVectorD*>(File->Get( "Errors_HPD_Negative" )->Clone());
+  TVectorD* Errors_HPD_Positive = static_cast<TVectorD*>(File->Get( "Errors_HPD_Positive" ));
+  TVectorD* Errors_HPD_Negative = static_cast<TVectorD*>(File->Get( "Errors_HPD_Negative" ));
   //KS: I am tempted to multithread this...
-  for(int i = 0; i < nBins; ++i)
+  for(int i = 0; i < GraphBins; ++i)
   {
+    int Counter = Index.size() == 0 ? i : Index[i];
     //KS: We are extracting value from three object each having different numbering scheme, I have checked carefully so this is correct please don't change all these +1 +0.5 etc. it just work...
     x[i] = i + 0.5;
-    y[i] = PostHist->GetBinContent(i+1);
+    y[i] = PostHist->GetBinContent(Counter+1);
 
     //KS: We don't want x axis errors as they are confusing in Violin plot
     exh[i] = 0.00001;
     exl[i] = 0.00001;
-    eyh[i] = (*Errors_HPD_Positive)(i);
-    eyl[i] = (*Errors_HPD_Negative)(i);
+    eyh[i] = (*Errors_HPD_Positive)(Counter);
+    eyl[i] = (*Errors_HPD_Negative)(Counter);
   }
-  TGraphAsymmErrors* PostGraph = new TGraphAsymmErrors(nBins, x.data(), y.data(), exl.data(), exh.data(), eyl.data(), eyh.data());
+  TGraphAsymmErrors* PostGraph = new TGraphAsymmErrors(GraphBins, x.data(), y.data(), exl.data(), exh.data(), eyl.data(), eyh.data());
   PostGraph->SetTitle("");
-
-  delete PostHist;
-  delete Errors_HPD_Positive;
-  delete Errors_HPD_Negative;
 
   return PostGraph;
 }
@@ -888,10 +900,10 @@ inline TGraphAsymmErrors* MakeTGraphAsymmErrors(std::shared_ptr<TFile> File)
 //KS: Make fancy violin plots
 void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
 {
-  //KS: Should be in some config... either way it control whether you plot symetric or assymetric error bars
+  //KS: Should be in some config... either way it control whether you plot symmetric or asymmetric error bars
   bool PlotAssym = true;
     
-  //KS: No idea why but ROOT changed treatment of viilin in R6. If you have non uniform binning this will results in very hard to see violin plots.
+  //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
   TCandle::SetScaledViolin(false);
 
   MACH3LOG_INFO("Making Violin Plot");
@@ -931,7 +943,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
     MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
     return;
   }
-
+  // Do some fancy replacements
   ViolinPre->SetFillColor(kRed);
   ViolinPre->SetFillColorAlpha(kRed, 0.35);
   ViolinPre->SetMarkerColor(kRed);
@@ -953,12 +965,6 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   Postfit->SetLineColor(kRed);
   Postfit->SetMarkerStyle(7);
   
-  TGraphAsymmErrors* PostGraph = MakeTGraphAsymmErrors(File1);
-  PostGraph->SetMarkerColor(kBlack);
-  PostGraph->SetLineColor(kBlack);
-  PostGraph->SetMarkerStyle(7);
-  PostGraph->SetLineWidth(2);
-  PostGraph->SetLineStyle(kSolid);
  if(File2 != nullptr)
   {
     Violin2 = File2->Get<TH2D>( "param_violin" );
@@ -968,12 +974,14 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
     Violin2->SetFillColorAlpha(kGreen, 0.35);
   }
   
+  TGraphAsymmErrors* PostGraphAll = MakeTGraphAsymmErrors(File1);
+
   // Make a Legend page
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
   if (ViolinPre != nullptr) leg->AddEntry(ViolinPre, "Prior", "lpf");
   if (Violin != nullptr)    leg->AddEntry(Violin, "Posterior", "lpf");
   if (Violin2 != nullptr)   leg->AddEntry(Violin2, "Second Violin", "lpf");
-  if(PlotAssym)             leg->AddEntry(PostGraph, "HPD Assym", "lp");
+  if(PlotAssym)             leg->AddEntry(PostGraphAll, "HPD Assym", "lp");
   else                      leg->AddEntry(Postfit, "HPD", "lpf");
 
   canv->cd();
@@ -981,136 +989,90 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   leg->Draw();
   canv->Print((SaveName+".pdf").c_str());
   
-   // Do some fancy replacements
-  PrettifyTitles(ViolinPre);
-  //WARNING this is super hardcoded keep this in mind, ranges are diffefernt from one defined for postfit param
-  const int XsecPlots = 8;
-  int XsecOffset[XsecPlots] = {XsecStartingPos, XsecStartingPos+16, XsecStartingPos+22, XsecStartingPos+22+12, XsecStartingPos+22+12+11, XsecStartingPos+22+12+11+7,  XsecStartingPos+22+12+7+7+22, XsecStartingPos+CrossSectionParameters-FluxParameters};
-  std::string titles[XsecPlots-1] = {"CCQE", "Pauli Blocking and Optical Potential", "2p2h", "SPP", "FSI", "CC DIS, CC Multi #pi, CC coh., NC, #nu_{e}", "CCQE Binding Energy"};
+  // get the names of the blocks of parameters to group together
+  std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
+  const int XsecPlots = static_cast<int>(blockNames.size());
 
-  for (int i = 1; i < XsecPlots; ++i) 
+  for (int i = 0; i < XsecPlots; i++)
   {
-    canv->cd();
-    ViolinPre->SetTitle(titles[i-1].c_str());
-    ViolinPre->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-    ViolinPre->GetYaxis()->SetRangeUser(-1.5, 2.5);
+    // get the configuration for this parameter
+    std::string blockName = blockNames[i];
+    YAML::Node paramBlock = man->getOption(blockName);
+    std::string blockTitle                 = paramBlock[0].as<std::string>();
+    std::vector<double>      blockLimits   = paramBlock[1].as<std::vector<double>>();
+    std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
 
-    Violin->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-    Violin->GetYaxis()->SetRangeUser(-1.5, 2.5);
-    if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-1.5, 2.5);
-    
-    std::string name = ViolinPre->GetTitle();
-    if (name.find("SPP") != std::string::npos)
-    { 
-      ViolinPre->GetYaxis()->SetRangeUser(-5., 25.); //For RES Eb we need huge range
-      Violin->GetYaxis()->SetRangeUser(-5., 25.);
-      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-5., 25.);
-    }
-    else if (name.find("CCQE Binding Energy") != std::string::npos)   
-    {
-      ViolinPre->GetYaxis()->SetRangeUser(-10., 16.); //For Eb we need bigger range
-      Violin->GetYaxis()->SetRangeUser(-10., 16.); //For Eb we need bigger range
-      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-10., 16.);
-    }
-    else if (name.find("FSI") != std::string::npos)   
-    {
-      ViolinPre->GetYaxis()->SetRangeUser(-0.5, 2.8);
-      Violin->GetYaxis()->SetRangeUser(-0.5, 2.8);
-      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-0.5, 2.8);
-    }
-    else if (name.find("CCQE") != std::string::npos)   
-    {
-      ViolinPre->GetYaxis()->SetRangeUser(-2., 3.);
-      Violin->GetYaxis()->SetRangeUser(-2., 3.);
-      if(File2 != nullptr) Violin2->GetYaxis()->SetRangeUser(-2., 3.);
-    }
-    //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-    ViolinPre->Draw("violinX(03100300)");
-    Violin->Draw("violinX(03100300) SAME");
-    if(File2 != nullptr)
-    {
-      Violin2->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-      Violin2->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-      Violin2->Draw("violinX(03100300) SAME");
-    }
-    if (Postfit != nullptr) {
-      Postfit->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-      if(!PlotAssym) Postfit->Draw("SAME");
-    }
-    if (PostGraph != nullptr) {
-      PostGraph->GetXaxis()->SetRangeUser(XsecOffset[i-1], XsecOffset[i]);
-      if(PlotAssym) PostGraph->Draw("P SAME");
-    }
-    
-    canv->Print((SaveName+".pdf").c_str());
-  }
-  
-  //KS: Now flux
-  if(FluxParameters > 0)
-  {
-    canv->SetBottomMargin(0.1);
-    gStyle->SetOptTitle(0);
-    const int FluxInterval = 25;
-    for (int nFlux = XsecStartingPos+CrossSectionParameters-FluxParameters; nFlux < XsecStartingPos+CrossSectionParameters; nFlux += FluxInterval)
-    {
-      ViolinPre->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
-      Violin->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
-      Postfit->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
-      PostGraph->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
+    // get num of params in the block
+    const int nParams = static_cast<int>(blockContents.size());
 
-      ViolinPre->GetYaxis()->SetRangeUser(0.7, 1.3);
-      Violin->GetYaxis()->SetRangeUser(0.7, 1.3);
-      Postfit->GetYaxis()->SetRangeUser(0.7, 1.3);
-      PostGraph->GetYaxis()->SetRangeUser(0.7, 1.3);
+    // set some plot things
+    auto blockHist_prefit = std::make_unique<TH2D>(blockName.c_str(), blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams),
+                                      ViolinPre->GetYaxis()->GetNbins(), ViolinPre->GetYaxis()->GetXmin(), ViolinPre->GetYaxis()->GetXmax());
+    CopyViolinToBlock(ViolinPre, blockHist_prefit.get(), blockContents);
+    // set the y axis limits we got from config
+    blockHist_prefit->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
+    auto blockHist_Violin1 = std::make_unique<TH2D>((blockTitle + "Violin1").c_str(), (blockTitle + "Violin1").c_str(), nParams, 0.0, static_cast<double>(nParams),
+                                       Violin->GetYaxis()->GetNbins(), Violin->GetYaxis()->GetXmin(), Violin->GetYaxis()->GetXmax());
+    CopyViolinToBlock(Violin, blockHist_Violin1.get(), blockContents);
+    blockHist_Violin1->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
+    std::unique_ptr<TH2D> blockHist_Violin2 = nullptr;
+    if(Violin2 != nullptr) {
+      blockHist_Violin2 = std::make_unique<TH2D>((blockTitle + "Violin2").c_str(), (blockTitle + "Violin2").c_str(), nParams, 0.0, static_cast<double>(nParams),
+                                   Violin2->GetYaxis()->GetNbins(), Violin2->GetYaxis()->GetXmin(), Violin2->GetYaxis()->GetXmax());
+      CopyViolinToBlock(Violin2, blockHist_Violin2.get(), blockContents);
+      blockHist_Violin2->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
+    }
+    // Do some fancy replacements
+    PrettifyTitles(blockHist_prefit.get());
 
-      //KS: ROOT6 has some additional options, consider updaiting it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-      ViolinPre->Draw("violinX(03100300)");
-      Violin->Draw("violinX(03100300) SAME");
-      if(File2 != nullptr)
-      {
-        Violin2->GetYaxis()->SetRangeUser(0.7, 1.3);
-        Violin2->GetXaxis()->SetRangeUser(nFlux, nFlux+FluxInterval);
-        Violin2->Draw("violinX(03100300) SAME");
+    // set some plot things
+    auto blockHist_Best = std::make_unique<TH1D>(blockName.c_str(), blockTitle.c_str(),
+                                                 nParams, 0.0, static_cast<double>(nParams));
+    // set the errors for the prefit block hist
+    for(int localBin=0; localBin < nParams; localBin ++){
+      // the "local" bin is the params index within the group of parameters
+      std::string paramName = blockContents[localBin];
+      copyParToBlockHist(localBin, paramName, blockHist_Best.get(), "", 0);
+    }
+
+    std::vector<int> Index;
+    for(unsigned int is = 0; is < blockContents.size(); is++) {
+      int ParamBinId = -999;
+      for (int ix = 0; ix < ViolinPre->GetXaxis()->GetNbins(); ++ix) {
+        if(ViolinPre->GetXaxis()->GetBinLabel(ix+1) == blockContents[is]) {
+          ParamBinId = ix;
+          break;
+        }
       }
-      if(PlotAssym) PostGraph->Draw("P SAME");
-      else Postfit->Draw("SAME");
-      canv->Print((SaveName+".pdf").c_str());
+      Index.push_back(ParamBinId);
     }
-  }
-  //KS all other parmeters just in case
-  ViolinPre->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
-  Violin->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
-  Postfit->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
-  PostGraph->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
+    TGraphAsymmErrors* PostGraph = MakeTGraphAsymmErrors(File1, Index);
+    PostGraph->SetMarkerColor(kBlack);
+    PostGraph->SetLineColor(kBlack);
+    PostGraph->SetMarkerStyle(7);
+    PostGraph->SetLineWidth(2);
+    PostGraph->SetLineStyle(kSolid);
 
-  ViolinPre->GetYaxis()->SetRangeUser(-3.4, 3.4);
-  Violin->GetYaxis()->SetRangeUser(-3.4, 3.4);
-  Postfit->GetYaxis()->SetRangeUser(-3.4, 3.4);
-  PostGraph->GetYaxis()->SetRangeUser(-3.4, 3.4);
-         
-  //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
-  ViolinPre->Draw("violinX(03100300)");
-  Violin->Draw("violinX(03100300) SAME");
-  if(File2 != nullptr)
-  {
-    Violin2->GetXaxis()->SetRangeUser(CrossSectionParameters, nBins);
-    Violin2->GetYaxis()->SetRangeUser(-3.4, 3.4);
-    Violin2->Draw("violinX(03100300) SAME");
+    blockHist_prefit->Draw("violinX(03100300)");
+    blockHist_Violin1->Draw("violinX(03100300) SAME");
+    if(blockHist_Violin2 != nullptr) {
+      blockHist_Violin2->Draw("violinX(03100300) SAME");
+    }
+    if(PlotAssym) PostGraph->Draw("P SAME");
+    else Postfit->Draw("SAME");
+    canv->Print((SaveName+".pdf").c_str());
+    delete PostGraph;
   }
-  if(PlotAssym) PostGraph->Draw("P SAME");
-  else Postfit->Draw("SAME");
-  canv->Print((SaveName+".pdf").c_str());
-     
+
   canv->Print((SaveName+".pdf]").c_str());
   delete canv;
   delete ViolinPre;
   delete Violin;
+  delete PostGraphAll;
   if(Violin2 != nullptr) delete Violin2;
   delete Postfit;
-  delete PostGraph;
   File1->Close();
-  if(File2 != nullptr)
-  {
+  if(File2 != nullptr) {
     File2->Close();
   }
 }
