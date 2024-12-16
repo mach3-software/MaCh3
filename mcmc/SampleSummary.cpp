@@ -675,7 +675,6 @@ void SampleSummary::PrepareOutput() {
 // Write the contents to the file
 void SampleSummary::Write() {
 // *******************
-
   // Prepare the output tree
   PrepareOutput();
 
@@ -944,7 +943,6 @@ void SampleSummary::Write() {
         delete MeanProjectY_ByMode;
       } // End loop over bins
     }
-    
     // Delete temporary objects
     delete RatioHistMean;
     delete RatioHistMode;
@@ -1925,7 +1923,6 @@ void SampleSummary::StudyKinematicCorrelations() {
       // Get the Covariance for these two parameters
       (*SampleCorrelation)(i,j) = SamCorr[i][j]->GetCorrelationFactor();
       (*SampleCorrelation)(j,i) = (*SampleCorrelation)(i,j);
-
     }// End j loop
   }// End i loop
 
@@ -2032,7 +2029,6 @@ void SampleSummary::StudyKinematicCorrelations() {
           // Get the Covariance for these two parameters
           (*KinCorrelation)(i,j) = KinCorr[i][j]->GetCorrelationFactor();
           (*KinCorrelation)(j,i) = (*KinCorrelation)(i,j);
-
         }// End j loop
       }// End i loop
 
@@ -2183,7 +2179,6 @@ void SampleSummary::StudyKinematicCorrelations() {
         // Get the Covariance for these two parameters
         (*ModeCorrelation)(i,j) = ModeCorr[i][j]->GetCorrelationFactor();
         (*ModeCorrelation)(j,i) = (*ModeCorrelation)(i,j);
-
       }// End j loop
     }// End i loop
 
