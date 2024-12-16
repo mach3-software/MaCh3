@@ -16,6 +16,35 @@ int targetCompression = 1;
 std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 
+
+void CompareTwoConfigs(const std::string& File1, const std::string& File2) {
+  // Treat File1 and File2 as strings (not files) to read like streams
+  std::istringstream file1(File1);
+  std::istringstream file2(File2);
+
+  std::string line1, line2;
+  int lineNumber = 1;
+  // Read and compare line by line
+  while (std::getline(file1, line1) && std::getline(file2, line2)) {
+    if (line1 != line2) {
+      MACH3LOG_WARN("Difference found on line {}:", lineNumber);
+      MACH3LOG_WARN("Config1: {}", line1);
+      MACH3LOG_WARN("Config2: {}", line2);
+    }
+    ++lineNumber;
+  }
+
+  // Check if one file has extra lines
+  while (std::getline(file1, line1)) {
+    MACH3LOG_WARN("Extra line in {} on line {}: {}", File1, lineNumber, line1);
+    ++lineNumber;
+  }
+  while (std::getline(file2, line2)) {
+    MACH3LOG_WARN("Extra line in {} on line {}: {}", File2, lineNumber, line2);
+    ++lineNumber;
+  }
+}
+
 /// EM: Will compare the version header contained in the two provided files and shout if they don't match
 bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName)
 {
@@ -44,10 +73,10 @@ bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& Conf
   }
   else{
     MACH3LOG_DEBUG("  Prev header digest: {} :: current: {}", (prevVersionHeader->Checksum())->AsString(), (versionHeader->Checksum())->AsString());
-
     if(std::strcmp((versionHeader->Checksum())->AsString(), (prevVersionHeader->Checksum())->AsString()) != 0){
-      MACH3LOG_ERROR("Looks like the version header for file {} is different to the previous ones", file->GetName());
+      MACH3LOG_ERROR("Looks like the {} embedded config for file {} is different to the previous ones", ConfigName, file->GetName());
       MACH3LOG_ERROR("This strongly suggests that this file was made with different software versions than the previous ones");
+      CompareTwoConfigs(TMacroToString(*versionHeader), TMacroToString(*prevVersionHeader));
       weirdFile = true;
     }
   }
@@ -192,7 +221,6 @@ void CombineChain()
   CopyDir(CovarianceFolderDir);
 
   delete prevFile;
-
   MACH3LOG_INFO("Done!");
 }
     
@@ -264,7 +292,6 @@ void ParseArg(int argc, char *argv[]){
   if(forceOverwrite){
     MACH3LOG_INFO("Will overwrite {} if it exists already", OutFileName.c_str());
   }
-
   MACH3LOG_INFO("Combining a total of {} files into {}", inpFileList.size(), OutFileName.c_str());
 }
 
