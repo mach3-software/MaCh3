@@ -29,8 +29,6 @@ class samplePDFBase
   virtual inline std::string GetName()const {return "samplePDF";};
   virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
-  inline void GetSampleNames(std::vector<std::string> &sampleNameVect) ;
-  inline void GetModeName(std::vector<std::string> &modeNameVect);
 
   /// @brief Return pointer to MaCh3 modes
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
@@ -39,30 +37,17 @@ class samplePDFBase
   TH2D* get2DHist();
   TH1D* get1DDataHist(){return dathist;}
   TH2D* get2DDataHist(){return dathist2d;}
-  void set1DBinning(int nbins, double* boundaries);
-  void set1DBinning(int nbins, double low, double high);
-  void set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
-  void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
-  double getEventRate();
-  void setMCthrow(bool mc){MCthrow= mc;}
       
-  // generate fake dataset based on rejection sampling    
-  std::vector< std::vector <double> > generate2D(TH2D* pdf = 0);
-  std::vector<double> generate();
   virtual void reweight()=0;
   virtual double GetLikelihood() = 0;
-  virtual std::vector<double>* getDataSample() {return dataSample;};
 
   virtual int getNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   virtual int getNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
 
-  void addData(std::vector<double> &dat);
-  void addData(std::vector< std::vector <double> > &dat);
-  void addData(TH1D* binneddata);
-  void addData(TH2D* binneddata);
-
-  // For adding sample dependent branches to the posteriors tree
-  virtual void setMCMCBranches(TTree *outtree) {(void)outtree;};
+  virtual void addData(std::vector<double> &dat);
+  virtual void addData(std::vector< std::vector <double> > &dat);
+  virtual void addData(TH1D* binneddata);
+  virtual void addData(TH2D* binneddata);
 
   // WARNING KS: Needed for sigma var
   virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
@@ -81,16 +66,11 @@ class samplePDFBase
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
   double getTestStatLLH(const double data, const double mc, const double w2) const;
-  /// @brief Set the test statistic to be used when calculating the binned likelihoods 
-  /// @param testStat The test statistic to use.
-  inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
 
   virtual void fill1DHist()=0;
   virtual void fill2DHist()=0;
 
 protected:
-  void init();
-  
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries
   void QuietPlease();
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries
@@ -103,11 +83,6 @@ protected:
   std::streambuf *buf;
   /// Keep the cerr buffer
   std::streambuf *errbuf;
-
-  // KS: Need thinking what to do with them
-
-  std::vector<double>* dataSample;
-  std::vector< std::vector <double> >* dataSample2D;
 
   /// Contains how many samples we've got
   M3::int_t nSamples;
@@ -127,7 +102,6 @@ protected:
   TH2D*_hPDF2D;
 
   TRandom3* rnd;
-  bool MCthrow;
 
   double pot;
 };
