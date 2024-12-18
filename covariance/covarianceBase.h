@@ -63,6 +63,11 @@ class covarianceBase {
   /// @param eL bool telling if it will be flat or not
   void setFlatPrior(const int i, const bool eL);
   
+  /// @brief Set random value useful for debugging/CI
+  void SetRandomThrow(const int i, const double radn) { randParams[i] = radn;}
+  /// @brief Get random value useful for debugging/CI
+  double GetRandomThrow(const int i) { return randParams[i];}
+
   /// @brief set branches for output file
   /// @param tree Tree to which we will save branches
   /// @param SaveProposal Normally we only save parameter after is accepted, for debugging purpose it is helpful to see also proposed values. That's what this variable controls
@@ -104,6 +109,12 @@ class covarianceBase {
   TMatrixDSym *getCovMatrix() { return covMatrix; }
   /// @brief Return inverted covariance matrix
   TMatrixDSym *getInvCovMatrix() { return invCovMatrix; }
+  /// @brief Return inverted covariance matrix
+  double GetInvCovMatrix(const int i, const int j) { return InvertCovMatrix[i][j]; }
+
+  /// @brief Return correlated throws
+  double GetCorrThrows(const int i) { return corr_throw[i]; }
+
   /// @brief Get if param has flat prior or not
   /// @param i Parameter index
   inline bool getFlatPrior(const int i) { return _fFlatPrior[i]; }
@@ -149,6 +160,8 @@ class covarianceBase {
 
   /// @brief Get matrix used for step proposal
   inline TMatrixDSym *getThrowMatrix(){return throwMatrix;}
+  /// @brief Get matrix used for step proposal
+  double GetThrowMatrix(int i, int j) { return throwMatrixCholDecomp[i][j];}
   /// @brief Get the Cholesky decomposition of the throw matrix
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   /// @brief Get the parameter means used in the adaptive handler
@@ -209,6 +222,8 @@ class covarianceBase {
   /// @brief Get individual step scale for selected parameter
   /// @param ParameterIndex Parameter index
   inline double GetIndivStepScale(const int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  /// @brief Get global step scale for covariance object
+  inline double GetGlobalStepScale(){return _fGlobalStepScale; }
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParProp_PCA(const int i) {
@@ -300,6 +315,11 @@ class covarianceBase {
 
   /// @brief Generate a new proposed state
   virtual void proposeStep();
+  /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
+  void randomize() _noexcept_;
+  /// @brief Use Cholesky throw matrix for better step proposal
+  void CorrelateSteps() _noexcept_;
+
   /// @brief Accepted this step
   void acceptStep() _noexcept_;
 
@@ -340,6 +360,7 @@ class covarianceBase {
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
+
 protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
@@ -349,11 +370,6 @@ protected:
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
-
-  /// @brief "Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step
-  void randomize() _noexcept_;
-  /// @brief Use Cholesky throw matrix for better step proposal
-  void CorrelateSteps() _noexcept_;
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   /// @param cov Matrix which we evaluate Positive Definitiveness
