@@ -143,19 +143,8 @@ void covarianceBase::init(std::string name, std::string file) {
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
     
-  InvertCovMatrix = new double*[_fNumPar]();
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    InvertCovMatrix[i] = new double[_fNumPar]();
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++)
-    {
-      InvertCovMatrix[i][j] = 0.;
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
+  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
+  throwMatrixCholDecomp.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
 
   setName(name);
   MakePosDef(CovMat);
@@ -172,7 +161,6 @@ void covarianceBase::init(std::string name, std::string file) {
 
   MACH3LOG_INFO("Created covariance matrix named: {}", getName());
   MACH3LOG_INFO("from file: {}", file);
-
   delete infile;
 }
 
@@ -206,20 +194,8 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 
   use_adaptive = false;
 
-  InvertCovMatrix = new double*[_fNumPar]();
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    InvertCovMatrix[i] = new double[_fNumPar]();
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++)
-    {
-      InvertCovMatrix[i][j] = 0.;
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
-
+  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
+  throwMatrixCholDecomp.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
   ReserveMemory(_fNumPar);
 
   TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
@@ -239,7 +215,10 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
     _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
     _fError[i] = (param["Systematic"]["Error"].as<double>());
-
+    if(_fError[i] <= 0) {
+      MACH3LOG_ERROR("Error for param {}({}) is negative and eqaul to {}", _fFancyNames[i], i, _fError[i]);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
     //ETA - a bit of a fudge but works
     std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
     _fLowBound[i] = TempBoundsVec[0];
