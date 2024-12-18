@@ -888,8 +888,8 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
 // ********************************************
 void covarianceBase::setStepScale(const double scale) {
 // ********************************************
-  if(scale == 0) {
-    MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
+  if(scale <= 0) {
+    MACH3LOG_ERROR("You are trying so set StepScale to 0 or negative this will not work");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("{} setStepScale() = {}", getName(), scale);
