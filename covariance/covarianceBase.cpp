@@ -301,32 +301,6 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 }
 
 // ********************************************
-void covarianceBase::init(TMatrixDSym* covMat) {
-// ********************************************
-  _fNumPar = covMat->GetNrows();
-  InvertCovMatrix = new double*[_fNumPar]();
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    InvertCovMatrix[i] = new double[_fNumPar]();
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++)
-    {
-      InvertCovMatrix[i][j] = 0.;
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
-
-  use_adaptive = false;
-  setCovMatrix(covMat);
-
-  ReserveMemory(_fNumPar);
-
-  MACH3LOG_INFO("Created covariance matrix named: {}", getName());
-}
-
-// ********************************************
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 // ********************************************
