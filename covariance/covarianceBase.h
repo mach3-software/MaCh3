@@ -69,6 +69,7 @@ class covarianceBase {
   void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
+  /// @cite luengo2020survey
   void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param ParameterIndex Parameter Index
@@ -461,7 +462,7 @@ protected:
   /// Matrix which we use for step proposal after Cholesky decomposition
   TMatrixD* throwMatrix_CholDecomp;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
-  std::vector<std::vector<double>> throwMatrixCholDecomp;
+  double** throwMatrixCholDecomp;
 
   /// Are we using AMCMC?
   bool use_adaptive;
