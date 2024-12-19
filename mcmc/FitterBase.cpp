@@ -179,9 +179,6 @@ void FitterBase::PrepareOutput() {
       oss << "LogL_sample_" << i;
       oss2 << oss.str() << "/D";
       outTree->Branch(oss.str().c_str(), &sample_llh[i], oss2.str().c_str());
-
-      // For adding sample dependent branches to the posteriors tree
-      samples[i]->setMCMCBranches(outTree);
     }
 
     for (size_t i = 0; i < systematics.size(); ++i) {

@@ -41,6 +41,13 @@ constexpr static const int _BAD_INT_ = -999;
 
 constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
 
+// Some commonly used variables to which we set pointers to
+constexpr static const double Unity = 1.;
+constexpr static const double Zero = 0.;
+constexpr static const float Unity_F = 1.;
+constexpr static const float Zero_F = 0.;
+constexpr static const int Unity_Int = 1;
+
 // C++ includes
 #include <sstream>
 #include <fstream> 

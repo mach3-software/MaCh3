@@ -13,12 +13,12 @@ struct FarDetectorCoreInfo {
 
   ~FarDetectorCoreInfo(){ delete [] isNC; }
 
-  bool signal; // true if signue                                              
-  int nEvents; // how many MC events are there
+  bool signal; ///< true if signue
+  int nEvents; ///< how many MC events are there
   double ChannelIndex;
   std::string flavourName;
 
-  std::vector<int*> Target; // target the interaction was on
+  std::vector<int*> Target; ///< target the interaction was on
   std::vector<const int*> nupdg;
   std::vector<const int*> nupdgUnosc;
 
@@ -51,12 +51,12 @@ struct FarDetectorCoreInfo {
   bool *isNC;
 
   // histo pdf bins
-  std::vector<double> rw_lower_xbinedge; // lower to check if Eb has moved the erec bin
-  std::vector<double> rw_lower_lower_xbinedge; // lower to check if Eb has moved the erec bin
-  std::vector<double> rw_upper_xbinedge; // upper to check if Eb has moved the erec bin
-  std::vector<double> rw_upper_upper_xbinedge; // upper to check if Eb has moved the erec bin
+  std::vector<double> rw_lower_xbinedge;       ///< lower to check if Eb has moved the erec bin
+  std::vector<double> rw_lower_lower_xbinedge; ///< lower to check if Eb has moved the erec bin
+  std::vector<double> rw_upper_xbinedge;       ///< upper to check if Eb has moved the erec bin
+  std::vector<double> rw_upper_upper_xbinedge; ///< upper to check if Eb has moved the erec bin
 
-  std::vector<double*> mode;
+  std::vector<const double*> mode;
 
   std::vector<const M3::float_t*> osc_w_pointer;
   std::vector<M3::float_t> xsec_w;
