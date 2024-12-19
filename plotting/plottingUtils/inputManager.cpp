@@ -35,7 +35,6 @@ InputManager::InputManager(const std::string &translationConfigName) {
         MACH3LOG_DEBUG("  - Found {}!", tags.size());
       }
     }
-
     _paramToTagsMap[param] = tags;
   }
 
@@ -55,7 +54,6 @@ InputManager::InputManager(const std::string &translationConfigName) {
         MACH3LOG_DEBUG("  - Found {}!", tags.size());
       }
     }
-
     _sampleToTagsMap[samp] = tags;
   }
 }
@@ -227,10 +225,8 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
       if ( tagCount == valTags.size() ) retVec.push_back(val);
     }
   }
-
   MACH3LOG_DEBUG("Found {} values matching the specified tags", retVec.size());
   return retVec;
-
 }
 
 std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
@@ -315,7 +311,6 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
     {
       object = nullptr;
     }
-
     else
     {
       // loop through the keys in the directory and find objects whose name matches the specified
@@ -330,7 +325,6 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
         }
       }
     }
-
     // check that only one object matched the pattern
     if (nMatchingObjects > 1)
     {
@@ -339,11 +333,8 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
 
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-
   }
-
-  // Vector too big!!
-  else
+  else // Vector too big!!
   {
     MACH3LOG_CRITICAL("Invalid object location vector");
     MACH3LOG_CRITICAL("Should have two elements: [ (directory to look in), (end of the name of the object) ]");
@@ -351,14 +342,11 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
     
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
   return object;
 }
 
-
 bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &parameter,
                                    std::string &fitter, const std::string &sample, bool setInputFileScan) {
-
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
   // EM: Get where the by sample LLH scan for this parameter *should* live if it exists
@@ -402,14 +390,12 @@ bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &p
 
     inputFileDef.LLHScansBySample_map[sample][parameter] = LLHGraph;
   }
-
   return true;
 }
 
 // check the input file for raw MCMC step values for a particular parameter
 bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setInputBranch) const {
   // we'll assume for now that the chain is in the form of a TTree and the branch names are parameter names
-
   bool wasFound = false;
 
   // make sure that the filedef object has all the necessary stuff to read from the posterior tree
@@ -436,19 +422,15 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
           inputFileDef.MCMCstepParamsMap[parameter] = new double( _BAD_DOUBLE_ ); // <- initialise the parameter step values 
           inputFileDef.posteriorTree->SetBranchAddress( branchNames[paramIdx], inputFileDef.MCMCstepParamsMap.at(parameter) );
         }
-
         break;
       }
     }
   }
-
   return wasFound;
-
 }
 
 // check the input file for processed 1d posteriors for a particular parameter
 bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData) const {
-  
   bool wasFound = false;
   
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
@@ -471,9 +453,7 @@ bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &p
         break;
       }
     }
-
   }
-
   return wasFound;
 }
 
@@ -540,7 +520,6 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
   for (std::string fitter: _knownFitters)
   {
-
     // flag for whether or not the current fitter is the correct one
     bool foundFitter = false;
     if (printThoughts)
@@ -631,7 +610,6 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       {
         MACH3LOG_DEBUG("  No default location specified");
       }
-      
     }
 
     int numPostFitParams = 0;
@@ -833,7 +811,6 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
     // EM: now get the objects from the file
     for (const std::string &parameter : inputFileDef.availableParams_LLH)
     {
-
       std::shared_ptr<TObject> LLHObj = nullptr;
 
       // check the locations for the object
@@ -908,5 +885,4 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
     find1dPosterior(inputFileDef, parameter, inputFileDef.fitter, true);
   }
 }
-
 } // namespace MaCh3Plotting

@@ -324,7 +324,6 @@ public:
     }
 
     return *_fileVec[fileNum].MCMCstepParamsMap.at(paramName);
-
   }
 
   /// @brief Get the 1d posterior particular parameter from a particular input file.
@@ -392,7 +391,6 @@ public:
 
   inline TGraph getSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
                                          std::string sample) const {
-    
     if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
@@ -519,7 +517,6 @@ public:
   /// @}
 
 private:
-
   // Helper function to get tagged values from a vector of values
   // specify the initial list of *values*, the map of values to their tags, the tags to check,
   // and the type of check to perform (see getTaggedParameter() for details)
@@ -573,7 +570,6 @@ private:
                                YAML::Node subConfig) const{
     if (subConfig[parameter])
     {
-
       // EM: this is config definition of fitter specific names for this parameter
       YAML::Node paramTranslation = subConfig[parameter];
 
@@ -642,9 +638,7 @@ private:
     return false;
   }
 
-
 private:
-
   // all parameters which are known to this InputManager: all the ones defined in the translation
   // config used to create it
   std::vector<std::string> _knownParameters;
