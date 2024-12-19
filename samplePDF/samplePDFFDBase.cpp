@@ -1255,7 +1255,7 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
 }
 
 void samplePDFFDBase::addData(TH1D* Data) {
-  MACH3LOG_INFO("Adding 1D data histogram : {} with {} events", Data->GetName(), Data->Integral());
+  MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetName(), Data->Integral());
   dathist2d = nullptr;
   dathist = Data;
   
@@ -1276,7 +1276,7 @@ void samplePDFFDBase::addData(TH1D* Data) {
 }
 
 void samplePDFFDBase::addData(TH2D* Data) {
-  MACH3LOG_INFO("Adding 2D data histogram : {} with {} events", Data->GetName(), Data->Integral());
+  MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
   dathist = nullptr;
 
