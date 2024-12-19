@@ -799,15 +799,17 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
   for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
     std::vector< int > XsecBins = {};
     if (XsecCov) {
+      // Skip oscillated NC events
+      // Not strictly needed, but these events don't get included in oscillated predictions, so
+      // no need to waste our time calculating and storing information about xsec parameters
+      // that will never be used.
+      if (fdobj->isNC[iEvent] && fdobj->signal) {
+        MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
+        continue;
+      } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
       for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
-        // Skip oscillated NC events
-        // Not strictly needed, but these events don't get included in oscillated predictions, so
-        // no need to waste our time calculating and storing information about xsec parameters
-        // that will never be used.
-        if (fdobj->isNC[iEvent] && fdobj->signal) {continue;} //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-
         //Now check that the target of an interaction matches with the normalisation parameters
-        bool TargetMatch=false;
+        bool TargetMatch = false;
         //If no target specified then apply to all modes
         if ((*it).targets.size()==0) {
           TargetMatch=true;
@@ -818,7 +820,10 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
             }
           }
         }
-        if (!TargetMatch) {continue;}
+        if (!TargetMatch) {
+          MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, *(fdobj->Target[iEvent]), (*it).name);
+          continue;
+        }
 
         //Now check that the neutrino flavour in an interaction matches with the normalisation parameters
         bool FlavourMatch=false;
@@ -832,7 +837,10 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
             }
           }
         }
-        if (!FlavourMatch){continue;}
+        if (!FlavourMatch) {
+          MACH3LOG_TRACE("Event {}, missed PDG check ({}) for dial {}", iEvent,(*fdobj->nupdg[iEvent]), (*it).name);
+          continue;
+        }
 
         //Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
         bool FlavourUnoscMatch=false;
@@ -846,7 +854,10 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
             }
           }
         }
-        if (!FlavourUnoscMatch){continue;}
+        if (!FlavourUnoscMatch){
+          MACH3LOG_TRACE("Event {}, missed FlavourUnosc check ({}) for dial {}", iEvent,(*fdobj->nupdgUnosc[iEvent]), (*it).name);
+          continue;
+        }
 
         //Now check that the mode of an interaction matches with the normalisation parameters
         bool ModeMatch=false;
@@ -860,18 +871,23 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
             }
           }
         }
-        if (!ModeMatch) {continue;}
+        if (!ModeMatch) {
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(fdobj->mode[iEvent]), (*it).name);
+          continue;
+        }
 
         //Now check whether the norm has kinematic bounds
         //i.e. does it only apply to events in a particular kinematic region?
         bool IsSelected = true;
         if ((*it).hasKinBounds) {
           for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) { 
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) {
               IsSelected = false;
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinematicParameter], (*it).name);
               continue;
             }
             else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinematicParameter], (*it).name);
               IsSelected = false;
               continue;
             }
@@ -879,6 +895,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
         }
         //Need to then break the event loop 
         if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
           continue;
         }
         // Now set 'index bin' for each normalisation parameter
@@ -888,6 +905,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
         //If syst on applies to a particular detector
         if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
           XsecBins.push_back(bin);
+          MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
           #ifdef DEBUG
           VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
           #endif
@@ -897,16 +915,16 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
     fdobj->xsec_norms_bins[iEvent]=XsecBins;
   }//end loop over events
   #ifdef DEBUG
-  MACH3LOG_INFO("Channel {}", iSample);
-  MACH3LOG_INFO("┌──────────────────────────────────────────────────────────┐");
+  MACH3LOG_DEBUG("Channel {}", iSample);
+  MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
   for (std::size_t i = 0; i < xsec_norms.size(); ++i) {
     const auto& norm = xsec_norms[i];
     double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
 
-    MACH3LOG_INFO("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
+    MACH3LOG_DEBUG("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
                   XsecCov->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
   }
-  MACH3LOG_INFO("└──────────────────────────────────────────────────────────┘");
+  MACH3LOG_DEBUG("└──────────────────────────────────────────────────────────┘");
   #endif
 
   return;
