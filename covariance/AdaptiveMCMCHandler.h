@@ -7,7 +7,8 @@
 namespace adaptive_mcmc{
 
 /// @brief Contains information about adaptive covariance matrix
-/// @see An adaptive Metropolis algorithm, H.Haario et al., 2001 for more info!
+/// @cite haario2001adaptive
+/// @author Henry Wallace
 /// @details struct encapsulating all adaptive MCMC information
 class AdaptiveMCMCHandler{
  public:
@@ -16,7 +17,7 @@ class AdaptiveMCMCHandler{
   AdaptiveMCMCHandler();
 
   /// @brief Destructor
-  ~AdaptiveMCMCHandler();
+  virtual ~AdaptiveMCMCHandler();
 
   /// @brief Print all class members
   void Print();
@@ -46,7 +47,7 @@ class AdaptiveMCMCHandler{
                               const int Npars);
 
   /// @brief Method to update adaptive MCMC
-  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  /// @cite haario2001adaptive
   /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
   void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars);
 

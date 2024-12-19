@@ -33,7 +33,7 @@ class PCAHandler{
   PCAHandler();
 
   /// @brief Destructor
-  ~PCAHandler();
+  virtual ~PCAHandler();
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   void ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA);

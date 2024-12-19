@@ -953,7 +953,6 @@ void FitterBase::Run2DLLHScan() {
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-
         }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables

@@ -60,16 +60,11 @@ covarianceBase::~covarianceBase(){
   if (covMatrix != nullptr) delete covMatrix;
   if (invCovMatrix != nullptr) delete invCovMatrix;
   if (throwMatrix_CholDecomp != nullptr) delete throwMatrix_CholDecomp;
-
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    delete[] InvertCovMatrix[i];
+  if (throwMatrix != nullptr) delete throwMatrix;
+  for(int i = 0; i < _fNumPar; i++) {
     delete[] throwMatrixCholDecomp[i];
   }
-  delete[] InvertCovMatrix;
   delete[] throwMatrixCholDecomp;
-  
-  if (throwMatrix != nullptr) delete throwMatrix;
 }
 
 // ********************************************
@@ -112,7 +107,6 @@ void covarianceBase::ConstructPCA() {
 // ********************************************
 void covarianceBase::init(std::string name, std::string file) {
 // ********************************************
-
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file.c_str(), "READ");
   if (infile->IsZombie()) {
@@ -143,20 +137,15 @@ void covarianceBase::init(std::string name, std::string file) {
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
     
-  InvertCovMatrix = new double*[_fNumPar]();
+  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
   throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    InvertCovMatrix[i] = new double[_fNumPar]();
+  for(int i = 0; i < _fNumPar; i++) {
     throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++)
-    {
-      InvertCovMatrix[i][j] = 0.;
+    for (int j = 0; j < _fNumPar; j++) {
       throwMatrixCholDecomp[i][j] = 0.;
     }
   }
-
   setName(name);
   MakePosDef(CovMat);
   setCovMatrix(CovMat);
@@ -172,7 +161,6 @@ void covarianceBase::init(std::string name, std::string file) {
 
   MACH3LOG_INFO("Created covariance matrix named: {}", getName());
   MACH3LOG_INFO("from file: {}", file);
-
   delete infile;
 }
 
@@ -206,25 +194,17 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 
   use_adaptive = false;
 
-  InvertCovMatrix = new double*[_fNumPar]();
+  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
   throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    InvertCovMatrix[i] = new double[_fNumPar]();
+  for(int i = 0; i < _fNumPar; i++) {
     throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++)
-    {
-      InvertCovMatrix[i][j] = 0.;
+    for (int j = 0; j < _fNumPar; j++) {
       throwMatrixCholDecomp[i][j] = 0.;
     }
   }
-
   ReserveMemory(_fNumPar);
 
   TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
-  //_fDetString = std::vector<std::string>(_fNumPar);
-
   int i = 0;
   std::vector<std::map<std::string,double>> Correlations(_fNumPar);
   std::map<std::string, int> CorrNamesMap;
@@ -239,7 +219,10 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
     _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
     _fError[i] = (param["Systematic"]["Error"].as<double>());
-
+    if(_fError[i] <= 0) {
+      MACH3LOG_ERROR("Error for param {}({}) is negative and eqaul to {}", _fFancyNames[i], i, _fError[i]);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
     //ETA - a bit of a fudge but works
     std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
     _fLowBound[i] = TempBoundsVec[0];
@@ -265,12 +248,14 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     }
     i++;
   }
-
-  //ETA
-  //Now that we've been through all systematic let's fill the covmatrix
+  if(i != _fNumPar) {
+    MACH3LOG_CRITICAL("Inconsitnent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  // ETA Now that we've been through all systematic let's fill the covmatrix
   //This makes the root TCov from YAML
-  for(int j = 0; j < _fNumPar;j++) {
-    (*_fCovMatrix)(j, j)=_fError[j]*_fError[j];
+  for(int j = 0; j < _fNumPar; j++) {
+    (*_fCovMatrix)(j, j) = _fError[j]*_fError[j];
     //Get the map of parameter name to correlation from the Correlations object
     for (auto const& pair : Correlations[j]) {
       auto const& key = pair.first;
@@ -322,32 +307,6 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 }
 
 // ********************************************
-void covarianceBase::init(TMatrixDSym* covMat) {
-// ********************************************
-  _fNumPar = covMat->GetNrows();
-  InvertCovMatrix = new double*[_fNumPar]();
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++)
-  {
-    InvertCovMatrix[i] = new double[_fNumPar]();
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++)
-    {
-      InvertCovMatrix[i][j] = 0.;
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
-
-  use_adaptive = false;
-  setCovMatrix(covMat);
-
-  ReserveMemory(_fNumPar);
-
-  MACH3LOG_INFO("Created covariance matrix named: {}", getName());
-}
-
-// ********************************************
 // Set the covariance matrix for this class
 void covarianceBase::setCovMatrix(TMatrixDSym *cov) {
 // ********************************************
@@ -393,7 +352,7 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
   for(int i = 0; i < SizeVec; i++) {
     _fGenerated.at(i) = 1.;
     _fPreFitValue.at(i) = 1.;
-    _fError.at(i) = 0.;
+    _fError.at(i) = 1.;
     _fCurrVal.at(i) = 0.;
     _fPropVal.at(i) = 0.;
     _fLowBound.at(i) = -999.99;
@@ -846,8 +805,7 @@ double covarianceBase::GetLikelihood() {
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
   
-  if(NOutside > 0)
-    return NOutside*_LARGE_LOGL_;
+  if(NOutside > 0) return NOutside*_LARGE_LOGL_;
 
   return CalcLikelihood();
 }
@@ -930,12 +888,16 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
 // ********************************************
 void covarianceBase::setStepScale(const double scale) {
 // ********************************************
-  if(scale == 0)
-  {
-    MACH3LOG_ERROR("You are trying so set StepScale to 0 this will not work");
+  if(scale <= 0) {
+    MACH3LOG_ERROR("You are trying so set StepScale to 0 or negative this will not work");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("{} setStepScale() = {}", getName(), scale);
+  const double SuggestedScale = 2.38*2.38/_fNumPar;
+  if(std::fabs(scale - SuggestedScale)/SuggestedScale > 1) {
+    MACH3LOG_WARN("Defined Global StepScale is {}, while suggested suggested {}", scale, SuggestedScale);
+  }
+
   _fGlobalStepScale = scale;
 }
 
@@ -943,8 +905,7 @@ void covarianceBase::setStepScale(const double scale) {
 void covarianceBase::toggleFixAllParameters() {
 // ********************************************
   // fix or unfix all parameters by multiplying by -1
-  if(!pca)
-  {
+  if(!pca) {
     for (int i = 0; i < _fNumPar; i++) _fError[i] *= -1.0;
   } else{
      for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
@@ -1197,18 +1158,15 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 // HW : Here be adaption
 void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
-  // need to cast matrixName to string
-  std::string matrix_name_str(matrixName);
-
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrix_name_str, getNpars());
+  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, getNpars());
   if(!success) return;
   AdaptiveHandler.Print();
 
   // Next let"s check for external matrices
   // We"re going to grab this info from the YAML manager
-  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["UseExternalMatrix"], false)) {
-    MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrix_name_str);
+  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false)) {
+    MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
     AdaptiveHandler.CreateNewAdaptiveCovariance(_fNumPar);
@@ -1216,9 +1174,9 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   }
 
   // Finally, we accept that we want to read the matrix from a file!
-  std::string external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMatrixFileName"], "");
-  std::string external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMatrixName"], "");
-  std::string external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["ExternalMeansName"], "");
+  std::string external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "");
+  std::string external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "");
+  std::string external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "");
 
   AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);
