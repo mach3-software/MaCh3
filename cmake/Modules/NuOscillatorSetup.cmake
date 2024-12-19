@@ -46,8 +46,8 @@ IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
 IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
 IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
 IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
-IsTrue(NuFastLinear_ENABLED USE_NuFastLiner)
-IsTrue(NuSQUIDSLinear_ENABLED USE_NuSQUIDSLiner)
+IsTrue(NuFastLinear_ENABLED USE_NuFastLinear)
+IsTrue(NuSQUIDSLinear_ENABLED USE_NuSQUIDSLinear)
 IsTrue(OscProb_ENABLED USE_OscProb)
 
 #Also additional flags
@@ -83,7 +83,7 @@ CPMAddPackage(
     "UseCUDAProb3 ${USE_CUDAProb3}"
     "UseProbGPULinear ${USE_ProbGPULinear}"
     "UseProb3ppLinear ${USE_Prob3ppLinear}"
-    "UseNuFASTLinear  ${USE_NuFastLiner}"
+    "UseNuFASTLinear  ${USE_NuFastLinear}"
     "UseNuSQUIDSLinear ${USE_NuSQUIDSLinear}"
     "UseOscProb ${USE_OscProb}"
 
