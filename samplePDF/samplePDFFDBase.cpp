@@ -713,10 +713,8 @@ M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEv
   return xsecw;
 }
 
-void samplePDFFDBase::SetupNormParameters() {
-  
+void samplePDFFDBase::SetupNormParameters() {  
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
-  std::cout << "FOUND " << xsec_norms.size() << " norm parameters that affect this sample" << std::endl;
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
