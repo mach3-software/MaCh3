@@ -65,7 +65,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   // but we can split the matrix into independent block matrices
 
   // We"ll set a dummy variable here
-  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Settings"][matrix_name_str]["MatrixBlocks"], {{}});
+  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
 
   SetAdaptiveBlocks(matrix_blocks, Npars);
   return true;

@@ -179,9 +179,6 @@ void FitterBase::PrepareOutput() {
       oss << "LogL_sample_" << i;
       oss2 << oss.str() << "/D";
       outTree->Branch(oss.str().c_str(), &sample_llh[i], oss2.str().c_str());
-
-      // For adding sample dependent branches to the posteriors tree
-      samples[i]->setMCMCBranches(outTree);
     }
 
     for (size_t i = 0; i < systematics.size(); ++i) {
@@ -956,7 +953,6 @@ void FitterBase::Run2DLLHScan() {
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-
         }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables

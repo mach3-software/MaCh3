@@ -25,7 +25,7 @@ jobs:
             test_1: ./CIValidations/SplineValidations
             test_2: ./CIValidations/SamplePDFValidations
             test_3: ./CIValidations/NuOscillatorInterfaceValidations
-            test_4: empty
+            test_4: ./CIValidations/LLHValidation
             test_5: empty
             test_6: empty
             test_7: empty

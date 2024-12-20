@@ -695,30 +695,11 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
   if(hpost[0] == nullptr) MakePostfit();
 
   MACH3LOG_INFO("Making Credible Intervals ");
-
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
-  if(CredibleIntervals.size() != CredibleIntervalsColours.size())
-  {
-    MACH3LOG_ERROR("Size of  CredibleIntervals is not equal to size of CredibleIntervalsColours");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  if(CredibleIntervals.size() > 1)
-  {
-    for(unsigned int i = 1; i < CredibleIntervals.size(); i++ )
-    {
-      if(CredibleIntervals[i] > CredibleIntervals[i-1])
-      {
-        MACH3LOG_ERROR("Interval {} is smaller than {}", i, i-1);
-        MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleIntervals[i], CredibleIntervals[i-1]);
-        MACH3LOG_ERROR("They should be grouped in decreasing order");
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
-  }
-
+  // KS: Sanity check of size and ordering is correct
+  CheckCredibleIntervalsOrder(CredibleIntervals, CredibleIntervalsColours);
   const int nCredible = int(CredibleIntervals.size());
   std::vector<TH1D*> hpost_copy(nDraw);
   std::vector<std::vector<TH1D*>> hpost_cl(nDraw);
@@ -749,18 +730,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
     {
       // Scale the histograms before gettindg credible intervals
       hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
-
-      //KS: We have slightly different approach depending if you passed percentage or sigmas
-      if(CredibleInSigmas)
-      {
-        //KS: Convert sigmas into percentage
-        const double CredInter = GetSigmaValue(int(std::round(CredibleIntervals[j])));
-        GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredInter);
-      }
-      else
-      {
-        GetCredibleInterval(hpost_copy[i], hpost_cl[i][j], CredibleIntervals[j]);
-      }
+      GetCredibleIntervalSig(hpost_copy[i], hpost_cl[i][j], CredibleInSigmas, CredibleIntervals[j]);
 
       hpost_cl[i][j]->SetFillColor(CredibleIntervalsColours[j]);
       hpost_cl[i][j]->SetLineWidth(1);
@@ -1022,7 +992,6 @@ void MCMCProcessor::MakeCovariance() {
 
     // Loop over the other parameters to get the correlations
     for (int j = 0; j <= i; ++j) {
-
       // Skip the diagonal elements which we've already done above
       if (j == i) continue;
 
@@ -1486,7 +1455,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   constexpr double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
   constexpr Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
 
-  //KS: This strore neccesary entires for stripped covariance which strore only "menaingfull correlations
+  //KS: This store necessary entries for stripped covariance which store only "meaningful correlations
   std::vector<std::vector<double>> CorrOfInterest;
   CorrOfInterest.resize(nDraw);
   std::vector<std::vector<std::string>> NameCorrOfInterest;
@@ -1554,21 +1523,20 @@ void MCMCProcessor::DrawCorrelations1D() {
     Corr1DHist[i][0]->SetMaximum(+1.);
     Corr1DHist[i][0]->SetMinimum(-1.);
     Corr1DHist[i][0]->Draw();
-    for(int k = 1; k < Nhists; k++)
-    {
+    for(int k = 1; k < Nhists; k++) {
       Corr1DHist[i][k]->Draw("SAME");
     }
 
     auto leg = std::make_unique<TLegend>(0.3, 0.75, 0.6, 0.90);
     leg->SetTextSize(0.02);
-    for(int k = 0; k < Nhists; k++)
-    {
+    for(int k = 0; k < Nhists; k++) {
       leg->AddEntry(Corr1DHist[i][k].get(), Form("%.2f > |Corr| >= %.2f", Thresholds[k+1], Thresholds[k]), "f");
     }
     leg->SetLineColor(0);
     leg->SetLineStyle(0);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
+    leg->SetBorderSize(0);
     leg->Draw("SAME");
 
     Posterior->Write(Corr1DHist[i][0]->GetTitle());
@@ -1581,8 +1549,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     const int size = int(CorrOfInterest[i].size());
 
     if(size == 0) continue;
-    TH1D* Corr1DHist_Reduced = new TH1D("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
-
+    auto Corr1DHist_Reduced = std::make_unique<TH1D>("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
     Corr1DHist_Reduced->SetTitle(Corr1DHist[i][0]->GetTitle());
     Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
     Corr1DHist_Reduced->SetFillColor(kBlue);
@@ -1601,13 +1568,10 @@ void MCMCProcessor::DrawCorrelations1D() {
 
     Posterior->Write(Form("%s_Red", Corr1DHist_Reduced->GetTitle()));
     if(printToPDF) Posterior->Print(CanvasName);
-
-    delete Corr1DHist_Reduced;
   }
 
   CorrDir->Close();
   delete CorrDir;
-
   OutputFile->cd();
 
   Posterior->SetTopMargin(TopMargin);
@@ -1622,17 +1586,11 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
                                         const std::vector<Color_t>& CredibleRegionColor,
                                         const bool CredibleInSigmas) {
 // *********************
-
   if(hpost2D == nullptr) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");
 
-  if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
-  {
-    MACH3LOG_ERROR("Size of  CredibleRegions is not equat to size of CredibleRegionStyle");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
+  CheckCredibleRegionsOrder(CredibleRegions, CredibleRegionStyle, CredibleRegionColor);
   const int nCredible = int(CredibleRegions.size());
-
 
   std::vector<std::vector<TH2D*>> hpost_2D_copy(nDraw);
   std::vector<std::vector<std::vector<TH2D*>>> hpost_2D_cl(nDraw);
@@ -1662,16 +1620,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
     {
       for (int k = 0; k < nCredible; ++k)
       {
-        if(CredibleInSigmas)
-        {
-          //KS: Convert sigmas into percentage
-          double CredReg = GetSigmaValue(int(std::round(CredibleRegions[k])));
-          GetCredibleRegion(hpost_2D_cl[i][j][k], CredReg);
-        }
-        else
-        {
-          GetCredibleRegion(hpost_2D_cl[i][j][k], CredibleRegions[k]);
-        }
+        GetCredibleRegionSig(hpost_2D_cl[i][j][k], CredibleInSigmas, CredibleRegions[k]);
         hpost_2D_cl[i][j][k]->SetLineColor(CredibleRegionColor[k]);
         hpost_2D_cl[i][j][k]->SetLineWidth(2);
         hpost_2D_cl[i][j][k]->SetLineStyle(CredibleRegionStyle[k]);
@@ -1767,7 +1716,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      // Other
                                      const bool CredibleInSigmas) {
 // *********************
-
   if(hpost2D == nullptr) MakeCovariance_MP();
   MACH3LOG_INFO("Making Triangle Plot");
 
@@ -1775,18 +1723,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   std::vector<int> ParamNumber;
   for(int j = 0; j < nParamPlot; ++j)
   {
-    //KS: First we need to find parameter number based on name
-    int ParamNo = _UNDEF_;
-    for (int i = 0; i < nDraw; ++i)
-    {
-      TString Title = "";
-      double Prior = 1.0;
-      double PriorError = 1.0;
-
-      GetNthParameter(i, Prior, PriorError, Title);
-
-      if(ParNames[j] == Title) ParamNo = i;
-    }
+    int ParamNo = GetParamIndexFromName(ParNames[j]);
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParNames[j]);
@@ -1805,6 +1742,19 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   Posterior->SetLeftMargin(0.001);
   Posterior->SetRightMargin(0.001);
 
+  // KS: We later format hist several times so make one unfired lambda
+  auto FormatHistogram = [](auto* hist) {
+    hist->GetXaxis()->SetTitle("");
+    hist->GetYaxis()->SetTitle("");
+    hist->SetTitle("");
+
+    hist->GetXaxis()->SetLabelSize(0.1);
+    hist->GetYaxis()->SetLabelSize(0.1);
+
+    hist->GetXaxis()->SetNdivisions(4);
+    hist->GetYaxis()->SetNdivisions(4);
+  };
+
   Posterior->cd();
   Posterior->Clear();
   Posterior->Update();
@@ -1816,57 +1766,26 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   int Npad = 0;
   for(int j = 1; j < nParamPlot+1; j++) Npad += j;
   Posterior->cd();
+  // KS: Sanity check of size and ordering is correct
+  CheckCredibleIntervalsOrder(CredibleIntervals, CredibleIntervalsColours);
+  CheckCredibleRegionsOrder(CredibleRegions, CredibleRegionStyle, CredibleRegionColor);
 
-  if(CredibleIntervals.size() != CredibleIntervalsColours.size())
-  {
-    MACH3LOG_ERROR("size of  CredibleIntervals is not equat to size of CredibleIntervalsColours");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  if(CredibleIntervals.size() > 1)
-  {
-    for(unsigned int i = 1; i < CredibleIntervals.size(); i++ )
-    {
-      if(CredibleIntervals[i] > CredibleIntervals[i-1])
-      {
-        MACH3LOG_ERROR("Interval {} is smaller than {}", i, i-1);
-        MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleIntervals[i], CredibleIntervals[i-1]);
-        MACH3LOG_ERROR("They should be grouped in decreasing order");
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
-  }
-  if( (CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size()) )
-  {
-    MACH3LOG_ERROR("size of  CredibleRegions is not equat to size of CredibleRegionStyle");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  for(unsigned int i = 1; i < CredibleRegions.size(); i++ )
-  {
-    if(CredibleRegions[i] > CredibleRegions[i-1])
-    {
-      MACH3LOG_ERROR("Interval {} is smaller than {}", i, i-1);
-      MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleRegions[i], CredibleRegions[i-1]);
-      MACH3LOG_ERROR("They should be grouped in decreasing order");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-  }
   const int nCredibleIntervals = int(CredibleIntervals.size());
   const int nCredibleRegions = int(CredibleRegions.size());
 
   //KS: Initialise Tpad histograms etc we will need
-  TPad** TrianglePad = new TPad*[Npad];
+  std::vector<TPad*> TrianglePad(Npad);
   //KS: 1D copy of posterior, we need it as we modify them
-  TH1D** hpost_copy = new TH1D*[nParamPlot];
-  TH1D*** hpost_cl = new TH1D**[nParamPlot];
-  TText **TriangleText = new TText *[nParamPlot*2];
-  TH2D** hpost_2D_copy = new TH2D*[Npad-nParamPlot];
-  TH2D*** hpost_2D_cl = new TH2D**[Npad-nParamPlot];
+  std::vector<TH1D*> hpost_copy(nParamPlot);
+  std::vector<std::vector<TH1D*>> hpost_cl(nParamPlot);
+  std::vector<std::unique_ptr<TText>> TriangleText(nParamPlot * 2);
+  std::vector<TH2D*> hpost_2D_copy(Npad-nParamPlot);
+  std::vector<std::vector<TH2D*>> hpost_2D_cl(Npad-nParamPlot);
   gStyle->SetPalette(51);
 
   //KS: Super convoluted way of calculating ranges for our pads, trust me it works...
   std::vector<double> X_Min(nParamPlot);
   std::vector<double> X_Max(nParamPlot);
-
   X_Min[0] = 0.10;
   double xScale = (0.95 - (X_Min[0]+0.05))/nParamPlot;
   //KS: 0.05 is because we need additional offset for labels
@@ -1889,10 +1808,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   }
 
   //KS: We store as numbering of isn't straightforward
-  int counterPad = 0;
-  int counterText = 0;
-  int counterPost = 0;
-  int counter2DPost = 0;
+  int counterPad = 0, counterText = 0, counterPost = 0, counter2DPost = 0;
   //KS: We start from top of the plot, might be confusing but works very well
   for(int y = 0; y < nParamPlot; y++)
   {
@@ -1913,12 +1829,9 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       TrianglePad[counterPad]->SetBorderSize(0);
 
       //KS: Corresponds to bottom part of the plot, need margins for labels
-      if(y == (nParamPlot-1)) TrianglePad[counterPad]->SetBottomMargin(0.1);
-      else TrianglePad[counterPad]->SetBottomMargin(0);
-
+      TrianglePad[counterPad]->SetBottomMargin(y == (nParamPlot - 1) ? 0.1 : 0);
       //KS: Corresponds to left part, need margins for labels
-      if(x == 0) TrianglePad[counterPad]->SetLeftMargin(0.15);
-      else TrianglePad[counterPad]->SetLeftMargin(0);
+      TrianglePad[counterPad]->SetLeftMargin(x == 0 ? 0.15 : 0);
 
       TrianglePad[counterPad]->Draw();
       TrianglePad[counterPad]->cd();
@@ -1927,7 +1840,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       if(x == y)
       {
         hpost_copy[counterPost] = static_cast<TH1D*>(hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x])));
-        hpost_cl[counterPost] = new TH1D*[nCredibleIntervals];
+        hpost_cl[counterPost].resize(nCredibleIntervals);
         /// Scale the histograms so it shows the posterior probability
         hpost_copy[counterPost]->Scale(1. / hpost_copy[counterPost]->Integral());
         for (int j = 0; j < nCredibleIntervals; ++j)
@@ -1939,17 +1852,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 
           // Scale the histograms before gettindg credible intervals
           hpost_cl[counterPost][j]->Scale(1. / hpost_cl[counterPost][j]->Integral());
-          //KS: Slightly different approach depending if intervals are in percentage or sigmas
-          if(CredibleInSigmas)
-          {
-            //KS: Convert sigmas into percentage
-            const double CredReg = GetSigmaValue(int(std::round(CredibleIntervals[j])));
-            GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredReg);
-          }
-          else
-          {
-            GetCredibleInterval(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleIntervals[j]);
-          }
+          GetCredibleIntervalSig(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleInSigmas, CredibleIntervals[j]);
 
           hpost_cl[counterPost][j]->SetFillColor(CredibleIntervalsColours[j]);
           hpost_cl[counterPost][j]->SetLineWidth(1);
@@ -1960,19 +1863,12 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
         hpost_copy[counterPost]->SetLineColor(kBlack);
 
         //KS: Don't want any titles
-        hpost_copy[counterPost]->GetXaxis()->SetTitle("");
-        hpost_copy[counterPost]->GetYaxis()->SetTitle("");
-        hpost_copy[counterPost]->SetTitle("");
-
-        hpost_copy[counterPost]->GetXaxis()->SetLabelSize(0.1);
-        hpost_copy[counterPost]->GetYaxis()->SetLabelSize(0.1);
-
-        hpost_copy[counterPost]->GetXaxis()->SetNdivisions(4);
-        hpost_copy[counterPost]->GetYaxis()->SetNdivisions(4);
+        FormatHistogram(hpost_copy[counterPost]);
 
         hpost_copy[counterPost]->Draw("HIST");
-        for (int j = 0; j < nCredibleIntervals; ++j)
+        for (int j = 0; j < nCredibleIntervals; ++j){
           hpost_cl[counterPost][j]->Draw("HIST SAME");
+        }
         counterPost++;
       }
       //KS: Here we plot 2D credible regions
@@ -1980,61 +1876,44 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       {
         hpost_2D_copy[counter2DPost] = static_cast<TH2D*>(hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone(
           Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y])));
-        hpost_2D_cl[counter2DPost] = new TH2D*[nCredibleRegions];
+        hpost_2D_cl[counter2DPost].resize(nCredibleRegions);
         //KS: Now copy for every credible region
         for (int k = 0; k < nCredibleRegions; ++k)
         {
           hpost_2D_cl[counter2DPost][k] = static_cast<TH2D*>(hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone(
             Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k])));
-          if(CredibleInSigmas)
-          {
-            //KS: Convert sigmas into percentage
-            const double CredReg = GetSigmaValue(int(std::round(CredibleRegions[k])));
-            GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredReg);
-          }
-          else
-          {
-            GetCredibleRegion(hpost_2D_cl[counter2DPost][k], CredibleRegions[k]);
-          }
+          GetCredibleRegionSig(hpost_2D_cl[counter2DPost][k], CredibleInSigmas, CredibleRegions[k]);
 
           hpost_2D_cl[counter2DPost][k]->SetLineColor(CredibleRegionColor[k]);
           hpost_2D_cl[counter2DPost][k]->SetLineWidth(2);
           hpost_2D_cl[counter2DPost][k]->SetLineStyle(CredibleRegionStyle[k]);
         }
-
         //KS: Don't want any titles
-        hpost_2D_copy[counter2DPost]->GetXaxis()->SetTitle("");
-        hpost_2D_copy[counter2DPost]->GetYaxis()->SetTitle("");
-        hpost_2D_copy[counter2DPost]->SetTitle("");
+        FormatHistogram(hpost_2D_copy[counter2DPost]);
 
-        hpost_2D_copy[counter2DPost]->GetXaxis()->SetLabelSize(0.1);
-        hpost_2D_copy[counter2DPost]->GetYaxis()->SetLabelSize(0.1);
-
-        hpost_2D_copy[counter2DPost]-> GetXaxis()->SetNdivisions(4);
-        hpost_2D_copy[counter2DPost]-> GetYaxis()->SetNdivisions(4);
         hpost_2D_copy[counter2DPost]->Draw("COL");
         //Now credible regions
-        for (int k = 0; k < nCredibleRegions; ++k)
+        for (int k = 0; k < nCredibleRegions; ++k){
           hpost_2D_cl[counter2DPost][k]->Draw("CONT3 SAME");
+        }
         counter2DPost++;
       }
       //KS: Corresponds to bottom part of the plot
       if(y == (nParamPlot-1))
       {
         Posterior->cd();
-        TriangleText[counterText] = new TText(X_Min[x]+ (X_Max[x]-X_Min[x])/4, 0.04, hpost[ParamNumber[x]]->GetTitle());
+        TriangleText[counterText] = std::make_unique<TText>(X_Min[x]+ (X_Max[x]-X_Min[x])/4, 0.04, hpost[ParamNumber[x]]->GetTitle());
         //KS: Unfortunately for many plots or long names this can go out of bounds :(
         TriangleText[counterText]->SetTextSize(0.015);
         TriangleText[counterText]->SetNDC(true);
         TriangleText[counterText]->Draw();
-
         counterText++;
       }
       //KS: Corresponds to left part
       if(x == 0)
       {
         Posterior->cd();
-        TriangleText[counterText] = new TText(0.04, Y_Min[y] + (Y_Max[y]-Y_Min[y])/4, hpost[ParamNumber[y]]->GetTitle());
+        TriangleText[counterText] = std::make_unique<TText>(0.04, Y_Min[y] + (Y_Max[y]-Y_Min[y])/4, hpost[ParamNumber[y]]->GetTitle());
         //KS: Rotate as this is y axis
         TriangleText[counterText]->SetTextAngle(90);
         //KS: Unfortunately for many plots or long names this can go out of bounds :(
@@ -2085,7 +1964,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 
   //KS: Remove allocated structures
   for(int i = 0; i < Npad; i++) delete TrianglePad[i];
-  for(int i = 0; i < nParamPlot*2; i++) delete TriangleText[i];
   for(int i = 0; i < nParamPlot; i++)
   {
     delete hpost_copy[i];
@@ -2093,7 +1971,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     {
       delete hpost_cl[i][j];
     }
-    delete[] hpost_cl[i];
   }
   for(int i = 0; i < Npad - nParamPlot; i++)
   {
@@ -2102,14 +1979,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     {
       delete hpost_2D_cl[i][j];
     }
-    delete[] hpost_2D_cl[i];
   }
-  delete[] hpost_copy;
-  delete[] hpost_cl;
-  delete[] hpost_2D_copy;
-  delete[] hpost_2D_cl;
-  delete[] TrianglePad;
-  delete[] TriangleText;
 
   //KS: Restore margin
   Posterior->SetTopMargin(TopMargin);
@@ -2243,7 +2113,6 @@ void MCMCProcessor::ScanInput() {
 // Set up the output files and canvases
 void MCMCProcessor::SetupOutput() {
 // ****************************
-
   // Make sure we can read files located anywhere and strip the .root ending
   MCMCFile = MCMCFile.substr(0, MCMCFile.find(".root"));
 
@@ -2767,13 +2636,11 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    bool skip = false;
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Polar Plot", ParNames[k]);
-      skip = true;
+      continue;
     }
-    if(skip) continue;
 
     TString Title = "";
     double Prior = 1.0;
@@ -2839,13 +2706,11 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    bool skip = false;
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Bayes Factor", ParNames[k]);
-      skip = true;
+      continue;
     }
-    if(skip) continue;
 
     const double M1_min = Model1Bounds[k][0];
     const double M2_min = Model2Bounds[k][0];
@@ -2901,13 +2766,11 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    bool skip = false;
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate SavageDickey", ParNames[k]);
-      skip = true;
+      continue;
     }
-    if(skip) continue;
     
     TString Title = "";
     double Prior = 1.0;
@@ -3410,7 +3273,6 @@ void MCMCProcessor::ParamTraces() {
 
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nDraw; ++j) {
-
     TString Title = "";
     double Prior = 1.0;
     double PriorError = 1.0;
@@ -4399,4 +4261,43 @@ void MCMCProcessor::AcceptanceProbabilities() {
   delete probDir;
 
   OutputFile->cd();
+}
+
+
+// **************************
+void MCMCProcessor::CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours) {
+// **************************
+  if (CredibleIntervals.size() != CredibleIntervalsColours.size()) {
+    MACH3LOG_ERROR("size of CredibleIntervals is not equal to size of CredibleIntervalsColours");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (CredibleIntervals.size() > 1) {
+    for (unsigned int i = 1; i < CredibleIntervals.size(); i++) {
+      if (CredibleIntervals[i] > CredibleIntervals[i - 1]) {
+        MACH3LOG_ERROR("Interval {} is smaller than {}", i, i - 1);
+        MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleIntervals[i], CredibleIntervals[i - 1]);
+        MACH3LOG_ERROR("They should be grouped in decreasing order");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+  }
+}
+
+// **************************
+void MCMCProcessor::CheckCredibleRegionsOrder(const std::vector<double>& CredibleRegions,
+                               const std::vector<Style_t>& CredibleRegionStyle,
+                               const std::vector<Color_t>& CredibleRegionColor) {
+// **************************
+  if ((CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size())) {
+    MACH3LOG_ERROR("size of CredibleRegions is not equal to size of CredibleRegionStyle or CredibleRegionColor");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  for (unsigned int i = 1; i < CredibleRegions.size(); i++) {
+    if (CredibleRegions[i] > CredibleRegions[i - 1]) {
+      MACH3LOG_ERROR("Interval {} is smaller than {}", i, i - 1);
+      MACH3LOG_ERROR("{:.2f} {:.2f}", CredibleRegions[i], CredibleRegions[i - 1]);
+      MACH3LOG_ERROR("They should be grouped in decreasing order");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
 }

@@ -17,9 +17,8 @@ class samplePDFFDBase :  public samplePDFBase
 {
 public:
   //######################################### Functions #########################################
-
-  samplePDFFDBase(){};
-  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  /// @param ConfigFileName Name of config to initialise the sample object
+  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
@@ -30,15 +29,15 @@ public:
 
   //ETA - abstract these to samplePDFFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void addData(TH1D* Data);
-  void addData(TH2D* Data);
-  void addData(std::vector<double> &data);
-  void addData(std::vector< std::vector <double> > &data);
+  void addData(TH1D* Data) override;
+  void addData(TH2D* Data) override;
+  void addData(std::vector<double> &data) override;
+  void addData(std::vector< std::vector <double> > &data) override;
   /// @brief DB Multi-threaded GetLikelihood
-  double GetLikelihood();
+  double GetLikelihood() override;
   //===============================================================================
 
-  void reweight();
+  void reweight() override;
   M3::float_t GetEventWeight(int iSample, int iEntry);
 
   ///  @brief including Dan's magic NuOscillator
@@ -48,7 +47,7 @@ public:
 
   void ReadSampleConfig();
 
-  int getNMCSamples() {return int(MCSamples.size());}
+  int getNMCSamples() override {return int(MCSamples.size());}
 
   int getNEventsInSample(int iSample) {
     if (iSample < 0 || iSample > getNMCSamples()) {
@@ -146,7 +145,7 @@ public:
   void SetupNormParameters();
 
   //===============================================================================
-  //DB Functions required for reweighting functions  
+  //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from samplePDF_array
   void fill1DHist();
   void fill2DHist();
@@ -233,14 +232,6 @@ public:
   std::unique_ptr<manager> SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
-
-  double Unity = 1.;
-  double Zero = 0.;
-  
-  float Unity_F = 1.;
-  float Zero_F = 0.;
-
-  int Unity_Int = 1;
 
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;

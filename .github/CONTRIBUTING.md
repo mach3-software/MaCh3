@@ -8,10 +8,10 @@ Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gi
 ## PR tittles
 When creating a Pull Request (PR), make sure the title starts with one of the following prefixes to indicate the type of PR:
 
-- **`feat`**: For new features
-- **`bugfix`**: For fixing bugs
-- **`tidy`**: For minor changes like refactoring or updating dependencies
-- **`breaking`**: For changes that break backward compatibility
+- **`feat:`**: For new features
+- **`bugfix:`** For fixing bugs
+- **`tidy:`** For minor changes like refactoring or updating dependencies
+- **`breaking:`** For changes that break backward compatibility
 
 ## Doxygen
 When making comments try following Doxygen type of comments
