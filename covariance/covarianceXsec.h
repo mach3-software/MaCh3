@@ -6,6 +6,9 @@
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
 class covarianceXsec : public covarianceBase {
   public:
     /// @brief Constructor
