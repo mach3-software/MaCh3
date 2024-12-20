@@ -977,12 +977,11 @@ void splineFDBase::PrintBinning(TAxis *Axis)
 //****************************************
 {
   const int NBins = Axis->GetNbins();
-  const double *BinEdges = Axis->GetXbins()->GetArray();
   
   std::cout << "\t";
   for (int iBin = 0; iBin < (NBins + 1); iBin++)
   {
-    std::cout << BinEdges[iBin] << " ";
+    std::cout << Axis->GetXbins()->GetAt(iBin) << " " << std::endl;
   }
   std::cout << std::endl;
   return;
