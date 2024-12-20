@@ -13,6 +13,8 @@
 class OscillatorBase;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+/// @author Dan Barrow
+/// @author Ed Atkin
 class samplePDFFDBase :  public samplePDFBase
 {
 public:

@@ -23,6 +23,7 @@
 #include "plottingUtils/plottingUtils.h"
 #include "plottingUtils/plottingManager.h"
 
+/// @file GetPostfitParamPlots
 /// This script generates post-fit parameter plots. The central postfit value is
 /// taken as the Highest Posterior Density (HPD), but can be easily changed to
 /// another method such as Gaussian. Be cautious as parameter names and the number
@@ -34,7 +35,10 @@
 /// ./GetPostfitParamPlots ProcessMCMC_Output1.root <ProcessMCMC_Output2.root> <ProcessMCMC_Output3.root>
 /// ```
 ///
-/// @note Originally written by Clarence, with changes by Will, updates by Kamil, and converted to a generic plotter by Ewan.
+/// @author Clarence Wret
+/// @author Will Parker
+/// @author Kamil Skwarczynski
+/// @author Ewan Miller
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"

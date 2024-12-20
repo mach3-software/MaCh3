@@ -11,6 +11,7 @@
 #include "TStyle.h"
 
 namespace MaCh3Plotting {
+/// @author Ewan Miller
 class StyleManager {
 public:
   /// @brief Constructor

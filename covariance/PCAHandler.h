@@ -26,6 +26,7 @@
 
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
+/// @author Clarence Wret
 class PCAHandler{
  public:
 

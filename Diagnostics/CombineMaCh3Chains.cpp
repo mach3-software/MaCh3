@@ -11,6 +11,10 @@
 // MaCh3 includes
 #include "manager/manager.h"
 
+/// @file CombineMaCh3Chains
+/// @author Ewan Miller
+/// @author Kamil Skwarczynski
+
 std::string OutFileName = "";
 int targetCompression = 1;
 std::vector<std::string> inpFileList;

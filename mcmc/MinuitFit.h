@@ -9,7 +9,8 @@
 #include "Math/Functor.h"
 
 /// @brief Implementation of Minuit fitting algorithm
-/// \cite James:2004xla
+/// @cite James:2004xla
+/// @author Kamil Skwarczynski
 class MinuitFit : public LikelihoodFit {
  public:
   /// @brief Constructor
