@@ -478,7 +478,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   if (isHist3D)
   {
-    Hist3D = File->Get<TH3F>(("dev_tmp_0_0"));
+    Hist3D = File->Get<TH3F>((TemplateName.c_str()));
 
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
@@ -977,12 +977,11 @@ void splineFDBase::PrintBinning(TAxis *Axis)
 //****************************************
 {
   const int NBins = Axis->GetNbins();
-  const double *BinEdges = Axis->GetXbins()->GetArray();
   
   std::cout << "\t";
   for (int iBin = 0; iBin < (NBins + 1); iBin++)
   {
-    std::cout << BinEdges[iBin] << " ";
+    std::cout << Axis->GetXbins()->GetAt(iBin) << " " << std::endl;
   }
   std::cout << std::endl;
   return;
