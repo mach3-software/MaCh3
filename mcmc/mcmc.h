@@ -3,6 +3,7 @@
 #include "mcmc/FitterBase.h"
 
 /// @brief Implementation of MR2T2 algorithm
+/// @author Asher Kaboth
 class mcmc : public FitterBase {
  public:
    /// @brief Constructor

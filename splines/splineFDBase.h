@@ -9,6 +9,9 @@
 
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Henry Wallace
 class splineFDBase : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:

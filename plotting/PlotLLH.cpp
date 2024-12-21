@@ -9,6 +9,9 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
 
+/// @file PlotLLH
+/// @author Ewan Miller
+
 // some options for the plots
 double ratioPlotSplit;
 double yTitleOffset;

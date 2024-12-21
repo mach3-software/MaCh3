@@ -13,6 +13,8 @@ class TFile;
 
 /// @brief The manager class is responsible for managing configurations and settings.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/01.-Manager-and-config-handling).
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
 class manager {
 public:
   /// @brief Constructs a manager object with the specified file name.

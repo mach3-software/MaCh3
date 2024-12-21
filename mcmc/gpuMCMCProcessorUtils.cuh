@@ -9,6 +9,9 @@
 
 #include "manager/gpuUtils.cuh"
 
+/// @file gpuMCMCProcessorUtils
+/// @author Kamil Skwarczynski
+
 /// @brief KS: Initialiser, here we allocate memory for variables and copy constants
 /// @param ParStep_gpu Parameter value at each step
 /// @param NumeratorSum_gpu Sum used for nominator of autocorrelation calculations

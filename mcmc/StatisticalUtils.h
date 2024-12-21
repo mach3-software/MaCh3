@@ -14,6 +14,7 @@
 
 /// @file StatisticalUtils.h
 /// @brief Utility functions for statistical interpretations in MaCh3
+/// @author Kamil Skwarczynski
 
 // **************************
 /// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
