@@ -123,7 +123,9 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
   return returnVec;
 }
 
+// ********************************************
 const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFromDetID(const int DetID) {
+// ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
@@ -132,12 +134,7 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
     if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
-
-    // if ((GetParDetID(SystIndex) & DetID )){
-    //   returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
-    // }
   }
-
   return returnVec;
 }
 
@@ -193,9 +190,9 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
       }
       if(TempKinematicStrings.size() == 0) {
-	MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-	MACH3LOG_ERROR("For Param {}", norm.name);
-	throw MaCh3Exception(__FILE__, __LINE__);
+        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("For Param {}", norm.name);
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
     }//KinVar_i
     norm.KinematicVarStr = TempKinematicStrings;
@@ -277,15 +274,13 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
 const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const int DetID) {
 // ********************************************
   std::vector<XsecNorms4> returnVec;
-  int norm_counter = 0;
-  IterateOverParams(DetID,
-    [&](int i) { return GetParamType(i) == kNorm; }, // Filter condition
-    [&](auto) {
-      XsecNorms4 Temp = NormParams[norm_counter];
-      returnVec.push_back(Temp);
-      norm_counter++;
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
+    auto &NormIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+    if (AppliesToDetID(GlobalIndex, DetID)) {
+      returnVec.push_back(NormParams[NormIndex]);
     }
-  );
+  }
   return returnVec;
 }
 
