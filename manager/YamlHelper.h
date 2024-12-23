@@ -268,7 +268,7 @@ Type GetFromManager(const YAML::Node& node, Type defval) {
     MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
     //const std::string expectedType = DemangleTypeName(typeid(Type).name());
     //MACH3LOG_ERROR("Expected argument is {}", expectedType);
-    throw MaCh3Exception(file, line);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 }
 
