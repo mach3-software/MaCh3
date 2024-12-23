@@ -264,10 +264,11 @@ Type GetFromManager(const YAML::Node& node, Type defval) {
     return node.as<Type>();
   } catch (const YAML::BadConversion& e) {
     const std::string nodeAsString = YAMLtoSTRING(node);
-    const std::string expectedType = DemangleTypeName(typeid(Type).name());
     MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
     MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
-    MACH3LOG_ERROR("Expected argument is {}", expectedType);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    //const std::string expectedType = DemangleTypeName(typeid(Type).name());
+    //MACH3LOG_ERROR("Expected argument is {}", expectedType);
+    throw MaCh3Exception(file, line);
   }
 }
+
