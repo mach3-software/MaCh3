@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cxxabi.h>
 
 // ROOT Includes
 #include "TMacro.h"
@@ -13,23 +14,12 @@
 // yaml Includes
 #include "yaml-cpp/yaml.h"
 
+// MaCh3 Includes
+#include "manager/MaCh3Exception.h"
+
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
-
-// **********************
-/// @brief Get content of config file if node is not found take default value specified
-/// @param node Yaml node
-/// @param defval Default value which will be used in case node doesn't exist
-template<typename Type>
-Type GetFromManager(const YAML::Node& node, Type defval) {
-// **********************
-  YAML::Node tmpNode = node;
-
-  if(!tmpNode){
-    return defval;
-  }
-  return tmpNode.as<Type>();
-}
+/// @author Kamil Skwarczynski
 
 // **********************
 /// @brief Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
@@ -246,4 +236,38 @@ template <typename... Args>
 void OverrideConfig(YAML::Node node, std::string const &key, Args... args) {
 // **********************
   OverrideConfig(node[key], args...);
+}
+
+// **********************
+/// @brief Function to demangle type names
+inline std::string DemangleTypeName(const std::string& mangledName) {
+// **********************
+  int status = 0;
+  char* demangledName = abi::__cxa_demangle(mangledName.c_str(), nullptr, nullptr, &status);
+  std::string result = (status == 0) ? demangledName : mangledName;
+  free(demangledName);
+  return result;
+}
+
+// **********************
+/// @brief Get content of config file if node is not found take default value specified
+/// @param node Yaml node
+/// @param defval Default value which will be used in case node doesn't exist
+template<typename Type>
+Type GetFromManager(const YAML::Node& node, Type defval) {
+  // **********************
+  if (!node) {
+    return defval;
+  }
+  try {
+    // Attempt to convert the node to the expected type
+    return node.as<Type>();
+  } catch (const YAML::BadConversion& e) {
+    const std::string nodeAsString = YAMLtoSTRING(node);
+    const std::string expectedType = DemangleTypeName(typeid(Type).name());
+    MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
+    MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    MACH3LOG_ERROR("Expected argument is {}", expectedType);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
 }
