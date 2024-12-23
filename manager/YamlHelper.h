@@ -66,7 +66,7 @@ template<typename T, typename... Args>
 T FindFromManagerHelper(const YAML::Node& node, const std::string& key, Args... args) {
   // **********************
   if (!node[key]) {
-    std::cerr << "Node " << key << " doesn't exist." << std::endl;
+    MACH3LOG_ERROR("Node {} doesn't exist.", key);
     throw;
     return T();
   }
@@ -88,7 +88,7 @@ inline YAML::Node STRINGtoYAML(const std::string& yaml_string){
   try {
     return YAML::Load(yaml_string);
   } catch (const YAML::ParserException& e) {
-    std::cerr << "Error parsing YAML string: " << e.what() << std::endl;
+    MACH3LOG_ERROR("Error parsing YAML string: {}", e.what());
     return YAML::Node();
   }
 }
@@ -115,7 +115,7 @@ inline std::string TMacroToString(const TMacro& macro) {
   // Retrieve lines from TMacro
   TList* linesList = macro.GetListOfLines();
   if (!linesList) {
-    std::cerr << "Error: Failed to retrieve lines from TMacro." << std::endl;
+    MACH3LOG_ERROR("Failed to retrieve lines from TMacro.");
     return "";
   }
 
@@ -124,7 +124,7 @@ inline std::string TMacroToString(const TMacro& macro) {
   while ((obj = nextLine())) {
     TObjString* line = dynamic_cast<TObjString*>(obj);
     if (!line) {
-      std::cerr << "Error: Failed to cast object to TObjString." << std::endl;
+      MACH3LOG_ERROR("Failed to cast object to TObjString.");
       continue;
     }
     ss << line->GetString() << std::endl;
@@ -254,8 +254,8 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 /// @param node Yaml node
 /// @param defval Default value which will be used in case node doesn't exist
 template<typename Type>
-Type GetFromManager(const YAML::Node& node, Type defval) {
-  // **********************
+Type GetFromManager(const YAML::Node& node, Type defval, const std::string File = "", const int Line = 1) {
+// **********************
   if (!node) {
     return defval;
   }
@@ -268,7 +268,11 @@ Type GetFromManager(const YAML::Node& node, Type defval) {
     MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
     //const std::string expectedType = DemangleTypeName(typeid(Type).name());
     //MACH3LOG_ERROR("Expected argument is {}", expectedType);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    if(File == "") {
+      throw MaCh3Exception(__FILE__ , __LINE__);
+    } else {
+      throw MaCh3Exception(File , Line );
+    }
   }
 }
 
