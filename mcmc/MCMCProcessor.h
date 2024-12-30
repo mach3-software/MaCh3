@@ -9,16 +9,12 @@
 #include <cstdio>
 
 // ROOT includes
-#include "TObjArray.h"
-#include "TObjString.h"
 #include "TFile.h"
 #include "TBranch.h"
 #include "TCanvas.h"
 #include "TLine.h"
 #include "TLegend.h"
 #include "TString.h"
-#include "TH1.h"
-#include "TH2.h"
 #include "TGraphErrors.h"
 #include "TVectorD.h"
 #include "TColor.h"
@@ -49,8 +45,8 @@ class TF1;
 
 /// KS: Enum for different covariance classes
 enum ParameterEnum {
-  kXSecPar  = 0, //KS: This hold both xsec and flux
-  kNDPar = 1,
+  kXSecPar  = 0,
+  kNDPar    = 1,
   kFDDetPar = 2,
   kOSCPar   = 3,
   
@@ -190,12 +186,13 @@ class MCMCProcessor {
     // Get the number of parameters
     /// @brief Get total number of used parameters
     inline int GetNParams() { return nDraw; };
-    inline int GetNFlux() { return nFlux; };
     inline int GetNXSec() { return nParam[kXSecPar]; };
     inline int GetNND() { return nParam[kNDPar]; };
     inline int GetNFD() { return nParam[kFDDetPar]; };
     inline int GetOSC() { return nParam[kOSCPar]; };
-        
+    /// @brief Number of params from a given group, for example flux
+    int GetGroup(const std::string& name) const;
+
     /// @brief Get 1D posterior for a given parameter
     /// @param i parameter index
     inline TH1D* GetHpost(const int i) { return hpost[i]; };
@@ -273,7 +270,7 @@ class MCMCProcessor {
     inline void SetPosterior1DCut(const std::string Cut){Posterior1DCut = Cut; };
   private:
     /// @brief Prepare prefit histogram for parameter overlay plot
-    inline TH1D* MakePrefit();
+    inline std::unique_ptr<TH1D> MakePrefit();
     /// @brief prepare output root file and canvas to which we will save EVERYTHING
     inline void MakeOutputFile();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
@@ -294,7 +291,9 @@ class MCMCProcessor {
     inline void ReadOSCFile();
     /// @brief Remove parameter specified in config
     inline void RemoveParameters();
-   
+    /// @brief Print info like how many params have been loaded etc
+    inline void PrintInfo() const;
+
     /// @brief Scan Input etc.
     inline void ScanInput();
     /// @brief Scan order of params from a different groups
@@ -393,13 +392,8 @@ class MCMCProcessor {
     /// KS: in MCMC output there is order of parameters so for example first goes xsec then nd det etc.
     /// Idea is that this parameter will keep track of it so code is flexible
     std::vector<int> ParamTypeStartPos;
-    
-    /// In XsecMatrix we have both xsec and flux parameters, this is just for some plotting options
-    /// @warning will become deprecated
-    std::vector<bool> IsXsec;
-    /// This keep number of Flux params in xsec matrix
-    /// @warning will become deprecated
-    int nFlux;
+    // KS: For example flux or detector within matrix
+    std::vector<std::string> ParameterGroup;
 
     /// Vector of each systematic
     std::vector<TString> SampleName_v;
@@ -434,8 +428,8 @@ class MCMCProcessor {
     /// MJR: Use FFT-based autocorrelation algorithm (save time & resources)?
     bool useFFTAutoCorrelation;
 
-    std::vector< int > NDSamplesBins;
-    std::vector< std::string > NDSamplesNames;
+    std::vector<int> NDSamplesBins;
+    std::vector<std::string> NDSamplesNames;
 
     /// Gaussian fitter
     TF1 *Gauss;
@@ -444,7 +438,7 @@ class MCMCProcessor {
     TFile *OutputFile;
     
     /// Fancy canvas used for our beautiful plots
-    TCanvas *Posterior;
+    std::unique_ptr<TCanvas> Posterior;
 
     //Vector of best fit points and errors obtained with different methods
     /// Vector with central value for each parameter
@@ -474,7 +468,7 @@ class MCMCProcessor {
     /// Holds 1D Posterior Distributions
     std::vector<TH1D*> hpost;
     /// Holds 2D Posterior Distributions
-    TH2D ***hpost2D;
+    std::vector<std::vector<TH2D*>> hpost2D;
     /// Holds violin plot for all dials
     TH2D *hviolin;
     /// Holds prior violin plot for all dials,
