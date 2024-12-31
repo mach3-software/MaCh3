@@ -98,32 +98,32 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 /// Carrier for whether you want to apply a systematic to an event or not
 struct XsecNorms4 {
 // *******************
-    /// Name of parameters
-    std::string name;
-    /// Mode which parameter applies to
-    std::vector<int> modes;
-    /// Horn currents which parameter applies to
-    std::vector<int> horncurrents;
-    /// PDG which parameter applies to
-    std::vector<int> pdgs;
-    /// Preosc PDG which parameter applies to
-    std::vector<int> preoscpdgs;
-    /// Targets which parameter applies to
-    std::vector<int> targets;
-    /// Does this parameter have kinematic bounds
-    bool hasKinBounds;
-    /// Generic vector contain enum relating to a kinematic variable
-    /// and lower and upper bounds. This can then be passed to IsEventSelected
-    std::vector< std::vector<double> > Selection;
+  /// Name of parameters
+  std::string name;
+  /// Mode which parameter applies to
+  std::vector<int> modes;
+  /// Horn currents which parameter applies to
+  std::vector<int> horncurrents;
+  /// PDG which parameter applies to
+  std::vector<int> pdgs;
+  /// Preosc PDG which parameter applies to
+  std::vector<int> preoscpdgs;
+  /// Targets which parameter applies to
+  std::vector<int> targets;
+  /// Does this parameter have kinematic bounds
+  bool hasKinBounds;
+  /// Generic vector contain enum relating to a kinematic variable
+  /// and lower and upper bounds. This can then be passed to IsEventSelected
+  std::vector< std::vector<double> > Selection;
 
-    /// Generic vector containing the string of kinematic type
-    /// This then needs to be converted to a kinematic type enum
-    /// within a samplePDF daughter class
-    /// The bounds for each kinematic variable are given in Selection
-    std::vector< std::string > KinematicVarStr;
+  /// Generic vector containing the string of kinematic type
+  /// This then needs to be converted to a kinematic type enum
+  /// within a samplePDF daughter class
+  /// The bounds for each kinematic variable are given in Selection
+  std::vector< std::string > KinematicVarStr;
 
-    /// Parameter number of this normalisation in current systematic model
-    int index;
+  /// Parameter number of this normalisation in current systematic model
+  int index;
 };
 
 /// Make an enum of the spline interpolation type
@@ -557,7 +557,7 @@ namespace MaCh3Utils {
 
   /// @brief DB Anything added here must be of the form 2^X, where X is an integer
   /// @warning DB Used to contain which DetIDs are supported
-  std::unordered_map<int,int>KnownDetIDsMap({
+  static const std::unordered_map<int,int>KnownDetIDsMap({
     {0,1},    //ND
     {1,8},    //FD
     {2,16},   //SK1Rmu
@@ -567,6 +567,6 @@ namespace MaCh3Utils {
     {6,256},  //Atm MultiGeV e-like
     {7,512},  //Atm MultiGeV mu-like
   });
-  int nKnownDetIDs = int(KnownDetIDsMap.size());
+  static const int nKnownDetIDs = int(KnownDetIDsMap.size());
 
 } // end MaCh3Utils namespace
