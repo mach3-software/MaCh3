@@ -557,7 +557,7 @@ namespace MaCh3Utils {
 
   /// @brief DB Anything added here must be of the form 2^X, where X is an integer
   /// @warning DB Used to contain which DetIDs are supported
-  inline std::unordered_map<int,int>KnownDetIDsMap({
+  std::unordered_map<int,int>KnownDetIDsMap({
     {0,1},    //ND
     {1,8},    //FD
     {2,16},   //SK1Rmu
@@ -567,6 +567,6 @@ namespace MaCh3Utils {
     {6,256},  //Atm MultiGeV e-like
     {7,512},  //Atm MultiGeV mu-like
   });
-  inline int nKnownDetIDs = int(KnownDetIDsMap.size());
+  int nKnownDetIDs = int(KnownDetIDsMap.size());
 
 } // end MaCh3Utils namespace
