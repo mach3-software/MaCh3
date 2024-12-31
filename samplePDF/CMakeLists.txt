@@ -2,13 +2,14 @@ set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
     Structs.h
-	FarDetectorCoreInfoStruct.h
+    HistogramUtils.h
+    FarDetectorCoreInfoStruct.h
 )
 
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
-    Structs.cpp
+    HistogramUtils.cpp
 )
 
 target_link_libraries(SamplePDF PUBLIC Splines NuOscillator Covariance)

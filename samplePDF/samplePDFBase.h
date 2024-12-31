@@ -15,6 +15,7 @@
 
 //MaCh3 includes
 #include "samplePDF/Structs.h"
+#include "samplePDF/HistogramUtils.h"
 #include "manager/manager.h"
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
