@@ -2,7 +2,6 @@
 
 // ROOT include
 #include "TGraphAsymmErrors.h"
-#include "TH2Poly.h"
 #include "TLorentzVector.h"
 #include "TObjString.h"
 

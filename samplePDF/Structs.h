@@ -63,6 +63,8 @@ constexpr static const int Unity_Int = 1;
 #include "TObjString.h"
 #include "TFile.h"
 #include "TF1.h"
+#include "TH2Poly.h"
+#include "TH1.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
