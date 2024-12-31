@@ -43,11 +43,11 @@ void covarianceXsec::InitXsecFromConfig() {
   //PreFitValues etc etc.
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
-    _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
-    _ParameterGroup[i] = (param["Systematic"]["ParameterGroup"].as<std::string>());
+    _fDetID[i] = Get<int>(param["Systematic"]["DetID"], __FILE__ , __LINE__);
+    _ParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
 
     //Fill the map to get the correlations later as well
-    std::string ParamType = param["Systematic"]["Type"].as<std::string>();
+    auto ParamType = Get<std::string>(param["Systematic"]["Type"], __FILE__ , __LINE__);
     //Now load in variables for spline systematics only
     if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
     {
@@ -69,13 +69,11 @@ void covarianceXsec::InitXsecFromConfig() {
       NormParams.push_back(GetXsecNorm(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kNorm].insert(std::make_pair(ParamCounter[SystType::kNorm], i));
       ParamCounter[SystType::kNorm]++;
-    }
-    else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
       _fParamType[i] = SystType::kFunc;
       _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
       ParamCounter[SystType::kFunc]++;
-    }
-    else{
+    } else{
       MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
       std::string expectedTypes = "Expecting ";
       for (int s = 0; s < SystType::kSystTypes; ++s) {
@@ -87,7 +85,7 @@ void covarianceXsec::InitXsecFromConfig() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     i++;
-  }
+  } //end loop over params
 
   //Add a sanity check,
   if(_fSplineNames.size() != ParamCounter[SystType::kSpline]){
@@ -97,8 +95,6 @@ void covarianceXsec::InitXsecFromConfig() {
   //KS We resized them above to all params to fight memory fragmentation, now let's resize to fit only allocated memory to save RAM
   NormParams.shrink_to_fit();
   SplineParams.shrink_to_fit();
-
-  return;
 }
 
 // ********************************************

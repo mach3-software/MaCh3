@@ -214,17 +214,17 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   //PreFitValues etc etc.
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
-    _fFancyNames[i] = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
-    _fPreFitValue[i] = (param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
-    _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
-    _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
-    _fError[i] = (param["Systematic"]["Error"].as<double>());
+    _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
+    _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
+    _fGenerated[i] = Get<double>(param["Systematic"]["ParameterValues"]["Generated"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
+    _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and eqaul to {}", _fFancyNames[i], i, _fError[i]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     //ETA - a bit of a fudge but works
-    std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
+    auto TempBoundsVec = Get<std::vector<double>>(param["Systematic"]["ParameterBounds"], __FILE__ , __LINE__);
     _fLowBound[i] = TempBoundsVec[0];
     _fUpBound[i] = TempBoundsVec[1];
 
@@ -241,15 +241,15 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     //Also loop through the correlations
     if(param["Systematic"]["Correlations"]) {
       for(unsigned int Corr_i = 0; Corr_i < param["Systematic"]["Correlations"].size(); ++Corr_i){
-        for (YAML::const_iterator it=param["Systematic"]["Correlations"][Corr_i].begin();it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
+        for (YAML::const_iterator it = param["Systematic"]["Correlations"][Corr_i].begin(); it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
           Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
         }
       }
     }
     i++;
-  }
+  } // end loop over para
   if(i != _fNumPar) {
-    MACH3LOG_CRITICAL("Inconsitnent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
+    MACH3LOG_CRITICAL("Inconsistent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   // ETA Now that we've been through all systematic let's fill the covmatrix
@@ -264,8 +264,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
       //If you found the parameter name then get the index
       if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
         index = CorrNamesMap[key];
-      }
-      else {
+      } else {
         MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }

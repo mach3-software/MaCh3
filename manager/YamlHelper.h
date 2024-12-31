@@ -250,6 +250,27 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 }
 
 // **********************
+/// @brief Get content of config file
+/// @param node Yaml node
+template<typename Type>
+Type Get(const YAML::Node& node, const std::string File, const int Line) {
+// **********************
+  if (!node) {
+    MACH3LOG_ERROR("Empty Yaml node");
+    throw MaCh3Exception(File , Line );
+  }
+  try {
+    // Attempt to convert the node to the expected type
+    return node.as<Type>();
+  } catch (const YAML::BadConversion& e) {
+    const std::string nodeAsString = YAMLtoSTRING(node);
+    MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
+    MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    throw MaCh3Exception(File , Line );
+  }
+}
+
+// **********************
 /// @brief Get content of config file if node is not found take default value specified
 /// @param node Yaml node
 /// @param defval Default value which will be used in case node doesn't exist
