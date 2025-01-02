@@ -240,7 +240,7 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
   return hist;
 }
 // ****************
-TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
+TH2Poly* ConvertTH2DtoTH2Poly(TH2D* hist) {
 // ****************
   // Make the x axis from the momentum of lepton
   TAxis* xaxis = hist->GetXaxis();
