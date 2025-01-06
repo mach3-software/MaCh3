@@ -128,7 +128,6 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
 //WP: Helper function for projecting TH2Poly onto the Y axis
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
-
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),int(ybins.size()-1),&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
   std::vector<double> hProjY_Error(hProjY->GetXaxis()->GetNbins() + 1, 0.0);
@@ -325,6 +324,29 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
     integral += Histogram->GetBinContent(i)*area;
   }
   return integral;
+}
+
+// *********************
+TH2Poly* MakePolyHist(const std::string& name, const std::vector<double>& BinArray_x, const std::vector<double>& BinArray_y) {
+// *********************
+  TH2Poly* poly = new TH2Poly();
+  poly->SetName(name.c_str());
+  poly->SetTitle(name.c_str());
+  double xmax, xmin, ymax, ymin;
+  for(unsigned int iy = 0; iy < BinArray_y.size()-1; iy++)
+  {
+    ymax = BinArray_y[iy+1];
+    ymin = BinArray_y[iy];
+    for(unsigned int ix = 0; ix < BinArray_x.size()-1; ix++)
+    {
+      xmax = BinArray_x[ix+1];
+      xmin = BinArray_x[ix];
+      double binofx[] = {xmin, xmax, xmax, xmin};
+      double binofy[] = {ymin, ymin, ymax, ymax};
+      poly->AddBin(4,binofx,binofy);
+    }
+  }
+  return poly;
 }
 
 // *********************

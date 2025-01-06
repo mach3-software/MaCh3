@@ -6,6 +6,8 @@
 /// @details This file includes macros and enums for defining spline coefficients.
 /// It is designed to be compatible with older CUDA versions, so be cautious
 /// when adding new features or including other headers.
+/// @author Clarence Wret
+/// @author Kamil Skwarczynski
 
 #ifndef _BAD_SPLINE_
 #define _BAD_SPLINE_ 123456789
@@ -24,7 +26,6 @@ enum SplineSegmentCoeffs
   kCoeffC = 2, ///< Coefficient C
   kCoeffD = 3  ///< Coefficient D
 };
-
 
 // *******************
 /// @brief KS: Struct storing information for spline monolith

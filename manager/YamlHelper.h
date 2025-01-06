@@ -20,6 +20,7 @@
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
 /// @author Kamil Skwarczynski
+/// @author Luke Pickering
 
 // **********************
 /// @brief Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
