@@ -22,6 +22,7 @@
 
 /// @file Monitor.h
 /// @brief System and monitoring utilities for printing system information and status updates.
+/// @author Kamil Skwarczynski
 
 namespace MaCh3Utils {
   /// @brief KS: Prints welcome message with MaCh3 logo
