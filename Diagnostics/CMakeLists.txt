@@ -7,6 +7,7 @@ foreach(app
     GetPenaltyTerm
     ProcessMCMC
     CombineMaCh3Chains
+    PlotMCMCDiag
     )
     add_executable(${app} ${app}.cpp)
     add_dependencies(DiagApps ${app})
