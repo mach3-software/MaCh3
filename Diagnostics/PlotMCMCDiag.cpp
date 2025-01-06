@@ -27,6 +27,8 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
 {
   TCanvas *c1 = new TCanvas("c1"," ", 0, 0, 800,630);
   gStyle->SetOptStat(0); //Set 0 to disable statystic box
+  //To avoid TCanvas::Print> messages
+  gErrorIgnoreLevel = kWarning;
 
   TKey *key;
   TFile *infile = TFile::Open(fname1.Data());
@@ -41,6 +43,7 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
   TIter next(infile->GetListOfKeys());
   while ((key = static_cast<TKey*>(next()))) {
     std::string dirname = std::string(key->GetName());
+    if (std::string(key->GetClassName()) != "TDirectoryFile") continue;
     //KS: Script will work with LogL and Batched_means, you can comment it if you are interested in it
     if( (dirname == "LogL") || (dirname == "Batched_means") ) continue;
     //KS: Trace wo longer chains is super big, the way to avoid is to plot as png but I don't like png,
@@ -54,13 +57,12 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
     {
       std::string name = std::string(subkey->GetName());
       name = dirname + "/" + name;
-      std::cout<<name<<std::endl;
-
+      MACH3LOG_INFO("{}", name);
       if (std::string(subkey->GetClassName()) != "TH1D"){continue;}
-      else{std::cout << "continuing along my way" << std::endl;}
+      else{MACH3LOG_WARN("continuing along my way for {}", dirname);}
 
       TH1D* blarb[4];
-      std::cout << "Looking for " << name.c_str() << " from file " << fname1.Data() << std::endl;
+      MACH3LOG_INFO("Looking for {} from file {}", name.c_str(), fname1.Data());
       blarb[0] = static_cast<TH1D*>(infile->Get(name.c_str())->Clone());
       //KS: Some fixe params can go crazy
       if(TMath::IsNaN(blarb[0]->GetBinContent(1)) ) continue;
@@ -125,6 +127,8 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
 
   TCanvas *c1 = new TCanvas("c1"," ", 0, 0, 800,630);
   gStyle->SetOptStat(0); //Set 0 to disable statistic box
+  //To avoid TCanvas::Print> messages
+  gErrorIgnoreLevel = kWarning;
 
   c1->Print("Auto_Corr_PerFile.pdf[", "pdf");
   for(int ik = 0; ik < Nfiles; ik++)
@@ -150,7 +154,7 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
         name = dirname + "/" + name;
 
         if (std::string(subkey->GetClassName()) != "TH1D") continue;
-        std::cout<<name.c_str()<<std::endl;
+        MACH3LOG_DEBUG("{}", name.c_str());
         TH1D* blarb = static_cast<TH1D*>(infile[ik]->Get(name.c_str())->Clone());
         //KS: Some fixe pramas can go crazy
         if(TMath::IsNaN(blarb->GetBinContent(1))) continue;
