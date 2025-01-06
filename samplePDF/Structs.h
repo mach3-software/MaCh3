@@ -60,12 +60,11 @@ constexpr static const int Unity_Int = 1;
 
 // ROOT include
 #include "TSpline.h"
-#include "TF1.h"
-#include "TLorentzVector.h"
 #include "TObjString.h"
-#include "TH2Poly.h"
 #include "TFile.h"
-#include "TGraphAsymmErrors.h"
+#include "TF1.h"
+#include "TH2Poly.h"
+#include "TH1.h"
 
 #ifdef MULTITHREAD
 #include "omp.h"
@@ -73,6 +72,11 @@ constexpr static const int Unity_Int = 1;
 
 #include "manager/MaCh3Exception.h"
 #include "manager/MaCh3Logger.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#include "Constants/OscillatorConstants.h"
+#pragma GCC diagnostic pop
 
 // *******************
 /// @brief Template to make vector out of an array of any length
@@ -94,32 +98,32 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 /// Carrier for whether you want to apply a systematic to an event or not
 struct XsecNorms4 {
 // *******************
-    /// Name of parameters
-    std::string name;
-    /// Mode which parameter applies to
-    std::vector<int> modes;
-    /// Horn currents which parameter applies to
-    std::vector<int> horncurrents;
-    /// PDG which parameter applies to
-    std::vector<int> pdgs;
-    /// Preosc PDG which parameter applies to
-    std::vector<int> preoscpdgs;
-    /// Targets which parameter applies to
-    std::vector<int> targets;
-    /// Does this parameter have kinematic bounds
-    bool hasKinBounds;
-    /// Generic vector contain enum relating to a kinematic variable
-    /// and lower and upper bounds. This can then be passed to IsEventSelected
-    std::vector< std::vector<double> > Selection;
+  /// Name of parameters
+  std::string name;
+  /// Mode which parameter applies to
+  std::vector<int> modes;
+  /// Horn currents which parameter applies to
+  std::vector<int> horncurrents;
+  /// PDG which parameter applies to
+  std::vector<int> pdgs;
+  /// Preosc PDG which parameter applies to
+  std::vector<int> preoscpdgs;
+  /// Targets which parameter applies to
+  std::vector<int> targets;
+  /// Does this parameter have kinematic bounds
+  bool hasKinBounds;
+  /// Generic vector contain enum relating to a kinematic variable
+  /// and lower and upper bounds. This can then be passed to IsEventSelected
+  std::vector< std::vector<double> > Selection;
 
-    /// Generic vector containing the string of kinematic type
-    /// This then needs to be converted to a kinematic type enum
-    /// within a samplePDF daughter class
-    /// The bounds for each kinematic variable are given in Selection
-    std::vector< std::string > KinematicVarStr;
+  /// Generic vector containing the string of kinematic type
+  /// This then needs to be converted to a kinematic type enum
+  /// within a samplePDF daughter class
+  /// The bounds for each kinematic variable are given in Selection
+  std::vector< std::string > KinematicVarStr;
 
-    /// Parameter number of this normalisation in current systematic model
-    int index;
+  /// Parameter number of this normalisation in current systematic model
+  int index;
 };
 
 /// Make an enum of the spline interpolation type
@@ -267,28 +271,6 @@ inline std::string SystType_ToString(const SystType i) {
   }
   return name;
 }
-
-// ***************************
-// A handy namespace for variables extraction
-namespace MaCh3Utils {
-// ***************************
-
-  // ***************************
-  /// @brief Return mass for given PDG
-  double GetMassFromPDG(int PDG);
-  // ***************************
-  
-  // ***************************
-  /// @brief Convert from PDG flavour to NuOscillator type
-  /// beware that in the case of anti-neutrinos the NuOscillator
-  /// type simply gets multiplied by -1
-  int PDGToNuOscillatorFlavour(int PDG);
-  // ***************************
-
-  extern std::unordered_map<int,int> KnownDetIDsMap;
-  extern int nKnownDetIDs;
-
-} // end MaCh3Utils namespace
 
 // *****************
 /// Enum to track the target material
@@ -469,61 +451,122 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
   return name;
 }
 
-/// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
-double OverflowIntegral(TH2Poly* poly);
 
-/// @brief WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
-double NoOverflowIntegral(TH2Poly* poly);
+// ***************************
+// A handy namespace for variables extraction
+namespace MaCh3Utils {
+  // ***************************
 
-/// @brief WP: Poly Projectors
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors = false);
-/// @brief WP: Poly Projectors
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors = false);
-
-/// @brief KS: Convert TH2D to TH2Poly
-TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *TH2Dhist);
-/// @brief KS: Convert TH2Poly to TH2D
-TH2Poly* ConvertTH2DtoTH2Poly(TH2D *TH2Dhist);
-
-/// @brief WP: Helper to Normalise histograms
-TH2Poly* NormalisePoly(TH2Poly* Histogram);
-
-/// @brief WP: Helper to scale th2poly analogous to th2d scale with option "width"
-TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
-/// @brief WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
-double PolyIntegralWidth(TH2Poly *Histogram);
-
-/// @brief KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
-/// @brief However if you use ROOT6 and have ROOT6 file exactly the same code will work. Something have changed with how TH2Poly bins are stored in TFile
-/// @param file ROOT file that we will make version checks
-void CheckTH2PolyFileVersion(TFile *file);
-
-/// @brief KS: Remove fitted TF1 from hist to make comparison easier
-void RemoveFitter(TH1D* hist, const std::string& name);
-
-/// @brief Used by sigma variation, check how 1 sigma changes spectra
-/// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
-/// @param sigmaArrayCentr sigma var hist at prior values
-/// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
-/// @param title A tittle for returned object
-/// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
-
-/// @brief Helper to check if files exist or not
-inline std::string file_exists(std::string filename) {
-  std::ifstream infile(filename.c_str());
-  if (!infile.good()) {
-    MACH3LOG_ERROR("*** ERROR ***");
-    MACH3LOG_ERROR("File {} does not exist", filename);
-    MACH3LOG_ERROR("Please try again");
-    MACH3LOG_ERROR("*************");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+  // ***************************
+  /// @brief Return mass for given PDG
+  // *****************************
+  // Get the mass of a particle from the PDG
+  // In GeV, not MeV!
+  inline double GetMassFromPDG(const int PDG) {
+    // *****************************
+    switch (abs(PDG)) {
+      case 11:
+        return 0.511E-3;
+        break;
+      case 13:
+        return 105.658E-3;
+        break;
+      case 15:
+        return 1.77682;
+        break;
+      case 22:
+        return 0.;
+        break;
+      case 211:
+        return 139.57E-3;
+        break;
+      case 111:
+        return 134.98E-3;
+        break;
+      case 2112:
+        return 939.565E-3;
+        break;
+      case 2212:
+        return 938.27E-3;
+        break;
+        //Oxygen nucleus
+      case 1000080160:
+        return 14.89926;
+        break;
+        //eta
+      case 221:
+        return 547.862E-3;
+        break;
+        //K^0 (s or l)
+      case 311:
+      case 130:
+      case 310:
+        return 497.611E-3;
+        break;
+      case 321:
+        return 493.677E-3;
+        break;
+        // Lambda baryon
+      case 3122:
+        return 1115.683E-3;
+        break;
+      case 12:
+      case 14:
+      case 16:
+        return 0.0;
+        break;
+      default:
+        MACH3LOG_ERROR("Haven't got a saved mass for PDG: {}", PDG);
+        MACH3LOG_ERROR("Please implement me!");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    } // End switch
+    MACH3LOG_ERROR("Warning, didn't catch a saved mass");
+    return 0;
   }
-  return filename;
-}
+  // ***************************
 
-/// @brief DB Get the Cherenkov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG);
+  // ***************************
+  /// @brief Convert from PDG flavour to NuOscillator type
+  /// beware that in the case of anti-neutrinos the NuOscillator
+  /// type simply gets multiplied by -1
+  inline int PDGToNuOscillatorFlavour(int NuPdg){
+    int NuOscillatorFlavour = _BAD_INT_;
+    switch(std::abs(NuPdg)){
+      case NuPDG::kNue:
+        NuOscillatorFlavour = NuOscillator::kElectron;
+        break;
+      case NuPDG::kNumu:
+        NuOscillatorFlavour = NuOscillator::kMuon;
+        break;
+      case NuPDG::kNutau:
+        NuOscillatorFlavour = NuOscillator::kTau;
+        break;
+      default:
+        MACH3LOG_ERROR("Unknown Nuetrino PDG {}, cannot convert to NuOscillator type", NuPdg);
+        break;
+    }
 
-double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
-double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
+    //This is very cheeky but if the PDG is negative then multiply the PDG by -1
+    // This is consistent with the treatment that NuOscillator expects as enums only
+    // exist for the generic matter flavour and not the anti-matter version
+    if(NuPdg < 0){NuOscillatorFlavour *= -1;}
+
+    return NuOscillatorFlavour;
+  }
+  // ***************************
+
+  /// @brief DB Anything added here must be of the form 2^X, where X is an integer
+  /// @warning DB Used to contain which DetIDs are supported
+  static const std::unordered_map<int,int>KnownDetIDsMap({
+    {0,1},    //ND
+    {1,8},    //FD
+    {2,16},   //SK1Rmu
+    {3,32},   //Nova
+    {4,64},   //Atm SubGeV e-like
+    {5,128},  //Atm SubGeV mu-like
+    {6,256},  //Atm MultiGeV e-like
+    {7,512},  //Atm MultiGeV mu-like
+  });
+  static const int nKnownDetIDs = int(KnownDetIDsMap.size());
+
+} // end MaCh3Utils namespace
