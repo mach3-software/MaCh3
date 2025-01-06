@@ -55,7 +55,7 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'catch2' # Specify that the benchmark tool is Catch2
-          github-token: ${{ secrets.GITHUB_TOKEN }} # Use GitHub token for authentication
+          github-token: ${{ secrets.MACH3_VALIDATIONS_PAT }} # Use GitHub token for authentication
           output-file-path: /opt/MaCh3Validations/build/output.txt # Path to the benchmark output file
           alert-threshold: 200% # Alert threshold for performance degradation
           comment-on-alert: true
