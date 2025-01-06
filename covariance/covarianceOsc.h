@@ -4,6 +4,8 @@
 #include "covariance/covarianceBase.h"
 
 /// @brief Class responsible for handling of neutrino oscillation  parameters.
+/// @author Richard Calland
+/// @author Asher Kaboth
 class covarianceOsc : public covarianceBase
 {
  public:
@@ -29,10 +31,8 @@ class covarianceOsc : public covarianceBase
   void Print();
 
  protected:
-
     /// Do we flip DeltaM23 or not
     bool flipdelM;
-
     /// There is special treatment for delta CP, therefore store enum keeping track when to apply special treatment
     int kDeltaCP;
     /// There is special treatment for DeltaM23, therefore store enum keeping track when to apply special treatment

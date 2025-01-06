@@ -43,11 +43,11 @@ void covarianceXsec::InitXsecFromConfig() {
   //PreFitValues etc etc.
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
-    _fDetID[i] = (param["Systematic"]["DetID"].as<int>());
-    _ParameterGroup[i] = (param["Systematic"]["ParameterGroup"].as<std::string>());
+    _fDetID[i] = Get<int>(param["Systematic"]["DetID"], __FILE__ , __LINE__);
+    _ParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
 
     //Fill the map to get the correlations later as well
-    std::string ParamType = param["Systematic"]["Type"].as<std::string>();
+    auto ParamType = Get<std::string>(param["Systematic"]["Type"], __FILE__ , __LINE__);
     //Now load in variables for spline systematics only
     if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
     {
@@ -69,13 +69,11 @@ void covarianceXsec::InitXsecFromConfig() {
       NormParams.push_back(GetXsecNorm(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kNorm].insert(std::make_pair(ParamCounter[SystType::kNorm], i));
       ParamCounter[SystType::kNorm]++;
-    }
-    else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
       _fParamType[i] = SystType::kFunc;
       _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
       ParamCounter[SystType::kFunc]++;
-    }
-    else{
+    } else{
       MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
       std::string expectedTypes = "Expecting ";
       for (int s = 0; s < SystType::kSystTypes; ++s) {
@@ -87,7 +85,7 @@ void covarianceXsec::InitXsecFromConfig() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     i++;
-  }
+  } //end loop over params
 
   //Add a sanity check,
   if(_fSplineNames.size() != ParamCounter[SystType::kSpline]){
@@ -97,8 +95,6 @@ void covarianceXsec::InitXsecFromConfig() {
   //KS We resized them above to all params to fight memory fragmentation, now let's resize to fit only allocated memory to save RAM
   NormParams.shrink_to_fit();
   SplineParams.shrink_to_fit();
-
-  return;
 }
 
 // ********************************************
@@ -168,10 +164,10 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
   //Ultimately all this information ends up in the NormParams vector
 
   //Copy the mode information into an XsecNorms4 struct
-  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], DummyModeVec);
-  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], DummyModeVec);
-  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], DummyModeVec);
-  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], DummyModeVec);
+  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], DummyModeVec, __FILE__ , __LINE__);
+  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], DummyModeVec, __FILE__ , __LINE__);
+  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], DummyModeVec, __FILE__ , __LINE__);
+  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], DummyModeVec, __FILE__ , __LINE__);
 
   //ETA - I think this can go in the norm parameters only if statement above
   int NumKinematicCuts = 0;
@@ -260,11 +256,11 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
   } else { //KS: By default use TSpline3
     Spline._SplineInterpolationType = kTSpline3;
   }
-  Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999);
-  Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999);
+  Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999, __FILE__ , __LINE__);
+  Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999, __FILE__ , __LINE__);
 
   //If there is no mode information given then this will be an empty vector
-  Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>());
+  Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 
   return Spline;
 }
@@ -383,7 +379,6 @@ void covarianceXsec::Print() {
   CheckCorrectInitialisation();
 } // End
 
-
 // ********************************************
 void covarianceXsec::PrintGlobablInfo() {
 // ********************************************
@@ -446,24 +441,23 @@ void covarianceXsec::PrintNormParams() {
     MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:40}│", "#", "Global #", "Name", "KinematicCut", "Value");
     MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
     for (unsigned int i = 0; i < NormParams.size(); ++i)
-      {
-	//skip parameters with no KinematicCuts
-	if(!NormParams[i].hasKinBounds) continue;
+    {
+      //skip parameters with no KinematicCuts
+      if(!NormParams[i].hasKinBounds) continue;
 
-	const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
-      	for(long unsigned int icut = 0; icut < ncuts; icut++) {
-	  std::string kinematicCutValueString;
-	  for(const auto & value : NormParams[i].Selection[icut]) {
-	    kinematicCutValueString += std::to_string(value);
-	    kinematicCutValueString += " ";
-	  }
-
-	  if(icut == 0)
-	    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
-	  else
-	    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
-	}//icut
-      }//i
+      const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
+      for(long unsigned int icut = 0; icut < ncuts; icut++) {
+        std::string kinematicCutValueString;
+        for(const auto & value : NormParams[i].Selection[icut]) {
+          kinematicCutValueString += std::to_string(value);
+          kinematicCutValueString += " ";
+        }
+        if(icut == 0)
+          MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+        else
+          MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+      }//icut
+    }//i
     MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────────────────────────┘");
   }
   else
