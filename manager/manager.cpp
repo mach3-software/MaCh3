@@ -6,7 +6,6 @@
 manager::manager(std::string const &filename)
     : config(YAML::LoadFile(filename)) {
 // *************************
-
   FileName = filename;
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -18,7 +17,7 @@ manager::manager(std::string const &filename)
 
   if (config["LikelihoodOptions"])
   {
-    auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
+    auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston", __FILE__ , __LINE__);
     if (likelihood == "Barlow-Beeston")                 mc_stat_llh = kBarlowBeeston;
     else if (likelihood == "IceCube")                   mc_stat_llh = kIceCube;
     else if (likelihood == "Poisson")                   mc_stat_llh = kPoisson;
@@ -38,7 +37,7 @@ manager::manager(std::string const &filename)
   }
 
   Modes = nullptr;
-  std::string ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null");
+  auto ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null", __FILE__ , __LINE__);
   if(ModeInput != "null") Modes = new MaCh3Modes(ModeInput);
 }
 
@@ -46,7 +45,6 @@ manager::manager(std::string const &filename)
 // Empty destructor, for now...
 manager::~manager() {
 // *************************
-
   if(!Modes) delete Modes;
 }
 
@@ -56,7 +54,6 @@ manager::~manager() {
 // Outputfile is the TFile pointer we write to
 void manager::SaveSettings(TFile* const OutputFile) {
 // *************************
-
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
 
