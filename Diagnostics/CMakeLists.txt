@@ -15,5 +15,3 @@ foreach(app
 
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
-
-install(DIRECTORY Diagnostics_utils DESTINATION Diagnostics USE_SOURCE_PERMISSIONS)
