@@ -11,6 +11,7 @@
 //MaCh3 includes
 #include "samplePDF/Structs.h"
 #include "manager/manager.h"
+#include "samplePDF/HistogramUtils.h"
 
 /// @file StatisticalUtils.h
 /// @brief Utility functions for statistical interpretations in MaCh3

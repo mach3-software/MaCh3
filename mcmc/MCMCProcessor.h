@@ -34,6 +34,7 @@
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
+#include "samplePDF/HistogramUtils.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
