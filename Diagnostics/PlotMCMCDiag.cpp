@@ -183,11 +183,11 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
 
 int main(int argc, char *argv[]) {
   SetMaCh3LoggerFormat();
-  if (argc != 2)
+  if (argc < 2 || argc > 5)
   {
     MACH3LOG_ERROR("How to use: {} DiagMCMC_Output.root", argv[0]);
     MACH3LOG_ERROR("Up to 4 files");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    throw MaCh3Exception(__FILE__ , __LINE__);
   }
 
   if(argc == 2) {
