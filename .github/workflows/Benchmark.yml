@@ -32,7 +32,6 @@ jobs:
           # Configure the project with benchmark support enabled
           if [ "${{ github.event_name }}" == 'pull_request' ]; then
             cmake ../ -DMaCh3_Branch=${{ github.head_ref }}  -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
-            git clone --branch feature_benchmark https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
           else
             cmake ../ -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
           fi
