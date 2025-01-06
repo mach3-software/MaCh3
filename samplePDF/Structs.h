@@ -78,6 +78,15 @@ constexpr static const int Unity_Int = 1;
 #include "Constants/OscillatorConstants.h"
 #pragma GCC diagnostic pop
 
+
+/// @file Structs.h
+/// @author Asher Kaboth
+/// @author Clarence Wret
+/// @author Patrick Dunne
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
+
 // *******************
 /// @brief Template to make vector out of an array of any length
 template< typename T, size_t N >

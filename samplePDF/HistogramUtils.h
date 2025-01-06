@@ -8,6 +8,9 @@
 // MaCh3 inlcudes
 #include "samplePDF/Structs.h"
 
+/// @file HistogramUtils.h
+/// @author Will Parker
+
 /// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly);
 
@@ -31,6 +34,12 @@ TH2Poly* NormalisePoly(TH2Poly* Histogram);
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
 /// @brief WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
+
+/// @brief WP: Helper function to create TH2Poly histogram with uniform binning
+/// @param name This will be tittle of output histogram
+/// @param BinArray_x Bin edges for X axis
+/// @param BinArray_y Bin edges for Y axis
+TH2Poly* MakePolyHist(const std::string& name, const std::vector<double>& BinArray_x, const std::vector<double>& BinArray_y);
 
 /// @brief KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
 /// @brief However if you use ROOT6 and have ROOT6 file exactly the same code will work. Something have changed with how TH2Poly bins are stored in TFile

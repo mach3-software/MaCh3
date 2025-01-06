@@ -12,6 +12,9 @@ constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
 class covarianceBase {
  public:
   /// @brief ETA - constructor for a YAML file

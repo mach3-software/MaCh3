@@ -15,6 +15,8 @@
 
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
+/// @author Kamil Skwarczynski
+/// @author Luke Pickering
 
 // **********************
 /// @brief Get content of config file if node is not found take default value specified
