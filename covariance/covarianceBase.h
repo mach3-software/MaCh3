@@ -240,7 +240,7 @@ class covarianceBase {
   inline double getParInit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Return generated value, although is virtual so class inheriting might actual get prior not generated.
   /// @param i Parameter index
-  virtual double getNominal(const int i) const { return getParInit(i); }
+  virtual double getNominal(const int i) { return getParInit(i); }
   /// @brief Return generated value for a given parameter
   /// @param i Parameter index
   inline double GetGenerated(const int i) const { return _fGenerated[i];}
