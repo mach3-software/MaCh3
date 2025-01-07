@@ -53,7 +53,7 @@ jobs:
             test_7: ./bin/MatrixPlotter bin/TutorialDiagConfig.yaml MCMC_Test_drawCorr.root
             test_8: bin/GetPostfitParamPlots MCMC_Test_drawCorr.root
             test_9: bin/PlotLLH MCMC_Test.root
-            test_10: bin/PlotMCMCDiag MCMC_Test_Diag.root MCMC_Test_Diag.root
+            test_10: bin/PlotMCMCDiag MCMC_Test_MCMC_Diag.root MCMC_Test_MCMC_Diag.root
 
           - name: NuMCMC Tools Validations
             test_1: ./CIValidations/NuMCMCvalidations.sh
