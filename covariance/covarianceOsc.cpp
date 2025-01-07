@@ -65,12 +65,12 @@ void covarianceOsc::proposeStep() {
 
 // *************************************
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
-void covarianceOsc::CircularPrior(const int i, const double LowBound, const double UpBound) {
+void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
 // *************************************
-  if(_fPropVal[i] > UpBound) {
-    _fPropVal[i] = LowBound + std::fmod(_fPropVal[kDeltaCP], UpBound);
-  } else if (_fPropVal[i] < LowBound) {
-    _fPropVal[i] = UpBound + std::fmod(_fPropVal[kDeltaCP], UpBound);
+  if(_fPropVal[index] > UpBound) {
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
+  } else if (_fPropVal[index] < LowBound) {
+    _fPropVal[index] = UpBound + std::fmod(_fPropVal[index], UpBound);
   }
 }
 
