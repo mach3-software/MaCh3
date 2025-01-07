@@ -45,15 +45,6 @@ covarianceBase::covarianceBase(const std::vector<std::string>& YAMLFile, std::st
 //Destructor
 covarianceBase::~covarianceBase(){
 // ********************************************
-  _fPreFitValue.clear();
-  _fError.clear();
-  _fCurrVal.clear();
-  _fPropVal.clear();
-  _fLowBound.clear();
-  _fUpBound.clear();
-  _fIndivStepScale.clear();
-  _fFlatPrior.clear();
-
   delete[] randParams;
   delete[] corr_throw;
 
@@ -730,7 +721,7 @@ void covarianceBase::throwParCurr(const double mag) {
 }
 // ********************************************
 // Function to print the prior values
-void covarianceBase::printNominal() {
+void covarianceBase::printNominal() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
   for (int i = 0; i < _fNumPar; i++) {
@@ -740,7 +731,7 @@ void covarianceBase::printNominal() {
 
 // ********************************************
 // Function to print the prior, current and proposed values
-void covarianceBase::printNominalCurrProp() {
+void covarianceBase::printNominalCurrProp() const {
 // ********************************************
   MACH3LOG_INFO("Printing parameters for {}", getName());
   // Dump out the PCA parameters too
@@ -783,7 +774,7 @@ double covarianceBase::CalcLikelihood() _noexcept_ {
 }
 
 // ********************************************
-int covarianceBase::CheckBounds() {
+int covarianceBase::CheckBounds() const {
 // ********************************************
   int NOutside = 0;
   #ifdef MULTITHREAD
@@ -807,16 +798,6 @@ double covarianceBase::GetLikelihood() {
   if(NOutside > 0) return NOutside*_LARGE_LOGL_;
 
   return CalcLikelihood();
-}
-
-// ********************************************
-void covarianceBase::printPars() {
-// ********************************************
-  MACH3LOG_INFO("Number of pars: {}", _fNumPar);
-  MACH3LOG_INFO("Current {} parameters:", matrixName);
-  for(int i = 0; i < _fNumPar; i++) {
-    MACH3LOG_INFO("{:s} current: \t{:.5f}   \tproposed: \t{:.5f}", _fNames[i], _fCurrVal[i], _fPropVal[i]);
-  }
 }
 
 // ********************************************
@@ -951,7 +932,7 @@ void covarianceBase::toggleFixParameter(const std::string& name) {
 }
 
 // ********************************************
-bool covarianceBase::isParameterFixed(const std::string& name) {
+bool covarianceBase::isParameterFixed(const std::string& name) const {
 // ********************************************
   for (int i = 0; i <_fNumPar; ++i) {
     if(name == _fFancyNames[i]) {
@@ -1033,7 +1014,7 @@ void covarianceBase::setIndivStepScale(const std::vector<double>& stepscale) {
 }
 
 // ********************************************
-void covarianceBase::printIndivStepScale() {
+void covarianceBase::printIndivStepScale() const {
 // ********************************************
   MACH3LOG_INFO("============================================================");
   MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
@@ -1047,12 +1028,13 @@ void covarianceBase::printIndivStepScale() {
 //Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
 void covarianceBase::MakePosDef(TMatrixDSym *cov) {
 // ********************************************
-  //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
-  //Means we no longer need to overload
   if(cov == nullptr){
     cov = &*covMatrix;
+    MACH3LOG_WARN("Passed nullptr to cov matrix in {}", matrixName);
   }
 
+  //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
+  //Means we no longer need to overload
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
   
@@ -1213,7 +1195,6 @@ void covarianceBase::updateAdaptiveCovariance(){
 // then does Euclidean norm)
 void covarianceBase::makeClosestPosDef(TMatrixDSym *cov) {
 // ********************************************
-
   // Want to get cov' = (cov_sym+cov_polar)/2
   // cov_sym=(cov+cov^T)/2
   // cov_polar-> SVD cov to cov=USV^T then cov_polar=VSV^T
