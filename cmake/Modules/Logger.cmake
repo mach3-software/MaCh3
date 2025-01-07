@@ -41,8 +41,9 @@ else()
 endif()
 
 # KS: If logger is set to off many functions which sole purpose is to print message will not print anything. Thus variable will not be used and our very picky WErrror will throw errors
-if(LOG_LEVEL STREQUAL "OFF" OR LOG_LEVEL STREQUAL "CRITICAL" OR LOG_LEVEL STREQUAL "ERROR" OR LOG_LEVEL STREQUAL "WARN")
-  target_compile_options(MaCh3Warnings INTERFACE
+set(WIGNORE_LIST OFF CRITICAL ERROR WARN)
+if(${LOG_LEVEL} IN_LIST WIGNORE_LIST)
+target_compile_options(MaCh3Warnings INTERFACE
     -Wno-error=unused-variable
     -Wno-error=unused-parameter
   )
