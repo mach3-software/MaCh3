@@ -32,43 +32,55 @@ class covarianceBase {
   /// @brief Destructor
   virtual ~covarianceBase();
   
+  /// \defgroup Setters
+  /// Group of functions to set various parameters, names, and values.
+
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
   /// @param cov Covariance matrix which we set and will be used later for evaluation of penalty term
+  /// \ingroup Setters
   void setCovMatrix(TMatrixDSym *cov);
   /// @brief Set matrix name
   void setName(std::string name) { matrixName = name; }
   /// @brief change parameter name
   /// @param i Parameter index
   /// @param name new name which will be set
+  /// \ingroup Setters
   void setParName(int i, std::string name) { _fNames.at(i) = name; }
+  /// \ingroup Setters
   void setSingleParameter(const int parNo, const double parVal);
   /// @brief Set all the covariance matrix parameters to a user-defined value
   /// @param i Parameter index
   /// @param val new value which will be set
+  /// \ingroup Setters
   void setPar(const int i, const double val);
   /// @brief Set current parameter value
   /// @param i Parameter index
   /// @param val new value which will be set
+  /// \ingroup Setters
   void setParCurrProp(const int i, const double val);
   /// @brief Set proposed parameter value
   /// @param i Parameter index
   /// @param val new value which will be set
+  /// \ingroup Setters
   void setParProp(const int i, const double val) {
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
   }
   /// @brief Set parameter values using vector, it has to have same size as covariance class
   /// @param pars Vector holding new values for every parameter
+  /// \ingroup Setters
   void setParameters(const std::vector<double>& pars = {});
   /// @brief Set if parameter should have flat prior or not
   /// @param i Parameter index
   /// @param eL bool telling if it will be flat or not
+  /// \ingroup Setters
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
+  /// \ingroup Setters
   void SetRandomThrow(const int i, const double rand) { randParams[i] = rand;}
   /// @brief Get random value useful for debugging/CI
   /// @param i Parameter index
@@ -77,19 +89,24 @@ class covarianceBase {
   /// @brief set branches for output file
   /// @param tree Tree to which we will save branches
   /// @param SaveProposal Normally we only save parameter after is accepted, for debugging purpose it is helpful to see also proposed values. That's what this variable controls
+  /// \ingroup Setters
   void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
   /// @cite luengo2020survey
+  /// \ingroup Setters
   void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param ParameterIndex Parameter Index
   /// @param StepScale Value of individual step scale
+  /// \ingroup Setters
   void setIndivStepScale(const int ParameterIndex, const double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param stepscale Vector of individual step scale, should have same
+  /// \ingroup Setters
   void setIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
+  /// \ingroup Setters
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
