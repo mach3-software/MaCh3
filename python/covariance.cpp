@@ -17,15 +17,6 @@ public:
     using covarianceBase::covarianceBase;
 
     /* Trampoline (need one for each virtual function) */
-    int CheckBounds() {
-        PYBIND11_OVERRIDE_NAME(
-            int,            /* Return type */
-            covarianceBase, /* Parent class */
-            "check_bounds", /* Name in python*/
-            CheckBounds     /* Name of function in C++ (must match Python name) */
-        );
-    }
-
     double GetLikelihood() override {
         PYBIND11_OVERRIDE_NAME(
             double,           /* Return type */
