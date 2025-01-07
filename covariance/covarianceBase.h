@@ -32,7 +32,6 @@ class covarianceBase {
   /// @brief Destructor
   virtual ~covarianceBase();
   
-  // Setters
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
   /// @param cov Covariance matrix which we set and will be used later for evaluation of penalty term
@@ -53,6 +52,7 @@ class covarianceBase {
   /// @param val new value which will be set
   void setParCurrProp(const int i, const double val);
   /// @brief Set proposed parameter value
+  /// @param i Parameter index
   /// @param val new value which will be set
   void setParProp(const int i, const double val) {
     _fPropVal[i] = val;
@@ -67,8 +67,11 @@ class covarianceBase {
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief Set random value useful for debugging/CI
-  void SetRandomThrow(const int i, const double radn) { randParams[i] = radn;}
+  /// @param i Parameter index
+  /// @param rand New value for random number
+  void SetRandomThrow(const int i, const double rand) { randParams[i] = rand;}
   /// @brief Get random value useful for debugging/CI
+  /// @param i Parameter index
   double GetRandomThrow(const int i) { return randParams[i];}
 
   /// @brief set branches for output file
@@ -103,7 +106,7 @@ class covarianceBase {
   void RandomConfiguration();
   
   /// @brief Check if parameters were proposed outside physical boundary
-  virtual int CheckBounds();
+  int CheckBounds();
   /// @brief Calc penalty term based on inverted covariance matrix
   double CalcLikelihood() _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
@@ -117,6 +120,7 @@ class covarianceBase {
   double GetInvCovMatrix(const int i, const int j) { return InvertCovMatrix[i][j]; }
 
   /// @brief Return correlated throws
+  /// @param i Parameter index
   double GetCorrThrows(const int i) { return corr_throw[i]; }
 
   /// @brief Get if param has flat prior or not
@@ -313,9 +317,11 @@ class covarianceBase {
   void printNominal();
   /// @brief Print prior, current and proposed value for each parameter
   void printNominalCurrProp();
-  void printPars();
+  /// @warning only for backward compatibility
+  /// @todo remove it
+  void printPars() {printNominalCurrProp();};
   /// @brief Print step scale for each parameter
-  void printIndivStepScale();
+  void printIndivStepScale() const;
 
   /// @brief Generate a new proposed state
   virtual void proposeStep();
@@ -386,9 +392,6 @@ protected:
   /// @brief Transfer param values from PCA base to normal base
   void TransferToParam();
 
-  /// @brief Handy function to return 1 for any systs
-  const double* ReturnUnity(){return &Unity;}
-
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
   /// @param matrix_name name of matrix in file
@@ -396,7 +399,7 @@ protected:
   void setThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
 
   /// @brief Method to update adaptive MCMC
-  /// @see https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+  /// @cite haario2001adaptive
   void updateAdaptiveCovariance();
 
   /// The input root file we read in
@@ -418,7 +421,7 @@ protected:
   double* randParams;
   /// Result of multiplication of Cholesky matrix and randParams
   double* corr_throw;
-  /// Global step scale applied ot all params in this class
+  /// Global step scale applied to all params in this class
   double _fGlobalStepScale;
 
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
@@ -450,9 +453,6 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
-
-  /// Unity for null systs to point back to
-  const double Unity = 1.0;
 
   /// perform PCA or not
   bool pca;
