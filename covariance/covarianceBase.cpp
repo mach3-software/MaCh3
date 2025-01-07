@@ -214,25 +214,25 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   //PreFitValues etc etc.
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
-    _fFancyNames[i] = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
-    _fPreFitValue[i] = (param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
-    _fGenerated[i] = (param["Systematic"]["ParameterValues"]["Generated"].as<double>());
-    _fIndivStepScale[i] = (param["Systematic"]["StepScale"]["MCMC"].as<double>());
-    _fError[i] = (param["Systematic"]["Error"].as<double>());
+    _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
+    _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
+    _fGenerated[i] = Get<double>(param["Systematic"]["ParameterValues"]["Generated"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
+    _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and eqaul to {}", _fFancyNames[i], i, _fError[i]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     //ETA - a bit of a fudge but works
-    std::vector<double> TempBoundsVec = param["Systematic"]["ParameterBounds"].as<std::vector<double>>();
+    auto TempBoundsVec = Get<std::vector<double>>(param["Systematic"]["ParameterBounds"], __FILE__ , __LINE__);
     _fLowBound[i] = TempBoundsVec[0];
     _fUpBound[i] = TempBoundsVec[1];
 
     //ETA - now for parameters which are optional and have default values
-    _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false);
+    _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
 
     // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
-    if(GetFromManager<bool>(param["Systematic"]["FixParam"], false)) {
+    if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
       toggleFixParameter(_fFancyNames[i]);
     }
     //Fill the map to get the correlations later as well
@@ -241,15 +241,15 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     //Also loop through the correlations
     if(param["Systematic"]["Correlations"]) {
       for(unsigned int Corr_i = 0; Corr_i < param["Systematic"]["Correlations"].size(); ++Corr_i){
-        for (YAML::const_iterator it=param["Systematic"]["Correlations"][Corr_i].begin();it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
+        for (YAML::const_iterator it = param["Systematic"]["Correlations"][Corr_i].begin(); it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
           Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
         }
       }
     }
     i++;
-  }
+  } // end loop over para
   if(i != _fNumPar) {
-    MACH3LOG_CRITICAL("Inconsitnent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
+    MACH3LOG_CRITICAL("Inconsistent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   // ETA Now that we've been through all systematic let's fill the covmatrix
@@ -264,8 +264,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
       //If you found the parameter name then get the index
       if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
         index = CorrNamesMap[key];
-      }
-      else {
+      } else {
         MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
@@ -1165,7 +1164,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 
   // Next let"s check for external matrices
   // We"re going to grab this info from the YAML manager
-  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false)) {
+  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
@@ -1174,9 +1173,9 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   }
 
   // Finally, we accept that we want to read the matrix from a file!
-  std::string external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "");
-  std::string external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "");
-  std::string external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "");
+  auto external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "", __FILE__ , __LINE__);
+  auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
+  auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
 
   AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);

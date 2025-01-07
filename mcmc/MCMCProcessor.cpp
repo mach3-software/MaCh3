@@ -25,7 +25,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   StepNumber = nullptr;
     
   Posterior = nullptr;
-  hpost2D = nullptr;
   hviolin = nullptr;
   hviolin_prior = nullptr;
 
@@ -55,7 +54,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   Post2DPlotThreshold = 1.e-5;
 
   nDraw = 0;
-  nFlux = 0;
   nEntries = 0;
   UpperCut = _UNDEF_;
   nSteps = 0;
@@ -106,7 +104,6 @@ MCMCProcessor::~MCMCProcessor() {
   MACH3LOG_INFO("Closing pdf in MCMCProcessor: {}", CanvasName.Data());
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
-  if (Posterior != nullptr) delete Posterior;
 
   delete Gauss;
   delete Covariance;
@@ -121,7 +118,6 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive;
   delete Errors_HPD_Negative;
 
-
   for (int i = 0; i < nDraw; ++i)
   {
     if(hpost[i] != nullptr) delete hpost[i];
@@ -135,10 +131,8 @@ MCMCProcessor::~MCMCProcessor() {
         delete hpost2D[i][j];
       }
       delete[] ParStep[i];
-      delete[] hpost2D[i];
     }
     delete[] ParStep;
-    delete[] hpost2D;
   }
   if(StepNumber != nullptr) delete[] StepNumber;
 
@@ -208,7 +202,7 @@ void MCMCProcessor::MakeOutputFile() {
   auto rand = std::make_unique<TRandom3>(0);
   const int uniform = int(rand->Uniform(0, 10000));
   // Open a TCanvas to write the posterior onto
-  Posterior = new TCanvas(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
+  Posterior = std::make_unique<TCanvas>(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
   //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
   TCandle::SetScaledViolin(false);
 
@@ -238,7 +232,6 @@ void MCMCProcessor::MakeOutputFile() {
 //CW: Function to make the post-fit
 void MCMCProcessor::MakePostfit() {
 // ****************************
-
   // Check if we've already made post-fit
   if (MadePostfit == true) return;
   MadePostfit = true;
@@ -384,7 +377,7 @@ void MCMCProcessor::MakePostfit() {
   SettingsBranch->Branch("CrossSectionParameters", &CrossSectionParameters);
   int CrossSectionParametersStartingPos = ParamTypeStartPos[kXSecPar];
   SettingsBranch->Branch("CrossSectionParametersStartingPos", &CrossSectionParametersStartingPos);
-  int FluxParameters = nFlux;
+  int FluxParameters = GetGroup("Flux");
   SettingsBranch->Branch("FluxParameters", &FluxParameters);
   
   int NDParameters = nParam[kNDPar];
@@ -407,7 +400,6 @@ void MCMCProcessor::MakePostfit() {
 
   SettingsBranch->Fill();
   SettingsBranch->Write();
-
   delete SettingsBranch;
 
   TDirectory *Names = OutputFile->mkdir("Names");
@@ -415,6 +407,9 @@ void MCMCProcessor::MakePostfit() {
   for (std::vector<TString>::iterator it = BranchNames.begin(); it != BranchNames.end(); ++it) {
     TObjString((*it)).Write();
   }
+  Names->Close();
+  delete Names;
+
   OutputFile->cd();
   Central_Value->Write("Central_Value");
   Means->Write("PDF_Means");
@@ -439,8 +434,9 @@ void MCMCProcessor::DrawPostfit() {
   if (OutputFile == nullptr) MakeOutputFile();
 
   // Make the prefit plot
-  TH1D* prefit = MakePrefit();
+  std::unique_ptr<TH1D> prefit = MakePrefit();
 
+  prefit->GetXaxis()->SetTitle("");
   // cd into the output file
   OutputFile->cd();
  
@@ -461,6 +457,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot->SetMarkerStyle(20);
   paramPlot->SetLineColor(paramPlot->GetFillColor());
   paramPlot->SetMarkerSize(prefit->GetMarkerSize());
+  paramPlot->GetXaxis()->SetTitle("");
 
   // Same but with Gaussian output
   TH1D *paramPlot_Gauss = static_cast<TH1D*>(paramPlot->Clone());
@@ -471,6 +468,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot_Gauss->SetFillColor(paramPlot_Gauss->GetMarkerColor());
   paramPlot_Gauss->SetFillStyle(3244);
   paramPlot_Gauss->SetLineColor(paramPlot_Gauss->GetMarkerColor());
+  paramPlot_Gauss->GetXaxis()->SetTitle("");
 
   // Same but with Gaussian output
   TH1D *paramPlot_HPD = static_cast<TH1D*>(paramPlot->Clone());
@@ -481,7 +479,8 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot_HPD->SetFillColor(0);
   paramPlot_HPD->SetFillStyle(0);
   paramPlot_HPD->SetLineColor(paramPlot_HPD->GetMarkerColor());
-  
+  paramPlot_HPD->GetXaxis()->SetTitle("");
+
   // Set labels and data
   for (int i = 0; i < nDraw; ++i)
   {
@@ -547,10 +546,14 @@ void MCMCProcessor::DrawPostfit() {
     paramPlot_Gauss->GetXaxis()->SetBinLabel(i+1, prefit->GetXaxis()->GetBinLabel(i+1));
     paramPlot_HPD->GetXaxis()->SetBinLabel(i+1, prefit->GetXaxis()->GetBinLabel(i+1));
   }
+  prefit->GetXaxis()->LabelsOption("v");
+  paramPlot->GetXaxis()->LabelsOption("v");\
+  paramPlot_Gauss->GetXaxis()->LabelsOption("v");
+  paramPlot_HPD->GetXaxis()->LabelsOption("v");
 
   // Make a TLegend
   auto CompLeg = std::make_unique<TLegend>(0.33, 0.73, 0.76, 0.95);
-  CompLeg->AddEntry(prefit, "Prefit", "fp");
+  CompLeg->AddEntry(prefit.get(), "Prefit", "fp");
   CompLeg->AddEntry(paramPlot, "Postfit PDF", "fp");
   CompLeg->AddEntry(paramPlot_Gauss, "Postfit Gauss", "fp");
   CompLeg->AddEntry(paramPlot_HPD, "Postfit HPD", "lfep");
@@ -564,17 +567,18 @@ void MCMCProcessor::DrawPostfit() {
   Posterior->SetBottomMargin(0.2);
 
   OutputFile->cd();
+
   //KS: Plot Xsec and Flux
+  /// @todo this need revision
   if (nParam[kXSecPar] > 0)
   {
     const int Start = ParamTypeStartPos[kXSecPar];
+    const int nFlux = GetGroup("Flux");
     // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
     // Have already looked through the branches earlier
     if(plotRelativeToPrior)  prefit->GetYaxis()->SetTitle("Variation rel. prior"); 
     else prefit->GetYaxis()->SetTitle("Parameter Value");
     prefit->GetYaxis()->SetRangeUser(-2.5, 2.5);
-    prefit->GetXaxis()->SetTitle("");
-    prefit->GetXaxis()->LabelsOption("v");
 
     prefit->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
     paramPlot->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
@@ -586,7 +590,7 @@ void MCMCProcessor::DrawPostfit() {
     paramPlot->Write("param_xsec");
     paramPlot_Gauss->Write("param_xsec_gaus");
     paramPlot_HPD->Write("param_xsec_HPD");
-    
+
     // And the combined
     prefit->Draw("e2");
     paramPlot->Draw("e2, same");
@@ -637,29 +641,21 @@ void MCMCProcessor::DrawPostfit() {
       prefit->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       prefit->GetYaxis()->SetRangeUser(0.6, 1.4);
       prefit->GetXaxis()->SetRangeUser(Start, NDbinCounter);
-      prefit->GetXaxis()->SetTitle();
-      prefit->GetXaxis()->LabelsOption("v");
 
       paramPlot->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot->GetXaxis()->SetRangeUser(Start, NDbinCounter);
-      paramPlot->GetXaxis()->SetTitle("");
       paramPlot->SetTitle(CutPosterior1D.c_str());
-      paramPlot->GetXaxis()->LabelsOption("v");
 
       paramPlot_Gauss->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot_Gauss->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot_Gauss->GetXaxis()->SetRangeUser(Start, NDbinCounter);
-      paramPlot_Gauss->GetXaxis()->SetTitle("");
       paramPlot_Gauss->SetTitle(CutPosterior1D.c_str());
-      paramPlot_Gauss->GetXaxis()->LabelsOption("v");
 
       paramPlot_HPD->GetYaxis()->SetTitle(("Variation for "+NDname).c_str());
       paramPlot_HPD->GetYaxis()->SetRangeUser(0.6, 1.4);
       paramPlot_HPD->GetXaxis()->SetRangeUser(Start, NDbinCounter);
-      paramPlot_HPD->GetXaxis()->SetTitle("");
       paramPlot_HPD->SetTitle(CutPosterior1D.c_str());
-      paramPlot_HPD->GetXaxis()->LabelsOption("v");
 
       prefit->Write(("param_"+NDname+"_prefit").c_str());
       paramPlot->Write(("param_"+NDname).c_str());
@@ -677,7 +673,6 @@ void MCMCProcessor::DrawPostfit() {
       Start += NDSamplesBins[i];
     }
   }
-  delete prefit;
   delete paramPlot;
   delete paramPlot_Gauss;
   delete paramPlot_HPD;
@@ -830,7 +825,6 @@ void MCMCProcessor::MakeViolin() {
   }
 
   const int vBins = (maxi_y-mini_y)*25;
-
   hviolin = new TH2D("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y);
 
   //KS: Prior has larger errors so we increase range and number of bins
@@ -1039,7 +1033,7 @@ void MCMCProcessor::MakeCovariance() {
         //KS: Skip Flux Params
         if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
         {
-          if(IsXsec[j] && IsXsec[i] && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+          if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
           {
             Posterior->cd();
             hpost_2D->Draw("colz");
@@ -1083,13 +1077,11 @@ void MCMCProcessor::CacheSteps() {
   ParStep = new double*[nDraw];
   StepNumber = new int[nEntries];
   
-  hpost2D = new TH2D**[nDraw]();
-
+  hpost2D.resize(nDraw);
   for (int i = 0; i < nDraw; ++i) 
   {
     ParStep[i] = new double[nEntries];
-    hpost2D[i] = new TH2D*[nDraw]();
-
+    hpost2D[i].resize(nDraw);
     for (int j = 0; j < nEntries; ++j)
     {
       ParStep[i][j] = -999.99;
@@ -1151,7 +1143,6 @@ void MCMCProcessor::CacheSteps() {
   
       // TH2D to hold the Correlation 
       hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain_i, Max_Chain_i, nBins, Min_Chain_j, Max_Chain_j);
-      
       TString Title_j = "";
       double Prior_j, PriorError_j;
       GetNthParameter(j, Prior_j, PriorError_j, Title_j);
@@ -1162,7 +1153,6 @@ void MCMCProcessor::CacheSteps() {
       hpost2D[i][j]->GetZaxis()->SetTitle("Steps");
     }
   }
-      
   clock.Stop();
   MACH3LOG_INFO("Caching steps took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries );
 }
@@ -1254,8 +1244,7 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
 
         if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
         {
-          //KS: Skip Flux Params
-          if(IsXsec[j] && IsXsec[i] && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+          if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
           {
             hpost2D[i][j]->Draw("colz");
             Posterior->SetName(hpost2D[i][j]->GetName());
@@ -1586,7 +1575,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
                                         const std::vector<Color_t>& CredibleRegionColor,
                                         const bool CredibleInSigmas) {
 // *********************
-  if(hpost2D == nullptr) MakeCovariance_MP();
+  if(hpost2D.size() == 0) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");
 
   CheckCredibleRegionsOrder(CredibleRegions, CredibleRegionStyle, CredibleRegionColor);
@@ -1680,7 +1669,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       Posterior->SetName(hpost2D[i][j]->GetName());
       Posterior->SetTitle(hpost2D[i][j]->GetTitle());
 
-      //KS: Print only regions with correlation greater than specified value, by defualt 0.2. This is done to avoid dumping thousands of plots
+      //KS: Print only regions with correlation greater than specified value, by default 0.2. This is done to avoid dumping thousands of plots
       if(printToPDF && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) Posterior->Print(CanvasName);
       // Write it to root file
       //OutputFile->cd();
@@ -1716,7 +1705,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      // Other
                                      const bool CredibleInSigmas) {
 // *********************
-  if(hpost2D == nullptr) MakeCovariance_MP();
+  if(hpost2D.size() == 0) MakeCovariance_MP();
   MACH3LOG_INFO("Making Triangle Plot");
 
   const int nParamPlot = int(ParNames.size());
@@ -2093,15 +2082,9 @@ void MCMCProcessor::ScanInput() {
   
   // Check order of parameter types
   ScanParameterOrder();
-  MACH3LOG_INFO("************************************************");
-  MACH3LOG_INFO("Scanning output branches...");
-  MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
-  MACH3LOG_INFO("# XSec params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar] - nFlux, ParamTypeStartPos[kXSecPar]);
-  MACH3LOG_INFO("# Flux params:   {}", nFlux);
-  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
-  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
-  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
-  MACH3LOG_INFO("************************************************");
+
+  // Print useful Info
+  PrintInfo();
 
   nSteps = Chain->GetMaximum("step");
   // Set the step cut to be 20%
@@ -2184,11 +2167,12 @@ void MCMCProcessor::ScanParameterOrder() {
     
 // *****************************
 // Make the prefit plots
-TH1D* MCMCProcessor::MakePrefit() {
+std::unique_ptr<TH1D> MCMCProcessor::MakePrefit() {
 // *****************************
   if (OutputFile == nullptr) MakeOutputFile();
 
-  TH1D *PreFitPlot = new TH1D("Prefit", "Prefit", nDraw, 0, nDraw);
+  auto PreFitPlot = std::make_unique<TH1D>("Prefit", "Prefit", nDraw, 0, nDraw);
+  PreFitPlot->SetDirectory(nullptr);
   for (int i = 0; i < PreFitPlot->GetNbinsX() + 1; ++i) {
     PreFitPlot->SetBinContent(i+1, 0);
     PreFitPlot->SetBinError(i+1, 0);
@@ -2208,12 +2192,10 @@ TH1D* MCMCProcessor::MakePrefit() {
     if(plotRelativeToPrior) 
     {
       // Normalise the prior relative the nominal/prior, just the way we get our fit results in MaCh3
-      if ( CentralValueTemp != 0)
-      {
+      if ( CentralValueTemp != 0) {
         Central = ParamCentral[ParamEnum][ParamNo] / CentralValueTemp;
         Error = ParamErrors[ParamEnum][ParamNo]/CentralValueTemp;
-      } else 
-      {
+      } else {
         Central = CentralValueTemp + 1.0;
         Error = ParamErrors[ParamEnum][ParamNo];
       }
@@ -2224,11 +2206,9 @@ TH1D* MCMCProcessor::MakePrefit() {
       Error = ParamErrors[ParamEnum][ParamNo];
     }
     //KS: If plotting error for param with flat prior is turned off and given param really has flat prior set error to 0
-    if(!PlotFlatPrior && ParamFlat[ParamEnum][ParamNo])
-    {
+    if(!PlotFlatPrior && ParamFlat[ParamEnum][ParamNo]) {
       Error = 0.;
     }
-
     PreFitPlot->SetBinContent(i+1, Central);
     PreFitPlot->SetBinError(i+1, Error);
     PreFitPlot->GetXaxis()->SetBinLabel(i+1, ParamNames[ParamEnum][ParamNo]);
@@ -2253,7 +2233,7 @@ void MCMCProcessor::ReadInputCov() {
 // **************************
   FindInputFiles();
   if(nParam[kXSecPar] > 0)  ReadXSecFile();
-  if(nParam[kNDPar] > 0) ReadNDFile();
+  if(nParam[kNDPar] > 0)    ReadNDFile();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
   if(nParam[kOSCPar] > 0)   ReadOSCFile();
   //KS: Remove parameters which were removed
@@ -2368,11 +2348,9 @@ void MCMCProcessor::ReadXSecFile() {
   for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
   {
     auto const &param = *it;
-
     // Push back the name
     std::string TempString = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
 
-    //KS:Reject particular parameter names, noticed that sometimes string comparison doesn't work becasue of some weird casting of TObjString into std::string. This is rare and sooner or later we move away from TObjString so this is fine
     bool rejected = false;
     for (unsigned int ik = 0; ik < ExcludedNames.size(); ++ik)
     {
@@ -2387,20 +2365,12 @@ void MCMCProcessor::ReadXSecFile() {
     }
     if(rejected) continue;
     ParamNames[kXSecPar].push_back(TempString);
-    if(ParamNames[kXSecPar][i].BeginsWith("b_"))
-    {
-      IsXsec.push_back(false);
-      nFlux++;
-    } 
-    else IsXsec.push_back(true);  
-    
-    ParamCentral[kXSecPar].push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
-    ParamNom[kXSecPar].push_back( param["Systematic"]["ParameterValues"]["Generated"].as<double>() );
-    ParamErrors[kXSecPar].push_back( param["Systematic"]["Error"].as<double>() );
+    ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
+    ParamNom[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["Generated"].as<double>());
+    ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
+    ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
 
-    bool flat = false;
-    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
-    ParamFlat[kXSecPar].push_back( flat );
+    ParameterGroup.push_back(param["Systematic"]["ParameterGroup"].as<std::string>());
   }
 }
 
@@ -2738,8 +2708,8 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
     std::string DunneKabothScale = GetDunneKaboth(BayesFactor);
 
     MACH3LOG_INFO("{} for {}", Name, ParNames[k]);
-    MACH3LOG_INFO("Following Jeffreys Scale = ", JeffreysScale);
-    MACH3LOG_INFO("Following Dunne-Kaboth Scale = ", DunneKabothScale);
+    MACH3LOG_INFO("Following Jeffreys Scale = {}", JeffreysScale);
+    MACH3LOG_INFO("Following Dunne-Kaboth Scale = {}", DunneKabothScale);
     std::cout<<std::endl;
   }
 }
@@ -3096,15 +3066,13 @@ void MCMCProcessor::PrepareDiagMCMC() {
 // **************************
   doDiagMCMC = true;
     
-  if(ParStep != nullptr)
-  {
+  if(ParStep != nullptr) {
     MACH3LOG_ERROR("It look like ParStep was already filled ");
     MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC");
     MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  if(nBatches == 0)
-  {
+  if(nBatches == 0) {
     MACH3LOG_ERROR("nBatches is equal to 0");
     MACH3LOG_ERROR("please use SetnBatches to set other value fore example 20");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -3123,7 +3091,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
   SystValues = new double*[nEntries]();
   AccProbValues = new double[nEntries]();
   StepNumber = new int[nEntries]();
-
   for (int i = 0; i < nEntries; ++i) {
     SampleValues[i] = new double[nSamples]();
     SystValues[i] = new double[nSysts]();
@@ -3135,7 +3102,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
       SystValues[i][j] = -999.99;
     }
     AccProbValues[i] = -999.99;
-
     StepNumber[i] = -999.99;
   }
 
@@ -3166,9 +3132,9 @@ void MCMCProcessor::PrepareDiagMCMC() {
       BatchedAverages[i][j] = 0.0;
     }
   }
-  double* ParStepBranch = new double[nDraw];
-  double* SampleValuesBranch = new double[nSamples];
-  double* SystValuesBranch = new double[nSysts];
+  std::vector<double> ParStepBranch(nDraw);
+  std::vector<double> SampleValuesBranch(nSamples);
+  std::vector<double> SystValuesBranch(nSysts);
   int StepNumberBranch = 0;
   double AccProbValuesBranch = 0;
   // Set the branch addresses for params
@@ -3237,9 +3203,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
     //KS: Could easily add this to above loop but I accProb is different beast so better keep it like this
     AccProbBatchedAverages[BatchNumber] += AccProbValues[i];
   }
-  delete[] ParStepBranch;
-  delete[] SampleValuesBranch;
-  delete[] SystValuesBranch;
   clock.Stop();
   MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nEntries);
 
@@ -4086,7 +4049,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 void MCMCProcessor::GewekeDiagnostic() {
 // **************************
   MACH3LOG_INFO("Making Geweke Diagnostic");
-
   //KS: Up refers to upper limit we check, it stays constant, in literature it is mostly 50% thus using 0.5 for threshold
   std::vector<double> MeanUp(nDraw, 0.0);
   std::vector<double> SpectralVarianceUp(nDraw, 0.0);
@@ -4212,7 +4174,6 @@ void MCMCProcessor::GewekeDiagnostic() {
 
   GewekeDir->Close();
   delete GewekeDir;
-
   OutputFile->cd();
 }
 
@@ -4263,7 +4224,6 @@ void MCMCProcessor::AcceptanceProbabilities() {
   OutputFile->cd();
 }
 
-
 // **************************
 void MCMCProcessor::CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours) {
 // **************************
@@ -4300,4 +4260,46 @@ void MCMCProcessor::CheckCredibleRegionsOrder(const std::vector<double>& Credibl
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
+}
+
+// **************************
+int MCMCProcessor::GetGroup(const std::string& name) const {
+// **************************
+  // Lambda to compare strings case-insensitively
+  auto caseInsensitiveCompare = [](const std::string& a, const std::string& b) {
+    return std::equal(a.begin(), a.end(), b.begin(), b.end(),
+                      [](char c1, char c2) { return std::tolower(c1) == std::tolower(c2); });
+  };
+  int numerator = 0;
+  for (const auto& groupName : ParameterGroup) {
+    if (caseInsensitiveCompare(groupName, name)) {
+      numerator++;
+    }
+  }
+  return numerator;
+}
+
+// **************************
+void MCMCProcessor::PrintInfo() const {
+// **************************
+  // KS: Create a map to store the counts of unique strings
+  std::unordered_map<std::string, int> paramCounts;
+
+  std::for_each(ParameterGroup.begin(), ParameterGroup.end(),
+                [&paramCounts](const std::string& param) {
+                  paramCounts[param]++;
+                });
+
+  MACH3LOG_INFO("************************************************");
+  MACH3LOG_INFO("Scanning output branches...");
+  MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
+  MACH3LOG_INFO("# Model params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar], ParamTypeStartPos[kXSecPar]);
+  MACH3LOG_INFO("# With following groups: ");
+  for (const auto& pair : paramCounts) {
+    MACH3LOG_INFO(" # {} params: {}", pair.first, pair.second);
+  }
+  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
+  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
+  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
+  MACH3LOG_INFO("************************************************");
 }
