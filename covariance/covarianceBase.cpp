@@ -721,7 +721,7 @@ void covarianceBase::throwParCurr(const double mag) {
 }
 // ********************************************
 // Function to print the prior values
-void covarianceBase::printNominal() {
+void covarianceBase::printNominal() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} covarianceBase:", getName());
   for (int i = 0; i < _fNumPar; i++) {
@@ -731,7 +731,7 @@ void covarianceBase::printNominal() {
 
 // ********************************************
 // Function to print the prior, current and proposed values
-void covarianceBase::printNominalCurrProp() {
+void covarianceBase::printNominalCurrProp() const {
 // ********************************************
   MACH3LOG_INFO("Printing parameters for {}", getName());
   // Dump out the PCA parameters too
@@ -774,7 +774,7 @@ double covarianceBase::CalcLikelihood() _noexcept_ {
 }
 
 // ********************************************
-int covarianceBase::CheckBounds() {
+int covarianceBase::CheckBounds() const {
 // ********************************************
   int NOutside = 0;
   #ifdef MULTITHREAD
@@ -932,7 +932,7 @@ void covarianceBase::toggleFixParameter(const std::string& name) {
 }
 
 // ********************************************
-bool covarianceBase::isParameterFixed(const std::string& name) {
+bool covarianceBase::isParameterFixed(const std::string& name) const {
 // ********************************************
   for (int i = 0; i <_fNumPar; ++i) {
     if(name == _fFancyNames[i]) {

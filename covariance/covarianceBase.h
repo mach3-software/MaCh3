@@ -32,43 +32,55 @@ class covarianceBase {
   /// @brief Destructor
   virtual ~covarianceBase();
   
+  /// \defgroup Setters
+  /// Group of functions to set various parameters, names, and values.
+
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
   /// @param cov Covariance matrix which we set and will be used later for evaluation of penalty term
+  /// \ingroup Setters
   void setCovMatrix(TMatrixDSym *cov);
   /// @brief Set matrix name
   void setName(std::string name) { matrixName = name; }
   /// @brief change parameter name
   /// @param i Parameter index
   /// @param name new name which will be set
+  /// \ingroup Setters
   void setParName(int i, std::string name) { _fNames.at(i) = name; }
+  /// \ingroup Setters
   void setSingleParameter(const int parNo, const double parVal);
   /// @brief Set all the covariance matrix parameters to a user-defined value
   /// @param i Parameter index
   /// @param val new value which will be set
+  /// \ingroup Setters
   void setPar(const int i, const double val);
   /// @brief Set current parameter value
   /// @param i Parameter index
   /// @param val new value which will be set
+  /// \ingroup Setters
   void setParCurrProp(const int i, const double val);
   /// @brief Set proposed parameter value
   /// @param i Parameter index
   /// @param val new value which will be set
+  /// \ingroup Setters
   void setParProp(const int i, const double val) {
     _fPropVal[i] = val;
     if (pca) TransferToPCA();
   }
   /// @brief Set parameter values using vector, it has to have same size as covariance class
   /// @param pars Vector holding new values for every parameter
+  /// \ingroup Setters
   void setParameters(const std::vector<double>& pars = {});
   /// @brief Set if parameter should have flat prior or not
   /// @param i Parameter index
   /// @param eL bool telling if it will be flat or not
+  /// \ingroup Setters
   void setFlatPrior(const int i, const bool eL);
   
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
+  /// \ingroup Setters
   void SetRandomThrow(const int i, const double rand) { randParams[i] = rand;}
   /// @brief Get random value useful for debugging/CI
   /// @param i Parameter index
@@ -77,19 +89,24 @@ class covarianceBase {
   /// @brief set branches for output file
   /// @param tree Tree to which we will save branches
   /// @param SaveProposal Normally we only save parameter after is accepted, for debugging purpose it is helpful to see also proposed values. That's what this variable controls
+  /// \ingroup Setters
   void SetBranches(TTree &tree, bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
   /// @cite luengo2020survey
+  /// \ingroup Setters
   void setStepScale(const double scale);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param ParameterIndex Parameter Index
   /// @param StepScale Value of individual step scale
+  /// \ingroup Setters
   void setIndivStepScale(const int ParameterIndex, const double StepScale){ _fIndivStepScale.at(ParameterIndex) = StepScale; }
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param stepscale Vector of individual step scale, should have same
+  /// \ingroup Setters
   void setIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
+  /// \ingroup Setters
   inline void setPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
@@ -106,7 +123,7 @@ class covarianceBase {
   void RandomConfiguration();
   
   /// @brief Check if parameters were proposed outside physical boundary
-  int CheckBounds();
+  int CheckBounds() const;
   /// @brief Calc penalty term based on inverted covariance matrix
   double CalcLikelihood() _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
@@ -128,22 +145,28 @@ class covarianceBase {
   inline bool getFlatPrior(const int i) { return _fFlatPrior[i]; }
 
   /// @brief Get name of covariance
-  std::string getName() { return matrixName; }
+  /// \ingroup Setters
+  std::string getName() const { return matrixName; }
   /// @brief Get name of covariance
   /// @param i Parameter index
-  std::string GetParName(const int i) {return _fNames[i];}
+  /// \ingroup Setters
+  std::string GetParName(const int i) const {return _fNames[i];}
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
-  std::string GetParFancyName(const int i) {return _fFancyNames[i];}
+  /// \ingroup Setters
+  std::string GetParFancyName(const int i) const {return _fFancyNames[i];}
   /// @brief Get name of input file
+  /// \ingroup Setters
   std::string getInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
-  inline double getDiagonalError(const int i) { return std::sqrt((*covMatrix)(i,i)); }
+  /// \ingroup Setters
+  inline double getDiagonalError(const int i) const { return std::sqrt((*covMatrix)(i,i)); }
   /// @brief Get the error for the ith parameter
   /// @param i Parameter index
-  inline double GetError(const int i) {return _fError[i];}
+  /// \ingroup Setters
+  inline double GetError(const int i) const {return _fError[i];}
 
   /// @brief Adaptive Step Tuning Stuff
   void resetIndivStepScale();
@@ -197,44 +220,44 @@ class covarianceBase {
 
   //Some Getters
   /// @brief Get total number of parameters
-  inline int  GetNumParams() {return _fNumPar;}
+  inline int  GetNumParams() const {return _fNumPar;}
   /// @brief Get the prior array for parameters.
   virtual std::vector<double> getNominalArray();
   /// @brief Get the pre-fit values of the parameters.
-  std::vector<double> getPreFitValues(){return _fPreFitValue;}
+  std::vector<double> getPreFitValues() const {return _fPreFitValue;}
   /// @brief Get the generated values of the parameters.
-  std::vector<double> getGeneratedValues(){return _fGenerated;}
+  std::vector<double> getGeneratedValues() const {return _fGenerated;}
   /// @brief Get vector of all proposed parameter values
   std::vector<double> getProposed() const;
   /// @brief Get proposed parameter value
   /// @param i Parameter index
-  inline double getParProp(const int i) { return _fPropVal[i]; }
+  inline double getParProp(const int i) const { return _fPropVal[i]; }
   /// @brief Get current parameter value
   /// @param i Parameter index
-  inline double getParCurr(const int i) { return _fCurrVal[i]; }
+  inline double getParCurr(const int i) const { return _fCurrVal[i]; }
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  inline double getParInit(const int i) { return _fPreFitValue[i]; }
+  inline double getParInit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Return generated value, although is virtual so class inheriting might actual get prior not generated.
   /// @param i Parameter index
   virtual double getNominal(const int i) { return getParInit(i); }
   /// @brief Return generated value for a given parameter
   /// @param i Parameter index
-  inline double GetGenerated(const int i) { return _fGenerated[i];}
+  inline double GetGenerated(const int i) const { return _fGenerated[i];}
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetUpperBound(const int i){ return _fUpBound[i];}
+  inline double GetUpperBound(const int i) const { return _fUpBound[i];}
   /// @brief Get lower parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetLowerBound(const int i){ return _fLowBound[i]; }
+  inline double GetLowerBound(const int i) const { return _fLowBound[i]; }
   /// @brief Get individual step scale for selected parameter
   /// @param ParameterIndex Parameter index
-  inline double GetIndivStepScale(const int ParameterIndex){return _fIndivStepScale.at(ParameterIndex); }
+  inline double GetIndivStepScale(const int ParameterIndex) const {return _fIndivStepScale.at(ParameterIndex); }
   /// @brief Get global step scale for covariance object
-  inline double GetGlobalStepScale(){return _fGlobalStepScale; }
+  inline double GetGlobalStepScale() const {return _fGlobalStepScale; }
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  inline double getParProp_PCA(const int i) {
+  inline double getParProp_PCA(const int i)  {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return fParProp_PCA(i);
   }
@@ -314,12 +337,12 @@ class covarianceBase {
   }
 
   /// @brief Print prior value for every parameter
-  void printNominal();
+  void printNominal() const;
   /// @brief Print prior, current and proposed value for each parameter
-  void printNominalCurrProp();
+  void printNominalCurrProp() const;
   /// @warning only for backward compatibility
   /// @todo remove it
-  void printPars() {printNominalCurrProp();};
+  void printPars() const {printNominalCurrProp();};
   /// @brief Print step scale for each parameter
   void printIndivStepScale() const;
 
@@ -344,13 +367,13 @@ class covarianceBase {
 
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
-  bool isParameterFixed(const int i) {
+  bool isParameterFixed(const int i) const {
     if (_fError[i] < 0) { return true; }
     else                { return false; }
   }
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
-  bool isParameterFixed(const std::string& name);
+  bool isParameterFixed(const std::string& name) const;
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
