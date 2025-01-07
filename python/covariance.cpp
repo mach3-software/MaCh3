@@ -17,7 +17,7 @@ public:
     using covarianceBase::covarianceBase;
 
     /* Trampoline (need one for each virtual function) */
-    int CheckBounds() override {
+    int CheckBounds() {
         PYBIND11_OVERRIDE_NAME(
             int,            /* Return type */
             covarianceBase, /* Parent class */
