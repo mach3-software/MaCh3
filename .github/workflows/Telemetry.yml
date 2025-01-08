@@ -34,7 +34,7 @@ jobs:
           make -j4 install # Build and install the project
 
       - name: Run chain
-        run: ./opt/MaCh3Validations/build/_deps/mach3-src/.gihub/CIscripts/RAM.sh
+        run: ./opt/MaCh3Validations/build/_deps/mach3-src/.github/CIscripts/RAM.sh
 
       - name: Update job summary with plot
         run: |
