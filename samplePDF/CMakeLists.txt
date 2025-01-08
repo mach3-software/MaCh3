@@ -12,7 +12,7 @@ add_library(SamplePDF SHARED
     HistogramUtils.cpp
 )
 
-target_link_libraries(SamplePDF PUBLIC Splines NuOscillator Covariance)
+target_link_libraries(SamplePDF PUBLIC Splines NuOscillator)
 target_link_libraries(SamplePDF PRIVATE MaCh3Warnings)
 
 target_include_directories(SamplePDF PUBLIC
