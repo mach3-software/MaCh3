@@ -1,5 +1,5 @@
 ---
-# This will
+# This will run telemetry like RAM etc and make summary
 name: MaCh3 Telemetry
 
 on:
