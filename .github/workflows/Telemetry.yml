@@ -46,6 +46,7 @@ jobs:
           path: /opt/MaCh3Validations/build/memory_usage_plot.png
 
       - name: Update job summary with plot
+        shell: bash
         run: |
           if [[ -f /opt/MaCh3Validations/build/memory_usage_plot.png ]]; then
             echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
