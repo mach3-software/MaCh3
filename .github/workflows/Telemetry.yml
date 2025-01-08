@@ -1,0 +1,47 @@
+---
+# This will
+name: MaCh3 Telemetry
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+permissions:
+  # Required permissions for GitHub Pages deployment and content updates
+  deployments: write
+  contents: write
+
+jobs:
+  benchmark:
+    name: Telemetry
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9v1.3.0
+    steps:
+      - name: Get MaCh3 Validations
+        run: |
+          cd /opt/
+          # Clone the MaCh3Tutorial repository with the current branch
+          git clone --branch main https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+          cd MaCh3Validations
+          mkdir build
+          cd build
+          cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+
+      - name: Build MaCh3 Validations
+        run: |
+          cd /opt/MaCh3Validations/build
+          make -j4 install # Build and install the project
+
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v2
+
+      - name: Run chain
+        run: |
+          # Source environment setup scripts
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
+          source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
+          cd /opt/MaCh3Validations/build/
+          # Run the actual chain
+          ./bin/MCMCTutorial Inputs/FitterConfig.yaml
