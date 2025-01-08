@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   nFiles = 0;
   if (argc != 3 && argc !=6 && argc != 8)
   {
-    MACH3LOG_ERROR("How to use: {}<Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("How to use: {} <Config> <MCMM_ND_Output.root>", argv[0]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 

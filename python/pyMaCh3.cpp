@@ -1,6 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+/// @file pyMaCh3.cpp
+/// @author Ewan Miller
+
 namespace py = pybind11;
 
 void initPlotting(py::module &); // <- defined in python/plotting.cpp

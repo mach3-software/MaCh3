@@ -2,16 +2,17 @@ set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
     Structs.h
-	FarDetectorCoreInfoStruct.h
+    HistogramUtils.h
+    FarDetectorCoreInfoStruct.h
 )
 
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
-    Structs.cpp
+    HistogramUtils.cpp
 )
 
-target_link_libraries(SamplePDF PUBLIC Splines NuOscillator Covariance)
+target_link_libraries(SamplePDF PUBLIC Splines NuOscillator)
 target_link_libraries(SamplePDF PRIVATE MaCh3Warnings)
 
 target_include_directories(SamplePDF PUBLIC

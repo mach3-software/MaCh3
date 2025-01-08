@@ -13,6 +13,8 @@
 
 **DiagMCMC** - Perform MCMC diagnostic like autocorrelation or trace plots.
 
+**PlotMCMCDiag** - Plot output of **DiagMCMC**, can compare multiple files if more than one argument is used
+
 **RHat** - Performs RHat diagnostic to study if all used chains converged to the same stationary distribution.
 ```bash
 ./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]
