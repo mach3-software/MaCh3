@@ -44,12 +44,12 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE/artifacts"
           cp /opt/MaCh3Validations/build/memory_usage_plot.png "$GITHUB_WORKSPACE/artifacts/"
-          echo "::set-output name=image_path::$GITHUB_WORKSPACE/artifacts/memory_usage_plot.png"
+          echo "image_path=$GITHUB_WORKSPACE/artifacts/memory_usage_plot.png" >> $GITHUB_ENV
 
       - name: Print image link to job summary
         run: |
           echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
-          echo "![Memory Usage Plot](${{ steps.upload.outputs.image_path }})" >> $GITHUB_STEP_SUMMARY
+          echo "![Memory Usage Plot](${{ env.image_path }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary link
         uses: peter-evans/create-or-update-comment@v3
