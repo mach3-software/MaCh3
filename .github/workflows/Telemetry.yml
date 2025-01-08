@@ -48,11 +48,9 @@ jobs:
       - name: Update job summary with plot
         shell: bash
         run: |
-          if [[ -f /opt/MaCh3Validations/build/memory_usage_plot.png ]]; then
-            echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
-            echo "![Memory Usage Plot](memory_usage_plot.png)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "Memory usage plot not found." >> $GITHUB_STEP_SUMMARY
+          echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
+          echo "![Memory Usage Plot](memory_usage_plot.png)" >> $GITHUB_STEP_SUMMARY
+
 
       - name: Create PR comment with summary link
         uses: peter-evans/create-or-update-comment@v3
