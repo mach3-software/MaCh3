@@ -6,10 +6,9 @@ rm -f memory_usage.log memory_usage_data.txt
 pip install matplotlib
 
 # Source environment setup scripts
-source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
-source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
-source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
-cd /opt/MaCh3Validations/build/
+source bin/setup.MaCh3.sh
+source bin/setup.MaCh3Tutorial.sh
+source bin/setup.NuOscillator.sh
 
 # Start the executable in the background
 ./bin/MCMCTutorial Inputs/FitterConfig.yaml &

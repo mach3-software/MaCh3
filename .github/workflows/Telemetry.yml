@@ -33,8 +33,11 @@ jobs:
           cd /opt/MaCh3Validations/build
           make -j4 install # Build and install the project
 
-      - name: Run chain
-        run: ./opt/MaCh3Validations/build/_deps/mach3-src/.github/CIscripts/RAM.sh
+      - name: Run memory telemetry and generate plot
+        run: |
+          cd /opt/MaCh3Validations/build
+          find -iname "RAM.sh"
+          ./_deps/mach3-src/.github/CIscripts/RAM.sh
 
       - name: Update job summary with plot
         run: |
