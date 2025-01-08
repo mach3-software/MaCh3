@@ -67,11 +67,11 @@ class splineFDBase : public SplineBase {
 
   protected:
 	/// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
-	inline void FindSplineSegment() override;
+	void FindSplineSegment() override;
 	/// @brief CPU based code which eval weight for each spline
-	inline void CalcSplineWeights() override;
+	void CalcSplineWeights() override;
 	/// @brief Calc total event weight, not used by Bin-by-bin splines
-	inline void ModifyWeights() override {return;};
+	void ModifyWeights() override {return;};
 	/// Pointer to covariance xsec
 	covarianceXsec* xsec;
 
