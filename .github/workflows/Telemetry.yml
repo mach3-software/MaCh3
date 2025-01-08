@@ -38,18 +38,24 @@ jobs:
           find -iname "RAM.sh"
           ./_deps/mach3-src/.github/CIscripts/RAM.sh
 
-      - name: Upload memory usage plot as artifact
-        id: upload
+      - name: Upload memory usage plot artifact
+        id: upload-artifact
         if: success()
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/artifacts"
-          cp /opt/MaCh3Validations/build/memory_usage_plot.png "$GITHUB_WORKSPACE/artifacts/"
-          echo "image_path=$GITHUB_WORKSPACE/artifacts/memory_usage_plot.png" >> $GITHUB_ENV
+        uses: actions/upload-artifact@v3
+        with:
+          name: memory-usage-plot
+          path: /opt/MaCh3Validations/build/memory_usage_plot.png
 
-      - name: Print image link to job summary
+
+      - name: Copy memory usage plot to a location accessible for job summary
+        run: |
+          cp /opt/MaCh3Validations/build/memory_usage_plot.png /tmp/memory_usage_plot.png
+
+      - name: Update job summary with plot
         run: |
           echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
-          echo "![Memory Usage Plot](${{ env.image_path }})" >> $GITHUB_STEP_SUMMARY
+          echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
+
 
       - name: Create PR comment with summary link
         uses: peter-evans/create-or-update-comment@v3
