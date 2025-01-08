@@ -3,6 +3,8 @@
 # Remove any existing log files
 rm -f memory_usage.log memory_usage_data.txt
 
+dnf install -y procps
+
 pip install matplotlib
 
 # Source environment setup scripts
