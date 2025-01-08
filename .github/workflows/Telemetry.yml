@@ -45,12 +45,15 @@ jobs:
           name: memory-usage-plot
           path: /opt/MaCh3Validations/build/memory_usage_plot.png
 
+
+      - name: Copy memory usage plot to a location accessible for job summary
+        run: |
+          cp /opt/MaCh3Validations/build/memory_usage_plot.png /tmp/memory_usage_plot.png
+
       - name: Update job summary with plot
-        shell: bash
         run: |
           echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
-          echo "![Memory Usage Plot](memory_usage_plot.png)" >> $GITHUB_STEP_SUMMARY
-
+          echo "![Memory Usage Plot](file:///tmp/memory_usage_plot.png)" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary link
         uses: peter-evans/create-or-update-comment@v3
