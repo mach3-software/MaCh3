@@ -16,7 +16,6 @@ add_library(Splines SHARED
     SplineBase.cpp
     splineFDBase.cpp
     SplineMonolith.cpp
-    #MaCh3SplineDict.cxx #KS: This will have to be sperate library because root like C-style casting too much
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuSplineUtils.cu>
 )
 
@@ -38,9 +37,6 @@ target_include_directories(Splines PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict_rdict.pcm DESTINATION lib/)
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict.rootmap DESTINATION lib/)
-
 install(TARGETS Splines
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
@@ -48,3 +44,11 @@ install(TARGETS Splines
 
 add_library(MaCh3::Splines ALIAS Splines)
 
+
+# KS: Now we generate root dictionary, we can't add it to above as ROOT is bit dumb and things will fail due to MaCh3Warnings etc
+add_library(SplineDict SHARED MaCh3SplineDict.cxx)
+target_include_directories(SplineDict PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(SplineDict PUBLIC Splines MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict_rdict.pcm DESTINATION lib/)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict.rootmap DESTINATION lib/)
