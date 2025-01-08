@@ -54,3 +54,4 @@ jobs:
           cd /opt/MaCh3Validations/build/
           # Run the actual chain
           ./bin/MCMCTutorial Inputs/FitterConfig.yaml
+        shell: bash
