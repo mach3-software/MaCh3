@@ -7,9 +7,8 @@ on:
     branches: [ develop ]
 
 permissions:
-  # Required permissions for GitHub Pages deployment and content updates
-  deployments: write
-  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   benchmark:
@@ -47,7 +46,7 @@ jobs:
       - name: Create PR comment with summary link
         uses: peter-evans/create-or-update-comment@v3
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          pull-request-number: ${{ github.event.pull_request.number }}
           body: |
             You can view the memory usage plot in the job summary: [Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
