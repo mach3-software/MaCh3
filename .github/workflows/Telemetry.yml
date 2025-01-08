@@ -38,22 +38,18 @@ jobs:
           find -iname "RAM.sh"
           ./_deps/mach3-src/.github/CIscripts/RAM.sh
 
-      - name: Upload memory usage plot artifact
+      - name: Upload memory usage plot as artifact
+        id: upload
         if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: memory-usage-plot
-          path: /opt/MaCh3Validations/build/memory_usage_plot.png
-
-
-      - name: Copy memory usage plot to a location accessible for job summary
         run: |
-          cp /opt/MaCh3Validations/build/memory_usage_plot.png /tmp/memory_usage_plot.png
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          cp /opt/MaCh3Validations/build/memory_usage_plot.png "$GITHUB_WORKSPACE/artifacts/"
+          echo "::set-output name=image_path::$GITHUB_WORKSPACE/artifacts/memory_usage_plot.png"
 
-      - name: Update job summary with plot
+      - name: Print image link to job summary
         run: |
           echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
-          echo "![Memory Usage Plot](file:///tmp/memory_usage_plot.png)" >> $GITHUB_STEP_SUMMARY
+          echo "![Memory Usage Plot](${{ steps.upload.outputs.image_path }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary link
         uses: peter-evans/create-or-update-comment@v3
@@ -61,4 +57,3 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             You can view the memory usage plot in the job summary: [Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
