@@ -47,14 +47,9 @@ void covarianceOsc::proposeStep() {
 // *************************************
   covarianceBase::proposeStep();
 
-  // HW :: This method is a tad hacky but modular arithmetic gives me a headache.
-  //        It should now automatically set dcp to be with [-pi, pi]
-  if(_fPropVal[kDeltaCP] > TMath::Pi()) {
-    _fPropVal[kDeltaCP] = -1*TMath::Pi() + std::fmod(_fPropVal[kDeltaCP], TMath::Pi());
-  } else if (_fPropVal[kDeltaCP] < -TMath::Pi()) {
-    _fPropVal[kDeltaCP] = TMath::Pi() + std::fmod(_fPropVal[kDeltaCP], TMath::Pi());
-  }
-  
+  // HW It should now automatically set dcp to be with [-pi, pi]
+  CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
+
   // Okay now we've done the standard steps, we can add in our nice flips
   // hierarchy flip first
   if(random_number[0]->Uniform() < 0.5 && flipdelM){
@@ -65,6 +60,17 @@ void covarianceOsc::proposeStep() {
     // flip octant around point of maximal disappearance (0.5112)
     // this ensures we move to a parameter value which has the same oscillation probability
     _fPropVal[kSinTheta23] = 0.5112 - (_fPropVal[kSinTheta23] - 0.5112);
+  }
+}
+
+// *************************************
+//HW: This method is a tad hacky but modular arithmetic gives me a headache.
+void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
+// *************************************
+  if(_fPropVal[index] > UpBound) {
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
+  } else if (_fPropVal[index] < LowBound) {
+    _fPropVal[index] = UpBound + std::fmod(_fPropVal[index], UpBound);
   }
 }
 
