@@ -31,7 +31,7 @@ class splineFDBase : public SplineBase {
 	//Spline Monolith things
 	//Essential methods used externally
 	//Move these to splineFDBase in core
-	bool AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
+	bool AddSample(std::string SampleName, const std::string& DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
 	void TransferToMonolith();	
 	void cleanUpMemory();
 
@@ -80,7 +80,7 @@ class splineFDBase : public SplineBase {
 	std::vector<int> BinningOpts;
 	std::vector<int> Dimensions;
 	std::vector<std::vector<std::string>> DimensionLabels;
-	std::vector<int> DetIDs;
+	std::vector<std::string> DetIDs;
 	std::vector<int> nSplineParams;
 	std::vector<int> nOscChans;
 

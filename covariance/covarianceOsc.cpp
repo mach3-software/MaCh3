@@ -81,11 +81,34 @@ void covarianceOsc::Print() {
   MACH3LOG_INFO("Number of pars: {}", _fNumPar);
   MACH3LOG_INFO("Current: {} parameters:", matrixName);
 
-  MACH3LOG_INFO("{:<5} | {:<25} | {:<10} | {:<15} | {:<15} | {:<10}",
-                "#", "Name", "Nom.", "IndivStepScale", "_fError", "FlatPrior");
+  MACH3LOG_INFO("=================================================================================================================================");
+  MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10} {:2} {:<15} {:2} {:<15} {:2} {:<10} {:2} {:<10}",
+                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "DetID");
+  MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------");
+  for (int i = 0; i < _fNumPar; i++) {
+    std::string detIdString = "";
+    for (const auto& detID : _fDetID[i]) {
+      if (!detIdString.empty()) {
+        detIdString += ", ";
+      }
+      detIdString += detID;
+    }
 
-  for(int i = 0; i < _fNumPar; i++) {
-    MACH3LOG_INFO("{:<5} | {:<25} | {:<10.4f} | {:<15.2f} | {:<15.4f} | {:<10}",
-                  i, _fNames[i].c_str(), _fPreFitValue[i], _fIndivStepScale[i], _fError[i], _fFlatPrior[i]);
+    MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10.4f} {:2} {:<15.2f} {:2} {:<15.4f} {:2} {:<10} {:2} {:<10}",
+                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", detIdString);
   }
+  MACH3LOG_INFO("=================================================================================================================================");
+}
+
+// ********************************************
+// DB Grab the Normalisation parameters for the relevant DetID
+std::vector<const double*> covarianceOsc::GetOscParsFromDetID(const std::string& DetID) {
+// ********************************************
+  std::vector<const double*> returnVec;
+  for (int i = 0; i < _fNumPar; ++i) {
+    if (AppliesToDetID(i, DetID)) {
+      returnVec.push_back(retPointer(i));
+    }
+  }
+  return returnVec;
 }

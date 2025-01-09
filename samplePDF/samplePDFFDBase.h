@@ -201,7 +201,7 @@ public:
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = _BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  int SampleDetID = _BAD_INT_;
+  std::string SampleDetID;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
@@ -211,6 +211,7 @@ public:
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
 
+  std::vector<const double*> OscParams;
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 

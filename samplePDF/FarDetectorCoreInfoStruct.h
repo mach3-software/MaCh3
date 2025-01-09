@@ -22,8 +22,6 @@ struct FarDetectorCoreInfo {
   std::vector<const int*> nupdg;
   std::vector<const int*> nupdgUnosc;
 
-  int SampleDetID;
-
   //THe x_var and y_vars that you're binning in
   std::vector<const double*> x_var;
   std::vector<const double*> y_var;
