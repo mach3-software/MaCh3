@@ -65,6 +65,15 @@ jobs:
           echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
           echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
+      - name: Get artifact ID and link
+        id: get-artifact-link
+        run: |
+          ARTIFACT_NAME="memory-usage-plot"
+          RUN_ID="${{ github.run_id }}"
+          REPO="${{ github.repository }}"
+          ARTIFACT_ID=$(gh api repos/${REPO}/actions/runs/${RUN_ID}/artifacts --jq ".artifacts[] | select(.name == \"${ARTIFACT_NAME}\") | .id")
+          echo "artifact_link=https://github.com/${REPO}/actions/runs/${RUN_ID}/artifacts/${ARTIFACT_ID}" >> $GITHUB_ENV
+
       - name: Create PR comment with summary and artifact link
         uses: peter-evans/create-or-update-comment@v3
         with:
@@ -77,6 +86,6 @@ jobs:
             ```
             ### Memory Usage Plot
             - **[Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**
-            - **[Download Memory Usage Plot Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)**
+            - **[Download Memory Usage Plot Artifact](${{ env.artifact_link }})**
 
             You can view the memory usage plot directly in the job summary or download the artifact from the link above.
