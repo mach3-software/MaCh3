@@ -1,124 +1,7 @@
-#include "samplePDF/Structs.h"
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#include "Constants/OscillatorConstants.h"
-#pragma GCC diagnostic pop
-
 #include "TList.h"
 #include "TObjArray.h"
 
-namespace MaCh3Utils {
-
-  // *****************************
-  // Get the mass of a particle from the PDG
-  // In GeV, not MeV!
-  double GetMassFromPDG(int PDG) {
-  // *****************************
-
-    switch (abs(PDG)) {  
-    case 11:
-      return 0.511E-3;
-      break;
-    case 13:
-      return 105.658E-3;
-      break;
-    case 15:
-      return 1.77682;
-      break;
-    case 22:
-      return 0.;
-      break;
-    case 211:
-      return 139.57E-3;
-      break;
-    case 111:
-      return 134.98E-3;
-      break;
-    case 2112:
-      return 939.565E-3;
-      break;
-    case 2212:
-      return 938.27E-3;
-      break;
-    //Oxygen nucleus
-    case 1000080160:
-      return 14.89926;
-      break;
-	//eta
-	case 221:
-	  return 547.862E-3;
-	  break;
-	  //K^0 (s or l)
-	case 311:
-	case 130:
-	case 310:
-	  return 497.611E-3;
-	  break;
-	case 321:
-	  return 493.677E-3;
-	  break;
-	// Lamda baryon
-	case 3122:
-	  return 1115.683E-3;
-	  break;
-    case 12:
-    case 14:
-    case 16:
-      return 0.0;
-      break;
-    default:
-      MACH3LOG_ERROR("Haven't got a saved mass for PDG: {}", PDG);
-      MACH3LOG_ERROR("Please implement me!");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    } // End switch
-    MACH3LOG_ERROR("Warning, didn't catch a saved mass");
-    return 0;
-  }
-
-  int PDGToNuOscillatorFlavour(int NuPdg){
-    int NuOscillatorFlavour = _BAD_INT_;
-    switch(std::abs(NuPdg)){
-      case NuPDG::kNue:
-        NuOscillatorFlavour = NuOscillator::kElectron;
-        break;
-      case NuPDG::kNumu:
-        NuOscillatorFlavour = NuOscillator::kMuon;
-        break;
-      case NuPDG::kNutau:
-        NuOscillatorFlavour = NuOscillator::kTau;
-        break;
-      default:
-        MACH3LOG_ERROR("Unknown Nuetrino PDG {}, cannot convert to NuOscillator type", NuPdg);
-        break;
-    }
-
-    //This is very cheeky but if the PDG is negative then multiply the PDG by -1
-    // This is consistent with the treatment that NuOscillator expects as enums only
-    // exist for the generic matter flavour and not the anti-matter version
-    if(NuPdg < 0){NuOscillatorFlavour *= -1;}
-
-    return NuOscillatorFlavour;
-  }
-
- 
-  //DB Anything added here must be of the form 2^X, where X is an integer
-  //
-  //DB Used to contain which DetIDs are supported
-  std::unordered_map<int,int>KnownDetIDsMap({
-      {0,1},    //ND
-      {1,8},    //FD
-      {2,16},   //SK1Rmu
-      {3,32},   //Nova
-      {4,64},   //Atm SubGeV e-like
-      {5,128},  //Atm SubGeV mu-like 
-      {6,256},  //Atm MultiGeV e-like
-      {7,512},  //Atm MultiGeV mu-like
-	  });
-	
-  int nKnownDetIDs = int(KnownDetIDsMap.size());
-
-}
+#include "samplePDF/HistogramUtils.h"
 
 // **************************************************
 //KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
@@ -245,7 +128,6 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
 //WP: Helper function for projecting TH2Poly onto the Y axis
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
-
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),int(ybins.size()-1),&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
   std::vector<double> hProjY_Error(hProjY->GetXaxis()->GetNbins() + 1, 0.0);
@@ -357,7 +239,7 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
   return hist;
 }
 // ****************
-TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
+TH2Poly* ConvertTH2DtoTH2Poly(TH2D* hist) {
 // ****************
   // Make the x axis from the momentum of lepton
   TAxis* xaxis = hist->GetXaxis();
@@ -445,10 +327,32 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
 }
 
 // *********************
+TH2Poly* MakePolyHist(const std::string& name, const std::vector<double>& BinArray_x, const std::vector<double>& BinArray_y) {
+// *********************
+  TH2Poly* poly = new TH2Poly();
+  poly->SetName(name.c_str());
+  poly->SetTitle(name.c_str());
+  double xmax, xmin, ymax, ymin;
+  for(unsigned int iy = 0; iy < BinArray_y.size()-1; iy++)
+  {
+    ymax = BinArray_y[iy+1];
+    ymin = BinArray_y[iy];
+    for(unsigned int ix = 0; ix < BinArray_x.size()-1; ix++)
+    {
+      xmax = BinArray_x[ix+1];
+      xmin = BinArray_x[ix];
+      double binofx[] = {xmin, xmax, xmax, xmin};
+      double binofy[] = {ymin, ymin, ymax, ymax};
+      poly->AddBin(4,binofx,binofy);
+    }
+  }
+  return poly;
+}
+
+// *********************
 //KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, const std::string& name) {
 // *********************
-
   TList *listOfFunctions = hist->GetListOfFunctions();
   TF1 *fitter = dynamic_cast<TF1*>(listOfFunctions->FindObject(name.c_str()));
 

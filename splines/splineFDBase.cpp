@@ -84,10 +84,6 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
-  // for(auto SplineMode : SplineModeVecs_Sample){
-  //   std::cout << SplineMode << ",";
-  // }
-  std::cout << "/n" << std::endl;
 
   MACH3LOG_INFO("SplineModeVecs is of size {}", SplineModeVecs.size());
 
@@ -99,18 +95,17 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   std::vector<std::vector<TAxis *>> SampleBinning(nOscChan);
   for (int iOscChan = 0; iOscChan < nOscChan; iOscChan++)
   {
-    std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
     SampleBinning[iOscChan] = FindSplineBinning(OscChanFileNames[iOscChan], SampleName);
   }
-  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+  MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
   SplineBinning.push_back(SampleBinning);
 
   BuildSampleIndexingArray(SampleName);
   PrintArrayDetails(SampleName);
-  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+  MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 
   FillSampleArray(SampleName, OscChanFileNames);
-  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+  MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 
   return true;
 }
@@ -558,10 +553,7 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
         }
       }
     }
-    if (Verbosity > 0)
-    {
-      std::cout << std::setw(10) << SampleNames[iSample] << " has " << std::setw(10) << SampleCounter_All << " splines, of which " << std::setw(10) << SampleCounter_NonFlat << " are not flat" << std::endl;
-    }
+    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleNames[iSample], SampleCounter_All, SampleCounter_NonFlat);
 
     FullCounter_NonFlat += SampleCounter_NonFlat;
     FullCounter_All += SampleCounter_All;
@@ -584,10 +576,8 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
 }
 
 //****************************************
-void splineFDBase::PrepForReweight()
+void splineFDBase::PrepForReweight() {
 //****************************************
-{
-
   std::vector<TSpline3_red*> UniqueSystSplines;
 
   // DB Find all the Unique systs across each sample and oscillation channel
@@ -695,18 +685,12 @@ void splineFDBase::PrepForReweight()
     xVarArray[iSpline]=0;
   }
   
-
   MACH3LOG_INFO("nUniqueSysts: {}", nUniqueSysts);
-
-  std::cout << std::setw(15) << "Spline Index"
-            << " | " << std::setw(20) << "Syst Name"
-            << " | " << std::setw(6) << "nKnots" << std::endl;
-  std::cout << "-----------------------------------------------------" << std::endl;
+  MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", "Spline Index", "Syst Name", "nKnots");
   for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
   {
-    std::cout << std::setw(15) << iUniqueSyst << " | " << std::setw(20) << UniqueSystNames[iUniqueSyst] << " | " << std::setw(6) << UniqueSystNKnots[iUniqueSyst] << std::endl;
+    MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", iUniqueSyst, UniqueSystNames[iUniqueSyst], UniqueSystNKnots[iUniqueSyst]);
   }
-  std::cout << std::endl;
 
   //ETA
   //Isn't this just doing what CountNumberOfLoadedSplines() does?
@@ -745,14 +729,12 @@ void splineFDBase::PrepForReweight()
   }
   // We need to grab the maximum number of knots
   MACH3LOG_INFO("Number of combinations of Sample, OscChan, Syst and Mode which have entirely flat response: {} / {}", nCombinations_FlatSplines, nCombinations_All);
-  
 }
 
 //****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
 void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
 //****************************************
-
   // Initialise all arrays to 1.0
   int nPoints;
   //No point evaluating a flat spline
@@ -853,63 +835,46 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 }
 
 //****************************************
-void splineFDBase::PrintArrayDimension()
+void splineFDBase::PrintArrayDimension() {
 //****************************************
-{
-  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
-  std::cout << "Array dimensions.." << std::endl;
-  std::cout << std::endl;
+  MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
+  MACH3LOG_INFO("Array dimensions..");
+  MACH3LOG_INFO("{:<20}{}", "nSamples:", indexvec.size());
 
-  std::cout << std::setw(20) << "nSamples:" << indexvec.size() << std::endl;
-  std::cout << std::endl;
-
-  std::cout << std::setw(20) << "nOscChans:";
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
-  {
-    std::cout << indexvec[iSample].size() << " ";
+  MACH3LOG_INFO("{:<20}", "nOscChans:");
+  std::string oscChans;
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
+    oscChans += fmt::format("{} ", indexvec[iSample].size());
   }
-  std::cout << std::endl;
-  std::cout << std::endl;
+  MACH3LOG_INFO("{}", oscChans);
 
-  std::cout << std::setw(20) << "nSysts:" << std::endl;
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
-  {
-    std::cout << "\t"
-              << "Sample:" << iSample << "\t";
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
-    {
-      std::cout << indexvec[iSample][iOscChan].size() << " ";
+  MACH3LOG_INFO("{:<20}", "nSysts:");
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
+    std::string systs = fmt::format("\tSample: {}\t", iSample);
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+      systs += fmt::format("{} ", indexvec[iSample][iOscChan].size());
     }
-    std::cout << std::endl;
+    MACH3LOG_INFO("{}", systs);
   }
-  std::cout << std::endl;
 
-  std::cout << std::setw(20) << "nModes:" << std::endl;
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
-  {
-    std::cout << "\t"
-              << "Sample:" << iSample << "\t"
-              << "--------------------------" << std::endl;
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
-    {
-      std::cout << "\t\t"
-                << "OscChan:" << iOscChan << "\t";
-      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
-      {
-        std::cout << indexvec[iSample][iOscChan][iSyst].size() << " ";
+  MACH3LOG_INFO("{:<20}", "nModes:");
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
+    MACH3LOG_INFO("\tSample: {}\t--------------------------", iSample);
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+      std::string modes = fmt::format("\t\tOscChan: {}\t", iOscChan);
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
+        modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
       }
-      std::cout << std::endl;
+      MACH3LOG_INFO("{}", modes);
     }
-    std::cout << std::endl;
+    MACH3LOG_INFO("");  // Empty line for spacing
   }
-  std::cout << "#----------------------------------------------------------------------------------------------------------------------------------#" << std::endl;
+  MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 }
-
 //****************************************
 bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
 {
-
   int iSample=getSampleIndex(SampleName);
   bool isValid = true;
 
@@ -976,12 +941,8 @@ void splineFDBase::PrintBinning(TAxis *Axis)
 //****************************************
 {
   const int NBins = Axis->GetNbins();
-  
-  std::cout << "\t";
   for (int iBin = 0; iBin < (NBins + 1); iBin++)
   {
-    std::cout << Axis->GetXbins()->GetAt(iBin) << ", ";
+    MACH3LOG_INFO("{}", Axis->GetXbins()->GetAt(iBin));
   }
-  std::cout << std::endl;
-  return;
 }

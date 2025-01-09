@@ -22,9 +22,7 @@ endif()
 # SPDLOG_LEVEL_CRITICAL,
 # SPDLOG_LEVEL_OFF
 
-option(LOG_LEVEL "LOG_LEVEL" Info)
-
-if(NOT LOG_LEVEL)
+if(NOT DEFINED LOG_LEVEL)
   if(MaCh3_DEBUG_ENABLED)
     set(LOG_LEVEL "DEBUG")
   else()
@@ -40,4 +38,13 @@ if(${index} GREATER -1)
   target_compile_definitions(MaCh3CompilerOptions INTERFACE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
 else()
   cmessage(FATAL_ERROR "Invalid log level specified: ${LOG_LEVEL} \n Should be one of: ${VALID_LOG_OPTIONS}")
+endif()
+
+# KS: If logger is set to off many functions which sole purpose is to print message will not print anything. Thus variable will not be used and our very picky WErrror will throw errors
+set(WIGNORE_LIST OFF CRITICAL ERROR WARN)
+if(${LOG_LEVEL} IN_LIST WIGNORE_LIST)
+target_compile_options(MaCh3Warnings INTERFACE
+    -Wno-error=unused-variable
+    -Wno-error=unused-parameter
+  )
 endif()

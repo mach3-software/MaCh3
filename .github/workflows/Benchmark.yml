@@ -1,0 +1,68 @@
+---
+# This will
+# TODO rather than store on tutorial better to have different branch and main MaCh3 should use it
+name: MaCh3 Benchmark
+
+on:
+  pull_request:
+    branches: [ develop ]
+  push:
+    branches: [ develop ]
+
+permissions:
+  # Required permissions for GitHub Pages deployment and content updates
+  deployments: write
+  contents: write
+
+jobs:
+  benchmark:
+    name: Performance regression check
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9v1.3.0
+    steps:
+      - name: Get MaCh3 Validations
+        run: |
+          cd /opt/
+          # Clone the MaCh3Tutorial repository with the current branch
+          git clone --branch main https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+          cd MaCh3Validations
+          mkdir build
+          cd build
+          # Configure the project with benchmark support enabled
+          if [ "${{ github.event_name }}" == 'pull_request' ]; then
+            cmake ../ -DMaCh3_Branch=${{ github.head_ref }}  -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
+          else
+            cmake ../ -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
+          fi
+
+      - name: Build MaCh3 Validations
+        run: |
+          cd /opt/MaCh3Validations/build
+          make -j4 install # Build and install the project
+
+      - name: Run benchmark
+        run: |
+          # Source environment setup scripts
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
+          source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
+          cd /opt/MaCh3Validations/build/
+          # Run the benchmark and store the output in a file
+          ./CIValidations/Benchmark/MaCh3Benchmark | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'catch2' # Specify that the benchmark tool is Catch2
+          github-token: ${{ secrets.MACH3_VALIDATIONS_PAT }} # Use GitHub token for authentication
+          output-file-path: /opt/MaCh3Validations/build/output.txt # Path to the benchmark output file
+          alert-threshold: 200% # Alert threshold for performance degradation
+          comment-on-alert: true
+          gh-pages-branch: gh-pages # Branch to store benchmark results
+          gh-repository: github.com/mach3-software/MaCh3Tutorial # Repository for benchmark results
+          summary-always: true # Always show summary in job logs
+          fail-on-alert: false # Do not fail the workflow on alert
+          benchmark-data-dir-path: "" # Use ROOT directory
+          # Push and deploy GitHub pages branch automatically, only if type isn't PR
+          auto-push: ${{ github.event_name != 'pull_request' }}

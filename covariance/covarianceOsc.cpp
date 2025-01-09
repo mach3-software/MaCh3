@@ -4,35 +4,36 @@
 covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
 : covarianceBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // *************************************
-
   kDeltaCP = -999;
   kDeltaM23 = -999;
-  kSinTheta23 = -999;
-  kSinTheta23 = -999;
   kSinTheta23 = -999;
   for(int io = 0; io < _fNumPar; io++)
   {
     _fNames[io] = _fFancyNames[io];
-
     if(_fNames[io] == "delta_cp")  kDeltaCP = io;
     if(_fNames[io] == "delm2_23")  kDeltaM23 = io;
     if(_fNames[io] == "sin2th_23") kSinTheta23 = io;
-    if(_fNames[io] == "baseline") kBaseline = io;
-    if(_fNames[io] == "density") kDensity = io;
 
     // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[io] = _fPreFitValue[io];
     _fPropVal[io] = _fCurrVal[io];
   }
+  // KS: Check if params have been found. Otherwise things can go wrong
+  auto CheckInitialisation = [](const std::string& paramName, int paramValue) {
+    if (paramValue == -999) {
+      MACH3LOG_WARN("Parameter {} has not been initialized properly.", paramName);
+      MACH3LOG_WARN("Things are unpredictable");
+    }
+  };
+  CheckInitialisation("delta_cp", kDeltaCP);
+  CheckInitialisation("delm2_23", kDeltaM23);
+  CheckInitialisation("sin2th_23", kSinTheta23);
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
   flipdelM = false;
 
   randomize();
-
   Print();
-
-  MACH3LOG_INFO("Created oscillation parameter handler");
 }
 
 // *************************************
@@ -42,35 +43,13 @@ covarianceOsc::~covarianceOsc() {
 }
 
 // *************************************
-int covarianceOsc::CheckBounds() {
-// *************************************
-  int NOutside = 0;
-
-  // ensure osc params don't go unphysical
-  if (_fPropVal[0] > 1.0 || _fPropVal[0] < 0 ||
-      _fPropVal[kSinTheta23] > 1.0 || _fPropVal[kSinTheta23] < 0 ||
-      _fPropVal[2] > 1.0 || _fPropVal[2] < 0
-      //|| _fPropVal[kDeltaM23] < 0.0 || _fPropVal[kDeltaM23] > 20E-3 // don't let dm32 go to IH
-      //|| fabs(_fPropVal[kDeltaM23]) > 0.004 || fabs(_fPropVal[kDeltaM23]) < 0.001
-      //|| _fPropVal[kDeltaCP] < -1*TMath::Pi() || _fPropVal[kDeltaCP] > TMath::Pi()
-     ){ NOutside++;}
-  return NOutside;
-}
-
-// *************************************
 void covarianceOsc::proposeStep() {
 // *************************************
-
   covarianceBase::proposeStep();
 
-  // HW :: This method is a tad hacky but modular arithmetic gives me a headache.
-  //        It should now automatically set dcp to be with [-pi, pi]
-  if(_fPropVal[kDeltaCP] > TMath::Pi()) {
-    _fPropVal[kDeltaCP] = -1*TMath::Pi() + std::fmod(_fPropVal[kDeltaCP], TMath::Pi());
-  } else if (_fPropVal[kDeltaCP] < -TMath::Pi()) {
-    _fPropVal[kDeltaCP] = TMath::Pi() + std::fmod(_fPropVal[kDeltaCP], TMath::Pi());
-  }
-  
+  // HW It should now automatically set dcp to be with [-pi, pi]
+  CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
+
   // Okay now we've done the standard steps, we can add in our nice flips
   // hierarchy flip first
   if(random_number[0]->Uniform() < 0.5 && flipdelM){
@@ -85,10 +64,20 @@ void covarianceOsc::proposeStep() {
 }
 
 // *************************************
+//HW: This method is a tad hacky but modular arithmetic gives me a headache.
+void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
+// *************************************
+  if(_fPropVal[index] > UpBound) {
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
+  } else if (_fPropVal[index] < LowBound) {
+    _fPropVal[index] = UpBound + std::fmod(_fPropVal[index], UpBound);
+  }
+}
+
+// *************************************
 //KS: Print all useful information's after initialization
 void covarianceOsc::Print() {
 // *************************************
-
   MACH3LOG_INFO("Number of pars: {}", _fNumPar);
   MACH3LOG_INFO("Current: {} parameters:", matrixName);
 
