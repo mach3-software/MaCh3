@@ -17,12 +17,6 @@ jobs:
     container:
       image: ghcr.io/mach3-software/mach3:alma9v1.3.0
     steps:
-      - name: Install GitHub CLI (gh)
-        run: |
-          dnf install -y 'dnf-command(config-manager)'
-          dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-          dnf install -y gh
-
       - name: Get MaCh3 Validations
         run: |
           cd /opt/
@@ -51,6 +45,7 @@ jobs:
           name: memory-usage-plot
           path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
 
+
       - name: Read summary table
         id: read-summary
         run: |
@@ -66,17 +61,9 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "${{ env.summary_table }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
-          echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
-
-      - name: Get artifact ID and link
-        id: get-artifact-link
-        run: |
-          ARTIFACT_NAME="memory-usage-plot"
-          RUN_ID="${{ github.run_id }}"
-          REPO="${{ github.repository }}"
-          ARTIFACT_ID=$(gh api repos/${REPO}/actions/runs/${RUN_ID}/artifacts --jq ".artifacts[] | select(.name == \"${ARTIFACT_NAME}\") | .id")
-          echo "artifact_link=https://github.com/${REPO}/actions/runs/${RUN_ID}/artifacts/${ARTIFACT_ID}" >> "$GITHUB_ENV"
+          echo "### Find plots in artifacts below" >> $GITHUB_STEP_SUMMARY
+          #echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
+          #echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary and artifact link
         uses: peter-evans/create-or-update-comment@v3
@@ -90,6 +77,5 @@ jobs:
             ```
             ### Memory Usage Plot
             - **[Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**
-            - **[Download Memory Usage Plot Artifact](${{ env.artifact_link }})**
 
             You can view the memory usage plot directly in the job summary or download the artifact from the link above.
