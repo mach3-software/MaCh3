@@ -44,22 +44,39 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: memory-usage-plot
-          path: /opt/MaCh3Validations/build/memory_usage_plot.png
+          path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
 
 
-      - name: Copy memory usage plot to a location accessible for job summary
+      - name: Read summary table
+        id: read-summary
         run: |
-          cp /opt/MaCh3Validations/build/memory_usage_plot.png /tmp/memory_usage_plot.png
+          cd /opt/MaCh3Validations/build
+          cat summary_table.txt
+          echo "summary_table<<EOF" >> $GITHUB_ENV
+          cat summary_table.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-      - name: Update job summary with plot
+      - name: Update job summary with plot and table
         run: |
+          echo "### Memory and CPU Usage Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ env.summary_table }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
           echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
-
-      - name: Create PR comment with summary link
+      - name: Create PR comment with summary and artifact link
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            You can view the memory usage plot in the job summary: [Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            Hi, I am MaCh3-Telemetry bot
+            ### Memory and CPU Usage Summary
+            ```text
+            ${{ env.summary_table }}
+            ```
+            ### Memory Usage Plot
+            - **[Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**
+            - **[Download Memory Usage Plot Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)**
+
+            You can view the memory usage plot directly in the job summary or download the artifact from the link above.
