@@ -513,7 +513,6 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
   delete DummyAxis;
-  File->Close();
 
   return ReturnVec;
 }
@@ -981,7 +980,7 @@ void splineFDBase::PrintBinning(TAxis *Axis)
   std::cout << "\t";
   for (int iBin = 0; iBin < (NBins + 1); iBin++)
   {
-    std::cout << Axis->GetXbins()->GetAt(iBin) << " " << std::endl;
+    std::cout << Axis->GetXbins()->GetAt(iBin) << ", ";
   }
   std::cout << std::endl;
   return;
