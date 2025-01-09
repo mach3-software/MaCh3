@@ -68,10 +68,10 @@ max_cpu = max(cpu_data) if cpu_data else 0
 # Save the summary table in markdown format
 with open('summary_table.txt', 'w') as summary_file:
     summary_file.write(f"### Memory and CPU Usage Summary\n\n")
-    summary_file.write(f"| Metric | Mean     | Max     |\n")
-    summary_file.write(f"|--------|----------|---------|\n")
-    summary_file.write(f"| **RAM** | {mean_ram:.2f} MB | {max_ram:.2f} MB |\n")
-    summary_file.write(f"| **CPU** | {mean_cpu:.2f} %  | {max_cpu:.2f} %  |\n")
+    summary_file.write(f"| Metric  |     Mean    |      Max    |\n")
+    summary_file.write(f"|---------|-------------|-------------|\n")
+    summary_file.write(f"| **RAM** | {mean_ram:8.2f} MB | {max_ram:8.2f} MB |\n")
+    summary_file.write(f"| **CPU** | {mean_cpu:8.2f} %  | {max_cpu:8.2f} %  |\n")
 
 # Create a time axis (in seconds) corresponding to each memory reading
 time_data = [i * 0.1 for i in range(len(memory_data))]

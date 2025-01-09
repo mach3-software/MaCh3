@@ -4,7 +4,7 @@ name: MaCh3 Telemetry
 
 on:
   pull_request:
-    branches: [ develop ]
+    types: [opened]
 
 permissions:
   issues: write
@@ -78,4 +78,4 @@ jobs:
             ### Memory Usage Plot
             - **[Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**
 
-            You can view the memory usage plot directly in the job summary or download the artifact from the link above.
+            You can view the memory usage plot directly in the job summary from the link above.
