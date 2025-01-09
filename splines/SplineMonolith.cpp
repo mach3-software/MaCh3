@@ -438,47 +438,54 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
     numParams = short(MasterSpline[EventCounter].size());
 
     int nSplines_SingleEvent = 0;
+    int nPoints = 0;
     // Loop over each pointer
     for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
-      // If NULL we don't have this spline for the event, so move to next spline
-      if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
 
-      if(SplineType[ParamNumber] == kTSpline3_red)
-      {
-        TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
-        TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(TespFunc);
-        int nPoints = CurrSpline->GetNp();
-        if (nPoints > MaxPoints) {
-          MaxPoints = static_cast<short int>(nPoints);
-        }
-        numKnots += nPoints;
-        nSplines_SingleEvent++;
-
-        // Fill the SplineInfoArray entries with information on each splinified parameter
-        if (SplineInfoArray[ParamNumber].xPts == NULL)
+      if (MasterSpline[EventCounter][ParamNumber]) {
+        if(SplineType[ParamNumber] == kTSpline3_red)
         {
-          // Fill the number of points
-          SplineInfoArray[ParamNumber].nPts = CurrSpline->GetNp();
-
-          // Fill the x points
-          SplineInfoArray[ParamNumber].xPts = new M3::float_t[SplineInfoArray[ParamNumber].nPts];
-          for (M3::int_t k = 0; k < SplineInfoArray[ParamNumber].nPts; ++k)
-          {
-            M3::float_t xtemp = M3::float_t(-999.99);
-            M3::float_t ytemp = M3::float_t(-999.99);
-            CurrSpline->GetKnot(k, xtemp, ytemp);
-            SplineInfoArray[ParamNumber].xPts[k] = xtemp;
+          TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
+          TSpline3_red* CurrSpline = dynamic_cast<TSpline3_red*>(TespFunc);
+          if(CurrSpline){
+            nPoints = CurrSpline->GetNp();
           }
+
+          if (nPoints > MaxPoints) {
+            MaxPoints = static_cast<short int>(nPoints);
+          }
+          numKnots += nPoints;
+          nSplines_SingleEvent++;
+
+          // Fill the SplineInfoArray entries with information on each splinified parameter
+          if (SplineInfoArray[ParamNumber].xPts == NULL)
+          {
+            // Fill the number of points
+            SplineInfoArray[ParamNumber].nPts = CurrSpline->GetNp();
+
+            // Fill the x points
+            SplineInfoArray[ParamNumber].xPts = new M3::float_t[SplineInfoArray[ParamNumber].nPts];
+            for (M3::int_t k = 0; k < SplineInfoArray[ParamNumber].nPts; ++k)
+            {
+              M3::float_t xtemp = M3::float_t(-999.99);
+              M3::float_t ytemp = M3::float_t(-999.99);
+              CurrSpline->GetKnot(k, xtemp, ytemp);
+              SplineInfoArray[ParamNumber].xPts[k] = xtemp;
+            }
+          }
+          NSplinesValid++;
         }
-        NSplinesValid++;
-      }
-      else if (SplineType[ParamNumber] == kTF1_red)
-      {
-        TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
-        TF1_red* CurrSpline = dynamic_cast<TF1_red*>(TespFunc);
-        int nPoints = CurrSpline->GetSize();
-        nTF1_coeff += nPoints;
-        nTF1Valid++;
+        else if (SplineType[ParamNumber] == kTF1_red)
+        {
+          TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
+          TF1_red* CurrSpline = dynamic_cast<TF1_red*>(TespFunc);
+          nPoints = CurrSpline->GetSize();
+          nTF1_coeff += nPoints;
+          nTF1Valid++;
+        }
+      } else {
+        // If NULL we don't have this spline for the event, so move to next spline
+        continue;
       }
     }
     if (nSplines_SingleEvent > nMaxSplines_PerEvent) nMaxSplines_PerEvent = nSplines_SingleEvent;

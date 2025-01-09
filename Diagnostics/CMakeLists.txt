@@ -7,6 +7,7 @@ foreach(app
     GetPenaltyTerm
     ProcessMCMC
     CombineMaCh3Chains
+    PlotMCMCDiag
     )
     add_executable(${app} ${app}.cpp)
     add_dependencies(DiagApps ${app})
@@ -14,5 +15,3 @@ foreach(app
 
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
-
-install(DIRECTORY Diagnostics_utils DESTINATION Diagnostics USE_SOURCE_PERMISSIONS)

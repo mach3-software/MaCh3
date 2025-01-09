@@ -82,10 +82,6 @@ class covarianceXsec : public covarianceBase {
       }
       return prior;
     }
-    /// @brief Get prior for a given param
-    /// @param i parameter index
-    inline double getNominal(const int i) override { return _fPreFitValue.at(i); };
-
     /// @brief Checks if parameter belongs to a given group
     /// @param i parameter index
     /// @param Group name of group, like Xsec or Flux
