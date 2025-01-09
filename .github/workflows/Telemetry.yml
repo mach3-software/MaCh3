@@ -17,6 +17,12 @@ jobs:
     container:
       image: ghcr.io/mach3-software/mach3:alma9v1.3.0
     steps:
+      - name: Install GitHub CLI (gh)
+        run: |
+          dnf install -y 'dnf-command(config-manager)'
+          dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+          dnf install -y gh
+
       - name: Get MaCh3 Validations
         run: |
           cd /opt/
@@ -35,7 +41,6 @@ jobs:
       - name: Run memory telemetry and generate plot
         run: |
           cd /opt/MaCh3Validations/build
-          find -iname "RAM.sh"
           ./_deps/mach3-src/.github/CIscripts/RAM.sh
 
       - name: Upload memory usage plot artifact
@@ -45,7 +50,6 @@ jobs:
         with:
           name: memory-usage-plot
           path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
-
 
       - name: Read summary table
         id: read-summary
@@ -72,7 +76,7 @@ jobs:
           RUN_ID="${{ github.run_id }}"
           REPO="${{ github.repository }}"
           ARTIFACT_ID=$(gh api repos/${REPO}/actions/runs/${RUN_ID}/artifacts --jq ".artifacts[] | select(.name == \"${ARTIFACT_NAME}\") | .id")
-          echo "artifact_link=https://github.com/${REPO}/actions/runs/${RUN_ID}/artifacts/${ARTIFACT_ID}" >> $GITHUB_ENV
+          echo "artifact_link=https://github.com/${REPO}/actions/runs/${RUN_ID}/artifacts/${ARTIFACT_ID}" >> "$GITHUB_ENV"
 
       - name: Create PR comment with summary and artifact link
         uses: peter-evans/create-or-update-comment@v3
