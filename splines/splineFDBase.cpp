@@ -508,7 +508,6 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
   delete DummyAxis;
-  File->Close();
 
   return ReturnVec;
 }
