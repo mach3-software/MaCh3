@@ -40,7 +40,7 @@ jobs:
       - name: Upload memory usage plot artifact
         id: upload-artifact
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: memory-usage-plot
           path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
@@ -66,7 +66,7 @@ jobs:
           #echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary and artifact link
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
