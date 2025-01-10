@@ -40,7 +40,7 @@ jobs:
       - name: Upload memory usage plot artifact
         id: upload-artifact
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: memory-usage-plot
           path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
