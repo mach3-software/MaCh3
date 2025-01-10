@@ -1309,7 +1309,6 @@ void samplePDFFDBase::SetupNuOscillator() {
                   [this, iSample, &OscillFactory]() {
                     this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
                   });
-      //NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
 
       if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
         std::vector<M3::float_t> EnergyArray;

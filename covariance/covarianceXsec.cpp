@@ -179,8 +179,7 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
     std::vector<std::vector<double>> TempKinematicBounds;
     //First element of TempKinematicBounds is always -999, and size is then 3
     for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
-      //ETA
-      //This is a bit messy, Kinematic cuts is a list of maps
+      //ETA: This is a bit messy, Kinematic cuts is a list of maps
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());

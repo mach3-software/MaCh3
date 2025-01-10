@@ -4,7 +4,7 @@
 
 // *************************
 manager::manager(std::string const &filename)
-    : config(YAML::LoadFile(filename)) {
+    : config(M3OpenConfig(filename)) {
 // *************************
   FileName = filename;
   SetMaCh3LoggerFormat();
@@ -100,4 +100,3 @@ void manager::Print() {
   MaCh3Utils::PrintConfig(config);
   MACH3LOG_INFO("---------------------------------");
 }
-

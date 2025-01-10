@@ -165,7 +165,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(YAMLFile[i]);
+    YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
     for (const auto& item : YAMLDocTemp["Systematics"]) {
       _fYAMLDoc["Systematics"].push_back(item);
     }
