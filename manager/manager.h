@@ -31,7 +31,7 @@ public:
   void Print();
 
   /// @brief Get likelihood type defined in the config
-  inline int GetMCStatLLH(){return mc_stat_llh;}
+  int GetMCStatLLH();
   /// @brief Return name of config
   inline std::string GetFileName(){return FileName;}
   /// @brief Return config
@@ -56,8 +56,6 @@ private:
   YAML::Node config;
   /// The name of the configuration file.
   std::string FileName;
-  /// The likelihood type defined in the configuration.
-  int mc_stat_llh;
   /// MaCh3 Modes
   MaCh3Modes* Modes;
 };
