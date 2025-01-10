@@ -27,6 +27,8 @@
 
 /// @file gpuUtils.cuh
 /// @brief Common CUDA utilities and definitions for shared GPU functionality.
+/// @author Richard Calland
+/// @author Kamil Skwarczynski
 
 /// @todo KS: There is plenty of useful stuff here https://github.com/NVIDIA/cuda-samples/blob/master/Samples/1_Utilities/deviceQuery/deviceQuery.cpp
 /// @todo KS: We might want to port some of these utilities, for example having bool if there is unified memory etc.
