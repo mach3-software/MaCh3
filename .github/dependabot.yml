@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "weekly" # Check for updates on a weekly basis
     commit-message:
-      prefix: "fix"
+      prefix: "tidy"
 
   # Update Python dependencies
   - package-ecosystem: "pip"
