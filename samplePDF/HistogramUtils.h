@@ -1,9 +1,12 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 // ROOT include
 #include "TGraphAsymmErrors.h"
 #include "TLorentzVector.h"
 #include "TObjString.h"
+#pragma GCC diagnostic pop
 
 // MaCh3 inlcudes
 #include "samplePDF/Structs.h"
