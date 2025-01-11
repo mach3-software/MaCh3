@@ -5,10 +5,18 @@
 #include "manager/YamlHelper.h"
 #include "manager/MaCh3Exception.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT Things
 #include "TColor.h"
 #include "TH1.h"
 #include "TStyle.h"
+#pragma GCC diagnostic pop
 
 namespace MaCh3Plotting {
 /// @author Ewan Miller

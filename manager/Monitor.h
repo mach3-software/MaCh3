@@ -8,7 +8,11 @@
 #include <cstdlib>
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT include
 #include "TTree.h"
 #include "TBranch.h"

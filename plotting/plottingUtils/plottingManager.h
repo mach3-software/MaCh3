@@ -9,11 +9,6 @@
 #include <unistd.h>
 #include <vector>
 
-// ROOT includes
-#include "TColor.h"
-#include "TH1.h"
-#include "TStyle.h"
-
 // MaCh3 Includes
 #include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"

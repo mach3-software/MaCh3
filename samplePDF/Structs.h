@@ -66,7 +66,11 @@ constexpr static const int Unity_Int = 1;
 #include "manager/MaCh3Logger.h"
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT include
 #include "TSpline.h"
 #include "TObjString.h"

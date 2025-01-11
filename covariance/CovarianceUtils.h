@@ -1,5 +1,12 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT includes
 #include "TMatrixT.h"
 #include "TMatrixDSym.h"
@@ -17,6 +24,7 @@
 #include "TMatrixDSymEigen.h"
 #include "TMatrixDEigen.h"
 #include "TDecompSVD.h"
+#pragma GCC diagnostic pop
 
 #ifdef MULTITHREAD
 #include "omp.h"

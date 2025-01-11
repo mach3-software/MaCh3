@@ -10,6 +10,13 @@
 #include <iostream>
 #include <map>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT
 #include "TCanvas.h"
 #include "TGraph2D.h"
@@ -29,6 +36,7 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TMultiGraph.h"
+#pragma GCC diagnostic pop
 
 namespace MaCh3Plotting {
 /// @defgroup Utils Plotting Utility Functions
