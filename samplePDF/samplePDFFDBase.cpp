@@ -746,13 +746,15 @@ void samplePDFFDBase::SetupNormParameters() {
   }
 }
 
+// ************************************************
 //A way to check whether a normalisation parameter applies to an event or not
-void samplePDFFDBase::CalcXsecNormsBins(int iSample){
+void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
+// ************************************************
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   #ifdef DEBUG
   std::vector<int> VerboseCounter(xsec_norms.size(), 0);
   #endif
-  for(int iEvent=0; iEvent < fdobj->nEvents; ++iEvent){
+  for(int iEvent = 0; iEvent < fdobj->nEvents; ++iEvent){
     std::vector< int > XsecBins = {};
     if (XsecCov) {
       // Skip oscillated NC events
@@ -765,68 +767,28 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
       for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
-        bool TargetMatch = false;
-        //If no target specified then apply to all modes
-        if ((*it).targets.size()==0) {
-          TargetMatch=true;
-        } else {
-          for (unsigned iTarget=0;iTarget<(*it).targets.size();iTarget++) {
-            if ((*it).targets.at(iTarget)== *(fdobj->Target[iEvent])) {
-              TargetMatch=true;
-            }
-          }
-        }
+        bool TargetMatch = MatchCondition((*it).targets, *(fdobj->Target[iEvent]));
         if (!TargetMatch) {
           MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, *(fdobj->Target[iEvent]), (*it).name);
           continue;
         }
 
         //Now check that the neutrino flavour in an interaction matches with the normalisation parameters
-        bool FlavourMatch=false;
-        //If no mode specified then apply to all modes
-        if ((*it).pdgs.size()==0) {
-          FlavourMatch=true;
-        } else {
-          for (unsigned iPDG=0;iPDG<(*it).pdgs.size();iPDG++) {
-            if ((*it).pdgs.at(iPDG)== (*fdobj->nupdg[iEvent])) {
-              FlavourMatch=true;
-            }
-          }
-        }
+        bool FlavourMatch = MatchCondition((*it).pdgs, *(fdobj->nupdg[iEvent]));
         if (!FlavourMatch) {
           MACH3LOG_TRACE("Event {}, missed PDG check ({}) for dial {}", iEvent,(*fdobj->nupdg[iEvent]), (*it).name);
           continue;
         }
 
         //Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
-        bool FlavourUnoscMatch=false;
-        //If no mode specified then apply to all modes
-        if ((*it).preoscpdgs.size()==0) {
-          FlavourUnoscMatch=true;
-        } else {
-          for (unsigned iPDG=0;iPDG<(*it).preoscpdgs.size();iPDG++) {
-            if ((*it).preoscpdgs.at(iPDG) == (*fdobj->nupdgUnosc[iEvent])) {
-              FlavourUnoscMatch=true;
-            }
-          }
-        }
+        bool FlavourUnoscMatch = MatchCondition((*it).preoscpdgs, *(fdobj->nupdgUnosc[iEvent]));
         if (!FlavourUnoscMatch){
           MACH3LOG_TRACE("Event {}, missed FlavourUnosc check ({}) for dial {}", iEvent,(*fdobj->nupdgUnosc[iEvent]), (*it).name);
           continue;
         }
 
         //Now check that the mode of an interaction matches with the normalisation parameters
-        bool ModeMatch=false;
-        //If no mode specified then apply to all modes
-        if ((*it).modes.size()==0) {
-          ModeMatch=true;
-        } else {
-          for (unsigned imode=0;imode<(*it).modes.size();imode++) {
-            if ((*it).modes.at(imode)== *(fdobj->mode[iEvent])) {
-              ModeMatch=true;
-            }
-          }
-        }
+        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(*(fdobj->mode[iEvent])));
         if (!ModeMatch) {
           MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(fdobj->mode[iEvent]), (*it).name);
           continue;
