@@ -63,24 +63,37 @@ void LoggerPrint(const std::string& LibName, LogFunc logFunction, Func&& func, A
   // Create a stringstream to capture the output
   std::stringstream sss;
   // Save the original stream buffers
-  std::streambuf* coutBuf = std::cout.rdbuf();
-  std::streambuf* cerrBuf = std::cerr.rdbuf();
+  std::streambuf* coutBuf = nullptr;
+  std::streambuf* cerrBuf = nullptr;
 
-  // Redirect std::cout and std::cerr to the stringstream buffer
-  std::cout.rdbuf(sss.rdbuf());
-  std::cerr.rdbuf(sss.rdbuf());
+  // This should be rare but in case buffers no longer exist ignore
+  if (std::cout.rdbuf() && std::cerr.rdbuf()) {
+    coutBuf = std::cout.rdbuf();  // Save original cout buffer
+    cerrBuf = std::cerr.rdbuf();  // Save original cerr buffer
 
-  // Call the provided function
-  func(std::forward<Args>(args)...);
+    // Redirect std::cout and std::cerr to the stringstream buffer
+    std::cout.rdbuf(sss.rdbuf());
+    std::cerr.rdbuf(sss.rdbuf());
+  }
 
-  // Restore the original stream buffers
-  std::cout.rdbuf(coutBuf);
-  std::cerr.rdbuf(cerrBuf);
+  try {
+    // Call the provided function
+    func(std::forward<Args>(args)...);
 
-  std::string line;
-  while (std::getline(sss, line))
-  {
-    auto formatted_message = fmt::format("[{}] {}", LibName, line);
-    logFunction(formatted_message);
+    // Restore the original stream buffers
+    if (coutBuf) std::cout.rdbuf(coutBuf);
+    if (cerrBuf) std::cerr.rdbuf(cerrBuf);
+
+    std::string line;
+    while (std::getline(sss, line))
+    {
+      auto formatted_message = fmt::format("[{}] {}", LibName, line);
+      logFunction(formatted_message);
+    }
+  } catch (...) {
+    // Restore the original buffers in case of an exception
+    std::cout.rdbuf(coutBuf);
+    std::cerr.rdbuf(cerrBuf);
+    throw;
   }
 }
