@@ -1,3 +1,10 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT includes
 #include "TList.h"
 #include "TFile.h"
@@ -7,6 +14,7 @@
 #include "TFileMerger.h"
 #include "TKey.h"
 #include "TROOT.h"
+#pragma GCC diagnostic pop
 
 // MaCh3 includes
 #include "manager/manager.h"

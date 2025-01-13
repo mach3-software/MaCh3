@@ -6,10 +6,17 @@
 #include <string>
 #include <cxxabi.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT Includes
 #include "TMacro.h"
 #include "TList.h"
 #include "TObjString.h"
+#pragma GCC diagnostic pop
 
 // yaml Includes
 #include "yaml-cpp/yaml.h"

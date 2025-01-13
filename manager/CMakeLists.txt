@@ -26,7 +26,7 @@ if(NOT CPU_ONLY)
 endif()
 
 #If compiling with GPU is not enabled MaCh3GPUCompilerOptions will be empty
-target_link_libraries(Manager PUBLIC MaCh3CompilerOptions MaCh3GPUCompilerOptions yaml-cpp spdlog NuOscillator ROOT::Tree ROOT::Hist)
+target_link_libraries(Manager PUBLIC MaCh3CompilerOptions MaCh3GPUCompilerOptions yaml-cpp spdlog NuOscillator ROOT::Tree ROOT::Hist ROOT::Physics)
 target_link_libraries(Manager PRIVATE MaCh3Warnings)
 
 target_include_directories(Manager PUBLIC

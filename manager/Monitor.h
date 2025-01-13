@@ -7,12 +7,19 @@
 #include <vector>
 #include <cstdlib>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT include
 #include "TTree.h"
 #include "TBranch.h"
 #include "TMacro.h"
 #include "TChain.h"
 #include "TStopwatch.h"
+#pragma GCC diagnostic pop
 
 // MaCh3 includes
 #include "manager/MaCh3Logger.h"

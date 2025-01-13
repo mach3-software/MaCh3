@@ -1,7 +1,6 @@
 // MaCh3 includes
 #include "mcmc/MaCh3Factory.h"
 
-
 // ********************************************
 std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
 // ********************************************
