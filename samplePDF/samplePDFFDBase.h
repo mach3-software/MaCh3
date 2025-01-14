@@ -240,5 +240,4 @@ public:
   std::vector<int> sample_vecno;
   std::vector<int> sample_nupdg;
   std::vector<int> sample_nupdgunosc;
-  std::vector<bool> sample_signal;
 };
