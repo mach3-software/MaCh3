@@ -12,6 +12,9 @@
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
+/// @file MaCh3Factory.h
+/// @brief Factory methods for MaCh3 software which streamline initialisation of different objects
+/// @author Kamil Skwarczynski
 
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
 /// @param fitMan pointer to Manager class
@@ -23,6 +26,17 @@
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
 std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan);
+
+/// @brief Initializes the config manager class and allows overriding settings via command-line arguments.
+/// @param argc number of arguments
+/// @param argv name of arguments
+/// @return A unique pointer to the initialized `manager` instance with optional overrides applied.
+/// @example Usage examples:
+/// ```
+/// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root
+/// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root General:MCMC:NSteps:50000
+/// ```
+std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
 
 /// @brief Factory function for creating a covariance class for systematic handling.
 covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix);
