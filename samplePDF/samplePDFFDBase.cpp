@@ -758,7 +758,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
       // Not strictly needed, but these events don't get included in oscillated predictions, so
       // no need to waste our time calculating and storing information about xsec parameters
       // that will never be used.
-      if (fdobj->isNC[iEvent] && (fdobj->nupdg[iEvent] == fdobj->nupdgUnosc[iEvent]) ) {
+      if (fdobj->isNC[iEvent] && (fdobj->nupdg[iEvent] != fdobj->nupdgUnosc[iEvent]) ) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
         continue;
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
@@ -1346,7 +1346,7 @@ void samplePDFFDBase::SetupNuOscillator() {
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
 #endif
       if (MCSamples[iSample].isNC[iEvent]) {
-        if (MCSamples[iSample].nupdg[iEvent] == MCSamples[iSample].nupdgUnosc[iEvent]) {
+        if (MCSamples[iSample].nupdg[iEvent] != MCSamples[iSample].nupdgUnosc[iEvent]) {
 #ifdef _LOW_MEMORY_STRUCTS_
           MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
 #else
