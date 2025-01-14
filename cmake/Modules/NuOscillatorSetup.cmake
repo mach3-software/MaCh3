@@ -70,7 +70,7 @@ CPMAddPackage(
   NAME NuOscillator
     VERSION 1.1.0
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "v1.1.0"
+    GIT_TAG "dbarrow257/feature/BetterThrowing"
     GIT_SHALLOW YES
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
