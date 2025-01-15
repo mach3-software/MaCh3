@@ -529,7 +529,6 @@ void samplePDFFDBase::fillArray_MP()  {
     if(SplineHandler){
       SplineHandler->Evaluate();
     }
-    //KS: I don't have time right now but replacing below omp with this might significantly improve performance #pragma omp for collpase(2)
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
       #pragma omp for
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
