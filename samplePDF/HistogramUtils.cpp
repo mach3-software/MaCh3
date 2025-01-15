@@ -453,7 +453,10 @@ void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom
   FluctHist->Fill(0.0, 0.0);
 
   const double evrate = PolyHist->Integral();
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
   const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
   int count = 0;
   while(count < num)
   {
@@ -502,7 +505,10 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
   FluctHist->Fill(0.0, 0.0, 0.0);
 
   const double evrate = NoOverflowIntegral(PolyHist);
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
   const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
   int count = 0;
   while(count < num)
   {
