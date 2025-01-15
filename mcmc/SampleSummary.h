@@ -1,8 +1,5 @@
 #pragma once
 
-// ROOT includes
-#include "TROOT.h"
-
 // MaCh3 includes
 #include "samplePDF/samplePDFBase.h"
 #include "mcmc/StatisticalUtils.h"

@@ -189,7 +189,7 @@ void splineFDBase::TransferToMonolith()
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
-					  manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+			manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
                   delete[] tmpXCoeffArr;
@@ -205,14 +205,11 @@ void splineFDBase::TransferToMonolith()
       }//syst2 loop end
     }//osc loop end
   }//syst1 loop end
-
-  return;
 }
 
 // *****************************************
 void splineFDBase::Evaluate() {
 // *****************************************
-
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
   FindSplineSegment();
@@ -222,8 +219,6 @@ void splineFDBase::Evaluate() {
 
   //KS: Huge MP loop over all events calculating total weight
   ModifyWeights();
-
-  return;
 }
 
 //****************************************
@@ -508,7 +503,6 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
   delete DummyAxis;
-  File->Close();
 
   return ReturnVec;
 }
@@ -647,10 +641,10 @@ void splineFDBase::PrepForReweight() {
             break;
           }
         }//osc loop end
-		 //ETA - only push back unique name if a non-flat response has been found
-		if(FoundNonFlatSpline){
-		  UniqueSystNames.push_back(SystName);
-		}
+	//ETA - only push back unique name if a non-flat response has been found
+	if(FoundNonFlatSpline){
+	  UniqueSystNames.push_back(SystName);
+	}
 
         if (!FoundNonFlatSpline)
         {
@@ -816,8 +810,6 @@ void splineFDBase::PrintSampleDetails(std::string SampleName)
   MACH3LOG_INFO("\t DetID: {:<35}", DetIDs[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
-
-  return;
 }
 
 //****************************************
@@ -942,8 +934,9 @@ void splineFDBase::PrintBinning(TAxis *Axis)
 //****************************************
 {
   const int NBins = Axis->GetNbins();
-  for (int iBin = 0; iBin < (NBins + 1); iBin++)
-  {
-    MACH3LOG_INFO("{}", Axis->GetXbins()->GetAt(iBin));
+  std::string text = "";
+  for (int iBin = 0; iBin <= NBins; iBin++) {
+    text += fmt::format("{} ", Axis->GetXbins()->GetAt(iBin));
   }
+  MACH3LOG_INFO("{}", text);
 }

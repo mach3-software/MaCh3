@@ -8,6 +8,13 @@
 #include <complex>
 #include <cstdio>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT includes
 #include "TFile.h"
 #include "TBranch.h"
@@ -31,6 +38,8 @@
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
 #include "TVirtualFFT.h"
+#pragma GCC diagnostic pop
+
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"

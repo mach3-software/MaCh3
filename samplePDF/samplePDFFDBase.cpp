@@ -748,7 +748,6 @@ void samplePDFFDBase::SetupNormParameters() {
 
 //A way to check whether a normalisation parameter applies to an event or not
 void samplePDFFDBase::CalcXsecNormsBins(int iSample){
-
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   #ifdef DEBUG
   std::vector<int> VerboseCounter(xsec_norms.size(), 0);
@@ -881,13 +880,10 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
   }
   MACH3LOG_DEBUG("└──────────────────────────────────────────────────────────┘");
   #endif
-
-  return;
 }
 
 //ETA - this is all a bit (less) stupid
 void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
-  
   _hPDF1D->Reset();
   _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
   dathist->SetBins(int(XVec.size()-1), XVec.data());
@@ -1144,8 +1140,9 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
   FindNominalBinAndEdges2D();
 }
 
+// ************************************************
 void samplePDFFDBase::FindNominalBinAndEdges2D() {
-
+// ************************************************
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
@@ -1295,14 +1292,21 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
 }
 
+// ************************************************
 void samplePDFFDBase::SetupNuOscillator() {
+// ************************************************
   OscillatorFactory* OscillFactory = new OscillatorFactory();  
 
   NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
     if(OscCov){
       MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
-      NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(NuOscillatorConfigFile);
+
+      LoggerPrint("NuOscillator",
+                  [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+                  [this, iSample, &OscillFactory]() {
+                    this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
+                  });
 
       if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
         std::vector<M3::float_t> EnergyArray;
@@ -1382,7 +1386,6 @@ void samplePDFFDBase::SetupNuOscillator() {
       } // end if NC
     } // end loop over events
   }// end loop over channels
-  
   delete OscillFactory;
 
   OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
@@ -1436,7 +1439,10 @@ void samplePDFFDBase::fillSplineBins() {
   }
 }
 
+// ************************************************
 double samplePDFFDBase::GetLikelihood() {
+// ************************************************
+
   if (samplePDFFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);

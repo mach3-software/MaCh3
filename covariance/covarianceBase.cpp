@@ -107,9 +107,9 @@ void covarianceBase::init(std::string name, std::string file) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  TMatrixDSym *CovMat = infile->Get<TMatrixDSym>(name.c_str());
+  TMatrixDSym *CovMat = static_cast<TMatrixDSym*>(infile->Get(name.c_str()));
 
-  if (CovMat == nullptr) {
+  if (!CovMat) {
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -166,7 +166,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(YAMLFile[i]);
+    YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
     for (const auto& item : YAMLDocTemp["Systematics"]) {
       _fYAMLDoc["Systematics"].push_back(item);
     }

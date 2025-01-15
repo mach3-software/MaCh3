@@ -58,14 +58,6 @@ constexpr static const int Unity_Int = 1;
 #include <list>
 #include <unordered_map>
 
-// ROOT include
-#include "TSpline.h"
-#include "TObjString.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "TH2Poly.h"
-#include "TH1.h"
-
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
@@ -74,7 +66,19 @@ constexpr static const int Unity_Int = 1;
 #include "manager/MaCh3Logger.h"
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+// ROOT include
+#include "TSpline.h"
+#include "TObjString.h"
+#include "TFile.h"
+#include "TF1.h"
+#include "TH2Poly.h"
+#include "TH1.h"
+// NuOscillator includes
 #include "Constants/OscillatorConstants.h"
 #pragma GCC diagnostic pop
 

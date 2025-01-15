@@ -1,7 +1,15 @@
 #pragma once
 
-//ROOT
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// ROOT includes
 #include "TH3F.h"
+#pragma GCC diagnostic pop
 
 //MaCh3
 #include "samplePDF/Structs.h"

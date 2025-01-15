@@ -1,14 +1,4 @@
-#include <iostream>
-#include <algorithm>
-
-#include "TFile.h"
-#include "TH2D.h"
-#include "TCanvas.h"
-#include "TStyle.h"
-#include "TError.h"
-#include "TPaletteAxis.h"
-#include "TColor.h"
-
+//MaCh3 Includes
 #include "plottingUtils/plottingUtils.h"
 #include "plottingUtils/plottingManager.h"
 

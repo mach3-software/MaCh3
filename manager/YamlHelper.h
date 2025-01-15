@@ -6,10 +6,17 @@
 #include <string>
 #include <cxxabi.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT Includes
 #include "TMacro.h"
 #include "TList.h"
 #include "TObjString.h"
+#pragma GCC diagnostic pop
 
 // yaml Includes
 #include "yaml-cpp/yaml.h"
@@ -298,3 +305,21 @@ Type GetFromManager(const YAML::Node& node, Type defval, const std::string File 
   }
 }
 
+// **********************
+/// @brief Open YAML file
+/// @param filename name of filename to open
+/// @param File name of file where function is called
+/// @param Line number where function is called
+inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string& File, const int Line) {
+// **********************
+  try {
+    return YAML::LoadFile(filename);
+  } catch (const std::exception& e) {
+    MACH3LOG_ERROR("{}", e.what());
+    MACH3LOG_ERROR("Can't open file {}", filename);
+    throw MaCh3Exception(File, Line);
+  }
+}
+
+/// Macro to simplify calling LoadYaml with file and line info
+#define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)
