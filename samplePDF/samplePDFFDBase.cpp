@@ -137,6 +137,7 @@ void samplePDFFDBase::ReadSampleConfig()
   std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
   
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+    oscchan_flavnames.push_back(osc_channel["name"].as<std::string>());
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
@@ -1480,6 +1481,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
+  fdobj->flavourName = oscchan_flavnames[iSample];
   
   int nEvents = fdobj->nEvents;
   fdobj->x_var.resize(nEvents, &Unity);
