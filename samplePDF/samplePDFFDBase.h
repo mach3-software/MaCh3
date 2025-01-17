@@ -40,7 +40,7 @@ public:
   //===============================================================================
 
   void reweight() override;
-  M3::float_t GetEventWeight(int iSample, int iEntry);
+  M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
@@ -132,11 +132,16 @@ public:
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent);
+  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent);
-  /// @brief Virtual so this can be over-riden in an experiment derived class
-  virtual M3::float_t CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
+  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent) const;
+
+  /// @brief Calculate weights for function parameters
+  ///
+  /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
+  /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
+  /// This way func weight shall be used in GetEventWeight
+  virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
