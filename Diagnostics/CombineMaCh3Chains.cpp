@@ -5,6 +5,9 @@
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// C++ includes
+#include <unistd.h>
+
 // ROOT includes
 #include "TList.h"
 #include "TFile.h"

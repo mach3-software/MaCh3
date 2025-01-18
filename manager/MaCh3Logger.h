@@ -9,6 +9,8 @@
 #include <functional>
 #include <string>
 
+#include <exception>
+
 /// @file MaCh3Logger.h
 /// @brief KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284
 
@@ -61,7 +63,9 @@ template <typename Func, typename LogFunc, typename... Args>
 void LoggerPrint(const std::string& LibName, LogFunc logFunction, Func&& func, Args&&... args)
 {
   // Create a stringstream to capture the output
-  std::stringstream sss;
+  std::stringstream sss_cout;
+  std::stringstream sss_cerr;
+  
   // Save the original stream buffers
   std::streambuf* coutBuf = nullptr;
   std::streambuf* cerrBuf = nullptr;
@@ -72,8 +76,8 @@ void LoggerPrint(const std::string& LibName, LogFunc logFunction, Func&& func, A
     cerrBuf = std::cerr.rdbuf();  // Save original cerr buffer
 
     // Redirect std::cout and std::cerr to the stringstream buffer
-    std::cout.rdbuf(sss.rdbuf());
-    std::cerr.rdbuf(sss.rdbuf());
+    std::cout.rdbuf(sss_cout.rdbuf());
+    std::cerr.rdbuf(sss_cerr.rdbuf());
   }
 
   try {
@@ -85,15 +89,26 @@ void LoggerPrint(const std::string& LibName, LogFunc logFunction, Func&& func, A
     if (cerrBuf) std::cerr.rdbuf(cerrBuf);
 
     std::string line;
-    while (std::getline(sss, line))
+    while (std::getline(sss_cout, line))
     {
       auto formatted_message = fmt::format("[{}] {}", LibName, line);
       logFunction(formatted_message);
     }
-  } catch (...) {
+    while (std::getline(sss_cerr, line))
+    {
+      auto formatted_message = fmt::format("[{}] {}", LibName, line);
+      logFunction(formatted_message);
+    }
+  } catch (std::runtime_error &err) {
     // Restore the original buffers in case of an exception
     std::cout.rdbuf(coutBuf);
     std::cerr.rdbuf(cerrBuf);
+
+    std::cout << "\nConsole cout output:" << std::endl;
+    std::cout << sss_cout.rdbuf()->str() << std::endl;
+
+    std::cout << "\nConsole cerr output:" << std::endl;
+    std::cout << sss_cerr.rdbuf()->str() << std::endl;
     throw;
   }
 }
