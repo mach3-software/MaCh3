@@ -44,7 +44,16 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
 
   // Initialise manger responsible for config handling
   auto FitManager = std::make_unique<manager>(argv[1]);
-
+  
+  //KS: Lambda to make sure we are not overwriting setting which should be committed
+  auto SanityOverwrite = [](const std::string& Name) {
+    if (Name.find("Systematics") != std::string::npos ||
+        Name.find("Samples") != std::string::npos)
+    {
+      MACH3LOG_WARN("You are overwriting settings ({}) that are highly likely intended to be committed.", Name);
+    }
+  };
+  
   for (int i = 2; i < argc; ++i)
   {
     const std::string arg = argv[i];
@@ -57,6 +66,7 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
       const std::string value = arg.substr(firstColon + 1);
 
       MACH3LOG_INFO("Overriding setting: Section={}, Value={}", section, value);
+      SanityOverwrite(section);
       FitManager->OverrideSettings(section, value);
     } else if (colonCount == 2) {
       const size_t firstColon = arg.find(':');
@@ -67,6 +77,8 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
       const std::string value = arg.substr(secondColon + 1);
 
       MACH3LOG_INFO("Overriding setting: Section={}, Key={}, Value={}", section, key, value);
+      SanityOverwrite(section);
+      SanityOverwrite(key);
       FitManager->OverrideSettings(section, key, value);
     } else if (colonCount == 3) {
       const size_t firstColon = arg.find(':');
@@ -79,6 +91,9 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
       const std::string value = arg.substr(thridColon + 1);
 
       MACH3LOG_INFO("Overriding setting: Section={}, Key={}, Key={}, Value={}", section, key, key2, value);
+      SanityOverwrite(section);
+      SanityOverwrite(key);
+      SanityOverwrite(key2);
       FitManager->OverrideSettings(section, key, key2, value);
     } else {
       MACH3LOG_ERROR("Invalid override argument format: {}", arg);
