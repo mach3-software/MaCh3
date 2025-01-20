@@ -11,6 +11,7 @@
 #include "TGraphAsymmErrors.h"
 #include "TLorentzVector.h"
 #include "TObjString.h"
+#include "TRandom3.h"
 #pragma GCC diagnostic pop
 
 // MaCh3 inlcudes
@@ -38,10 +39,21 @@ TH2Poly* ConvertTH2DtoTH2Poly(TH2D *TH2Dhist);
 /// @brief WP: Helper to Normalise histograms
 TH2Poly* NormalisePoly(TH2Poly* Histogram);
 
+/// @brief Helper to Normalise histograms
+/// @param Histogram hist which we normalise
+void NormaliseTH2Poly(TH2Poly* Histogram);
+
 /// @brief WP: Helper to scale th2poly analogous to th2d scale with option "width"
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
+
 /// @brief WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
 double PolyIntegralWidth(TH2Poly *Histogram);
+
+/// @brief Helper to make ratio histograms
+template<class HistType> HistType* RatioHists(HistType* NumHist, HistType* DenomHist);
+
+/// @brief Helper to make ratio of TH2Polys
+TH2Poly* RatioPolys(TH2Poly* NumPoly, TH2Poly* DenomPoly);
 
 /// @brief WP: Helper function to create TH2Poly histogram with uniform binning
 /// @param name This will be tittle of output histogram
@@ -57,6 +69,19 @@ void CheckTH2PolyFileVersion(TFile *file);
 /// @brief KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, const std::string& name);
 
+/// @brief Make Poisson fluctuation of TH1D hist using default fast method
+void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
+/// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
+void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
+
+/// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
+void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
+/// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check
+void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
+
+/// @brief KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on [link](https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e)
+int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
+
 /// @brief Used by sigma variation, check how 1 sigma changes spectra
 /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
 /// @param sigmaArrayCentr sigma var hist at prior values
@@ -64,6 +89,11 @@ void RemoveFitter(TH1D* hist, const std::string& name);
 /// @param title A tittle for returned object
 /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
 TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+
+/// @brief KS: Fill Violin histogram with entry from a toy
+/// @param violin hist that will be filled
+/// @param hist_1d refence hist from which we take entries to be filled
+void FastViolinFill(TH2D* violin, TH1D* hist_1d);
 
 /// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {

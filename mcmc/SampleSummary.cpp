@@ -151,7 +151,6 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, s
   }//end loop over samples
 
   DoByModePlots = false;
-  MeanHist_ByMode = nullptr;
   PosteriorHist_ByMode = nullptr;
 
   nModelParams = 0;
@@ -184,10 +183,8 @@ SampleSummary::~SampleSummary() {
         if(MeanHist_ByMode[i][j] != nullptr) delete MeanHist_ByMode[i][j];
       }
       delete[] PosteriorHist_ByMode[i];
-      delete[] MeanHist_ByMode[i];
     }
     delete[] PosteriorHist_ByMode;
-    delete[] MeanHist_ByMode;
   }
 
   for (int i = 0; i < nSamples; ++i)
@@ -217,7 +214,7 @@ SampleSummary::~SampleSummary() {
 
 // *******************
 // Check size of sample against size of vectors
-bool SampleSummary::CheckSamples(int Length) {
+bool SampleSummary::CheckSamples(const int Length) {
 // *******************
   bool ok = (nSamples == Length);
   if (!ok) {
@@ -266,7 +263,6 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
 // Add the nominal histograms to the list (will have N_samples of these)
 void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Poly*> &NomW2) {
 // *******************
-
   const int Length = int(Nominal.size());
   if (!CheckSamples(Length)) throw MaCh3Exception(__FILE__ , __LINE__ );
   
@@ -411,7 +407,6 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
 // The input here is nSamples long
 void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH2Poly*> &W2Vec, const double LLHPenalty, const double Weight, const int DrawNumber) {
 // *******************
-
   nThrows++;
   //KS: Only make sense for PosteriorPredictive
   if( !isPriorPredictive )RandomHist->Fill(DrawNumber);
@@ -490,7 +485,6 @@ void SampleSummary::AddThrow(std::vector<TH2Poly*> &SampleVector, std::vector<TH
 // The input here is has dimension [nsample][nMaCh3Modes]
 void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVector_ByMode) {
 // *******************
-
   MCVectorByMode.push_back(SampleVector_ByMode);
 
   //KS: This means this is first time
@@ -498,14 +492,13 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
   {
     MACH3LOG_INFO("Turning reaction breadkwon mode, brum brum");
     PosteriorHist_ByMode = new TH1D***[nSamples];
-    MeanHist_ByMode = new TH2Poly**[nSamples];
-
+    MeanHist_ByMode.resize(nSamples);
     for (int SampleNum = 0;  SampleNum < nSamples; SampleNum++)
     {
       if (DataHist[SampleNum] == nullptr) continue;
 
       PosteriorHist_ByMode[SampleNum] = new TH1D**[Modes->GetNModes()+1];
-      MeanHist_ByMode[SampleNum] = new TH2Poly*[Modes->GetNModes()+1];
+      MeanHist_ByMode[SampleNum].resize(Modes->GetNModes()+1);
       for (int j = 0; j < Modes->GetNModes()+1; j++)
       {
         PosteriorHist_ByMode[SampleNum][j] = new TH1D*[maxBins[SampleNum]+1];
@@ -981,7 +974,7 @@ void SampleSummary::Write() {
 }
 
 // *******************
-// Make the posterior predictive distributions: fit Poissons etc
+// Make the posterior predictive distributions: fit Poisson etc
 void SampleSummary::MakePredictive() {
 // *******************
   // First make the projection on the z axis of the TH3D* for every pmu cosmu bin
@@ -1618,46 +1611,6 @@ void SampleSummary::MakeCutEventRate(TH1D *Histogram, const double DataRate) {
 }
 
 // ****************
-// Make a ratio histogram
-template<class HistType>
-HistType* SampleSummary::RatioHists(HistType *NumHist, HistType *DenomHist) {
-// ****************
-  HistType *NumCopy = static_cast<HistType*>(NumHist->Clone());
-  std::string title = std::string(DenomHist->GetName()) + "_ratio";
-  NumCopy->SetNameTitle(title.c_str(), title.c_str());
-  NumCopy->Divide(DenomHist);
-
-  return NumCopy;
-}
-
-// ****************
-// Make a ratio th2poly
-TH2Poly* SampleSummary::RatioPolys(TH2Poly *NumHist, TH2Poly *DenomHist) {
-// ****************
-  TH2Poly *NumCopy = static_cast<TH2Poly*>(NumHist->Clone());
-  std::string title = std::string(DenomHist->GetName()) + "_ratio";
-  NumCopy->SetNameTitle(title.c_str(), title.c_str());
-
-  for(int i = 1; i < NumCopy->GetNumberOfBins()+1; ++i)
-  {
-    NumCopy->SetBinContent(i,NumHist->GetBinContent(i)/DenomHist->GetBinContent(i));
-  }
-
-  return NumCopy;
-}
-
-// ****************
-// Normalise a TH2Poly
-void SampleSummary::NormaliseTH2Poly(TH2Poly* Histogram){
-// ****************
-  const double Integral = NoOverflowIntegral(Histogram);
-  for(int j = 1; j < Histogram->GetNumberOfBins()+1; j++)
-  {
-    Histogram->SetBinContent(j, Histogram->GetBinContent(j)/Integral);
-  }
-}
-
-// ****************
 // Calculate the LLH for TH1D, set the LLH to title of MCHist
 void SampleSummary::CalcLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D * const & W2Hist) {
 // ****************
@@ -2283,177 +2236,18 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
 void SampleSummary::MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist){
 // ****************
-  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
-  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
+  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist, rnd.get());
+  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist, rnd.get());
 }
 
 // ****************
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
 void SampleSummary::MakeFluctuatedHistogram(TH2Poly *FluctHist, TH2Poly* PolyHist){
 // ****************
-  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
-  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
+  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist, rnd.get());
+  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist, rnd.get());
 }
 
-// ****************
-// Make Poisson Fluctuation of TH1D hist
-void SampleSummary::MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist){
-// ****************
-  // Make the Poisson fluctuated hist
-  FluctHist->Reset("");
-  FluctHist->Fill(0.0, 0.0);
-
-  for (int i = 1; i <= PolyHist->GetXaxis()->GetNbins(); ++i)  
-  {
-    // Get the posterior predictive bin content
-    const double MeanContent = PolyHist->GetBinContent(i);
-    // Get a Poisson fluctuation of the content
-    const double Random = rnd->PoissonD(MeanContent);
-    // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
-    FluctHist->SetBinContent(i,Random);
-  }
-}
-
-// ****************
-// Make Poisson Fluctuation of TH2Poly hist
-void SampleSummary::MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist){
-// ****************
-  // Make the Poisson fluctuated hist
-  FluctHist->Reset("");
-  FluctHist->Fill(0.0, 0.0, 0.0);
-
-  for (int i = 1; i < FluctHist->GetNumberOfBins()+1; ++i) 
-  {
-    // Get the posterior predictive bin content
-    const double MeanContent = PolyHist->GetBinContent(i);
-    // Get a Poisson fluctuation of the content
-    const double Random = rnd->PoissonD(MeanContent);
-    // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
-    FluctHist->SetBinContent(i,Random);
-  }
-}
-
-// ****************
-// Make Poisson Fluctuation of TH1D hist
-void SampleSummary::MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist){
-// ****************
-  // Make the Poisson fluctuated hist
-  FluctHist->Reset("");
-  FluctHist->Fill(0.0, 0.0);
-
-  const double evrate = PolyHist->Integral();
-  const int num = rnd->PoissonD(evrate);
-  int count = 0;
-  while(count < num)
-  {
-    const double candidate = PolyHist->GetRandom();
-    FluctHist->Fill(candidate);                 
-    count++;
-  }
-}
-
-// ****************
-// Make Poisson fluctuation of TH2Poly hist
-void SampleSummary::MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist){
-// ****************
-  // Make the Poisson fluctuated hist
-  FluctHist->Reset("");
-  FluctHist->Fill(0.0, 0.0, 0.0);
-
-  const double evrate = NoOverflowIntegral(PolyHist);
-  const int num = rnd->PoissonD(evrate);
-  int count = 0;
-  while(count < num)
-  {
-    const int iBin = GetRandomPoly2(PolyHist);
-    FluctHist->SetBinContent(iBin, FluctHist->GetBinContent(iBin) + 1);                
-    count++;
-  }
-}
-
-// ****************
-//KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
-// https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
-int SampleSummary::GetRandomPoly2(const TH2Poly* PolyHist){
-// ****************
-  const int nbins = PolyHist->GetNumberOfBins();
-  const double r1 = rnd->Rndm();
-  
-  double* fIntegral = new double[nbins+2];
-  fIntegral[0] = 0.0;
-
-  //KS: This is custom version of ComputeIntegral, once again ROOT was lazy :(
-  for (int i = 1; i < nbins+1; ++i) 
-  {
-    fIntegral[i] = 0.0;
-    const double content = PolyHist->GetBinContent(i);
-    fIntegral[i] += fIntegral[i - 1] + content;
-  }
-  for (Int_t bin = 1; bin < nbins+1; ++bin)  fIntegral[bin] /= fIntegral[nbins];
-  fIntegral[nbins+1] = PolyHist->GetEntries();
-  
-  //KS: We just return one rather then X and Y, this way we can use SetBinContent rather than Fill, which is faster 
-  int iBin = int(TMath::BinarySearch(nbins, fIntegral, r1));
-  //KS: Have to increment because TH2Poly has stupid offset arghh
-  iBin += 1;
-  
-  delete[] fIntegral;
-  return iBin;
-}
-
-// ****************
-// Get the mode error from a TH1D
-double SampleSummary::GetModeError(TH1D* hpost){
-// ****************
-  // Get the bin which has the largest posterior density
-  int MaxBin = hpost->GetMaximumBin();
-
-  // The total integral of the posterior
-  const double Integral = hpost->Integral();
-
-  int LowBin = MaxBin;
-  int HighBin = MaxBin;
-  double sum = hpost->GetBinContent(MaxBin);;
-  double LowCon = 0.0;
-  double HighCon = 0.0;
-  while (sum/Integral < 0.6827 && (LowBin > 0 || HighBin < hpost->GetNbinsX()+1) )
-  {
-    LowCon = 0.0;
-    HighCon = 0.0;
-    //KS:: Move further only if you haven't reached histogram end
-    if(LowBin > 1)
-    {
-      LowBin--;
-      LowCon = hpost->GetBinContent(LowBin);
-    }
-    if(HighBin < hpost->GetNbinsX())
-    {
-      HighBin++;
-      HighCon = hpost->GetBinContent(HighBin);
-    }
-
-    // If we're on the last slice and the lower contour is larger than the upper
-    if ((sum+LowCon+HighCon)/Integral > 0.6827 && LowCon > HighCon) {
-      sum += LowCon;
-      break;
-      // If we're on the last slice and the upper contour is larger than the lower
-    } else if ((sum+LowCon+HighCon)/Integral > 0.6827 && HighCon >= LowCon) {
-      sum += HighCon;
-      break;
-    } else {
-      sum += LowCon + HighCon;
-    }
-  }
-
-  double Mode_Error = 0.0;
-  if (LowCon > HighCon) {
-    Mode_Error = std::fabs(hpost->GetBinCenter(LowBin)-hpost->GetBinCenter(MaxBin));
-  } else {
-    Mode_Error = std::fabs(hpost->GetBinCenter(HighBin)-hpost->GetBinCenter(MaxBin));
-  }
-
-  return Mode_Error;
-}
 
 // ****************
 void SampleSummary::StudyInformationCriterion(M3::kInfCrit Criterion) {
@@ -2590,15 +2384,4 @@ void SampleSummary::StudyWAIC() {
   double WAIC = -2 * (lppd - p_WAIC);
   MACH3LOG_INFO("Effective number of parameters following WAIC formalism is equal to: {:.2f}", p_WAIC);
   MACH3LOG_INFO("WAIC = {:.2f}", WAIC);
-}
-
-// ****************
-//Fast and thread safe fill of violin histogram, it assumes both histograms have the same binning
-void SampleSummary::FastViolinFill(TH2D* violin, TH1D* hist_1d){
-// ****************
-  for (int x = 0; x < violin->GetXaxis()->GetNbins(); ++x) 
-  {
-    const double y = violin->GetYaxis()->FindBin(hist_1d->GetBinContent(x+1));
-    violin->SetBinContent(x+1, y,  violin->GetBinContent(x+1, y)+1);
-  }
 }
