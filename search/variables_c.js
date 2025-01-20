@@ -20,7 +20,7 @@ var searchData=
   ['meanglobal_17',['MeanGlobal',['../RHat__HighMem_8cpp.html#a4526fa4abfccd1173c87267a0beb6977',1,'MeanGlobal():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#a4526fa4abfccd1173c87267a0beb6977',1,'MeanGlobal():&#160;RHat.cpp']]],
   ['meanglobalfolded_18',['MeanGlobalFolded',['../RHat__HighMem_8cpp.html#a5afb47112913938579beb8b9f385a574',1,'RHat_HighMem.cpp']]],
   ['meanhist_19',['MeanHist',['../classSampleSummary.html#af0edee6c71137e2a8150c7ba3e8fb6e0',1,'SampleSummary']]],
-  ['meanhist_5fbymode_20',['MeanHist_ByMode',['../classSampleSummary.html#a20237446a72eda2dc833bfc72c7e42e1',1,'SampleSummary']]],
+  ['meanhist_5fbymode_20',['MeanHist_ByMode',['../classSampleSummary.html#abd1a2dcf5f199d89b08d756552bb5036',1,'SampleSummary']]],
   ['meanhistcorrected_21',['MeanHistCorrected',['../classSampleSummary.html#a6191a0fc1c8f1f0889b3dedcc5485a3d',1,'SampleSummary']]],
   ['means_22',['Means',['../classMCMCProcessor.html#acaf7f239136dfa3506d095b612323d0a',1,'MCMCProcessor']]],
   ['means_5fgauss_23',['Means_Gauss',['../classMCMCProcessor.html#a600fc8c39af2750df91fb7a0ff85ac74',1,'MCMCProcessor']]],
@@ -31,8 +31,8 @@ var searchData=
   ['mode_28',['mode',['../structFarDetectorCoreInfo.html#a8e5ddbda4c271abb29952f7f123fb881',1,'FarDetectorCoreInfo']]],
   ['modehist_29',['ModeHist',['../classSampleSummary.html#a9b21ff74bb8ebd7c3af2c24e02f3d7dc',1,'SampleSummary']]],
   ['modemap_30',['ModeMap',['../classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3',1,'MaCh3Modes']]],
-  ['modes_31',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classFitterBase.html#a004cb6e6168032d9280ce3db912f1a43',1,'FitterBase::Modes()'],['../classsamplePDFBase.html#ab4ce7691212fdc86570b98d58a333ddf',1,'samplePDFBase::Modes()'],['../classmanager.html#ab30ad812780ee2152b72f942b7b91dec',1,'manager::Modes()']]],
-  ['modes_32',['modes',['../structXsecNorms4.html#ad0632d5a94a37ee5ce297698abadd844',1,'XsecNorms4']]],
+  ['modes_31',['modes',['../structXsecNorms4.html#ad0632d5a94a37ee5ce297698abadd844',1,'XsecNorms4']]],
+  ['modes_32',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classFitterBase.html#a004cb6e6168032d9280ce3db912f1a43',1,'FitterBase::Modes()'],['../classsamplePDFBase.html#ab4ce7691212fdc86570b98d58a333ddf',1,'samplePDFBase::Modes()'],['../classmanager.html#ab30ad812780ee2152b72f942b7b91dec',1,'manager::Modes()']]],
   ['monolithindex_33',['MonolithIndex',['../classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a',1,'splineFDBase']]],
   ['monolithsize_34',['MonolithSize',['../classsplineFDBase.html#ad1fefa7f796f2a28a69f5336f5777bce',1,'splineFDBase']]]
 ];

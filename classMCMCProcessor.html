@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.3</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.4</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -2696,8 +2696,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2712</span>      BayesFactor = IntegralMode2/IntegralMode1;</div>
 <div class="line"><span class="lineno"> 2713</span>      Name = <span class="stringliteral">&quot;\\mathfrak{B}(&quot;</span> + ModelNames[k][1]+ <span class="stringliteral">&quot;/&quot;</span> + ModelNames[k][0] + <span class="stringliteral">&quot;) = &quot;</span> + std::to_string(BayesFactor);</div>
 <div class="line"><span class="lineno"> 2714</span>    }</div>
-<div class="line"><span class="lineno"> 2715</span>    std::string JeffreysScale = <a class="code hl_function" href="StatisticalUtils_8h.html#aac0e253784ed2f2a3258d68df22a2568">GetJeffreysScale</a>(BayesFactor);</div>
-<div class="line"><span class="lineno"> 2716</span>    std::string DunneKabothScale = <a class="code hl_function" href="StatisticalUtils_8h.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a>(BayesFactor);</div>
+<div class="line"><span class="lineno"> 2715</span>    std::string JeffreysScale = <a class="code hl_function" href="StatisticalUtils_8cpp.html#aac0e253784ed2f2a3258d68df22a2568">GetJeffreysScale</a>(BayesFactor);</div>
+<div class="line"><span class="lineno"> 2716</span>    std::string DunneKabothScale = <a class="code hl_function" href="StatisticalUtils_8cpp.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a>(BayesFactor);</div>
 <div class="line"><span class="lineno"> 2717</span> </div>
 <div class="line"><span class="lineno"> 2718</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} for {}&quot;</span>, Name, ParNames[k]);</div>
 <div class="line"><span class="lineno"> 2719</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Following Jeffreys Scale = {}&quot;</span>, JeffreysScale);</div>
@@ -2705,8 +2705,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2721</span>    std::cout&lt;&lt;std::endl;</div>
 <div class="line"><span class="lineno"> 2722</span>  }</div>
 <div class="line"><span class="lineno"> 2723</span>}</div>
-<div class="ttc" id="aStatisticalUtils_8h_html_aac0e253784ed2f2a3258d68df22a2568"><div class="ttname"><a href="StatisticalUtils_8h.html#aac0e253784ed2f2a3258d68df22a2568">GetJeffreysScale</a></div><div class="ttdeci">std::string GetJeffreysScale(const double BayesFactor)</div><div class="ttdoc">KS: Following H. Jeffreys .</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00023">StatisticalUtils.h:23</a></div></div>
-<div class="ttc" id="aStatisticalUtils_8h_html_acf403b05be9baa719893db7449e833c7"><div class="ttname"><a href="StatisticalUtils_8h.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a></div><div class="ttdeci">std::string GetDunneKaboth(const double BayesFactor)</div><div class="ttdoc">KS: Based on Table 1 in https://www.t2k.org/docs/technotes/435.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00040">StatisticalUtils.h:40</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_aac0e253784ed2f2a3258d68df22a2568"><div class="ttname"><a href="StatisticalUtils_8cpp.html#aac0e253784ed2f2a3258d68df22a2568">GetJeffreysScale</a></div><div class="ttdeci">std::string GetJeffreysScale(const double BayesFactor)</div><div class="ttdoc">KS: Following H. Jeffreys .</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00005">StatisticalUtils.cpp:5</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_acf403b05be9baa719893db7449e833c7"><div class="ttname"><a href="StatisticalUtils_8cpp.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a></div><div class="ttdeci">std::string GetDunneKaboth(const double BayesFactor)</div><div class="ttdoc">KS: Based on Table 1 in https://www.t2k.org/docs/technotes/435.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00020">StatisticalUtils.cpp:20</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a5ab91183fbbf23fff759fefc9954a1a5"><div class="ttname"><a href="classMCMCProcessor.html#a5ab91183fbbf23fff759fefc9954a1a5">MCMCProcessor::GetParamIndexFromName</a></div><div class="ttdeci">int GetParamIndexFromName(const std::string &amp;Name)</div><div class="ttdoc">Get parameter number based on name.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02554">MCMCProcessor.cpp:2554</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a8667510132aa01395520f028287f511b"><div class="ttname"><a href="classMCMCProcessor.html#a8667510132aa01395520f028287f511b">MCMCProcessor::MakePostfit</a></div><div class="ttdeci">void MakePostfit()</div><div class="ttdoc">Make 1D projection for each parameter and prepare structure.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l00241">MCMCProcessor.cpp:241</a></div></div>
 </div><!-- fragment -->
@@ -3650,7 +3650,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2824</span>    <span class="keywordtype">double</span> ProbPosterior = PosteriorHist-&gt;GetBinContent(PosteriorHist-&gt;FindBin(EvaluationPoint[k]));</div>
 <div class="line"><span class="lineno"> 2825</span>    <span class="keywordtype">double</span> SavageDickey = ProbPosterior/ProbPrior;</div>
 <div class="line"><span class="lineno"> 2826</span>    </div>
-<div class="line"><span class="lineno"> 2827</span>    std::string DunneKabothScale = <a class="code hl_function" href="StatisticalUtils_8h.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a>(SavageDickey);</div>
+<div class="line"><span class="lineno"> 2827</span>    std::string DunneKabothScale = <a class="code hl_function" href="StatisticalUtils_8cpp.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a>(SavageDickey);</div>
 <div class="line"><span class="lineno"> 2828</span>    <span class="comment">//Get Best point</span></div>
 <div class="line"><span class="lineno"> 2829</span>    std::unique_ptr&lt;TGraph&gt; PostPoint(<span class="keyword">new</span> TGraph(1));</div>
 <div class="line"><span class="lineno"> 2830</span>    PostPoint-&gt;SetPoint(0, EvaluationPoint[k], ProbPosterior);</div>
@@ -3688,7 +3688,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2862</span> </div>
 <div class="line"><span class="lineno"> 2863</span>  <a class="code hl_variable" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
 <div class="line"><span class="lineno"> 2864</span>}</div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_a85463c0c6943e3d544d5fcb3f96bf18a"><div class="ttname"><a href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a></div><div class="ttdeci">void RemoveFitter(TH1D *hist, const std::string &amp;name)</div><div class="ttdoc">KS: Remove fitted TF1 from hist to make comparison easier.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00362">HistogramUtils.cpp:362</a></div></div>
+<div class="ttc" id="aHistogramUtils_8cpp_html_a85463c0c6943e3d544d5fcb3f96bf18a"><div class="ttname"><a href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a></div><div class="ttdeci">void RemoveFitter(TH1D *hist, const std::string &amp;name)</div><div class="ttdoc">KS: Remove fitted TF1 from hist to make comparison easier.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00400">HistogramUtils.cpp:400</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4311,7 +4311,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  733</span>    {</div>
 <div class="line"><span class="lineno">  734</span>      <span class="comment">// Scale the histograms before gettindg credible intervals</span></div>
 <div class="line"><span class="lineno">  735</span>      hpost_cl[i][j]-&gt;Scale(1. / hpost_cl[i][j]-&gt;Integral());</div>
-<div class="line"><span class="lineno">  736</span>      <a class="code hl_function" href="StatisticalUtils_8h.html#a0413100715668b076011027175f6c44e">GetCredibleIntervalSig</a>(hpost_copy[i], hpost_cl[i][j], CredibleInSigmas, CredibleIntervals[j]);</div>
+<div class="line"><span class="lineno">  736</span>      <a class="code hl_function" href="StatisticalUtils_8cpp.html#a330e012c4b76ad3dbc5095c10e1eb2fb">GetCredibleIntervalSig</a>(hpost_copy[i], hpost_cl[i][j], CredibleInSigmas, CredibleIntervals[j]);</div>
 <div class="line"><span class="lineno">  737</span> </div>
 <div class="line"><span class="lineno">  738</span>      hpost_cl[i][j]-&gt;SetFillColor(CredibleIntervalsColours[j]);</div>
 <div class="line"><span class="lineno">  739</span>      hpost_cl[i][j]-&gt;SetLineWidth(1);</div>
@@ -4391,7 +4391,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  813</span>  <span class="comment">//Set back to normal</span></div>
 <div class="line"><span class="lineno">  814</span>  <a class="code hl_variable" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetLeftMargin(LeftMargin);</div>
 <div class="line"><span class="lineno">  815</span>}</div>
-<div class="ttc" id="aStatisticalUtils_8h_html_a0413100715668b076011027175f6c44e"><div class="ttname"><a href="StatisticalUtils_8h.html#a0413100715668b076011027175f6c44e">GetCredibleIntervalSig</a></div><div class="ttdeci">void GetCredibleIntervalSig(TH1D *const hist, TH1D *hpost_copy, const bool CredibleInSigmas, const double coverage=0.6827)</div><div class="ttdoc">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning,...</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00432">StatisticalUtils.h:432</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_a330e012c4b76ad3dbc5095c10e1eb2fb"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a330e012c4b76ad3dbc5095c10e1eb2fb">GetCredibleIntervalSig</a></div><div class="ttdeci">void GetCredibleIntervalSig(TH1D *const hist, TH1D *hpost_copy, const bool CredibleInSigmas, const double coverage)</div><div class="ttdoc">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning,...</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00367">StatisticalUtils.cpp:367</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_ade917a46fb88e77afbfe47aec2aaa839"><div class="ttname"><a href="classMCMCProcessor.html#ade917a46fb88e77afbfe47aec2aaa839">MCMCProcessor::CheckCredibleIntervalsOrder</a></div><div class="ttdeci">void CheckCredibleIntervalsOrder(const std::vector&lt; double &gt; &amp;CredibleIntervals, const std::vector&lt; Color_t &gt; &amp;CredibleIntervalsColours)</div><div class="ttdoc">Checks the order and size consistency of the CredibleIntervals and CredibleIntervalsColours vectors.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04236">MCMCProcessor.cpp:4236</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -4482,7 +4482,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1617</span>    {</div>
 <div class="line"><span class="lineno"> 1618</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; nCredible; ++k)</div>
 <div class="line"><span class="lineno"> 1619</span>      {</div>
-<div class="line"><span class="lineno"> 1620</span>        <a class="code hl_function" href="StatisticalUtils_8h.html#ad158fe25b150d80b7ef3f9dc88ab697d">GetCredibleRegionSig</a>(hpost_2D_cl[i][j][k], CredibleInSigmas, CredibleRegions[k]);</div>
+<div class="line"><span class="lineno"> 1620</span>        <a class="code hl_function" href="StatisticalUtils_8cpp.html#a7679ed4cc0f915500e223e1f51b34821">GetCredibleRegionSig</a>(hpost_2D_cl[i][j][k], CredibleInSigmas, CredibleRegions[k]);</div>
 <div class="line"><span class="lineno"> 1621</span>        hpost_2D_cl[i][j][k]-&gt;SetLineColor(CredibleRegionColor[k]);</div>
 <div class="line"><span class="lineno"> 1622</span>        hpost_2D_cl[i][j][k]-&gt;SetLineWidth(2);</div>
 <div class="line"><span class="lineno"> 1623</span>        hpost_2D_cl[i][j][k]-&gt;SetLineStyle(CredibleRegionStyle[k]);</div>
@@ -4564,7 +4564,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1699</span>    }</div>
 <div class="line"><span class="lineno"> 1700</span>  }</div>
 <div class="line"><span class="lineno"> 1701</span>}</div>
-<div class="ttc" id="aStatisticalUtils_8h_html_ad158fe25b150d80b7ef3f9dc88ab697d"><div class="ttname"><a href="StatisticalUtils_8h.html#ad158fe25b150d80b7ef3f9dc88ab697d">GetCredibleRegionSig</a></div><div class="ttdeci">void GetCredibleRegionSig(TH2D *const hist2D, const bool CredibleInSigmas, const double coverage=0.6827)</div><div class="ttdoc">KS: Set 2D contour within some coverage.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00503">StatisticalUtils.h:503</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_a7679ed4cc0f915500e223e1f51b34821"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a7679ed4cc0f915500e223e1f51b34821">GetCredibleRegionSig</a></div><div class="ttdeci">void GetCredibleRegionSig(TH2D *const hist2D, const bool CredibleInSigmas, const double coverage)</div><div class="ttdoc">KS: Set 2D contour within some coverage.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00431">StatisticalUtils.cpp:431</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_ab11b70175cd1e63722942a063192968a"><div class="ttname"><a href="classMCMCProcessor.html#ab11b70175cd1e63722942a063192968a">MCMCProcessor::CheckCredibleRegionsOrder</a></div><div class="ttdeci">void CheckCredibleRegionsOrder(const std::vector&lt; double &gt; &amp;CredibleRegions, const std::vector&lt; Style_t &gt; &amp;CredibleRegionStyle, const std::vector&lt; Color_t &gt; &amp;CredibleRegionColor)</div><div class="ttdoc">Checks the order and size consistency of the CredibleRegions, CredibleRegionStyle,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04255">MCMCProcessor.cpp:4255</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -4706,15 +4706,15 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  296</span>    (*Central_Value)(i) = Prior;</div>
 <div class="line"><span class="lineno">  297</span> </div>
 <div class="line"><span class="lineno">  298</span>    <span class="keywordtype">double</span> <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err, Err_p, Err_m;</div>
-<div class="line"><span class="lineno">  299</span>    <a class="code hl_function" href="StatisticalUtils_8h.html#ab4dc9e4455015e55031e2cc8a076349d">GetArithmetic</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a795f661ed1ba8b8ae54c41fde5fb9496">hpost</a>[i], <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err);</div>
+<div class="line"><span class="lineno">  299</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#ab4dc9e4455015e55031e2cc8a076349d">GetArithmetic</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a795f661ed1ba8b8ae54c41fde5fb9496">hpost</a>[i], <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err);</div>
 <div class="line"><span class="lineno">  300</span>    (*Means)(i) = <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>;</div>
 <div class="line"><span class="lineno">  301</span>    (*Errors)(i) = Err;</div>
 <div class="line"><span class="lineno">  302</span> </div>
-<div class="line"><span class="lineno">  303</span>    <a class="code hl_function" href="StatisticalUtils_8h.html#a7237fc819d10a341c286a5597f584a96">GetGaussian</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a795f661ed1ba8b8ae54c41fde5fb9496">hpost</a>[i], <a class="code hl_variable" href="classMCMCProcessor.html#a92c1d9b0ebdf90951221cdaf2ac4cc2c">Gauss</a>, <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err);</div>
+<div class="line"><span class="lineno">  303</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a7237fc819d10a341c286a5597f584a96">GetGaussian</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a795f661ed1ba8b8ae54c41fde5fb9496">hpost</a>[i], <a class="code hl_variable" href="classMCMCProcessor.html#a92c1d9b0ebdf90951221cdaf2ac4cc2c">Gauss</a>, <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err);</div>
 <div class="line"><span class="lineno">  304</span>    (*Means_Gauss)(i) = <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>;</div>
 <div class="line"><span class="lineno">  305</span>    (*Errors_Gauss)(i) = Err;</div>
 <div class="line"><span class="lineno">  306</span> </div>
-<div class="line"><span class="lineno">  307</span>    <a class="code hl_function" href="StatisticalUtils_8h.html#aadbb121e8fc7db8e4e28d6b04d351460">GetHPD</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a795f661ed1ba8b8ae54c41fde5fb9496">hpost</a>[i], <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err, Err_p, Err_m);</div>
+<div class="line"><span class="lineno">  307</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#aaf9d02010c94cac104e7987880adfb24">GetHPD</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a795f661ed1ba8b8ae54c41fde5fb9496">hpost</a>[i], <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, Err, Err_p, Err_m);</div>
 <div class="line"><span class="lineno">  308</span>    (*Means_HPD)(i) = <a class="code hl_variable" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>;</div>
 <div class="line"><span class="lineno">  309</span>    (*Errors_HPD)(i) = Err;</div>
 <div class="line"><span class="lineno">  310</span>    (*Errors_HPD_Positive)(i) = Err_p;</div>
@@ -4853,9 +4853,9 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_adb4ee3a874472b4ffccc8734da66250e"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#adb4ee3a874472b4ffccc8734da66250e">NDParameters</a></div><div class="ttdeci">int NDParameters</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00062">GetPostfitParamPlots.cpp:62</a></div></div>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_adf4147e2ac31f2cb321121a90cb8c853"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#adf4147e2ac31f2cb321121a90cb8c853">FluxParameters</a></div><div class="ttdeci">int FluxParameters</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00074">GetPostfitParamPlots.cpp:74</a></div></div>
 <div class="ttc" id="aRHat_8cpp_html_ab7d224b5fffa9367046f2976bb4972d1"><div class="ttname"><a href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a></div><div class="ttdeci">double ** Mean</div><div class="ttdef"><b>Definition:</b> <a href="RHat_8cpp_source.html#l00067">RHat.cpp:67</a></div></div>
-<div class="ttc" id="aStatisticalUtils_8h_html_a7237fc819d10a341c286a5597f584a96"><div class="ttname"><a href="StatisticalUtils_8h.html#a7237fc819d10a341c286a5597f584a96">GetGaussian</a></div><div class="ttdeci">void GetGaussian(TH1D *&amp;hist, TF1 *gauss, double &amp;Mean, double &amp;Error)</div><div class="ttdoc">CW: Fit Gaussian to posterior.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00259">StatisticalUtils.h:259</a></div></div>
-<div class="ttc" id="aStatisticalUtils_8h_html_aadbb121e8fc7db8e4e28d6b04d351460"><div class="ttname"><a href="StatisticalUtils_8h.html#aadbb121e8fc7db8e4e28d6b04d351460">GetHPD</a></div><div class="ttdeci">void GetHPD(TH1D *const hist, double &amp;Mean, double &amp;Error, double &amp;Error_p, double &amp;Error_m, const double coverage=0.6827)</div><div class="ttdoc">Get Highest Posterior Density (HPD)</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00286">StatisticalUtils.h:286</a></div></div>
-<div class="ttc" id="aStatisticalUtils_8h_html_ab4dc9e4455015e55031e2cc8a076349d"><div class="ttname"><a href="StatisticalUtils_8h.html#ab4dc9e4455015e55031e2cc8a076349d">GetArithmetic</a></div><div class="ttdeci">void GetArithmetic(TH1D *const hist, double &amp;Mean, double &amp;Error)</div><div class="ttdoc">CW: Get Arithmetic mean from posterior.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00247">StatisticalUtils.h:247</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_a7237fc819d10a341c286a5597f584a96"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a7237fc819d10a341c286a5597f584a96">GetGaussian</a></div><div class="ttdeci">void GetGaussian(TH1D *&amp;hist, TF1 *gauss, double &amp;Mean, double &amp;Error)</div><div class="ttdoc">CW: Fit Gaussian to posterior.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00208">StatisticalUtils.cpp:208</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_aaf9d02010c94cac104e7987880adfb24"><div class="ttname"><a href="StatisticalUtils_8cpp.html#aaf9d02010c94cac104e7987880adfb24">GetHPD</a></div><div class="ttdeci">void GetHPD(TH1D *const hist, double &amp;Mean, double &amp;Error, double &amp;Error_p, double &amp;Error_m, const double coverage)</div><div class="ttdoc">Get Highest Posterior Density (HPD)</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00228">StatisticalUtils.cpp:228</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_ab4dc9e4455015e55031e2cc8a076349d"><div class="ttname"><a href="StatisticalUtils_8cpp.html#ab4dc9e4455015e55031e2cc8a076349d">GetArithmetic</a></div><div class="ttdeci">void GetArithmetic(TH1D *const hist, double &amp;Mean, double &amp;Error)</div><div class="ttdoc">CW: Get Arithmetic mean from posterior.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00201">StatisticalUtils.cpp:201</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5014,7 +5014,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1321</span>    {</div>
 <div class="line"><span class="lineno"> 1322</span>      EigenValues[j] = eigen_values(j);</div>
 <div class="line"><span class="lineno"> 1323</span>    }</div>
-<div class="line"><span class="lineno"> 1324</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> SubOptimalityValue = <a class="code hl_function" href="StatisticalUtils_8h.html#a34d5232bfb12e29ec9d63acaa8744b58">GetSubOptimality</a>(EigenValues, <a class="code hl_variable" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>);</div>
+<div class="line"><span class="lineno"> 1324</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> SubOptimalityValue = <a class="code hl_function" href="StatisticalUtils_8cpp.html#a34d5232bfb12e29ec9d63acaa8744b58">GetSubOptimality</a>(EigenValues, <a class="code hl_variable" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>);</div>
 <div class="line"><span class="lineno"> 1325</span>    SubOptimality-&gt;SetBinContent(i+1, SubOptimalityValue);</div>
 <div class="line"><span class="lineno"> 1326</span>  }</div>
 <div class="line"><span class="lineno"> 1327</span>  clock.Stop();</div>
@@ -5033,7 +5033,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1340</span>  <a class="code hl_variable" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
 <div class="line"><span class="lineno"> 1341</span>  <a class="code hl_variable" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;Write();</div>
 <div class="line"><span class="lineno"> 1342</span>}</div>
-<div class="ttc" id="aStatisticalUtils_8h_html_a34d5232bfb12e29ec9d63acaa8744b58"><div class="ttname"><a href="StatisticalUtils_8h.html#a34d5232bfb12e29ec9d63acaa8744b58">GetSubOptimality</a></div><div class="ttdeci">double GetSubOptimality(const std::vector&lt; double &gt; &amp;EigenValues, const int TotalTarameters)</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00226">StatisticalUtils.h:226</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_a34d5232bfb12e29ec9d63acaa8744b58"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a34d5232bfb12e29ec9d63acaa8744b58">GetSubOptimality</a></div><div class="ttdeci">double GetSubOptimality(const std::vector&lt; double &gt; &amp;EigenValues, const int TotalTarameters)</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00184">StatisticalUtils.cpp:184</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a36441ec3d5b0e24e48040282ffcda3eb"><div class="ttname"><a href="classMCMCProcessor.html#a36441ec3d5b0e24e48040282ffcda3eb">MCMCProcessor::ResetHistograms</a></div><div class="ttdeci">void ResetHistograms()</div><div class="ttdoc">Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02576">MCMCProcessor.cpp:2576</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -5247,7 +5247,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1849</span> </div>
 <div class="line"><span class="lineno"> 1850</span>          <span class="comment">// Scale the histograms before gettindg credible intervals</span></div>
 <div class="line"><span class="lineno"> 1851</span>          hpost_cl[counterPost][j]-&gt;Scale(1. / hpost_cl[counterPost][j]-&gt;Integral());</div>
-<div class="line"><span class="lineno"> 1852</span>          <a class="code hl_function" href="StatisticalUtils_8h.html#a0413100715668b076011027175f6c44e">GetCredibleIntervalSig</a>(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleInSigmas, CredibleIntervals[j]);</div>
+<div class="line"><span class="lineno"> 1852</span>          <a class="code hl_function" href="StatisticalUtils_8cpp.html#a330e012c4b76ad3dbc5095c10e1eb2fb">GetCredibleIntervalSig</a>(hpost_copy[counterPost], hpost_cl[counterPost][j], CredibleInSigmas, CredibleIntervals[j]);</div>
 <div class="line"><span class="lineno"> 1853</span> </div>
 <div class="line"><span class="lineno"> 1854</span>          hpost_cl[counterPost][j]-&gt;SetFillColor(CredibleIntervalsColours[j]);</div>
 <div class="line"><span class="lineno"> 1855</span>          hpost_cl[counterPost][j]-&gt;SetLineWidth(1);</div>
@@ -5277,7 +5277,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1879</span>        {</div>
 <div class="line"><span class="lineno"> 1880</span>          hpost_2D_cl[counter2DPost][k] = <span class="keyword">static_cast&lt;</span>TH2D*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classMCMCProcessor.html#ac924273ef73ef60a5f6e8a166918bb31">hpost2D</a>[ParamNumber[x]][ParamNumber[y]]-&gt;Clone(</div>
 <div class="line"><span class="lineno"> 1881</span>            Form(<span class="stringliteral">&quot;hpost_copy_%i_%i_CL_%f&quot;</span>, ParamNumber[x], ParamNumber[y], CredibleRegions[k])));</div>
-<div class="line"><span class="lineno"> 1882</span>          <a class="code hl_function" href="StatisticalUtils_8h.html#ad158fe25b150d80b7ef3f9dc88ab697d">GetCredibleRegionSig</a>(hpost_2D_cl[counter2DPost][k], CredibleInSigmas, CredibleRegions[k]);</div>
+<div class="line"><span class="lineno"> 1882</span>          <a class="code hl_function" href="StatisticalUtils_8cpp.html#a7679ed4cc0f915500e223e1f51b34821">GetCredibleRegionSig</a>(hpost_2D_cl[counter2DPost][k], CredibleInSigmas, CredibleRegions[k]);</div>
 <div class="line"><span class="lineno"> 1883</span> </div>
 <div class="line"><span class="lineno"> 1884</span>          hpost_2D_cl[counter2DPost][k]-&gt;SetLineColor(CredibleRegionColor[k]);</div>
 <div class="line"><span class="lineno"> 1885</span>          hpost_2D_cl[counter2DPost][k]-&gt;SetLineWidth(2);</div>
@@ -7512,8 +7512,8 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8h_source.html#l00191">191</a> of file <a class="el" href="MCMCProcessor_8h_source.html">MCMCProcessor.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  191</span>{ <a class="code hl_function" href="StatisticalUtils_8h.html#aa6fd944e00fcda133cfef10782f08de0">ThinningMCMC</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a6d212d77a818304a8674a7b9b18d43b8">MCMCFile</a>+<span class="stringliteral">&quot;.root&quot;</span>, ThinningCut); };</div>
-<div class="ttc" id="aStatisticalUtils_8h_html_aa6fd944e00fcda133cfef10782f08de0"><div class="ttname"><a href="StatisticalUtils_8h.html#aa6fd944e00fcda133cfef10782f08de0">ThinningMCMC</a></div><div class="ttdeci">void ThinningMCMC(const std::string &amp;FilePath, const int ThinningCut)</div><div class="ttdoc">Thin MCMC Chain, to save space and maintain low autocorrelations.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8h_source.html#l00577">StatisticalUtils.h:577</a></div></div>
+<div class="fragment"><div class="line"><span class="lineno">  191</span>{ <a class="code hl_function" href="StatisticalUtils_8cpp.html#aa6fd944e00fcda133cfef10782f08de0">ThinningMCMC</a>(<a class="code hl_variable" href="classMCMCProcessor.html#a6d212d77a818304a8674a7b9b18d43b8">MCMCFile</a>+<span class="stringliteral">&quot;.root&quot;</span>, ThinningCut); };</div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_aa6fd944e00fcda133cfef10782f08de0"><div class="ttname"><a href="StatisticalUtils_8cpp.html#aa6fd944e00fcda133cfef10782f08de0">ThinningMCMC</a></div><div class="ttdeci">void ThinningMCMC(const std::string &amp;FilePath, const int ThinningCut)</div><div class="ttdoc">Thin MCMC Chain, to save space and maintain low autocorrelations.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00487">StatisticalUtils.cpp:487</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

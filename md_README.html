@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.3</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.4</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -218,28 +218,27 @@ Plotting and Diagnostic</h1>
 <p>Example of chain diagnostic utils can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics">here</a> with example of config. The MaCh3 core plotting library code can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/plotting">here</a> along with example config files and some apps for making standard plots.</p>
 <h1><a class="anchor" id="autotoc_md16"></a>
 How To Use</h1>
-<p>This is an example how your executable can look like using MaCh3: </p><div class="fragment"><div class="line"><a class="code hl_class" href="classmanager.html">manager</a> *fitMan = <span class="keyword">nullptr</span>; <span class="comment">//Manager is responsible for reading from config</span></div>
+<p>This is an example how your executable can look like using MaCh3: </p><div class="fragment"><div class="line"><span class="comment">//Manager is responsible for reading from config</span></div>
+<div class="line">std::unique_ptr&lt;manager&gt; fitMan = MaCh3ManagerFactory(argc, argv);</div>
 <div class="line"> </div>
 <div class="line">std::vector&lt;samplePDFBase*&gt; sample; <span class="comment">//vector storing information about sample for different detector</span></div>
 <div class="line">std::vector&lt;covarianceBase*&gt; Cov; <span class="comment">// vector with systematic implementation</span></div>
-<div class="line"><a class="code hl_class" href="classmcmc.html">mcmc</a> *markovChain = <span class="keyword">nullptr</span>; <span class="comment">// MCMC class, can be replaced with other fitting method</span></div>
-<div class="line">MakeMaCh3Instance(fitMan, sample, Cov, markovChain); <span class="comment">//Factory like function which initialises everything</span></div>
+<div class="line">MakeMaCh3Instance(fitMan.get(), sample, Cov); <span class="comment">//Factory like function which initialises everything</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// FitterBase class, can be replaced with other fitting method</span></div>
+<div class="line">std::unique_ptr&lt;FitterBase&gt; MarkovChain = <a class="code hl_function" href="MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a">MaCh3FitterFactory</a>(FitManager.get());</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">//Adding samples and covariances to the Fitter class could be in the factory</span></div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; sample.size(); i++)</div>
-<div class="line">  markovChain-&gt;<a class="code hl_function" href="classFitterBase.html#abe93c6d49aa079d811a9021de59691b1">addSamplePDF</a>(sample[i]);</div>
+<div class="line">  MarkovChain-&gt;addSamplePDF(sample[i]);</div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; Cov.size(); i++)</div>
-<div class="line">  markovChain-&gt;<a class="code hl_function" href="classFitterBase.html#a1d0068193922448a6fed0e0d3ff4305a">addSystObj</a>(Cov[i]);</div>
+<div class="line">  MarkovChain-&gt;addSystObj(Cov[i]);</div>
 <div class="line"> </div>
-<div class="line">markovChain-&gt;<a class="code hl_function" href="classFitterBase.html#a018e8d09a62bca19840e1321b49df2c0">RunLLHScan</a>(); <span class="comment">// can run LLH scan</span></div>
-<div class="line">markovChain-&gt;<a class="code hl_function" href="classmcmc.html#a8a9cc0e0aa65c8573fca703a42b2ee31">runMCMC</a>(); <span class="comment">//or run actual fit</span></div>
-<div class="ttc" id="aclassFitterBase_html_a018e8d09a62bca19840e1321b49df2c0"><div class="ttname"><a href="classFitterBase.html#a018e8d09a62bca19840e1321b49df2c0">FitterBase::RunLLHScan</a></div><div class="ttdeci">void RunLLHScan()</div><div class="ttdoc">Perform a 1D likelihood scan.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00460">FitterBase.cpp:460</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a1d0068193922448a6fed0e0d3ff4305a"><div class="ttname"><a href="classFitterBase.html#a1d0068193922448a6fed0e0d3ff4305a">FitterBase::addSystObj</a></div><div class="ttdeci">void addSystObj(covarianceBase *cov)</div><div class="ttdoc">This function adds a Covariance object to the analysis framework. The Covariance object will be utili...</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00248">FitterBase.cpp:248</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_abe93c6d49aa079d811a9021de59691b1"><div class="ttname"><a href="classFitterBase.html#abe93c6d49aa079d811a9021de59691b1">FitterBase::addSamplePDF</a></div><div class="ttdeci">void addSamplePDF(samplePDFBase *sample)</div><div class="ttdoc">This function adds a sample PDF object to the analysis framework. The sample PDF object will be utili...</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00237">FitterBase.cpp:237</a></div></div>
-<div class="ttc" id="aclassmanager_html"><div class="ttname"><a href="classmanager.html">manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="manager_8h_source.html#l00018">manager.h:18</a></div></div>
-<div class="ttc" id="aclassmcmc_html"><div class="ttname"><a href="classmcmc.html">mcmc</a></div><div class="ttdoc">Implementation of MR2T2 algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00007">mcmc.h:7</a></div></div>
-<div class="ttc" id="aclassmcmc_html_a8a9cc0e0aa65c8573fca703a42b2ee31"><div class="ttname"><a href="classmcmc.html#a8a9cc0e0aa65c8573fca703a42b2ee31">mcmc::runMCMC</a></div><div class="ttdeci">void runMCMC() override</div><div class="ttdoc">Actual implementation of MCMC fitting algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00078">mcmc.cpp:78</a></div></div>
-</div><!-- fragment --> </div></div><!-- contents -->
+<div class="line">MarkovChain-&gt;RunLLHScan(); <span class="comment">// can run LLH scan</span></div>
+<div class="line">MarkovChain-&gt;runMCMC(); <span class="comment">//or run actual fit</span></div>
+<div class="ttc" id="aMaCh3Factory_8cpp_html_a126d15eeabecd1e4ab67422784a9f84a"><div class="ttname"><a href="MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a">MaCh3FitterFactory</a></div><div class="ttdeci">std::unique_ptr&lt; FitterBase &gt; MaCh3FitterFactory(manager *fitMan)</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Factory_8cpp_source.html#l00005">MaCh3Factory.cpp:5</a></div></div>
+</div><!-- fragment --><p> For more see <a href="https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp">here</a> </p>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

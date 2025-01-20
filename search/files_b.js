@@ -16,8 +16,9 @@ var searchData=
   ['splinemonolith_2eh_13',['SplineMonolith.h',['../SplineMonolith_8h.html',1,'']]],
   ['splines_2ecpp_14',['splines.cpp',['../splines_8cpp.html',1,'']]],
   ['splinestructs_2eh_15',['SplineStructs.h',['../SplineStructs_8h.html',1,'']]],
-  ['statisticalutils_2eh_16',['StatisticalUtils.h',['../StatisticalUtils_8h.html',1,'']]],
-  ['structs_2eh_17',['Structs.h',['../Structs_8h.html',1,'']]],
-  ['stylemanager_2ecpp_18',['styleManager.cpp',['../styleManager_8cpp.html',1,'']]],
-  ['stylemanager_2eh_19',['styleManager.h',['../styleManager_8h.html',1,'']]]
+  ['statisticalutils_2ecpp_16',['StatisticalUtils.cpp',['../StatisticalUtils_8cpp.html',1,'']]],
+  ['statisticalutils_2eh_17',['StatisticalUtils.h',['../StatisticalUtils_8h.html',1,'']]],
+  ['structs_2eh_18',['Structs.h',['../Structs_8h.html',1,'']]],
+  ['stylemanager_2ecpp_19',['styleManager.cpp',['../styleManager_8cpp.html',1,'']]],
+  ['stylemanager_2eh_20',['styleManager.h',['../styleManager_8h.html',1,'']]]
 ];

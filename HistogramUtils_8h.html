@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.3</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.4</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -91,38 +91,40 @@ $(function() {
 <div class="textblock"><code>#include &quot;TGraphAsymmErrors.h&quot;</code><br />
 <code>#include &quot;TLorentzVector.h&quot;</code><br />
 <code>#include &quot;TObjString.h&quot;</code><br />
+<code>#include &quot;TRandom3.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="Structs_8h_source.html">samplePDF/Structs.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for HistogramUtils.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="HistogramUtils_8h__incl.png" border="0" usemap="#asamplePDF_2HistogramUtils_8h" alt=""/></div>
 <map name="asamplePDF_2HistogramUtils_8h" id="asamplePDF_2HistogramUtils_8h">
-<area shape="rect" title=" " alt="" coords="210,5,421,31"/>
+<area shape="rect" title=" " alt="" coords="262,5,473,31"/>
 <area shape="rect" title=" " alt="" coords="5,79,175,104"/>
 <area shape="rect" title=" " alt="" coords="199,79,330,104"/>
-<area shape="rect" title=" " alt="" coords="25,152,128,177"/>
-<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="766,79,923,104"/>
-<area shape="rect" title=" " alt="" coords="1435,299,1510,324"/>
-<area shape="rect" title=" " alt="" coords="1735,152,1808,177"/>
-<area shape="rect" title=" " alt="" coords="669,299,749,324"/>
-<area shape="rect" title=" " alt="" coords="204,152,267,177"/>
-<area shape="rect" title=" " alt="" coords="291,152,366,177"/>
-<area shape="rect" title=" " alt="" coords="390,152,433,177"/>
-<area shape="rect" title=" " alt="" coords="457,152,499,177"/>
-<area shape="rect" title=" " alt="" coords="524,152,648,177"/>
-<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="673,152,878,177"/>
-<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="823,225,1007,251"/>
-<area shape="rect" title=" " alt="" coords="953,152,1035,177"/>
-<area shape="rect" title=" " alt="" coords="1060,152,1125,177"/>
-<area shape="rect" title=" " alt="" coords="1150,152,1209,177"/>
-<area shape="rect" title=" " alt="" coords="1233,152,1320,177"/>
-<area shape="rect" title=" " alt="" coords="1344,152,1404,177"/>
-<area shape="rect" title=" " alt="" coords="1428,152,1659,177"/>
-<area shape="rect" title=" " alt="" coords="773,299,831,324"/>
-<area shape="rect" title=" " alt="" coords="611,225,697,251"/>
-<area shape="rect" title=" " alt="" coords="967,299,1091,324"/>
-<area shape="rect" title=" " alt="" coords="1115,299,1201,324"/>
-<area shape="rect" title=" " alt="" coords="856,299,943,324"/>
+<area shape="rect" title=" " alt="" coords="89,152,192,177"/>
+<area shape="rect" title=" " alt="" coords="405,79,509,104"/>
+<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="830,79,987,104"/>
+<area shape="rect" title=" " alt="" coords="1499,299,1574,324"/>
+<area shape="rect" title=" " alt="" coords="1799,152,1872,177"/>
+<area shape="rect" title=" " alt="" coords="733,299,813,324"/>
+<area shape="rect" title=" " alt="" coords="268,152,331,177"/>
+<area shape="rect" title=" " alt="" coords="355,152,430,177"/>
+<area shape="rect" title=" " alt="" coords="454,152,497,177"/>
+<area shape="rect" title=" " alt="" coords="521,152,563,177"/>
+<area shape="rect" title=" " alt="" coords="588,152,712,177"/>
+<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="737,152,942,177"/>
+<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="887,225,1071,251"/>
+<area shape="rect" title=" " alt="" coords="1017,152,1099,177"/>
+<area shape="rect" title=" " alt="" coords="1124,152,1189,177"/>
+<area shape="rect" title=" " alt="" coords="1214,152,1273,177"/>
+<area shape="rect" title=" " alt="" coords="1297,152,1384,177"/>
+<area shape="rect" title=" " alt="" coords="1408,152,1468,177"/>
+<area shape="rect" title=" " alt="" coords="1492,152,1723,177"/>
+<area shape="rect" title=" " alt="" coords="837,299,895,324"/>
+<area shape="rect" title=" " alt="" coords="675,225,761,251"/>
+<area shape="rect" title=" " alt="" coords="1031,299,1155,324"/>
+<area shape="rect" title=" " alt="" coords="1179,299,1265,324"/>
+<area shape="rect" title=" " alt="" coords="920,299,1007,324"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -130,42 +132,43 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="HistogramUtils_8h__dep__incl.png" border="0" usemap="#asamplePDF_2HistogramUtils_8hdep" alt=""/></div>
 <map name="asamplePDF_2HistogramUtils_8hdep" id="asamplePDF_2HistogramUtils_8hdep">
-<area shape="rect" title=" " alt="" coords="1018,5,1229,31"/>
-<area shape="rect" href="PlotMCMCDiag_8cpp.html" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="146,233,373,258"/>
-<area shape="rect" href="MCMCProcessor_8h.html" title=" " alt="" coords="908,152,1091,177"/>
-<area shape="rect" href="StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="1037,79,1210,104"/>
-<area shape="rect" href="HistogramUtils_8cpp.html" title=" " alt="" coords="1284,79,1509,104"/>
-<area shape="rect" href="samplePDFBase_8h.html" title=" " alt="" coords="1423,152,1642,177"/>
-<area shape="rect" href="DiagMCMC_8cpp.html" title=" " alt="" coords="397,233,599,258"/>
-<area shape="rect" href="ProcessMCMC_8cpp.html" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="803,233,1025,258"/>
-<area shape="rect" href="FitterBase_8h.html" title=" " alt="" coords="1270,233,1414,258"/>
-<area shape="rect" href="MCMCProcessor_8cpp.html" title=" " alt="" coords="1049,233,1246,258"/>
-<area shape="rect" href="SampleSummary_8h.html" title=" " alt="" coords="1439,233,1627,258"/>
-<area shape="rect" href="inputManager_8h.html" title=" " alt="" coords="623,225,779,265"/>
-<area shape="rect" href="FitterBase_8cpp.html" title=" " alt="" coords="1641,321,1800,346"/>
-<area shape="rect" href="LikelihoodFit_8h.html" title=" " alt="" coords="1171,321,1331,346"/>
-<area shape="rect" href="MaCh3Factory_8h.html" title=" " alt="" coords="883,489,1051,515"/>
-<area shape="rect" href="fitter_8cpp.html" title=" " alt="" coords="1394,489,1522,515"/>
-<area shape="rect" href="mcmc_8h.html" title=" " alt="" coords="1541,409,1660,434"/>
-<area shape="rect" href="LikelihoodFit_8cpp.html" title=" " alt="" coords="1343,409,1517,434"/>
-<area shape="rect" href="MinuitFit_8h.html" title=" " alt="" coords="1184,409,1319,434"/>
-<area shape="rect" href="PSO_8h.html" title=" " alt="" coords="1055,409,1159,434"/>
-<area shape="rect" href="MaCh3Factory_8cpp.html" title=" " alt="" coords="876,563,1059,588"/>
-<area shape="rect" href="MinuitFit_8cpp.html" title=" " alt="" coords="1219,489,1369,515"/>
-<area shape="rect" href="PSO_8cpp.html" title=" " alt="" coords="1076,489,1195,515"/>
-<area shape="rect" href="mcmc_8cpp.html" title=" " alt="" coords="1546,489,1679,515"/>
-<area shape="rect" href="SampleSummary_8cpp.html" title=" " alt="" coords="1825,321,2027,346"/>
-<area shape="rect" href="inputManager_8cpp.html" title=" " alt="" coords="387,313,543,353"/>
-<area shape="rect" href="plottingManager_8h.html" title=" " alt="" coords="567,313,723,353"/>
-<area shape="rect" href="plotting_8cpp.html" title=" " alt="" coords="5,409,153,434"/>
-<area shape="rect" href="GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="749,401,930,441"/>
-<area shape="rect" href="MatrixPlotter_8cpp.html" title=" " alt="" coords="178,409,365,434"/>
-<area shape="rect" href="PlotLLH_8cpp.html" title=" " alt="" coords="389,409,541,434"/>
-<area shape="rect" href="plottingManager_8cpp.html" title=" " alt="" coords="565,401,724,441"/>
-<area shape="rect" href="samplePDFBase_8cpp.html" title=" " alt="" coords="1651,233,1884,258"/>
-<area shape="rect" href="samplePDFFDBase_8h.html" title=" " alt="" coords="2019,233,2255,258"/>
-<area shape="rect" href="samplePDF_8cpp.html" title=" " alt="" coords="2051,321,2222,346"/>
-<area shape="rect" href="samplePDFFDBase_8cpp.html" title=" " alt="" coords="2246,321,2497,346"/>
+<area shape="rect" title=" " alt="" coords="836,5,1047,31"/>
+<area shape="rect" href="PlotMCMCDiag_8cpp.html" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="5,233,232,258"/>
+<area shape="rect" href="MCMCProcessor_8h.html" title=" " alt="" coords="722,152,905,177"/>
+<area shape="rect" href="StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="855,79,1028,104"/>
+<area shape="rect" href="HistogramUtils_8cpp.html" title=" " alt="" coords="1053,79,1278,104"/>
+<area shape="rect" href="samplePDFBase_8h.html" title=" " alt="" coords="1305,152,1524,177"/>
+<area shape="rect" href="DiagMCMC_8cpp.html" title=" " alt="" coords="905,233,1106,258"/>
+<area shape="rect" href="ProcessMCMC_8cpp.html" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="256,233,477,258"/>
+<area shape="rect" href="FitterBase_8h.html" title=" " alt="" coords="1343,233,1487,258"/>
+<area shape="rect" href="MCMCProcessor_8cpp.html" title=" " alt="" coords="683,233,880,258"/>
+<area shape="rect" href="SampleSummary_8h.html" title=" " alt="" coords="1130,233,1318,258"/>
+<area shape="rect" href="inputManager_8h.html" title=" " alt="" coords="502,225,658,265"/>
+<area shape="rect" href="FitterBase_8cpp.html" title=" " alt="" coords="1493,321,1651,346"/>
+<area shape="rect" href="LikelihoodFit_8h.html" title=" " alt="" coords="1308,321,1468,346"/>
+<area shape="rect" href="MaCh3Factory_8h.html" title=" " alt="" coords="1551,489,1719,515"/>
+<area shape="rect" href="fitter_8cpp.html" title=" " alt="" coords="1221,489,1349,515"/>
+<area shape="rect" href="mcmc_8h.html" title=" " alt="" coords="1673,409,1791,434"/>
+<area shape="rect" href="LikelihoodFit_8cpp.html" title=" " alt="" coords="1422,409,1597,434"/>
+<area shape="rect" href="MinuitFit_8h.html" title=" " alt="" coords="1083,409,1218,434"/>
+<area shape="rect" href="PSO_8h.html" title=" " alt="" coords="1293,409,1397,434"/>
+<area shape="rect" href="MaCh3Factory_8cpp.html" title=" " alt="" coords="1543,563,1726,588"/>
+<area shape="rect" href="MinuitFit_8cpp.html" title=" " alt="" coords="1046,489,1197,515"/>
+<area shape="rect" href="PSO_8cpp.html" title=" " alt="" coords="1374,489,1493,515"/>
+<area shape="rect" href="mcmc_8cpp.html" title=" " alt="" coords="1743,489,1876,515"/>
+<area shape="rect" href="SampleSummary_8cpp.html" title=" " alt="" coords="1016,321,1219,346"/>
+<area shape="rect" href="inputManager_8cpp.html" title=" " alt="" coords="349,313,505,353"/>
+<area shape="rect" href="plottingManager_8h.html" title=" " alt="" coords="529,313,685,353"/>
+<area shape="rect" href="plotting_8cpp.html" title=" " alt="" coords="135,409,283,434"/>
+<area shape="rect" href="GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="308,401,489,441"/>
+<area shape="rect" href="MatrixPlotter_8cpp.html" title=" " alt="" coords="513,409,700,434"/>
+<area shape="rect" href="PlotLLH_8cpp.html" title=" " alt="" coords="724,409,876,434"/>
+<area shape="rect" href="plottingManager_8cpp.html" title=" " alt="" coords="901,401,1059,441"/>
+<area shape="rect" href="StatisticalUtils_8cpp.html" title=" " alt="" coords="981,152,1169,177"/>
+<area shape="rect" href="samplePDFBase_8cpp.html" title=" " alt="" coords="1511,233,1745,258"/>
+<area shape="rect" href="samplePDFFDBase_8h.html" title=" " alt="" coords="1834,233,2070,258"/>
+<area shape="rect" href="samplePDF_8cpp.html" title=" " alt="" coords="1867,321,2037,346"/>
+<area shape="rect" href="samplePDFFDBase_8cpp.html" title=" " alt="" coords="2061,321,2312,346"/>
 </map>
 </div>
 </div>
@@ -194,12 +197,22 @@ Functions</h2></td></tr>
 <tr class="memitem:ae28c217f8e8591248bfa54e95fdd7741"><td class="memItemLeft" align="right" valign="top">TH2Poly *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#ae28c217f8e8591248bfa54e95fdd7741">NormalisePoly</a> (TH2Poly *Histogram)</td></tr>
 <tr class="memdesc:ae28c217f8e8591248bfa54e95fdd7741"><td class="mdescLeft">&#160;</td><td class="mdescRight">WP: Helper to Normalise histograms.  <br /></td></tr>
 <tr class="separator:ae28c217f8e8591248bfa54e95fdd7741"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fc5d92fb039ba3c886404100876a511"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a2fc5d92fb039ba3c886404100876a511">NormaliseTH2Poly</a> (TH2Poly *Histogram)</td></tr>
+<tr class="memdesc:a2fc5d92fb039ba3c886404100876a511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to Normalise histograms.  <br /></td></tr>
+<tr class="separator:a2fc5d92fb039ba3c886404100876a511"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61d8f295d13a5fe82a552c08d42c8bfa"><td class="memItemLeft" align="right" valign="top">TH2Poly *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a61d8f295d13a5fe82a552c08d42c8bfa">PolyScaleWidth</a> (TH2Poly *Histogram, double scale)</td></tr>
 <tr class="memdesc:a61d8f295d13a5fe82a552c08d42c8bfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">WP: Helper to scale th2poly analogous to th2d scale with option "width".  <br /></td></tr>
 <tr class="separator:a61d8f295d13a5fe82a552c08d42c8bfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bab8af5f0339c6ec0310ff5ea87f26d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a8bab8af5f0339c6ec0310ff5ea87f26d">PolyIntegralWidth</a> (TH2Poly *Histogram)</td></tr>
 <tr class="memdesc:a8bab8af5f0339c6ec0310ff5ea87f26d"><td class="mdescLeft">&#160;</td><td class="mdescRight">WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width".  <br /></td></tr>
 <tr class="separator:a8bab8af5f0339c6ec0310ff5ea87f26d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84f9597f629eac6a951b455001d034d4"><td class="memTemplParams" colspan="2">template&lt;class HistType &gt; </td></tr>
+<tr class="memitem:a84f9597f629eac6a951b455001d034d4"><td class="memTemplItemLeft" align="right" valign="top">HistType *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a84f9597f629eac6a951b455001d034d4">RatioHists</a> (HistType *NumHist, HistType *DenomHist)</td></tr>
+<tr class="memdesc:a84f9597f629eac6a951b455001d034d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to make ratio histograms.  <br /></td></tr>
+<tr class="separator:a84f9597f629eac6a951b455001d034d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a105593155519e6b3bd302f8d04769280"><td class="memItemLeft" align="right" valign="top">TH2Poly *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a105593155519e6b3bd302f8d04769280">RatioPolys</a> (TH2Poly *NumPoly, TH2Poly *DenomPoly)</td></tr>
+<tr class="memdesc:a105593155519e6b3bd302f8d04769280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to make ratio of TH2Polys.  <br /></td></tr>
+<tr class="separator:a105593155519e6b3bd302f8d04769280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9372bd8295f0ce1759ebf5a35106f4af"><td class="memItemLeft" align="right" valign="top">TH2Poly *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a9372bd8295f0ce1759ebf5a35106f4af">MakePolyHist</a> (const std::string &amp;name, const std::vector&lt; double &gt; &amp;BinArray_x, const std::vector&lt; double &gt; &amp;BinArray_y)</td></tr>
 <tr class="memdesc:a9372bd8295f0ce1759ebf5a35106f4af"><td class="mdescLeft">&#160;</td><td class="mdescRight">WP: Helper function to create TH2Poly histogram with uniform binning.  <br /></td></tr>
 <tr class="separator:a9372bd8295f0ce1759ebf5a35106f4af"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,9 +222,27 @@ Functions</h2></td></tr>
 <tr class="memitem:a85463c0c6943e3d544d5fcb3f96bf18a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a> (TH1D *hist, const std::string &amp;name)</td></tr>
 <tr class="memdesc:a85463c0c6943e3d544d5fcb3f96bf18a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Remove fitted TF1 from hist to make comparison easier.  <br /></td></tr>
 <tr class="separator:a85463c0c6943e3d544d5fcb3f96bf18a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3652f7ce5e798d97696ec65b485b32ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a3652f7ce5e798d97696ec65b485b32ba">MakeFluctuatedHistogramStandard</a> (TH1D *FluctHist, TH1D *PolyHist, TRandom3 *rand)</td></tr>
+<tr class="memdesc:a3652f7ce5e798d97696ec65b485b32ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make Poisson fluctuation of TH1D hist using default fast method.  <br /></td></tr>
+<tr class="separator:a3652f7ce5e798d97696ec65b485b32ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d326700660ac56ba63cba9ac12316bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a> (TH1D *FluctHist, TH1D *PolyHist, TRandom3 *rand)</td></tr>
+<tr class="memdesc:a1d326700660ac56ba63cba9ac12316bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check.  <br /></td></tr>
+<tr class="separator:a1d326700660ac56ba63cba9ac12316bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc24766032d2e7097948e12a55db6168"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#abc24766032d2e7097948e12a55db6168">MakeFluctuatedHistogramStandard</a> (TH2Poly *FluctHist, TH2Poly *PolyHist, TRandom3 *rand)</td></tr>
+<tr class="memdesc:abc24766032d2e7097948e12a55db6168"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make Poisson fluctuation of TH2Poly hist using default fast method.  <br /></td></tr>
+<tr class="separator:abc24766032d2e7097948e12a55db6168"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa22d114df73293219d5360244921248a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#aa22d114df73293219d5360244921248a">MakeFluctuatedHistogramAlternative</a> (TH2Poly *FluctHist, TH2Poly *PolyHist, TRandom3 *rand)</td></tr>
+<tr class="memdesc:aa22d114df73293219d5360244921248a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check.  <br /></td></tr>
+<tr class="separator:aa22d114df73293219d5360244921248a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a454513bc80904ed4f7982d0c62aaf09a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a454513bc80904ed4f7982d0c62aaf09a">GetRandomPoly2</a> (const TH2Poly *PolyHist, TRandom3 *rand)</td></tr>
+<tr class="memdesc:a454513bc80904ed4f7982d0c62aaf09a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on <a href="https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e">link</a>  <br /></td></tr>
+<tr class="separator:a454513bc80904ed4f7982d0c62aaf09a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b61160c5ff362348884cb311e827221"><td class="memItemLeft" align="right" valign="top">TGraphAsymmErrors *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a> (TH1D *sigmaArrayLeft, TH1D *sigmaArrayCentr, TH1D *sigmaArrayRight, const std::string &amp;title)</td></tr>
 <tr class="memdesc:a3b61160c5ff362348884cb311e827221"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by sigma variation, check how 1 sigma changes spectra.  <br /></td></tr>
 <tr class="separator:a3b61160c5ff362348884cb311e827221"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5057e3deaf657180213e52d3f5bc41cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#a5057e3deaf657180213e52d3f5bc41cc">FastViolinFill</a> (TH2D *violin, TH1D *hist_1d)</td></tr>
+<tr class="memdesc:a5057e3deaf657180213e52d3f5bc41cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Fill Violin histogram with entry from a toy.  <br /></td></tr>
+<tr class="separator:a5057e3deaf657180213e52d3f5bc41cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbf5ccf44bc187caa268d4d158f4e5f6"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8h.html#afbf5ccf44bc187caa268d4d158f4e5f6">file_exists</a> (std::string filename)</td></tr>
 <tr class="memdesc:afbf5ccf44bc187caa268d4d158f4e5f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to check if files exist or not.  <br /></td></tr>
 <tr class="separator:afbf5ccf44bc187caa268d4d158f4e5f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -270,24 +301,24 @@ Functions</h2></td></tr>
 
 <p>Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00433">433</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  433</span>                                                                        {</div>
-<div class="line"><span class="lineno">  434</span><span class="comment">// ***************************************************************************</span></div>
-<div class="line"><span class="lineno">  435</span>  <span class="keywordtype">double</span> mNeff = 0.93956536 - Eb / 1000.;</div>
-<div class="line"><span class="lineno">  436</span>  <span class="keywordtype">double</span> mNoth = 0.93827203;</div>
-<div class="line"><span class="lineno">  437</span> </div>
-<div class="line"><span class="lineno">  438</span>  <span class="keywordflow">if</span> (!neutrino) {</div>
-<div class="line"><span class="lineno">  439</span>    mNeff = 0.93827203 - Eb / 1000.;</div>
-<div class="line"><span class="lineno">  440</span>    mNoth = 0.93956536;</div>
-<div class="line"><span class="lineno">  441</span>  }</div>
-<div class="line"><span class="lineno">  442</span> </div>
-<div class="line"><span class="lineno">  443</span>  <span class="keywordtype">double</span> mLep = 0.10565837;</div>
-<div class="line"><span class="lineno">  444</span>  <span class="keywordtype">double</span> eLep = sqrt(PLep * PLep + mLep * mLep);</div>
-<div class="line"><span class="lineno">  445</span> </div>
-<div class="line"><span class="lineno">  446</span>  <span class="keywordtype">double</span> Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));</div>
-<div class="line"><span class="lineno">  447</span> </div>
-<div class="line"><span class="lineno">  448</span>  <span class="keywordflow">return</span> Enu;</div>
-<div class="line"><span class="lineno">  449</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00595">595</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  595</span>                                                                        {</div>
+<div class="line"><span class="lineno">  596</span><span class="comment">// ***************************************************************************</span></div>
+<div class="line"><span class="lineno">  597</span>  <span class="keywordtype">double</span> mNeff = 0.93956536 - Eb / 1000.;</div>
+<div class="line"><span class="lineno">  598</span>  <span class="keywordtype">double</span> mNoth = 0.93827203;</div>
+<div class="line"><span class="lineno">  599</span> </div>
+<div class="line"><span class="lineno">  600</span>  <span class="keywordflow">if</span> (!neutrino) {</div>
+<div class="line"><span class="lineno">  601</span>    mNeff = 0.93827203 - Eb / 1000.;</div>
+<div class="line"><span class="lineno">  602</span>    mNoth = 0.93956536;</div>
+<div class="line"><span class="lineno">  603</span>  }</div>
+<div class="line"><span class="lineno">  604</span> </div>
+<div class="line"><span class="lineno">  605</span>  <span class="keywordtype">double</span> mLep = 0.10565837;</div>
+<div class="line"><span class="lineno">  606</span>  <span class="keywordtype">double</span> eLep = sqrt(PLep * PLep + mLep * mLep);</div>
+<div class="line"><span class="lineno">  607</span> </div>
+<div class="line"><span class="lineno">  608</span>  <span class="keywordtype">double</span> Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));</div>
+<div class="line"><span class="lineno">  609</span> </div>
+<div class="line"><span class="lineno">  610</span>  <span class="keywordflow">return</span> Enu;</div>
+<div class="line"><span class="lineno">  611</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -331,23 +362,23 @@ Functions</h2></td></tr>
 
 <p>Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00414">414</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  414</span>                                                                              {</div>
-<div class="line"><span class="lineno">  415</span><span class="comment">// ***************************************************************************</span></div>
-<div class="line"><span class="lineno">  416</span>  <span class="keyword">constexpr</span> <span class="keywordtype">double</span> MLep = 0.10565837;</div>
-<div class="line"><span class="lineno">  417</span> </div>
-<div class="line"><span class="lineno">  418</span>  <span class="comment">// Caluclate muon energy</span></div>
-<div class="line"><span class="lineno">  419</span>  <span class="keywordtype">double</span> ELep = sqrt((MLep*MLep)+(PLep*PLep));</div>
-<div class="line"><span class="lineno">  420</span> </div>
-<div class="line"><span class="lineno">  421</span>  <span class="keywordtype">double</span> CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);</div>
-<div class="line"><span class="lineno">  422</span> </div>
-<div class="line"><span class="lineno">  423</span>  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));</div>
-<div class="line"><span class="lineno">  424</span> </div>
-<div class="line"><span class="lineno">  425</span>  <span class="comment">// Calculate the new Q2</span></div>
-<div class="line"><span class="lineno">  426</span>  <span class="keywordtype">double</span> Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);</div>
-<div class="line"><span class="lineno">  427</span> </div>
-<div class="line"><span class="lineno">  428</span>  <span class="keywordflow">return</span> Q2Upd - InitialQ2;</div>
-<div class="line"><span class="lineno">  429</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00576">576</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  576</span>                                                                              {</div>
+<div class="line"><span class="lineno">  577</span><span class="comment">// ***************************************************************************</span></div>
+<div class="line"><span class="lineno">  578</span>  <span class="keyword">constexpr</span> <span class="keywordtype">double</span> MLep = 0.10565837;</div>
+<div class="line"><span class="lineno">  579</span> </div>
+<div class="line"><span class="lineno">  580</span>  <span class="comment">// Caluclate muon energy</span></div>
+<div class="line"><span class="lineno">  581</span>  <span class="keywordtype">double</span> ELep = sqrt((MLep*MLep)+(PLep*PLep));</div>
+<div class="line"><span class="lineno">  582</span> </div>
+<div class="line"><span class="lineno">  583</span>  <span class="keywordtype">double</span> CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);</div>
+<div class="line"><span class="lineno">  584</span> </div>
+<div class="line"><span class="lineno">  585</span>  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));</div>
+<div class="line"><span class="lineno">  586</span> </div>
+<div class="line"><span class="lineno">  587</span>  <span class="comment">// Calculate the new Q2</span></div>
+<div class="line"><span class="lineno">  588</span>  <span class="keywordtype">double</span> Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);</div>
+<div class="line"><span class="lineno">  589</span> </div>
+<div class="line"><span class="lineno">  590</span>  <span class="keywordflow">return</span> Q2Upd - InitialQ2;</div>
+<div class="line"><span class="lineno">  591</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -420,53 +451,53 @@ Functions</h2></td></tr>
 
 <p>KS: Convert TH2Poly to TH2D. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00250">250</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  250</span>                                          {</div>
-<div class="line"><span class="lineno">  251</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  252</span>  <span class="comment">// Make the x axis from the momentum of lepton</span></div>
-<div class="line"><span class="lineno">  253</span>  TAxis* xaxis = hist-&gt;GetXaxis();</div>
-<div class="line"><span class="lineno">  254</span>  <span class="comment">// Make the y axis from the cos theta of lepton</span></div>
-<div class="line"><span class="lineno">  255</span>  TAxis* yaxis = hist-&gt;GetYaxis();</div>
-<div class="line"><span class="lineno">  256</span> </div>
-<div class="line"><span class="lineno">  257</span>  TString histname = hist-&gt;GetName();</div>
-<div class="line"><span class="lineno">  258</span>  <span class="comment">// Convert TH2D binning to TH2Poly</span></div>
-<div class="line"><span class="lineno">  259</span>  TH2Poly* poly = <span class="keyword">new</span> TH2Poly();</div>
-<div class="line"><span class="lineno">  260</span>  poly-&gt;SetName(histname);</div>
-<div class="line"><span class="lineno">  261</span>  poly-&gt;SetTitle(histname);</div>
-<div class="line"><span class="lineno">  262</span> </div>
-<div class="line"><span class="lineno">  263</span>  <span class="comment">// Copy axis titles</span></div>
-<div class="line"><span class="lineno">  264</span>  poly-&gt;GetXaxis()-&gt;SetTitle(xaxis-&gt;GetTitle());</div>
-<div class="line"><span class="lineno">  265</span>  poly-&gt;GetYaxis()-&gt;SetTitle(yaxis-&gt;GetTitle());</div>
-<div class="line"><span class="lineno">  266</span> </div>
-<div class="line"><span class="lineno">  267</span>  <span class="keywordtype">double</span> xmax, xmin, ymax, ymin;</div>
-<div class="line"><span class="lineno">  268</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iy = 1; iy &lt;= yaxis-&gt;GetNbins(); iy++) {</div>
-<div class="line"><span class="lineno">  269</span>    ymax = yaxis-&gt;GetBinUpEdge(iy);</div>
-<div class="line"><span class="lineno">  270</span>    ymin = yaxis-&gt;GetBinLowEdge(iy);</div>
-<div class="line"><span class="lineno">  271</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ix = 1; ix &lt;= xaxis-&gt;GetNbins(); ix++) {</div>
-<div class="line"><span class="lineno">  272</span>      xmax = xaxis-&gt;GetBinUpEdge(ix);</div>
-<div class="line"><span class="lineno">  273</span>      xmin = xaxis-&gt;GetBinLowEdge(ix);</div>
-<div class="line"><span class="lineno">  274</span>      <span class="keywordtype">double</span> binofx[] = {xmin, xmax, xmax, xmin};</div>
-<div class="line"><span class="lineno">  275</span>      <span class="keywordtype">double</span> binofy[] = {ymin, ymin, ymax, ymax};</div>
-<div class="line"><span class="lineno">  276</span>      poly-&gt;AddBin(4, binofx, binofy);</div>
-<div class="line"><span class="lineno">  277</span>    }</div>
-<div class="line"><span class="lineno">  278</span>  }</div>
-<div class="line"><span class="lineno">  279</span> </div>
-<div class="line"><span class="lineno">  280</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iy = 1; iy &lt;= yaxis-&gt;GetNbins(); iy++) {</div>
-<div class="line"><span class="lineno">  281</span>    ymax = yaxis-&gt;GetBinUpEdge(iy);</div>
-<div class="line"><span class="lineno">  282</span>    ymin = yaxis-&gt;GetBinLowEdge(iy);</div>
-<div class="line"><span class="lineno">  283</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ix = 1; ix &lt;= xaxis-&gt;GetNbins(); ix++) {</div>
-<div class="line"><span class="lineno">  284</span>      xmax = xaxis-&gt;GetBinUpEdge(ix);</div>
-<div class="line"><span class="lineno">  285</span>      xmin = xaxis-&gt;GetBinLowEdge(ix);</div>
-<div class="line"><span class="lineno">  286</span> </div>
-<div class="line"><span class="lineno">  287</span>      <span class="comment">// Get the content of the corresponding bin in TH2D and set it in TH2Poly</span></div>
-<div class="line"><span class="lineno">  288</span>      <span class="keywordtype">int</span> bin = hist-&gt;GetBin(ix, iy);</div>
-<div class="line"><span class="lineno">  289</span>      <span class="keywordtype">double</span> content = hist-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno">  290</span>      poly-&gt;SetBinContent(poly-&gt;FindBin((xmin + xmax) / 2, (ymin + ymax) / 2), content);</div>
-<div class="line"><span class="lineno">  291</span>    }</div>
-<div class="line"><span class="lineno">  292</span>  }</div>
-<div class="line"><span class="lineno">  293</span> </div>
-<div class="line"><span class="lineno">  294</span>  <span class="keywordflow">return</span> poly;</div>
-<div class="line"><span class="lineno">  295</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00288">288</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  288</span>                                          {</div>
+<div class="line"><span class="lineno">  289</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  290</span>  <span class="comment">// Make the x axis from the momentum of lepton</span></div>
+<div class="line"><span class="lineno">  291</span>  TAxis* xaxis = hist-&gt;GetXaxis();</div>
+<div class="line"><span class="lineno">  292</span>  <span class="comment">// Make the y axis from the cos theta of lepton</span></div>
+<div class="line"><span class="lineno">  293</span>  TAxis* yaxis = hist-&gt;GetYaxis();</div>
+<div class="line"><span class="lineno">  294</span> </div>
+<div class="line"><span class="lineno">  295</span>  TString histname = hist-&gt;GetName();</div>
+<div class="line"><span class="lineno">  296</span>  <span class="comment">// Convert TH2D binning to TH2Poly</span></div>
+<div class="line"><span class="lineno">  297</span>  TH2Poly* poly = <span class="keyword">new</span> TH2Poly();</div>
+<div class="line"><span class="lineno">  298</span>  poly-&gt;SetName(histname);</div>
+<div class="line"><span class="lineno">  299</span>  poly-&gt;SetTitle(histname);</div>
+<div class="line"><span class="lineno">  300</span> </div>
+<div class="line"><span class="lineno">  301</span>  <span class="comment">// Copy axis titles</span></div>
+<div class="line"><span class="lineno">  302</span>  poly-&gt;GetXaxis()-&gt;SetTitle(xaxis-&gt;GetTitle());</div>
+<div class="line"><span class="lineno">  303</span>  poly-&gt;GetYaxis()-&gt;SetTitle(yaxis-&gt;GetTitle());</div>
+<div class="line"><span class="lineno">  304</span> </div>
+<div class="line"><span class="lineno">  305</span>  <span class="keywordtype">double</span> xmax, xmin, ymax, ymin;</div>
+<div class="line"><span class="lineno">  306</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iy = 1; iy &lt;= yaxis-&gt;GetNbins(); iy++) {</div>
+<div class="line"><span class="lineno">  307</span>    ymax = yaxis-&gt;GetBinUpEdge(iy);</div>
+<div class="line"><span class="lineno">  308</span>    ymin = yaxis-&gt;GetBinLowEdge(iy);</div>
+<div class="line"><span class="lineno">  309</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ix = 1; ix &lt;= xaxis-&gt;GetNbins(); ix++) {</div>
+<div class="line"><span class="lineno">  310</span>      xmax = xaxis-&gt;GetBinUpEdge(ix);</div>
+<div class="line"><span class="lineno">  311</span>      xmin = xaxis-&gt;GetBinLowEdge(ix);</div>
+<div class="line"><span class="lineno">  312</span>      <span class="keywordtype">double</span> binofx[] = {xmin, xmax, xmax, xmin};</div>
+<div class="line"><span class="lineno">  313</span>      <span class="keywordtype">double</span> binofy[] = {ymin, ymin, ymax, ymax};</div>
+<div class="line"><span class="lineno">  314</span>      poly-&gt;AddBin(4, binofx, binofy);</div>
+<div class="line"><span class="lineno">  315</span>    }</div>
+<div class="line"><span class="lineno">  316</span>  }</div>
+<div class="line"><span class="lineno">  317</span> </div>
+<div class="line"><span class="lineno">  318</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iy = 1; iy &lt;= yaxis-&gt;GetNbins(); iy++) {</div>
+<div class="line"><span class="lineno">  319</span>    ymax = yaxis-&gt;GetBinUpEdge(iy);</div>
+<div class="line"><span class="lineno">  320</span>    ymin = yaxis-&gt;GetBinLowEdge(iy);</div>
+<div class="line"><span class="lineno">  321</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ix = 1; ix &lt;= xaxis-&gt;GetNbins(); ix++) {</div>
+<div class="line"><span class="lineno">  322</span>      xmax = xaxis-&gt;GetBinUpEdge(ix);</div>
+<div class="line"><span class="lineno">  323</span>      xmin = xaxis-&gt;GetBinLowEdge(ix);</div>
+<div class="line"><span class="lineno">  324</span> </div>
+<div class="line"><span class="lineno">  325</span>      <span class="comment">// Get the content of the corresponding bin in TH2D and set it in TH2Poly</span></div>
+<div class="line"><span class="lineno">  326</span>      <span class="keywordtype">int</span> bin = hist-&gt;GetBin(ix, iy);</div>
+<div class="line"><span class="lineno">  327</span>      <span class="keywordtype">double</span> content = hist-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno">  328</span>      poly-&gt;SetBinContent(poly-&gt;FindBin((xmin + xmax) / 2, (ymin + ymax) / 2), content);</div>
+<div class="line"><span class="lineno">  329</span>    }</div>
+<div class="line"><span class="lineno">  330</span>  }</div>
+<div class="line"><span class="lineno">  331</span> </div>
+<div class="line"><span class="lineno">  332</span>  <span class="keywordflow">return</span> poly;</div>
+<div class="line"><span class="lineno">  333</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -498,41 +529,88 @@ Functions</h2></td></tr>
 
 <p>KS: Convert TH2D to TH2Poly. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00216">216</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  216</span>                                                         {</div>
-<div class="line"><span class="lineno">  217</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  218</span>  <span class="keywordtype">double</span> xlow, xup, ylow, yup;</div>
-<div class="line"><span class="lineno">  219</span>  std::string HistTempName = poly-&gt;GetName();</div>
-<div class="line"><span class="lineno">  220</span> </div>
-<div class="line"><span class="lineno">  221</span>  HistTempName += <span class="stringliteral">&quot;_&quot;</span>;</div>
-<div class="line"><span class="lineno">  222</span>  <span class="comment">//make the th2d</span></div>
-<div class="line"><span class="lineno">  223</span>  TH2D *hist = <span class="keyword">static_cast&lt;</span>TH2D*<span class="keyword">&gt;</span>(h2dhist-&gt;Clone());</div>
-<div class="line"><span class="lineno">  224</span>  hist-&gt;SetNameTitle(HistTempName.c_str(), HistTempName.c_str());</div>
-<div class="line"><span class="lineno">  225</span> </div>
-<div class="line"><span class="lineno">  226</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ix = 0; ix &lt; hist-&gt;GetNbinsX() + 2; ix++) {</div>
-<div class="line"><span class="lineno">  227</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iy = 0; iy &lt; hist-&gt;GetNbinsY() + 2; iy++) {</div>
-<div class="line"><span class="lineno">  228</span>      hist-&gt;SetBinContent(ix, iy, 0);</div>
-<div class="line"><span class="lineno">  229</span>    }</div>
-<div class="line"><span class="lineno">  230</span>  }</div>
-<div class="line"><span class="lineno">  231</span>  <span class="comment">//Loop over poly bins, find the corresponding th2d and setbincontent!</span></div>
-<div class="line"><span class="lineno">  232</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt; poly-&gt;GetNumberOfBins(); i++){</div>
-<div class="line"><span class="lineno">  233</span>    TH2PolyBin &amp; polybin = <span class="keyword">static_cast&lt;</span>TH2PolyBin &amp;<span class="keyword">&gt;</span>(*poly-&gt;GetBins()-&gt;At(i));</div>
-<div class="line"><span class="lineno">  234</span>    xlow = polybin.GetXMin();</div>
-<div class="line"><span class="lineno">  235</span>    xup = polybin.GetXMax();</div>
-<div class="line"><span class="lineno">  236</span>    ylow = polybin.GetYMin();</div>
-<div class="line"><span class="lineno">  237</span>    yup = polybin.GetYMax();</div>
-<div class="line"><span class="lineno">  238</span>    <span class="keywordtype">int</span> xbin, ybin;</div>
-<div class="line"><span class="lineno">  239</span> </div>
-<div class="line"><span class="lineno">  240</span>    xbin = hist-&gt;GetXaxis()-&gt;FindBin(xlow+(xup-xlow)/2);</div>
-<div class="line"><span class="lineno">  241</span>    ybin = hist-&gt;GetYaxis()-&gt;FindBin(ylow+(yup-ylow)/2);</div>
-<div class="line"><span class="lineno">  242</span> </div>
-<div class="line"><span class="lineno">  243</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a>(<span class="stringliteral">&quot;Poly bin {}, xlow: {}, xup: {}, ylow: {}, yup: {}. Finding bin for ({}, {}). Found Bin ({}, {}) with content {}. But Poly content: {}&quot;</span>,</div>
-<div class="line"><span class="lineno">  244</span>                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin.GetContent(), poly-&gt;GetBinContent(i));</div>
-<div class="line"><span class="lineno">  245</span>    hist-&gt;SetBinContent(xbin, ybin, polybin.GetContent());</div>
-<div class="line"><span class="lineno">  246</span>  }</div>
-<div class="line"><span class="lineno">  247</span>  <span class="keywordflow">return</span> hist;</div>
-<div class="line"><span class="lineno">  248</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00254">254</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  254</span>                                                         {</div>
+<div class="line"><span class="lineno">  255</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  256</span>  <span class="keywordtype">double</span> xlow, xup, ylow, yup;</div>
+<div class="line"><span class="lineno">  257</span>  std::string HistTempName = poly-&gt;GetName();</div>
+<div class="line"><span class="lineno">  258</span> </div>
+<div class="line"><span class="lineno">  259</span>  HistTempName += <span class="stringliteral">&quot;_&quot;</span>;</div>
+<div class="line"><span class="lineno">  260</span>  <span class="comment">//make the th2d</span></div>
+<div class="line"><span class="lineno">  261</span>  TH2D *hist = <span class="keyword">static_cast&lt;</span>TH2D*<span class="keyword">&gt;</span>(h2dhist-&gt;Clone());</div>
+<div class="line"><span class="lineno">  262</span>  hist-&gt;SetNameTitle(HistTempName.c_str(), HistTempName.c_str());</div>
+<div class="line"><span class="lineno">  263</span> </div>
+<div class="line"><span class="lineno">  264</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ix = 0; ix &lt; hist-&gt;GetNbinsX() + 2; ix++) {</div>
+<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iy = 0; iy &lt; hist-&gt;GetNbinsY() + 2; iy++) {</div>
+<div class="line"><span class="lineno">  266</span>      hist-&gt;SetBinContent(ix, iy, 0);</div>
+<div class="line"><span class="lineno">  267</span>    }</div>
+<div class="line"><span class="lineno">  268</span>  }</div>
+<div class="line"><span class="lineno">  269</span>  <span class="comment">//Loop over poly bins, find the corresponding th2d and setbincontent!</span></div>
+<div class="line"><span class="lineno">  270</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i&lt; poly-&gt;GetNumberOfBins(); i++){</div>
+<div class="line"><span class="lineno">  271</span>    TH2PolyBin &amp; polybin = <span class="keyword">static_cast&lt;</span>TH2PolyBin &amp;<span class="keyword">&gt;</span>(*poly-&gt;GetBins()-&gt;At(i));</div>
+<div class="line"><span class="lineno">  272</span>    xlow = polybin.GetXMin();</div>
+<div class="line"><span class="lineno">  273</span>    xup = polybin.GetXMax();</div>
+<div class="line"><span class="lineno">  274</span>    ylow = polybin.GetYMin();</div>
+<div class="line"><span class="lineno">  275</span>    yup = polybin.GetYMax();</div>
+<div class="line"><span class="lineno">  276</span>    <span class="keywordtype">int</span> xbin, ybin;</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>    xbin = hist-&gt;GetXaxis()-&gt;FindBin(xlow+(xup-xlow)/2);</div>
+<div class="line"><span class="lineno">  279</span>    ybin = hist-&gt;GetYaxis()-&gt;FindBin(ylow+(yup-ylow)/2);</div>
+<div class="line"><span class="lineno">  280</span> </div>
+<div class="line"><span class="lineno">  281</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a>(<span class="stringliteral">&quot;Poly bin {}, xlow: {}, xup: {}, ylow: {}, yup: {}. Finding bin for ({}, {}). Found Bin ({}, {}) with content {}. But Poly content: {}&quot;</span>,</div>
+<div class="line"><span class="lineno">  282</span>                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin.GetContent(), poly-&gt;GetBinContent(i));</div>
+<div class="line"><span class="lineno">  283</span>    hist-&gt;SetBinContent(xbin, ybin, polybin.GetContent());</div>
+<div class="line"><span class="lineno">  284</span>  }</div>
+<div class="line"><span class="lineno">  285</span>  <span class="keywordflow">return</span> hist;</div>
+<div class="line"><span class="lineno">  286</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_afc88f0aa23c7127b2ff6e5c7ca3fa892"><div class="ttname"><a href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a></div><div class="ttdeci">#define MACH3LOG_TRACE</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00017">MaCh3Logger.h:17</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a5057e3deaf657180213e52d3f5bc41cc" name="a5057e3deaf657180213e52d3f5bc41cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5057e3deaf657180213e52d3f5bc41cc">&#9670;&#160;</a></span>FastViolinFill()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FastViolinFill </td>
+          <td>(</td>
+          <td class="paramtype">TH2D *&#160;</td>
+          <td class="paramname"><em>violin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>hist_1d</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Fill Violin histogram with entry from a toy. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">violin</td><td>hist that will be filled </td></tr>
+    <tr><td class="paramname">hist_1d</td><td>refence hist from which we take entries to be filled </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00554">554</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  554</span>                                                {</div>
+<div class="line"><span class="lineno">  555</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  556</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = 0; x &lt; violin-&gt;GetXaxis()-&gt;GetNbins(); ++x)</div>
+<div class="line"><span class="lineno">  557</span>  {</div>
+<div class="line"><span class="lineno">  558</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> y = violin-&gt;GetYaxis()-&gt;FindBin(hist_1d-&gt;GetBinContent(x+1));</div>
+<div class="line"><span class="lineno">  559</span>    violin-&gt;SetBinContent(x+1, y,  violin-&gt;GetBinContent(x+1, y)+1);</div>
+<div class="line"><span class="lineno">  560</span>  }</div>
+<div class="line"><span class="lineno">  561</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -562,18 +640,76 @@ Functions</h2></td></tr>
 
 <p>Helper to check if files exist or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00069">69</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   69</span>                                                 {</div>
-<div class="line"><span class="lineno">   70</span>  std::ifstream infile(filename.c_str());</div>
-<div class="line"><span class="lineno">   71</span>  <span class="keywordflow">if</span> (!infile.good()) {</div>
-<div class="line"><span class="lineno">   72</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*** ERROR ***&quot;</span>);</div>
-<div class="line"><span class="lineno">   73</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} does not exist&quot;</span>, filename);</div>
-<div class="line"><span class="lineno">   74</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please try again&quot;</span>);</div>
-<div class="line"><span class="lineno">   75</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*************&quot;</span>);</div>
-<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">   77</span>  }</div>
-<div class="line"><span class="lineno">   78</span>  <span class="keywordflow">return</span> filename;</div>
-<div class="line"><span class="lineno">   79</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00099">99</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   99</span>                                                 {</div>
+<div class="line"><span class="lineno">  100</span>  std::ifstream infile(filename.c_str());</div>
+<div class="line"><span class="lineno">  101</span>  <span class="keywordflow">if</span> (!infile.good()) {</div>
+<div class="line"><span class="lineno">  102</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*** ERROR ***&quot;</span>);</div>
+<div class="line"><span class="lineno">  103</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} does not exist&quot;</span>, filename);</div>
+<div class="line"><span class="lineno">  104</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please try again&quot;</span>);</div>
+<div class="line"><span class="lineno">  105</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*************&quot;</span>);</div>
+<div class="line"><span class="lineno">  106</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  107</span>  }</div>
+<div class="line"><span class="lineno">  108</span>  <span class="keywordflow">return</span> filename;</div>
+<div class="line"><span class="lineno">  109</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a454513bc80904ed4f7982d0c62aaf09a" name="a454513bc80904ed4f7982d0c62aaf09a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a454513bc80904ed4f7982d0c62aaf09a">&#9670;&#160;</a></span>GetRandomPoly2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GetRandomPoly2 </td>
+          <td>(</td>
+          <td class="paramtype">const TH2Poly *&#160;</td>
+          <td class="paramname"><em>PolyHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TRandom3 *&#160;</td>
+          <td class="paramname"><em>rand</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on <a href="https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e">link</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00472">472</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  472</span>                                                           {</div>
+<div class="line"><span class="lineno">  473</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  474</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> nbins = PolyHist-&gt;GetNumberOfBins();</div>
+<div class="line"><span class="lineno">  475</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> r1 = rand-&gt;Rndm();</div>
+<div class="line"><span class="lineno">  476</span> </div>
+<div class="line"><span class="lineno">  477</span>  <span class="keywordtype">double</span>* fIntegral = <span class="keyword">new</span> <span class="keywordtype">double</span>[nbins+2];</div>
+<div class="line"><span class="lineno">  478</span>  fIntegral[0] = 0.0;</div>
+<div class="line"><span class="lineno">  479</span> </div>
+<div class="line"><span class="lineno">  480</span>  <span class="comment">//KS: This is custom version of ComputeIntegral, once again ROOT was lazy :(</span></div>
+<div class="line"><span class="lineno">  481</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt; nbins+1; ++i)</div>
+<div class="line"><span class="lineno">  482</span>  {</div>
+<div class="line"><span class="lineno">  483</span>    fIntegral[i] = 0.0;</div>
+<div class="line"><span class="lineno">  484</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> content = PolyHist-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  485</span>    fIntegral[i] += fIntegral[i - 1] + content;</div>
+<div class="line"><span class="lineno">  486</span>  }</div>
+<div class="line"><span class="lineno">  487</span>  <span class="keywordflow">for</span> (Int_t bin = 1; bin &lt; nbins+1; ++bin)  fIntegral[bin] /= fIntegral[nbins];</div>
+<div class="line"><span class="lineno">  488</span>  fIntegral[nbins+1] = PolyHist-&gt;GetEntries();</div>
+<div class="line"><span class="lineno">  489</span> </div>
+<div class="line"><span class="lineno">  490</span>  <span class="comment">//KS: We just return one rather then X and Y, this way we can use SetBinContent rather than Fill, which is faster</span></div>
+<div class="line"><span class="lineno">  491</span>  <span class="keywordtype">int</span> iBin = int(TMath::BinarySearch(nbins, fIntegral, r1));</div>
+<div class="line"><span class="lineno">  492</span>  <span class="comment">//KS: Have to increment because TH2Poly has stupid offset arghh</span></div>
+<div class="line"><span class="lineno">  493</span>  iBin += 1;</div>
+<div class="line"><span class="lineno">  494</span> </div>
+<div class="line"><span class="lineno">  495</span>  <span class="keyword">delete</span>[] fIntegral;</div>
+<div class="line"><span class="lineno">  496</span>  <span class="keywordflow">return</span> iBin;</div>
+<div class="line"><span class="lineno">  497</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -627,36 +763,260 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code>TGraphAsymmErrors</code> object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00372">372</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  372</span>                                                                                                                             {</div>
-<div class="line"><span class="lineno">  373</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  374</span>  TGraphAsymmErrors *var = <span class="keyword">new</span> TGraphAsymmErrors(sigmaArrayCentr);</div>
-<div class="line"><span class="lineno">  375</span>  var-&gt;SetNameTitle((title).c_str(), (title).c_str());</div>
-<div class="line"><span class="lineno">  376</span> </div>
-<div class="line"><span class="lineno">  377</span>  <span class="comment">// Need to draw TGraphs to set axes labels</span></div>
-<div class="line"><span class="lineno">  378</span>  var-&gt;Draw(<span class="stringliteral">&quot;AP&quot;</span>);</div>
-<div class="line"><span class="lineno">  379</span>  var-&gt;GetXaxis()-&gt;SetTitle(sigmaArrayCentr-&gt;GetXaxis()-&gt;GetTitle());</div>
-<div class="line"><span class="lineno">  380</span>  var-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Number of events/bin&quot;</span>);</div>
-<div class="line"><span class="lineno">  381</span> </div>
-<div class="line"><span class="lineno">  382</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> m = 0; m &lt; var-&gt;GetN(); ++m)</div>
-<div class="line"><span class="lineno">  383</span>  {</div>
-<div class="line"><span class="lineno">  384</span>    <span class="keywordtype">double</span> xlow = sigmaArrayLeft-&gt;GetBinContent(m+1);</div>
-<div class="line"><span class="lineno">  385</span>    <span class="keywordtype">double</span> xhigh = sigmaArrayRight-&gt;GetBinContent(m+1);</div>
-<div class="line"><span class="lineno">  386</span>    <span class="keywordtype">double</span> xtemp;</div>
-<div class="line"><span class="lineno">  387</span> </div>
-<div class="line"><span class="lineno">  388</span>    <span class="comment">// Figure out which variation is larger so we set the error correctly</span></div>
-<div class="line"><span class="lineno">  389</span>    <span class="keywordflow">if</span> (xlow &gt; xhigh)</div>
-<div class="line"><span class="lineno">  390</span>    {</div>
-<div class="line"><span class="lineno">  391</span>      xtemp = xlow;</div>
-<div class="line"><span class="lineno">  392</span>      xlow = xhigh;</div>
-<div class="line"><span class="lineno">  393</span>      xhigh = xtemp;</div>
-<div class="line"><span class="lineno">  394</span>    }</div>
-<div class="line"><span class="lineno">  395</span> </div>
-<div class="line"><span class="lineno">  396</span>    var-&gt;SetPointEYhigh(m, xhigh - var-&gt;GetY()[m]);</div>
-<div class="line"><span class="lineno">  397</span>    var-&gt;SetPointEYlow(m, var-&gt;GetY()[m] - xlow);</div>
-<div class="line"><span class="lineno">  398</span>  }</div>
-<div class="line"><span class="lineno">  399</span>  <span class="keywordflow">return</span> var;</div>
-<div class="line"><span class="lineno">  400</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00522">522</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  522</span>                                                                                                                             {</div>
+<div class="line"><span class="lineno">  523</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  524</span>  TGraphAsymmErrors *var = <span class="keyword">new</span> TGraphAsymmErrors(sigmaArrayCentr);</div>
+<div class="line"><span class="lineno">  525</span>  var-&gt;SetNameTitle((title).c_str(), (title).c_str());</div>
+<div class="line"><span class="lineno">  526</span> </div>
+<div class="line"><span class="lineno">  527</span>  <span class="comment">// Need to draw TGraphs to set axes labels</span></div>
+<div class="line"><span class="lineno">  528</span>  var-&gt;Draw(<span class="stringliteral">&quot;AP&quot;</span>);</div>
+<div class="line"><span class="lineno">  529</span>  var-&gt;GetXaxis()-&gt;SetTitle(sigmaArrayCentr-&gt;GetXaxis()-&gt;GetTitle());</div>
+<div class="line"><span class="lineno">  530</span>  var-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Number of events/bin&quot;</span>);</div>
+<div class="line"><span class="lineno">  531</span> </div>
+<div class="line"><span class="lineno">  532</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> m = 0; m &lt; var-&gt;GetN(); ++m)</div>
+<div class="line"><span class="lineno">  533</span>  {</div>
+<div class="line"><span class="lineno">  534</span>    <span class="keywordtype">double</span> xlow = sigmaArrayLeft-&gt;GetBinContent(m+1);</div>
+<div class="line"><span class="lineno">  535</span>    <span class="keywordtype">double</span> xhigh = sigmaArrayRight-&gt;GetBinContent(m+1);</div>
+<div class="line"><span class="lineno">  536</span>    <span class="keywordtype">double</span> xtemp;</div>
+<div class="line"><span class="lineno">  537</span> </div>
+<div class="line"><span class="lineno">  538</span>    <span class="comment">// Figure out which variation is larger so we set the error correctly</span></div>
+<div class="line"><span class="lineno">  539</span>    <span class="keywordflow">if</span> (xlow &gt; xhigh)</div>
+<div class="line"><span class="lineno">  540</span>    {</div>
+<div class="line"><span class="lineno">  541</span>      xtemp = xlow;</div>
+<div class="line"><span class="lineno">  542</span>      xlow = xhigh;</div>
+<div class="line"><span class="lineno">  543</span>      xhigh = xtemp;</div>
+<div class="line"><span class="lineno">  544</span>    }</div>
+<div class="line"><span class="lineno">  545</span> </div>
+<div class="line"><span class="lineno">  546</span>    var-&gt;SetPointEYhigh(m, xhigh - var-&gt;GetY()[m]);</div>
+<div class="line"><span class="lineno">  547</span>    var-&gt;SetPointEYlow(m, var-&gt;GetY()[m] - xlow);</div>
+<div class="line"><span class="lineno">  548</span>  }</div>
+<div class="line"><span class="lineno">  549</span>  <span class="keywordflow">return</span> var;</div>
+<div class="line"><span class="lineno">  550</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1d326700660ac56ba63cba9ac12316bc" name="a1d326700660ac56ba63cba9ac12316bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d326700660ac56ba63cba9ac12316bc">&#9670;&#160;</a></span>MakeFluctuatedHistogramAlternative() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MakeFluctuatedHistogramAlternative </td>
+          <td>(</td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>FluctHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>PolyHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TRandom3 *&#160;</td>
+          <td class="paramname"><em>rand</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check. </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00449">449</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  449</span>                                                                                        {</div>
+<div class="line"><span class="lineno">  450</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  451</span>  <span class="comment">// Make the Poisson fluctuated hist</span></div>
+<div class="line"><span class="lineno">  452</span>  FluctHist-&gt;Reset(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  453</span>  FluctHist-&gt;Fill(0.0, 0.0);</div>
+<div class="line"><span class="lineno">  454</span> </div>
+<div class="line"><span class="lineno">  455</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> evrate = PolyHist-&gt;Integral();</div>
+<div class="line"><span class="lineno">  456</span><span class="preprocessor">  #pragma GCC diagnostic push</span></div>
+<div class="line"><span class="lineno">  457</span><span class="preprocessor">  #pragma GCC diagnostic ignored &quot;-Wconversion&quot;</span></div>
+<div class="line"><span class="lineno">  458</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> num = rand-&gt;Poisson(evrate);</div>
+<div class="line"><span class="lineno">  459</span><span class="preprocessor">  #pragma GCC diagnostic pop</span></div>
+<div class="line"><span class="lineno">  460</span>  <span class="keywordtype">int</span> count = 0;</div>
+<div class="line"><span class="lineno">  461</span>  <span class="keywordflow">while</span>(count &lt; num)</div>
+<div class="line"><span class="lineno">  462</span>  {</div>
+<div class="line"><span class="lineno">  463</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> candidate = PolyHist-&gt;GetRandom();</div>
+<div class="line"><span class="lineno">  464</span>    FluctHist-&gt;Fill(candidate);</div>
+<div class="line"><span class="lineno">  465</span>    count++;</div>
+<div class="line"><span class="lineno">  466</span>  }</div>
+<div class="line"><span class="lineno">  467</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aa22d114df73293219d5360244921248a" name="aa22d114df73293219d5360244921248a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa22d114df73293219d5360244921248a">&#9670;&#160;</a></span>MakeFluctuatedHistogramAlternative() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MakeFluctuatedHistogramAlternative </td>
+          <td>(</td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>FluctHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>PolyHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TRandom3 *&#160;</td>
+          <td class="paramname"><em>rand</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check. </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00501">501</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  501</span>                                                                                              {</div>
+<div class="line"><span class="lineno">  502</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  503</span>  <span class="comment">// Make the Poisson fluctuated hist</span></div>
+<div class="line"><span class="lineno">  504</span>  FluctHist-&gt;Reset(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  505</span>  FluctHist-&gt;Fill(0.0, 0.0, 0.0);</div>
+<div class="line"><span class="lineno">  506</span> </div>
+<div class="line"><span class="lineno">  507</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> evrate = <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(PolyHist);</div>
+<div class="line"><span class="lineno">  508</span><span class="preprocessor">  #pragma GCC diagnostic push</span></div>
+<div class="line"><span class="lineno">  509</span><span class="preprocessor">  #pragma GCC diagnostic ignored &quot;-Wconversion&quot;</span></div>
+<div class="line"><span class="lineno">  510</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> num = rand-&gt;Poisson(evrate);</div>
+<div class="line"><span class="lineno">  511</span><span class="preprocessor">  #pragma GCC diagnostic pop</span></div>
+<div class="line"><span class="lineno">  512</span>  <span class="keywordtype">int</span> count = 0;</div>
+<div class="line"><span class="lineno">  513</span>  <span class="keywordflow">while</span>(count &lt; num)</div>
+<div class="line"><span class="lineno">  514</span>  {</div>
+<div class="line"><span class="lineno">  515</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> iBin = <a class="code hl_function" href="HistogramUtils_8cpp.html#a454513bc80904ed4f7982d0c62aaf09a">GetRandomPoly2</a>(PolyHist, rand);</div>
+<div class="line"><span class="lineno">  516</span>    FluctHist-&gt;SetBinContent(iBin, FluctHist-&gt;GetBinContent(iBin) + 1);</div>
+<div class="line"><span class="lineno">  517</span>    count++;</div>
+<div class="line"><span class="lineno">  518</span>  }</div>
+<div class="line"><span class="lineno">  519</span>}</div>
+<div class="ttc" id="aHistogramUtils_8cpp_html_a454513bc80904ed4f7982d0c62aaf09a"><div class="ttname"><a href="HistogramUtils_8cpp.html#a454513bc80904ed4f7982d0c62aaf09a">GetRandomPoly2</a></div><div class="ttdeci">int GetRandomPoly2(const TH2Poly *PolyHist, TRandom3 *rand)</div><div class="ttdoc">KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on l...</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00472">HistogramUtils.cpp:472</a></div></div>
+<div class="ttc" id="aHistogramUtils_8cpp_html_ab18c6b2408d7b9021bad06d47a06ee8d"><div class="ttname"><a href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a></div><div class="ttdeci">double NoOverflowIntegral(TH2Poly *poly)</div><div class="ttdoc">WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00056">HistogramUtils.cpp:56</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a3652f7ce5e798d97696ec65b485b32ba" name="a3652f7ce5e798d97696ec65b485b32ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3652f7ce5e798d97696ec65b485b32ba">&#9670;&#160;</a></span>MakeFluctuatedHistogramStandard() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MakeFluctuatedHistogramStandard </td>
+          <td>(</td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>FluctHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>PolyHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TRandom3 *&#160;</td>
+          <td class="paramname"><em>rand</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Make Poisson fluctuation of TH1D hist using default fast method. </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00411">411</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  411</span>                                                                                     {</div>
+<div class="line"><span class="lineno">  412</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  413</span>  <span class="comment">// Make the Poisson fluctuated hist</span></div>
+<div class="line"><span class="lineno">  414</span>  FluctHist-&gt;Reset(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  415</span>  FluctHist-&gt;Fill(0.0, 0.0);</div>
+<div class="line"><span class="lineno">  416</span> </div>
+<div class="line"><span class="lineno">  417</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= PolyHist-&gt;GetXaxis()-&gt;GetNbins(); ++i)</div>
+<div class="line"><span class="lineno">  418</span>  {</div>
+<div class="line"><span class="lineno">  419</span>    <span class="comment">// Get the posterior predictive bin content</span></div>
+<div class="line"><span class="lineno">  420</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> MeanContent = PolyHist-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  421</span>    <span class="comment">// Get a Poisson fluctuation of the content</span></div>
+<div class="line"><span class="lineno">  422</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> Random = rand-&gt;PoissonD(MeanContent);</div>
+<div class="line"><span class="lineno">  423</span>    <span class="comment">// Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram</span></div>
+<div class="line"><span class="lineno">  424</span>    FluctHist-&gt;SetBinContent(i,Random);</div>
+<div class="line"><span class="lineno">  425</span>  }</div>
+<div class="line"><span class="lineno">  426</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abc24766032d2e7097948e12a55db6168" name="abc24766032d2e7097948e12a55db6168"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc24766032d2e7097948e12a55db6168">&#9670;&#160;</a></span>MakeFluctuatedHistogramStandard() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MakeFluctuatedHistogramStandard </td>
+          <td>(</td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>FluctHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>PolyHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TRandom3 *&#160;</td>
+          <td class="paramname"><em>rand</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Make Poisson fluctuation of TH2Poly hist using default fast method. </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00430">430</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  430</span>                                                                                            {</div>
+<div class="line"><span class="lineno">  431</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  432</span>  <span class="comment">// Make the Poisson fluctuated hist</span></div>
+<div class="line"><span class="lineno">  433</span>  FluctHist-&gt;Reset(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  434</span>  FluctHist-&gt;Fill(0.0, 0.0, 0.0);</div>
+<div class="line"><span class="lineno">  435</span> </div>
+<div class="line"><span class="lineno">  436</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt; FluctHist-&gt;GetNumberOfBins()+1; ++i)</div>
+<div class="line"><span class="lineno">  437</span>  {</div>
+<div class="line"><span class="lineno">  438</span>    <span class="comment">// Get the posterior predictive bin content</span></div>
+<div class="line"><span class="lineno">  439</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> MeanContent = PolyHist-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  440</span>    <span class="comment">// Get a Poisson fluctuation of the content</span></div>
+<div class="line"><span class="lineno">  441</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> Random = rand-&gt;PoissonD(MeanContent);</div>
+<div class="line"><span class="lineno">  442</span>    <span class="comment">// Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram</span></div>
+<div class="line"><span class="lineno">  443</span>    FluctHist-&gt;SetBinContent(i,Random);</div>
+<div class="line"><span class="lineno">  444</span>  }</div>
+<div class="line"><span class="lineno">  445</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -702,28 +1062,28 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00338">338</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  338</span>                                                                                                                       {</div>
-<div class="line"><span class="lineno">  339</span><span class="comment">// *********************</span></div>
-<div class="line"><span class="lineno">  340</span>  TH2Poly* poly = <span class="keyword">new</span> TH2Poly();</div>
-<div class="line"><span class="lineno">  341</span>  poly-&gt;SetName(name.c_str());</div>
-<div class="line"><span class="lineno">  342</span>  poly-&gt;SetTitle(name.c_str());</div>
-<div class="line"><span class="lineno">  343</span>  <span class="keywordtype">double</span> xmax, xmin, ymax, ymin;</div>
-<div class="line"><span class="lineno">  344</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iy = 0; iy &lt; BinArray_y.size()-1; iy++)</div>
-<div class="line"><span class="lineno">  345</span>  {</div>
-<div class="line"><span class="lineno">  346</span>    ymax = BinArray_y[iy+1];</div>
-<div class="line"><span class="lineno">  347</span>    ymin = BinArray_y[iy];</div>
-<div class="line"><span class="lineno">  348</span>    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ix = 0; ix &lt; BinArray_x.size()-1; ix++)</div>
-<div class="line"><span class="lineno">  349</span>    {</div>
-<div class="line"><span class="lineno">  350</span>      xmax = BinArray_x[ix+1];</div>
-<div class="line"><span class="lineno">  351</span>      xmin = BinArray_x[ix];</div>
-<div class="line"><span class="lineno">  352</span>      <span class="keywordtype">double</span> binofx[] = {xmin, xmax, xmax, xmin};</div>
-<div class="line"><span class="lineno">  353</span>      <span class="keywordtype">double</span> binofy[] = {ymin, ymin, ymax, ymax};</div>
-<div class="line"><span class="lineno">  354</span>      poly-&gt;AddBin(4,binofx,binofy);</div>
-<div class="line"><span class="lineno">  355</span>    }</div>
-<div class="line"><span class="lineno">  356</span>  }</div>
-<div class="line"><span class="lineno">  357</span>  <span class="keywordflow">return</span> poly;</div>
-<div class="line"><span class="lineno">  358</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00376">376</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  376</span>                                                                                                                       {</div>
+<div class="line"><span class="lineno">  377</span><span class="comment">// *********************</span></div>
+<div class="line"><span class="lineno">  378</span>  TH2Poly* poly = <span class="keyword">new</span> TH2Poly();</div>
+<div class="line"><span class="lineno">  379</span>  poly-&gt;SetName(name.c_str());</div>
+<div class="line"><span class="lineno">  380</span>  poly-&gt;SetTitle(name.c_str());</div>
+<div class="line"><span class="lineno">  381</span>  <span class="keywordtype">double</span> xmax, xmin, ymax, ymin;</div>
+<div class="line"><span class="lineno">  382</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iy = 0; iy &lt; BinArray_y.size()-1; iy++)</div>
+<div class="line"><span class="lineno">  383</span>  {</div>
+<div class="line"><span class="lineno">  384</span>    ymax = BinArray_y[iy+1];</div>
+<div class="line"><span class="lineno">  385</span>    ymin = BinArray_y[iy];</div>
+<div class="line"><span class="lineno">  386</span>    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ix = 0; ix &lt; BinArray_x.size()-1; ix++)</div>
+<div class="line"><span class="lineno">  387</span>    {</div>
+<div class="line"><span class="lineno">  388</span>      xmax = BinArray_x[ix+1];</div>
+<div class="line"><span class="lineno">  389</span>      xmin = BinArray_x[ix];</div>
+<div class="line"><span class="lineno">  390</span>      <span class="keywordtype">double</span> binofx[] = {xmin, xmax, xmax, xmin};</div>
+<div class="line"><span class="lineno">  391</span>      <span class="keywordtype">double</span> binofy[] = {ymin, ymin, ymax, ymax};</div>
+<div class="line"><span class="lineno">  392</span>      poly-&gt;AddBin(4,binofx,binofy);</div>
+<div class="line"><span class="lineno">  393</span>    }</div>
+<div class="line"><span class="lineno">  394</span>  }</div>
+<div class="line"><span class="lineno">  395</span>  <span class="keywordflow">return</span> poly;</div>
+<div class="line"><span class="lineno">  396</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -788,8 +1148,44 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  211</span> </div>
 <div class="line"><span class="lineno">  212</span>  <span class="keywordflow">return</span> HistCopy;</div>
 <div class="line"><span class="lineno">  213</span>}</div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_a61d8f295d13a5fe82a552c08d42c8bfa"><div class="ttname"><a href="HistogramUtils_8cpp.html#a61d8f295d13a5fe82a552c08d42c8bfa">PolyScaleWidth</a></div><div class="ttdeci">TH2Poly * PolyScaleWidth(TH2Poly *Histogram, double scale)</div><div class="ttdoc">WP: Helper to scale th2poly analogous to th2d scale with option &quot;width&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00299">HistogramUtils.cpp:299</a></div></div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_a8bab8af5f0339c6ec0310ff5ea87f26d"><div class="ttname"><a href="HistogramUtils_8cpp.html#a8bab8af5f0339c6ec0310ff5ea87f26d">PolyIntegralWidth</a></div><div class="ttdeci">double PolyIntegralWidth(TH2Poly *Histogram)</div><div class="ttdoc">WP: Helper to calc integral of th2poly analogous to th2d integra; with option &quot;width&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00319">HistogramUtils.cpp:319</a></div></div>
+<div class="ttc" id="aHistogramUtils_8cpp_html_a61d8f295d13a5fe82a552c08d42c8bfa"><div class="ttname"><a href="HistogramUtils_8cpp.html#a61d8f295d13a5fe82a552c08d42c8bfa">PolyScaleWidth</a></div><div class="ttdeci">TH2Poly * PolyScaleWidth(TH2Poly *Histogram, double scale)</div><div class="ttdoc">WP: Helper to scale th2poly analogous to th2d scale with option &quot;width&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00337">HistogramUtils.cpp:337</a></div></div>
+<div class="ttc" id="aHistogramUtils_8cpp_html_a8bab8af5f0339c6ec0310ff5ea87f26d"><div class="ttname"><a href="HistogramUtils_8cpp.html#a8bab8af5f0339c6ec0310ff5ea87f26d">PolyIntegralWidth</a></div><div class="ttdeci">double PolyIntegralWidth(TH2Poly *Histogram)</div><div class="ttdoc">WP: Helper to calc integral of th2poly analogous to th2d integra; with option &quot;width&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00357">HistogramUtils.cpp:357</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a2fc5d92fb039ba3c886404100876a511" name="a2fc5d92fb039ba3c886404100876a511"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fc5d92fb039ba3c886404100876a511">&#9670;&#160;</a></span>NormaliseTH2Poly()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void NormaliseTH2Poly </td>
+          <td>(</td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>Histogram</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Helper to Normalise histograms. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Histogram</td><td>hist which we normalise </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00217">217</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  217</span>                                         {</div>
+<div class="line"><span class="lineno">  218</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  219</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> Integral = <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(Histogram);</div>
+<div class="line"><span class="lineno">  220</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 1; j &lt; Histogram-&gt;GetNumberOfBins()+1; j++)</div>
+<div class="line"><span class="lineno">  221</span>  {</div>
+<div class="line"><span class="lineno">  222</span>    Histogram-&gt;SetBinContent(j, Histogram-&gt;GetBinContent(j)/Integral);</div>
+<div class="line"><span class="lineno">  223</span>  }</div>
+<div class="line"><span class="lineno">  224</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -824,7 +1220,6 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   50</span> </div>
 <div class="line"><span class="lineno">   51</span>  <span class="keywordflow">return</span> IntegralUn;</div>
 <div class="line"><span class="lineno">   52</span>} <span class="comment">// end function</span></div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_ab18c6b2408d7b9021bad06d47a06ee8d"><div class="ttname"><a href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a></div><div class="ttdeci">double NoOverflowIntegral(TH2Poly *poly)</div><div class="ttdoc">WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00056">HistogramUtils.cpp:56</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -846,24 +1241,24 @@ Functions</h2></td></tr>
 
 <p>WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width". </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00319">319</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  319</span>                                             {</div>
-<div class="line"><span class="lineno">  320</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  321</span>  <span class="keywordtype">double</span> integral = 0;</div>
-<div class="line"><span class="lineno">  322</span>  <span class="keywordtype">double</span> xlow, xup, ylow, yup, area;</div>
-<div class="line"><span class="lineno">  323</span> </div>
-<div class="line"><span class="lineno">  324</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 1; i &lt; Histogram-&gt;GetNumberOfBins()+1; i++)</div>
-<div class="line"><span class="lineno">  325</span>  {</div>
-<div class="line"><span class="lineno">  326</span>    TH2PolyBin* bin = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Histogram-&gt;GetBins()-&gt;At(i - 1));</div>
-<div class="line"><span class="lineno">  327</span>    xlow = bin-&gt;GetXMin();</div>
-<div class="line"><span class="lineno">  328</span>    xup = bin-&gt;GetXMax();</div>
-<div class="line"><span class="lineno">  329</span>    ylow = bin-&gt;GetYMin();</div>
-<div class="line"><span class="lineno">  330</span>    yup = bin-&gt;GetYMax();</div>
-<div class="line"><span class="lineno">  331</span>    area = (xup-xlow)*(yup-ylow);</div>
-<div class="line"><span class="lineno">  332</span>    integral += Histogram-&gt;GetBinContent(i)*area;</div>
-<div class="line"><span class="lineno">  333</span>  }</div>
-<div class="line"><span class="lineno">  334</span>  <span class="keywordflow">return</span> integral;</div>
-<div class="line"><span class="lineno">  335</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00357">357</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  357</span>                                             {</div>
+<div class="line"><span class="lineno">  358</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  359</span>  <span class="keywordtype">double</span> integral = 0;</div>
+<div class="line"><span class="lineno">  360</span>  <span class="keywordtype">double</span> xlow, xup, ylow, yup, area;</div>
+<div class="line"><span class="lineno">  361</span> </div>
+<div class="line"><span class="lineno">  362</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 1; i &lt; Histogram-&gt;GetNumberOfBins()+1; i++)</div>
+<div class="line"><span class="lineno">  363</span>  {</div>
+<div class="line"><span class="lineno">  364</span>    TH2PolyBin* bin = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Histogram-&gt;GetBins()-&gt;At(i - 1));</div>
+<div class="line"><span class="lineno">  365</span>    xlow = bin-&gt;GetXMin();</div>
+<div class="line"><span class="lineno">  366</span>    xup = bin-&gt;GetXMax();</div>
+<div class="line"><span class="lineno">  367</span>    ylow = bin-&gt;GetYMin();</div>
+<div class="line"><span class="lineno">  368</span>    yup = bin-&gt;GetYMax();</div>
+<div class="line"><span class="lineno">  369</span>    area = (xup-xlow)*(yup-ylow);</div>
+<div class="line"><span class="lineno">  370</span>    integral += Histogram-&gt;GetBinContent(i)*area;</div>
+<div class="line"><span class="lineno">  371</span>  }</div>
+<div class="line"><span class="lineno">  372</span>  <span class="keywordflow">return</span> integral;</div>
+<div class="line"><span class="lineno">  373</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1112,24 +1507,110 @@ Functions</h2></td></tr>
 
 <p>WP: Helper to scale th2poly analogous to th2d scale with option "width". </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00299">299</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  299</span>                                                          {</div>
-<div class="line"><span class="lineno">  300</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  301</span>  TH2Poly* HistCopy = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(Histogram-&gt;Clone());</div>
-<div class="line"><span class="lineno">  302</span>  <span class="keywordtype">double</span> xlow, xup, ylow, yup, area;</div>
-<div class="line"><span class="lineno">  303</span> </div>
-<div class="line"><span class="lineno">  304</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 1; i &lt; HistCopy-&gt;GetNumberOfBins()+1; i++)</div>
-<div class="line"><span class="lineno">  305</span>  {</div>
-<div class="line"><span class="lineno">  306</span>    TH2PolyBin* bin = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Histogram-&gt;GetBins()-&gt;At(i - 1));</div>
-<div class="line"><span class="lineno">  307</span>    xlow = bin-&gt;GetXMin();</div>
-<div class="line"><span class="lineno">  308</span>    xup = bin-&gt;GetXMax();</div>
-<div class="line"><span class="lineno">  309</span>    ylow = bin-&gt;GetYMin();</div>
-<div class="line"><span class="lineno">  310</span>    yup = bin-&gt;GetYMax();</div>
-<div class="line"><span class="lineno">  311</span>    area = (xup-xlow)*(yup-ylow);</div>
-<div class="line"><span class="lineno">  312</span>    HistCopy-&gt;SetBinContent(i, Histogram-&gt;GetBinContent(i)/(area*scale));</div>
-<div class="line"><span class="lineno">  313</span>  }</div>
-<div class="line"><span class="lineno">  314</span>  <span class="keywordflow">return</span> HistCopy;</div>
-<div class="line"><span class="lineno">  315</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00337">337</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  337</span>                                                          {</div>
+<div class="line"><span class="lineno">  338</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  339</span>  TH2Poly* HistCopy = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(Histogram-&gt;Clone());</div>
+<div class="line"><span class="lineno">  340</span>  <span class="keywordtype">double</span> xlow, xup, ylow, yup, area;</div>
+<div class="line"><span class="lineno">  341</span> </div>
+<div class="line"><span class="lineno">  342</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 1; i &lt; HistCopy-&gt;GetNumberOfBins()+1; i++)</div>
+<div class="line"><span class="lineno">  343</span>  {</div>
+<div class="line"><span class="lineno">  344</span>    TH2PolyBin* bin = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Histogram-&gt;GetBins()-&gt;At(i - 1));</div>
+<div class="line"><span class="lineno">  345</span>    xlow = bin-&gt;GetXMin();</div>
+<div class="line"><span class="lineno">  346</span>    xup = bin-&gt;GetXMax();</div>
+<div class="line"><span class="lineno">  347</span>    ylow = bin-&gt;GetYMin();</div>
+<div class="line"><span class="lineno">  348</span>    yup = bin-&gt;GetYMax();</div>
+<div class="line"><span class="lineno">  349</span>    area = (xup-xlow)*(yup-ylow);</div>
+<div class="line"><span class="lineno">  350</span>    HistCopy-&gt;SetBinContent(i, Histogram-&gt;GetBinContent(i)/(area*scale));</div>
+<div class="line"><span class="lineno">  351</span>  }</div>
+<div class="line"><span class="lineno">  352</span>  <span class="keywordflow">return</span> HistCopy;</div>
+<div class="line"><span class="lineno">  353</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a84f9597f629eac6a951b455001d034d4" name="a84f9597f629eac6a951b455001d034d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84f9597f629eac6a951b455001d034d4">&#9670;&#160;</a></span>RatioHists()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class HistType &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">HistType * RatioHists </td>
+          <td>(</td>
+          <td class="paramtype">HistType *&#160;</td>
+          <td class="paramname"><em>NumHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">HistType *&#160;</td>
+          <td class="paramname"><em>DenomHist</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Helper to make ratio histograms. </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00229">229</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  229</span>                                                             {</div>
+<div class="line"><span class="lineno">  230</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  231</span>  HistType *NumCopy = <span class="keyword">static_cast&lt;</span>HistType*<span class="keyword">&gt;</span>(NumHist-&gt;Clone());</div>
+<div class="line"><span class="lineno">  232</span>  std::string title = std::string(DenomHist-&gt;GetName()) + <span class="stringliteral">&quot;_ratio&quot;</span>;</div>
+<div class="line"><span class="lineno">  233</span>  NumCopy-&gt;SetNameTitle(title.c_str(), title.c_str());</div>
+<div class="line"><span class="lineno">  234</span>  NumCopy-&gt;Divide(DenomHist);</div>
+<div class="line"><span class="lineno">  235</span> </div>
+<div class="line"><span class="lineno">  236</span>  <span class="keywordflow">return</span> NumCopy;</div>
+<div class="line"><span class="lineno">  237</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a105593155519e6b3bd302f8d04769280" name="a105593155519e6b3bd302f8d04769280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a105593155519e6b3bd302f8d04769280">&#9670;&#160;</a></span>RatioPolys()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TH2Poly * RatioPolys </td>
+          <td>(</td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>NumPoly</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH2Poly *&#160;</td>
+          <td class="paramname"><em>DenomPoly</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Helper to make ratio of TH2Polys. </p>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00241">241</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  241</span>                                                          {</div>
+<div class="line"><span class="lineno">  242</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  243</span>  TH2Poly *NumCopy = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(NumHist-&gt;Clone());</div>
+<div class="line"><span class="lineno">  244</span>  std::string title = std::string(DenomHist-&gt;GetName()) + <span class="stringliteral">&quot;_ratio&quot;</span>;</div>
+<div class="line"><span class="lineno">  245</span>  NumCopy-&gt;SetNameTitle(title.c_str(), title.c_str());</div>
+<div class="line"><span class="lineno">  246</span> </div>
+<div class="line"><span class="lineno">  247</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 1; i &lt; NumCopy-&gt;GetNumberOfBins()+1; ++i) {</div>
+<div class="line"><span class="lineno">  248</span>    NumCopy-&gt;SetBinContent(i,NumHist-&gt;GetBinContent(i)/DenomHist-&gt;GetBinContent(i));</div>
+<div class="line"><span class="lineno">  249</span>  }</div>
+<div class="line"><span class="lineno">  250</span>  <span class="keywordflow">return</span> NumCopy;</div>
+<div class="line"><span class="lineno">  251</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1161,15 +1642,15 @@ Functions</h2></td></tr>
 
 <p>KS: Remove fitted TF1 from hist to make comparison easier. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00362">362</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  362</span>                                                     {</div>
-<div class="line"><span class="lineno">  363</span><span class="comment">// *********************</span></div>
-<div class="line"><span class="lineno">  364</span>  TList *listOfFunctions = hist-&gt;GetListOfFunctions();</div>
-<div class="line"><span class="lineno">  365</span>  TF1 *fitter = <span class="keyword">dynamic_cast&lt;</span>TF1*<span class="keyword">&gt;</span>(listOfFunctions-&gt;FindObject(name.c_str()));</div>
-<div class="line"><span class="lineno">  366</span> </div>
-<div class="line"><span class="lineno">  367</span>  listOfFunctions-&gt;Remove(fitter);</div>
-<div class="line"><span class="lineno">  368</span>  <span class="keyword">delete</span> fitter;</div>
-<div class="line"><span class="lineno">  369</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00400">400</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  400</span>                                                     {</div>
+<div class="line"><span class="lineno">  401</span><span class="comment">// *********************</span></div>
+<div class="line"><span class="lineno">  402</span>  TList *listOfFunctions = hist-&gt;GetListOfFunctions();</div>
+<div class="line"><span class="lineno">  403</span>  TF1 *fitter = <span class="keyword">dynamic_cast&lt;</span>TF1*<span class="keyword">&gt;</span>(listOfFunctions-&gt;FindObject(name.c_str()));</div>
+<div class="line"><span class="lineno">  404</span> </div>
+<div class="line"><span class="lineno">  405</span>  listOfFunctions-&gt;Remove(fitter);</div>
+<div class="line"><span class="lineno">  406</span>  <span class="keyword">delete</span> fitter;</div>
+<div class="line"><span class="lineno">  407</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1191,14 +1672,14 @@ Functions</h2></td></tr>
 
 <p>DB Get the Cherenkov momentum threshold in MeV. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00404">404</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  404</span>                                                 {</div>
-<div class="line"><span class="lineno">  405</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  406</span>  <span class="keyword">constexpr</span> <span class="keywordtype">double</span> refractiveIndex = 1.334; <span class="comment">//DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757</span></div>
-<div class="line"><span class="lineno">  407</span>  <span class="keywordtype">double</span> mass =  <a class="code hl_function" href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a>(PDG)*1e3;</div>
-<div class="line"><span class="lineno">  408</span>  <span class="keywordtype">double</span> momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);</div>
-<div class="line"><span class="lineno">  409</span>  <span class="keywordflow">return</span> momentumThreshold;</div>
-<div class="line"><span class="lineno">  410</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00566">566</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  566</span>                                                 {</div>
+<div class="line"><span class="lineno">  567</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  568</span>  <span class="keyword">constexpr</span> <span class="keywordtype">double</span> refractiveIndex = 1.334; <span class="comment">//DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757</span></div>
+<div class="line"><span class="lineno">  569</span>  <span class="keywordtype">double</span> mass =  <a class="code hl_function" href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a>(PDG)*1e3;</div>
+<div class="line"><span class="lineno">  570</span>  <span class="keywordtype">double</span> momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);</div>
+<div class="line"><span class="lineno">  571</span>  <span class="keywordflow">return</span> momentumThreshold;</div>
+<div class="line"><span class="lineno">  572</span>}</div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a1b305c72615a48a89e74a9c3ded69c02"><div class="ttname"><a href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a></div><div class="ttdeci">double GetMassFromPDG(const int PDG)</div><div class="ttdoc">Return mass for given PDG.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00478">Structs.h:478</a></div></div>
 </div><!-- fragment -->
 </div>

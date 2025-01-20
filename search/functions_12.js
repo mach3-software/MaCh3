@@ -7,7 +7,7 @@ var searchData=
   ['tgraphtoth1d_4',['TGraphToTH1D',['../group__Utils.html#gaf1329db6e5a742f7dcfa154629c54542',1,'MaCh3Plotting']]],
   ['tgraphtovector_5',['TGraphToVector',['../group__Utils.html#ga30c29bb2cae29751d106bd93dfeaff81',1,'MaCh3Plotting::TGraphToVector(TGraph2D graph)'],['../group__Utils.html#gabee3ac13b77811574c1650016e81a229',1,'MaCh3Plotting::TGraphToVector(TGraph graph)']]],
   ['thinmcmc_6',['ThinMCMC',['../classMCMCProcessor.html#a623957be60ec7c48145e80d0014ef971',1,'MCMCProcessor']]],
-  ['thinningmcmc_7',['ThinningMCMC',['../StatisticalUtils_8h.html#aa6fd944e00fcda133cfef10782f08de0',1,'StatisticalUtils.h']]],
+  ['thinningmcmc_7',['ThinningMCMC',['../StatisticalUtils_8h.html#aa6fd944e00fcda133cfef10782f08de0',1,'ThinningMCMC(const std::string &amp;FilePath, const int ThinningCut):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8cpp.html#aa6fd944e00fcda133cfef10782f08de0',1,'ThinningMCMC(const std::string &amp;FilePath, const int ThinningCut):&#160;StatisticalUtils.cpp']]],
   ['three_5fvector_5faddition_8',['three_vector_addition',['../classPSO.html#a440e0cb32000cf9c5d2170d0c2d08dc2',1,'PSO']]],
   ['throwparameters_9',['throwParameters',['../classcovarianceBase.html#aa5d82895bcbae7773b6813c02cf2f485',1,'covarianceBase']]],
   ['throwparcurr_10',['throwParCurr',['../classcovarianceBase.html#a4e92a9db846d956473efbe5712c71d31',1,'covarianceBase']]],

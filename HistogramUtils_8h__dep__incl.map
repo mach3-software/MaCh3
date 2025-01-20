@@ -1,38 +1,39 @@
 <map id="samplePDF/HistogramUtils.h" name="samplePDF/HistogramUtils.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1018,5,1229,31"/>
-<area shape="rect" id="node2" href="$PlotMCMCDiag_8cpp.html" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="146,233,373,258"/>
-<area shape="rect" id="node3" href="$MCMCProcessor_8h.html" title=" " alt="" coords="908,152,1091,177"/>
-<area shape="rect" id="node30" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="1037,79,1210,104"/>
-<area shape="rect" id="node31" href="$HistogramUtils_8cpp.html" title=" " alt="" coords="1284,79,1509,104"/>
-<area shape="rect" id="node32" href="$samplePDFBase_8h.html" title=" " alt="" coords="1423,152,1642,177"/>
-<area shape="rect" id="node4" href="$DiagMCMC_8cpp.html" title=" " alt="" coords="397,233,599,258"/>
-<area shape="rect" id="node5" href="$ProcessMCMC_8cpp.html" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="803,233,1025,258"/>
-<area shape="rect" id="node6" href="$FitterBase_8h.html" title=" " alt="" coords="1270,233,1414,258"/>
-<area shape="rect" id="node19" href="$MCMCProcessor_8cpp.html" title=" " alt="" coords="1049,233,1246,258"/>
-<area shape="rect" id="node20" href="$SampleSummary_8h.html" title=" " alt="" coords="1439,233,1627,258"/>
-<area shape="rect" id="node22" href="$inputManager_8h.html" title=" " alt="" coords="623,225,779,265"/>
-<area shape="rect" id="node7" href="$FitterBase_8cpp.html" title=" " alt="" coords="1641,321,1800,346"/>
-<area shape="rect" id="node8" href="$LikelihoodFit_8h.html" title=" " alt="" coords="1171,321,1331,346"/>
-<area shape="rect" id="node10" href="$MaCh3Factory_8h.html" title=" " alt="" coords="883,489,1051,515"/>
-<area shape="rect" id="node14" href="$fitter_8cpp.html" title=" " alt="" coords="1394,489,1522,515"/>
-<area shape="rect" id="node17" href="$mcmc_8h.html" title=" " alt="" coords="1541,409,1660,434"/>
-<area shape="rect" id="node9" href="$LikelihoodFit_8cpp.html" title=" " alt="" coords="1343,409,1517,434"/>
-<area shape="rect" id="node12" href="$MinuitFit_8h.html" title=" " alt="" coords="1184,409,1319,434"/>
-<area shape="rect" id="node15" href="$PSO_8h.html" title=" " alt="" coords="1055,409,1159,434"/>
-<area shape="rect" id="node11" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="876,563,1059,588"/>
-<area shape="rect" id="node13" href="$MinuitFit_8cpp.html" title=" " alt="" coords="1219,489,1369,515"/>
-<area shape="rect" id="node16" href="$PSO_8cpp.html" title=" " alt="" coords="1076,489,1195,515"/>
-<area shape="rect" id="node18" href="$mcmc_8cpp.html" title=" " alt="" coords="1546,489,1679,515"/>
-<area shape="rect" id="node21" href="$SampleSummary_8cpp.html" title=" " alt="" coords="1825,321,2027,346"/>
-<area shape="rect" id="node23" href="$inputManager_8cpp.html" title=" " alt="" coords="387,313,543,353"/>
-<area shape="rect" id="node24" href="$plottingManager_8h.html" title=" " alt="" coords="567,313,723,353"/>
-<area shape="rect" id="node29" href="$plotting_8cpp.html" title=" " alt="" coords="5,409,153,434"/>
-<area shape="rect" id="node25" href="$GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="749,401,930,441"/>
-<area shape="rect" id="node26" href="$MatrixPlotter_8cpp.html" title=" " alt="" coords="178,409,365,434"/>
-<area shape="rect" id="node27" href="$PlotLLH_8cpp.html" title=" " alt="" coords="389,409,541,434"/>
-<area shape="rect" id="node28" href="$plottingManager_8cpp.html" title=" " alt="" coords="565,401,724,441"/>
-<area shape="rect" id="node33" href="$samplePDFBase_8cpp.html" title=" " alt="" coords="1651,233,1884,258"/>
-<area shape="rect" id="node34" href="$samplePDFFDBase_8h.html" title=" " alt="" coords="2019,233,2255,258"/>
-<area shape="rect" id="node35" href="$samplePDF_8cpp.html" title=" " alt="" coords="2051,321,2222,346"/>
-<area shape="rect" id="node36" href="$samplePDFFDBase_8cpp.html" title=" " alt="" coords="2246,321,2497,346"/>
+<area shape="rect" id="node1" title=" " alt="" coords="836,5,1047,31"/>
+<area shape="rect" id="node2" href="$PlotMCMCDiag_8cpp.html" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="5,233,232,258"/>
+<area shape="rect" id="node3" href="$MCMCProcessor_8h.html" title=" " alt="" coords="722,152,905,177"/>
+<area shape="rect" id="node30" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="855,79,1028,104"/>
+<area shape="rect" id="node32" href="$HistogramUtils_8cpp.html" title=" " alt="" coords="1053,79,1278,104"/>
+<area shape="rect" id="node33" href="$samplePDFBase_8h.html" title=" " alt="" coords="1305,152,1524,177"/>
+<area shape="rect" id="node4" href="$DiagMCMC_8cpp.html" title=" " alt="" coords="905,233,1106,258"/>
+<area shape="rect" id="node5" href="$ProcessMCMC_8cpp.html" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="256,233,477,258"/>
+<area shape="rect" id="node6" href="$FitterBase_8h.html" title=" " alt="" coords="1343,233,1487,258"/>
+<area shape="rect" id="node19" href="$MCMCProcessor_8cpp.html" title=" " alt="" coords="683,233,880,258"/>
+<area shape="rect" id="node20" href="$SampleSummary_8h.html" title=" " alt="" coords="1130,233,1318,258"/>
+<area shape="rect" id="node22" href="$inputManager_8h.html" title=" " alt="" coords="502,225,658,265"/>
+<area shape="rect" id="node7" href="$FitterBase_8cpp.html" title=" " alt="" coords="1493,321,1651,346"/>
+<area shape="rect" id="node8" href="$LikelihoodFit_8h.html" title=" " alt="" coords="1308,321,1468,346"/>
+<area shape="rect" id="node10" href="$MaCh3Factory_8h.html" title=" " alt="" coords="1551,489,1719,515"/>
+<area shape="rect" id="node14" href="$fitter_8cpp.html" title=" " alt="" coords="1221,489,1349,515"/>
+<area shape="rect" id="node17" href="$mcmc_8h.html" title=" " alt="" coords="1673,409,1791,434"/>
+<area shape="rect" id="node9" href="$LikelihoodFit_8cpp.html" title=" " alt="" coords="1422,409,1597,434"/>
+<area shape="rect" id="node12" href="$MinuitFit_8h.html" title=" " alt="" coords="1083,409,1218,434"/>
+<area shape="rect" id="node15" href="$PSO_8h.html" title=" " alt="" coords="1293,409,1397,434"/>
+<area shape="rect" id="node11" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="1543,563,1726,588"/>
+<area shape="rect" id="node13" href="$MinuitFit_8cpp.html" title=" " alt="" coords="1046,489,1197,515"/>
+<area shape="rect" id="node16" href="$PSO_8cpp.html" title=" " alt="" coords="1374,489,1493,515"/>
+<area shape="rect" id="node18" href="$mcmc_8cpp.html" title=" " alt="" coords="1743,489,1876,515"/>
+<area shape="rect" id="node21" href="$SampleSummary_8cpp.html" title=" " alt="" coords="1016,321,1219,346"/>
+<area shape="rect" id="node23" href="$inputManager_8cpp.html" title=" " alt="" coords="349,313,505,353"/>
+<area shape="rect" id="node24" href="$plottingManager_8h.html" title=" " alt="" coords="529,313,685,353"/>
+<area shape="rect" id="node29" href="$plotting_8cpp.html" title=" " alt="" coords="135,409,283,434"/>
+<area shape="rect" id="node25" href="$GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="308,401,489,441"/>
+<area shape="rect" id="node26" href="$MatrixPlotter_8cpp.html" title=" " alt="" coords="513,409,700,434"/>
+<area shape="rect" id="node27" href="$PlotLLH_8cpp.html" title=" " alt="" coords="724,409,876,434"/>
+<area shape="rect" id="node28" href="$plottingManager_8cpp.html" title=" " alt="" coords="901,401,1059,441"/>
+<area shape="rect" id="node31" href="$StatisticalUtils_8cpp.html" title=" " alt="" coords="981,152,1169,177"/>
+<area shape="rect" id="node34" href="$samplePDFBase_8cpp.html" title=" " alt="" coords="1511,233,1745,258"/>
+<area shape="rect" id="node35" href="$samplePDFFDBase_8h.html" title=" " alt="" coords="1834,233,2070,258"/>
+<area shape="rect" id="node36" href="$samplePDF_8cpp.html" title=" " alt="" coords="1867,321,2037,346"/>
+<area shape="rect" id="node37" href="$samplePDFFDBase_8cpp.html" title=" " alt="" coords="2061,321,2312,346"/>
 </map>
