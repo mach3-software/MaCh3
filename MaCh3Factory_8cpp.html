@@ -95,7 +95,7 @@ Include dependency graph for MaCh3Factory.cpp:</div>
 <div class="center"><img src="MaCh3Factory_8cpp__incl.png" border="0" usemap="#amcmc_2MaCh3Factory_8cpp" alt=""/></div>
 <map name="amcmc_2MaCh3Factory_8cpp" id="amcmc_2MaCh3Factory_8cpp">
 <area shape="rect" title=" " alt="" coords="2990,5,3173,31"/>
-<area shape="rect" href="MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="2997,79,3165,104"/>
+<area shape="rect" href="MaCh3Factory_8h.html" title=" " alt="" coords="2997,79,3165,104"/>
 <area shape="rect" href="FitterBase_8h.html" title=" " alt="" coords="2944,299,3088,324"/>
 <area shape="rect" href="mcmc_8h.html" title=" " alt="" coords="2974,152,3093,177"/>
 <area shape="rect" href="PSO_8h.html" title=" " alt="" coords="3272,152,3376,177"/>
@@ -155,8 +155,6 @@ Functions</h2></td></tr>
 <tr class="separator:a126d15eeabecd1e4ab67422784a9f84a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37464d72da10c4e30eba841888416f40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcovarianceXsec.html">covarianceXsec</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MaCh3Factory_8cpp.html#a37464d72da10c4e30eba841888416f40">MaCh3CovarianceFactory</a> (<a class="el" href="classmanager.html">manager</a> *FitManager, const std::string &amp;PreFix)</td></tr>
 <tr class="separator:a37464d72da10c4e30eba841888416f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aada46b6630f2f29c34c35354973388b3"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classmanager.html">manager</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3">MaCh3ManagerFactory</a> (int argc, char **argv)</td></tr>
-<tr class="separator:aada46b6630f2f29c34c35354973388b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a37464d72da10c4e30eba841888416f40" name="a37464d72da10c4e30eba841888416f40"></a>
@@ -236,109 +234,6 @@ Functions</h2></td></tr>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00012">MaCh3Exception.h:12</a></div></div>
 <div class="ttc" id="aclassmanager_html_ab3999cc856ede72b37f68bdb28bd5520"><div class="ttname"><a href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">manager::raw</a></div><div class="ttdeci">YAML::Node const &amp; raw()</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="manager_8h_source.html#l00038">manager.h:38</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="aada46b6630f2f29c34c35354973388b3" name="aada46b6630f2f29c34c35354973388b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aada46b6630f2f29c34c35354973388b3">&#9670;&#160;</a></span>MaCh3ManagerFactory()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::unique_ptr&lt; <a class="el" href="classmanager.html">manager</a> &gt; MaCh3ManagerFactory </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>argc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char **&#160;</td>
-          <td class="paramname"><em>argv</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd>KS: May need some recursive magic to reduce amount of hardcoding </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="MaCh3Factory_8cpp_source.html#l00036">36</a> of file <a class="el" href="MaCh3Factory_8cpp_source.html">MaCh3Factory.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   36</span>                                                                  {</div>
-<div class="line"><span class="lineno">   37</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">   38</span>  <span class="keywordflow">if</span> (argc &lt; 2) {</div>
-<div class="line"><span class="lineno">   39</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Wrong usage of MaCh3 executable!&quot;</span>);</div>
-<div class="line"><span class="lineno">   40</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Syntax is $: {} config.yaml&quot;</span>, argv[0]);</div>
-<div class="line"><span class="lineno">   41</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Where config.yaml is a valid config file, compatible with the manager class (manager/manager.cpp/h)&quot;</span>);</div>
-<div class="line"><span class="lineno">   42</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   43</span>  }</div>
-<div class="line"><span class="lineno">   44</span> </div>
-<div class="line"><span class="lineno">   45</span>  <span class="comment">// Initialise manger responsible for config handling</span></div>
-<div class="line"><span class="lineno">   46</span>  <span class="keyword">auto</span> FitManager = std::make_unique&lt;manager&gt;(argv[1]);</div>
-<div class="line"><span class="lineno">   47</span>  </div>
-<div class="line"><span class="lineno">   48</span>  <span class="comment">//KS: Lambda to make sure we are not overwriting setting which should be committed</span></div>
-<div class="line"><span class="lineno">   49</span>  <span class="keyword">auto</span> SanityOverwrite = [](<span class="keyword">const</span> std::string&amp; Name) {</div>
-<div class="line"><span class="lineno">   50</span>    <span class="keywordflow">if</span> (Name.find(<span class="stringliteral">&quot;Systematics&quot;</span>) != std::string::npos ||</div>
-<div class="line"><span class="lineno">   51</span>        Name.find(<span class="stringliteral">&quot;Samples&quot;</span>) != std::string::npos)</div>
-<div class="line"><span class="lineno">   52</span>    {</div>
-<div class="line"><span class="lineno">   53</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;You are overwriting settings ({}) that are highly likely intended to be committed.&quot;</span>, Name);</div>
-<div class="line"><span class="lineno">   54</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">   55</span>    }</div>
-<div class="line"><span class="lineno">   56</span>  };</div>
-<div class="line"><span class="lineno">   57</span>  </div>
-<div class="line"><span class="lineno">   58</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 2; i &lt; argc; ++i)</div>
-<div class="line"><span class="lineno">   59</span>  {</div>
-<div class="line"><span class="lineno">   60</span>    <span class="keyword">const</span> std::string arg = argv[i];</div>
-<div class="line"><span class="lineno">   61</span>    <span class="keyword">const</span> <span class="keywordtype">size_t</span> colonCount = std::count(arg.begin(), arg.end(), <span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   62</span> </div>
-<div class="line"><span class="lineno">   64</span>    <span class="keywordflow">if</span> (colonCount == 1) {</div>
-<div class="line"><span class="lineno">   65</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   66</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
-<div class="line"><span class="lineno">   67</span>      <span class="keyword">const</span> std::string value = arg.substr(firstColon + 1);</div>
-<div class="line"><span class="lineno">   68</span> </div>
-<div class="line"><span class="lineno">   69</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Value={}&quot;</span>, section, value);</div>
-<div class="line"><span class="lineno">   70</span>      SanityOverwrite(section);</div>
-<div class="line"><span class="lineno">   71</span>      FitManager-&gt;OverrideSettings(section, value);</div>
-<div class="line"><span class="lineno">   72</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (colonCount == 2) {</div>
-<div class="line"><span class="lineno">   73</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   74</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> secondColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, firstColon + 1);</div>
-<div class="line"><span class="lineno">   75</span> </div>
-<div class="line"><span class="lineno">   76</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
-<div class="line"><span class="lineno">   77</span>      <span class="keyword">const</span> std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);</div>
-<div class="line"><span class="lineno">   78</span>      <span class="keyword">const</span> std::string value = arg.substr(secondColon + 1);</div>
-<div class="line"><span class="lineno">   79</span> </div>
-<div class="line"><span class="lineno">   80</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Key={}, Value={}&quot;</span>, section, key, value);</div>
-<div class="line"><span class="lineno">   81</span>      SanityOverwrite(section);</div>
-<div class="line"><span class="lineno">   82</span>      SanityOverwrite(key);</div>
-<div class="line"><span class="lineno">   83</span>      FitManager-&gt;OverrideSettings(section, key, value);</div>
-<div class="line"><span class="lineno">   84</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (colonCount == 3) {</div>
-<div class="line"><span class="lineno">   85</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   86</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> secondColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, firstColon + 1);</div>
-<div class="line"><span class="lineno">   87</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> thridColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, secondColon + 1);</div>
-<div class="line"><span class="lineno">   88</span> </div>
-<div class="line"><span class="lineno">   89</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
-<div class="line"><span class="lineno">   90</span>      <span class="keyword">const</span> std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);</div>
-<div class="line"><span class="lineno">   91</span>      <span class="keyword">const</span> std::string key2 = arg.substr(secondColon + 1, thridColon - secondColon - 1);</div>
-<div class="line"><span class="lineno">   92</span>      <span class="keyword">const</span> std::string value = arg.substr(thridColon + 1);</div>
-<div class="line"><span class="lineno">   93</span> </div>
-<div class="line"><span class="lineno">   94</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Key={}, Key={}, Value={}&quot;</span>, section, key, key2, value);</div>
-<div class="line"><span class="lineno">   95</span>      SanityOverwrite(section);</div>
-<div class="line"><span class="lineno">   96</span>      SanityOverwrite(key);</div>
-<div class="line"><span class="lineno">   97</span>      SanityOverwrite(key2);</div>
-<div class="line"><span class="lineno">   98</span>      FitManager-&gt;OverrideSettings(section, key, key2, value);</div>
-<div class="line"><span class="lineno">   99</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  100</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid override argument format: {}&quot;</span>, arg);</div>
-<div class="line"><span class="lineno">  101</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Expected format:Section:Key:Key:Valu, Section:Key:Value or Section:Value&quot;</span>);</div>
-<div class="line"><span class="lineno">  102</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  103</span>    }</div>
-<div class="line"><span class="lineno">  104</span>  }</div>
-<div class="line"><span class="lineno">  105</span>  <span class="keywordflow">return</span> FitManager;</div>
-<div class="line"><span class="lineno">  106</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00019">MaCh3Logger.h:19</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
