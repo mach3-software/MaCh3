@@ -57,10 +57,13 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ApplySmoothing = true;
   FancyPlotNames = true;
   doDiagMCMC = false;
-  useFFTAutoCorrelation = true;
 
   // KS: ROOT can compile FFT code but it will crash during run time. Turn off FFT dynamically
-  if (std::system("ls $(root-config --libdir) | grep -i FFT") == 0) useFFTAutoCorrelation = false;
+#ifdef MaCh3_FFT
+  useFFTAutoCorrelation = true;
+#else
+  useFFTAutoCorrelation = false;
+#endif
   OutputSuffix = "_Process";
   Post2DPlotThreshold = 1.e-5;
 

@@ -49,6 +49,14 @@ set(MaCh3_MINUIT2_ENABLED FALSE)
 if(ROOT_VERSION GREATER_EQUAL 6.32.00 OR ROOT_CONFIG_MINUIT2 GREATER -1)
   set(MaCh3_MINUIT2_ENABLED TRUE)
 endif()
+
+list(FIND ROOT_FEATURES_LIST "fftw3" ROOT_CONFIG_FFT)
+set(MaCh3_FFT_ENABLED FALSE)
+if(ROOT_CONFIG_FFT GREATER -1)
+  cmessage(STATUS "FFT Enabled")
+  set(MaCh3_FFT_ENABLED TRUE)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MaCh3_FFT)
+endif()
 ### End ROOT setup
 
 #YAML for reading in config files
