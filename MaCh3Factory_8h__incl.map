@@ -1,5 +1,5 @@
 <map id="mcmc/MaCh3Factory.h" name="mcmc/MaCh3Factory.h">
-<area shape="rect" id="node1" title=" " alt="" coords="2793,5,2961,31"/>
+<area shape="rect" id="node1" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="2793,5,2961,31"/>
 <area shape="rect" id="node2" href="$FitterBase_8h.html" title=" " alt="" coords="2724,225,2868,251"/>
 <area shape="rect" id="node44" href="$mcmc_8h.html" title=" " alt="" coords="2770,79,2889,104"/>
 <area shape="rect" id="node45" href="$PSO_8h.html" title=" " alt="" coords="3164,79,3268,104"/>
