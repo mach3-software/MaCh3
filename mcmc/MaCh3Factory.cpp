@@ -50,7 +50,8 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
     if (Name.find("Systematics") != std::string::npos ||
         Name.find("Samples") != std::string::npos)
     {
-      MACH3LOG_WARN("You are overwriting settings ({}) that are highly likely intended to be committed.", Name);
+      MACH3LOG_CRITICAL("You are overwriting settings ({}) that are highly likely intended to be committed.", Name);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   };
   
