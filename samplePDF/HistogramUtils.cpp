@@ -213,6 +213,44 @@ TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 }
 
 // ****************
+// Normalise a TH2Poly
+void NormaliseTH2Poly(TH2Poly* Histogram){
+// ****************
+  const double Integral = NoOverflowIntegral(Histogram);
+  for(int j = 1; j < Histogram->GetNumberOfBins()+1; j++)
+  {
+    Histogram->SetBinContent(j, Histogram->GetBinContent(j)/Integral);
+  }
+}
+
+// ****************
+// Make a ratio histogram
+template<class HistType>
+HistType* RatioHists(HistType *NumHist, HistType *DenomHist) {
+// ****************
+  HistType *NumCopy = static_cast<HistType*>(NumHist->Clone());
+  std::string title = std::string(DenomHist->GetName()) + "_ratio";
+  NumCopy->SetNameTitle(title.c_str(), title.c_str());
+  NumCopy->Divide(DenomHist);
+
+  return NumCopy;
+}
+
+// ****************
+// Make a ratio th2poly
+TH2Poly* RatioPolys(TH2Poly *NumHist, TH2Poly *DenomHist) {
+// ****************
+  TH2Poly *NumCopy = static_cast<TH2Poly*>(NumHist->Clone());
+  std::string title = std::string(DenomHist->GetName()) + "_ratio";
+  NumCopy->SetNameTitle(title.c_str(), title.c_str());
+
+  for(int i = 1; i < NumCopy->GetNumberOfBins()+1; ++i) {
+    NumCopy->SetBinContent(i,NumHist->GetBinContent(i)/DenomHist->GetBinContent(i));
+  }
+  return NumCopy;
+}
+
+// ****************
 TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
 // ****************
   double xlow, xup, ylow, yup;
@@ -368,6 +406,118 @@ void RemoveFitter(TH1D* hist, const std::string& name) {
   delete fitter;
 }
 
+// ****************
+// Make Poisson Fluctuation of TH1D hist
+void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand){
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0);
+
+  for (int i = 1; i <= PolyHist->GetXaxis()->GetNbins(); ++i)
+  {
+    // Get the posterior predictive bin content
+    const double MeanContent = PolyHist->GetBinContent(i);
+    // Get a Poisson fluctuation of the content
+    const double Random = rand->PoissonD(MeanContent);
+    // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
+    FluctHist->SetBinContent(i,Random);
+  }
+}
+
+// ****************
+// Make Poisson Fluctuation of TH2Poly hist
+void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand) {
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  for (int i = 1; i < FluctHist->GetNumberOfBins()+1; ++i)
+  {
+    // Get the posterior predictive bin content
+    const double MeanContent = PolyHist->GetBinContent(i);
+    // Get a Poisson fluctuation of the content
+    const double Random = rand->PoissonD(MeanContent);
+    // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
+    FluctHist->SetBinContent(i,Random);
+  }
+}
+
+// ****************
+// Make Poisson Fluctuation of TH1D hist
+void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom3* rand){
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0);
+
+  const double evrate = PolyHist->Integral();
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
+  int count = 0;
+  while(count < num)
+  {
+    const double candidate = PolyHist->GetRandom();
+    FluctHist->Fill(candidate);
+    count++;
+  }
+}
+
+// ****************
+//KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
+// https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
+int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand){
+// ****************
+  const int nbins = PolyHist->GetNumberOfBins();
+  const double r1 = rand->Rndm();
+
+  double* fIntegral = new double[nbins+2];
+  fIntegral[0] = 0.0;
+
+  //KS: This is custom version of ComputeIntegral, once again ROOT was lazy :(
+  for (int i = 1; i < nbins+1; ++i)
+  {
+    fIntegral[i] = 0.0;
+    const double content = PolyHist->GetBinContent(i);
+    fIntegral[i] += fIntegral[i - 1] + content;
+  }
+  for (Int_t bin = 1; bin < nbins+1; ++bin)  fIntegral[bin] /= fIntegral[nbins];
+  fIntegral[nbins+1] = PolyHist->GetEntries();
+
+  //KS: We just return one rather then X and Y, this way we can use SetBinContent rather than Fill, which is faster
+  int iBin = int(TMath::BinarySearch(nbins, fIntegral, r1));
+  //KS: Have to increment because TH2Poly has stupid offset arghh
+  iBin += 1;
+
+  delete[] fIntegral;
+  return iBin;
+}
+
+// ****************
+// Make Poisson fluctuation of TH2Poly hist
+void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand){
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  const double evrate = NoOverflowIntegral(PolyHist);
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
+  int count = 0;
+  while(count < num)
+  {
+    const int iBin = GetRandomPoly2(PolyHist, rand);
+    FluctHist->SetBinContent(iBin, FluctHist->GetBinContent(iBin) + 1);
+    count++;
+  }
+}
+
 // *************************
 TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
 // *************************
@@ -398,6 +548,18 @@ TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH
   }
   return var;
 }
+
+// ****************
+//Fast and thread safe fill of violin histogram, it assumes both histograms have the same binning
+void FastViolinFill(TH2D* violin, TH1D* hist_1d){
+// ****************
+  for (int x = 0; x < violin->GetXaxis()->GetNbins(); ++x)
+  {
+    const int y = violin->GetYaxis()->FindBin(hist_1d->GetBinContent(x+1));
+    violin->SetBinContent(x+1, y,  violin->GetBinContent(x+1, y)+1);
+  }
+}
+
 
 // ****************
 //DB Get the Cherenkov momentum threshold in MeV

@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.3.3 LANGUAGES CXX)
+project(MaCh3 VERSION 1.3.4 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 #LP - This option name is confusing, but I wont change it now.
