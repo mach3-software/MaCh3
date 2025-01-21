@@ -775,7 +775,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
         }
 
         //Now check that the mode of an interaction matches with the normalisation parameters
-        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(fdobj->mode[iEvent])));
+        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(fdobj->mode[iEvent]))));
         if (!ModeMatch) {
           MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(fdobj->mode[iEvent]), (*it).name);
           continue;
