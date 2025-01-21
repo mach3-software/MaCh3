@@ -14,7 +14,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
-  
+
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(!xsec_cov){
     MACH3LOG_ERROR("You've passed me a nullptr to a covarianceXsec... I need this to setup splines!");
@@ -137,12 +137,12 @@ void samplePDFFDBase::ReadSampleConfig()
   std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
   
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+    oscchan_flavnames.push_back(osc_channel["name"].as<std::string>());
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
     sample_nupdgunosc.push_back(static_cast<NuPDG>(osc_channel["nutype"].as<int>()));
     sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
-    sample_signal.push_back(osc_channel["signal"].as<bool>());
   }
 
   //Now get selection cuts
@@ -746,7 +746,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample){
       // Not strictly needed, but these events don't get included in oscillated predictions, so
       // no need to waste our time calculating and storing information about xsec parameters
       // that will never be used.
-      if (fdobj->isNC[iEvent] && fdobj->signal) {
+      if (fdobj->isNC[iEvent] && (*fdobj->nupdg[iEvent] != *fdobj->nupdgUnosc[iEvent]) ) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
         continue;
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
@@ -1334,7 +1334,7 @@ void samplePDFFDBase::SetupNuOscillator() {
       MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
 #endif
       if (MCSamples[iSample].isNC[iEvent]) {
-        if (MCSamples[iSample].signal) {
+        if (*MCSamples[iSample].nupdg[iEvent] != *MCSamples[iSample].nupdgUnosc[iEvent]) {
 #ifdef _LOW_MEMORY_STRUCTS_
           MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
 #else
@@ -1467,7 +1467,8 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
-  fdobj->signal = false;
+  fdobj->flavourName = oscchan_flavnames[iSample];
+  fdobj->ChannelIndex = iSample;
   
   int nEvents = fdobj->nEvents;
   fdobj->x_var.resize(nEvents, &Unity);
