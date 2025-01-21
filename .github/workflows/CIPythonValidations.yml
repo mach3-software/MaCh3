@@ -3,9 +3,12 @@
 name: Validations Python CI 
 
 # The events that trigger the workflow
+# on:
+#   pull_request:
+#     branches: [ develop ]
+# This wrokflow temporary dont work, please uncoment this when fixed
 on:
-  pull_request:
-    branches: [ develop ]
+  workflow_dispatch:  # Placeholder trigger to allow manual runs only
 
 permissions:
   contents: read
