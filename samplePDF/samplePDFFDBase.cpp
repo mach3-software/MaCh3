@@ -402,7 +402,6 @@ void samplePDFFDBase::fillArray() {
 
       double splineweight = 1.0;
       double normweight = 1.0;
-      double funcweight = 1.0;
       double totalweight = 1.0;
       
       if(SplineHandler){
@@ -422,15 +421,10 @@ void samplePDFFDBase::fillArray() {
         MCSamples[iSample].xsec_w[iEvent] = 0.;
         continue;
       }
+      // Virtual by default does nothing
+      CalcWeightFunc(iSample,iEvent);
       
-      funcweight = CalcXsecWeightFunc(iSample,iEvent);
-      //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-      if (funcweight <= 0.){          
-        MCSamples[iSample].xsec_w[iEvent] = 0.;
-        continue;
-      }
-      
-      MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
+      MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight;
       
       //DB Total weight
       totalweight = GetEventWeight(iSample,iEvent);
@@ -517,10 +511,10 @@ void samplePDFFDBase::fillArray_MP()  {
     //
     //Those relevant to reweighting
     // 1. Don't bother storing and calculating NC signal events - Implemented and saves marginal s/step
-    // 2. Loop over spline event weight calculation in the following event loop - Currently done in splineSKBase->calcWeight() where multi-threading won't be optmised - Implemented and saves 0.3s/step
+    // 2. Loop over spline event weight calculation in the following event loop - Currently done in splineSKBase->calcWeight() where multi-threading won't be optimised - Implemented and saves 0.3s/step
     // 3. Inline getDiscVar or somehow include that calculation inside the multi-threading - Implemented and saves about 0.01s/step
     // 4. Include isCC inside SKMCStruct so don't have to have several 'if' statements determine if oscillation weight needs to be set to 1.0 for NC events - Implemented and saves marginal s/step
-    // 5. Do explict check on adjacent bins when finding event XBin instead of looping over all BinEdge indicies - Implemented but doesn't significantly affect s/step
+    // 5. Do explict check on adjacent bins when finding event XBin instead of looping over all BinEdge indices - Implemented but doesn't significantly affect s/step
     //
     //Other aspects
     // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside samplePDFFD_array_class[yBin][xBin]
@@ -535,11 +529,9 @@ void samplePDFFDBase::fillArray_MP()  {
     if(SplineHandler){
       SplineHandler->Evaluate();
     }
-    
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
       #pragma omp for
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-
         //ETA - generic functions to apply shifts to kinematic variables
         // Apply this before IsEventSelected is called.
         applyShifts(iSample, iEvent);
@@ -553,7 +545,6 @@ void samplePDFFDBase::fillArray_MP()  {
 
         M3::float_t splineweight = 1.0;
         M3::float_t normweight = 1.0;
-        M3::float_t funcweight = 1.0;
         M3::float_t totalweight = 1.0;
 
         //DB SKDet Syst
@@ -575,14 +566,10 @@ void samplePDFFDBase::fillArray_MP()  {
           continue;
         }
 
-        funcweight = CalcXsecWeightFunc(iSample,iEvent);
-        //DB Catch negative func weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-        if (funcweight <= 0.){
-          MCSamples[iSample].xsec_w[iEvent] = 0.;
-          continue;
-        }
+        // Virtual by default does nothing
+        CalcWeightFunc(iSample,iEvent);
 
-        MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight*funcweight;
+        MCSamples[iSample].xsec_w[iEvent] = splineweight*normweight;
 
         totalweight = GetEventWeight(iSample, iEvent);
 
@@ -684,12 +671,12 @@ void samplePDFFDBase::ResetHistograms() {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) {
+M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //DB Xsec syst
   //Loop over stored spline pointers
-  for (int iSpline=0;iSpline<MCSamples[iSample].nxsec_spline_pointers[iEvent];iSpline++) {
+  for (int iSpline = 0; iSpline < MCSamples[iSample].nxsec_spline_pointers[iEvent]; ++iSpline) {
     xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
   }
   return xsecw;
@@ -697,18 +684,18 @@ M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int i
 
 // ***************************************************************************
 // Calculate the normalisation weight for one event
-M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) {
+M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
-  for (int iParam = 0;iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; iParam++)
+  for (int iParam = 0; iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; ++iParam)
   {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
     xsecw *= static_cast<M3::float_t>(*(MCSamples[iSample].xsec_norm_pointers[iEvent][iParam]));
 #pragma GCC diagnostic pop
     #ifdef DEBUG
-    if (TMath::IsNaN(xsecw)) std::cout << "iParam=" << iParam << "xsecweight=nan from norms" << std::endl;
+    if (TMath::IsNaN(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
     #endif
   }
   return xsecw;
@@ -1391,14 +1378,13 @@ void samplePDFFDBase::SetupNuOscillator() {
   OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
 }
 
-M3::float_t samplePDFFDBase::GetEventWeight(int iSample, int iEntry) {
+M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
   M3::float_t totalweight = 1.0;
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
-  for (int iParam=0;iParam<MCSamples[iSample].ntotal_weight_pointers[iEntry];iParam++) {
+  for (int iParam = 0; iParam < MCSamples[iSample].ntotal_weight_pointers[iEntry]; ++iParam) {
     totalweight *= *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]);
-    //std::cout << "Weight " << iParam << " is " << *(MCSamples[iSample].total_weight_pointers[iEntry][iParam]) << std::endl;
   }
   
   return totalweight;

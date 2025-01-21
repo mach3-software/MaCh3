@@ -101,11 +101,6 @@ class SampleSummary {
     /// @brief Check the length of samples agrees
     inline bool CheckSamples(const int Length);
 
-    /// @brief Helper to make ratio histograms
-    template<class HistType> HistType* RatioHists(HistType* NumHist, HistType* DenomHist);
-    /// @brief Helper to make ratio of TH2Polys
-    inline TH2Poly* RatioPolys(TH2Poly* NumPoly, TH2Poly* DenomPoly);
-
     /// @brief Helper to project TH2D onto axis
     inline TH1D* ProjectHist(TH2D* Histogram, const bool ProjectX);
     /// @brief Helper to project TH2Poly onto axis
@@ -113,28 +108,9 @@ class SampleSummary {
 
     /// @brief Make Poisson fluctuation of TH1D hist
     inline void MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist);
-    /// @brief Make Poisson fluctuation of TH1D hist using default fast method
-    inline void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist);
-    /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
-    inline void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist);
 
     /// @brief Make Poisson fluctuation of TH2Poly hist
     inline void MakeFluctuatedHistogram(TH2Poly *FluctHist, TH2Poly* PolyHist);
-    /// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
-    inline void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist);
-    /// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check
-    inline void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist);
-        
-    /// @brief KS: Fill Violin histogram with entry from a toy
-    /// @param violin hist that will be filled
-    /// @param hist_1d refence hist from which we take entries to be filled
-    inline void FastViolinFill(TH2D* violin, TH1D* hist_1d);
-    /// @brief KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on [link](https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e)
-    inline int GetRandomPoly2(const TH2Poly* PolyHist);
-
-    /// @brief Get the mode error from a TH1D
-    /// @param hpost hist from which we extract mode error
-    inline double GetModeError(TH1D* hpost);
 
     /// @brief Information Criterion
     inline void StudyInformationCriterion(M3::kInfCrit Criterion);
@@ -152,10 +128,6 @@ class SampleSummary {
     /// @cite Gelman2014
     /// @cite Hartig2024WAIC
     inline void StudyWAIC();
-
-    /// @brief Helper to Normalise histograms
-    /// @param Histogram hist which we normalise
-    inline void NormaliseTH2Poly(TH2Poly* Histogram);
 
     /// Random number generator
     std::unique_ptr<TRandom3> rnd;
@@ -358,7 +330,7 @@ class SampleSummary {
     /// By mode variables
     bool DoByModePlots;
     /// The posterior predictive distribution in pmu cosmu using the mean
-    TH2Poly ***MeanHist_ByMode;
+    std::vector<std::vector<TH2Poly*>> MeanHist_ByMode;
     /// Histogram which corresponds to each bin in the sample's th2poly
     TH1D ****PosteriorHist_ByMode;
     

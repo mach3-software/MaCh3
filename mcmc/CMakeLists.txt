@@ -20,6 +20,7 @@ add_library(MCMC SHARED
     MCMCProcessor.cpp
     SampleSummary.cpp
     MaCh3Factory.cpp
+    StatisticalUtils.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
 )
 
