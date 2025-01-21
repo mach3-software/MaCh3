@@ -1,0 +1,7 @@
+SamplePDFFDBase
+===============
+
+.. currentmodule:: pyMaCh3._pyMaCh3.sample_pdf
+
+.. autoclass:: SamplePDFFDBase
+   :show-inheritance:
