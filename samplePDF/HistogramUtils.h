@@ -9,7 +9,6 @@
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT include
 #include "TGraphAsymmErrors.h"
-#include "TLorentzVector.h"
 #include "TObjString.h"
 #include "TRandom3.h"
 #pragma GCC diagnostic pop

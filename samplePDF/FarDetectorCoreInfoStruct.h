@@ -13,7 +13,6 @@ struct FarDetectorCoreInfo {
 
   ~FarDetectorCoreInfo(){ delete [] isNC; }
 
-  bool signal; ///< true if signue
   int nEvents; ///< how many MC events are there
   double ChannelIndex;
   std::string flavourName;
