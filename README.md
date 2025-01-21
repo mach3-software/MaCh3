@@ -181,19 +181,23 @@ The MaCh3 core plotting library code can be found [here](https://github.com/mach
 ## How To Use
 This is an example how your executable can look like using MaCh3:
 ```cpp
-  manager *fitMan = nullptr; //Manager is responsible for reading from config
+  //Manager is responsible for reading from config
+  std::unique_ptr<manager> fitMan = MaCh3ManagerFactory(argc, argv);
 
   std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector
   std::vector<covarianceBase*> Cov; // vector with systematic implementation
-  mcmc *markovChain = nullptr; // MCMC class, can be replaced with other fitting method
-  MakeMaCh3Instance(fitMan, sample, Cov, markovChain); //Factory like function which initialises everything
+  MakeMaCh3Instance(fitMan.get(), sample, Cov); //Factory like function which initialises everything
+
+  // FitterBase class, can be replaced with other fitting method
+  std::unique_ptr<FitterBase> MarkovChain = MaCh3FitterFactory(FitManager.get());
 
   //Adding samples and covariances to the Fitter class could be in the factory
   for(unsigned int i = 0; sample.size(); i++)
-    markovChain->addSamplePDF(sample[i]);
+    MarkovChain->addSamplePDF(sample[i]);
   for(unsigned int i = 0; Cov.size(); i++)
-    markovChain->addSystObj(Cov[i]);
+    MarkovChain->addSystObj(Cov[i]);
 
-  markovChain->RunLLHScan(); // can run LLH scan
-  markovChain->runMCMC(); //or run actual fit
+  MarkovChain->RunLLHScan(); // can run LLH scan
+  MarkovChain->runMCMC(); //or run actual fit
 ```
+For more see [here](https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp)
