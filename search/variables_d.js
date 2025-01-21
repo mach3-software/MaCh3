@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['name_0',['name',['../structXsecNorms4.html#a848104ff97acc9a0df9861acc8615aa7',1,'XsecNorms4']]],
-  ['name_1',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
+  ['name_0',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
+  ['name_1',['name',['../structXsecNorms4.html#a848104ff97acc9a0df9861acc8615aa7',1,'XsecNorms4']]],
   ['nbatches_2',['nBatches',['../classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19',1,'MCMCProcessor']]],
   ['nbins_3',['nBins',['../GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1',1,'nBins():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()']]],
   ['nbranches_4',['nBranches',['../classMCMCProcessor.html#af6ba5d9aec5350fafebbf81309e813cb',1,'MCMCProcessor']]],
@@ -15,8 +15,8 @@ var searchData=
   ['ndsamplesbins_12',['NDSamplesBins',['../classMCMCProcessor.html#ab2649d6e851ec0a08985a35da299fa5b',1,'MCMCProcessor::NDSamplesBins()'],['../GetPostfitParamPlots_8cpp.html#a329ffa5c522d29e1ec016f0b7028437d',1,'NDSamplesBins():&#160;GetPostfitParamPlots.cpp']]],
   ['ndsamplesnames_13',['NDSamplesNames',['../GetPostfitParamPlots_8cpp.html#ab5cba8ce6ff9a6e1e9a5ba0b9cfb0b37',1,'NDSamplesNames():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#aab80e0a8be27cc9206e1834a2f1f1ca2',1,'MCMCProcessor::NDSamplesNames()']]],
   ['nentries_14',['nEntries',['../classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c',1,'MCMCProcessor']]],
-  ['nevents_15',['NEvents',['../classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5',1,'SMonolith']]],
-  ['nevents_16',['nEvents',['../structFarDetectorCoreInfo.html#a8dcc8da8a59b657be343aa3008e7b204',1,'FarDetectorCoreInfo']]],
+  ['nevents_15',['nEvents',['../structFarDetectorCoreInfo.html#a8dcc8da8a59b657be343aa3008e7b204',1,'FarDetectorCoreInfo']]],
+  ['nevents_16',['NEvents',['../classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5',1,'SMonolith']]],
   ['nfiles_17',['nFiles',['../ProcessMCMC_8cpp.html#a6b25bcddaae9b868109dc98a54476e46',1,'ProcessMCMC.cpp']]],
   ['nkeptpcapars_18',['nKeptPCApars',['../classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458',1,'PCAHandler']]],
   ['nknots_19',['nKnots',['../classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b',1,'SMonolith']]],
