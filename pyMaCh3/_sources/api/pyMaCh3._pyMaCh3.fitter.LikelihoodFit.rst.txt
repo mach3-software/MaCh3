@@ -1,0 +1,19 @@
+LikelihoodFit
+=============
+
+.. currentmodule:: pyMaCh3._pyMaCh3.fitter
+
+.. autoclass:: LikelihoodFit
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LikelihoodFit.caluclate_chi2
+      ~LikelihoodFit.get_n_params
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: caluclate_chi2
+   .. automethod:: get_n_params
