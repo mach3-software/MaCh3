@@ -116,3 +116,10 @@ if( MaCh3_PYTHON_ENABLED )
       GIT_TAG v2.13.5
     )
 endif()
+
+CPMAddPackage(
+    NAME oneTBB
+    GITHUB_REPOSITORY oneapi-src/oneTBB
+    GIT_TAG master  # Adjust the version as needed
+    OPTIONS "CMAKE_CXX_FLAGS=-Wno-error -Wno-shadow -Wno-conversion -Wno-redundant-decls"
+)
