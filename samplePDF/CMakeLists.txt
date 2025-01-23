@@ -14,6 +14,7 @@ add_library(SamplePDF SHARED
 
 target_link_libraries(SamplePDF PUBLIC Splines NuOscillator)
 target_link_libraries(SamplePDF PRIVATE MaCh3Warnings)
+target_link_libraries(SamplePDF PRIVATE TBB::tbb)
 
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

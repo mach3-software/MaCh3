@@ -9,6 +9,16 @@
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FarDetectorCoreInfoStruct.h"
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+#pragma GCC diagnostic pop
+
+
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;
 
@@ -176,9 +186,9 @@ public:
   std::vector<double> YBinEdges;
 
   /// DB Array to be filled after reweighting
-  double** samplePDFFD_array;
+  std::vector<std::vector<double>> samplePDFFD_array;
   /// KS Array used for MC stat
-  double** samplePDFFD_array_w2;
+  std::vector<std::vector<double>> samplePDFFD_array_w2;
   /// DB Array to be filled in AddData
   double** samplePDFFD_data;
   //===============================================================================

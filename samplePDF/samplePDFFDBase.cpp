@@ -27,7 +27,6 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   }
   OscCov = osc_cov;
   
-  samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
@@ -37,16 +36,6 @@ samplePDFFDBase::~samplePDFFDBase()
 {
   MACH3LOG_DEBUG("I'm deleting samplePDFFDBase");
   
-  for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
-    if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
-    delete[] samplePDFFD_array_w2[yBin];
-    //ETA - there is a chance that you haven't added any data...
-    if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data[yBin];}
-  }
-
-  if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array;}
-  delete[] samplePDFFD_array_w2;
-  //ETA - there is a chance that you haven't added any data...
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
  
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
@@ -479,6 +468,8 @@ void samplePDFFDBase::fillArray() {
 #endif // end the else in openMP
 }
 
+
+/*
 #ifdef MULTITHREAD
 // ************************************************ 
 /// Multithreaded version of fillArray @see fillArray()
@@ -651,7 +642,98 @@ void samplePDFFDBase::fillArray_MP()  {
   } //end of parallel region
 }
 #endif
+*/
 
+#ifdef MULTITHREAD
+void samplePDFFDBase::fillArray_MP() {
+    size_t nXBins = int(XBinEdges.size() - 1);
+    size_t nYBins = int(YBinEdges.size() - 1);
+
+    // Store arrays using std::vector for better memory management
+    samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+    samplePDFFD_array_w2= std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+
+    // Prepare functional parameters
+    PrepFunctionalParameters();
+
+    // Evaluate the spline handler if it exists
+    if (SplineHandler) {
+        SplineHandler->Evaluate();
+    }
+
+    // Parallel processing of events using oneTBB
+    for (unsigned int iSample = 0; iSample < MCSamples.size(); ++iSample) {
+        tbb::parallel_for(
+            tbb::blocked_range<size_t>(0, MCSamples[iSample].nEvents),
+            [&](const tbb::blocked_range<size_t>& range) {
+                for (int iEvent = static_cast<int>(range.begin()); iEvent < static_cast<int>(range.end()); ++iEvent) {
+                    // Apply shifts and perform selection
+                    applyShifts(iSample, iEvent);
+                    if (!IsEventSelected(iSample, iEvent)) {
+                        continue;
+                    }
+
+                    // Compute event weights
+                    double splineweight = 1.0, normweight = 1.0, totalweight = 1.0;
+                    if (SplineHandler) {
+                        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+                    }
+                    if (splineweight <= 0.0) {
+                        MCSamples[iSample].xsec_w[iEvent] = 0.0;
+                        continue;
+                    }
+
+                    normweight *= CalcXsecWeightNorm(iSample, iEvent);
+                    if (normweight <= 0.0) {
+                        MCSamples[iSample].xsec_w[iEvent] = 0.0;
+                        continue;
+                    }
+
+                    CalcWeightFunc(iSample, iEvent);
+                    MCSamples[iSample].xsec_w[iEvent] = splineweight * normweight;
+
+                    totalweight = GetEventWeight(iSample, iEvent);
+                    if (totalweight <= 0.0) {
+                        MCSamples[iSample].xsec_w[iEvent] = 0.0;
+                        continue;
+                    }
+
+                    // Determine bin indices
+                    double XVar = *(MCSamples[iSample].x_var[iEvent]);
+                    int XBinToFill = -1;
+                    int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
+
+                    if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] &&
+                        XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
+                        XBinToFill = MCSamples[iSample].NomXBin[iEvent];
+                    } else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
+                        MACH3LOG_WARN("XVAR BEYOND BIN EDGES!!");
+                        continue;
+                    } else {
+                        for (unsigned int iBin = 0; iBin < (XBinEdges.size() - 1); ++iBin) {
+                            if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin + 1]) {
+                                XBinToFill = iBin;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (XBinToFill != -1 && YBinToFill != -1) {
+                        // Thread-local accumulation to reduce contention
+                        samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
+                        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight * totalweight;
+                    }
+                }
+            }
+        );
+    }
+
+    // Accumulate results (already handled locally in TBB)
+    // If necessary, this is where we could combine thread-local data
+
+    // No need for manual memory cleanup as std::vector manages memory automatically
+}
+#endif
 
 // **************************************************
 // Helper function to reset the data and MC histograms
@@ -852,16 +934,9 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
+  samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0));
+  samplePDFFD_array_w2 = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0));
+
   FindNominalBinAndEdges1D();
 }
 
@@ -880,16 +955,8 @@ void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double
   int nXBins = int(XVec.size()-1);
   int nYBins = int(YVec.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
+  samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+  samplePDFFD_array_w2= std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
 
   FindNominalBinAndEdges2D();
 }
@@ -924,16 +991,8 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
+  samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+  samplePDFFD_array_w2= std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
 
   FindNominalBinAndEdges1D();
 }
@@ -959,16 +1018,9 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
+  samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+  samplePDFFD_array_w2= std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+
   FindNominalBinAndEdges1D();
 }
 
@@ -1037,20 +1089,13 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   for (int i=0;i<nbins2+1;i++) {
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
-  
+
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
+  
+  samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+  samplePDFFD_array_w2= std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
 
   FindNominalBinAndEdges2D();
 }
@@ -1077,16 +1122,10 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
+
+  samplePDFFD_array = std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+  samplePDFFD_array_w2= std::vector<std::vector<double>>(nYBins, std::vector<double>(nXBins, 0.0));
+
 
   FindNominalBinAndEdges2D();
 }
