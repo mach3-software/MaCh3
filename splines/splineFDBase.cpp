@@ -818,7 +818,7 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 {
   int iSample = getSampleIndex(SampleName);
   int nOscChannels = int(indexvec[iSample].size());
-  MACH3LOG_INFO("Sample {} has {} oscillation channels", iSample, nOscChannels);	
+  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleName, nOscChannels);	
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
