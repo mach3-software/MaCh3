@@ -88,6 +88,15 @@ protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries
   void NowTalk();
 
+  /// @brief check if event is affected by following conditions, for example pdg, or modes etc
+  template <typename T>
+  bool MatchCondition(const std::vector<T>& allowedValues, const T& value) {
+    if (allowedValues.empty()) {
+      return true;  // Apply to all if no specific values are specified
+    }
+    return std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();
+  }
+
   /// Test statistic tells what kind of likelihood sample is using
   TestStatistic fTestStatistic;
 
