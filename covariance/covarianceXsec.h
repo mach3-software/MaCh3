@@ -24,7 +24,7 @@ class covarianceXsec : public covarianceBase {
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
     /// @param i parameter index
-    inline int GetParDetID(const int i) const { return _fDetID[i];};
+    inline std::vector<std::string> GetParDetID(const int i) const { return _fDetID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
     inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
@@ -36,13 +36,13 @@ class covarianceXsec : public covarianceBase {
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
     /// @brief Get the interpolation types for splines affecting a particular DetID
-    const std::vector<SplineInterpolation> GetSplineInterpolationFromDetID(int DetID);
+    const std::vector<SplineInterpolation> GetSplineInterpolationFromDetID(const std::string& DetID);
     /// @brief Get the name of the spline associated with the spline at index i
     /// @param i spline parameter index, not to be confused with global index
     std::string GetParSplineName(const int i) {return _fSplineNames[i];}
 
-    //DB Get spline parameters depending on given DetID
-    const std::vector<int> GetGlobalSystIndexFromDetID(const int DetID, const SystType Type);
+    /// @brief DB Get spline parameters depending on given DetID
+    const std::vector<int> GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type);
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i)._SplineKnotUpBound;}
@@ -52,26 +52,26 @@ class covarianceXsec : public covarianceBase {
 
     /// @brief DB Grab the number of parameters for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    int GetNumParamsFromDetID(const int DetID, const SystType Type);
+    int GetNumParamsFromDetID(const std::string& DetID, const SystType Type);
     /// @brief DB Grab the parameter names for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<std::string> GetParsNamesFromDetID(const int DetID, const SystType Type);
+    const std::vector<std::string> GetParsNamesFromDetID(const std::string& DetID, const SystType Type);
     /// @brief DB Grab the parameter indices for the relevant DetID
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<int> GetParsIndexFromDetID(const int DetID, const SystType Type);
+    const std::vector<int> GetParsIndexFromDetID(const std::string& DetID, const SystType Type);
 
     /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineParsNamesFromDetID(const int DetID);
+    const std::vector<std::string> GetSplineParsNamesFromDetID(const std::string& DetID);
     /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineFileParsNamesFromDetID(const int DetID);
+    const std::vector<std::string> GetSplineFileParsNamesFromDetID(const std::string& DetID);
 
     /// @brief DB Grab the Spline Modes for the relevant DetID
-    const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const int DetID);
+    const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const std::string& DetID);
     /// @brief Grab the index of the syst relative to global numbering.
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<int> GetSystIndexFromDetID(const int DetID, const SystType Type);
+    const std::vector<int> GetSystIndexFromDetID(const std::string& DetID, const SystType Type);
     /// @brief DB Get norm/func parameters depending on given DetID
-    const std::vector<XsecNorms4> GetNormParsFromDetID(const int DetID);
+    const std::vector<XsecNorms4> GetNormParsFromDetID(const std::string& DetID);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> getNominalArray() override
@@ -126,13 +126,8 @@ class covarianceXsec : public covarianceBase {
     /// parameter.
     /// @param DetID The Detector ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
-    void IterateOverParams(const int DetID, FilterFunc filter, ActionFunc action);
-    /// @brief Check if parameter is affecting given det ID
-    /// @param SystIndex number of parameter
-    /// @param DetID The Detector ID used to filter parameters.
-    bool AppliesToDetID(const int SystIndex, const int DetID) const {
-      return (GetParDetID(SystIndex) & DetID) != 0;
-    }
+    void IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action);
+
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.
@@ -148,8 +143,6 @@ class covarianceXsec : public covarianceBase {
     /// @param param Yaml node describing param
     inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
 
-    /// Tells to which samples object param should be applied
-    std::vector<int> _fDetID;
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
 

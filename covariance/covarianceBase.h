@@ -425,6 +425,11 @@ protected:
   /// @cite haario2001adaptive
   void updateAdaptiveCovariance();
 
+  /// @brief Check if parameter is affecting given det ID
+  /// @param SystIndex number of parameter
+  /// @param DetID The Detector ID used to filter parameters.
+  bool AppliesToDetID(const int SystIndex, const std::string& DetID) const;
+
   /// The input root file we read in
   const std::string inputFile;
 
@@ -476,6 +481,8 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
+  /// Tells to which samples object param should be applied
+  std::vector<std::vector<std::string>> _fDetID;
 
   /// perform PCA or not
   bool pca;
