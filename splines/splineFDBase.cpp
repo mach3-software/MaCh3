@@ -54,7 +54,7 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
+bool splineFDBase::AddSample(std::string SampleName, const std::string& DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {

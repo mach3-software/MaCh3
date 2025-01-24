@@ -567,19 +567,4 @@ namespace MaCh3Utils {
     return NuOscillatorFlavour;
   }
   // ***************************
-
-  /// @brief DB Anything added here must be of the form 2^X, where X is an integer
-  /// @warning DB Used to contain which DetIDs are supported
-  static const std::unordered_map<int,int>KnownDetIDsMap({
-    {0,1},    //ND
-    {1,8},    //FD
-    {2,16},   //SK1Rmu
-    {3,32},   //Nova
-    {4,64},   //Atm SubGeV e-like
-    {5,128},  //Atm SubGeV mu-like
-    {6,256},  //Atm MultiGeV e-like
-    {7,512},  //Atm MultiGeV mu-like
-  });
-  static const int nKnownDetIDs = int(KnownDetIDsMap.size());
-
 } // end MaCh3Utils namespace
