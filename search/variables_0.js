@@ -9,7 +9,7 @@ var searchData=
   ['_5fexecoptions_6',['_execOptions',['../classMaCh3Plotting_1_1PlottingManager.html#a9304b66768eea558854d652a9beddbf1',1,'MaCh3Plotting::PlottingManager']]],
   ['_5fextradrawoptions_7',['_extraDrawOptions',['../classMaCh3Plotting_1_1PlottingManager.html#a8fabd7cbc31aa1f9ed15f0b0d3201c81',1,'MaCh3Plotting::PlottingManager']]],
   ['_5ffcurrval_8',['_fCurrVal',['../classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65',1,'covarianceBase']]],
-  ['_5ffdetid_9',['_fDetID',['../classcovarianceXsec.html#a183f01056fc0e9b42db202e944021332',1,'covarianceXsec']]],
+  ['_5ffdetid_9',['_fDetID',['../classcovarianceBase.html#a267523bb0f78c27208000b2856f741da',1,'covarianceBase']]],
   ['_5fferror_10',['_fError',['../classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858',1,'covarianceBase']]],
   ['_5fffancynames_11',['_fFancyNames',['../classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c',1,'covarianceBase']]],
   ['_5ffflatprior_12',['_fFlatPrior',['../classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb',1,'covarianceBase']]],

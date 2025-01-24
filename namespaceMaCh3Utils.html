@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.3.4</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.4.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -80,8 +80,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">MaCh3Utils Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -133,9 +132,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a8152408c87ebdf1f28204c54f01384d5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#a8152408c87ebdf1f28204c54f01384d5">PDGToNuOscillatorFlavour</a> (int NuPdg)</td></tr>
 <tr class="memdesc:a8152408c87ebdf1f28204c54f01384d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert from PDG flavour to NuOscillator type beware that in the case of anti-neutrinos the NuOscillator type simply gets multiplied by -1.  <br /></td></tr>
 <tr class="separator:a8152408c87ebdf1f28204c54f01384d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8ce63d18fe4673e2c6b199776935f9f"><td class="memItemLeft" align="right" valign="top">static const std::unordered_map&lt; int, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#ab8ce63d18fe4673e2c6b199776935f9f">KnownDetIDsMap</a> ({ {0, 1}, {1, 8}, {2, 16}, {3, 32}, {4, 64}, {5, 128}, {6, 256}, {7, 512}, })</td></tr>
-<tr class="memdesc:ab8ce63d18fe4673e2c6b199776935f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Anything added here must be of the form 2^X, where X is an integer.  <br /></td></tr>
-<tr class="separator:ab8ce63d18fe4673e2c6b199776935f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5aff908b9241c673e8d05403996e2229"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#a5aff908b9241c673e8d05403996e2229">GetNThreads</a> ()</td></tr>
 <tr class="memdesc:a5aff908b9241c673e8d05403996e2229"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of threads which we need for example for TRandom3  <br /></td></tr>
 <tr class="separator:a5aff908b9241c673e8d05403996e2229"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,11 +144,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ac4d63087b4dc0c0a0e49d375ece4cb00"><td class="memItemLeft" align="right" valign="top">TMatrixD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#ac4d63087b4dc0c0a0e49d375ece4cb00">MatrixMult</a> (TMatrixD A, TMatrixD B)</td></tr>
 <tr class="memdesc:ac4d63087b4dc0c0a0e49d375ece4cb00"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
 <tr class="separator:ac4d63087b4dc0c0a0e49d375ece4cb00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:aab7f576a31d84edca65700697865aa41"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#aab7f576a31d84edca65700697865aa41">nKnownDetIDs</a> = int(KnownDetIDsMap.size())</td></tr>
-<tr class="separator:aab7f576a31d84edca65700697865aa41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="afb0be593dc0d5e481b78afa4625c858c" name="afb0be593dc0d5e481b78afa4625c858c"></a>
@@ -606,35 +597,6 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  252</span>}</div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_af06aa84306b4d4692f30e63d08180c83"><div class="ttname"><a href="namespaceMaCh3Utils.html#af06aa84306b4d4692f30e63d08180c83">MaCh3Utils::parseLine</a></div><div class="ttdeci">int parseLine(const std::string &amp;line)</div><div class="ttdoc">CW: Get memory, which is probably silly.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00256">Monitor.cpp:256</a></div></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="ab8ce63d18fe4673e2c6b199776935f9f" name="ab8ce63d18fe4673e2c6b199776935f9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab8ce63d18fe4673e2c6b199776935f9f">&#9670;&#160;</a></span>KnownDetIDsMap()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const std::unordered_map&lt; int, int &gt; MaCh3Utils::KnownDetIDsMap </td>
-          <td>(</td>
-          <td class="paramtype">{ {0, 1}, {1, 8}, {2, 16}, {3, 32}, {4, 64}, {5, 128}, {6, 256}, {7, 512}, }&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>DB Anything added here must be of the form 2^X, where X is an integer. </p>
-<dl class="section warning"><dt>Warning</dt><dd>DB Used to contain which DetIDs are supported </dd></dl>
-
 </div>
 </div>
 <a id="abcecb06e3d26685da80dd1f3a08e3d0c" name="abcecb06e3d26685da80dd1f3a08e3d0c"></a>
@@ -1183,31 +1145,6 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  162</span>  <span class="keywordflow">return</span> result;</div>
 <div class="line"><span class="lineno">  163</span>}</div>
 </div><!-- fragment -->
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="aab7f576a31d84edca65700697865aa41" name="aab7f576a31d84edca65700697865aa41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab7f576a31d84edca65700697865aa41">&#9670;&#160;</a></span>nKnownDetIDs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const int MaCh3Utils::nKnownDetIDs = int(KnownDetIDsMap.size())</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00583">583</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-
 </div>
 </div>
 </div><!-- contents -->

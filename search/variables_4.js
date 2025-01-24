@@ -17,7 +17,7 @@ var searchData=
   ['default_5fstyle_5fconfig_14',['DEFAULT_STYLE_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a2e234f2546aa3eb2c7d97e2f28024511',1,'MaCh3Plotting::PlottingManager']]],
   ['default_5ftranslation_5fconfig_15',['DEFAULT_TRANSLATION_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a59d9e05c0590931aa260d81cd97bf3e4',1,'MaCh3Plotting::PlottingManager']]],
   ['defaulterrortype_16',['defaultErrorType',['../structMaCh3Plotting_1_1InputFile.html#a4a4c62bb5c0978571d11356b77a28e3e',1,'MaCh3Plotting::InputFile']]],
-  ['detids_17',['DetIDs',['../classsplineFDBase.html#aeb743760ca4a477771132aaf0e334d15',1,'splineFDBase']]],
+  ['detids_17',['DetIDs',['../classsplineFDBase.html#a481d275de711edfddbb82d3924b6e63a',1,'splineFDBase']]],
   ['dimensionlabels_18',['DimensionLabels',['../classsplineFDBase.html#a00e1aeea8e9389c41f93469a26c83adc',1,'splineFDBase']]],
   ['dimensions_19',['Dimensions',['../classsplineFDBase.html#a6c28400605049bdee229885c46463dcd',1,'splineFDBase']]],
   ['dir_20',['Dir',['../classSampleSummary.html#aa2064e7455c3164ee5118a5e5162f282',1,'SampleSummary']]],
