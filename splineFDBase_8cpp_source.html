@@ -548,8 +548,8 @@ $(function() {
 <div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classsplineFDBase.html#a6c28400605049bdee229885c46463dcd">Dimensions</a>[iSample] != 2)</div>
 <div class="line"><a id="l00461" name="l00461"></a><span class="lineno">  461</span>    {</div>
 <div class="line"><a id="l00462" name="l00462"></a><span class="lineno">  462</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Trying to load a 2D spline template when nDim={}&quot;</span>, <a class="code hl_variable" href="classsplineFDBase.html#a6c28400605049bdee229885c46463dcd">Dimensions</a>[iSample]);</div>
-<div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span>    }</div>
-<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span>    }</div>
 <div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>    <span class="comment">//Hist2D = std::unique_ptr&lt;TH2F&gt;(File-&gt;Get&lt;TH2F&gt;(&quot;dev_tmp_0_0&quot;));</span></div>
 <div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span>    Hist2D = File-&gt;Get&lt;TH2F&gt;(TemplateName.c_str());</div>
 <div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span>  }</div>
