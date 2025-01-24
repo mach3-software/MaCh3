@@ -599,7 +599,6 @@ void samplePDFFDBase::fillArray_MP()  {
         }
         //DB - Second, check to see if the event is outside of the binning range and skip event if it is
         else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-          MACH3LOG_WARN("XVAR BEYOND BIN EDGES!!");
           continue;
         }
         //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
