@@ -1667,66 +1667,66 @@ Ed Atkin </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="samplePDFFDBase_8cpp_source.html#l01498">1498</a> of file <a class="el" href="samplePDFFDBase_8cpp_source.html">samplePDFFDBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1498</span>                                                                                                                                         {</div>
-<div class="line"><span class="lineno"> 1499</span>  <span class="comment">//DB Grab the associated enum with the argument string</span></div>
-<div class="line"><span class="lineno"> 1500</span>  <span class="keywordtype">int</span> ProjectionVar_Int = <a class="code hl_function" href="classsamplePDFFDBase.html#a4d5e30a730ecda30eb05343ec3959fd3">ReturnKinematicParameterFromString</a>(ProjectionVar_Str);</div>
+<p class="definition">Definition at line <a class="el" href="samplePDFFDBase_8cpp_source.html#l01497">1497</a> of file <a class="el" href="samplePDFFDBase_8cpp_source.html">samplePDFFDBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1497</span>                                                                                                                                         {</div>
+<div class="line"><span class="lineno"> 1498</span>  <span class="comment">//DB Grab the associated enum with the argument string</span></div>
+<div class="line"><span class="lineno"> 1499</span>  <span class="keywordtype">int</span> ProjectionVar_Int = <a class="code hl_function" href="classsamplePDFFDBase.html#a4d5e30a730ecda30eb05343ec3959fd3">ReturnKinematicParameterFromString</a>(ProjectionVar_Str);</div>
+<div class="line"><span class="lineno"> 1500</span> </div>
 <div class="line"><span class="lineno"> 1501</span> </div>
-<div class="line"><span class="lineno"> 1502</span> </div>
-<div class="line"><span class="lineno"> 1503</span>  <span class="comment">//DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.</span></div>
-<div class="line"><span class="lineno"> 1504</span>  <span class="comment">//   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset</span></div>
-<div class="line"><span class="lineno"> 1505</span>  std::vector&lt; std::vector&lt;double&gt; &gt; tmp_Selection = <a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a>;</div>
-<div class="line"><span class="lineno"> 1506</span>  std::vector&lt; std::vector&lt;double&gt; &gt; SelectionVecToApply;</div>
-<div class="line"><span class="lineno"> 1507</span> </div>
-<div class="line"><span class="lineno"> 1508</span>  <span class="comment">//DB Add all the predefined selections to the selection vector which will be applied</span></div>
-<div class="line"><span class="lineno"> 1509</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSelec=0;iSelec&lt;<a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a>.size();iSelec++) {</div>
-<div class="line"><span class="lineno"> 1510</span>    SelectionVecToApply.emplace_back(<a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a>[iSelec]);</div>
-<div class="line"><span class="lineno"> 1511</span>  }</div>
-<div class="line"><span class="lineno"> 1512</span> </div>
-<div class="line"><span class="lineno"> 1513</span>  <span class="comment">//DB Add all requested cuts from the argument to the selection vector which will be applied</span></div>
-<div class="line"><span class="lineno"> 1514</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSelec=0;iSelec&lt;SelectionVec.size();iSelec++) {</div>
-<div class="line"><span class="lineno"> 1515</span>    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);</div>
-<div class="line"><span class="lineno"> 1516</span>  }</div>
-<div class="line"><span class="lineno"> 1517</span> </div>
-<div class="line"><span class="lineno"> 1518</span>  <span class="comment">//DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]</span></div>
-<div class="line"><span class="lineno"> 1519</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSelec=0;iSelec&lt;SelectionVecToApply.size();iSelec++) {</div>
-<div class="line"><span class="lineno"> 1520</span>    <span class="keywordflow">if</span> (SelectionVecToApply[iSelec].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>()!=3) {</div>
-<div class="line"><span class="lineno"> 1521</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}&quot;</span>,iSelec,SelectionVecToApply[iSelec].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>());</div>
-<div class="line"><span class="lineno"> 1522</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno"> 1523</span>    }</div>
-<div class="line"><span class="lineno"> 1524</span>  }</div>
-<div class="line"><span class="lineno"> 1525</span> </div>
-<div class="line"><span class="lineno"> 1526</span>  <span class="comment">//DB Set the member variable to be the cuts to apply</span></div>
-<div class="line"><span class="lineno"> 1527</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a> = SelectionVecToApply;</div>
-<div class="line"><span class="lineno"> 1528</span> </div>
-<div class="line"><span class="lineno"> 1529</span>  <span class="comment">//DB Define the histogram which will be returned</span></div>
-<div class="line"><span class="lineno"> 1530</span>  TH1D* _h1DVar;</div>
-<div class="line"><span class="lineno"> 1531</span>  <span class="keywordflow">if</span> (Axis) {</div>
-<div class="line"><span class="lineno"> 1532</span>    _h1DVar = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;&quot;</span>,<span class="stringliteral">&quot;&quot;</span>,Axis-&gt;GetNbins(),Axis-&gt;GetXbins()-&gt;GetArray());</div>
-<div class="line"><span class="lineno"> 1533</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 1534</span>    std::vector&lt;double&gt; xBinEdges = <a class="code hl_function" href="classsamplePDFFDBase.html#abfbc5e1153ac47c81c0c9307ddbb18f0">ReturnKinematicParameterBinning</a>(ProjectionVar_Str);</div>
-<div class="line"><span class="lineno"> 1535</span>    _h1DVar = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">int</span>(xBinEdges.size())-1, xBinEdges.data());</div>
-<div class="line"><span class="lineno"> 1536</span>  }</div>
-<div class="line"><span class="lineno"> 1537</span> </div>
-<div class="line"><span class="lineno"> 1538</span>  <span class="comment">//DB Loop over all events</span></div>
-<div class="line"><span class="lineno"> 1539</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample=0;iSample&lt;<a class="code hl_function" href="classsamplePDFFDBase.html#ae8ee9af6196445bf5396c95f2ae04dae">getNMCSamples</a>();iSample++) {</div>
-<div class="line"><span class="lineno"> 1540</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iEvent=0;iEvent&lt;<a class="code hl_function" href="classsamplePDFFDBase.html#a9f87a162fb3d9ec424d057ebaa9d41e5">getNEventsInSample</a>(iSample);iEvent++) {</div>
-<div class="line"><span class="lineno"> 1541</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="classsamplePDFFDBase.html#a82c460356e8ab122671422b873a8e1f0">IsEventSelected</a>(iSample,iEvent)) {</div>
-<div class="line"><span class="lineno"> 1542</span>        <span class="keywordtype">double</span> Weight = <a class="code hl_function" href="classsamplePDFFDBase.html#a1b5a95bfad60e1f630f62a712721a198">GetEventWeight</a>(iSample,iEvent);</div>
-<div class="line"><span class="lineno"> 1543</span>        <span class="keywordflow">if</span> (WeightStyle==1) {</div>
-<div class="line"><span class="lineno"> 1544</span>          Weight = 1.;</div>
-<div class="line"><span class="lineno"> 1545</span>        }</div>
-<div class="line"><span class="lineno"> 1546</span>        <span class="keywordtype">double</span> Var = <a class="code hl_function" href="classsamplePDFFDBase.html#a40269d6e2aa2b6517ce1dc28b2905028">ReturnKinematicParameter</a>(ProjectionVar_Int,iSample,iEvent);</div>
-<div class="line"><span class="lineno"> 1547</span>        _h1DVar-&gt;Fill(Var,Weight);</div>
-<div class="line"><span class="lineno"> 1548</span>      }</div>
-<div class="line"><span class="lineno"> 1549</span>    }</div>
-<div class="line"><span class="lineno"> 1550</span>  }</div>
-<div class="line"><span class="lineno"> 1551</span>  </div>
-<div class="line"><span class="lineno"> 1552</span>  <span class="comment">//DB Reset the saved selection</span></div>
-<div class="line"><span class="lineno"> 1553</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a> = tmp_Selection;</div>
-<div class="line"><span class="lineno"> 1554</span> </div>
-<div class="line"><span class="lineno"> 1555</span>  <span class="keywordflow">return</span> _h1DVar;</div>
-<div class="line"><span class="lineno"> 1556</span>}</div>
+<div class="line"><span class="lineno"> 1502</span>  <span class="comment">//DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.</span></div>
+<div class="line"><span class="lineno"> 1503</span>  <span class="comment">//   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset</span></div>
+<div class="line"><span class="lineno"> 1504</span>  std::vector&lt; std::vector&lt;double&gt; &gt; tmp_Selection = <a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a>;</div>
+<div class="line"><span class="lineno"> 1505</span>  std::vector&lt; std::vector&lt;double&gt; &gt; SelectionVecToApply;</div>
+<div class="line"><span class="lineno"> 1506</span> </div>
+<div class="line"><span class="lineno"> 1507</span>  <span class="comment">//DB Add all the predefined selections to the selection vector which will be applied</span></div>
+<div class="line"><span class="lineno"> 1508</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSelec=0;iSelec&lt;<a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a>.size();iSelec++) {</div>
+<div class="line"><span class="lineno"> 1509</span>    SelectionVecToApply.emplace_back(<a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a>[iSelec]);</div>
+<div class="line"><span class="lineno"> 1510</span>  }</div>
+<div class="line"><span class="lineno"> 1511</span> </div>
+<div class="line"><span class="lineno"> 1512</span>  <span class="comment">//DB Add all requested cuts from the argument to the selection vector which will be applied</span></div>
+<div class="line"><span class="lineno"> 1513</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSelec=0;iSelec&lt;SelectionVec.size();iSelec++) {</div>
+<div class="line"><span class="lineno"> 1514</span>    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);</div>
+<div class="line"><span class="lineno"> 1515</span>  }</div>
+<div class="line"><span class="lineno"> 1516</span> </div>
+<div class="line"><span class="lineno"> 1517</span>  <span class="comment">//DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]</span></div>
+<div class="line"><span class="lineno"> 1518</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSelec=0;iSelec&lt;SelectionVecToApply.size();iSelec++) {</div>
+<div class="line"><span class="lineno"> 1519</span>    <span class="keywordflow">if</span> (SelectionVecToApply[iSelec].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>()!=3) {</div>
+<div class="line"><span class="lineno"> 1520</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}&quot;</span>,iSelec,SelectionVecToApply[iSelec].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>());</div>
+<div class="line"><span class="lineno"> 1521</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno"> 1522</span>    }</div>
+<div class="line"><span class="lineno"> 1523</span>  }</div>
+<div class="line"><span class="lineno"> 1524</span> </div>
+<div class="line"><span class="lineno"> 1525</span>  <span class="comment">//DB Set the member variable to be the cuts to apply</span></div>
+<div class="line"><span class="lineno"> 1526</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a> = SelectionVecToApply;</div>
+<div class="line"><span class="lineno"> 1527</span> </div>
+<div class="line"><span class="lineno"> 1528</span>  <span class="comment">//DB Define the histogram which will be returned</span></div>
+<div class="line"><span class="lineno"> 1529</span>  TH1D* _h1DVar;</div>
+<div class="line"><span class="lineno"> 1530</span>  <span class="keywordflow">if</span> (Axis) {</div>
+<div class="line"><span class="lineno"> 1531</span>    _h1DVar = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;&quot;</span>,<span class="stringliteral">&quot;&quot;</span>,Axis-&gt;GetNbins(),Axis-&gt;GetXbins()-&gt;GetArray());</div>
+<div class="line"><span class="lineno"> 1532</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno"> 1533</span>    std::vector&lt;double&gt; xBinEdges = <a class="code hl_function" href="classsamplePDFFDBase.html#abfbc5e1153ac47c81c0c9307ddbb18f0">ReturnKinematicParameterBinning</a>(ProjectionVar_Str);</div>
+<div class="line"><span class="lineno"> 1534</span>    _h1DVar = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">int</span>(xBinEdges.size())-1, xBinEdges.data());</div>
+<div class="line"><span class="lineno"> 1535</span>  }</div>
+<div class="line"><span class="lineno"> 1536</span> </div>
+<div class="line"><span class="lineno"> 1537</span>  <span class="comment">//DB Loop over all events</span></div>
+<div class="line"><span class="lineno"> 1538</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample=0;iSample&lt;<a class="code hl_function" href="classsamplePDFFDBase.html#ae8ee9af6196445bf5396c95f2ae04dae">getNMCSamples</a>();iSample++) {</div>
+<div class="line"><span class="lineno"> 1539</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iEvent=0;iEvent&lt;<a class="code hl_function" href="classsamplePDFFDBase.html#a9f87a162fb3d9ec424d057ebaa9d41e5">getNEventsInSample</a>(iSample);iEvent++) {</div>
+<div class="line"><span class="lineno"> 1540</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="classsamplePDFFDBase.html#a82c460356e8ab122671422b873a8e1f0">IsEventSelected</a>(iSample,iEvent)) {</div>
+<div class="line"><span class="lineno"> 1541</span>        <span class="keywordtype">double</span> Weight = <a class="code hl_function" href="classsamplePDFFDBase.html#a1b5a95bfad60e1f630f62a712721a198">GetEventWeight</a>(iSample,iEvent);</div>
+<div class="line"><span class="lineno"> 1542</span>        <span class="keywordflow">if</span> (WeightStyle==1) {</div>
+<div class="line"><span class="lineno"> 1543</span>          Weight = 1.;</div>
+<div class="line"><span class="lineno"> 1544</span>        }</div>
+<div class="line"><span class="lineno"> 1545</span>        <span class="keywordtype">double</span> Var = <a class="code hl_function" href="classsamplePDFFDBase.html#a40269d6e2aa2b6517ce1dc28b2905028">ReturnKinematicParameter</a>(ProjectionVar_Int,iSample,iEvent);</div>
+<div class="line"><span class="lineno"> 1546</span>        _h1DVar-&gt;Fill(Var,Weight);</div>
+<div class="line"><span class="lineno"> 1547</span>      }</div>
+<div class="line"><span class="lineno"> 1548</span>    }</div>
+<div class="line"><span class="lineno"> 1549</span>  }</div>
+<div class="line"><span class="lineno"> 1550</span>  </div>
+<div class="line"><span class="lineno"> 1551</span>  <span class="comment">//DB Reset the saved selection</span></div>
+<div class="line"><span class="lineno"> 1552</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aafa0e8f399c5c22d9234e55a7289f8ed">Selection</a> = tmp_Selection;</div>
+<div class="line"><span class="lineno"> 1553</span> </div>
+<div class="line"><span class="lineno"> 1554</span>  <span class="keywordflow">return</span> _h1DVar;</div>
+<div class="line"><span class="lineno"> 1555</span>}</div>
 <div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00046">GetPenaltyTerm.cpp:46</a></div></div>
 <div class="ttc" id="aclasssamplePDFFDBase_html_a4d5e30a730ecda30eb05343ec3959fd3"><div class="ttname"><a href="classsamplePDFFDBase.html#a4d5e30a730ecda30eb05343ec3959fd3">samplePDFFDBase::ReturnKinematicParameterFromString</a></div><div class="ttdeci">virtual int ReturnKinematicParameterFromString(std::string KinematicStr)=0</div></div>
 <div class="ttc" id="aclasssamplePDFFDBase_html_a9f87a162fb3d9ec424d057ebaa9d41e5"><div class="ttname"><a href="classsamplePDFFDBase.html#a9f87a162fb3d9ec424d057ebaa9d41e5">samplePDFFDBase::getNEventsInSample</a></div><div class="ttdeci">int getNEventsInSample(int iSample)</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFFDBase_8h_source.html#l00054">samplePDFFDBase.h:54</a></div></div>
@@ -2343,17 +2343,16 @@ Ed Atkin </dd></dl>
 <div class="line"><span class="lineno"> 1483</span>  }</div>
 <div class="line"><span class="lineno"> 1484</span>  </div>
 <div class="line"><span class="lineno"> 1485</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;AddSample(<a class="code hl_variable" href="classsamplePDFFDBase.html#ae1c9d87b302042e4e2347aa787a947cd">samplename</a>, <a class="code hl_variable" href="classsamplePDFFDBase.html#aa259ac4e4916ceb6a17d40ff713c9a24">SampleDetID</a>, spline_filepaths, <a class="code hl_variable" href="classsamplePDFFDBase.html#acd1d62630e3ac6fc012e97f74a12bda0">SplineVarNames</a>);</div>
-<div class="line"><span class="lineno"> 1486</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;PrintArrayDimension();</div>
-<div class="line"><span class="lineno"> 1487</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;CountNumberOfLoadedSplines(<span class="keyword">false</span>, 1);</div>
-<div class="line"><span class="lineno"> 1488</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;TransferToMonolith();</div>
-<div class="line"><span class="lineno"> 1489</span> </div>
-<div class="line"><span class="lineno"> 1490</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;--------------------------------&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1491</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setup Far Detector splines&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1492</span> </div>
-<div class="line"><span class="lineno"> 1493</span>  <a class="code hl_function" href="classsamplePDFFDBase.html#acf33f477d5ed7ed4113ef50b190ccf3e">fillSplineBins</a>();</div>
-<div class="line"><span class="lineno"> 1494</span> </div>
-<div class="line"><span class="lineno"> 1495</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;cleanUpMemory();</div>
-<div class="line"><span class="lineno"> 1496</span>}</div>
+<div class="line"><span class="lineno"> 1486</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;CountNumberOfLoadedSplines(<span class="keyword">false</span>, 1);</div>
+<div class="line"><span class="lineno"> 1487</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;TransferToMonolith();</div>
+<div class="line"><span class="lineno"> 1488</span> </div>
+<div class="line"><span class="lineno"> 1489</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;--------------------------------&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1490</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setup Far Detector splines&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1491</span> </div>
+<div class="line"><span class="lineno"> 1492</span>  <a class="code hl_function" href="classsamplePDFFDBase.html#acf33f477d5ed7ed4113ef50b190ccf3e">fillSplineBins</a>();</div>
+<div class="line"><span class="lineno"> 1493</span> </div>
+<div class="line"><span class="lineno"> 1494</span>  <a class="code hl_variable" href="classsamplePDFFDBase.html#aa5e4bbbc2793215c20d5a10f46cf5b65">SplineHandler</a>-&gt;cleanUpMemory();</div>
+<div class="line"><span class="lineno"> 1495</span>}</div>
 <div class="ttc" id="aclasssamplePDFFDBase_html_a25781d37f6f9413b82ec330ff64caf9a"><div class="ttname"><a href="classsamplePDFFDBase.html#a25781d37f6f9413b82ec330ff64caf9a">samplePDFFDBase::spline_files</a></div><div class="ttdeci">std::vector&lt; std::string &gt; spline_files</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFFDBase_8h_source.html#l00246">samplePDFFDBase.h:246</a></div></div>
 <div class="ttc" id="aclasssamplePDFFDBase_html_acd1d62630e3ac6fc012e97f74a12bda0"><div class="ttname"><a href="classsamplePDFFDBase.html#acd1d62630e3ac6fc012e97f74a12bda0">samplePDFFDBase::SplineVarNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SplineVarNames</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFFDBase_8h_source.html#l00116">samplePDFFDBase.h:116</a></div></div>
 <div class="ttc" id="aclasssamplePDFFDBase_html_acf33f477d5ed7ed4113ef50b190ccf3e"><div class="ttname"><a href="classsamplePDFFDBase.html#acf33f477d5ed7ed4113ef50b190ccf3e">samplePDFFDBase::fillSplineBins</a></div><div class="ttdeci">void fillSplineBins()</div><div class="ttdoc">Finds the binned spline that an event should apply to and stored them in a a vector for easy evaluati...</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFFDBase_8cpp_source.html#l01357">samplePDFFDBase.cpp:1357</a></div></div>
