@@ -66,8 +66,7 @@ class splineFDBase : public SplineBase {
 	void PrintBinning(TAxis* Axis);
 	void PrintSampleDetails(std::string SampleName);
 	void PrintArrayDetails(std::string SampleName);
-	void PrintArrayDimension();
-
+	
 	const M3::float_t* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
 	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
 	  return &weightvec_Monolith[index];

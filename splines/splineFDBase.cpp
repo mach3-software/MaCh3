@@ -818,52 +818,27 @@ void splineFDBase::PrintArrayDetails(std::string SampleName)
 {
   int iSample = getSampleIndex(SampleName);
   int nOscChannels = int(indexvec[iSample].size());
-  MACH3LOG_INFO("Sample {} has {} oscillation channels", iSample, nOscChannels);	
+  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleName, nOscChannels);	
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
     int nSysts = int(indexvec[iSample][iOscChan].size());
     MACH3LOG_INFO("Oscillation channel {} has {} systematics", iOscChan, nSysts);	  
   }
-}
 
-//****************************************
-void splineFDBase::PrintArrayDimension() {
-//****************************************
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
-  MACH3LOG_INFO("Array dimensions..");
-  MACH3LOG_INFO("{:<20}{}", "nSamples:", indexvec.size());
-
-  MACH3LOG_INFO("{:<20}", "nOscChans:");
-  std::string oscChans;
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
-    oscChans += fmt::format("{} ", indexvec[iSample].size());
-  }
-  MACH3LOG_INFO("{}", oscChans);
-
-  MACH3LOG_INFO("{:<20}", "nSysts:");
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
-    std::string systs = fmt::format("\tSample: {}\t", iSample);
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
-      systs += fmt::format("{} ", indexvec[iSample][iOscChan].size());
+  MACH3LOG_INFO("Printing no. of modes affected by each systematic for each oscillation channel");
+  for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+    std::string modes = fmt::format("OscChan: {}\t", iOscChan);
+    for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
+      modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
     }
-    MACH3LOG_INFO("{}", systs);
-  }
-
-  MACH3LOG_INFO("{:<20}", "nModes:");
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
-    MACH3LOG_INFO("\tSample: {}\t--------------------------", iSample);
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
-      std::string modes = fmt::format("\t\tOscChan: {}\t", iOscChan);
-      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
-        modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
-      }
-      MACH3LOG_INFO("{}", modes);
-    }
-    MACH3LOG_INFO("");  // Empty line for spacing
+    MACH3LOG_INFO("{}", modes);
   }
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
+
 }
+
 //****************************************
 bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
