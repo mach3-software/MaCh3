@@ -836,12 +836,15 @@ void splineFDBase::PrintArrayDimension(std::string SampleName) {
   MACH3LOG_INFO("On sample {}",SampleName);
   MACH3LOG_INFO("Printing no. of modes affected by each systematic for each oscillation channel");
   
-  for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
-    std::string modes = fmt::format("\t\tOscChan: {}\t", iOscChan);
-    for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
-      modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+      std::string modes = fmt::format("OscChan: {}\t", iOscChan);
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
+        modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
+      }
+      MACH3LOG_INFO("{}", modes);
     }
-    MACH3LOG_INFO("{}", modes);
+    MACH3LOG_INFO("");  // Empty line for spacing
   }
   
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
