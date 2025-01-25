@@ -17,7 +17,8 @@ class covarianceOsc : public covarianceBase
   void proposeStep() override;
   /// @brief Sets whether to flip delta M23.
   void setFlipDeltaM23(bool flip){flipdelM = flip;}
-
+  /// @brief Get pointers to Osc params from detId
+  std::vector<const double*> GetOscParsFromDetID(const std::string& DetID);
   /// @brief KS: Print all useful information's after initialization
   void Print();
 

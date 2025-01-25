@@ -54,7 +54,7 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
+bool splineFDBase::AddSample(std::string SampleName, const std::string& DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
@@ -460,8 +460,8 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
     if (Dimensions[iSample] != 2)
     {
       MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
-    }
       throw MaCh3Exception(__FILE__, __LINE__);
+    }
     //Hist2D = std::unique_ptr<TH2F>(File->Get<TH2F>("dev_tmp_0_0"));
     Hist2D = File->Get<TH2F>(TemplateName.c_str());
   }
