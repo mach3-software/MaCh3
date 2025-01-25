@@ -11,7 +11,6 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 
-
 /// @file SplineStructs.h
 /// @brief Contains structures and helper functions for handling spline representations of systematic parameters in the MaCh3.
 /// @author Clarence Wret

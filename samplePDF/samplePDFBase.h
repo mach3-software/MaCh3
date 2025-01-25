@@ -3,13 +3,12 @@
 //C++ includes
 #include <assert.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+//MaCh3 includes
+#include "samplePDF/Structs.h"
+#include "samplePDF/HistogramUtils.h"
+#include "manager/manager.h"
+
+_MaCh3_Safe_Include_Start_ //{
 //ROOT includes
 #include "TTree.h"
 #include "TH1D.h"
@@ -19,12 +18,7 @@
 #include "TROOT.h"
 #include "TRandom3.h"
 #include "TString.h"
-#pragma GCC diagnostic pop
-
-//MaCh3 includes
-#include "samplePDF/Structs.h"
-#include "samplePDF/HistogramUtils.h"
-#include "manager/manager.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFBase

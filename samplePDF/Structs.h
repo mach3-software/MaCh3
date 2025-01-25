@@ -62,15 +62,27 @@ constexpr static const int Unity_Int = 1;
 #include "omp.h"
 #endif
 
+// MaCh3 includes
 #include "manager/MaCh3Exception.h"
 #include "manager/MaCh3Logger.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
+/// @brief KS: Avoiding warning checking for headers
+/// @details Many external files don't strictly adhere to rigorous C++ standards.
+/// Inline functions in such headers may cause errors when compiled with strict MaCh3 compiler flags.
+/// @warning Use this for any external header file to avoid warnings.
+#define _MaCh3_Safe_Include_Start_ \
+_Pragma("GCC diagnostic push") \
+_Pragma("GCC diagnostic ignored \"-Wuseless-cast\"") \
+_Pragma("GCC diagnostic ignored \"-Wfloat-conversion\"") \
+_Pragma("GCC diagnostic ignored \"-Wold-style-cast\"") \
+_Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
+_Pragma("GCC diagnostic ignored \"-Wconversion\"")
+
+/// @brief KS: Restore warning checking after including external headers
+#define _MaCh3_Safe_Include_End_ \
+_Pragma("GCC diagnostic pop")
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TSpline.h"
 #include "TObjString.h"
@@ -80,7 +92,7 @@ constexpr static const int Unity_Int = 1;
 #include "TH1.h"
 // NuOscillator includes
 #include "Constants/OscillatorConstants.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 
 /// @file Structs.h

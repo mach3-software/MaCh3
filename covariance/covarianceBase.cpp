@@ -117,7 +117,7 @@ void covarianceBase::init(std::string name, std::string file) {
 
   PrintLength = 35;
 
-  const int nThreads = MaCh3Utils::GetNThreads();
+  const int nThreads = M3::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
   random_number.reserve(nThreads);
@@ -172,7 +172,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     }
   }
 
-  const int nThreads = MaCh3Utils::GetNThreads();
+  const int nThreads = M3::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
   random_number.reserve(nThreads);
