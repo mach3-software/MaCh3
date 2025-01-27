@@ -228,7 +228,7 @@ void samplePDFFDBase::fill2DHist()
 
 // ************************************************
 /// @function samplePDFFDBase::SetupSampleBinning()
-/// @brief Function to setup the binning of your sample histograms and the underlying 
+/// @brief Function to setup the binning of your sample histograms and the underlying
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
@@ -294,44 +294,6 @@ bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {  
     Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
     if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
-      return false;
-    }
-  }
-  
-  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
-  return true;
-}
-
-// ************************************************
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr, const int iSample, const int iEvent) {
-// ************************************************
-  double Val;
-  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    if ((Val<SelectionBounds[iSelection][0])||(Val>=SelectionBounds[iSelection][1])) {
-      return false;
-    }
-  }
-  
-  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
-  return true;
-}
-
-// ************************************************
-//Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
-                                      const std::vector< std::vector<double> > &SelectionCuts,
-                                      const int iSample, const int iEvent) {
-// ************************************************
-  
-  double Val;
-  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-    
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
-      return false;
-    }
-    else if(Val < SelectionCuts[iSelection][0] && SelectionCuts[iSelection][1] != -999){
       return false;
     }
   }
@@ -650,7 +612,6 @@ void samplePDFFDBase::fillArray_MP()  {
   } //end of parallel region
 }
 #endif
-
 
 // **************************************************
 // Helper function to reset the data and MC histograms
