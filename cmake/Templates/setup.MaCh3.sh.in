@@ -59,13 +59,19 @@ function add_to_PYTHONPATH () {
     d=$(cd -- "$d" && { pwd -P || pwd; }) 2>/dev/null  # canonicalize symbolic links
     if [ -z "$d" ]; then continue; fi  # skip nonexistent directory
 
-    case ":$PYTHONPATH:" in
-      *":$d:"*) :;;
-      *) export PYTHONPATH=$d:$PYTHONPATH;;
-    esac
+    if [ "$d" == "/usr/bin" ] || [ "$d" == "/usr/bin64" ] || [ "$d" == "/usr/local/bin" ] || [ "$d" == "/usr/local/bin64" ]; then
+      case ":$PYTHONPATH:" in
+        *":$d:"*) :;;
+        *) export PYTHONPATH=$PYTHONPATH:$d;;
+      esac
+    else
+      case ":$PYTHONPATH:" in
+        *":$d:"*) :;;
+        *) export PYTHONPATH=$d:$PYTHONPATH;;
+      esac
+    fi
   done
 }
-
 fi
 
 
