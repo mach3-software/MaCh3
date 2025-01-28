@@ -1117,7 +1117,7 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
   }
   FDpdf->samplePDFFD_data.resize(nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data.resize(nXBins);
+    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = dathist->GetBinContent(xBin+1);
     }
@@ -1148,7 +1148,7 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   }
   FDpdf->samplePDFFD_data.resize(nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data.resize(nXBins);
+    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
@@ -1174,7 +1174,7 @@ void samplePDFFDBase::addData(TH1D* Data) {
   }
   FDpdf->samplePDFFD_data.resize(nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data.resize(nXBins);
+    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = Data->GetBinContent(xBin+1);
     }
@@ -1200,7 +1200,7 @@ void samplePDFFDBase::addData(TH2D* Data) {
   }
   FDpdf->samplePDFFD_data.resize(nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data.resize(nXBins);
+    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
