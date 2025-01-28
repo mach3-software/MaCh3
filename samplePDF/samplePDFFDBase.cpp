@@ -804,7 +804,7 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  InitPDFHandler(nXBins, nYBins);
+  FDpdf->InitPDFHandler(nXBins, nYBins);
   FindNominalBinAndEdges1D();
 }
 
@@ -823,7 +823,7 @@ void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double
   int nXBins = int(XVec.size()-1);
   int nYBins = int(YVec.size()-1);
 
-  InitPDFHandler(nXBins, nYBins);
+  FDpdf->InitPDFHandler(nXBins, nYBins);
   FindNominalBinAndEdges2D();
 }
 
@@ -857,7 +857,7 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  InitPDFHandler(nXBins, nYBins);
+  FDpdf->InitPDFHandler(nXBins, nYBins);
   FindNominalBinAndEdges1D();
 }
 
@@ -882,23 +882,8 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  InitPDFHandler(nXBins, nYBins);
+  FDpdf->InitPDFHandler(nXBins, nYBins);
   FindNominalBinAndEdges1D();
-}
-
-// ************************************************
-void samplePDFFDBase::InitPDFHandler(const int nXBins, const int nYBins) {
-// ************************************************
-  FDpdf->samplePDFFD_array.resize(nYBins);
-  FDpdf->samplePDFFD_array_w2.resize(nYBins);
-  for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_array[yBin].resize(nXBins);
-    FDpdf->samplePDFFD_array_w2[yBin].resize(nXBins);
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      FDpdf->samplePDFFD_array[yBin][xBin] = 0.;
-      FDpdf->samplePDFFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
 }
 
 
@@ -971,7 +956,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  InitPDFHandler(nXBins, nYBins);
+  FDpdf->InitPDFHandler(nXBins, nYBins);
   FindNominalBinAndEdges2D();
 }
 
@@ -997,7 +982,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  InitPDFHandler(nXBins, nYBins);
+  FDpdf->InitPDFHandler(nXBins, nYBins);
   FindNominalBinAndEdges2D();
 }
 
@@ -1107,14 +1092,8 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  if(FDpdf->samplePDFFD_data.size() != 0 )
-  {
-    MACH3LOG_WARN("addData has been used already");
-    MACH3LOG_WARN("This may indicate some problems in you code");
-  }
-  FDpdf->samplePDFFD_data.resize(nYBins);
+  FDpdf->InitialiseDataPDF(nXBins, nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
@@ -1133,14 +1112,8 @@ void samplePDFFDBase::addData(TH1D* Data) {
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  if(FDpdf->samplePDFFD_data.size() != 0 )
-  {
-    MACH3LOG_WARN("addData has been used already");
-    MACH3LOG_WARN("This may indicate some problems in you code");
-  }
-  FDpdf->samplePDFFD_data.resize(nYBins);
+  FDpdf->InitialiseDataPDF(nXBins, nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = Data->GetBinContent(xBin+1);
     }
@@ -1159,14 +1132,8 @@ void samplePDFFDBase::addData(TH2D* Data) {
   int nXBins = int(FDpdf->XBinEdges.size()-1);
   int nYBins = int(FDpdf->YBinEdges.size()-1);
 
-  if(FDpdf->samplePDFFD_data.size() != 0 )
-  {
-    MACH3LOG_WARN("addData has been used already");
-    MACH3LOG_WARN("This may indicate some problems in you code");
-  }
-  FDpdf->samplePDFFD_data.resize(nYBins);
+  FDpdf->InitialiseDataPDF(nXBins, nYBins);
   for (int yBin=0;yBin<nYBins;yBin++) {
-    FDpdf->samplePDFFD_data[yBin].resize(nXBins);
     for (int xBin=0;xBin<nXBins;xBin++) {
       FDpdf->samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
@@ -1339,9 +1306,9 @@ double samplePDFFDBase::GetLikelihood() {
   {
     for (int yBin = 0; yBin < nYBins; ++yBin)
     {
-      const double DataVal = FDpdf->samplePDFFD_data[yBin][xBin];
-      const double MCPred = FDpdf->samplePDFFD_array[yBin][xBin];
-      const double w2 = FDpdf->samplePDFFD_array_w2[yBin][xBin];
+      const double DataVal = FDpdf->GetData(yBin,xBin);
+      const double MCPred = FDpdf->GetMC(yBin,xBin);
+      const double w2 = FDpdf->GetW2(yBin,xBin);
       
       //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
       negLogL += getTestStatLLH(DataVal, MCPred, w2);

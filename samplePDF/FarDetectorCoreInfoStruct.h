@@ -3,18 +3,45 @@
 #include <string>
 #include "samplePDF/Structs.h"
 
-
 // ********************************************
 /// @brief Struct for making predictions and LLH
 class PDFHandler {
 // ********************************************
+public:
   PDFHandler(){}
   ~PDFHandler(){}
 
-  inline double GetData(const int X, const int Y) const return {samplePDFFD_data[X][Y];}
-  inline double GetMC(const int X, const int Y) const return {samplePDFFD_array[X][Y];}
-  inline double GetW2(const int X, const int Y) const return {samplePDFFD_array_w2[X][Y];}
+  inline double GetData(const int X, const int Y) const {return samplePDFFD_data[X][Y];}
+  inline double GetMC(const int X, const int Y) const {return samplePDFFD_array[X][Y];}
+  inline double GetW2(const int X, const int Y) const {return samplePDFFD_array_w2[X][Y];}
 
+  void InitialiseDataPDF(const int nXBins, const int nYBins){
+    if(samplePDFFD_data.size() != 0 )
+    {
+      MACH3LOG_WARN("PDF has been already ");
+      MACH3LOG_WARN("This may indicate some problems in you code");
+    }
+    samplePDFFD_data.resize(nYBins);
+    for (int yBin=0;yBin<nYBins;yBin++) {
+      samplePDFFD_data[yBin].resize(nXBins);
+      for (int xBin=0;xBin<nXBins;xBin++) {
+        samplePDFFD_data[yBin][xBin] = 0.;
+      }
+    }
+  }
+
+  void InitPDFHandler(const int nXBins, const int nYBins){
+    samplePDFFD_array.resize(nYBins);
+    samplePDFFD_array_w2.resize(nYBins);
+    for (int yBin=0;yBin<nYBins;yBin++) {
+      samplePDFFD_array[yBin].resize(nXBins);
+      samplePDFFD_array_w2[yBin].resize(nXBins);
+      for (int xBin=0;xBin<nXBins;xBin++) {
+        samplePDFFD_array[yBin][xBin] = 0.;
+        samplePDFFD_array_w2[yBin][xBin] = 0.;
+      }
+    }
+  }
 
   /// DB Vectors to hold bin edges for X axis
   std::vector<double> XBinEdges;
