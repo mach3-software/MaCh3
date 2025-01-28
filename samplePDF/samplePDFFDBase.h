@@ -131,9 +131,9 @@ public:
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightNorm(const int iSample, const int iEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
