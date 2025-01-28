@@ -38,7 +38,7 @@ struct FarDetectorCoreInfo {
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
 
-  ~FarDetectorCoreInfo(){ delete [] isNC; }
+  ~FarDetectorCoreInfo(){if(isNC != nullptr) delete [] isNC;}
 
   int nEvents; ///< how many MC events are there
   double ChannelIndex;

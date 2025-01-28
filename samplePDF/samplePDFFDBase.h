@@ -21,6 +21,7 @@ public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
   samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  /// @brief destructor
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
@@ -82,7 +83,7 @@ public:
   virtual void SetupSplines() = 0;
 
   //DB Require all objects to have a function which reads in the MC
-  // @brief Initialise any variables that your experiment specific samplePDF needs
+  /// @brief Initialise any variables that your experiment specific samplePDF needs
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
@@ -128,15 +129,13 @@ public:
   virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
-  bool IsEventSelected(const std::vector<std::string>& ParameterStr, const int iSample, const int iEvent);
-  bool IsEventSelected(const std::vector<std::string>& ParameterStr, const std::vector<std::vector<double>> &SelectionCuts, const int iSample, const int iEvent);
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightNorm(const int iSample, const int iEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -203,7 +202,7 @@ public:
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
-
+  /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
   std::vector<const double*> OscParams;
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
