@@ -764,7 +764,7 @@ void SampleSummary::Write() {
     TempHistogram->GetXaxis()->SetTitle("-2LLH(Draw Fluc, Draw)");
     TempHistogram->GetYaxis()->SetTitle("-2LLH(Data, Draw)");
     TempHistogram->SetNameTitle((SampleNames[i]+"_drawfluc_draw").c_str(), (SampleNames[i]+"_drawfluc_draw").c_str());
-    MakeCutLLH2D(TempHistogram);
+    Get2DBayesianpValue(TempHistogram);
     TempHistogram->Write();
     delete TempHistogram;
 
@@ -774,7 +774,7 @@ void SampleSummary::Write() {
     TempHistogram2->GetXaxis()->SetTitle("-2LLH(Pred Fluc, Draw)");
     TempHistogram2->GetYaxis()->SetTitle("-2LLH(Data, Draw)");
     TempHistogram2->SetNameTitle((SampleNames[i]+"_predfluc_draw").c_str(), (SampleNames[i]+"_predfluc_draw").c_str());
-    MakeCutLLH2D(TempHistogram2);
+    Get2DBayesianpValue(TempHistogram2);
     TempHistogram2->Write();
     delete TempHistogram2;
    
@@ -784,7 +784,7 @@ void SampleSummary::Write() {
     TempHistogram3->GetXaxis()->SetTitle("-2LLH(Pred Fluc, Draw)");
     TempHistogram3->GetYaxis()->SetTitle("-2LLH(Data, Draw)");
     TempHistogram3->SetNameTitle((SampleNames[i]+"_rate_predfluc_draw").c_str(), (SampleNames[i]+"_rate_predfluc_draw").c_str());
-    MakeCutLLH2D(TempHistogram3);
+    Get2DBayesianpValue(TempHistogram3);
     TempHistogram3->Write();
     delete TempHistogram3;
 
@@ -794,7 +794,7 @@ void SampleSummary::Write() {
     TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SamplePDF->GetKinVarLabel(i, 0)).c_str());
     TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SamplePDF->GetKinVarLabel(i, 0)).c_str());
     TempHistogram4->SetNameTitle((SampleNames[i]+"_drawfluc_draw_ProjectX").c_str(), (SampleNames[i]+"_drawfluc_draw_ProjectX").c_str());
-    MakeCutLLH2D(TempHistogram4);
+    Get2DBayesianpValue(TempHistogram4);
     TempHistogram4->Write();
     delete TempHistogram4;
     
@@ -1438,10 +1438,10 @@ void SampleSummary::MakeCutLLH() {
   MakeCutLLH1D(lnLHist_drawdata.get());
   MakeCutLLH1D(lnLHist_drawflucdraw.get());
   
-  MakeCutLLH2D(lnLDrawHist.get());
-  MakeCutLLH2D(lnLFlucHist.get());
-  MakeCutLLH2D(lnLDrawHistRate.get());
-  MakeCutLLH2D(lnLFlucHist_ProjectX.get());
+  Get2DBayesianpValue(lnLDrawHist.get());
+  Get2DBayesianpValue(lnLFlucHist.get());
+  Get2DBayesianpValue(lnLDrawHistRate.get());
+  Get2DBayesianpValue(lnLFlucHist_ProjectX.get());
 }
 
 // ****************
@@ -1503,60 +1503,6 @@ void SampleSummary::MakeCutLLH1D(TH1D *Histogram, double llh_ref) {
   TempCanvas->Write();
 
   delete TempHistogram;
-  delete TempCanvas;
-}
-
-// ****************
-// Make the 2D cut distribution and give the 2D p-value
-void SampleSummary::MakeCutLLH2D(TH2D *Histogram) {
-// ****************
-  const double TotalIntegral = Histogram->Integral();
-  // Count how many fills are above y=x axis
-  // This is the 2D p-value
-  double Above = 0.0;
-  for (int i = 0; i < Histogram->GetXaxis()->GetNbins(); ++i) {
-    const double xvalue = Histogram->GetXaxis()->GetBinCenter(i+1);
-    for (int j = 0; j < Histogram->GetYaxis()->GetNbins(); ++j) {
-      const double yvalue = Histogram->GetYaxis()->GetBinCenter(j+1);
-      // We're only interested in being _ABOVE_ the y=x axis
-      if (xvalue >= yvalue) {
-        Above += Histogram->GetBinContent(i+1, j+1);
-      }
-    }
-  }
-  const double pvalue = Above/TotalIntegral;
-  std::stringstream ss;
-  ss << int(Above) << "/" << int(TotalIntegral) << "=" << pvalue;
-  Histogram->SetTitle((std::string(Histogram->GetTitle())+"_"+ss.str()).c_str());
-
-  // Now add the TLine going diagonally
-  double minimum = Histogram->GetXaxis()->GetBinLowEdge(1);
-  if (Histogram->GetYaxis()->GetBinLowEdge(1) > minimum) {
-    minimum = Histogram->GetYaxis()->GetBinLowEdge(1);
-  }
-  double maximum = Histogram->GetXaxis()->GetBinLowEdge(Histogram->GetXaxis()->GetNbins());
-  if (Histogram->GetYaxis()->GetBinLowEdge(Histogram->GetYaxis()->GetNbins()) < maximum) {
-    maximum = Histogram->GetYaxis()->GetBinLowEdge(Histogram->GetYaxis()->GetNbins());
-    //KS: Extend by bin width to perfectly fit canvas
-    maximum += Histogram->GetYaxis()->GetBinWidth(Histogram->GetYaxis()->GetNbins());
-  }
-  else maximum += Histogram->GetXaxis()->GetBinWidth(Histogram->GetXaxis()->GetNbins());
-  auto TempLine = std::make_unique<TLine>(minimum, minimum, maximum, maximum);
-  TempLine->SetLineColor(kRed);
-  TempLine->SetLineWidth(2);
-
-  std::string Title = Histogram->GetName();
-  Title += "_canv";
-  TCanvas *TempCanvas = new TCanvas(Title.c_str(), Title.c_str(), 1024, 1024);
-  TempCanvas->SetGridx();
-  TempCanvas->SetGridy();
-  TempCanvas->cd();
-  gStyle->SetPalette(81);
-  Histogram->SetMinimum(-0.01);
-  Histogram->Draw("colz");
-  TempLine->Draw("same");
-
-  TempCanvas->Write();
   delete TempCanvas;
 }
 
