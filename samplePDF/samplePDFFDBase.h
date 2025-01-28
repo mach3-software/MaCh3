@@ -111,6 +111,8 @@ public:
   void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
   void set1DBinning(std::vector<double> &XVec);
   void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
+  void InitPDFHandler(const int nXBins, const int nYBins);
+
   void SetupSampleBinning();
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
@@ -167,22 +169,8 @@ public:
 
   /// @brief Helper function to reset histograms
   inline void ResetHistograms();
-  
-  //===============================================================================
-  //DB Variables required for GetLikelihood
-  //
-  /// DB Vectors to hold bin edges
-  std::vector<double> XBinEdges;
-  std::vector<double> YBinEdges;
-
-  /// DB Array to be filled after reweighting
-  double** samplePDFFD_array;
-  /// KS Array used for MC stat
-  double** samplePDFFD_array_w2;
-  /// DB Array to be filled in AddData
-  double** samplePDFFD_data;
-  //===============================================================================
-
+  /// This holds data, MC and W2 prediction for every bin, used for LLH calculations
+  std::unique_ptr<PDFHandler> FDpdf;
   //===============================================================================
   //MC variables
   std::vector<FarDetectorCoreInfo> MCSamples;

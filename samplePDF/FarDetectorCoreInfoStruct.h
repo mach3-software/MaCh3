@@ -3,6 +3,28 @@
 #include <string>
 #include "samplePDF/Structs.h"
 
+
+// ********************************************
+/// @brief Struct for making predictions and LLH
+struct PDFHandler {
+// ********************************************
+  PDFHandler(){}
+  ~PDFHandler(){}
+
+  /// DB Vectors to hold bin edges for X axis
+  std::vector<double> XBinEdges;
+  /// DB Vectors to hold bin edges for Y axis
+  std::vector<double> YBinEdges;
+
+  /// DB Array to be filled after reweighting
+  std::vector<std::vector<double>> samplePDFFD_array;
+  /// KS Array used for MC stat
+  std::vector<std::vector<double>> samplePDFFD_array_w2;
+  /// DB Array to be filled in AddData
+  std::vector<std::vector<double>> samplePDFFD_data;
+};
+
+
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
   FarDetectorCoreInfo() : isNC{nullptr} {}
