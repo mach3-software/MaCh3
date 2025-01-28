@@ -6,10 +6,15 @@
 
 // ********************************************
 /// @brief Struct for making predictions and LLH
-struct PDFHandler {
+class PDFHandler {
 // ********************************************
   PDFHandler(){}
   ~PDFHandler(){}
+
+  inline double GetData(const int X, const int Y) const return {samplePDFFD_data[X][Y];}
+  inline double GetMC(const int X, const int Y) const return {samplePDFFD_array[X][Y];}
+  inline double GetW2(const int X, const int Y) const return {samplePDFFD_array_w2[X][Y];}
+
 
   /// DB Vectors to hold bin edges for X axis
   std::vector<double> XBinEdges;
