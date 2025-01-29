@@ -1,8 +1,22 @@
 #pragma once
 
+// C++ includes
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <set>
+#include <list>
+#include <unordered_map>
+#include <cmath>
+
+#ifdef MULTITHREAD
+#include "omp.h"
+#endif
+
 /// Run low or high memory versions of structs
 /// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
-/// KS: Need more testing on FD
 namespace M3 {
 #ifdef _LOW_MEMORY_STRUCTS_
 /// Custom floating point (float or double)
@@ -11,13 +25,25 @@ using float_t = float;
 using int_t = short;
 /// Custom unsigned integer (unsigned short int or unsigned int)
 using uint_t = unsigned short;
+/// Define fused multiply-add function for low-memory mode
+#define M3_fmaf_t std::fmaf
 #else
 using float_t = double;
 using int_t = int;
 using uint_t = unsigned;
+#define M3_fmaf_t std::fma
 #endif
-}
 
+/// Function template for fused multiply-add
+template <typename T>
+constexpr T fmaf_t(T x, T y, T z) {
+  #ifdef _LOW_MEMORY_STRUCTS_
+  return std::fmaf(x, y, z);
+  #else
+  return std::fma(x, y, z);
+  #endif
+}
+}
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
 //#define SafeException
 #ifndef SafeException
@@ -47,20 +73,6 @@ constexpr static const double Zero = 0.;
 constexpr static const float Unity_F = 1.;
 constexpr static const float Zero_F = 0.;
 constexpr static const int Unity_Int = 1;
-
-// C++ includes
-#include <sstream>
-#include <fstream> 
-#include <iostream>
-#include <vector>
-#include <iomanip>
-#include <set>
-#include <list>
-#include <unordered_map>
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
 
 // MaCh3 includes
 #include "manager/MaCh3Exception.h"
@@ -109,6 +121,45 @@ template< typename T, size_t N >
 std::vector<T> MakeVector( const T (&data)[N] ) {
 // *******************
   return std::vector<T>(data, data+N);
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<T>& vec) {
+// *******************
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<std::vector<T>>& vec) {
+// *******************
+  for (auto& innerVec : vec) {
+    innerVec.clear();
+    innerVec.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
+// *******************
+  for (auto& inner2DVec : vec) {
+    for (auto& innerVec : inner2DVec) {
+      innerVec.clear();
+      innerVec.shrink_to_fit();
+    }
+    inner2DVec.clear();
+    inner2DVec.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
 }
 
 // *******************
