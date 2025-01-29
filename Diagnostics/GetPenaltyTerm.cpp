@@ -1,10 +1,8 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "manager/manager.h"
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TFile.h"
 #include "TBranch.h"
@@ -22,14 +20,7 @@
 #include "TColor.h"
 #include "TObjString.h"
 #include "TROOT.h"
-#pragma GCC diagnostic pop
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
-#include "manager/manager.h"
-
+_MaCh3_Safe_Include_End_ //}
 
 /// @file GetPenaltyTerm.cpp
 /// @brief KS: This file contains the implementation of the function to extract specific penalty terms from systematic chains.

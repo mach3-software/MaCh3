@@ -1,13 +1,11 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // C++ includes
 #include <unistd.h>
 
+// MaCh3 includes
+#include "manager/manager.h"
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TList.h"
 #include "TFile.h"
@@ -17,10 +15,7 @@
 #include "TFileMerger.h"
 #include "TKey.h"
 #include "TROOT.h"
-#pragma GCC diagnostic pop
-
-// MaCh3 includes
-#include "manager/manager.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file CombineMaCh3Chains
 /// @author Ewan Miller

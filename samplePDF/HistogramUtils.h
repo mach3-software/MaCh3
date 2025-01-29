@@ -1,20 +1,14 @@
 #pragma once
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TGraphAsymmErrors.h"
 #include "TObjString.h"
 #include "TRandom3.h"
-#pragma GCC diagnostic pop
-
-// MaCh3 inlcudes
-#include "samplePDF/Structs.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file HistogramUtils.h
 /// @author Will Parker

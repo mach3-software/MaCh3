@@ -8,13 +8,11 @@
 #include <complex>
 #include <cstdio>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "mcmc/StatisticalUtils.h"
+#include "samplePDF/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TFile.h"
 #include "TBranch.h"
@@ -38,12 +36,8 @@
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
 #include "TVirtualFFT.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
-
-// MaCh3 includes
-#include "mcmc/StatisticalUtils.h"
-#include "samplePDF/HistogramUtils.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
