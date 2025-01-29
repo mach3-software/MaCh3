@@ -1,35 +1,35 @@
 <map id="splineFDBase" name="splineFDBase">
-<area shape="rect" id="node1" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="2381,1287,2492,1313"/>
-<area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="1999,103,2094,129"/>
-<area shape="rect" id="node3" href="$classcovarianceXsec.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1985,982,2109,1007"/>
-<area shape="rect" id="node4" href="$classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1076,721,1201,746"/>
-<area shape="rect" id="node5" title=" " alt="" coords="259,1085,346,1110"/>
-<area shape="rect" id="node11" title=" " alt="" coords="653,1146,840,1171"/>
-<area shape="rect" id="node23" href="$structXsecNorms4.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="1087,982,1191,1007"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,1077,144,1117"/>
-<area shape="rect" id="node7" title=" " alt="" coords="659,941,834,981"/>
-<area shape="rect" id="node8" title=" " alt="" coords="220,791,385,817"/>
-<area shape="rect" id="node15" href="$classPCAHandler.html" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="697,770,796,795"/>
-<area shape="rect" id="node16" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="604,721,889,746"/>
-<area shape="rect" id="node9" title=" " alt="" coords="657,432,836,472"/>
-<area shape="rect" id="node10" title=" " alt="" coords="193,439,412,465"/>
-<area shape="rect" id="node12" title=" " alt="" coords="672,382,821,407"/>
-<area shape="rect" id="node13" title=" " alt="" coords="659,255,834,295"/>
-<area shape="rect" id="node14" title=" " alt="" coords="233,321,372,346"/>
-<area shape="rect" id="node21" href="$structXsecSplines1.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="693,205,801,230"/>
-<area shape="rect" id="node17" title=" " alt="" coords="1493,933,1672,958"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1501,1032,1664,1072"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1063,1039,1214,1065"/>
-<area shape="rect" id="node20" title=" " alt="" coords="1251,213,1457,238"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1481,982,1684,1007"/>
-<area shape="rect" id="node24" title=" " alt="" coords="1495,1271,1670,1311"/>
-<area shape="rect" id="node26" title=" " alt="" coords="1955,1280,2138,1320"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1941,1344,2153,1384"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1951,1408,2142,1448"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1959,1535,2134,1575"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1487,1493,1678,1518"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1925,1599,2168,1668"/>
-<area shape="rect" id="node31" title=" " alt="" coords="1965,1692,2128,1732"/>
-<area shape="rect" id="node32" href="$classTSpline3__red.html" title="CW: Reduced TSpline3 class." alt="" coords="1529,1699,1636,1725"/>
-<area shape="rect" id="node33" href="$classTResponseFunction__red.html" title="KS: A reduced ResponseFunction Generic function used for evaluating weight." alt="" coords="1051,1699,1227,1725"/>
+<area shape="rect" id="node1" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="2381,1258,2492,1283"/>
+<area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="1999,74,2094,99"/>
+<area shape="rect" id="node3" href="$classcovarianceXsec.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1985,953,2109,978"/>
+<area shape="rect" id="node4" href="$classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1076,691,1201,717"/>
+<area shape="rect" id="node5" title=" " alt="" coords="259,1055,346,1081"/>
+<area shape="rect" id="node11" title=" " alt="" coords="653,1117,840,1142"/>
+<area shape="rect" id="node23" href="$structXsecNorms4.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="1087,953,1191,978"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,1048,144,1088"/>
+<area shape="rect" id="node7" title=" " alt="" coords="659,912,834,952"/>
+<area shape="rect" id="node8" title=" " alt="" coords="220,762,385,787"/>
+<area shape="rect" id="node15" href="$classPCAHandler.html" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="697,741,796,766"/>
+<area shape="rect" id="node16" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="604,691,889,717"/>
+<area shape="rect" id="node9" title=" " alt="" coords="657,403,836,443"/>
+<area shape="rect" id="node10" title=" " alt="" coords="193,410,412,435"/>
+<area shape="rect" id="node12" title=" " alt="" coords="672,353,821,378"/>
+<area shape="rect" id="node13" title=" " alt="" coords="659,225,834,265"/>
+<area shape="rect" id="node14" title=" " alt="" coords="233,291,372,317"/>
+<area shape="rect" id="node21" href="$structXsecSplines1.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="693,175,801,201"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1493,903,1672,929"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1501,1003,1664,1043"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1063,1010,1214,1035"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1251,183,1457,209"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1481,953,1684,978"/>
+<area shape="rect" id="node24" title=" " alt="" coords="1495,1241,1670,1281"/>
+<area shape="rect" id="node26" title=" " alt="" coords="1955,1251,2138,1291"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1941,1315,2153,1355"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1951,1379,2142,1419"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1959,1505,2134,1545"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1487,1463,1678,1489"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1925,1569,2168,1639"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1965,1663,2128,1703"/>
+<area shape="rect" id="node32" href="$classTSpline3__red.html" title="CW: Reduced TSpline3 class." alt="" coords="1529,1670,1636,1695"/>
+<area shape="rect" id="node33" href="$classTResponseFunction__red.html" title="KS: A reduced ResponseFunction Generic function used for evaluating weight." alt="" coords="1051,1670,1227,1695"/>
 </map>

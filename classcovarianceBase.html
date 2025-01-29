@@ -915,7 +915,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1337</span>  }</div>
 <div class="line"><span class="lineno"> 1338</span>  <span class="keywordflow">return</span> Applies;</div>
 <div class="line"><span class="lineno"> 1339</span>}</div>
-<div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00046">GetPenaltyTerm.cpp:46</a></div></div>
+<div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00037">GetPenaltyTerm.cpp:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a267523bb0f78c27208000b2856f741da"><div class="ttname"><a href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">covarianceBase::_fDetID</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fDetID</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00485">covarianceBase.h:485</a></div></div>
 </div><!-- fragment -->
@@ -2447,7 +2447,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  172</span>    }</div>
 <div class="line"><span class="lineno">  173</span>  }</div>
 <div class="line"><span class="lineno">  174</span> </div>
-<div class="line"><span class="lineno">  175</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> nThreads = <a class="code hl_function" href="namespaceMaCh3Utils.html#a5aff908b9241c673e8d05403996e2229">MaCh3Utils::GetNThreads</a>();</div>
+<div class="line"><span class="lineno">  175</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> nThreads = <a class="code hl_function" href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">M3::GetNThreads</a>();</div>
 <div class="line"><span class="lineno">  176</span>  <span class="comment">//KS: set Random numbers for each thread so each thread has different seed</span></div>
 <div class="line"><span class="lineno">  177</span>  <span class="comment">//or for one thread if without MULTITHREAD</span></div>
 <div class="line"><span class="lineno">  178</span>  <a class="code hl_variable" href="classcovarianceBase.html#a0704c430bdc8e87fd6f03f01b2ab00df">random_number</a>.reserve(nThreads);</div>
@@ -2581,7 +2581,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclasscovarianceBase_html_aafbbdc05b87df882dc341e20fe870603"><div class="ttname"><a href="classcovarianceBase.html#aafbbdc05b87df882dc341e20fe870603">covarianceBase::toggleFixParameter</a></div><div class="ttdeci">void toggleFixParameter(const int i)</div><div class="ttdoc">fix parameter at prior values</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00899">covarianceBase.cpp:899</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_ae2850c8e2f2d4acfe322b0ebe65b07cf"><div class="ttname"><a href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">covarianceBase::MakePosDef</a></div><div class="ttdeci">void MakePosDef(TMatrixDSym *cov=nullptr)</div><div class="ttdoc">Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01032">covarianceBase.cpp:1032</a></div></div>
 <div class="ttc" id="agroup__Setters_html_ga5f28f7294d25cca6334f7033a63596b9"><div class="ttname"><a href="group__Setters.html#ga5f28f7294d25cca6334f7033a63596b9">covarianceBase::setCovMatrix</a></div><div class="ttdeci">void setCovMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Set covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00303">covarianceBase.cpp:303</a></div></div>
-<div class="ttc" id="anamespaceMaCh3Utils_html_a5aff908b9241c673e8d05403996e2229"><div class="ttname"><a href="namespaceMaCh3Utils.html#a5aff908b9241c673e8d05403996e2229">MaCh3Utils::GetNThreads</a></div><div class="ttdeci">int GetNThreads()</div><div class="ttdoc">number of threads which we need for example for TRandom3</div><div class="ttdef"><b>Definition:</b> <a href="CovarianceUtils_8h_source.html#l00036">CovarianceUtils.h:36</a></div></div>
+<div class="ttc" id="anamespaceM3_html_ad1896bacf74c409a461dd1ea43f8bc99"><div class="ttname"><a href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">M3::GetNThreads</a></div><div class="ttdeci">int GetNThreads()</div><div class="ttdoc">number of threads which we need for example for TRandom3</div><div class="ttdef"><b>Definition:</b> <a href="CovarianceUtils_8h_source.html#l00029">CovarianceUtils.h:29</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2642,7 +2642,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  117</span> </div>
 <div class="line"><span class="lineno">  118</span>  <a class="code hl_variable" href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">PrintLength</a> = 35;</div>
 <div class="line"><span class="lineno">  119</span> </div>
-<div class="line"><span class="lineno">  120</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> nThreads = <a class="code hl_function" href="namespaceMaCh3Utils.html#a5aff908b9241c673e8d05403996e2229">MaCh3Utils::GetNThreads</a>();</div>
+<div class="line"><span class="lineno">  120</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> nThreads = <a class="code hl_function" href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">M3::GetNThreads</a>();</div>
 <div class="line"><span class="lineno">  121</span>  <span class="comment">//KS: set Random numbers for each thread so each thread has different seed</span></div>
 <div class="line"><span class="lineno">  122</span>  <span class="comment">//or for one thread if without MULTITHREAD</span></div>
 <div class="line"><span class="lineno">  123</span>  <a class="code hl_variable" href="classcovarianceBase.html#a0704c430bdc8e87fd6f03f01b2ab00df">random_number</a>.reserve(nThreads);</div>

@@ -81,7 +81,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">M3 Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -104,6 +105,21 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a007e5ed320c3672a3faf79da0a38fb7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Different Information Criterion tests mostly based Gelman paper.  <a href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7a">More...</a><br /></td></tr>
 <tr class="separator:a007e5ed320c3672a3faf79da0a38fb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ad1896bacf74c409a461dd1ea43f8bc99"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">GetNThreads</a> ()</td></tr>
+<tr class="memdesc:ad1896bacf74c409a461dd1ea43f8bc99"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of threads which we need for example for TRandom3  <br /></td></tr>
+<tr class="separator:ad1896bacf74c409a461dd1ea43f8bc99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae577be53e3bb2051d10f34fd054c3e5d"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">MatrixMult</a> (double *A, double *B, int n)</td></tr>
+<tr class="memdesc:ae577be53e3bb2051d10f34fd054c3e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
+<tr class="separator:ae577be53e3bb2051d10f34fd054c3e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8413af64315ec1b23ac543fce4a93f1"><td class="memItemLeft" align="right" valign="top">double **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#af8413af64315ec1b23ac543fce4a93f1">MatrixMult</a> (double **A, double **B, int n)</td></tr>
+<tr class="memdesc:af8413af64315ec1b23ac543fce4a93f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
+<tr class="separator:af8413af64315ec1b23ac543fce4a93f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4b0eaa854abea094a8340f46e3d3d9c"><td class="memItemLeft" align="right" valign="top">TMatrixD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aa4b0eaa854abea094a8340f46e3d3d9c">MatrixMult</a> (TMatrixD A, TMatrixD B)</td></tr>
+<tr class="memdesc:aa4b0eaa854abea094a8340f46e3d3d9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
+<tr class="separator:aa4b0eaa854abea094a8340f46e3d3d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Run low or high memory versions of structs N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect KS: Need more testing on FD </p>
@@ -192,6 +208,248 @@ Enumerations</h2></td></tr>
 <div class="ttc" id="anamespaceM3_html_a007e5ed320c3672a3faf79da0a38fb7aa6658ca8eff798dbb482882a913e26f8c"><div class="ttname"><a href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aa6658ca8eff798dbb482882a913e26f8c">M3::kInfCrits</a></div><div class="ttdeci">@ kInfCrits</div><div class="ttdoc">This only enumerates.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00015">SampleSummary.h:14</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a007e5ed320c3672a3faf79da0a38fb7aa79fe5945605f47383db32b24445e9d9b"><div class="ttname"><a href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aa79fe5945605f47383db32b24445e9d9b">M3::kBIC</a></div><div class="ttdeci">@ kBIC</div><div class="ttdoc">Bayesian Information Criterion.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00011">SampleSummary.h:11</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a007e5ed320c3672a3faf79da0a38fb7aaefce2d9c622c72dcb56556408d3d56dc"><div class="ttname"><a href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aaefce2d9c622c72dcb56556408d3d56dc">M3::kDIC</a></div><div class="ttdeci">@ kDIC</div><div class="ttdoc">Deviance Information Criterion.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00012">SampleSummary.h:12</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ad1896bacf74c409a461dd1ea43f8bc99" name="ad1896bacf74c409a461dd1ea43f8bc99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1896bacf74c409a461dd1ea43f8bc99">&#9670;&#160;</a></span>GetNThreads()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int M3::GetNThreads </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>number of threads which we need for example for TRandom3 </p>
+
+<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00029">29</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   30</span>  {</div>
+<div class="line"><span class="lineno">   31</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   32</span>    <span class="keywordtype">int</span> nThreads = omp_get_max_threads();</div>
+<div class="line"><span class="lineno">   33</span><span class="preprocessor">    #else</span></div>
+<div class="line"><span class="lineno">   34</span>    <span class="keywordtype">int</span> nThreads = 1;</div>
+<div class="line"><span class="lineno">   35</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   36</span> </div>
+<div class="line"><span class="lineno">   37</span>    <span class="keywordflow">return</span> nThreads;</div>
+<div class="line"><span class="lineno">   38</span>  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af8413af64315ec1b23ac543fce4a93f1" name="af8413af64315ec1b23ac543fce4a93f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8413af64315ec1b23ac543fce4a93f1">&#9670;&#160;</a></span>MatrixMult() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ** M3::MatrixMult </td>
+          <td>(</td>
+          <td class="paramtype">double **&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double **&#160;</td>
+          <td class="paramname"><em>B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CW: Multi-threaded matrix multiplication. </p>
+
+<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00073">73</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   73</span>                                                            {</div>
+<div class="line"><span class="lineno">   74</span>    <span class="comment">// First make into monolithic array</span></div>
+<div class="line"><span class="lineno">   75</span>    <span class="keywordtype">double</span> *A_mon = <span class="keyword">new</span> <span class="keywordtype">double</span>[n*n];</div>
+<div class="line"><span class="lineno">   76</span>    <span class="keywordtype">double</span> *B_mon = <span class="keyword">new</span> <span class="keywordtype">double</span>[n*n];</div>
+<div class="line"><span class="lineno">   77</span> </div>
+<div class="line"><span class="lineno">   78</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   79</span><span class="preprocessor">    #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">   80</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   81</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
+<div class="line"><span class="lineno">   82</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j) {</div>
+<div class="line"><span class="lineno">   83</span>        A_mon[i*n+j] = A[i][j];</div>
+<div class="line"><span class="lineno">   84</span>        B_mon[i*n+j] = B[i][j];</div>
+<div class="line"><span class="lineno">   85</span>      }</div>
+<div class="line"><span class="lineno">   86</span>    }</div>
+<div class="line"><span class="lineno">   87</span>    <span class="comment">//CW: Now call the monolithic calculator</span></div>
+<div class="line"><span class="lineno">   88</span>    <span class="keywordtype">double</span> *C_mon = <a class="code hl_function" href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">MatrixMult</a>(A_mon, B_mon, n);</div>
+<div class="line"><span class="lineno">   89</span>    <span class="keyword">delete</span> A_mon;</div>
+<div class="line"><span class="lineno">   90</span>    <span class="keyword">delete</span> B_mon;</div>
+<div class="line"><span class="lineno">   91</span> </div>
+<div class="line"><span class="lineno">   92</span>    <span class="comment">// Return the double pointer</span></div>
+<div class="line"><span class="lineno">   93</span>    <span class="keywordtype">double</span> **C = <span class="keyword">new</span> <span class="keywordtype">double</span>*[n];</div>
+<div class="line"><span class="lineno">   94</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   95</span><span class="preprocessor">    #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">   96</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   97</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
+<div class="line"><span class="lineno">   98</span>      C[i] = <span class="keyword">new</span> <span class="keywordtype">double</span>[n];</div>
+<div class="line"><span class="lineno">   99</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j) {</div>
+<div class="line"><span class="lineno">  100</span>        C[i][j] = C_mon[i*n+j];</div>
+<div class="line"><span class="lineno">  101</span>      }</div>
+<div class="line"><span class="lineno">  102</span>    }</div>
+<div class="line"><span class="lineno">  103</span>    <span class="keyword">delete</span> C_mon;</div>
+<div class="line"><span class="lineno">  104</span> </div>
+<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">return</span> C;</div>
+<div class="line"><span class="lineno">  106</span>  }</div>
+<div class="ttc" id="anamespaceM3_html_ae577be53e3bb2051d10f34fd054c3e5d"><div class="ttname"><a href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">M3::MatrixMult</a></div><div class="ttdeci">double * MatrixMult(double *A, double *B, int n)</div><div class="ttdoc">CW: Multi-threaded matrix multiplication.</div><div class="ttdef"><b>Definition:</b> <a href="CovarianceUtils_8h_source.html#l00041">CovarianceUtils.h:41</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ae577be53e3bb2051d10f34fd054c3e5d" name="ae577be53e3bb2051d10f34fd054c3e5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae577be53e3bb2051d10f34fd054c3e5d">&#9670;&#160;</a></span>MatrixMult() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double * M3::MatrixMult </td>
+          <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CW: Multi-threaded matrix multiplication. </p>
+
+<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00041">41</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   41</span>                                                         {</div>
+<div class="line"><span class="lineno">   42</span>    <span class="comment">//CW: First transpose to increse cache hits</span></div>
+<div class="line"><span class="lineno">   43</span>    <span class="keywordtype">double</span> *BT = <span class="keyword">new</span> <span class="keywordtype">double</span>[n*n];</div>
+<div class="line"><span class="lineno">   44</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   45</span><span class="preprocessor">    #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">   46</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; i++) {</div>
+<div class="line"><span class="lineno">   48</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; j++) {</div>
+<div class="line"><span class="lineno">   49</span>        BT[j*n+i] = B[i*n+j];</div>
+<div class="line"><span class="lineno">   50</span>      }</div>
+<div class="line"><span class="lineno">   51</span>    }</div>
+<div class="line"><span class="lineno">   52</span> </div>
+<div class="line"><span class="lineno">   53</span>    <span class="comment">// Now multiply</span></div>
+<div class="line"><span class="lineno">   54</span>    <span class="keywordtype">double</span> *C = <span class="keyword">new</span> <span class="keywordtype">double</span>[n*n];</div>
+<div class="line"><span class="lineno">   55</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   56</span><span class="preprocessor">    #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">   57</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   58</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; i++) {</div>
+<div class="line"><span class="lineno">   59</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; j++) {</div>
+<div class="line"><span class="lineno">   60</span>        <span class="keywordtype">double</span> sum = 0;</div>
+<div class="line"><span class="lineno">   61</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; n; k++) {</div>
+<div class="line"><span class="lineno">   62</span>          sum += A[i*n+k]*BT[j*n+k];</div>
+<div class="line"><span class="lineno">   63</span>        }</div>
+<div class="line"><span class="lineno">   64</span>        C[i*n+j] = sum;</div>
+<div class="line"><span class="lineno">   65</span>      }</div>
+<div class="line"><span class="lineno">   66</span>    }</div>
+<div class="line"><span class="lineno">   67</span>    <span class="keyword">delete</span> BT;</div>
+<div class="line"><span class="lineno">   68</span> </div>
+<div class="line"><span class="lineno">   69</span>    <span class="keywordflow">return</span> C;</div>
+<div class="line"><span class="lineno">   70</span>  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aa4b0eaa854abea094a8340f46e3d3d9c" name="aa4b0eaa854abea094a8340f46e3d3d9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4b0eaa854abea094a8340f46e3d3d9c">&#9670;&#160;</a></span>MatrixMult() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">TMatrixD M3::MatrixMult </td>
+          <td>(</td>
+          <td class="paramtype">TMatrixD&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TMatrixD&#160;</td>
+          <td class="paramname"><em>B</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CW: Multi-threaded matrix multiplication. </p>
+
+<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00109">109</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  110</span>  {</div>
+<div class="line"><span class="lineno">  111</span>    <span class="keywordtype">double</span> *C_mon = <a class="code hl_function" href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">MatrixMult</a>(A.GetMatrixArray(), B.GetMatrixArray(), A.GetNcols());</div>
+<div class="line"><span class="lineno">  112</span>    TMatrixD C;</div>
+<div class="line"><span class="lineno">  113</span>    C.Use(A.GetNcols(), A.GetNrows(), C_mon);</div>
+<div class="line"><span class="lineno">  114</span>    <span class="keywordflow">return</span> C;</div>
+<div class="line"><span class="lineno">  115</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
