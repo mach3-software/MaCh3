@@ -399,6 +399,8 @@ void FitterBase::ProcessMCMC() {
 void FitterBase::DragRace(const int NLaps) {
 // *************************
   MACH3LOG_INFO("Let the Race Begin!");
+  MACH3LOG_INFO("All tests will be performed with {} threads", GetNThreads());
+
   // Reweight the MC
   for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
   {

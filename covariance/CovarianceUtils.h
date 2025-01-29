@@ -32,17 +32,6 @@
 
 namespace MaCh3Utils
 {
-  /// @brief number of threads which we need for example for TRandom3
-  inline int GetNThreads()
-  {
-    #ifdef MULTITHREAD
-    int nThreads = omp_get_max_threads();
-    #else
-    int nThreads = 1;
-    #endif
-
-    return nThreads;
-  }
 
   /// @brief CW: Multi-threaded matrix multiplication
   inline double* MatrixMult(double *A, double *B, int n) {

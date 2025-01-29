@@ -75,4 +75,7 @@ namespace MaCh3Utils {
   /// @param argv The array of command-line arguments.
   /// @details This function prints a simple usage guide for MaCh3 executables, typically called when incorrect arguments are passed.
   void MaCh3Usage(int argc, char **argv);
+
+  /// @brief number of threads which we need for example for TRandom3
+  int GetNThreads();
 }
