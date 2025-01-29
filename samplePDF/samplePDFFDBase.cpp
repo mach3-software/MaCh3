@@ -202,9 +202,8 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
 
-  if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr)
-  {
-    MACH3LOG_INFO("Setting up Weight Pointers..");
+  if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr) {
+    MACH3LOG_INFO("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   MACH3LOG_INFO("=======================================================");
