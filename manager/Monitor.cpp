@@ -110,7 +110,7 @@ void GetCPUInfo() {
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'L3 |L3:'"));
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E 'Thread.* per core:|Wątków na rdzeń:'"));
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E '^CPU(:|\\(s\\)):?\\s+[0-9]+'"));
-  MACH3LOG_INFO("With available threads = {}", M3::GetNThreads());
+  MACH3LOG_INFO("With available threads                {}", M3::GetNThreads());
 
   //KS: /proc/cpuinfo and lscpu holds much more info I have limited it but one can expand it if needed
 }
