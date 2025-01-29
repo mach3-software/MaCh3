@@ -25,7 +25,6 @@ _MaCh3_Safe_Include_End_ //}
 
 namespace M3
 {
-
   /// @brief CW: Multi-threaded matrix multiplication
   inline double* MatrixMult(double *A, double *B, int n) {
     //CW: First transpose to increse cache hits

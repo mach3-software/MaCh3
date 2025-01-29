@@ -1,9 +1,11 @@
 #include "FitterBase.h"
 
+_MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
+_MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
@@ -399,7 +401,7 @@ void FitterBase::ProcessMCMC() {
 void FitterBase::DragRace(const int NLaps) {
 // *************************
   MACH3LOG_INFO("Let the Race Begin!");
-  MACH3LOG_INFO("All tests will be performed with {} threads", GetNThreads());
+  MACH3LOG_INFO("All tests will be performed with {} threads", M3::GetNThreads());
 
   // Reweight the MC
   for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
