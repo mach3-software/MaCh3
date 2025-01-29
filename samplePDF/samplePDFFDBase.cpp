@@ -27,6 +27,9 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   }
   OscCov = osc_cov;
   
+  KinematicParameters = nullptr;
+  ReversedKinematicParameters = nullptr;
+
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   SampleDetID = "";
@@ -199,6 +202,11 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
 
+  if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr)
+  {
+    MACH3LOG_INFO("Setting up Weight Pointers..");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   MACH3LOG_INFO("=======================================================");
 }
 
@@ -1518,4 +1526,30 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   Selection = tmp_Selection;
 
   return _h1DVar;
+}
+
+// ************************************************
+int samplePDFFDBase::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
+// ************************************************
+  auto it = KinematicParameters->find(KinematicParameterStr);
+  if (it != KinematicParameters->end()) return it->second;
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameterStr);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return -999;
+}
+
+// ************************************************
+std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
+// ************************************************
+  auto it = ReversedKinematicParameters->find(KinematicParameter);
+  if (it != ReversedKinematicParameters->end()) {
+    return it->second;
+  }
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameter);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return "";
 }
