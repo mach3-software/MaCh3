@@ -157,7 +157,6 @@ Based on several test here are recommended version:
 | Rocky9      | ✅     |
 | Ubuntu22.04 | ✅     |
 | Fedora32    | ✅     |
-| Arch        | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
 | MacOS       | ❌     |

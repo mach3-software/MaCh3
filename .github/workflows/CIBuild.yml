@@ -34,9 +34,9 @@ jobs:
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag: rocky9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
-          - os: Arch NoMultithreading
-            file: Doc/MaCh3DockerFiles/Arch/Dockerfile
-            tag: archlatest
+          - os: Alma9 NoMultithreading
+            file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
+            tag: alma9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF
 
     name: Build CI ${{ matrix.os }}
