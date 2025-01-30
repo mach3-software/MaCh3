@@ -1,15 +1,9 @@
 #include "MCMCProcessor.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TF1.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
 #ifdef CUDA

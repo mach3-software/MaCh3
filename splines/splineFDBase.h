@@ -1,19 +1,13 @@
 #pragma once
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-// ROOT includes
-#include "TH3F.h"
-#pragma GCC diagnostic pop
-
-//MaCh3
+//MaCh3 includes
 #include "samplePDF/Structs.h"
 #include "splines/SplineBase.h"
+
+_MaCh3_Safe_Include_Start_ //{
+// ROOT includes
+#include "TH3F.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
@@ -84,7 +78,6 @@ class splineFDBase : public SplineBase {
 
 	//And now the actual member variables	
 	std::vector<std::string> SampleNames;
-	std::vector<int> BinningOpts;
 	std::vector<int> Dimensions;
 	std::vector<std::vector<std::string>> DimensionLabels;
 	std::vector<std::string> DetIDs;
@@ -94,9 +87,9 @@ class splineFDBase : public SplineBase {
 	std::vector< std::vector<int> > SplineParsIndex;
 	std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
 	std::vector< std::vector<std::string> > SplineFileParPrefixNames;
-	//A vector of vectors of the spline modes that a systematic applies to
-	//This gets compared against the event mode to figure out if a syst should 
-	//apply to an event or not
+	/// A vector of vectors of the spline modes that a systematic applies to
+	/// This gets compared against the event mode to figure out if a syst should
+	/// apply to an event or not
 	std::vector< std::vector< std::vector<int> > > SplineModeVecs;
 	/// @brief This holds the global spline index and is used to grab the current parameter value
 	/// to evaluate splines at. Each internal vector will be of size of the number of spline
@@ -124,11 +117,14 @@ class splineFDBase : public SplineBase {
 	int MonolithIndex;
 	int CoeffIndex;
 
-	//Probably need to clear these arrays up at some point
+	/// Probably need to clear these arrays up at some point
 	M3::float_t *xVarArray;
-	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
-	M3::float_t *xcoeff_arr;    //x coefficients for each spline
-	M3::float_t *manycoeff_arr; //ybcd coefficients for each spline
+	/// Need to keep track of which splines are flat and which aren't
+	bool *isflatarray;
+	/// x coefficients for each spline
+	M3::float_t *xcoeff_arr;
+	/// ybcd coefficients for each spline
+	M3::float_t *manycoeff_arr;
 
 	std::vector<M3::float_t> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;

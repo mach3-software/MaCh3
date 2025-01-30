@@ -189,7 +189,7 @@ void splineFDBase::TransferToMonolith()
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
-			manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+                      manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
                   delete[] tmpXCoeffArr;
@@ -205,6 +205,10 @@ void splineFDBase::TransferToMonolith()
       }//syst2 loop end
     }//osc loop end
   }//syst1 loop end
+
+  // No longer needs it so shrink size to save RAM
+  splinevec_Monolith.clear();
+  splinevec_Monolith.shrink_to_fit();
 }
 
 // *****************************************

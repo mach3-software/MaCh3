@@ -334,7 +334,7 @@ void samplePDFFDBase::fillArray() {
 #else
   //ETA we should probably store this in samplePDFFDBase
   const size_t nXBins = int(FDpdf->XBinEdges.size()-1);
-  const size_t nYBins = int(FDpdf->YBinEdges.size()-1);
+  //const size_t nYBins = int(FDpdf->YBinEdges.size()-1);
 
   PrepFunctionalParameters();
   if(SplineHandler){
