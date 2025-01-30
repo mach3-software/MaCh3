@@ -48,4 +48,4 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Build the Docker image
-      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION=${{ github.head_ref }} --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"
+      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION="${{ github.head_ref }}" --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"
