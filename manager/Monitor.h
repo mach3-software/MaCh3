@@ -7,25 +7,22 @@
 #include <vector>
 #include <cstdlib>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
+// MaCh3 includes
+#include "manager/MaCh3Logger.h"
+#include "samplePDF/Structs.h"
+#include "manager/MaCh3Exception.h"
+#include "manager/YamlHelper.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TTree.h"
 #include "TBranch.h"
 #include "TMacro.h"
 #include "TChain.h"
 #include "TStopwatch.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
-// MaCh3 includes
-#include "manager/MaCh3Logger.h"
-#include "samplePDF/Structs.h"
-#include "manager/MaCh3Exception.h"
-#include "manager/YamlHelper.h"
+
 
 /// @file Monitor.h
 /// @brief System and monitoring utilities for printing system information and status updates.
@@ -75,4 +72,9 @@ namespace MaCh3Utils {
   /// @param argv The array of command-line arguments.
   /// @details This function prints a simple usage guide for MaCh3 executables, typically called when incorrect arguments are passed.
   void MaCh3Usage(int argc, char **argv);
+}
+
+namespace M3 {
+  /// @brief number of threads which we need for example for TRandom3
+  int GetNThreads();
 }
