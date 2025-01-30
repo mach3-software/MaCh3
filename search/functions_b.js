@@ -43,7 +43,7 @@ var searchData=
   ['makeviolin_40',['MakeViolin',['../classMCMCProcessor.html#a04976c69f0ef0b3f39edcf5f25f90981',1,'MCMCProcessor']]],
   ['makexsecplots_41',['MakeXsecPlots',['../GetPostfitParamPlots_8cpp.html#af79360b46fcb2923363d459ca9c4a0a8',1,'GetPostfitParamPlots.cpp']]],
   ['makexsecridgeplots_42',['MakeXsecRidgePlots',['../GetPostfitParamPlots_8cpp.html#afd4a3205511125d3d4d95dd3b925f7e4',1,'GetPostfitParamPlots.cpp']]],
-  ['manager_43',['manager',['../classmanager.html#a1f70d87043901a5f3b79f9828873642c',1,'manager']]],
+  ['manager_43',['manager',['../classmanager.html#a6160e24182595be72827499a24f5f454',1,'manager']]],
   ['matchcondition_44',['MatchCondition',['../classsamplePDFBase.html#a675e4fc7f80805cd4c562c5adb46ee90',1,'samplePDFBase']]],
   ['matrixmult_45',['MatrixMult',['../namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d',1,'M3::MatrixMult(double *A, double *B, int n)'],['../namespaceM3.html#af8413af64315ec1b23ac543fce4a93f1',1,'M3::MatrixMult(double **A, double **B, int n)'],['../namespaceM3.html#aa4b0eaa854abea094a8340f46e3d3d9c',1,'M3::MatrixMult(TMatrixD A, TMatrixD B)']]],
   ['matrixvectormulti_46',['MatrixVectorMulti',['../classcovarianceBase.html#a43367db263b2607232077410f27b1146',1,'covarianceBase']]],

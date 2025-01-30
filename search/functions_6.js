@@ -25,6 +25,6 @@ var searchData=
   ['findsplinesegment_22',['FindSplineSegment',['../classSMonolith.html#a7128a7c13b10f331df8946a0a87c4b33',1,'SMonolith::FindSplineSegment()'],['../classPySplineBase.html#a0654b19ddbc23d80db808c3da65259a8',1,'PySplineBase::FindSplineSegment()'],['../classsplineFDBase.html#ab4a852337aab961abbcaa0c9f70c88ba',1,'splineFDBase::FindSplineSegment()'],['../classSplineBase.html#ae18e490295762416c8627d2db11ee98d',1,'SplineBase::FindSplineSegment()']]],
   ['findx_23',['FindX',['../classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf',1,'TSpline3_red']]],
   ['fishercombinedpvalue_24',['FisherCombinedPValue',['../StatisticalUtils_8cpp.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp']]],
-  ['fitterbase_25',['FitterBase',['../classFitterBase.html#a2d45811f9bcb9719f312048bbd36a423',1,'FitterBase::FitterBase()'],['../classPyFitterBase.html#a2d45811f9bcb9719f312048bbd36a423',1,'PyFitterBase::FitterBase()']]],
+  ['fitterbase_25',['FitterBase',['../classFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'FitterBase::FitterBase()'],['../classPyFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'PyFitterBase::FitterBase()']]],
   ['four_5fvector_5faddition_26',['four_vector_addition',['../classPSO.html#ac6522025d324079b88bc7ea8c5e766d6',1,'PSO']]]
 ];

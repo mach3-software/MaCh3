@@ -68,7 +68,7 @@ var searchData=
   ['makexsecplots_65',['MakeXsecPlots',['../GetPostfitParamPlots_8cpp.html#af79360b46fcb2923363d459ca9c4a0a8',1,'GetPostfitParamPlots.cpp']]],
   ['makexsecridgeplots_66',['MakeXsecRidgePlots',['../GetPostfitParamPlots_8cpp.html#afd4a3205511125d3d4d95dd3b925f7e4',1,'GetPostfitParamPlots.cpp']]],
   ['man_67',['man',['../GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40',1,'man():&#160;GetPostfitParamPlots.cpp'],['../PlotLLH_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40',1,'man():&#160;PlotLLH.cpp']]],
-  ['manager_68',['manager',['../classmanager.html#a1f70d87043901a5f3b79f9828873642c',1,'manager::manager()'],['../classmanager.html',1,'manager']]],
+  ['manager_68',['manager',['../classmanager.html#a6160e24182595be72827499a24f5f454',1,'manager::manager()'],['../classmanager.html',1,'manager']]],
   ['manager_2ecpp_69',['manager.cpp',['../python_2manager_8cpp.html',1,'(Global Namespace)'],['../manager_2manager_8cpp.html',1,'(Global Namespace)']]],
   ['manager_2eh_70',['manager.h',['../manager_8h.html',1,'']]],
   ['manycoeff_5farr_71',['manycoeff_arr',['../classsplineFDBase.html#ab883a1f2cdae707c36fa27b86ed7f279',1,'splineFDBase']]],

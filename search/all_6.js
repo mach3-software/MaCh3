@@ -47,7 +47,7 @@ var searchData=
   ['fitman_44',['fitMan',['../classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095',1,'FitterBase']]],
   ['fitter_45',['fitter',['../structMaCh3Plotting_1_1InputFile.html#a6ad1094c5fb3dcd4479ef8fdf378370c',1,'MaCh3Plotting::InputFile']]],
   ['fitter_2ecpp_46',['fitter.cpp',['../fitter_8cpp.html',1,'']]],
-  ['fitterbase_47',['FitterBase',['../classPyFitterBase.html#a2d45811f9bcb9719f312048bbd36a423',1,'PyFitterBase::FitterBase()'],['../classFitterBase.html#a2d45811f9bcb9719f312048bbd36a423',1,'FitterBase::FitterBase()'],['../classFitterBase.html',1,'FitterBase']]],
+  ['fitterbase_47',['FitterBase',['../classPyFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'PyFitterBase::FitterBase()'],['../classFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'FitterBase::FitterBase()'],['../classFitterBase.html',1,'FitterBase']]],
   ['fitterbase_2ecpp_48',['FitterBase.cpp',['../FitterBase_8cpp.html',1,'']]],
   ['fitterbase_2eh_49',['FitterBase.h',['../FitterBase_8h.html',1,'']]],
   ['fixed_50',['fixed',['../classPSO.html#a90cf855167748b488851c559de49283c',1,'PSO']]],
