@@ -343,6 +343,11 @@ class MCMCProcessor {
     /// @author Richard Calland
     inline void PowerSpectrumAnalysis();
 
+    /// @brief Get TCanvas margins, to be able to reset them if particular function need different margins
+    std::vector<double> GetMargins(const std::unique_ptr<TCanvas>& Canv) const;
+    /// @brief Set TCanvas margins to specified values
+    void SetMargins(std::unique_ptr<TCanvas>& Canv, const std::vector<double>& margins);
+
     /// Name of MCMC file
     std::string MCMCFile;
     /// Output file suffix useful when running over same file with different settings
