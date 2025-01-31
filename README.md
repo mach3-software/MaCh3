@@ -128,7 +128,6 @@ The following fitting algorithms are available:
 | MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
 | PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
 
-
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
 ```bash
@@ -160,6 +159,7 @@ Based on several test here are recommended version:
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
+| MacOS       | ❌     |
 
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
