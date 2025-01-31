@@ -200,7 +200,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">    6</span><span class="comment">// *******************</span></div>
 <div class="line"><span class="lineno">    7</span> </div>
 <div class="line"><span class="lineno">    8</span>  <span class="comment">// Load config</span></div>
-<div class="line"><span class="lineno">    9</span>  YAML::Node <a class="code hl_variable" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a> = YAML::LoadFile(filename);</div>
+<div class="line"><span class="lineno">    9</span>  YAML::Node <a class="code hl_variable" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a> = <a class="code hl_define" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(filename);</div>
 <div class="line"><span class="lineno">   10</span> </div>
 <div class="line"><span class="lineno">   11</span>  std::string <a class="code hl_function" href="classMaCh3Modes.html#abf4ac35511787907bc16ae26aa6c2a15">GetMaCh3ModeName</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> Index);</div>
 <div class="line"><span class="lineno">   12</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a> = 0;</div>
@@ -228,6 +228,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   34</span>  <a class="code hl_function" href="classMaCh3Modes.html#a53a3e7076a1ed535c9d8ce29505a4256">Print</a>();</div>
 <div class="line"><span class="lineno">   35</span>}</div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00029">ProcessMCMC.cpp:29</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00328">YamlHelper.h:328</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a3bde53f0145673d99b9866b3fb5dcbaf"><div class="ttname"><a href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">MaCh3Modes::NModes</a></div><div class="ttdeci">int NModes</div><div class="ttdoc">KS: Number of modes, keep in mind actual number is +1 greater due to unknown category.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00081">MaCh3Modes.h:81</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a53a3e7076a1ed535c9d8ce29505a4256"><div class="ttname"><a href="classMaCh3Modes.html#a53a3e7076a1ed535c9d8ce29505a4256">MaCh3Modes::Print</a></div><div class="ttdeci">void Print()</div><div class="ttdoc">KS: Print info about initialised modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00038">MaCh3Modes.cpp:38</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a68ccf4c0fcd926574b33ef1dbcad3110"><div class="ttname"><a href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">MaCh3Modes::Generator</a></div><div class="ttdeci">std::string Generator</div><div class="ttdoc">KS: Name of generator like NEUT, NuWro etc. this is to make stuff fancy.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00079">MaCh3Modes.h:79</a></div></div>
@@ -626,7 +627,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  120</span>  }</div>
 <div class="line"><span class="lineno">  121</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
-<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00012">MaCh3Exception.h:12</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
