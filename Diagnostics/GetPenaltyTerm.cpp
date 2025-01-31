@@ -76,7 +76,7 @@ void ReadXSecFile(const std::string& inputFile)
   XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
   for(unsigned int i = 0; i < XsecCovPos.size(); i++)
   {
-    YAML::Node YAMLDocTemp = YAML::LoadFile(XsecCovPos[i]);
+    YAML::Node YAMLDocTemp = M3OpenConfig(XsecCovPos[i]);
     for (const auto& item : YAMLDocTemp["Systematics"]) {
       XSecFile["Systematics"].push_back(item);
     }

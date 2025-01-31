@@ -23,7 +23,6 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 
-
 /// @file Monitor.h
 /// @brief System and monitoring utilities for printing system information and status updates.
 /// @author Kamil Skwarczynski

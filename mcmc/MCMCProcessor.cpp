@@ -571,7 +571,7 @@ void MCMCProcessor::DrawPostfit() {
   CompLeg->SetLineStyle(0);
   CompLeg->SetBorderSize(0);
 
-  const double BottomMargin = Posterior->GetBottomMargin();
+  const std::vector<double> Margins = GetMargins(Posterior);
   Posterior->SetBottomMargin(0.2);
 
   OutputFile->cd();
@@ -686,7 +686,7 @@ void MCMCProcessor::DrawPostfit() {
   delete paramPlot_HPD;
 
   //KS: Return Margin to default one
-  Posterior->SetBottomMargin(BottomMargin);
+  SetMargins(Posterior, Margins);
 }
 
 // *********************
@@ -1439,8 +1439,7 @@ void MCMCProcessor::DrawCovariance() {
 void MCMCProcessor::DrawCorrelations1D() {
 // *********************
   //KS: Store it as we go back to them at the end
-  const double TopMargin  = Posterior->GetTopMargin();
-  const double BottomMargin  = Posterior->GetBottomMargin();
+  const std::vector<double> Margins = GetMargins(Posterior);
   const int OptTitle = gStyle->GetOptTitle();
 
   Posterior->SetTopMargin(0.1);
@@ -1571,8 +1570,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   delete CorrDir;
   OutputFile->cd();
 
-  Posterior->SetTopMargin(TopMargin);
-  Posterior->SetBottomMargin(BottomMargin);
+  SetMargins(Posterior, Margins);
   gStyle->SetOptTitle(OptTitle);
 }
 
@@ -1730,10 +1728,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   }
 
   //KS: Store it as we go back to them at the end
-  const double TopMargin    = Posterior->GetTopMargin();
-  const double BottomMargin = Posterior->GetBottomMargin();
-  const double LeftMargin   = Posterior->GetLeftMargin();
-  const double RighMargin   = Posterior->GetRightMargin();
+  const std::vector<double> Margins = GetMargins(Posterior);
   Posterior->SetTopMargin(0.001);
   Posterior->SetBottomMargin(0.001);
   Posterior->SetLeftMargin(0.001);
@@ -1964,25 +1959,20 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   for(int i = 0; i < nParamPlot; i++)
   {
     delete hpost_copy[i];
-    for (int j = 0; j < nCredibleIntervals; ++j)
-    {
+    for (int j = 0; j < nCredibleIntervals; ++j) {
       delete hpost_cl[i][j];
     }
   }
   for(int i = 0; i < Npad - nParamPlot; i++)
   {
     delete hpost_2D_copy[i];
-    for (int j = 0; j < nCredibleRegions; ++j)
-    {
+    for (int j = 0; j < nCredibleRegions; ++j) {
       delete hpost_2D_cl[i][j];
     }
   }
 
   //KS: Restore margin
-  Posterior->SetTopMargin(TopMargin);
-  Posterior->SetLeftMargin(BottomMargin);
-  Posterior->SetLeftMargin(LeftMargin);
-  Posterior->SetRightMargin(RighMargin);
+  SetMargins(Posterior, Margins);
 }
 
 // **************************
@@ -2595,10 +2585,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 // **************************
   if(hpost[0] == nullptr) MakePostfit();
 
-  const double TopMargin = Posterior->GetTopMargin();
-  const double BottomMargin = Posterior->GetBottomMargin();
-  const double LeftMargin = Posterior->GetLeftMargin();
-  const double RightMargin = Posterior->GetRightMargin();
+  std::vector<double> Margins = GetMargins(Posterior);
 
   Posterior->SetTopMargin(0.1);
   Posterior->SetBottomMargin(0.1);
@@ -2659,10 +2646,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 
   OutputFile->cd();
 
-  Posterior->SetTopMargin(TopMargin);
-  Posterior->SetBottomMargin(BottomMargin);
-  Posterior->SetLeftMargin(LeftMargin);
-  Posterior->SetRightMargin(RightMargin);
+  SetMargins(Posterior, Margins);
 }
 
 // **************************
@@ -2718,7 +2702,7 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
     MACH3LOG_INFO("{} for {}", Name, ParNames[k]);
     MACH3LOG_INFO("Following Jeffreys Scale = {}", JeffreysScale);
     MACH3LOG_INFO("Following Dunne-Kaboth Scale = {}", DunneKabothScale);
-    std::cout<<std::endl;
+    MACH3LOG_INFO("");
   }
 }
 
@@ -2944,12 +2928,9 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
       double old_chi = -1;
       double old_prior = -1;
-      if(FlatPrior[j])
-      {
+      if(FlatPrior[j]) {
         old_prior = 1.0;
-      }
-      else
-      {
+      } else {
         old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
         old_prior = std::exp(-0.5 * old_chi * old_chi);
       }
@@ -2985,7 +2966,6 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
     }
 
     const int IntervalsSize = nSteps/NIntervals[k];
-
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
     int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
     if (ret != 0){
@@ -3041,7 +3021,6 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 // Diagnose the MCMC
 void MCMCProcessor::DiagMCMC() {
 // **************************
-
   // Prepare branches etc for DiagMCMC
   PrepareDiagMCMC();
 
@@ -3343,12 +3322,12 @@ void MCMCProcessor::AutoCorrelation_FFT() {
   std::vector<std::vector<double>> LagL(nDraw);
 
   // Arrays needed to perform FFT using ROOT
-  double* ACFFT = new double[nEntries](); // Main autocorrelation array
-  double* ParVals = new double[nEntries](); // Param values for full chain
-  double* ParValsFFTR = new double[nEntries](); // FFT Real part
-  double* ParValsFFTI = new double[nEntries](); // FFT Imaginary part
-  double* ParValsFFTSquare = new double[nEntries](); // FFT Absolute square
-  double* ParValsComplex = new double[nEntries](); // Input Imaginary values (0)
+  std::vector<double> ACFFT(nEntries, 0.0);  // Main autocorrelation array
+  std::vector<double> ParVals(nEntries, 0.0);  // Param values for full chain
+  std::vector<double> ParValsFFTR(nEntries, 0.0);  // FFT Real part
+  std::vector<double> ParValsFFTI(nEntries, 0.0);  // FFT Imaginary part
+  std::vector<double> ParValsFFTSquare(nEntries, 0.0);  // FFT Absolute square
+  std::vector<double> ParValsComplex(nEntries, 0.0);  // Input Imaginary values (0)
 
   // Create forward and reverse FFT objects. I don't love using ROOT here,
   // but it works so I can't complain
@@ -3365,9 +3344,9 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     }
 
     // Transform
-    fftf->SetPointsComplex(ParVals, ParValsComplex);
+    fftf->SetPointsComplex(ParVals.data(), ParValsComplex.data());
     fftf->Transform();
-    fftf->GetPointsComplex(ParValsFFTR, ParValsFFTI);
+    fftf->GetPointsComplex(ParValsFFTR.data(), ParValsFFTI.data());
 
     // Square the results to get the power spectrum
     for (int i = 0; i < nEntries; ++i) {
@@ -3375,9 +3354,9 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     }
 
     // Transforming back gives the autocovariance
-    fftb->SetPointsComplex(ParValsFFTSquare, ParValsComplex);
+    fftb->SetPointsComplex(ParValsFFTSquare.data(), ParValsComplex.data());
     fftb->Transform();
-    fftb->GetPointsComplex(ACFFT, ParValsComplex);
+    fftb->GetPointsComplex(ACFFT.data(), ParValsComplex.data());
 
     // Divide by norm to get autocorrelation
     double normAC = ACFFT[0];
@@ -3411,14 +3390,6 @@ void MCMCProcessor::AutoCorrelation_FFT() {
 
   //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
   CalculateESS(nLags, LagL);
-
-  // Clean up
-  delete[] ACFFT;
-  delete[] ParVals;
-  delete[] ParValsFFTR;
-  delete[] ParValsFFTI;
-  delete[] ParValsFFTSquare;
-  delete[] ParValsComplex;
 
   AutoCorrDir->Close();
   delete AutoCorrDir;
@@ -4310,4 +4281,29 @@ void MCMCProcessor::PrintInfo() const {
   MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
   MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
   MACH3LOG_INFO("************************************************");
+}
+
+
+// **************************
+std::vector<double> MCMCProcessor::GetMargins(const std::unique_ptr<TCanvas>& Canv) const {
+// **************************
+  return std::vector<double>{Canv->GetTopMargin(), Canv->GetBottomMargin(),
+                              Canv->GetLeftMargin(), Canv->GetRightMargin()};
+}
+
+// **************************
+void MCMCProcessor::SetMargins(std::unique_ptr<TCanvas>& Canv, const std::vector<double>& margins) {
+// **************************
+  if (!Canv) {
+    MACH3LOG_ERROR("Canv is nullptr");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (margins.size() != 4) {
+    MACH3LOG_ERROR("Margin vector must have exactly 4 elements");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  Canv->SetTopMargin(margins[0]);
+  Canv->SetBottomMargin(margins[1]);
+  Canv->SetLeftMargin(margins[2]);
+  Canv->SetRightMargin(margins[3]);
 }

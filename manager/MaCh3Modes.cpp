@@ -6,7 +6,7 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 // *******************
 
   // Load config
-  YAML::Node config = YAML::LoadFile(filename);
+  YAML::Node config = M3OpenConfig(filename);
 
   std::string GetMaCh3ModeName(const int Index);
   NModes = 0;
