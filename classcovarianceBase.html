@@ -200,7 +200,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b5b8d13e1bd12c2520298ed1e34847e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a2b5b8d13e1bd12c2520298ed1e34847e">CheckBounds</a> () const</td></tr>
 <tr class="memdesc:a2b5b8d13e1bd12c2520298ed1e34847e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if parameters were proposed outside physical boundary.  <br /></td></tr>
 <tr class="separator:a2b5b8d13e1bd12c2520298ed1e34847e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65ab5bc56a3bef105b6ae9328271f530"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a65ab5bc56a3bef105b6ae9328271f530">CalcLikelihood</a> () <a class="el" href="Structs_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
+<tr class="memitem:a65ab5bc56a3bef105b6ae9328271f530"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a65ab5bc56a3bef105b6ae9328271f530">CalcLikelihood</a> () <a class="el" href="Core_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
 <tr class="memdesc:a65ab5bc56a3bef105b6ae9328271f530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calc penalty term based on inverted covariance matrix.  <br /></td></tr>
 <tr class="separator:a65ab5bc56a3bef105b6ae9328271f530"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ee2fbfe0f1ac86c8c129095638e0f76"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a9ee2fbfe0f1ac86c8c129095638e0f76">GetLikelihood</a> ()</td></tr>
@@ -369,13 +369,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a95c7ca23995af579cfa7f199833fe24a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a95c7ca23995af579cfa7f199833fe24a">proposeStep</a> ()</td></tr>
 <tr class="memdesc:a95c7ca23995af579cfa7f199833fe24a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a new proposed state.  <br /></td></tr>
 <tr class="separator:a95c7ca23995af579cfa7f199833fe24a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8">randomize</a> () <a class="el" href="Structs_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
+<tr class="memitem:a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8">randomize</a> () <a class="el" href="Core_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
 <tr class="memdesc:a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Randomize" the parameters in the covariance class for the proposed step. Used the proposal kernel and the current parameter value to set proposed step  <br /></td></tr>
 <tr class="separator:a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a044a1c9e5642d9f2f7e713999898a2f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a044a1c9e5642d9f2f7e713999898a2f8">CorrelateSteps</a> () <a class="el" href="Structs_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
+<tr class="memitem:a044a1c9e5642d9f2f7e713999898a2f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a044a1c9e5642d9f2f7e713999898a2f8">CorrelateSteps</a> () <a class="el" href="Core_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
 <tr class="memdesc:a044a1c9e5642d9f2f7e713999898a2f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use Cholesky throw matrix for better step proposal.  <br /></td></tr>
 <tr class="separator:a044a1c9e5642d9f2f7e713999898a2f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54712c01de98adcaaa0ecb5a650a3457"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457">acceptStep</a> () <a class="el" href="Structs_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
+<tr class="memitem:a54712c01de98adcaaa0ecb5a650a3457"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457">acceptStep</a> () <a class="el" href="Core_8h.html#a2abc3d82639661d84964bed9e2df0e68">_noexcept_</a></td></tr>
 <tr class="memdesc:a54712c01de98adcaaa0ecb5a650a3457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accepted this step.  <br /></td></tr>
 <tr class="separator:a54712c01de98adcaaa0ecb5a650a3457"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb2d1a39cd2bd160257bc9e34e32df4c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#adb2d1a39cd2bd160257bc9e34e32df4c">toggleFixAllParameters</a> ()</td></tr>
@@ -399,10 +399,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a30f3f34243be0f6bc901e525497e7f56"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a30f3f34243be0f6bc901e525497e7f56">IsPCA</a> ()</td></tr>
 <tr class="memdesc:a30f3f34243be0f6bc901e525497e7f56"><td class="mdescLeft">&#160;</td><td class="mdescRight">is PCA, can use to query e.g. LLH scans  <br /></td></tr>
 <tr class="separator:a30f3f34243be0f6bc901e525497e7f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43367db263b2607232077410f27b1146"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a43367db263b2607232077410f27b1146">MatrixVectorMulti</a> (double *<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> VecMulti, double **<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> matrix, const double *<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> vector, const int n) const</td></tr>
+<tr class="memitem:a43367db263b2607232077410f27b1146"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a43367db263b2607232077410f27b1146">MatrixVectorMulti</a> (double *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> VecMulti, double **<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> matrix, const double *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> vector, const int n) const</td></tr>
 <tr class="memdesc:a43367db263b2607232077410f27b1146"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Custom function to perform multiplication of matrix and vector with multithreading.  <br /></td></tr>
 <tr class="separator:a43367db263b2607232077410f27b1146"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29d3a7af51740c17ae5002b579923446"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a29d3a7af51740c17ae5002b579923446">MatrixVectorMultiSingle</a> (double **<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> matrix, const double *<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> vector, const int Length, const int i) const</td></tr>
+<tr class="memitem:a29d3a7af51740c17ae5002b579923446"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a29d3a7af51740c17ae5002b579923446">MatrixVectorMultiSingle</a> (double **<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> matrix, const double *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> vector, const int Length, const int i) const</td></tr>
 <tr class="memdesc:a29d3a7af51740c17ae5002b579923446"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Custom function to perform multiplication of matrix and single element which is thread safe.  <br /></td></tr>
 <tr class="separator:a29d3a7af51740c17ae5002b579923446"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61936f5c39ad7902624222fc49ad1362"><td class="memItemLeft" align="right" valign="top">YAML::Node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a61936f5c39ad7902624222fc49ad1362">GetConfig</a> () const</td></tr>
@@ -1055,7 +1055,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   95</span>  </div>
 <div class="line"><span class="lineno">   96</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = <a class="code hl_variable" href="classcovarianceBase.html#abba75182305d556818c76974a054a17d">FirstPCAdpar</a>+<a class="code hl_variable" href="classcovarianceBase.html#ad0022a3e9dd3b2661c9b02a02488759c">PCAObj</a>.<a class="code hl_variable" href="classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458">nKeptPCApars</a>+1; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++i) <a class="code hl_variable" href="classcovarianceBase.html#ae9f3cb2a310874b86965903714ef2bd8">isDecomposed_PCA</a>[i] = i+(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>-<a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>);</div>
 <div class="line"><span class="lineno">   97</span>}</div>
-<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00012">MaCh3Exception.h:12</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassPCAHandler_html_a361fd5f81ae3bcd915cd598b69e264ba"><div class="ttname"><a href="classPCAHandler.html#a361fd5f81ae3bcd915cd598b69e264ba">PCAHandler::ConstructPCA</a></div><div class="ttdeci">void ConstructPCA(TMatrixDSym *covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int &amp;_fNumParPCA)</div><div class="ttdoc">CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8cpp_source.html#l00018">PCAHandler.cpp:18</a></div></div>
 <div class="ttc" id="aclassPCAHandler_html_aa39db9118399bebcdb784fe9c9fea458"><div class="ttname"><a href="classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458">PCAHandler::nKeptPCApars</a></div><div class="ttdeci">int nKeptPCApars</div><div class="ttdoc">Total number that remained after applying PCA Threshold.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00059">PCAHandler.h:59</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a7b83a17de68cc7838b93de242d91d9a0"><div class="ttname"><a href="classcovarianceBase.html#a7b83a17de68cc7838b93de242d91d9a0">covarianceBase::fParSigma_PCA</a></div><div class="ttdeci">std::vector&lt; double &gt; fParSigma_PCA</div><div class="ttdoc">Tells if parameter is fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00505">covarianceBase.h:505</a></div></div>
@@ -2573,7 +2573,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  298</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;----------------&quot;</span>);</div>
 <div class="line"><span class="lineno">  299</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00325">YamlHelper.h:325</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00328">YamlHelper.h:328</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a0704c430bdc8e87fd6f03f01b2ab00df"><div class="ttname"><a href="classcovarianceBase.html#a0704c430bdc8e87fd6f03f01b2ab00df">covarianceBase::random_number</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; random_number</div><div class="ttdoc">KS: Set Random numbers for each thread so each thread has different seed.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00446">covarianceBase.h:446</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a75b5553823335bb82026ff46369fb67e"><div class="ttname"><a href="classcovarianceBase.html#a75b5553823335bb82026ff46369fb67e">covarianceBase::ReserveMemory</a></div><div class="ttdeci">void ReserveMemory(const int size)</div><div class="ttdoc">Initialise vectors with parameters information.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00325">covarianceBase.cpp:325</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a8d821ce805f2426fe95549170866821f"><div class="ttname"><a href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">covarianceBase::PrintLength</a></div><div class="ttdeci">int PrintLength</div><div class="ttdoc">KS: This is used when printing parameters, sometimes we have super long parameters name,...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00456">covarianceBase.h:456</a></div></div>
@@ -3062,19 +3062,19 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="memname">void covarianceBase::MatrixVectorMulti </td>
           <td>(</td>
-          <td class="paramtype">double *<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
+          <td class="paramtype">double *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
           <td class="paramname"><em>VecMulti</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double **<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
+          <td class="paramtype">double **<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
           <td class="paramname"><em>matrix</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double *<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
+          <td class="paramtype">const double *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
           <td class="paramname"><em>vector</em>, </td>
         </tr>
         <tr>
@@ -3141,13 +3141,13 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="memname">double covarianceBase::MatrixVectorMultiSingle </td>
           <td>(</td>
-          <td class="paramtype">double **<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
+          <td class="paramtype">double **<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
           <td class="paramname"><em>matrix</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double *<a class="el" href="Structs_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
+          <td class="paramtype">const double *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a>&#160;</td>
           <td class="paramname"><em>vector</em>, </td>
         </tr>
         <tr>

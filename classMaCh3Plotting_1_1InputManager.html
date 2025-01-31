@@ -347,7 +347,7 @@ Private Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="inputManager_8cpp_source.html#l00006">6</a> of file <a class="el" href="inputManager_8cpp_source.html">inputManager.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    6</span>                                                                 {</div>
 <div class="line"><span class="lineno">    7</span>  <span class="comment">// read the config file</span></div>
-<div class="line"><span class="lineno">    8</span>  <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ad2cec8b2758ffcb661db59f930e8010e">_translatorConfig</a> = YAML::LoadFile(translationConfigName);</div>
+<div class="line"><span class="lineno">    8</span>  <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ad2cec8b2758ffcb661db59f930e8010e">_translatorConfig</a> = <a class="code hl_define" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(translationConfigName);</div>
 <div class="line"><span class="lineno">    9</span> </div>
 <div class="line"><span class="lineno">   10</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;InputManager: have loaded translation config file&quot;</span>);</div>
 <div class="line"><span class="lineno">   11</span>  </div>
@@ -400,6 +400,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   58</span>  }</div>
 <div class="line"><span class="lineno">   59</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00018">MaCh3Logger.h:18</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00328">YamlHelper.h:328</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a0d66afafbba133fc3c1b4867957eb3db"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a0d66afafbba133fc3c1b4867957eb3db">MaCh3Plotting::InputManager::_paramToTagsMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::vector&lt; std::string &gt; &gt; _paramToTagsMap</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00654">inputManager.h:654</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a1eed58ec2fc42d44474c80b8f4e91e15"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a1eed58ec2fc42d44474c80b8f4e91e15">MaCh3Plotting::InputManager::_samplesConfig</a></div><div class="ttdeci">YAML::Node _samplesConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00663">inputManager.h:663</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a3915837631cc08351a34cb135b0bb351"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">MaCh3Plotting::InputManager::_knownParameters</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownParameters</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00644">inputManager.h:644</a></div></div>
@@ -748,7 +749,7 @@ Private Attributes</h2></td></tr>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00019">MaCh3Logger.h:19</a></div></div>
-<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00012">MaCh3Exception.h:12</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a041b9611ce812326995c54f8c73c4867"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a041b9611ce812326995c54f8c73c4867">MaCh3Plotting::InputManager::parseLocation</a></div><div class="ttdeci">std::vector&lt; std::string &gt; parseLocation(const std::string &amp;locationString, std::string &amp;fitter, fileTypeEnum fileType, const std::string &amp;parameter=&quot;&quot;, const std::string &amp;sample=&quot;&quot;, const std::string &amp;parameter2=&quot;&quot;) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00232">inputManager.cpp:232</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a479520c576d5f58f6db5c28133ad1714"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a479520c576d5f58f6db5c28133ad1714">MaCh3Plotting::InputManager::find1dPosterior</a></div><div class="ttdeci">bool find1dPosterior(InputFile &amp;inputFileDef, const std::string &amp;parameter, std::string &amp;fitter, bool setFileData=false) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00433">inputManager.cpp:433</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a7e9f932d7591cbdd6c99c56c2da75f85"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a7e9f932d7591cbdd6c99c56c2da75f85">MaCh3Plotting::InputManager::findRootObject</a></div><div class="ttdeci">std::shared_ptr&lt; TObject &gt; findRootObject(const InputFile &amp;fileDef, const std::vector&lt; std::string &gt; &amp;locationVec) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00291">inputManager.cpp:291</a></div></div>
@@ -1422,7 +1423,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  419</span>        <span class="keywordflow">if</span> ( setInputBranch )</div>
 <div class="line"><span class="lineno">  420</span>        {</div>
 <div class="line"><span class="lineno">  421</span>          <span class="comment">// EM: should probably use MCMCProcessor for this so we can use caching, gpu etc.</span></div>
-<div class="line"><span class="lineno">  422</span>          inputFileDef.MCMCstepParamsMap[parameter] = <span class="keyword">new</span> double( <a class="code hl_variable" href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a> ); <span class="comment">// &lt;- initialise the parameter step values </span></div>
+<div class="line"><span class="lineno">  422</span>          inputFileDef.MCMCstepParamsMap[parameter] = <span class="keyword">new</span> double( <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a> ); <span class="comment">// &lt;- initialise the parameter step values </span></div>
 <div class="line"><span class="lineno">  423</span>          inputFileDef.posteriorTree-&gt;SetBranchAddress( branchNames[paramIdx], inputFileDef.MCMCstepParamsMap.at(parameter) );</div>
 <div class="line"><span class="lineno">  424</span>        }</div>
 <div class="line"><span class="lineno">  425</span>        <span class="keywordflow">break</span>;</div>
@@ -1431,7 +1432,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  428</span>  }</div>
 <div class="line"><span class="lineno">  429</span>  <span class="keywordflow">return</span> wasFound;</div>
 <div class="line"><span class="lineno">  430</span>}</div>
-<div class="ttc" id="aStructs_8h_html_aa2920b946077e971486eaf1b49101f01"><div class="ttname"><a href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00039">Structs.h:39</a></div></div>
+<div class="ttc" id="aCore_8h_html_aa2920b946077e971486eaf1b49101f01"><div class="ttname"><a href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00044">Core.h:44</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2644,7 +2645,7 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  320</span>    {</div>
 <div class="line"><span class="lineno">  321</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have an MCMC entry for parameter {}&quot;</span>, fileNum, paramName);</div>
 <div class="line"><span class="lineno">  322</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning a bad float&quot;</span>);</div>
-<div class="line"><span class="lineno">  323</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>; </div>
+<div class="line"><span class="lineno">  323</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>; </div>
 <div class="line"><span class="lineno">  324</span>    }</div>
 <div class="line"><span class="lineno">  325</span> </div>
 <div class="line"><span class="lineno">  326</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].MCMCstepParamsMap.at(paramName);</div>
@@ -2787,9 +2788,9 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  130</span>    <span class="keywordflow">return</span> inputFileDef.postFitErrors.at(errorType).at(paramName);</div>
 <div class="line"><span class="lineno">  131</span>  }</div>
 <div class="line"><span class="lineno">  132</span> </div>
-<div class="line"><span class="lineno">  133</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit error for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  133</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit error for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>;</div>
+<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  136</span>}</div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a2f8f94ca3b6e0d2b34c75dee24b81e49"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">MaCh3Plotting::InputManager::getFile</a></div><div class="ttdeci">InputFile const &amp; getFile(int fileId) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00498">inputManager.h:498</a></div></div>
 </div><!-- fragment -->
@@ -2862,9 +2863,9 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  159</span>    <span class="keywordflow">return</span> inputFileDef.postFitValues.at(errorType).at(paramName);</div>
 <div class="line"><span class="lineno">  160</span>  }</div>
 <div class="line"><span class="lineno">  161</span>  </div>
-<div class="line"><span class="lineno">  162</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit value for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  162</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit value for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  163</span> </div>
-<div class="line"><span class="lineno">  164</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="Structs_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>;</div>
+<div class="line"><span class="lineno">  164</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  165</span>}</div>
 </div><!-- fragment -->
 </div>

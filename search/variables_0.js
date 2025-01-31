@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['_5fbad_5fdouble_5f_0',['_BAD_DOUBLE_',['../Structs_8h.html#aa2920b946077e971486eaf1b49101f01',1,'Structs.h']]],
-  ['_5fbad_5fint_5f_1',['_BAD_INT_',['../Structs_8h.html#a27974ef7059f8fc3305881e97ede4325',1,'Structs.h']]],
+  ['_5fbad_5fdouble_5f_0',['_BAD_DOUBLE_',['../Core_8h.html#aa2920b946077e971486eaf1b49101f01',1,'Core.h']]],
+  ['_5fbad_5fint_5f_1',['_BAD_INT_',['../Core_8h.html#a27974ef7059f8fc3305881e97ede4325',1,'Core.h']]],
   ['_5fconfigfilename_2',['_configFileName',['../classMaCh3Plotting_1_1PlottingManager.html#a390f806466cadac1548160c89f2c2e6d',1,'MaCh3Plotting::PlottingManager']]],
-  ['_5fdefault_5freturn_5fval_5f_3',['_DEFAULT_RETURN_VAL_',['../Structs_8h.html#aa3be778b9a2141963769bb334457b805',1,'Structs.h']]],
+  ['_5fdefault_5freturn_5fval_5f_3',['_DEFAULT_RETURN_VAL_',['../Core_8h.html#aa3be778b9a2141963769bb334457b805',1,'Core.h']]],
   ['_5fdefaultfilelabels_4',['_defaultFileLabels',['../classMaCh3Plotting_1_1PlottingManager.html#a3cd2734e72a6247826e566057367e3a6',1,'MaCh3Plotting::PlottingManager']]],
   ['_5fdrawgrid_5',['_drawGrid',['../classMaCh3Plotting_1_1PlottingManager.html#a329ea5735ec605624867435d512ed16d',1,'MaCh3Plotting::PlottingManager']]],
   ['_5fexecoptions_6',['_execOptions',['../classMaCh3Plotting_1_1PlottingManager.html#a9304b66768eea558854d652a9beddbf1',1,'MaCh3Plotting::PlottingManager']]],
