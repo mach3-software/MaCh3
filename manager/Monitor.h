@@ -9,7 +9,6 @@
 
 // MaCh3 includes
 #include "manager/MaCh3Logger.h"
-#include "samplePDF/Structs.h"
 #include "manager/MaCh3Exception.h"
 #include "manager/YamlHelper.h"
 
@@ -21,7 +20,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TStopwatch.h"
 _MaCh3_Safe_Include_End_ //}
-
 
 
 /// @file Monitor.h

@@ -9,7 +9,7 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
 {
   MACH3LOG_INFO("File for study: {}", inputFile);
 
-  YAML::Node Settings = YAML::LoadFile(config);
+  YAML::Node Settings = M3OpenConfig(config);
 
   // Make the processor
   auto Processor = std::make_unique<MCMCProcessor>(inputFile);
