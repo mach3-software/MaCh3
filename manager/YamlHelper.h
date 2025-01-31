@@ -8,7 +8,7 @@
 
 // MaCh3 Includes
 #include "manager/MaCh3Exception.h"
-#include "samplePDF/Structs.h"
+#include "manager/Core.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT Includes
