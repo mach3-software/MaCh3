@@ -39,7 +39,7 @@ var searchData=
   ['makesuboptimality_36',['MakeSubOptimality',['../classMCMCProcessor.html#afac304b884238cc3624f5471b43f1a7e',1,'MCMCProcessor']]],
   ['maketgraphasymmerrors_37',['MakeTGraphAsymmErrors',['../GetPostfitParamPlots_8cpp.html#ae1da909295e10b2eecd557546efccd70',1,'GetPostfitParamPlots.cpp']]],
   ['maketriangleplot_38',['MakeTrianglePlot',['../classMCMCProcessor.html#a3ae80722efa0c94eec066ee91f3cf997',1,'MCMCProcessor']]],
-  ['makevector_39',['MakeVector',['../Structs_8h.html#a6a7efa31950e85001a060205c7d07c97',1,'Structs.h']]],
+  ['makevector_39',['MakeVector',['../Structs_8h.html#a83c20b7fa05cfeed058565367d1c2475',1,'Structs.h']]],
   ['makeviolin_40',['MakeViolin',['../classMCMCProcessor.html#a04976c69f0ef0b3f39edcf5f25f90981',1,'MCMCProcessor']]],
   ['makexsecplots_41',['MakeXsecPlots',['../GetPostfitParamPlots_8cpp.html#af79360b46fcb2923363d459ca9c4a0a8',1,'GetPostfitParamPlots.cpp']]],
   ['makexsecridgeplots_42',['MakeXsecRidgePlots',['../GetPostfitParamPlots_8cpp.html#afd4a3205511125d3d4d95dd3b925f7e4',1,'GetPostfitParamPlots.cpp']]],
