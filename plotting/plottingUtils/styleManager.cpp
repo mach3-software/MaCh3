@@ -31,7 +31,7 @@ void StyleManager::setPalette(std::string configStyleName) const {
   std::vector<std::vector<double>> paletteDef =
       palettes[configStyleName].as<std::vector<std::vector<double>>>();
 
-  const Int_t NCont = (Int_t)(paletteDef[0][0]);
+  const Int_t NCont = Int_t(paletteDef[0][0]);
 
   std::vector<double> stopVec = paletteDef[1];
   std::vector<double> redsVec = paletteDef[2];
@@ -39,16 +39,16 @@ void StyleManager::setPalette(std::string configStyleName) const {
   std::vector<double> bluesVec = paletteDef[4];
 
   // get the number of colour stops and check all vectors are same size
-  const Int_t NRGBs = stopVec.size();
-  if ((Int_t)redsVec.size() != NRGBs || (Int_t)greensVec.size() != NRGBs ||
-      (Int_t)bluesVec.size() != NRGBs)
+  const size_t NRGBs = stopVec.size();
+  if (redsVec.size() != NRGBs || greensVec.size() != NRGBs ||
+      bluesVec.size() != NRGBs)
   {
     MACH3LOG_ERROR("invalid colour palettet defined in style config file: {}");
     MACH3LOG_ERROR("RGB arrays dont all have the same size, please fix that");
   }
 
   // now actually set the palette
-  TColor::CreateGradientColorTable(NRGBs, stopVec.data(), redsVec.data(), greensVec.data(), bluesVec.data(), NCont);
+  TColor::CreateGradientColorTable(int(NRGBs), stopVec.data(), redsVec.data(), greensVec.data(), bluesVec.data(), NCont);
   gStyle->SetNumberContours(NCont);
 }
 
@@ -59,27 +59,27 @@ void StyleManager::setTH1Style(TH1 *hist, std::string styleName) const {
 
   if (styleDef["MarkerColor"])
   {
-    hist->SetMarkerColor(styleDef["MarkerColor"].as<int>());
+    hist->SetMarkerColor(styleDef["MarkerColor"].as<Color_t>());
   }
   if (styleDef["MarkerStyle"])
   {
-    hist->SetMarkerStyle(styleDef["MarkerStyle"].as<int>());
+    hist->SetMarkerStyle(styleDef["MarkerStyle"].as<Color_t>());
   }
   if (styleDef["FillColor"])
   {
-    hist->SetFillColor(styleDef["FillColor"].as<int>());
+    hist->SetFillColor(styleDef["FillColor"].as<Color_t>());
   }
   if (styleDef["FillStyle"])
   {
-    hist->SetFillStyle(styleDef["FillStyle"].as<int>());
+    hist->SetFillStyle(styleDef["FillStyle"].as<Color_t>());
   }
   if (styleDef["LineColor"])
   {
-    hist->SetLineColor(styleDef["LineColor"].as<int>());
+    hist->SetLineColor(styleDef["LineColor"].as<Color_t>());
   }
   if (styleDef["LineStyle"])
   {
-    hist->SetLineStyle(styleDef["LineStyle"].as<int>());
+    hist->SetLineStyle(styleDef["LineStyle"].as<Color_t>());
   }
 }
 

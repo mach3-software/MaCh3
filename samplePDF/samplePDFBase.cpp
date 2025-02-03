@@ -4,29 +4,15 @@ samplePDFBase::samplePDFBase()
 {
   nDims = 0;
   rnd = new TRandom3(0);
-  MCthrow = false;
   dathist = NULL;
   dathist2d = NULL;
-  dataSample = NULL;
-  dataSample2D = NULL;
 }
 
 samplePDFBase::~samplePDFBase()
 {
   if(dathist != NULL) delete dathist;
   if(dathist2d != NULL) delete dathist2d;
-  if(dataSample != NULL) delete dataSample;
-  if(dataSample2D != NULL) delete dataSample2D;  
   delete rnd;
-}
-
-void samplePDFBase::init()
-{
-    
-    
-  //TODO KS: Need to set test stat from config file
-  // Set the test-statistic
-  //SetTestStatistic(static_cast<TestStatistic>(FitManager->GetMCStatLLH()));
 }
 
 void samplePDFBase::addData(std::vector<double> &data)
@@ -34,20 +20,18 @@ void samplePDFBase::addData(std::vector<double> &data)
   if(nDims != 0 && nDims != 1)
   {
     std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
-  dataSample = new std::vector<double>(data);
   if(dathist == NULL)
   {
-      std::cerr<<"dathist not initialised"<<std::endl;
-      std::cerr<<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+    std::cerr<<"dathist not initialised"<<std::endl;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   dathist->Reset();                                                         
-  for (int i = 0; i < int(dataSample->size()); i++)                         
-    dathist->Fill(dataSample->at(i));
+  for (int i = 0; i < int(data.size()); i++) {
+    dathist->Fill(data.at(i));
+  }
 }
 
 void samplePDFBase::addData(std::vector< std::vector <double> > &data)
@@ -56,19 +40,17 @@ void samplePDFBase::addData(std::vector< std::vector <double> > &data)
   {
     std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
     std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 2;  
-  dataSample2D = new std::vector< std::vector <double> >(data);
   if(dathist2d == NULL)
   {
-      std::cerr<<"dathist2d not initialised"<<std::endl;
-      std::cerr <<"Find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+    std::cerr<<"dathist2d not initialised"<<std::endl;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   dathist2d->Reset();                                                       
-  for (int i = 0; i < int(dataSample2D->size()); i++)                       
-    dathist2d->Fill(dataSample2D->at(0)[i],dataSample2D->at(1)[i]); 
+  for (int i = 0; i < int(data.size()); i++)
+    dathist2d->Fill(data.at(0)[i], data.at(1)[i]);
 }
 
 void samplePDFBase::addData(TH1D* binneddata)
@@ -77,7 +59,7 @@ void samplePDFBase::addData(TH1D* binneddata)
   {
     std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
     std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
   std::cout << "adding 1D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
@@ -101,104 +83,21 @@ void samplePDFBase::addData(TH2D* binneddata)
   dathist2d = binneddata;
 }
 
-std::vector<double> samplePDFBase::generate()
-{
-  std::vector<double> data;
-  TH1D *pdf = (TH1D*)get1DHist();
-  double evrate = getEventRate();
-  int num = rnd->Poisson(evrate);
-  std::cout << std::endl << "sampling " << num << " events from " << evrate << std::endl;
-
-  // rejection sampling
-  //double M = 6; // *** DO NOT HARDCODE THIS, WILL ALTER RESULTS WHEN POT IS CHANGED ***
-  int count = 0;
-
-  dathist->Reset();
-
-  while(count < num)
-  {
-    /*double candidate = gRandom->Uniform(upp);
-      double accProb = pdf->GetBinContent(pdf->FindBin(candidate)) / M;
-      double rand = gRandom->Uniform(1);
-      if (accProb >= rand)
-      {
-      std::cout << candidate << " " << std::flush;
-      data.push_back(candidate);
-      dathist->Fill(candidate);
-      count++;
-      }*/
-    double candidate = pdf->GetRandom();
-    std::cout << candidate << " " << std::flush;                                                                                                                       
-    data.push_back(candidate);                                                                                                                                         
-    dathist->Fill(candidate);                                                                                                                                          
-    count++;
-  }
-
-  std::cout << "sampling complete" << std::endl;
-  return data;
-}
-
-std::vector< std::vector <double> > samplePDFBase::generate2D(TH2D* pdf)
-{
-  std::vector< std::vector <double> > data;
-  if(!pdf) pdf = (TH2D*)get2DHist();
-
-  if(MCthrow)
-  {
-    for(int i=1; i<=pdf->GetNbinsX(); i++)
-    {
-      for(int j=1; j<=pdf->GetNbinsY(); j++)
-      {
-        pdf->SetBinContent(i,j,rnd->Gaus(pdf->GetBinContent(i,j),pdf->GetBinError(i,j)));
-      }
-    }
-  }
-
-  double evrate = pdf->Integral();
-  int num = rnd->Poisson(evrate);
-  std::cout << "sampling " << num << " events from " << evrate << std::endl;
-
-  std::vector<double> var1;
-  std::vector<double> var2;
-  double x,y;
-
-  dathist2d->Reset();
-
-  for(int i=0; i < num; i++)
-  {
-    pdf->GetRandom2(x,y);
-    var1.push_back(x);
-    var2.push_back(y);
-    dathist2d->Fill(x, y);
-  }
-  data.push_back(var1);
-  data.push_back(var2);
-
-  std::cout << "sampling complete " << data[0].size() << std::endl;
-  return data;
-}
-
 TH1D* samplePDFBase::get1DHist()
 {
   fill1DHist();
   return _hPDF1D;
 }
+
 TH2D* samplePDFBase::get2DHist()
 {
   fill2DHist();
   return _hPDF2D;
 }
 
-double samplePDFBase::getEventRate()
-{
-  //if (_hErec == NULL) 
-  fill1DHist();
-  return _hPDF1D->Integral();
-}
-
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double samplePDFBase::getTestStatLLH(const double data, const double mc) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Need some MC
   if(mc == 0) return 0.;
@@ -216,13 +115,13 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) {
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) {
+double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
 
   // Need some MC
   if (mc == 0) return 0.0;
 
-  // The MC used in the likeliihood calculation
+  // The MC used in the likelihood calculation
   // Is allowed to be changed by Barlow Beeston beta parameters
   double newmc = mc;
 
@@ -231,7 +130,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     //CW: Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
     // Assume the MC has a Gaussian distribution around generated
     // As in https://arxiv.org/abs/1103.0354 eq 10, 11
-    //CW: Calculate the Barlow-Beeston likelhood contribution from MC statistics
+    //CW: Calculate the Barlow-Beeston likelihood contribution from MC statistics
     // Assumes the beta scaling parameters are Gaussian distributed
     // Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5
     // Essentially solves equation 11
@@ -246,9 +145,8 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       // b^2 - 4ac in quadratic equation
       const double temp2 = temp*temp + 4*data*fractional*fractional;
       if (temp2 < 0) {
-        std::cerr << "Negative square root in Barlow Beeston coefficient calculation!" << std::endl;
-        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-        throw;
+        MACH3LOG_ERROR("Negative square root in Barlow Beeston coefficient calculation!");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       // Solve for the positive beta
       const double beta = (-1*temp+sqrt(temp2))/2.;
@@ -317,12 +215,12 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
 
         return stat;
       }
-      // Auxillary variables
+      // Auxiliary variables
       const long double b = mc/w2;
       const long double a = mc*b+1;
       const long double k = data;
       // Use C99's implementation of log of gamma function to not be C++11 dependent
-      stat = -1*(a * logl(b) + lgammal(k+a) - lgammal(k+(long double)1) - ((k+a)*log1pl(b)) - lgammal(a));
+      stat = double(-1*(a * logl(b) + lgammal(k+a) - lgammal(k+1) - ((k+a)*log1pl(b)) - lgammal(a)));
 
       // Return the statistical contribution and penalty
       return stat;
@@ -340,96 +238,29 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     break;
     case (kPoisson):
     {
-	  //Just call getTestStatLLH which doesn't take in weights
-	  //and is a poisson likelihood comparison.
+      //Just call getTestStatLLH which doesn't take in weights
+      //and is a Poisson likelihood comparison.
       return getTestStatLLH(data, mc);//stat;
     }
     break;
 
     default:
     std::cerr << "Couldn't find TestStatistic " << fTestStatistic << " exiting!" << std::endl;
-    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   } // end switch
 }
-
-/*
-// **************************************************
-// Helper function to set LLH type used in the fit
-void samplePDFBase::SetTestStatistic(TestStatistic test_stat) {
-// **************************************************
-  fTestStatistic = test_stat;
-
-  std::string name = TestStatistic_ToString((TestStatistic)test_stat);
-  MACH3LOG_INFO("Using {} likelihood",name); 
-}
-*/
-
-void samplePDFBase::set1DBinning(int nbins, double* boundaries)
-{
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(nbins,boundaries);
-  dathist->SetBins(nbins,boundaries);
-}
-
-void samplePDFBase::set1DBinning(int nbins, double low, double high)
-{
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(nbins,low,high);
-  dathist->SetBins(nbins,low,high);
-}
-void samplePDFBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
-{
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(nbins1,boundaries1,nbins2,boundaries2);
-  dathist2d->SetBins(nbins1,boundaries1,nbins2,boundaries2);
-}
-
-void samplePDFBase::set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2)
-{
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(nbins1,low1,high1,nbins2,low2,high2);
-  dathist2d->SetBins(nbins1,low1,high1,nbins2,low2,high2);
-}
-
 
 // ***************************************************************************
 //KS: Sample getter
 std::string samplePDFBase::GetSampleName(int Sample) {
 // ***************************************************************************
-
   if(Sample > nSamples)
   {
    std::cerr<<" You are asking for sample "<< Sample <<" I only have "<< nSamples<<std::endl;
-   throw;
+   throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   return SampleName[Sample];
-}
-// ***************************************************************************
-void samplePDFBase::GetSampleNames(std::vector<std::string> &sampleNameVect) {
-// ***************************************************************************
-  if(sampleNameVect.size() !=0)
-    sampleNameVect.clear() ;
-
-  for(int i = 0; nSamples; i++)
-  {
-    sampleNameVect.push_back(GetSampleName(i));
-  }
-}
-
-// ***************************************************************************
-void samplePDFBase::GetModeName(std::vector<std::string> &modeNameVect) {
-// ***************************************************************************
-
-  if(modeNameVect.size() !=0)
-    modeNameVect.clear() ;
-
-  for(int i = 0; Modes->GetNModes()+1; i++)
-  {
-    modeNameVect.push_back(Modes->GetMaCh3ModeName(i));
-  }
-
 }
 
 // ***************************************************************************

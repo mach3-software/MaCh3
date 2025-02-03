@@ -8,7 +8,6 @@
 // MaCh3 Includes
 #include "samplePDF/samplePDFBase.h"
 #include "covariance/covarianceBase.h"
-#include "covariance/covarianceOsc.h"
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
 
@@ -37,15 +36,6 @@ class FitterBase {
   /// @param cov A pointer to a Covariance object derived from covarianceBase.
   void addSystObj(covarianceBase* cov);
 
-  /// @brief Adds an oscillation handler for covariance objects.
-  /// @param oscf A pointer to a covarianceOsc object for forward oscillations.
-  void addOscHandler(covarianceOsc* oscf);
-
-  /// @brief Adds two oscillation handlers for covariance objects.
-  /// @param osca A pointer to a covarianceOsc object for the first oscillation.
-  /// @param oscb A pointer to a covarianceOsc object for the second oscillation.
-  void addOscHandler(covarianceOsc* osca, covarianceOsc* oscb);
-
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
 
@@ -67,6 +57,11 @@ class FitterBase {
   /// @warning Code uses TH2Poly
   void RunSigmaVar();
 
+  /// @brief Allow to start from previous fit/chain
+  /// @param FitName Name of previous chain
+  /// @todo implement some check that number of params matches etc
+  virtual void StartFromPreviousFit(const std::string& FitName);
+
   /// @brief Get name of class
   virtual inline std::string GetName()const {return "FitterBase";};
  protected:
@@ -81,14 +76,6 @@ class FitterBase {
 
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
-
-  /// @brief Used by sigma variation, check how 1 sigma changes spectra
-  /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
-  /// @param sigmaArrayCentr sigma var hist at prior values
-  /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
-  /// @param title A tittle for returned object
-  /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-  inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
 
   /// The manager
   manager *fitMan;
@@ -107,13 +94,10 @@ class FitterBase {
   /// counts accepted steps
   int accCount;
 
-  /// LLH for samples/syst objects
-  /// oscillation covariance llh
-  double osc_llh;
   /// store the llh breakdowns
-  double *sample_llh;
+  std::vector<double> sample_llh;
   /// systematic llh breakdowns
-  double *syst_llh;
+  std::vector<double> syst_llh;
 
   /// Sample holder
   std::vector<samplePDFBase*> samples;
@@ -123,20 +107,15 @@ class FitterBase {
   /// Systematic holder
   std::vector<covarianceBase*> systematics;
 
-  /// handles oscillation parameters
-  covarianceOsc *osc;
-  /// handles oscillation parameters
-  covarianceOsc *osc2;
-
   /// tells global time how long fit took
-  TStopwatch* clock;
+  std::unique_ptr<TStopwatch> clock;
   /// tells how long single step/fit iteration took
-  TStopwatch* stepClock;
+  std::unique_ptr<TStopwatch> stepClock;
   /// Time of single step
   double stepTime;
 
   /// Random number
-  TRandom3* random;
+  std::unique_ptr<TRandom3> random;
 
   /// Output
   TFile *outputFile;

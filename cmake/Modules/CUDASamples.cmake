@@ -30,7 +30,7 @@ if(NOT CUDASAMPLES_FOUND)
 endif()
 
 cmessage(STATUS "Using the following CUDA samples paths: ${CMAKE_CUDA_SAMPLES_PATH}")
-target_include_directories(MaCh3CompilerOptions INTERFACE
+target_include_directories(MaCh3GPUCompilerOptions INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CUDA_SAMPLES_PATH}>"
     "$<INSTALL_INTERFACE:include>"
 )

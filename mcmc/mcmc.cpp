@@ -5,13 +5,12 @@
 // Now we can dump manager settings to the output file
 mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
-
   // Beginning step number
   stepStart = 0;
 
   // Starting parameters should be thrown
   reject = false;
-  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<double>();
+  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<unsigned>();
 
   AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
   if(AnnealTemp < 0) anneal = false;
@@ -29,40 +28,10 @@ mcmc::~mcmc() {
 
 }
 
-// *************************
-// Load starting positions from the end of a previous chain
-void mcmc::ReadParsFromFile(std::string file) {
-// *************************
-  MACH3LOG_INFO("MCMC getting starting position from {}", file);
-
-  TFile *infile = new TFile(file.c_str(), "READ");
-  TTree *posts = (TTree*)infile->Get("posteriors");
-  TObjArray* brlis = (TObjArray*)posts->GetListOfBranches();
-  int nbr = brlis->GetEntries();
-  TString* branch_names = new TString[nbr];
-  double* branch_vals = new double[nbr];
-
-  for (int i = 0; i < nbr; ++i) {
-    TBranch *br = (TBranch*)brlis->At(i);
-    TString bname = br->GetName();
-    branch_names[i] = bname;
-    std::cout << " * Loading " << bname << std::endl;
-    posts->SetBranchAddress(branch_names[i], &branch_vals[i]);
-  }
-
-  posts->GetEntry(posts->GetEntries()-1);
-
-  delete[] branch_names;
-  delete[] branch_vals;
-  infile->Close();
-  delete infile;
-}
-
 // **********************
 // Do we accept the proposed step for all the parameters?
 void mcmc::CheckStep() {
 // **********************
-
   bool accept = false;
 
   // Set the acceptance probability to zero
@@ -91,10 +60,6 @@ void mcmc::CheckStep() {
   if (accept && !reject) {
     logLCurr = logLProp;
 
-    if (osc) {
-      osc->acceptStep();
-    }
-    
     // Loop over systematics and accept
     for (size_t s = 0; s < systematics.size(); ++s) {
       systematics[s]->acceptStep();
@@ -229,7 +194,7 @@ void mcmc::ProposeStep() {
     // But since sample reweight is multi-threaded it's probably better to do that
     for (size_t i = 0; i < samples.size(); ++i)
     {
-        samples[i]->reweight(); 
+      samples[i]->reweight();
     }
 
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
@@ -276,16 +241,35 @@ void mcmc::PrintProgress() {
   MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
-    if (std::string((*it)->getName()) == "xsec_cov") {
+  for (covarianceBase *cov : systematics) {
+    if (cov->getName() == "xsec_cov") {
       MACH3LOG_INFO("Cross-section parameters: ");
-      (*it)->printNominalCurrProp();
+      cov->printNominalCurrProp();
     }
   }
-  #ifdef DEBUF
+  #ifdef DEBUG
   if (debug) {
     debugFile << "\n-------------------------------------------------------" << std::endl;
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
   }
   #endif
+}
+
+// *******************
+void mcmc::StartFromPreviousFit(const std::string& FitName) {
+// *******************
+  // Use base class
+  FitterBase::StartFromPreviousFit(FitName);
+
+  // For MCMC we also need to set stepStart
+  TFile *infile = new TFile(FitName.c_str(), "READ");
+  TTree *posts = infile->Get<TTree>("posteriors");
+  int step_val = 0;
+
+  posts->SetBranchAddress("step",&step_val);
+  posts->GetEntry(posts->GetEntries()-1);
+
+  stepStart = step_val;
+  infile->Close();
+  delete infile;
 }

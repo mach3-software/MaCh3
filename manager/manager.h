@@ -13,6 +13,8 @@ class TFile;
 
 /// @brief The manager class is responsible for managing configurations and settings.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/01.-Manager-and-config-handling).
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
 class manager {
 public:
   /// @brief Constructs a manager object with the specified file name.
@@ -29,7 +31,7 @@ public:
   void Print();
 
   /// @brief Get likelihood type defined in the config
-  inline int GetMCStatLLH(){return mc_stat_llh;}
+  int GetMCStatLLH();
   /// @brief Return name of config
   inline std::string GetFileName(){return FileName;}
   /// @brief Return config
@@ -38,13 +40,22 @@ public:
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
   /// @brief Get class name
   inline std::string GetName()const {return "Manager";};
+
+  /// @brief Overrides the configuration settings based on provided arguments.
+  /// @note Example usage:
+  /// @code
+  /// FitManager->OverrideSettings("General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
+  /// @endcode
+  template <typename... Args>
+  void OverrideSettings(Args&&... args) {
+    OverrideConfig(config, std::forward<Args>(args)...);
+  }
+
 private:
   /// The YAML node containing the configuration data.
   YAML::Node config;
   /// The name of the configuration file.
   std::string FileName;
-  /// The likelihood type defined in the configuration.
-  int mc_stat_llh;
   /// MaCh3 Modes
   MaCh3Modes* Modes;
 };

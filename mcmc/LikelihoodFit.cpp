@@ -32,10 +32,6 @@ void LikelihoodFit::PrepareFit() {
     NParsPCA += systematics[s]->getNpars();
   }
 
-  if (osc) {
-    std::cerr<<" Osc not supported "<<std::endl;
-    throw;
-  }
   //KS: If PCA is note enabled NParsPCA == NPars
   MACH3LOG_INFO("Total number of parameters {}", NParsPCA);
 }
@@ -58,10 +54,10 @@ double LikelihoodFit::CalcChi2(const double* x) {
     if(!(*it)->IsPCA())
     {
       std::vector<double> pars;
-      const int Size = (*it)->GetNumParams();
+      const int NumPar = (*it)->GetNumParams();
       //KS: Avoid push back as they are slow
-      pars.resize(Size);
-      for(int i = 0; i < Size; ++i, ++ParCounter)
+      pars.resize(NumPar);
+      for(int i = 0; i < NumPar; ++i, ++ParCounter)
       {
         double ParVal = x[ParCounter];
         //KS: Basically apply mirroring for parameters out of bounds
@@ -83,10 +79,10 @@ double LikelihoodFit::CalcChi2(const double* x) {
     else
     {
       std::vector<double> pars;
-      const int Size = (*it)->getNpars();
+      const int NumPar = (*it)->getNpars();
       //KS: Avoid push back as they are slow
-      pars.resize(Size);
-      for(int i = 0; i < Size; ++i, ++ParCounter)
+      pars.resize(NumPar);
+      for(int i = 0; i < NumPar; ++i, ++ParCounter)
       {
         double ParVal = x[ParCounter];
         //KS: Basically apply mirroring for parameters out of bounds
@@ -112,13 +108,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
   // But since sample reweight is multi-threaded it's probably better to do that
   for (size_t i = 0; i < samples.size(); i++)
   {
-    // If we're running with different oscillation parameters for neutrino and anti-neutrino
-    if (osc) {
-      samples[i]->reweight();
-      // If we aren't using any oscillation
-      } else {
-        samples[i]->reweight();
-    }
+    samples[i]->reweight();
   }
 
   //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation

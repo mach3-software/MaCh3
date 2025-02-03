@@ -1,0 +1,46 @@
+# Performs unit and integration testing
+
+name: Validations Python CI 
+
+# The events that trigger the workflow
+# on:
+#   pull_request:
+#     branches: [ develop ]
+# This wrokflow temporary dont work, please uncoment this when fixed
+on:
+  workflow_dispatch:  # Placeholder trigger to allow manual runs only
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get MaCh3 Validations
+      run: |
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+
+    - name: Install pytest
+      working-directory: /opt/MaCh3Validations
+      run: |
+        mkdir python-test-modules
+        pip install -r ./CIValidations/PythonTests/requirements.txt -t python-test-modules/
+
+    - name: Validations
+      working-directory: /opt/MaCh3Validations
+      run: |
+        source /opt/root/v6-26-10/bin/thisroot.sh
+        export PYTHONPATH=$PYTHONPATH:$PWD/python-test-modules/
+        export MACH3=$PWD
+        
+        python3 -m pytest --config Inputs/FitterConfig.yaml CIValidations/PythonTests
+        

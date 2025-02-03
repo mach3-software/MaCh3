@@ -44,7 +44,6 @@ void MaCh3Welcome() {
 // KS: Get version of MaCh3
 std::string GetMaCh3Version() {
 // ************************
-
   //KS: Find MaCh3 version based on header file. There could be better way to just include version.h but as long as we don't have to hardcode version I am content
   std::string MaCh3_VERSION = "";
 
@@ -87,7 +86,6 @@ std::string GetMaCh3Version() {
 // KS: Find out more about operational system
 void GetOSInfo() {
 // ************************
-
   MACH3LOG_INFO("Operating System Information:");
 
   // Distribution and version
@@ -99,7 +97,6 @@ void GetOSInfo() {
 //KS: Simple function retrieving CPU info
 void GetCPUInfo() {
 // ************************
-
   //KS: Use -m 1 to limit to only one grep because in one computing node there is a lot of CPU which are the same
   MACH3LOG_INFO("Using following CPU:");
 
@@ -121,7 +118,6 @@ void GetCPUInfo() {
 //KS: Simple function retrieving GPU info
 void GetGPUInfo(){
 // ************************
-
 #ifdef CUDA
   MACH3LOG_INFO("Using following GPU:");
   // Print GPU name
@@ -150,12 +146,11 @@ void GetDiskUsage() {
 
 // ************************
 // KS: Convoluted code to grab output from terminal to string
-std::string TerminalToString(const char* cmd) {
+std::string TerminalToString(std::string cmd) {
 // ************************
-
   std::array<char, 128> buffer;
   std::string result;
-  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
   if (!pipe) {
     throw MaCh3Exception(__FILE__, __LINE__, "popen() failed!");
   }
@@ -169,9 +164,8 @@ std::string TerminalToString(const char* cmd) {
 
 // ************************
 //KS: Simple to retrieve speed of get entry inspired by
-void EstimateDataTransferRate(TChain* chain, const int entry){
+void EstimateDataTransferRate(TChain* chain, const Long64_t entry){
 // ************************
-
   TStopwatch timer;
 
   timer.Start();
@@ -187,15 +181,14 @@ void EstimateDataTransferRate(TChain* chain, const int entry){
 
 // ************************
 //KS: Simply print progress bar
-void PrintProgressBar(const int Done, const int All){
+void PrintProgressBar(const Long64_t Done, const Long64_t All){
 // ************************
-
-  double progress = double((double(Done)/double(All)));
+  double progress = double(Done)/double(All);
   const int barWidth = 20;
   std::ostringstream progressBar;
 
   progressBar << "[";
-  int pos = barWidth * progress;
+  int pos = int(barWidth * progress);
   for (int i = 0; i < barWidth; ++i) {
     if (i < pos)
       progressBar << "=";
@@ -211,7 +204,7 @@ void PrintProgressBar(const int Done, const int All){
 
 // ***************************************************************************
 //CW: Get memory, which is probably silly
-int getValue(std::string Type){ //Note: this value is in KB!
+int getValue(const std::string& Type){ //Note: this value is in KB!
 // ***************************************************************************
   std::ifstream file("/proc/self/status");
   int result = -1;
@@ -255,7 +248,6 @@ int getValue(std::string Type){ //Note: this value is in KB!
     MACH3LOG_ERROR("Not supported getValue: {}", Type);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-
   return result;
 }
 
@@ -295,4 +287,5 @@ void MaCh3Usage(int argc, char **argv){
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
-}
+
+} //end namespace

@@ -3,18 +3,20 @@
 /// Run low or high memory versions of structs
 /// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 /// KS: Need more testing on FD
+namespace M3 {
 #ifdef _LOW_MEMORY_STRUCTS_
 /// Custom floating point (float or double)
-#define _float_ float
+using float_t = float;
 /// Custom integer (int or short int)
-#define _int_ short int
+using int_t = short;
 /// Custom unsigned integer (unsigned short int or unsigned int)
-#define _unsigned_int_ unsigned short int
+using uint_t = unsigned short;
 #else
-#define _float_ double
-#define _int_ int
-#define _unsigned_int_ unsigned int
+using float_t = double;
+using int_t = int;
+using uint_t = unsigned;
 #endif
+}
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
 //#define SafeException
@@ -34,11 +36,17 @@
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
 
-/// Include some healthy defines for constructors
-#define _BAD_DOUBLE_ -999.99
-#define _BAD_INT_ -999
+constexpr static const double _BAD_DOUBLE_ = -999.99;
+constexpr static const int _BAD_INT_ = -999;
 
-#define _DEFAULT_RETURN_VAL_ -999999.123456
+constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
+
+// Some commonly used variables to which we set pointers to
+constexpr static const double Unity = 1.;
+constexpr static const double Zero = 0.;
+constexpr static const float Unity_F = 1.;
+constexpr static const float Zero_F = 0.;
+constexpr static const int Unity_Int = 1;
 
 // C++ includes
 #include <sstream>
@@ -50,17 +58,38 @@
 #include <list>
 #include <unordered_map>
 
-// ROOT include
-#include "TSpline.h"
-#include "TF1.h"
-#include "TLorentzVector.h"
-#include "TObjString.h"
-#include "TH2Poly.h"
-#include "TFile.h"
-
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
+
+#include "manager/MaCh3Exception.h"
+#include "manager/MaCh3Logger.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+// ROOT include
+#include "TSpline.h"
+#include "TObjString.h"
+#include "TFile.h"
+#include "TF1.h"
+#include "TH2Poly.h"
+#include "TH1.h"
+// NuOscillator includes
+#include "Constants/OscillatorConstants.h"
+#pragma GCC diagnostic pop
+
+
+/// @file Structs.h
+/// @author Asher Kaboth
+/// @author Clarence Wret
+/// @author Patrick Dunne
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
 
 // *******************
 /// @brief Template to make vector out of an array of any length
@@ -82,32 +111,32 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 /// Carrier for whether you want to apply a systematic to an event or not
 struct XsecNorms4 {
 // *******************
-    /// Name of parameters
-    std::string name;
-    /// Mode which parameter applies to
-    std::vector<int> modes;
-    /// Horn currents which parameter applies to
-    std::vector<int> horncurrents;
-    /// PDG which parameter applies to
-    std::vector<int> pdgs;
-    /// Preosc PDG which parameter applies to
-    std::vector<int> preoscpdgs;
-    /// Targets which parameter applies to
-    std::vector<int> targets;
-    /// Does this parameter have kinematic bounds
-    bool hasKinBounds;
-    /// Generic vector contain enum relating to a kinematic variable
-    /// and lower and upper bounds. This can then be passed to IsEventSelected
-    std::vector< std::vector<double> > Selection;
+  /// Name of parameters
+  std::string name;
+  /// Mode which parameter applies to
+  std::vector<int> modes;
+  /// Horn currents which parameter applies to
+  std::vector<int> horncurrents;
+  /// PDG which parameter applies to
+  std::vector<int> pdgs;
+  /// Preosc PDG which parameter applies to
+  std::vector<int> preoscpdgs;
+  /// Targets which parameter applies to
+  std::vector<int> targets;
+  /// Does this parameter have kinematic bounds
+  bool hasKinBounds;
+  /// Generic vector contain enum relating to a kinematic variable
+  /// and lower and upper bounds. This can then be passed to IsEventSelected
+  std::vector< std::vector<double> > Selection;
 
-    /// Generic vector containing the string of kinematic type
-    /// This then needs to be converted to a kinematic type enum
-    /// within a samplePDF daughter class
-    /// The bounds for each kinematic variable are given in Selection
-    std::vector< std::string > KinematicVarStr;
+  /// Generic vector containing the string of kinematic type
+  /// This then needs to be converted to a kinematic type enum
+  /// within a samplePDF daughter class
+  /// The bounds for each kinematic variable are given in Selection
+  std::vector< std::string > KinematicVarStr;
 
-    /// Parameter number of this normalisation in current systematic model
-    int index;
+  /// Parameter number of this normalisation in current systematic model
+  int index;
 };
 
 /// Make an enum of the spline interpolation type
@@ -127,7 +156,6 @@ enum SplineInterpolation {
   kSplineInterpolations  //!< This only enumerates
 };
 
-
 // **************************************************
 /// @brief Get function for TF1_red
 /// @param i Interpolation type
@@ -135,14 +163,13 @@ inline std::string GetTF1(const SplineInterpolation i) {
   // **************************************************
   std::string Func = "";
   switch(i) {
-    case kLinearFunc:
+    case SplineInterpolation::kLinearFunc:
       Func = "([1]+[0]*x)";
       break;
     default:
-      std::cerr << "UNKNOWN SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return Func;
 }
@@ -155,27 +182,26 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
   RespFuncType Type = kRespFuncTypes;
   switch(i) {
     //  TSpline3 (third order spline in ROOT)
-    case kTSpline3:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kTSpline3:
+      Type = RespFuncType::kTSpline3_red;
       break;
-    case kLinear:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kLinear:
+      Type = RespFuncType::kTSpline3_red;
       break;
-    case kMonotonic:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kMonotonic:
+      Type = RespFuncType::kTSpline3_red;
       break;
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
-    case kAkima:
-      Type = kTSpline3_red;
+    case SplineInterpolation::kAkima:
+      Type = RespFuncType::kTSpline3_red;
       break;
-    case kLinearFunc:
-      Type = kTF1_red;
+    case SplineInterpolation::kLinearFunc:
+      Type = RespFuncType::kTF1_red;
       break;
     default:
-      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return Type;
 }
@@ -187,39 +213,38 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
   std::string name = "";
   switch(i) {
     //  TSpline3 (third order spline in ROOT)
-    case kTSpline3:
+    case SplineInterpolation::kTSpline3:
       name = "TSpline3";
       break;
-    case kLinear:
+    case SplineInterpolation::kLinear:
       name = "Linear";
       break;
-    case kMonotonic:
+    case SplineInterpolation::kMonotonic:
       name = "Monotonic";
       break;
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
-    case kAkima:
+    case SplineInterpolation::kAkima:
       name = "Akima";
       break;
-    case kLinearFunc:
+    case SplineInterpolation::kLinearFunc:
       name = "LinearFunc";
       break;
     default:
-      std::cerr << "UNKNOWN SPLINE INTERPOLATION SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
 
 /// Make an enum of systematic type recognised by covariance class
+/// @todo KS: Consider using enum class, it is generally recommended as safer. It will require many static_cast
 enum SystType {
   kNorm,      //!< For normalisation parameters
   kSpline,    //!< For splined parameters (1D)
   kFunc,      //!< For functional parameters
   kSystTypes  //!< This only enumerates
 };
-
 
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
@@ -243,38 +268,22 @@ inline std::string SystType_ToString(const SystType i) {
 // **************************************************
   std::string name = "";
   switch(i) {
-    case kNorm:
+    case SystType::kNorm:
       name = "Norm";
       break;
-    case kSpline:
+    case SystType::kSpline:
       name = "Spline";
       break;
-    case kFunc:
+    case SystType::kFunc:
       name = "Functional";
       break;
     default:
-      std::cerr << "UNKNOWN SYST TYPE SPECIFIED!" << std::endl;
-      std::cerr << "You gave  " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN SYST TYPE SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
-
-// ***************************
-// A handy namespace for variables extraction
-namespace MaCh3Utils {
-// ***************************
-
-  // ***************************
-  /// @brief Return mass for given PDG
-  double GetMassFromPDG(int PDG);
-  // ***************************
-
-  extern std::unordered_map<int,int> KnownDetIDsMap;
-  extern int nKnownDetIDs;
-
-} // end MaCh3Utils namespace
 
 // *****************
 /// Enum to track the target material
@@ -361,59 +370,57 @@ inline int PDGToProbs(NuPDG pdg){
 
   switch (pdg){
     case kNue:
-	  ReturnProbNu = kProbNue;
-	  break;
+      ReturnProbNu = kProbNue;
+      break;
     case kNumu:
-	  ReturnProbNu = kProbNumu;
-	  break;
+      ReturnProbNu = kProbNumu;
+      break;
     case kNutau:
-	  ReturnProbNu = kProbNutau;
-	  break;
+      ReturnProbNu = kProbNutau;
+      break;
     case kNueBar:
-	  ReturnProbNu = kProbNueBar;
-	  break;
-	case kNumuBar:
-	  ReturnProbNu = kProbNumuBar;
-	  break;
-	case kNutauBar:
-	  ReturnProbNu = kProbNutauBar;
-	  break;
-	default:
-	  std::cout << "Unrecognised pdg for the neutrino so can't map this to an int for Prob3++" << std::endl;
-	  break;
+      ReturnProbNu = kProbNueBar;
+      break;
+    case kNumuBar:
+      ReturnProbNu = kProbNumuBar;
+      break;
+    case kNutauBar:
+      ReturnProbNu = kProbNutauBar;
+      break;
+    default:
+      MACH3LOG_WARN("Unrecognised pdg for the neutrino so can't map this to an int for Prob3++");
+      break;
   }
 
   return ReturnProbNu;
 }
 
 inline int ProbsToPDG(ProbNu NuType){
-
   int ReturnNuPDG = -999;
 
   switch (NuType){
-	case kProbNue:
-	  ReturnNuPDG = static_cast<int>(kNue);
-	  break;
-	case kProbNumu:
-	  ReturnNuPDG = static_cast<int>(kNumu);
-	  break;
-	case kProbNutau:
-	  ReturnNuPDG = static_cast<int>(kNutau);
-	  break;
-	case kProbNueBar:
-	  ReturnNuPDG = static_cast<int>(kNueBar);
-	  break;
-	case kProbNumuBar:
-	  ReturnNuPDG = static_cast<int>(kNumuBar);
-	  break;
-	case kProbNutauBar:
-	  ReturnNuPDG = static_cast<int>(kNutauBar);
-	  break;
-	default:
-	  std::cout << "Unrecognised NuType for the neutrino so can't map this to a PDG code" << std::endl;
-	  break;
+    case kProbNue:
+      ReturnNuPDG = static_cast<int>(kNue);
+      break;
+    case kProbNumu:
+      ReturnNuPDG = static_cast<int>(kNumu);
+      break;
+    case kProbNutau:
+      ReturnNuPDG = static_cast<int>(kNutau);
+      break;
+    case kProbNueBar:
+      ReturnNuPDG = static_cast<int>(kNueBar);
+      break;
+    case kProbNumuBar:
+      ReturnNuPDG = static_cast<int>(kNumuBar);
+      break;
+    case kProbNutauBar:
+      ReturnNuPDG = static_cast<int>(kNutauBar);
+      break;
+    default:
+      MACH3LOG_WARN("Unrecognised NuType for the neutrino so can't map this to a PDG code");
+      break;
   }
-
   return ReturnNuPDG;
 }
 
@@ -450,133 +457,129 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
     name = "DembinskiAbdelmottele";
     break;
     default:
-      std::cerr << "UNKNOWN LIKELHOOD SPECIFIED!" << std::endl;
-      std::cerr << "You gave test-statistic " << i << std::endl;
-      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-      throw;
+      MACH3LOG_ERROR("UNKNOWN LIKELIHOOD SPECIFIED!");
+      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
 }
 
-/// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
-double OverflowIntegral(TH2Poly* poly);
 
-/// @brief WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow
-double NoOverflowIntegral(TH2Poly* poly);
+// ***************************
+// A handy namespace for variables extraction
+namespace MaCh3Utils {
+  // ***************************
 
-/// @brief WP: Poly Projectors
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, std::vector<double> xbins, bool computeErrors = false);
-/// @brief WP: Poly Projectors
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, std::vector<double> ybins, bool computeErrors = false);
-
-/// @brief KS: Convert TH2D to TH2Poly
-TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *TH2Dhist);
-/// @brief KS: Convert TH2Poly to TH2D
-TH2Poly* ConvertTH2DtoTH2Poly(TH2D *TH2Dhist);
-
-/// @brief WP: Helper to Normalise histograms
-TH2Poly* NormalisePoly(TH2Poly* Histogram);
-
-/// @brief WP: Helper to scale th2poly analogous to th2d scale with option "width"
-TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale);
-/// @brief WP: Helper to calc integral of th2poly analogous to th2d integra; with option "width"
-double PolyIntegralWidth(TH2Poly *Histogram);
-
-/// @brief KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
-/// @brief However if you use ROOT6 and have ROOT6 file exactly the same code will work. Something have changed with how TH2Poly bins are stored in TFile
-/// @param file ROOT file that we will make version checks
-void CheckTH2PolyFileVersion(TFile *file);
-
-/// @brief KS: Remove fitted TF1 from hist to make comparison easier
-void RemoveFitter(TH1D* hist, const std::string& name);
-
-/// @brief Helper to check if files exist or not
-inline std::string file_exists(std::string filename) {
-  std::ifstream infile(filename.c_str());
-  if (!infile.good()) {
-    std::cerr << "*** ERROR ***" << std::endl;
-    std::cerr << "File " << filename << " does not exist" << std::endl;
-    std::cerr << "Please try again" << std::endl;
-    std::cerr << "*************" << std::endl;
-    throw;
+  // ***************************
+  /// @brief Return mass for given PDG
+  // *****************************
+  // Get the mass of a particle from the PDG
+  // In GeV, not MeV!
+  inline double GetMassFromPDG(const int PDG) {
+    // *****************************
+    switch (abs(PDG)) {
+      case 11:
+        return 0.511E-3;
+        break;
+      case 13:
+        return 105.658E-3;
+        break;
+      case 15:
+        return 1.77682;
+        break;
+      case 22:
+        return 0.;
+        break;
+      case 211:
+        return 139.57E-3;
+        break;
+      case 111:
+        return 134.98E-3;
+        break;
+      case 2112:
+        return 939.565E-3;
+        break;
+      case 2212:
+        return 938.27E-3;
+        break;
+        //Oxygen nucleus
+      case 1000080160:
+        return 14.89926;
+        break;
+        //eta
+      case 221:
+        return 547.862E-3;
+        break;
+        //K^0 (s or l)
+      case 311:
+      case 130:
+      case 310:
+        return 497.611E-3;
+        break;
+      case 321:
+        return 493.677E-3;
+        break;
+        // Lambda baryon
+      case 3122:
+        return 1115.683E-3;
+        break;
+      case 12:
+      case 14:
+      case 16:
+        return 0.0;
+        break;
+      default:
+        MACH3LOG_ERROR("Haven't got a saved mass for PDG: {}", PDG);
+        MACH3LOG_ERROR("Please implement me!");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    } // End switch
+    MACH3LOG_ERROR("Warning, didn't catch a saved mass");
+    return 0;
   }
+  // ***************************
 
-  return filename;
-}
-/// @brief DB Get the Cernekov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG);
-
-double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
-double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
-
-
-enum CUDAProb_nu {
-  e_e = 0,
-  e_m = 1,
-  e_t = 2,
-  m_e = 3,
-  m_m = 4,
-  m_t = 5,
-  t_e = 6,
-  t_m = 7,
-  t_t = 8
-};
- 
-
-// ************************************************
-/// @brief Get CUDAProb3 flavour from intital and final states
-inline CUDAProb_nu GetCUDAProbFlavour(int nu_i, int nu_f) {
-//*************************************************  
-    
-  switch (abs(nu_i)) {
-  case 1:
-    switch (abs(nu_f)) {
-    case 1:
-      return CUDAProb_nu::e_e;
-      break;
-    case 2:
-      return CUDAProb_nu::e_m;
-      break;
-    case 3:
-      return CUDAProb_nu::e_t;
-      break;
-	default:
-	  std::cout << "Unknow flavour " << nu_f << std::endl;
-	  throw;
-    } 
-  case 2:
-    switch (abs(nu_f)) {
-    case 1:
-      return CUDAProb_nu::m_e;
-      break;
-    case 2:
-      return CUDAProb_nu::m_m;
-      break;
-    case 3:
-      return CUDAProb_nu::m_t;
-      break;
-	default:
-	  std::cout << "Unknow flavour " << nu_f << std::endl;
-	  throw;
-    } 
-  case 3:
-    switch (abs(nu_f)) {
-    case 1:
-      return CUDAProb_nu::t_e;
-      break;
-    case 2:
-      return CUDAProb_nu::t_m;
-      break;
-    case 3:
-      return CUDAProb_nu::t_t;
-      break;
-	default:
-	  std::cout << "Unknow flavour " << nu_f << std::endl;
-	  throw;
+  // ***************************
+  /// @brief Convert from PDG flavour to NuOscillator type
+  /// beware that in the case of anti-neutrinos the NuOscillator
+  /// type simply gets multiplied by -1
+  inline int PDGToNuOscillatorFlavour(int NuPdg){
+    int NuOscillatorFlavour = _BAD_INT_;
+    switch(std::abs(NuPdg)){
+      case NuPDG::kNue:
+        NuOscillatorFlavour = NuOscillator::kElectron;
+        break;
+      case NuPDG::kNumu:
+        NuOscillatorFlavour = NuOscillator::kMuon;
+        break;
+      case NuPDG::kNutau:
+        NuOscillatorFlavour = NuOscillator::kTau;
+        break;
+      default:
+        MACH3LOG_ERROR("Unknown Nuetrino PDG {}, cannot convert to NuOscillator type", NuPdg);
+        break;
     }
-  default:
-	std::cout << "Unknow flavour " << nu_i << std::endl;
-	throw;
-  }
 
-}
+    //This is very cheeky but if the PDG is negative then multiply the PDG by -1
+    // This is consistent with the treatment that NuOscillator expects as enums only
+    // exist for the generic matter flavour and not the anti-matter version
+    if(NuPdg < 0){NuOscillatorFlavour *= -1;}
+
+    return NuOscillatorFlavour;
+  }
+  // ***************************
+
+  /// @brief DB Anything added here must be of the form 2^X, where X is an integer
+  /// @warning DB Used to contain which DetIDs are supported
+  static const std::unordered_map<int,int>KnownDetIDsMap({
+    {0,1},    //ND
+    {1,8},    //FD
+    {2,16},   //SK1Rmu
+    {3,32},   //Nova
+    {4,64},   //Atm SubGeV e-like
+    {5,128},  //Atm SubGeV mu-like
+    {6,256},  //Atm MultiGeV e-like
+    {7,512},  //Atm MultiGeV mu-like
+  });
+  static const int nKnownDetIDs = int(KnownDetIDsMap.size());
+
+} // end MaCh3Utils namespace

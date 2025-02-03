@@ -1,4 +1,4 @@
-## Plotting
+# Plotting
 
 This directory contains the core MaCh3 plotting tools. `plottingUtils` contains all the code defining the plotting library, the majority of which basically consists of a highly flexible root file reader which can be configured by different experiments to read from their MaCh3 output files and put everything in a nice common format that can then be accessed in plotting applications and allows for easy iteration over parameters and samples. It is also possible to configure the plotting library to be able to read files from other fitters, which is especially useful for cross-fitter validations (a task that tends to take up a lot of time during an analsis). The aim here is to avoid having to have vast numbers of un-maintained plotting scripts for dealing with every possible combination of fitter and analysis iteration and instead maintain this core code and allow experiments to simply maintain their own config files.
 
@@ -26,7 +26,7 @@ The goal with MaCh3s plotting library is to be as flexible as possible and to ab
 
 The plotting library comes with a python interface (see [here](https://github.com/mach3-software/MaCh3/blob/develop/README.md#python) for installation details). Once installed, you can simply import the plotting submodule as follows:
 
-```
+```python
 from pyMaCh3 import plotting
 ```
 
@@ -34,7 +34,7 @@ from pyMaCh3 import plotting
 
 A very basic example that will plot LLH scans is:
 
-```
+```python
 from pyMaCh3 import plotting
 import matplotlib.backends.backend_pdf
 from matplotlib import pyplot as plt
@@ -86,3 +86,6 @@ options:
     -o the name of the output pdf
 
     -d a string specifying additional drawing options to pass to the histogram draw calls, e.g. `-d "C"` will plot smooth curves through the histogram bins. See https://root.cern/doc/master/classTHistPainter.html#HP01a for possible options.
+
+
+**MatrixPlotter** - As input you need output from `ProcessMCMC`, keep in mind you need to run it with `PlotCorr`. The executable allows to plot submatrices and whatever combination of parameters you like.

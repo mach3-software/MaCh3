@@ -1,3 +1,13 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// C++ includes
+#include <unistd.h>
+
 // ROOT includes
 #include "TList.h"
 #include "TFile.h"
@@ -7,50 +17,82 @@
 #include "TFileMerger.h"
 #include "TKey.h"
 #include "TROOT.h"
+#pragma GCC diagnostic pop
 
 // MaCh3 includes
 #include "manager/manager.h"
+
+/// @file CombineMaCh3Chains
+/// @author Ewan Miller
+/// @author Kamil Skwarczynski
 
 std::string OutFileName = "";
 int targetCompression = 1;
 std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
+bool forceMerge = false;
+
+/// @brief KS: This allow us to skip output name etc in config. We expect Output name will be different but this doesn't invalidate chain merging
+bool ShouldSkipLine(const std::string& line, const std::vector<std::string>& SkipVector) {
+  // Otherwise, check if the line contains any word from SkipVector
+  for (const auto& word : SkipVector) {
+    MACH3LOG_TRACE("{} : {}",line, word);
+    if (line.find(word) != std::string::npos) {
+      MACH3LOG_TRACE("Found matching word, therefore Skipping");
+      return true;
+    }
+  }
+  return false;
+}
+
+bool CompareTwoConfigs(const std::string& File1, const std::string& File2, const std::vector<std::string>& SkipVector) {
+  std::istringstream file1(File1);
+  std::istringstream file2(File2);
+
+  std::string line1, line2;
+  int lineNumber = 1;
+  bool areEqual = true;
+
+  while (std::getline(file1, line1) && std::getline(file2, line2)) {
+    if (ShouldSkipLine(line1, SkipVector) || ShouldSkipLine(line2, SkipVector)) {
+      ++lineNumber;
+      continue;
+    }
+    if (line1 != line2) {
+      areEqual = false;
+      MACH3LOG_WARN("Difference found on line {}:", lineNumber);
+      MACH3LOG_WARN("Config1: {}", line1);
+      MACH3LOG_WARN("Config2: {}", line2);
+    }
+    ++lineNumber;
+  }
+  // Check if one file has extra lines
+  while (std::getline(file1, line1)) {
+    MACH3LOG_WARN("Extra line in {} on line {}: {}", File1, lineNumber, line1);
+    ++lineNumber;
+  }
+  while (std::getline(file2, line2)) {
+    MACH3LOG_WARN("Extra line in {} on line {}: {}", File2, lineNumber, line2);
+    ++lineNumber;
+  }
+  return areEqual;
+}
 
 /// EM: Will compare the version header contained in the two provided files and shout if they don't match
-bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName)
+bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName, const std::vector<std::string>& SkipVector = {})
 {
   bool weirdFile = false;
 
-  TMacro *versionHeader = (TMacro*)file->Get(ConfigName.c_str());
-  TMacro *prevVersionHeader = (TMacro*)prevFile->Get(ConfigName.c_str());
+  TMacro *versionHeader = file->Get<TMacro>(ConfigName.c_str());
+  TMacro *prevVersionHeader = prevFile->Get<TMacro>(ConfigName.c_str());
 
   // EM: compare the digest of the version header file in this file, with the previous one
-  if((versionHeader == NULL) && (prevVersionHeader == NULL)){
-    MACH3LOG_WARN("files don't contain an embedded version header, indicating they were made before this feature was added");
-    MACH3LOG_WARN("  I can still combine them but I can't guarantee they were made with matching software versions");
-    MACH3LOG_WARN("  This is ok but you'll just have to be extra careful and make sure you check this yourself!");
-  }
-  else if((versionHeader != NULL) && (prevVersionHeader == NULL)){
-    MACH3LOG_ERROR("looks like file {} has a version header file but previous ones do not", file->GetName());
-    MACH3LOG_ERROR("This is odd and suggests this file was made with an MaCh3 version");
-    MACH3LOG_ERROR("from after this feature was added, whereas other files were made with an older MaCh3");
+  if(!CompareTwoConfigs(TMacroToString(*versionHeader), TMacroToString(*prevVersionHeader), SkipVector)){
+    MACH3LOG_ERROR("Looks like the {} embedded config for file {} is different to the previous ones", ConfigName, file->GetName());
+    MACH3LOG_ERROR("This strongly suggests that this file was made with different software versions than the previous ones");
     weirdFile = true;
   }
-  else if((versionHeader == NULL) && (prevVersionHeader != NULL)){
-    MACH3LOG_ERROR("looks like file {} doesn't have a version header file but previous ones do", file->GetName());
-    MACH3LOG_ERROR("This is odd and suggests this file was made with an MaCh3 version");
-    MACH3LOG_ERROR("from before this feature was added, whereas other files were made with newer MaCh3");
-    weirdFile = true;
-  }
-  else{
-    MACH3LOG_DEBUG("  Prev header digest: {} :: current: {}", (prevVersionHeader->Checksum())->AsString(), (versionHeader->Checksum())->AsString());
 
-    if(std::strcmp((versionHeader->Checksum())->AsString(), (prevVersionHeader->Checksum())->AsString()) != 0){
-      MACH3LOG_ERROR("Looks like the version header for file {} is different to the previous ones", file->GetName());
-      MACH3LOG_ERROR("This strongly suggests that this file was made with different software versions than the previous ones");
-      weirdFile = true;
-    }
-  }
   return weirdFile;
 }
 
@@ -58,12 +100,12 @@ void CopyDir(TDirectory *source) {
   //copy all objects and subdirs of directory source as a subdir of the current directory
   source->ls();
   TDirectory *savdir = gDirectory;
-  TDirectory *adir = (TDirectory*)savdir->Get(source->GetName());
+  TDirectory *adir = savdir->Get<TDirectory>(source->GetName());
   adir->cd();
   //loop on all entries of this directory
   TKey *key;
   TIter nextkey(source->GetListOfKeys());
-  while ((key = (TKey*)nextkey())) {
+  while ((key = static_cast<TKey*>(nextkey()))) {
     const char *classname = key->GetClassName();
     TClass *cl = gROOT->GetClass(classname);
     if (!cl) continue;
@@ -74,7 +116,7 @@ void CopyDir(TDirectory *source) {
       CopyDir(subdir);
       adir->cd();
     } else if (cl->InheritsFrom("TTree")) {
-      TTree *T = (TTree*)source->Get(key->GetName());
+      TTree *T = source->Get<TTree>(key->GetName());
       adir->cd();
       TTree *newT = T->CloneTree();
       newT->Write();
@@ -136,20 +178,16 @@ void CombineChain()
     MACH3LOG_DEBUG("############ File {} #############", fileId);
 
     bool weirdFile = false;
+    if(checkSoftwareVersions(file, prevFile, "MaCh3Engine/version_header")) weirdFile = true;
+    if(checkSoftwareVersions(file, prevFile, "MaCh3_Config", {"OutputFile:", "NSteps:"})) weirdFile = true;
 
-
-    if(checkSoftwareVersions(file, prevFile, "MaCh3Engine/version_header"))
-        weirdFile = true;
-
-    if(checkSoftwareVersions(file, prevFile, "MaCh3_Config"))
-      weirdFile = true;
-
-    if(weirdFile){
+    if(weirdFile && !forceMerge){
       MACH3LOG_ERROR("");
       MACH3LOG_ERROR("=====================================================================================");
       MACH3LOG_ERROR("This is not a great idea and could lead to weird outputs and cause some big headaches");
       MACH3LOG_ERROR("further down the road. But if you reeeeally wanna do it and you know what you're");
       MACH3LOG_ERROR("doing you can come here and remove the 'throw'");
+      MACH3LOG_ERROR("Or use -m option");
       MACH3LOG_ERROR("{}:{}", __FILE__, __LINE__ + 2);
       MACH3LOG_ERROR("=====================================================================================");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -165,7 +203,7 @@ void CombineChain()
   outputFile->cd();
 
   // EM: write out the version and config files to the combined file
-  TMacro *MaCh3_Config = (TMacro*)prevFile->Get("MaCh3_Config");
+  TMacro *MaCh3_Config = prevFile->Get<TMacro>("MaCh3_Config");
 
   if(MaCh3_Config != NULL) MaCh3_Config->Write();
   delete MaCh3_Config;
@@ -174,8 +212,7 @@ void CombineChain()
   bool mergeSuccess = fileMerger->PartialMerge(TFileMerger::kRegular | TFileMerger::kAll | TFileMerger::kOnlyListed);
   if(mergeSuccess){
     MACH3LOG_INFO("Files merged successfully");
-  }
-  else{
+  } else{
     MACH3LOG_ERROR("Failed to merge files");
   }
   delete fileMerger;
@@ -184,15 +221,14 @@ void CombineChain()
   outputFile = new TFile(OutFileName.c_str(), "UPDATE");
 
   // Get the source directory
-  TDirectory *MaCh3EngineDir = (TDirectory*)prevFile->Get("MaCh3Engine");
-  TDirectory *CovarianceFolderDir = (TDirectory*)prevFile->Get("CovarianceFolder");
+  TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");
+  TDirectory *CovarianceFolderDir = prevFile->Get<TDirectory>("CovarianceFolder");
 
   outputFile->cd();
   CopyDir(MaCh3EngineDir);
   CopyDir(CovarianceFolderDir);
 
   delete prevFile;
-
   MACH3LOG_INFO("Done!");
 }
     
@@ -204,6 +240,7 @@ void usage(){
   MACH3LOG_INFO("output file    : name of combined spline file. optional: if not specified, the app will just use the first input file as the output, the same as hadd'");
   MACH3LOG_INFO("-c             : target compression level for the combined file, default is 1, in line with hadd");
   MACH3LOG_INFO("-f             : force overwrite the output file if it exists already");
+  MACH3LOG_INFO("-m             : merge files in-spite of differences");
   MACH3LOG_INFO("-h             : print this message and exit");
 }
 
@@ -242,6 +279,10 @@ void ParseArg(int argc, char *argv[]){
           targetCompression = atoi(optarg);
           break;
         }
+        case 'm': {
+          forceMerge = true;
+          break;
+        }
         case 'h': {
           usage();
           exit(0);
@@ -264,7 +305,6 @@ void ParseArg(int argc, char *argv[]){
   if(forceOverwrite){
     MACH3LOG_INFO("Will overwrite {} if it exists already", OutFileName.c_str());
   }
-
   MACH3LOG_INFO("Combining a total of {} files into {}", inpFileList.size(), OutFileName.c_str());
 }
 

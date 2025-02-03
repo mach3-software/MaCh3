@@ -1,0 +1,18 @@
+# Add random meme whenever PR is opened
+name: "Random Meme"
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  test:
+    name: setup environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Memes
+        uses: deep5050/memes-on-issues-action@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_msg: 'Hi {{author}}, thank you for contributing to MaCh3! Please wait for MaCh3 developers to review your PR. If no one answers within a week, please message people from this list: https://github.com/orgs/mach3-software/teams/mach3admin . While waiting, please enjoy this {{meme}}'
+

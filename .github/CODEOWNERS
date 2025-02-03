@@ -10,6 +10,8 @@
 # Inspired by ROOT
 #   - https://github.com/root-project/root/blob/master/.github/CODEOWNERS
 
+* @kskwarczynski
+
 /cmake/* @kskwarczynski
 **/CMakeLists.txt @kskwarczynski
 
@@ -22,6 +24,7 @@
 /mcmc/* @kskwarczynski
 
 /samplePDF/samplePDFFDBase* @edatkin @dbarrow257
+/splines/splineFDBase* @edatkin @dbarrow257
 
 /plotting/* @ewanwm
 *.py @henry-wallace-phys @ewanwm

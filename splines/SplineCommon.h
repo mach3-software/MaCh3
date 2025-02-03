@@ -6,13 +6,15 @@
 /// @details This file includes macros and enums for defining spline coefficients.
 /// It is designed to be compatible with older CUDA versions, so be cautious
 /// when adding new features or including other headers.
+/// @author Clarence Wret
+/// @author Kamil Skwarczynski
 
 #ifndef _BAD_SPLINE_
 #define _BAD_SPLINE_ 123456789
 #endif
 
 /// KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
-#define _nCoeff_ 4
+#define _nCoeff_  4
 /// KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track
 #define _nTF1Coeff_ 2
 
@@ -24,7 +26,6 @@ enum SplineSegmentCoeffs
   kCoeffC = 2, ///< Coefficient C
   kCoeffD = 3  ///< Coefficient D
 };
-
 
 // *******************
 /// @brief KS: Struct storing information for spline monolith

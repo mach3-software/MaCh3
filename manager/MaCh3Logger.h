@@ -9,7 +9,10 @@
 #include <functional>
 #include <string>
 
-//KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284
+#include <exception>
+
+/// @file MaCh3Logger.h
+/// @brief KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284
 
 #define MACH3LOG_TRACE SPDLOG_TRACE
 #define MACH3LOG_DEBUG SPDLOG_DEBUG
@@ -60,26 +63,52 @@ template <typename Func, typename LogFunc, typename... Args>
 void LoggerPrint(const std::string& LibName, LogFunc logFunction, Func&& func, Args&&... args)
 {
   // Create a stringstream to capture the output
-  std::stringstream sss;
+  std::stringstream sss_cout;
+  std::stringstream sss_cerr;
+  
   // Save the original stream buffers
-  std::streambuf* coutBuf = std::cout.rdbuf();
-  std::streambuf* cerrBuf = std::cerr.rdbuf();
+  std::streambuf* coutBuf = nullptr;
+  std::streambuf* cerrBuf = nullptr;
 
-  // Redirect std::cout and std::cerr to the stringstream buffer
-  std::cout.rdbuf(sss.rdbuf());
-  std::cerr.rdbuf(sss.rdbuf());
+  // This should be rare but in case buffers no longer exist ignore
+  if (std::cout.rdbuf() && std::cerr.rdbuf()) {
+    coutBuf = std::cout.rdbuf();  // Save original cout buffer
+    cerrBuf = std::cerr.rdbuf();  // Save original cerr buffer
 
-  // Call the provided function
-  func(std::forward<Args>(args)...);
+    // Redirect std::cout and std::cerr to the stringstream buffer
+    std::cout.rdbuf(sss_cout.rdbuf());
+    std::cerr.rdbuf(sss_cerr.rdbuf());
+  }
 
-  // Restore the original stream buffers
-  std::cout.rdbuf(coutBuf);
-  std::cerr.rdbuf(cerrBuf);
+  try {
+    // Call the provided function
+    func(std::forward<Args>(args)...);
 
-  std::string line;
-  while (std::getline(sss, line))
-  {
-    auto formatted_message = fmt::format("[{}] {}", LibName, line);
-    logFunction(formatted_message);
+    // Restore the original stream buffers
+    if (coutBuf) std::cout.rdbuf(coutBuf);
+    if (cerrBuf) std::cerr.rdbuf(cerrBuf);
+
+    std::string line;
+    while (std::getline(sss_cout, line))
+    {
+      auto formatted_message = fmt::format("[{}] {}", LibName, line);
+      logFunction(formatted_message);
+    }
+    while (std::getline(sss_cerr, line))
+    {
+      auto formatted_message = fmt::format("[{}] {}", LibName, line);
+      logFunction(formatted_message);
+    }
+  } catch (std::runtime_error &err) {
+    // Restore the original buffers in case of an exception
+    std::cout.rdbuf(coutBuf);
+    std::cerr.rdbuf(cerrBuf);
+
+    std::cout << "\nConsole cout output:" << std::endl;
+    std::cout << sss_cout.rdbuf()->str() << std::endl;
+
+    std::cout << "\nConsole cerr output:" << std::endl;
+    std::cout << sss_cerr.rdbuf()->str() << std::endl;
+    throw;
   }
 }

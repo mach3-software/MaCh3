@@ -1,12 +1,19 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+// ROOT include
 #include "TFile.h"
+#pragma GCC diagnostic pop
 
 #include "manager/manager.h"
 
 // *************************
 manager::manager(std::string const &filename)
-    : config(YAML::LoadFile(filename)) {
+    : config(M3OpenConfig(filename)) {
 // *************************
-
   FileName = filename;
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -16,29 +23,8 @@ manager::manager(std::string const &filename)
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);
 
-  if (config["LikelihoodOptions"])
-  {
-    std::string likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston");
-    if (likelihood == "Barlow-Beeston")                 mc_stat_llh = TestStatistic(kBarlowBeeston);
-    else if (likelihood == "IceCube")                   mc_stat_llh = TestStatistic(kIceCube);
-    else if (likelihood == "Poisson")                   mc_stat_llh = TestStatistic(kPoisson);
-    else if (likelihood == "Pearson")                   mc_stat_llh = TestStatistic(kPearson);
-    else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = TestStatistic(kDembinskiAbdelmottele);
-    else {
-      MACH3LOG_ERROR("Wrong form of test-statistic specified!");
-      MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
-      for(int i = 0; i < kNTestStatistics; i++)
-      {
-        MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
-      }
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-  } else {
-    mc_stat_llh = kPoisson;
-  }
-
   Modes = nullptr;
-  std::string ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null");
+  auto ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null", __FILE__ , __LINE__);
   if(ModeInput != "null") Modes = new MaCh3Modes(ModeInput);
 }
 
@@ -46,9 +32,7 @@ manager::manager(std::string const &filename)
 // Empty destructor, for now...
 manager::~manager() {
 // *************************
-
   if(!Modes) delete Modes;
-
 }
 
 // *************************
@@ -57,21 +41,18 @@ manager::~manager() {
 // Outputfile is the TFile pointer we write to
 void manager::SaveSettings(TFile* const OutputFile) {
 // *************************
-
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
 
   // EM: embed the config used for this app
-  TMacro MaCh3Config("MaCh3_Config", "MaCh3_Config");
-  MaCh3Config.ReadFile(FileName.c_str());
-  MaCh3Config.Write();
+  TMacro ConfigSave = YAMLtoTMacro(config, "MaCh3_Config");
+  ConfigSave.Write();
 
   // The Branch!
   TTree *SaveBranch = new TTree("Settings", "Settings");
 
   // Fill the doubles
   SaveBranch->Branch("Output", &OutputFilename);
-  SaveBranch->Branch("TestStatistic", &mc_stat_llh);
 
   // Get settings defined by pre-processor directives, e.g. CPU MP and GPU
   #ifdef MULTITHREAD
@@ -101,8 +82,36 @@ void manager::SaveSettings(TFile* const OutputFile) {
 // *************************
 void manager::Print() {
 // *************************
-
   MACH3LOG_INFO("---------------------------------");
-  std::cout << config << "\n";
+  MaCh3Utils::PrintConfig(config);
   MACH3LOG_INFO("---------------------------------");
 }
+
+// *************************
+int manager::GetMCStatLLH() {
+// *************************
+  int mc_stat_llh;
+  if (config["LikelihoodOptions"])
+  {
+    auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston", __FILE__ , __LINE__);
+    if (likelihood == "Barlow-Beeston")                 mc_stat_llh = kBarlowBeeston;
+    else if (likelihood == "IceCube")                   mc_stat_llh = kIceCube;
+    else if (likelihood == "Poisson")                   mc_stat_llh = kPoisson;
+    else if (likelihood == "Pearson")                   mc_stat_llh = kPearson;
+    else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = kDembinskiAbdelmottele;
+    else {
+      MACH3LOG_ERROR("Wrong form of test-statistic specified!");
+      MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
+      for(int i = 0; i < kNTestStatistics; i++)
+      {
+        MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
+      }
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  } else {
+    mc_stat_llh = kPoisson;
+  }
+  return mc_stat_llh;
+}
+
+

@@ -1,0 +1,23 @@
+name: Create MaCh3 Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release pushed tag
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+              --repo="${{ github.repository }}" \
+              --title="${{ github.ref_name }}" \
+              --generate-notes

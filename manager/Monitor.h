@@ -7,18 +7,29 @@
 #include <vector>
 #include <cstdlib>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT include
 #include "TTree.h"
 #include "TBranch.h"
 #include "TMacro.h"
 #include "TChain.h"
 #include "TStopwatch.h"
+#pragma GCC diagnostic pop
 
 // MaCh3 includes
 #include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"
 #include "manager/MaCh3Exception.h"
 #include "manager/YamlHelper.h"
+
+/// @file Monitor.h
+/// @brief System and monitoring utilities for printing system information and status updates.
+/// @author Kamil Skwarczynski
 
 namespace MaCh3Utils {
   /// @brief KS: Prints welcome message with MaCh3 logo
@@ -32,16 +43,16 @@ namespace MaCh3Utils {
   /// @brief KS: Convoluted code to grab output from terminal to string
   /// @param cmd The terminal command to execute.
   /// @return The output of the terminal command as a string.
-  std::string TerminalToString(const char* cmd);
+  std::string TerminalToString(std::string cmd);
   /// @brief KS: Check what CPU you are using
-  void EstimateDataTransferRate(TChain* chain, const int entry);
+  void EstimateDataTransferRate(TChain* chain, const Long64_t entry);
   /// @brief KS: Find out about Disk usage
   void GetDiskUsage();
   /// @brief KS: Simply print progress bar
   /// @param Done The number of tasks completed.
   /// @param All The total number of tasks.
   /// @details This function prints a progress bar to the terminal, indicating the percentage of tasks completed.
-  void PrintProgressBar(const int Done, const int All);
+  void PrintProgressBar(const Long64_t Done, const Long64_t All);
   /// @brief KS: Get version of MaCh3
   /// @return The current MaCh3 version as a string.
   /// @details This function fetches and returns the version of the MaCh3 software being used.
@@ -50,7 +61,7 @@ namespace MaCh3Utils {
   /// @param Type The type of system information to retrieve (e.g., RAM, CPU usage).
   /// @return The requested system information as an integer.
   /// @details This function fetches system information like RAM usage or other hardware details based on the specified type.
-  int getValue(std::string Type);
+  int getValue(const std::string& Type);
   /// @brief CW: Get memory, which is probably silly
   /// @param line The line of text to parse.
   /// @return The extracted memory value as an integer.

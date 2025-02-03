@@ -9,11 +9,6 @@
 #include <unistd.h>
 #include <vector>
 
-// ROOT includes
-#include "TColor.h"
-#include "TH1.h"
-#include "TStyle.h"
-
 // MaCh3 Includes
 #include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"
@@ -34,6 +29,7 @@ namespace MaCh3Plotting {
 /// any style options you like from the StyleManager. Also a hopefully not too distant dream is to
 /// wrap this up in python so it is usable in .py scripts to take advantage of nice existing
 /// plotting libraries for e.g. MCMC plotting.
+/// @author Ewan Miller
 class PlottingManager {
 public:
   // EM: cant make these static as std::getenv("MACH3") not known at compile time
@@ -72,21 +68,21 @@ public:
   /// @brief Parse command line arguments.
   /// @param argc The number of command line arguments.
   /// @param argv The arguments themselves.
-  void parseInputs(int argc, char **argv);
+  void parseInputs(int argc, char* const *argv);
 
 
   /// @brief Parse vector of command line arguments.
   /// @details This mainly just exists for the sake of the python binding.
   /// @param argv The arguments to parse.
   inline void parseInputsVec(std::vector<std::string> argv) {
-    std::vector<char*> charVec;
+    std::vector<char *> charVec;
     MACH3LOG_DEBUG("Parsing Inputs :: was given vector:");
     for( const std::string &arg : argv ) 
     {
-      charVec.push_back( (char*)arg.c_str() );
+      charVec.push_back( const_cast<char *>(arg.c_str()) );
       MACH3LOG_DEBUG("  - {}", arg );
     }
-    parseInputs(argv.size(), charVec.data());
+    parseInputs(int(argv.size()), charVec.data());
   }
 
   /// @brief Describe an option you want to add to the PlottingManager which can be read in from the
@@ -146,7 +142,7 @@ public:
 
   const std::vector<std::string> getFileLabels() { return _fileLabels; }
 
-  int getNFiles() { return (int)_fileNames.size(); }
+  size_t getNFiles() { return _fileNames.size(); }
 
   bool getSplitBySample() { return _splitBySample; }
 
