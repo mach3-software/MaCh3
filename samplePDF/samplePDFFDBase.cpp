@@ -1272,11 +1272,11 @@ void samplePDFFDBase::SetupNuOscillator() {
     NuOscProbCalcers = std::vector<OscillatorBase*>(1);
     LoggerPrint("NuOscillator",
 		[](const std::string& message) { MACH3LOG_INFO("{}", message); },
-		[this, iSample, &OscillFactory]() {
+		[this, &OscillFactory]() {
 		  this->NuOscProbCalcers[0] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
 		});
 
-    if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
+    if (!NuOscProbCalcers[0]->EvalPointsSetInConstructor()) {
       MACH3LOG_ERROR("Attempted to use equal binning per oscillation channel, but not binning has been set in the NuOscillator::Oscillator object");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
@@ -1363,7 +1363,7 @@ void samplePDFFDBase::SetupNuOscillator() {
 
 	int Index = 0;
 	if (!EqualBinningPerOscChannel) {
-	  Index = iSample;
+	  Index = static_cast<int>(iSample);
 	}
 	if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
 	  //Atmospherics
