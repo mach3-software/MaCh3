@@ -22,6 +22,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Counter of the accepted # of steps
   accCount = 0;
   step = 0;
+  stepStart = 0;
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
@@ -220,7 +221,7 @@ void FitterBase::SaveOutput() {
   outputFile->cd();
   outTree->Write();
 
-  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step, clock->RealTime(), clock->RealTime() / step);
+  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
   #ifdef DEBUG
   if (debug)
@@ -309,12 +310,15 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-    }
-    if(ConfigCov == nullptr) delete ConfigCov;
 
-    std::vector<double> branch_vals(systematics[s]->GetNumParams());
+      delete ConfigCov;
+    }
+
+    CovarianceFolder->Close();
+    delete CovarianceFolder;
+
+    std::vector<double> branch_vals(systematics[s]->GetNumParams(), _BAD_DOUBLE_);
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      branch_vals[i] = _BAD_DOUBLE_;
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
     }
     posts->GetEntry(posts->GetEntries()-1);
@@ -333,11 +337,14 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
     systematics[s]->printNominalCurrProp();
 
-    CovarianceFolder->Close();
-    delete CovarianceFolder;
+    // Resetting branch adressed to nullptr as we don't want to write into a delected vector out of scope...
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
+    }
   }
   logLCurr = log_val;
 
+  delete posts;
   infile->Close();
   delete infile;
 
