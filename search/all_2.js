@@ -11,6 +11,6 @@ var searchData=
   ['bisection_8',['bisection',['../classPSO.html#af45f4a02f49c33401588a12f667e7380',1,'PSO']]],
   ['branchnames_9',['BranchNames',['../classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a',1,'MCMCProcessor::BranchNames()'],['../GetPenaltyTerm_8cpp.html#a871d6466cea2597401bdb203293f4033',1,'BranchNames():&#160;GetPenaltyTerm.cpp'],['../RHat_8cpp.html#a871d6466cea2597401bdb203293f4033',1,'BranchNames():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#a871d6466cea2597401bdb203293f4033',1,'BranchNames():&#160;RHat_HighMem.cpp']]],
   ['buf_10',['buf',['../classsamplePDFBase.html#a361ce3bc003686a461e7def89ebebfbc',1,'samplePDFBase']]],
-  ['buildsampleindexingarray_11',['BuildSampleIndexingArray',['../classsplineFDBase.html#aaa699bd90abc662ce3af907733b3b704',1,'splineFDBase']]],
+  ['buildsampleindexingarray_11',['BuildSampleIndexingArray',['../classsplineFDBase.html#ac9bcc5253804c4a5ad8e2990490ecfab',1,'splineFDBase']]],
   ['burnincut_12',['BurnInCut',['../classMCMCProcessor.html#a22f82dadceccbe87dd8c5b7daa8432e8',1,'MCMCProcessor']]]
 ];
