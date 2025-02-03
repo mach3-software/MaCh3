@@ -167,13 +167,28 @@ void mcmc::ProposeStep() {
   // Initiate to false
   reject = false;
 
+  bool multicanonical = fitMan->raw()["General"]["MCMC"]["Multicanonical"].as<bool>();
+  double multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
+
   // Propose steps for the oscillation handlers
   if (osc) {
     osc->proposeStep();
 
     // Now get the likelihoods for the oscillation
     osc_llh = osc->GetLikelihood();
-    
+
+    if (multicanonical){
+      std::string deltaCPParamNumber = osc->GetParName(1);
+
+      double delta_cp_value = osc->getParProp(1);
+
+      std::cout << "Delta CP value: " << delta_cp_value << std::endl;
+
+      osc_llh = osc_llh * pow(GetMulticanonicalWeight(delta_cp_value),1-multicanonicalBeta);
+
+    }
+    std::cout << "Oscillation likelihood: " << osc_llh << std::endl;
+
     // Add the oscillation likelihoods to the reconfigure likelihoods
     llh += osc_llh;
 
@@ -240,6 +255,17 @@ void mcmc::ProposeStep() {
 
   // Save the proposed likelihood (class member)
   logLProp = llh;
+}
+
+double mcmc::GetMulticanonicalWeight(double deltacp){
+  double delta_cp_value = deltacp;
+  double delta_cp_log_likelihood;
+
+  // calculate log likelihood according to gaussian around -1/2pi
+  // #####proof of concept#####, this need to be changed to a sensible prior for dcp
+  delta_cp_log_likelihood = -TMath::Log(TMath::Exp(-pow(delta_cp_value + 0.5*TMath::Pi(),2)));
+
+  return delta_cp_log_likelihood;
 }
 
 // *******************

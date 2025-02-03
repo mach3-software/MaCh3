@@ -29,6 +29,9 @@ class mcmc : public FitterBase {
   /// @brief Do we accept the step
   inline void CheckStep();
 
+  /// @brief Get the multicanonical weight for a given delta_cp value
+  double GetMulticanonicalWeight(double kDeltacp);
+
   /// @brief Print the progress
   inline void PrintProgress();
 
