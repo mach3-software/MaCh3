@@ -82,7 +82,7 @@ void samplePDFFDBase::ReadSampleConfig()
   MCSamples.resize(nSamples);
 
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "EqualBinningPerOscChannel")) {
-    MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
+    MACH3LOG_ERROR("NuOsc::EqualBinningPerOscChannel is not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   EqualBinningPerOscChannel = SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"].as<bool>();
