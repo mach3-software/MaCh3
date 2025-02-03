@@ -7,7 +7,6 @@
 
 /// Run low or high memory versions of structs
 /// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
-/// KS: Need more testing on FD
 namespace M3 {
   #ifdef _LOW_MEMORY_STRUCTS_
   /// Custom floating point (float or double)
@@ -21,6 +20,16 @@ namespace M3 {
   using int_t = int;
   using uint_t = unsigned;
   #endif
+
+  /// Function template for fused multiply-add
+  template <typename T>
+  constexpr T fmaf_t(T x, T y, T z) {
+    #ifdef _LOW_MEMORY_STRUCTS_
+    return std::fmaf(x, y, z);
+    #else
+    return std::fma(x, y, z);
+    #endif
+  }
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
