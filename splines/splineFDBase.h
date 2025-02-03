@@ -18,23 +18,23 @@ class splineFDBase : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
 	/// @brief Constructor
-	splineFDBase(covarianceXsec *xsec_ = NULL);
+	splineFDBase(covarianceXsec *xsec_ = nullptr);
 	/// @brief Destructor
 	/// @todo it need some love
 	virtual ~splineFDBase();
-	void SetupSplines();
-	void SetupSplines(int BinningOpt);
 
 	/// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays 
 	/// to store the weights; probably the best one here! Same thing but pass parameter 
 	/// spline segments instead of variations
 	void Evaluate();
 
-	//Spline Monolith things
-	//Essential methods used externally
-	//Move these to splineFDBase in core
-	bool AddSample(std::string SampleName, const std::string& DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames);
-	void TransferToMonolith();	
+	/// @brief add oscillation channel to spline monolith
+	bool AddSample(const std::string& SampleName,
+				   const std::string& DetID,
+				   const std::vector<std::string>& OscChanFileNames,
+				   const std::vector<std::string>& SplineVarNames);
+	void TransferToMonolith();
+	/// @brief Remove setup variables not needed for spline evaluations
 	void cleanUpMemory();
 
 	//Have to define this in your own class 
@@ -51,17 +51,18 @@ class splineFDBase : public SplineBase {
 	int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
 	int getNDim(int BinningOpt);
 	std::string getDimLabel(int BinningOpt, unsigned int Axis);
-	int getSampleIndex(std::string SampleName);
-	bool isValidSplineIndex(std::string SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
+	int getSampleIndex(const std::string& SampleName);
+	bool isValidSplineIndex(const std::string& SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
 
-	void BuildSampleIndexingArray(std::string SampleName);
+	void BuildSampleIndexingArray(const std::string& SampleName);
 	void PrepForReweight();
 	void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
 	void PrintBinning(TAxis* Axis);
-	void PrintSampleDetails(std::string SampleName);
-	void PrintArrayDetails(std::string SampleName);
+	void PrintSampleDetails(const std::string& SampleName);
+	void PrintArrayDetails(const std::string& SampleName);
 	
-	const M3::float_t* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
+	const M3::float_t* retPointer(const int sample, const int oscchan, const int syst, const int mode,
+									const int var1bin, const int var2bin, const int var3bin) const{
 	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
 	  return &weightvec_Monolith[index];
 	}
@@ -84,7 +85,6 @@ class splineFDBase : public SplineBase {
 	std::vector<int> nSplineParams;
 	std::vector<int> nOscChans;
 
-	std::vector< std::vector<int> > SplineParsIndex;
 	std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
 	std::vector< std::vector<std::string> > SplineFileParPrefixNames;
 	/// A vector of vectors of the spline modes that a systematic applies to
@@ -109,7 +109,7 @@ class splineFDBase : public SplineBase {
 	/// @brief Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
 	std::vector<int > coeffindexvec;
-	std::vector<int>uniquecoeffindices; //Unique coefficient indices
+	std::vector<int> uniquecoeffindices; //Unique coefficient indices
 
 	std::vector< TSpline3_red* > splinevec_Monolith;
 

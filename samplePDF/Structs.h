@@ -39,6 +39,45 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
 }
 
 // *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<T>& vec) {
+// *******************
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<std::vector<T>>& vec) {
+// *******************
+  for (auto& innerVec : vec) {
+    innerVec.clear();
+    innerVec.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
+// *******************
+  for (auto& inner2DVec : vec) {
+    for (auto& innerVec : inner2DVec) {
+      innerVec.clear();
+      innerVec.shrink_to_fit();
+    }
+    inner2DVec.clear();
+    inner2DVec.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
 /// @brief KS: This is mad way of converting string to int. Why? To be able to use string with switch
 constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
