@@ -79,6 +79,9 @@ public:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
 
+  /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
+  void SetupKinematicMap();
+
   /// @todo abstract the spline initialisation completely to core
   /// @brief initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up
   virtual void SetupSplines() = 0;
