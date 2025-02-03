@@ -6,23 +6,19 @@
 #include <string>
 #include <cxxabi.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
+// MaCh3 Includes
+#include "manager/MaCh3Exception.h"
+#include "manager/Core.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT Includes
 #include "TMacro.h"
 #include "TList.h"
 #include "TObjString.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 // yaml Includes
 #include "yaml-cpp/yaml.h"
-
-// MaCh3 Includes
-#include "manager/MaCh3Exception.h"
 
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
@@ -312,6 +308,13 @@ Type GetFromManager(const YAML::Node& node, Type defval, const std::string File 
 /// @param Line number where function is called
 inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string& File, const int Line) {
 // **********************
+  // KS: YAML can be dumb and not throw error if you pass toml for example...
+  if (!(filename.length() >= 5 && filename.compare(filename.length() - 5, 5, ".yaml") == 0) &&
+    !(filename.length() >= 4 && filename.compare(filename.length() - 4, 4, ".yml") == 0)) {
+    MACH3LOG_ERROR("Invalid file extension: {}", filename);
+    throw MaCh3Exception(File, Line);
+  }
+
   try {
     return YAML::LoadFile(filename);
   } catch (const std::exception& e) {

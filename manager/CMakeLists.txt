@@ -6,6 +6,7 @@ set(HEADERS
     Monitor.h
     MaCh3Exception.h
     gpuUtils.cuh
+    Core.h
 )
 
 add_library(Manager SHARED

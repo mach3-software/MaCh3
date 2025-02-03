@@ -3,13 +3,11 @@
 #include <iomanip>
 #include <algorithm>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#include "plottingUtils/plottingUtils.h"
+#include "plottingUtils/plottingManager.h"
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
 #include "TGaxis.h"
 #include "TString.h"
@@ -26,10 +24,7 @@
 #include "TCandle.h"
 #include "TFrame.h"
 #include "TGraphAsymmErrors.h"
-#pragma GCC diagnostic pop
-
-#include "plottingUtils/plottingUtils.h"
-#include "plottingUtils/plottingManager.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file GetPostfitParamPlots
 /// This script generates post-fit parameter plots. The central postfit value is

@@ -13,6 +13,20 @@
 #include "manager/manager.h"
 #include "samplePDF/HistogramUtils.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// ROOT includes
+#include "TCanvas.h"
+#include "TLine.h"
+#include "TROOT.h"
+#include "TStyle.h"
+#pragma GCC diagnostic pop
+
 /// @file StatisticalUtils.h
 /// @brief Utility functions for statistical interpretations in MaCh3
 /// @author Kamil Skwarczynski
@@ -156,3 +170,8 @@ double GetPValueFromZScore(const double zScore);
 /// @brief Get the mode error from a TH1D
 /// @param hpost hist from which we extract mode error
 double GetModeError(TH1D* hpost);
+
+/// @brief Calculates the 2D Bayesian p-value and generates a visualization.
+/// @param Histogram A pointer to a TH2D histogram object. The function modifies the histogram's title to include the p-value information.
+/// @warning The canvas is saved to the current ROOT file using `TempCanvas->Write()`.
+void Get2DBayesianpValue(TH2D *Histogram);

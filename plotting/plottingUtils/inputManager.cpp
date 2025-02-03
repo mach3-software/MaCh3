@@ -5,7 +5,7 @@ namespace MaCh3Plotting {
 // this is the constructor with user specified translation config file
 InputManager::InputManager(const std::string &translationConfigName) {
   // read the config file
-  _translatorConfig = YAML::LoadFile(translationConfigName);
+  _translatorConfig = M3OpenConfig(translationConfigName);
 
   MACH3LOG_DEBUG("InputManager: have loaded translation config file");
   

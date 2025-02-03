@@ -1,10 +1,8 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "manager/manager.h"
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TObjArray.h"
 #include "TChain.h"
@@ -20,14 +18,7 @@
 #include "TColor.h"
 #include "TStyle.h"
 #include "TROOT.h"
-#pragma GCC diagnostic pop
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
-// MaCh3 includes
-#include "manager/manager.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file RHat.cpp
 /// @brief This executable calculates the \f$ \hat{R} \f$ estimator for Markov Chain Monte Carlo (MCMC) convergence.

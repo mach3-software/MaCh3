@@ -74,7 +74,7 @@ void ProcessMCMC(const std::string& inputFile)
   // Make the processor)
   auto Processor = std::make_unique<MCMCProcessor>(inputFile);
 
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   const bool PlotCorr = GetFromManager<bool>(Settings["PlotCorr"], false);
@@ -152,7 +152,7 @@ void ProcessMCMC(const std::string& inputFile)
 
 void MultipleProcessMCMC()
 {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   constexpr Color_t PosteriorColor[] = {kBlue-1, kRed, kGreen+2};
@@ -318,7 +318,7 @@ void MultipleProcessMCMC()
 // KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
 void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor)
 {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   std::vector<std::string> ParNames;
@@ -338,7 +338,7 @@ void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor)
 
 void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor)
 {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   std::vector<std::string> ParNames;
@@ -356,7 +356,7 @@ void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor)
 
 void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor)
 {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   std::vector<std::string> ParNames;
@@ -371,7 +371,7 @@ void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor)
 
 void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor)
 {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   std::vector<std::string> ParNames;
@@ -383,7 +383,7 @@ void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor)
 }
 
 void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor) {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   for (const auto& dg : Settings["TrianglePlot"])
@@ -433,7 +433,7 @@ void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, c
   Canvas->Print(Form("Correlation_%s.pdf[", OutName.c_str()), "pdf");
   Canvas->Print(Form("Covariance_%s.pdf[", OutName.c_str()), "pdf");
   
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   const int entries = int(Processor->GetnSteps());
@@ -579,7 +579,7 @@ void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, c
 
 void ReweightPrior(const std::unique_ptr<MCMCProcessor>& Processor)
 {
-  YAML::Node card_yaml = YAML::LoadFile(config.c_str());
+  YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
   const auto& Prior = Settings["PriorReweighting"];

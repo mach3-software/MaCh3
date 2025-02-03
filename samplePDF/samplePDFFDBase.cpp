@@ -29,7 +29,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
-  
+  SampleDetID = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
@@ -72,7 +72,7 @@ void samplePDFFDBase::ReadSampleConfig()
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  SampleDetID = SampleManager->raw()["DetID"].as<int>();
+  SampleDetID = SampleManager->raw()["DetID"].as<std::string>();
 
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
@@ -228,7 +228,7 @@ void samplePDFFDBase::fill2DHist()
 
 // ************************************************
 /// @function samplePDFFDBase::SetupSampleBinning()
-/// @brief Function to setup the binning of your sample histograms and the underlying 
+/// @brief Function to setup the binning of your sample histograms and the underlying
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
@@ -297,44 +297,6 @@ bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
       return false;
     }
   }
-  
-  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
-  return true;
-}
-
-// ************************************************
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr, const int iSample, const int iEvent) {
-// ************************************************
-  double Val;
-  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    if ((Val<SelectionBounds[iSelection][0])||(Val>=SelectionBounds[iSelection][1])) {
-      return false;
-    }
-  }
-  
-  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
-  return true;
-}
-
-// ************************************************
-//Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
-                                      const std::vector< std::vector<double> > &SelectionCuts,
-                                      const int iSample, const int iEvent) {
-// ************************************************
-  
-  double Val;
-  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-    
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
-      return false;
-    }
-    else if(Val < SelectionCuts[iSelection][0] && SelectionCuts[iSelection][1] != -999){
-      return false;
-    }
-  }
   //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
@@ -349,14 +311,14 @@ void samplePDFFDBase::reweight() {
   //You only need to do these things if OscCov has been initialised
   //if not then you're not considering oscillations
   if (OscCov) {
-    std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
-    for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+    std::vector<M3::float_t> OscVec(OscParams.size());
+    for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wuseless-cast"
-      OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
+      OscVec[iPar] = M3::float_t(*OscParams[iPar]);
       #pragma GCC diagnostic pop
     } 
-    for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
+    for (int iSample = 0;iSample < int(MCSamples.size()); ++iSample) {
       NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
     }
   }
@@ -383,7 +345,7 @@ void samplePDFFDBase::fillArray() {
 #else
   //ETA we should probably store this in samplePDFFDBase
   size_t nXBins = int(XBinEdges.size()-1);
-  size_t nYBins = int(YBinEdges.size()-1);
+  //size_t nYBins = int(YBinEdges.size()-1);
 
   PrepFunctionalParameters();
   if(SplineHandler){
@@ -398,14 +360,12 @@ void samplePDFFDBase::fillArray() {
         continue;
       } 
 
-      std::cout << "Event passed selection, here we go!!" << std::endl;
-
       double splineweight = 1.0;
       double normweight = 1.0;
       double totalweight = 1.0;
       
       if(SplineHandler){
-        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+        splineweight = CalcWeightSpline(iSample, iEvent);
       }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
@@ -414,7 +374,7 @@ void samplePDFFDBase::fillArray() {
       }
       
       //Loop over stored normalisation and function pointers 
-      normweight *= CalcXsecWeightNorm(iSample, iEvent);
+      normweight = CalcWeightNorm(iSample, iEvent);
       
       //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (normweight <= 0.){
@@ -551,7 +511,7 @@ void samplePDFFDBase::fillArray_MP()  {
         //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
         if(SplineHandler){
-          splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+          splineweight = CalcWeightSpline(iSample, iEvent);
         }
         //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
         if (splineweight <= 0.){
@@ -559,7 +519,7 @@ void samplePDFFDBase::fillArray_MP()  {
           continue;
         }
 
-        normweight *= CalcXsecWeightNorm(iSample, iEvent);
+        normweight = CalcWeightNorm(iSample, iEvent);
         //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
         if (normweight <= 0.){
           MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -593,7 +553,7 @@ void samplePDFFDBase::fillArray_MP()  {
         int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
 
         //DB Check to see if momentum shift has moved bins
-        //DB - First, check to see if the event is still in the nominal bin	
+        //DB - First, check to see if the event is still in the nominal bin
         if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
           XBinToFill = MCSamples[iSample].NomXBin[iEvent];
         }
@@ -651,7 +611,6 @@ void samplePDFFDBase::fillArray_MP()  {
 }
 #endif
 
-
 // **************************************************
 // Helper function to reset the data and MC histograms
 void samplePDFFDBase::ResetHistograms() {
@@ -670,7 +629,7 @@ void samplePDFFDBase::ResetHistograms() {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) const {
+M3::float_t samplePDFFDBase::CalcWeightSpline(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //DB Xsec syst
@@ -683,7 +642,7 @@ M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int i
 
 // ***************************************************************************
 // Calculate the normalisation weight for one event
-M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) const {
+M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
@@ -730,6 +689,13 @@ void samplePDFFDBase::SetupNormParameters() {
       }
     }
   }
+  // If not debugging let's clear memory
+  #ifndef DEBUG
+  for (size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    MCSamples[iSample].xsec_norms_bins.clear();
+    MCSamples[iSample].xsec_norms_bins.shrink_to_fit();
+  }
+  #endif
 }
 
 // ************************************************
@@ -806,17 +772,15 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
         int bin = (*it).index;
 
-        //If syst on applies to a particular detector
-        if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
-          XsecBins.push_back(bin);
-          MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
-          #ifdef DEBUG
-          VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
-          #endif
-        }
+        XsecBins.push_back(bin);
+        MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
+        #ifdef DEBUG
+        VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
+        #endif
+        //}
       } // end iteration over xsec_norms
     } // end if (xsecCov)
-    fdobj->xsec_norms_bins[iEvent]=XsecBins;
+    fdobj->xsec_norms_bins[iEvent] = XsecBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("Channel {}", iSample);
@@ -1337,6 +1301,8 @@ void samplePDFFDBase::SetupNuOscillator() {
     } // end loop over events
   }// end loop over channels
   delete OscillFactory;
+
+  OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
@@ -1377,9 +1343,9 @@ void samplePDFFDBase::fillSplineBins() {
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       MCSamples[i].xsec_spline_pointers[j].resize(MCSamples[i].nxsec_spline_pointers[j]);
-      for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
+      for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
+        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2],
             EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
       }
     }
@@ -1401,7 +1367,7 @@ double samplePDFFDBase::GetLikelihood() {
   
   double negLogL = 0.;
   #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:negLogL)
+  #pragma omp parallel for collapse(2) reduction(+:negLogL)
   #endif
   for (int xBin = 0; xBin < nXBins; ++xBin)
   {
@@ -1461,7 +1427,6 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
 #else
   fdobj->osc_w_pointer.resize(nEvents, &Unity); 
 #endif
-  fdobj->SampleDetID = -1;
 
   for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
     fdobj->isNC[iEvent] = false;
@@ -1484,7 +1449,6 @@ void samplePDFFDBase::InitialiseSplineObject() {
   }
   
   SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
-  SplineHandler->PrintArrayDimension();
   SplineHandler->CountNumberOfLoadedSplines(false, 1);
   SplineHandler->TransferToMonolith();
 

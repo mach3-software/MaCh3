@@ -1,15 +1,9 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#include "samplePDF/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
 #include "TList.h"
 #include "TObjArray.h"
-#pragma GCC diagnostic pop
-
-#include "samplePDF/HistogramUtils.h"
+_MaCh3_Safe_Include_End_ //}
 
 // **************************************************
 //KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins

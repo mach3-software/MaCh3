@@ -5,6 +5,8 @@ FROM kamilskwarczynski/nukamil:latest AS mach3_build
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
+LABEL compiler="GNU 11.4.1"
+LABEL root_version="v6.30.04"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument

@@ -8,13 +8,11 @@
 #include <complex>
 #include <cstdio>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "mcmc/StatisticalUtils.h"
+#include "samplePDF/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TFile.h"
 #include "TBranch.h"
@@ -38,12 +36,8 @@
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
 #include "TVirtualFFT.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
-
-// MaCh3 includes
-#include "mcmc/StatisticalUtils.h"
-#include "samplePDF/HistogramUtils.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
@@ -348,6 +342,11 @@ class MCMCProcessor {
     /// @cite Dunkley:2004sv
     /// @author Richard Calland
     inline void PowerSpectrumAnalysis();
+
+    /// @brief Get TCanvas margins, to be able to reset them if particular function need different margins
+    std::vector<double> GetMargins(const std::unique_ptr<TCanvas>& Canv) const;
+    /// @brief Set TCanvas margins to specified values
+    void SetMargins(std::unique_ptr<TCanvas>& Canv, const std::vector<double>& margins);
 
     /// Name of MCMC file
     std::string MCMCFile;

@@ -1,14 +1,9 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
+#include "manager/manager.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TFile.h"
-#pragma GCC diagnostic pop
-
-#include "manager/manager.h"
+_MaCh3_Safe_Include_End_ //}
 
 // *************************
 manager::manager(std::string const &filename)

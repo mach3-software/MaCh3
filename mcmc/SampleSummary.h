@@ -88,8 +88,6 @@ class SampleSummary {
     inline void MakeCutLLH();
     // Make the 1D cut distribution and give the 1D p-value
     inline void MakeCutLLH1D(TH1D *Histogram, double llh_ref = -999);
-    /// @brief Make the 2D cut distribution and give the 2D p-value
-    inline void MakeCutLLH2D(TH2D *Histogram);
     /// @brief Make the 1D Event Rate Hist
     inline void MakeCutEventRate(TH1D *Histogram, const double DataRate);
     /// @brief Make the fluctuated histograms (2D and 1D) for the chi2s

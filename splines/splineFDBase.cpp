@@ -1,6 +1,5 @@
 #include "splineFDBase.h"
 #include <memory>
-#include "samplePDF/Structs.h"
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
@@ -29,21 +28,32 @@ splineFDBase::~splineFDBase(){
 //****************************************
 void splineFDBase::cleanUpMemory() {
 //****************************************
-
   //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
   //Not a huge saving but it's better than leaving everything up to the compiler
   MACH3LOG_INFO("Cleaning up spline memory");
+  CleanVector(indexvec);
+  CleanVector(SplineFileParPrefixNames);
+  CleanVector(GlobalSystIndex);
+  CleanVector(SplineModeVecs);
+  CleanVector(UniqueSystNames);
+  CleanVector(SplineInterpolationTypes);
 
-  indexvec.clear();
-  indexvec.shrink_to_fit();
-  SplineFileParPrefixNames.clear();
-  SplineFileParPrefixNames.shrink_to_fit();
+
+
+  for (auto& Binning2D : SplineBinning) {
+    for (auto& Binning1D : Binning2D) {
+      for (TAxis* axis : Binning1D) {
+        delete axis;
+      }
+      Binning1D.clear();
+      Binning1D.shrink_to_fit();
+    }
+    Binning2D.clear();
+    Binning2D.shrink_to_fit();
+  }
   SplineBinning.clear();
   SplineBinning.shrink_to_fit();
-  GlobalSystIndex.clear();
-  GlobalSystIndex.shrink_to_fit();
-  UniqueSystNames.clear();
-  UniqueSystNames.shrink_to_fit();
+
   //Really make sure all the memory is cleared
   for(auto Spline : splinevec_Monolith){
     if(Spline){delete Spline;}
@@ -54,7 +64,10 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std::string> OscChanFileNames, std::vector<std::string> SplineVarNames)
+bool splineFDBase::AddSample(const std::string& SampleName,
+                             const std::string& DetID,
+                             const std::vector<std::string>& OscChanFileNames,
+                             const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
@@ -74,8 +87,6 @@ bool splineFDBase::AddSample(std::string SampleName, int DetID, std::vector<std:
   std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromDetID(DetID);
   // Keep track of this for all samples
   SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
-
-  //std::vector<int> SplineParsIndex_Sample_temp = xsec->GetSplineParsIndexFromDetID(DetID);
 
   std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
@@ -189,7 +200,7 @@ void splineFDBase::TransferToMonolith()
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
-			manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+                      manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
                     }
                   }
                   delete[] tmpXCoeffArr;
@@ -225,23 +236,19 @@ void splineFDBase::Evaluate() {
 // ETA - find the spline segment that the current parameter
 // value is in. This is now extremely similar to the
 // function in SplineMonolith.cpp
-void splineFDBase::FindSplineSegment()
+void splineFDBase::FindSplineSegment() {
 //****************************************
-{
   //HW okay let's try this, we delete+refill a new array which we'll fill with x-s for our segment
-  #ifdef MULTITHREAD
-  #pragma omp parallel //for schedule(dynamic)
-  #endif
-  for (int iSyst = 0; iSyst < nUniqueSysts; iSyst++) {
-    int nPoints = UniqueSystNKnots[iSyst];
-    std::vector<M3::float_t> xArray = UniqueSystXPts[iSyst];
+  for (int iSyst = 0; iSyst < nUniqueSysts; ++iSyst) {
+    const int nPoints = UniqueSystNKnots[iSyst];
+    // KS: By reference to not copy memory like a fool
+    const std::vector<M3::float_t>& xArray = UniqueSystXPts[iSyst];
 
     // Get the variation for this reconfigure for the ith parameter
-    int GlobalIndex = UniqueSystIndices[iSyst];
+    const int GlobalIndex = UniqueSystIndices[iSyst];
+    const M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
 
-    M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
-
-    xVarArray[iSyst]=xvar;
+    xVarArray[iSyst] = xvar;
 
     M3::int_t segment = 0;
     M3::int_t kHigh = M3::int_t(nPoints - 1);
@@ -279,23 +286,6 @@ void splineFDBase::FindSplineSegment()
 
     if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
     UniqueSystCurrSegment[iSyst] = segment; 
-
-    //#ifdef DEBUG
-    //    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
-    //      std::cerr << "Found a segment which is _ABOVE_ the variation!" << std::endl;
-    //      std::cerr << "IT SHOULD ALWAYS BE BELOW! (except when segment 0)" << std::endl;
-    //      std::cerr << "Spline: "<< i << std::endl;
-    //
-    //      std::cerr << "Found segment   = " << segment << std::endl;
-    //      std::cerr << "Doing variation = " << xvar << std::endl;
-    //      std::cerr << "x in spline     = " << SplineInfoArray[i].xPts[segment] << std::endl;
-    //      for (_M3::int_t_ j = 0; j < SplineInfoArray[j].nPts; ++j) {
-    //        std::cerr << "    " << j << " = " << SplineInfoArray[i].xPts[j] << std::endl;
-    //      }
-    //      std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-    //      throw;
-    //    }
-    //#endif
   } //end loop over params
 }
 
@@ -306,51 +296,40 @@ void splineFDBase::CalcSplineWeights()
   #ifdef MULTITHREAD
   #pragma omp parallel for simd
   #endif
-  for (unsigned int iCoeff = 0; iCoeff < uniquecoeffindices.size(); iCoeff++)
+  for (size_t iCoeff = 0; iCoeff < uniquecoeffindices.size(); ++iCoeff)
   {
+    const int iSpline = uniquecoeffindices[iCoeff];
+    const short int uniqueIndex = short(uniquesplinevec_Monolith[iSpline]);
+    const short int currentsegment = short(UniqueSystCurrSegment[uniqueIndex]);
 
-    int iSpline = uniquecoeffindices[iCoeff];
-    short int uniqueIndex=short(uniquesplinevec_Monolith[iSpline]);
-    short int currentsegment=short(UniqueSystCurrSegment[uniqueIndex]);
-
-    int segCoeff = coeffindexvec[iSpline]+currentsegment;
-
+    const int segCoeff = coeffindexvec[iSpline]+currentsegment;
+    const int coeffOffset = segCoeff * 4;
     // These are what we can extract from the TSpline3
-    M3::float_t x = xcoeff_arr[segCoeff];
-    M3::float_t y = manycoeff_arr[(segCoeff)*4+kCoeffY];
-    M3::float_t b = manycoeff_arr[(segCoeff)*4+kCoeffB];
-    M3::float_t c = manycoeff_arr[(segCoeff)*4+kCoeffC];
-    M3::float_t d = manycoeff_arr[(segCoeff)*4+kCoeffD];
+    const M3::float_t x = xcoeff_arr[segCoeff];
+    const M3::float_t y = manycoeff_arr[coeffOffset+kCoeffY];
+    const M3::float_t b = manycoeff_arr[coeffOffset+kCoeffB];
+    const M3::float_t c = manycoeff_arr[coeffOffset+kCoeffC];
+    const M3::float_t d = manycoeff_arr[coeffOffset+kCoeffD];
 
     // Get the variation for this reconfigure for the ith parameter
-    M3::float_t xvar = xVarArray[uniqueIndex];
+    const M3::float_t xvar = xVarArray[uniqueIndex];
     // The Delta(x)
-    M3::float_t dx = xvar - x;
+    const M3::float_t dx = xvar - x;
 
     //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
-    M3::float_t weight = 0;
-#ifdef _LOW_MEMORY_STRUCTS_
-      weight = std::fmaf(dx, std::fmaf(dx, std::fmaf(dx, d, c), b), y);
-#else
-      weight = std::fma(dx, std::fma(dx, std::fma(dx, d, c), b), y);
-#endif
+    M3::float_t weight = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
     //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
-
 
     //ETA - do we need this? We check later for negative weights and I wonder if this is even
     //possible with the fmaf line above?
-    if(weight<0){weight=0;}  //Stops is getting negative weights
+    if(weight < 0){weight = 0.;}  //Stops is getting negative weights
 
-// LP - ignore the diagnostic here as it is only useless if M3::float_t = double
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-    weightvec_Monolith[iSpline] = double(weight);
-#pragma GCC diagnostic pop
+    weightvec_Monolith[iSpline] = weight;
   }
 }
 
 //****************************************
-void splineFDBase::BuildSampleIndexingArray(std::string SampleName)
+void splineFDBase::BuildSampleIndexingArray(const std::string& SampleName)
 //Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector)
 //Only need 1 indexing array everything else interfaces with this to get binning properties
 //****************************************
@@ -525,7 +504,7 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
     { // Loop over oscillation channels
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
       { // Loop over systematics
-   		for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
+        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++)
         { // Loop over modes
           for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++)
           { // Loop over first dimension
@@ -585,8 +564,8 @@ void splineFDBase::PrepForReweight() {
       std::string SystName = SplineFileParPrefixNames[iSample][iSyst];
       bool FoundSyst = false;
 
-	  //ETA - this always seems to be empty to begin with??
-	  //so this loop never gets used?
+      //ETA - this always seems to be empty to begin with??
+      //so this loop never gets used?
       for (unsigned int iFoundSyst = 0; iFoundSyst < UniqueSystNames.size(); iFoundSyst++)
       {
         if (SystName == UniqueSystNames[iFoundSyst])
@@ -641,10 +620,10 @@ void splineFDBase::PrepForReweight() {
             break;
           }
         }//osc loop end
-	//ETA - only push back unique name if a non-flat response has been found
-	if(FoundNonFlatSpline){
-	  UniqueSystNames.push_back(SystName);
-	}
+        //ETA - only push back unique name if a non-flat response has been found
+        if(FoundNonFlatSpline){
+          UniqueSystNames.push_back(SystName);
+        }
 
         if (!FoundNonFlatSpline)
         {
@@ -675,7 +654,7 @@ void splineFDBase::PrepForReweight() {
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
       UniqueSystXPts[iSpline][iKnot] = xPoint;
     }
-	//ETA - let this just be set as the first segment by default
+    //ETA - let this just be set as the first segment by default
     UniqueSystCurrSegment[iSpline] = 0;
     xVarArray[iSpline]=0;
   }
@@ -742,10 +721,10 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray,
     }
   }
 
-  for(int i=0; i<nPoints; i++){
+  for(int i=0; i<nPoints; i++) {
     // Spline coefficients to be
-	// M3::float_t type is defined by the LOW_MEMORY_STRUCTS compiler flag
-	// so M3::float_t can be double or float depending on this
+    // M3::float_t type is defined by the LOW_MEMORY_STRUCTS compiler flag
+    // so M3::float_t can be double or float depending on this
     M3::float_t x = M3::float_t(-999.99);
     M3::float_t y = M3::float_t(-999.99);
     M3::float_t b = M3::float_t(-999.99);
@@ -753,8 +732,8 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray,
     M3::float_t d = M3::float_t(-999.99);
     splinevec_Monolith[splineindex]->GetCoeff(i, x, y, b, c, d);
 
-	// Store the coefficients for each knot contiguously in memory
-	// 4 because manyArray stores y,b,c,d
+    // Store the coefficients for each knot contiguously in memory
+    // 4 because manyArray stores y,b,c,d
     xArray[i] = x;
     manyArray[i*4] = y; 
     manyArray[i*4+1] = b;
@@ -782,7 +761,7 @@ std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 }
 
 //Returns sample index in 
-int splineFDBase::getSampleIndex(std::string SampleName){
+int splineFDBase::getSampleIndex(const std::string& SampleName){
   int SampleIndex = -1;
   for (unsigned int iSample = 0; iSample < SampleNames.size(); iSample++)
   {
@@ -800,7 +779,7 @@ int splineFDBase::getSampleIndex(std::string SampleName){
 }
 
 //****************************************
-void splineFDBase::PrintSampleDetails(std::string SampleName)
+void splineFDBase::PrintSampleDetails(const std::string& SampleName)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
@@ -813,59 +792,33 @@ void splineFDBase::PrintSampleDetails(std::string SampleName)
 }
 
 //****************************************
-void splineFDBase::PrintArrayDetails(std::string SampleName)
+void splineFDBase::PrintArrayDetails(const std::string& SampleName)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
   int nOscChannels = int(indexvec[iSample].size());
-  MACH3LOG_INFO("Sample {} has {} oscillation channels", iSample, nOscChannels);	
+  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleName, nOscChannels);	
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
     int nSysts = int(indexvec[iSample][iOscChan].size());
     MACH3LOG_INFO("Oscillation channel {} has {} systematics", iOscChan, nSysts);	  
   }
-}
 
-//****************************************
-void splineFDBase::PrintArrayDimension() {
-//****************************************
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
-  MACH3LOG_INFO("Array dimensions..");
-  MACH3LOG_INFO("{:<20}{}", "nSamples:", indexvec.size());
-
-  MACH3LOG_INFO("{:<20}", "nOscChans:");
-  std::string oscChans;
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
-    oscChans += fmt::format("{} ", indexvec[iSample].size());
-  }
-  MACH3LOG_INFO("{}", oscChans);
-
-  MACH3LOG_INFO("{:<20}", "nSysts:");
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
-    std::string systs = fmt::format("\tSample: {}\t", iSample);
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
-      systs += fmt::format("{} ", indexvec[iSample][iOscChan].size());
+  MACH3LOG_INFO("Printing no. of modes affected by each systematic for each oscillation channel");
+  for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+    std::string modes = fmt::format("OscChan: {}\t", iOscChan);
+    for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
+      modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
     }
-    MACH3LOG_INFO("{}", systs);
-  }
-
-  MACH3LOG_INFO("{:<20}", "nModes:");
-  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
-    MACH3LOG_INFO("\tSample: {}\t--------------------------", iSample);
-    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
-      std::string modes = fmt::format("\t\tOscChan: {}\t", iOscChan);
-      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
-        modes += fmt::format("{} ", indexvec[iSample][iOscChan][iSyst].size());
-      }
-      MACH3LOG_INFO("{}", modes);
-    }
-    MACH3LOG_INFO("");  // Empty line for spacing
+    MACH3LOG_INFO("{}", modes);
   }
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 }
+
 //****************************************
-bool splineFDBase::isValidSplineIndex(std::string SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
+bool splineFDBase::isValidSplineIndex(const std::string& SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
 {
   int iSample=getSampleIndex(SampleName);

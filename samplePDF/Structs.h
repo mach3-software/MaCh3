@@ -1,76 +1,16 @@
 #pragma once
 
-/// Run low or high memory versions of structs
-/// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
-/// KS: Need more testing on FD
-namespace M3 {
-#ifdef _LOW_MEMORY_STRUCTS_
-/// Custom floating point (float or double)
-using float_t = float;
-/// Custom integer (int or short int)
-using int_t = short;
-/// Custom unsigned integer (unsigned short int or unsigned int)
-using uint_t = unsigned short;
-#else
-using float_t = double;
-using int_t = int;
-using uint_t = unsigned;
-#endif
-}
-
-/// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
-//#define SafeException
-#ifndef SafeException
-#define _noexcept_ noexcept
-#else
-#define _noexcept_
-#endif
-
-/// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
-#ifndef DEBUG
-#define _restrict_ __restrict__
-#else
-#define _restrict_
-#endif
-
-/// Number of overflow bins in TH2Poly,
-#define _TH2PolyOverflowBins_ 9
-
-constexpr static const double _BAD_DOUBLE_ = -999.99;
-constexpr static const int _BAD_INT_ = -999;
-
-constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
-
-// Some commonly used variables to which we set pointers to
-constexpr static const double Unity = 1.;
-constexpr static const double Zero = 0.;
-constexpr static const float Unity_F = 1.;
-constexpr static const float Zero_F = 0.;
-constexpr static const int Unity_Int = 1;
-
 // C++ includes
-#include <sstream>
-#include <fstream> 
-#include <iostream>
-#include <vector>
-#include <iomanip>
 #include <set>
 #include <list>
 #include <unordered_map>
 
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
+// MaCh3 includes
 #include "manager/MaCh3Exception.h"
 #include "manager/MaCh3Logger.h"
+#include "manager/Core.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TSpline.h"
 #include "TObjString.h"
@@ -80,8 +20,7 @@ constexpr static const int Unity_Int = 1;
 #include "TH1.h"
 // NuOscillator includes
 #include "Constants/OscillatorConstants.h"
-#pragma GCC diagnostic pop
-
+_MaCh3_Safe_Include_End_ //}
 
 /// @file Structs.h
 /// @author Asher Kaboth
@@ -97,6 +36,45 @@ template< typename T, size_t N >
 std::vector<T> MakeVector( const T (&data)[N] ) {
 // *******************
   return std::vector<T>(data, data+N);
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<T>& vec) {
+// *******************
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<std::vector<T>>& vec) {
+// *******************
+  for (auto& innerVec : vec) {
+    innerVec.clear();
+    innerVec.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
+// *******************
+  for (auto& inner2DVec : vec) {
+    for (auto& innerVec : inner2DVec) {
+      innerVec.clear();
+      innerVec.shrink_to_fit();
+    }
+    inner2DVec.clear();
+    inner2DVec.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
 }
 
 // *******************
@@ -567,19 +545,4 @@ namespace MaCh3Utils {
     return NuOscillatorFlavour;
   }
   // ***************************
-
-  /// @brief DB Anything added here must be of the form 2^X, where X is an integer
-  /// @warning DB Used to contain which DetIDs are supported
-  static const std::unordered_map<int,int>KnownDetIDsMap({
-    {0,1},    //ND
-    {1,8},    //FD
-    {2,16},   //SK1Rmu
-    {3,32},   //Nova
-    {4,64},   //Atm SubGeV e-like
-    {5,128},  //Atm SubGeV mu-like
-    {6,256},  //Atm MultiGeV e-like
-    {7,512},  //Atm MultiGeV mu-like
-  });
-  static const int nKnownDetIDs = int(KnownDetIDsMap.size());
-
 } // end MaCh3Utils namespace
