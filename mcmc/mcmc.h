@@ -47,8 +47,5 @@ class mcmc : public FitterBase {
   bool anneal;
   /// simulated annealing temperature
   double AnnealTemp;
-
-  /// starting value of a chain, usually 0, unless starting from previous chain
-  int stepStart;
 };
 

@@ -29,7 +29,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
-  
+  SampleDetID = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
@@ -72,7 +72,7 @@ void samplePDFFDBase::ReadSampleConfig()
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  SampleDetID = SampleManager->raw()["DetID"].as<int>();
+  SampleDetID = SampleManager->raw()["DetID"].as<std::string>();
 
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
@@ -355,11 +355,11 @@ void samplePDFFDBase::reweight() {
   //You only need to do these things if OscCov has been initialised
   //if not then you're not considering oscillations
   if (OscCov) {
-    std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
-    for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+    std::vector<M3::float_t> OscVec(OscParams.size());
+    for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wuseless-cast"
-      OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
+      OscVec[iPar] = M3::float_t(*OscParams[iPar]);
       #pragma GCC diagnostic pop
     }
 
@@ -367,7 +367,7 @@ void samplePDFFDBase::reweight() {
       NuOscProbCalcers[0]->CalculateProbabilities(OscVec);
     } else {
       for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
-	NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+	        NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
       }
     }
     
@@ -818,17 +818,15 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
         int bin = (*it).index;
 
-        //If syst on applies to a particular detector
-        if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
-          XsecBins.push_back(bin);
-          MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
-          #ifdef DEBUG
-          VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
-          #endif
-        }
+        XsecBins.push_back(bin);
+        MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
+        #ifdef DEBUG
+        VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
+        #endif
+        //}
       } // end iteration over xsec_norms
     } // end if (xsecCov)
-    fdobj->xsec_norms_bins[iEvent]=XsecBins;
+    fdobj->xsec_norms_bins[iEvent] = XsecBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("Channel {}", iSample);
@@ -1378,6 +1376,8 @@ void samplePDFFDBase::SetupNuOscillator() {
     } // end loop over events
   }// end loop over channels
   delete OscillFactory;
+
+  OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
@@ -1502,7 +1502,6 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
 #else
   fdobj->osc_w_pointer.resize(nEvents, &Unity); 
 #endif
-  fdobj->SampleDetID = -1;
 
   for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
     fdobj->isNC[iEvent] = false;
