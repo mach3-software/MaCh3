@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['mach3covariancefactory_0',['MaCh3CovarianceFactory',['../MaCh3Factory_8h.html#a24f887a3654e745105ec22bb90b7ab89',1,'MaCh3CovarianceFactory(manager *FitManager, const std::string &amp;PreFix):&#160;MaCh3Factory.h'],['../MaCh3Factory_8cpp.html#a37464d72da10c4e30eba841888416f40',1,'MaCh3CovarianceFactory(manager *FitManager, const std::string &amp;PreFix):&#160;MaCh3Factory.cpp']]],
+  ['mach3covariancefactory_0',['MaCh3CovarianceFactory',['../MaCh3Factory_8h.html#ac6dbfd8e5dc633275a94f0fc88cac50d',1,'MaCh3Factory.h']]],
   ['mach3exception_1',['MaCh3Exception',['../classMaCh3Exception.html#a848f0037a80a607b8721b7a163b1077e',1,'MaCh3Exception']]],
   ['mach3fitterfactory_2',['MaCh3FitterFactory',['../MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a',1,'MaCh3Factory.cpp']]],
   ['mach3managerfactory_3',['MaCh3ManagerFactory',['../MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3',1,'MaCh3Factory.cpp']]],
@@ -51,7 +51,7 @@ var searchData=
   ['mcmc_48',['mcmc',['../classmcmc.html#a56195958aee22996158d3ba341dcf31e',1,'mcmc']]],
   ['mcmcprocessor_49',['MCMCProcessor',['../classMCMCProcessor.html#a23c3d6934899266401e336a8d7142774',1,'MCMCProcessor']]],
   ['minuitfit_50',['MinuitFit',['../classMinuitFit.html#a5392a49207148d7b884974db3d3f5eac',1,'MinuitFit']]],
-  ['modifyweights_51',['ModifyWeights',['../classSMonolith.html#ac37ee525aa57316f652433a4e393afaf',1,'SMonolith::ModifyWeights()'],['../classSplineBase.html#a49665d2712b61b038085d25ace96a568',1,'SplineBase::ModifyWeights()'],['../classPySplineBase.html#ac7361b35ea190c2a88487f2bb6a92305',1,'PySplineBase::ModifyWeights()'],['../classsplineFDBase.html#a1a237a8b8c3c165c82ebe15d2ca740c7',1,'splineFDBase::ModifyWeights()']]],
+  ['modifyweights_51',['ModifyWeights',['../classsplineFDBase.html#a1a237a8b8c3c165c82ebe15d2ca740c7',1,'splineFDBase::ModifyWeights()'],['../classPySplineBase.html#ac7361b35ea190c2a88487f2bb6a92305',1,'PySplineBase::ModifyWeights()'],['../classSMonolith.html#ac37ee525aa57316f652433a4e393afaf',1,'SMonolith::ModifyWeights()'],['../classSplineBase.html#a49665d2712b61b038085d25ace96a568',1,'SplineBase::ModifyWeights()']]],
   ['modifyweights_5fgpu_52',['ModifyWeights_GPU',['../classSMonolith.html#a72cd282322bdaadb23d8a376efa9e2c1',1,'SMonolith']]],
   ['movetogpu_53',['MoveToGPU',['../classSMonolith.html#aac73a1089592c5f22755b7427869827f',1,'SMonolith']]],
   ['multipleprocessmcmc_54',['MultipleProcessMCMC',['../ProcessMCMC_8cpp.html#a83be70750a728e4deae518ea3ffaf388',1,'ProcessMCMC.cpp']]]
