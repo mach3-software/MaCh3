@@ -135,33 +135,6 @@ void mcmc::ProposeStep() {
   bool multicanonical = fitMan->raw()["General"]["MCMC"]["Multicanonical"].as<bool>();
   double multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
 
-  // Propose steps for the oscillation handlers
-  if (osc) {
-    osc->proposeStep();
-
-    // Now get the likelihoods for the oscillation
-    osc_llh = osc->GetLikelihood();
-
-    if (multicanonical){
-      std::string deltaCPParamNumber = osc->GetParName(1);
-
-      double delta_cp_value = osc->getParProp(1);
-
-      std::cout << "Delta CP value: " << delta_cp_value << std::endl;
-
-      osc_llh = osc_llh * pow(GetMulticanonicalWeight(delta_cp_value),1-multicanonicalBeta);
-
-    }
-    std::cout << "Oscillation likelihood: " << osc_llh << std::endl;
-
-    // Add the oscillation likelihoods to the reconfigure likelihoods
-    llh += osc_llh;
-
-    #ifdef DEBUG
-    if (debug) debugFile << "LLH for oscillation handler: " << llh << std::endl;
-    #endif
-  }
-
   // Loop over the systematics and propose the initial step
   for (size_t s = 0; s < systematics.size(); ++s) {
     // Could throw the initial value here to do MCMC stability studies
@@ -171,6 +144,16 @@ void mcmc::ProposeStep() {
     // Get the likelihood from the systematics
     syst_llh[s] = systematics[s]->GetLikelihood();
     llh += syst_llh[s];
+
+    if (multicanonical){
+      std::cout << "Systematic: " << systematics[s]->getName() << std::endl;
+      if (systematics[s]->getName() == "delta_cp"){
+        double delta_cp_value = systematics[s]->getParProp(static_cast<int>(s));
+        std::cout << "Delta CP value: " << delta_cp_value << std::endl; 
+        double multicanonical_penalty = pow(GetMulticanonicalWeight(delta_cp_value),1-multicanonicalBeta);
+        llh += multicanonical_penalty;
+        }
+    }
 
     #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[s]->getName() << " " << llh << std::endl;
