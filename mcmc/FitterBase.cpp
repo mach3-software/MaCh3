@@ -14,7 +14,6 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-
   //Get mach3 modes from manager
   Modes = fitMan->GetMaCh3Modes();
   random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
@@ -22,20 +21,19 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   // Counter of the accepted # of steps
   accCount = 0;
   step = 0;
+  stepStart = 0;
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
   #ifdef DEBUG
   // Fit summary and debug info
-  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false);
+  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
   #endif
 
-  auto outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
+  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
-  // Do we want to save the nominal parameters to output
-  save_nominal = true;
+  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
 
   // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
   SaveProposal = false;
@@ -107,13 +105,10 @@ void FitterBase::SaveSettings() {
   header_path += "/version.h";
   FILE* file = fopen(header_path.c_str(), "r");
   //KS: It is better to use experiment specific header file. If given experiment didn't provide it we gonna use one given by Core MaCh3.
-  if (!file)
-  {
+  if (!file) {
     header_path = std::string(std::getenv("MaCh3_ROOT"));
     header_path += "/version.h";
-  }
-  else
-  {
+  } else {
     fclose(file);
   }
 
@@ -150,7 +145,6 @@ void FitterBase::SaveSettings() {
 // Prepare the output tree
 void FitterBase::PrepareOutput() {
 // *******************
-
   if(OutputPrepared) return;
   //MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not
   if(!fTestLikelihood)
@@ -220,7 +214,7 @@ void FitterBase::SaveOutput() {
   outputFile->cd();
   outTree->Write();
 
-  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step, clock->RealTime(), clock->RealTime() / step);
+  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
   #ifdef DEBUG
   if (debug)
@@ -241,8 +235,6 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
   TotalNSamples += sample->GetNsamples();
   MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());
   samples.push_back(sample);
-
-  return;
 }
 
 // *************************
@@ -256,9 +248,6 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i)
     n_vec[i] = cov->getParInit(i);
-
-  TVectorT<double> t_vec(cov->GetNumParams(), n_vec.data());
-  t_vec.Write((cov->getName() + "_prior").c_str());
 
   cov->getCovMatrix()->Write(cov->getName().c_str());
 
@@ -275,8 +264,6 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   }
 
   outputFile->cd();
-
-  return;
 }
 
 // *******************
@@ -309,12 +296,15 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-    }
-    if(ConfigCov == nullptr) delete ConfigCov;
 
-    std::vector<double> branch_vals(systematics[s]->GetNumParams());
+      delete ConfigCov;
+    }
+
+    CovarianceFolder->Close();
+    delete CovarianceFolder;
+
+    std::vector<double> branch_vals(systematics[s]->GetNumParams(), _BAD_DOUBLE_);
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      branch_vals[i] = _BAD_DOUBLE_;
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
     }
     posts->GetEntry(posts->GetEntries()-1);
@@ -333,11 +323,14 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
     systematics[s]->printNominalCurrProp();
 
-    CovarianceFolder->Close();
-    delete CovarianceFolder;
+    // Resetting branch adressed to nullptr as we don't want to write into a delected vector out of scope...
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
+    }
   }
   logLCurr = log_val;
 
+  delete posts;
   infile->Close();
   delete infile;
 
@@ -355,8 +348,7 @@ void FitterBase::ProcessMCMC() {
   if (fitMan == nullptr) return;
 
   // Process the MCMC
-  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
-
+  if (GetFromManager<bool>(fitMan->raw()["General"]["ProcessMCMC"], false, __FILE__ , __LINE__)){
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()));
 
@@ -515,21 +507,15 @@ void FitterBase::RunLLHScan() {
     }
   }
   // Number of points we do for each LLH scan
-  const int n_points = GetFromManager<int>(fitMan->raw()["General"]["LLHScanPoints"], 100);
+  const int n_points = GetFromManager<int>(fitMan->raw()["General"]["LLHScanPoints"], 100, __FILE__ , __LINE__);
 
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
 
-  bool isxsec = false;
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
-    if (cov->getName() == "xsec_cov")
-    {
-      isxsec = true;
-    } else {
-      isxsec = false;
-    }
+    bool isxsec = (cov->getName() == "xsec_cov");
 
     // Scan over all the parameters
     // Get the number of parameters
@@ -841,7 +827,6 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
 // Run 2D LLH scan
 void FitterBase::Run2DLLHScan() {
 // *************************
-
   // Save the settings into the output file
   SaveSettings();
 
@@ -860,16 +845,10 @@ void FitterBase::Run2DLLHScan() {
   // We print 5 reweights
   constexpr int countwidth = double(n_points)/double(5);
 
-  bool isxsec = false;
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
-    if (cov->getName() == "xsec_cov")
-    {
-      isxsec = true;
-    } else {
-      isxsec = false;
-    }
+    bool isxsec = (cov->getName() == "xsec_cov");
     // Scan over all the parameters
     // Get the number of parameters
     int npars = cov->GetNumParams();
@@ -1044,7 +1023,7 @@ void FitterBase::RunSigmaVar() {
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
   constexpr int nRelevantModes = 2;
   MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
-  bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false);
+  bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false, __FILE__ , __LINE__);
 
   //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
   bool PlotLLHperBin = false;
@@ -1093,8 +1072,8 @@ void FitterBase::RunSigmaVar() {
       if(skip) continue;
 
       outputFile->cd();
-      TDirectory * dirArryDial = outputFile->mkdir(name.c_str());
-      TDirectory **dirArrySample = new TDirectory*[TotalNSamples];
+      TDirectory* dirArryDial = outputFile->mkdir(name.c_str());
+      std::vector<TDirectory*> dirArrySample(TotalNSamples);
 
       int SampleIterator = 0;
       // Get each sample and how it's responded to our reweighted parameter
@@ -1309,7 +1288,6 @@ void FitterBase::RunSigmaVar() {
           SampleIterator++;
         }
       }
-      delete[] dirArrySample;
 
       for (int j = 0; j < numVar; ++j)
       {

@@ -93,6 +93,8 @@ class FitterBase {
   double accProb;
   /// counts accepted steps
   int accCount;
+  /// step start if restarting
+  int stepStart;
 
   /// store the llh breakdowns
   std::vector<double> sample_llh;
@@ -128,8 +130,6 @@ class FitterBase {
 
   /// Necessary for some fitting algorithms like PSO
   bool fTestLikelihood;
-  /// save nominal matrix info or not
-  bool save_nominal;
   /// Save proposal at each step
   bool SaveProposal;
 
