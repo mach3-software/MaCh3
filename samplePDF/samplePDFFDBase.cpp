@@ -447,6 +447,13 @@ void samplePDFFDBase::fillArray_MP()  {
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
 
+  PrepFunctionalParameters();
+  //==================================================
+  //Calc Weights and fill Array
+  if(SplineHandler){
+    SplineHandler->Evaluate();
+  }
+
   //This is stored as [y][x] due to shifts only occurring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses
   double** samplePDFFD_array_private = nullptr;
   double** samplePDFFD_array_private_w2 = nullptr;
@@ -481,14 +488,6 @@ void samplePDFFDBase::fillArray_MP()  {
     //
     // We will hit <0.1 s/step eventually! :D
     
-    //ETA - does these three calls need to be inside the omp parrallel region? 
-    //I don't think this will affect anything but maybe should check.
-    PrepFunctionalParameters();
-    //==================================================
-    //Calc Weights and fill Array
-    if(SplineHandler){
-      SplineHandler->Evaluate();
-    }
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
       #pragma omp for
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
