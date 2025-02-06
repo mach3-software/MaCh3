@@ -391,11 +391,7 @@ void covarianceBase::throwParameters() {
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
-        #ifdef MULTITHREAD
-        randParams[i] = random_number[omp_get_thread_num()]->Gaus(0, 1);
-        #else
-        randParams[i] = random_number[0]->Gaus(0,1);
-        #endif
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
@@ -504,11 +500,7 @@ void covarianceBase::randomize() _noexcept_ {
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
       if (_fError[i] > 0.0) {
-        #ifdef MULTITHREAD
-        randParams[i] = random_number[omp_get_thread_num()]->Gaus(0, 1);
-        #else
-        randParams[i] = random_number[0]->Gaus(0, 1);
-        #endif
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         // If parameter IS fixed
       } else {
         randParams[i] = 0.0;
@@ -524,11 +516,7 @@ void covarianceBase::randomize() _noexcept_ {
     {
       if (PCAObj->fParSigma_PCA[i] > 0. && i < _fNumParPCA)
       {
-        #ifdef MULTITHREAD
-        randParams[i] = random_number[omp_get_thread_num()]->Gaus(0,1);
-        #else
-        randParams[i] = random_number[0]->Gaus(0,1);
-        #endif
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
       } else { // If parameter IS fixed or out od bounds
         randParams[i] = 0.0;
       }

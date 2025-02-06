@@ -295,12 +295,11 @@ namespace M3 {
 int GetNThreads() {
 // ***************************************************************************
   #ifdef MULTITHREAD
-  int nThreads = omp_get_max_threads();
+  return omp_get_max_threads();
   #else
-  int nThreads = 1;
+  return 1;
   #endif
-
-  return nThreads;
 }
+
 } //end namespace
 
