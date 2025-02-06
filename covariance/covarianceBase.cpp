@@ -1243,7 +1243,6 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 
   if(AdaptiveHandler.UpdateMatrixAdapt()) {
-    #ifdef DEBUG
     std::cout << "==== Updating throw matrix ====" << std::endl;
     std::cout << "Current step:" << AdaptiveHandler.total_steps << std::endl;
     std::cout << "Cov matrix: " << std::endl;
@@ -1264,7 +1263,6 @@ void covarianceBase::updateAdaptiveCovariance(){
     }
     std::cout << std::endl;
     std::cout << "===============================" << std::endl;
-    #endif
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
   }

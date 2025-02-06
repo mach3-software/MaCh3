@@ -162,6 +162,7 @@ void mcmc::ProposeStep() {
         delete adacov_save;
         delete outMeanVec;
         AdaptiveFolder->Write();
+        // HH: We need to flush the file to make sure the data is written  
         AdaptiveFolder->GetFile()->Flush();
         std::cout << "Saving adaptive throw matrix at step " << total_steps_str << " for systematic " << systematics[s]->getName() << std::endl;
         TMatrixDSym *throwMatrix = systematics[s]->getThrowMatrix();

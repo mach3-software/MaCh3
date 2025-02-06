@@ -95,6 +95,7 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     #-Wold-style-cast       # Warn for c-style casts
     #-Wconversion           # Warn on type conversions that may lose data
     #-Werror                # Treat Warnings as Errors
+    -march=native           # Optimize for the native architecture
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -121,7 +122,7 @@ endif()
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O0                                  # Turn off any optimisation to have best debug experience
+    -Og                                  # Turn off any optimisation to have best debug experience
   )
   target_compile_definitions(MaCh3CompilerOptions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
