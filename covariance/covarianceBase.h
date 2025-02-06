@@ -7,9 +7,6 @@
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
 
-/// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should eb removed
-constexpr static const double _LARGE_LOGL_ = 1234567890.0;
-
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 /// @author Dan Barrow
@@ -123,9 +120,9 @@ class covarianceBase {
   void RandomConfiguration();
   
   /// @brief Check if parameters were proposed outside physical boundary
-  int CheckBounds() const;
+  int CheckBounds() const _noexcept_;
   /// @brief Calc penalty term based on inverted covariance matrix
-  double CalcLikelihood() _noexcept_;
+  double CalcLikelihood() const _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
 
