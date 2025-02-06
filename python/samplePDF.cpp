@@ -113,7 +113,7 @@ public:
         );
     }
 
-    int ReturnKinematicParameterFromString(std::string) override {
+    int ReturnKinematicParameterFromString(std::string) {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,                     /* Return type */
             samplePDFFDBase,            /* Parent class */
@@ -123,7 +123,7 @@ public:
         );
     }
     
-    std::string ReturnStringFromKinematicParameter(int) override {
+    std::string ReturnStringFromKinematicParameter(int) {
         PYBIND11_OVERRIDE_PURE_NAME(
             std::string,                /* Return type */
             samplePDFFDBase,            /* Parent class */
