@@ -20,6 +20,7 @@ add_library(MCMC SHARED
     MCMCProcessor.cpp
     SampleSummary.cpp
     MaCh3Factory.cpp
+    StatisticalUtils.cpp
     $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuMCMCProcessorUtils.cu>
 )
 
@@ -33,7 +34,9 @@ set_target_properties(MCMC PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME MCMC)
 
-target_link_libraries(MCMC SamplePDF MaCh3CompilerOptions)
+target_link_libraries(MCMC PUBLIC SamplePDF)
+target_link_libraries(MCMC PRIVATE MaCh3Warnings)
+
 target_include_directories(MCMC PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>

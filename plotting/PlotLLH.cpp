@@ -5,6 +5,13 @@
 // MACH3 PLOTTING
 #include "plottingUtils/plottingManager.h"
 
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wconversion"
+
+/// @file PlotLLH
+/// @author Ewan Miller
+
 // some options for the plots
 double ratioPlotSplit;
 double yTitleOffset;
@@ -22,7 +29,6 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
                          THStack *sampleStack, TLegend *splitSamplesLegend,
                          float baselineLLH_main = 0.00001) 
   {
-
   std::vector<std::string> sampNames = man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags"));
   size_t nSamples = sampNames.size();
 
@@ -57,9 +63,9 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
 
     LLH_indivSam->SetStats(0);
     LLH_indivSam->SetLineColor(TColor::GetColorPalette(
-        floor((float)i * TColor::GetNumberOfColors() / (float)nSamples)));
+        floor(static_cast<float>(i) * TColor::GetNumberOfColors() / static_cast<float>(nSamples))));
     LLH_indivSam->SetFillColor(TColor::GetColorPalette(
-        floor((float)i * TColor::GetNumberOfColors() / (float)nSamples)));
+        floor(static_cast<float>(i) * TColor::GetNumberOfColors() / static_cast<float>(nSamples))));
     sampleStack->Add(LLH_indivSam);
     splitSamplesLegend->AddEntry(LLH_indivSam, man->style().prettifySampleName(sampName).c_str(),
                                  "lf");
@@ -81,13 +87,9 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
     {
       drawLabel[i] = false;
     }
-
     MACH3LOG_DEBUG("    drawLabel = {}", drawLabel.back()); 
     MACH3LOG_DEBUG("");
-  
   }
-
-  return;
 }
 
 // handy dandy helper function for drawing and nicely formatting a stack of ratio plots
@@ -124,7 +126,7 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
   // will use these to make comparisons of likelihoods
   THStack *compStack = new THStack("LLH_Stack", "");
   THStack *ratioCompStack = new THStack("LLH_Ratio_Stack", "");
-  TLegend *legend = new TLegend(0.3, 0.6, 0.7, 0.8);
+  auto legend = std::make_unique<TLegend>(0.3, 0.6, 0.7, 0.8);
 
   // get the sample reweight hist from the main file
   TH1D LLH_main = man->input().getLLHScan_TH1D(0, paramName, LLHType);
@@ -137,9 +139,8 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
   int nBins = LLH_main.GetNbinsX();
 
   // go through the other files
-  for (int extraFileIdx = 1; extraFileIdx < man->input().getNInputFiles(); extraFileIdx++)
+  for (unsigned int extraFileIdx = 1; extraFileIdx < man->input().getNInputFiles(); extraFileIdx++)
   {
-
     TH1D *compHist = new TH1D(man->input().getLLHScan_TH1D(extraFileIdx, paramName, LLHType));
     compHist->SetBit(kCanDelete); // <- will allow this to be deleted by root once done plotting
     if (compHist->GetNbinsX() == 0)
@@ -147,12 +148,12 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
 
     // make them look different to each other
     compHist->SetLineColor(
-        TColor::GetColorPalette(floor((float)extraFileIdx * TColor::GetNumberOfColors() /
-                                      (float)man->input().getNInputFiles())));
+        TColor::GetColorPalette(floor(static_cast<float>(extraFileIdx) * TColor::GetNumberOfColors() /
+                                      static_cast<float>(man->input().getNInputFiles()))));
     compHist->SetLineStyle(2 + extraFileIdx % 9);
     compHist->SetLineWidth(lineWidth);
 
-    TH1D *divHist = (TH1D *)compHist->Clone(Form("RatioHist_%i", extraFileIdx));
+    TH1D *divHist = static_cast<TH1D*>(compHist->Clone(Form("RatioHist_%i", extraFileIdx)));
     divHist->SetBit(kCanDelete);
 
     if (man->getPlotRatios())
@@ -206,12 +207,10 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
   // will use these to make comparisons of likelihoods
   delete compStack;
   delete ratioCompStack;
-  delete legend;
 }
 
 void makeSplitSampleLLHScanComparisons(std::string paramName, std::string outputFileName,
                                        TCanvas *canv, TPad *LLHPad, TPad *ratioPad) {
-  
   MACH3LOG_DEBUG(" Making split sample LLH comparison");
   canv->Clear();
   canv->Draw();
@@ -276,7 +275,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
   }
 
   // now we plot the comparisson file plots
-  for (int extraFileIdx = 1; extraFileIdx < man->getNFiles(); extraFileIdx++)
+  for (unsigned int extraFileIdx = 1; extraFileIdx < man->getNFiles(); extraFileIdx++)
   {
     MACH3LOG_DEBUG("  - Adding plot for additional file {}", extraFileIdx);
     canv->cd(1 + extraFileIdx);
@@ -342,7 +341,6 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
 
     if (man->getPlotRatios())
     {
-
       THStack *splitSamplesStackRatios = new THStack(paramName.c_str(), "");
 
       TList *baselineHistList = baseSplitSamplesStack->GetHists();
@@ -356,10 +354,10 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
             Form("%s_%s_splitDiv", paramName.c_str(), man->getFileLabel(extraFileIdx).c_str()),
             compLLH_main.GetNbinsX(), compLLH_main.GetBinLowEdge(1),
             compLLH_main.GetBinLowEdge(compLLH_main.GetNbinsX() + 1));
-        divHist->Divide((TH1D *)compHistList->At(sampleIdx),
-                        (TH1D *)baselineHistList->At(sampleIdx));
+        divHist->Divide(static_cast<TH1D*>(compHistList->At(sampleIdx)),
+                        static_cast<TH1D*>(baselineHistList->At(sampleIdx)));
         splitSamplesStackRatios->Add(divHist);
-        divHist->SetLineColor(((TH1D *)compHistList->At(sampleIdx))->GetLineColor());
+        divHist->SetLineColor((static_cast<TH1D*>(compHistList->At(sampleIdx))->GetLineColor()));
       }
 
       canv->cd(2 + extraFileIdx);
@@ -374,6 +372,7 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
 
   canv->SaveAs(outputFileName.c_str());
 
+  delete label;
   delete baseSplitSamplesStack;
   delete baseSplitSamplesLegend;
 }
@@ -384,7 +383,7 @@ int PlotLLH() {
 
   // make the canvas and other plotting stuff
   TCanvas *canv = new TCanvas("canv", "", 1024, 1024);
-
+  gStyle->SetOptTitle(2);
   // split up the canvas so can have side by side plots, one for each file
   TCanvas *splitSamplesCanv = new TCanvas("splitSampCanv", "", 4096 * man->getNFiles(), 4096);
 
@@ -442,7 +441,10 @@ int PlotLLH() {
   if (man->getSplitBySample())
     canv->SaveAs((man->getOutputName("_bySample") + "]").c_str());
 
+  delete LLHPad;
+  delete ratioPad;
   delete canv;
+  if(man != nullptr) delete man;
 
   return 0;
 }

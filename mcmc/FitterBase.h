@@ -77,14 +77,6 @@ class FitterBase {
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
 
-  /// @brief Used by sigma variation, check how 1 sigma changes spectra
-  /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
-  /// @param sigmaArrayCentr sigma var hist at prior values
-  /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
-  /// @param title A tittle for returned object
-  /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-  inline TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
-
   /// The manager
   manager *fitMan;
 
@@ -103,9 +95,9 @@ class FitterBase {
   int accCount;
 
   /// store the llh breakdowns
-  double *sample_llh;
+  std::vector<double> sample_llh;
   /// systematic llh breakdowns
-  double *syst_llh;
+  std::vector<double> syst_llh;
 
   /// Sample holder
   std::vector<samplePDFBase*> samples;
@@ -116,14 +108,14 @@ class FitterBase {
   std::vector<covarianceBase*> systematics;
 
   /// tells global time how long fit took
-  TStopwatch* clock;
+  std::unique_ptr<TStopwatch> clock;
   /// tells how long single step/fit iteration took
-  TStopwatch* stepClock;
+  std::unique_ptr<TStopwatch> stepClock;
   /// Time of single step
   double stepTime;
 
   /// Random number
-  TRandom3* random;
+  std::unique_ptr<TRandom3> random;
 
   /// Output
   TFile *outputFile;

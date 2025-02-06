@@ -9,6 +9,8 @@ updates:
     directory: ".github/workflows/" # Location of the GitHub Actions workflow files
     schedule:
       interval: "weekly" # Check for updates on a weekly basis
+    commit-message:
+      prefix: "tidy"
 
   # Update Python dependencies
   - package-ecosystem: "pip"

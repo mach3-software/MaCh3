@@ -1,9 +1,8 @@
 // MaCh3 includes
 #include "mcmc/MaCh3Factory.h"
 
-
 // ********************************************
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samplePDFBase*>& Samples, std::vector<covarianceBase*>& Covariances) {
+std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
 // ********************************************
   std::unique_ptr<FitterBase> MaCh3Fitter = nullptr;
 
@@ -24,61 +23,84 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan, std::vector<samp
     MACH3LOG_ERROR("You want to use algorithm {}, I don't recognize it, sry", Algorithm);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
-  //KS: Adding samples and covariances to the Fitter class could be in the factory
-  for(unsigned int i = 0; Samples.size(); i++)
-    MaCh3Fitter->addSamplePDF(Samples[i]);
-  for(unsigned int i = 0; Covariances.size(); i++)
-    MaCh3Fitter->addSystObj(Covariances[i]);
-
   return MaCh3Fitter;
 }
 
 // ********************************************
 covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix) {
 // ********************************************
-  // config for our matrix
-  YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
-  auto CovMatrixName = Settings[std::string(PreFix) + "CovName"].as<std::string>();
-  MACH3LOG_INFO("Initialising {} matrix", CovMatrixName);
+  return MaCh3CovarianceFactory<covarianceXsec>(FitManager, PreFix);
+}
 
-  // yaml files initialising out matrix
-  auto CovMatrixFile = Settings[std::string(PreFix) + "CovFile"].as<std::vector<std::string>>();
+// ********************************************
+std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
+// ********************************************
+  if (argc < 2) {
+    MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");
+    MACH3LOG_ERROR("Syntax is $: {} config.yaml", argv[0]);
+    MACH3LOG_ERROR("Where config.yaml is a valid config file, compatible with the manager class (manager/manager.cpp/h)");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
-  // PCA threshold, -1 means no pca
-  auto PCAThreshold = GetFromManager<double>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
-  // do we pca whole matrix or only submatrix
-  auto PCAParamRegion = GetFromManager<std::vector<double>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
-
-  /// @todo this massive hack with "xsec_cov" is because we have const char * ... will have to fix it later...
-  covarianceXsec* xsec = new covarianceXsec(CovMatrixFile, "xsec_cov", PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
-
-  // Fill the parameter values with their nominal values
-  // should _ALWAYS_ be done before overriding with fix or flat
-  xsec->setParameters();
-
-  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "FixParams"], {});
-
-  // Fixed xsec parameters loop
-  if (FixParams.size() == 1 && FixParams.at(0) == "All") {
-    for (int j = 0; j < xsec->GetNumParams(); j++) {
-      xsec->toggleFixParameter(j);
+  // Initialise manger responsible for config handling
+  auto FitManager = std::make_unique<manager>(argv[1]);
+  
+  //KS: Lambda to make sure we are not overwriting setting which should be committed
+  auto SanityOverwrite = [](const std::string& Name) {
+    if (Name.find("Systematics") != std::string::npos ||
+        Name.find("Samples") != std::string::npos)
+    {
+      MACH3LOG_CRITICAL("You are overwriting settings ({}) that are highly likely intended to be committed.", Name);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-  } else {
-    for (unsigned int j = 0; j < FixParams.size(); j++) {
-      xsec->toggleFixParameter(FixParams.at(j));
+  };
+  
+  for (int i = 2; i < argc; ++i)
+  {
+    const std::string arg = argv[i];
+    const size_t colonCount = std::count(arg.begin(), arg.end(), ':');
+
+    /// @todo KS: May need some recursive magic to reduce amount of hardcoding
+    if (colonCount == 1) {
+      const size_t firstColon = arg.find(':');
+      const std::string section = arg.substr(0, firstColon);
+      const std::string value = arg.substr(firstColon + 1);
+
+      MACH3LOG_INFO("Overriding setting: Section={}, Value={}", section, value);
+      SanityOverwrite(section);
+      FitManager->OverrideSettings(section, value);
+    } else if (colonCount == 2) {
+      const size_t firstColon = arg.find(':');
+      const size_t secondColon = arg.find(':', firstColon + 1);
+
+      const std::string section = arg.substr(0, firstColon);
+      const std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);
+      const std::string value = arg.substr(secondColon + 1);
+
+      MACH3LOG_INFO("Overriding setting: Section={}, Key={}, Value={}", section, key, value);
+      SanityOverwrite(section);
+      SanityOverwrite(key);
+      FitManager->OverrideSettings(section, key, value);
+    } else if (colonCount == 3) {
+      const size_t firstColon = arg.find(':');
+      const size_t secondColon = arg.find(':', firstColon + 1);
+      const size_t thridColon = arg.find(':', secondColon + 1);
+
+      const std::string section = arg.substr(0, firstColon);
+      const std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);
+      const std::string key2 = arg.substr(secondColon + 1, thridColon - secondColon - 1);
+      const std::string value = arg.substr(thridColon + 1);
+
+      MACH3LOG_INFO("Overriding setting: Section={}, Key={}, Key={}, Value={}", section, key, key2, value);
+      SanityOverwrite(section);
+      SanityOverwrite(key);
+      SanityOverwrite(key2);
+      FitManager->OverrideSettings(section, key, key2, value);
+    } else {
+      MACH3LOG_ERROR("Invalid override argument format: {}", arg);
+      MACH3LOG_ERROR("Expected format:Section:Key:Key:Valu, Section:Key:Value or Section:Value");
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
-  //Global step scale for matrix
-  auto StepScale = Settings[std::string(PreFix) + "StepScale"].as<double>();
-
-  xsec->setStepScale(StepScale);
-
-  // Adaptive MCMC stuff
-  if(FitManager->raw()["AdaptionOptions"])
-    xsec->initialiseAdaption(FitManager->raw());
-
-  MACH3LOG_INFO("Factory successful");
-
-  return xsec;
+  return FitManager;
 }

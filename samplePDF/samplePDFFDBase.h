@@ -1,53 +1,55 @@
 #pragma once
 
 //MaCh3 includes
-#include "OscProbCalcer/OscProbCalcerBase.h"
-#include "Oscillator/OscillatorBase.h"
-
 #include "splines/splineFDBase.h"
 
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
 
 #include "samplePDF/samplePDFBase.h"
-#include "samplePDF/FDMCStruct.h"
+#include "samplePDF/FarDetectorCoreInfoStruct.h"
+
+//forward declare so we don't bleed NuOscillator headers
+class OscillatorBase;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+/// @author Dan Barrow
+/// @author Ed Atkin
 class samplePDFFDBase :  public samplePDFBase
 {
 public:
   //######################################### Functions #########################################
-
-  samplePDFFDBase(){};
-  samplePDFFDBase(std::string mc_version, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  /// @param ConfigFileName Name of config to initialise the sample object
+  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName() {return samplename;}
+  std::string GetName() const {return samplename;}
 
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
   //ETA - abstract these to samplePDFFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void addData(TH1D* Data);
-  void addData(TH2D* Data);
-  void addData(std::vector<double> &data);
-  void addData(std::vector< std::vector <double> > &data);
+  void addData(TH1D* Data) override;
+  void addData(TH2D* Data) override;
+  void addData(std::vector<double> &data) override;
+  void addData(std::vector< std::vector <double> > &data) override;
   /// @brief DB Multi-threaded GetLikelihood
-  double GetLikelihood();
+  double GetLikelihood() override;
   //===============================================================================
 
-  void reweight();
-  double GetEventWeight(int iSample, int iEntry);
+  void reweight() override;
+  M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
   void SetupNuOscillator();
 
-  virtual void setupSplines(fdmc_base *FDObj, const char *SplineFileName, int nutype, int signal){};
+  virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
+
   void ReadSampleConfig();
 
-  int getNMCSamples() {return MCSamples.size();}
+  int getNMCSamples() override {return int(MCSamples.size());}
 
   int getNEventsInSample(int iSample) {
     if (iSample < 0 || iSample > getNMCSamples()) {
@@ -68,8 +70,8 @@ public:
   TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
 
   //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual inline int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual inline std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
+  virtual std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
@@ -92,7 +94,8 @@ public:
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
   
-  splineFDBase *splineFile;
+  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
+  std::unique_ptr<splineFDBase> SplineHandler;
   //===============================================================================
   void fillSplineBins();
 
@@ -129,11 +132,16 @@ public:
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
-  double CalcXsecWeightSpline(const int iSample, const int iEvent);
+  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
-  double CalcXsecWeightNorm(const int iSample, const int iEvent);
-  /// @brief Virtual so this can be over-riden in an experiment derived class
-  virtual double CalcXsecWeightFunc(int iSample, int iEvent){(void)iSample; (void)iEvent; return 1.0;};
+  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent) const;
+
+  /// @brief Calculate weights for function parameters
+  ///
+  /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
+  /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
+  /// This way func weight shall be used in GetEventWeight
+  virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
@@ -144,7 +152,7 @@ public:
   void SetupNormParameters();
 
   //===============================================================================
-  //DB Functions required for reweighting functions  
+  //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from samplePDF_array
   void fill1DHist();
   void fill2DHist();
@@ -177,7 +185,7 @@ public:
 
   //===============================================================================
   //MC variables
-  std::vector<fdmc_base> MCSamples;
+  std::vector<FarDetectorCoreInfo> MCSamples;
   //===============================================================================
 
   //===============================================================================
@@ -232,16 +240,10 @@ public:
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 
-  double Unity = 1.;
-  double Zero = 0.;
-  
-  float Unity_F = 1.;
-  float Zero_F = 0.;
-
+  std::vector<std::string> oscchan_flavnames;
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;
   std::vector<int> sample_nupdg;
   std::vector<int> sample_nupdgunosc;
-  std::vector<bool> sample_signal;
 };

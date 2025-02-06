@@ -21,21 +21,27 @@ jobs:
       fail-fast: false  # Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
-          - name: Spline Validations
+          - name: Reweight Validations
             test_1: ./CIValidations/SplineValidations
-            test_2: empty
-            test_3: empty
-            test_4: empty
+            test_2: ./CIValidations/SamplePDFValidations
+            test_3: ./CIValidations/NuOscillatorInterfaceValidations
+            test_4: ./CIValidations/LLHValidation
             test_5: empty
             test_6: empty
+            test_7: empty
+            test_8: empty
+            test_9: empty
 
           - name: Covariance Validations
             test_1: ./CIValidations/CovarianceValidations
             test_2: ./CIValidations/MaCh3ModeValidations
-            test_3: empty
-            test_4: empty
-            test_5: empty
-            test_6: empty
+            test_3: ./CIValidations/pValueValidations 
+            test_4: ./CIValidations/UnitTests/manager_tests
+            test_5: ./CIValidations/UnitTests/histogram_tests
+            test_6: ./CIValidations/UnitTests/statistical_tests
+            test_7: empty
+            test_8: empty
+            test_9: empty
 
           - name: Fitter Validations
             test_1: ./CIValidations/FitterValidations
@@ -44,10 +50,10 @@ jobs:
             test_4: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
             test_5: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
             test_6: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
-            # TODO
-            #need fixing config
-            #test_7: bin/GetPostfitParamPlots -o MCMC_Test_Process.root -c Inputs/PlottingConfig.yaml
-            #test_8: bin/PlotLLH -o MCMC_Test.root -c Inputs/PlottingConfig.yaml
+            test_7: ./bin/MatrixPlotter bin/TutorialDiagConfig.yaml MCMC_Test_drawCorr.root
+            test_8: bin/GetPostfitParamPlots MCMC_Test_drawCorr.root
+            test_9: bin/PlotLLH MCMC_Test.root
+            test_10: bin/PlotMCMCDiag MCMC_Test_MCMC_Diag.root MCMC_Test_MCMC_Diag.root
 
           - name: NuMCMC Tools Validations
             test_1: ./CIValidations/NuMCMCvalidations.sh
@@ -56,6 +62,9 @@ jobs:
             test_4: empty
             test_5: empty
             test_6: empty
+            test_7: empty
+            test_8: empty
+            test_9: empty
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
@@ -71,7 +80,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+        cmake ../ -DMaCh3_Branch=${{ github.head_ref }} -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
     - name: Build MaCh3 Validations
       run: |
@@ -117,4 +126,28 @@ jobs:
             echo " "
             echo "Performing  test 6"
             ${{ matrix.test_6 }}
+        fi
+
+        if [[ "${{ matrix.test_7 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 7"
+            ${{ matrix.test_7 }}
+        fi
+
+        if [[ "${{ matrix.test_8 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 8"
+            ${{ matrix.test_8 }}
+        fi
+
+        if [[ "${{ matrix.test_9 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 9"
+            ${{ matrix.test_9 }}
+        fi
+
+        if [[ "${{ matrix.test_10 }}" != "empty" ]]; then
+            echo " "
+            echo "Performing  test 10"
+            ${{ matrix.test_10 }}
         fi

@@ -1,0 +1,24 @@
+# This workflow make sure PR tittles obeys Contributing guide
+name: "PR Title Checker"
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - labeled
+      - unlabeled
+  workflow_dispatch:  # This allows the workflow to be triggered manually
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: thehanimo/pr-title-checker@v1.4.3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pass_on_octokit_error: false
+          local_configuration_path: .github/pr-title-checker-config.json

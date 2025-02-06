@@ -1,0 +1,81 @@
+---
+# This will run telemetry like RAM etc and make summary
+name: MaCh3 Telemetry
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  benchmark:
+    name: Telemetry
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9v1.3.0
+    steps:
+      - name: Get MaCh3 Validations
+        run: |
+          cd /opt/
+          # Clone the MaCh3Tutorial repository with the current branch
+          git clone --branch main https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+          cd MaCh3Validations
+          mkdir build
+          cd build
+          cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+
+      - name: Build MaCh3 Validations
+        run: |
+          cd /opt/MaCh3Validations/build
+          make -j4 install # Build and install the project
+
+      - name: Run memory telemetry and generate plot
+        run: |
+          cd /opt/MaCh3Validations/build
+          ./_deps/mach3-src/.github/CIscripts/RAM.sh
+
+      - name: Upload memory usage plot artifact
+        id: upload-artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-usage-plot
+          path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
+
+
+      - name: Read summary table
+        id: read-summary
+        run: |
+          cd /opt/MaCh3Validations/build
+          cat summary_table.txt
+          echo "summary_table<<EOF" >> $GITHUB_ENV
+          cat summary_table.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Update job summary with plot and table
+        run: |
+          echo "### Memory and CPU Usage Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ env.summary_table }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "### Find plots in artifacts below" >> $GITHUB_STEP_SUMMARY
+          #echo "### Memory Usage Plot" >> $GITHUB_STEP_SUMMARY
+          #echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create PR comment with summary and artifact link
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Hi, I am MaCh3-Telemetry bot
+            ### Memory and CPU Usage Summary
+            ```text
+            ${{ env.summary_table }}
+            ```
+            ### Memory Usage Plot
+            - **[Job Summary Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**
+
+            You can view the memory usage plot directly in the job summary from the link above.

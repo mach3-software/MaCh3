@@ -4,29 +4,30 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cxxabi.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
 // ROOT Includes
 #include "TMacro.h"
 #include "TList.h"
 #include "TObjString.h"
+#pragma GCC diagnostic pop
 
 // yaml Includes
 #include "yaml-cpp/yaml.h"
 
-// **********************
-/// @brief Get content of config file if node is not found take default value specified
-/// @param node Yaml node
-/// @param defval Default value which will be used in case node doesn't exist
-template<typename Type>
-Type GetFromManager(const YAML::Node& node, Type defval) {
-// **********************
-  YAML::Node tmpNode = node;
+// MaCh3 Includes
+#include "manager/MaCh3Exception.h"
 
-  if(!tmpNode){
-    return defval;
-  }
-  return tmpNode.as<Type>();
-}
+/// @file YamlHelper.h
+/// @brief Utility functions for handling YAML nodes
+/// @author Kamil Skwarczynski
+/// @author Luke Pickering
 
 // **********************
 /// @brief Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
@@ -73,7 +74,7 @@ template<typename T, typename... Args>
 T FindFromManagerHelper(const YAML::Node& node, const std::string& key, Args... args) {
   // **********************
   if (!node[key]) {
-    std::cerr << "Node " << key << " doesn't exist." << std::endl;
+    MACH3LOG_ERROR("Node {} doesn't exist.", key);
     throw;
     return T();
   }
@@ -95,7 +96,7 @@ inline YAML::Node STRINGtoYAML(const std::string& yaml_string){
   try {
     return YAML::Load(yaml_string);
   } catch (const YAML::ParserException& e) {
-    std::cerr << "Error parsing YAML string: " << e.what() << std::endl;
+    MACH3LOG_ERROR("Error parsing YAML string: {}", e.what());
     return YAML::Node();
   }
 }
@@ -122,7 +123,7 @@ inline std::string TMacroToString(const TMacro& macro) {
   // Retrieve lines from TMacro
   TList* linesList = macro.GetListOfLines();
   if (!linesList) {
-    std::cerr << "Error: Failed to retrieve lines from TMacro." << std::endl;
+    MACH3LOG_ERROR("Failed to retrieve lines from TMacro.");
     return "";
   }
 
@@ -131,7 +132,7 @@ inline std::string TMacroToString(const TMacro& macro) {
   while ((obj = nextLine())) {
     TObjString* line = dynamic_cast<TObjString*>(obj);
     if (!line) {
-      std::cerr << "Error: Failed to cast object to TObjString." << std::endl;
+      MACH3LOG_ERROR("Failed to cast object to TObjString.");
       continue;
     }
     ss << line->GetString() << std::endl;
@@ -225,48 +226,100 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 /// @brief Overrides the configuration settings based on provided arguments.
 ///
 /// This function allows you to set configuration options in a nested YAML node.
-/// It accepts two, three, or four string arguments:
-/// - For two arguments, the first argument is a key, and the second is the value.
-/// - For three arguments, the first two arguments are keys (for nested configuration), and the third is the value.
-/// - For four arguments, the first three arguments are keys (for deeper nested configuration), and the fourth is the value.
-///
 /// @param node YAML node that will be modified
-/// @param args The arguments to override the configuration.
-///             - When two arguments are provided, they represent the key and value, respectively.
-///             - When three arguments are provided, they represent two keys and a value.
-///             - When four arguments are provided, they represent three keys and a value.
+/// @param args The arguments to override the configuration. The last argument
+///             will be used as the value
 ///
 /// @note Example usage:
 /// @code
 /// OverrideConfig(config, "General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
+/// OverrideConfig(config, "General", "MyDouble", 5.3);
 /// @endcode
-template <typename... Args>
-void OverrideConfig(YAML::Node& node, Args... args) {
+template <typename TValue>
+void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
 // **********************
-  static_assert(sizeof...(args) == 2 || sizeof...(args) == 3 || sizeof...(args) == 4,
-                "OverrideConfig accepts either 2, 3, or 4 arguments.");
+  node[key] = val;
+}
+template <typename... Args>
+void OverrideConfig(YAML::Node node, std::string const &key, Args... args) {
+// **********************
+  OverrideConfig(node[key], args...);
+}
 
-  auto args_tuple = std::make_tuple(args...); // Create a tuple from the parameter pack
+// **********************
+/// @brief Function to demangle type names
+inline std::string DemangleTypeName(const std::string& mangledName) {
+// **********************
+  int status = 0;
+  char* demangledName = abi::__cxa_demangle(mangledName.c_str(), nullptr, nullptr, &status);
+  std::string result = (status == 0) ? demangledName : mangledName;
+  free(demangledName);
+  return result;
+}
 
-  if constexpr (sizeof...(args) == 2) {
-    std::string blarb1 = std::get<0>(args_tuple); // First argument
-    std::string result = std::get<1>(args_tuple); // Second argument
-
-    node[blarb1] = result;
+// **********************
+/// @brief Get content of config file
+/// @param node Yaml node
+template<typename Type>
+Type Get(const YAML::Node& node, const std::string File, const int Line) {
+// **********************
+  if (!node) {
+    MACH3LOG_ERROR("Empty Yaml node");
+    throw MaCh3Exception(File , Line );
   }
-  else if constexpr (sizeof...(args) == 3) {
-    std::string blarb1 = std::get<0>(args_tuple); // First argument
-    std::string blarb2 = std::get<1>(args_tuple); // Second argument
-    std::string result = std::get<2>(args_tuple); // Third argument
-
-    node[blarb1][blarb2] = result;
-  }
-  else if constexpr (sizeof...(args) == 4) {
-    std::string blarb1 = std::get<0>(args_tuple); // First argument
-    std::string blarb2 = std::get<1>(args_tuple); // Second argument
-    std::string blarb3 = std::get<2>(args_tuple); // Third argument
-    std::string result = std::get<3>(args_tuple); // Fourth argument
-
-    node[blarb1][blarb2][blarb3] = result;
+  try {
+    // Attempt to convert the node to the expected type
+    return node.as<Type>();
+  } catch (const YAML::BadConversion& e) {
+    const std::string nodeAsString = YAMLtoSTRING(node);
+    MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
+    MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    throw MaCh3Exception(File , Line );
   }
 }
+
+// **********************
+/// @brief Get content of config file if node is not found take default value specified
+/// @param node Yaml node
+/// @param defval Default value which will be used in case node doesn't exist
+template<typename Type>
+Type GetFromManager(const YAML::Node& node, Type defval, const std::string File = "", const int Line = 1) {
+// **********************
+  if (!node) {
+    return defval;
+  }
+  try {
+    // Attempt to convert the node to the expected type
+    return node.as<Type>();
+  } catch (const YAML::BadConversion& e) {
+    const std::string nodeAsString = YAMLtoSTRING(node);
+    MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
+    MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    //const std::string expectedType = DemangleTypeName(typeid(Type).name());
+    //MACH3LOG_ERROR("Expected argument is {}", expectedType);
+    if(File == "") {
+      throw MaCh3Exception(__FILE__ , __LINE__);
+    } else {
+      throw MaCh3Exception(File , Line );
+    }
+  }
+}
+
+// **********************
+/// @brief Open YAML file
+/// @param filename name of filename to open
+/// @param File name of file where function is called
+/// @param Line number where function is called
+inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string& File, const int Line) {
+// **********************
+  try {
+    return YAML::LoadFile(filename);
+  } catch (const std::exception& e) {
+    MACH3LOG_ERROR("{}", e.what());
+    MACH3LOG_ERROR("Can't open file {}", filename);
+    throw MaCh3Exception(File, Line);
+  }
+}
+
+/// Macro to simplify calling LoadYaml with file and line info
+#define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)

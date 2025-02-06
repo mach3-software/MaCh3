@@ -1,7 +1,7 @@
 Manager
 =======
 
-This module handles the high level stuff like config options and YAML stuff. The main class is the :py:class:`pyMaCh3.manager.Manager` class. \
+This module handles the high level stuff like config options and YAML stuff. The main class is the :py:class:`pyMaCh3._pyMaCh3.manager.Manager` class. \
 You can read more about the manager and config files on `the wiki page <https://github.com/mach3-software/MaCh3/wiki/01.-Manager-and-config-handling>`_. \
 YAML stuff works essentially the same as in the c++ version but with some caveats. 
 The main difference is that in the python version, the way that you access the actual data of a yaml node is different due to the way the python binding of the c++ code works. 
@@ -45,7 +45,7 @@ Parsing arrays can be made a bit less painful using list comprehension ::
    str_list = [i.data() for i in node['StrArray']] 
 
 
-.. automodapi:: pyMaCh3.manager
+.. automodapi:: pyMaCh3._pyMaCh3.manager
    :members:
    :undoc-members:
    :show-inheritance:

@@ -10,6 +10,13 @@
 #include <iostream>
 #include <map>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 // ROOT
 #include "TCanvas.h"
 #include "TGraph2D.h"
@@ -29,6 +36,7 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TMultiGraph.h"
+#pragma GCC diagnostic pop
 
 namespace MaCh3Plotting {
 /// @defgroup Utils Plotting Utility Functions
@@ -46,13 +54,13 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName = "", std::string newTitle =
 /// @brief This handy little function lets you interpret a TGraph as a vector containing the same data.
 /// @param graph The graph you want to convert.
 /// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis
-std::vector<std::vector<float>> TGraphToVector(TGraph graph);
+std::vector<std::vector<double>> TGraphToVector(TGraph graph);
 
 
 /// @brief This handy little function lets you interpret a 2d TGraph as a vector containing the same data.
 /// @param graph The graph you want to convert.
 /// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis, the 3rd is the z axis
-std::vector<std::vector<float>> TGraphToVector(TGraph2D graph);
+std::vector<std::vector<double>> TGraphToVector(TGraph2D graph);
 
 
 /// @}

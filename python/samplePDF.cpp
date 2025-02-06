@@ -2,9 +2,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include "samplePDF/samplePDFBase.h"
 #include "samplePDF/samplePDFFDBase.h"
-#include "samplePDF/FDMCStruct.h"
 
 namespace py = pybind11;
 
@@ -254,7 +252,7 @@ void initSamplePDF(py::module &m){
 
         .def(
             "get_bin_LLH",
-            py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH),
+            py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH, py::const_),
             "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
             :param data: The data content of the bin. \n\
             :param mc: The mc content of the bin \n\
@@ -276,19 +274,6 @@ void initSamplePDF(py::module &m){
             py::arg("mc_version"),
             py::arg("xsec_cov")
         )
-        
-        .def(
-            "set_xsec_cov", 
-            &samplePDFFDBase::SetXsecCov, 
-            "Set the cross section covariance matrix object."
-        )
-        
-        .def(
-            "set_osc_cov", 
-            &samplePDFFDBase::SetOscCov, 
-            "Set the oscillation parameter covariance matrix object."
-        )
-        
     ;
 
     /* Not sure if this will be needed in future versions of MaCh3 so leaving commented for now

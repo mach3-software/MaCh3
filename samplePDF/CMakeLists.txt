@@ -2,16 +2,18 @@ set(HEADERS
     samplePDFBase.h
     samplePDFFDBase.h
     Structs.h
-    FDMCStruct.h
+    HistogramUtils.h
+    FarDetectorCoreInfoStruct.h
 )
 
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
-    Structs.cpp
+    HistogramUtils.cpp
 )
 
-target_link_libraries(SamplePDF Splines NuOscillator Covariance MaCh3CompilerOptions)
+target_link_libraries(SamplePDF PUBLIC Splines NuOscillator)
+target_link_libraries(SamplePDF PRIVATE MaCh3Warnings)
 
 target_include_directories(SamplePDF PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

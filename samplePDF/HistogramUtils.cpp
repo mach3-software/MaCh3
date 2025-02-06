@@ -1,94 +1,15 @@
-#include "samplePDF/Structs.h"
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #include "TList.h"
 #include "TObjArray.h"
+#pragma GCC diagnostic pop
 
-namespace MaCh3Utils {
-
-  // *****************************
-  // Get the mass of a particle from the PDG
-  // In GeV, not MeV!
-  double GetMassFromPDG(int PDG) {
-  // *****************************
-
-    switch (abs(PDG)) {  
-    case 11:
-      return 0.511E-3;
-      break;
-    case 13:
-      return 105.658E-3;
-      break;
-    case 15:
-      return 1.77682;
-      break;
-    case 22:
-      return 0.;
-      break;
-    case 211:
-      return 139.57E-3;
-      break;
-    case 111:
-      return 134.98E-3;
-      break;
-    case 2112:
-      return 939.565E-3;
-      break;
-    case 2212:
-      return 938.27E-3;
-      break;
-    //Oxygen nucleus
-    case 1000080160:
-      return 14.89926;
-      break;
-	//eta
-	case 221:
-	  return 547.862E-3;
-	  break;
-	  //K^0 (s or l)
-	case 311:
-	case 130:
-	case 310:
-	  return 497.611E-3;
-	  break;
-	case 321:
-	  return 493.677E-3;
-	  break;
-	// Lamda baryon
-	case 3122:
-	  return 1115.683E-3;
-	  break;
-    case 12:
-    case 14:
-    case 16:
-      return 0.0;
-      break;
-    default:
-      MACH3LOG_ERROR("Haven't got a saved mass for PDG: {}", PDG);
-      MACH3LOG_ERROR("Please implement me!");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    } // End switch
-    MACH3LOG_ERROR("Warning, didn't catch a saved mass");
-    return 0;
-  }
-
- 
-  //DB Anything added here must be of the form 2^X, where X is an integer
-  //
-  //DB Used to contain which DetIDs are supported
-  std::unordered_map<int,int>KnownDetIDsMap({
-      {0,1},    //ND
-      {1,8},    //FD
-      {2,16},   //SK1Rmu
-      {3,32},   //Nova
-      {4,64},   //Atm SubGeV e-like
-      {5,128},  //Atm SubGeV mu-like 
-      {6,256},  //Atm MultiGeV e-like
-      {7,512},  //Atm MultiGeV mu-like
-	  });
-	
-  int nKnownDetIDs = KnownDetIDsMap.size();
-
-}
+#include "samplePDF/HistogramUtils.h"
 
 // **************************************************
 //KS: ROOT changes something with binning when moving from ROOT 5 to ROOT 6. If you open ROOT5 produced file with ROOT6 you will be missing 9 last bins
@@ -147,7 +68,7 @@ double NoOverflowIntegral(TH2Poly* poly) {
 //WP: Helper function for projecting TH2Poly onto the X axis
 TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors) {
 // **************************************************
-  TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), xbins.size()-1, &xbins[0]);
+  TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), int(xbins.size()-1), &xbins[0]);
 
   //KS: Temp Histogram to store error, use double as this is thread safe
   std::vector<double> hProjX_Error(hProjX->GetXaxis()->GetNbins() + 1, 0.0);
@@ -215,8 +136,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
 //WP: Helper function for projecting TH2Poly onto the Y axis
 TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
-
-  TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),ybins.size()-1,&ybins[0]);
+  TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),int(ybins.size()-1),&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
   std::vector<double> hProjY_Error(hProjY->GetXaxis()->GetNbins() + 1, 0.0);
   double ylow, yup, frac = 0.;
@@ -293,6 +213,44 @@ TH2Poly* NormalisePoly(TH2Poly *Histogram) {
 }
 
 // ****************
+// Normalise a TH2Poly
+void NormaliseTH2Poly(TH2Poly* Histogram){
+// ****************
+  const double Integral = NoOverflowIntegral(Histogram);
+  for(int j = 1; j < Histogram->GetNumberOfBins()+1; j++)
+  {
+    Histogram->SetBinContent(j, Histogram->GetBinContent(j)/Integral);
+  }
+}
+
+// ****************
+// Make a ratio histogram
+template<class HistType>
+HistType* RatioHists(HistType *NumHist, HistType *DenomHist) {
+// ****************
+  HistType *NumCopy = static_cast<HistType*>(NumHist->Clone());
+  std::string title = std::string(DenomHist->GetName()) + "_ratio";
+  NumCopy->SetNameTitle(title.c_str(), title.c_str());
+  NumCopy->Divide(DenomHist);
+
+  return NumCopy;
+}
+
+// ****************
+// Make a ratio th2poly
+TH2Poly* RatioPolys(TH2Poly *NumHist, TH2Poly *DenomHist) {
+// ****************
+  TH2Poly *NumCopy = static_cast<TH2Poly*>(NumHist->Clone());
+  std::string title = std::string(DenomHist->GetName()) + "_ratio";
+  NumCopy->SetNameTitle(title.c_str(), title.c_str());
+
+  for(int i = 1; i < NumCopy->GetNumberOfBins()+1; ++i) {
+    NumCopy->SetBinContent(i,NumHist->GetBinContent(i)/DenomHist->GetBinContent(i));
+  }
+  return NumCopy;
+}
+
+// ****************
 TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
 // ****************
   double xlow, xup, ylow, yup;
@@ -300,7 +258,7 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
 
   HistTempName += "_";
   //make the th2d
-  TH2D *hist = (TH2D*) h2dhist->Clone();
+  TH2D *hist = static_cast<TH2D*>(h2dhist->Clone());
   hist->SetNameTitle(HistTempName.c_str(), HistTempName.c_str());
 
   for(int ix = 0; ix < hist->GetNbinsX() + 2; ix++) {
@@ -310,24 +268,24 @@ TH2D* ConvertTH2PolyToTH2D(TH2Poly *poly, TH2D *h2dhist) {
   }
   //Loop over poly bins, find the corresponding th2d and setbincontent!
   for(int i = 0; i< poly->GetNumberOfBins(); i++){
-    TH2PolyBin* polybin = (TH2PolyBin*) (poly->GetBins()->At(i)->Clone());
-    xlow = polybin->GetXMin();
-    xup = polybin->GetXMax();
-    ylow = polybin->GetYMin();
-    yup = polybin->GetYMax();
+    TH2PolyBin & polybin = static_cast<TH2PolyBin &>(*poly->GetBins()->At(i));
+    xlow = polybin.GetXMin();
+    xup = polybin.GetXMax();
+    ylow = polybin.GetYMin();
+    yup = polybin.GetYMax();
     int xbin, ybin;
 
     xbin = hist->GetXaxis()->FindBin(xlow+(xup-xlow)/2);
     ybin = hist->GetYaxis()->FindBin(ylow+(yup-ylow)/2);
 
     MACH3LOG_TRACE("Poly bin {}, xlow: {}, xup: {}, ylow: {}, yup: {}. Finding bin for ({}, {}). Found Bin ({}, {}) with content {}. But Poly content: {}",
-                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin->GetContent(), poly->GetBinContent(i));
-    hist->SetBinContent(xbin, ybin, polybin->GetContent());
+                i, xlow, xup, ylow, yup, (xlow + (xup - xlow) / 2), (ylow + (yup - ylow) / 2), xbin, ybin, polybin.GetContent(), poly->GetBinContent(i));
+    hist->SetBinContent(xbin, ybin, polybin.GetContent());
   }
   return hist;
 }
 // ****************
-TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
+TH2Poly* ConvertTH2DtoTH2Poly(TH2D* hist) {
 // ****************
   // Make the x axis from the momentum of lepton
   TAxis* xaxis = hist->GetXaxis();
@@ -378,7 +336,7 @@ TH2Poly* ConvertTH2DToTH2Poly(TH2D* hist) {
 //WP: Scale a TH2Poly and divide by bin width
 TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
 // ****************
-  TH2Poly* HistCopy = (TH2Poly*)(Histogram->Clone());
+  TH2Poly* HistCopy = static_cast<TH2Poly*>(Histogram->Clone());
   double xlow, xup, ylow, yup, area;
 
   for(int i = 1; i < HistCopy->GetNumberOfBins()+1; i++)
@@ -391,7 +349,6 @@ TH2Poly* PolyScaleWidth(TH2Poly *Histogram, double scale) {
     area = (xup-xlow)*(yup-ylow);
     HistCopy->SetBinContent(i, Histogram->GetBinContent(i)/(area*scale));
   }
-
   return HistCopy;
 }
 
@@ -412,15 +369,36 @@ double PolyIntegralWidth(TH2Poly *Histogram) {
     area = (xup-xlow)*(yup-ylow);
     integral += Histogram->GetBinContent(i)*area;
   }
-
   return integral;
+}
+
+// *********************
+TH2Poly* MakePolyHist(const std::string& name, const std::vector<double>& BinArray_x, const std::vector<double>& BinArray_y) {
+// *********************
+  TH2Poly* poly = new TH2Poly();
+  poly->SetName(name.c_str());
+  poly->SetTitle(name.c_str());
+  double xmax, xmin, ymax, ymin;
+  for(unsigned int iy = 0; iy < BinArray_y.size()-1; iy++)
+  {
+    ymax = BinArray_y[iy+1];
+    ymin = BinArray_y[iy];
+    for(unsigned int ix = 0; ix < BinArray_x.size()-1; ix++)
+    {
+      xmax = BinArray_x[ix+1];
+      xmin = BinArray_x[ix];
+      double binofx[] = {xmin, xmax, xmax, xmin};
+      double binofy[] = {ymin, ymin, ymax, ymax};
+      poly->AddBin(4,binofx,binofy);
+    }
+  }
+  return poly;
 }
 
 // *********************
 //KS: Remove fitted TF1 from hist to make comparison easier
 void RemoveFitter(TH1D* hist, const std::string& name) {
 // *********************
-
   TList *listOfFunctions = hist->GetListOfFunctions();
   TF1 *fitter = dynamic_cast<TF1*>(listOfFunctions->FindObject(name.c_str()));
 
@@ -429,10 +407,165 @@ void RemoveFitter(TH1D* hist, const std::string& name) {
 }
 
 // ****************
-//DB Get the Cernekov momentum threshold in MeV
+// Make Poisson Fluctuation of TH1D hist
+void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand){
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0);
+
+  for (int i = 1; i <= PolyHist->GetXaxis()->GetNbins(); ++i)
+  {
+    // Get the posterior predictive bin content
+    const double MeanContent = PolyHist->GetBinContent(i);
+    // Get a Poisson fluctuation of the content
+    const double Random = rand->PoissonD(MeanContent);
+    // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
+    FluctHist->SetBinContent(i,Random);
+  }
+}
+
+// ****************
+// Make Poisson Fluctuation of TH2Poly hist
+void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand) {
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  for (int i = 1; i < FluctHist->GetNumberOfBins()+1; ++i)
+  {
+    // Get the posterior predictive bin content
+    const double MeanContent = PolyHist->GetBinContent(i);
+    // Get a Poisson fluctuation of the content
+    const double Random = rand->PoissonD(MeanContent);
+    // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
+    FluctHist->SetBinContent(i,Random);
+  }
+}
+
+// ****************
+// Make Poisson Fluctuation of TH1D hist
+void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom3* rand){
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0);
+
+  const double evrate = PolyHist->Integral();
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
+  int count = 0;
+  while(count < num)
+  {
+    const double candidate = PolyHist->GetRandom();
+    FluctHist->Fill(candidate);
+    count++;
+  }
+}
+
+// ****************
+//KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
+// https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
+int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand){
+// ****************
+  const int nbins = PolyHist->GetNumberOfBins();
+  const double r1 = rand->Rndm();
+
+  double* fIntegral = new double[nbins+2];
+  fIntegral[0] = 0.0;
+
+  //KS: This is custom version of ComputeIntegral, once again ROOT was lazy :(
+  for (int i = 1; i < nbins+1; ++i)
+  {
+    fIntegral[i] = 0.0;
+    const double content = PolyHist->GetBinContent(i);
+    fIntegral[i] += fIntegral[i - 1] + content;
+  }
+  for (Int_t bin = 1; bin < nbins+1; ++bin)  fIntegral[bin] /= fIntegral[nbins];
+  fIntegral[nbins+1] = PolyHist->GetEntries();
+
+  //KS: We just return one rather then X and Y, this way we can use SetBinContent rather than Fill, which is faster
+  int iBin = int(TMath::BinarySearch(nbins, fIntegral, r1));
+  //KS: Have to increment because TH2Poly has stupid offset arghh
+  iBin += 1;
+
+  delete[] fIntegral;
+  return iBin;
+}
+
+// ****************
+// Make Poisson fluctuation of TH2Poly hist
+void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand){
+// ****************
+  // Make the Poisson fluctuated hist
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  const double evrate = NoOverflowIntegral(PolyHist);
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
+  int count = 0;
+  while(count < num)
+  {
+    const int iBin = GetRandomPoly2(PolyHist, rand);
+    FluctHist->SetBinContent(iBin, FluctHist->GetBinContent(iBin) + 1);
+    count++;
+  }
+}
+
+// *************************
+TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
+// *************************
+  TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
+  var->SetNameTitle((title).c_str(), (title).c_str());
+
+  // Need to draw TGraphs to set axes labels
+  var->Draw("AP");
+  var->GetXaxis()->SetTitle(sigmaArrayCentr->GetXaxis()->GetTitle());
+  var->GetYaxis()->SetTitle("Number of events/bin");
+
+  for (int m = 0; m < var->GetN(); ++m)
+  {
+    double xlow = sigmaArrayLeft->GetBinContent(m+1);
+    double xhigh = sigmaArrayRight->GetBinContent(m+1);
+    double xtemp;
+
+    // Figure out which variation is larger so we set the error correctly
+    if (xlow > xhigh)
+    {
+      xtemp = xlow;
+      xlow = xhigh;
+      xhigh = xtemp;
+    }
+
+    var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
+    var->SetPointEYlow(m, var->GetY()[m] - xlow);
+  }
+  return var;
+}
+
+// ****************
+//Fast and thread safe fill of violin histogram, it assumes both histograms have the same binning
+void FastViolinFill(TH2D* violin, TH1D* hist_1d){
+// ****************
+  for (int x = 0; x < violin->GetXaxis()->GetNbins(); ++x)
+  {
+    const int y = violin->GetYaxis()->FindBin(hist_1d->GetBinContent(x+1));
+    violin->SetBinContent(x+1, y,  violin->GetBinContent(x+1, y)+1);
+  }
+}
+
+
+// ****************
+//DB Get the Cherenkov momentum threshold in MeV
 double returnCherenkovThresholdMomentum(int PDG) {
 // ****************
-  double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
+  constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
@@ -442,8 +575,7 @@ double returnCherenkovThresholdMomentum(int PDG) {
 // Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
-
-  const double MLep = 0.10565837;
+  constexpr double MLep = 0.10565837;
 
   // Caluclate muon energy
   double ELep = sqrt((MLep*MLep)+(PLep*PLep));
@@ -458,12 +590,10 @@ double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
   return Q2Upd - InitialQ2;
 }
 
-
 // **************************************************************************
 // Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
 double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
 // ***************************************************************************
-
   double mNeff = 0.93956536 - Eb / 1000.;
   double mNoth = 0.93827203;
 
@@ -478,5 +608,4 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
 
   return Enu;
-
 }

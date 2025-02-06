@@ -10,7 +10,7 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
 
   // Starting parameters should be thrown
   reject = false;
-  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<double>();
+  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<unsigned>();
 
   AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
   if(AnnealTemp < 0) anneal = false;
@@ -227,13 +227,13 @@ void mcmc::PrintProgress() {
   MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it) {
-    if (std::string((*it)->getName()) == "xsec_cov") {
+  for (covarianceBase *cov : systematics) {
+    if (cov->getName() == "xsec_cov") {
       MACH3LOG_INFO("Cross-section parameters: ");
-      (*it)->printNominalCurrProp();
+      cov->printNominalCurrProp();
     }
   }
-  #ifdef DEBUF
+  #ifdef DEBUG
   if (debug) {
     debugFile << "\n-------------------------------------------------------" << std::endl;
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
@@ -249,7 +249,7 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
 
   // For MCMC we also need to set stepStart
   TFile *infile = new TFile(FitName.c_str(), "READ");
-  TTree *posts = (TTree*)infile->Get("posteriors");
+  TTree *posts = infile->Get<TTree>("posteriors");
   int step_val = 0;
 
   posts->SetBranchAddress("step",&step_val);

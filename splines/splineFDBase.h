@@ -1,7 +1,15 @@
 #pragma once
 
-//ROOT
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// ROOT includes
 #include "TH3F.h"
+#pragma GCC diagnostic pop
 
 //MaCh3
 #include "samplePDF/Structs.h"
@@ -9,6 +17,9 @@
 
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Henry Wallace
 class splineFDBase : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
@@ -51,24 +62,24 @@ class splineFDBase : public SplineBase {
 
 	void BuildSampleIndexingArray(std::string SampleName);
 	void PrepForReweight();
-	void getSplineCoeff_SepMany(int splineindex, _float_ *& xArray, _float_ *&manyArray);
+	void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
 	void PrintBinning(TAxis* Axis);
 	void PrintSampleDetails(std::string SampleName);
 	void PrintArrayDetails(std::string SampleName);
 	void PrintArrayDimension();
 
-	const double* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
+	const M3::float_t* retPointer(int sample, int oscchan, int syst, int mode, int var1bin, int var2bin, int var3bin){
 	  int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
 	  return &weightvec_Monolith[index];
 	}
 
   protected:
 	/// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
-	inline void FindSplineSegment() override;
+	void FindSplineSegment() override;
 	/// @brief CPU based code which eval weight for each spline
-	inline void CalcSplineWeights() override;
+	void CalcSplineWeights() override;
 	/// @brief Calc total event weight, not used by Bin-by-bin splines
-	inline void ModifyWeights() override {return;};
+	void ModifyWeights() override {return;};
 	/// Pointer to covariance xsec
 	covarianceXsec* xsec;
 
@@ -101,7 +112,7 @@ class splineFDBase : public SplineBase {
 	std::vector<int> UniqueSystIndices;
 	std::vector<int> UniqueSystNKnots;
 	std::vector<int> UniqueSystCurrSegment;
-	std::vector< std::vector<_float_> > UniqueSystXPts;
+	std::vector< std::vector<M3::float_t> > UniqueSystXPts;
 
 	/// @brief Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
@@ -115,11 +126,11 @@ class splineFDBase : public SplineBase {
 	int CoeffIndex;
 
 	//Probably need to clear these arrays up at some point
-	_float_ *xVarArray;
+	M3::float_t *xVarArray;
 	bool *isflatarray;    // Need to keep track of which splines are flat and which aren't
-	_float_ *xcoeff_arr;    //x coefficients for each spline
-	_float_ *manycoeff_arr; //ybcd coefficients for each spline
+	M3::float_t *xcoeff_arr;    //x coefficients for each spline
+	M3::float_t *manycoeff_arr; //ybcd coefficients for each spline
 
-	std::vector<double> weightvec_Monolith;
+	std::vector<M3::float_t> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;
 };
