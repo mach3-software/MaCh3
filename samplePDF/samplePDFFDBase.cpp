@@ -213,7 +213,10 @@ void samplePDFFDBase::SetupKinematicMap() {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   // KS: Ensure maps exist correctly
-  for (const auto& [key, value] : *KinematicParameters) {
+  for (const auto& pair : *KinematicParameters) {
+    const auto& key = pair.first;
+    const auto& value = pair.second;
+
     auto it = ReversedKinematicParameters->find(value);
     if (it == ReversedKinematicParameters->end() || it->second != key) {
       MACH3LOG_ERROR("Mismatch found: {} -> {} but {} -> {}",
