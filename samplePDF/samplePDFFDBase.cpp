@@ -1,11 +1,10 @@
 #include "samplePDFFDBase.h"
 #include "samplePDF/Structs.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
+_MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 #include <algorithm>
 #include <memory>
@@ -27,6 +26,9 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   }
   OscCov = osc_cov;
   
+  KinematicParameters = nullptr;
+  ReversedKinematicParameters = nullptr;
+
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
   SampleDetID = "";
@@ -198,8 +200,30 @@ void samplePDFFDBase::Initialise() {
   SetupFunctionalParameters();
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
-
+  MACH3LOG_INFO("Setting up Kinematic Map..");
+  SetupKinematicMap();
   MACH3LOG_INFO("=======================================================");
+}
+
+// ************************************************
+void samplePDFFDBase::SetupKinematicMap() {
+// ************************************************
+  if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr) {
+    MACH3LOG_INFO("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  // KS: Ensure maps exist correctly
+  for (const auto& pair : *KinematicParameters) {
+    const auto& key = pair.first;
+    const auto& value = pair.second;
+
+    auto it = ReversedKinematicParameters->find(value);
+    if (it == ReversedKinematicParameters->end() || it->second != key) {
+      MACH3LOG_ERROR("Mismatch found: {} -> {} but {} -> {}",
+                     key, value, value, (it != ReversedKinematicParameters->end() ? it->second : "NOT FOUND"));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -468,10 +492,9 @@ void samplePDFFDBase::fillArray_MP()  {
     for (size_t yBin=0;yBin<nYBins;yBin++) {
       samplePDFFD_array_private[yBin] = new double[nXBins];
       samplePDFFD_array_private_w2[yBin] = new double[nXBins];
-      for (size_t xBin=0;xBin<nXBins;xBin++) {
-        samplePDFFD_array_private[yBin][xBin] = 0.;
-        samplePDFFD_array_private_w2[yBin][xBin] = 0.;
-      }
+
+      std::fill_n(samplePDFFD_array_private[yBin], nXBins, 0.0);
+      std::fill_n(samplePDFFD_array_private_w2[yBin], nXBins, 0.0);
     }
     
     //DB - Brain dump of speedup ideas
@@ -1517,4 +1540,30 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   Selection = tmp_Selection;
 
   return _h1DVar;
+}
+
+// ************************************************
+int samplePDFFDBase::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
+// ************************************************
+  auto it = KinematicParameters->find(KinematicParameterStr);
+  if (it != KinematicParameters->end()) return it->second;
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameterStr);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return -999;
+}
+
+// ************************************************
+std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
+// ************************************************
+  auto it = ReversedKinematicParameters->find(KinematicParameter);
+  if (it != ReversedKinematicParameters->end()) {
+    return it->second;
+  }
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameter);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return "";
 }
