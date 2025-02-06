@@ -363,10 +363,10 @@ void SMonolith::MoveToGPU() {
 
   // Delete all the coefficient arrays from the CPU once they are on the GPU
   CleanVector(cpu_coeff_TF1_many);
-  CleanVector(cpu_paramNo_TF1_arr)
+  CleanVector(cpu_paramNo_TF1_arr);
   #ifndef Weight_On_SplineBySpline_Basis
   CleanVector(cpu_nParamPerEvent);
-  CleanVector(cpu_nParamPerEvent_tf1)
+  CleanVector(cpu_nParamPerEvent_tf1);
   #endif
   delete cpu_spline_handler;
   cpu_spline_handler = nullptr;
