@@ -7,13 +7,14 @@ var searchData=
   ['eigen_5fvalues_5fmaster_4',['eigen_values_master',['../classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1',1,'PCAHandler']]],
   ['eigen_5fvectors_5',['eigen_vectors',['../classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2',1,'PCAHandler']]],
   ['end_5fadaptive_5fupdate_6',['end_adaptive_update',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['errbuf_7',['errbuf',['../classsamplePDFBase.html#ace134e4f57297cc68b5b299f97821b6c',1,'samplePDFBase']]],
-  ['errormessage_8',['errorMessage',['../classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d',1,'MaCh3Exception']]],
-  ['errors_9',['Errors',['../classMCMCProcessor.html#a5174aaa900edf16ddc6e841ea4adae83',1,'MCMCProcessor']]],
-  ['errors_5fgauss_10',['Errors_Gauss',['../classMCMCProcessor.html#aa78b7ed1bb9966f84f4eaf8cedf5e688',1,'MCMCProcessor']]],
-  ['errors_5fhpd_11',['Errors_HPD',['../classMCMCProcessor.html#abb5c6ad85c89227bbb9bc5de2eb71272',1,'MCMCProcessor']]],
-  ['errors_5fhpd_5fnegative_12',['Errors_HPD_Negative',['../classMCMCProcessor.html#a7b85df39f22390dac24f4d66a89518e5',1,'MCMCProcessor']]],
-  ['errors_5fhpd_5fpositive_13',['Errors_HPD_Positive',['../classMCMCProcessor.html#af96664fa8cc51c49ad1385da07a343b8',1,'MCMCProcessor']]],
-  ['excludednames_14',['ExcludedNames',['../classMCMCProcessor.html#a7425f7802e50bcb5ff4b38e20157c423',1,'MCMCProcessor']]],
-  ['excludedtypes_15',['ExcludedTypes',['../classMCMCProcessor.html#aada4aadea10661586b46c1013a9d018f',1,'MCMCProcessor']]]
+  ['equalbinningperoscchannel_7',['EqualBinningPerOscChannel',['../classsamplePDFFDBase.html#aa567b7fbd9cd1da96d11e52f8dc31db5',1,'samplePDFFDBase']]],
+  ['errbuf_8',['errbuf',['../classsamplePDFBase.html#ace134e4f57297cc68b5b299f97821b6c',1,'samplePDFBase']]],
+  ['errormessage_9',['errorMessage',['../classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d',1,'MaCh3Exception']]],
+  ['errors_10',['Errors',['../classMCMCProcessor.html#a5174aaa900edf16ddc6e841ea4adae83',1,'MCMCProcessor']]],
+  ['errors_5fgauss_11',['Errors_Gauss',['../classMCMCProcessor.html#aa78b7ed1bb9966f84f4eaf8cedf5e688',1,'MCMCProcessor']]],
+  ['errors_5fhpd_12',['Errors_HPD',['../classMCMCProcessor.html#abb5c6ad85c89227bbb9bc5de2eb71272',1,'MCMCProcessor']]],
+  ['errors_5fhpd_5fnegative_13',['Errors_HPD_Negative',['../classMCMCProcessor.html#a7b85df39f22390dac24f4d66a89518e5',1,'MCMCProcessor']]],
+  ['errors_5fhpd_5fpositive_14',['Errors_HPD_Positive',['../classMCMCProcessor.html#af96664fa8cc51c49ad1385da07a343b8',1,'MCMCProcessor']]],
+  ['excludednames_15',['ExcludedNames',['../classMCMCProcessor.html#a7425f7802e50bcb5ff4b38e20157c423',1,'MCMCProcessor']]],
+  ['excludedtypes_16',['ExcludedTypes',['../classMCMCProcessor.html#aada4aadea10661586b46c1013a9d018f',1,'MCMCProcessor']]]
 ];
