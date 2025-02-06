@@ -82,6 +82,12 @@ void samplePDFFDBase::ReadSampleConfig()
   }
   NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
   MCSamples.resize(nSamples);
+
+  if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "EqualBinningPerOscChannel")) {
+    MACH3LOG_ERROR("NuOsc::EqualBinningPerOscChannel is not defined in {}, please add this!", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  EqualBinningPerOscChannel = SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"].as<bool>();
   
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
@@ -341,10 +347,16 @@ void samplePDFFDBase::reweight() {
       #pragma GCC diagnostic ignored "-Wuseless-cast"
       OscVec[iPar] = M3::float_t(*OscParams[iPar]);
       #pragma GCC diagnostic pop
-    } 
-    for (int iSample = 0;iSample < int(MCSamples.size()); ++iSample) {
-      NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
     }
+
+    if (EqualBinningPerOscChannel) {
+      NuOscProbCalcers[0]->CalculateProbabilities(OscVec);
+    } else {
+      for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
+	        NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+      }
+    }
+    
   }
   
   fillArray();
@@ -1231,47 +1243,72 @@ void samplePDFFDBase::addData(TH2D* Data) {
 // ************************************************
 void samplePDFFDBase::SetupNuOscillator() {
 // ************************************************
-  OscillatorFactory* OscillFactory = new OscillatorFactory();  
+  OscillatorFactory* OscillFactory = new OscillatorFactory();
+  if (!OscCov) {
+    MACH3LOG_WARN("Attempted to setup NuOscillator without covarianceOsc object");
+    return;
+  }
 
-  NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
-  for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
-    if(OscCov){
+  //DB's explanation of EqualBinningPerOscChannel:
+  //In the situation where we are applying binning oscillation probabilities to a samplePDF object, it maybe the case that there is identical binning per oscillation channel
+  //In which case, and remembering that each NuOscillator::Oscillator object calculate the oscillation probabilities for all channels, we just have to create one Oscillator object and use the results from that
+  //This means that we can get upto a factor of 12 reduction in the calculation time of the oscillation probabilities, because we don't need to repeat the operation per oscillation channel
+
+  if (EqualBinningPerOscChannel) {
+    NuOscProbCalcers = std::vector<OscillatorBase*>(1);
+    LoggerPrint("NuOscillator",
+		[](const std::string& message) { MACH3LOG_INFO("{}", message); },
+		[this, &OscillFactory]() {
+		  this->NuOscProbCalcers[0] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
+		});
+
+    if (!NuOscProbCalcers[0]->EvalPointsSetInConstructor()) {
+      MACH3LOG_ERROR("Attempted to use equal binning per oscillation channel, but not binning has been set in the NuOscillator::Oscillator object");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    NuOscProbCalcers[0]->Setup();
+  } else {
+    NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
+    for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
       MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
-
+      
       LoggerPrint("NuOscillator",
-                  [](const std::string& message) { MACH3LOG_INFO("{}", message); },
-                  [this, iSample, &OscillFactory]() {
-                    this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
-                  });
-
+		  [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+		  [this, iSample, &OscillFactory]() {
+		    this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
+		  });
+      
       if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-        std::vector<M3::float_t> EnergyArray;
-        for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-          if (!MCSamples[iSample].isNC[iEvent]) {
-            EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
-          }
-        }
-        std::sort(EnergyArray.begin(),EnergyArray.end());
-        NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
-
-        //============================================================================
-        //DB Atmospheric only part
-        if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
-          std::vector<M3::float_t> CosineZArray;
-          for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-            //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-            if (!MCSamples[iSample].isNC[iEvent]) {
-              CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
-            }
-          }
-          std::sort(CosineZArray.begin(),CosineZArray.end());
-
-          NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
-        }
+	std::vector<M3::float_t> EnergyArray;
+	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+	  if (!MCSamples[iSample].isNC[iEvent]) {
+	    EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
+	  }
+	}
+	std::sort(EnergyArray.begin(),EnergyArray.end());
+	NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
+	
+	//============================================================================
+	//DB Atmospheric only part
+	if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+	  std::vector<M3::float_t> CosineZArray;
+	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+	    //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+	    if (!MCSamples[iSample].isNC[iEvent]) {
+	      CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
+	    }
+	  }
+	  std::sort(CosineZArray.begin(),CosineZArray.end());
+	  
+	  NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+	}
       }
       NuOscProbCalcers[iSample]->Setup();
-    } 
+    }
+  }
+  
+  for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
@@ -1310,15 +1347,19 @@ void samplePDFFDBase::SetupNuOscillator() {
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
-        if(OscCov){
-          if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
-            //Atmospherics
-            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
-          } else {
-            //Beam
-            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
-          }
+	int Index = 0;
+	if (!EqualBinningPerOscChannel) {
+	  Index = static_cast<int>(iSample);
+	}
+	if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
+	  //Atmospherics
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[Index]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
+	} else {
+	  //Beam
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[Index]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
         }
+
+	
       } // end if NC
     } // end loop over events
   }// end loop over channels
