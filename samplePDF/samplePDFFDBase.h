@@ -70,13 +70,17 @@ public:
 
   TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
 
-  //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  /// ETA function to generically convert a string from xsec cov to a kinematic type
+  int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
+  /// ETA function to generically convert a kinematic type from xsec cov to a string
+  std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
+
+  /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
+  void SetupKinematicMap();
 
   /// @todo abstract the spline initialisation completely to core
   /// @brief initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up
@@ -144,6 +148,7 @@ public:
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
@@ -235,6 +240,11 @@ public:
   /// most of the time this is just the same as StoredSelection
   std::vector< std::vector<double> > Selection;
    //===========================================================================
+
+  /// Mapping between string and kinematic enum
+  const std::unordered_map<std::string, int>* KinematicParameters;
+  /// Mapping between kinematic enum and string
+  const std::unordered_map<int, std::string>* ReversedKinematicParameters;
 
   std::unique_ptr<manager> SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
