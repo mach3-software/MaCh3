@@ -9,13 +9,14 @@ var searchData=
   ['ratiolabelscaling_6',['ratioLabelScaling',['../PlotLLH_8cpp.html#a152bc19a7768c2022e7195771f385521',1,'PlotLLH.cpp']]],
   ['ratioplotsplit_7',['ratioPlotSplit',['../PlotLLH_8cpp.html#a45cc23dd922ece737b1306d357671417',1,'PlotLLH.cpp']]],
   ['reject_8',['reject',['../classmcmc.html#a537f7c2411a6a8e65fdf57b81ce6fe4a',1,'mcmc']]],
-  ['rhat_9',['RHat',['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp']]],
-  ['rhatfolded_10',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
-  ['rnd_11',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary::rnd()'],['../classsamplePDFBase.html#a06fd2c9575c0b9e56aaaf78b5be59b44',1,'samplePDFBase::rnd()']]],
-  ['rw_5fetru_12',['rw_etru',['../structFarDetectorCoreInfo.html#a90ac71448d50c0b8db0a4479444779c3',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5flower_5fxbinedge_13',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a1da2583460c7d5292c97cb44187b9d91',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5fxbinedge_14',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#a0cb33607ebcc5e8ab3dc2e03b61744b0',1,'FarDetectorCoreInfo']]],
-  ['rw_5ftruecz_15',['rw_truecz',['../structFarDetectorCoreInfo.html#a6a26058f1a5ee11d9dfbfb9433acd282',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fupper_5fxbinedge_16',['rw_upper_upper_xbinedge',['../structFarDetectorCoreInfo.html#ad1b522c6ab1427789fb1888657173572',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fxbinedge_17',['rw_upper_xbinedge',['../structFarDetectorCoreInfo.html#a697bb2e1b4ec61a6125b04e856f4825f',1,'FarDetectorCoreInfo']]]
+  ['reversedkinematicparameters_9',['ReversedKinematicParameters',['../classsamplePDFFDBase.html#a8846231f1fe9375ee934c7b8da9e31fa',1,'samplePDFFDBase']]],
+  ['rhat_10',['RHat',['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp']]],
+  ['rhatfolded_11',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
+  ['rnd_12',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary::rnd()'],['../classsamplePDFBase.html#a06fd2c9575c0b9e56aaaf78b5be59b44',1,'samplePDFBase::rnd()']]],
+  ['rw_5fetru_13',['rw_etru',['../structFarDetectorCoreInfo.html#a90ac71448d50c0b8db0a4479444779c3',1,'FarDetectorCoreInfo']]],
+  ['rw_5flower_5flower_5fxbinedge_14',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a1da2583460c7d5292c97cb44187b9d91',1,'FarDetectorCoreInfo']]],
+  ['rw_5flower_5fxbinedge_15',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#a0cb33607ebcc5e8ab3dc2e03b61744b0',1,'FarDetectorCoreInfo']]],
+  ['rw_5ftruecz_16',['rw_truecz',['../structFarDetectorCoreInfo.html#a6a26058f1a5ee11d9dfbfb9433acd282',1,'FarDetectorCoreInfo']]],
+  ['rw_5fupper_5fupper_5fxbinedge_17',['rw_upper_upper_xbinedge',['../structFarDetectorCoreInfo.html#ad1b522c6ab1427789fb1888657173572',1,'FarDetectorCoreInfo']]],
+  ['rw_5fupper_5fxbinedge_18',['rw_upper_xbinedge',['../structFarDetectorCoreInfo.html#a697bb2e1b4ec61a6125b04e856f4825f',1,'FarDetectorCoreInfo']]]
 ];
