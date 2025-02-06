@@ -2,7 +2,6 @@
 
 // MaCh3 includes
 #include "manager/manager.h"
-#include "samplePDF/Structs.h"
 #include "covariance/CovarianceUtils.h"
 #include "covariance/AdaptiveMCMCHandler.h"
 #include "covariance/PCAHandler.h"
@@ -65,7 +64,7 @@ class covarianceBase {
   /// \ingroup Setters
   void setParProp(const int i, const double val) {
     _fPropVal[i] = val;
-    if (pca) TransferToPCA();
+    if (pca) PCAObj->TransferToPCA();
   }
   /// @brief Set parameter values using vector, it has to have same size as covariance class
   /// @param pars Vector holding new values for every parameter
@@ -259,59 +258,59 @@ class covarianceBase {
   /// @param i Parameter index
   inline double getParProp_PCA(const int i)  {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    return fParProp_PCA(i);
+    return PCAObj->fParProp_PCA(i);
   }
   
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   inline double getParCurr_PCA(const int i) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    return fParCurr_PCA(i);
+    return PCAObj->fParCurr_PCA(i);
   }
 
   /// @brief Is parameter fixed in PCA base or not
   /// @param i Parameter index
   inline bool isParameterFixedPCA(const int i) {
-    if (fParSigma_PCA[i] < 0) { return true;  }
-    else                      { return false; }
+    if (PCAObj->fParSigma_PCA[i] < 0) { return true;  }
+    else                              { return false; }
   }
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
   inline const TMatrixD getTransferMatrix() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    return PCAObj.TransferMat;
+    return PCAObj->TransferMat;
   }
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
   inline const TMatrixD getEigenVectors() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    return PCAObj.eigen_vectors;
+    return PCAObj->eigen_vectors;
   }
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use getEigenValuesMaster
   inline const TVectorD getEigenValues() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    return PCAObj.eigen_values;
+    return PCAObj->eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use getEigenValues
   inline const std::vector<double> getEigenValuesMaster() {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    return PCAObj.eigen_values_master;
+    return PCAObj->eigen_values_master;
   }
   /// @brief Set proposed value for parameter in PCA base
   /// @param i Parameter index
   /// @param value new value
   inline void setParProp_PCA(const int i, const double value) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    fParProp_PCA(i) = value;
+    PCAObj->fParProp_PCA(i) = value;
     // And then transfer back to the parameter basis
-    TransferToParam();
+    PCAObj->TransferToParam();
   }
   /// @brief Set current value for parameter in PCA base
   /// @param i Parameter index
   /// @param value new value
   inline void setParCurr_PCA(const int i, const double value) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
-    fParCurr_PCA(i) = value;
+    PCAObj->fParCurr_PCA(i) = value;
     // And then transfer back to the parameter basis
-    TransferToParam();
+    PCAObj->TransferToParam();
   }
 
   /// @brief Set values for PCA parameters in PCA base
@@ -324,10 +323,10 @@ class covarianceBase {
     }
     int parsSize = int(pars.size());
     for (int i = 0; i < parsSize; i++) {
-      fParProp_PCA(i) = pars[i];
+      PCAObj->fParProp_PCA(i) = pars[i];
     }
     //KS: Transfer to normal base
-    TransferToParam();
+    PCAObj->TransferToParam();
   }
 
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
@@ -410,10 +409,6 @@ protected:
 
   /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
   void makeClosestPosDef(TMatrixDSym *cov);
-  /// @brief Transfer param values from normal base to PCA base
-  void TransferToPCA();
-  /// @brief Transfer param values from PCA base to normal base
-  void TransferToParam();
 
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
@@ -495,17 +490,6 @@ protected:
   /// Index of the last param that is being decomposed
   int LastPCAdpar;
 
-  /// Prefit value for PCA params
-  std::vector<double> _fPreFitValue_PCA;
-  /// CW: Current parameter value in PCA base
-  TVectorD fParProp_PCA;
-  /// CW: Proposed parameter value in PCA base
-  TVectorD fParCurr_PCA;
-  /// Tells if parameter is fixed in PCA base or not
-  std::vector<double> fParSigma_PCA;
-  /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
-  std::vector<int> isDecomposed_PCA;
-
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
   /// Matrix which we use for step proposal after Cholesky decomposition
@@ -517,7 +501,7 @@ protected:
   bool use_adaptive;
 
   /// Struct containing information about PCA
-  PCAHandler PCAObj;
+  std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption
   adaptive_mcmc::AdaptiveMCMCHandler AdaptiveHandler;
 };
