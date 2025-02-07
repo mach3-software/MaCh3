@@ -654,7 +654,7 @@ void covarianceBase::printNominalCurrProp() const {
 // fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
 //                    true = evaluate likelihood (so run with a prior)
 //                    false = don't evaluate likelihood (so run without a prior)
-double covarianceBase::CalcLikelihood() _noexcept_ {
+double covarianceBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
   double logL = 0.0;
   #ifdef MULTITHREAD
@@ -676,7 +676,7 @@ double covarianceBase::CalcLikelihood() _noexcept_ {
 }
 
 // ********************************************
-int covarianceBase::CheckBounds() const {
+int covarianceBase::CheckBounds() const _noexcept_ {
 // ********************************************
   int NOutside = 0;
   #ifdef MULTITHREAD
