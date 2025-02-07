@@ -1423,7 +1423,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  419</span>        <span class="keywordflow">if</span> ( setInputBranch )</div>
 <div class="line"><span class="lineno">  420</span>        {</div>
 <div class="line"><span class="lineno">  421</span>          <span class="comment">// EM: should probably use MCMCProcessor for this so we can use caching, gpu etc.</span></div>
-<div class="line"><span class="lineno">  422</span>          inputFileDef.MCMCstepParamsMap[parameter] = <span class="keyword">new</span> double( <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a> ); <span class="comment">// &lt;- initialise the parameter step values </span></div>
+<div class="line"><span class="lineno">  422</span>          inputFileDef.MCMCstepParamsMap[parameter] = <span class="keyword">new</span> double( <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a> ); <span class="comment">// &lt;- initialise the parameter step values</span></div>
 <div class="line"><span class="lineno">  423</span>          inputFileDef.posteriorTree-&gt;SetBranchAddress( branchNames[paramIdx], inputFileDef.MCMCstepParamsMap.at(parameter) );</div>
 <div class="line"><span class="lineno">  424</span>        }</div>
 <div class="line"><span class="lineno">  425</span>        <span class="keywordflow">break</span>;</div>
@@ -1432,7 +1432,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  428</span>  }</div>
 <div class="line"><span class="lineno">  429</span>  <span class="keywordflow">return</span> wasFound;</div>
 <div class="line"><span class="lineno">  430</span>}</div>
-<div class="ttc" id="aCore_8h_html_aa2920b946077e971486eaf1b49101f01"><div class="ttname"><a href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00052">Core.h:52</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a32ef26a222f7341e03dcc42cdd2badd3"><div class="ttname"><a href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00033">Core.h:33</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2645,7 +2645,7 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  320</span>    {</div>
 <div class="line"><span class="lineno">  321</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have an MCMC entry for parameter {}&quot;</span>, fileNum, paramName);</div>
 <div class="line"><span class="lineno">  322</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning a bad float&quot;</span>);</div>
-<div class="line"><span class="lineno">  323</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>; </div>
+<div class="line"><span class="lineno">  323</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  324</span>    }</div>
 <div class="line"><span class="lineno">  325</span> </div>
 <div class="line"><span class="lineno">  326</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].MCMCstepParamsMap.at(paramName);</div>
@@ -2788,9 +2788,9 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  130</span>    <span class="keywordflow">return</span> inputFileDef.postFitErrors.at(errorType).at(paramName);</div>
 <div class="line"><span class="lineno">  131</span>  }</div>
 <div class="line"><span class="lineno">  132</span> </div>
-<div class="line"><span class="lineno">  133</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit error for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  133</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit error for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>;</div>
+<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  136</span>}</div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a2f8f94ca3b6e0d2b34c75dee24b81e49"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">MaCh3Plotting::InputManager::getFile</a></div><div class="ttdeci">InputFile const &amp; getFile(int fileId) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00498">inputManager.h:498</a></div></div>
 </div><!-- fragment -->
@@ -2863,9 +2863,9 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  159</span>    <span class="keywordflow">return</span> inputFileDef.postFitValues.at(errorType).at(paramName);</div>
 <div class="line"><span class="lineno">  160</span>  }</div>
 <div class="line"><span class="lineno">  161</span>  </div>
-<div class="line"><span class="lineno">  162</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit value for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  162</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Didn&#39;t fnd {} post fit value for {}. Returning {}&quot;</span>, errorType, paramName, <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  163</span> </div>
-<div class="line"><span class="lineno">  164</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>;</div>
+<div class="line"><span class="lineno">  164</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  165</span>}</div>
 </div><!-- fragment -->
 </div>

@@ -554,11 +554,11 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  396</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;All tests will be performed with {} threads&quot;</span>, <a class="code hl_function" href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">M3::GetNThreads</a>());</div>
 <div class="line"><span class="lineno">  397</span> </div>
 <div class="line"><span class="lineno">  398</span>  <span class="comment">// Reweight the MC</span></div>
-<div class="line"><span class="lineno">  399</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno">  399</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ++ivs)</div>
 <div class="line"><span class="lineno">  400</span>  {</div>
 <div class="line"><span class="lineno">  401</span>    TStopwatch clockRace;</div>
 <div class="line"><span class="lineno">  402</span>    clockRace.Start();</div>
-<div class="line"><span class="lineno">  403</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; Lap++) {</div>
+<div class="line"><span class="lineno">  403</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; ++Lap) {</div>
 <div class="line"><span class="lineno">  404</span>      <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;reweight();</div>
 <div class="line"><span class="lineno">  405</span>    }</div>
 <div class="line"><span class="lineno">  406</span>    clockRace.Stop();</div>
@@ -566,11 +566,11 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  408</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;On average {:.6f}&quot;</span>, clockRace.RealTime()/NLaps);</div>
 <div class="line"><span class="lineno">  409</span>  }</div>
 <div class="line"><span class="lineno">  410</span> </div>
-<div class="line"><span class="lineno">  411</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno">  411</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ++ivs)</div>
 <div class="line"><span class="lineno">  412</span>  {</div>
 <div class="line"><span class="lineno">  413</span>    TStopwatch clockRace;</div>
 <div class="line"><span class="lineno">  414</span>    clockRace.Start();</div>
-<div class="line"><span class="lineno">  415</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; Lap++) {</div>
+<div class="line"><span class="lineno">  415</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; ++Lap) {</div>
 <div class="line"><span class="lineno">  416</span>      <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetLikelihood();</div>
 <div class="line"><span class="lineno">  417</span>    }</div>
 <div class="line"><span class="lineno">  418</span>    clockRace.Stop();</div>
@@ -585,7 +585,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  427</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>.size(); ++s) {</div>
 <div class="line"><span class="lineno">  428</span>    TStopwatch clockRace;</div>
 <div class="line"><span class="lineno">  429</span>    clockRace.Start();</div>
-<div class="line"><span class="lineno">  430</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; Lap++) {</div>
+<div class="line"><span class="lineno">  430</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; ++Lap) {</div>
 <div class="line"><span class="lineno">  431</span>      <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;proposeStep();</div>
 <div class="line"><span class="lineno">  432</span>    }</div>
 <div class="line"><span class="lineno">  433</span>    clockRace.Stop();</div>
@@ -599,7 +599,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  441</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>.size(); ++s) {</div>
 <div class="line"><span class="lineno">  442</span>    TStopwatch clockRace;</div>
 <div class="line"><span class="lineno">  443</span>    clockRace.Start();</div>
-<div class="line"><span class="lineno">  444</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; Lap++) {</div>
+<div class="line"><span class="lineno">  444</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> Lap = 0; Lap &lt; NLaps; ++Lap) {</div>
 <div class="line"><span class="lineno">  445</span>      <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;GetLikelihood();</div>
 <div class="line"><span class="lineno">  446</span>    }</div>
 <div class="line"><span class="lineno">  447</span>    clockRace.Stop();</div>
@@ -2009,7 +2009,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  274</span>  TFile *infile = <span class="keyword">new</span> TFile(FitName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>);</div>
 <div class="line"><span class="lineno">  275</span>  TTree *posts = infile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
 <div class="line"><span class="lineno">  276</span>  <span class="keywordtype">int</span> step_val = 0;</div>
-<div class="line"><span class="lineno">  277</span>  <span class="keywordtype">double</span> log_val = <a class="code hl_variable" href="Core_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a>;</div>
+<div class="line"><span class="lineno">  277</span>  <span class="keywordtype">double</span> log_val = <a class="code hl_variable" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a>;</div>
 <div class="line"><span class="lineno">  278</span>  posts-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>,&amp;step_val);</div>
 <div class="line"><span class="lineno">  279</span>  posts-&gt;SetBranchAddress(<span class="stringliteral">&quot;LogL&quot;</span>,&amp;log_val);</div>
 <div class="line"><span class="lineno">  280</span> </div>
@@ -2038,14 +2038,14 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  303</span>    CovarianceFolder-&gt;Close();</div>
 <div class="line"><span class="lineno">  304</span>    <span class="keyword">delete</span> CovarianceFolder;</div>
 <div class="line"><span class="lineno">  305</span> </div>
-<div class="line"><span class="lineno">  306</span>    std::vector&lt;double&gt; branch_vals(<a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;GetNumParams(), <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  306</span>    std::vector&lt;double&gt; branch_vals(<a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;GetNumParams(), <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  307</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;GetNumParams(); ++i) {</div>
 <div class="line"><span class="lineno">  308</span>      posts-&gt;SetBranchAddress(<a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;GetParName(i).c_str(), &amp;branch_vals[i]);</div>
 <div class="line"><span class="lineno">  309</span>    }</div>
 <div class="line"><span class="lineno">  310</span>    posts-&gt;GetEntry(posts-&gt;GetEntries()-1);</div>
 <div class="line"><span class="lineno">  311</span> </div>
 <div class="line"><span class="lineno">  312</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>[s]-&gt;GetNumParams(); ++i) {</div>
-<div class="line"><span class="lineno">  313</span>      <span class="keywordflow">if</span>(branch_vals[i] == <a class="code hl_variable" href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a>)</div>
+<div class="line"><span class="lineno">  313</span>      <span class="keywordflow">if</span>(branch_vals[i] == <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>)</div>
 <div class="line"><span class="lineno">  314</span>      {</div>
 <div class="line"><span class="lineno">  315</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter {} is unvitalised with value {}&quot;</span>, i, branch_vals[i]);</div>
 <div class="line"><span class="lineno">  316</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please check more precisely chain you passed {}&quot;</span>, FitName);</div>
@@ -2075,10 +2075,10 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  340</span>    }</div>
 <div class="line"><span class="lineno">  341</span>  }</div>
 <div class="line"><span class="lineno">  342</span>}</div>
-<div class="ttc" id="aCore_8h_html_aa2920b946077e971486eaf1b49101f01"><div class="ttname"><a href="Core_8h.html#aa2920b946077e971486eaf1b49101f01">_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00052">Core.h:52</a></div></div>
-<div class="ttc" id="aCore_8h_html_abca890bf9293ecdebfc0494ce32cee96"><div class="ttname"><a href="Core_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00064">Core.h:64</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a7e0ade2fd295a927676c243c97d0aa64"><div class="ttname"><a href="YamlHelper_8h.html#a7e0ade2fd295a927676c243c97d0aa64">TMacroToYAML</a></div><div class="ttdeci">YAML::Node TMacroToYAML(const TMacro &amp;macro)</div><div class="ttdoc">KS: Convert a ROOT TMacro object to a YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00144">YamlHelper.h:144</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ab06d2acbecc5692cab63bdf679ef0034"><div class="ttname"><a href="YamlHelper_8h.html#ab06d2acbecc5692cab63bdf679ef0034">compareYAMLNodes</a></div><div class="ttdeci">bool compareYAMLNodes(const YAML::Node &amp;node1, const YAML::Node &amp;node2)</div><div class="ttdoc">Compare if yaml nodes are identical.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00177">YamlHelper.h:177</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a32ef26a222f7341e03dcc42cdd2badd3"><div class="ttname"><a href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00033">Core.h:33</a></div></div>
+<div class="ttc" id="anamespaceM3_html_aaf4ba720c8ab2982beaa3c243aee1b98"><div class="ttname"><a href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00045">Core.h:45</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
