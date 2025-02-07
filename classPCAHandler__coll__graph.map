@@ -1,4 +1,5 @@
 <map id="PCAHandler" name="PCAHandler">
-<area shape="rect" id="node1" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="39,93,137,119"/>
+<area shape="rect" id="node1" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="127,152,225,177"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,5,171,31"/>
+<area shape="rect" id="node3" title=" " alt="" coords="195,5,333,31"/>
 </map>

@@ -9,7 +9,7 @@ var searchData=
   ['inputfile_6',['inputFile',['../classcovarianceBase.html#a5451d4189a9fb7591c8ce728852ba82e',1,'covarianceBase']]],
   ['invcovmatrix_7',['invCovMatrix',['../classcovarianceBase.html#a35c7dc7817eaf4058e9775b6bc792ebc',1,'covarianceBase::invCovMatrix()'],['../GetPenaltyTerm_8cpp.html#a3fd4dd88b1fa6119298781296ea761c5',1,'invCovMatrix():&#160;GetPenaltyTerm.cpp']]],
   ['invertcovmatrix_8',['InvertCovMatrix',['../classcovarianceBase.html#a5973f7f446d6058af9bcd006a6cf562d',1,'covarianceBase']]],
-  ['isdecomposed_5fpca_9',['isDecomposed_PCA',['../classcovarianceBase.html#ae9f3cb2a310874b86965903714ef2bd8',1,'covarianceBase']]],
+  ['isdecomposed_5fpca_9',['isDecomposed_PCA',['../classPCAHandler.html#ac3a904d697dcf6eb146f69c4d69d5a1f',1,'PCAHandler']]],
   ['isflat_10',['isFlat',['../GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17',1,'GetPenaltyTerm.cpp']]],
   ['isflatarray_11',['isflatarray',['../classsplineFDBase.html#aa8a204355df78af3f79bf8f2815258d3',1,'splineFDBase']]],
   ['isnc_12',['isNC',['../structFarDetectorCoreInfo.html#aa747b7b9ef0058fc9362fc48c4a53b7e',1,'FarDetectorCoreInfo']]],

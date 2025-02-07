@@ -18,8 +18,8 @@ var searchData=
   ['togglefixallparameters_15',['toggleFixAllParameters',['../classcovarianceBase.html#adb2d1a39cd2bd160257bc9e34e32df4c',1,'covarianceBase']]],
   ['togglefixparameter_16',['toggleFixParameter',['../classcovarianceBase.html#a41cc8dd2185af7cee380f3c6d463e5a4',1,'covarianceBase::toggleFixParameter(const std::string &amp;name)'],['../classcovarianceBase.html#aafbbdc05b87df882dc341e20fe870603',1,'covarianceBase::toggleFixParameter(const int i)']]],
   ['transfertomonolith_17',['TransferToMonolith',['../classsplineFDBase.html#a6d1872fe4be72c735bd55fa00e1674b8',1,'splineFDBase']]],
-  ['transfertoparam_18',['TransferToParam',['../classcovarianceBase.html#a65ac4956a782b01768f445732522a450',1,'covarianceBase']]],
-  ['transfertopca_19',['TransferToPCA',['../classcovarianceBase.html#a651f5ecd8973918d5683606a607fa88c',1,'covarianceBase']]],
+  ['transfertoparam_18',['TransferToParam',['../classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59',1,'PCAHandler']]],
+  ['transfertopca_19',['TransferToPCA',['../classPCAHandler.html#a7782b7f998d5a53ab88d76a41ff73fe4',1,'PCAHandler']]],
   ['translatename_20',['translateName',['../classMaCh3Plotting_1_1InputManager.html#ab4ecb1daf7b700137a15c3cad48cdaa4',1,'MaCh3Plotting::InputManager']]],
   ['tresponsefunction_5fred_21',['TResponseFunction_red',['../classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91',1,'TResponseFunction_red']]],
   ['tspline3_5fred_22',['TSpline3_red',['../classTSpline3__red.html#a49e4386a4d7870a8f3a9f744d1b3ce7c',1,'TSpline3_red::TSpline3_red(M3::float_t *X, M3::float_t *Y, M3::int_t N, M3::float_t **P)'],['../classTSpline3__red.html#a643d07969140e64bb55e8639552d1209',1,'TSpline3_red::TSpline3_red(TSpline3 *&amp;spline, SplineInterpolation InterPolation=kTSpline3)'],['../classTSpline3__red.html#ae76e72436b20a59ee33eb1d41dbe59eb',1,'TSpline3_red::TSpline3_red()']]]

@@ -99,20 +99,21 @@ Collaboration diagram for PyCovarianceBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classPyCovarianceBase__coll__graph.png" border="0" usemap="#aPyCovarianceBase_coll__map" alt="Collaboration graph"/></div>
 <map name="aPyCovarianceBase_coll__map" id="aPyCovarianceBase_coll__map">
-<area shape="rect" title=" " alt="" coords="1225,490,1368,515"/>
-<area shape="rect" href="classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1051,490,1176,515"/>
-<area shape="rect" title=" " alt="" coords="259,83,346,109"/>
-<area shape="rect" title=" " alt="" coords="653,127,840,153"/>
-<area shape="rect" title=" " alt="" coords="5,76,144,116"/>
-<area shape="rect" title=" " alt="" coords="659,401,834,441"/>
-<area shape="rect" title=" " alt="" coords="220,398,385,423"/>
-<area shape="rect" href="classPCAHandler.html" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="697,466,796,491"/>
-<area shape="rect" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="604,515,889,541"/>
-<area shape="rect" title=" " alt="" coords="657,636,836,676"/>
-<area shape="rect" title=" " alt="" coords="193,643,412,669"/>
-<area shape="rect" title=" " alt="" coords="672,701,821,726"/>
-<area shape="rect" title=" " alt="" coords="659,751,834,791"/>
-<area shape="rect" title=" " alt="" coords="233,562,372,587"/>
+<area shape="rect" title=" " alt="" coords="1428,345,1571,370"/>
+<area shape="rect" href="classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1253,345,1379,370"/>
+<area shape="rect" title=" " alt="" coords="458,54,545,79"/>
+<area shape="rect" title=" " alt="" coords="887,21,1073,46"/>
+<area shape="rect" title=" " alt="" coords="19,47,157,87"/>
+<area shape="rect" title=" " alt="" coords="668,271,843,311"/>
+<area shape="rect" title=" " alt="" coords="5,333,171,358"/>
+<area shape="rect" href="classPCAHandler.html" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="452,493,551,518"/>
+<area shape="rect" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="359,567,644,593"/>
+<area shape="rect" title=" " alt="" coords="891,337,1069,377"/>
+<area shape="rect" title=" " alt="" coords="392,345,611,370"/>
+<area shape="rect" title=" " alt="" coords="905,402,1055,427"/>
+<area shape="rect" title=" " alt="" coords="893,452,1067,492"/>
+<area shape="rect" title=" " alt="" coords="867,517,1093,542"/>
+<area shape="rect" title=" " alt="" coords="19,530,157,555"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -438,12 +439,6 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a8a709e1c6c58618cf65400eef1741cc7 inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a8a709e1c6c58618cf65400eef1741cc7">makeClosestPosDef</a> (TMatrixDSym *cov)</td></tr>
 <tr class="memdesc:a8a709e1c6c58618cf65400eef1741cc7 inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)  <br /></td></tr>
 <tr class="separator:a8a709e1c6c58618cf65400eef1741cc7 inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a651f5ecd8973918d5683606a607fa88c inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a651f5ecd8973918d5683606a607fa88c">TransferToPCA</a> ()</td></tr>
-<tr class="memdesc:a651f5ecd8973918d5683606a607fa88c inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transfer param values from normal base to PCA base.  <br /></td></tr>
-<tr class="separator:a651f5ecd8973918d5683606a607fa88c inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65ac4956a782b01768f445732522a450 inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a65ac4956a782b01768f445732522a450">TransferToParam</a> ()</td></tr>
-<tr class="memdesc:a65ac4956a782b01768f445732522a450 inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transfer param values from PCA base to normal base.  <br /></td></tr>
-<tr class="separator:a65ac4956a782b01768f445732522a450 inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ab3d89b7fe6103ae6f750c984bcefc8 inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a5ab3d89b7fe6103ae6f750c984bcefc8">setThrowMatrixFromFile</a> (const std::string &amp;matrix_file_name, const std::string &amp;matrix_name, const std::string &amp;means_name)</td></tr>
 <tr class="memdesc:a5ab3d89b7fe6103ae6f750c984bcefc8 inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets throw matrix from a file  <br /></td></tr>
 <tr class="separator:a5ab3d89b7fe6103ae6f750c984bcefc8 inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -541,21 +536,6 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a5ebdc744b733656972a15f1657915a3f inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a5ebdc744b733656972a15f1657915a3f">LastPCAdpar</a></td></tr>
 <tr class="memdesc:a5ebdc744b733656972a15f1657915a3f inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of the last param that is being decomposed.  <br /></td></tr>
 <tr class="separator:a5ebdc744b733656972a15f1657915a3f inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6aada94037640a68e3f37898f276019 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ae6aada94037640a68e3f37898f276019">_fPreFitValue_PCA</a></td></tr>
-<tr class="memdesc:ae6aada94037640a68e3f37898f276019 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prefit value for PCA params.  <br /></td></tr>
-<tr class="separator:ae6aada94037640a68e3f37898f276019 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e101b6b7028c82a02e617c90212e4cc inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">TVectorD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a2e101b6b7028c82a02e617c90212e4cc">fParProp_PCA</a></td></tr>
-<tr class="memdesc:a2e101b6b7028c82a02e617c90212e4cc inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Current parameter value in PCA base.  <br /></td></tr>
-<tr class="separator:a2e101b6b7028c82a02e617c90212e4cc inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa96f87ab90dc26fc1b5e157149b9dfd3 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">TVectorD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#aa96f87ab90dc26fc1b5e157149b9dfd3">fParCurr_PCA</a></td></tr>
-<tr class="memdesc:aa96f87ab90dc26fc1b5e157149b9dfd3 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Proposed parameter value in PCA base.  <br /></td></tr>
-<tr class="separator:aa96f87ab90dc26fc1b5e157149b9dfd3 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b83a17de68cc7838b93de242d91d9a0 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a7b83a17de68cc7838b93de242d91d9a0">fParSigma_PCA</a></td></tr>
-<tr class="memdesc:a7b83a17de68cc7838b93de242d91d9a0 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells if parameter is fixed in PCA base or not.  <br /></td></tr>
-<tr class="separator:a7b83a17de68cc7838b93de242d91d9a0 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9f3cb2a310874b86965903714ef2bd8 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ae9f3cb2a310874b86965903714ef2bd8">isDecomposed_PCA</a></td></tr>
-<tr class="memdesc:ae9f3cb2a310874b86965903714ef2bd8 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.  <br /></td></tr>
-<tr class="separator:ae9f3cb2a310874b86965903714ef2bd8 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cb3d0b4096fbb55b040f70cd5b6e32b inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">TMatrixDSym *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a></td></tr>
 <tr class="memdesc:a6cb3d0b4096fbb55b040f70cd5b6e32b inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)  <br /></td></tr>
 <tr class="separator:a6cb3d0b4096fbb55b040f70cd5b6e32b inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -568,9 +548,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a838731abd6716940043b484b2b266f86 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a></td></tr>
 <tr class="memdesc:a838731abd6716940043b484b2b266f86 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Are we using AMCMC?  <br /></td></tr>
 <tr class="separator:a838731abd6716940043b484b2b266f86 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0022a3e9dd3b2661c9b02a02488759c inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPCAHandler.html">PCAHandler</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ad0022a3e9dd3b2661c9b02a02488759c">PCAObj</a></td></tr>
-<tr class="memdesc:ad0022a3e9dd3b2661c9b02a02488759c inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct containing information about PCA.  <br /></td></tr>
-<tr class="separator:ad0022a3e9dd3b2661c9b02a02488759c inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb8262289fb5a37e849def35c04d6165 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classPCAHandler.html">PCAHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a></td></tr>
+<tr class="memdesc:acb8262289fb5a37e849def35c04d6165 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct containing information about PCA.  <br /></td></tr>
+<tr class="separator:acb8262289fb5a37e849def35c04d6165 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3833dc51a81afc9dca7c3dcbb107af7 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html">adaptive_mcmc::AdaptiveMCMCHandler</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a></td></tr>
 <tr class="memdesc:ab3833dc51a81afc9dca7c3dcbb107af7 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct containing information about adaption.  <br /></td></tr>
 <tr class="separator:ab3833dc51a81afc9dca7c3dcbb107af7 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -635,7 +615,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00026">26</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00025">25</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   23</span>                                                                                                                                : <a class="code hl_variable" href="classcovarianceBase.html#a5451d4189a9fb7591c8ce728852ba82e">inputFile</a>(YAMLFile[0].c_str()), <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>(name), <a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>(<span class="keyword">true</span>), <a class="code hl_variable" href="classcovarianceBase.html#add54ab1ba46b723fa23d7c95dfad671a">eigen_threshold</a>(threshold), <a class="code hl_variable" href="classcovarianceBase.html#abba75182305d556818c76974a054a17d">FirstPCAdpar</a>(FirstPCA), <a class="code hl_variable" href="classcovarianceBase.html#a5ebdc744b733656972a15f1657915a3f">LastPCAdpar</a>(LastPCA) {</div>
 <div class="line"><span class="lineno">   24</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">   25</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Constructing instance of covarianceBase using &quot;</span>);</div>
@@ -658,14 +638,14 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   42</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) <a class="code hl_function" href="classcovarianceBase.html#a8ac3a458097817eca534c23554a7635b">ConstructPCA</a>();</div>
 <div class="line"><span class="lineno">   43</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00019">MaCh3Logger.h:19</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a26618d3f5633b33ce20e38ce8261b3ee"><div class="ttname"><a href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">covarianceBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00437">covarianceBase.h:437</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a2960c489f6aafdb5a2291e1a48b14e9a"><div class="ttname"><a href="classcovarianceBase.html#a2960c489f6aafdb5a2291e1a48b14e9a">covarianceBase::init</a></div><div class="ttdeci">void init(std::string name, std::string file)</div><div class="ttdoc">Initialisation of the class using matrix from root file.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00100">covarianceBase.cpp:100</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a5451d4189a9fb7591c8ce728852ba82e"><div class="ttname"><a href="classcovarianceBase.html#a5451d4189a9fb7591c8ce728852ba82e">covarianceBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00434">covarianceBase.h:434</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a5ebdc744b733656972a15f1657915a3f"><div class="ttname"><a href="classcovarianceBase.html#a5ebdc744b733656972a15f1657915a3f">covarianceBase::LastPCAdpar</a></div><div class="ttdeci">int LastPCAdpar</div><div class="ttdoc">Index of the last param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00496">covarianceBase.h:496</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a26618d3f5633b33ce20e38ce8261b3ee"><div class="ttname"><a href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">covarianceBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00432">covarianceBase.h:432</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a2960c489f6aafdb5a2291e1a48b14e9a"><div class="ttname"><a href="classcovarianceBase.html#a2960c489f6aafdb5a2291e1a48b14e9a">covarianceBase::init</a></div><div class="ttdeci">void init(std::string name, std::string file)</div><div class="ttdoc">Initialisation of the class using matrix from root file.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00085">covarianceBase.cpp:85</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a5451d4189a9fb7591c8ce728852ba82e"><div class="ttname"><a href="classcovarianceBase.html#a5451d4189a9fb7591c8ce728852ba82e">covarianceBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00429">covarianceBase.h:429</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a5ebdc744b733656972a15f1657915a3f"><div class="ttname"><a href="classcovarianceBase.html#a5ebdc744b733656972a15f1657915a3f">covarianceBase::LastPCAdpar</a></div><div class="ttdeci">int LastPCAdpar</div><div class="ttdoc">Index of the last param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00491">covarianceBase.h:491</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a8ac3a458097817eca534c23554a7635b"><div class="ttname"><a href="classcovarianceBase.html#a8ac3a458097817eca534c23554a7635b">covarianceBase::ConstructPCA</a></div><div class="ttdeci">void ConstructPCA()</div><div class="ttdoc">CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00063">covarianceBase.cpp:63</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_ab4b7f96d3e977a0b3307ceecbd0baeb4"><div class="ttname"><a href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">covarianceBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00488">covarianceBase.h:488</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_abba75182305d556818c76974a054a17d"><div class="ttname"><a href="classcovarianceBase.html#abba75182305d556818c76974a054a17d">covarianceBase::FirstPCAdpar</a></div><div class="ttdeci">int FirstPCAdpar</div><div class="ttdoc">Index of the first param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00494">covarianceBase.h:494</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_add54ab1ba46b723fa23d7c95dfad671a"><div class="ttname"><a href="classcovarianceBase.html#add54ab1ba46b723fa23d7c95dfad671a">covarianceBase::eigen_threshold</a></div><div class="ttdeci">double eigen_threshold</div><div class="ttdoc">CW: Threshold based on which we remove parameters in eigen base.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00490">covarianceBase.h:490</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_ab4b7f96d3e977a0b3307ceecbd0baeb4"><div class="ttname"><a href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">covarianceBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00483">covarianceBase.h:483</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_abba75182305d556818c76974a054a17d"><div class="ttname"><a href="classcovarianceBase.html#abba75182305d556818c76974a054a17d">covarianceBase::FirstPCAdpar</a></div><div class="ttdeci">int FirstPCAdpar</div><div class="ttdoc">Index of the first param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00489">covarianceBase.h:489</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_add54ab1ba46b723fa23d7c95dfad671a"><div class="ttname"><a href="classcovarianceBase.html#add54ab1ba46b723fa23d7c95dfad671a">covarianceBase::eigen_threshold</a></div><div class="ttdeci">double eigen_threshold</div><div class="ttdoc">CW: Threshold based on which we remove parameters in eigen base.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00485">covarianceBase.h:485</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -722,7 +702,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00030">30</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00029">29</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    5</span>                                                                                                          : <a class="code hl_variable" href="classcovarianceBase.html#a5451d4189a9fb7591c8ce728852ba82e">inputFile</a>(file), <a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>(<span class="keyword">false</span>),</div>
 <div class="line"><span class="lineno">    6</span><a class="code hl_variable" href="classcovarianceBase.html#add54ab1ba46b723fa23d7c95dfad671a">eigen_threshold</a>(threshold), <a class="code hl_variable" href="classcovarianceBase.html#abba75182305d556818c76974a054a17d">FirstPCAdpar</a>(FirstPCA), <a class="code hl_variable" href="classcovarianceBase.html#a5ebdc744b733656972a15f1657915a3f">LastPCAdpar</a>(LastPCA) {</div>
 <div class="line"><span class="lineno">    7</span><span class="comment">// ********************************************</span></div>
@@ -780,7 +760,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   26</span>        );</div>
 <div class="line"><span class="lineno">   27</span>    }</div>
 <div class="ttc" id="aclassPyCovarianceBase_html_a8be2563cd8f0905deb6109e0c3068ec1"><div class="ttname"><a href="classPyCovarianceBase.html#a8be2563cd8f0905deb6109e0c3068ec1">PyCovarianceBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdoc">Return CalcLikelihood if some params were thrown out of boundary return LARGE_LOGL</div><div class="ttdef"><b>Definition:</b> <a href="covariance_8cpp_source.html#l00020">covariance.cpp:20</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html"><div class="ttname"><a href="classcovarianceBase.html">covarianceBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00018">covarianceBase.h:18</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html"><div class="ttname"><a href="classcovarianceBase.html">covarianceBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00017">covarianceBase.h:17</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

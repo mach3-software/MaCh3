@@ -54,8 +54,8 @@ var searchData=
   ['transfermat_51',['TransferMat',['../classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61',1,'PCAHandler']]],
   ['transfermatt_52',['TransferMatT',['../classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27',1,'PCAHandler']]],
   ['transfertomonolith_53',['TransferToMonolith',['../classsplineFDBase.html#a6d1872fe4be72c735bd55fa00e1674b8',1,'splineFDBase']]],
-  ['transfertoparam_54',['TransferToParam',['../classcovarianceBase.html#a65ac4956a782b01768f445732522a450',1,'covarianceBase']]],
-  ['transfertopca_55',['TransferToPCA',['../classcovarianceBase.html#a651f5ecd8973918d5683606a607fa88c',1,'covarianceBase']]],
+  ['transfertoparam_54',['TransferToParam',['../classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59',1,'PCAHandler']]],
+  ['transfertopca_55',['TransferToPCA',['../classPCAHandler.html#a7782b7f998d5a53ab88d76a41ff73fe4',1,'PCAHandler']]],
   ['translatename_56',['translateName',['../classMaCh3Plotting_1_1InputManager.html#ab4ecb1daf7b700137a15c3cad48cdaa4',1,'MaCh3Plotting::InputManager']]],
   ['tresponsefunction_5fred_57',['TResponseFunction_red',['../classTResponseFunction__red.html',1,'TResponseFunction_red'],['../classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91',1,'TResponseFunction_red::TResponseFunction_red()']]],
   ['tspline3_5fred_58',['TSpline3_red',['../classTSpline3__red.html',1,'TSpline3_red'],['../classTSpline3__red.html#ae76e72436b20a59ee33eb1d41dbe59eb',1,'TSpline3_red::TSpline3_red()'],['../classTSpline3__red.html#a49e4386a4d7870a8f3a9f744d1b3ce7c',1,'TSpline3_red::TSpline3_red(M3::float_t *X, M3::float_t *Y, M3::int_t N, M3::float_t **P)'],['../classTSpline3__red.html#a643d07969140e64bb55e8639552d1209',1,'TSpline3_red::TSpline3_red(TSpline3 *&amp;spline, SplineInterpolation InterPolation=kTSpline3)']]]

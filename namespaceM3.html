@@ -115,6 +115,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ad1896bacf74c409a461dd1ea43f8bc99"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">GetNThreads</a> ()</td></tr>
 <tr class="memdesc:ad1896bacf74c409a461dd1ea43f8bc99"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of threads which we need for example for TRandom3  <br /></td></tr>
 <tr class="separator:ad1896bacf74c409a461dd1ea43f8bc99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">GetThreadIndex</a> ()</td></tr>
+<tr class="memdesc:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="mdescLeft">&#160;</td><td class="mdescRight">thread index inside parallel loop  <br /></td></tr>
+<tr class="separator:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae577be53e3bb2051d10f34fd054c3e5d"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">MatrixMult</a> (double *A, double *B, int n)</td></tr>
 <tr class="memdesc:ae577be53e3bb2051d10f34fd054c3e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
 <tr class="separator:ae577be53e3bb2051d10f34fd054c3e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -292,13 +295,47 @@ template&lt;typename T &gt; </div>
 <div class="fragment"><div class="line"><span class="lineno">  295</span>                  {</div>
 <div class="line"><span class="lineno">  296</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><span class="lineno">  297</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  298</span>  <span class="keywordtype">int</span> nThreads = omp_get_max_threads();</div>
+<div class="line"><span class="lineno">  298</span>  <span class="keywordflow">return</span> omp_get_max_threads();</div>
 <div class="line"><span class="lineno">  299</span><span class="preprocessor">  #else</span></div>
-<div class="line"><span class="lineno">  300</span>  <span class="keywordtype">int</span> nThreads = 1;</div>
+<div class="line"><span class="lineno">  300</span>  <span class="keywordflow">return</span> 1;</div>
 <div class="line"><span class="lineno">  301</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  302</span> </div>
-<div class="line"><span class="lineno">  303</span>  <span class="keywordflow">return</span> nThreads;</div>
-<div class="line"><span class="lineno">  304</span>}</div>
+<div class="line"><span class="lineno">  302</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a5ed0accdbf66626c16b6c3b00bd5d030" name="a5ed0accdbf66626c16b6c3b00bd5d030"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ed0accdbf66626c16b6c3b00bd5d030">&#9670;&#160;</a></span>GetThreadIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int M3::GetThreadIndex </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>thread index inside parallel loop </p>
+
+<p class="definition">Definition at line <a class="el" href="Monitor_8h_source.html#l00080">80</a> of file <a class="el" href="Monitor_8h_source.html">Monitor.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   80</span>                              {</div>
+<div class="line"><span class="lineno">   81</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">return</span> omp_get_thread_num();</div>
+<div class="line"><span class="lineno">   83</span><span class="preprocessor">    #else</span></div>
+<div class="line"><span class="lineno">   84</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">   85</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   86</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
