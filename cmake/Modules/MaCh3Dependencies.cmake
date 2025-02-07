@@ -93,7 +93,6 @@ endif()
 #  target_include_directories(Eigen INTERFACE ${Eigen_SOURCE_DIR})
 #endif()
 
-
 set(MaCh3_Fitter_ENABLED "MR2T2")
 LIST(APPEND MaCh3_Fitter_ENABLED " PSO")
 if(MaCh3_MINUIT2_ENABLED)
@@ -101,11 +100,7 @@ if(MaCh3_MINUIT2_ENABLED)
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MaCh3_MINUIT2)
 endif()
 
-
 ######################### python binding ##########################
-# EM: If Debug is not defined disable it by default
-DefineEnabledRequiredSwitch(MaCh3_PYTHON_ENABLED FALSE)
-
 if( MaCh3_PYTHON_ENABLED )
   set(PYBIND11_FINDPYTHON ON)
   CPMFindPackage(

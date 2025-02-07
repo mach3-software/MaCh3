@@ -11,6 +11,11 @@ option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 option(MaCh3_LOW_MEMORY_STRUCTS_ENABLED "This will use float/short string for many structures" OFF)
+option(MaCh3_MULTITHREAD_ENABLED "This will enable multithreading (OMP) in whole framework" ON)
+option(MaCh3_DEBUG_ENABLED "Enable special debugging mode, with additional printouts and data structure, increases RAM usage and low performance" OFF)
+option(MaCh3_DependancyGraph "Will produce dependency graph" OFF)
+option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
+option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 
 add_library(MaCh3CompileDefinitions INTERFACE)
 #Create a seperate target for GPU compiler options
@@ -122,9 +127,6 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
 )
 
-#KS: If Debug is not defined disable it by default
-DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
-
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
   set(MaCh3_DEBUG_ENABLED TRUE)
@@ -158,8 +160,9 @@ else()
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
-#KS: If multithreading is not defined enable it by default
-DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
+if(MaCh3_NATIVE_ENABLED)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -march=native)
+endif()
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
@@ -259,9 +262,6 @@ install(EXPORT MaCh3-targets
         DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
 install(DIRECTORY cmake DESTINATION ${CMAKE_BINARY_DIR})
-
-#KS: Options to print dependency graph
-DefineEnabledRequiredSwitch(MaCh3_DependancyGraph FALSE)
 
 if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL
