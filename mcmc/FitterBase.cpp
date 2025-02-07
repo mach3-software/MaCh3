@@ -303,14 +303,14 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     CovarianceFolder->Close();
     delete CovarianceFolder;
 
-    std::vector<double> branch_vals(systematics[s]->GetNumParams(), _BAD_DOUBLE_);
+    std::vector<double> branch_vals(systematics[s]->GetNumParams(), M3::_BAD_DOUBLE_);
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
     }
     posts->GetEntry(posts->GetEntries()-1);
 
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      if(branch_vals[i] == _BAD_DOUBLE_)
+      if(branch_vals[i] == M3::_BAD_DOUBLE_)
       {
         MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
         MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);

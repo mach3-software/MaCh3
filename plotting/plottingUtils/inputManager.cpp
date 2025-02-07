@@ -130,9 +130,9 @@ double InputManager::getPostFitError(int fileNum, const std::string &paramName,
     return inputFileDef.postFitErrors.at(errorType).at(paramName);
   }
 
-  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, _BAD_DOUBLE_);
+  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
 
-  return _BAD_DOUBLE_;
+  return M3::_BAD_DOUBLE_;
 }
 
 double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
@@ -159,9 +159,9 @@ double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
     return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
   
-  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, _BAD_DOUBLE_);
+  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
 
-  return _BAD_DOUBLE_;
+  return M3::_BAD_DOUBLE_;
 }
 
 
@@ -419,7 +419,7 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
         if ( setInputBranch )
         {
           // EM: should probably use MCMCProcessor for this so we can use caching, gpu etc.
-          inputFileDef.MCMCstepParamsMap[parameter] = new double( _BAD_DOUBLE_ ); // <- initialise the parameter step values 
+          inputFileDef.MCMCstepParamsMap[parameter] = new double( M3::_BAD_DOUBLE_ ); // <- initialise the parameter step values
           inputFileDef.posteriorTree->SetBranchAddress( branchNames[paramIdx], inputFileDef.MCMCstepParamsMap.at(parameter) );
         }
         break;
