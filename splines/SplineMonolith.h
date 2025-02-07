@@ -20,7 +20,7 @@ class SMonolith : public SplineBase {
               const bool SaveFlatTree = false);
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
-    SMonolith(std::string FileName);
+    SMonolith(const std::string& FileName);
     /// @brief Destructor for SMonolith class.
     virtual ~SMonolith();
 
@@ -28,7 +28,7 @@ class SMonolith : public SplineBase {
     void Evaluate() override;
 
     /// @brief Get class name
-    inline std::string GetName()const {return "SplineMonolith";};
+    inline std::string GetName() const {return "SplineMonolith";};
 
     /// @brief Get number of spline parameters
     short int GetNParams()const {return nParams;};
@@ -51,7 +51,7 @@ class SMonolith : public SplineBase {
     /// The returned gpu weights, read by the GPU
     float* cpu_weights;
     /// KS: This holds the total CPU weights that gets read in samplePDFND
-    float *cpu_total_weights;
+    float* cpu_total_weights;
 
   private:
     /// @brief KS: Set everything to null etc.

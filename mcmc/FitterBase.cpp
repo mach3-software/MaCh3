@@ -274,7 +274,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
   TFile *infile = new TFile(FitName.c_str(), "READ");
   TTree *posts = infile->Get<TTree>("posteriors");
   int step_val = 0;
-  double log_val = _LARGE_LOGL_;
+  double log_val = M3::_LARGE_LOGL_;
   posts->SetBranchAddress("step",&step_val);
   posts->SetBranchAddress("LogL",&log_val);
 
@@ -396,11 +396,11 @@ void FitterBase::DragRace(const int NLaps) {
   MACH3LOG_INFO("All tests will be performed with {} threads", M3::GetNThreads());
 
   // Reweight the MC
-  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
   {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       samples[ivs]->reweight();
     }
     clockRace.Stop();
@@ -408,11 +408,11 @@ void FitterBase::DragRace(const int NLaps) {
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
-  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
   {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       samples[ivs]->GetLikelihood();
     }
     clockRace.Stop();
@@ -427,7 +427,7 @@ void FitterBase::DragRace(const int NLaps) {
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       systematics[s]->proposeStep();
     }
     clockRace.Stop();
@@ -441,7 +441,7 @@ void FitterBase::DragRace(const int NLaps) {
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       systematics[s]->GetLikelihood();
     }
     clockRace.Stop();

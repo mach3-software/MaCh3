@@ -38,8 +38,6 @@ void splineFDBase::cleanUpMemory() {
   CleanVector(UniqueSystNames);
   CleanVector(SplineInterpolationTypes);
 
-
-
   for (auto& Binning2D : SplineBinning) {
     for (auto& Binning1D : Binning2D) {
       for (TAxis* axis : Binning1D) {

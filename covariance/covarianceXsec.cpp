@@ -346,9 +346,9 @@ void covarianceXsec::initParams() {
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   if (pca)
   {
-    TransferToPCA();
+    PCAObj->TransferToPCA();
     for (int i = 0; i < _fNumParPCA; ++i) {
-      _fPreFitValue_PCA[i] = fParCurr_PCA(i);
+      PCAObj->_fPreFitValue_PCA[i] = PCAObj->fParCurr_PCA(i);
     }
   }
 }

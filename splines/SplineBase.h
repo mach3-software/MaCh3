@@ -37,7 +37,6 @@ class SplineBase {
     virtual inline std::string GetName()const {return "SplineBase";};
 
   protected:
-
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     virtual void FindSplineSegment() = 0;
     /// @brief CPU based code which eval weight for each spline
