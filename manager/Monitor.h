@@ -75,4 +75,13 @@ namespace MaCh3Utils {
 namespace M3 {
   /// @brief number of threads which we need for example for TRandom3
   int GetNThreads();
+
+  /// @brief thread index inside parallel loop
+  inline int GetThreadIndex() {
+    #ifdef MULTITHREAD
+    return omp_get_thread_num();
+    #else
+    return 0;
+    #endif
+  }
 }

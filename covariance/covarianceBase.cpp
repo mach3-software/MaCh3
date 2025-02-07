@@ -62,6 +62,7 @@ covarianceBase::~covarianceBase(){
 // ********************************************
 void covarianceBase::ConstructPCA() {
 // ********************************************
+  PCAObj = std::make_unique<PCAHandler>();
   //Check whether first and last pcadpar are set and if not just PCA everything
   if(FirstPCAdpar == -999 || LastPCAdpar == -999){
     if(FirstPCAdpar == -999 && LastPCAdpar == -999){
@@ -74,26 +75,10 @@ void covarianceBase::ConstructPCA() {
     }
   }
 
-  PCAObj.ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA);
+  PCAObj->ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA, _fNumPar);
+  PCAObj->SetupPointers(&_fCurrVal, &_fPropVal);
   // Make a note that we have now done PCA
   pca = true;
-
-  // Make the PCA parameter arrays
-  fParCurr_PCA.ResizeTo(_fNumParPCA);
-  fParProp_PCA.ResizeTo(_fNumParPCA);
-  _fPreFitValue_PCA.resize(_fNumParPCA);
-
-  //KS: make easy map so we could easily find un-decomposed parameters
-  isDecomposed_PCA.resize(_fNumParPCA);
-  fParSigma_PCA.resize(_fNumParPCA);
-  for (int i = 0; i < _fNumParPCA; ++i)
-  {
-    fParSigma_PCA[i] = 1;
-    isDecomposed_PCA[i] = -1;
-  }
-  for (int i = 0; i < FirstPCAdpar; ++i) isDecomposed_PCA[i] = i;
-  
-  for (int i = FirstPCAdpar+PCAObj.nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposed_PCA[i] = i+(_fNumPar-_fNumParPCA);
 }
 
 // ********************************************
@@ -157,8 +142,7 @@ void covarianceBase::init(std::string name, std::string file) {
 }
 
 // ********************************************
-// ETA
-// An init function for the YAML constructor
+// ETA An init function for the YAML constructor
 // All you really need from the YAML file is the number of Systematics
 // Then get all the info from the YAML file in the covarianceXsec::ParseYAML function
 void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
@@ -371,49 +355,9 @@ void covarianceBase::setPar(int i , double val) {
   _fPreFitValue[i] = val;
 
   // Transfer the parameter values to the PCA basis
-  if (pca) TransferToPCA();
+  if (pca) PCAObj->TransferToPCA();
 }
 
-// ********************************************
-// Transfer a parameter variation in the parameter basis to the eigen basis
-void covarianceBase::TransferToPCA() {
-// ********************************************
-  if (!pca) {
-    MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  // Make the temporary vectors
-  TVectorD fParCurr_vec(_fNumPar);
-  TVectorD fParProp_vec(_fNumPar);
-  for (int i = 0; i < _fNumPar; ++i) {
-    fParCurr_vec(i) = _fCurrVal[i];
-    fParProp_vec(i) = _fPropVal[i];
-  }
-
-  fParCurr_PCA = PCAObj.TransferMatT*fParCurr_vec;
-  fParProp_PCA = PCAObj.TransferMatT*fParProp_vec;
-}
-
-// ********************************************
-// Transfer a parameter variation in the eigen basis to the parameter basis
-void covarianceBase::TransferToParam() {
-// ********************************************
-  if (!pca) {
-    MACH3LOG_ERROR("Can not transfer to PCA if PCA isn't enabled");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  // Make the temporary vectors
-  TVectorD fParProp_vec = PCAObj.TransferMat*fParProp_PCA;
-  TVectorD fParCurr_vec = PCAObj.TransferMat*fParCurr_PCA;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int i = 0; i < _fNumPar; ++i) {
-    _fPropVal[i] = fParProp_vec(i);
-    _fCurrVal[i] = fParCurr_vec(i);
-  }
-}
 // ********************************************
 std::vector<double> covarianceBase::getProposed() const {
 // ********************************************
@@ -447,11 +391,7 @@ void covarianceBase::throwParameters() {
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
-#ifdef MULTITHREAD
-        randParams[i] = random_number[omp_get_thread_num()]->Gaus(0, 1);
-#else
-        randParams[i] = random_number[0]->Gaus(0,1);
-#endif
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
@@ -515,7 +455,7 @@ void covarianceBase::RandomConfiguration() {
     MACH3LOG_INFO("Setting current step in {} param {} = {} from {}", matrixName, i, _fPropVal[i], _fCurrVal[i]);
     _fCurrVal[i] = _fPropVal[i];
   }
-  if (pca) TransferToPCA();
+  if (pca) PCAObj->TransferToPCA();
 }
 
 // *************************************
@@ -525,7 +465,7 @@ void covarianceBase::setSingleParameter(const int parNo, const double parVal) {
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
-  if (pca) TransferToPCA();
+  if (pca) PCAObj->TransferToPCA();
 }
 // ********************************************
 void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
@@ -533,7 +473,7 @@ void covarianceBase::setParCurrProp(const int parNo, const double parVal) {
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
-  if (pca) TransferToPCA();
+  if (pca) PCAObj->TransferToPCA();
 }
 
 // ************************************************
@@ -553,18 +493,14 @@ void covarianceBase::proposeStep() {
 void covarianceBase::randomize() _noexcept_ {
 // ************************************************
   if (!pca) {
-//KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit      
+    //KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
       if (_fError[i] > 0.0) {
-#ifdef MULTITHREAD
-        randParams[i] = random_number[omp_get_thread_num()]->Gaus(0, 1);
-#else
-        randParams[i] = random_number[0]->Gaus(0, 1);
-#endif 
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         // If parameter IS fixed
       } else {
         randParams[i] = 0.0;
@@ -578,13 +514,9 @@ void covarianceBase::randomize() _noexcept_ {
     #endif
     for (int i = 0; i < _fNumPar; ++i)
     {
-      if (fParSigma_PCA[i] > 0. && i < _fNumParPCA)
+      if (PCAObj->fParSigma_PCA[i] > 0. && i < _fNumParPCA)
       {
-#ifdef MULTITHREAD        
-        randParams[i] = random_number[omp_get_thread_num()]->Gaus(0,1);
-#else        
-        randParams[i] = random_number[0]->Gaus(0,1);
-#endif
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
       } else { // If parameter IS fixed or out od bounds
         randParams[i] = 0.0;
       }
@@ -611,33 +543,7 @@ void covarianceBase::CorrelateSteps() _noexcept_ {
     }
     // If doing PCA throw uncorrelated in PCA basis (orthogonal basis by definition)
   } else { 
-    // Throw around the current step
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
-    for (int i = 0; i < _fNumParPCA; ++i)
-    {
-      if (fParSigma_PCA[i] > 0.) 
-      {
-        double IndStepScale = 1.;
-        //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
-        if(isDecomposed_PCA[i] >= 0)
-        {
-          IndStepScale *= _fIndivStepScale[isDecomposed_PCA[i]];
-          IndStepScale *= corr_throw[isDecomposed_PCA[i]];
-        }
-        //If decomposed apply only random number
-        else
-        {
-         IndStepScale *= randParams[i];
-         //KS: All PCA-ed parameters have the same step scale
-         IndStepScale *= _fIndivStepScale[FirstPCAdpar];
-        }
-        fParProp_PCA(i) = fParCurr_PCA(i)+_fGlobalStepScale*IndStepScale*PCAObj.eigen_values_master[i];
-      }
-    }
-    // Then update the parameter basis
-    TransferToParam();
+    PCAObj->CorrelateSteps(_fIndivStepScale, _fGlobalStepScale, randParams, corr_throw);
   }
 }
 // ********************************************
@@ -653,17 +559,10 @@ void covarianceBase::acceptStep() _noexcept_ {
       _fCurrVal[i] = _fPropVal[i];
     }
   } else {
-  // Update the book-keeping for the output
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
-    for (int i = 0; i < _fNumParPCA; ++i) {
-      fParCurr_PCA(i) = fParProp_PCA(i);
-    }
-    // Then update the parameter basis
-    TransferToParam();
+    PCAObj->AcceptStep();
   }
 }
+
 // ********************************************
 // Throw the proposed parameter by mag sigma
 // Should really just have the user specify this throw by having argument double
@@ -680,13 +579,13 @@ void covarianceBase::throwParProp(const double mag) {
     }
   } else {
     for (int i = 0; i < _fNumPar; i++) {
-      fParProp_PCA(i) = fParCurr_PCA(i)+mag*randParams[i];
+      PCAObj->fParProp_PCA(i) = PCAObj->fParCurr_PCA(i)+mag*randParams[i];
     }
     // And update the fParCurr in the basis
     // Then update the fParProp in the parameter basis using the transfer matrix, so likelihood is evaluated correctly
-    TVectorD proposed = PCAObj.TransferMat*fParProp_PCA;
+    TVectorD proposed = PCAObj->TransferMat*PCAObj->fParProp_PCA;
     for (int i = 0; i < _fNumPar; ++i) {
-      if (fParSigma_PCA[i] > 0.) {
+      if (PCAObj->fParSigma_PCA[i] > 0.) {
         _fPropVal[i] = proposed(i);
       }
     }
@@ -710,13 +609,13 @@ void covarianceBase::throwParCurr(const double mag) {
     }
   } else {
     for (int i = 0; i < _fNumPar; i++) {
-      fParProp_PCA(i) = mag*randParams[i];
+      PCAObj->fParProp_PCA(i) = mag*randParams[i];
     }
     // And update the fParCurr in the basis
     // Then update the fParProp in the parameter basis using the transfer matrix, so likelihood is evaluated correctly
-    TVectorD current = PCAObj.TransferMat*fParCurr_PCA;
+    TVectorD current = PCAObj->TransferMat*PCAObj->fParCurr_PCA;
     for (int i = 0; i < _fNumPar; ++i) {
-      if (fParSigma_PCA[i] > 0.) {
+      if (PCAObj->fParSigma_PCA[i] > 0.) {
         _fCurrVal[i] = current(i);
       }
     }
@@ -741,7 +640,7 @@ void covarianceBase::printNominalCurrProp() const {
   if (pca) {
     MACH3LOG_INFO("PCA:");
     for (int i = 0; i < _fNumParPCA; ++i) {
-      MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, fParCurr_PCA(i), fParProp_PCA(i));
+      MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, PCAObj->fParCurr_PCA(i), PCAObj->fParProp_PCA(i));
     }
   }
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
@@ -832,8 +731,8 @@ void covarianceBase::setParameters(const std::vector<double>& pars) {
   }
   // And if pca make the transfer
   if (pca) {
-    TransferToPCA();
-    TransferToParam();
+    PCAObj->TransferToPCA();
+    PCAObj->TransferToParam();
   }
 }
 
@@ -848,7 +747,7 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
   if (pca) {
     for (int i = 0; i < _fNumParPCA; ++i) {
 
-      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &fParCurr_PCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
+      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &PCAObj->fParCurr_PCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
 
@@ -862,7 +761,7 @@ void covarianceBase::SetBranches(TTree &tree, bool SaveProposal) {
     if (pca) {
       for (int i = 0; i < _fNumParPCA; ++i) {
 
-        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &fParProp_PCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
+        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &PCAObj->fParProp_PCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
       }
     }
   }
@@ -891,7 +790,7 @@ void covarianceBase::toggleFixAllParameters() {
   if(!pca) {
     for (int i = 0; i < _fNumPar; i++) _fError[i] *= -1.0;
   } else{
-     for (int i = 0; i < _fNumParPCA; i++) fParSigma_PCA[i] *= -1.0;
+     for (int i = 0; i < _fNumParPCA; i++) PCAObj->fParSigma_PCA[i] *= -1.0;
   }
 }
 
@@ -910,13 +809,13 @@ void covarianceBase::toggleFixParameter(const int i) {
   } else {
     int isDecom = -1;
     for (int im = 0; im < _fNumParPCA; ++im) {
-      if(isDecomposed_PCA[im] == i) {isDecom = im;}
+      if(PCAObj->isDecomposed_PCA[im] == i) {isDecom = im;}
     }
     if(isDecom < 0) {
       MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", GetParName(i));
       //throw MaCh3Exception(__FILE__ , __LINE__ );
     } else {
-      fParSigma_PCA[isDecom] *= -1.0;
+      PCAObj->fParSigma_PCA[isDecom] *= -1.0;
       MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
     }
   }
@@ -1057,7 +956,7 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
       #pragma omp parallel for
       #endif
       for (int iVar = 0 ; iVar < _fNumPar; iVar++) {
-        (*cov)(iVar,iVar) += pow(10,-9);
+        (*cov)(iVar,iVar) += pow(10, -9);
       }
     }
   }
