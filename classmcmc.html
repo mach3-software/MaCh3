@@ -570,7 +570,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  213</span>  }</div>
 <div class="line"><span class="lineno">  214</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><span class="lineno">  215</span>}</div>
-<div class="ttc" id="aclasscovarianceBase_html"><div class="ttname"><a href="classcovarianceBase.html">covarianceBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00017">covarianceBase.h:17</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html"><div class="ttname"><a href="classcovarianceBase.html">covarianceBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00014">covarianceBase.h:14</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -626,7 +626,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  149</span> </div>
 <div class="line"><span class="lineno">  150</span>  <span class="comment">// Check if we&#39;ve hit a boundary in the systematics</span></div>
 <div class="line"><span class="lineno">  151</span>  <span class="comment">// In this case we can save time by not having to reconfigure the simulation</span></div>
-<div class="line"><span class="lineno">  152</span>  <span class="keywordflow">if</span> (llh &gt;= <a class="code hl_variable" href="covarianceBase_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a>) {</div>
+<div class="line"><span class="lineno">  152</span>  <span class="keywordflow">if</span> (llh &gt;= <a class="code hl_variable" href="Core_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a>) {</div>
 <div class="line"><span class="lineno">  153</span>    <a class="code hl_variable" href="classmcmc.html#a537f7c2411a6a8e65fdf57b81ce6fe4a">reject</a> = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  154</span><span class="preprocessor">    #ifdef DEBUG</span></div>
 <div class="line"><span class="lineno">  155</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;Rejecting based on boundary&quot;</span> &lt;&lt; std::endl;</div>
@@ -658,7 +658,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  181</span>  } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  182</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ++i) {</div>
 <div class="line"><span class="lineno">  183</span>      <span class="comment">// Set the sample_llh[i] to be madly high also to signify a step out of bounds</span></div>
-<div class="line"><span class="lineno">  184</span>      <a class="code hl_variable" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code hl_variable" href="covarianceBase_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a>;</div>
+<div class="line"><span class="lineno">  184</span>      <a class="code hl_variable" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code hl_variable" href="Core_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a>;</div>
 <div class="line"><span class="lineno">  185</span><span class="preprocessor">      #ifdef DEBUG</span></div>
 <div class="line"><span class="lineno">  186</span>      <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after REJECT sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  187</span><span class="preprocessor">      #endif</span></div>
@@ -668,10 +668,10 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  191</span>  <span class="comment">// Save the proposed likelihood (class member)</span></div>
 <div class="line"><span class="lineno">  192</span>  <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> = llh;</div>
 <div class="line"><span class="lineno">  193</span>}</div>
+<div class="ttc" id="aCore_8h_html_abca890bf9293ecdebfc0494ce32cee96"><div class="ttname"><a href="Core_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00064">Core.h:64</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a6f435e161c96eea778aba844115428d4"><div class="ttname"><a href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">FitterBase::sample_llh</a></div><div class="ttdeci">std::vector&lt; double &gt; sample_llh</div><div class="ttdoc">store the llh breakdowns</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00100">FitterBase.h:100</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_ace2eeca9829f63200c3f956c600d09ff"><div class="ttname"><a href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">FitterBase::syst_llh</a></div><div class="ttdeci">std::vector&lt; double &gt; syst_llh</div><div class="ttdoc">systematic llh breakdowns</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00102">FitterBase.h:102</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_afac0dcceb1df194159c07945e8dc0069"><div class="ttname"><a href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">FitterBase::samples</a></div><div class="ttdeci">std::vector&lt; samplePDFBase * &gt; samples</div><div class="ttdoc">Sample holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00105">FitterBase.h:105</a></div></div>
-<div class="ttc" id="acovarianceBase_8h_html_abca890bf9293ecdebfc0494ce32cee96"><div class="ttname"><a href="covarianceBase_8h.html#abca890bf9293ecdebfc0494ce32cee96">_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00010">covarianceBase.h:10</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

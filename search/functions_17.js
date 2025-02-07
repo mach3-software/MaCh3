@@ -5,7 +5,7 @@ var searchData=
   ['_7ecovarianceosc_2',['~covarianceOsc',['../classcovarianceOsc.html#aab90b93f18a4cffbed4c225fecfdc5a8',1,'covarianceOsc']]],
   ['_7ecovariancexsec_3',['~covarianceXsec',['../classcovarianceXsec.html#af84383b735f450c33c9c34f7ca207a66',1,'covarianceXsec']]],
   ['_7efardetectorcoreinfo_4',['~FarDetectorCoreInfo',['../structFarDetectorCoreInfo.html#a45938774054a8a9a288dd8df2464c475',1,'FarDetectorCoreInfo']]],
-  ['_7efastsplineinfo_5',['~FastSplineInfo',['../structFastSplineInfo.html#a64b519df4830241b9aea24ed4f0fe3f6',1,'FastSplineInfo']]],
+  ['_7efastsplineinfo_5',['~FastSplineInfo',['../structFastSplineInfo.html#a29129bd9c51916990ef44e99a36fa6b5',1,'FastSplineInfo']]],
   ['_7efitterbase_6',['~FitterBase',['../classFitterBase.html#ae8677b449e49ca86bafee685e8dbe93f',1,'FitterBase']]],
   ['_7einputfile_7',['~InputFile',['../structMaCh3Plotting_1_1InputFile.html#a64c6c4553a2fcc4fb85a243c0b1736f9',1,'MaCh3Plotting::InputFile']]],
   ['_7einputmanager_8',['~InputManager',['../classMaCh3Plotting_1_1InputManager.html#a911e73c70393339552e7b389f9f28a2f',1,'MaCh3Plotting::InputManager']]],
@@ -27,7 +27,7 @@ var searchData=
   ['_7esplinebase_24',['~SplineBase',['../classSplineBase.html#a0de19b2322edb4197380506d594456bd',1,'SplineBase']]],
   ['_7esplinefdbase_25',['~splineFDBase',['../classsplineFDBase.html#a16c33124874a336255a3cba480b835c2',1,'splineFDBase']]],
   ['_7estylemanager_26',['~StyleManager',['../classMaCh3Plotting_1_1StyleManager.html#af5267abeb152c1c482f00a98ab9c722f',1,'MaCh3Plotting::StyleManager']]],
-  ['_7etf1_5fred_27',['~TF1_red',['../classTF1__red.html#a154077c37858ec88449cae76c41d671b',1,'TF1_red']]],
+  ['_7etf1_5fred_27',['~TF1_red',['../classTF1__red.html#a924e317434d841390d4b787ec0354c02',1,'TF1_red']]],
   ['_7etresponsefunction_5fred_28',['~TResponseFunction_red',['../classTResponseFunction__red.html#a216998fd1fed9353073640ede950a916',1,'TResponseFunction_red']]],
-  ['_7etspline3_5fred_29',['~TSpline3_red',['../classTSpline3__red.html#a275808bab562c82d155433c1d62ac1a1',1,'TSpline3_red']]]
+  ['_7etspline3_5fred_29',['~TSpline3_red',['../classTSpline3__red.html#a3e675b3f84a92347498b2cebff39e584',1,'TSpline3_red']]]
 ];

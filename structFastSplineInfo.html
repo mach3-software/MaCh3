@@ -97,9 +97,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa24d249adfbca006f9544a704f29faf7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#aa24d249adfbca006f9544a704f29faf7">FastSplineInfo</a> ()</td></tr>
 <tr class="memdesc:aa24d249adfbca006f9544a704f29faf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
 <tr class="separator:aa24d249adfbca006f9544a704f29faf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64b519df4830241b9aea24ed4f0fe3f6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#a64b519df4830241b9aea24ed4f0fe3f6">~FastSplineInfo</a> ()</td></tr>
-<tr class="memdesc:a64b519df4830241b9aea24ed4f0fe3f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <br /></td></tr>
-<tr class="separator:a64b519df4830241b9aea24ed4f0fe3f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29129bd9c51916990ef44e99a36fa6b5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#a29129bd9c51916990ef44e99a36fa6b5">~FastSplineInfo</a> ()</td></tr>
+<tr class="memdesc:a29129bd9c51916990ef44e99a36fa6b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <br /></td></tr>
+<tr class="separator:a29129bd9c51916990ef44e99a36fa6b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -149,9 +149,9 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00024">24</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   24</span>                   {</div>
 <div class="line"><span class="lineno">   25</span>    <a class="code hl_variable" href="structFastSplineInfo.html#ac8538a8e3438ae06d8f467cc0fd5ce0d">nPts</a> = -999;</div>
-<div class="line"><span class="lineno">   26</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a> = NULL;</div>
+<div class="line"><span class="lineno">   26</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">   27</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">CurrSegment</a> = 0;</div>
-<div class="line"><span class="lineno">   28</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">splineParsPointer</a> = NULL;</div>
+<div class="line"><span class="lineno">   28</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">splineParsPointer</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">   29</span>  }</div>
 <div class="ttc" id="astructFastSplineInfo_html_a768e33415a2a6b50e9019d6a74fa5509"><div class="ttname"><a href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">FastSplineInfo::splineParsPointer</a></div><div class="ttdeci">const double * splineParsPointer</div><div class="ttdoc">Array of the knots positions.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00047">SplineStructs.h:47</a></div></div>
 <div class="ttc" id="astructFastSplineInfo_html_a80e4c1195099d2c34a1a511e4f749fe4"><div class="ttname"><a href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">FastSplineInfo::CurrSegment</a></div><div class="ttdeci">M3::int_t CurrSegment</div><div class="ttdoc">Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00044">SplineStructs.h:44</a></div></div>
@@ -160,8 +160,8 @@ Public Attributes</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a64b519df4830241b9aea24ed4f0fe3f6" name="a64b519df4830241b9aea24ed4f0fe3f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64b519df4830241b9aea24ed4f0fe3f6">&#9670;&#160;</a></span>~FastSplineInfo()</h2>
+<a id="a29129bd9c51916990ef44e99a36fa6b5" name="a29129bd9c51916990ef44e99a36fa6b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29129bd9c51916990ef44e99a36fa6b5">&#9670;&#160;</a></span>~FastSplineInfo()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +170,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">FastSplineInfo::~FastSplineInfo </td>
+          <td class="memname">virtual FastSplineInfo::~FastSplineInfo </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -178,7 +178,7 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -186,9 +186,9 @@ Public Attributes</h2></td></tr>
 <p>Destructor. </p>
 
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00032">32</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   32</span>                    {</div>
+<div class="fragment"><div class="line"><span class="lineno">   32</span>                            {</div>
 <div class="line"><span class="lineno">   33</span>    <span class="comment">// Free dynamically allocated memory</span></div>
-<div class="line"><span class="lineno">   34</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a> != NULL) <span class="keyword">delete</span>[] <a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a>;</div>
+<div class="line"><span class="lineno">   34</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a>;</div>
 <div class="line"><span class="lineno">   35</span>  }</div>
 </div><!-- fragment -->
 </div>

@@ -43,7 +43,7 @@ var searchData=
   ['_5fknownfitters_40',['_knownFitters',['../classMaCh3Plotting_1_1InputManager.html#a836a1772cb3fdf2d6e38ee1b113bc4e8',1,'MaCh3Plotting::InputManager']]],
   ['_5fknownparameters_41',['_knownParameters',['../classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351',1,'MaCh3Plotting::InputManager']]],
   ['_5fknownsamples_42',['_knownSamples',['../classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe',1,'MaCh3Plotting::InputManager']]],
-  ['_5flarge_5flogl_5f_43',['_LARGE_LOGL_',['../covarianceBase_8h.html#abca890bf9293ecdebfc0494ce32cee96',1,'covarianceBase.h']]],
+  ['_5flarge_5flogl_5f_43',['_LARGE_LOGL_',['../Core_8h.html#abca890bf9293ecdebfc0494ce32cee96',1,'Core.h']]],
   ['_5fmach3_5fsafe_5finclude_5fend_5f_44',['_MaCh3_Safe_Include_End_',['../Core_8h.html#a91209a17295738b34b124b79faa68a1b',1,'Core.h']]],
   ['_5fmach3_5fsafe_5finclude_5fstart_5f_45',['_MaCh3_Safe_Include_Start_',['../Core_8h.html#a46b8fa28114cf68de4549061568b5ade',1,'Core.h']]],
   ['_5fmax_5fknots_46',['_max_knots',['../classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85',1,'SMonolith']]],

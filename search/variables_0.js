@@ -39,7 +39,7 @@ var searchData=
   ['_5fknownfitters_36',['_knownFitters',['../classMaCh3Plotting_1_1InputManager.html#a836a1772cb3fdf2d6e38ee1b113bc4e8',1,'MaCh3Plotting::InputManager']]],
   ['_5fknownparameters_37',['_knownParameters',['../classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351',1,'MaCh3Plotting::InputManager']]],
   ['_5fknownsamples_38',['_knownSamples',['../classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe',1,'MaCh3Plotting::InputManager']]],
-  ['_5flarge_5flogl_5f_39',['_LARGE_LOGL_',['../covarianceBase_8h.html#abca890bf9293ecdebfc0494ce32cee96',1,'covarianceBase.h']]],
+  ['_5flarge_5flogl_5f_39',['_LARGE_LOGL_',['../Core_8h.html#abca890bf9293ecdebfc0494ce32cee96',1,'Core.h']]],
   ['_5fmax_5fknots_40',['_max_knots',['../classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85',1,'SMonolith']]],
   ['_5foutputname_41',['_outputName',['../classMaCh3Plotting_1_1PlottingManager.html#a362e5a4b44a17e5548d0301c2fb43a0a',1,'MaCh3Plotting::PlottingManager']]],
   ['_5fparametergroup_42',['_ParameterGroup',['../classcovarianceXsec.html#a47cd1802e0dac0c22c8c16f214272c34',1,'covarianceXsec']]],

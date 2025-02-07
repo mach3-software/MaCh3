@@ -91,7 +91,7 @@ var searchData=
   ['setusefftautocorrelation_88',['SetUseFFTAutoCorrelation',['../classMCMCProcessor.html#ab90c5ec77c57103dfaa72648c330a390',1,'MCMCProcessor']]],
   ['shouldskipline_89',['ShouldSkipLine',['../CombineMaCh3Chains_8cpp.html#abbd9b7766547362faa69a37ad56b0fc3',1,'CombineMaCh3Chains.cpp']]],
   ['skipadaption_90',['SkipAdaption',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af797ab969eb8c1802afa12df8c2106d8',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['smonolith_91',['SMonolith',['../classSMonolith.html#a4fe737f7c948f9ee963d87aac46ddebb',1,'SMonolith::SMonolith(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, const std::vector&lt; RespFuncType &gt; &amp;SplineType, const bool SaveFlatTree=false)'],['../classSMonolith.html#ac622c355f630c12438b547bbb9fe212c',1,'SMonolith::SMonolith(std::string FileName)']]],
+  ['smonolith_91',['SMonolith',['../classSMonolith.html#a4fe737f7c948f9ee963d87aac46ddebb',1,'SMonolith::SMonolith(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, const std::vector&lt; RespFuncType &gt; &amp;SplineType, const bool SaveFlatTree=false)'],['../classSMonolith.html#a2ddb60ccfabbb433c316fde62e93e8df',1,'SMonolith::SMonolith(const std::string &amp;FileName)']]],
   ['smonolithgpu_92',['SMonolithGPU',['../classSMonolithGPU.html#aa19e498d0e762566ee62c7b93de18598',1,'SMonolithGPU']]],
   ['splinebase_93',['SplineBase',['../classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1',1,'PySplineBase::SplineBase()'],['../classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1',1,'SplineBase::SplineBase()']]],
   ['splinefdbase_94',['splineFDBase',['../classsplineFDBase.html#ae46579e08ee311f797423b50003cd002',1,'splineFDBase']]],
