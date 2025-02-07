@@ -38,6 +38,10 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF
+          - os: Alma9 Native
+            file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
+            tag: alma9latest
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NATIVE_ENABLED=ON
 
     name: Build CI ${{ matrix.os }}
 

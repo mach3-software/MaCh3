@@ -20,24 +20,18 @@ endif()
 
 #KS: Save which oscillators are being used
 set(MaCh3_Oscillator_ENABLED "")
-if(CUDAProb3Linear_ENABLED)
-  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3Linear")
-endif()
-if(CUDAProb3_ENABLED)
-  LIST(APPEND MaCh3_Oscillator_ENABLED "CUDAProb3")
-endif()
-if(ProbGPULinear_ENABLED)
-  LIST(APPEND MaCh3_Oscillator_ENABLED "ProbGPULinear")
-endif()
-if(Prob3ppLinear_ENABLED)
-  LIST(APPEND MaCh3_Oscillator_ENABLED "Prob3ppLinear")
-endif()
-if(NuFastLinear_ENABLED)
-  LIST(APPEND MaCh3_Oscillator_ENABLED "NuFast")
-endif()
-if(OscProb_ENABLED)
-  LIST(APPEND MaCh3_Oscillator_ENABLED "OscProb")
-endif()
+foreach(option
+    CUDAProb3Linear
+    CUDAProb3
+    ProbGPULinear
+    Prob3ppLinear
+    NuFastLinear
+    OscProb
+    )
+  if(${option}_ENABLED)
+    LIST(APPEND MaCh3_Oscillator_ENABLED ${option})
+  endif()
+endforeach()
 
 #NuOscillator uses 1/0 instead of true/false thus use conversion
 IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
