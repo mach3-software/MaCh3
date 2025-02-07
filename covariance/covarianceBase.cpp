@@ -697,7 +697,7 @@ double covarianceBase::GetLikelihood() {
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
   
-  if(NOutside > 0) return NOutside*_LARGE_LOGL_;
+  if(NOutside > 0) return NOutside*M3::_LARGE_LOGL_;
 
   return CalcLikelihood();
 }

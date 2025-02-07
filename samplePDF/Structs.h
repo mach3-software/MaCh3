@@ -521,7 +521,7 @@ namespace MaCh3Utils {
   /// beware that in the case of anti-neutrinos the NuOscillator
   /// type simply gets multiplied by -1
   inline int PDGToNuOscillatorFlavour(int NuPdg){
-    int NuOscillatorFlavour = _BAD_INT_;
+    int NuOscillatorFlavour = M3::_BAD_INT_;
     switch(std::abs(NuPdg)){
       case NuPDG::kNue:
         NuOscillatorFlavour = NuOscillator::kElectron;

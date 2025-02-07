@@ -976,11 +976,11 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       
       //Set x_var and y_var values based on XVarStr and YVarStr
       MCSamples[mc_i].x_var[event_i] = GetPointerToKinematicParameter(XVarStr, mc_i, event_i);
-      //Give y_var _BAD_DOUBLE_ value for the 1D case since this won't be used
-      MCSamples[mc_i].y_var[event_i] = &(_BAD_DOUBLE_);
+      //Give y_var M3::_BAD_DOUBLE_ value for the 1D case since this won't be used
+      MCSamples[mc_i].y_var[event_i] = &(M3::_BAD_DOUBLE_);
       int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
       
-      double low_lower_edge = _DEFAULT_RETURN_VAL_;
+      double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin==0) {
         low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
       } else {
@@ -990,7 +990,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
       double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
       
-      double upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin<(_hPDF1D->GetNbinsX()-2)) {
         upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
       } else {
@@ -1001,10 +1001,10 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 		  MCSamples[mc_i].NomXBin[event_i] = bin-1;
 	  } else {
 		  MCSamples[mc_i].NomXBin[event_i] = -1;
-		  low_edge = _DEFAULT_RETURN_VAL_;
-		  upper_edge = _DEFAULT_RETURN_VAL_;
-		  low_lower_edge = _DEFAULT_RETURN_VAL_;
-		  upper_upper_edge = _DEFAULT_RETURN_VAL_;
+		  low_edge = M3::_DEFAULT_RETURN_VAL_;
+		  upper_edge = M3::_DEFAULT_RETURN_VAL_;
+		  low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+		  upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
 	  }
       MCSamples[mc_i].NomYBin[event_i] = 0;
       
@@ -1108,7 +1108,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
       _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
       //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
       
-      double low_lower_edge = _DEFAULT_RETURN_VAL_;
+      double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin==0) {
         low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
       } else {
@@ -1118,7 +1118,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
       double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
       double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
       
-      double upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin<(_hPDF2D->GetNbinsX()-2)) {
         upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
       } else {
@@ -1129,10 +1129,10 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
         MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
       } else {
         MCSamples[mc_i].NomXBin[event_i] = -1;
-        low_edge = _DEFAULT_RETURN_VAL_;
-        upper_edge = _DEFAULT_RETURN_VAL_;
-        low_lower_edge = _DEFAULT_RETURN_VAL_;
-        upper_upper_edge = _DEFAULT_RETURN_VAL_;
+        low_edge = M3::_DEFAULT_RETURN_VAL_;
+        upper_edge = M3::_DEFAULT_RETURN_VAL_;
+        low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+        upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       }
       MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
       if(MCSamples[mc_i].NomYBin[event_i] < 0){
@@ -1313,32 +1313,32 @@ void samplePDFFDBase::SetupNuOscillator() {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
 #ifdef _LOW_MEMORY_STRUCTS_
-      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+      MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity_F;
 #else
-      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+      MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
 #endif
       if (MCSamples[iSample].isNC[iEvent]) {
         if (*MCSamples[iSample].nupdg[iEvent] != *MCSamples[iSample].nupdgUnosc[iEvent]) {
 #ifdef _LOW_MEMORY_STRUCTS_
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Zero_F;
 #else
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Zero;
 #endif
         } else {
 #ifdef _LOW_MEMORY_STRUCTS_
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity_F;
 #else
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
 #endif
         }
       } else {
-        int InitFlav = _BAD_INT_;
-        int FinalFlav = _BAD_INT_;
+        int InitFlav = M3::_BAD_INT_;
+        int FinalFlav = M3::_BAD_INT_;
 
         InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdgUnosc[iEvent]));
         FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdg[iEvent]));
 
-        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+        if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
           MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
           MACH3LOG_ERROR("MCSamples[iSample].nupdgUnosc: {}", (*MCSamples[iSample].nupdgUnosc[iEvent]));
           MACH3LOG_ERROR("InitFlav: {}", InitFlav);
@@ -1461,9 +1461,9 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->ChannelIndex = iSample;
   
   int nEvents = fdobj->nEvents;
-  fdobj->x_var.resize(nEvents, &Unity);
-  fdobj->y_var.resize(nEvents, &Unity);
-  fdobj->rw_etru.resize(nEvents, &Unity);
+  fdobj->x_var.resize(nEvents, &M3::Unity);
+  fdobj->y_var.resize(nEvents, &M3::Unity);
+  fdobj->rw_etru.resize(nEvents, &M3::Unity);
   fdobj->XBin.resize(nEvents, -1);
   fdobj->YBin.resize(nEvents, -1);
   fdobj->NomXBin.resize(nEvents, -1);
@@ -1472,7 +1472,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
-  fdobj->mode.resize(nEvents, &Unity);
+  fdobj->mode.resize(nEvents, &M3::Unity);
   fdobj->nxsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
@@ -1486,9 +1486,9 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->total_weight_pointers.resize(nEvents);
   fdobj->Target.resize(nEvents, 0);
 #ifdef _LOW_MEMORY_STRUCTS_
-  fdobj->osc_w_pointer.resize(nEvents, &Unity_F);
+  fdobj->osc_w_pointer.resize(nEvents, &M3::Unity_F);
 #else
-  fdobj->osc_w_pointer.resize(nEvents, &Unity); 
+  fdobj->osc_w_pointer.resize(nEvents, &M3::Unity);
 #endif
 
   for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){

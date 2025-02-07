@@ -211,7 +211,7 @@ public:
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
-  int nDimensions = _BAD_INT_;
+  int nDimensions = M3::_BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
   std::string SampleDetID;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
@@ -230,7 +230,7 @@ public:
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
   /// @brief the Number of selections in the 
-  int NSelections = _BAD_INT_;
+  int NSelections = M3::_BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound

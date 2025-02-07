@@ -30,6 +30,19 @@ namespace M3 {
     return std::fma(x, y, z);
     #endif
   }
+  constexpr static const double _BAD_DOUBLE_ = -999.99;
+  constexpr static const int _BAD_INT_ = -999;
+  constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
+
+  /// Some commonly used variables to which we set pointers to
+  constexpr static const double Unity = 1.;
+  constexpr static const double Zero = 0.;
+  constexpr static const float Unity_F = 1.;
+  constexpr static const float Zero_F = 0.;
+  constexpr static const int Unity_Int = 1;
+
+  /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
+  constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
@@ -48,20 +61,6 @@ namespace M3 {
 
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
-
-constexpr static const double _BAD_DOUBLE_ = -999.99;
-constexpr static const int _BAD_INT_ = -999;
-constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
-
-/// Some commonly used variables to which we set pointers to
-constexpr static const double Unity = 1.;
-constexpr static const double Zero = 0.;
-constexpr static const float Unity_F = 1.;
-constexpr static const float Zero_F = 0.;
-constexpr static const int Unity_Int = 1;
-
-/// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
-constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
 // C++ includes
 #include <sstream>
