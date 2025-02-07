@@ -201,6 +201,9 @@ public:
   covarianceXsec *XsecCov = nullptr;
   covarianceOsc *OscCov = nullptr;
 
+  /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
+  bool EqualBinningPerOscChannel = false;
+  
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
