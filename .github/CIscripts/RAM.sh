@@ -16,7 +16,7 @@ source bin/setup.NuOscillator.sh
 NUM_CORES=$(nproc)
 
 # Start the executable in the background
-./bin/MCMCTutorial Inputs/FitterConfig.yaml General:MCMC:NSteps:100000 &
+./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:100000 &
 
 # Get the PID of the process
 PID=$!
