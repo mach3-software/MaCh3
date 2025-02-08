@@ -667,8 +667,8 @@ double covarianceBase::CalcLikelihood() const _noexcept_ {
     for (int j = 0; j <= i; ++j) {
       if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-        short int scale = (i != j) ? 2 : 1;
-        logL += scale * 0.5*(_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
+        double scale = (i != j) ? 1. : 0.5;
+        logL += scale * (_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
       }
     }
   }
