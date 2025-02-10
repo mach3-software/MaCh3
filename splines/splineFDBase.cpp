@@ -263,7 +263,7 @@ void splineFDBase::CalcSplineWeights()
 
     //ETA - do we need this? We check later for negative weights and I wonder if this is even
     //possible with the fmaf line above?
-    weight = std::max(weight, 0.0); //Stops is getting negative weights
+    if(weight < 0){weight = 0.;}  //Stops is getting negative weights
 
     weightvec_Monolith[iSpline] = weight;
   }

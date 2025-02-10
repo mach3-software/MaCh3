@@ -40,7 +40,7 @@ public:
         );
     }
 
-    void FindSplineSegment() override {
+    void FindSplineSegment() {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,             /* Return type */
             SplineBase,       /* Parent class */
