@@ -434,34 +434,34 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Destructor for <a class="el" href="classSMonolith.html" title="Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleratio...">SMonolith</a> class. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00798">798</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  798</span>                      {</div>
-<div class="line"><span class="lineno">  799</span><span class="comment">// *****************************************</span></div>
-<div class="line"><span class="lineno">  800</span><span class="preprocessor">  #ifdef CUDA</span></div>
-<div class="line"><span class="lineno">  801</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#a1ca23401d8d99412288952a1d44390ea">CleanupGPU_SplineMonolith</a>(</div>
-<div class="line"><span class="lineno">  802</span>        #ifndef Weight_On_SplineBySpline_Basis</div>
-<div class="line"><span class="lineno">  803</span>        <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a></div>
-<div class="line"><span class="lineno">  804</span>        #endif</div>
-<div class="line"><span class="lineno">  805</span>        );</div>
-<div class="line"><span class="lineno">  806</span> </div>
-<div class="line"><span class="lineno">  807</span>  <span class="comment">//KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions</span></div>
-<div class="line"><span class="lineno">  808</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#af5ca949ba6d79666b541350d24e3daaf">CleanupGPU_Segments</a>(<a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>, <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>);</div>
-<div class="line"><span class="lineno">  809</span> </div>
-<div class="line"><span class="lineno">  810</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>;</div>
-<div class="line"><span class="lineno">  811</span><span class="preprocessor">  #else</span></div>
-<div class="line"><span class="lineno">  812</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>;</div>
-<div class="line"><span class="lineno">  813</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>;</div>
-<div class="line"><span class="lineno">  814</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a>;</div>
-<div class="line"><span class="lineno">  815</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  816</span> </div>
-<div class="line"><span class="lineno">  817</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a8614e8ef07431d99f62ab88d9ebdad16">cpu_weights</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a8614e8ef07431d99f62ab88d9ebdad16">cpu_weights</a>;</div>
-<div class="line"><span class="lineno">  818</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a>;</div>
-<div class="line"><span class="lineno">  819</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a>;</div>
-<div class="line"><span class="lineno">  820</span> </div>
-<div class="line"><span class="lineno">  821</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>;</div>
-<div class="line"><span class="lineno">  822</span>}</div>
-<div class="ttc" id="aclassSMonolithGPU_html_a1ca23401d8d99412288952a1d44390ea"><div class="ttname"><a href="classSMonolithGPU.html#a1ca23401d8d99412288952a1d44390ea">SMonolithGPU::CleanupGPU_SplineMonolith</a></div><div class="ttdeci">__host__ void CleanupGPU_SplineMonolith(float *cpu_total_weights)</div><div class="ttdoc">This function deallocates the resources allocated for the separate {x} and {ybcd} arrays in the and T...</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00551">gpuSplineUtils.cu:551</a></div></div>
-<div class="ttc" id="aclassSMonolithGPU_html_af5ca949ba6d79666b541350d24e3daaf"><div class="ttname"><a href="classSMonolithGPU.html#af5ca949ba6d79666b541350d24e3daaf">SMonolithGPU::CleanupGPU_Segments</a></div><div class="ttdeci">__host__ void CleanupGPU_Segments(short int *segment, float *vals)</div><div class="ttdoc">Clean up pinned variables at CPU.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00587">gpuSplineUtils.cu:587</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00800">800</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  800</span>                      {</div>
+<div class="line"><span class="lineno">  801</span><span class="comment">// *****************************************</span></div>
+<div class="line"><span class="lineno">  802</span><span class="preprocessor">  #ifdef CUDA</span></div>
+<div class="line"><span class="lineno">  803</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#a1ca23401d8d99412288952a1d44390ea">CleanupGPU_SplineMonolith</a>(</div>
+<div class="line"><span class="lineno">  804</span>        #ifndef Weight_On_SplineBySpline_Basis</div>
+<div class="line"><span class="lineno">  805</span>        <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a></div>
+<div class="line"><span class="lineno">  806</span>        #endif</div>
+<div class="line"><span class="lineno">  807</span>        );</div>
+<div class="line"><span class="lineno">  808</span> </div>
+<div class="line"><span class="lineno">  809</span>  <span class="comment">//KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions</span></div>
+<div class="line"><span class="lineno">  810</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#af5ca949ba6d79666b541350d24e3daaf">CleanupGPU_Segments</a>(<a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>, <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>);</div>
+<div class="line"><span class="lineno">  811</span> </div>
+<div class="line"><span class="lineno">  812</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>;</div>
+<div class="line"><span class="lineno">  813</span><span class="preprocessor">  #else</span></div>
+<div class="line"><span class="lineno">  814</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>;</div>
+<div class="line"><span class="lineno">  815</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>;</div>
+<div class="line"><span class="lineno">  816</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a>;</div>
+<div class="line"><span class="lineno">  817</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  818</span> </div>
+<div class="line"><span class="lineno">  819</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a8614e8ef07431d99f62ab88d9ebdad16">cpu_weights</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a8614e8ef07431d99f62ab88d9ebdad16">cpu_weights</a>;</div>
+<div class="line"><span class="lineno">  820</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a>;</div>
+<div class="line"><span class="lineno">  821</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a>;</div>
+<div class="line"><span class="lineno">  822</span> </div>
+<div class="line"><span class="lineno">  823</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>;</div>
+<div class="line"><span class="lineno">  824</span>}</div>
+<div class="ttc" id="aclassSMonolithGPU_html_a1ca23401d8d99412288952a1d44390ea"><div class="ttname"><a href="classSMonolithGPU.html#a1ca23401d8d99412288952a1d44390ea">SMonolithGPU::CleanupGPU_SplineMonolith</a></div><div class="ttdeci">__host__ void CleanupGPU_SplineMonolith(float *cpu_total_weights)</div><div class="ttdoc">This function deallocates the resources allocated for the separate {x} and {ybcd} arrays in the and T...</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00568">gpuSplineUtils.cu:568</a></div></div>
+<div class="ttc" id="aclassSMonolithGPU_html_af5ca949ba6d79666b541350d24e3daaf"><div class="ttname"><a href="classSMonolithGPU.html#af5ca949ba6d79666b541350d24e3daaf">SMonolithGPU::CleanupGPU_Segments</a></div><div class="ttdeci">__host__ void CleanupGPU_Segments(short int *segment, float *vals)</div><div class="ttdoc">Clean up pinned variables at CPU.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00604">gpuSplineUtils.cu:604</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a03444cbed8a9d9a7798d0ef2b26bd702"><div class="ttname"><a href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">SMonolith::gpu_spline_handler</a></div><div class="ttdeci">SMonolithGPU * gpu_spline_handler</div><div class="ttdoc">KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary informa...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00160">SplineMonolith.h:160</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a48d0e5e5b4130fcd191c3e8f1d841eb7"><div class="ttname"><a href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">SMonolith::cpu_spline_handler</a></div><div class="ttdeci">SplineMonoStruct * cpu_spline_handler</div><div class="ttdoc">KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary informa...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00157">SplineMonolith.h:157</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a4a1d45d273cc40cb4f684400812dcb60"><div class="ttname"><a href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">SMonolith::cpu_weights_tf1_var</a></div><div class="ttdeci">float * cpu_weights_tf1_var</div><div class="ttdoc">CPU arrays to hold weight for each TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00148">SplineMonolith.h:148</a></div></div>
@@ -501,69 +501,69 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Implements <a class="el" href="classSplineBase.html#a1ceacf5fee1fc8438501582bef93a9b5">SplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l01002">1002</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1002</span>                                  {</div>
-<div class="line"><span class="lineno"> 1003</span><span class="comment">//*********************************************************</span></div>
-<div class="line"><span class="lineno"> 1004</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1005</span>  <span class="comment">//KS: Open parallel region</span></div>
-<div class="line"><span class="lineno"> 1006</span><span class="preprocessor">  #pragma omp parallel</span></div>
-<div class="line"><span class="lineno"> 1007</span>  {</div>
-<div class="line"><span class="lineno"> 1008</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1009</span>    <span class="comment">//KS: First we calculate</span></div>
-<div class="line"><span class="lineno"> 1010</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1011</span><span class="preprocessor">    #pragma omp for simd nowait</span></div>
-<div class="line"><span class="lineno"> 1012</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno"> 1013</span>    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> splineNum = 0; splineNum &lt; <a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>; ++splineNum)</div>
-<div class="line"><span class="lineno"> 1014</span>    {</div>
-<div class="line"><span class="lineno"> 1015</span>      <span class="comment">//CW: Which Parameter we are accessing</span></div>
-<div class="line"><span class="lineno"> 1016</span>      <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> Param = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#af24b409ab3da1a88e855e1a9d172741f">paramNo_arr</a>[splineNum];</div>
-<div class="line"><span class="lineno"> 1017</span> </div>
-<div class="line"><span class="lineno"> 1018</span>      <span class="comment">//CW: Avoids doing costly binary search on GPU</span></div>
-<div class="line"><span class="lineno"> 1019</span>      <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment = <a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>[Param];</div>
-<div class="line"><span class="lineno"> 1020</span> </div>
-<div class="line"><span class="lineno"> 1021</span>      <span class="comment">//KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing</span></div>
-<div class="line"><span class="lineno"> 1022</span>      <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment_X = short(Param*<a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>+segment);</div>
-<div class="line"><span class="lineno"> 1023</span> </div>
-<div class="line"><span class="lineno"> 1024</span>      <span class="comment">//KS: Find knot position in out monolithical structure</span></div>
-<div class="line"><span class="lineno"> 1025</span>      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> CurrentKnotPos = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a398e0212915793852137384a3406b37f">nKnots_arr</a>[splineNum]*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+segment*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>;</div>
-<div class="line"><span class="lineno"> 1026</span> </div>
-<div class="line"><span class="lineno"> 1027</span>      <span class="comment">// We&#39;ve read the segment straight from CPU and is saved in segment_gpu</span></div>
-<div class="line"><span class="lineno"> 1028</span>      <span class="comment">// polynomial parameters from the monolithic splineMonolith</span></div>
-<div class="line"><span class="lineno"> 1029</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fY = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos];</div>
-<div class="line"><span class="lineno"> 1030</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fB = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos + 1];</div>
-<div class="line"><span class="lineno"> 1031</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fC = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos + 2];</div>
-<div class="line"><span class="lineno"> 1032</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fD = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos + 3];</div>
-<div class="line"><span class="lineno"> 1033</span>      <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
-<div class="line"><span class="lineno"> 1034</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> dx = <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>[Param] - <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a47012ee423ea21f99d06eff8257cf0f0">coeff_x</a>[segment_X];</div>
-<div class="line"><span class="lineno"> 1035</span> </div>
-<div class="line"><span class="lineno"> 1036</span>      <span class="comment">//CW: Wooow, let&#39;s use some fancy intrinsic and pull down the processing time by &lt;1% from normal multiplication! HURRAY</span></div>
-<div class="line"><span class="lineno"> 1037</span>      <a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a>[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);</div>
-<div class="line"><span class="lineno"> 1038</span>      <span class="comment">// Or for the more &quot;easy to read&quot; version:</span></div>
-<div class="line"><span class="lineno"> 1039</span>      <span class="comment">//cpu_weights_spline_var[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));</span></div>
-<div class="line"><span class="lineno"> 1040</span>    }</div>
-<div class="line"><span class="lineno"> 1041</span> </div>
-<div class="line"><span class="lineno"> 1042</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1043</span><span class="preprocessor">    #pragma omp for simd</span></div>
-<div class="line"><span class="lineno"> 1044</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno"> 1045</span>    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> tf1Num = 0; tf1Num &lt; <a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>; ++tf1Num)</div>
-<div class="line"><span class="lineno"> 1046</span>    {</div>
-<div class="line"><span class="lineno"> 1047</span>      <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
-<div class="line"><span class="lineno"> 1048</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> x = <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>[<a class="code hl_variable" href="classSMonolith.html#af87cf7ae888eb7d4c56f8b6c41c9fd02">cpu_paramNo_TF1_arr</a>[tf1Num]];</div>
-<div class="line"><span class="lineno"> 1049</span> </div>
-<div class="line"><span class="lineno"> 1050</span>      <span class="comment">// Read the coefficients</span></div>
-<div class="line"><span class="lineno"> 1051</span>      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> TF1_Index = tf1Num * <a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>;</div>
-<div class="line"><span class="lineno"> 1052</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> a = <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>[TF1_Index];</div>
-<div class="line"><span class="lineno"> 1053</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> b = <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>[TF1_Index + 1];</div>
-<div class="line"><span class="lineno"> 1054</span> </div>
-<div class="line"><span class="lineno"> 1055</span>      <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a>[tf1Num] = fmaf(a, x, b);</div>
-<div class="line"><span class="lineno"> 1056</span>      <span class="comment">// cpu_weights_tf1_var[tf1Num] = a*x + b;</span></div>
-<div class="line"><span class="lineno"> 1057</span>      <span class="comment">//cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;</span></div>
-<div class="line"><span class="lineno"> 1058</span>    }</div>
-<div class="line"><span class="lineno"> 1059</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1060</span>  <span class="comment">//KS: End parallel region</span></div>
-<div class="line"><span class="lineno"> 1061</span>  }</div>
-<div class="line"><span class="lineno"> 1062</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1063</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l01004">1004</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1004</span>                                  {</div>
+<div class="line"><span class="lineno"> 1005</span><span class="comment">//*********************************************************</span></div>
+<div class="line"><span class="lineno"> 1006</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1007</span>  <span class="comment">//KS: Open parallel region</span></div>
+<div class="line"><span class="lineno"> 1008</span><span class="preprocessor">  #pragma omp parallel</span></div>
+<div class="line"><span class="lineno"> 1009</span>  {</div>
+<div class="line"><span class="lineno"> 1010</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1011</span>    <span class="comment">//KS: First we calculate</span></div>
+<div class="line"><span class="lineno"> 1012</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1013</span><span class="preprocessor">    #pragma omp for simd nowait</span></div>
+<div class="line"><span class="lineno"> 1014</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno"> 1015</span>    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> splineNum = 0; splineNum &lt; <a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>; ++splineNum)</div>
+<div class="line"><span class="lineno"> 1016</span>    {</div>
+<div class="line"><span class="lineno"> 1017</span>      <span class="comment">//CW: Which Parameter we are accessing</span></div>
+<div class="line"><span class="lineno"> 1018</span>      <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> Param = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#af24b409ab3da1a88e855e1a9d172741f">paramNo_arr</a>[splineNum];</div>
+<div class="line"><span class="lineno"> 1019</span> </div>
+<div class="line"><span class="lineno"> 1020</span>      <span class="comment">//CW: Avoids doing costly binary search on GPU</span></div>
+<div class="line"><span class="lineno"> 1021</span>      <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment = <a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>[Param];</div>
+<div class="line"><span class="lineno"> 1022</span> </div>
+<div class="line"><span class="lineno"> 1023</span>      <span class="comment">//KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing</span></div>
+<div class="line"><span class="lineno"> 1024</span>      <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment_X = short(Param*<a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>+segment);</div>
+<div class="line"><span class="lineno"> 1025</span> </div>
+<div class="line"><span class="lineno"> 1026</span>      <span class="comment">//KS: Find knot position in out monolithical structure</span></div>
+<div class="line"><span class="lineno"> 1027</span>      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> CurrentKnotPos = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a398e0212915793852137384a3406b37f">nKnots_arr</a>[splineNum]*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+segment*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>;</div>
+<div class="line"><span class="lineno"> 1028</span> </div>
+<div class="line"><span class="lineno"> 1029</span>      <span class="comment">// We&#39;ve read the segment straight from CPU and is saved in segment_gpu</span></div>
+<div class="line"><span class="lineno"> 1030</span>      <span class="comment">// polynomial parameters from the monolithic splineMonolith</span></div>
+<div class="line"><span class="lineno"> 1031</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fY = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos];</div>
+<div class="line"><span class="lineno"> 1032</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fB = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos+1];</div>
+<div class="line"><span class="lineno"> 1033</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fC = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos+2];</div>
+<div class="line"><span class="lineno"> 1034</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> fD = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[CurrentKnotPos+3];</div>
+<div class="line"><span class="lineno"> 1035</span>      <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
+<div class="line"><span class="lineno"> 1036</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> dx = <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>[Param] - <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a47012ee423ea21f99d06eff8257cf0f0">coeff_x</a>[segment_X];</div>
+<div class="line"><span class="lineno"> 1037</span> </div>
+<div class="line"><span class="lineno"> 1038</span>      <span class="comment">//CW: Wooow, let&#39;s use some fancy intrinsic and pull down the processing time by &lt;1% from normal multiplication! HURRAY</span></div>
+<div class="line"><span class="lineno"> 1039</span>      <a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a>[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);</div>
+<div class="line"><span class="lineno"> 1040</span>      <span class="comment">// Or for the more &quot;easy to read&quot; version:</span></div>
+<div class="line"><span class="lineno"> 1041</span>      <span class="comment">//cpu_weights_spline_var[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));</span></div>
+<div class="line"><span class="lineno"> 1042</span>    }</div>
+<div class="line"><span class="lineno"> 1043</span> </div>
+<div class="line"><span class="lineno"> 1044</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1045</span><span class="preprocessor">    #pragma omp for simd</span></div>
+<div class="line"><span class="lineno"> 1046</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno"> 1047</span>    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> tf1Num = 0; tf1Num &lt; <a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>; ++tf1Num)</div>
+<div class="line"><span class="lineno"> 1048</span>    {</div>
+<div class="line"><span class="lineno"> 1049</span>      <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
+<div class="line"><span class="lineno"> 1050</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> x = <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>[<a class="code hl_variable" href="classSMonolith.html#af87cf7ae888eb7d4c56f8b6c41c9fd02">cpu_paramNo_TF1_arr</a>[tf1Num]];</div>
+<div class="line"><span class="lineno"> 1051</span> </div>
+<div class="line"><span class="lineno"> 1052</span>      <span class="comment">// Read the coefficients</span></div>
+<div class="line"><span class="lineno"> 1053</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> a = <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>[tf1Num*<a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>];</div>
+<div class="line"><span class="lineno"> 1054</span>      <span class="keyword">const</span> <span class="keywordtype">float</span> b = <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>[tf1Num*<a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>+1];</div>
+<div class="line"><span class="lineno"> 1055</span> </div>
+<div class="line"><span class="lineno"> 1056</span>      <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a>[tf1Num] = fmaf(a, x, b);</div>
+<div class="line"><span class="lineno"> 1057</span>      <span class="comment">// cpu_weights_tf1_var[tf1Num] = a*x + b;</span></div>
+<div class="line"><span class="lineno"> 1058</span> </div>
+<div class="line"><span class="lineno"> 1059</span>      <span class="comment">//cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;</span></div>
+<div class="line"><span class="lineno"> 1060</span>    }</div>
+<div class="line"><span class="lineno"> 1061</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1062</span>  <span class="comment">//KS: End parallel region</span></div>
+<div class="line"><span class="lineno"> 1063</span>  }</div>
+<div class="line"><span class="lineno"> 1064</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1065</span>}</div>
 <div class="ttc" id="aSplineCommon_8h_html_a283177311bade7400c6088e8fad71a1f"><div class="ttname"><a href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a></div><div class="ttdeci">#define _nCoeff_</div><div class="ttdoc">KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather th...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00017">SplineCommon.h:17</a></div></div>
 <div class="ttc" id="aSplineCommon_8h_html_a911160077ffa38727e0494f178ce380a"><div class="ttname"><a href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a></div><div class="ttdeci">#define _nTF1Coeff_</div><div class="ttdoc">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it her...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00019">SplineCommon.h:19</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a13699796db31517edba3a8009317f779"><div class="ttname"><a href="classSMonolith.html#a13699796db31517edba3a8009317f779">SMonolith::NTF1_valid</a></div><div class="ttdeci">unsigned int NTF1_valid</div><div class="ttdoc">Number of valid TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00135">SplineMonolith.h:135</a></div></div>
@@ -605,22 +605,22 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Implements <a class="el" href="classSplineBase.html#a86e629f3eef59b2f3800136c86fe90c3">SplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00905">905</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  905</span>                         {</div>
-<div class="line"><span class="lineno">  906</span><span class="comment">// *****************************************</span></div>
-<div class="line"><span class="lineno">  907</span>  <span class="comment">// There&#39;s a parameter mapping that goes from spline parameter to a global parameter index</span></div>
-<div class="line"><span class="lineno">  908</span>  <span class="comment">// Find the spline segments</span></div>
-<div class="line"><span class="lineno">  909</span>  <a class="code hl_function" href="classSMonolith.html#a7128a7c13b10f331df8946a0a87c4b33">FindSplineSegment</a>();</div>
-<div class="line"><span class="lineno">  910</span> </div>
-<div class="line"><span class="lineno">  911</span>  <span class="comment">//KS: Huge MP loop over all valid splines</span></div>
-<div class="line"><span class="lineno">  912</span>  <a class="code hl_function" href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">CalcSplineWeights</a>();</div>
-<div class="line"><span class="lineno">  913</span> </div>
-<div class="line"><span class="lineno">  914</span>  <span class="comment">//KS: Huge MP loop over all events calculating total weight</span></div>
-<div class="line"><span class="lineno">  915</span>  <a class="code hl_function" href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">ModifyWeights</a>();</div>
-<div class="line"><span class="lineno">  916</span>}</div>
-<div class="ttc" id="aclassSMonolith_html_a7128a7c13b10f331df8946a0a87c4b33"><div class="ttname"><a href="classSMonolith.html#a7128a7c13b10f331df8946a0a87c4b33">SMonolith::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment() override</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00923">SplineMonolith.cpp:923</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_aa36be17828281e1412a93c0e239cdbc0"><div class="ttname"><a href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">SMonolith::CalcSplineWeights</a></div><div class="ttdeci">void CalcSplineWeights() override</div><div class="ttdoc">CPU based code which eval weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l01002">SplineMonolith.cpp:1002</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_ac37ee525aa57316f652433a4e393afaf"><div class="ttname"><a href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">SMonolith::ModifyWeights</a></div><div class="ttdeci">void ModifyWeights() override</div><div class="ttdoc">Calc total event weight.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l01067">SplineMonolith.cpp:1067</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00907">907</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  907</span>                         {</div>
+<div class="line"><span class="lineno">  908</span><span class="comment">// *****************************************</span></div>
+<div class="line"><span class="lineno">  909</span>  <span class="comment">// There&#39;s a parameter mapping that goes from spline parameter to a global parameter index</span></div>
+<div class="line"><span class="lineno">  910</span>  <span class="comment">// Find the spline segments</span></div>
+<div class="line"><span class="lineno">  911</span>  <a class="code hl_function" href="classSMonolith.html#a7128a7c13b10f331df8946a0a87c4b33">FindSplineSegment</a>();</div>
+<div class="line"><span class="lineno">  912</span> </div>
+<div class="line"><span class="lineno">  913</span>  <span class="comment">//KS: Huge MP loop over all valid splines</span></div>
+<div class="line"><span class="lineno">  914</span>  <a class="code hl_function" href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">CalcSplineWeights</a>();</div>
+<div class="line"><span class="lineno">  915</span> </div>
+<div class="line"><span class="lineno">  916</span>  <span class="comment">//KS: Huge MP loop over all events calculating total weight</span></div>
+<div class="line"><span class="lineno">  917</span>  <a class="code hl_function" href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">ModifyWeights</a>();</div>
+<div class="line"><span class="lineno">  918</span>}</div>
+<div class="ttc" id="aclassSMonolith_html_a7128a7c13b10f331df8946a0a87c4b33"><div class="ttname"><a href="classSMonolith.html#a7128a7c13b10f331df8946a0a87c4b33">SMonolith::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment() override</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00925">SplineMonolith.cpp:925</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_aa36be17828281e1412a93c0e239cdbc0"><div class="ttname"><a href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">SMonolith::CalcSplineWeights</a></div><div class="ttdeci">void CalcSplineWeights() override</div><div class="ttdoc">CPU based code which eval weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l01004">SplineMonolith.cpp:1004</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_ac37ee525aa57316f652433a4e393afaf"><div class="ttname"><a href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">SMonolith::ModifyWeights</a></div><div class="ttdeci">void ModifyWeights() override</div><div class="ttdoc">Calc total event weight.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l01069">SplineMonolith.cpp:1069</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -651,85 +651,84 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Implements <a class="el" href="classSplineBase.html#ae18e490295762416c8627d2db11ee98d">SplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00923">923</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  923</span>                                  {</div>
-<div class="line"><span class="lineno">  924</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  925</span>  <span class="comment">// Loop over the splines</span></div>
-<div class="line"><span class="lineno">  926</span>  <span class="comment">//KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting</span></div>
-<div class="line"><span class="lineno">  927</span>  <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>; ++i)</div>
-<div class="line"><span class="lineno">  928</span>  {</div>
-<div class="line"><span class="lineno">  929</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].nPts;</div>
-<div class="line"><span class="lineno">  930</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>* <a class="code hl_define" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> xArray = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts;</div>
-<div class="line"><span class="lineno">  931</span> </div>
-<div class="line"><span class="lineno">  932</span>    <span class="comment">// Get the variation for this reconfigure for the ith parameter</span></div>
-<div class="line"><span class="lineno">  933</span>    <span class="keyword">const</span> <span class="keywordtype">float</span> xvar = float(*<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].<a class="code hl_variable" href="classSMonolith.html#afa782652b0b3da923c5b20bb1319aadd">splineParsPointer</a>);</div>
-<div class="line"><span class="lineno">  934</span>    <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>[i] = xvar;</div>
-<div class="line"><span class="lineno">  935</span> </div>
-<div class="line"><span class="lineno">  936</span>    <span class="comment">// EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here</span></div>
-<div class="line"><span class="lineno">  937</span>    <span class="comment">//     In principle, such parameters shouldn&#39;t really be included in the first place, but with new det syst splines this</span></div>
-<div class="line"><span class="lineno">  938</span>    <span class="comment">//     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.</span></div>
-<div class="line"><span class="lineno">  939</span>    <span class="keywordflow">if</span>(xArray == <span class="keyword">nullptr</span>) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  940</span> </div>
-<div class="line"><span class="lineno">  941</span>    <span class="comment">// The segment we&#39;re interested in (klow in ROOT code)</span></div>
-<div class="line"><span class="lineno">  942</span>    <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> segment = 0;</div>
-<div class="line"><span class="lineno">  943</span>    <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHigh = nPoints-1;</div>
-<div class="line"><span class="lineno">  944</span>    <span class="comment">//KS: We expect new segment is very close to previous</span></div>
-<div class="line"><span class="lineno">  945</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> PreviousSegment = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].CurrSegment;</div>
-<div class="line"><span class="lineno">  946</span> </div>
-<div class="line"><span class="lineno">  947</span>    <span class="comment">// If the variation is below the lowest saved spline point</span></div>
-<div class="line"><span class="lineno">  948</span>    <span class="keywordflow">if</span> (xvar &lt;= xArray[0]) {</div>
-<div class="line"><span class="lineno">  949</span>      segment = 0;</div>
-<div class="line"><span class="lineno">  950</span>      <span class="comment">// If the variation is above the highest saved spline point</span></div>
-<div class="line"><span class="lineno">  951</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (xvar &gt;= xArray[nPoints-1]) {</div>
-<div class="line"><span class="lineno">  952</span>      <span class="comment">//CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651</span></div>
-<div class="line"><span class="lineno">  953</span>      segment = kHigh;</div>
-<div class="line"><span class="lineno">  954</span>      <span class="comment">//KS: It is quite probable the new segment is same as in previous step so try to avoid binary search, first we have to check if it is in bounds to avoid seg fault</span></div>
-<div class="line"><span class="lineno">  955</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( xArray[PreviousSegment+1] &gt; xvar &amp;&amp; xvar &gt;= xArray[PreviousSegment] ) {</div>
-<div class="line"><span class="lineno">  956</span>      segment = PreviousSegment;</div>
-<div class="line"><span class="lineno">  957</span>      <span class="comment">// If the variation is between the maximum and minimum, perform a binary search</span></div>
-<div class="line"><span class="lineno">  958</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  959</span>      <span class="comment">// The top point we&#39;ve got</span></div>
-<div class="line"><span class="lineno">  960</span>      <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHalf = 0;</div>
-<div class="line"><span class="lineno">  961</span>      <span class="comment">// While there is still a difference in the points (we haven&#39;t yet found the segment)</span></div>
-<div class="line"><span class="lineno">  962</span>      <span class="comment">// This is a binary search, incrementing segment and decrementing kHalf until we&#39;ve found the segment</span></div>
-<div class="line"><span class="lineno">  963</span>      <span class="keywordflow">while</span> (kHigh - segment &gt; 1) {</div>
-<div class="line"><span class="lineno">  964</span>        <span class="comment">// Increment the half-step</span></div>
-<div class="line"><span class="lineno">  965</span>        kHalf = <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>((segment + kHigh)/2);</div>
-<div class="line"><span class="lineno">  966</span>        <span class="comment">// If our variation is above the kHalf, set the segment to kHalf</span></div>
-<div class="line"><span class="lineno">  967</span>        <span class="keywordflow">if</span> (xvar &gt; xArray[kHalf]) {</div>
-<div class="line"><span class="lineno">  968</span>          segment = kHalf;</div>
-<div class="line"><span class="lineno">  969</span>          <span class="comment">// Else move kHigh down</span></div>
-<div class="line"><span class="lineno">  970</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  971</span>          kHigh = kHalf;</div>
-<div class="line"><span class="lineno">  972</span>        }</div>
-<div class="line"><span class="lineno">  973</span>      } <span class="comment">// End the while: we&#39;ve now done our binary search</span></div>
-<div class="line"><span class="lineno">  974</span>    } <span class="comment">// End the else: we&#39;ve now found our point</span></div>
-<div class="line"><span class="lineno">  975</span> </div>
-<div class="line"><span class="lineno">  976</span>    <span class="keywordflow">if</span> (segment &gt;= nPoints-1 &amp;&amp; nPoints &gt; 1) segment = nPoints-2;</div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00925">925</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  925</span>                                  {</div>
+<div class="line"><span class="lineno">  926</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  927</span>  <span class="comment">// Loop over the splines</span></div>
+<div class="line"><span class="lineno">  928</span>  <span class="comment">//KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting</span></div>
+<div class="line"><span class="lineno">  929</span>  <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>; ++i)</div>
+<div class="line"><span class="lineno">  930</span>  {</div>
+<div class="line"><span class="lineno">  931</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].nPts;</div>
+<div class="line"><span class="lineno">  932</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>* xArray = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts;</div>
+<div class="line"><span class="lineno">  933</span> </div>
+<div class="line"><span class="lineno">  934</span>    <span class="comment">// Get the variation for this reconfigure for the ith parameter</span></div>
+<div class="line"><span class="lineno">  935</span>    <span class="keyword">const</span> <span class="keywordtype">float</span> xvar = float(*<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].<a class="code hl_variable" href="classSMonolith.html#afa782652b0b3da923c5b20bb1319aadd">splineParsPointer</a>);</div>
+<div class="line"><span class="lineno">  936</span>    <a class="code hl_variable" href="classSMonolith.html#a73fdaf051a568fd58bf8f65574b5c646">ParamValues</a>[i] = xvar;</div>
+<div class="line"><span class="lineno">  937</span> </div>
+<div class="line"><span class="lineno">  938</span>    <span class="comment">// EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here</span></div>
+<div class="line"><span class="lineno">  939</span>    <span class="comment">//     In principle, such parameters shouldn&#39;t really be included in the first place, but with new det syst splines this</span></div>
+<div class="line"><span class="lineno">  940</span>    <span class="comment">//     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.</span></div>
+<div class="line"><span class="lineno">  941</span>    <span class="keywordflow">if</span>(xArray == <span class="keyword">nullptr</span>) <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  942</span> </div>
+<div class="line"><span class="lineno">  943</span>    <span class="comment">// The segment we&#39;re interested in (klow in ROOT code)</span></div>
+<div class="line"><span class="lineno">  944</span>    <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> segment = 0;</div>
+<div class="line"><span class="lineno">  945</span>    <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHigh = nPoints-1;</div>
+<div class="line"><span class="lineno">  946</span>    <span class="comment">//KS: We expect new segment is very close to previous</span></div>
+<div class="line"><span class="lineno">  947</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> PreviousSegment = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].CurrSegment;</div>
+<div class="line"><span class="lineno">  948</span> </div>
+<div class="line"><span class="lineno">  949</span>    <span class="comment">// If the variation is below the lowest saved spline point</span></div>
+<div class="line"><span class="lineno">  950</span>    <span class="keywordflow">if</span> (xvar &lt;= xArray[0]) {</div>
+<div class="line"><span class="lineno">  951</span>      segment = 0;</div>
+<div class="line"><span class="lineno">  952</span>      <span class="comment">// If the variation is above the highest saved spline point</span></div>
+<div class="line"><span class="lineno">  953</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (xvar &gt;= xArray[nPoints-1]) {</div>
+<div class="line"><span class="lineno">  954</span>      <span class="comment">//CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651</span></div>
+<div class="line"><span class="lineno">  955</span>      segment = kHigh;</div>
+<div class="line"><span class="lineno">  956</span>      <span class="comment">//KS: It is quite probable the new segment is same as in previous step so try to avoid binary search, first we have to check if it is in bounds to avoid seg fault</span></div>
+<div class="line"><span class="lineno">  957</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( xArray[PreviousSegment+1] &gt; xvar &amp;&amp; xvar &gt;= xArray[PreviousSegment] ) {</div>
+<div class="line"><span class="lineno">  958</span>      segment = PreviousSegment;</div>
+<div class="line"><span class="lineno">  959</span>      <span class="comment">// If the variation is between the maximum and minimum, perform a binary search</span></div>
+<div class="line"><span class="lineno">  960</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  961</span>      <span class="comment">// The top point we&#39;ve got</span></div>
+<div class="line"><span class="lineno">  962</span>      <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHalf = 0;</div>
+<div class="line"><span class="lineno">  963</span>      <span class="comment">// While there is still a difference in the points (we haven&#39;t yet found the segment)</span></div>
+<div class="line"><span class="lineno">  964</span>      <span class="comment">// This is a binary search, incrementing segment and decrementing kHalf until we&#39;ve found the segment</span></div>
+<div class="line"><span class="lineno">  965</span>      <span class="keywordflow">while</span> (kHigh - segment &gt; 1) {</div>
+<div class="line"><span class="lineno">  966</span>        <span class="comment">// Increment the half-step</span></div>
+<div class="line"><span class="lineno">  967</span>        kHalf = <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>((segment + kHigh)/2);</div>
+<div class="line"><span class="lineno">  968</span>        <span class="comment">// If our variation is above the kHalf, set the segment to kHalf</span></div>
+<div class="line"><span class="lineno">  969</span>        <span class="keywordflow">if</span> (xvar &gt; xArray[kHalf]) {</div>
+<div class="line"><span class="lineno">  970</span>          segment = kHalf;</div>
+<div class="line"><span class="lineno">  971</span>          <span class="comment">// Else move kHigh down</span></div>
+<div class="line"><span class="lineno">  972</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  973</span>          kHigh = kHalf;</div>
+<div class="line"><span class="lineno">  974</span>        }</div>
+<div class="line"><span class="lineno">  975</span>      } <span class="comment">// End the while: we&#39;ve now done our binary search</span></div>
+<div class="line"><span class="lineno">  976</span>    } <span class="comment">// End the else: we&#39;ve now found our point</span></div>
 <div class="line"><span class="lineno">  977</span> </div>
-<div class="line"><span class="lineno">  978</span>    <span class="comment">//CW: This way we avoid doing 1.2M+ binary searches on the GPU</span></div>
-<div class="line"><span class="lineno">  979</span>    <span class="comment">// and literally just multiply lots of numbers together on the GPU without any algorithm</span></div>
-<div class="line"><span class="lineno">  980</span>    <span class="comment">// Update the values and which segment it belongs to</span></div>
-<div class="line"><span class="lineno">  981</span>    <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].CurrSegment = segment;</div>
-<div class="line"><span class="lineno">  982</span>    <a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>[i] = short(<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].CurrSegment);</div>
-<div class="line"><span class="lineno">  983</span> </div>
-<div class="line"><span class="lineno">  984</span><span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><span class="lineno">  985</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[segment] &gt; xvar &amp;&amp; segment != 0) {</div>
-<div class="line"><span class="lineno">  986</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found a segment which is _ABOVE_ the variation!&quot;</span>);</div>
-<div class="line"><span class="lineno">  987</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;IT SHOULD ALWAYS BE BELOW! (except when segment 0)&quot;</span>);</div>
-<div class="line"><span class="lineno">  988</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Spline: {}&quot;</span>, i);</div>
-<div class="line"><span class="lineno">  989</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found segment = {}&quot;</span>, segment);</div>
-<div class="line"><span class="lineno">  990</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Doing variation = {}&quot;</span>, xvar);</div>
-<div class="line"><span class="lineno">  991</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;x in spline = {}&quot;</span>, <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[segment]);</div>
-<div class="line"><span class="lineno">  992</span>      <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> j = 0; j &lt; <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[j].nPts; ++j) {</div>
-<div class="line"><span class="lineno">  993</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;    {} = {}&quot;</span>, j, <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[j]);</div>
-<div class="line"><span class="lineno">  994</span>      }</div>
-<div class="line"><span class="lineno">  995</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  996</span>    }</div>
-<div class="line"><span class="lineno">  997</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  998</span>  } <span class="comment">//end loop over params</span></div>
-<div class="line"><span class="lineno">  999</span>}</div>
-<div class="ttc" id="aCore_8h_html_ab6a7e23420f0bcfb04f42f45f8283101"><div class="ttname"><a href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a></div><div class="ttdeci">#define _restrict_</div><div class="ttdoc">KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I foun...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00064">Core.h:64</a></div></div>
+<div class="line"><span class="lineno">  978</span>    <span class="keywordflow">if</span> (segment &gt;= nPoints-1 &amp;&amp; nPoints &gt; 1) segment = nPoints-2;</div>
+<div class="line"><span class="lineno">  979</span> </div>
+<div class="line"><span class="lineno">  980</span>    <span class="comment">//CW: This way we avoid doing 1.2M+ binary searches on the GPU</span></div>
+<div class="line"><span class="lineno">  981</span>    <span class="comment">// and literally just multiply lots of numbers together on the GPU without any algorithm</span></div>
+<div class="line"><span class="lineno">  982</span>    <span class="comment">// Update the values and which segment it belongs to</span></div>
+<div class="line"><span class="lineno">  983</span>    <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].CurrSegment = segment;</div>
+<div class="line"><span class="lineno">  984</span>    <a class="code hl_variable" href="classSMonolith.html#a53ab5b2235fd697f27556f1a1a7a5354">segments</a>[i] = short(<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].CurrSegment);</div>
+<div class="line"><span class="lineno">  985</span> </div>
+<div class="line"><span class="lineno">  986</span><span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  987</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[segment] &gt; xvar &amp;&amp; segment != 0) {</div>
+<div class="line"><span class="lineno">  988</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found a segment which is _ABOVE_ the variation!&quot;</span>);</div>
+<div class="line"><span class="lineno">  989</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;IT SHOULD ALWAYS BE BELOW! (except when segment 0)&quot;</span>);</div>
+<div class="line"><span class="lineno">  990</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Spline: {}&quot;</span>, i);</div>
+<div class="line"><span class="lineno">  991</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found segment = {}&quot;</span>, segment);</div>
+<div class="line"><span class="lineno">  992</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Doing variation = {}&quot;</span>, xvar);</div>
+<div class="line"><span class="lineno">  993</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;x in spline = {}&quot;</span>, <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[segment]);</div>
+<div class="line"><span class="lineno">  994</span>      <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> j = 0; j &lt; <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[j].nPts; ++j) {</div>
+<div class="line"><span class="lineno">  995</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;    {} = {}&quot;</span>, j, <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[j]);</div>
+<div class="line"><span class="lineno">  996</span>      }</div>
+<div class="line"><span class="lineno">  997</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  998</span>    }</div>
+<div class="line"><span class="lineno">  999</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno"> 1000</span>  } <span class="comment">//end loop over params</span></div>
+<div class="line"><span class="lineno"> 1001</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a4606b53f321992377d420a838c76ab3b"><div class="ttname"><a href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">SMonolith::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of NIWG parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00124">SplineMonolith.h:124</a></div></div>
@@ -859,51 +858,51 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00828">828</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  828</span>                                                                                                            {</div>
-<div class="line"><span class="lineno">  829</span><span class="comment">// *****************************************</span></div>
-<div class="line"><span class="lineno">  830</span>  <span class="comment">// Initialise all arrays to 1.0</span></div>
-<div class="line"><span class="lineno">  831</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>; ++i) {</div>
-<div class="line"><span class="lineno">  832</span>    xArray[i] = 1.0;</div>
-<div class="line"><span class="lineno">  833</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>; j++) {</div>
-<div class="line"><span class="lineno">  834</span>      manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+j] = 1.0;</div>
-<div class="line"><span class="lineno">  835</span>    }</div>
-<div class="line"><span class="lineno">  836</span>  }</div>
-<div class="line"><span class="lineno">  837</span>  <span class="comment">// Get number of points in spline</span></div>
-<div class="line"><span class="lineno">  838</span>  <span class="keywordtype">int</span> Np = spl-&gt;<a class="code hl_function" href="classTSpline3__red.html#a6b680cfb96e11c55b8325e1274251b91">GetNp</a>();</div>
-<div class="line"><span class="lineno">  839</span>  <span class="comment">// If spline is flat, set number of knots to 1.0,</span></div>
-<div class="line"><span class="lineno">  840</span>  <span class="comment">// This is used later to expedite the calculations for flat splines</span></div>
-<div class="line"><span class="lineno">  841</span>  <span class="comment">// tmpArray[0] is number of knots</span></div>
-<div class="line"><span class="lineno">  842</span>  nPoints = Np;</div>
-<div class="line"><span class="lineno">  843</span>  <span class="keywordflow">if</span> (Np &gt; <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>) {</div>
-<div class="line"><span class="lineno">  844</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error, number of points is greater than saved {}&quot;</span>, <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>);</div>
-<div class="line"><span class="lineno">  845</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This _WILL_ cause problems with GPU splines and _SHOULD_ be fixed!&quot;</span>);</div>
-<div class="line"><span class="lineno">  846</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;nPoints = {}, _max_knots = {}&quot;</span>, nPoints, <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>);</div>
-<div class="line"><span class="lineno">  847</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  848</span>  }</div>
-<div class="line"><span class="lineno">  849</span> </div>
-<div class="line"><span class="lineno">  850</span>  <span class="comment">// The coefficients we&#39;re writing to</span></div>
-<div class="line"><span class="lineno">  851</span>  <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> x, y, b, c, d;</div>
-<div class="line"><span class="lineno">  852</span>  <span class="comment">// TSpline3 can only take doubles, not floats</span></div>
-<div class="line"><span class="lineno">  853</span>  <span class="comment">// But our GPU is slow with doubles, so need to cast to float</span></div>
-<div class="line"><span class="lineno">  854</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; Np; i++) {</div>
-<div class="line"><span class="lineno">  855</span>    <span class="comment">// Get the coefficients from the TSpline3 object</span></div>
-<div class="line"><span class="lineno">  856</span>    spl-&gt;<a class="code hl_function" href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">GetCoeff</a>(i, x, y, b, c, d);</div>
-<div class="line"><span class="lineno">  857</span>    <span class="comment">// Write the arrays</span></div>
-<div class="line"><span class="lineno">  858</span>    xArray[i] = float(x);</div>
-<div class="line"><span class="lineno">  859</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>] = float(y); <span class="comment">// 4 because manyArray stores y,b,c,d</span></div>
-<div class="line"><span class="lineno">  860</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+1] = float(b);</div>
-<div class="line"><span class="lineno">  861</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+2] = float(c);</div>
-<div class="line"><span class="lineno">  862</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+3] = float(d);</div>
-<div class="line"><span class="lineno">  863</span>    <span class="keywordflow">if</span>((xArray[i] == -999) || (manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>] == -999) || (manyArray[i*4+1] == -999) || (manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+2] == -999) || (manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+3] == -999)){</div>
-<div class="line"><span class="lineno">  864</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*********** Bad params in getSplineCoeff_SepMany() ************&quot;</span>);</div>
-<div class="line"><span class="lineno">  865</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}&quot;</span>, x, y, b, c, d);</div>
-<div class="line"><span class="lineno">  866</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}&quot;</span>, xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+3]);</div>
-<div class="line"><span class="lineno">  867</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This will cause problems when preparing for GPU&quot;</span>);</div>
-<div class="line"><span class="lineno">  868</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;***************************************************************&quot;</span>);</div>
-<div class="line"><span class="lineno">  869</span>    }</div>
-<div class="line"><span class="lineno">  870</span>  }</div>
-<div class="line"><span class="lineno">  871</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00830">830</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  830</span>                                                                                                            {</div>
+<div class="line"><span class="lineno">  831</span><span class="comment">// *****************************************</span></div>
+<div class="line"><span class="lineno">  832</span>  <span class="comment">// Initialise all arrays to 1.0</span></div>
+<div class="line"><span class="lineno">  833</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>; ++i) {</div>
+<div class="line"><span class="lineno">  834</span>    xArray[i] = 1.0;</div>
+<div class="line"><span class="lineno">  835</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>; j++) {</div>
+<div class="line"><span class="lineno">  836</span>      manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+j] = 1.0;</div>
+<div class="line"><span class="lineno">  837</span>    }</div>
+<div class="line"><span class="lineno">  838</span>  }</div>
+<div class="line"><span class="lineno">  839</span>  <span class="comment">// Get number of points in spline</span></div>
+<div class="line"><span class="lineno">  840</span>  <span class="keywordtype">int</span> Np = spl-&gt;<a class="code hl_function" href="classTSpline3__red.html#a6b680cfb96e11c55b8325e1274251b91">GetNp</a>();</div>
+<div class="line"><span class="lineno">  841</span>  <span class="comment">// If spline is flat, set number of knots to 1.0,</span></div>
+<div class="line"><span class="lineno">  842</span>  <span class="comment">// This is used later to expedite the calculations for flat splines</span></div>
+<div class="line"><span class="lineno">  843</span>  <span class="comment">// tmpArray[0] is number of knots</span></div>
+<div class="line"><span class="lineno">  844</span>  nPoints = Np;</div>
+<div class="line"><span class="lineno">  845</span>  <span class="keywordflow">if</span> (Np &gt; <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>) {</div>
+<div class="line"><span class="lineno">  846</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error, number of points is greater than saved {}&quot;</span>, <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>);</div>
+<div class="line"><span class="lineno">  847</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This _WILL_ cause problems with GPU splines and _SHOULD_ be fixed!&quot;</span>);</div>
+<div class="line"><span class="lineno">  848</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;nPoints = {}, _max_knots = {}&quot;</span>, nPoints, <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>);</div>
+<div class="line"><span class="lineno">  849</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  850</span>  }</div>
+<div class="line"><span class="lineno">  851</span> </div>
+<div class="line"><span class="lineno">  852</span>  <span class="comment">// The coefficients we&#39;re writing to</span></div>
+<div class="line"><span class="lineno">  853</span>  <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> x, y, b, c, d;</div>
+<div class="line"><span class="lineno">  854</span>  <span class="comment">// TSpline3 can only take doubles, not floats</span></div>
+<div class="line"><span class="lineno">  855</span>  <span class="comment">// But our GPU is slow with doubles, so need to cast to float</span></div>
+<div class="line"><span class="lineno">  856</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; Np; i++) {</div>
+<div class="line"><span class="lineno">  857</span>    <span class="comment">// Get the coefficients from the TSpline3 object</span></div>
+<div class="line"><span class="lineno">  858</span>    spl-&gt;<a class="code hl_function" href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">GetCoeff</a>(i, x, y, b, c, d);</div>
+<div class="line"><span class="lineno">  859</span>    <span class="comment">// Write the arrays</span></div>
+<div class="line"><span class="lineno">  860</span>    xArray[i] = float(x);</div>
+<div class="line"><span class="lineno">  861</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>] = float(y); <span class="comment">// 4 because manyArray stores y,b,c,d</span></div>
+<div class="line"><span class="lineno">  862</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+1] = float(b);</div>
+<div class="line"><span class="lineno">  863</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+2] = float(c);</div>
+<div class="line"><span class="lineno">  864</span>    manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+3] = float(d);</div>
+<div class="line"><span class="lineno">  865</span>    <span class="keywordflow">if</span>((xArray[i] == -999) || (manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>] == -999) || (manyArray[i*4+1] == -999) || (manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+2] == -999) || (manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+3] == -999)){</div>
+<div class="line"><span class="lineno">  866</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*********** Bad params in getSplineCoeff_SepMany() ************&quot;</span>);</div>
+<div class="line"><span class="lineno">  867</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}&quot;</span>, x, y, b, c, d);</div>
+<div class="line"><span class="lineno">  868</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}&quot;</span>, xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>+3]);</div>
+<div class="line"><span class="lineno">  869</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This will cause problems when preparing for GPU&quot;</span>);</div>
+<div class="line"><span class="lineno">  870</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;***************************************************************&quot;</span>);</div>
+<div class="line"><span class="lineno">  871</span>    }</div>
+<div class="line"><span class="lineno">  872</span>  }</div>
+<div class="line"><span class="lineno">  873</span>}</div>
 <div class="ttc" id="aclassTSpline3__red_html_a6b680cfb96e11c55b8325e1274251b91"><div class="ttname"><a href="classTSpline3__red.html#a6b680cfb96e11c55b8325e1274251b91">TSpline3_red::GetNp</a></div><div class="ttdeci">M3::int_t GetNp() override</div><div class="ttdoc">CW: Get the number of points.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00613">SplineStructs.h:613</a></div></div>
 <div class="ttc" id="aclassTSpline3__red_html_a74d108b99a9060ab85c22343fa4a4532"><div class="ttname"><a href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">TSpline3_red::GetCoeff</a></div><div class="ttdeci">void GetCoeff(int segment, M3::float_t &amp;x, M3::float_t &amp;y, M3::float_t &amp;b, M3::float_t &amp;c, M3::float_t &amp;d)</div><div class="ttdoc">CW: Get the coefficient of a given segment.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00621">SplineStructs.h:621</a></div></div>
 </div><!-- fragment -->
@@ -1015,7 +1014,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  525</span>      FileName.insert(0, std::string(std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>))+<span class="stringliteral">&quot;/&quot;</span>);</div>
 <div class="line"><span class="lineno">  526</span>   }</div>
 <div class="line"><span class="lineno">  527</span> </div>
-<div class="line"><span class="lineno">  528</span>  <span class="keyword">auto</span> SplineFile = std::make_unique&lt;TFile&gt;(FileName.c_str(), <span class="stringliteral">&quot;OPEN&quot;</span>);</div>
+<div class="line"><span class="lineno">  528</span>  TFile *SplineFile = <span class="keyword">new</span> TFile(FileName.c_str(), <span class="stringliteral">&quot;OPEN&quot;</span>);</div>
 <div class="line"><span class="lineno">  529</span>  TTree *Settings = SplineFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;Settings&quot;</span>);</div>
 <div class="line"><span class="lineno">  530</span>  TTree *Monolith = SplineFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;Monolith&quot;</span>);</div>
 <div class="line"><span class="lineno">  531</span>  TTree *Monolith_TF1 = SplineFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;Monolith_TF1&quot;</span>);</div>
@@ -1145,14 +1144,15 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  655</span>  }</div>
 <div class="line"><span class="lineno">  656</span> </div>
 <div class="line"><span class="lineno">  657</span>  SplineFile-&gt;Close();</div>
-<div class="line"><span class="lineno">  658</span> </div>
-<div class="line"><span class="lineno">  659</span>  <span class="comment">// Print some info; could probably make this to a separate function</span></div>
-<div class="line"><span class="lineno">  660</span>  <a class="code hl_function" href="classSMonolith.html#a5c374d4505de53ad68d176a5644568e6">PrintInitialsiation</a>();</div>
-<div class="line"><span class="lineno">  661</span> </div>
-<div class="line"><span class="lineno">  662</span>  <a class="code hl_function" href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">MoveToGPU</a>();</div>
-<div class="line"><span class="lineno">  663</span>}</div>
-<div class="ttc" id="aclassSMonolithGPU_html_a3fbbb94f6db65b73a394ab541f94fba6"><div class="ttname"><a href="classSMonolithGPU.html#a3fbbb94f6db65b73a394ab541f94fba6">SMonolithGPU::InitGPU_Vals</a></div><div class="ttdeci">__host__ void InitGPU_Vals(float **vals)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00183">gpuSplineUtils.cu:183</a></div></div>
-<div class="ttc" id="aclassSMonolithGPU_html_ab674ec40c136d89b56b7c25d9337c48a"><div class="ttname"><a href="classSMonolithGPU.html#ab674ec40c136d89b56b7c25d9337c48a">SMonolithGPU::InitGPU_Segments</a></div><div class="ttdeci">__host__ void InitGPU_Segments(short int **segment)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00174">gpuSplineUtils.cu:174</a></div></div>
+<div class="line"><span class="lineno">  658</span>  <span class="keyword">delete</span> SplineFile;</div>
+<div class="line"><span class="lineno">  659</span> </div>
+<div class="line"><span class="lineno">  660</span>  <span class="comment">// Print some info; could probably make this to a separate function</span></div>
+<div class="line"><span class="lineno">  661</span>  <a class="code hl_function" href="classSMonolith.html#a5c374d4505de53ad68d176a5644568e6">PrintInitialsiation</a>();</div>
+<div class="line"><span class="lineno">  662</span> </div>
+<div class="line"><span class="lineno">  663</span>  <a class="code hl_function" href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">MoveToGPU</a>();</div>
+<div class="line"><span class="lineno">  664</span>}</div>
+<div class="ttc" id="aclassSMonolithGPU_html_a3fbbb94f6db65b73a394ab541f94fba6"><div class="ttname"><a href="classSMonolithGPU.html#a3fbbb94f6db65b73a394ab541f94fba6">SMonolithGPU::InitGPU_Vals</a></div><div class="ttdeci">__host__ void InitGPU_Vals(float **vals)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00184">gpuSplineUtils.cu:184</a></div></div>
+<div class="ttc" id="aclassSMonolithGPU_html_ab674ec40c136d89b56b7c25d9337c48a"><div class="ttname"><a href="classSMonolithGPU.html#ab674ec40c136d89b56b7c25d9337c48a">SMonolithGPU::InitGPU_Segments</a></div><div class="ttdeci">__host__ void InitGPU_Segments(short int **segment)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00175">gpuSplineUtils.cu:175</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a0a6599372d1e3d38105478a68308d9a6"><div class="ttname"><a href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">SMonolith::cpu_nParamPerEvent</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00151">SplineMonolith.h:151</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a5c374d4505de53ad68d176a5644568e6"><div class="ttname"><a href="classSMonolith.html#a5c374d4505de53ad68d176a5644568e6">SMonolith::PrintInitialsiation</a></div><div class="ttdeci">void PrintInitialsiation()</div><div class="ttdoc">KS: Print info about how much knots etc has been initialised.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l01135">SplineMonolith.cpp:1135</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a66eecc550dea893c60a435a034e7ebf5"><div class="ttname"><a href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">SMonolith::cpu_nParamPerEvent_tf1</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_tf1</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00154">SplineMonolith.h:154</a></div></div>
@@ -1187,22 +1187,20 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Implements <a class="el" href="classSplineBase.html#a49665d2712b61b038085d25ace96a568">SplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l01067">1067</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1067</span>                             {</div>
-<div class="line"><span class="lineno"> 1068</span><span class="comment">//*********************************************************</span></div>
-<div class="line"><span class="lineno"> 1069</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno"> 1070</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1071</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno"> 1072</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1073</span>  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventNum = 0; EventNum &lt; <a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>; ++EventNum)</div>
-<div class="line"><span class="lineno"> 1074</span>  {</div>
-<div class="line"><span class="lineno"> 1075</span>    <span class="keywordtype">float</span> totalWeight = 1.0f; <span class="comment">// Initialize total weight for each event</span></div>
-<div class="line"><span class="lineno"> 1076</span> </div>
-<div class="line"><span class="lineno"> 1077</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Offset = 2 * EventNum;</div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l01069">1069</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1069</span>                             {</div>
+<div class="line"><span class="lineno"> 1070</span><span class="comment">//*********************************************************</span></div>
+<div class="line"><span class="lineno"> 1071</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno"> 1072</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1073</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno"> 1074</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1075</span>  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventNum = 0; EventNum &lt; <a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>; ++EventNum)</div>
+<div class="line"><span class="lineno"> 1076</span>  {</div>
+<div class="line"><span class="lineno"> 1077</span>    <span class="keywordtype">float</span> totalWeight = 1.0f; <span class="comment">// Initialize total weight for each event</span></div>
 <div class="line"><span class="lineno"> 1078</span> </div>
 <div class="line"><span class="lineno"> 1079</span>    <span class="comment">// Extract the parameters for the current event</span></div>
-<div class="line"><span class="lineno"> 1080</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex = <a class="code hl_variable" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[Offset + 1];</div>
-<div class="line"><span class="lineno"> 1081</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams = <a class="code hl_variable" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[Offset];</div>
+<div class="line"><span class="lineno"> 1080</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex = <a class="code hl_variable" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[2 * EventNum + 1];</div>
+<div class="line"><span class="lineno"> 1081</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams = <a class="code hl_variable" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[2 * EventNum];</div>
 <div class="line"><span class="lineno"> 1082</span> </div>
 <div class="line"><span class="lineno"> 1083</span>    <span class="comment">// Compute total weight for the current event</span></div>
 <div class="line"><span class="lineno"> 1084</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
@@ -1213,8 +1211,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1089</span>    }</div>
 <div class="line"><span class="lineno"> 1090</span>    <span class="comment">//Now TF1</span></div>
 <div class="line"><span class="lineno"> 1091</span>    <span class="comment">// Extract the parameters for the current event</span></div>
-<div class="line"><span class="lineno"> 1092</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex_tf1 = <a class="code hl_variable" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[Offset + 1];</div>
-<div class="line"><span class="lineno"> 1093</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams_tf1 = <a class="code hl_variable" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[Offset];</div>
+<div class="line"><span class="lineno"> 1092</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex_tf1 = <a class="code hl_variable" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[2 * EventNum + 1];</div>
+<div class="line"><span class="lineno"> 1093</span>    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams_tf1 = <a class="code hl_variable" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[2 * EventNum];</div>
 <div class="line"><span class="lineno"> 1094</span> </div>
 <div class="line"><span class="lineno"> 1095</span>    <span class="comment">// Compute total weight for the current event</span></div>
 <div class="line"><span class="lineno"> 1096</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
@@ -1382,7 +1380,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aStructs_8h_html_a85aef80dc0fb38ccb4ff2f7b6a49a5ab"><div class="ttname"><a href="Structs_8h.html#a85aef80dc0fb38ccb4ff2f7b6a49a5ab">CleanVector</a></div><div class="ttdeci">void CleanVector(std::vector&lt; T &gt; &amp;vec)</div><div class="ttdoc">Generic cleanup function.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00044">Structs.h:44</a></div></div>
 <div class="ttc" id="aclassSMonolithGPU_html"><div class="ttname"><a href="classSMonolithGPU.html">SMonolithGPU</a></div><div class="ttdoc">Class responsible for calculating spline weight on GPU.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cuh_source.html#l00061">gpuSplineUtils.cuh:62</a></div></div>
 <div class="ttc" id="aclassSMonolithGPU_html_a713a47fd41a93d2b6d40c4b392158aae"><div class="ttname"><a href="classSMonolithGPU.html#a713a47fd41a93d2b6d40c4b392158aae">SMonolithGPU::InitGPU_SplineMonolith</a></div><div class="ttdeci">__host__ void InitGPU_SplineMonolith(float **cpu_total_weights, int n_events, unsigned int total_nknots, unsigned int n_splines, unsigned int n_tf1, int Eve_size)</div><div class="ttdoc">Allocate memory on gpu for spline monolith.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00106">gpuSplineUtils.cu:106</a></div></div>
-<div class="ttc" id="aclassSMonolithGPU_html_aef41d94cf5e44ebf4fe427c3ce84f20b"><div class="ttname"><a href="classSMonolithGPU.html#aef41d94cf5e44ebf4fe427c3ce84f20b">SMonolithGPU::CopyToGPU_SplineMonolith</a></div><div class="ttdeci">__host__ void CopyToGPU_SplineMonolith(SplineMonoStruct *cpu_spline_handler, std::vector&lt; float &gt; cpu_many_array_TF1, std::vector&lt; short int &gt; cpu_paramNo_arr_TF1, int n_events, std::vector&lt; unsigned int &gt; cpu_nParamPerEvent, std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_TF1, int n_params, unsigned int n_splines, short int spline_size, unsigned int total_nknots, unsigned int n_tf1)</div><div class="ttdoc">Copies data from CPU to GPU for the spline monolith.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00198">gpuSplineUtils.cu:198</a></div></div>
+<div class="ttc" id="aclassSMonolithGPU_html_aef41d94cf5e44ebf4fe427c3ce84f20b"><div class="ttname"><a href="classSMonolithGPU.html#aef41d94cf5e44ebf4fe427c3ce84f20b">SMonolithGPU::CopyToGPU_SplineMonolith</a></div><div class="ttdeci">__host__ void CopyToGPU_SplineMonolith(SplineMonoStruct *cpu_spline_handler, std::vector&lt; float &gt; cpu_many_array_TF1, std::vector&lt; short int &gt; cpu_paramNo_arr_TF1, int n_events, std::vector&lt; unsigned int &gt; cpu_nParamPerEvent, std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_TF1, int n_params, unsigned int n_splines, short int spline_size, unsigned int total_nknots, unsigned int n_tf1)</div><div class="ttdoc">Copies data from CPU to GPU for the spline monolith.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00199">gpuSplineUtils.cu:199</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1681,8 +1679,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aStructs_8h_html_a6a73aa1ad819973a9c421c17c2a7f36da847a18b0a859ce2b3b87a98f455855b1"><div class="ttname"><a href="Structs_8h.html#a6a73aa1ad819973a9c421c17c2a7f36da847a18b0a859ce2b3b87a98f455855b1">kTF1_red</a></div><div class="ttdeci">@ kTF1_red</div><div class="ttdoc">Uses TF1_red for interpolation.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00123">Structs.h:123</a></div></div>
 <div class="ttc" id="aStructs_8h_html_a6a73aa1ad819973a9c421c17c2a7f36da8bea6994e011cc85a5a88b50c97ce7b2"><div class="ttname"><a href="Structs_8h.html#a6a73aa1ad819973a9c421c17c2a7f36da8bea6994e011cc85a5a88b50c97ce7b2">kTSpline3_red</a></div><div class="ttdeci">@ kTSpline3_red</div><div class="ttdoc">Uses TSpline3_red for interpolation.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00122">Structs.h:122</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a14b9c21186a53196f49c8d8d3555fbf2"><div class="ttname"><a href="classSMonolith.html#a14b9c21186a53196f49c8d8d3555fbf2">SMonolith::cpu_nPoints_arr</a></div><div class="ttdeci">std::vector&lt; short int &gt; cpu_nPoints_arr</div><div class="ttdoc">CPU arrays to hold number of points.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00166">SplineMonolith.h:166</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_a79f4bf0cac279cf57ab8f06698052922"><div class="ttname"><a href="classSMonolith.html#a79f4bf0cac279cf57ab8f06698052922">SMonolith::PrepareSplineFile</a></div><div class="ttdeci">void PrepareSplineFile()</div><div class="ttdoc">KS: Prepare spline file that can be used for fast loading.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00667">SplineMonolith.cpp:667</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_acbbe3398718d0d02d65a1e92a91c112c"><div class="ttname"><a href="classSMonolith.html#acbbe3398718d0d02d65a1e92a91c112c">SMonolith::getSplineCoeff_SepMany</a></div><div class="ttdeci">void getSplineCoeff_SepMany(TSpline3_red *&amp;spl, int &amp;nPoints, float *&amp;xArray, float *&amp;manyArray)</div><div class="ttdoc">CW: This loads up coefficients into two arrays: one x array and one yabcd array.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00828">SplineMonolith.cpp:828</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_a79f4bf0cac279cf57ab8f06698052922"><div class="ttname"><a href="classSMonolith.html#a79f4bf0cac279cf57ab8f06698052922">SMonolith::PrepareSplineFile</a></div><div class="ttdeci">void PrepareSplineFile()</div><div class="ttdoc">KS: Prepare spline file that can be used for fast loading.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00668">SplineMonolith.cpp:668</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_acbbe3398718d0d02d65a1e92a91c112c"><div class="ttname"><a href="classSMonolith.html#acbbe3398718d0d02d65a1e92a91c112c">SMonolith::getSplineCoeff_SepMany</a></div><div class="ttdeci">void getSplineCoeff_SepMany(TSpline3_red *&amp;spl, int &amp;nPoints, float *&amp;xArray, float *&amp;manyArray)</div><div class="ttdoc">CW: This loads up coefficients into two arrays: one x array and one yabcd array.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00830">SplineMonolith.cpp:830</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_af2a015f3d6f4f8a51d27f8cd8a67c229"><div class="ttname"><a href="classSMonolith.html#af2a015f3d6f4f8a51d27f8cd8a67c229">SMonolith::ScanMasterSpline</a></div><div class="ttdeci">void ScanMasterSpline(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, unsigned int &amp;nEvents, short int &amp;MaxPoints, short int &amp;numParams, int &amp;nSplines, unsigned int &amp;NSplinesValid, unsigned int &amp;numKnots, unsigned int &amp;nTF1Valid, unsigned int &amp;nTF1_coeff, const std::vector&lt; RespFuncType &gt; &amp;SplineType)</div><div class="ttdoc">CW: Function to scan through the MasterSpline of TSpline3.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00380">SplineMonolith.cpp:380</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_ac8a5f86ac6f156a7e11ef188b06f425f"><div class="ttname"><a href="classSplineBase.html#ac8a5f86ac6f156a7e11ef188b06f425f">SplineBase::getTF1Coeff</a></div><div class="ttdeci">void getTF1Coeff(TF1_red *&amp;spl, int &amp;nPoints, float *&amp;coeffs)</div><div class="ttdoc">CW: Gets the polynomial coefficients for TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00023">SplineBase.cpp:23</a></div></div>
 <div class="ttc" id="aclassTF1__red_html"><div class="ttname"><a href="classTF1__red.html">TF1_red</a></div><div class="ttdoc">CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each paramet...</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00119">SplineStructs.h:119</a></div></div>
@@ -1716,134 +1714,135 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: Prepare spline file that can be used for fast loading. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00667">667</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  667</span>                                  {</div>
-<div class="line"><span class="lineno">  668</span><span class="comment">// *****************************************</span></div>
-<div class="line"><span class="lineno">  669</span>  std::string FileName = <span class="stringliteral">&quot;SplineFile.root&quot;</span>;</div>
-<div class="line"><span class="lineno">  670</span>  <span class="keywordflow">if</span> (std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>) != <span class="keyword">nullptr</span>) {</div>
-<div class="line"><span class="lineno">  671</span>      FileName.insert(0, std::string(std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>))+<span class="stringliteral">&quot;/&quot;</span>);</div>
-<div class="line"><span class="lineno">  672</span>   }</div>
-<div class="line"><span class="lineno">  673</span> </div>
-<div class="line"><span class="lineno">  674</span>  <span class="keyword">auto</span> SplineFile = std::make_unique&lt;TFile&gt;(FileName.c_str(), <span class="stringliteral">&quot;recreate&quot;</span>);</div>
-<div class="line"><span class="lineno">  675</span>  TTree *Settings = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;Settings&quot;</span>, <span class="stringliteral">&quot;Settings&quot;</span>);</div>
-<div class="line"><span class="lineno">  676</span>  TTree *Monolith = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;Monolith&quot;</span>, <span class="stringliteral">&quot;Monolith&quot;</span>);</div>
-<div class="line"><span class="lineno">  677</span>  TTree *Monolith_TF1 = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;Monolith_TF1&quot;</span>, <span class="stringliteral">&quot;Monolith_TF1&quot;</span>);</div>
-<div class="line"><span class="lineno">  678</span>  TTree *ParamInfo = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;ParamInfo&quot;</span>, <span class="stringliteral">&quot;ParamInfo&quot;</span>);</div>
-<div class="line"><span class="lineno">  679</span>  TTree *XKnots = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;XKnots&quot;</span>, <span class="stringliteral">&quot;XKnots&quot;</span>);</div>
-<div class="line"><span class="lineno">  680</span>  TTree *EventInfo = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;EventInfo&quot;</span>, <span class="stringliteral">&quot;EventInfo&quot;</span>);</div>
-<div class="line"><span class="lineno">  681</span>  TTree *FastSplineInfoTree = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>, <span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>);</div>
-<div class="line"><span class="lineno">  682</span> </div>
-<div class="line"><span class="lineno">  683</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> NEvents_temp = <a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>;</div>
-<div class="line"><span class="lineno">  684</span>  <span class="keywordtype">short</span> <span class="keywordtype">int</span> nParams_temp = <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>;</div>
-<div class="line"><span class="lineno">  685</span>  <span class="keywordtype">int</span> _max_knots_temp = <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>;</div>
-<div class="line"><span class="lineno">  686</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nKnots_temp = <a class="code hl_variable" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a>;</div>
-<div class="line"><span class="lineno">  687</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> NSplines_valid_temp = <a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>;</div>
-<div class="line"><span class="lineno">  688</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nTF1Valid_temp = <a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>;</div>
-<div class="line"><span class="lineno">  689</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nTF1coeff_temp = <a class="code hl_variable" href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">nTF1coeff</a>;</div>
-<div class="line"><span class="lineno">  690</span> </div>
-<div class="line"><span class="lineno">  691</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;NEvents&quot;</span>, &amp;NEvents_temp, <span class="stringliteral">&quot;NEvents/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  692</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;nParams&quot;</span>, &amp;nParams_temp, <span class="stringliteral">&quot;nParams/S&quot;</span>);</div>
-<div class="line"><span class="lineno">  693</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;_max_knots&quot;</span>, &amp;_max_knots_temp, <span class="stringliteral">&quot;_max_knots/I&quot;</span>);</div>
-<div class="line"><span class="lineno">  694</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;nKnots&quot;</span>, &amp;nKnots_temp, <span class="stringliteral">&quot;nKnots/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  695</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;NSplines_valid&quot;</span>, &amp;NSplines_valid_temp, <span class="stringliteral">&quot;NSplines_valid/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  696</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;NTF1_valid&quot;</span>, &amp;nTF1Valid_temp, <span class="stringliteral">&quot;NTF1_valid/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  697</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;nTF1coeff&quot;</span>, &amp;nTF1coeff_temp, <span class="stringliteral">&quot;nTF1coeff/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  698</span> </div>
-<div class="line"><span class="lineno">  699</span>  Settings-&gt;Fill();</div>
-<div class="line"><span class="lineno">  700</span> </div>
-<div class="line"><span class="lineno">  701</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  702</span>  Settings-&gt;Write();</div>
-<div class="line"><span class="lineno">  703</span> </div>
-<div class="line"><span class="lineno">  704</span>  <span class="keywordtype">float</span> coeff = 0.;</div>
-<div class="line"><span class="lineno">  705</span>  Monolith-&gt;Branch(<span class="stringliteral">&quot;cpu_coeff_many&quot;</span>, &amp;coeff, <span class="stringliteral">&quot;cpu_coeff_many/F&quot;</span>);</div>
-<div class="line"><span class="lineno">  706</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a>*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>; i++)</div>
-<div class="line"><span class="lineno">  707</span>  {</div>
-<div class="line"><span class="lineno">  708</span>    coeff = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[i];</div>
-<div class="line"><span class="lineno">  709</span>    Monolith-&gt;Fill();</div>
-<div class="line"><span class="lineno">  710</span>  }</div>
-<div class="line"><span class="lineno">  711</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  712</span>  Monolith-&gt;Write();</div>
-<div class="line"><span class="lineno">  713</span> </div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00668">668</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  668</span>                                  {</div>
+<div class="line"><span class="lineno">  669</span><span class="comment">// *****************************************</span></div>
+<div class="line"><span class="lineno">  670</span>  std::string FileName = <span class="stringliteral">&quot;SplineFile.root&quot;</span>;</div>
+<div class="line"><span class="lineno">  671</span>  <span class="keywordflow">if</span> (std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>) != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><span class="lineno">  672</span>      FileName.insert(0, std::string(std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>))+<span class="stringliteral">&quot;/&quot;</span>);</div>
+<div class="line"><span class="lineno">  673</span>   }</div>
+<div class="line"><span class="lineno">  674</span> </div>
+<div class="line"><span class="lineno">  675</span>  TFile *SplineFile = <span class="keyword">new</span> TFile(FileName.c_str(), <span class="stringliteral">&quot;recreate&quot;</span>);</div>
+<div class="line"><span class="lineno">  676</span>  TTree *Settings = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;Settings&quot;</span>, <span class="stringliteral">&quot;Settings&quot;</span>);</div>
+<div class="line"><span class="lineno">  677</span>  TTree *Monolith = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;Monolith&quot;</span>, <span class="stringliteral">&quot;Monolith&quot;</span>);</div>
+<div class="line"><span class="lineno">  678</span>  TTree *Monolith_TF1 = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;Monolith_TF1&quot;</span>, <span class="stringliteral">&quot;Monolith_TF1&quot;</span>);</div>
+<div class="line"><span class="lineno">  679</span>  TTree *ParamInfo = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;ParamInfo&quot;</span>, <span class="stringliteral">&quot;ParamInfo&quot;</span>);</div>
+<div class="line"><span class="lineno">  680</span>  TTree *XKnots = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;XKnots&quot;</span>, <span class="stringliteral">&quot;XKnots&quot;</span>);</div>
+<div class="line"><span class="lineno">  681</span>  TTree *EventInfo = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;EventInfo&quot;</span>, <span class="stringliteral">&quot;EventInfo&quot;</span>);</div>
+<div class="line"><span class="lineno">  682</span>  TTree *FastSplineInfoTree = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>, <span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>);</div>
+<div class="line"><span class="lineno">  683</span> </div>
+<div class="line"><span class="lineno">  684</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> NEvents_temp = <a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>;</div>
+<div class="line"><span class="lineno">  685</span>  <span class="keywordtype">short</span> <span class="keywordtype">int</span> nParams_temp = <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>;</div>
+<div class="line"><span class="lineno">  686</span>  <span class="keywordtype">int</span> _max_knots_temp = <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a>;</div>
+<div class="line"><span class="lineno">  687</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nKnots_temp = <a class="code hl_variable" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a>;</div>
+<div class="line"><span class="lineno">  688</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> NSplines_valid_temp = <a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>;</div>
+<div class="line"><span class="lineno">  689</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nTF1Valid_temp = <a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>;</div>
+<div class="line"><span class="lineno">  690</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nTF1coeff_temp = <a class="code hl_variable" href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">nTF1coeff</a>;</div>
+<div class="line"><span class="lineno">  691</span> </div>
+<div class="line"><span class="lineno">  692</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;NEvents&quot;</span>, &amp;NEvents_temp, <span class="stringliteral">&quot;NEvents/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  693</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;nParams&quot;</span>, &amp;nParams_temp, <span class="stringliteral">&quot;nParams/S&quot;</span>);</div>
+<div class="line"><span class="lineno">  694</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;_max_knots&quot;</span>, &amp;_max_knots_temp, <span class="stringliteral">&quot;_max_knots/I&quot;</span>);</div>
+<div class="line"><span class="lineno">  695</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;nKnots&quot;</span>, &amp;nKnots_temp, <span class="stringliteral">&quot;nKnots/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  696</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;NSplines_valid&quot;</span>, &amp;NSplines_valid_temp, <span class="stringliteral">&quot;NSplines_valid/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  697</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;NTF1_valid&quot;</span>, &amp;nTF1Valid_temp, <span class="stringliteral">&quot;NTF1_valid/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  698</span>  Settings-&gt;Branch(<span class="stringliteral">&quot;nTF1coeff&quot;</span>, &amp;nTF1coeff_temp, <span class="stringliteral">&quot;nTF1coeff/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  699</span> </div>
+<div class="line"><span class="lineno">  700</span>  Settings-&gt;Fill();</div>
+<div class="line"><span class="lineno">  701</span> </div>
+<div class="line"><span class="lineno">  702</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  703</span>  Settings-&gt;Write();</div>
+<div class="line"><span class="lineno">  704</span> </div>
+<div class="line"><span class="lineno">  705</span>  <span class="keywordtype">float</span> coeff = 0.;</div>
+<div class="line"><span class="lineno">  706</span>  Monolith-&gt;Branch(<span class="stringliteral">&quot;cpu_coeff_many&quot;</span>, &amp;coeff, <span class="stringliteral">&quot;cpu_coeff_many/F&quot;</span>);</div>
+<div class="line"><span class="lineno">  707</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a>*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>; i++)</div>
+<div class="line"><span class="lineno">  708</span>  {</div>
+<div class="line"><span class="lineno">  709</span>    coeff = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>[i];</div>
+<div class="line"><span class="lineno">  710</span>    Monolith-&gt;Fill();</div>
+<div class="line"><span class="lineno">  711</span>  }</div>
+<div class="line"><span class="lineno">  712</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  713</span>  Monolith-&gt;Write();</div>
 <div class="line"><span class="lineno">  714</span> </div>
-<div class="line"><span class="lineno">  715</span>  <span class="keywordtype">float</span> coeff_tf1 = 0.;</div>
-<div class="line"><span class="lineno">  716</span>  Monolith_TF1-&gt;Branch(<span class="stringliteral">&quot;cpu_coeff_TF1_many&quot;</span>, &amp;coeff_tf1, <span class="stringliteral">&quot;cpu_coeff_TF1_many/F&quot;</span>);</div>
-<div class="line"><span class="lineno">  717</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">nTF1coeff</a>; i++)</div>
-<div class="line"><span class="lineno">  718</span>  {</div>
-<div class="line"><span class="lineno">  719</span>    coeff_tf1 = <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>[i];</div>
-<div class="line"><span class="lineno">  720</span>    Monolith_TF1-&gt;Fill();</div>
-<div class="line"><span class="lineno">  721</span>  }</div>
-<div class="line"><span class="lineno">  722</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  723</span>  Monolith_TF1-&gt;Write();</div>
-<div class="line"><span class="lineno">  724</span> </div>
-<div class="line"><span class="lineno">  725</span>  <span class="keywordtype">short</span> <span class="keywordtype">int</span> paramNo_arr = 0;</div>
-<div class="line"><span class="lineno">  726</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nKnots_arr = 0;</div>
-<div class="line"><span class="lineno">  727</span>  ParamInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_paramNo_arr&quot;</span>, &amp;paramNo_arr, <span class="stringliteral">&quot;cpu_paramNo_arr/S&quot;</span>);</div>
-<div class="line"><span class="lineno">  728</span>  ParamInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_nKnots_arr&quot;</span>, &amp;nKnots_arr, <span class="stringliteral">&quot;cpu_nKnots_arr/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  729</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>; i++)</div>
-<div class="line"><span class="lineno">  730</span>  {</div>
-<div class="line"><span class="lineno">  731</span>    paramNo_arr = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#af24b409ab3da1a88e855e1a9d172741f">paramNo_arr</a>[i];</div>
-<div class="line"><span class="lineno">  732</span>    nKnots_arr = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a398e0212915793852137384a3406b37f">nKnots_arr</a>[i];</div>
-<div class="line"><span class="lineno">  733</span> </div>
-<div class="line"><span class="lineno">  734</span>    ParamInfo-&gt;Fill();</div>
-<div class="line"><span class="lineno">  735</span>  }</div>
-<div class="line"><span class="lineno">  736</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  737</span>  ParamInfo-&gt;Write();</div>
-<div class="line"><span class="lineno">  738</span> </div>
-<div class="line"><span class="lineno">  739</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> event_size_max = <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a> * <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>;</div>
-<div class="line"><span class="lineno">  740</span> </div>
-<div class="line"><span class="lineno">  741</span>  <span class="keywordtype">float</span> coeff_x = 0.;</div>
-<div class="line"><span class="lineno">  742</span>  XKnots-&gt;Branch(<span class="stringliteral">&quot;cpu_coeff_x&quot;</span>, &amp;coeff_x, <span class="stringliteral">&quot;cpu_coeff_x/F&quot;</span>);</div>
-<div class="line"><span class="lineno">  743</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; event_size_max; i++)</div>
-<div class="line"><span class="lineno">  744</span>  {</div>
-<div class="line"><span class="lineno">  745</span>    coeff_x = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a47012ee423ea21f99d06eff8257cf0f0">coeff_x</a>[i];</div>
-<div class="line"><span class="lineno">  746</span>    XKnots-&gt;Fill();</div>
-<div class="line"><span class="lineno">  747</span>  }</div>
-<div class="line"><span class="lineno">  748</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  749</span>  XKnots-&gt;Write();</div>
-<div class="line"><span class="lineno">  750</span> </div>
-<div class="line"><span class="lineno">  751</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nParamPerEvent = 0;</div>
-<div class="line"><span class="lineno">  752</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nParamPerEvent_tf1 = 0;</div>
-<div class="line"><span class="lineno">  753</span> </div>
-<div class="line"><span class="lineno">  754</span>  EventInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_nParamPerEvent&quot;</span>, &amp;nParamPerEvent, <span class="stringliteral">&quot;cpu_nParamPerEvent/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  755</span>  EventInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_nParamPerEvent_tf1&quot;</span>, &amp;nParamPerEvent_tf1, <span class="stringliteral">&quot;cpu_nParamPerEvent_tf1/i&quot;</span>);</div>
-<div class="line"><span class="lineno">  756</span> </div>
-<div class="line"><span class="lineno">  757</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; 2*<a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>; i++)</div>
-<div class="line"><span class="lineno">  758</span>  {</div>
-<div class="line"><span class="lineno">  759</span>    nParamPerEvent = <a class="code hl_variable" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[i];</div>
-<div class="line"><span class="lineno">  760</span>    nParamPerEvent_tf1 = <a class="code hl_variable" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[i];</div>
-<div class="line"><span class="lineno">  761</span>    EventInfo-&gt;Fill();</div>
-<div class="line"><span class="lineno">  762</span>  }</div>
-<div class="line"><span class="lineno">  763</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  764</span>  EventInfo-&gt;Write();</div>
-<div class="line"><span class="lineno">  765</span> </div>
-<div class="line"><span class="lineno">  766</span>  <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = 0;</div>
-<div class="line"><span class="lineno">  767</span>  <span class="keywordtype">float</span> xtemp[20];</div>
-<div class="line"><span class="lineno">  768</span>  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;nPts&quot;</span>, &amp;nPoints, <span class="stringliteral">&quot;nPts/I&quot;</span>);</div>
-<div class="line"><span class="lineno">  769</span>  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;xPts&quot;</span>, xtemp, <span class="stringliteral">&quot;xPts[nPts]/F&quot;</span>);</div>
-<div class="line"><span class="lineno">  770</span> </div>
-<div class="line"><span class="lineno">  771</span>  <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>; ++i)</div>
-<div class="line"><span class="lineno">  772</span>  {</div>
-<div class="line"><span class="lineno">  773</span>    nPoints = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].nPts;</div>
-<div class="line"><span class="lineno">  774</span> </div>
-<div class="line"><span class="lineno">  775</span>    <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> k = 0; k &lt; <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].nPts; ++k)</div>
-<div class="line"><span class="lineno">  776</span>    {</div>
-<div class="line"><span class="lineno">  777</span>      xtemp[k] = float(<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[k]);</div>
-<div class="line"><span class="lineno">  778</span>    }</div>
-<div class="line"><span class="lineno">  779</span>    FastSplineInfoTree-&gt;Fill();</div>
-<div class="line"><span class="lineno">  780</span>  }</div>
-<div class="line"><span class="lineno">  781</span> </div>
-<div class="line"><span class="lineno">  782</span>  SplineFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  783</span>  FastSplineInfoTree-&gt;Write();</div>
-<div class="line"><span class="lineno">  784</span> </div>
-<div class="line"><span class="lineno">  785</span>  <span class="keyword">delete</span> Settings;</div>
-<div class="line"><span class="lineno">  786</span>  <span class="keyword">delete</span> Monolith;</div>
-<div class="line"><span class="lineno">  787</span>  <span class="keyword">delete</span> Monolith_TF1;</div>
-<div class="line"><span class="lineno">  788</span>  <span class="keyword">delete</span> ParamInfo;</div>
-<div class="line"><span class="lineno">  789</span>  <span class="keyword">delete</span> XKnots;</div>
-<div class="line"><span class="lineno">  790</span>  <span class="keyword">delete</span> EventInfo;</div>
-<div class="line"><span class="lineno">  791</span>  <span class="keyword">delete</span> FastSplineInfoTree;</div>
-<div class="line"><span class="lineno">  792</span>  SplineFile-&gt;Close();</div>
-<div class="line"><span class="lineno">  793</span>}</div>
+<div class="line"><span class="lineno">  715</span> </div>
+<div class="line"><span class="lineno">  716</span>  <span class="keywordtype">float</span> coeff_tf1 = 0.;</div>
+<div class="line"><span class="lineno">  717</span>  Monolith_TF1-&gt;Branch(<span class="stringliteral">&quot;cpu_coeff_TF1_many&quot;</span>, &amp;coeff_tf1, <span class="stringliteral">&quot;cpu_coeff_TF1_many/F&quot;</span>);</div>
+<div class="line"><span class="lineno">  718</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">nTF1coeff</a>; i++)</div>
+<div class="line"><span class="lineno">  719</span>  {</div>
+<div class="line"><span class="lineno">  720</span>    coeff_tf1 = <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>[i];</div>
+<div class="line"><span class="lineno">  721</span>    Monolith_TF1-&gt;Fill();</div>
+<div class="line"><span class="lineno">  722</span>  }</div>
+<div class="line"><span class="lineno">  723</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  724</span>  Monolith_TF1-&gt;Write();</div>
+<div class="line"><span class="lineno">  725</span> </div>
+<div class="line"><span class="lineno">  726</span>  <span class="keywordtype">short</span> <span class="keywordtype">int</span> paramNo_arr = 0;</div>
+<div class="line"><span class="lineno">  727</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nKnots_arr = 0;</div>
+<div class="line"><span class="lineno">  728</span>  ParamInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_paramNo_arr&quot;</span>, &amp;paramNo_arr, <span class="stringliteral">&quot;cpu_paramNo_arr/S&quot;</span>);</div>
+<div class="line"><span class="lineno">  729</span>  ParamInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_nKnots_arr&quot;</span>, &amp;nKnots_arr, <span class="stringliteral">&quot;cpu_nKnots_arr/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  730</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>; i++)</div>
+<div class="line"><span class="lineno">  731</span>  {</div>
+<div class="line"><span class="lineno">  732</span>    paramNo_arr = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#af24b409ab3da1a88e855e1a9d172741f">paramNo_arr</a>[i];</div>
+<div class="line"><span class="lineno">  733</span>    nKnots_arr = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a398e0212915793852137384a3406b37f">nKnots_arr</a>[i];</div>
+<div class="line"><span class="lineno">  734</span> </div>
+<div class="line"><span class="lineno">  735</span>    ParamInfo-&gt;Fill();</div>
+<div class="line"><span class="lineno">  736</span>  }</div>
+<div class="line"><span class="lineno">  737</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  738</span>  ParamInfo-&gt;Write();</div>
+<div class="line"><span class="lineno">  739</span> </div>
+<div class="line"><span class="lineno">  740</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> event_size_max = <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a> * <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>;</div>
+<div class="line"><span class="lineno">  741</span> </div>
+<div class="line"><span class="lineno">  742</span>  <span class="keywordtype">float</span> coeff_x = 0.;</div>
+<div class="line"><span class="lineno">  743</span>  XKnots-&gt;Branch(<span class="stringliteral">&quot;cpu_coeff_x&quot;</span>, &amp;coeff_x, <span class="stringliteral">&quot;cpu_coeff_x/F&quot;</span>);</div>
+<div class="line"><span class="lineno">  744</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; event_size_max; i++)</div>
+<div class="line"><span class="lineno">  745</span>  {</div>
+<div class="line"><span class="lineno">  746</span>    coeff_x = <a class="code hl_variable" href="classSMonolith.html#a48d0e5e5b4130fcd191c3e8f1d841eb7">cpu_spline_handler</a>-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a47012ee423ea21f99d06eff8257cf0f0">coeff_x</a>[i];</div>
+<div class="line"><span class="lineno">  747</span>    XKnots-&gt;Fill();</div>
+<div class="line"><span class="lineno">  748</span>  }</div>
+<div class="line"><span class="lineno">  749</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  750</span>  XKnots-&gt;Write();</div>
+<div class="line"><span class="lineno">  751</span> </div>
+<div class="line"><span class="lineno">  752</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nParamPerEvent = 0;</div>
+<div class="line"><span class="lineno">  753</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nParamPerEvent_tf1 = 0;</div>
+<div class="line"><span class="lineno">  754</span> </div>
+<div class="line"><span class="lineno">  755</span>  EventInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_nParamPerEvent&quot;</span>, &amp;nParamPerEvent, <span class="stringliteral">&quot;cpu_nParamPerEvent/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  756</span>  EventInfo-&gt;Branch(<span class="stringliteral">&quot;cpu_nParamPerEvent_tf1&quot;</span>, &amp;nParamPerEvent_tf1, <span class="stringliteral">&quot;cpu_nParamPerEvent_tf1/i&quot;</span>);</div>
+<div class="line"><span class="lineno">  757</span> </div>
+<div class="line"><span class="lineno">  758</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; 2*<a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>; i++)</div>
+<div class="line"><span class="lineno">  759</span>  {</div>
+<div class="line"><span class="lineno">  760</span>    nParamPerEvent = <a class="code hl_variable" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[i];</div>
+<div class="line"><span class="lineno">  761</span>    nParamPerEvent_tf1 = <a class="code hl_variable" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[i];</div>
+<div class="line"><span class="lineno">  762</span>    EventInfo-&gt;Fill();</div>
+<div class="line"><span class="lineno">  763</span>  }</div>
+<div class="line"><span class="lineno">  764</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  765</span>  EventInfo-&gt;Write();</div>
+<div class="line"><span class="lineno">  766</span> </div>
+<div class="line"><span class="lineno">  767</span>  <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = 0;</div>
+<div class="line"><span class="lineno">  768</span>  <span class="keywordtype">float</span> xtemp[20];</div>
+<div class="line"><span class="lineno">  769</span>  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;nPts&quot;</span>, &amp;nPoints, <span class="stringliteral">&quot;nPts/I&quot;</span>);</div>
+<div class="line"><span class="lineno">  770</span>  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;xPts&quot;</span>, xtemp, <span class="stringliteral">&quot;xPts[nPts]/F&quot;</span>);</div>
+<div class="line"><span class="lineno">  771</span> </div>
+<div class="line"><span class="lineno">  772</span>  <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code hl_variable" href="classSMonolith.html#a4606b53f321992377d420a838c76ab3b">nParams</a>; ++i)</div>
+<div class="line"><span class="lineno">  773</span>  {</div>
+<div class="line"><span class="lineno">  774</span>    nPoints = <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].nPts;</div>
+<div class="line"><span class="lineno">  775</span> </div>
+<div class="line"><span class="lineno">  776</span>    <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> k = 0; k &lt; <a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].nPts; ++k)</div>
+<div class="line"><span class="lineno">  777</span>    {</div>
+<div class="line"><span class="lineno">  778</span>      xtemp[k] = float(<a class="code hl_variable" href="classSMonolith.html#a701e12512a1d8b8c9038d881adc9264c">SplineInfoArray</a>[i].xPts[k]);</div>
+<div class="line"><span class="lineno">  779</span>    }</div>
+<div class="line"><span class="lineno">  780</span>    FastSplineInfoTree-&gt;Fill();</div>
+<div class="line"><span class="lineno">  781</span>  }</div>
+<div class="line"><span class="lineno">  782</span> </div>
+<div class="line"><span class="lineno">  783</span>  SplineFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  784</span>  FastSplineInfoTree-&gt;Write();</div>
+<div class="line"><span class="lineno">  785</span> </div>
+<div class="line"><span class="lineno">  786</span>  <span class="keyword">delete</span> Settings;</div>
+<div class="line"><span class="lineno">  787</span>  <span class="keyword">delete</span> Monolith;</div>
+<div class="line"><span class="lineno">  788</span>  <span class="keyword">delete</span> Monolith_TF1;</div>
+<div class="line"><span class="lineno">  789</span>  <span class="keyword">delete</span> ParamInfo;</div>
+<div class="line"><span class="lineno">  790</span>  <span class="keyword">delete</span> XKnots;</div>
+<div class="line"><span class="lineno">  791</span>  <span class="keyword">delete</span> EventInfo;</div>
+<div class="line"><span class="lineno">  792</span>  <span class="keyword">delete</span> FastSplineInfoTree;</div>
+<div class="line"><span class="lineno">  793</span>  SplineFile-&gt;Close();</div>
+<div class="line"><span class="lineno">  794</span>  <span class="keyword">delete</span> SplineFile;</div>
+<div class="line"><span class="lineno">  795</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
