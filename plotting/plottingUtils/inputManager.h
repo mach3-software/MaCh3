@@ -264,7 +264,8 @@ public:
       return "MCMC";
     case kSigmaVar:
       return "SigmaVar";
-
+    case kNFileTypes:
+      return "NFileTypes";
     default:
       return "UNKNOWN_FILE_TYPE";
     }

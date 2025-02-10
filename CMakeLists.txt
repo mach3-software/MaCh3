@@ -102,7 +102,7 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wconversion            # Warn on type conversions that may lose data
   -Wformat-security       # Warn on functions that are potentially insecure for formatting
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
-  #-Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  -Wswitch-enum          # Warn if a `switch` statement on an enum does not cover all values
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )

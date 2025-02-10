@@ -19,7 +19,7 @@ void samplePDFBase::addData(std::vector<double> &data)
 {
   if(nDims != 0 && nDims != 1)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 1", nDims);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
@@ -38,8 +38,7 @@ void samplePDFBase::addData(std::vector< std::vector <double> > &data)
 {
   if(nDims != 0 && nDims != 2)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 2", nDims);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 2;  
@@ -57,12 +56,11 @@ void samplePDFBase::addData(TH1D* binneddata)
 {
   if(nDims != 0 && nDims != 1)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 1", nDims);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
-  std::cout << "adding 1D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
+  MACH3LOG_INFO("Adding 1D data histogram: {} with {} events.", binneddata->GetName(), binneddata->Integral());
   //KS: If exist delete to avoid memory leak
   if(dathist != NULL) delete dathist;
   dathist = binneddata;
@@ -72,12 +70,11 @@ void samplePDFBase::addData(TH2D* binneddata)
 {
   if(nDims != 0 && nDims != 2)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 2", nDims);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 2;
-  std::cout << "adding 2D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
+  MACH3LOG_INFO("Adding 2D data histogram: {} with {} events.", binneddata->GetName(), binneddata->Integral());
   //KS: If exist delete to avoid memory leak
   if(dathist2d != NULL) delete dathist;
   dathist2d = binneddata;
@@ -105,8 +102,8 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
   double negLogL = 0;
   if(mc > 0 && data > 0)
   {
-     //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-     negLogL += (mc - data + data * std::log(data/mc));
+    //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+    negLogL += (mc - data + data * std::log(data/mc));
   }
   else if(mc > 0 && data == 0) negLogL += mc;
   
@@ -117,7 +114,6 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
 double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
-
   // Need some MC
   if (mc == 0) return 0.0;
 
@@ -243,9 +239,11 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       return getTestStatLLH(data, mc);//stat;
     }
     break;
-
+    case TestStatistic::kNTestStatistics:
+      MACH3LOG_ERROR("kNTestStatistics is not a valid TestStatistic!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
-    std::cerr << "Couldn't find TestStatistic " << fTestStatistic << " exiting!" << std::endl;
+    MACH3LOG_ERROR("Couldn't find TestStatistic {} exiting!", static_cast<int>(fTestStatistic));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   } // end switch
 }
@@ -256,7 +254,7 @@ std::string samplePDFBase::GetSampleName(int Sample) {
 // ***************************************************************************
   if(Sample > nSamples)
   {
-   std::cerr<<" You are asking for sample "<< Sample <<" I only have "<< nSamples<<std::endl;
+    MACH3LOG_ERROR("You are asking for sample {}. I only have {}", Sample, nSamples);
    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
