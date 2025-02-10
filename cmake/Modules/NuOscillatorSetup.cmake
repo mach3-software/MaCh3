@@ -73,7 +73,7 @@ CPMAddPackage(
     GIT_TAG "v1.2.0"
     GIT_SHALLOW YES
     OPTIONS
-    "UseGPU ${DAN_USE_GPU}"
+    "UseGPU FALSE"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
     "UseDoubles ${DAN_DOUBLE}"
 
