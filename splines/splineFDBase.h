@@ -68,8 +68,6 @@ class splineFDBase : public SplineBase {
 	}
 
   protected:
-	/// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
-	void FindSplineSegment() override;
 	/// @brief CPU based code which eval weight for each spline
 	void CalcSplineWeights() override;
 	/// @brief Calc total event weight, not used by Bin-by-bin splines
@@ -99,12 +97,11 @@ class splineFDBase : public SplineBase {
     /// a call to GetSplineInterpolationFromDetID()
     std::vector< std::vector<SplineInterpolation> > SplineInterpolationTypes;
 
-	int nUniqueSysts;
+	//int nUniqueSysts;
 	std::vector<std::string> UniqueSystNames;
 	std::vector<int> UniqueSystIndices;
-	std::vector<int> UniqueSystNKnots;
 	std::vector<int> UniqueSystCurrSegment;
-	std::vector< std::vector<M3::float_t> > UniqueSystXPts;
+	//std::vector< std::vector<M3::float_t> > UniqueSystXPts; KURWA
 
 	/// @brief Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
@@ -117,8 +114,6 @@ class splineFDBase : public SplineBase {
 	int MonolithIndex;
 	int CoeffIndex;
 
-	/// Probably need to clear these arrays up at some point
-	M3::float_t *xVarArray;
 	/// Need to keep track of which splines are flat and which aren't
 	bool *isflatarray;
 	/// x coefficients for each spline

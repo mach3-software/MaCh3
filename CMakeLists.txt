@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.4.0 LANGUAGES CXX)
+project(MaCh3 VERSION 1.4.1 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 #LP - This option name is confusing, but I wont change it now.
@@ -18,7 +18,7 @@ option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 
 add_library(MaCh3CompileDefinitions INTERFACE)
-#Create a seperate target for GPU compiler options
+#Create a separate target for GPU compiler options
 #if GPU is not enabled nothing will be added to this and it will be empty
 # this saves a few if statements
 add_library(MaCh3GPUCompilerOptions INTERFACE)
@@ -102,7 +102,7 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wconversion            # Warn on type conversions that may lose data
   -Wformat-security       # Warn on functions that are potentially insecure for formatting
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
-  #-Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  #-Wswitch-enum          # Warn if a `switch` statement on an enum does not cover all values
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
