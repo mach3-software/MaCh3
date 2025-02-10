@@ -2212,6 +2212,9 @@ void SampleSummary::StudyInformationCriterion(M3::kInfCrit Criterion) {
       // Study Watanabe-Akaike information criterion (WAIC)
       StudyWAIC();
       break;
+    case M3::kInfCrit::kInfCrits:
+      MACH3LOG_ERROR("kInfCrits is not a valid kInfCrit!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN Information Criterion SPECIFIED!");
       MACH3LOG_ERROR("You gave {}", static_cast<int>(Criterion));

@@ -5,6 +5,13 @@
 /// @author Kamil Skwarczynski
 /// @author Luke Pickering
 
+// C++ includes
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <cmath>
 /// Run low or high memory versions of structs
 /// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 namespace M3 {
@@ -62,13 +69,6 @@ namespace M3 {
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
 
-// C++ includes
-#include <sstream>
-#include <fstream>
-#include <iostream>
-#include <vector>
-#include <iomanip>
-
 #ifdef MULTITHREAD
 #include "omp.h"
 #endif
@@ -83,6 +83,7 @@ _Pragma("GCC diagnostic ignored \"-Wuseless-cast\"") \
 _Pragma("GCC diagnostic ignored \"-Wfloat-conversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wold-style-cast\"") \
 _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
+_Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"")
 
 /// @brief KS: Restore warning checking after including external headers
