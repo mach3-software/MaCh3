@@ -1,15 +1,16 @@
 <map id="manager/MaCh3Exception.h" name="manager/MaCh3Exception.h">
-<area shape="rect" id="node1" title=" " alt="" coords="396,5,601,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="459,152,539,177"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,152,64,177"/>
-<area shape="rect" id="node4" title=" " alt="" coords="687,79,774,104"/>
-<area shape="rect" id="node5" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="277,79,461,104"/>
-<area shape="rect" id="node10" href="$Core_8h.html" title=" " alt="" coords="537,79,663,104"/>
-<area shape="rect" id="node6" title=" " alt="" coords="89,152,213,177"/>
-<area shape="rect" id="node7" title=" " alt="" coords="563,152,637,177"/>
-<area shape="rect" id="node8" title=" " alt="" coords="237,152,323,177"/>
-<area shape="rect" id="node9" title=" " alt="" coords="347,152,434,177"/>
-<area shape="rect" id="node11" title=" " alt="" coords="662,152,735,177"/>
-<area shape="rect" id="node12" title=" " alt="" coords="759,152,822,177"/>
-<area shape="rect" id="node13" title=" " alt="" coords="847,152,921,177"/>
+<area shape="rect" id="node1" title=" " alt="" coords="51,5,257,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="234,225,314,251"/>
+<area shape="rect" id="node3" title=" " alt="" coords="29,152,87,177"/>
+<area shape="rect" id="node4" title=" " alt="" coords="111,79,197,104"/>
+<area shape="rect" id="node5" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="229,79,413,104"/>
+<area shape="rect" id="node9" href="$Core_8h.html" title=" " alt="" coords="584,152,711,177"/>
+<area shape="rect" id="node6" title=" " alt="" coords="378,225,453,251"/>
+<area shape="rect" id="node7" title=" " alt="" coords="363,152,449,177"/>
+<area shape="rect" id="node8" title=" " alt="" coords="473,152,560,177"/>
+<area shape="rect" id="node14" title=" " alt="" coords="112,152,236,177"/>
+<area shape="rect" id="node10" title=" " alt="" coords="683,225,756,251"/>
+<area shape="rect" id="node11" title=" " alt="" coords="780,225,843,251"/>
+<area shape="rect" id="node12" title=" " alt="" coords="497,225,571,251"/>
+<area shape="rect" id="node13" title=" " alt="" coords="596,225,659,251"/>
 </map>

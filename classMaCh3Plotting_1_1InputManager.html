@@ -309,7 +309,7 @@ Private Attributes</h2></td></tr>
 <div class="line">plots.</div>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_aa6f3c9a8cee8f72f6f8ce65b720a2d40"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a></div><div class="ttdeci">MaCh3Plotting::PlottingManager * man</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00050">GetPostfitParamPlots.cpp:50</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html">MaCh3Plotting::InputManager</a></div><div class="ttdoc">This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00215">inputManager.h:215</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a51314d45eb8b9eb288a520f17661b3a1"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a51314d45eb8b9eb288a520f17661b3a1">MaCh3Plotting::InputManager::getLLHScan</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; getLLHScan(int fileNum, std::string paramName, std::string LLHType) const</div><div class="ttdoc">Get the log likelihood scan data for a particular parameter from a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00285">inputManager.h:285</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a51314d45eb8b9eb288a520f17661b3a1"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a51314d45eb8b9eb288a520f17661b3a1">MaCh3Plotting::InputManager::getLLHScan</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; getLLHScan(int fileNum, std::string paramName, std::string LLHType) const</div><div class="ttdoc">Get the log likelihood scan data for a particular parameter from a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00286">inputManager.h:286</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a8f78dd7607191728f0a52bc27ade9af3"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a8f78dd7607191728f0a52bc27ade9af3">MaCh3Plotting::InputManager::addFile</a></div><div class="ttdeci">void addFile(const std::string &amp;fileName)</div><div class="ttdoc">Add a new InputFile object to this input manager.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00069">inputManager.cpp:69</a></div></div>
 </div><!-- fragment --> <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000019">Todo:</a></b></dt><dd><p class="startdd">A lot of string comparisons going on in the code for the post fit errors, would maybe be good to implement some kind of indexing for parameters and just have a map between the parameter names and this index to be used internally by the class. </p>
 <p class="interdd">Add code to read MCMC from input file </p>
@@ -399,17 +399,17 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   57</span>    <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ada0eddda54a072bdfc2464a9902cfe01">_sampleToTagsMap</a>[samp] = tags;</div>
 <div class="line"><span class="lineno">   58</span>  }</div>
 <div class="line"><span class="lineno">   59</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00018">MaCh3Logger.h:18</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00328">YamlHelper.h:328</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a0d66afafbba133fc3c1b4867957eb3db"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a0d66afafbba133fc3c1b4867957eb3db">MaCh3Plotting::InputManager::_paramToTagsMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::vector&lt; std::string &gt; &gt; _paramToTagsMap</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00654">inputManager.h:654</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a1eed58ec2fc42d44474c80b8f4e91e15"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a1eed58ec2fc42d44474c80b8f4e91e15">MaCh3Plotting::InputManager::_samplesConfig</a></div><div class="ttdeci">YAML::Node _samplesConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00663">inputManager.h:663</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a3915837631cc08351a34cb135b0bb351"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">MaCh3Plotting::InputManager::_knownParameters</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownParameters</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00644">inputManager.h:644</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a836a1772cb3fdf2d6e38ee1b113bc4e8"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a836a1772cb3fdf2d6e38ee1b113bc4e8">MaCh3Plotting::InputManager::_knownFitters</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownFitters</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00651">inputManager.h:651</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_abafd844353d8fc69cf31ccf85b2bdcbe"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe">MaCh3Plotting::InputManager::_knownSamples</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownSamples</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00648">inputManager.h:648</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ad243d0438a33356e6bca0677c8b588e6"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ad243d0438a33356e6bca0677c8b588e6">MaCh3Plotting::InputManager::_parametersConfig</a></div><div class="ttdeci">YAML::Node _parametersConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00662">inputManager.h:662</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ad2cec8b2758ffcb661db59f930e8010e"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ad2cec8b2758ffcb661db59f930e8010e">MaCh3Plotting::InputManager::_translatorConfig</a></div><div class="ttdeci">YAML::Node _translatorConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00660">inputManager.h:660</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ad2e204406fd336e7fcf00fafdff87703"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ad2e204406fd336e7fcf00fafdff87703">MaCh3Plotting::InputManager::_fitterSpecConfig</a></div><div class="ttdeci">YAML::Node _fitterSpecConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00661">inputManager.h:661</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ada0eddda54a072bdfc2464a9902cfe01"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ada0eddda54a072bdfc2464a9902cfe01">MaCh3Plotting::InputManager::_sampleToTagsMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::vector&lt; std::string &gt; &gt; _sampleToTagsMap</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00656">inputManager.h:656</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a0d66afafbba133fc3c1b4867957eb3db"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a0d66afafbba133fc3c1b4867957eb3db">MaCh3Plotting::InputManager::_paramToTagsMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::vector&lt; std::string &gt; &gt; _paramToTagsMap</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00655">inputManager.h:655</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a1eed58ec2fc42d44474c80b8f4e91e15"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a1eed58ec2fc42d44474c80b8f4e91e15">MaCh3Plotting::InputManager::_samplesConfig</a></div><div class="ttdeci">YAML::Node _samplesConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00664">inputManager.h:664</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a3915837631cc08351a34cb135b0bb351"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">MaCh3Plotting::InputManager::_knownParameters</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownParameters</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00645">inputManager.h:645</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a836a1772cb3fdf2d6e38ee1b113bc4e8"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a836a1772cb3fdf2d6e38ee1b113bc4e8">MaCh3Plotting::InputManager::_knownFitters</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownFitters</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00652">inputManager.h:652</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_abafd844353d8fc69cf31ccf85b2bdcbe"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe">MaCh3Plotting::InputManager::_knownSamples</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _knownSamples</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00649">inputManager.h:649</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ad243d0438a33356e6bca0677c8b588e6"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ad243d0438a33356e6bca0677c8b588e6">MaCh3Plotting::InputManager::_parametersConfig</a></div><div class="ttdeci">YAML::Node _parametersConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00663">inputManager.h:663</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ad2cec8b2758ffcb661db59f930e8010e"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ad2cec8b2758ffcb661db59f930e8010e">MaCh3Plotting::InputManager::_translatorConfig</a></div><div class="ttdeci">YAML::Node _translatorConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00661">inputManager.h:661</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ad2e204406fd336e7fcf00fafdff87703"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ad2e204406fd336e7fcf00fafdff87703">MaCh3Plotting::InputManager::_fitterSpecConfig</a></div><div class="ttdeci">YAML::Node _fitterSpecConfig</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00662">inputManager.h:662</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ada0eddda54a072bdfc2464a9902cfe01"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ada0eddda54a072bdfc2464a9902cfe01">MaCh3Plotting::InputManager::_sampleToTagsMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::vector&lt; std::string &gt; &gt; _sampleToTagsMap</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00657">inputManager.h:657</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -449,7 +449,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  239</span> </div>
 <div class="line"><span class="lineno">  240</span>    <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>.clear();</div>
 <div class="line"><span class="lineno">  241</span>  }</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a29202faed03b0e9a22f2d34bce604793"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">MaCh3Plotting::InputManager::_fileVec</a></div><div class="ttdeci">std::vector&lt; InputFile &gt; _fileVec</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00666">inputManager.h:666</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a29202faed03b0e9a22f2d34bce604793"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">MaCh3Plotting::InputManager::_fileVec</a></div><div class="ttdeci">std::vector&lt; InputFile &gt; _fileVec</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00667">inputManager.h:667</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -596,11 +596,13 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  264</span>      <span class="keywordflow">return</span> <span class="stringliteral">&quot;MCMC&quot;</span>;</div>
 <div class="line"><span class="lineno">  265</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a8c0ed9a67c98996a334179217d152200">kSigmaVar</a>:</div>
 <div class="line"><span class="lineno">  266</span>      <span class="keywordflow">return</span> <span class="stringliteral">&quot;SigmaVar&quot;</span>;</div>
-<div class="line"><span class="lineno">  267</span> </div>
-<div class="line"><span class="lineno">  268</span>    <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  269</span>      <span class="keywordflow">return</span> <span class="stringliteral">&quot;UNKNOWN_FILE_TYPE&quot;</span>;</div>
-<div class="line"><span class="lineno">  270</span>    }</div>
-<div class="line"><span class="lineno">  271</span>  }</div>
+<div class="line"><span class="lineno">  267</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a061b376dc1c0bdc2e7a434852b9924ee">kNFileTypes</a>:</div>
+<div class="line"><span class="lineno">  268</span>      <span class="keywordflow">return</span> <span class="stringliteral">&quot;NFileTypes&quot;</span>;</div>
+<div class="line"><span class="lineno">  269</span>    <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  270</span>      <span class="keywordflow">return</span> <span class="stringliteral">&quot;UNKNOWN_FILE_TYPE&quot;</span>;</div>
+<div class="line"><span class="lineno">  271</span>    }</div>
+<div class="line"><span class="lineno">  272</span>  }</div>
+<div class="ttc" id="anamespaceMaCh3Plotting_html_a4152b51a260d6a18f41b3a22aa2a6b75a061b376dc1c0bdc2e7a434852b9924ee"><div class="ttname"><a href="namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a061b376dc1c0bdc2e7a434852b9924ee">MaCh3Plotting::kNFileTypes</a></div><div class="ttdeci">@ kNFileTypes</div><div class="ttdoc">Number of types of file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00023">inputManager.h:22</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Plotting_html_a4152b51a260d6a18f41b3a22aa2a6b75a0dd2e9b7a6fcbfa5724ac5e17ea0eeaf"><div class="ttname"><a href="namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a0dd2e9b7a6fcbfa5724ac5e17ea0eeaf">MaCh3Plotting::kPostFit</a></div><div class="ttdeci">@ kPostFit</div><div class="ttdoc">Processed post fit errors.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00018">inputManager.h:18</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Plotting_html_a4152b51a260d6a18f41b3a22aa2a6b75a439e10ed490e0eae34588a3e8005c619"><div class="ttname"><a href="namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a439e10ed490e0eae34588a3e8005c619">MaCh3Plotting::kLLH</a></div><div class="ttdeci">@ kLLH</div><div class="ttdoc">Log Likelihood scan.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00017">inputManager.h:17</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Plotting_html_a4152b51a260d6a18f41b3a22aa2a6b75a8c0ed9a67c98996a334179217d152200"><div class="ttname"><a href="namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a8c0ed9a67c98996a334179217d152200">MaCh3Plotting::kSigmaVar</a></div><div class="ttdeci">@ kSigmaVar</div><div class="ttdoc">Sigma variations.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00020">inputManager.h:20</a></div></div>
@@ -746,9 +748,9 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  885</span>    <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a479520c576d5f58f6db5c28133ad1714">find1dPosterior</a>(inputFileDef, parameter, inputFileDef.fitter, <span class="keyword">true</span>);</div>
 <div class="line"><span class="lineno">  886</span>  }</div>
 <div class="line"><span class="lineno">  887</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00019">MaCh3Logger.h:19</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00026">MaCh3Logger.h:26</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a041b9611ce812326995c54f8c73c4867"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a041b9611ce812326995c54f8c73c4867">MaCh3Plotting::InputManager::parseLocation</a></div><div class="ttdeci">std::vector&lt; std::string &gt; parseLocation(const std::string &amp;locationString, std::string &amp;fitter, fileTypeEnum fileType, const std::string &amp;parameter=&quot;&quot;, const std::string &amp;sample=&quot;&quot;, const std::string &amp;parameter2=&quot;&quot;) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00232">inputManager.cpp:232</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a479520c576d5f58f6db5c28133ad1714"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a479520c576d5f58f6db5c28133ad1714">MaCh3Plotting::InputManager::find1dPosterior</a></div><div class="ttdeci">bool find1dPosterior(InputFile &amp;inputFileDef, const std::string &amp;parameter, std::string &amp;fitter, bool setFileData=false) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00433">inputManager.cpp:433</a></div></div>
@@ -1063,7 +1065,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  781</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;I don&#39;t know what kinda fitter this came from, will proceed with caution&quot;</span>);</div>
 <div class="line"><span class="lineno">  782</span>  inputFileDef.fitter = <span class="stringliteral">&quot;UNKNOWN_FITTER&quot;</span>;</div>
 <div class="line"><span class="lineno">  783</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00020">MaCh3Logger.h:20</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html"><div class="ttname"><a href="classMCMCProcessor.html">MCMCProcessor</a></div><div class="ttdoc">Class responsible for processing MCMC chains, performing diagnostics, generating plots,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00065">MCMCProcessor.h:65</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1345,9 +1347,9 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  505</span>  <span class="comment">// EM: Didn&#39;t find the parameter in any of the specified locations</span></div>
 <div class="line"><span class="lineno">  506</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  507</span>}</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a942677ee3a65b1d4b48ce474dddaf3b1"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a942677ee3a65b1d4b48ce474dddaf3b1">MaCh3Plotting::InputManager::getFitterSpecificParamOption</a></div><div class="ttdeci">bool getFitterSpecificParamOption(const std::string &amp;fitter, const std::string &amp;option, T &amp;ret, const std::string &amp;parameter) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00593">inputManager.h:593</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a9f98ca215112178b1de36e328424aa35"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a9f98ca215112178b1de36e328424aa35">MaCh3Plotting::InputManager::strEndsWith</a></div><div class="ttdeci">bool strEndsWith(const std::string &amp;str, const std::string &amp;ending) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00634">inputManager.h:634</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_aa3a91c2525f5aea76ba182b3be4b2b2a"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#aa3a91c2525f5aea76ba182b3be4b2b2a">MaCh3Plotting::InputManager::getFitterSpecificParamName</a></div><div class="ttdeci">std::string getFitterSpecificParamName(const std::string &amp;fitter, fileTypeEnum fileType, const std::string &amp;parameter) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00607">inputManager.h:607</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a942677ee3a65b1d4b48ce474dddaf3b1"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a942677ee3a65b1d4b48ce474dddaf3b1">MaCh3Plotting::InputManager::getFitterSpecificParamOption</a></div><div class="ttdeci">bool getFitterSpecificParamOption(const std::string &amp;fitter, const std::string &amp;option, T &amp;ret, const std::string &amp;parameter) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00594">inputManager.h:594</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a9f98ca215112178b1de36e328424aa35"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a9f98ca215112178b1de36e328424aa35">MaCh3Plotting::InputManager::strEndsWith</a></div><div class="ttdeci">bool strEndsWith(const std::string &amp;str, const std::string &amp;ending) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00635">inputManager.h:635</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_aa3a91c2525f5aea76ba182b3be4b2b2a"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#aa3a91c2525f5aea76ba182b3be4b2b2a">MaCh3Plotting::InputManager::getFitterSpecificParamName</a></div><div class="ttdeci">std::string getFitterSpecificParamName(const std::string &amp;fitter, fileTypeEnum fileType, const std::string &amp;parameter) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00608">inputManager.h:608</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1432,7 +1434,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  428</span>  }</div>
 <div class="line"><span class="lineno">  429</span>  <span class="keywordflow">return</span> wasFound;</div>
 <div class="line"><span class="lineno">  430</span>}</div>
-<div class="ttc" id="anamespaceM3_html_a32ef26a222f7341e03dcc42cdd2badd3"><div class="ttname"><a href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00033">Core.h:33</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a32ef26a222f7341e03dcc42cdd2badd3"><div class="ttname"><a href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00040">Core.h:40</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1573,17 +1575,17 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00333">333</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  333</span>                                                                                      {</div>
-<div class="line"><span class="lineno">  334</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a7707e97f306066bd39660088d2d08c93">getEnabled1dPosteriors</a>(fileNum, paramName))</div>
-<div class="line"><span class="lineno">  335</span>    {</div>
-<div class="line"><span class="lineno">  336</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have a 1d posterior for parameter {}&quot;</span>, fileNum, paramName);</div>
-<div class="line"><span class="lineno">  337</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty vector&quot;</span>);</div>
-<div class="line"><span class="lineno">  338</span>      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;(2);</div>
-<div class="line"><span class="lineno">  339</span>    }</div>
-<div class="line"><span class="lineno">  340</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">TGraphToVector</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].posteriors1d_map.at(paramName));</div>
-<div class="line"><span class="lineno">  341</span>  }</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a7707e97f306066bd39660088d2d08c93"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a7707e97f306066bd39660088d2d08c93">MaCh3Plotting::InputManager::getEnabled1dPosteriors</a></div><div class="ttdeci">bool getEnabled1dPosteriors(int fileNum, std::string paramName) const</div><div class="ttdoc">Get whether or not a particular parameter has 1d posteriors in a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00445">inputManager.h:445</a></div></div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00334">334</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  334</span>                                                                                      {</div>
+<div class="line"><span class="lineno">  335</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a7707e97f306066bd39660088d2d08c93">getEnabled1dPosteriors</a>(fileNum, paramName))</div>
+<div class="line"><span class="lineno">  336</span>    {</div>
+<div class="line"><span class="lineno">  337</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have a 1d posterior for parameter {}&quot;</span>, fileNum, paramName);</div>
+<div class="line"><span class="lineno">  338</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty vector&quot;</span>);</div>
+<div class="line"><span class="lineno">  339</span>      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;(2);</div>
+<div class="line"><span class="lineno">  340</span>    }</div>
+<div class="line"><span class="lineno">  341</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">TGraphToVector</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].posteriors1d_map.at(paramName));</div>
+<div class="line"><span class="lineno">  342</span>  }</div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a7707e97f306066bd39660088d2d08c93"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a7707e97f306066bd39660088d2d08c93">MaCh3Plotting::InputManager::getEnabled1dPosteriors</a></div><div class="ttdeci">bool getEnabled1dPosteriors(int fileNum, std::string paramName) const</div><div class="ttdoc">Get whether or not a particular parameter has 1d posteriors in a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00446">inputManager.h:446</a></div></div>
 <div class="ttc" id="agroup__Utils_html_gabee3ac13b77811574c1650016e81a229"><div class="ttname"><a href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">MaCh3Plotting::TGraphToVector</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; TGraphToVector(TGraph graph)</div><div class="ttdoc">This handy little function lets you interpret a TGraph as a vector containing the same data.</div><div class="ttdef"><b>Definition:</b> <a href="plottingUtils_8cpp_source.html#l00064">plottingUtils.cpp:64</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1632,10 +1634,10 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if scan exists, false if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00445">445</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  445</span>                                                                             {</div>
-<div class="line"><span class="lineno">  446</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_1dPosteriors.at(paramName);</div>
-<div class="line"><span class="lineno">  447</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00446">446</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  446</span>                                                                             {</div>
+<div class="line"><span class="lineno">  447</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_1dPosteriors.at(paramName);</div>
+<div class="line"><span class="lineno">  448</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1690,10 +1692,10 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if scan exists, false if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00418">418</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  419</span>                                                                {</div>
-<div class="line"><span class="lineno">  420</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);</div>
-<div class="line"><span class="lineno">  421</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00419">419</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  420</span>                                                                {</div>
+<div class="line"><span class="lineno">  421</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);</div>
+<div class="line"><span class="lineno">  422</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1748,10 +1750,10 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if scan exists, false if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00429">429</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  429</span>                                                                                              {</div>
-<div class="line"><span class="lineno">  430</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);</div>
-<div class="line"><span class="lineno">  431</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00430">430</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  430</span>                                                                                              {</div>
+<div class="line"><span class="lineno">  431</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);</div>
+<div class="line"><span class="lineno">  432</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1799,10 +1801,10 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if scan exists, false if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00437">437</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  437</span>                                                                          {</div>
-<div class="line"><span class="lineno">  438</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_MCMCchain.at(paramName);</div>
-<div class="line"><span class="lineno">  439</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00438">438</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  438</span>                                                                          {</div>
+<div class="line"><span class="lineno">  439</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].availableParams_map_MCMCchain.at(paramName);</div>
+<div class="line"><span class="lineno">  440</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1830,8 +1832,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00498">498</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  498</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId]; }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00499">499</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  499</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId]; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1889,27 +1891,27 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00569">569</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  570</span>                                                        {</div>
-<div class="line"><span class="lineno">  571</span>    <span class="keywordflow">if</span> (subConfig[parameter])</div>
-<div class="line"><span class="lineno">  572</span>    {</div>
-<div class="line"><span class="lineno">  573</span>      <span class="comment">// EM: this is config definition of fitter specific names for this parameter</span></div>
-<div class="line"><span class="lineno">  574</span>      YAML::Node paramTranslation = subConfig[parameter];</div>
-<div class="line"><span class="lineno">  575</span> </div>
-<div class="line"><span class="lineno">  576</span>      <span class="keywordflow">if</span> (paramTranslation[fitter])</div>
-<div class="line"><span class="lineno">  577</span>      {</div>
-<div class="line"><span class="lineno">  578</span>        <span class="comment">// EM: then this is definition of how to find parameter in the specified fitter</span></div>
-<div class="line"><span class="lineno">  579</span>        YAML::Node fitterParamTranslation = paramTranslation[fitter];</div>
-<div class="line"><span class="lineno">  580</span> </div>
-<div class="line"><span class="lineno">  581</span>        <span class="keywordflow">if</span> (fitterParamTranslation[option])</div>
-<div class="line"><span class="lineno">  582</span>        {</div>
-<div class="line"><span class="lineno">  583</span>          ret = fitterParamTranslation[option].as&lt;T&gt;();</div>
-<div class="line"><span class="lineno">  584</span>          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  585</span>        }</div>
-<div class="line"><span class="lineno">  586</span>      }</div>
-<div class="line"><span class="lineno">  587</span>    }</div>
-<div class="line"><span class="lineno">  588</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  589</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00570">570</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  571</span>                                                        {</div>
+<div class="line"><span class="lineno">  572</span>    <span class="keywordflow">if</span> (subConfig[parameter])</div>
+<div class="line"><span class="lineno">  573</span>    {</div>
+<div class="line"><span class="lineno">  574</span>      <span class="comment">// EM: this is config definition of fitter specific names for this parameter</span></div>
+<div class="line"><span class="lineno">  575</span>      YAML::Node paramTranslation = subConfig[parameter];</div>
+<div class="line"><span class="lineno">  576</span> </div>
+<div class="line"><span class="lineno">  577</span>      <span class="keywordflow">if</span> (paramTranslation[fitter])</div>
+<div class="line"><span class="lineno">  578</span>      {</div>
+<div class="line"><span class="lineno">  579</span>        <span class="comment">// EM: then this is definition of how to find parameter in the specified fitter</span></div>
+<div class="line"><span class="lineno">  580</span>        YAML::Node fitterParamTranslation = paramTranslation[fitter];</div>
+<div class="line"><span class="lineno">  581</span> </div>
+<div class="line"><span class="lineno">  582</span>        <span class="keywordflow">if</span> (fitterParamTranslation[option])</div>
+<div class="line"><span class="lineno">  583</span>        {</div>
+<div class="line"><span class="lineno">  584</span>          ret = fitterParamTranslation[option].as&lt;T&gt;();</div>
+<div class="line"><span class="lineno">  585</span>          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  586</span>        }</div>
+<div class="line"><span class="lineno">  587</span>      }</div>
+<div class="line"><span class="lineno">  588</span>    }</div>
+<div class="line"><span class="lineno">  589</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  590</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1953,17 +1955,17 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00607">607</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  608</span>                                                                                  {</div>
-<div class="line"><span class="lineno">  609</span>    std::string specificName;</div>
-<div class="line"><span class="lineno">  610</span>    <span class="keywordflow">if</span> (getFitterSpecificParamOption&lt;std::string&gt;(fitter, <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a487b62643d1a5c63415685d662b7118d">convertFileTypeNames</a>(fileType),</div>
-<div class="line"><span class="lineno">  611</span>                                                  specificName, parameter))</div>
-<div class="line"><span class="lineno">  612</span>    {</div>
-<div class="line"><span class="lineno">  613</span>      <span class="keywordflow">return</span> specificName;</div>
-<div class="line"><span class="lineno">  614</span>    }</div>
-<div class="line"><span class="lineno">  615</span>    <span class="comment">// EM: Default to just return the specified name</span></div>
-<div class="line"><span class="lineno">  616</span>    <span class="keywordflow">return</span> parameter;</div>
-<div class="line"><span class="lineno">  617</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00608">608</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  609</span>                                                                                  {</div>
+<div class="line"><span class="lineno">  610</span>    std::string specificName;</div>
+<div class="line"><span class="lineno">  611</span>    <span class="keywordflow">if</span> (getFitterSpecificParamOption&lt;std::string&gt;(fitter, <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a487b62643d1a5c63415685d662b7118d">convertFileTypeNames</a>(fileType),</div>
+<div class="line"><span class="lineno">  612</span>                                                  specificName, parameter))</div>
+<div class="line"><span class="lineno">  613</span>    {</div>
+<div class="line"><span class="lineno">  614</span>      <span class="keywordflow">return</span> specificName;</div>
+<div class="line"><span class="lineno">  615</span>    }</div>
+<div class="line"><span class="lineno">  616</span>    <span class="comment">// EM: Default to just return the specified name</span></div>
+<div class="line"><span class="lineno">  617</span>    <span class="keywordflow">return</span> parameter;</div>
+<div class="line"><span class="lineno">  618</span>  }</div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a487b62643d1a5c63415685d662b7118d"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a487b62643d1a5c63415685d662b7118d">MaCh3Plotting::InputManager::convertFileTypeNames</a></div><div class="ttdeci">static const std::string convertFileTypeNames(fileTypeEnum fileType)</div><div class="ttdoc">Convert from fileTypeEnum to the name of the file type.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00256">inputManager.h:256</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2016,10 +2018,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00593">593</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  594</span>                                                                             {</div>
-<div class="line"><span class="lineno">  595</span>    <span class="keywordflow">return</span> getFitterSpecificOption&lt;T&gt;(fitter, option, ret, parameter, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ad243d0438a33356e6bca0677c8b588e6">_parametersConfig</a>);</div>
-<div class="line"><span class="lineno">  596</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00594">594</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  595</span>                                                                             {</div>
+<div class="line"><span class="lineno">  596</span>    <span class="keywordflow">return</span> getFitterSpecificOption&lt;T&gt;(fitter, option, ret, parameter, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ad243d0438a33356e6bca0677c8b588e6">_parametersConfig</a>);</div>
+<div class="line"><span class="lineno">  597</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2063,17 +2065,17 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00621">621</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  622</span>                                                                                {</div>
-<div class="line"><span class="lineno">  623</span>    std::string specificName;</div>
-<div class="line"><span class="lineno">  624</span>    <span class="keywordflow">if</span> (getFitterSpecificSampleOption&lt;std::string&gt;(fitter, <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a487b62643d1a5c63415685d662b7118d">convertFileTypeNames</a>(fileType),</div>
-<div class="line"><span class="lineno">  625</span>                                                   specificName, sample))</div>
-<div class="line"><span class="lineno">  626</span>    {</div>
-<div class="line"><span class="lineno">  627</span>      <span class="keywordflow">return</span> specificName;</div>
-<div class="line"><span class="lineno">  628</span>    }</div>
-<div class="line"><span class="lineno">  629</span>    <span class="comment">// EM: Default to just return the specified name</span></div>
-<div class="line"><span class="lineno">  630</span>    <span class="keywordflow">return</span> sample;</div>
-<div class="line"><span class="lineno">  631</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00622">622</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  623</span>                                                                                {</div>
+<div class="line"><span class="lineno">  624</span>    std::string specificName;</div>
+<div class="line"><span class="lineno">  625</span>    <span class="keywordflow">if</span> (getFitterSpecificSampleOption&lt;std::string&gt;(fitter, <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a487b62643d1a5c63415685d662b7118d">convertFileTypeNames</a>(fileType),</div>
+<div class="line"><span class="lineno">  626</span>                                                   specificName, sample))</div>
+<div class="line"><span class="lineno">  627</span>    {</div>
+<div class="line"><span class="lineno">  628</span>      <span class="keywordflow">return</span> specificName;</div>
+<div class="line"><span class="lineno">  629</span>    }</div>
+<div class="line"><span class="lineno">  630</span>    <span class="comment">// EM: Default to just return the specified name</span></div>
+<div class="line"><span class="lineno">  631</span>    <span class="keywordflow">return</span> sample;</div>
+<div class="line"><span class="lineno">  632</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2125,10 +2127,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00600">600</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  601</span>                                                                       {</div>
-<div class="line"><span class="lineno">  602</span>    <span class="keywordflow">return</span> getFitterSpecificOption&lt;T&gt;(fitter, option, ret, parameter, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a1eed58ec2fc42d44474c80b8f4e91e15">_samplesConfig</a>);</div>
-<div class="line"><span class="lineno">  603</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00601">601</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  602</span>                                                                       {</div>
+<div class="line"><span class="lineno">  603</span>    <span class="keywordflow">return</span> getFitterSpecificOption&lt;T&gt;(fitter, option, ret, parameter, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a1eed58ec2fc42d44474c80b8f4e91e15">_samplesConfig</a>);</div>
+<div class="line"><span class="lineno">  604</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2156,10 +2158,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00514">514</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  514</span>                                                                                     {</div>
-<div class="line"><span class="lineno">  515</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_1dPosteriors;</div>
-<div class="line"><span class="lineno">  516</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00515">515</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  515</span>                                                                                     {</div>
+<div class="line"><span class="lineno">  516</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_1dPosteriors;</div>
+<div class="line"><span class="lineno">  517</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2187,10 +2189,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00502">502</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  502</span>                                                                             {</div>
-<div class="line"><span class="lineno">  503</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_LLH;</div>
-<div class="line"><span class="lineno">  504</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00503">503</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  503</span>                                                                             {</div>
+<div class="line"><span class="lineno">  504</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_LLH;</div>
+<div class="line"><span class="lineno">  505</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2218,10 +2220,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00505">505</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  505</span>                                                                          {</div>
-<div class="line"><span class="lineno">  506</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableSamples_LLH;</div>
-<div class="line"><span class="lineno">  507</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00506">506</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  506</span>                                                                          {</div>
+<div class="line"><span class="lineno">  507</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableSamples_LLH;</div>
+<div class="line"><span class="lineno">  508</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2249,10 +2251,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00511">511</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  511</span>                                                                              {</div>
-<div class="line"><span class="lineno">  512</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_MCMCchain;</div>
-<div class="line"><span class="lineno">  513</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00512">512</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  512</span>                                                                              {</div>
+<div class="line"><span class="lineno">  513</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_MCMCchain;</div>
+<div class="line"><span class="lineno">  514</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2279,8 +2281,8 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00469">469</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  469</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">_knownParameters</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00470">470</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  470</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">_knownParameters</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2308,10 +2310,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00508">508</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  508</span>                                                                                 {</div>
-<div class="line"><span class="lineno">  509</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_postFitErrors;</div>
-<div class="line"><span class="lineno">  510</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00509">509</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  509</span>                                                                                 {</div>
+<div class="line"><span class="lineno">  510</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].availableParams_postFitErrors;</div>
+<div class="line"><span class="lineno">  511</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2338,8 +2340,8 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00470">470</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  470</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe">_knownSamples</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00471">471</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  471</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe">_knownSamples</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2394,17 +2396,17 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00285">285</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  285</span>                                                                                                     {</div>
-<div class="line"><span class="lineno">  286</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">getEnabledLLH</a>(fileNum, paramName, LLHType))</div>
-<div class="line"><span class="lineno">  287</span>    {</div>
-<div class="line"><span class="lineno">  288</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for parameter {}&quot;</span>, fileNum, paramName);</div>
-<div class="line"><span class="lineno">  289</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty vector&quot;</span>);</div>
-<div class="line"><span class="lineno">  290</span>      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;(2); </div>
-<div class="line"><span class="lineno">  291</span>    }</div>
-<div class="line"><span class="lineno">  292</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">TGraphToVector</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScans_map.at(LLHType).at(paramName));</div>
-<div class="line"><span class="lineno">  293</span>  }</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a049bc81681a3f72487a3606d88cd23a8"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">MaCh3Plotting::InputManager::getEnabledLLH</a></div><div class="ttdeci">bool getEnabledLLH(int fileNum, std::string paramName, std::string LLHType=&quot;total&quot;) const</div><div class="ttdoc">Get whether or not a particular parameter has an LLH scan in a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00418">inputManager.h:418</a></div></div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00286">286</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  286</span>                                                                                                     {</div>
+<div class="line"><span class="lineno">  287</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">getEnabledLLH</a>(fileNum, paramName, LLHType))</div>
+<div class="line"><span class="lineno">  288</span>    {</div>
+<div class="line"><span class="lineno">  289</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for parameter {}&quot;</span>, fileNum, paramName);</div>
+<div class="line"><span class="lineno">  290</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty vector&quot;</span>);</div>
+<div class="line"><span class="lineno">  291</span>      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;(2); </div>
+<div class="line"><span class="lineno">  292</span>    }</div>
+<div class="line"><span class="lineno">  293</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">TGraphToVector</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScans_map.at(LLHType).at(paramName));</div>
+<div class="line"><span class="lineno">  294</span>  }</div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a049bc81681a3f72487a3606d88cd23a8"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">MaCh3Plotting::InputManager::getEnabledLLH</a></div><div class="ttdeci">bool getEnabledLLH(int fileNum, std::string paramName, std::string LLHType=&quot;total&quot;) const</div><div class="ttdoc">Get whether or not a particular parameter has an LLH scan in a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00419">inputManager.h:419</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2465,16 +2467,16 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The graph of the likelihood scan. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00356">356</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  356</span>                                                                                             {</div>
-<div class="line"><span class="lineno">  357</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">getEnabledLLH</a>(fileNum, paramName, LLHType))</div>
-<div class="line"><span class="lineno">  358</span>    {</div>
-<div class="line"><span class="lineno">  359</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for parameter {}&quot;</span>, fileNum, paramName);</div>
-<div class="line"><span class="lineno">  360</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TGraph&quot;</span>);</div>
-<div class="line"><span class="lineno">  361</span>      <span class="keywordflow">return</span> TGraph(); </div>
-<div class="line"><span class="lineno">  362</span>    }</div>
-<div class="line"><span class="lineno">  363</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScans_map.at(LLHType).at(paramName);</div>
-<div class="line"><span class="lineno">  364</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00357">357</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  357</span>                                                                                             {</div>
+<div class="line"><span class="lineno">  358</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">getEnabledLLH</a>(fileNum, paramName, LLHType))</div>
+<div class="line"><span class="lineno">  359</span>    {</div>
+<div class="line"><span class="lineno">  360</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for parameter {}&quot;</span>, fileNum, paramName);</div>
+<div class="line"><span class="lineno">  361</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TGraph&quot;</span>);</div>
+<div class="line"><span class="lineno">  362</span>      <span class="keywordflow">return</span> TGraph(); </div>
+<div class="line"><span class="lineno">  363</span>    }</div>
+<div class="line"><span class="lineno">  364</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScans_map.at(LLHType).at(paramName);</div>
+<div class="line"><span class="lineno">  365</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2518,16 +2520,16 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00366">366</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  366</span>                                                                                         {</div>
-<div class="line"><span class="lineno">  367</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">getEnabledLLH</a>(fileNum, paramName, LLHType))</div>
-<div class="line"><span class="lineno">  368</span>    {</div>
-<div class="line"><span class="lineno">  369</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for parameter {}&quot;</span>, fileNum, paramName);</div>
-<div class="line"><span class="lineno">  370</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TH1D&quot;</span>);</div>
-<div class="line"><span class="lineno">  371</span>      <span class="keywordflow">return</span> TH1D(); </div>
-<div class="line"><span class="lineno">  372</span>    }</div>
-<div class="line"><span class="lineno">  373</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gaf1329db6e5a742f7dcfa154629c54542">TGraphToTH1D</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScans_map.at(LLHType).at(paramName));</div>
-<div class="line"><span class="lineno">  374</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00367">367</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  367</span>                                                                                         {</div>
+<div class="line"><span class="lineno">  368</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a049bc81681a3f72487a3606d88cd23a8">getEnabledLLH</a>(fileNum, paramName, LLHType))</div>
+<div class="line"><span class="lineno">  369</span>    {</div>
+<div class="line"><span class="lineno">  370</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for parameter {}&quot;</span>, fileNum, paramName);</div>
+<div class="line"><span class="lineno">  371</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TH1D&quot;</span>);</div>
+<div class="line"><span class="lineno">  372</span>      <span class="keywordflow">return</span> TH1D(); </div>
+<div class="line"><span class="lineno">  373</span>    }</div>
+<div class="line"><span class="lineno">  374</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gaf1329db6e5a742f7dcfa154629c54542">TGraphToTH1D</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScans_map.at(LLHType).at(paramName));</div>
+<div class="line"><span class="lineno">  375</span>  }</div>
 <div class="ttc" id="agroup__Utils_html_gaf1329db6e5a742f7dcfa154629c54542"><div class="ttname"><a href="group__Utils.html#gaf1329db6e5a742f7dcfa154629c54542">MaCh3Plotting::TGraphToTH1D</a></div><div class="ttdeci">TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle)</div><div class="ttdoc">This handy little function lets you interpret a TGraph as a TH1D.</div><div class="ttdef"><b>Definition:</b> <a href="plottingUtils_8cpp_source.html#l00010">plottingUtils.cpp:10</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2575,24 +2577,24 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00298">298</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  298</span>                                                  {</div>
-<div class="line"><span class="lineno">  299</span>    <span class="comment">// EM: the const here is a little bit of a lie since GetEntry will in fact modify </span></div>
-<div class="line"><span class="lineno">  300</span>    <span class="comment">//     the pointers to the stored data for the MCMC chain values but hopefully this should be ok</span></div>
-<div class="line"><span class="lineno">  301</span>    <span class="keyword">const</span> InputFile &amp;file = <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum];</div>
-<div class="line"><span class="lineno">  302</span> </div>
-<div class="line"><span class="lineno">  303</span>    <span class="keywordflow">if</span>( entry &gt; file.nMCMCentries )</div>
-<div class="line"><span class="lineno">  304</span>    {</div>
-<div class="line"><span class="lineno">  305</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Trying to access entries beyond what exist in file {}. No-can-do!&quot;</span>, file.fileName);</div>
-<div class="line"><span class="lineno">  306</span>    }</div>
-<div class="line"><span class="lineno">  307</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  308</span>    {</div>
-<div class="line"><span class="lineno">  309</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a>(<span class="stringliteral">&quot;Getting entry {} in MCMC tree for file at index {}&quot;</span>, entry, fileNum);</div>
-<div class="line"><span class="lineno">  310</span>      file.posteriorTree-&gt;GetEntry(entry);</div>
-<div class="line"><span class="lineno">  311</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a>(<span class="stringliteral">&quot;  Got successfuly&quot;</span>);</div>
-<div class="line"><span class="lineno">  312</span>    }</div>
-<div class="line"><span class="lineno">  313</span>  }</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_afc88f0aa23c7127b2ff6e5c7ca3fa892"><div class="ttname"><a href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a></div><div class="ttdeci">#define MACH3LOG_TRACE</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00017">MaCh3Logger.h:17</a></div></div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00299">299</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  299</span>                                                  {</div>
+<div class="line"><span class="lineno">  300</span>    <span class="comment">// EM: the const here is a little bit of a lie since GetEntry will in fact modify </span></div>
+<div class="line"><span class="lineno">  301</span>    <span class="comment">//     the pointers to the stored data for the MCMC chain values but hopefully this should be ok</span></div>
+<div class="line"><span class="lineno">  302</span>    <span class="keyword">const</span> InputFile &amp;file = <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum];</div>
+<div class="line"><span class="lineno">  303</span> </div>
+<div class="line"><span class="lineno">  304</span>    <span class="keywordflow">if</span>( entry &gt; file.nMCMCentries )</div>
+<div class="line"><span class="lineno">  305</span>    {</div>
+<div class="line"><span class="lineno">  306</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Trying to access entries beyond what exist in file {}. No-can-do!&quot;</span>, file.fileName);</div>
+<div class="line"><span class="lineno">  307</span>    }</div>
+<div class="line"><span class="lineno">  308</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  309</span>    {</div>
+<div class="line"><span class="lineno">  310</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a>(<span class="stringliteral">&quot;Getting entry {} in MCMC tree for file at index {}&quot;</span>, entry, fileNum);</div>
+<div class="line"><span class="lineno">  311</span>      file.posteriorTree-&gt;GetEntry(entry);</div>
+<div class="line"><span class="lineno">  312</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a>(<span class="stringliteral">&quot;  Got successfuly&quot;</span>);</div>
+<div class="line"><span class="lineno">  313</span>    }</div>
+<div class="line"><span class="lineno">  314</span>  }</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_afc88f0aa23c7127b2ff6e5c7ca3fa892"><div class="ttname"><a href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a></div><div class="ttdeci">#define MACH3LOG_TRACE</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2639,18 +2641,18 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00318">318</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  318</span>                                                              {</div>
-<div class="line"><span class="lineno">  319</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#aeac58645b18dbc0784adc4b44ee0b33b">getEnabledMCMCchain</a>(fileNum, paramName))</div>
-<div class="line"><span class="lineno">  320</span>    {</div>
-<div class="line"><span class="lineno">  321</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have an MCMC entry for parameter {}&quot;</span>, fileNum, paramName);</div>
-<div class="line"><span class="lineno">  322</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning a bad float&quot;</span>);</div>
-<div class="line"><span class="lineno">  323</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
-<div class="line"><span class="lineno">  324</span>    }</div>
-<div class="line"><span class="lineno">  325</span> </div>
-<div class="line"><span class="lineno">  326</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].MCMCstepParamsMap.at(paramName);</div>
-<div class="line"><span class="lineno">  327</span>  }</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_aeac58645b18dbc0784adc4b44ee0b33b"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#aeac58645b18dbc0784adc4b44ee0b33b">MaCh3Plotting::InputManager::getEnabledMCMCchain</a></div><div class="ttdeci">bool getEnabledMCMCchain(int fileNum, std::string paramName) const</div><div class="ttdoc">Get whether or not a particular parameter has MCMC chain entries in a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00437">inputManager.h:437</a></div></div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00319">319</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  319</span>                                                              {</div>
+<div class="line"><span class="lineno">  320</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#aeac58645b18dbc0784adc4b44ee0b33b">getEnabledMCMCchain</a>(fileNum, paramName))</div>
+<div class="line"><span class="lineno">  321</span>    {</div>
+<div class="line"><span class="lineno">  322</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have an MCMC entry for parameter {}&quot;</span>, fileNum, paramName);</div>
+<div class="line"><span class="lineno">  323</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning a bad float&quot;</span>);</div>
+<div class="line"><span class="lineno">  324</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
+<div class="line"><span class="lineno">  325</span>    }</div>
+<div class="line"><span class="lineno">  326</span> </div>
+<div class="line"><span class="lineno">  327</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].MCMCstepParamsMap.at(paramName);</div>
+<div class="line"><span class="lineno">  328</span>  }</div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_aeac58645b18dbc0784adc4b44ee0b33b"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#aeac58645b18dbc0784adc4b44ee0b33b">MaCh3Plotting::InputManager::getEnabledMCMCchain</a></div><div class="ttdeci">bool getEnabledMCMCchain(int fileNum, std::string paramName) const</div><div class="ttdoc">Get whether or not a particular parameter has MCMC chain entries in a particular input file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00438">inputManager.h:438</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2677,8 +2679,8 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00471">471</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  471</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>.size(); }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00472">472</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  472</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>.size(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2714,10 +2716,10 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00345">345</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  345</span>                                         {</div>
-<div class="line"><span class="lineno">  346</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].nMCMCentries;</div>
-<div class="line"><span class="lineno">  347</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00346">346</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  346</span>                                         {</div>
+<div class="line"><span class="lineno">  347</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].nMCMCentries;</div>
+<div class="line"><span class="lineno">  348</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2792,7 +2794,7 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  134</span> </div>
 <div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  136</span>}</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a2f8f94ca3b6e0d2b34c75dee24b81e49"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">MaCh3Plotting::InputManager::getFile</a></div><div class="ttdeci">InputFile const &amp; getFile(int fileId) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00498">inputManager.h:498</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a2f8f94ca3b6e0d2b34c75dee24b81e49"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">MaCh3Plotting::InputManager::getFile</a></div><div class="ttdeci">InputFile const &amp; getFile(int fileId) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00499">inputManager.h:499</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2921,17 +2923,17 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00382">382</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  382</span>                                                                                                                  {</div>
-<div class="line"><span class="lineno">  383</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">getEnabledLLHBySample</a>(fileNum, paramName, sample))</div>
-<div class="line"><span class="lineno">  384</span>    {</div>
-<div class="line"><span class="lineno">  385</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for sample {} for parameter {}&quot;</span>, fileNum, sample, paramName);</div>
-<div class="line"><span class="lineno">  386</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty vector&quot;</span>);</div>
-<div class="line"><span class="lineno">  387</span>      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;(2); </div>
-<div class="line"><span class="lineno">  388</span>    }</div>
-<div class="line"><span class="lineno">  389</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">TGraphToVector</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScansBySample_map.at(sample).at(paramName));</div>
-<div class="line"><span class="lineno">  390</span>  }</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ae2d12152db0ed06d1d862dad2cb4cc9e"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">MaCh3Plotting::InputManager::getEnabledLLHBySample</a></div><div class="ttdeci">bool getEnabledLLHBySample(int fileNum, std::string paramName, std::string sample) const</div><div class="ttdoc">Get whether or not a particular parameter has an LLH scan in a particular input file for a particular...</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00429">inputManager.h:429</a></div></div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00383">383</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  383</span>                                                                                                                  {</div>
+<div class="line"><span class="lineno">  384</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">getEnabledLLHBySample</a>(fileNum, paramName, sample))</div>
+<div class="line"><span class="lineno">  385</span>    {</div>
+<div class="line"><span class="lineno">  386</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for sample {} for parameter {}&quot;</span>, fileNum, sample, paramName);</div>
+<div class="line"><span class="lineno">  387</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty vector&quot;</span>);</div>
+<div class="line"><span class="lineno">  388</span>      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;(2); </div>
+<div class="line"><span class="lineno">  389</span>    }</div>
+<div class="line"><span class="lineno">  390</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gabee3ac13b77811574c1650016e81a229">TGraphToVector</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScansBySample_map.at(sample).at(paramName));</div>
+<div class="line"><span class="lineno">  391</span>  }</div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ae2d12152db0ed06d1d862dad2cb4cc9e"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">MaCh3Plotting::InputManager::getEnabledLLHBySample</a></div><div class="ttdeci">bool getEnabledLLHBySample(int fileNum, std::string paramName, std::string sample) const</div><div class="ttdoc">Get whether or not a particular parameter has an LLH scan in a particular input file for a particular...</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00430">inputManager.h:430</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2975,16 +2977,16 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00392">392</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  393</span>                                                                 {</div>
-<div class="line"><span class="lineno">  394</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">getEnabledLLHBySample</a>(fileNum, paramName, sample))</div>
-<div class="line"><span class="lineno">  395</span>    {</div>
-<div class="line"><span class="lineno">  396</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for sample {} for parameter {}&quot;</span>, fileNum, sample, paramName);</div>
-<div class="line"><span class="lineno">  397</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TGraph&quot;</span>);</div>
-<div class="line"><span class="lineno">  398</span>      <span class="keywordflow">return</span> TGraph();</div>
-<div class="line"><span class="lineno">  399</span>    }</div>
-<div class="line"><span class="lineno">  400</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScansBySample_map.at(sample).at(paramName);</div>
-<div class="line"><span class="lineno">  401</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00393">393</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  394</span>                                                                 {</div>
+<div class="line"><span class="lineno">  395</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">getEnabledLLHBySample</a>(fileNum, paramName, sample))</div>
+<div class="line"><span class="lineno">  396</span>    {</div>
+<div class="line"><span class="lineno">  397</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for sample {} for parameter {}&quot;</span>, fileNum, sample, paramName);</div>
+<div class="line"><span class="lineno">  398</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TGraph&quot;</span>);</div>
+<div class="line"><span class="lineno">  399</span>      <span class="keywordflow">return</span> TGraph();</div>
+<div class="line"><span class="lineno">  400</span>    }</div>
+<div class="line"><span class="lineno">  401</span>    <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScansBySample_map.at(sample).at(paramName);</div>
+<div class="line"><span class="lineno">  402</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3028,16 +3030,16 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00403">403</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  403</span>                                                                                                      {</div>
-<div class="line"><span class="lineno">  404</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">getEnabledLLHBySample</a>(fileNum, paramName, sample))</div>
-<div class="line"><span class="lineno">  405</span>    {</div>
-<div class="line"><span class="lineno">  406</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for sample {} for parameter {}&quot;</span>, fileNum, sample, paramName);</div>
-<div class="line"><span class="lineno">  407</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TH1D&quot;</span>);</div>
-<div class="line"><span class="lineno">  408</span>      <span class="keywordflow">return</span> TH1D();</div>
-<div class="line"><span class="lineno">  409</span>    }</div>
-<div class="line"><span class="lineno">  410</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gaf1329db6e5a742f7dcfa154629c54542">TGraphToTH1D</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScansBySample_map.at(sample).at(paramName));</div>
-<div class="line"><span class="lineno">  411</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00404">404</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  404</span>                                                                                                      {</div>
+<div class="line"><span class="lineno">  405</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e">getEnabledLLHBySample</a>(fileNum, paramName, sample))</div>
+<div class="line"><span class="lineno">  406</span>    {</div>
+<div class="line"><span class="lineno">  407</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;file at index {} does not have LLH scan for sample {} for parameter {}&quot;</span>, fileNum, sample, paramName);</div>
+<div class="line"><span class="lineno">  408</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;am returning an empty TH1D&quot;</span>);</div>
+<div class="line"><span class="lineno">  409</span>      <span class="keywordflow">return</span> TH1D();</div>
+<div class="line"><span class="lineno">  410</span>    }</div>
+<div class="line"><span class="lineno">  411</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="group__Utils.html#gaf1329db6e5a742f7dcfa154629c54542">TGraphToTH1D</a>(*<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileNum].LLHScansBySample_map.at(sample).at(paramName));</div>
+<div class="line"><span class="lineno">  412</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3089,10 +3091,10 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00480">480</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  480</span>                                                                                                                       {</div>
-<div class="line"><span class="lineno">  481</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a7d2679e29c99220b8e99bdaa0b642441">getTaggedValues</a>(<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">_knownParameters</a>, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a0d66afafbba133fc3c1b4867957eb3db">_paramToTagsMap</a>, tags, checkType);</div>
-<div class="line"><span class="lineno">  482</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00481">481</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  481</span>                                                                                                                       {</div>
+<div class="line"><span class="lineno">  482</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a7d2679e29c99220b8e99bdaa0b642441">getTaggedValues</a>(<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a3915837631cc08351a34cb135b0bb351">_knownParameters</a>, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a0d66afafbba133fc3c1b4867957eb3db">_paramToTagsMap</a>, tags, checkType);</div>
+<div class="line"><span class="lineno">  483</span>  }</div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a7d2679e29c99220b8e99bdaa0b642441"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a7d2679e29c99220b8e99bdaa0b642441">MaCh3Plotting::InputManager::getTaggedValues</a></div><div class="ttdeci">std::vector&lt; std::string &gt; getTaggedValues(const std::vector&lt; std::string &gt; &amp;values, const std::unordered_map&lt; std::string, std::vector&lt; std::string &gt; &gt; &amp;tagMap, const std::vector&lt; std::string &gt; &amp;tags, std::string checkType) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8cpp_source.html#l00172">inputManager.cpp:172</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3145,10 +3147,10 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00491">491</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  491</span>                                                                                                                    {</div>
-<div class="line"><span class="lineno">  492</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a7d2679e29c99220b8e99bdaa0b642441">getTaggedValues</a>(<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe">_knownSamples</a>, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ada0eddda54a072bdfc2464a9902cfe01">_sampleToTagsMap</a>, tags, checkType);</div>
-<div class="line"><span class="lineno">  493</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00492">492</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  492</span>                                                                                                                    {</div>
+<div class="line"><span class="lineno">  493</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a7d2679e29c99220b8e99bdaa0b642441">getTaggedValues</a>(<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#abafd844353d8fc69cf31ccf85b2bdcbe">_knownSamples</a>, <a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#ada0eddda54a072bdfc2464a9902cfe01">_sampleToTagsMap</a>, tags, checkType);</div>
+<div class="line"><span class="lineno">  494</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3374,7 +3376,7 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  287</span> </div>
 <div class="line"><span class="lineno">  288</span>  <span class="keywordflow">return</span> tokens;</div>
 <div class="line"><span class="lineno">  289</span>}</div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_abd7bd6137530d4ba7f8a64c2b6e5dfa6"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#abd7bd6137530d4ba7f8a64c2b6e5dfa6">MaCh3Plotting::InputManager::getFitterSpecificSampleName</a></div><div class="ttdeci">std::string getFitterSpecificSampleName(const std::string &amp;fitter, fileTypeEnum fileType, const std::string &amp;sample) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00621">inputManager.h:621</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_abd7bd6137530d4ba7f8a64c2b6e5dfa6"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#abd7bd6137530d4ba7f8a64c2b6e5dfa6">MaCh3Plotting::InputManager::getFitterSpecificSampleName</a></div><div class="ttdeci">std::string getFitterSpecificSampleName(const std::string &amp;fitter, fileTypeEnum fileType, const std::string &amp;sample) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00622">inputManager.h:622</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3467,13 +3469,13 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00634">634</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  634</span>                                                                               {</div>
-<div class="line"><span class="lineno">  635</span>    <span class="keywordflow">if</span> (str.size() &gt;= ending.size()) {</div>
-<div class="line"><span class="lineno">  636</span>      <span class="keywordflow">return</span> str.compare(str.size() - ending.size(), ending.size(), ending) == 0;</div>
-<div class="line"><span class="lineno">  637</span>    }</div>
-<div class="line"><span class="lineno">  638</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  639</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00635">635</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  635</span>                                                                               {</div>
+<div class="line"><span class="lineno">  636</span>    <span class="keywordflow">if</span> (str.size() &gt;= ending.size()) {</div>
+<div class="line"><span class="lineno">  637</span>      <span class="keywordflow">return</span> str.compare(str.size() - ending.size(), ending.size(), ending) == 0;</div>
+<div class="line"><span class="lineno">  638</span>    }</div>
+<div class="line"><span class="lineno">  639</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  640</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3517,10 +3519,10 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00499">499</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  499</span>                                                                                               {</div>
-<div class="line"><span class="lineno">  500</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#aa3a91c2525f5aea76ba182b3be4b2b2a">getFitterSpecificParamName</a>(<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].fitter, fileType, paramName);</div>
-<div class="line"><span class="lineno">  501</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00500">500</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  500</span>                                                                                               {</div>
+<div class="line"><span class="lineno">  501</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#aa3a91c2525f5aea76ba182b3be4b2b2a">getFitterSpecificParamName</a>(<a class="code hl_variable" href="classMaCh3Plotting_1_1InputManager.html#a29202faed03b0e9a22f2d34bce604793">_fileVec</a>[fileId].fitter, fileType, paramName);</div>
+<div class="line"><span class="lineno">  502</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3545,7 +3547,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00666">666</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00667">667</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3569,7 +3571,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00661">661</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00662">662</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3593,7 +3595,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00651">651</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00652">652</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3617,7 +3619,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00644">644</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00645">645</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3641,7 +3643,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00648">648</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00649">649</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3665,7 +3667,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00662">662</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00663">663</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3689,7 +3691,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00654">654</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00655">655</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3713,7 +3715,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00663">663</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00664">664</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3737,7 +3739,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00656">656</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00657">657</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -3761,7 +3763,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00660">660</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00661">661</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
