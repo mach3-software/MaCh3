@@ -5,6 +5,7 @@ set(HEADERS
     MinuitFit.h
     PSO.h
     MCMCProcessor.h
+    OscProcessor.h
     SampleSummary.h
     MaCh3Factory.h
     StatisticalUtils.h
@@ -18,6 +19,7 @@ add_library(MCMC SHARED
     $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.cpp>
     PSO.cpp
     MCMCProcessor.cpp
+    OscProcessor.cpp
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
