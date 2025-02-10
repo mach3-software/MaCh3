@@ -300,17 +300,17 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00604">604</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  604</span>                                                                               {</div>
-<div class="line"><span class="lineno">  605</span><span class="comment">// *******************************************</span></div>
-<div class="line"><span class="lineno">  606</span>  cudaFreeHost(segment);</div>
-<div class="line"><span class="lineno">  607</span>  cudaFreeHost(vals);</div>
-<div class="line"><span class="lineno">  608</span> </div>
-<div class="line"><span class="lineno">  609</span>  segment = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  610</span>  vals = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  611</span> </div>
-<div class="line"><span class="lineno">  612</span>  <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  613</span>}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00587">587</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  587</span>                                                                               {</div>
+<div class="line"><span class="lineno">  588</span><span class="comment">// *******************************************</span></div>
+<div class="line"><span class="lineno">  589</span>  cudaFreeHost(segment);</div>
+<div class="line"><span class="lineno">  590</span>  cudaFreeHost(vals);</div>
+<div class="line"><span class="lineno">  591</span> </div>
+<div class="line"><span class="lineno">  592</span>  segment = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  593</span>  vals = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  594</span> </div>
+<div class="line"><span class="lineno">  595</span>  <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  596</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -338,36 +338,36 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00568">568</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  572</span> {</div>
-<div class="line"><span class="lineno">  573</span><span class="comment">// *********************************</span></div>
-<div class="line"><span class="lineno">  574</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>);</div>
-<div class="line"><span class="lineno">  575</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>);</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00551">551</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  555</span> {</div>
+<div class="line"><span class="lineno">  556</span><span class="comment">// *********************************</span></div>
+<div class="line"><span class="lineno">  557</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>);</div>
+<div class="line"><span class="lineno">  558</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>);</div>
+<div class="line"><span class="lineno">  559</span> </div>
+<div class="line"><span class="lineno">  560</span>  <span class="comment">// free the coefficient arrays</span></div>
+<div class="line"><span class="lineno">  561</span>  cudaDestroyTextureObject(<a class="code hl_variable" href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">text_coeff_x</a>);</div>
+<div class="line"><span class="lineno">  562</span> </div>
+<div class="line"><span class="lineno">  563</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>);</div>
+<div class="line"><span class="lineno">  564</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>);</div>
+<div class="line"><span class="lineno">  565</span> </div>
+<div class="line"><span class="lineno">  566</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>);</div>
+<div class="line"><span class="lineno">  567</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>);</div>
+<div class="line"><span class="lineno">  568</span>  <span class="comment">// free weights on the gpu</span></div>
+<div class="line"><span class="lineno">  569</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>);</div>
+<div class="line"><span class="lineno">  570</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>);</div>
+<div class="line"><span class="lineno">  571</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno">  572</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>);</div>
+<div class="line"><span class="lineno">  573</span>  <span class="comment">//KS: Before removing variable let&#39;s destroy texture</span></div>
+<div class="line"><span class="lineno">  574</span>  cudaDestroyTextureObject(<a class="code hl_variable" href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">text_nParamPerEvent</a>);</div>
+<div class="line"><span class="lineno">  575</span>  cudaDestroyTextureObject(<a class="code hl_variable" href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">text_nParamPerEvent_TF1</a>);</div>
 <div class="line"><span class="lineno">  576</span> </div>
-<div class="line"><span class="lineno">  577</span>  <span class="comment">// free the coefficient arrays</span></div>
-<div class="line"><span class="lineno">  578</span>  cudaDestroyTextureObject(<a class="code hl_variable" href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">text_coeff_x</a>);</div>
-<div class="line"><span class="lineno">  579</span> </div>
-<div class="line"><span class="lineno">  580</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>);</div>
-<div class="line"><span class="lineno">  581</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>);</div>
-<div class="line"><span class="lineno">  582</span> </div>
-<div class="line"><span class="lineno">  583</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>);</div>
-<div class="line"><span class="lineno">  584</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>);</div>
-<div class="line"><span class="lineno">  585</span>  <span class="comment">// free weights on the gpu</span></div>
-<div class="line"><span class="lineno">  586</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>);</div>
-<div class="line"><span class="lineno">  587</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>);</div>
-<div class="line"><span class="lineno">  588</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno">  589</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>);</div>
-<div class="line"><span class="lineno">  590</span>  <span class="comment">//KS: Before removing variable let&#39;s destroy texture</span></div>
-<div class="line"><span class="lineno">  591</span>  cudaDestroyTextureObject(<a class="code hl_variable" href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">text_nParamPerEvent</a>);</div>
-<div class="line"><span class="lineno">  592</span>  cudaDestroyTextureObject(<a class="code hl_variable" href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">text_nParamPerEvent_TF1</a>);</div>
-<div class="line"><span class="lineno">  593</span> </div>
-<div class="line"><span class="lineno">  594</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>);</div>
-<div class="line"><span class="lineno">  595</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>);</div>
-<div class="line"><span class="lineno">  596</span>  cudaFreeHost(cpu_total_weights);</div>
-<div class="line"><span class="lineno">  597</span>  cpu_total_weights = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  598</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  599</span>  <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  600</span>}</div>
+<div class="line"><span class="lineno">  577</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>);</div>
+<div class="line"><span class="lineno">  578</span>  cudaFree(<a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>);</div>
+<div class="line"><span class="lineno">  579</span>  cudaFreeHost(cpu_total_weights);</div>
+<div class="line"><span class="lineno">  580</span>  cpu_total_weights = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  581</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  582</span>  <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  583</span>}</div>
 <div class="ttc" id="aclassSMonolithGPU_html_a089fd1b491667e60d06c3713cd45552e"><div class="ttname"><a href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">SMonolithGPU::text_nParamPerEvent_TF1</a></div><div class="ttdeci">cudaTextureObject_t text_nParamPerEvent_TF1</div><div class="ttdoc">KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of ...</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cuh_source.html#l00229">gpuSplineUtils.cuh:229</a></div></div>
 <div class="ttc" id="aclassSMonolithGPU_html_a1fb766b50293e6b611c45aa21c5c1b9c"><div class="ttname"><a href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">SMonolithGPU::text_coeff_x</a></div><div class="ttdeci">cudaTextureObject_t text_coeff_x</div><div class="ttdoc">KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for vari...</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cuh_source.html#l00224">gpuSplineUtils.cuh:224</a></div></div>
 <div class="ttc" id="aclassSMonolithGPU_html_a663a150b3464b28d6161df1924cd534f"><div class="ttname"><a href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">SMonolithGPU::text_nParamPerEvent</a></div><div class="ttdeci">cudaTextureObject_t text_nParamPerEvent</div><div class="ttdoc">KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of ...</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cuh_source.html#l00227">gpuSplineUtils.cuh:227</a></div></div>
@@ -473,126 +473,127 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00199">199</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  216</span>                                                {</div>
-<div class="line"><span class="lineno">  217</span>  <span class="keywordflow">if</span> (n_params != <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>) {</div>
-<div class="line"><span class="lineno">  218</span>    printf(<span class="stringliteral">&quot;Number of splines not equal to %i, GPU code for event-by-event splines will fail\n&quot;</span>, <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>);</div>
-<div class="line"><span class="lineno">  219</span>    printf(<span class="stringliteral">&quot;n_params = %i\n&quot;</span>, n_params);</div>
-<div class="line"><span class="lineno">  220</span>    printf(<span class="stringliteral">&quot;%s : %i\n&quot;</span>, __FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  221</span>    exit(-1);</div>
-<div class="line"><span class="lineno">  222</span>  }</div>
-<div class="line"><span class="lineno">  223</span> </div>
-<div class="line"><span class="lineno">  224</span>  <span class="comment">// Write to the global statics (h_* denotes host stored variable)</span></div>
-<div class="line"><span class="lineno">  225</span>  <a class="code hl_variable" href="classSMonolithGPU.html#ad36c112081992f2887fe24675f4bba06">h_n_params</a> = n_params;</div>
-<div class="line"><span class="lineno">  226</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno">  227</span>  <a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a>    = n_events;</div>
-<div class="line"><span class="lineno">  228</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  229</span>  <span class="comment">// Copy the constants</span></div>
-<div class="line"><span class="lineno">  230</span>  <span class="comment">// Total number of valid splines for all loaded events</span></div>
-<div class="line"><span class="lineno">  231</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#a8df652f27dcffc6b349298601ed790ea">d_n_splines</a>, &amp;n_splines, <span class="keyword">sizeof</span>(n_splines));</div>
-<div class="line"><span class="lineno">  232</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  233</span> </div>
-<div class="line"><span class="lineno">  234</span>  <span class="comment">// Total number of valid TF1 for all loaded events</span></div>
-<div class="line"><span class="lineno">  235</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#a70d02be4848ebb3c6778c1c1250a5288">d_n_TF1</a>,   &amp;n_tf1, <span class="keyword">sizeof</span>(n_tf1));</div>
-<div class="line"><span class="lineno">  236</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  237</span> </div>
-<div class="line"><span class="lineno">  238</span>  <span class="comment">// Total spline size per spline; i.e. just the number of points or knots in the spline</span></div>
-<div class="line"><span class="lineno">  239</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ae11082fcc44d3cf2e38cb74043fd7835">d_spline_size</a>, &amp;spline_size, <span class="keyword">sizeof</span>(spline_size));</div>
-<div class="line"><span class="lineno">  240</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  241</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno">  242</span>  <span class="comment">// Number of events</span></div>
-<div class="line"><span class="lineno">  243</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ad333bfa4035ada9207fc1df19272c4e2">d_n_events</a>, &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a>, <span class="keyword">sizeof</span>(<a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a>));</div>
-<div class="line"><span class="lineno">  244</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  245</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  246</span>  <span class="comment">// Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies</span></div>
-<div class="line"><span class="lineno">  247</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>.data(), <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*total_nknots*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>, cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  248</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  249</span> </div>
-<div class="line"><span class="lineno">  250</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a47012ee423ea21f99d06eff8257cf0f0">coeff_x</a>.data(), <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*spline_size*n_params, cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  251</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  252</span> </div>
-<div class="line"><span class="lineno">  253</span>  <span class="comment">//KS: Bind our texture with the GPU variable</span></div>
-<div class="line"><span class="lineno">  254</span>  <span class="comment">//KS: Tried also moving gpu_many_array to texture memory it only worked with restricted number of MC runs, most likely hit texture memory limit :(</span></div>
-<div class="line"><span class="lineno">  255</span>  <span class="keyword">struct </span>cudaResourceDesc resDesc_coeff_x;</div>
-<div class="line"><span class="lineno">  256</span>  memset(&amp;resDesc_coeff_x, 0, <span class="keyword">sizeof</span>(resDesc_coeff_x));</div>
-<div class="line"><span class="lineno">  257</span>  resDesc_coeff_x.resType = cudaResourceTypeLinear;</div>
-<div class="line"><span class="lineno">  258</span>  resDesc_coeff_x.res.linear.devPtr = <a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>;</div>
-<div class="line"><span class="lineno">  259</span>  resDesc_coeff_x.res.linear.desc = cudaCreateChannelDesc&lt;float&gt;();</div>
-<div class="line"><span class="lineno">  260</span>  resDesc_coeff_x.res.linear.sizeInBytes = <span class="keyword">sizeof</span>(float)*spline_size*n_params;</div>
-<div class="line"><span class="lineno">  261</span> </div>
-<div class="line"><span class="lineno">  262</span>  <span class="comment">// Specify texture object parameters</span></div>
-<div class="line"><span class="lineno">  263</span>  <span class="keyword">struct </span>cudaTextureDesc texDesc_coeff_x;</div>
-<div class="line"><span class="lineno">  264</span>  memset(&amp;texDesc_coeff_x, 0, <span class="keyword">sizeof</span>(texDesc_coeff_x));</div>
-<div class="line"><span class="lineno">  265</span>  texDesc_coeff_x.readMode = cudaReadModeElementType;</div>
-<div class="line"><span class="lineno">  266</span> </div>
-<div class="line"><span class="lineno">  267</span>  <span class="comment">// Create texture object</span></div>
-<div class="line"><span class="lineno">  268</span>  cudaCreateTextureObject(&amp;<a class="code hl_variable" href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">text_coeff_x</a>, &amp;resDesc_coeff_x, &amp;texDesc_coeff_x, NULL);</div>
-<div class="line"><span class="lineno">  269</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  270</span> </div>
-<div class="line"><span class="lineno">  271</span>  <span class="comment">// Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now</span></div>
-<div class="line"><span class="lineno">  272</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#af24b409ab3da1a88e855e1a9d172741f">paramNo_arr</a>.data(), n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  273</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  274</span> </div>
-<div class="line"><span class="lineno">  275</span>  <span class="comment">// Also copy the knot map for each spline onto the GPU;</span></div>
-<div class="line"><span class="lineno">  276</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a398e0212915793852137384a3406b37f">nKnots_arr</a>.data(), n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  277</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  278</span> </div>
-<div class="line"><span class="lineno">  279</span>  <span class="comment">//Now TF1</span></div>
-<div class="line"><span class="lineno">  280</span>  <span class="comment">// Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies</span></div>
-<div class="line"><span class="lineno">  281</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>, cpu_many_array_TF1.data(), <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*n_tf1*<a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>, cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  282</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  283</span> </div>
-<div class="line"><span class="lineno">  284</span>  <span class="comment">// Also copy the parameter number for each TF1 onto the GPU; i.e. what TF1 parameter are we calculating right now</span></div>
-<div class="line"><span class="lineno">  285</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>, cpu_paramNo_arr_TF1.data(), n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  286</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  287</span> </div>
-<div class="line"><span class="lineno">  288</span><span class="preprocessor">  #ifndef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno">  289</span>  <span class="comment">//KS: Keep track how much splines each event has</span></div>
-<div class="line"><span class="lineno">  290</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>, cpu_nParamPerEvent.data(), 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  291</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  292</span> </div>
-<div class="line"><span class="lineno">  293</span>  <span class="comment">//KS: Bind our texture with the GPU variable</span></div>
-<div class="line"><span class="lineno">  294</span>  <span class="comment">// create a resource descriptor based on device pointers</span></div>
-<div class="line"><span class="lineno">  295</span>  <span class="keyword">struct </span>cudaResourceDesc resDesc_nParamPerEvent;</div>
-<div class="line"><span class="lineno">  296</span>  memset(&amp;resDesc_nParamPerEvent, 0, <span class="keyword">sizeof</span>(resDesc_nParamPerEvent));</div>
-<div class="line"><span class="lineno">  297</span>  resDesc_nParamPerEvent.resType = cudaResourceTypeLinear;</div>
-<div class="line"><span class="lineno">  298</span>  resDesc_nParamPerEvent.res.linear.devPtr = <a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>;</div>
-<div class="line"><span class="lineno">  299</span>  resDesc_nParamPerEvent.res.linear.desc = cudaCreateChannelDesc&lt;unsigned int&gt;();</div>
-<div class="line"><span class="lineno">  300</span>  resDesc_nParamPerEvent.res.linear.sizeInBytes = 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> int);</div>
-<div class="line"><span class="lineno">  301</span> </div>
-<div class="line"><span class="lineno">  302</span>  <span class="comment">// Specify texture object parameters</span></div>
-<div class="line"><span class="lineno">  303</span>  <span class="keyword">struct </span>cudaTextureDesc texDesc_nParamPerEvent;</div>
-<div class="line"><span class="lineno">  304</span>  memset(&amp;texDesc_nParamPerEvent, 0, <span class="keyword">sizeof</span>(texDesc_nParamPerEvent));</div>
-<div class="line"><span class="lineno">  305</span>  texDesc_nParamPerEvent.readMode = cudaReadModeElementType;</div>
-<div class="line"><span class="lineno">  306</span> </div>
-<div class="line"><span class="lineno">  307</span>  <span class="comment">//Finally create texture object</span></div>
-<div class="line"><span class="lineno">  308</span>  cudaCreateTextureObject(&amp;<a class="code hl_variable" href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">text_nParamPerEvent</a>, &amp;resDesc_nParamPerEvent, &amp;texDesc_nParamPerEvent, NULL);</div>
-<div class="line"><span class="lineno">  309</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  310</span> </div>
-<div class="line"><span class="lineno">  311</span>  <span class="comment">// Now TF1</span></div>
-<div class="line"><span class="lineno">  312</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>, cpu_nParamPerEvent_TF1.data(), 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
-<div class="line"><span class="lineno">  313</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  314</span> </div>
-<div class="line"><span class="lineno">  315</span>  <span class="comment">//KS: Bind our texture with the GPU variable</span></div>
-<div class="line"><span class="lineno">  316</span>  <span class="comment">// create a resource descriptor based on device pointers</span></div>
-<div class="line"><span class="lineno">  317</span>  <span class="keyword">struct </span>cudaResourceDesc resDesc_nParamPerEvent_tf1;</div>
-<div class="line"><span class="lineno">  318</span>  memset(&amp;resDesc_nParamPerEvent_tf1, 0, <span class="keyword">sizeof</span>(resDesc_nParamPerEvent_tf1));</div>
-<div class="line"><span class="lineno">  319</span>  resDesc_nParamPerEvent_tf1.resType = cudaResourceTypeLinear;</div>
-<div class="line"><span class="lineno">  320</span>  resDesc_nParamPerEvent_tf1.res.linear.devPtr = <a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>;</div>
-<div class="line"><span class="lineno">  321</span>  resDesc_nParamPerEvent_tf1.res.linear.desc = cudaCreateChannelDesc&lt;unsigned int&gt;();</div>
-<div class="line"><span class="lineno">  322</span>  resDesc_nParamPerEvent_tf1.res.linear.sizeInBytes = 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> int);</div>
-<div class="line"><span class="lineno">  323</span> </div>
-<div class="line"><span class="lineno">  324</span>  <span class="comment">// Specify texture object parameters</span></div>
-<div class="line"><span class="lineno">  325</span>  <span class="keyword">struct </span>cudaTextureDesc texDesc_nParamPerEvent_tf1;</div>
-<div class="line"><span class="lineno">  326</span>  memset(&amp;texDesc_nParamPerEvent_tf1, 0, <span class="keyword">sizeof</span>(texDesc_nParamPerEvent_tf1));</div>
-<div class="line"><span class="lineno">  327</span>  texDesc_nParamPerEvent_tf1.readMode = cudaReadModeElementType;</div>
-<div class="line"><span class="lineno">  328</span> </div>
-<div class="line"><span class="lineno">  329</span>  <span class="comment">//Finally create texture object</span></div>
-<div class="line"><span class="lineno">  330</span>  cudaCreateTextureObject(&amp;<a class="code hl_variable" href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">text_nParamPerEvent_TF1</a>, &amp;resDesc_nParamPerEvent_tf1, &amp;texDesc_nParamPerEvent_tf1, NULL);</div>
-<div class="line"><span class="lineno">  331</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  332</span> </div>
-<div class="line"><span class="lineno">  333</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  334</span>}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00198">198</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  214</span>                                                {</div>
+<div class="line"><span class="lineno">  215</span><span class="comment">// ******************************************************</span></div>
+<div class="line"><span class="lineno">  216</span>  <span class="keywordflow">if</span> (n_params != <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>) {</div>
+<div class="line"><span class="lineno">  217</span>    printf(<span class="stringliteral">&quot;Number of splines not equal to %i, GPU code for event-by-event splines will fail\n&quot;</span>, <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>);</div>
+<div class="line"><span class="lineno">  218</span>    printf(<span class="stringliteral">&quot;n_params = %i\n&quot;</span>, n_params);</div>
+<div class="line"><span class="lineno">  219</span>    printf(<span class="stringliteral">&quot;%s : %i\n&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  220</span>    exit(-1);</div>
+<div class="line"><span class="lineno">  221</span>  }</div>
+<div class="line"><span class="lineno">  222</span> </div>
+<div class="line"><span class="lineno">  223</span>  <span class="comment">// Write to the global statics (h_* denotes host stored variable)</span></div>
+<div class="line"><span class="lineno">  224</span>  <a class="code hl_variable" href="classSMonolithGPU.html#ad36c112081992f2887fe24675f4bba06">h_n_params</a> = n_params;</div>
+<div class="line"><span class="lineno">  225</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno">  226</span>  <a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a>    = n_events;</div>
+<div class="line"><span class="lineno">  227</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  228</span>  <span class="comment">// Copy the constants</span></div>
+<div class="line"><span class="lineno">  229</span>  <span class="comment">// Total number of valid splines for all loaded events</span></div>
+<div class="line"><span class="lineno">  230</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#a8df652f27dcffc6b349298601ed790ea">d_n_splines</a>, &amp;n_splines, <span class="keyword">sizeof</span>(n_splines));</div>
+<div class="line"><span class="lineno">  231</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  232</span> </div>
+<div class="line"><span class="lineno">  233</span>  <span class="comment">// Total number of valid TF1 for all loaded events</span></div>
+<div class="line"><span class="lineno">  234</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#a70d02be4848ebb3c6778c1c1250a5288">d_n_TF1</a>,   &amp;n_tf1, <span class="keyword">sizeof</span>(n_tf1));</div>
+<div class="line"><span class="lineno">  235</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  236</span> </div>
+<div class="line"><span class="lineno">  237</span>  <span class="comment">// Total spline size per spline; i.e. just the number of points or knots in the spline</span></div>
+<div class="line"><span class="lineno">  238</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ae11082fcc44d3cf2e38cb74043fd7835">d_spline_size</a>, &amp;spline_size, <span class="keyword">sizeof</span>(spline_size));</div>
+<div class="line"><span class="lineno">  239</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  240</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno">  241</span>  <span class="comment">// Number of events</span></div>
+<div class="line"><span class="lineno">  242</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ad333bfa4035ada9207fc1df19272c4e2">d_n_events</a>, &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a>, <span class="keyword">sizeof</span>(<a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a>));</div>
+<div class="line"><span class="lineno">  243</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  244</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  245</span>  <span class="comment">// Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies</span></div>
+<div class="line"><span class="lineno">  246</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a67c5585ae47fc8a646dfae3fe9690775">coeff_many</a>.data(), <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*total_nknots*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>, cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  247</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  248</span> </div>
+<div class="line"><span class="lineno">  249</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a47012ee423ea21f99d06eff8257cf0f0">coeff_x</a>.data(), <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*spline_size*n_params, cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  250</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  251</span> </div>
+<div class="line"><span class="lineno">  252</span>  <span class="comment">//KS: Bind our texture with the GPU variable</span></div>
+<div class="line"><span class="lineno">  253</span>  <span class="comment">//KS: Tried also moving gpu_many_array to texture memory it only worked with restricted number of MC runs, most likely hit texture memory limit :(</span></div>
+<div class="line"><span class="lineno">  254</span>  <span class="keyword">struct </span>cudaResourceDesc resDesc_coeff_x;</div>
+<div class="line"><span class="lineno">  255</span>  memset(&amp;resDesc_coeff_x, 0, <span class="keyword">sizeof</span>(resDesc_coeff_x));</div>
+<div class="line"><span class="lineno">  256</span>  resDesc_coeff_x.resType = cudaResourceTypeLinear;</div>
+<div class="line"><span class="lineno">  257</span>  resDesc_coeff_x.res.linear.devPtr = <a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>;</div>
+<div class="line"><span class="lineno">  258</span>  resDesc_coeff_x.res.linear.desc = cudaCreateChannelDesc&lt;float&gt;();</div>
+<div class="line"><span class="lineno">  259</span>  resDesc_coeff_x.res.linear.sizeInBytes = <span class="keyword">sizeof</span>(float)*spline_size*n_params;</div>
+<div class="line"><span class="lineno">  260</span> </div>
+<div class="line"><span class="lineno">  261</span>  <span class="comment">// Specify texture object parameters</span></div>
+<div class="line"><span class="lineno">  262</span>  <span class="keyword">struct </span>cudaTextureDesc texDesc_coeff_x;</div>
+<div class="line"><span class="lineno">  263</span>  memset(&amp;texDesc_coeff_x, 0, <span class="keyword">sizeof</span>(texDesc_coeff_x));</div>
+<div class="line"><span class="lineno">  264</span>  texDesc_coeff_x.readMode = cudaReadModeElementType;</div>
+<div class="line"><span class="lineno">  265</span> </div>
+<div class="line"><span class="lineno">  266</span>  <span class="comment">// Create texture object</span></div>
+<div class="line"><span class="lineno">  267</span>  cudaCreateTextureObject(&amp;<a class="code hl_variable" href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">text_coeff_x</a>, &amp;resDesc_coeff_x, &amp;texDesc_coeff_x, NULL);</div>
+<div class="line"><span class="lineno">  268</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  269</span> </div>
+<div class="line"><span class="lineno">  270</span>  <span class="comment">// Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now</span></div>
+<div class="line"><span class="lineno">  271</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#af24b409ab3da1a88e855e1a9d172741f">paramNo_arr</a>.data(), n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  272</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  273</span> </div>
+<div class="line"><span class="lineno">  274</span>  <span class="comment">// Also copy the knot map for each spline onto the GPU;</span></div>
+<div class="line"><span class="lineno">  275</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>, cpu_spline_handler-&gt;<a class="code hl_variable" href="structSplineMonoStruct.html#a398e0212915793852137384a3406b37f">nKnots_arr</a>.data(), n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  276</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>  <span class="comment">//Now TF1</span></div>
+<div class="line"><span class="lineno">  279</span>  <span class="comment">// Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies</span></div>
+<div class="line"><span class="lineno">  280</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>, cpu_many_array_TF1.data(), <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*n_tf1*<a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>, cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  281</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  282</span> </div>
+<div class="line"><span class="lineno">  283</span>  <span class="comment">// Also copy the parameter number for each TF1 onto the GPU; i.e. what TF1 parameter are we calculating right now</span></div>
+<div class="line"><span class="lineno">  284</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>, cpu_paramNo_arr_TF1.data(), n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  285</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  286</span> </div>
+<div class="line"><span class="lineno">  287</span><span class="preprocessor">  #ifndef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno">  288</span>  <span class="comment">//KS: Keep track how much splines each event has</span></div>
+<div class="line"><span class="lineno">  289</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>, cpu_nParamPerEvent.data(), 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  290</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  291</span> </div>
+<div class="line"><span class="lineno">  292</span>  <span class="comment">//KS: Bind our texture with the GPU variable</span></div>
+<div class="line"><span class="lineno">  293</span>  <span class="comment">// create a resource descriptor based on device pointers</span></div>
+<div class="line"><span class="lineno">  294</span>  <span class="keyword">struct </span>cudaResourceDesc resDesc_nParamPerEvent;</div>
+<div class="line"><span class="lineno">  295</span>  memset(&amp;resDesc_nParamPerEvent, 0, <span class="keyword">sizeof</span>(resDesc_nParamPerEvent));</div>
+<div class="line"><span class="lineno">  296</span>  resDesc_nParamPerEvent.resType = cudaResourceTypeLinear;</div>
+<div class="line"><span class="lineno">  297</span>  resDesc_nParamPerEvent.res.linear.devPtr = <a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>;</div>
+<div class="line"><span class="lineno">  298</span>  resDesc_nParamPerEvent.res.linear.desc = cudaCreateChannelDesc&lt;unsigned int&gt;();</div>
+<div class="line"><span class="lineno">  299</span>  resDesc_nParamPerEvent.res.linear.sizeInBytes = 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> int);</div>
+<div class="line"><span class="lineno">  300</span> </div>
+<div class="line"><span class="lineno">  301</span>  <span class="comment">// Specify texture object parameters</span></div>
+<div class="line"><span class="lineno">  302</span>  <span class="keyword">struct </span>cudaTextureDesc texDesc_nParamPerEvent;</div>
+<div class="line"><span class="lineno">  303</span>  memset(&amp;texDesc_nParamPerEvent, 0, <span class="keyword">sizeof</span>(texDesc_nParamPerEvent));</div>
+<div class="line"><span class="lineno">  304</span>  texDesc_nParamPerEvent.readMode = cudaReadModeElementType;</div>
+<div class="line"><span class="lineno">  305</span> </div>
+<div class="line"><span class="lineno">  306</span>  <span class="comment">//Finally create texture object</span></div>
+<div class="line"><span class="lineno">  307</span>  cudaCreateTextureObject(&amp;<a class="code hl_variable" href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">text_nParamPerEvent</a>, &amp;resDesc_nParamPerEvent, &amp;texDesc_nParamPerEvent, NULL);</div>
+<div class="line"><span class="lineno">  308</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  309</span> </div>
+<div class="line"><span class="lineno">  310</span>  <span class="comment">// Now TF1</span></div>
+<div class="line"><span class="lineno">  311</span>  cudaMemcpy(<a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>, cpu_nParamPerEvent_TF1.data(), 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>), cudaMemcpyHostToDevice);</div>
+<div class="line"><span class="lineno">  312</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  313</span> </div>
+<div class="line"><span class="lineno">  314</span>  <span class="comment">//KS: Bind our texture with the GPU variable</span></div>
+<div class="line"><span class="lineno">  315</span>  <span class="comment">// create a resource descriptor based on device pointers</span></div>
+<div class="line"><span class="lineno">  316</span>  <span class="keyword">struct </span>cudaResourceDesc resDesc_nParamPerEvent_tf1;</div>
+<div class="line"><span class="lineno">  317</span>  memset(&amp;resDesc_nParamPerEvent_tf1, 0, <span class="keyword">sizeof</span>(resDesc_nParamPerEvent_tf1));</div>
+<div class="line"><span class="lineno">  318</span>  resDesc_nParamPerEvent_tf1.resType = cudaResourceTypeLinear;</div>
+<div class="line"><span class="lineno">  319</span>  resDesc_nParamPerEvent_tf1.res.linear.devPtr = <a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>;</div>
+<div class="line"><span class="lineno">  320</span>  resDesc_nParamPerEvent_tf1.res.linear.desc = cudaCreateChannelDesc&lt;unsigned int&gt;();</div>
+<div class="line"><span class="lineno">  321</span>  resDesc_nParamPerEvent_tf1.res.linear.sizeInBytes = 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> int);</div>
+<div class="line"><span class="lineno">  322</span> </div>
+<div class="line"><span class="lineno">  323</span>  <span class="comment">// Specify texture object parameters</span></div>
+<div class="line"><span class="lineno">  324</span>  <span class="keyword">struct </span>cudaTextureDesc texDesc_nParamPerEvent_tf1;</div>
+<div class="line"><span class="lineno">  325</span>  memset(&amp;texDesc_nParamPerEvent_tf1, 0, <span class="keyword">sizeof</span>(texDesc_nParamPerEvent_tf1));</div>
+<div class="line"><span class="lineno">  326</span>  texDesc_nParamPerEvent_tf1.readMode = cudaReadModeElementType;</div>
+<div class="line"><span class="lineno">  327</span> </div>
+<div class="line"><span class="lineno">  328</span>  <span class="comment">//Finally create texture object</span></div>
+<div class="line"><span class="lineno">  329</span>  cudaCreateTextureObject(&amp;<a class="code hl_variable" href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">text_nParamPerEvent_TF1</a>, &amp;resDesc_nParamPerEvent_tf1, &amp;texDesc_nParamPerEvent_tf1, NULL);</div>
+<div class="line"><span class="lineno">  330</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  331</span> </div>
+<div class="line"><span class="lineno">  332</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  333</span>}</div>
 <div class="ttc" id="aSplineCommon_8h_html_a283177311bade7400c6088e8fad71a1f"><div class="ttname"><a href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a></div><div class="ttdeci">#define _nCoeff_</div><div class="ttdoc">KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather th...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00017">SplineCommon.h:17</a></div></div>
 <div class="ttc" id="aSplineCommon_8h_html_a911160077ffa38727e0494f178ce380a"><div class="ttname"><a href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a></div><div class="ttdeci">#define _nTF1Coeff_</div><div class="ttdoc">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it her...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00019">SplineCommon.h:19</a></div></div>
 <div class="ttc" id="agpuSplineUtils_8cu_html_a466f32a4912da866d5014fd8cdbd06a4"><div class="ttname"><a href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a></div><div class="ttdeci">#define _N_SPLINES_</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00006">gpuSplineUtils.cu:6</a></div></div>
@@ -632,13 +633,13 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00175">175</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  175</span>                                                                {</div>
-<div class="line"><span class="lineno">  176</span><span class="comment">// *******************************************</span></div>
-<div class="line"><span class="lineno">  177</span>  <span class="comment">//KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster</span></div>
-<div class="line"><span class="lineno">  178</span>  cudaMallocHost((<span class="keywordtype">void</span> **) segment, <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  179</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  180</span>}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00174">174</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  174</span>                                                                {</div>
+<div class="line"><span class="lineno">  175</span><span class="comment">// *******************************************</span></div>
+<div class="line"><span class="lineno">  176</span>  <span class="comment">//KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster</span></div>
+<div class="line"><span class="lineno">  177</span>  cudaMallocHost((<span class="keywordtype">void</span> **) segment, <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  178</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  179</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -705,63 +706,63 @@ Private Attributes</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00106">106</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  115</span>                                        {</div>
-<div class="line"><span class="lineno">  116</span> </div>
-<div class="line"><span class="lineno">  117</span>  <span class="comment">// Allocate chunks of memory to GPU</span></div>
-<div class="line"><span class="lineno">  118</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>, n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  119</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  120</span> </div>
-<div class="line"><span class="lineno">  121</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>, n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  122</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>, Eve_size*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  125</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  126</span> </div>
-<div class="line"><span class="lineno">  127</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>, <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>*total_nknots*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  128</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  129</span> </div>
-<div class="line"><span class="lineno">  130</span>  <span class="comment">// Allocate memory for the array of weights to be returned to CPU</span></div>
-<div class="line"><span class="lineno">  131</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>, n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  132</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  133</span> </div>
-<div class="line"><span class="lineno">  134</span>  <span class="comment">// Now TF1 specific</span></div>
-<div class="line"><span class="lineno">  135</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>, <a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>*n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  136</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  137</span> </div>
-<div class="line"><span class="lineno">  138</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>, n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  139</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  140</span> </div>
-<div class="line"><span class="lineno">  141</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>, n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  142</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  143</span> </div>
-<div class="line"><span class="lineno">  144</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno">  145</span>  <span class="comment">//KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster</span></div>
-<div class="line"><span class="lineno">  146</span>  cudaMallocHost((<span class="keywordtype">void</span> **) cpu_total_weights, n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  147</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  148</span> </div>
-<div class="line"><span class="lineno">  149</span>  <span class="comment">//KS: Allocate memory for the array of total weights to be returned to CPU</span></div>
-<div class="line"><span class="lineno">  150</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>, n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  151</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  152</span>  </div>
-<div class="line"><span class="lineno">  153</span>  <span class="comment">//KS: Allocate memory for the map keeping track how many splines each parameter has</span></div>
-<div class="line"><span class="lineno">  154</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>, 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  155</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  156</span>  </div>
-<div class="line"><span class="lineno">  157</span>  <span class="comment">//KS: Allocate memory for the map keeping track how many TF1 each parameter has</span></div>
-<div class="line"><span class="lineno">  158</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>, 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  159</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  160</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  161</span>  </div>
-<div class="line"><span class="lineno">  162</span>  <span class="comment">// Print allocation info to user</span></div>
-<div class="line"><span class="lineno">  163</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n&quot;</span>, n_splines, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>)*n_splines+<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>)*n_splines)/1.E6);</div>
-<div class="line"><span class="lineno">  164</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for x coeff arrays, size = %f MB\n&quot;</span>, Eve_size, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*Eve_size)/1.E6);</div>
-<div class="line"><span class="lineno">  165</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n&quot;</span>, <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>*total_nknots, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>*total_nknots)/1.E6);</div>
-<div class="line"><span class="lineno">  166</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for TF1 coefficient arrays, size = %f MB\n&quot;</span>, <a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>*n_tf1, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>*n_tf1)/1.E6);</div>
-<div class="line"><span class="lineno">  167</span> </div>
-<div class="line"><span class="lineno">  168</span>  <span class="comment">//KS: Ask CUDA about memory usage</span></div>
-<div class="line"><span class="lineno">  169</span>  <a class="code hl_function" href="gpuUtils_8cu.html#a5cfcf006bd817b3cff5da08c7f0ecb5e">checkGpuMem</a>();</div>
-<div class="line"><span class="lineno">  170</span>  <a class="code hl_function" href="gpuUtils_8cu.html#acbef44018c81d3830eb03d342bd55dd0">PrintNdevices</a>();</div>
-<div class="line"><span class="lineno">  171</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  114</span>                                        {</div>
+<div class="line"><span class="lineno">  115</span><span class="comment">// *******************************************</span></div>
+<div class="line"><span class="lineno">  116</span>  <span class="comment">// Allocate chunks of memory to GPU</span></div>
+<div class="line"><span class="lineno">  117</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>, n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  118</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  119</span> </div>
+<div class="line"><span class="lineno">  120</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>, n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  121</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  122</span> </div>
+<div class="line"><span class="lineno">  123</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af">gpu_coeff_x</a>, Eve_size*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  124</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  125</span> </div>
+<div class="line"><span class="lineno">  126</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>, <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>*total_nknots*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  127</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  128</span> </div>
+<div class="line"><span class="lineno">  129</span>  <span class="comment">// Allocate memory for the array of weights to be returned to CPU</span></div>
+<div class="line"><span class="lineno">  130</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>, n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  131</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  132</span> </div>
+<div class="line"><span class="lineno">  133</span>  <span class="comment">// Now TF1 specific</span></div>
+<div class="line"><span class="lineno">  134</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>, <a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>*n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  135</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  136</span> </div>
+<div class="line"><span class="lineno">  137</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>, n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  138</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>, n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  141</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  142</span> </div>
+<div class="line"><span class="lineno">  143</span><span class="preprocessor">#ifndef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno">  144</span>  <span class="comment">//KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster</span></div>
+<div class="line"><span class="lineno">  145</span>  cudaMallocHost((<span class="keywordtype">void</span> **) cpu_total_weights, n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  146</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  147</span> </div>
+<div class="line"><span class="lineno">  148</span>  <span class="comment">//KS: Allocate memory for the array of total weights to be returned to CPU</span></div>
+<div class="line"><span class="lineno">  149</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>, n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  150</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  151</span>  </div>
+<div class="line"><span class="lineno">  152</span>  <span class="comment">//KS: Allocate memory for the map keeping track how many splines each parameter has</span></div>
+<div class="line"><span class="lineno">  153</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a13324d2fe2a29f7bbff19c55ddd6968c">gpu_nParamPerEvent</a>, 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  154</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  155</span>  </div>
+<div class="line"><span class="lineno">  156</span>  <span class="comment">//KS: Allocate memory for the map keeping track how many TF1 each parameter has</span></div>
+<div class="line"><span class="lineno">  157</span>  cudaMalloc((<span class="keywordtype">void</span> **) &amp;<a class="code hl_variable" href="classSMonolithGPU.html#a60191ebfcba5bedf7e01c923887d5ceb">gpu_nParamPerEvent_TF1</a>, 2*n_events*<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  158</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  159</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  160</span>  </div>
+<div class="line"><span class="lineno">  161</span>  <span class="comment">// Print allocation info to user</span></div>
+<div class="line"><span class="lineno">  162</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n&quot;</span>, n_splines, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>)*n_splines+<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>)*n_splines)/1.E6);</div>
+<div class="line"><span class="lineno">  163</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for x coeff arrays, size = %f MB\n&quot;</span>, Eve_size, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*Eve_size)/1.E6);</div>
+<div class="line"><span class="lineno">  164</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n&quot;</span>, <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>*total_nknots, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>*total_nknots)/1.E6);</div>
+<div class="line"><span class="lineno">  165</span>  printf(<span class="stringliteral">&quot;Allocated %i entries for TF1 coefficient arrays, size = %f MB\n&quot;</span>, <a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>*n_tf1, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code hl_define" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>*n_tf1)/1.E6);</div>
+<div class="line"><span class="lineno">  166</span> </div>
+<div class="line"><span class="lineno">  167</span>  <span class="comment">//KS: Ask CUDA about memory usage</span></div>
+<div class="line"><span class="lineno">  168</span>  <a class="code hl_function" href="gpuUtils_8cu.html#a5cfcf006bd817b3cff5da08c7f0ecb5e">checkGpuMem</a>();</div>
+<div class="line"><span class="lineno">  169</span>  <a class="code hl_function" href="gpuUtils_8cu.html#acbef44018c81d3830eb03d342bd55dd0">PrintNdevices</a>();</div>
+<div class="line"><span class="lineno">  170</span>}</div>
 <div class="ttc" id="agpuUtils_8cu_html_a5cfcf006bd817b3cff5da08c7f0ecb5e"><div class="ttname"><a href="gpuUtils_8cu.html#a5cfcf006bd817b3cff5da08c7f0ecb5e">checkGpuMem</a></div><div class="ttdeci">void checkGpuMem()</div><div class="ttdoc">KS: Get some fancy info about VRAM usage.</div><div class="ttdef"><b>Definition:</b> <a href="gpuUtils_8cu_source.html#l00045">gpuUtils.cu:45</a></div></div>
 <div class="ttc" id="agpuUtils_8cu_html_acbef44018c81d3830eb03d342bd55dd0"><div class="ttname"><a href="gpuUtils_8cu.html#acbef44018c81d3830eb03d342bd55dd0">PrintNdevices</a></div><div class="ttdeci">void PrintNdevices()</div><div class="ttdoc">KS: Get some fancy info about GPU.</div><div class="ttdef"><b>Definition:</b> <a href="gpuUtils_8cu_source.html#l00063">gpuUtils.cu:63</a></div></div>
 </div><!-- fragment -->
@@ -791,14 +792,14 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00184">184</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  184</span>                                                     {</div>
-<div class="line"><span class="lineno">  185</span><span class="comment">// *******************************************</span></div>
-<div class="line"><span class="lineno">  186</span> </div>
-<div class="line"><span class="lineno">  187</span>  <span class="comment">//KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster</span></div>
-<div class="line"><span class="lineno">  188</span>  cudaMallocHost((<span class="keywordtype">void</span> **) vals, <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  189</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  190</span>}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00183">183</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  183</span>                                                     {</div>
+<div class="line"><span class="lineno">  184</span><span class="comment">// *******************************************</span></div>
+<div class="line"><span class="lineno">  185</span> </div>
+<div class="line"><span class="lineno">  186</span>  <span class="comment">//KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster</span></div>
+<div class="line"><span class="lineno">  187</span>  cudaMallocHost((<span class="keywordtype">void</span> **) vals, <a class="code hl_define" href="gpuSplineUtils_8cu.html#a466f32a4912da866d5014fd8cdbd06a4">_N_SPLINES_</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  188</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  189</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -862,82 +863,82 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00474">474</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  486</span>                                {</div>
-<div class="line"><span class="lineno">  487</span><span class="comment">// *****************************************</span></div>
-<div class="line"><span class="lineno">  488</span> </div>
-<div class="line"><span class="lineno">  489</span>  dim3 block_size;</div>
-<div class="line"><span class="lineno">  490</span>  dim3 grid_size;</div>
-<div class="line"><span class="lineno">  491</span> </div>
-<div class="line"><span class="lineno">  492</span>  block_size.x = <a class="code hl_define" href="gpuUtils_8cuh.html#a393d21a8f493c2561a0ae703973dccc2">_BlockSize_</a>;</div>
-<div class="line"><span class="lineno">  493</span>  grid_size.x = (h_n_splines / block_size.x) + 1;</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00457">457</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  469</span>                                {</div>
+<div class="line"><span class="lineno">  470</span><span class="comment">// *****************************************</span></div>
+<div class="line"><span class="lineno">  471</span> </div>
+<div class="line"><span class="lineno">  472</span>  dim3 block_size;</div>
+<div class="line"><span class="lineno">  473</span>  dim3 grid_size;</div>
+<div class="line"><span class="lineno">  474</span> </div>
+<div class="line"><span class="lineno">  475</span>  block_size.x = <a class="code hl_define" href="gpuUtils_8cuh.html#a393d21a8f493c2561a0ae703973dccc2">_BlockSize_</a>;</div>
+<div class="line"><span class="lineno">  476</span>  grid_size.x = (h_n_splines / block_size.x) + 1;</div>
+<div class="line"><span class="lineno">  477</span> </div>
+<div class="line"><span class="lineno">  478</span>  <span class="comment">// Copy the segment values to the GPU (segment_gpu), which is h_n_params long</span></div>
+<div class="line"><span class="lineno">  479</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ab99f54969e418c0517309fae3f648588">segment_gpu</a>, segment, <a class="code hl_variable" href="classSMonolithGPU.html#ad36c112081992f2887fe24675f4bba06">h_n_params</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
+<div class="line"><span class="lineno">  480</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  481</span> </div>
+<div class="line"><span class="lineno">  482</span>  <span class="comment">// Copy the parameter values values to the GPU (vals_gpu), which is h_n_params long</span></div>
+<div class="line"><span class="lineno">  483</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ac95f6dd3bc9efb4292a4e3f264492f05">val_gpu</a>, vals, <a class="code hl_variable" href="classSMonolithGPU.html#ad36c112081992f2887fe24675f4bba06">h_n_params</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
+<div class="line"><span class="lineno">  484</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  485</span> </div>
+<div class="line"><span class="lineno">  486</span>  <span class="comment">// KS: Consider asynchronous kernel call, this might help EvalOnGPU_Splines and EvalOnGPU_TF1 are independent</span></div>
+<div class="line"><span class="lineno">  487</span>  <span class="comment">// Set the cache config to prefer L1 for the kernel</span></div>
+<div class="line"><span class="lineno">  488</span>  <span class="comment">//cudaFuncSetCacheConfig(EvalOnGPU_Splines, cudaFuncCachePreferL1);</span></div>
+<div class="line"><span class="lineno">  489</span>  EvalOnGPU_Splines&lt;&lt;&lt;grid_size, block_size&gt;&gt;&gt;(</div>
+<div class="line"><span class="lineno">  490</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>,</div>
+<div class="line"><span class="lineno">  491</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>,</div>
+<div class="line"><span class="lineno">  492</span> </div>
+<div class="line"><span class="lineno">  493</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>,</div>
 <div class="line"><span class="lineno">  494</span> </div>
-<div class="line"><span class="lineno">  495</span>  <span class="comment">// Copy the segment values to the GPU (segment_gpu), which is h_n_params long</span></div>
-<div class="line"><span class="lineno">  496</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ab99f54969e418c0517309fae3f648588">segment_gpu</a>, segment, <a class="code hl_variable" href="classSMonolithGPU.html#ad36c112081992f2887fe24675f4bba06">h_n_params</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>));</div>
-<div class="line"><span class="lineno">  497</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  498</span> </div>
-<div class="line"><span class="lineno">  499</span>  <span class="comment">// Copy the parameter values values to the GPU (vals_gpu), which is h_n_params long</span></div>
-<div class="line"><span class="lineno">  500</span>  cudaMemcpyToSymbol(<a class="code hl_variable" href="gpuSplineUtils_8cu.html#ac95f6dd3bc9efb4292a4e3f264492f05">val_gpu</a>, vals, <a class="code hl_variable" href="classSMonolithGPU.html#ad36c112081992f2887fe24675f4bba06">h_n_params</a>*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>));</div>
-<div class="line"><span class="lineno">  501</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  502</span> </div>
-<div class="line"><span class="lineno">  503</span>  <span class="comment">// KS: Consider asynchronous kernel call, this might help EvalOnGPU_Splines and EvalOnGPU_TF1 are independent</span></div>
-<div class="line"><span class="lineno">  504</span>  <span class="comment">// Set the cache config to prefer L1 for the kernel</span></div>
-<div class="line"><span class="lineno">  505</span>  <span class="comment">//cudaFuncSetCacheConfig(EvalOnGPU_Splines, cudaFuncCachePreferL1);</span></div>
-<div class="line"><span class="lineno">  506</span>  EvalOnGPU_Splines&lt;&lt;&lt;grid_size, block_size&gt;&gt;&gt;(</div>
-<div class="line"><span class="lineno">  507</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ae8f091bec85671c4f96a2d0d9dbe4243">gpu_paramNo_arr</a>,</div>
-<div class="line"><span class="lineno">  508</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ac291adc527ef593bb62a8440a131798f">gpu_nKnots_arr</a>,</div>
-<div class="line"><span class="lineno">  509</span> </div>
-<div class="line"><span class="lineno">  510</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc">gpu_coeff_many</a>,</div>
-<div class="line"><span class="lineno">  511</span> </div>
-<div class="line"><span class="lineno">  512</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>,</div>
-<div class="line"><span class="lineno">  513</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">text_coeff_x</a></div>
-<div class="line"><span class="lineno">  514</span>  );</div>
-<div class="line"><span class="lineno">  515</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  516</span> </div>
-<div class="line"><span class="lineno">  517</span>  grid_size.x = (h_n_tf1 / block_size.x) + 1;</div>
-<div class="line"><span class="lineno">  518</span>  EvalOnGPU_TF1&lt;&lt;&lt;grid_size, block_size&gt;&gt;&gt;(</div>
-<div class="line"><span class="lineno">  519</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>,</div>
-<div class="line"><span class="lineno">  520</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>,</div>
+<div class="line"><span class="lineno">  495</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>,</div>
+<div class="line"><span class="lineno">  496</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c">text_coeff_x</a></div>
+<div class="line"><span class="lineno">  497</span>  );</div>
+<div class="line"><span class="lineno">  498</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  499</span> </div>
+<div class="line"><span class="lineno">  500</span>  grid_size.x = (h_n_tf1 / block_size.x) + 1;</div>
+<div class="line"><span class="lineno">  501</span>  EvalOnGPU_TF1&lt;&lt;&lt;grid_size, block_size&gt;&gt;&gt;(</div>
+<div class="line"><span class="lineno">  502</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7">gpu_coeff_TF1_many</a>,</div>
+<div class="line"><span class="lineno">  503</span>    <a class="code hl_variable" href="classSMonolithGPU.html#a2f8de24623a787f9f728bdd0b735c89c">gpu_paramNo_TF1_arr</a>,</div>
+<div class="line"><span class="lineno">  504</span> </div>
+<div class="line"><span class="lineno">  505</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a></div>
+<div class="line"><span class="lineno">  506</span>  );</div>
+<div class="line"><span class="lineno">  507</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  508</span> </div>
+<div class="line"><span class="lineno">  509</span><span class="comment">//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calculate total weight stall at GPU, which means less memory transfer</span></div>
+<div class="line"><span class="lineno">  510</span><span class="preprocessor">#ifdef Weight_On_SplineBySpline_Basis</span></div>
+<div class="line"><span class="lineno">  511</span>  <span class="comment">// Here we have to make a somewhat large GPU-&gt;CPU transfer because it&#39;s all the splines&#39; response</span></div>
+<div class="line"><span class="lineno">  512</span>  cudaMemcpy(cpu_weights, <a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>, h_n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), cudaMemcpyDeviceToHost);</div>
+<div class="line"><span class="lineno">  513</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  514</span> </div>
+<div class="line"><span class="lineno">  515</span>  cudaMemcpy(cpu_weights_tf1, <a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>, h_n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), cudaMemcpyDeviceToHost);</div>
+<div class="line"><span class="lineno">  516</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  517</span> </div>
+<div class="line"><span class="lineno">  518</span><span class="comment">//KS: Else calculate Total Weight</span></div>
+<div class="line"><span class="lineno">  519</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno">  520</span>  grid_size.x = (<a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a> / block_size.x) + 1;</div>
 <div class="line"><span class="lineno">  521</span> </div>
-<div class="line"><span class="lineno">  522</span>    <a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a></div>
-<div class="line"><span class="lineno">  523</span>  );</div>
-<div class="line"><span class="lineno">  524</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  522</span>  EvalOnGPU_TotWeight&lt;&lt;&lt;grid_size, block_size&gt;&gt;&gt;(</div>
+<div class="line"><span class="lineno">  523</span>      <a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>,</div>
+<div class="line"><span class="lineno">  524</span>      <a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>,</div>
 <div class="line"><span class="lineno">  525</span> </div>
-<div class="line"><span class="lineno">  526</span><span class="comment">//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calculate total weight stall at GPU, which means less memory transfer</span></div>
-<div class="line"><span class="lineno">  527</span><span class="preprocessor">#ifdef Weight_On_SplineBySpline_Basis</span></div>
-<div class="line"><span class="lineno">  528</span>  <span class="comment">// Here we have to make a somewhat large GPU-&gt;CPU transfer because it&#39;s all the splines&#39; response</span></div>
-<div class="line"><span class="lineno">  529</span>  cudaMemcpy(cpu_weights, <a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>, h_n_splines*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), cudaMemcpyDeviceToHost);</div>
-<div class="line"><span class="lineno">  530</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  531</span> </div>
-<div class="line"><span class="lineno">  532</span>  cudaMemcpy(cpu_weights_tf1, <a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>, h_n_tf1*<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), cudaMemcpyDeviceToHost);</div>
-<div class="line"><span class="lineno">  533</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  534</span> </div>
-<div class="line"><span class="lineno">  535</span><span class="comment">//KS: Else calculate Total Weight</span></div>
-<div class="line"><span class="lineno">  536</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno">  537</span>  grid_size.x = (<a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a> / block_size.x) + 1;</div>
+<div class="line"><span class="lineno">  526</span>      <a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>,</div>
+<div class="line"><span class="lineno">  527</span> </div>
+<div class="line"><span class="lineno">  528</span>      <a class="code hl_variable" href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">text_nParamPerEvent</a>,</div>
+<div class="line"><span class="lineno">  529</span>      <a class="code hl_variable" href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">text_nParamPerEvent_TF1</a></div>
+<div class="line"><span class="lineno">  530</span>      );</div>
+<div class="line"><span class="lineno">  531</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  532</span> </div>
+<div class="line"><span class="lineno">  533</span>  <span class="comment">//KS: Here we have to make a somewhat large GPU-&gt;CPU transfer because it is proportional to number of events</span></div>
+<div class="line"><span class="lineno">  534</span>  <span class="comment">//KS: Normally code wait for memory transfer to finish before moving further cudaMemcpyAsync means we will continue to execute code and in a meantime keep copying stuff.</span></div>
+<div class="line"><span class="lineno">  535</span>  cudaMemcpyAsync(cpu_total_weights, <a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>, <a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a> * <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), cudaMemcpyDeviceToHost, 0);</div>
+<div class="line"><span class="lineno">  536</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><span class="lineno">  537</span><span class="preprocessor">#endif</span></div>
 <div class="line"><span class="lineno">  538</span> </div>
-<div class="line"><span class="lineno">  539</span>  EvalOnGPU_TotWeight&lt;&lt;&lt;grid_size, block_size&gt;&gt;&gt;(</div>
-<div class="line"><span class="lineno">  540</span>      <a class="code hl_variable" href="classSMonolithGPU.html#a4f29d521544dd4bb64e6f2bfd68c21af">gpu_weights</a>,</div>
-<div class="line"><span class="lineno">  541</span>      <a class="code hl_variable" href="classSMonolithGPU.html#ab5d038b66802271bbaf8f0c06704e5da">gpu_weights_tf1</a>,</div>
-<div class="line"><span class="lineno">  542</span> </div>
-<div class="line"><span class="lineno">  543</span>      <a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>,</div>
-<div class="line"><span class="lineno">  544</span> </div>
-<div class="line"><span class="lineno">  545</span>      <a class="code hl_variable" href="classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f">text_nParamPerEvent</a>,</div>
-<div class="line"><span class="lineno">  546</span>      <a class="code hl_variable" href="classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e">text_nParamPerEvent_TF1</a></div>
-<div class="line"><span class="lineno">  547</span>      );</div>
-<div class="line"><span class="lineno">  548</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  549</span> </div>
-<div class="line"><span class="lineno">  550</span>  <span class="comment">//KS: Here we have to make a somewhat large GPU-&gt;CPU transfer because it is proportional to number of events</span></div>
-<div class="line"><span class="lineno">  551</span>  <span class="comment">//KS: Normally code wait for memory transfer to finish before moving further cudaMemcpyAsync means we will continue to execute code and in a meantime keep copying stuff.</span></div>
-<div class="line"><span class="lineno">  552</span>  cudaMemcpyAsync(cpu_total_weights, <a class="code hl_variable" href="classSMonolithGPU.html#af5007136ab5e2fdbf3b9387e14a1c64a">gpu_total_weights</a>, <a class="code hl_variable" href="classSMonolithGPU.html#a4628e4d9bb58650086cf51098c996059">h_n_events</a> * <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>), cudaMemcpyDeviceToHost, 0);</div>
-<div class="line"><span class="lineno">  553</span>  <a class="code hl_define" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
-<div class="line"><span class="lineno">  554</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  555</span> </div>
-<div class="line"><span class="lineno">  556</span><span class="preprocessor">  #ifdef DEBUG</span></div>
-<div class="line"><span class="lineno">  557</span>    printf(<span class="stringliteral">&quot;Copied GPU total weights to CPU with SUCCESS (drink more tea)\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  558</span>    printf(<span class="stringliteral">&quot;Released calculated response from GPU with SUCCESS (drink most tea)\n&quot;</span>);</div>
-<div class="line"><span class="lineno">  559</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  560</span>}</div>
+<div class="line"><span class="lineno">  539</span><span class="preprocessor">  #ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  540</span>    printf(<span class="stringliteral">&quot;Copied GPU total weights to CPU with SUCCESS (drink more tea)\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  541</span>    printf(<span class="stringliteral">&quot;Released calculated response from GPU with SUCCESS (drink most tea)\n&quot;</span>);</div>
+<div class="line"><span class="lineno">  542</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  543</span>}</div>
 <div class="ttc" id="agpuSplineUtils_8cu_html_ab99f54969e418c0517309fae3f648588"><div class="ttname"><a href="gpuSplineUtils_8cu.html#ab99f54969e418c0517309fae3f648588">segment_gpu</a></div><div class="ttdeci">__device__ __constant__ short int segment_gpu[NSplines_GPU]</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00068">gpuSplineUtils.cu:68</a></div></div>
 <div class="ttc" id="agpuSplineUtils_8cu_html_ac95f6dd3bc9efb4292a4e3f264492f05"><div class="ttname"><a href="gpuSplineUtils_8cu.html#ac95f6dd3bc9efb4292a4e3f264492f05">val_gpu</a></div><div class="ttdeci">__device__ __constant__ float val_gpu[NSplines_GPU]</div><div class="ttdoc">CW: Constant memory needs to be hard-coded on compile time. Could make this texture memory instead,...</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00067">gpuSplineUtils.cu:67</a></div></div>
 <div class="ttc" id="agpuUtils_8cuh_html_a393d21a8f493c2561a0ae703973dccc2"><div class="ttname"><a href="gpuUtils_8cuh.html#a393d21a8f493c2561a0ae703973dccc2">_BlockSize_</a></div><div class="ttdeci">#define _BlockSize_</div><div class="ttdoc">KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now.</div><div class="ttdef"><b>Definition:</b> <a href="gpuUtils_8cuh_source.html#l00025">gpuUtils.cuh:25</a></div></div>
