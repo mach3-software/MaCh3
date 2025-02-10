@@ -97,11 +97,9 @@ class splineFDBase : public SplineBase {
     /// a call to GetSplineInterpolationFromDetID()
     std::vector< std::vector<SplineInterpolation> > SplineInterpolationTypes;
 
-	//int nUniqueSysts;
 	std::vector<std::string> UniqueSystNames;
 	std::vector<int> UniqueSystIndices;
 	std::vector<int> UniqueSystCurrSegment;
-	//std::vector< std::vector<M3::float_t> > UniqueSystXPts; KURWA
 
 	/// @brief Variables related to determined which modes have splines and which piggy-back of other modes
 	std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< std::vector< int > > > > > > > indexvec;
