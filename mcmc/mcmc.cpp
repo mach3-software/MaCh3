@@ -247,12 +247,12 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
   // For MCMC we also need to set stepStart
   TFile *infile = new TFile(FitName.c_str(), "READ");
   TTree *posts = infile->Get<TTree>("posteriors");
-  int step_val = 0;
+  int step_val = -1;
 
   posts->SetBranchAddress("step",&step_val);
   posts->GetEntry(posts->GetEntries()-1);
 
-  stepStart = step_val;
+  stepStart = step_val + 1;
   infile->Close();
   delete infile;
 }

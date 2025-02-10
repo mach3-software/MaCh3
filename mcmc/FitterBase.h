@@ -93,6 +93,8 @@ class FitterBase {
   double accProb;
   /// counts accepted steps
   int accCount;
+  /// step start if restarting
+  int stepStart;
 
   /// store the llh breakdowns
   std::vector<double> sample_llh;
