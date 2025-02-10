@@ -521,7 +521,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
    }
 
-  TFile *SplineFile = new TFile(FileName.c_str(), "OPEN");
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
   TTree *Settings = SplineFile->Get<TTree>("Settings");
   TTree *Monolith = SplineFile->Get<TTree>("Monolith");
   TTree *Monolith_TF1 = SplineFile->Get<TTree>("Monolith_TF1");
@@ -651,7 +651,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   }
 
   SplineFile->Close();
-  delete SplineFile;
 
   // Print some info; could probably make this to a separate function
   PrintInitialsiation();
@@ -668,7 +667,7 @@ void SMonolith::PrepareSplineFile() {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
    }
 
-  TFile *SplineFile = new TFile(FileName.c_str(), "recreate");
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
   TTree *Settings = new TTree("Settings", "Settings");
   TTree *Monolith = new TTree("Monolith", "Monolith");
   TTree *Monolith_TF1 = new TTree("Monolith_TF1", "Monolith_TF1");
@@ -787,7 +786,6 @@ void SMonolith::PrepareSplineFile() {
   delete EventInfo;
   delete FastSplineInfoTree;
   SplineFile->Close();
-  delete SplineFile;
 }
 
 // *****************************************
@@ -914,7 +912,6 @@ void SMonolith::Evaluate() {
 }
 #endif
 
-
 //*********************************************************
 void SMonolith::CalcSplineWeights() {
 //*********************************************************
@@ -944,9 +941,9 @@ void SMonolith::CalcSplineWeights() {
       // We've read the segment straight from CPU and is saved in segment_gpu
       // polynomial parameters from the monolithic splineMonolith
       const float fY = cpu_spline_handler->coeff_many[CurrentKnotPos];
-      const float fB = cpu_spline_handler->coeff_many[CurrentKnotPos+1];
-      const float fC = cpu_spline_handler->coeff_many[CurrentKnotPos+2];
-      const float fD = cpu_spline_handler->coeff_many[CurrentKnotPos+3];
+      const float fB = cpu_spline_handler->coeff_many[CurrentKnotPos + 1];
+      const float fC = cpu_spline_handler->coeff_many[CurrentKnotPos + 2];
+      const float fD = cpu_spline_handler->coeff_many[CurrentKnotPos + 3];
       // The is the variation itself (needed to evaluate variation - stored spline point = dx)
       const float dx = ParamValues[Param] - cpu_spline_handler->coeff_x[segment_X];
 
@@ -965,12 +962,12 @@ void SMonolith::CalcSplineWeights() {
       const float x = ParamValues[cpu_paramNo_TF1_arr[tf1Num]];
 
       // Read the coefficients
-      const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
-      const float b = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_+1];
+      const unsigned int TF1_Index = tf1Num * _nTF1Coeff_;
+      const float a = cpu_coeff_TF1_many[TF1_Index];
+      const float b = cpu_coeff_TF1_many[TF1_Index + 1];
 
       cpu_weights_tf1_var[tf1Num] = fmaf(a, x, b);
       // cpu_weights_tf1_var[tf1Num] = a*x + b;
-
       //cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
     }
   #ifdef MULTITHREAD
@@ -991,9 +988,11 @@ void SMonolith::ModifyWeights(){
   {
     float totalWeight = 1.0f; // Initialize total weight for each event
 
+    const unsigned int Offset = 2 * EventNum;
+
     // Extract the parameters for the current event
-    const unsigned int startIndex = cpu_nParamPerEvent[2 * EventNum + 1];
-    const unsigned int numParams = cpu_nParamPerEvent[2 * EventNum];
+    const unsigned int startIndex = cpu_nParamPerEvent[Offset + 1];
+    const unsigned int numParams = cpu_nParamPerEvent[Offset];
 
     // Compute total weight for the current event
     #ifdef MULTITHREAD
@@ -1004,8 +1003,8 @@ void SMonolith::ModifyWeights(){
     }
     //Now TF1
     // Extract the parameters for the current event
-    const unsigned int startIndex_tf1 = cpu_nParamPerEvent_tf1[2 * EventNum + 1];
-    const unsigned int numParams_tf1 = cpu_nParamPerEvent_tf1[2 * EventNum];
+    const unsigned int startIndex_tf1 = cpu_nParamPerEvent_tf1[Offset + 1];
+    const unsigned int numParams_tf1 = cpu_nParamPerEvent_tf1[Offset];
 
     // Compute total weight for the current event
     #ifdef MULTITHREAD

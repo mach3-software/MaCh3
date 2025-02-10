@@ -144,6 +144,13 @@ inline std::string GetTF1(const SplineInterpolation i) {
     case SplineInterpolation::kLinearFunc:
       Func = "([1]+[0]*x)";
       break;
+    case SplineInterpolation::kTSpline3:
+    case SplineInterpolation::kLinear:
+    case SplineInterpolation::kMonotonic:
+    case SplineInterpolation::kAkima:
+    case SplineInterpolation::kSplineInterpolations:
+      MACH3LOG_ERROR("Interpolation type {} not supported for TF1!", static_cast<int>(i));
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
       MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
@@ -159,27 +166,22 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
 // **************************************************
   RespFuncType Type = kRespFuncTypes;
   switch(i) {
-    //  TSpline3 (third order spline in ROOT)
     case SplineInterpolation::kTSpline3:
-      Type = RespFuncType::kTSpline3_red;
-      break;
     case SplineInterpolation::kLinear:
-      Type = RespFuncType::kTSpline3_red;
-      break;
     case SplineInterpolation::kMonotonic:
-      Type = RespFuncType::kTSpline3_red;
-      break;
-    //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
     case SplineInterpolation::kAkima:
       Type = RespFuncType::kTSpline3_red;
       break;
     case SplineInterpolation::kLinearFunc:
       Type = RespFuncType::kTF1_red;
       break;
+    case SplineInterpolation::kSplineInterpolations:
+      MACH3LOG_ERROR("kSplineInterpolations is not a valid interpolation type!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
       MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
-      throw MaCh3Exception(__FILE__ , __LINE__ );
+      throw MaCh3Exception(__FILE__, __LINE__);
   }
   return Type;
 }
@@ -207,6 +209,9 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
     case SplineInterpolation::kLinearFunc:
       name = "LinearFunc";
       break;
+    case SplineInterpolation::kSplineInterpolations:
+      MACH3LOG_ERROR("kSplineInterpolations is not a valid interpolation type!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
       MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
@@ -255,6 +260,9 @@ inline std::string SystType_ToString(const SystType i) {
     case SystType::kFunc:
       name = "Functional";
       break;
+    case SystType::kSystTypes:
+      MACH3LOG_ERROR("kSystTypes is not a valid SystType!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN SYST TYPE SPECIFIED!");
       MACH3LOG_ERROR("You gave {}", static_cast<int>(i));
@@ -299,6 +307,9 @@ inline std::string TargetMat_ToString(const TargetMat i) {
       break;
     case kTarget_Al:
       name = "Aluminium";
+      break;
+    case kTarget_Ar:
+      name = "Argon";
       break;
     case kTarget_Ti:
       name = "Titanium";
@@ -419,21 +430,24 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
   std::string name = "";
 
   switch(i) {
-    case kPoisson:
+    case TestStatistic::kPoisson:
     name = "Poisson";
     break;
-    case kBarlowBeeston:
+    case TestStatistic::kBarlowBeeston:
     name = "BarlowBeeston";
     break;
-    case kIceCube:
+    case TestStatistic::kIceCube:
     name = "IceCube";
     break;
-    case kPearson:
+    case TestStatistic::kPearson:
     name = "Pearson";
     break;
-    case kDembinskiAbdelmottele:
+    case TestStatistic::kDembinskiAbdelmottele:
     name = "DembinskiAbdelmottele";
     break;
+    case TestStatistic::kNTestStatistics:
+      MACH3LOG_ERROR("kNTestStatistics is not a valid TestStatistic!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN LIKELIHOOD SPECIFIED!");
       MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(i));
