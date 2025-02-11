@@ -89,10 +89,8 @@ add_to_PATH ${MaCh3_ROOT}/bin
 add_to_LD_LIBRARY_PATH ${MaCh3_ROOT}/lib
 add_to_LD_LIBRARY_PATH ${MaCh3_ROOT}/lib64
 
-echo "Sourcing NuOscillator"
-if [ -n "@NUOSCILLATOR_ROOT@" ]; then
-  source "@NUOSCILLATOR_ROOT@/Linux/bin/setup.NuOscillator.sh"
-else
+if [ -f "${MaCh3_ROOT}/bin/setup.NuOscillator.sh" ]; then
+  echo "Sourcing NuOscillator"
   source "${MaCh3_ROOT}/bin/setup.NuOscillator.sh"
 fi
 
