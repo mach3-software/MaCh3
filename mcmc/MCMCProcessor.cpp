@@ -810,10 +810,11 @@ void MCMCProcessor::MakeViolin() {
 
   const int vBins = (maxi_y-mini_y)*25;
   hviolin = std::make_unique<TH2D>("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y);
-
+  hviolin->SetDirectory(nullptr);
   //KS: Prior has larger errors so we increase range and number of bins
   constexpr int PriorFactor = 4;
   hviolin_prior = std::make_unique<TH2D>("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
+  hviolin_prior->SetDirectory(nullptr);
 
   auto rand = std::make_unique<TRandom3>(0);
   std::vector<double> PriorVec(nDraw);
