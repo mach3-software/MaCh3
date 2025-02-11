@@ -53,6 +53,10 @@ get_target_property(cpu_compile_options MaCh3CompilerOptions INTERFACE_COMPILE_O
 # Join the compile options list into a space-separated string
 string(REPLACE ";" " " cpu_compile_options_string "${cpu_compile_options}")
 
+if(USE_CUDAProb3Linear EQUAL 1 AND DAN_USE_GPU EQUAL 1)
+  cmessage(WARNING "Right now GPU support for CUDAProb3Linear is broken, turning OFF GPU support")
+  set(DAN_USE_GPU 0)
+endif()
 
 #KS: This may seem hacky, but when CMAKE_CUDA_ARCHITECTURES is passed, it's treated as a string rather than a list. Since CMake uses semi-colon-delimited strings to represent lists, we convert it to a proper list to handle CUDA architectures correctly.
 set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
