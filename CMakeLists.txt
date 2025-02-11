@@ -114,6 +114,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
   )
 endif()
+
+# KS: Clang is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(MaCh3_WERROR_ENABLED FALSE)
+endif()
+
 if(MaCh3_WERROR_ENABLED)
 target_compile_options(MaCh3Warnings INTERFACE
   -Werror                # Treat Warnings as Errors
@@ -174,6 +180,11 @@ if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
+  # KS: Not a clue why clang need different...
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  endif()
+
 endif()
 
 if(CPU_ONLY)
