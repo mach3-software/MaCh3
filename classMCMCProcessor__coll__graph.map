@@ -1,5 +1,5 @@
 <map id="MCMCProcessor" name="MCMCProcessor">
-<area shape="rect" id="node1" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="872,531,999,557"/>
+<area shape="rect" id="node1" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="872,555,999,581"/>
 <area shape="rect" id="node2" title=" " alt="" coords="233,135,320,161"/>
 <area shape="rect" id="node7" title=" " alt="" coords="493,179,679,205"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,128,144,168"/>
@@ -16,4 +16,5 @@
 <area shape="rect" id="node15" title=" " alt="" coords="484,803,688,829"/>
 <area shape="rect" id="node16" title=" " alt="" coords="502,853,670,878"/>
 <area shape="rect" id="node17" title=" " alt="" coords="499,903,673,943"/>
+<area shape="rect" id="node18" title=" " alt="" coords="493,969,679,994"/>
 </map>

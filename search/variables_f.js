@@ -26,7 +26,7 @@ var searchData=
   ['plotbinvalue_23',['plotBinValue',['../classMCMCProcessor.html#aa7611f55ac3c0ea70607761d037fbd91',1,'MCMCProcessor']]],
   ['plotcolor_24',['PlotColor',['../GetPostfitParamPlots_8cpp.html#ab2b28d9b5fd61ee45bbdfa307b969241',1,'GetPostfitParamPlots.cpp']]],
   ['plotflatprior_25',['PlotFlatPrior',['../classMCMCProcessor.html#ad24411a2556504c440ff0af045e8e7aa',1,'MCMCProcessor']]],
-  ['plotjarlskog_26',['PlotJarlskog',['../classMCMCProcessor.html#af1392c6cff68e9f0a27e2c9a4e52cf4c',1,'MCMCProcessor']]],
+  ['plotjarlskog_26',['PlotJarlskog',['../classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5',1,'OscProcessor']]],
   ['plotrelativetoprior_27',['plotRelativeToPrior',['../classMCMCProcessor.html#afbac2a114c15ca7db4abe71dd549504c',1,'MCMCProcessor']]],
   ['plottype_28',['plotType',['../GetPostfitParamPlots_8cpp.html#aee5c9d8d7ad14d8728dffad47b8d4efe',1,'GetPostfitParamPlots.cpp']]],
   ['position_29',['position',['../classparticle.html#a16f312fadb1c50e0a45a840f9e393eae',1,'particle']]],
