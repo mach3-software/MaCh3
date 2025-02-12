@@ -95,7 +95,7 @@ cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to [CUDA](https://developer.nvidia.com/cuda-toolkit)
 ```bash
 mkdir build; cd build;
-cmake ../ -DUSE_CPU=ON
+cmake ../ -DMaCh3_GPU_ENABLED=OFF
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 

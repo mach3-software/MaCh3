@@ -20,7 +20,7 @@ set_target_properties(Covariance PROPERTIES
     EXPORT_NAME Covariance)
 
 
-if(NOT CPU_ONLY)
+if(MaCh3_GPU_ENABLED)
     set_target_properties(Covariance PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
     set_property(TARGET Covariance PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
