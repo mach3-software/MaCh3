@@ -9,6 +9,9 @@
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FarDetectorCoreInfoStruct.h"
 
+#include "THStack.h"
+#include "TLegend.h"
+
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;
 
@@ -27,6 +30,8 @@ public:
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
   std::string GetName() const {return samplename;}
 
+  void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
+  
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
@@ -69,7 +74,23 @@ public:
   }
 
   TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHist(std::string ProjectionVarX, std::string ProjectionVarY, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
+  TH1* get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+
+  TH1 *getModeHist1D(int s, int m, int style = 0) {
+    return get1DVarHistByModeAndChannel(XVarStr,m,s,style);
+  }
+  TH2 *getModeHist2D(int s, int m, int style = 0) {
+    return get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
+  }
+
+  std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
+  THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  TLegend* ReturnStackHistLegend() {return THStackLeg;}
+  
   /// ETA function to generically convert a string from xsec cov to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
   /// ETA function to generically convert a kinematic type from xsec cov to a string
@@ -259,4 +280,9 @@ public:
   std::vector<int> sample_vecno;
   std::vector<int> sample_nupdg;
   std::vector<int> sample_nupdgunosc;
+
+  //===============================================================================
+  //DB Miscellaneous Variables
+  TLegend* THStackLeg;
+  //===============================================================================
 };

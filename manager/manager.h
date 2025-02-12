@@ -6,7 +6,6 @@
 #include "manager/YamlHelper.h"
 #include "manager/Monitor.h"
 #include "manager/MaCh3Exception.h"
-#include "manager/MaCh3Modes.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;
@@ -36,8 +35,6 @@ public:
   inline std::string GetFileName(){return FileName;}
   /// @brief Return config
   inline YAML::Node const &raw(){return config;}
-  /// @brief Return pointer to MaCh3 modes
-  MaCh3Modes* GetMaCh3Modes() const { return Modes; }
   /// @brief Get class name
   inline std::string GetName()const {return "Manager";};
 
@@ -56,6 +53,4 @@ private:
   YAML::Node config;
   /// The name of the configuration file.
   std::string FileName;
-  /// MaCh3 Modes
-  MaCh3Modes* Modes;
 };

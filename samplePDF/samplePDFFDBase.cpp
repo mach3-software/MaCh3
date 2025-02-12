@@ -58,6 +58,12 @@ samplePDFFDBase::~samplePDFFDBase()
 
 void samplePDFFDBase::ReadSampleConfig() 
 {
+  if (!CheckNodeExists(SampleManager->raw(), "MaCh3ModeConfig")) {
+    MACH3LOG_ERROR("MaCh3ModeConfig not defined in {}, please add this!", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  Modes = new MaCh3Modes(SampleManager->raw()["MaCh3ModeConfig"].as<std::string>());
+  
   if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1527,7 +1533,6 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
-
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< std::vector<double> > tmp_Selection = Selection;
@@ -1583,6 +1588,68 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   return _h1DVar;
 }
 
+TH2* samplePDFFDBase::get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+  //DB Grab the associated enum with the argument string
+  int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+  int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
+
+  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
+  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
+  std::vector< std::vector<double> > tmp_Selection = Selection;
+  std::vector< std::vector<double> > SelectionVecToApply;
+
+  //DB Add all the predefined selections to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
+    SelectionVecToApply.emplace_back(Selection[iSelec]);
+  }
+
+  //DB Add all requested cuts from the argument to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  }
+
+  //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
+  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
+    if (SelectionVecToApply[iSelec].size()!=3) {
+      MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  //DB Set the member variable to be the cuts to apply
+  Selection = SelectionVecToApply;
+
+  //DB Define the histogram which will be returned
+  TH2D* _h2DVar;
+  if (AxisX && AxisY) {
+    _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
+  } else {
+    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrX);
+    std::vector<double> yBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrY);
+    _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
+  }
+
+  //DB Loop over all events
+  for (int iSample=0;iSample<getNMCSamples();iSample++) {
+    for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
+      if (IsEventSelected(iSample,iEvent)) {
+        double Weight = GetEventWeight(iSample,iEvent);
+        if (WeightStyle==1) {
+          Weight = 1.;
+        }
+        double VarX = ReturnKinematicParameter(ProjectionVar_IntX,iSample,iEvent);
+	double VarY = ReturnKinematicParameter(ProjectionVar_IntY,iSample,iEvent);
+        _h2DVar->Fill(VarX,VarY,Weight);
+      }
+    }
+  }
+  
+  //DB Reset the saved selection
+  Selection = tmp_Selection;
+
+  return _h2DVar;
+}
+
 // ************************************************
 int samplePDFFDBase::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
 // ************************************************
@@ -1607,4 +1674,324 @@ std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int Kinema
   throw MaCh3Exception(__FILE__, __LINE__);
 
   return "";
+}
+
+TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+  bool fChannel;
+  bool fMode;
+
+  if (kChannelToFill!=-1) {
+    if (kChannelToFill>getNMCSamples()) {
+      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", getNMCSamples());
+      MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
+      MACH3LOG_ERROR("Exiting.");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fChannel = true;
+  } else {
+    fChannel = false;
+  }
+
+  if (kModeToFill!=-1) {
+    if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
+      MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
+      MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
+      MACH3LOG_ERROR("Exiting..");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fMode = true;
+  } else {
+    fMode = false;
+  }
+
+  std::vector< std::vector<double> > SelectionVec;
+
+  if (fMode) {
+    std::vector<double> SelecMode(3);
+    SelecMode[0] = ReturnKinematicParameterFromString("Mode");
+    SelecMode[1] = kModeToFill;
+    SelecMode[2] = kModeToFill+1;
+    SelectionVec.push_back(SelecMode);
+  }
+
+  if (fChannel) {
+    std::vector<double> SelecChannel(3);
+    SelecChannel[0] = ReturnKinematicParameterFromString("OscillationChannel");
+    SelecChannel[1] = kChannelToFill;
+    SelecChannel[2] = kChannelToFill+1;
+    SelectionVec.push_back(SelecChannel);
+  }
+
+  return get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
+}
+
+TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+  bool fChannel;
+  bool fMode;
+
+  if (kChannelToFill!=-1) {
+    if (kChannelToFill>getNMCSamples()) {
+      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", getNMCSamples());
+      MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
+      MACH3LOG_ERROR("Exiting.");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fChannel = true;
+  } else {
+    fChannel = false;
+  }
+
+  if (kModeToFill!=-1) {
+    if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
+      MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
+      MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
+      MACH3LOG_ERROR("Exiting..");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fMode = true;
+  } else {
+    fMode = false;
+  }
+
+  std::vector< std::vector<double> > SelectionVec;
+
+  if (fMode) {
+    std::vector<double> SelecMode(3);
+    SelecMode[0] = ReturnKinematicParameterFromString("Mode");
+    SelecMode[1] = kModeToFill;
+    SelecMode[2] = kModeToFill+1;
+    SelectionVec.push_back(SelecMode);
+  }
+
+  if (fChannel) {
+    std::vector<double> SelecChannel(3);
+    SelecChannel[0] = ReturnKinematicParameterFromString("OscillationChannel");
+    SelecChannel[1] = kChannelToFill;
+    SelecChannel[2] = kChannelToFill+1;
+    SelectionVec.push_back(SelecChannel);
+  }
+
+  return get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
+}
+
+void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
+  int space = 14;
+
+  bool printToFile=false;
+  if (OutputFileName.CompareTo("/dev/null")) {printToFile = true;}
+
+  bool printToCSV=false;
+  if(OutputCSVFileName.CompareTo("/dev/null")) printToCSV=true;
+  
+  std::ofstream outfile;
+  if (printToFile) {
+    outfile.open(OutputFileName.Data(), std::ios_base::app);
+    outfile.precision(7);
+  }
+
+  std::ofstream outcsv;
+  if(printToCSV){
+    outcsv.open(OutputCSVFileName, std::ios_base::app); // Appened to CSV
+    outcsv.precision(7);
+  }
+
+  double PDFIntegral = 0;
+
+  std::vector< std::vector< TH2* > > IntegralList;
+  IntegralList.resize(Modes->GetNModes());
+
+  std::vector<double> ChannelIntegral;
+  ChannelIntegral.resize(getNMCSamples());
+  for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
+  
+  for (int i=0;i<Modes->GetNModes();i++) {
+    IntegralList[i] = ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle);
+  }
+
+  MACH3LOG_INFO("-------------------------------------------------");
+
+  if (printToFile) {
+    outfile << "\\begin{table}[ht]" << std::endl;
+    outfile << "\\begin{center}" << std::endl;
+    outfile << "\\caption{Integral breakdown for sample: " << GetName() << "}" << std::endl;
+    outfile << "\\label{" << GetName() << "-EventRate}" << std::endl;
+    
+    TString nColumns;
+    for (int i=0;i<getNMCSamples();i++) {nColumns+="|c";}
+    nColumns += "|c|";
+    outfile << "\\begin{tabular}{|l" << nColumns.Data() << "}" << std::endl;
+    outfile << "\\hline" << std::endl;
+  }
+
+  if(printToCSV){
+    // HI Probably a better way but oh well, here I go making MaCh3 messy again
+    outcsv<<"Integral Breakdown for sample :"<<GetName()<<"\n";
+  }
+  
+  MACH3LOG_INFO("Integral breakdown for sample: {}", GetName());
+  MACH3LOG_INFO("");
+
+  if (printToFile) {outfile << std::setw(space) << "Mode:";}
+  if(printToCSV) {outcsv<<"Mode,";}
+
+  std::string table_headings = fmt::format("| {:<8} |", "Mode");
+  std::string table_footline = "------------"; //Scalable table horizontal line
+  for (int i=0;i<getNMCSamples();i++) {
+    table_headings += fmt::format(" {:<17} |", MCSamples[i].flavourName);
+    table_footline += "--------------------";
+    //DB TODO: Fix
+    //if (printToFile) {outfile << "&" << std::setw(space) << MaCh3Utils::SKSampleName_toLatexString(MCSamples[i].flavourName) << " ";}
+    if (printToFile) {outfile << "&" << std::setw(space) << MCSamples[i].flavourName << " ";}
+    if (printToCSV)  {outcsv << MCSamples[i].flavourName << ",";}
+  }
+  if (printToFile) {outfile << "&" << std::setw(space) << "Total:" << "\\\\ \\hline" << std::endl;}
+  if (printToCSV)  {outcsv <<"Total\n";}
+  table_headings += fmt::format(" {:<10} |", "Total");
+  table_footline += "-------------";
+
+  MACH3LOG_INFO("{}", table_headings);
+  MACH3LOG_INFO("{}", table_footline);
+  
+  for (unsigned int i=0;i<IntegralList.size();i++) {
+    double ModeIntegral = 0;
+    if (printToFile) {outfile << std::setw(space) << Modes->GetMaCh3ModeName(i);}
+    if(printToCSV)   {outcsv << Modes->GetMaCh3ModeName(i) << ",";}
+
+    table_headings = fmt::format("| {:<8} |", Modes->GetMaCh3ModeName(i)); //Start string with mode name
+
+    for (unsigned int j=0;j<IntegralList[i].size();j++) {
+      double Integral = IntegralList[i][j]->Integral();
+
+      if (Integral<1e-100) {Integral=0;}
+
+      ModeIntegral += Integral;
+      ChannelIntegral[j] += Integral;
+      PDFIntegral += Integral;
+      
+      if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",Integral) << " ";}
+      if (printToCSV)  {outcsv << Form("%4.5f", Integral) << ",";}
+
+      table_headings += fmt::format(" {:<17.4f} |", Integral);
+    }
+    if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",ModeIntegral) <<  " \\\\ \\hline" << std::endl;}
+    if (printToCSV)  {outcsv << Form("%4.5f", ModeIntegral) << "\n";}
+    
+    table_headings += fmt::format(" {:<10.4f} |", ModeIntegral);
+    
+    MACH3LOG_INFO("{}", table_headings);
+  }
+
+  if (printToFile) {outfile << std::setw(space) << "Total:";}
+  if (printToCSV)  {outcsv << "Total,";}
+
+  //Clear the table_headings to print last row of totals
+  table_headings = fmt::format("| {:<8} |", "Total");
+  for (unsigned int i=0;i<ChannelIntegral.size();i++) {
+    if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",ChannelIntegral[i]) << " ";}
+    if (printToCSV)  {outcsv << Form("%4.5f", ChannelIntegral[i]) << ",";}
+    table_headings += fmt::format(" {:<17.4f} |", ChannelIntegral[i]);
+  }
+  if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",PDFIntegral) << " \\\\ \\hline" << std::endl;}
+  if (printToCSV)  {outcsv << Form("%4.5f", PDFIntegral) << "\n\n\n\n";} // Let's have a few new lines!
+
+  table_headings += fmt::format(" {:<10.4f} |", PDFIntegral);
+  MACH3LOG_INFO("{}", table_headings);
+  MACH3LOG_INFO("{}", table_footline);
+
+  if (printToFile) {
+    outfile << "\\end{tabular}" << std::endl;
+    outfile << "\\end{center}" << std::endl;
+    outfile << "\\end{table}" << std::endl;
+  }
+
+  MACH3LOG_INFO("");
+
+  if (printToFile) {
+    outfile << std::endl;
+    outfile.close();
+  }
+
+}
+
+std::vector<TH1*> samplePDFFDBase::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+  std::vector<TH1*> hHistList;
+  std::string legendEntry;
+
+  if (THStackLeg) {delete [] THStackLeg;}
+  THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
+
+  int iMax = -1;
+  if (Selection1 == 0) {
+    iMax = Modes->GetNModes();
+  }
+  if (Selection1 == 1) {
+    iMax = getNMCSamples();
+  }
+  if (iMax == -1) {
+    //DB TODO FIX
+    throw;
+  }
+
+  for (int i=0;i<iMax;i++) {
+    if (Selection1==0) {
+      hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
+      THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
+    }
+    if (Selection1==1) {
+      hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
+      THStackLeg->AddEntry(hHistList[i],(MCSamples[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
+    }
+
+    //DB TODO FIX
+    /*
+    hHistList[i]->SetFillColor(MaCh3ModeColor(i));
+    hHistList[i]->SetLineColor(MaCh3ModeColor(i));
+    */
+    
+  }
+
+  return hHistList;
+}
+
+std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis, TAxis* YAxis) {
+  std::vector<TH2*> hHistList;
+
+  int iMax = -1;
+  if (Selection1 == 0) {
+    iMax = Modes->GetNModes();
+  }
+  if (Selection1 == 1) {
+    iMax = getNMCSamples();
+  }
+  if (iMax == -1) {
+    //DB TODO FIX
+    throw;
+  }
+
+  for (int i=0;i<iMax;i++) {
+    if (Selection1==0) {
+      hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
+    }
+    if (Selection1==1) {
+      hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
+    }
+
+    //DB TODO FIX
+    /*
+    hHistList[i]->SetFillColor(MaCh3ModeColor(i));
+    hHistList[i]->SetLineColor(MaCh3ModeColor(i));
+    */
+    
+  }
+
+  return hHistList;
+}
+
+THStack* samplePDFFDBase::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+  std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
+  THStack* StackHist = new THStack((GetName()+"_"+KinematicProjection+"_Stack").c_str(),"");
+  for (unsigned int i=0;i<HistList.size();i++) {
+    StackHist->Add(HistList[i]);
+  }
+  return StackHist;
 }

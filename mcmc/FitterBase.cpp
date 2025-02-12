@@ -15,7 +15,10 @@ _MaCh3_Safe_Include_End_ //}
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
   //Get mach3 modes from manager
-  Modes = fitMan->GetMaCh3Modes();
+
+  //DB TODO: Fix
+  //Modes = fitMan->GetMaCh3Modes();
+  
   random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
@@ -1019,6 +1022,7 @@ void FitterBase::RunSigmaVar() {
 
   outputFile->cd();
 
+  //DB TODO: Fix Modes
   //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
   constexpr int nRelevantModes = 2;
