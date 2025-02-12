@@ -21,7 +21,7 @@ OscProcessor::~OscProcessor() {
 // Read the Osc cov file and get the input central values and errors
 void OscProcessor::ReadOSCFile() {
 // ***************
-  // Call base class constructor
+  // Call base class function
   MCMCProcessor::ReadOSCFile();
 
   if(PlotJarlskog)
@@ -38,6 +38,6 @@ void OscProcessor::ReadOSCFile() {
     ParamErrors[kOSCPar].push_back( 1. );
     // Push back the name
     ParamNames[kOSCPar].push_back("J_cp");
-      ParamFlat[kOSCPar].push_back( false );
+    ParamFlat[kOSCPar].push_back( false );
   }
 }
