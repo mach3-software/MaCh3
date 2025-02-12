@@ -9,6 +9,7 @@
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class SMonolithGPU;
 
+
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 class SMonolith : public SplineBase {
@@ -157,7 +158,7 @@ class SMonolith : public SplineBase {
     sycl::queue queue;
     SplineMonoUSM* cpu_spline_handler;
     float* cpu_coeff_TF1_many;
-    
+
     short int* cpu_paramNo_TF1_arr;
     #else
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.

@@ -1,4 +1,7 @@
 #include "SplineMonolith.h"
+#define STRING2(x) #x
+#define STRING(x) STRING2(x)
+#pragma message "CHECKME: " STRING(USE_FPGA)
 #ifdef USE_FPGA
 #include <sycl/ext/intel/experimental/task_sequence.hpp>
 #include <sycl/ext/intel/fpga_extensions.hpp>
@@ -24,7 +27,7 @@ using PipeAB = sycl::ext::intel::pipe<IDPipeAB,        // An identifier for the 
 
 //*********************************************************
 [[intel::use_stall_enable_clusters]] 
-void FPGACalcSplineWeights(int NSplines_valid, int *param_n_knots, short *segments, float *coeff_many, float *coeff_x, float *vals) {
+void FPGACalcSplineWeights(int nParams, int NSplines_valid, int *param_n_knots, short *segments, float *coeff_many, float *coeff_x, float *vals) {
 //*********************************************************
 
   // //int _nCoeff_,
@@ -35,12 +38,13 @@ void FPGACalcSplineWeights(int NSplines_valid, int *param_n_knots, short *segmen
   // float *coeff_x, 
   // float *vals
 
-  [[intel::fpga_memory("BLOCK_RAM")]] std::array<int, 100> segments_bram;
+  // 200 = arbitrary number > nParams
+  [[intel::fpga_memory("BLOCK_RAM")]] std::array<int, 200> segments_bram;
 
-  [[intel::max_replicates(4)]] std::array<float, 100> vals_bram;
+  [[intel::max_replicates(4)]] std::array<float, 200> vals_bram;
 
   //#pragma unroll
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < nParams; i++) {
     segments_bram[i] = segments[i];
     vals_bram[i] = vals[i];
   }
@@ -202,11 +206,13 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     #elif FPGA_HARDWARE
       auto selector = sycl::ext::intel::fpga_selector_v;
     #elif FPGA_EMULATOR
+      std::cout<<"CHECK!!! FPGA_EMULATOR active"<<std::endl;
       auto selector = sycl::ext::intel::fpga_emulator_selector_v;
     #else
       auto selector = sycl::default_selector{};
     #endif
 
+    std::cout<<"CHECK!!! USE_FPGA active"<<std::endl;
     queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
     //queue = sycl::queue(sycl::default_selector{});
     //segments = sycl::malloc_shared<short int>(nParams, queue);
@@ -1146,27 +1152,28 @@ void SMonolith::Evaluate() {
   FindSplineSegment();
 
   #ifdef USE_FPGA
-    int Nsegments = 10;
-    for (int i = 0; i < NSplines_valid; i++) {
-      cpu_spline_handler->param_n_knots[2*i] = i % Nsegments;
-      cpu_spline_handler->param_n_knots[2*i+1] = i % Nsegments;
-      cpu_spline_handler->coeff_many[i] = i % Nsegments;
-      cpu_spline_handler->coeff_x[i] = i % Nsegments;
-    }
+    // int Nsegments = 10;
+    // for (int i = 0; i < NSplines_valid; i++) {
+    //   cpu_spline_handler->param_n_knots[2*i] = i % Nsegments;
+    //   cpu_spline_handler->param_n_knots[2*i+1] = i % Nsegments;
+    //   cpu_spline_handler->coeff_many[i] = i % Nsegments;
+    //   cpu_spline_handler->coeff_x[i] = i % Nsegments;
+    // }
 
-    for (int i = 0; i < nParams; i++) {
-          segments[i] = 1;
-          vals[i] = 1;
+    // for (int i = 0; i < nParams; i++) {
+    //       segments[i] = 1;
+    //       vals[i] = 1;
 
-    }
+    // }
 
 
-    for (int i = 0; i < NSplines_valid / 4; i++) {
-      cpu_total_weights[i] = 1;
-    }
+    // for (int i = 0; i < NSplines_valid / 4; i++) {
+    //   cpu_total_weights[i] = 1;
+    // }
 
 
     struct OptimizedKernel {
+      int nParams;
       unsigned int NSplines_valid;
       int *param_n_knots;
       short *segments;
@@ -1179,7 +1186,8 @@ void SMonolith::Evaluate() {
         sycl::ext::intel::experimental::task_sequence<FPGACalcSplineWeights> task_a;
         sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_b;
 
-        task_a.async(NSplines_valid,
+        task_a.async(nParams,
+                     NSplines_valid,
                      param_n_knots,
                      segments,
                      coeff_many,
@@ -1189,7 +1197,8 @@ void SMonolith::Evaluate() {
       }
     };
     // Call the kernel
-    auto e = queue.single_task<IDOptimized>(OptimizedKernel{NSplines_valid,
+    auto e = queue.single_task<IDOptimized>(OptimizedKernel{nParams,
+                                                            NSplines_valid,
                                                             cpu_spline_handler->param_n_knots,
                                                             segments,
                                                             cpu_spline_handler->coeff_many,
