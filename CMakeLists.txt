@@ -96,13 +96,12 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wunused                # Warn on anything being unused
   -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
   -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
-  -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
   -Wnull-dereference      # Warn if a null dereference is detected (only in GCC >= 6.0)
   -Wold-style-cast        # Warn for c-style casts
   -Wconversion            # Warn on type conversions that may lose data
   -Wformat-security       # Warn on functions that are potentially insecure for formatting
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
-  -Wswitch-enum          # Warn if a `switch` statement on an enum does not cover all values
+  -Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
@@ -112,8 +111,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
+    -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
   )
 endif()
+
+# KS: Clang is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(MaCh3_WERROR_ENABLED FALSE)
+endif()
+
 if(MaCh3_WERROR_ENABLED)
 target_compile_options(MaCh3Warnings INTERFACE
   -Werror                # Treat Warnings as Errors
@@ -149,13 +155,18 @@ else()
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
-    -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
     #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
     # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
     #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
+  # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(MaCh3CompilerOptions INTERFACE
+      -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    )
+  endif()
   #KS: add Link-Time Optimization (LTO)
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
@@ -169,6 +180,11 @@ if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
+  # KS: Not a clue why clang need different...
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  endif()
+
 endif()
 
 if(CPU_ONLY)
