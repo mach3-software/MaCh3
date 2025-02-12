@@ -58,7 +58,7 @@ void splineFDBase::cleanUpMemory() {
   }
   splinevec_Monolith.clear();
   splinevec_Monolith.shrink_to_fit();
-  if(isflatarray != nullptr) delete isflatarray;
+  if(isflatarray) delete [] isflatarray;
 }
 
 //****************************************
