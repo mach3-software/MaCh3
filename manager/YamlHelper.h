@@ -15,10 +15,10 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TMacro.h"
 #include "TList.h"
 #include "TObjString.h"
-_MaCh3_Safe_Include_End_ //}
 
 // yaml Includes
 #include "yaml-cpp/yaml.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
