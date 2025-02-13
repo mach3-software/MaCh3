@@ -281,7 +281,6 @@ public:
   std::vector<std::string> oscchan_flavnames_Latex;
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
-  std::vector<int> sample_vecno;
   std::vector<int> sample_nupdg;
   std::vector<int> sample_nupdgunosc;
 

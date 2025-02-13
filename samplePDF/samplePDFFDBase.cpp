@@ -69,13 +69,7 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   samplename = SampleManager->raw()["SampleName"].as<std::string>();
-  
-  if (!CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-    MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
-
+    
   if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
     MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -87,7 +81,6 @@ void samplePDFFDBase::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
-  MCSamples.resize(nSamples);
 
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "EqualBinningPerOscChannel")) {
     MACH3LOG_ERROR("NuOsc::EqualBinningPerOscChannel is not defined in {}, please add this!", SampleManager->GetFileName());
@@ -150,12 +143,14 @@ void samplePDFFDBase::ReadSampleConfig()
   std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
   std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
   
+  nSamples = static_cast<M3::int_t>(SampleManager->raw()["SubSamples"].size());
+  MCSamples.resize(nSamples);
+  
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
     oscchan_flavnames.push_back(osc_channel["Name"].as<std::string>());
     oscchan_flavnames_Latex.push_back(osc_channel["LatexName"].as<std::string>());
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
-    sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
     sample_nupdgunosc.push_back(static_cast<NuPDG>(osc_channel["nutype"].as<int>()));
     sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
   }
