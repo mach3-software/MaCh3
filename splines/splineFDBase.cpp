@@ -641,10 +641,11 @@ void splineFDBase::PrepForReweight() {
             break;
           }
         }//osc loop end
-	//ETA - only push back unique name if a non-flat response has been found
-	if(FoundNonFlatSpline){
-	  UniqueSystNames.push_back(SystName);
-	}
+        // ETA - only push back unique name if a non-flat response has been found
+        if (FoundNonFlatSpline)
+        {
+          UniqueSystNames.push_back(SystName);
+        }
 
         if (!FoundNonFlatSpline)
         {
@@ -679,7 +680,7 @@ void splineFDBase::PrepForReweight() {
     UniqueSystCurrSegment[iSpline] = 0;
     xVarArray[iSpline]=0;
   }
-  
+
   MACH3LOG_INFO("nUniqueSysts: {}", nUniqueSysts);
   MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", "Spline Index", "Syst Name", "nKnots");
   for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
@@ -807,6 +808,10 @@ void splineFDBase::PrintSampleDetails(std::string SampleName)
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
+  for (unsigned int iDim = 0; iDim < DimensionLabels[iSample].size(); iDim++)
+  {
+    MACH3LOG_INFO("\t DimensionLabels: {:<35}", DimensionLabels[iSample][iDim]);
+  }
   MACH3LOG_INFO("\t DetID: {:<35}", DetIDs[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
