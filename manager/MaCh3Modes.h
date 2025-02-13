@@ -21,6 +21,8 @@ struct MaCh3ModeInfo {
   std::string FancyName;
   /// Mapping between mode and generator integers
   std::vector<int> GeneratorMaping;
+  /// IsNC check
+  bool IsNC;
   /// @brief KS: Checks MaCh3 modes is associated with a given generator mode
   inline bool IsMode(const int GenMode) {
     bool exists = std::find(GeneratorMaping.begin(), GeneratorMaping.end(), GenMode) != GeneratorMaping.end();
@@ -49,6 +51,8 @@ class MaCh3Modes {
   std::string GetMaCh3ModeName(const int Index);
   /// @brief KS: Get fancy name of mode, if mode not known you will get UNKNOWN_BAD
   std::string GetMaCh3ModeFancyName(const int Index);
+  /// @brief DB: Get IsNC (a check whether the given MaCh3 corresponds to a Neutral Current mode)
+  bool IsMaCh3ModeNC(const int Index);
   /// @brief KS: Get MaCh3 mode from generator mode
   MaCh3Modes_t GetModeFromGenerator(const int Index);
   /// @brief Get class name
@@ -60,8 +64,9 @@ class MaCh3Modes {
 
   /// @brief KS: Add new mode
   inline void DeclareNewMode(std::string const &name,
-                      std::string const &fancyname,
-                      std::vector<int> const &GenMap);
+			     std::string const &fancyname,
+			     std::vector<int> const &GenMap,
+			     bool IsNC);
 
   /// @brief KS: Fill ModeMap
   inline void PrepareMap();
