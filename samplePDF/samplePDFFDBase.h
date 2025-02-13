@@ -30,6 +30,9 @@ public:
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
   std::string GetName() const {return samplename;}
 
+  std::string GetXBinVarName() {return XVarStr;}
+  std::string GetYBinVarName() {return YVarStr;}
+
   void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
   
   //===============================================================================
@@ -275,6 +278,7 @@ public:
   void InitialiseSplineObject();
 
   std::vector<std::string> oscchan_flavnames;
+  std::vector<std::string> oscchan_flavnames_Latex;
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
   std::vector<int> sample_vecno;

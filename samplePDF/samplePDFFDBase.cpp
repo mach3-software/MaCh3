@@ -120,7 +120,7 @@ void samplePDFFDBase::ReadSampleConfig()
   SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
   if(YVarStr.length() > 0){
     if(XVarStr.length() == 0){
-      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+      MACH3LOG_ERROR("Please specify an Y-variable string in sample config {}", SampleManager->GetFileName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     nDimensions++;
@@ -151,7 +151,8 @@ void samplePDFFDBase::ReadSampleConfig()
   std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
   
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-    oscchan_flavnames.push_back(osc_channel["name"].as<std::string>());
+    oscchan_flavnames.push_back(osc_channel["Name"].as<std::string>());
+    oscchan_flavnames_Latex.push_back(osc_channel["LatexName"].as<std::string>());
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
     sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
@@ -1488,6 +1489,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   
   fdobj->nEvents = nEvents_;
   fdobj->flavourName = oscchan_flavnames[iSample];
+  fdobj->flavourName_Latex = oscchan_flavnames_Latex[iSample];
   fdobj->ChannelIndex = iSample;
   
   int nEvents = fdobj->nEvents;
@@ -1863,9 +1865,7 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   for (int i=0;i<getNMCSamples();i++) {
     table_headings += fmt::format(" {:<17} |", MCSamples[i].flavourName);
     table_footline += "--------------------";
-    //DB TODO: Fix
-    //if (printToFile) {outfile << "&" << std::setw(space) << MaCh3Utils::SKSampleName_toLatexString(MCSamples[i].flavourName) << " ";}
-    if (printToFile) {outfile << "&" << std::setw(space) << MCSamples[i].flavourName << " ";}
+    if (printToFile) {outfile << "&" << std::setw(space) << MCSamples[i].flavourName_Latex << " ";}
     if (printToCSV)  {outcsv << MCSamples[i].flavourName << ",";}
   }
   if (printToFile) {outfile << "&" << std::setw(space) << "Total:" << "\\\\ \\hline" << std::endl;}
@@ -1952,26 +1952,22 @@ std::vector<TH1*> samplePDFFDBase::ReturnHistsBySelection1D(std::string Kinemati
     iMax = getNMCSamples();
   }
   if (iMax == -1) {
-    //DB TODO FIX
-    throw;
+    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   for (int i=0;i<iMax;i++) {
     if (Selection1==0) {
       hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
+
+      hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
+      hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
     if (Selection1==1) {
       hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(MCSamples[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
-
-    //DB TODO FIX
-    /*
-    hHistList[i]->SetFillColor(MaCh3ModeColor(i));
-    hHistList[i]->SetLineColor(MaCh3ModeColor(i));
-    */
-    
   }
 
   return hHistList;
@@ -1988,8 +1984,8 @@ std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string Kinemati
     iMax = getNMCSamples();
   }
   if (iMax == -1) {
-    //DB TODO FIX
-    throw;
+    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   for (int i=0;i<iMax;i++) {
@@ -1999,13 +1995,6 @@ std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string Kinemati
     if (Selection1==1) {
       hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
     }
-
-    //DB TODO FIX
-    /*
-    hHistList[i]->SetFillColor(MaCh3ModeColor(i));
-    hHistList[i]->SetLineColor(MaCh3ModeColor(i));
-    */
-    
   }
 
   return hHistList;

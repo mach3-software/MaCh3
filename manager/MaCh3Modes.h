@@ -19,6 +19,8 @@ struct MaCh3ModeInfo {
   std::string Name;
   /// Mode fancy name
   std::string FancyName;
+  /// Mode color for plotting purposes
+  int PlotColor;
   /// Mapping between mode and generator integers
   std::vector<int> GeneratorMaping;
   /// IsNC check
@@ -49,6 +51,8 @@ class MaCh3Modes {
   MaCh3Modes_t GetMode(const std::string& name);
   /// @brief KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD
   std::string GetMaCh3ModeName(const int Index);
+  /// @brief KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD
+  int GetMaCh3ModePlotColor(const int Index);
   /// @brief KS: Get fancy name of mode, if mode not known you will get UNKNOWN_BAD
   std::string GetMaCh3ModeFancyName(const int Index);
   /// @brief DB: Get IsNC (a check whether the given MaCh3 corresponds to a Neutral Current mode)
@@ -65,6 +69,7 @@ class MaCh3Modes {
   /// @brief KS: Add new mode
   inline void DeclareNewMode(std::string const &name,
 			     std::string const &fancyname,
+			     int PlotColor,
 			     std::vector<int> const &GenMap,
 			     bool IsNC);
 

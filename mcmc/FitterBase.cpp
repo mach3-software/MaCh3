@@ -16,9 +16,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
   //Get mach3 modes from manager
 
-  //DB TODO: Fix
-  //Modes = fitMan->GetMaCh3Modes();
-  
   random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
@@ -1022,11 +1019,10 @@ void FitterBase::RunSigmaVar() {
 
   outputFile->cd();
 
-  //DB TODO: Fix Modes
   //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
   constexpr int nRelevantModes = 2;
-  MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
+
   bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false, __FILE__ , __LINE__);
 
   //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
@@ -1165,16 +1161,21 @@ void FitterBase::RunSigmaVar() {
             //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
             if (DoByMode)
             {
+	      //KS: this is only relevant if PlotByMode is turned on
+	      //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+	      MaCh3Modes_t RelevantModes[nRelevantModes] = {samples[ivs]->GetMaCh3Modes()->GetMode("CCQE"), samples[ivs]->GetMaCh3Modes()->GetMode("2p2h")};
+	      
               sigmaArray_mode_x[j][SampleIterator] = new TH1D*[nRelevantModes]();
               sigmaArray_mode_y[j][SampleIterator] = new TH1D*[nRelevantModes]();
               // Now get the TH2D mode variations
               std::string mode_title_long;
+	      
               for(int ir = 0; ir < nRelevantModes; ir++)
               {
                 std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone()));
                 currSampMode->SetDirectory(nullptr);
 
-                mode_title_long = title_long + "_" + Modes->GetMaCh3ModeName(RelevantModes[ir]);
+                mode_title_long = title_long + "_" + samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir]);
                 currSampMode->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
                 dirArrySample[SampleIterator]->cd();
                 currSampMode->Write();
@@ -1264,21 +1265,25 @@ void FitterBase::RunSigmaVar() {
 
           //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
           if (DoByMode)
-          {
-            for(int ir = 0; ir < nRelevantModes;ir++)
-            {
-              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
-              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
-
-              dirArrySample[SampleIterator]->cd();
-              var_mode_x->Write();
-              var_mode_y->Write();
-
-              delete var_mode_x;
-              delete var_mode_y;
-            } // end for nRelevantModes
-          } // end if mode
-
+	    {
+              //KS: this is only relevant if PlotByMode is turned on
+              //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+              MaCh3Modes_t RelevantModes[nRelevantModes] = {samples[ivs]->GetMaCh3Modes()->GetMode("CCQE"), samples[ivs]->GetMaCh3Modes()->GetMode("2p2h")};
+	      
+	      for(int ir = 0; ir < nRelevantModes;ir++)
+		{
+		  TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+		  TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
+		  
+		  dirArrySample[SampleIterator]->cd();
+		  var_mode_x->Write();
+		  var_mode_y->Write();
+		  
+		  delete var_mode_x;
+		  delete var_mode_y;
+		} // end for nRelevantModes
+	    } // end if mode
+	  
           SampleIterator++;
         }//End loop over samples(k)
       }//end looping over sample object

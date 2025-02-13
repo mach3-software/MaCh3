@@ -20,12 +20,14 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
   {
     DeclareNewMode(names[i],
 		   config[names[i]]["Name"].as<std::string>(),
+		   config[names[i]]["PlotColor"].as<int>(),
 		   config[names[i]]["GeneratorMaping"].as<std::vector<int>>(),
 		   config[names[i]]["IsNC"].as<bool>());
   }
   // Add unknown category, it's better to have garbage category where all undefined modes will go rather than get random crashes
   DeclareNewMode("UNKNOWN_BAD",
                  "UNKNOWN_BAD",
+		 -1,
                  {},
 		 false);
   // This is hack to not have bad mode
@@ -81,12 +83,14 @@ MaCh3Modes_t MaCh3Modes::EnsureModeNameRegistered(std::string const &name) {
 // *******************
 void MaCh3Modes::DeclareNewMode(std::string const &name,
 				std::string const &fancyname,
+				int PlotColor,
 				std::vector<int> const &GenMap,
 				bool IsNC) {
 // *******************
   MaCh3ModeInfo newinfo;
   newinfo.GeneratorMaping = GenMap;
   newinfo.FancyName = fancyname;
+  newinfo.PlotColor = PlotColor;
   newinfo.Name = name;
   newinfo.IsNC = IsNC;
 
@@ -195,4 +199,19 @@ MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
   }
 
   return ModeMap[Index];
+}
+
+// *******************
+int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) {
+// *******************
+  // return UNKNOWN_BAD if out of boundary
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
+
+  if(Index > NModes)
+  {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].PlotColor);
+    return fMode[NModes].PlotColor;
+  }
+  return fMode[Index].PlotColor;
 }
