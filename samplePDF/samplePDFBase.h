@@ -118,6 +118,4 @@ protected:
   TH2D*_hPDF2D;
 
   TRandom3* rnd;
-
-  double pot;
 };

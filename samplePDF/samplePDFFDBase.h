@@ -281,6 +281,8 @@ public:
   std::vector<int> sample_nupdg;
   std::vector<int> sample_nupdgunosc;
 
+  std::unordered_map<std::string, double> _modeNomWeightMap;
+  
   //===============================================================================
   //DB Miscellaneous Variables
   TLegend* THStackLeg;

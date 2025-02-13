@@ -176,6 +176,30 @@ void samplePDFFDBase::ReadSampleConfig()
     StoredSelection.push_back(SelectionVec);
   }
   NSelections = int(SelectionStr.size());
+
+  // EM: initialise the mode weight map
+  for( int iMode=0; iMode < Modes->GetNModes(); iMode++ ) {
+    _modeNomWeightMap[Modes->GetMaCh3ModeName(iMode)] = 1.0;
+  }
+
+  // EM: multiply by the nominal weight specified in the sample config file
+  if ( SampleManager->raw()["NominalWeights"] ) {
+    for( int iMode=0; iMode<Modes->GetNModes(); iMode++ ) {
+      std::string modeStr = Modes->GetMaCh3ModeName(iMode);
+      if( SampleManager->raw()["NominalWeights"][modeStr] ) {
+        double modeWeight = SampleManager->raw()["NominalWeights"][modeStr].as<double>();
+	_modeNomWeightMap[Modes->GetMaCh3ModeName(iMode)] *= modeWeight;
+      }
+    }
+  }
+
+  // EM: print em out
+  MACH3LOG_INFO("  Nominal mode weights to apply: ");
+  for( int iMode=0; iMode<Modes->GetNModes(); iMode++ ) {
+    std::string modeStr = Modes->GetMaCh3ModeName(iMode);
+    MACH3LOG_INFO("    - {}: {}", modeStr, _modeNomWeightMap.at(modeStr));
+  }
+
 }
 
 void samplePDFFDBase::Initialise() {
