@@ -462,13 +462,13 @@ void FitterBase::RunLLHScan() {
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotAllNDsamplesLLH = false;
-  if(fitMan->raw()["General"]["LLHScan"]["LLHScanBySample"])
-    PlotAllNDsamplesLLH = fitMan->raw()["General"]["LLHScan"]["LLHScanBySample"].as<bool>();
+  if(fitMan->raw()["LLHScan"]["LLHScanBySample"])
+    PlotAllNDsamplesLLH = fitMan->raw()["LLHScan"]["LLHScanBySample"].as<bool>();
 
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["General"]["LLHScan"]["LLHScanSkipVector"])
+  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["General"]["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
@@ -507,7 +507,7 @@ void FitterBase::RunLLHScan() {
     }
   }
   // Number of points we do for each LLH scan
-  const int n_points = GetFromManager<int>(fitMan->raw()["General"]["LLHScan"]["LLHScanPoints"], 100, __FILE__ , __LINE__);
+  const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 100, __FILE__ , __LINE__);
 
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
