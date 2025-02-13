@@ -117,7 +117,7 @@ If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. T
 ```bash
 cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON
 ```
-You can specify more than one engine, and MaCh3 support different engines for different samples. 
+You can specify more than one engine, and MaCh3 support different engines for different samples.
 For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.
 
 ## Fitting algorithms
