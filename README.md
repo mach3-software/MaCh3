@@ -100,7 +100,7 @@ cmake ../ -DMaCh3_GPU_ENABLED=OFF
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
 ## Oscillator
-MaCh3 uses several neutrino oscillation calculators.
+MaCh3 has access to several neutrino oscillation calculators via [NuOscillator](https://github.com/dbarrow257/NuOscillator/tree/main) framework.
 
 Following neutrino oscillation calculators are available:
 |Oscillator        | Hardware   | Source     | Reference  |
@@ -115,9 +115,10 @@ Following neutrino oscillation calculators are available:
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
-cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON
 ```
-You can only specify engines you want to use, and you can in principle use more than one.
+You can specify more than one engine, and MaCh3 support different engines for different samples. 
+For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.
 
 ## Fitting algorithms
 The following fitting algorithms are available:
