@@ -27,6 +27,7 @@ jobs:
           # Clone the MaCh3Tutorial repository with the current branch
           git clone --branch main https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
           cd MaCh3Validations
+	  git checkout dbarrow257/feature/MoveSKFeaturesToCore
           mkdir build
           cd build
           # Configure the project with benchmark support enabled
