@@ -574,6 +574,22 @@ void FitterBase::RunLLHScan() {
       double prior = cov->getParInit(i);
       if (IsPCA) prior = cov->getParCurr_PCA(i);
 
+      // Get the covariance matrix and do the +/- nSigma
+      double nSigma = 1;
+      if (IsPCA) nSigma = 0.5;
+      // Set lower and upper bounds relative the prior
+      lower = prior - nSigma*cov->getDiagonalError(i);
+      upper = prior + nSigma*cov->getDiagonalError(i);
+      // If PCA, transform these parameter values to the PCA basis
+      if (IsPCA) {
+        lower = prior - nSigma*std::sqrt((cov->getEigenValues())(i));
+        upper = prior + nSigma*std::sqrt((cov->getEigenValues())(i));
+        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(i));
+        MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
+        MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
+        MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
+        MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+      }  
       // Implementation suggested by D. Barrow  
       // If param ranges are specified in scanRanges node, extract it from there 
       if(isScanRanges){
@@ -585,24 +601,6 @@ void FitterBase::RunLLHScan() {
           MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
           MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
         }
-      }
-      else{ // Otherwise, obtain it by default relative to the param's prior and error.
-        // Get the covariance matrix and do the +/- nSigma
-        double nSigma = 1;
-        if (IsPCA) nSigma = 0.5;
-        // Set lower and upper bounds relative the prior
-        lower = prior - nSigma*cov->getDiagonalError(i);
-        upper = prior + nSigma*cov->getDiagonalError(i);
-        // If PCA, transform these parameter values to the PCA basis
-        if (IsPCA) {
-          lower = prior - nSigma*std::sqrt((cov->getEigenValues())(i));
-          upper = prior + nSigma*std::sqrt((cov->getEigenValues())(i));
-          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(i));
-          MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
-          MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
-          MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
-          MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-        }  
       }
       
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
