@@ -512,7 +512,7 @@ void FitterBase::RunLLHScan() {
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
 
-  //YSP: Set up a mapping to store parameters with user-specified ranges
+  //YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   std::map<std::string, std::vector<double>> scanRanges;
   for (const auto& params : fitMan->raw()["LLHScan"]["ScanRanges"]) {
     for (auto it = params.begin(); it != params.end(); ++it) {
@@ -569,6 +569,7 @@ void FitterBase::RunLLHScan() {
       double prior = cov->getParInit(i);
       if (IsPCA) prior = cov->getParCurr_PCA(i);
 
+      // Implementation suggested by D. Barrow  
       // If param ranges are specified in scanRanges node, extract it from there 
       if(isScanRanges){
         for (const auto& scanRange : scanRanges) {
