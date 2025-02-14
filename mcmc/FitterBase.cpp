@@ -528,7 +528,9 @@ void FitterBase::RunLLHScan() {
       scanRanges[param_name] = param_range;
     }
   }
+  bool isScanRanges = true; 
   if(scanRanges.empty()){
+    isScanRanges = false;
     MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
   }
 
@@ -564,17 +566,19 @@ void FitterBase::RunLLHScan() {
       double lower;
       double upper;
 
-      // Check if the parameter name matches with the one whose range is specified
-      bool rangefound = false;
-      for (const auto& [param_name, param_range] : scanRanges) {
-        if(param_name == name){
-          lower = param_range[0];
-          upper = param_range[1];
-          rangefound = true;
-          break; // Break out of the loop if you already found matching param names
+      // If param ranges are specified in scanRanges node, extract it from there 
+      if(isScanRanges){
+        for (const auto& [param_name, param_range] : scanRanges) {
+          if(param_name == name){
+            lower = param_range[0];
+            upper = param_range[1];
+            break; // Break out of the loop if you already found matching param names
+          }
         }
+        MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
+        MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
       }
-      if(!rangefound){ // If no user-defined ranges are specified, obtain them from prior and errors
+      else{ // Otherwise, obtain it by default relative to the param's prior and error.
         // Get the parameter priors and bounds
         double prior = cov->getParInit(i);
         if (IsPCA) prior = cov->getParCurr_PCA(i);
@@ -594,7 +598,7 @@ void FitterBase::RunLLHScan() {
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-        }  
+        }   
       }
       
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
