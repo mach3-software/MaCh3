@@ -514,7 +514,7 @@ void FitterBase::RunLLHScan() {
 
   //YSP: Set up a mapping to store parameters with user-specified ranges
   std::map<std::string, std::vector<double>> scanRanges;
-  for (const auto& params : config["LLHScanApp"]["ScanRanges"]) {
+  for (const auto& params : fitMan->raw()["LLHScan"]["ScanRanges"]) {
     for (auto it = params.begin(); it != params.end(); ++it) {
       std::string param_name = it->first.as<std::string>();
       std::vector<std::string> raw_values = it->second.as<std::vector<std::string>>();
@@ -522,7 +522,7 @@ void FitterBase::RunLLHScan() {
       // Extract parameter ranges
       std::vector<double> param_range;
       for (const std::string& val : raw_values) {
-        values.push_back(std::stod(val));
+        param_range.push_back(std::stod(val));
       }
       // Set the mapping as param_name:param_range
       scanRanges[param_name] = param_range;
@@ -565,6 +565,9 @@ void FitterBase::RunLLHScan() {
       // Set the parameter ranges between which LLH points are scanned  
       double lower;
       double upper;
+      // Get the parameter priors and bounds
+      double prior = cov->getParInit(i);
+      if (IsPCA) prior = cov->getParCurr_PCA(i);
 
       // If param ranges are specified in scanRanges node, extract it from there 
       if(isScanRanges){
@@ -579,10 +582,6 @@ void FitterBase::RunLLHScan() {
         MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
       }
       else{ // Otherwise, obtain it by default relative to the param's prior and error.
-        // Get the parameter priors and bounds
-        double prior = cov->getParInit(i);
-        if (IsPCA) prior = cov->getParCurr_PCA(i);
-
         // Get the covariance matrix and do the +/- nSigma
         double nSigma = 1;
         if (IsPCA) nSigma = 0.5;
@@ -598,7 +597,7 @@ void FitterBase::RunLLHScan() {
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-        }   
+        }  
       }
       
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
@@ -783,7 +782,7 @@ void FitterBase::RunLLHScan() {
     delete Cov_LLH[ivc];
   }
 
-  for(unsigned int ivs = 0; ivs < samples.size(); +ivs )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
     SampleClass_LLH[ivs]->Write();
     delete SampleClass_LLH[ivs];
