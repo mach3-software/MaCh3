@@ -571,7 +571,9 @@ void FitterBase::RunLLHScan() {
 
       // If param ranges are specified in scanRanges node, extract it from there 
       if(isScanRanges){
-        for (const auto& [param_name, param_range] : scanRanges) {
+        for (const auto& scanRange : scanRanges) {
+          const std::string& param_name = scanRange.first;
+          const std::vector<double>& param_range = scanRange.second;
           if(param_name == name){
             lower = param_range[0];
             upper = param_range[1];
