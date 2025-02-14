@@ -514,18 +514,13 @@ void FitterBase::RunLLHScan() {
 
   //YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   std::map<std::string, std::vector<double>> scanRanges;
-  for (const auto& params : fitMan->raw()["LLHScan"]["ScanRanges"]) {
-    for (auto it = params.begin(); it != params.end(); ++it) {
-      std::string par_name = it->first.as<std::string>();
-      std::vector<std::string> raw_values = it->second.as<std::vector<std::string>>();
-
-      // Extract parameter ranges
-      std::vector<double> par_range;
-      for (const std::string& val : raw_values) {
-        par_range.push_back(std::stod(val));
-      }
+  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
+    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
+    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
+      std::string itname = it->first.as<std::string>();
+      std::vector<double> itrange = it->second.as<std::vector<double>>();
       // Set the mapping as param_name:param_range
-      scanRanges[par_name] = par_range;
+      scanRanges[itname] = itrange;
     }
   }
   // Having an std::map of special params and their specified ranges works.
