@@ -512,6 +512,26 @@ void FitterBase::RunLLHScan() {
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
 
+  //YSP: Set up a mapping to store parameters with user-specified ranges
+  std::map<std::string, std::vector<double>> scanRanges;
+  for (const auto& params : config["LLHScanApp"]["ScanRanges"]) {
+    for (auto it = params.begin(); it != params.end(); ++it) {
+      std::string param_name = it->first.as<std::string>();
+      std::vector<std::string> raw_values = it->second.as<std::vector<std::string>>();
+
+      // Extract parameter ranges
+      std::vector<double> param_range;
+      for (const std::string& val : raw_values) {
+        values.push_back(std::stod(val));
+      }
+      // Set the mapping as param_name:param_range
+      scanRanges[param_name] = param_range;
+    }
+  }
+  if(scanRanges.empty()){
+    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
+  }
+
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
@@ -540,28 +560,45 @@ void FitterBase::RunLLHScan() {
       }
       if(skip) continue;
 
-      // Get the parameter priors and bounds
-      double prior = cov->getParInit(i);
-      if (IsPCA) prior = cov->getParCurr_PCA(i);
+      // Set the parameter ranges between which LLH points are scanned  
+      double lower;
+      double upper;
 
-      // Get the covariance matrix and do the +/- nSigma
-      double nSigma = 1;
-      if (IsPCA) nSigma = 0.5;
-      // Set lower and upper bounds relative the prior
-      double lower = prior - nSigma*cov->getDiagonalError(i);
-      double upper = prior + nSigma*cov->getDiagonalError(i);
-      // If PCA, transform these parameter values to the PCA basis
-      if (IsPCA) {
-        lower = prior - nSigma*std::sqrt((cov->getEigenValues())(i));
-        upper = prior + nSigma*std::sqrt((cov->getEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(i));
-        MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
-        MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
-        MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
-        MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+      // Check if the parameter name matches with the one whose range is specified
+      bool rangefound = false;
+      for (const auto& [param_name, param_range] : scanRanges) {
+        if(param_name == name){
+          lower = param_range[0];
+          upper = param_range[1];
+          rangefound = true;
+          break; // Break out of the loop if you already found matching param names
+        }
       }
+      if(!rangefound){ // If no user-defined ranges are specified, obtain them from prior and errors
+        // Get the parameter priors and bounds
+        double prior = cov->getParInit(i);
+        if (IsPCA) prior = cov->getParCurr_PCA(i);
 
+        // Get the covariance matrix and do the +/- nSigma
+        double nSigma = 1;
+        if (IsPCA) nSigma = 0.5;
+        // Set lower and upper bounds relative the prior
+        lower = prior - nSigma*cov->getDiagonalError(i);
+        upper = prior + nSigma*cov->getDiagonalError(i);
+        // If PCA, transform these parameter values to the PCA basis
+        if (IsPCA) {
+          lower = prior - nSigma*std::sqrt((cov->getEigenValues())(i));
+          upper = prior + nSigma*std::sqrt((cov->getEigenValues())(i));
+          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(i));
+          MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
+          MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
+          MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
+          MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+        }  
+      }
+      
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
+      // This also applies for other parameters like osc, etc.
       if (lower < cov->GetLowerBound(i)) {
         lower = cov->GetLowerBound(i);
       }
