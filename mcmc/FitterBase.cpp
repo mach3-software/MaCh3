@@ -580,12 +580,11 @@ void FitterBase::RunLLHScan() {
         // Find matching entries through std::maps
         auto it = scanRanges.find(name);
         if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
-            lower = it->second[0];
-            upper = it->second[1];
+          lower = it->second[0];
+          upper = it->second[1];
+          MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
+          MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
         }
-
-        MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
-        MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
       }
       else{ // Otherwise, obtain it by default relative to the param's prior and error.
         // Get the covariance matrix and do the +/- nSigma
