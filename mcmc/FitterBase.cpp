@@ -577,15 +577,13 @@ void FitterBase::RunLLHScan() {
       // Implementation suggested by D. Barrow  
       // If param ranges are specified in scanRanges node, extract it from there 
       if(isScanRanges){
-        for (const auto& scanRange : scanRanges) {
-          const std::string& param_name = scanRange.first;
-          const std::vector<double>& param_range = scanRange.second;
-          if(param_name == name){
-            lower = param_range[0];
-            upper = param_range[1];
-            break; // Break out of the loop if you already found matching param names
-          }
+        // Find matching entries through std::maps
+        auto it = scanRanges.find(name);
+        if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+            lower = it->second[0];
+            upper = it->second[1];
         }
+
         MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
         MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
       }
