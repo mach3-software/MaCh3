@@ -530,7 +530,7 @@ void FitterBase::RunLLHScan() {
   }*/
   // I want to test if this actually works inside the cov:param loop later on
   std::string par_name = "delta_cp";
-  std::vector<double> par_range = {-1.0,1.0};
+  std::vector<double> par_range = {-3.14,3.14};
   scanRanges[par_name] = par_range;
 
   bool isScanRanges = true; 
