@@ -514,7 +514,7 @@ void FitterBase::RunLLHScan() {
 
   //YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   std::map<std::string, std::vector<double>> scanRanges;
-  for (const auto& params : fitMan->raw()["LLHScan"]["ScanRanges"]) {
+  /*for (const auto& params : fitMan->raw()["LLHScan"]["ScanRanges"]) {
     for (auto it = params.begin(); it != params.end(); ++it) {
       std::string param_name = it->first.as<std::string>();
       std::vector<std::string> raw_values = it->second.as<std::vector<std::string>>();
@@ -527,7 +527,12 @@ void FitterBase::RunLLHScan() {
       // Set the mapping as param_name:param_range
       scanRanges[param_name] = param_range;
     }
-  }
+  }*/
+  // I want to test if this actually works inside the cov:param loop later on
+  std::string param_name = "delta_cp";
+  std::vector<double> param_range = {-1.0,1.0};
+  scanRanges[param_name] = param_range;
+
   bool isScanRanges = true; 
   if(scanRanges.empty()){
     isScanRanges = false;
