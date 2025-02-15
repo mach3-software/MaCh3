@@ -512,8 +512,9 @@ void FitterBase::RunLLHScan() {
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
 
-  //YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   std::map<std::string, std::vector<double>> scanRanges;
+  bool isScanRanges = false;
   if(fitMan->raw()["LLHScan"]["ScanRanges"]){
     YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
     for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
@@ -522,18 +523,11 @@ void FitterBase::RunLLHScan() {
       // Set the mapping as param_name:param_range
       scanRanges[itname] = itrange;
     }
-  }
-  // Having an std::map of special params and their specified ranges works.
-  /*std::string par_name = "delta_cp";
-  std::vector<double> par_range = {-3.14,3.14};
-  scanRanges[par_name] = par_range;*/
-
-  bool isScanRanges = true; 
-  if(scanRanges.empty()){
-    isScanRanges = false;
+    isScanRanges = true;
+  } else {
     MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
   }
-
+   
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
