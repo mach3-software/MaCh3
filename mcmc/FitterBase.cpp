@@ -600,7 +600,7 @@ void FitterBase::RunLLHScan() {
       if (upper > cov->GetUpperBound(i)) {
         upper = cov->GetUpperBound(i);
       }
-      MACH3LOG_INFO("Scanning {} with {} steps, from {:.2f} - {:.2f}, prior = {:.2f}", name, n_points, lower, upper, prior);
+      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
       auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
