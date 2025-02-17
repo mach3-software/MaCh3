@@ -99,8 +99,11 @@ Collaboration diagram for PySplineBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classPySplineBase__coll__graph.png" border="0" usemap="#aPySplineBase_coll__map" alt="Collaboration graph"/></div>
 <map name="aPySplineBase_coll__map" id="aPySplineBase_coll__map">
-<area shape="rect" title=" " alt="" coords="5,79,116,104"/>
-<area shape="rect" href="classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="13,5,108,31"/>
+<area shape="rect" title=" " alt="" coords="56,344,167,369"/>
+<area shape="rect" href="classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="64,269,159,295"/>
+<area shape="rect" title=" " alt="" coords="5,181,217,207"/>
+<area shape="rect" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="55,93,168,119"/>
+<area shape="rect" title=" " alt="" coords="16,5,207,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -112,9 +115,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a00fe8ae11d3ca09811cfcf8affd66262"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#a00fe8ae11d3ca09811cfcf8affd66262">GetName</a> () const override</td></tr>
 <tr class="memdesc:a00fe8ae11d3ca09811cfcf8affd66262"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get class name.  <br /></td></tr>
 <tr class="separator:a00fe8ae11d3ca09811cfcf8affd66262"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0654b19ddbc23d80db808c3da65259a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#a0654b19ddbc23d80db808c3da65259a8">FindSplineSegment</a> () override</td></tr>
-<tr class="memdesc:a0654b19ddbc23d80db808c3da65259a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW:Code used in step by step reweighting, Find Spline Segment for each param.  <br /></td></tr>
-<tr class="separator:a0654b19ddbc23d80db808c3da65259a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0589f9189764287f84b61b89fc1a4c1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f">FindSplineSegment</a> ()</td></tr>
+<tr class="separator:a0589f9189764287f84b61b89fc1a4c1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19f9f443bcc72d5d038a822a088bc036"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#a19f9f443bcc72d5d038a822a088bc036">CalcSplineWeights</a> () override</td></tr>
 <tr class="memdesc:a19f9f443bcc72d5d038a822a088bc036"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU based code which eval weight for each spline.  <br /></td></tr>
 <tr class="separator:a19f9f443bcc72d5d038a822a088bc036"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,13 +139,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2e1534f622ae1976b21df1ebf984eec5 inherit pub_methods_classSplineBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a2e1534f622ae1976b21df1ebf984eec5">GetName</a> () const</td></tr>
 <tr class="memdesc:a2e1534f622ae1976b21df1ebf984eec5 inherit pub_methods_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get class name.  <br /></td></tr>
 <tr class="separator:a2e1534f622ae1976b21df1ebf984eec5 inherit pub_methods_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af825e2661f4a52c146973edf35de9afb inherit pub_methods_classSplineBase"><td class="memItemLeft" align="right" valign="top">short int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#af825e2661f4a52c146973edf35de9afb">GetNParams</a> () const</td></tr>
+<tr class="memdesc:af825e2661f4a52c146973edf35de9afb inherit pub_methods_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get number of spline parameters.  <br /></td></tr>
+<tr class="separator:af825e2661f4a52c146973edf35de9afb inherit pub_methods_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_classSplineBase"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classSplineBase')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classSplineBase.html">SplineBase</a></td></tr>
-<tr class="memitem:ae18e490295762416c8627d2db11ee98d inherit pro_methods_classSplineBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ae18e490295762416c8627d2db11ee98d">FindSplineSegment</a> ()=0</td></tr>
-<tr class="memdesc:ae18e490295762416c8627d2db11ee98d inherit pro_methods_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW:Code used in step by step reweighting, Find Spline Segment for each param.  <br /></td></tr>
-<tr class="separator:ae18e490295762416c8627d2db11ee98d inherit pro_methods_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a589011b547ff70262ed43021a016ef30 inherit pro_methods_classSplineBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a589011b547ff70262ed43021a016ef30">FindSplineSegment</a> ()</td></tr>
+<tr class="memdesc:a589011b547ff70262ed43021a016ef30 inherit pro_methods_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW:Code used in step by step reweighting, Find Spline Segment for each param.  <br /></td></tr>
+<tr class="separator:a589011b547ff70262ed43021a016ef30 inherit pro_methods_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ceacf5fee1fc8438501582bef93a9b5 inherit pro_methods_classSplineBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a1ceacf5fee1fc8438501582bef93a9b5">CalcSplineWeights</a> ()=0</td></tr>
 <tr class="memdesc:a1ceacf5fee1fc8438501582bef93a9b5 inherit pro_methods_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU based code which eval weight for each spline.  <br /></td></tr>
 <tr class="separator:a1ceacf5fee1fc8438501582bef93a9b5 inherit pro_methods_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,6 +158,17 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:ac8a5f86ac6f156a7e11ef188b06f425f inherit pro_methods_classSplineBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ac8a5f86ac6f156a7e11ef188b06f425f">getTF1Coeff</a> (<a class="el" href="classTF1__red.html">TF1_red</a> *&amp;spl, int &amp;nPoints, float *&amp;coeffs)</td></tr>
 <tr class="memdesc:ac8a5f86ac6f156a7e11ef188b06f425f inherit pro_methods_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Gets the polynomial coefficients for TF1.  <br /></td></tr>
 <tr class="separator:ac8a5f86ac6f156a7e11ef188b06f425f inherit pro_methods_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classSplineBase"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classSplineBase')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classSplineBase.html">SplineBase</a></td></tr>
+<tr class="memitem:a9452897aecfe016466543dfe19c0628b inherit pro_attribs_classSplineBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structFastSplineInfo.html">FastSplineInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a></td></tr>
+<tr class="separator:a9452897aecfe016466543dfe19c0628b inherit pro_attribs_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a938e3a60326137037f868b9930e2a972 inherit pro_attribs_classSplineBase"><td class="memItemLeft" align="right" valign="top">short int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a></td></tr>
+<tr class="separator:a938e3a60326137037f868b9930e2a972 inherit pro_attribs_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0b1d3a1adf7cffa7e74581bc7d58d4c inherit pro_attribs_classSplineBase"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a></td></tr>
+<tr class="memdesc:aa0b1d3a1adf7cffa7e74581bc7d58d4c inherit pro_attribs_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store parameter values they are not in <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment.">FastSplineInfo</a> as in case of GPU we need to copy paste it to GPU.  <br /></td></tr>
+<tr class="separator:aa0b1d3a1adf7cffa7e74581bc7d58d4c inherit pro_attribs_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2165b057a0125a28d96f247ca8680b42 inherit pro_attribs_classSplineBase"><td class="memItemLeft" align="right" valign="top">short int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a></td></tr>
+<tr class="memdesc:a2165b057a0125a28d96f247ca8680b42 inherit pro_attribs_classSplineBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of parameters that have splines.  <br /></td></tr>
+<tr class="separator:a2165b057a0125a28d96f247ca8680b42 inherit pro_attribs_classSplineBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
@@ -239,8 +255,8 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a0654b19ddbc23d80db808c3da65259a8" name="a0654b19ddbc23d80db808c3da65259a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0654b19ddbc23d80db808c3da65259a8">&#9670;&#160;</a></span>FindSplineSegment()</h2>
+<a id="a0589f9189764287f84b61b89fc1a4c1f" name="a0589f9189764287f84b61b89fc1a4c1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0589f9189764287f84b61b89fc1a4c1f">&#9670;&#160;</a></span>FindSplineSegment()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -257,25 +273,21 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>CW:Code used in step by step reweighting, Find Spline Segment for each param. </p>
-
-<p>Implements <a class="el" href="classSplineBase.html#ae18e490295762416c8627d2db11ee98d">SplineBase</a>.</p>
-
 <p class="definition">Definition at line <a class="el" href="splines_8cpp_source.html#l00043">43</a> of file <a class="el" href="splines_8cpp_source.html">splines.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   43</span>                                      {</div>
+<div class="fragment"><div class="line"><span class="lineno">   43</span>                             {</div>
 <div class="line"><span class="lineno">   44</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
 <div class="line"><span class="lineno">   45</span>            <span class="keywordtype">void</span>,             <span class="comment">/* Return type */</span></div>
 <div class="line"><span class="lineno">   46</span>            <a class="code hl_class" href="classSplineBase.html">SplineBase</a>,       <span class="comment">/* Parent class */</span></div>
 <div class="line"><span class="lineno">   47</span>            <span class="stringliteral">&quot;find_segment&quot;</span>,   <span class="comment">/* Name in python*/</span></div>
-<div class="line"><span class="lineno">   48</span>            <a class="code hl_function" href="classPySplineBase.html#a0654b19ddbc23d80db808c3da65259a8">FindSplineSegment</a> <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   48</span>            <a class="code hl_function" href="classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f">FindSplineSegment</a> <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
 <div class="line"><span class="lineno">   49</span>        );</div>
 <div class="line"><span class="lineno">   50</span>    }</div>
-<div class="ttc" id="aclassPySplineBase_html_a0654b19ddbc23d80db808c3da65259a8"><div class="ttname"><a href="classPySplineBase.html#a0654b19ddbc23d80db808c3da65259a8">PySplineBase::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment() override</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="splines_8cpp_source.html#l00043">splines.cpp:43</a></div></div>
+<div class="ttc" id="aclassPySplineBase_html_a0589f9189764287f84b61b89fc1a4c1f"><div class="ttname"><a href="classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f">PySplineBase::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment()</div><div class="ttdef"><b>Definition:</b> <a href="splines_8cpp_source.html#l00043">splines.cpp:43</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -379,8 +391,13 @@ Additional Inherited Members</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00029">29</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    7</span>                       {</div>
 <div class="line"><span class="lineno">    8</span><span class="comment">// *****************************************</span></div>
-<div class="line"><span class="lineno">    9</span> </div>
-<div class="line"><span class="lineno">   10</span>}</div>
+<div class="line"><span class="lineno">    9</span>  <a class="code hl_variable" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> = 0;</div>
+<div class="line"><span class="lineno">   10</span>  <a class="code hl_variable" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">   11</span>  <a class="code hl_variable" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">   12</span>}</div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00065">SplineBase.h:65</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00061">SplineBase.h:61</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00063">SplineBase.h:63</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -60,9 +60,8 @@ var searchData=
   ['processmcmc_57',['ProcessMCMC',['../ProcessMCMC_8cpp.html#a52c48199a4bcad577b88768020a91041',1,'ProcessMCMC():&#160;ProcessMCMC.cpp'],['../classFitterBase.html#a1dccdac8611e70c759c47a65f2b1aea7',1,'FitterBase::ProcessMCMC()']]],
   ['projecthist_58',['ProjectHist',['../classSampleSummary.html#af9277cfce437396a23e3fb22c55196f9',1,'SampleSummary']]],
   ['projectpoly_59',['ProjectPoly',['../classSampleSummary.html#a685a8ef3180d4f6474328b5c806d8b74',1,'SampleSummary']]],
-  ['proposestep_60',['proposeStep',['../classPyCovarianceBase.html#ab0aaac71243a7e4c26656412e15af48f',1,'PyCovarianceBase']]],
-  ['proposestep_61',['ProposeStep',['../classmcmc.html#aaf921343861cec8bb96beb2503b3fe2c',1,'mcmc']]],
-  ['proposestep_62',['proposeStep',['../classcovarianceBase.html#a95c7ca23995af579cfa7f199833fe24a',1,'covarianceBase::proposeStep()'],['../classcovarianceOsc.html#abb8df24417b380af9b96763b8abc6b2e',1,'covarianceOsc::proposeStep()']]],
-  ['pso_63',['PSO',['../classPSO.html#a14542152b9bd6e2e0f59c8ea1e1e890f',1,'PSO']]],
-  ['pybind11_5fmodule_64',['PYBIND11_MODULE',['../pyMaCh3_8cpp.html#a606010d5eeab87d7ab044ea295dd7522',1,'pyMaCh3.cpp']]]
+  ['proposestep_60',['ProposeStep',['../classmcmc.html#aaf921343861cec8bb96beb2503b3fe2c',1,'mcmc']]],
+  ['proposestep_61',['proposeStep',['../classcovarianceBase.html#a95c7ca23995af579cfa7f199833fe24a',1,'covarianceBase::proposeStep()'],['../classcovarianceOsc.html#abb8df24417b380af9b96763b8abc6b2e',1,'covarianceOsc::proposeStep()'],['../classPyCovarianceBase.html#ab0aaac71243a7e4c26656412e15af48f',1,'PyCovarianceBase::proposeStep()']]],
+  ['pso_62',['PSO',['../classPSO.html#a14542152b9bd6e2e0f59c8ea1e1e890f',1,'PSO']]],
+  ['pybind11_5fmodule_63',['PYBIND11_MODULE',['../pyMaCh3_8cpp.html#a606010d5eeab87d7ab044ea295dd7522',1,'pyMaCh3.cpp']]]
 ];

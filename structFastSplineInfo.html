@@ -91,6 +91,15 @@ $(function() {
  <a href="structFastSplineInfo.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SplineStructs_8h_source.html">splines/SplineStructs.h</a>&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for FastSplineInfo:</div>
+<div class="dyncontent">
+<div class="center"><img src="structFastSplineInfo__coll__graph.png" border="0" usemap="#aFastSplineInfo_coll__map" alt="Collaboration graph"/></div>
+<map name="aFastSplineInfo_coll__map" id="aFastSplineInfo_coll__map">
+<area shape="rect" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="44,93,157,119"/>
+<area shape="rect" title=" " alt="" coords="5,5,196,31"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -106,9 +115,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ac8538a8e3438ae06d8f467cc0fd5ce0d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#ac8538a8e3438ae06d8f467cc0fd5ce0d">nPts</a></td></tr>
 <tr class="memdesc:ac8538a8e3438ae06d8f467cc0fd5ce0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of points in spline.  <br /></td></tr>
 <tr class="separator:ac8538a8e3438ae06d8f467cc0fd5ce0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e9d432eb250bba227d31022ac9c5779"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a></td></tr>
-<tr class="memdesc:a9e9d432eb250bba227d31022ac9c5779"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of the knots positions.  <br /></td></tr>
-<tr class="separator:a9e9d432eb250bba227d31022ac9c5779"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76813a59f4a6fcef50f55d3c18733fcb"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#a76813a59f4a6fcef50f55d3c18733fcb">xPts</a></td></tr>
+<tr class="memdesc:a76813a59f4a6fcef50f55d3c18733fcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of the knots positions.  <br /></td></tr>
+<tr class="separator:a76813a59f4a6fcef50f55d3c18733fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80e4c1195099d2c34a1a511e4f749fe4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">CurrSegment</a></td></tr>
 <tr class="memdesc:a80e4c1195099d2c34a1a511e4f749fe4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration.  <br /></td></tr>
 <tr class="separator:a80e4c1195099d2c34a1a511e4f749fe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -149,14 +158,12 @@ Public Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00024">24</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   24</span>                   {</div>
 <div class="line"><span class="lineno">   25</span>    <a class="code hl_variable" href="structFastSplineInfo.html#ac8538a8e3438ae06d8f467cc0fd5ce0d">nPts</a> = -999;</div>
-<div class="line"><span class="lineno">   26</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">   27</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">CurrSegment</a> = 0;</div>
-<div class="line"><span class="lineno">   28</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">splineParsPointer</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">   29</span>  }</div>
-<div class="ttc" id="astructFastSplineInfo_html_a768e33415a2a6b50e9019d6a74fa5509"><div class="ttname"><a href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">FastSplineInfo::splineParsPointer</a></div><div class="ttdeci">const double * splineParsPointer</div><div class="ttdoc">Array of the knots positions.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00047">SplineStructs.h:47</a></div></div>
-<div class="ttc" id="astructFastSplineInfo_html_a80e4c1195099d2c34a1a511e4f749fe4"><div class="ttname"><a href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">FastSplineInfo::CurrSegment</a></div><div class="ttdeci">M3::int_t CurrSegment</div><div class="ttdoc">Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00044">SplineStructs.h:44</a></div></div>
-<div class="ttc" id="astructFastSplineInfo_html_a9e9d432eb250bba227d31022ac9c5779"><div class="ttname"><a href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">FastSplineInfo::xPts</a></div><div class="ttdeci">M3::float_t * xPts</div><div class="ttdoc">Array of the knots positions.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00041">SplineStructs.h:41</a></div></div>
-<div class="ttc" id="astructFastSplineInfo_html_ac8538a8e3438ae06d8f467cc0fd5ce0d"><div class="ttname"><a href="structFastSplineInfo.html#ac8538a8e3438ae06d8f467cc0fd5ce0d">FastSplineInfo::nPts</a></div><div class="ttdeci">M3::int_t nPts</div><div class="ttdoc">Number of points in spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00038">SplineStructs.h:38</a></div></div>
+<div class="line"><span class="lineno">   26</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">CurrSegment</a> = 0;</div>
+<div class="line"><span class="lineno">   27</span>    <a class="code hl_variable" href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">splineParsPointer</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">   28</span>  }</div>
+<div class="ttc" id="astructFastSplineInfo_html_a768e33415a2a6b50e9019d6a74fa5509"><div class="ttname"><a href="structFastSplineInfo.html#a768e33415a2a6b50e9019d6a74fa5509">FastSplineInfo::splineParsPointer</a></div><div class="ttdeci">const double * splineParsPointer</div><div class="ttdoc">Array of the knots positions.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00045">SplineStructs.h:45</a></div></div>
+<div class="ttc" id="astructFastSplineInfo_html_a80e4c1195099d2c34a1a511e4f749fe4"><div class="ttname"><a href="structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4">FastSplineInfo::CurrSegment</a></div><div class="ttdeci">M3::int_t CurrSegment</div><div class="ttdoc">Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00042">SplineStructs.h:42</a></div></div>
+<div class="ttc" id="astructFastSplineInfo_html_ac8538a8e3438ae06d8f467cc0fd5ce0d"><div class="ttname"><a href="structFastSplineInfo.html#ac8538a8e3438ae06d8f467cc0fd5ce0d">FastSplineInfo::nPts</a></div><div class="ttdeci">M3::int_t nPts</div><div class="ttdoc">Number of points in spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00036">SplineStructs.h:36</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -185,11 +192,10 @@ Public Attributes</h2></td></tr>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00032">32</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   32</span>                            {</div>
-<div class="line"><span class="lineno">   33</span>    <span class="comment">// Free dynamically allocated memory</span></div>
-<div class="line"><span class="lineno">   34</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779">xPts</a>;</div>
-<div class="line"><span class="lineno">   35</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00031">31</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   31</span>                            {</div>
+<div class="line"><span class="lineno">   32</span> </div>
+<div class="line"><span class="lineno">   33</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -208,7 +214,7 @@ Public Attributes</h2></td></tr>
 
 <p>Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00044">44</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00042">42</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -226,7 +232,7 @@ Public Attributes</h2></td></tr>
 
 <p>Number of points in spline. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00038">38</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00036">36</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -244,25 +250,25 @@ Public Attributes</h2></td></tr>
 
 <p>Array of the knots positions. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00047">47</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00045">45</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
-<a id="a9e9d432eb250bba227d31022ac9c5779" name="a9e9d432eb250bba227d31022ac9c5779"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e9d432eb250bba227d31022ac9c5779">&#9670;&#160;</a></span>xPts</h2>
+<a id="a76813a59f4a6fcef50f55d3c18733fcb" name="a76813a59f4a6fcef50f55d3c18733fcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76813a59f4a6fcef50f55d3c18733fcb">&#9670;&#160;</a></span>xPts</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>* FastSplineInfo::xPts</td>
+          <td class="memname">std::vector&lt;<a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&gt; FastSplineInfo::xPts</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Array of the knots positions. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00041">41</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00039">39</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>

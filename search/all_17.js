@@ -5,7 +5,7 @@ var searchData=
   ['xbinedges_2',['XBinEdges',['../classsamplePDFFDBase.html#a9a9e5d66ac2216095af25108118bab49',1,'samplePDFFDBase']]],
   ['xcoeff_5farr_3',['xcoeff_arr',['../classsplineFDBase.html#a00f046c4c64c0aa11334b32b0701a9f1',1,'splineFDBase']]],
   ['xpos_4',['XPos',['../classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79',1,'TSpline3_red']]],
-  ['xpts_5',['xPts',['../structFastSplineInfo.html#a9e9d432eb250bba227d31022ac9c5779',1,'FastSplineInfo']]],
+  ['xpts_5',['xPts',['../structFastSplineInfo.html#a76813a59f4a6fcef50f55d3c18733fcb',1,'FastSplineInfo']]],
   ['xsec_6',['xsec',['../classsplineFDBase.html#a891de87b873e079f6bbdb1355a9ff153',1,'splineFDBase']]],
   ['xsec_5fnorm_5fpointers_7',['xsec_norm_pointers',['../structFarDetectorCoreInfo.html#aacd3b678a4a7745c24725058c8fa494e',1,'FarDetectorCoreInfo']]],
   ['xsec_5fnorms_8',['xsec_norms',['../classsamplePDFFDBase.html#ab83151b9062747f96a7c9629a63e05ed',1,'samplePDFFDBase']]],
@@ -16,6 +16,5 @@ var searchData=
   ['xsecnorms4_13',['XsecNorms4',['../structXsecNorms4.html',1,'']]],
   ['xsecsplines1_14',['XsecSplines1',['../structXsecSplines1.html',1,'']]],
   ['xsecstartingpos_15',['XsecStartingPos',['../GetPostfitParamPlots_8cpp.html#a3bb8bb8766f5ea15aa9ac31a1c9127e8',1,'GetPostfitParamPlots.cpp']]],
-  ['xvararray_16',['xVarArray',['../classsplineFDBase.html#a324c4b50910454092ba45d945ef57bda',1,'splineFDBase']]],
-  ['xvarstr_17',['XVarStr',['../classsamplePDFFDBase.html#a281040515d05b37d5d4e4b3888ca3a83',1,'samplePDFFDBase']]]
+  ['xvarstr_16',['XVarStr',['../classsamplePDFFDBase.html#a281040515d05b37d5d4e4b3888ca3a83',1,'samplePDFFDBase']]]
 ];
