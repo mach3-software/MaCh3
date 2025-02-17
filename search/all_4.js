@@ -13,7 +13,7 @@ var searchData=
   ['dathist_10',['dathist',['../classsamplePDFBase.html#a695ac7419652443240feb046f14ba1bb',1,'samplePDFBase']]],
   ['dathist2d_11',['dathist2d',['../classsamplePDFBase.html#a22cd9b0e8664b6e0859e34a51731fadc',1,'samplePDFBase']]],
   ['debug_12',['Debug',['../classSampleSummary.html#a807e348a85fb460c5ca4a1ce56d08aab',1,'SampleSummary']]],
-  ['declarenewmode_13',['DeclareNewMode',['../classMaCh3Modes.html#ad32518cbc4d3c4d45c3737193e637cb8',1,'MaCh3Modes']]],
+  ['declarenewmode_13',['DeclareNewMode',['../classMaCh3Modes.html#ae58ca2779f5a950cf489fc102f82d7d3',1,'MaCh3Modes']]],
   ['default_5fplotting_5fconfig_14',['DEFAULT_PLOTTING_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a1947b4f022707ef6f570787ec62ba90c',1,'MaCh3Plotting::PlottingManager']]],
   ['default_5fstyle_5fconfig_15',['DEFAULT_STYLE_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a2e234f2546aa3eb2c7d97e2f28024511',1,'MaCh3Plotting::PlottingManager']]],
   ['default_5ftranslation_5fconfig_16',['DEFAULT_TRANSLATION_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a59d9e05c0590931aa260d81cd97bf3e4',1,'MaCh3Plotting::PlottingManager']]],

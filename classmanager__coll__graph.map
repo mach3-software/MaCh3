@@ -1,10 +1,5 @@
 <map id="manager" name="manager">
-<area shape="rect" id="node1" title="The manager class is responsible for managing configurations and settings." alt="" coords="1319,63,1399,89"/>
-<area shape="rect" id="node2" title=" " alt="" coords="219,94,306,119"/>
-<area shape="rect" id="node4" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1112,121,1223,146"/>
-<area shape="rect" id="node5" title=" " alt="" coords="649,113,812,153"/>
-<area shape="rect" id="node7" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="497,189,625,214"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,87,144,127"/>
-<area shape="rect" id="node6" title=" " alt="" coords="836,181,1019,221"/>
-<area shape="rect" id="node8" title=" " alt="" coords="193,246,332,271"/>
+<area shape="rect" id="node1" title="The manager class is responsible for managing configurations and settings." alt="" coords="35,183,115,208"/>
+<area shape="rect" id="node2" title=" " alt="" coords="31,95,118,120"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,5,144,45"/>
 </map>
