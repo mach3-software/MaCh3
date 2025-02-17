@@ -132,7 +132,7 @@ CUDA</h1>
 </div><!-- fragment --><p> MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.</p>
 <h1><a class="anchor" id="autotoc_md9"></a>
 Oscillator</h1>
-<p>MaCh3 uses several neutrino oscillation calculators.</p>
+<p>MaCh3 has access to several neutrino oscillation calculators via <a href="https://github.com/dbarrow257/NuOscillator/tree/main">NuOscillator</a> framework.</p>
 <p>Following neutrino oscillation calculators are available: </p><table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Oscillator   </th><th class="markdownTableHeadNone">Hardware   </th><th class="markdownTableHeadNone">Source   </th><th class="markdownTableHeadNone">Reference    </th></tr>
@@ -147,11 +147,11 @@ Oscillator</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">NuFastLinear   </td><td class="markdownTableBodyNone">CPU   </td><td class="markdownTableBodyNone">Beam   </td><td class="markdownTableBodyNone"><a href="https://doi.org/10.48550/arXiv.2405.02400">Ref</a>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">OscProb   </td><td class="markdownTableBodyNone">CPU   </td><td class="markdownTableBodyNone">Beam/Atm   </td><td class="markdownTableBodyNone"></td></tr>
+<td class="markdownTableBodyNone">OscProb   </td><td class="markdownTableBodyNone">CPU   </td><td class="markdownTableBodyNone">Beam/Atm   </td><td class="markdownTableBodyNone"><a href="https://doi.org/10.5281/zenodo.6347002">Ref</a>   </td></tr>
 </table>
 <p>If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:</p>
-<div class="fragment"><div class="line">cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON</div>
-</div><!-- fragment --><p> You can only specify engines you want to use, and you can in principle use more than one.</p>
+<div class="fragment"><div class="line">cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON</div>
+</div><!-- fragment --><p> You can specify more than one engine, and MaCh3 support different engines for different samples. For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.</p>
 <h1><a class="anchor" id="autotoc_md10"></a>
 Fitting algorithms</h1>
 <p>The following fitting algorithms are available:</p>
