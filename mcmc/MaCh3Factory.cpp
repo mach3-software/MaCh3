@@ -27,12 +27,6 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
 }
 
 // ********************************************
-covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix) {
-// ********************************************
-  return MaCh3CovarianceFactory<covarianceXsec>(FitManager, PreFix);
-}
-
-// ********************************************
 std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
 // ********************************************
   if (argc < 2) {

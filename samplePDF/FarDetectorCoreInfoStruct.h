@@ -11,7 +11,7 @@ struct FarDetectorCoreInfo {
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
 
-  ~FarDetectorCoreInfo(){ delete [] isNC; }
+  ~FarDetectorCoreInfo(){if(isNC != nullptr) delete [] isNC;}
 
   int nEvents; ///< how many MC events are there
   double ChannelIndex;
@@ -20,8 +20,6 @@ struct FarDetectorCoreInfo {
   std::vector<int*> Target; ///< target the interaction was on
   std::vector<const int*> nupdg;
   std::vector<const int*> nupdgUnosc;
-
-  int SampleDetID;
 
   //THe x_var and y_vars that you're binning in
   std::vector<const double*> x_var;

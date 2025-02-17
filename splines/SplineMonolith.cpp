@@ -362,23 +362,11 @@ void SMonolith::MoveToGPU() {
           NTF1_valid);
 
   // Delete all the coefficient arrays from the CPU once they are on the GPU
-  cpu_spline_handler->coeff_x.clear();
-  cpu_spline_handler->coeff_x.shrink_to_fit();
-  cpu_spline_handler->coeff_many.clear();
-  cpu_spline_handler->coeff_many.shrink_to_fit();
-  cpu_spline_handler->paramNo_arr.clear();
-  cpu_spline_handler->paramNo_arr.shrink_to_fit();
-  cpu_spline_handler->nKnots_arr.clear();
-  cpu_spline_handler->nKnots_arr.shrink_to_fit();
-  cpu_coeff_TF1_many.clear();
-  cpu_coeff_TF1_many.shrink_to_fit();
-  cpu_paramNo_TF1_arr.clear();
-  cpu_paramNo_TF1_arr.shrink_to_fit();
+  CleanVector(cpu_coeff_TF1_many);
+  CleanVector(cpu_paramNo_TF1_arr);
   #ifndef Weight_On_SplineBySpline_Basis
-  cpu_nParamPerEvent.clear();
-  cpu_nParamPerEvent.shrink_to_fit();
-  cpu_nParamPerEvent_tf1.clear();
-  cpu_nParamPerEvent_tf1.shrink_to_fit();
+  CleanVector(cpu_nParamPerEvent);
+  CleanVector(cpu_nParamPerEvent_tf1);
   #endif
   delete cpu_spline_handler;
   cpu_spline_handler = nullptr;
@@ -458,7 +446,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
           nSplines_SingleEvent++;
 
           // Fill the SplineInfoArray entries with information on each splinified parameter
-          if (SplineInfoArray[ParamNumber].xPts == NULL)
+          if (SplineInfoArray[ParamNumber].xPts == nullptr)
           {
             // Fill the number of points
             SplineInfoArray[ParamNumber].nPts = CurrSpline->GetNp();
@@ -501,7 +489,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
 
     const M3::int_t nPoints = SplineInfoArray[i].nPts;
     const M3::float_t* xArray = SplineInfoArray[i].xPts;
-    if (nPoints == -999 || xArray == NULL) {
+    if (nPoints == -999 || xArray == nullptr) {
       Counter++;
       if(Counter < 5) {
         MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
@@ -515,7 +503,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
 
 // *****************************************
 // Load SplineFile
-SMonolith::SMonolith(std::string FileName)
+SMonolith::SMonolith(const std::string& FileName)
           : SplineBase() {
 // *****************************************
   Initialise();
@@ -537,7 +525,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
    }
 
-  TFile *SplineFile = new TFile(FileName.c_str(), "OPEN");
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
   TTree *Settings = SplineFile->Get<TTree>("Settings");
   TTree *Monolith = SplineFile->Get<TTree>("Monolith");
   TTree *Monolith_TF1 = SplineFile->Get<TTree>("Monolith_TF1");
@@ -667,7 +655,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   }
 
   SplineFile->Close();
-  delete SplineFile;
 
   // Print some info; could probably make this to a separate function
   PrintInitialsiation();
@@ -684,7 +671,7 @@ void SMonolith::PrepareSplineFile() {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
    }
 
-  TFile *SplineFile = new TFile(FileName.c_str(), "recreate");
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
   TTree *Settings = new TTree("Settings", "Settings");
   TTree *Monolith = new TTree("Monolith", "Monolith");
   TTree *Monolith_TF1 = new TTree("Monolith_TF1", "Monolith_TF1");
@@ -803,15 +790,13 @@ void SMonolith::PrepareSplineFile() {
   delete EventInfo;
   delete FastSplineInfoTree;
   SplineFile->Close();
-  delete SplineFile;
 }
 
 // *****************************************
 // Destructor
 // Cleans up the allocated GPU memory
 SMonolith::~SMonolith() {
-  // *****************************************
-
+// *****************************************
   #ifdef CUDA
   gpu_spline_handler->CleanupGPU_SplineMonolith(
         #ifndef Weight_On_SplineBySpline_Basis
@@ -832,31 +817,6 @@ SMonolith::~SMonolith() {
   if(cpu_weights != nullptr) delete[] cpu_weights;
   if(cpu_weights_spline_var != nullptr) delete[] cpu_weights_spline_var;
   if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
-
-  //KS: Those might be deleted or not depending on GPU/CPU TSpline3/TF1 DEBUG or not hence we check if not NULL
-  if(cpu_spline_handler != nullptr)
-  {
-    cpu_spline_handler->coeff_x.clear();
-    cpu_spline_handler->coeff_x.shrink_to_fit();
-    cpu_spline_handler->coeff_many.clear();
-    cpu_spline_handler->coeff_many.shrink_to_fit();
-    cpu_spline_handler->paramNo_arr.clear();
-    cpu_spline_handler->paramNo_arr.shrink_to_fit();
-    cpu_spline_handler->nKnots_arr.clear();
-    cpu_spline_handler->nKnots_arr.shrink_to_fit();
-  }
-  cpu_coeff_TF1_many.clear();
-  cpu_coeff_TF1_many.shrink_to_fit();
-  cpu_paramNo_TF1_arr.clear();
-  cpu_paramNo_TF1_arr.shrink_to_fit();
-  #ifndef Weight_On_SplineBySpline_Basis
-  cpu_nParamPerEvent.clear();
-  cpu_nParamPerEvent.shrink_to_fit();
-  cpu_nParamPerEvent_tf1.clear();
-  cpu_nParamPerEvent_tf1.shrink_to_fit();
-  #endif
-  cpu_nPoints_arr.clear();
-  cpu_nPoints_arr.shrink_to_fit();
 
   if(cpu_spline_handler != nullptr) delete cpu_spline_handler;
 }
@@ -910,7 +870,6 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
   }
 }
 
-
 #ifdef CUDA
 // *****************************************
 // Tell the GPU to evaluate the weights
@@ -920,7 +879,6 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
 // This avoids doing lots of binary searches on the GPU
 void SMonolith::Evaluate() {
 // *****************************************
-
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
   FindSplineSegment();
@@ -946,7 +904,6 @@ void SMonolith::Evaluate() {
 // *****************************************
 void SMonolith::Evaluate() {
 // *****************************************
-
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
   FindSplineSegment();
@@ -970,7 +927,7 @@ void SMonolith::FindSplineSegment() {
   for (M3::int_t i = 0; i < nParams; ++i)
   {
     const M3::int_t nPoints = SplineInfoArray[i].nPts;
-    const M3::float_t* xArray = SplineInfoArray[i].xPts;
+    const M3::float_t* _restrict_ xArray = SplineInfoArray[i].xPts;
 
     // Get the variation for this reconfigure for the ith parameter
     const float xvar = float(*SplineInfoArray[i].splineParsPointer);
@@ -979,7 +936,7 @@ void SMonolith::FindSplineSegment() {
     // EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here
     //     In principle, such parameters shouldn't really be included in the first place, but with new det syst splines this
     //     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.
-    if(xArray == NULL) continue;
+    if(xArray == nullptr) continue;
 
     // The segment we're interested in (klow in ROOT code)
     M3::int_t segment = 0;
@@ -1070,9 +1027,9 @@ void SMonolith::CalcSplineWeights() {
       // We've read the segment straight from CPU and is saved in segment_gpu
       // polynomial parameters from the monolithic splineMonolith
       const float fY = cpu_spline_handler->coeff_many[CurrentKnotPos];
-      const float fB = cpu_spline_handler->coeff_many[CurrentKnotPos+1];
-      const float fC = cpu_spline_handler->coeff_many[CurrentKnotPos+2];
-      const float fD = cpu_spline_handler->coeff_many[CurrentKnotPos+3];
+      const float fB = cpu_spline_handler->coeff_many[CurrentKnotPos + 1];
+      const float fC = cpu_spline_handler->coeff_many[CurrentKnotPos + 2];
+      const float fD = cpu_spline_handler->coeff_many[CurrentKnotPos + 3];
       // The is the variation itself (needed to evaluate variation - stored spline point = dx)
       const float dx = ParamValues[Param] - cpu_spline_handler->coeff_x[segment_X];
 
@@ -1091,12 +1048,12 @@ void SMonolith::CalcSplineWeights() {
       const float x = ParamValues[cpu_paramNo_TF1_arr[tf1Num]];
 
       // Read the coefficients
-      const float a = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_];
-      const float b = cpu_coeff_TF1_many[tf1Num*_nTF1Coeff_+1];
+      const unsigned int TF1_Index = tf1Num * _nTF1Coeff_;
+      const float a = cpu_coeff_TF1_many[TF1_Index];
+      const float b = cpu_coeff_TF1_many[TF1_Index + 1];
 
       cpu_weights_tf1_var[tf1Num] = fmaf(a, x, b);
       // cpu_weights_tf1_var[tf1Num] = a*x + b;
-
       //cpu_weights_tf1_var[splineNum] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
     }
   #ifdef MULTITHREAD
@@ -1117,9 +1074,11 @@ void SMonolith::ModifyWeights(){
   {
     float totalWeight = 1.0f; // Initialize total weight for each event
 
+    const unsigned int Offset = 2 * EventNum;
+
     // Extract the parameters for the current event
-    const unsigned int startIndex = cpu_nParamPerEvent[2 * EventNum + 1];
-    const unsigned int numParams = cpu_nParamPerEvent[2 * EventNum];
+    const unsigned int startIndex = cpu_nParamPerEvent[Offset + 1];
+    const unsigned int numParams = cpu_nParamPerEvent[Offset];
 
     // Compute total weight for the current event
     #ifdef MULTITHREAD
@@ -1130,8 +1089,8 @@ void SMonolith::ModifyWeights(){
     }
     //Now TF1
     // Extract the parameters for the current event
-    const unsigned int startIndex_tf1 = cpu_nParamPerEvent_tf1[2 * EventNum + 1];
-    const unsigned int numParams_tf1 = cpu_nParamPerEvent_tf1[2 * EventNum];
+    const unsigned int startIndex_tf1 = cpu_nParamPerEvent_tf1[Offset + 1];
+    const unsigned int numParams_tf1 = cpu_nParamPerEvent_tf1[Offset];
 
     // Compute total weight for the current event
     #ifdef MULTITHREAD

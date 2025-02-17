@@ -264,7 +264,8 @@ public:
       return "MCMC";
     case kSigmaVar:
       return "SigmaVar";
-
+    case kNFileTypes:
+      return "NFileTypes";
     default:
       return "UNKNOWN_FILE_TYPE";
     }
@@ -320,7 +321,7 @@ public:
     {
       MACH3LOG_WARN("file at index {} does not have an MCMC entry for parameter {}", fileNum, paramName);
       MACH3LOG_WARN("am returning a bad float");
-      return _BAD_DOUBLE_; 
+      return M3::_BAD_DOUBLE_;
     }
 
     return *_fileVec[fileNum].MCMCstepParamsMap.at(paramName);

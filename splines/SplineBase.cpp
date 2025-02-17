@@ -7,14 +7,12 @@
 SplineBase::SplineBase() {
 // *****************************************
 
-
 }
 
 
 // *****************************************
 SplineBase::~SplineBase() {
 // *****************************************
-
 
 }
 
@@ -24,7 +22,6 @@ SplineBase::~SplineBase() {
 // This should maximize our cache hits!
 void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
 // *****************************************
-
   // Initialise all arrays to 1.0
   for (int i = 0; i < _nTF1Coeff_; ++i) {
     coeffs[i] = 0.0;

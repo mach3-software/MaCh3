@@ -4,13 +4,12 @@
 #include <cstdlib>
 #include <iomanip>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3  includes
+#include "manager/MaCh3Logger.h"
+#include "splines/SplineStructs.h"
+#include "splines/SplineCommon.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TFile.h"
 #include "TH1F.h"
@@ -21,16 +20,7 @@
 #include "TCanvas.h"
 #include "TStyle.h"
 #include "TTree.h"
-#pragma GCC diagnostic pop
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
-// MaCh3  includes
-#include "manager/MaCh3Logger.h"
-#include "splines/SplineStructs.h"
-#include "splines/SplineCommon.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Base class for calculating weight from spline
 class SplineBase {
@@ -47,7 +37,6 @@ class SplineBase {
     virtual inline std::string GetName()const {return "SplineBase";};
 
   protected:
-
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     virtual void FindSplineSegment() = 0;
     /// @brief CPU based code which eval weight for each spline

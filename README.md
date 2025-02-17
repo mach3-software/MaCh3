@@ -110,7 +110,7 @@ Following neutrino oscillation calculators are available:
 | ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
 | Prob3++Linear    | CPU        | Beam       |            |
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
-| OscProb          | CPU        | Atm        |            |
+| OscProb          | CPU        | Beam/Atm   |            |
 
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
@@ -127,7 +127,6 @@ The following fitting algorithms are available:
 | MR2T2      | [Ref](https://doi.org/10.1063/1.1699114)       | No       |
 | MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
 | PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
-
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
@@ -160,6 +159,7 @@ Based on several test here are recommended version:
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
+| MacOS       | ❌     |
 
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>

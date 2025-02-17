@@ -1,15 +1,19 @@
 #pragma once
 
-// spdlog Includes
-#include "spdlog/spdlog.h"
-
 // C++ Includes
 #include <iostream>
 #include <sstream>
 #include <functional>
 #include <string>
-
 #include <exception>
+
+// MaCh3 Includes
+#include "manager/Core.h"
+
+_MaCh3_Safe_Include_Start_ //{
+// spdlog Includes
+#include "spdlog/spdlog.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file MaCh3Logger.h
 /// @brief KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284

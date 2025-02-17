@@ -35,8 +35,6 @@ target_include_directories(MaCh3GPUCompilerOptions INTERFACE
     "$<INSTALL_INTERFACE:include>"
 )
 
-# KS: Perform fancy CUDA Benchmarking
-DefineEnabledRequiredSwitch(MaCh3_GPU_BENCHMARK FALSE)
 if(MaCh3_GPU_BENCHMARK)
     cmessage(STATUS "Building CUDA Benchmark")
 

@@ -4,18 +4,27 @@
 // ********************************************
 PCAHandler::PCAHandler() {
 // ********************************************
-
+  _pCurrVal = nullptr;
+  _pPropVal = nullptr;
 }
 
 // ********************************************
 PCAHandler::~PCAHandler() {
 // ********************************************
 
-
 }
 
 // ********************************************
-void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd, const double eigen_thresh, int& _fNumParPCA) {
+void PCAHandler::SetupPointers(std::vector<double>* fCurr_Val,
+                               std::vector<double>* fProp_Val) {
+// ********************************************
+  _pCurrVal = fCurr_Val;
+  _pPropVal = fProp_Val;
+}
+
+// ********************************************
+void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd,
+                              const double eigen_thresh, int& _fNumParPCA, const int _fNumPar) {
 // ********************************************
   FirstPCAdpar = firstPCAd;
   LastPCAdpar = lastPCAd;
@@ -38,7 +47,6 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
     MACH3LOG_ERROR("first: {} last: {}", FirstPCAdpar, LastPCAdpar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
   MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
   int numunpcadpars = covMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
@@ -67,6 +75,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
     }
   }
   _fNumParPCA = numunpcadpars+nKeptPCApars;
+  NumParPCA = _fNumParPCA;
   MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, _fNumParPCA);
 
   //DB Create array of correct size so eigen_values can be used in CorrelateSteps
@@ -118,16 +127,113 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
   //KS: Let's dump all useful matrices to properly validate PCA
   DebugPCA(sum, temp, submat, covMatrix->GetNrows());
   #endif
+
+  // Make the PCA parameter arrays
+  fParCurr_PCA.ResizeTo(_fNumParPCA);
+  fParProp_PCA.ResizeTo(_fNumParPCA);
+  _fPreFitValue_PCA.resize(_fNumParPCA);
+
+  //KS: make easy map so we could easily find un-decomposed parameters
+  isDecomposed_PCA.resize(_fNumParPCA);
+  fParSigma_PCA.resize(_fNumParPCA);
+  for (int i = 0; i < _fNumParPCA; ++i)
+  {
+    fParSigma_PCA[i] = 1;
+    isDecomposed_PCA[i] = -1;
+  }
+  for (int i = 0; i < FirstPCAdpar; ++i) isDecomposed_PCA[i] = i;
+
+  for (int i = FirstPCAdpar+nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposed_PCA[i] = i+(_fNumPar-_fNumParPCA);
+}
+
+// ********************************************
+// Update so that current step becomes the previously proposed step
+void PCAHandler::AcceptStep() _noexcept_ {
+// ********************************************
+  // Update the book-keeping for the output
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < NumParPCA; ++i) {
+    fParCurr_PCA(i) = fParProp_PCA(i);
+  }
+  // Then update the parameter basis
+  TransferToParam();
+}
+
+// ************************************************
+// Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
+void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
+                                const double GlobalStepScale,
+                                const double* _restrict_ randParams,
+                                const double* _restrict_ corr_throw) _noexcept_ {
+// ************************************************
+  // Throw around the current step
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < NumParPCA; ++i)
+  {
+    if (fParSigma_PCA[i] > 0.)
+    {
+      double IndStepScale = 1.;
+      //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
+      if(isDecomposed_PCA[i] >= 0)
+      {
+        IndStepScale *= IndivStepScale[isDecomposed_PCA[i]];
+        IndStepScale *= corr_throw[isDecomposed_PCA[i]];
+      }
+      //If decomposed apply only random number
+      else
+      {
+        IndStepScale *= randParams[i];
+        //KS: All PCA-ed parameters have the same step scale
+        IndStepScale *= IndivStepScale[FirstPCAdpar];
+      }
+      fParProp_PCA(i) = fParCurr_PCA(i)+GlobalStepScale*IndStepScale*eigen_values_master[i];
+    }
+  }
+  // Then update the parameter basis
+  TransferToParam();
+}
+
+// ********************************************
+// Transfer a parameter variation in the parameter basis to the eigen basis
+void PCAHandler::TransferToPCA() {
+// ********************************************
+  // Make the temporary vectors
+  TVectorD fParCurr_vec(static_cast<Int_t>(_pCurrVal->size()));
+  TVectorD fParProp_vec(static_cast<Int_t>(_pCurrVal->size()));
+  for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
+    fParCurr_vec(i) = (*_pCurrVal)[i];
+    fParProp_vec(i) = (*_pPropVal)[i];
+  }
+
+  fParCurr_PCA = TransferMatT*fParCurr_vec;
+  fParProp_PCA = TransferMatT*fParProp_vec;
+}
+
+// ********************************************
+// Transfer a parameter variation in the eigen basis to the parameter basis
+void PCAHandler::TransferToParam() {
+// ********************************************
+  // Make the temporary vectors
+  TVectorD fParProp_vec = TransferMat*fParProp_PCA;
+  TVectorD fParCurr_vec = TransferMat*fParCurr_PCA;
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
+    (*_pPropVal)[i] = fParProp_vec(i);
+    (*_pCurrVal)[i] = fParCurr_vec(i);
+  }
 }
 
 #ifdef DEBUG_PCA
-
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
-
 // ********************************************
 //KS: Let's dump all useful matrices to properly validate PCA
 void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar) {
-
 // ********************************************
   (void)submat;//This is used if DEBUG_PCA==2, this hack is to avoid compiler warnings
   TFile *PCA_Debug = new TFile("Debug_PCA.root", "RECREATE");

@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.3.6 LANGUAGES CXX)
+project(MaCh3 VERSION 1.4.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 #LP - This option name is confusing, but I wont change it now.
@@ -11,6 +11,11 @@ option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 option(MaCh3_LOW_MEMORY_STRUCTS_ENABLED "This will use float/short string for many structures" OFF)
+option(MaCh3_MULTITHREAD_ENABLED "This will enable multithreading (OMP) in whole framework" ON)
+option(MaCh3_DEBUG_ENABLED "Enable special debugging mode, with additional printouts and data structure, increases RAM usage and low performance" OFF)
+option(MaCh3_DependancyGraph "Will produce dependency graph" OFF)
+option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
+option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 
 add_library(MaCh3CompileDefinitions INTERFACE)
 #Create a seperate target for GPU compiler options
@@ -91,13 +96,12 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wunused                # Warn on anything being unused
   -Wredundant-decls       # Warn about multiple declarations of the same entity. Useful for code cleanup.
   -Wstrict-aliasing=2     # Helps detect potential aliasing issues that could lead to undefined behavior.
-  -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
   -Wnull-dereference      # Warn if a null dereference is detected (only in GCC >= 6.0)
   -Wold-style-cast        # Warn for c-style casts
   -Wconversion            # Warn on type conversions that may lose data
   -Wformat-security       # Warn on functions that are potentially insecure for formatting
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
-  #-Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  -Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
@@ -107,8 +111,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wlogical-op            # Warn about logical operations being used where bitwise were probably wanted (only in GCC)
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
+    -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
   )
 endif()
+
+# KS: Clang is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(MaCh3_WERROR_ENABLED FALSE)
+endif()
+
 if(MaCh3_WERROR_ENABLED)
 target_compile_options(MaCh3Warnings INTERFACE
   -Werror                # Treat Warnings as Errors
@@ -121,9 +132,6 @@ target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
     -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
 )
-
-#KS: If Debug is not defined disable it by default
-DefineEnabledRequiredSwitch(MaCh3_DEBUG_ENABLED FALSE)
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
 if(DEFINED DEBUG_LEVEL)
@@ -147,25 +155,36 @@ else()
   #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
-    -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
     #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
     # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
     #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
+  # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(MaCh3CompilerOptions INTERFACE
+      -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+    )
+  endif()
   #KS: add Link-Time Optimization (LTO)
   #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
 endif()
 
-#KS: If multithreading is not defined enable it by default
-DefineEnabledRequiredSwitch(MaCh3_MULTITHREAD_ENABLED TRUE)
+if(MaCh3_NATIVE_ENABLED)
+  target_compile_options(MaCh3CompilerOptions INTERFACE -march=native)
+endif()
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
   target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
+  # KS: Not a clue why clang need different...
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  endif()
+
 endif()
 
 if(CPU_ONLY)
@@ -259,9 +278,6 @@ install(EXPORT MaCh3-targets
         DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
 install(DIRECTORY cmake DESTINATION ${CMAKE_BINARY_DIR})
-
-#KS: Options to print dependency graph
-DefineEnabledRequiredSwitch(MaCh3_DependancyGraph FALSE)
 
 if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL

@@ -104,7 +104,6 @@ SMonolithGPU::~SMonolithGPU(){
 // *******************************************
 // Initialiser when using the x array and combined y,b,c,d array
 __host__ void SMonolithGPU::InitGPU_SplineMonolith(
-// *******************************************
                  #ifndef Weight_On_SplineBySpline_Basis
                           float **cpu_total_weights, 
                           int n_events,                              
@@ -113,7 +112,7 @@ __host__ void SMonolithGPU::InitGPU_SplineMonolith(
                           unsigned int n_splines,
                           unsigned int n_tf1,
                           int Eve_size) {
-
+// *******************************************
   // Allocate chunks of memory to GPU
   cudaMalloc((void **) &gpu_paramNo_arr, n_splines*sizeof(short int));
   CudaCheckError();
@@ -197,7 +196,6 @@ __host__ void SMonolithGPU::InitGPU_Vals(float **vals) {
 // ******************************************************
 // Copy to GPU for x array and separate ybcd array
 __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
-// ******************************************************
                             SplineMonoStruct* cpu_spline_handler,
 
                             // TFI related now
@@ -214,6 +212,7 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
                             short int spline_size,
                             unsigned int total_nknots,
                             unsigned int n_tf1) {
+// ******************************************************
   if (n_params != _N_SPLINES_) {
     printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", _N_SPLINES_);
     printf("n_params = %i\n", n_params);
@@ -351,7 +350,6 @@ __global__ void EvalOnGPU_Splines(
   float* __restrict__ gpu_weights,
   const cudaTextureObject_t __restrict__ text_coeff_x) {
 //*********************************************************
-
   // points per spline is the offset to skip in the index to move between splines
   const unsigned int splineNum = (blockIdx.x * blockDim.x + threadIdx.x);
 
@@ -375,9 +373,9 @@ __global__ void EvalOnGPU_Splines(
     // We've read the segment straight from CPU and is saved in segment_gpu
     // polynomial parameters from the monolithic splineMonolith
     const float fY = gpu_coeff_many[CurrentKnotPos];
-    const float fB = gpu_coeff_many[CurrentKnotPos+1];
-    const float fC = gpu_coeff_many[CurrentKnotPos+2];
-    const float fD = gpu_coeff_many[CurrentKnotPos+3];
+    const float fB = gpu_coeff_many[CurrentKnotPos + 1];
+    const float fC = gpu_coeff_many[CurrentKnotPos + 2];
+    const float fD = gpu_coeff_many[CurrentKnotPos + 3];
     // The is the variation itself (needed to evaluate variation - stored spline point = dx)
     const float dx = val_gpu[Param] - tex1Dfetch<float>(text_coeff_x, segment_X);
 
@@ -399,7 +397,6 @@ __global__ void EvalOnGPU_TF1(
     const short int* __restrict__ gpu_paramNo_arr_tf1,
     float* __restrict__ gpu_weights_tf1) {
 //*********************************************************
-
   // points per spline is the offset to skip in the index to move between splines
   const unsigned int tf1Num = (blockIdx.x * blockDim.x + threadIdx.x);
 
@@ -408,18 +405,14 @@ __global__ void EvalOnGPU_TF1(
     const float x = val_gpu[gpu_paramNo_arr_tf1[tf1Num]];
 
     // Read the coefficients
-    const float a = gpu_coeffs_tf1[tf1Num*_nTF1Coeff_];
-    const float b = gpu_coeffs_tf1[tf1Num*_nTF1Coeff_+1];
+    const unsigned int TF1_Index = tf1Num * _nTF1Coeff_;
+    const float a = gpu_coeffs_tf1[TF1_Index];
+    const float b = gpu_coeffs_tf1[TF1_Index+1];
 
     gpu_weights_tf1[tf1Num] = fmaf(a, x, b);
 
     // gpu_weights_tf1[tf1Num] = a*x + b;
-    //
     //gpu_weights_tf1[tf1Num] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;
-
-    //#ifdef DEBUG
-    //printf("TF1 = %i/%i, weight = %f \n", tf1Num, d_n_TF1, gpu_weights_tf1[tf1Num]);
-    //#endif
   }
 }
 
@@ -443,24 +436,14 @@ __global__ void EvalOnGPU_TotWeight(
   {
     shared_total_weights[threadIdx.x] = 1.f;
 
-    const unsigned int EventOffset = 2*EventNum;
+    const unsigned int EventOffset = 2 * EventNum;
 
-    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id)
-    {
+    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id) {
       shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
-      //#ifdef DEBUG
-      //printf("Event = %i, Spline_Num = %i, gpu_weights = %f \n",
-      //        EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id, gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, 2*EventNum+1) + id]);
-      //#endif
     }
 
-    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset); ++id)
-    {
+    for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset); ++id) {
       shared_total_weights[threadIdx.x] *= gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset+1) + id];
-      //#ifdef DEBUG
-      //printf("Event = %i, Spline_Num = %i, gpu_weights_tf1 = %f \n",
-      //       EventNum, tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id, gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, 2*EventNum+1) + id]);
-      //#endif
     }
     gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
   }

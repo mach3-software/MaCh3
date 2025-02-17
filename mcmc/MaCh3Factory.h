@@ -38,10 +38,6 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan);
 /// ```
 std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
 
-/// @brief Factory function for creating a covariance class for systematic handling.
-covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix);
-
-
 // ********************************************
 /// @brief Factory function for creating a covariance class for systematic handling.
 ///
@@ -69,7 +65,7 @@ covarianceXsec* MaCh3CovarianceFactory(manager *FitManager, const std::string& P
 ///
 /// @todo add adaptive stuff
 template <typename CovType>
-CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
+std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
 // ********************************************
   // config for our matrix
   YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
@@ -84,7 +80,7 @@ CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
   // do we pca whole matrix or only submatrix
   auto PCAParamRegion = GetFromManager<std::vector<int>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
 
-  CovType* CovObject = new CovType(CovMatrixFile, CovMatrixName, PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
+  auto CovObject = std::make_unique<CovType>(CovMatrixFile, CovMatrixName, PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
 
   // Fill the parameter values with their nominal values
   // should _ALWAYS_ be done before overriding with fix or flat
@@ -110,8 +106,6 @@ CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
   // Adaptive MCMC stuff
   if(FitManager->raw()["AdaptionOptions"])
     CovObject->initialiseAdaption(FitManager->raw());
-
-  MACH3LOG_INFO("Factory successful");
 
   return CovObject;
 }
