@@ -17,17 +17,12 @@ manager::manager(std::string const &filename)
 
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);
-
-  Modes = nullptr;
-  auto ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null", __FILE__ , __LINE__);
-  if(ModeInput != "null") Modes = new MaCh3Modes(ModeInput);
 }
 
 // *************************
 // Empty destructor, for now...
 manager::~manager() {
 // *************************
-  if(!Modes) delete Modes;
 }
 
 // *************************

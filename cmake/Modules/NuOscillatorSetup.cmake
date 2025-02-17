@@ -63,12 +63,16 @@ set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 #string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
+if(NOT DEFINED MaCh3_NuOscillatorBranch)
+  set(MaCh3_NuOscillatorBranch "v1.2.0")
+endif()
+
 #Try adding Oscillator Class
 CPMAddPackage(
   NAME NuOscillator
     VERSION 1.2.0
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
-    GIT_TAG "v1.2.0"
+    GIT_TAG ${MaCh3_NuOscillatorBranch}
     GIT_SHALLOW YES
     OPTIONS
     "UseGPU ${DAN_USE_GPU}"
