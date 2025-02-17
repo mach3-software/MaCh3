@@ -50,5 +50,17 @@ class mcmc : public FitterBase {
   bool anneal;
   /// simulated annealing temperature
   double AnnealTemp;
+
+  /// multi-canonical method
+  bool multicanonical;
+  /// multi-canonical beta
+  double multicanonicalBeta;
+  /// multi-canonical penalty
+  double multicanonical_penalty;
+  /// multi-canonical par number
+  int multicanonicalVar;
+  /// delta_cp parameter value
+  double delta_cp_value;
+
 };
 
