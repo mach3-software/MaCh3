@@ -95,12 +95,12 @@ cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to [CUDA](https://developer.nvidia.com/cuda-toolkit)
 ```bash
 mkdir build; cd build;
-cmake ../ -DUSE_CPU=ON
+cmake ../ -DMaCh3_GPU_ENABLED=OFF
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
 ## Oscillator
-MaCh3 uses several neutrino oscillation calculators.
+MaCh3 has access to several neutrino oscillation calculators via [NuOscillator](https://github.com/dbarrow257/NuOscillator/tree/main) framework.
 
 Following neutrino oscillation calculators are available:
 |Oscillator        | Hardware   | Source     | Reference  |
@@ -110,14 +110,15 @@ Following neutrino oscillation calculators are available:
 | ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
 | Prob3++Linear    | CPU        | Beam       |            |
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
-| OscProb          | CPU        | Beam/Atm   |            |
+| OscProb          | CPU        | Beam/Atm   | [Ref](https://doi.org/10.5281/zenodo.6347002)           |
 
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
-cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON
 ```
-You can only specify engines you want to use, and you can in principle use more than one.
+You can specify more than one engine, and MaCh3 support different engines for different samples.
+For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.
 
 ## Fitting algorithms
 The following fitting algorithms are available:
