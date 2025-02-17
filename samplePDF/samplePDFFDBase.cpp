@@ -379,7 +379,7 @@ void samplePDFFDBase::reweight() {
       NuOscProbCalcers[0]->CalculateProbabilities(OscVec);
     } else {
       for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
-	        NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+        NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
       }
     }
     
@@ -694,6 +694,9 @@ M3::float_t samplePDFFDBase::CalcWeightSpline(const int iSample, const int iEven
   M3::float_t xsecw = 1.0;
   //DB Xsec syst
   //Loop over stored spline pointers
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int iSpline = 0; iSpline < MCSamples[iSample].nxsec_spline_pointers[iEvent]; ++iSpline) {
     xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
   }
@@ -706,6 +709,9 @@ M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent)
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int iParam = 0; iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; ++iParam)
   {
 #pragma GCC diagnostic push

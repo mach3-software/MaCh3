@@ -23,7 +23,8 @@ splineFDBase::~splineFDBase(){
 //****************************************
   if(manycoeff_arr != nullptr) delete[] manycoeff_arr;
   if(xcoeff_arr != nullptr) delete[] xcoeff_arr;
-
+  if(SplineSegments != nullptr) delete[] SplineSegments;
+  if(ParamValues != nullptr) delete[] ParamValues;
 }
 //****************************************
 void splineFDBase::cleanUpMemory() {
@@ -160,7 +161,7 @@ void splineFDBase::TransferToMonolith()
                 weightvec_Monolith[splineindex] = 1.0;
 
                 bool foundUniqueSpline = false;
-                for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+                for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
                 {
                   if (SplineFileParPrefixNames[iSample][iSyst] == UniqueSystNames[iUniqueSyst])
                   {
@@ -173,8 +174,8 @@ void splineFDBase::TransferToMonolith()
                 {
                   MACH3LOG_ERROR("Unique spline index not found");
                   MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[iSample][iSyst]);
-                  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nUniqueSysts);
-                  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+                  MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[iSample][iSyst], nParams);
+                  for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
                   {
                     MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
                   }//unique syst loop end
@@ -194,7 +195,6 @@ void splineFDBase::TransferToMonolith()
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
 
                   for(int i = 0; i < splineKnots; i++){
-
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
                     for(int j=0; j<4; j++){
@@ -231,63 +231,6 @@ void splineFDBase::Evaluate() {
 }
 
 //****************************************
-// ETA - find the spline segment that the current parameter
-// value is in. This is now extremely similar to the
-// function in SplineMonolith.cpp
-void splineFDBase::FindSplineSegment() {
-//****************************************
-  //HW okay let's try this, we delete+refill a new array which we'll fill with x-s for our segment
-  for (int iSyst = 0; iSyst < nUniqueSysts; ++iSyst) {
-    const int nPoints = UniqueSystNKnots[iSyst];
-    // KS: By reference to not copy memory like a fool
-    const std::vector<M3::float_t>& xArray = UniqueSystXPts[iSyst];
-
-    // Get the variation for this reconfigure for the ith parameter
-    const int GlobalIndex = UniqueSystIndices[iSyst];
-    const M3::float_t xvar = M3::float_t(xsec->getParProp(GlobalIndex));
-
-    xVarArray[iSyst] = xvar;
-
-    M3::int_t segment = 0;
-    M3::int_t kHigh = M3::int_t(nPoints - 1);
-
-    //KS: We expect new segment is very close to previous
-    const M3::int_t PreviousSegment = M3::int_t(UniqueSystCurrSegment[iSyst]);
-    //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-    if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ) {
-      segment = PreviousSegment;
-    } else if (xvar <= xArray[0]) {
-    // If the variation is below the lowest saved spline point
-      segment = 0;
-      // If the variation is above the highest saved spline point
-    } else if (xvar >= xArray[nPoints-1]) {
-      //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
-      segment = kHigh;
-      //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search
-    } else {
-      // The top point we've got
-      M3::int_t kHalf = 0;
-      // While there is still a difference in the points (we haven't yet found the segment)
-      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-      while (kHigh - segment > 1) {
-        // Increment the half-step
-        kHalf = M3::int_t((segment + kHigh)/2);
-        // If our variation is above the kHalf, set the segment to kHalf
-        if (xvar > xArray[kHalf]) {
-          segment = kHalf;
-          // Else move kHigh down
-        } else {
-          kHigh = kHalf;
-        }
-      } // End the while: we've now done our binary search
-    } // End the else: we've now found our point
-
-    if (segment >= nPoints-1 && nPoints > 1){segment = M3::int_t(nPoints-2);}
-    UniqueSystCurrSegment[iSyst] = segment; 
-  } //end loop over params
-}
-
-//****************************************
 void splineFDBase::CalcSplineWeights()
 //****************************************
 {
@@ -298,21 +241,21 @@ void splineFDBase::CalcSplineWeights()
   {
     const int iSpline = uniquecoeffindices[iCoeff];
     const short int uniqueIndex = short(uniquesplinevec_Monolith[iSpline]);
-    const short int currentsegment = short(UniqueSystCurrSegment[uniqueIndex]);
+    const short int currentsegment = short(SplineSegments[uniqueIndex]);
 
     const int segCoeff = coeffindexvec[iSpline]+currentsegment;
     const int coeffOffset = segCoeff * 4;
     // These are what we can extract from the TSpline3
-    const M3::float_t x = xcoeff_arr[segCoeff];
     const M3::float_t y = manycoeff_arr[coeffOffset+kCoeffY];
     const M3::float_t b = manycoeff_arr[coeffOffset+kCoeffB];
     const M3::float_t c = manycoeff_arr[coeffOffset+kCoeffC];
     const M3::float_t d = manycoeff_arr[coeffOffset+kCoeffD];
 
     // Get the variation for this reconfigure for the ith parameter
-    const M3::float_t xvar = xVarArray[uniqueIndex];
-    // The Delta(x)
-    const M3::float_t dx = xvar - x;
+    /// @todo KS: Once could use "ParamValues" but this will result in tiny bit different results due to floating point precision
+    const M3::float_t xvar = (*SplineInfoArray[uniqueIndex].splineParsPointer);
+    // The Delta(x) = xvar - x
+    const M3::float_t dx = xvar - xcoeff_arr[segCoeff];
 
     //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
     M3::float_t weight = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
@@ -633,35 +576,34 @@ void splineFDBase::PrepForReweight() {
     }//Syst loop end
   }
   
-  nUniqueSysts = int(UniqueSystSplines.size());
+  nParams = static_cast<short int>(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
-  UniqueSystNKnots.resize(nUniqueSysts);
-  UniqueSystCurrSegment.resize(nUniqueSysts);
-  UniqueSystXPts.resize(nUniqueSysts);
-  xVarArray=new M3::float_t[nUniqueSysts];
-
-  for (int iSpline = 0; iSpline < nUniqueSysts; iSpline++)
+  SplineSegments = new short int[nParams]();
+  ParamValues = new float[nParams]();
+  SplineInfoArray.resize(nParams);
+  for (int iSpline = 0; iSpline < nParams; iSpline++)
   {
-    UniqueSystNKnots[iSpline] = UniqueSystSplines[iSpline]->GetNp();
-    UniqueSystXPts[iSpline].resize(UniqueSystNKnots[iSpline]);
-    for (int iKnot = 0; iKnot < UniqueSystNKnots[iSpline]; iKnot++)
+    SplineInfoArray[iSpline].nPts = static_cast<M3::int_t>(UniqueSystSplines[iSpline]->GetNp());
+    SplineInfoArray[iSpline].xPts.resize(SplineInfoArray[iSpline].nPts);
+    SplineInfoArray[iSpline].splineParsPointer = xsec->retPointer(UniqueSystIndices[iSpline]);
+    for (int iKnot = 0; iKnot < SplineInfoArray[iSpline].nPts; iKnot++)
     {
       M3::float_t xPoint;
       M3::float_t yPoint;
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
-      UniqueSystXPts[iSpline][iKnot] = xPoint;
+      SplineInfoArray[iSpline].xPts[iKnot] = xPoint;
     }
     //ETA - let this just be set as the first segment by default
-    UniqueSystCurrSegment[iSpline] = 0;
-    xVarArray[iSpline]=0;
+    SplineSegments[iSpline] = 0;
+    ParamValues[iSpline] = 0.;
   }
   
-  MACH3LOG_INFO("nUniqueSysts: {}", nUniqueSysts);
+  MACH3LOG_INFO("nUniqueSysts: {}", nParams);
   MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", "Spline Index", "Syst Name", "nKnots");
-  for (int iUniqueSyst = 0; iUniqueSyst < nUniqueSysts; iUniqueSyst++)
+  for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
   {
-    MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", iUniqueSyst, UniqueSystNames[iUniqueSyst], UniqueSystNKnots[iUniqueSyst]);
+    MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", iUniqueSyst, UniqueSystNames[iUniqueSyst], SplineInfoArray[iUniqueSyst].nPts);
   }
 
   //ETA
