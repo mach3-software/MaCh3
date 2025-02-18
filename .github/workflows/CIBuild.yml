@@ -42,6 +42,10 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NATIVE_ENABLED=ON
+          - os: Ubuntu24.10 Clang
+            file: Doc/MaCh3DockerFiles/Ubuntu24.10/Dockerfile
+            tag: ubuntu24.10latest
+            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
     name: Build CI ${{ matrix.os }}
 
