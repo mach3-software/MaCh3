@@ -165,7 +165,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     }
     break;
     //KS: Alternative calculation of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
-    case (kDembinskiAbdelmottele):
+    case (kDembinskiAbdelmotteleb):
     {
       //KS: code follows authors implementation from:
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
@@ -236,7 +236,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     {
       //Just call getTestStatLLH which doesn't take in weights
       //and is a Poisson likelihood comparison.
-      return getTestStatLLH(data, mc);//stat;
+      return getTestStatLLH(data, mc);
     }
     break;
     case TestStatistic::kNTestStatistics:
