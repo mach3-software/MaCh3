@@ -177,13 +177,13 @@ endif()
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
-  target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
-  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
   # KS: Not a clue why clang need different...
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  else()
+    target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
-
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
 endif()
 
 if(MaCh3_GPU_ENABLED) 
