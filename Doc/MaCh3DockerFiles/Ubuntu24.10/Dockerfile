@@ -5,7 +5,7 @@ FROM rootproject/root:6.34.00-ubuntu24.10 AS mach3_build
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
-#LABEL compiler="GNU 11.4.0"
+LABEL compiler="Clang 19.1.1"
 LABEL root_version="v6.34.00"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
@@ -15,7 +15,7 @@ RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
 RUN apt install -y --no-install-recommends \
     vim less nano gdb csh tcsh ed quota python3 python3-dev python3-pip \
-    cvs procmail ca-certificates cmake ninja-build clang
+    cvs procmail ca-certificates cmake ninja-build clang libomp-dev
 
 # Declare the build argument
 ARG MACH3_VERSION
