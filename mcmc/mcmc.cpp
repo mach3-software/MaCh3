@@ -79,7 +79,7 @@ void mcmc::runMCMC() {
 
   // *******************
 
-    // Set up the multicanonical weight on the delta_cp parameter
+  // Set up the multicanonical weight on the delta_cp parameter
   multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"],false);
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
   if (multicanonical) {
@@ -89,7 +89,8 @@ void mcmc::runMCMC() {
     for (size_t s = 0; s < systematics.size(); s++) {
       MACH3LOG_INFO("Systematic: {}", systematics[static_cast<int>(s)]->getName());
       if (systematics[static_cast<int>(s)]->getName() == "osc_cov") {
-        MACH3LOG_INFO("Found osc_cov systematic");
+        oscCovVar = static_cast<int>(s);
+        MACH3LOG_INFO("Found osc_cov systematic saving in variable {}", oscCovVar);
         for (int i = 0; i < systematics[static_cast<int>(s)]->GetNumParams(); i++) {
           MACH3LOG_INFO("Parameter: {}", systematics[static_cast<int>(s)]->GetParName(i));
           if (systematics[static_cast<int>(s)]->GetParName(i) == "delta_cp") {
@@ -114,7 +115,6 @@ void mcmc::runMCMC() {
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
 
-  MACH3LOG_INFO("IM HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
   // Begin MCMC
   for (step = stepStart; step < stepStart+chainLength; ++step)
@@ -166,37 +166,20 @@ void mcmc::ProposeStep() {
     syst_llh[s] = systematics[s]->GetLikelihood();
     llh += syst_llh[s];
 
-    // std::cout << "parameter s: " << s << std::endl;
-    // std::cout << "Systematic: " << systematics[s]->getName() << std::endl;
-    // std::cout << "Numparams: " << systematics[s]->GetNumParams() << std::endl;
-    // std::cout << "systematics.size() : " << systematics.size() << std::endl;
-    // for (int i = 0; i < systematics[s]->GetNumParams(); i++){
-    //   std::cout << "nominalArray: " << systematics[s]->getNominalArray()[i] << std::endl;
-    //   std::cout << "parname: " << systematics[s]->GetParName(i) << std::endl;
-    //   std::cout << "parprop: " << systematics[s]->getParProp(i) << std::endl;
-    //   // std::cout << "parname: " << systematics[s]->GetParName(static_cast<int>(i)) << std::endl;
-    //   // std::cout << "parprop: " << systematics[s]->getParProp(static_cast<int>(i)) << std::endl;
-    //   }
-
-    // MACH3LOG_INFO("Multi-canonical method: {}", multicanonical);
-    // MACH3LOG_INFO("Multi-canonical beta: {}", multicanonicalBeta);
-    // MACH3LOG_INFO("Multi-canonical variable: {}", multicanonicalVar);
-
-    // if (multicanonical){
-    //   if (systematics[s]->getName() == "osc_cov"){
-    //     // MACH3LOG_INFO("LLH before multicanonical penalty: {}", llh);
-    //     delta_cp_value = systematics[s]->getParProp(multicanonicalVar);
-    //     // MACH3LOG_INFO("Delta CP value: {}", delta_cp_value);
-    //     multicanonical_penalty = pow(GetMulticanonicalWeight(delta_cp_value),1-multicanonicalBeta);
-    //     // MACH3LOG_INFO("Multicanonical penalty: {}", multicanonical_penalty);
-    //     llh += multicanonical_penalty;
-    //     // MACH3LOG_INFO("LLH after multicanonical penalty: {}", llh);
-    //   }
-    // }
-
     #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[s]->getName() << " " << llh << std::endl;
     #endif
+  }
+
+  // if we're using the multicanonical method, we need to add the penalty to the likelihood now prior to the Large LLH check
+  if (multicanonical){
+    // MACH3LOG_INFO("LLH before multicanonical penalty: {}", llh);
+    delta_cp_value = systematics[oscCovVar]->getParProp(multicanonicalVar);
+    // MACH3LOG_INFO("Delta CP value: {}", delta_cp_value);
+    multicanonical_penalty = pow(GetMulticanonicalWeight(delta_cp_value),1-multicanonicalBeta);
+    // MACH3LOG_INFO("Multicanonical penalty: {}", multicanonical_penalty);
+    llh += multicanonical_penalty;
+    // MACH3LOG_INFO("LLH after multicanonical penalty: {}", llh);
   }
 
   // Check if we've hit a boundary in the systematics
@@ -244,14 +227,17 @@ void mcmc::ProposeStep() {
   logLProp = llh;
 }
 
-double mcmc::GetMulticanonicalWeight(double deltacp){
-  double delta_cp_log_likelihood;
+inline double mcmc::GetMulticanonicalWeight(double deltacp){
 
-  // calculate log likelihood according to gaussian around -0.5pi and +0.5pi
-  // #####proof of concept#####, this need to be changed to a sensible prior for dcp
-  delta_cp_log_likelihood = -TMath::Log(TMath::Gaus(deltacp,0.5*TMath::Pi(),1,kTRUE)+TMath::Gaus(deltacp,-0.5*TMath::Pi(),1,kTRUE));
+  constexpr double inv_sqrt_2pi = 0.3989422804014337;
+  constexpr double neg_half_sigma = -0.5;
 
-  return delta_cp_log_likelihood;
+  double exp1 = std::exp(neg_half_sigma * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
+  double exp2 = std::exp(neg_half_sigma * (deltacp) * (deltacp));
+  double exp3 = std::exp(neg_half_sigma * (deltacp + TMath::Pi()) * (deltacp + TMath::Pi()));
+  ///delta_cp_log_likelihood = -TMath::Log(TMath::Gaus(deltacp,TMath::Pi(),1,kTRUE)+TMath::Gaus(deltacp,0,1,kTRUE)+TMath::Gaus(deltacp,-TMath::Pi(),1,kTRUE));
+
+  return -std::log(inv_sqrt_2pi * (exp1 + exp2 + exp3));
 }
 
 // *******************

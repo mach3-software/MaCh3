@@ -57,6 +57,8 @@ class mcmc : public FitterBase {
   double multicanonicalBeta;
   /// multi-canonical penalty
   double multicanonical_penalty;
+  /// osc_cov systematic
+  int oscCovVar;
   /// multi-canonical par number
   int multicanonicalVar;
   /// delta_cp parameter value
