@@ -21,7 +21,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 include(MaCh3Utils)
 
 add_library(MaCh3CompileDefinitions INTERFACE)
-#Create a seperate target for GPU compiler options
+#Create a separate target for GPU compiler options
 #if GPU is not enabled nothing will be added to this and it will be empty
 # this saves a few if statements
 add_library(MaCh3GPUCompilerOptions INTERFACE)
