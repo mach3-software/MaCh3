@@ -725,6 +725,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   #if FPGA_SIMULATOR
     auto selector = sycl::ext::intel::fpga_simulator_selector_v;
   #elif FPGA_HARDWARE
+   //-Xshardware -fsycl-link=early -DFPGA_HARDWARE
     auto selector = sycl::ext::intel::fpga_selector_v;
   #elif FPGA_EMULATOR
     auto selector = sycl::ext::intel::fpga_emulator_selector_v;
@@ -802,6 +803,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     ParamInfo->GetEntry(i);
     cpu_spline_handler->paramNo_arr[i] = paramNo_arr;
     cpu_spline_handler->nKnots_arr[i] = nKnots_arr;
+    #ifdef USE_FPGA
+    cpu_spline_handler->param_n_knots[2*i] = paramNo_arr;
+    cpu_spline_handler->param_n_knots[2*i+1] = nKnots_arr;
+    #endif
   }
 
   float coeff_x = 0.;
