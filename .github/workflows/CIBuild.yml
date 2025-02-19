@@ -45,7 +45,7 @@ jobs:
           - os: Ubuntu24.10 Clang NoMultithreading
             file: Doc/MaCh3DockerFiles/Ubuntu24.10/Dockerfile
             tag: ubuntu24.10latest
-            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF
+            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF -DMaCh3_PYTHON_ENABLED=ON
 
     name: Build CI ${{ matrix.os }}
 
