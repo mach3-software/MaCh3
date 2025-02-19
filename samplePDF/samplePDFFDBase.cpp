@@ -1942,7 +1942,7 @@ std::vector<TH1*> samplePDFFDBase::ReturnHistsBySelection1D(std::string Kinemati
   std::vector<TH1*> hHistList;
   std::string legendEntry;
 
-  if (THStackLeg != nullptr) {delete [] THStackLeg;}
+  if (THStackLeg != nullptr) {delete THStackLeg;}
   THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
 
   int iMax = -1;
