@@ -158,6 +158,7 @@ Based on several test here are recommended version:
 | Alma9       | ✅     |
 | Rocky9      | ✅     |
 | Ubuntu22.04 | ✅     |
+| Ubuntu24.10 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
