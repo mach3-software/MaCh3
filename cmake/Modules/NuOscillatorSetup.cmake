@@ -6,6 +6,7 @@ DefineEnabledRequiredSwitch(CUDAProb3_ENABLED FALSE)
 DefineEnabledRequiredSwitch(ProbGPULinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(Prob3ppLinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(NuFastLinear_ENABLED FALSE)
+DefineEnabledRequiredSwitch(NuSQUIDSLinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(OscProb_ENABLED FALSE)
 
 #KS: If all Oscillators are turned off then enable CUDAProb3Linear_ENABLED
@@ -14,6 +15,7 @@ if (NOT CUDAProb3Linear_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
     NOT Prob3ppLinear_ENABLED AND
     NOT NuFastLinear_ENABLED AND
+    NOT NuSQUIDSLinear_ENABLED AND
     NOT OscProb_ENABLED)
     set(NuFastLinear_ENABLED TRUE)
 endif()
@@ -26,6 +28,7 @@ foreach(option
     ProbGPULinear
     Prob3ppLinear
     NuFastLinear
+    NuSQUIDSLinear
     OscProb
     )
   if(${option}_ENABLED)
@@ -38,7 +41,8 @@ IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
 IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
 IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
 IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
-IsTrue(NuFastLinear_ENABLED USE_NuFastLiner)
+IsTrue(NuFastLinear_ENABLED USE_NuFastLinear)
+IsTrue(NuSQUIDSLinear_ENABLED USE_NuSQUIDSLinear)
 IsTrue(OscProb_ENABLED USE_OscProb)
 
 #Also additional flags
@@ -60,17 +64,15 @@ endif()
 
 #KS: This may seem hacky, but when CMAKE_CUDA_ARCHITECTURES is passed, it's treated as a string rather than a list. Since CMake uses semi-colon-delimited strings to represent lists, we convert it to a proper list to handle CUDA architectures correctly.
 set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
-#string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 if(NOT DEFINED MaCh3_NuOscillatorBranch)
-  set(MaCh3_NuOscillatorBranch "v1.2.0")
+  set(MaCh3_NuOscillatorBranch "v1.2.1")
 endif()
 
 #Try adding Oscillator Class
 CPMAddPackage(
   NAME NuOscillator
-    VERSION 1.2.0
     GITHUB_REPOSITORY "dbarrow257/NuOscillator"
     GIT_TAG ${MaCh3_NuOscillatorBranch}
     GIT_SHALLOW YES
@@ -83,7 +85,8 @@ CPMAddPackage(
     "UseCUDAProb3 ${USE_CUDAProb3}"
     "UseProbGPULinear ${USE_ProbGPULinear}"
     "UseProb3ppLinear ${USE_Prob3ppLinear}"
-    "UseNuFASTLinear  ${USE_NuFastLiner}"
+    "UseNuFASTLinear  ${USE_NuFastLinear}"
+    "UseNuSQUIDSLinear  ${USE_NuSQUIDSLinear}"
     "UseOscProb ${USE_OscProb}"
 
     "NuOscillator_Compiler_Flags ${cpu_compile_options_string}"
