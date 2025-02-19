@@ -42,10 +42,10 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NATIVE_ENABLED=ON
-          - os: Ubuntu24.10 Clang
+          - os: Ubuntu24.10 Clang NoMultithreading
             file: Doc/MaCh3DockerFiles/Ubuntu24.10/Dockerfile
             tag: ubuntu24.10latest
-            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF
 
     name: Build CI ${{ matrix.os }}
 
@@ -56,7 +56,9 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: Set MACH3_VERSION
-      run: echo "MACH3_VERSION=${{ github.head_ref }}" >> $GITHUB_ENV
+      run: echo "MACH3_VERSION=${GITHUB_HEAD_REF}" >> "$GITHUB_ENV"
+      env:
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
 
     - name: Build the Docker image
       run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION="$MACH3_VERSION" --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"
