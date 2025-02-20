@@ -18,7 +18,7 @@ splineFDBase::splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes_) : SplineBa
   }
   xsec = xsec_;
 
-  if (!Modes) {
+  if (!Modes_) {
     MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised MaCh3Modes object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
