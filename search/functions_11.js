@@ -96,7 +96,7 @@ var searchData=
   ['smonolith_93',['SMonolith',['../classSMonolith.html#a4fe737f7c948f9ee963d87aac46ddebb',1,'SMonolith::SMonolith(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, const std::vector&lt; RespFuncType &gt; &amp;SplineType, const bool SaveFlatTree=false)'],['../classSMonolith.html#a2ddb60ccfabbb433c316fde62e93e8df',1,'SMonolith::SMonolith(const std::string &amp;FileName)']]],
   ['smonolithgpu_94',['SMonolithGPU',['../classSMonolithGPU.html#aa19e498d0e762566ee62c7b93de18598',1,'SMonolithGPU']]],
   ['splinebase_95',['SplineBase',['../classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1',1,'PySplineBase::SplineBase()'],['../classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1',1,'SplineBase::SplineBase()']]],
-  ['splinefdbase_96',['splineFDBase',['../classsplineFDBase.html#a10eb2e9c0968a510db769d7dc2653da8',1,'splineFDBase']]],
+  ['splinefdbase_96',['splineFDBase',['../classsplineFDBase.html#a0eac7d14ff4f54d5346b60a18876ecaf',1,'splineFDBase']]],
   ['splineinterpolation_5ftorespfunctype_97',['SplineInterpolation_ToRespFuncType',['../Structs_8h.html#af1b80b5456f9b1cb847fb56ddcc3c1ab',1,'Structs.h']]],
   ['splineinterpolation_5ftostring_98',['SplineInterpolation_ToString',['../Structs_8h.html#a2d969ce667e41bd2492cff1775456837',1,'Structs.h']]],
   ['startfrompreviousfit_99',['StartFromPreviousFit',['../classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0',1,'FitterBase::StartFromPreviousFit()'],['../classmcmc.html#adf4c80255288c5396da3b95d609ce4b2',1,'mcmc::StartFromPreviousFit()']]],

@@ -88,61 +88,63 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="splineFDBase_8h_source.html">splineFDBase.h</a>&quot;</code><br />
 <code>#include &lt;memory&gt;</code><br />
+<code>#include &quot;TROOT.h&quot;</code><br />
+<code>#include &quot;TKey.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for splineFDBase.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="splineFDBase_8cpp__incl.png" border="0" usemap="#asplines_2splineFDBase_8cpp" alt=""/></div>
 <map name="asplines_2splineFDBase_8cpp" id="asplines_2splineFDBase_8cpp">
-<area shape="rect" title=" " alt="" coords="1701,5,1889,31"/>
-<area shape="rect" href="splineFDBase_8h.html" title=" " alt="" coords="1672,79,1795,104"/>
-<area shape="rect" title=" " alt="" coords="1819,79,1896,104"/>
-<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="1785,372,1943,397"/>
-<area shape="rect" href="SplineBase_8h.html" title=" " alt="" coords="1273,152,1429,177"/>
-<area shape="rect" href="MaCh3Modes_8h.html" title=" " alt="" coords="509,225,693,251"/>
-<area shape="rect" title=" " alt="" coords="2340,152,2407,177"/>
-<area shape="rect" title=" " alt="" coords="1897,445,1940,471"/>
-<area shape="rect" title=" " alt="" coords="1681,445,1724,471"/>
-<area shape="rect" title=" " alt="" coords="1749,445,1873,471"/>
-<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="1057,445,1263,471"/>
-<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1180,519,1364,544"/>
-<area shape="rect" href="Core_8h.html" title=" " alt="" coords="815,592,942,617"/>
-<area shape="rect" title=" " alt="" coords="1964,445,2047,471"/>
-<area shape="rect" title=" " alt="" coords="930,445,1033,471"/>
-<area shape="rect" title=" " alt="" coords="1490,445,1555,471"/>
-<area shape="rect" title=" " alt="" coords="2071,445,2129,471"/>
-<area shape="rect" title=" " alt="" coords="2154,445,2241,471"/>
-<area shape="rect" title=" " alt="" coords="2265,445,2325,471"/>
-<area shape="rect" title=" " alt="" coords="2349,445,2579,471"/>
-<area shape="rect" title=" " alt="" coords="737,665,817,691"/>
-<area shape="rect" title=" " alt="" coords="660,592,719,617"/>
-<area shape="rect" title=" " alt="" coords="967,519,1054,544"/>
-<area shape="rect" title=" " alt="" coords="949,665,1024,691"/>
-<area shape="rect" title=" " alt="" coords="1277,592,1363,617"/>
-<area shape="rect" title=" " alt="" coords="1018,592,1105,617"/>
-<area shape="rect" title=" " alt="" coords="1129,592,1253,617"/>
-<area shape="rect" title=" " alt="" coords="19,665,93,691"/>
-<area shape="rect" title=" " alt="" coords="383,665,446,691"/>
-<area shape="rect" title=" " alt="" coords="1264,665,1339,691"/>
-<area shape="rect" title=" " alt="" coords="1471,665,1534,691"/>
-<area shape="rect" title=" " alt="" coords="1198,372,1263,397"/>
-<area shape="rect" href="SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="1854,225,2023,251"/>
-<area shape="rect" href="SplineCommon_8h.html" title="Contains definitions for spline coefficients and structure used in both CPU and GPU code." alt="" coords="1541,225,1723,251"/>
-<area shape="rect" title=" " alt="" coords="1748,225,1815,251"/>
-<area shape="rect" title=" " alt="" coords="717,225,781,251"/>
-<area shape="rect" title=" " alt="" coords="805,225,885,251"/>
-<area shape="rect" title=" " alt="" coords="910,225,999,251"/>
-<area shape="rect" title=" " alt="" coords="702,372,813,397"/>
-<area shape="rect" title=" " alt="" coords="1023,225,1113,251"/>
-<area shape="rect" title=" " alt="" coords="1137,225,1212,251"/>
-<area shape="rect" title=" " alt="" coords="837,372,907,397"/>
-<area shape="rect" href="covarianceXsec_8h.html" title=" " alt="" coords="1867,299,2077,324"/>
-<area shape="rect" title=" " alt="" coords="981,299,1032,324"/>
-<area shape="rect" href="YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="406,372,575,397"/>
-<area shape="rect" href="Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="529,299,674,324"/>
-<area shape="rect" title=" " alt="" coords="636,445,713,471"/>
-<area shape="rect" title=" " alt="" coords="220,445,303,471"/>
-<area shape="rect" title=" " alt="" coords="738,445,803,471"/>
-<area shape="rect" title=" " alt="" coords="479,445,611,471"/>
+<area shape="rect" title=" " alt="" coords="2172,5,2360,31"/>
+<area shape="rect" href="splineFDBase_8h.html" title=" " alt="" coords="1683,79,1806,104"/>
+<area shape="rect" title=" " alt="" coords="2601,225,2665,251"/>
+<area shape="rect" title=" " alt="" coords="2266,79,2343,104"/>
+<area shape="rect" title=" " alt="" coords="2368,79,2447,104"/>
+<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="1958,372,2115,397"/>
+<area shape="rect" href="SplineBase_8h.html" title=" " alt="" coords="1667,152,1823,177"/>
+<area shape="rect" href="MaCh3Modes_8h.html" title=" " alt="" coords="651,225,835,251"/>
+<area shape="rect" title=" " alt="" coords="1575,152,1642,177"/>
+<area shape="rect" title=" " alt="" coords="2135,445,2178,471"/>
+<area shape="rect" title=" " alt="" coords="1919,445,1962,471"/>
+<area shape="rect" title=" " alt="" coords="1987,445,2111,471"/>
+<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="709,445,914,471"/>
+<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1163,519,1347,544"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="1091,592,1217,617"/>
+<area shape="rect" title=" " alt="" coords="2202,445,2285,471"/>
+<area shape="rect" title=" " alt="" coords="531,445,633,471"/>
+<area shape="rect" title=" " alt="" coords="1472,445,1537,471"/>
+<area shape="rect" title=" " alt="" coords="2309,445,2367,471"/>
+<area shape="rect" title=" " alt="" coords="2392,445,2479,471"/>
+<area shape="rect" title=" " alt="" coords="2503,445,2563,471"/>
+<area shape="rect" title=" " alt="" coords="1664,445,1895,471"/>
+<area shape="rect" title=" " alt="" coords="911,665,991,691"/>
+<area shape="rect" title=" " alt="" coords="642,592,701,617"/>
+<area shape="rect" title=" " alt="" coords="768,519,855,544"/>
+<area shape="rect" title=" " alt="" coords="1166,665,1241,691"/>
+<area shape="rect" title=" " alt="" coords="1293,592,1380,617"/>
+<area shape="rect" title=" " alt="" coords="1404,592,1491,617"/>
+<area shape="rect" title=" " alt="" coords="1515,592,1639,617"/>
+<area shape="rect" title=" " alt="" coords="5,665,79,691"/>
+<area shape="rect" title=" " alt="" coords="1072,665,1135,691"/>
+<area shape="rect" title=" " alt="" coords="2173,665,2247,691"/>
+<area shape="rect" title=" " alt="" coords="1645,665,1708,691"/>
+<area shape="rect" title=" " alt="" coords="1091,372,1156,397"/>
+<area shape="rect" href="SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="2011,225,2180,251"/>
+<area shape="rect" href="SplineCommon_8h.html" title="Contains definitions for spline coefficients and structure used in both CPU and GPU code." alt="" coords="1003,225,1185,251"/>
+<area shape="rect" title=" " alt="" coords="1210,225,1277,251"/>
+<area shape="rect" title=" " alt="" coords="1301,225,1381,251"/>
+<area shape="rect" title=" " alt="" coords="1405,225,1495,251"/>
+<area shape="rect" title=" " alt="" coords="1180,372,1291,397"/>
+<area shape="rect" title=" " alt="" coords="1519,225,1608,251"/>
+<area shape="rect" title=" " alt="" coords="1633,225,1707,251"/>
+<area shape="rect" title=" " alt="" coords="1315,372,1385,397"/>
+<area shape="rect" href="covarianceXsec_8h.html" title=" " alt="" coords="2042,299,2253,324"/>
+<area shape="rect" title=" " alt="" coords="605,299,655,324"/>
+<area shape="rect" href="YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="301,372,471,397"/>
+<area shape="rect" href="Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="781,299,927,324"/>
+<area shape="rect" title=" " alt="" coords="79,445,157,471"/>
+<area shape="rect" title=" " alt="" coords="423,445,506,471"/>
+<area shape="rect" title=" " alt="" coords="181,445,247,471"/>
 </map>
 </div>
 </div>
