@@ -3,7 +3,7 @@ var searchData=
   ['madepostfit_0',['MadePostfit',['../classMCMCProcessor.html#aecc35d4ea7d2c7e020e50388ba0ffb64',1,'MCMCProcessor']]],
   ['man_1',['man',['../PlotLLH_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40',1,'man():&#160;PlotLLH.cpp'],['../GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40',1,'man():&#160;GetPostfitParamPlots.cpp']]],
   ['manycoeff_5farr_2',['manycoeff_arr',['../classsplineFDBase.html#ab883a1f2cdae707c36fa27b86ed7f279',1,'splineFDBase']]],
-  ['marginalposteriorvariance_3',['MarginalPosteriorVariance',['../RHat__HighMem_8cpp.html#a68813385f1240d1264e139391b12bf05',1,'MarginalPosteriorVariance():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#a68813385f1240d1264e139391b12bf05',1,'MarginalPosteriorVariance():&#160;RHat.cpp']]],
+  ['marginalposteriorvariance_3',['MarginalPosteriorVariance',['../RHat_8cpp.html#a68813385f1240d1264e139391b12bf05',1,'MarginalPosteriorVariance():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#a68813385f1240d1264e139391b12bf05',1,'MarginalPosteriorVariance():&#160;RHat_HighMem.cpp']]],
   ['marginalposteriorvariancefolded_4',['MarginalPosteriorVarianceFolded',['../RHat__HighMem_8cpp.html#af4fae3d323e2f5220b3506386304f8f4',1,'RHat_HighMem.cpp']]],
   ['matrixname_5',['matrixName',['../classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee',1,'covarianceBase']]],
   ['maxbins_6',['maxBins',['../classSampleSummary.html#af5a3139cef917abfddc36dbb8d4ac2fd',1,'SampleSummary']]],
@@ -31,7 +31,7 @@ var searchData=
   ['mode_28',['mode',['../structFarDetectorCoreInfo.html#a8e5ddbda4c271abb29952f7f123fb881',1,'FarDetectorCoreInfo']]],
   ['modehist_29',['ModeHist',['../classSampleSummary.html#a9b21ff74bb8ebd7c3af2c24e02f3d7dc',1,'SampleSummary']]],
   ['modemap_30',['ModeMap',['../classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3',1,'MaCh3Modes']]],
-  ['modes_31',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classsamplePDFBase.html#ab4ce7691212fdc86570b98d58a333ddf',1,'samplePDFBase::Modes()']]],
+  ['modes_31',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classsamplePDFBase.html#ab4ce7691212fdc86570b98d58a333ddf',1,'samplePDFBase::Modes()'],['../classsplineFDBase.html#ad004862f499b783034dd6a30df25c9f4',1,'splineFDBase::Modes()']]],
   ['modes_32',['modes',['../structXsecNorms4.html#ad0632d5a94a37ee5ce297698abadd844',1,'XsecNorms4']]],
   ['monolithindex_33',['MonolithIndex',['../classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a',1,'splineFDBase']]],
   ['monolithsize_34',['MonolithSize',['../classsplineFDBase.html#ad1fefa7f796f2a28a69f5336f5777bce',1,'splineFDBase']]]
