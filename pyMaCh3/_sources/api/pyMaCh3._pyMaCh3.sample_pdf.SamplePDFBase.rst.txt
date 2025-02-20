@@ -1,0 +1,27 @@
+SamplePDFBase
+=============
+
+.. currentmodule:: pyMaCh3._pyMaCh3.sample_pdf
+
+.. autoclass:: SamplePDFBase
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SamplePDFBase.fill_1d_hist
+      ~SamplePDFBase.fill_2d_hist
+      ~SamplePDFBase.get_bin_LLH
+      ~SamplePDFBase.get_likelihood
+      ~SamplePDFBase.reweight
+      ~SamplePDFBase.set_test_stat
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: fill_1d_hist
+   .. automethod:: fill_2d_hist
+   .. automethod:: get_bin_LLH
+   .. automethod:: get_likelihood
+   .. automethod:: reweight
+   .. automethod:: set_test_stat
