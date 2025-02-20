@@ -96,7 +96,7 @@ Collaboration diagram for MaCh3ModeInfo:</div>
 <div class="dyncontent">
 <div class="center"><img src="structMaCh3ModeInfo__coll__graph.png" border="0" usemap="#aMaCh3ModeInfo_coll__map" alt="Collaboration graph"/></div>
 <map name="aMaCh3ModeInfo_coll__map" id="aMaCh3ModeInfo_coll__map">
-<area shape="rect" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="80,197,208,223"/>
+<area shape="rect" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="80,212,208,237"/>
 <area shape="rect" title=" " alt="" coords="31,95,118,120"/>
 <area shape="rect" title=" " alt="" coords="5,5,144,45"/>
 <area shape="rect" title=" " alt="" coords="143,95,281,120"/>
@@ -126,6 +126,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ad987766dd95bed2cfcdad169d07a885b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b">IsNC</a></td></tr>
 <tr class="memdesc:ad987766dd95bed2cfcdad169d07a885b"><td class="mdescLeft">&#160;</td><td class="mdescRight">IsNC check.  <br /></td></tr>
 <tr class="separator:ad987766dd95bed2cfcdad169d07a885b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3238e80bbf6a18fc21419a3277406d8d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMaCh3ModeInfo.html#a3238e80bbf6a18fc21419a3277406d8d">SplineSuffix</a></td></tr>
+<tr class="memdesc:a3238e80bbf6a18fc21419a3277406d8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spline suffix.  <br /></td></tr>
+<tr class="separator:a3238e80bbf6a18fc21419a3277406d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>KS: Class containing information for a single MaCh3Mode. </p>
@@ -158,11 +161,11 @@ Public Attributes</h2></td></tr>
 
 <p>KS: Checks MaCh3 modes is associated with a given generator mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00029">29</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   29</span>                                        {</div>
-<div class="line"><span class="lineno">   30</span>    <span class="keywordtype">bool</span> exists = std::find(<a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.begin(), <a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.end(), GenMode) != <a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.end();</div>
-<div class="line"><span class="lineno">   31</span>    <span class="keywordflow">return</span> exists;</div>
-<div class="line"><span class="lineno">   32</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00031">31</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   31</span>                                        {</div>
+<div class="line"><span class="lineno">   32</span>    <span class="keywordtype">bool</span> exists = std::find(<a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.begin(), <a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.end(), GenMode) != <a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.end();</div>
+<div class="line"><span class="lineno">   33</span>    <span class="keywordflow">return</span> exists;</div>
+<div class="line"><span class="lineno">   34</span>  }</div>
 <div class="ttc" id="astructMaCh3ModeInfo_html_a02a4f32a5a65b723a0849539a315cc1a"><div class="ttname"><a href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">MaCh3ModeInfo::GeneratorMaping</a></div><div class="ttdeci">std::vector&lt; int &gt; GeneratorMaping</div><div class="ttdoc">Mapping between mode and generator integers.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00025">MaCh3Modes.h:25</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -255,6 +258,24 @@ Public Attributes</h2></td></tr>
 <p>Mode color for plotting purposes. </p>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00023">23</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+
+</div>
+</div>
+<a id="a3238e80bbf6a18fc21419a3277406d8d" name="a3238e80bbf6a18fc21419a3277406d8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3238e80bbf6a18fc21419a3277406d8d">&#9670;&#160;</a></span>SplineSuffix</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string MaCh3ModeInfo::SplineSuffix</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Spline suffix. </p>
+
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00029">29</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>

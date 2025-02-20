@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['declarenewmode_0',['DeclareNewMode',['../classMaCh3Modes.html#ae58ca2779f5a950cf489fc102f82d7d3',1,'MaCh3Modes']]],
+  ['declarenewmode_0',['DeclareNewMode',['../classMaCh3Modes.html#a180684434c373add20e58ab9fd083a93',1,'MaCh3Modes']]],
   ['demangletypename_1',['DemangleTypeName',['../YamlHelper_8h.html#a57276bf6624191db1d835a88b711e096',1,'YamlHelper.h']]],
   ['destroyarrays_2',['DestroyArrays',['../RHat_8cpp.html#abb60917440a91d5a3507fd4059d3e23b',1,'DestroyArrays():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#abb60917440a91d5a3507fd4059d3e23b',1,'DestroyArrays():&#160;RHat_HighMem.cpp']]],
   ['diagmcmc_3',['DiagMCMC',['../classMCMCProcessor.html#a7f8faecae63616ba100cf24ae42ecc08',1,'MCMCProcessor::DiagMCMC()'],['../DiagMCMC_8cpp.html#ae234755b7b483f97d2a48d8959e90a18',1,'DiagMCMC(const std::string &amp;inputFile, const std::string &amp;config):&#160;DiagMCMC.cpp']]],

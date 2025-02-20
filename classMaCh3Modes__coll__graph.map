@@ -1,9 +1,9 @@
 <map id="MaCh3Modes" name="MaCh3Modes">
-<area shape="rect" id="node1" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1112,107,1223,133"/>
-<area shape="rect" id="node2" title=" " alt="" coords="649,180,812,220"/>
-<area shape="rect" id="node3" title=" " alt="" coords="219,137,306,162"/>
-<area shape="rect" id="node6" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="497,77,625,102"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,129,144,169"/>
-<area shape="rect" id="node5" title=" " alt="" coords="836,71,1019,111"/>
-<area shape="rect" id="node7" title=" " alt="" coords="193,15,332,41"/>
+<area shape="rect" id="node1" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1112,114,1223,139"/>
+<area shape="rect" id="node2" title=" " alt="" coords="649,187,812,227"/>
+<area shape="rect" id="node3" title=" " alt="" coords="219,143,306,169"/>
+<area shape="rect" id="node6" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="497,83,625,109"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,136,144,176"/>
+<area shape="rect" id="node5" title=" " alt="" coords="836,77,1019,117"/>
+<area shape="rect" id="node7" title=" " alt="" coords="193,7,332,33"/>
 </map>
