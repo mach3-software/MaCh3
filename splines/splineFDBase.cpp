@@ -4,8 +4,10 @@
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
+_MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
 #include "TKey.h"
+_MaCh3_Safe_Include_End_ //}
 
 //****************************************
 splineFDBase::splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes_) : SplineBase() {
