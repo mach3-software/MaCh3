@@ -39,7 +39,7 @@ class splineFDBase : public SplineBase {
 	void cleanUpMemory();
 
 	//Have to define this in your own class 
-	virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)=0;
+        virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
 	/// @brief Check if there are any repeated modes. This is used to reduce the number
 	/// of modes in case many interaction modes get averaged into one spline
         std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
@@ -124,4 +124,6 @@ class splineFDBase : public SplineBase {
 	std::vector<int> uniquesplinevec_Monolith;
 
   MaCh3Modes* Modes;
+  enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
+  virtual std::vector<std::string> GetTokensFromSplineName(std::string FullSplineName) = 0;
 };
