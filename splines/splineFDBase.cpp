@@ -5,14 +5,19 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 //****************************************
-splineFDBase::splineFDBase(covarianceXsec *xsec_)
-              : SplineBase() {
+splineFDBase::splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes_) : SplineBase() {
 //****************************************
   if (!xsec_) {
     MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
+
+  if (!Modes) {
+    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised MaCh3Modes object");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  Modes = Modes_;
 
   // Keep these in class scope, important for using 1 monolith/sample!
   MonolithIndex = 0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
@@ -832,4 +837,107 @@ void splineFDBase::PrintBinning(TAxis *Axis)
     text += fmt::format("{} ", Axis->GetXbins()->GetAt(iBin));
   }
   MACH3LOG_INFO("{}", text);
+}
+
+//****************************************
+std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+//****************************************
+{
+  std::vector<std::vector<int>> ReturnVec;
+  int SampleIndex = -1;
+  for (unsigned int iSample = 0; iSample < SampleNames.size(); iSample++) {
+    if (SampleName == SampleNames[iSample]) {
+      SampleIndex = iSample;
+    }
+  }
+
+  if (SampleIndex == -1) {
+    MACH3LOG_ERROR("Sample not found: {}", SampleName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  
+  int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
+  //ETA- this is already a MaCh3 mode
+  int Mode = EventMode;
+
+  int Var1Bin = SplineBinning[SampleIndex][iOscChan][0]->FindBin(Var1Val)-1;
+  if (Var1Bin < 0 || Var1Bin >= SplineBinning[SampleIndex][iOscChan][0]->GetNbins()) {
+    return ReturnVec;
+  }
+
+  int Var2Bin = SplineBinning[SampleIndex][iOscChan][1]->FindBin(Var2Val)-1;
+  if (Var2Bin < 0 || Var2Bin >= SplineBinning[SampleIndex][iOscChan][1]->GetNbins()) {
+    return ReturnVec;
+  }
+
+  int Var3Bin = SplineBinning[SampleIndex][iOscChan][2]->FindBin(Var3Val)-1;
+
+  if (Var3Bin < 0 || Var3Bin >= SplineBinning[SampleIndex][iOscChan][2]->GetNbins()){
+    return ReturnVec;
+  }
+
+  for(int iSyst=0; iSyst<nSplineSysts; iSyst++){
+    std::vector<int> spline_modes = SplineModeVecs[SampleIndex][iSyst];
+    int nSampleModes = static_cast<int>(spline_modes.size());
+
+    //ETA - look here at the length of spline_modes and what you're actually comparing against
+    for(int iMode = 0; iMode<nSampleModes ; iMode++){
+      //Only consider if the event mode (Mode) matches ones of the spline modes
+      if (Mode == spline_modes[iMode]) {
+        std::vector<int> event_vec(7);
+        event_vec[0]=SampleIndex;
+        event_vec[1]=iOscChan;
+        event_vec[2]=iSyst;
+        event_vec[3]=iMode;
+        event_vec[4]=Var1Bin;
+        event_vec[5]=Var2Bin;
+        event_vec[6]=Var3Bin;
+        int splineID=indexvec[SampleIndex][iOscChan][iSyst][iMode][Var1Bin][Var2Bin][Var3Bin];
+        //Also check that the spline isn't flat
+        if(!isflatarray[splineID]){
+          ReturnVec.push_back(event_vec);
+        }
+      }
+    }
+  }
+  
+  return ReturnVec;
+}
+
+// checks if there are multiple modes with the same SplineSuffix
+// (for example if CCRES and CCCoherent are treated as one spline mode)
+std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
+
+  //ETA - this is of size nPars from the xsec model
+  size_t InputVectorSize = InputVector.size();
+  std::vector< std::vector<int> > ReturnVec(InputVectorSize);
+
+  //ETA - loop over all systematics
+  for (size_t iSyst=0;iSyst<InputVectorSize;iSyst++) {
+    std::vector<int> TmpVec;
+    std::vector<std::string> TestVec;
+
+    //Loop over the modes that we've listed in xsec cov
+    for (unsigned int iMode = 0 ; iMode < InputVector[iSyst].size() ; iMode++) {
+      int Mode = InputVector[iSyst][iMode];
+      std::string ModeName = Modes->GetSplineSuffixFromMaCh3Mode(Mode);
+
+      bool IncludeMode = true;
+      for (auto TestString : TestVec) {
+        if (ModeName == TestString) {
+          IncludeMode = false;
+          break;
+	}
+      }
+
+      if (IncludeMode) {
+        TmpVec.push_back(Mode);
+        TestVec.push_back(ModeName);
+      }
+    }
+
+    ReturnVec[iSyst] = TmpVec;
+  }
+
+  return ReturnVec;
 }
