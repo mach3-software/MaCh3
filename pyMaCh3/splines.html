@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Splines &mdash; pyMaCh3  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="EventSplineMonolith" href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html" />
+    <link rel="prev" title="TestStatistic" href="api/pyMaCh3._pyMaCh3.sample_pdf.TestStatistic.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyMaCh3
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="mainpage.html">Welcome To MaCh3!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainpage.html#mach3">MaCh3</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pyMaCh3.html">pyMaCh3</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="manager.html">Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample-pdf.html">Sample PDF</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Splines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-pyMaCh3._pyMaCh3.splines">pyMaCh3._pyMaCh3.splines Module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fitter.html">Fitter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="covariance.html">Covariance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html">plotting</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyMaCh3</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="pyMaCh3.html">pyMaCh3</a></li>
+      <li class="breadcrumb-item active">Splines</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/splines.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="splines">
+<h1>Splines<a class="headerlink" href="#splines" title="Link to this heading"></a></h1>
+<p>This module provides the utility for dealing with spline parameters. For some background reading se the <a class="reference external" href="https://github.com/mach3-software/MaCh3/wiki/05.-Splines">Splines wiki page</a>.</p>
+<p>The main class which represents individual spline functions is <a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.ResponseFunction.html#pyMaCh3._pyMaCh3.splines.ResponseFunction" title="pyMaCh3._pyMaCh3.splines.ResponseFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyMaCh3._pyMaCh3.splines.ResponseFunction</span></code></a>.
+This is an abstract representation which covers multiple different types of interpolation, where the type of interpolation is specified at the time of construction.
+The available interpolation types are defined by <a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.InterpolationType.html#pyMaCh3._pyMaCh3.splines.InterpolationType" title="pyMaCh3._pyMaCh3.splines.InterpolationType"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyMaCh3._pyMaCh3.splines.InterpolationType</span></code></a>. Here are some examples</p>
+<a class="reference internal image-reference" href="_images/spline-examples.png"><img alt="Examples of linear, TSpline3 and monotonic interpolation" src="_images/spline-examples.png" style="width: 400px;" />
+</a>
+<p>To construct a ResponseFunction you must specify the x and y positions of the knots, and the interpolation type like in the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyMaCh3</span><span class="w"> </span><span class="kn">import</span> <span class="n">splines</span>
+
+<span class="n">TSpline3_response_1</span> <span class="o">=</span> <span class="n">splines</span><span class="o">.</span><span class="n">ResponseFunction</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="n">splines</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">Cubic_TSpline3</span><span class="p">)</span>
+<span class="n">linear_response_1</span> <span class="o">=</span> <span class="n">splines</span><span class="o">.</span><span class="n">ResponseFunction</span><span class="p">([</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">splines</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">Linear</span><span class="p">)</span>
+
+<span class="n">TSpline3_response_2</span> <span class="o">=</span> <span class="n">splines</span><span class="o">.</span><span class="n">ResponseFunction</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">splines</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">Cubic_TSpline3</span><span class="p">)</span>
+<span class="n">linear_response_2</span> <span class="o">=</span> <span class="n">splines</span><span class="o">.</span><span class="n">ResponseFunction</span><span class="p">([</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">],</span> <span class="n">splines</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">Linear</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Another important part of this module is the <a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html#pyMaCh3._pyMaCh3.splines.EventSplineMonolith" title="pyMaCh3._pyMaCh3.splines.EventSplineMonolith"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyMaCh3._pyMaCh3.splines.EventSplineMonolith</span></code></a> class which allows you to easily and speedily deal with event-by-event splines in your analysis.
+To build this you first need to construct a response function for each event-by-event spline parameter for each of your events as in the example above.</p>
+<p>Let’s take those example responses and build a simple EventSplineMonolith:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">monolith</span> <span class="o">=</span> <span class="n">splines</span><span class="o">.</span><span class="n">EventSplineMonolith</span><span class="p">([[</span><span class="n">TSpline3_response_1</span><span class="p">,</span> <span class="n">linear_response_1</span><span class="p">],</span> <span class="p">[</span><span class="n">TSpline3_response_2</span><span class="p">,</span> <span class="n">linear_response_2</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>This will create an EventSplineMonolith which can deal with the reweighting of two events with two spline parameters.
+We now need to be able to set the values of the parameters so that we can calculate event weights.
+This is done using the <a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html#pyMaCh3._pyMaCh3.splines.EventSplineMonolith.set_param_value_array" title="pyMaCh3._pyMaCh3.splines.EventSplineMonolith.set_param_value_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyMaCh3._pyMaCh3.splines.EventSplineMonolith.set_param_value_array()</span></code></a> function.
+This allows us to bind a numpy array to our EventSplineMonolith, whose values we can change, and this will set the values of the parameters inside of the monolith.
+This works as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># we need to keep track of how many parameters we have</span>
+<span class="c1"># in our case this is two</span>
+<span class="n">n_parameters</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># we initialise the array, the initial values don&#39;t matter too much so we&#39;ll make them zero</span>
+<span class="n">param_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_parameters</span><span class="p">,))</span>
+
+<span class="c1"># now we bind this array to the monolith we made above</span>
+<span class="n">monolith</span><span class="o">.</span><span class="n">set_param_value_array</span><span class="p">(</span><span class="n">param_array</span><span class="p">)</span>
+
+<span class="c1"># now changes made in the param_array will be propagated to the monolith</span>
+<span class="n">param_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">param_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">11.042</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Once your array has been bound to your spline monolith that you keep it safe and don’t overwrite it by doing something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">param_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>as this will mean the original array (the one that is bound to your monolith will be lost forever and you will no longer be able to set parameter values!).
+You need to set the values using indexes as above, or if you want to set them all at once you use slicing like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">param_array</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This may seem a bit faffy but it is intended to avoid unneccessary copying from python to c++ so we can keep things nice and speedy.</p>
+</div>
+<p>Happy splining!</p>
+<section id="module-pyMaCh3._pyMaCh3.splines">
+<span id="pymach3-pymach3-splines-module"></span><h2>pyMaCh3._pyMaCh3.splines Module<a class="headerlink" href="#module-pyMaCh3._pyMaCh3.splines" title="Link to this heading"></a></h2>
+<p>This is a Python binding of MaCh3s C++ based spline library.</p>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html#pyMaCh3._pyMaCh3.splines.EventSplineMonolith" title="pyMaCh3._pyMaCh3.splines.EventSplineMonolith"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventSplineMonolith</span></code></a></p></td>
+<td><p>This 'monolith' deals with event by event weighting using splines.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.InterpolationType.html#pyMaCh3._pyMaCh3.splines.InterpolationType" title="pyMaCh3._pyMaCh3.splines.InterpolationType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InterpolationType</span></code></a></p></td>
+<td><p>Members:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.ResponseFunction.html#pyMaCh3._pyMaCh3.splines.ResponseFunction" title="pyMaCh3._pyMaCh3.splines.ResponseFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResponseFunction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyMaCh3._pyMaCh3.splines.SplineBase.html#pyMaCh3._pyMaCh3.splines.SplineBase" title="pyMaCh3._pyMaCh3.splines.SplineBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SplineBase</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="class-inheritance-diagram">
+<h3>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Link to this heading"></a></h3>
+<div class="graphviz"><img src="_images/inheritance-fa2a4c4015c85eb6c68b05d04984d134629e25ff.png" alt="Inheritance diagram of pyMaCh3._pyMaCh3.splines.EventSplineMonolith, pyMaCh3._pyMaCh3.splines.InterpolationType, pyMaCh3._pyMaCh3.splines.ResponseFunction, pyMaCh3._pyMaCh3.splines.SplineBase" usemap="#inheritance5046645c21" class="inheritance graphviz" /></div>
+<map id="inheritance5046645c21" name="inheritance5046645c21">
+<area shape="rect" id="node1" href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html#pyMaCh3._pyMaCh3.splines.EventSplineMonolith" target="_top" title="This &#39;monolith&#39; deals with event by event weighting using splines." alt="" coords="409,5,565,31"/>
+<area shape="rect" id="node2" href="api/pyMaCh3._pyMaCh3.splines.SplineBase.html#pyMaCh3._pyMaCh3.splines.SplineBase" target="_top" title="SplineBase" alt="" coords="225,5,319,31"/>
+<area shape="rect" id="node3" href="api/pyMaCh3._pyMaCh3.splines.InterpolationType.html#pyMaCh3._pyMaCh3.splines.InterpolationType" target="_top" title="Members:" alt="" coords="205,55,339,80"/>
+<area shape="rect" id="node5" href="api/pyMaCh3._pyMaCh3.splines.ResponseFunction.html#pyMaCh3._pyMaCh3.splines.ResponseFunction" target="_top" title="ResponseFunction" alt="" coords="417,104,557,129"/>
+</map></section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api/pyMaCh3._pyMaCh3.sample_pdf.TestStatistic.html" class="btn btn-neutral float-left" title="TestStatistic" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html" class="btn btn-neutral float-right" title="EventSplineMonolith" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
