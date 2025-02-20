@@ -29,7 +29,7 @@ class splineFDBase : public SplineBase {
 	void Evaluate();
 
 	/// @brief add oscillation channel to spline monolith
-	bool AddSample(const std::string& SampleName,
+	void AddSample(const std::string& SampleName,
 				   const std::string& DetID,
 				   const std::vector<std::string>& OscChanFileNames,
 				   const std::vector<std::string>& SplineVarNames);

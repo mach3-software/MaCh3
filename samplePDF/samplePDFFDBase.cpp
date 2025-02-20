@@ -1431,6 +1431,7 @@ void samplePDFFDBase::fillSplineBins() {
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
           MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
           MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+          throw MaCh3Exception(__FILE__, __LINE__);
           break;
       }
       MCSamples[i].nxsec_spline_pointers[j] = int(EventSplines.size());
@@ -1440,8 +1441,10 @@ void samplePDFFDBase::fillSplineBins() {
       MCSamples[i].xsec_spline_pointers[j].resize(MCSamples[i].nxsec_spline_pointers[j]);
       for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2],
-            EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
+        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                                                 EventSplines[spline][2], EventSplines[spline][3],
+                                                                                 EventSplines[spline][4], EventSplines[spline][5],
+                                                                                 EventSplines[spline][6]);
       }
     }
   }
@@ -1450,7 +1453,6 @@ void samplePDFFDBase::fillSplineBins() {
 // ************************************************
 double samplePDFFDBase::GetLikelihood() {
 // ************************************************
-
   if (samplePDFFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
