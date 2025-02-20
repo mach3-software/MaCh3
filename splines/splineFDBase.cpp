@@ -91,7 +91,7 @@ bool splineFDBase::AddSample(const std::string& SampleName,
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   MACH3LOG_INFO("Create SplineModeVecs_Sample");
-  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  std::vector<std::vector<int>> SplineModeVecs_Sample = xsec->GetSplineModeVecFromDetID(DetID);
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
 
