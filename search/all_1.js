@@ -21,7 +21,7 @@ var searchData=
   ['adddata_18',['AddData',['../classSampleSummary.html#a681bee322172bef35a64e86c23c415b6',1,'SampleSummary']]],
   ['addfile_19',['addFile',['../classMaCh3Plotting_1_1InputManager.html#a8f78dd7607191728f0a52bc27ade9af3',1,'MaCh3Plotting::InputManager']]],
   ['addnominal_20',['AddNominal',['../classSampleSummary.html#a8c870b718bccf37fc7f91b5201345f8e',1,'SampleSummary']]],
-  ['addsample_21',['AddSample',['../classsplineFDBase.html#a8e33b916e60b424a9f3b3c7f889a9b52',1,'splineFDBase']]],
+  ['addsample_21',['AddSample',['../classsplineFDBase.html#a2b4582865eab2e63a7b9ed9283469036',1,'splineFDBase']]],
   ['addsamplepdf_22',['addSamplePDF',['../classFitterBase.html#abe93c6d49aa079d811a9021de59691b1',1,'FitterBase']]],
   ['addsystobj_23',['addSystObj',['../classFitterBase.html#a1d0068193922448a6fed0e0d3ff4305a',1,'FitterBase']]],
   ['addthrow_24',['AddThrow',['../classSampleSummary.html#a10d0df830c319f3d8b76d2c3b85b4215',1,'SampleSummary']]],
