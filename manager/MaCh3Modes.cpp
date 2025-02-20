@@ -28,10 +28,10 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
   // Add unknown category, it's better to have garbage category where all undefined modes will go rather than get random crashes
   DeclareNewMode("UNKNOWN_BAD",
                  "UNKNOWN_BAD",
-		 -1,
+                 kBlack,
                  {},
-		 false,
-		 "UNKNOWN_BAD");
+                false,
+                "UNKNOWN_BAD");
   // This is hack to not have bad mode
   NModes--;
 
@@ -222,12 +222,13 @@ int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) {
 
 // *******************
 std::string MaCh3Modes::GetSplineSuffixFromMaCh3Mode(const int Index) {
+  // *******************
   // return UNKNOWN_BAD if out of boundary
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
 
   if(Index > NModes) {
-    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].PlotColor);
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].SplineSuffix);
     return fMode[NModes].SplineSuffix;
   }
 
