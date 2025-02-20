@@ -3,6 +3,7 @@
 //MaCh3 includes
 #include "samplePDF/Structs.h"
 #include "splines/SplineBase.h"
+#include "manager/MaCh3Modes.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -18,7 +19,7 @@ class splineFDBase : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
 	/// @brief Constructor
-	splineFDBase(covarianceXsec *xsec_ = nullptr);
+  splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes);
 	/// @brief Destructor
 	/// @todo it need some love
 	virtual ~splineFDBase();
@@ -37,10 +38,13 @@ class splineFDBase : public SplineBase {
 	/// @brief Remove setup variables not needed for spline evaluations
 	void cleanUpMemory();
 
-	//Have to define this in your own class 
-	virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)=0;
+        //Can use the default which assumes flat TTree
+        virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
+        /// @brief Check if there are any repeated modes. This is used to reduce the number
+	/// of modes in case many interaction modes get averaged into one spline
+        std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
 	/// @brief Return the splines which affect a given event
-	virtual std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)=0;
+        std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
 
 	/// @brief
 	std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
@@ -118,4 +122,8 @@ class splineFDBase : public SplineBase {
 
 	std::vector<M3::float_t> weightvec_Monolith;
 	std::vector<int> uniquesplinevec_Monolith;
+
+  MaCh3Modes* Modes;
+  enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
+  virtual std::vector<std::string> GetTokensFromSplineName(std::string FullSplineName) = 0;
 };
