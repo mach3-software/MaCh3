@@ -903,3 +903,41 @@ std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string Sample
   
   return ReturnVec;
 }
+
+// checks if there are multiple modes with the same SplineSuffix
+// (for example if CCRES and CCCoherent are treated as one spline mode)
+std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
+
+  //ETA - this is of size nPars from the xsec model
+  size_t InputVectorSize = InputVector.size();
+  std::vector< std::vector<int> > ReturnVec(InputVectorSize);
+
+  //ETA - loop over all systematics
+  for (size_t iSyst=0;iSyst<InputVectorSize;iSyst++) {
+    std::vector<int> TmpVec;
+    std::vector<std::string> TestVec;
+
+    //Loop over the modes that we've listed in xsec cov
+    for (unsigned int iMode = 0 ; iMode < InputVector[iSyst].size() ; iMode++) {
+      int Mode = InputVector[iSyst][iMode];
+      std::string ModeName = Modes->GetSplineSuffixFromMaCh3Mode(Mode);
+
+      bool IncludeMode = true;
+      for (auto TestString : TestVec) {
+        if (ModeName == TestString) {
+          IncludeMode = false;
+          break;
+	}
+      }
+
+      if (IncludeMode) {
+        TmpVec.push_back(Mode);
+        TestVec.push_back(ModeName);
+      }
+    }
+
+    ReturnVec[iSyst] = TmpVec;
+  }
+
+  return ReturnVec;
+}
