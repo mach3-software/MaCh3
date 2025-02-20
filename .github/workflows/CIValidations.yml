@@ -78,6 +78,7 @@ jobs:
         cd /opt/
         git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
         cd MaCh3Validations
+	git checkout dbarrow257/feature/MaCh3ModesWithSplines
         mkdir build
         cd build
         cmake ../ -DMaCh3_Branch=${{ github.head_ref }} -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
