@@ -15,7 +15,7 @@ _MaCh3_Safe_Include_End_ //}
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
   //Get mach3 modes from manager
-  Modes = fitMan->GetMaCh3Modes();
+
   random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
@@ -1054,16 +1054,16 @@ void FitterBase::RunSigmaVar() {
   //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
   constexpr int nRelevantModes = 2;
-  MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
+
   bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false, __FILE__ , __LINE__);
 
   //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
   bool PlotLLHperBin = false;
 
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
+  if(fitMan->raw()["General"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
@@ -1093,7 +1093,7 @@ void FitterBase::RunSigmaVar() {
       // For xsec we can get the actual name, hurray for being informative
       if (isxsec) name = cov->GetParFancyName(i);
       bool skip = false;
-      for(unsigned int is = 0; is < SkipVector.size(); ++is)
+      for(unsigned int is = 0; is < SkipVector.size(); is++)
       {
         if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
         {
@@ -1109,9 +1109,9 @@ void FitterBase::RunSigmaVar() {
 
       int SampleIterator = 0;
       // Get each sample and how it's responded to our reweighted parameter
-      for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
-        for(int k = 0; k < samples[ivs]->GetNsamples(); ++k )
+        for(int k = 0; k < samples[ivs]->GetNsamples(); k++ )
         {
           std::string title = std::string(samples[ivs]->getPDF(k)->GetName());
           dirArryDial->cd();
@@ -1151,7 +1151,7 @@ void FitterBase::RunSigmaVar() {
         // Set the parameter
         cov->setParProp(i, paramVal);
         // And reweight the sample
-        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs) {
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
           samples[ivs]->reweight();
         }
 
@@ -1168,7 +1168,7 @@ void FitterBase::RunSigmaVar() {
 
         SampleIterator = 0;
         // Get each sample and how it's responded to our reweighted parameter
-        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
           for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
           {
@@ -1193,16 +1193,21 @@ void FitterBase::RunSigmaVar() {
             //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
             if (DoByMode)
             {
+              //KS: this is only relevant if PlotByMode is turned on
+              //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+              MaCh3Modes_t RelevantModes[nRelevantModes] = {samples[ivs]->GetMaCh3Modes()->GetMode("CCQE"), samples[ivs]->GetMaCh3Modes()->GetMode("2p2h")};
+
               sigmaArray_mode_x[j][SampleIterator] = new TH1D*[nRelevantModes]();
               sigmaArray_mode_y[j][SampleIterator] = new TH1D*[nRelevantModes]();
               // Now get the TH2D mode variations
               std::string mode_title_long;
-              for(int ir = 0; ir < nRelevantModes; ++ir)
+
+              for(int ir = 0; ir < nRelevantModes; ir++)
               {
                 std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone()));
                 currSampMode->SetDirectory(nullptr);
 
-                mode_title_long = title_long + "_" + Modes->GetMaCh3ModeName(RelevantModes[ir]);
+                mode_title_long = title_long + "_" + samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir]);
                 currSampMode->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
                 dirArrySample[SampleIterator]->cd();
                 currSampMode->Write();
@@ -1226,7 +1231,7 @@ void FitterBase::RunSigmaVar() {
               TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->getData(k));
               TH2Poly* W2pdf = samples[ivs]->getW2(k);
 
-              for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; ++bin)
+              for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; bin++)
               {
                 const double mc = MCpdf->GetBinContent(bin);
                 const double dat = Datapdf->GetBinContent(bin);
@@ -1269,7 +1274,7 @@ void FitterBase::RunSigmaVar() {
 
       SampleIterator = 0;
       // Get each sample and how it's responded to our reweighted parameter
-      for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
@@ -1293,10 +1298,14 @@ void FitterBase::RunSigmaVar() {
           //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
           if (DoByMode)
           {
-            for(int ir = 0; ir < nRelevantModes; ++ir)
+            //KS: this is only relevant if PlotByMode is turned on
+            //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+            MaCh3Modes_t RelevantModes[nRelevantModes] = {samples[ivs]->GetMaCh3Modes()->GetMode("CCQE"), samples[ivs]->GetMaCh3Modes()->GetMode("2p2h")};
+
+            for(int ir = 0; ir < nRelevantModes;ir++)
             {
-              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
-              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
+              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
 
               dirArrySample[SampleIterator]->cd();
               var_mode_x->Write();
@@ -1311,7 +1320,7 @@ void FitterBase::RunSigmaVar() {
         }//End loop over samples(k)
       }//end looping over sample object
       SampleIterator = 0;
-      for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
       {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
@@ -1324,7 +1333,7 @@ void FitterBase::RunSigmaVar() {
       for (int j = 0; j < numVar; ++j)
       {
         SampleIterator = 0;
-        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
+        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
         {
           for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
           {
@@ -1353,11 +1362,11 @@ void FitterBase::RunSigmaVar() {
         for (int j = 0; j < numVar; ++j)
         {
           SampleIterator = 0;
-          for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+          for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
           {
             for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
             {
-              for(int ir = 0; ir < nRelevantModes; ++ir)
+              for(int ir = 0; ir < nRelevantModes;ir++)
               {
                 delete sigmaArray_mode_x[j][SampleIterator][ir];
                 delete sigmaArray_mode_y[j][SampleIterator][ir];

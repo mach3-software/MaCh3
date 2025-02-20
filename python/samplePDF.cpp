@@ -212,7 +212,7 @@ void initSamplePDF(py::module &m){
         .value("Barlow_Beeston", TestStatistic::kBarlowBeeston)
         .value("Ice_Cube", TestStatistic::kIceCube)
         .value("Pearson", TestStatistic::kPearson)
-        .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmottele)
+        .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmotteleb)
         .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
 
     py::class_<samplePDFBase, PySamplePDFBase /* <--- trampoline*/>(m_sample_pdf, "SamplePDFBase")

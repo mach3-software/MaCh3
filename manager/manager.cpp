@@ -17,17 +17,12 @@ manager::manager(std::string const &filename)
 
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);
-
-  Modes = nullptr;
-  auto ModeInput = GetFromManager<std::string>(config["General"]["MaCh3Modes"], "null", __FILE__ , __LINE__);
-  if(ModeInput != "null") Modes = new MaCh3Modes(ModeInput);
 }
 
 // *************************
 // Empty destructor, for now...
 manager::~manager() {
 // *************************
-  if(!Modes) delete Modes;
 }
 
 // *************************
@@ -85,16 +80,19 @@ void manager::Print() {
 // *************************
 int manager::GetMCStatLLH() {
 // *************************
-  int mc_stat_llh;
+  int mc_stat_llh = kNTestStatistics;
   if (config["LikelihoodOptions"])
   {
     auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston", __FILE__ , __LINE__);
-    if (likelihood == "Barlow-Beeston")                 mc_stat_llh = kBarlowBeeston;
-    else if (likelihood == "IceCube")                   mc_stat_llh = kIceCube;
-    else if (likelihood == "Poisson")                   mc_stat_llh = kPoisson;
-    else if (likelihood == "Pearson")                   mc_stat_llh = kPearson;
-    else if (likelihood == "Dembinski-Abdelmotteleb")   mc_stat_llh = kDembinskiAbdelmottele;
-    else {
+
+    for(int i = 0; i < kNTestStatistics; i++) {
+      if(likelihood == TestStatistic_ToString(TestStatistic(i))) {
+        mc_stat_llh = TestStatistic(i);
+        break;
+      }
+    }
+    if(mc_stat_llh == kNTestStatistics)
+    {
       MACH3LOG_ERROR("Wrong form of test-statistic specified!");
       MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
       for(int i = 0; i < kNTestStatistics; i++)

@@ -7,6 +7,7 @@
 #include "samplePDF/Structs.h"
 #include "samplePDF/HistogramUtils.h"
 #include "manager/manager.h"
+#include "manager/MaCh3Modes.h"
 
 _MaCh3_Safe_Include_Start_ //{
 //ROOT includes
@@ -117,6 +118,4 @@ protected:
   TH2D*_hPDF2D;
 
   TRandom3* rnd;
-
-  double pot;
 };

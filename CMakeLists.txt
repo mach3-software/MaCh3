@@ -21,7 +21,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
 include(MaCh3Utils)
 
 add_library(MaCh3CompileDefinitions INTERFACE)
-#Create a seperate target for GPU compiler options
+#Create a separate target for GPU compiler options
 #if GPU is not enabled nothing will be added to this and it will be empty
 # this saves a few if statements
 add_library(MaCh3GPUCompilerOptions INTERFACE)
@@ -177,13 +177,13 @@ endif()
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
-  target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
-  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
   # KS: Not a clue why clang need different...
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  else()
+    target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
-
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
 endif()
 
 if(MaCh3_GPU_ENABLED) 

@@ -16,6 +16,7 @@ struct FarDetectorCoreInfo {
   int nEvents; ///< how many MC events are there
   double ChannelIndex;
   std::string flavourName;
+  std::string flavourName_Latex;
 
   std::vector<int*> Target; ///< target the interaction was on
   std::vector<const int*> nupdg;

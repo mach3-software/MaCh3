@@ -414,13 +414,14 @@ inline int ProbsToPDG(ProbNu NuType){
 }
 
 /// Make an enum of the test statistic that we're using
+/// @todo KS: Consider adding BakerCousins based on Baker & Cousins, Nucl.Instrum.Meth.A 221 (1984) 437-442
 enum TestStatistic {
-  kPoisson,                //!< Standard Poisson likelihood
-  kBarlowBeeston,          //!< Barlow-Beeston following Conway \cite Conway:2011in
-  kIceCube,                //!< Based on \cite Arguelles:2019izp
-  kPearson,                //!< Standard Pearson likelihood
-  kDembinskiAbdelmottele,  //!< Based on \cite Dembinski:2022ios
-  kNTestStatistics         //!< Number of test statistics
+  kPoisson,                 //!< Standard Poisson likelihood
+  kBarlowBeeston,           //!< Barlow-Beeston following Conway \cite Conway:2011in
+  kIceCube,                 //!< Based on \cite Arguelles:2019izp
+  kPearson,                 //!< Standard Pearson likelihood
+  kDembinskiAbdelmotteleb,  //!< Based on \cite Dembinski:2022ios
+  kNTestStatistics          //!< Number of test statistics
 };
 
 // **************************************************
@@ -434,7 +435,7 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
     name = "Poisson";
     break;
     case TestStatistic::kBarlowBeeston:
-    name = "BarlowBeeston";
+    name = "Barlow-Beeston";
     break;
     case TestStatistic::kIceCube:
     name = "IceCube";
@@ -442,8 +443,8 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
     case TestStatistic::kPearson:
     name = "Pearson";
     break;
-    case TestStatistic::kDembinskiAbdelmottele:
-    name = "DembinskiAbdelmottele";
+    case TestStatistic::kDembinskiAbdelmotteleb:
+    name = "Dembinski-Abdelmotteleb";
     break;
     case TestStatistic::kNTestStatistics:
       MACH3LOG_ERROR("kNTestStatistics is not a valid TestStatistic!");

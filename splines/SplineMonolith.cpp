@@ -22,7 +22,6 @@ void SMonolith::Initialise() {
   nTF1coeff = 0;
   NEvents = 0;
   _max_knots = 0;
-  nParams = 0;
 
   NSplines_valid = 0;
   NTF1_valid = 0;
@@ -33,9 +32,6 @@ void SMonolith::Initialise() {
   cpu_weights_tf1_var = nullptr;
 
   cpu_total_weights = nullptr;
-
-  segments = nullptr;
-  ParamValues = nullptr;
 }
 
 // *****************************************
@@ -83,16 +79,16 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
   //KS: Since we are going to copy it each step use fancy CUDA memory allocation
   #ifdef CUDA
-  gpu_spline_handler->InitGPU_Segments(&segments);
+  gpu_spline_handler->InitGPU_Segments(&SplineSegments);
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
   #else
-  segments = new short int[nParams]();
-  ParamValues = new float[nParams]();
+  SplineSegments = new short int[nParams];
+  ParamValues = new float[nParams];
   #endif
 
   for (M3::int_t j = 0; j < nParams; j++)
   {
-    segments[j] = 0;
+    SplineSegments[j] = 0;
     ParamValues[j] = -999;
   }
 
@@ -446,13 +442,13 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
           nSplines_SingleEvent++;
 
           // Fill the SplineInfoArray entries with information on each splinified parameter
-          if (SplineInfoArray[ParamNumber].xPts == nullptr)
+          if (SplineInfoArray[ParamNumber].xPts.size() == 0)
           {
             // Fill the number of points
             SplineInfoArray[ParamNumber].nPts = CurrSpline->GetNp();
 
             // Fill the x points
-            SplineInfoArray[ParamNumber].xPts = new M3::float_t[SplineInfoArray[ParamNumber].nPts];
+            SplineInfoArray[ParamNumber].xPts.resize(SplineInfoArray[ParamNumber].nPts);
             for (M3::int_t k = 0; k < SplineInfoArray[ParamNumber].nPts; ++k)
             {
               M3::float_t xtemp = M3::float_t(-999.99);
@@ -488,8 +484,8 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
     if (SplineType[i] == kTF1_red) continue;
 
     const M3::int_t nPoints = SplineInfoArray[i].nPts;
-    const M3::float_t* xArray = SplineInfoArray[i].xPts;
-    if (nPoints == -999 || xArray == nullptr) {
+    const std::vector<M3::float_t>& xArray = SplineInfoArray[i].xPts;
+    if (nPoints == -999 || xArray.size() == 0) {
       Counter++;
       if(Counter < 5) {
         MACH3LOG_WARN("SplineInfoArray[{}] isn't set yet", i);
@@ -563,10 +559,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
   //KS: Since we are going to copy it each step use fancy CUDA memory allocation
 #ifdef CUDA
-  gpu_spline_handler->InitGPU_Segments(&segments);
+  gpu_spline_handler->InitGPU_Segments(&SplineSegments);
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
 #else
-  segments = new short int[nParams]();
+  SplineSegments = new short int[nParams]();
   ParamValues = new float[nParams]();
 #endif
 
@@ -647,7 +643,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     // Fill the number of points
     SplineInfoArray[i].nPts = nPoints;
     if(nPoints == -999) continue;
-    SplineInfoArray[i].xPts = new M3::float_t[SplineInfoArray[i].nPts];
+    SplineInfoArray[i].xPts.resize(SplineInfoArray[i].nPts);
     for (M3::int_t k = 0; k < SplineInfoArray[i].nPts; ++k)
     {
       SplineInfoArray[i].xPts[k] = xtemp[k];
@@ -805,11 +801,11 @@ SMonolith::~SMonolith() {
         );
 
   //KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions
-  gpu_spline_handler->CleanupGPU_Segments(segments, ParamValues);
+  gpu_spline_handler->CleanupGPU_Segments(SplineSegments, ParamValues);
 
   delete gpu_spline_handler;
   #else
-  if(segments != nullptr) delete[] segments;
+  if(SplineSegments != nullptr) delete[] SplineSegments;
   if(ParamValues != nullptr) delete[] ParamValues;
   if(cpu_total_weights != nullptr) delete[] cpu_total_weights;
   #endif
@@ -892,7 +888,7 @@ void SMonolith::Evaluate() {
           cpu_total_weights,
     #endif
           ParamValues,
-          segments,
+          SplineSegments,
           NSplines_valid,
           NTF1_valid);
 
@@ -916,88 +912,6 @@ void SMonolith::Evaluate() {
 }
 #endif
 
-// *************************
-// CW: Only need to do the binary search once per parameter, not once per event!
-// Takes down the number of binary searches from 1.2M to 17, ha!
-// For ROOT version see root/hist/hist/src/TSpline3.cxx TSpline3::FindX(double)
-void SMonolith::FindSplineSegment() {
-// *************************
-  // Loop over the splines
-  //KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting
-  for (M3::int_t i = 0; i < nParams; ++i)
-  {
-    const M3::int_t nPoints = SplineInfoArray[i].nPts;
-    const M3::float_t* _restrict_ xArray = SplineInfoArray[i].xPts;
-
-    // Get the variation for this reconfigure for the ith parameter
-    const float xvar = float(*SplineInfoArray[i].splineParsPointer);
-    ParamValues[i] = xvar;
-
-    // EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here
-    //     In principle, such parameters shouldn't really be included in the first place, but with new det syst splines this
-    //     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.
-    if(xArray == nullptr) continue;
-
-    // The segment we're interested in (klow in ROOT code)
-    M3::int_t segment = 0;
-    M3::int_t kHigh = nPoints-1;
-    //KS: We expect new segment is very close to previous
-    const M3::int_t PreviousSegment = SplineInfoArray[i].CurrSegment;
-
-    // If the variation is below the lowest saved spline point
-    if (xvar <= xArray[0]) {
-      segment = 0;
-      // If the variation is above the highest saved spline point
-    } else if (xvar >= xArray[nPoints-1]) {
-      //CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651
-      segment = kHigh;
-      //KS: It is quite probable the new segment is same as in previous step so try to avoid binary search, first we have to check if it is in bounds to avoid seg fault
-    } else if( xArray[PreviousSegment+1] > xvar && xvar >= xArray[PreviousSegment] ) {
-      segment = PreviousSegment;
-      // If the variation is between the maximum and minimum, perform a binary search
-    } else {
-      // The top point we've got
-      M3::int_t kHalf = 0;
-      // While there is still a difference in the points (we haven't yet found the segment)
-      // This is a binary search, incrementing segment and decrementing kHalf until we've found the segment
-      while (kHigh - segment > 1) {
-        // Increment the half-step
-        kHalf = M3::int_t((segment + kHigh)/2);
-        // If our variation is above the kHalf, set the segment to kHalf
-        if (xvar > xArray[kHalf]) {
-          segment = kHalf;
-          // Else move kHigh down
-        } else {
-          kHigh = kHalf;
-        }
-      } // End the while: we've now done our binary search
-    } // End the else: we've now found our point
-
-    if (segment >= nPoints-1 && nPoints > 1) segment = nPoints-2;
-
-    //CW: This way we avoid doing 1.2M+ binary searches on the GPU
-    // and literally just multiply lots of numbers together on the GPU without any algorithm
-    // Update the values and which segment it belongs to
-    SplineInfoArray[i].CurrSegment = segment;
-    segments[i] = short(SplineInfoArray[i].CurrSegment);
-
-#ifdef DEBUG
-    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
-      MACH3LOG_ERROR("Found a segment which is _ABOVE_ the variation!");
-      MACH3LOG_ERROR("IT SHOULD ALWAYS BE BELOW! (except when segment 0)");
-      MACH3LOG_ERROR("Spline: {}", i);
-      MACH3LOG_ERROR("Found segment = {}", segment);
-      MACH3LOG_ERROR("Doing variation = {}", xvar);
-      MACH3LOG_ERROR("x in spline = {}", SplineInfoArray[i].xPts[segment]);
-      for (M3::int_t j = 0; j < SplineInfoArray[j].nPts; ++j) {
-        MACH3LOG_ERROR("    {} = {}", j, SplineInfoArray[i].xPts[j]);
-      }
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-#endif
-  } //end loop over params
-}
-
 //*********************************************************
 void SMonolith::CalcSplineWeights() {
 //*********************************************************
@@ -1016,7 +930,7 @@ void SMonolith::CalcSplineWeights() {
       const short int Param = cpu_spline_handler->paramNo_arr[splineNum];
 
       //CW: Avoids doing costly binary search on GPU
-      const short int segment = segments[Param];
+      const short int segment = SplineSegments[Param];
 
       //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing
       const short int segment_X = short(Param*_max_knots+segment);

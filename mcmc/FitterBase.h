@@ -80,9 +80,6 @@ class FitterBase {
   /// The manager
   manager *fitMan;
 
-  /// MaCh3 Modes
-  MaCh3Modes* Modes;
-
   /// current state
   unsigned int step;
   /// current likelihood
