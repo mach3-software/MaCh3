@@ -1,15 +1,15 @@
 set(HEADERS
     CovarianceUtils.h
-    covarianceBase.h
-    covarianceOsc.h
+    ParameterHandlerBase.h
+    ParameterHandlerOsc.h
     SystematicHandlerGeneric.h
     AdaptiveMCMCHandler.h
     PCAHandler.h
 )
 
 add_library(Covariance SHARED
-    covarianceBase.cpp
-    covarianceOsc.cpp
+    ParameterHandlerBase.cpp
+    ParameterHandlerOsc.cpp
     SystematicHandlerGeneric.cpp
     AdaptiveMCMCHandler.cpp
     PCAHandler.cpp

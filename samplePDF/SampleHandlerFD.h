@@ -4,7 +4,7 @@
 #include "splines/BinnedSplineHandler.h"
 
 #include "covariance/SystematicHandlerGeneric.h"
-#include "covariance/covarianceOsc.h"
+#include "covariance/ParameterHandlerOsc.h"
 
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FarDetectorCoreInfoStruct.h"
@@ -23,7 +23,7 @@ class SampleHandlerFD :  public samplePDFBase
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
@@ -227,7 +227,7 @@ public:
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
   SystematicHandlerGeneric *XsecCov = nullptr;
-  covarianceOsc *OscCov = nullptr;
+  ParameterHandlerOsc *OscCov = nullptr;
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel = false;

@@ -7,7 +7,7 @@
 
 // MaCh3 Includes
 #include "samplePDF/samplePDFBase.h"
-#include "covariance/covarianceBase.h"
+#include "covariance/ParameterHandlerBase.h"
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
 

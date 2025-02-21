@@ -10,7 +10,7 @@
 #endif
 
 #include "covariance/SystematicHandlerGeneric.h"
-#include "covariance/covarianceOsc.h"
+#include "covariance/ParameterHandlerOsc.h"
 
 /// @file MaCh3Factory.h
 /// @brief Factory methods for MaCh3 software which streamline initialisation of different objects
@@ -126,7 +126,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& SampleConfig,
                                                SystematicHandlerGeneric* xsec,
-                                               covarianceOsc* osc = nullptr) {
+                                               ParameterHandlerOsc* osc = nullptr) {
 // ********************************************
   std::vector<SampleType*> PDFs(SampleConfig.size());
   for (size_t i = 0; i < SampleConfig.size(); ++i)

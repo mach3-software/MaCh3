@@ -1,18 +1,18 @@
 #pragma once
 
 // MaCh3 includes
-#include "covariance/covarianceBase.h"
+#include "covariance/ParameterHandlerBase.h"
 
 /// @brief Class responsible for handling of neutrino oscillation  parameters.
 /// @author Richard Calland
 /// @author Asher Kaboth
-class covarianceOsc : public ParameterHandlerBase
+class ParameterHandlerOsc : public ParameterHandlerBase
 {
  public:
   /// @brief Constructor
-  covarianceOsc(const std::vector<std::string>& FileNames, std::string name = "osc_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  ParameterHandlerOsc(const std::vector<std::string>& FileNames, std::string name = "osc_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief Destructor
-  virtual ~covarianceOsc();
+  virtual ~ParameterHandlerOsc();
   /// @brief Propose MCMC step, including mass flipping
   void proposeStep() override;
   /// @brief Sets whether to flip delta M23.
