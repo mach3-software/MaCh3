@@ -956,111 +956,125 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno">  857</span>    <span class="keywordtype">double</span> x,y, Eval = <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>;</div>
 <div class="line"><span class="lineno">  858</span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a> = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  859</span> </div>
-<div class="line"><span class="lineno">  860</span>    <span class="keyword">auto</span> File = std::unique_ptr&lt;TFile&gt;(TFile::Open(OscChanFileNames[iOscChan].c_str()));</div>
+<div class="line"><span class="lineno">  860</span>    std::vector&lt;std::string&gt; SplineFileNames;</div>
 <div class="line"><span class="lineno">  861</span> </div>
-<div class="line"><span class="lineno">  862</span>    <span class="keywordflow">if</span> (!File || File-&gt;IsZombie()) {</div>
-<div class="line"><span class="lineno">  863</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} not found&quot;</span>, OscChanFileNames[iOscChan]);</div>
-<div class="line"><span class="lineno">  864</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  865</span>    }</div>
-<div class="line"><span class="lineno">  866</span> </div>
-<div class="line"><span class="lineno">  867</span>    <span class="comment">//This is the MC specific part of the code</span></div>
-<div class="line"><span class="lineno">  868</span>    <span class="comment">//i.e. we always assume that the splines are just store in  single TDirectory and they&#39;re all in there as single objects   </span></div>
-<div class="line"><span class="lineno">  869</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> k : *File-&gt;GetListOfKeys()) {</div>
-<div class="line"><span class="lineno">  870</span>      <span class="keyword">auto</span> Key = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(k);</div>
-<div class="line"><span class="lineno">  871</span>      TClass *Class = gROOT-&gt;GetClass(Key-&gt;GetClassName(), <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">  872</span>      <span class="keywordflow">if</span>(!Class-&gt;InheritsFrom(<span class="stringliteral">&quot;TSpline3&quot;</span>)) {</div>
-<div class="line"><span class="lineno">  873</span>        <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  874</span>      }</div>
-<div class="line"><span class="lineno">  875</span> </div>
-<div class="line"><span class="lineno">  876</span>      std::string FullSplineName = std::string(Key-&gt;GetName());</div>
-<div class="line"><span class="lineno">  877</span>      std::vector&lt;std::string&gt; Tokens = <a class="code hl_function" href="classsplineFDBase.html#a6dc7b34c177e7b9a237e1298937f3caa">GetTokensFromSplineName</a>(FullSplineName);</div>
-<div class="line"><span class="lineno">  878</span> </div>
-<div class="line"><span class="lineno">  879</span>      <span class="keywordflow">if</span> (Tokens.size() != <a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a6e5418783dafc67b345ca47d3a367e3d">kNTokens</a>) {</div>
-<div class="line"><span class="lineno">  880</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid tokens from spline name - Expected {} tokens. Check implementation in GetTokensFromSplineName()&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a6e5418783dafc67b345ca47d3a367e3d">kNTokens</a>));</div>
-<div class="line"><span class="lineno">  881</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  882</span>      }</div>
-<div class="line"><span class="lineno">  883</span>      </div>
-<div class="line"><span class="lineno">  884</span>      Syst = Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a402d2fd0caedee7d15602b8a489d12d6">kSystToken</a>];</div>
-<div class="line"><span class="lineno">  885</span>      Mode = Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a2ee747878b23052ad23ebddb062d66c1">kModeToken</a>];</div>
-<div class="line"><span class="lineno">  886</span>      Var1Bin = std::stoi(Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014acff28c601e5d4612b305397eaa304970">kVar1BinToken</a>]);</div>
-<div class="line"><span class="lineno">  887</span>      Var2Bin = std::stoi(Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014aeda1921f7e60c568a9c3430c8f5d8ad7">kVar2BinToken</a>]);</div>
-<div class="line"><span class="lineno">  888</span>      Var3Bin = std::stoi(Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a4cae00a806b8ba6ec9d2e4299975dccd">kVar3BinToken</a>]);</div>
+<div class="line"><span class="lineno">  862</span>    <span class="keyword">auto</span> File = std::unique_ptr&lt;TFile&gt;(TFile::Open(OscChanFileNames[iOscChan].c_str()));</div>
+<div class="line"><span class="lineno">  863</span> </div>
+<div class="line"><span class="lineno">  864</span>    <span class="keywordflow">if</span> (!File || File-&gt;IsZombie()) {</div>
+<div class="line"><span class="lineno">  865</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} not found&quot;</span>, OscChanFileNames[iOscChan]);</div>
+<div class="line"><span class="lineno">  866</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  867</span>    }</div>
+<div class="line"><span class="lineno">  868</span> </div>
+<div class="line"><span class="lineno">  869</span>    <span class="comment">//This is the MC specific part of the code</span></div>
+<div class="line"><span class="lineno">  870</span>    <span class="comment">//i.e. we always assume that the splines are just store in  single TDirectory and they&#39;re all in there as single objects   </span></div>
+<div class="line"><span class="lineno">  871</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> k : *File-&gt;GetListOfKeys()) {</div>
+<div class="line"><span class="lineno">  872</span>      <span class="keyword">auto</span> Key = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(k);</div>
+<div class="line"><span class="lineno">  873</span>      TClass *Class = gROOT-&gt;GetClass(Key-&gt;GetClassName(), <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">  874</span>      <span class="keywordflow">if</span>(!Class-&gt;InheritsFrom(<span class="stringliteral">&quot;TSpline3&quot;</span>)) {</div>
+<div class="line"><span class="lineno">  875</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  876</span>      }</div>
+<div class="line"><span class="lineno">  877</span> </div>
+<div class="line"><span class="lineno">  878</span>      std::string FullSplineName = std::string(Key-&gt;GetName());</div>
+<div class="line"><span class="lineno">  879</span>      </div>
+<div class="line"><span class="lineno">  880</span>      <span class="keywordflow">for</span> (<span class="keyword">auto</span> TestSplineFile : SplineFileNames) {</div>
+<div class="line"><span class="lineno">  881</span>    <span class="keywordflow">if</span> (TestSplineFile == FullSplineName) {</div>
+<div class="line"><span class="lineno">  882</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Skipping spline - Found a spline whose name has already been encountered before: {}&quot;</span>, FullSplineName); </div>
+<div class="line"><span class="lineno">  883</span>      <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  884</span>    }</div>
+<div class="line"><span class="lineno">  885</span>      }</div>
+<div class="line"><span class="lineno">  886</span>      SplineFileNames.push_back(FullSplineName);</div>
+<div class="line"><span class="lineno">  887</span> </div>
+<div class="line"><span class="lineno">  888</span>      std::vector&lt;std::string&gt; Tokens = <a class="code hl_function" href="classsplineFDBase.html#a6dc7b34c177e7b9a237e1298937f3caa">GetTokensFromSplineName</a>(FullSplineName);</div>
 <div class="line"><span class="lineno">  889</span> </div>
-<div class="line"><span class="lineno">  890</span>      SystNum = -1;</div>
-<div class="line"><span class="lineno">  891</span>      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> iSyst = 0; iSyst &lt; <a class="code hl_variable" href="classsplineFDBase.html#a5619363447e607cd835c46d601b10675">SplineFileParPrefixNames</a>[iSample].size(); iSyst++) {</div>
-<div class="line"><span class="lineno">  892</span>        <span class="keywordflow">if</span> (Syst == <a class="code hl_variable" href="classsplineFDBase.html#a5619363447e607cd835c46d601b10675">SplineFileParPrefixNames</a>[iSample][iSyst]) {</div>
-<div class="line"><span class="lineno">  893</span>          SystNum = iSyst;</div>
-<div class="line"><span class="lineno">  894</span>          <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  895</span>        }</div>
-<div class="line"><span class="lineno">  896</span>      }</div>
-<div class="line"><span class="lineno">  897</span> </div>
-<div class="line"><span class="lineno">  898</span>      <span class="comment">// If the syst doesn&#39;t match any of the spline names then skip it</span></div>
-<div class="line"><span class="lineno">  899</span>      <span class="keywordflow">if</span> (SystNum == -1){</div>
-<div class="line"><span class="lineno">  900</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Couldn&#39;t match!!&quot;</span>);</div>
-<div class="line"><span class="lineno">  901</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Couldn&#39;t Match any systematic name in xsec yaml with spline name: {}&quot;</span> , FullSplineName);</div>
-<div class="line"><span class="lineno">  902</span>        <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  903</span>      }</div>
-<div class="line"><span class="lineno">  904</span> </div>
-<div class="line"><span class="lineno">  905</span>      ModeNum = -1;</div>
-<div class="line"><span class="lineno">  906</span>      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iMode = 0; iMode &lt; <a class="code hl_variable" href="classsplineFDBase.html#a6b7aeec6d03dad01975582226b39632b">SplineModeVecs</a>[iSample][SystNum].size(); iMode++) {</div>
-<div class="line"><span class="lineno">  907</span>        <span class="keywordflow">if</span> (Mode == <a class="code hl_variable" href="classsplineFDBase.html#ad004862f499b783034dd6a30df25c9f4">Modes</a>-&gt;<a class="code hl_function" href="classMaCh3Modes.html#a94d555d153fd328abd3c4411a285b3d3">GetSplineSuffixFromMaCh3Mode</a>(<a class="code hl_variable" href="classsplineFDBase.html#a6b7aeec6d03dad01975582226b39632b">SplineModeVecs</a>[iSample][SystNum][iMode])) {</div>
-<div class="line"><span class="lineno">  908</span>          ModeNum = iMode;</div>
-<div class="line"><span class="lineno">  909</span>          <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  910</span>        }</div>
-<div class="line"><span class="lineno">  911</span>      }</div>
-<div class="line"><span class="lineno">  912</span> </div>
-<div class="line"><span class="lineno">  913</span>      <span class="keywordflow">if</span> (ModeNum == -1) {</div>
-<div class="line"><span class="lineno">  914</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find mode for {} in {}. Problem Spline is : {} &quot;</span>, Mode, Syst, FullSplineName);</div>
-<div class="line"><span class="lineno">  915</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  916</span>      }</div>
-<div class="line"><span class="lineno">  917</span> </div>
-<div class="line"><span class="lineno">  918</span>      mySpline = Key-&gt;ReadObject&lt;TSpline3&gt;();</div>
-<div class="line"><span class="lineno">  919</span> </div>
-<div class="line"><span class="lineno">  920</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="classsplineFDBase.html#a2b026cd74035f56db3790f1eea49de92">isValidSplineIndex</a>(SampleName, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { <span class="comment">// loop over all the spline knots and check their value</span></div>
-<div class="line"><span class="lineno">  921</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Pushed back monolith for spline {}&quot;</span>, FullSplineName);</div>
-<div class="line"><span class="lineno">  922</span>        <span class="comment">// if the value is 1 then set the flat bool to false</span></div>
-<div class="line"><span class="lineno">  923</span>        nKnots = mySpline-&gt;GetNp();</div>
-<div class="line"><span class="lineno">  924</span>        <a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a> = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  925</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iKnot = 0; iKnot &lt; nKnots; iKnot++) {</div>
-<div class="line"><span class="lineno">  926</span>          mySpline-&gt;GetKnot(iKnot, x, y);</div>
-<div class="line"><span class="lineno">  927</span> </div>
-<div class="line"><span class="lineno">  928</span>          Eval = mySpline-&gt;Eval(x);</div>
-<div class="line"><span class="lineno">  929</span>          <span class="keywordflow">if</span> (Eval &lt; 0.99999 || Eval &gt; 1.00001)</div>
-<div class="line"><span class="lineno">  930</span>          {</div>
-<div class="line"><span class="lineno">  931</span>            <a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  932</span>            <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  933</span>          }</div>
-<div class="line"><span class="lineno">  934</span>        }</div>
-<div class="line"><span class="lineno">  935</span> </div>
-<div class="line"><span class="lineno">  936</span>        <span class="comment">//Rather than keeping a mega vector of splines then converting, this should just keep everything nice in memory!</span></div>
-<div class="line"><span class="lineno">  937</span>        <a class="code hl_variable" href="classsplineFDBase.html#ab3a4e79bfe675a4070597557e6226e12">indexvec</a>[iSample][iOscChan][SystNum][ModeNum][Var1Bin][Var2Bin][Var3Bin]=<a class="code hl_variable" href="classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a">MonolithIndex</a>;</div>
-<div class="line"><span class="lineno">  938</span>        <a class="code hl_variable" href="classsplineFDBase.html#af63885ddb6731f77808d029372e6b187">coeffindexvec</a>.push_back(<a class="code hl_variable" href="classsplineFDBase.html#abcff04fee3e6790a099a0df9dbee74c2">CoeffIndex</a>);</div>
-<div class="line"><span class="lineno">  939</span>        <span class="comment">// Should save memory rather saving [x_i_0 ,... x_i_maxknots] for every spline!</span></div>
-<div class="line"><span class="lineno">  940</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a>) {</div>
-<div class="line"><span class="lineno">  941</span>          <a class="code hl_variable" href="classsplineFDBase.html#a84ec9ea208503053b9735b1cb1bc417d">splinevec_Monolith</a>.push_back(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  942</span>          <span class="keyword">delete</span> mySpline;</div>
-<div class="line"><span class="lineno">  943</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  944</span>          Spline = <span class="keyword">new</span> <a class="code hl_class" href="classTSpline3__red.html">TSpline3_red</a>(mySpline, <a class="code hl_variable" href="classsplineFDBase.html#aabc74a6dd8b13fc6925e975bf5f92cff">SplineInterpolationTypes</a>[iSample][SystNum]);</div>
-<div class="line"><span class="lineno">  945</span>          <span class="keyword">delete</span> mySpline;</div>
-<div class="line"><span class="lineno">  946</span> </div>
-<div class="line"><span class="lineno">  947</span>          <a class="code hl_variable" href="classsplineFDBase.html#a84ec9ea208503053b9735b1cb1bc417d">splinevec_Monolith</a>.push_back(Spline);</div>
-<div class="line"><span class="lineno">  948</span>          <a class="code hl_variable" href="classsplineFDBase.html#a7a564f5748f16d97ebf1e1c300a1cc5c">uniquecoeffindices</a>.push_back(<a class="code hl_variable" href="classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a">MonolithIndex</a>); <span class="comment">//So we can get the unique coefficients and skip flat splines later on!</span></div>
-<div class="line"><span class="lineno">  949</span>          <a class="code hl_variable" href="classsplineFDBase.html#abcff04fee3e6790a099a0df9dbee74c2">CoeffIndex</a>+=nKnots;</div>
-<div class="line"><span class="lineno">  950</span>        }</div>
-<div class="line"><span class="lineno">  951</span>        <span class="comment">//Incrementing MonolithIndex to keep track of number of valid spline indices</span></div>
-<div class="line"><span class="lineno">  952</span>        <a class="code hl_variable" href="classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a">MonolithIndex</a>+=1;</div>
-<div class="line"><span class="lineno">  953</span>      } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  954</span>        <span class="comment">//Potentially you are not a valid spline index</span></div>
-<div class="line"><span class="lineno">  955</span>        <span class="keyword">delete</span> mySpline;</div>
-<div class="line"><span class="lineno">  956</span>      }</div>
-<div class="line"><span class="lineno">  957</span>    }<span class="comment">//End of loop over all TKeys in file</span></div>
-<div class="line"><span class="lineno">  958</span> </div>
-<div class="line"><span class="lineno">  959</span>    <span class="comment">//A bit of clean up</span></div>
-<div class="line"><span class="lineno">  960</span>    File-&gt;Delete(<span class="stringliteral">&quot;*&quot;</span>);</div>
-<div class="line"><span class="lineno">  961</span>    File-&gt;Close();</div>
-<div class="line"><span class="lineno">  962</span>  } <span class="comment">//End of oscillation channel loop</span></div>
-<div class="line"><span class="lineno">  963</span>}</div>
+<div class="line"><span class="lineno">  890</span>      <span class="keywordflow">if</span> (Tokens.size() != <a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a6e5418783dafc67b345ca47d3a367e3d">kNTokens</a>) {</div>
+<div class="line"><span class="lineno">  891</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid tokens from spline name - Expected {} tokens. Check implementation in GetTokensFromSplineName()&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a6e5418783dafc67b345ca47d3a367e3d">kNTokens</a>));</div>
+<div class="line"><span class="lineno">  892</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  893</span>      }</div>
+<div class="line"><span class="lineno">  894</span>      </div>
+<div class="line"><span class="lineno">  895</span>      Syst = Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a402d2fd0caedee7d15602b8a489d12d6">kSystToken</a>];</div>
+<div class="line"><span class="lineno">  896</span>      Mode = Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a2ee747878b23052ad23ebddb062d66c1">kModeToken</a>];</div>
+<div class="line"><span class="lineno">  897</span>      Var1Bin = std::stoi(Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014acff28c601e5d4612b305397eaa304970">kVar1BinToken</a>]);</div>
+<div class="line"><span class="lineno">  898</span>      Var2Bin = std::stoi(Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014aeda1921f7e60c568a9c3430c8f5d8ad7">kVar2BinToken</a>]);</div>
+<div class="line"><span class="lineno">  899</span>      Var3Bin = std::stoi(Tokens[<a class="code hl_enumvalue" href="classsplineFDBase.html#a60a2b2556b988c362c65f7f483acf014a4cae00a806b8ba6ec9d2e4299975dccd">kVar3BinToken</a>]);</div>
+<div class="line"><span class="lineno">  900</span> </div>
+<div class="line"><span class="lineno">  901</span>      SystNum = -1;</div>
+<div class="line"><span class="lineno">  902</span>      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> iSyst = 0; iSyst &lt; <a class="code hl_variable" href="classsplineFDBase.html#a5619363447e607cd835c46d601b10675">SplineFileParPrefixNames</a>[iSample].size(); iSyst++) {</div>
+<div class="line"><span class="lineno">  903</span>        <span class="keywordflow">if</span> (Syst == <a class="code hl_variable" href="classsplineFDBase.html#a5619363447e607cd835c46d601b10675">SplineFileParPrefixNames</a>[iSample][iSyst]) {</div>
+<div class="line"><span class="lineno">  904</span>          SystNum = iSyst;</div>
+<div class="line"><span class="lineno">  905</span>          <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  906</span>        }</div>
+<div class="line"><span class="lineno">  907</span>      }</div>
+<div class="line"><span class="lineno">  908</span> </div>
+<div class="line"><span class="lineno">  909</span>      <span class="comment">// If the syst doesn&#39;t match any of the spline names then skip it</span></div>
+<div class="line"><span class="lineno">  910</span>      <span class="keywordflow">if</span> (SystNum == -1){</div>
+<div class="line"><span class="lineno">  911</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Couldn&#39;t match!!&quot;</span>);</div>
+<div class="line"><span class="lineno">  912</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Couldn&#39;t Match any systematic name in xsec yaml with spline name: {}&quot;</span> , FullSplineName);</div>
+<div class="line"><span class="lineno">  913</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  914</span>      }</div>
+<div class="line"><span class="lineno">  915</span> </div>
+<div class="line"><span class="lineno">  916</span>      ModeNum = -1;</div>
+<div class="line"><span class="lineno">  917</span>      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iMode = 0; iMode &lt; <a class="code hl_variable" href="classsplineFDBase.html#a6b7aeec6d03dad01975582226b39632b">SplineModeVecs</a>[iSample][SystNum].size(); iMode++) {</div>
+<div class="line"><span class="lineno">  918</span>        <span class="keywordflow">if</span> (Mode == <a class="code hl_variable" href="classsplineFDBase.html#ad004862f499b783034dd6a30df25c9f4">Modes</a>-&gt;<a class="code hl_function" href="classMaCh3Modes.html#a94d555d153fd328abd3c4411a285b3d3">GetSplineSuffixFromMaCh3Mode</a>(<a class="code hl_variable" href="classsplineFDBase.html#a6b7aeec6d03dad01975582226b39632b">SplineModeVecs</a>[iSample][SystNum][iMode])) {</div>
+<div class="line"><span class="lineno">  919</span>          ModeNum = iMode;</div>
+<div class="line"><span class="lineno">  920</span>          <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  921</span>        }</div>
+<div class="line"><span class="lineno">  922</span>      }</div>
+<div class="line"><span class="lineno">  923</span> </div>
+<div class="line"><span class="lineno">  924</span>      <span class="keywordflow">if</span> (ModeNum == -1) {</div>
+<div class="line"><span class="lineno">  925</span>    <span class="comment">//DB - If you have splines in the root file that you don&#39;t want to use (e.g. removing a mode from a syst), this will cause a throw</span></div>
+<div class="line"><span class="lineno">  926</span>    <span class="comment">//     Therefore include as debug warning and continue instead</span></div>
+<div class="line"><span class="lineno">  927</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Couldn&#39;t find mode for {} in {}. Problem Spline is : {} &quot;</span>, Mode, Syst, FullSplineName);</div>
+<div class="line"><span class="lineno">  928</span>    <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  929</span>      }</div>
+<div class="line"><span class="lineno">  930</span> </div>
+<div class="line"><span class="lineno">  931</span>      mySpline = Key-&gt;ReadObject&lt;TSpline3&gt;();</div>
+<div class="line"><span class="lineno">  932</span> </div>
+<div class="line"><span class="lineno">  933</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="classsplineFDBase.html#a2b026cd74035f56db3790f1eea49de92">isValidSplineIndex</a>(SampleName, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { <span class="comment">// loop over all the spline knots and check their value</span></div>
+<div class="line"><span class="lineno">  934</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Pushed back monolith for spline {}&quot;</span>, FullSplineName);</div>
+<div class="line"><span class="lineno">  935</span>        <span class="comment">// if the value is 1 then set the flat bool to false</span></div>
+<div class="line"><span class="lineno">  936</span>        nKnots = mySpline-&gt;GetNp();</div>
+<div class="line"><span class="lineno">  937</span>        <a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  938</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iKnot = 0; iKnot &lt; nKnots; iKnot++) {</div>
+<div class="line"><span class="lineno">  939</span>          mySpline-&gt;GetKnot(iKnot, x, y);</div>
+<div class="line"><span class="lineno">  940</span> </div>
+<div class="line"><span class="lineno">  941</span>          Eval = mySpline-&gt;Eval(x);</div>
+<div class="line"><span class="lineno">  942</span>          <span class="keywordflow">if</span> (Eval &lt; 0.99999 || Eval &gt; 1.00001)</div>
+<div class="line"><span class="lineno">  943</span>          {</div>
+<div class="line"><span class="lineno">  944</span>            <a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  945</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  946</span>          }</div>
+<div class="line"><span class="lineno">  947</span>        }</div>
+<div class="line"><span class="lineno">  948</span> </div>
+<div class="line"><span class="lineno">  949</span>        <span class="comment">//Rather than keeping a mega vector of splines then converting, this should just keep everything nice in memory!</span></div>
+<div class="line"><span class="lineno">  950</span>        <a class="code hl_variable" href="classsplineFDBase.html#ab3a4e79bfe675a4070597557e6226e12">indexvec</a>[iSample][iOscChan][SystNum][ModeNum][Var1Bin][Var2Bin][Var3Bin]=<a class="code hl_variable" href="classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a">MonolithIndex</a>;</div>
+<div class="line"><span class="lineno">  951</span>        <a class="code hl_variable" href="classsplineFDBase.html#af63885ddb6731f77808d029372e6b187">coeffindexvec</a>.push_back(<a class="code hl_variable" href="classsplineFDBase.html#abcff04fee3e6790a099a0df9dbee74c2">CoeffIndex</a>);</div>
+<div class="line"><span class="lineno">  952</span>        <span class="comment">// Should save memory rather saving [x_i_0 ,... x_i_maxknots] for every spline!</span></div>
+<div class="line"><span class="lineno">  953</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a>) {</div>
+<div class="line"><span class="lineno">  954</span>          <a class="code hl_variable" href="classsplineFDBase.html#a84ec9ea208503053b9735b1cb1bc417d">splinevec_Monolith</a>.push_back(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  955</span>          <span class="keyword">delete</span> mySpline;</div>
+<div class="line"><span class="lineno">  956</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  957</span>          Spline = <span class="keyword">new</span> <a class="code hl_class" href="classTSpline3__red.html">TSpline3_red</a>(mySpline, <a class="code hl_variable" href="classsplineFDBase.html#aabc74a6dd8b13fc6925e975bf5f92cff">SplineInterpolationTypes</a>[iSample][SystNum]);</div>
+<div class="line"><span class="lineno">  958</span>          <span class="keyword">delete</span> mySpline;</div>
+<div class="line"><span class="lineno">  959</span> </div>
+<div class="line"><span class="lineno">  960</span>          <a class="code hl_variable" href="classsplineFDBase.html#a84ec9ea208503053b9735b1cb1bc417d">splinevec_Monolith</a>.push_back(Spline);</div>
+<div class="line"><span class="lineno">  961</span>          <a class="code hl_variable" href="classsplineFDBase.html#a7a564f5748f16d97ebf1e1c300a1cc5c">uniquecoeffindices</a>.push_back(<a class="code hl_variable" href="classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a">MonolithIndex</a>); <span class="comment">//So we can get the unique coefficients and skip flat splines later on!</span></div>
+<div class="line"><span class="lineno">  962</span>          <a class="code hl_variable" href="classsplineFDBase.html#abcff04fee3e6790a099a0df9dbee74c2">CoeffIndex</a>+=nKnots;</div>
+<div class="line"><span class="lineno">  963</span>        }</div>
+<div class="line"><span class="lineno">  964</span>        <span class="comment">//Incrementing MonolithIndex to keep track of number of valid spline indices</span></div>
+<div class="line"><span class="lineno">  965</span>        <a class="code hl_variable" href="classsplineFDBase.html#addec38a8493974ccc3ee16931d5b794a">MonolithIndex</a>+=1;</div>
+<div class="line"><span class="lineno">  966</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  967</span>        <span class="comment">//Potentially you are not a valid spline index</span></div>
+<div class="line"><span class="lineno">  968</span>        <span class="keyword">delete</span> mySpline;</div>
+<div class="line"><span class="lineno">  969</span>      }</div>
+<div class="line"><span class="lineno">  970</span>    }<span class="comment">//End of loop over all TKeys in file</span></div>
+<div class="line"><span class="lineno">  971</span> </div>
+<div class="line"><span class="lineno">  972</span>    <span class="comment">//A bit of clean up</span></div>
+<div class="line"><span class="lineno">  973</span>    File-&gt;Delete(<span class="stringliteral">&quot;*&quot;</span>);</div>
+<div class="line"><span class="lineno">  974</span>    File-&gt;Close();</div>
+<div class="line"><span class="lineno">  975</span>  } <span class="comment">//End of oscillation channel loop</span></div>
+<div class="line"><span class="lineno">  976</span>}</div>
 <div class="ttc" id="aGetPenaltyTerm_8cpp_html_ae7c3a438d4508eba7ac26e26135b2c17"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17">isFlat</a></div><div class="ttdeci">std::vector&lt; bool &gt; isFlat</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00034">GetPenaltyTerm.cpp:34</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00026">MaCh3Logger.h:26</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a94d555d153fd328abd3c4411a285b3d3"><div class="ttname"><a href="classMaCh3Modes.html#a94d555d153fd328abd3c4411a285b3d3">MaCh3Modes::GetSplineSuffixFromMaCh3Mode</a></div><div class="ttdeci">std::string GetSplineSuffixFromMaCh3Mode(const int Index)</div><div class="ttdoc">DB: Get binned spline mode suffic from MaCh3 Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00229">MaCh3Modes.cpp:229</a></div></div>
 <div class="ttc" id="aclassTSpline3__red_html"><div class="ttname"><a href="classTSpline3__red.html">TSpline3_red</a></div><div class="ttdoc">CW: Reduced TSpline3 class.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00234">SplineStructs.h:234</a></div></div>
