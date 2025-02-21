@@ -18,14 +18,14 @@ class OscillatorBase;
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
 /// @author Ed Atkin
-class samplePDFFDBase :  public samplePDFBase
+class SampleHandlerFD :  public samplePDFBase
 {
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
   /// @brief destructor
-  virtual ~samplePDFFDBase();
+  virtual ~SampleHandlerFD();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
   std::string GetName() const {return samplename;}

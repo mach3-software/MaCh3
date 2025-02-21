@@ -1,4 +1,4 @@
-#include "samplePDFFDBase.h"
+#include "SampleHandlerFD.h"
 #include "samplePDF/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
@@ -9,7 +9,7 @@ _MaCh3_Safe_Include_End_ //}
 #include <algorithm>
 #include <memory>
 
-samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
+SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
@@ -35,7 +35,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
-samplePDFFDBase::~samplePDFFDBase()
+SampleHandlerFD::~SampleHandlerFD()
 {
   MACH3LOG_DEBUG("I'm deleting samplePDFFDBase");
   
@@ -56,7 +56,7 @@ samplePDFFDBase::~samplePDFFDBase()
   }
 }
 
-void samplePDFFDBase::ReadSampleConfig() 
+void SampleHandlerFD::ReadSampleConfig() 
 {
   if (!CheckNodeExists(SampleManager->raw(), "MaCh3ModeConfig")) {
     MACH3LOG_ERROR("MaCh3ModeConfig not defined in {}, please add this!", SampleManager->GetFileName());
@@ -198,7 +198,7 @@ void samplePDFFDBase::ReadSampleConfig()
 
 }
 
-void samplePDFFDBase::Initialise() {
+void SampleHandlerFD::Initialise() {
   //First grab all the information from your sample config via your manager
   ReadSampleConfig();
 
@@ -238,7 +238,7 @@ void samplePDFFDBase::Initialise() {
 }
 
 // ************************************************
-void samplePDFFDBase::SetupKinematicMap() {
+void SampleHandlerFD::SetupKinematicMap() {
 // ************************************************
   if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr) {
     MACH3LOG_INFO("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
@@ -258,7 +258,7 @@ void samplePDFFDBase::SetupKinematicMap() {
   }
 }
 
-void samplePDFFDBase::fill1DHist()
+void SampleHandlerFD::fill1DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
@@ -270,7 +270,7 @@ void samplePDFFDBase::fill1DHist()
   }
 }
 
-void samplePDFFDBase::fill2DHist()
+void SampleHandlerFD::fill2DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
@@ -288,7 +288,7 @@ void samplePDFFDBase::fill2DHist()
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
-void samplePDFFDBase::SetupSampleBinning(){
+void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
   TString histname1d = (XVarStr).c_str();
@@ -344,7 +344,7 @@ void samplePDFFDBase::SetupSampleBinning(){
 }
 
 // ************************************************
-bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
+bool SampleHandlerFD::IsEventSelected(const int iSample, const int iEvent) {
 // ************************************************
   double Val;
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {  
@@ -359,7 +359,7 @@ bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
 
 //************************************************
 // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
-void samplePDFFDBase::reweight() {
+void SampleHandlerFD::reweight() {
 //************************************************
   //KS: Reset the histograms before reweight 
   ResetHistograms();
@@ -396,7 +396,7 @@ void samplePDFFDBase::reweight() {
 /// It also follows the ND code reweighting pretty closely. This function fills the samplePDFFD 
 /// array array which is binned to match the sample binning, such that bin[1][1] is the 
 /// equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
-void samplePDFFDBase::fillArray() {
+void SampleHandlerFD::fillArray() {
 //************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
@@ -504,7 +504,7 @@ void samplePDFFDBase::fillArray() {
 #ifdef MULTITHREAD
 // ************************************************ 
 /// Multithreaded version of fillArray @see fillArray()
-void samplePDFFDBase::fillArray_MP()  {
+void SampleHandlerFD::fillArray_MP()  {
 // ************************************************
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
@@ -673,7 +673,7 @@ void samplePDFFDBase::fillArray_MP()  {
 
 // **************************************************
 // Helper function to reset the data and MC histograms
-void samplePDFFDBase::ResetHistograms() {
+void SampleHandlerFD::ResetHistograms() {
 // **************************************************
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
@@ -689,7 +689,7 @@ void samplePDFFDBase::ResetHistograms() {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t samplePDFFDBase::CalcWeightSpline(const int iSample, const int iEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightSpline(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //DB Xsec syst
@@ -705,7 +705,7 @@ M3::float_t samplePDFFDBase::CalcWeightSpline(const int iSample, const int iEven
 
 // ***************************************************************************
 // Calculate the normalisation weight for one event
-M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightNorm(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
@@ -725,7 +725,7 @@ M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent)
   return xsecw;
 }
 
-void samplePDFFDBase::SetupNormParameters() {  
+void SampleHandlerFD::SetupNormParameters() {  
   xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
 
   if(!XsecCov){
@@ -766,7 +766,7 @@ void samplePDFFDBase::SetupNormParameters() {
 
 // ************************************************
 //A way to check whether a normalisation parameter applies to an event or not
-void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
+void SampleHandlerFD::CalcXsecNormsBins(int iSample) {
 // ************************************************
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   #ifdef DEBUG
@@ -863,7 +863,7 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
 }
 
 //ETA - this is all a bit (less) stupid
-void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
+void SampleHandlerFD::set1DBinning(std::vector<double> &XVec){
   _hPDF1D->Reset();
   _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
   dathist->SetBins(int(XVec.size()-1), XVec.data());
@@ -895,7 +895,7 @@ void samplePDFFDBase::set1DBinning(std::vector<double> &XVec){
 }
 
 //ETA - this is all a bit stupid
-void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
+void SampleHandlerFD::set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
@@ -928,7 +928,7 @@ void samplePDFFDBase::set2DBinning(std::vector<double> &XVec, std::vector<double
 //so that we can set the values of the bin and lower/upper
 //edges in the skmc_base. Hopefully we can use this to make
 //fill1Dhist and fill2Dhist quicker
-void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
+void SampleHandlerFD::set1DBinning(int nbins, double* boundaries)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins,boundaries);
@@ -967,7 +967,7 @@ void samplePDFFDBase::set1DBinning(int nbins, double* boundaries)
   FindNominalBinAndEdges1D();
 }
 
-void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
+void SampleHandlerFD::set1DBinning(int nbins, double low, double high)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins,low,high);
@@ -1001,7 +1001,7 @@ void samplePDFFDBase::set1DBinning(int nbins, double low, double high)
   FindNominalBinAndEdges1D();
 }
 
-void samplePDFFDBase::FindNominalBinAndEdges1D() {
+void SampleHandlerFD::FindNominalBinAndEdges1D() {
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
     for(int event_i = 0 ; event_i < MCSamples[mc_i].nEvents ; event_i++){
@@ -1048,7 +1048,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
   }
 }
 
-void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
+void SampleHandlerFD::set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins1,boundaries1);
@@ -1084,7 +1084,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   FindNominalBinAndEdges2D();
 }
 
-void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2)
+void SampleHandlerFD::set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins1,low1,high1);
@@ -1121,7 +1121,7 @@ void samplePDFFDBase::set2DBinning(int nbins1, double low1, double high1, int nb
 }
 
 // ************************************************
-void samplePDFFDBase::FindNominalBinAndEdges2D() {
+void SampleHandlerFD::FindNominalBinAndEdges2D() {
 // ************************************************
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(int mc_i = 0 ; mc_i < int(MCSamples.size()) ; mc_i++){
@@ -1178,7 +1178,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
   }
 }
 
-void samplePDFFDBase::addData(std::vector<double> &data) {
+void SampleHandlerFD::addData(std::vector<double> &data) {
   dathist2d = nullptr;
   dathist->Reset(); 
   
@@ -1204,7 +1204,7 @@ void samplePDFFDBase::addData(std::vector<double> &data) {
   }
 }
 
-void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
+void SampleHandlerFD::addData(std::vector< std::vector <double> > &data) {
   dathist = nullptr;
   dathist2d->Reset();                                                       
 
@@ -1230,7 +1230,7 @@ void samplePDFFDBase::addData(std::vector< std::vector <double> > &data) {
   }
 }
 
-void samplePDFFDBase::addData(TH1D* Data) {
+void SampleHandlerFD::addData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetName(), Data->Integral());
   dathist2d = nullptr;
   dathist = Data;
@@ -1251,7 +1251,7 @@ void samplePDFFDBase::addData(TH1D* Data) {
   }
 }
 
-void samplePDFFDBase::addData(TH2D* Data) {
+void SampleHandlerFD::addData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
   dathist = nullptr;
@@ -1273,7 +1273,7 @@ void samplePDFFDBase::addData(TH2D* Data) {
 }
 
 // ************************************************
-void samplePDFFDBase::SetupNuOscillator() {
+void SampleHandlerFD::SetupNuOscillator() {
 // ************************************************
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   if (!OscCov) {
@@ -1400,7 +1400,7 @@ void samplePDFFDBase::SetupNuOscillator() {
   OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
 }
 
-M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
+M3::float_t SampleHandlerFD::GetEventWeight(const int iSample, const int iEntry) const {
   M3::float_t totalweight = 1.0;
   #ifdef MULTITHREAD
   #pragma omp simd
@@ -1415,7 +1415,7 @@ M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry)
 /// @func fillSplineBins()
 /// @brief Finds the binned spline that an event should apply to and stored them in a
 /// a vector for easy evaluation in the fillArray() function.
-void samplePDFFDBase::fillSplineBins() {
+void SampleHandlerFD::fillSplineBins() {
   for (int i = 0; i < int(MCSamples.size()); ++i) {
     //Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
@@ -1451,7 +1451,7 @@ void samplePDFFDBase::fillSplineBins() {
 }
 
 // ************************************************
-double samplePDFFDBase::GetLikelihood() {
+double SampleHandlerFD::GetLikelihood() {
 // ************************************************
   if (samplePDFFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
@@ -1481,7 +1481,7 @@ double samplePDFFDBase::GetLikelihood() {
   return negLogL;
 }
 
-void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
+void SampleHandlerFD::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   if (iSample < 0 || iSample >= nSamples) {
     MACH3LOG_ERROR("Invalid iSample index in InitialiseSingleFDMCObject");
     MACH3LOG_ERROR("Index given is {} and only {} samples found", iSample, nSamples);
@@ -1531,7 +1531,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   }
 }
 
-void samplePDFFDBase::InitialiseSplineObject() {
+void SampleHandlerFD::InitialiseSplineObject() {
   std::vector<std::string> spline_filepaths;
   for(unsigned iSample=0 ; iSample < MCSamples.size() ; iSample++){
     spline_filepaths.push_back(spline_files[iSample]);
@@ -1558,7 +1558,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
@@ -1617,7 +1617,7 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   return _h1DVar;
 }
 
-TH2* samplePDFFDBase::get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* SampleHandlerFD::get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
@@ -1680,7 +1680,7 @@ TH2* samplePDFFDBase::get2DVarHist(std::string ProjectionVar_StrX, std::string P
 }
 
 // ************************************************
-int samplePDFFDBase::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
+int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
 // ************************************************
   auto it = KinematicParameters->find(KinematicParameterStr);
   if (it != KinematicParameters->end()) return it->second;
@@ -1692,7 +1692,7 @@ int samplePDFFDBase::ReturnKinematicParameterFromString(const std::string& Kinem
 }
 
 // ************************************************
-std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
+std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
 // ************************************************
   auto it = ReversedKinematicParameters->find(KinematicParameter);
   if (it != ReversedKinematicParameters->end()) {
@@ -1705,7 +1705,7 @@ std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int Kinema
   return "";
 }
 
-TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
 
@@ -1754,7 +1754,7 @@ TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str
   return get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* SampleHandlerFD::get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   bool fChannel;
   bool fMode;
 
@@ -1803,7 +1803,7 @@ TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(std::string ProjectionVar_Str
   return get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
 }
 
-void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
+void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
   int space = 14;
 
   bool printToFile=false;
@@ -1940,7 +1940,7 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
 }
 
-std::vector<TH1*> samplePDFFDBase::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
   std::vector<TH1*> hHistList;
   std::string legendEntry;
 
@@ -1976,7 +1976,7 @@ std::vector<TH1*> samplePDFFDBase::ReturnHistsBySelection1D(std::string Kinemati
   return hHistList;
 }
 
-std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis, TAxis* YAxis) {
+std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis, TAxis* YAxis) {
   std::vector<TH2*> hHistList;
 
   int iMax = -1;
@@ -2003,7 +2003,7 @@ std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string Kinemati
   return hHistList;
 }
 
-THStack* samplePDFFDBase::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
   std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
   THStack* StackHist = new THStack((GetName()+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {

@@ -1,6 +1,6 @@
 set(HEADERS
     samplePDFBase.h
-    samplePDFFDBase.h
+    SampleHandlerFD.h
     Structs.h
     HistogramUtils.h
     FarDetectorCoreInfoStruct.h
@@ -8,7 +8,7 @@ set(HEADERS
 
 add_library(SamplePDF SHARED
     samplePDFBase.cpp
-    samplePDFFDBase.cpp
+    SampleHandlerFD.cpp
     HistogramUtils.cpp
 )
 
