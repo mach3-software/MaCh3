@@ -857,7 +857,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
     double x,y, Eval = M3::_BAD_DOUBLE_;
     bool isFlat = true;
 
-    std::vector<std::string> SplineFileNames;
+    std::set<std::string> SplineFileNames;
 
     auto File = std::unique_ptr<TFile>(TFile::Open(OscChanFileNames[iOscChan].c_str()));
 
@@ -876,14 +876,12 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
       }
 
       std::string FullSplineName = std::string(Key->GetName());
-      
-      for (auto TestSplineFile : SplineFileNames) {
-	if (TestSplineFile == FullSplineName) {
-	  MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName); 
-	  continue;
-	}
+
+      if (SplineFileNames.count(FullSplineName) > 0) {
+	MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName); 
+	continue;
       }
-      SplineFileNames.push_back(FullSplineName);
+      SplineFileNames.insert(FullSplineName);
 
       std::vector<std::string> Tokens = GetTokensFromSplineName(FullSplineName);
 
