@@ -1,8 +1,8 @@
 var searchData=
 [
   ['acceptanceprobabilities_0',['AcceptanceProbabilities',['../classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61',1,'MCMCProcessor']]],
-  ['acceptstep_1',['AcceptStep',['../classPCAHandler.html#a7298eb3c337becf349d628c3049834f7',1,'PCAHandler']]],
-  ['acceptstep_2',['acceptStep',['../classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457',1,'covarianceBase']]],
+  ['acceptstep_1',['acceptStep',['../classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457',1,'covarianceBase']]],
+  ['acceptstep_2',['AcceptStep',['../classPCAHandler.html#a7298eb3c337becf349d628c3049834f7',1,'PCAHandler']]],
   ['adaptionupdate_3',['AdaptionUpdate',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a39a099e5712cf605190a53a4355c700c',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adaptivemcmchandler_4',['AdaptiveMCMCHandler',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8c1c9c62865ad7e2a9c9bdfa24ad54be',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adddata_5',['AddData',['../classSampleSummary.html#a681bee322172bef35a64e86c23c415b6',1,'SampleSummary']]],

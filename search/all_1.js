@@ -2,8 +2,8 @@ var searchData=
 [
   ['acccount_0',['accCount',['../classFitterBase.html#a2774f3a0047c4347ee0db05406425f79',1,'FitterBase']]],
   ['acceptanceprobabilities_1',['AcceptanceProbabilities',['../classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61',1,'MCMCProcessor']]],
-  ['acceptstep_2',['AcceptStep',['../classPCAHandler.html#a7298eb3c337becf349d628c3049834f7',1,'PCAHandler']]],
-  ['acceptstep_3',['acceptStep',['../classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457',1,'covarianceBase']]],
+  ['acceptstep_2',['acceptStep',['../classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457',1,'covarianceBase']]],
+  ['acceptstep_3',['AcceptStep',['../classPCAHandler.html#a7298eb3c337becf349d628c3049834f7',1,'PCAHandler']]],
   ['accprob_4',['accProb',['../classFitterBase.html#a6319d2ea50984860475bbc6c708b0d90',1,'FitterBase']]],
   ['accprobbatchedaverages_5',['AccProbBatchedAverages',['../classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3',1,'MCMCProcessor']]],
   ['accprobvalues_6',['AccProbValues',['../classMCMCProcessor.html#a88cab29770fd6098a674a0ab3628a251',1,'MCMCProcessor']]],
