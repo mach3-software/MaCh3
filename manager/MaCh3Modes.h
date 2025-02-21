@@ -66,6 +66,8 @@ class MaCh3Modes {
   MaCh3Modes_t GetModeFromGenerator(const int Index);
   /// @brief Get class name
   inline std::string GetName()const {return "MaCh3Modes";};
+  /// @brief Return count of CC modes
+  inline int GetNCCModes()const {return nCCModes;};
 
  private:
   /// @brief KS: Make sure we don't have two modes with the same name
@@ -95,4 +97,6 @@ class MaCh3Modes {
   std::string Generator;
   /// KS: Number of modes, keep in mind actual number is +1 greater due to unknown category
   int NModes;
+  /// DB: Number of CC modes
+  int nCCModes;
 };
