@@ -78,6 +78,39 @@ void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
 }
 
 // *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanContainer(std::vector<T*>& container) {
+// *******************
+  for (T* ptr : container) {
+    if(ptr) delete ptr;
+    ptr = nullptr;
+  }
+  container.clear();
+  container.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
+void CleanContainer(std::vector< std::vector< std::vector<T*> > >& container) {
+// *******************
+  for (auto& container2D : container) {
+    for (auto& container1D : container2D) {
+      for (T* ptr : container1D) {
+        if(ptr) delete ptr;
+      }
+      container1D.clear();
+      container1D.shrink_to_fit();
+    }
+    container2D.clear();
+    container2D.shrink_to_fit();
+  }
+  container.clear();
+  container.shrink_to_fit();
+}
+
+// *******************
 /// @brief KS: This is mad way of converting string to int. Why? To be able to use string with switch
 constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
@@ -275,15 +308,15 @@ inline std::string SystType_ToString(const SystType i) {
 /// Enum to track the target material
 enum TargetMat {
 // *****************
-  kTarget_H  = 1,   //!< Hydrogen
-  kTarget_C  = 12,  //!< Carbon 12
-  kTarget_N  = 14,
-  kTarget_O  = 16,  //!< Oxygen 16
-  kTarget_Al = 27,
-  kTarget_Ar = 40,
-  kTarget_Ti = 48,
-  kTarget_Fe = 56,
-  kTarget_Pb = 207
+  kTarget_H  = 1,    //!< Hydrogen (Atomic number 1)
+  kTarget_C  = 12,   //!< Carbon 12 (Atomic number 6)
+  kTarget_N  = 14,   //!< Nitrogen (Atomic number 7)
+  kTarget_O  = 16,   //!< Oxygen 16 (Atomic number 8)
+  kTarget_Al = 27,   //!< Aluminum (Atomic number 13)
+  kTarget_Ar = 40,   //!< Argon (Atomic number 18)
+  kTarget_Ti = 48,   //!< Titanium (Atomic number 22)
+  kTarget_Fe = 56,   //!< Iron (Atomic number 26)
+  kTarget_Pb = 207   //!< Lead (Atomic number 82)
 };
 
 // *****************
@@ -352,9 +385,10 @@ enum ProbNu {
   kProbNutauBar = -3
 };
 
+// *****************
 /// @brief ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter
 inline int PDGToProbs(NuPDG pdg){
-
+// *****************
   int ReturnProbNu = -999;
 
   switch (pdg){
@@ -380,7 +414,6 @@ inline int PDGToProbs(NuPDG pdg){
       MACH3LOG_WARN("Unrecognised pdg for the neutrino so can't map this to an int for Prob3++");
       break;
   }
-
   return ReturnProbNu;
 }
 
