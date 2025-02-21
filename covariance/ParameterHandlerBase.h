@@ -11,7 +11,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
-class covarianceBase {
+class ParameterHandlerBase {
  public:
   /// @brief ETA - constructor for a YAML file
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
@@ -19,14 +19,14 @@ class covarianceBase {
   /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
   /// @param FirstPCAdpar First PCA parameter that will be decomposed.
   /// @param LastPCAdpar First PCA parameter that will be decomposed.
-  covarianceBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
   /// @param file Path to matrix root file
-  covarianceBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  ParameterHandlerBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
 
   /// @brief Destructor
-  virtual ~covarianceBase();
+  virtual ~ParameterHandlerBase();
   
   /// \defgroup Setters
   /// Group of functions to set various parameters, names, and values.

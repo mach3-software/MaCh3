@@ -49,7 +49,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
 
   int ParCounter = 0;
   double llh = 0;
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
     if(!(*it)->IsPCA())
     {
@@ -95,7 +95,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
 
   // Loop over the systematics and propose the initial step
   int stdIt = 0;
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it, ++stdIt)
+  for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it, ++stdIt)
   {
     //GetLikelihood will return LargeL if out of bounds, for minimizers this is not the problem, while calcLikelihood will return actual likelihood
     syst_llh[stdIt] = (*it)->CalcLikelihood();

@@ -43,7 +43,7 @@ void MinuitFit::runMCMC() {
   MACH3LOG_INFO("Preparing Minuit");
   int ParCounter = 0;
 
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
     if(!(*it)->IsPCA())
     {
@@ -100,7 +100,7 @@ void MinuitFit::runMCMC() {
   ParCounter = 0;
   const double *X = minuit->X();
   const double *err = minuit->Errors();
-  for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+  for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
     if(!(*it)->IsPCA())
     {

@@ -63,7 +63,7 @@ void PSO::init(){
     }
   }
   else{
-    for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it){
+    for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it){
       if(!(*it)->IsPCA())
       {
         fDim += (*it)->GetNumParams();
@@ -460,7 +460,7 @@ void PSO::WriteOutput(){
     }
   }
   else{
-    for (std::vector<covarianceBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+    for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
     {
       if(!(*it)->IsPCA())
       {

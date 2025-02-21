@@ -6,7 +6,7 @@
 // this will replace the root file constructor but let's keep it in
 // to do some validations
 SystematicHandlerGeneric::SystematicHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
-               : covarianceBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
+               : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // ********************************************
   InitXsecFromConfig();
 

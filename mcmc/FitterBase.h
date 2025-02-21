@@ -34,7 +34,7 @@ class FitterBase {
 
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from covarianceBase.
-  void addSystObj(covarianceBase* cov);
+  void addSystObj(ParameterHandlerBase* cov);
 
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void runMCMC() = 0;
@@ -104,7 +104,7 @@ class FitterBase {
   unsigned int TotalNSamples;
 
   /// Systematic holder
-  std::vector<covarianceBase*> systematics;
+  std::vector<ParameterHandlerBase*> systematics;
 
   /// tells global time how long fit took
   std::unique_ptr<TStopwatch> clock;

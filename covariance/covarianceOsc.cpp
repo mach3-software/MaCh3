@@ -2,7 +2,7 @@
 
 // *************************************
 covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
-: covarianceBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
+: ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // *************************************
   kDeltaCP = -999;
   kDeltaM23 = -999;
@@ -45,7 +45,7 @@ covarianceOsc::~covarianceOsc() {
 // *************************************
 void covarianceOsc::proposeStep() {
 // *************************************
-  covarianceBase::proposeStep();
+  ParameterHandlerBase::proposeStep();
 
   // HW It should now automatically set dcp to be with [-pi, pi]
   CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());

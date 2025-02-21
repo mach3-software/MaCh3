@@ -9,7 +9,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
-class SystematicHandlerGeneric : public covarianceBase {
+class SystematicHandlerGeneric : public ParameterHandlerBase {
   public:
     /// @brief Constructor
     /// @param FileNames A vector of strings representing the YAML files used for initialisation of matrix

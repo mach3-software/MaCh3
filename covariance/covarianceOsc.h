@@ -6,7 +6,7 @@
 /// @brief Class responsible for handling of neutrino oscillation  parameters.
 /// @author Richard Calland
 /// @author Asher Kaboth
-class covarianceOsc : public covarianceBase
+class covarianceOsc : public ParameterHandlerBase
 {
  public:
   /// @brief Constructor

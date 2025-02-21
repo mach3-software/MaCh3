@@ -156,7 +156,7 @@ void FitterBase::PrepareOutput() {
     }
 
     // Prepare the output trees
-    for (covarianceBase *cov : systematics) {
+    for (ParameterHandlerBase *cov : systematics) {
       cov->SetBranches(*outTree, SaveProposal);
     }
 
@@ -239,7 +239,7 @@ void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 
 // *************************
 // Add flux systematics, cross-section systematics, ND systematics to the chain
-void FitterBase::addSystObj(covarianceBase * const cov) {
+void FitterBase::addSystObj(ParameterHandlerBase * const cov) {
 // *************************
   MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->getName(), cov->GetNumParams());
   systematics.push_back(cov);
@@ -529,7 +529,7 @@ void FitterBase::RunLLHScan() {
   }
    
   // Loop over the covariance classes
-  for (covarianceBase *cov : systematics)
+  for (ParameterHandlerBase *cov : systematics)
   {
     bool isxsec = (cov->getName() == "xsec_cov");
 
@@ -814,7 +814,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
     RunLLHScan();
   }
 
-  for (covarianceBase *cov : systematics)
+  for (ParameterHandlerBase *cov : systematics)
   {
     bool isxsec = (cov->getName() == "xsec_cov");
 
@@ -878,7 +878,7 @@ void FitterBase::Run2DLLHScan() {
   constexpr int countwidth = double(n_points)/double(5);
 
   // Loop over the covariance classes
-  for (covarianceBase *cov : systematics)
+  for (ParameterHandlerBase *cov : systematics)
   {
     bool isxsec = (cov->getName() == "xsec_cov");
     // Scan over all the parameters
@@ -1068,7 +1068,7 @@ void FitterBase::RunSigmaVar() {
   }
 
   bool isxsec = false;
-  for (covarianceBase *cov : systematics)
+  for (ParameterHandlerBase *cov : systematics)
   {
     TMatrixDSym *Cov = cov->getCovMatrix();
 

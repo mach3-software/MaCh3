@@ -197,7 +197,7 @@ void mcmc::PrintProgress() {
   MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
-  for (covarianceBase *cov : systematics) {
+  for (ParameterHandlerBase *cov : systematics) {
     if (cov->getName() == "xsec_cov") {
       MACH3LOG_INFO("Cross-section parameters: ");
       cov->printNominalCurrProp();
