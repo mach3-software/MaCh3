@@ -665,7 +665,7 @@ int splineFDBase::getSampleIndex(const std::string& SampleName) const{
 void splineFDBase::PrintSampleDetails(const std::string& SampleName) const
 //****************************************
 {
-  int iSample = getSampleIndex(SampleName);
+  const int iSample = getSampleIndex(SampleName);
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
