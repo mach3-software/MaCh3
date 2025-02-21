@@ -6,7 +6,7 @@
 #include <sstream>
 
 // MaCh3 Includes
-#include "samplePDF/samplePDFBase.h"
+#include "samplePDF/SampleHandlerBase.h"
 #include "covariance/ParameterHandlerBase.h"
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
@@ -30,7 +30,7 @@ class FitterBase {
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
   /// @param sample A pointer to a sample PDF object derived from samplePDFBase.
-  void addSamplePDF(samplePDFBase* sample);
+  void addSamplePDF(SampleHandlerBase* sample);
 
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from covarianceBase.
@@ -99,7 +99,7 @@ class FitterBase {
   std::vector<double> syst_llh;
 
   /// Sample holder
-  std::vector<samplePDFBase*> samples;
+  std::vector<SampleHandlerBase*> samples;
   /// Total number of samples used
   unsigned int TotalNSamples;
 

@@ -6,7 +6,7 @@
 #include "covariance/SystematicHandlerGeneric.h"
 #include "covariance/ParameterHandlerOsc.h"
 
-#include "samplePDF/samplePDFBase.h"
+#include "samplePDF/SampleHandlerBase.h"
 #include "samplePDF/FarDetectorCoreInfoStruct.h"
 
 #include "THStack.h"
@@ -18,7 +18,7 @@ class OscillatorBase;
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
 /// @author Ed Atkin
-class SampleHandlerFD :  public samplePDFBase
+class SampleHandlerFD :  public SampleHandlerBase
 {
 public:
   //######################################### Functions #########################################

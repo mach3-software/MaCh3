@@ -22,12 +22,12 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
-class samplePDFBase
+class SampleHandlerBase
 {
  public:
-   samplePDFBase();
+   SampleHandlerBase();
   /// @brief destructor
-  virtual ~samplePDFBase();
+  virtual ~SampleHandlerBase();
 
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
   virtual inline std::string GetName()const {return "samplePDF";};

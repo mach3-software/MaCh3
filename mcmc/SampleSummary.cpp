@@ -6,7 +6,7 @@
 
 // *******************
 // The constructor
-SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, samplePDFBase* const sample, const int nSteps) {
+SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerBase* const sample, const int nSteps) {
 // *******************
   MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD

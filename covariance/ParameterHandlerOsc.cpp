@@ -1,7 +1,7 @@
-#include "covariance/covarianceOsc.h"
+#include "covariance/ParameterHandlerOsc.h"
 
 // *************************************
-covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
+ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
 : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // *************************************
   kDeltaCP = -999;
@@ -37,13 +37,13 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
 }
 
 // *************************************
-covarianceOsc::~covarianceOsc() {
+ParameterHandlerOsc::~ParameterHandlerOsc() {
 // *************************************
 
 }
 
 // *************************************
-void covarianceOsc::proposeStep() {
+void ParameterHandlerOsc::proposeStep() {
 // *************************************
   ParameterHandlerBase::proposeStep();
 
@@ -65,7 +65,7 @@ void covarianceOsc::proposeStep() {
 
 // *************************************
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
-void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
+void ParameterHandlerOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
 // *************************************
   if(_fPropVal[index] > UpBound) {
     _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
@@ -76,7 +76,7 @@ void covarianceOsc::CircularPrior(const int index, const double LowBound, const 
 
 // *************************************
 //KS: Print all useful information's after initialization
-void covarianceOsc::Print() {
+void ParameterHandlerOsc::Print() {
 // *************************************
   MACH3LOG_INFO("Number of pars: {}", _fNumPar);
   MACH3LOG_INFO("Current: {} parameters:", matrixName);
@@ -102,7 +102,7 @@ void covarianceOsc::Print() {
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
-std::vector<const double*> covarianceOsc::GetOscParsFromDetID(const std::string& DetID) {
+std::vector<const double*> ParameterHandlerOsc::GetOscParsFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<const double*> returnVec;
   for (int i = 0; i < _fNumPar; ++i) {

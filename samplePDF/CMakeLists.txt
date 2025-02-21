@@ -1,5 +1,5 @@
 set(HEADERS
-    samplePDFBase.h
+    SampleHandlerBase.h
     SampleHandlerFD.h
     Structs.h
     HistogramUtils.h
@@ -7,7 +7,7 @@ set(HEADERS
 )
 
 add_library(SamplePDF SHARED
-    samplePDFBase.cpp
+    SampleHandlerBase.cpp
     SampleHandlerFD.cpp
     HistogramUtils.cpp
 )

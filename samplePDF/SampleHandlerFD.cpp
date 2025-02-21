@@ -9,7 +9,7 @@ _MaCh3_Safe_Include_End_ //}
 #include <algorithm>
 #include <memory>
 
-SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov) : samplePDFBase()
+SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov) : SampleHandlerBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");

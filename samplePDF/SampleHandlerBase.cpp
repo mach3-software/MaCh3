@@ -1,6 +1,6 @@
-#include "samplePDFBase.h"
+#include "SampleHandlerBase.h"
 
-samplePDFBase::samplePDFBase() 
+SampleHandlerBase::SampleHandlerBase() 
 {
   nDims = 0;
   rnd = new TRandom3(0);
@@ -8,14 +8,14 @@ samplePDFBase::samplePDFBase()
   dathist2d = NULL;
 }
 
-samplePDFBase::~samplePDFBase()
+SampleHandlerBase::~SampleHandlerBase()
 {
   if(dathist != NULL) delete dathist;
   if(dathist2d != NULL) delete dathist2d;
   delete rnd;
 }
 
-void samplePDFBase::addData(std::vector<double> &data)
+void SampleHandlerBase::addData(std::vector<double> &data)
 {
   if(nDims != 0 && nDims != 1)
   {
@@ -34,7 +34,7 @@ void samplePDFBase::addData(std::vector<double> &data)
   }
 }
 
-void samplePDFBase::addData(std::vector< std::vector <double> > &data)
+void SampleHandlerBase::addData(std::vector< std::vector <double> > &data)
 {
   if(nDims != 0 && nDims != 2)
   {
@@ -52,7 +52,7 @@ void samplePDFBase::addData(std::vector< std::vector <double> > &data)
     dathist2d->Fill(data.at(0)[i], data.at(1)[i]);
 }
 
-void samplePDFBase::addData(TH1D* binneddata)
+void SampleHandlerBase::addData(TH1D* binneddata)
 {
   if(nDims != 0 && nDims != 1)
   {
@@ -66,7 +66,7 @@ void samplePDFBase::addData(TH1D* binneddata)
   dathist = binneddata;
 }
 
-void samplePDFBase::addData(TH2D* binneddata)
+void SampleHandlerBase::addData(TH2D* binneddata)
 {
   if(nDims != 0 && nDims != 2)
   {
@@ -80,13 +80,13 @@ void samplePDFBase::addData(TH2D* binneddata)
   dathist2d = binneddata;
 }
 
-TH1D* samplePDFBase::get1DHist()
+TH1D* SampleHandlerBase::get1DHist()
 {
   fill1DHist();
   return _hPDF1D;
 }
 
-TH2D* samplePDFBase::get2DHist()
+TH2D* SampleHandlerBase::get2DHist()
 {
   fill2DHist();
   return _hPDF2D;
@@ -94,7 +94,7 @@ TH2D* samplePDFBase::get2DHist()
 
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
+double SampleHandlerBase::getTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Need some MC
   if(mc == 0) return 0.;
@@ -112,7 +112,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) const {
+double SampleHandlerBase::getTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
   // Need some MC
   if (mc == 0) return 0.0;
@@ -250,7 +250,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
 
 // ***************************************************************************
 //KS: Sample getter
-std::string samplePDFBase::GetSampleName(int Sample) {
+std::string SampleHandlerBase::GetSampleName(int Sample) {
 // ***************************************************************************
   if(Sample > nSamples)
   {
@@ -263,7 +263,7 @@ std::string samplePDFBase::GetSampleName(int Sample) {
 
 // ***************************************************************************
 // CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
-void samplePDFBase::QuietPlease() {
+void SampleHandlerBase::QuietPlease() {
 // ***************************************************************************
   #if DEBUG > 0
   return;
@@ -277,7 +277,7 @@ void samplePDFBase::QuietPlease() {
 
 // ***************************************************************************
 // CW: Reset cout and cerr
-void samplePDFBase::NowTalk() {
+void SampleHandlerBase::NowTalk() {
 // ***************************************************************************
   #if DEBUG > 0
   return;
