@@ -857,6 +857,8 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
     double x,y, Eval = M3::_BAD_DOUBLE_;
     bool isFlat = true;
 
+    std::vector<std::string> SplineFileNames;
+
     auto File = std::unique_ptr<TFile>(TFile::Open(OscChanFileNames[iOscChan].c_str()));
 
     if (!File || File->IsZombie()) {
@@ -874,6 +876,15 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
       }
 
       std::string FullSplineName = std::string(Key->GetName());
+      
+      for (auto TestSplineFile : SplineFileNames) {
+	if (TestSplineFile == FullSplineName) {
+	  MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName); 
+	  continue;
+	}
+      }
+      SplineFileNames.push_back(FullSplineName);
+
       std::vector<std::string> Tokens = GetTokensFromSplineName(FullSplineName);
 
       if (Tokens.size() != kNTokens) {
@@ -911,8 +922,10 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
       }
 
       if (ModeNum == -1) {
-        MACH3LOG_ERROR("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
-        throw MaCh3Exception(__FILE__, __LINE__);
+	//DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+	//     Therefore include as debug warning and continue instead
+        MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
+	continue;
       }
 
       mySpline = Key->ReadObject<TSpline3>();
