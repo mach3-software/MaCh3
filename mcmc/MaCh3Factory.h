@@ -9,7 +9,7 @@
 #include "mcmc/MinuitFit.h"
 #endif
 
-#include "covariance/covarianceXsec.h"
+#include "covariance/SystematicHandlerGeneric.h"
 #include "covariance/covarianceOsc.h"
 
 /// @file MaCh3Factory.h
@@ -125,7 +125,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 /// ```
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& SampleConfig,
-                                               covarianceXsec* xsec,
+                                               SystematicHandlerGeneric* xsec,
                                                covarianceOsc* osc = nullptr) {
 // ********************************************
   std::vector<SampleType*> PDFs(SampleConfig.size());

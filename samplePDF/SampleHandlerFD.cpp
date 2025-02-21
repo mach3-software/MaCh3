@@ -9,14 +9,14 @@ _MaCh3_Safe_Include_End_ //}
 #include <algorithm>
 #include <memory>
 
-SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
+SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(!xsec_cov){
-    MACH3LOG_ERROR("You've passed me a nullptr to a covarianceXsec... I need this to setup splines!");
+    MACH3LOG_ERROR("You've passed me a nullptr to a SystematicHandlerGeneric... I need this to setup splines!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   XsecCov = xsec_cov;
@@ -739,7 +739,7 @@ void SampleHandlerFD::SetupNormParameters() {
   }
 
   //DB
-  //Attempt at reducing impact of covarianceXsec::calcReweight()
+  //Attempt at reducing impact of SystematicHandlerGeneric::calcReweight()
   int counter;
 
   for (int iSample = 0; iSample < int(MCSamples.size()); ++iSample) {

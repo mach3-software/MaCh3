@@ -1,11 +1,11 @@
-#include "covariance/covarianceXsec.h"
+#include "covariance/SystematicHandlerGeneric.h"
 #include "samplePDF/Structs.h"
 
 // ********************************************
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
-covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
+SystematicHandlerGeneric::SystematicHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
                : covarianceBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // ********************************************
   InitXsecFromConfig();
@@ -24,7 +24,7 @@ covarianceXsec::covarianceXsec(const std::vector<std::string>& YAMLFile, std::st
 }
 
 // ********************************************
-void covarianceXsec::InitXsecFromConfig() {
+void SystematicHandlerGeneric::InitXsecFromConfig() {
 // ********************************************
   _fSystToGlobalSystIndexMap.resize(SystType::kSystTypes);
 
@@ -96,14 +96,14 @@ void covarianceXsec::InitXsecFromConfig() {
 }
 
 // ********************************************
-covarianceXsec::~covarianceXsec() {
+SystematicHandlerGeneric::~SystematicHandlerGeneric() {
 // ********************************************
   MACH3LOG_DEBUG("Deleting covarianceXsec");
 }
 
 // ********************************************
 // DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const std::string& DetID) {
+const std::vector<std::string> SystematicHandlerGeneric::GetSplineParsNamesFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<std::string> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -118,7 +118,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
 }
 
 // ********************************************
-const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFromDetID(const std::string& DetID) {
+const std::vector<SplineInterpolation> SystematicHandlerGeneric::GetSplineInterpolationFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -134,7 +134,7 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
 
 // ********************************************
 // DB Grab the Spline Modes for the relevant DetID
-const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(const std::string& DetID) {
+const std::vector< std::vector<int> > SystematicHandlerGeneric::GetSplineModeVecFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
@@ -151,7 +151,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
 
 // ********************************************
 // Get Norm params
-XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index) {
+XsecNorms4 SystematicHandlerGeneric::GetXsecNorm(const YAML::Node& param, const int Index) {
 // ********************************************
   XsecNorms4 norm;
   norm.name = GetParFancyName(Index);
@@ -210,7 +210,7 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
 // ********************************************
 // Grab the global syst index for the relevant DetID
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<int> SystematicHandlerGeneric::GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -225,7 +225,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const std::st
 // ********************************************
 // Grab the global syst index for the relevant DetID
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> covarianceXsec::GetSystIndexFromDetID(const std::string& DetID,  const SystType Type) {
+const std::vector<int> SystematicHandlerGeneric::GetSystIndexFromDetID(const std::string& DetID,  const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -240,7 +240,7 @@ const std::vector<int> covarianceXsec::GetSystIndexFromDetID(const std::string& 
 
 // ********************************************
 // Get Norm params
-XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
+XsecSplines1 SystematicHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
 // ********************************************
   XsecSplines1 Spline;
 
@@ -264,7 +264,7 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
-const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const std::string& DetID) {
+const std::vector<XsecNorms4> SystematicHandlerGeneric::GetNormParsFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<XsecNorms4> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
@@ -279,7 +279,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const std::st
 
 // ********************************************
 // DB Grab the number of parameters for the relevant DetID
-int covarianceXsec::GetNumParamsFromDetID(const std::string& DetID, const SystType Type) {
+int SystematicHandlerGeneric::GetNumParamsFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   int returnVal = 0;
   IterateOverParams(DetID,
@@ -291,7 +291,7 @@ int covarianceXsec::GetNumParamsFromDetID(const std::string& DetID, const SystTy
 
 // ********************************************
 // DB Grab the parameter names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<std::string> SystematicHandlerGeneric::GetParsNamesFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   std::vector<std::string> returnVec;
   IterateOverParams(DetID,
@@ -303,7 +303,7 @@ const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const std::
 
 // ********************************************
 // DB DB Grab the parameter indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<int> SystematicHandlerGeneric::GetParsIndexFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   IterateOverParams(DetID,
@@ -315,7 +315,7 @@ const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const std::string& 
 
 // ********************************************
 template <typename FilterFunc, typename ActionFunc>
-void covarianceXsec::IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action) {
+void SystematicHandlerGeneric::IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
@@ -325,7 +325,7 @@ void covarianceXsec::IterateOverParams(const std::string& DetID, FilterFunc filt
 }
 
 // ********************************************
-void covarianceXsec::initParams() {
+void SystematicHandlerGeneric::initParams() {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
@@ -355,7 +355,7 @@ void covarianceXsec::initParams() {
 
 // ********************************************
 // Print everything we know about the inputs we're Getting
-void covarianceXsec::Print() {
+void SystematicHandlerGeneric::Print() {
 // ********************************************
   MACH3LOG_INFO("#################################################");
   MACH3LOG_INFO("Printing covarianceXsec:");
@@ -377,7 +377,7 @@ void covarianceXsec::Print() {
 } // End
 
 // ********************************************
-void covarianceXsec::PrintGlobablInfo() {
+void SystematicHandlerGeneric::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
   MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
@@ -397,7 +397,7 @@ void covarianceXsec::PrintGlobablInfo() {
 }
 
 // ********************************************
-void covarianceXsec::PrintNormParams() {
+void SystematicHandlerGeneric::PrintNormParams() {
 // ********************************************
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
@@ -469,7 +469,7 @@ void covarianceXsec::PrintNormParams() {
 }
 
 // ********************************************
-void covarianceXsec::PrintSplineParams() {
+void SystematicHandlerGeneric::PrintSplineParams() {
 // ********************************************
   MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobalSystIndexMap[SystType::kSpline].size());
   if(_fSystToGlobalSystIndexMap[SystType::kSpline].size() == 0) return;
@@ -491,7 +491,7 @@ void covarianceXsec::PrintSplineParams() {
 }
 
 // ********************************************
-void covarianceXsec::PrintFunctionalParams() {
+void SystematicHandlerGeneric::PrintFunctionalParams() {
 // ********************************************
   MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[SystType::kFunc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kFunc].size() == 0) return;
@@ -507,7 +507,7 @@ void covarianceXsec::PrintFunctionalParams() {
 }
 
 // ********************************************
-void covarianceXsec::PrintParameterGroups() {
+void SystematicHandlerGeneric::PrintParameterGroups() {
 // ********************************************
   // KS: Create a map to store the counts of unique strings, in principle this could be in header file
   std::unordered_map<std::string, int> paramCounts;
@@ -526,7 +526,7 @@ void covarianceXsec::PrintParameterGroups() {
 
 // ********************************************
 // KS: Check if matrix is correctly initialised
-void covarianceXsec::CheckCorrectInitialisation() {
+void SystematicHandlerGeneric::CheckCorrectInitialisation() {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
   auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
@@ -549,7 +549,7 @@ void covarianceXsec::CheckCorrectInitialisation() {
 
 // ********************************************
 // Function to set to prior parameters of a given group
-void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
+void SystematicHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) {
 // ********************************************
   if(!pca) {
     for (int i = 0; i < _fNumPar; i++) {
@@ -563,7 +563,7 @@ void covarianceXsec::SetGroupOnlyParameters(const std::string& Group) {
 
 // ********************************************
 // Checks if parameter belongs to a given group
-bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
+bool SystematicHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
   std::string groupLower = Group;
   std::string paramGroupLower = _ParameterGroup[i];
@@ -577,7 +577,7 @@ bool covarianceXsec::IsParFromGroup(const int i, const std::string& Group) {
 
 // ********************************************
 // Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
-void covarianceXsec::DumpMatrixToFile(const std::string& Name) {
+void SystematicHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
 // ********************************************
   TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
 

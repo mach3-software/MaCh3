@@ -2,7 +2,7 @@ set(HEADERS
     CovarianceUtils.h
     covarianceBase.h
     covarianceOsc.h
-    covarianceXsec.h
+    SystematicHandlerGeneric.h
     AdaptiveMCMCHandler.h
     PCAHandler.h
 )
@@ -10,7 +10,7 @@ set(HEADERS
 add_library(Covariance SHARED
     covarianceBase.cpp
     covarianceOsc.cpp
-    covarianceXsec.cpp
+    SystematicHandlerGeneric.cpp
     AdaptiveMCMCHandler.cpp
     PCAHandler.cpp
 )

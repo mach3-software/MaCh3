@@ -19,7 +19,7 @@ class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
 	/// @brief Constructor
-  BinnedSplineHandler(covarianceXsec *xsec_, MaCh3Modes *Modes_);
+  BinnedSplineHandler(SystematicHandlerGeneric *xsec_, MaCh3Modes *Modes_);
 	/// @brief Destructor
 	/// @todo it need some love
 	virtual ~BinnedSplineHandler();
@@ -74,7 +74,7 @@ class BinnedSplineHandler : public SplineBase {
 	/// @brief Calc total event weight, not used by Bin-by-bin splines
 	void ModifyWeights() override {return;};
 	/// Pointer to covariance xsec
-	covarianceXsec* xsec;
+	SystematicHandlerGeneric* xsec;
 
 	//And now the actual member variables	
 	std::vector<std::string> SampleNames;

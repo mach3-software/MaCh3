@@ -9,7 +9,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
-class covarianceXsec : public covarianceBase {
+class SystematicHandlerGeneric : public covarianceBase {
   public:
     /// @brief Constructor
     /// @param FileNames A vector of strings representing the YAML files used for initialisation of matrix
@@ -17,9 +17,9 @@ class covarianceXsec : public covarianceBase {
     /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
     /// @param FirstPCAdpar First PCA parameter that will be decomposed.
     /// @param LastPCAdpar First PCA parameter that will be decomposed.
-    covarianceXsec(const std::vector<std::string>& FileNames, std::string name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+    SystematicHandlerGeneric(const std::vector<std::string>& FileNames, std::string name = "xsec_cov", double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
     /// @brief Destructor
-    ~covarianceXsec();
+    ~SystematicHandlerGeneric();
 
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.

@@ -3,7 +3,7 @@
 //MaCh3 includes
 #include "splines/BinnedSplineHandler.h"
 
-#include "covariance/covarianceXsec.h"
+#include "covariance/SystematicHandlerGeneric.h"
 #include "covariance/covarianceOsc.h"
 
 #include "samplePDF/samplePDFBase.h"
@@ -23,7 +23,7 @@ class SampleHandlerFD :  public samplePDFBase
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerFD(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, covarianceOsc* osc_cov = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
@@ -226,7 +226,7 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
-  covarianceXsec *XsecCov = nullptr;
+  SystematicHandlerGeneric *XsecCov = nullptr;
   covarianceOsc *OscCov = nullptr;
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
