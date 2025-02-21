@@ -1,4 +1,4 @@
-#include "splineFDBase.h"
+#include "BinnedSplineHandler.h"
 #include <memory>
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -10,7 +10,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 //****************************************
-splineFDBase::splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes_) : SplineBase() {
+BinnedSplineHandler::BinnedSplineHandler(covarianceXsec *xsec_, MaCh3Modes *Modes_) : SplineBase() {
 //****************************************
   if (!xsec_) {
     MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised covariance object");
@@ -29,7 +29,7 @@ splineFDBase::splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes_) : SplineBa
   CoeffIndex = 0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
 }
 //****************************************
-splineFDBase::~splineFDBase(){
+BinnedSplineHandler::~BinnedSplineHandler(){
 //****************************************
   if(manycoeff_arr != nullptr) delete[] manycoeff_arr;
   if(xcoeff_arr != nullptr) delete[] xcoeff_arr;
@@ -37,7 +37,7 @@ splineFDBase::~splineFDBase(){
   if(ParamValues != nullptr) delete[] ParamValues;
 }
 //****************************************
-void splineFDBase::cleanUpMemory() {
+void BinnedSplineHandler::cleanUpMemory() {
 //****************************************
   //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
   //Not a huge saving but it's better than leaving everything up to the compiler
@@ -73,7 +73,7 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-void splineFDBase::AddSample(const std::string& SampleName,
+void BinnedSplineHandler::AddSample(const std::string& SampleName,
                              const std::string& DetID,
                              const std::vector<std::string>& OscChanFileNames,
                              const std::vector<std::string>& SplineVarNames)
@@ -129,7 +129,7 @@ void splineFDBase::AddSample(const std::string& SampleName,
 }
 
 //****************************************
-void splineFDBase::TransferToMonolith()
+void BinnedSplineHandler::TransferToMonolith()
 //****************************************
 {
   PrepForReweight(); 
@@ -225,7 +225,7 @@ void splineFDBase::TransferToMonolith()
 }
 
 // *****************************************
-void splineFDBase::Evaluate() {
+void BinnedSplineHandler::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
@@ -239,7 +239,7 @@ void splineFDBase::Evaluate() {
 }
 
 //****************************************
-void splineFDBase::CalcSplineWeights()
+void BinnedSplineHandler::CalcSplineWeights()
 //****************************************
 {
   #ifdef MULTITHREAD
@@ -280,7 +280,7 @@ void splineFDBase::CalcSplineWeights()
 //****************************************
 //Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector)
 //Only need 1 indexing array everything else interfaces with this to get binning properties
-void splineFDBase::BuildSampleIndexingArray(const std::string& SampleName)
+void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleName)
 //****************************************
 {  
   int iSample = getSampleIndex(SampleName);
@@ -312,7 +312,7 @@ void splineFDBase::BuildSampleIndexingArray(const std::string& SampleName)
 }
 
 //****************************************
-std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::string SampleName)
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(std::string FileName, std::string SampleName)
 //****************************************
 {
   std::vector<TAxis *> ReturnVec;
@@ -413,7 +413,7 @@ std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::
 }
 
 //****************************************
-int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
+int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
 //****************************************
 {
   int SampleCounter_NonFlat = 0;
@@ -473,7 +473,7 @@ int splineFDBase::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
 }
 
 //****************************************
-void splineFDBase::PrepForReweight() {
+void BinnedSplineHandler::PrepForReweight() {
 //****************************************
   std::vector<TSpline3_red*> UniqueSystSplines;
 
@@ -614,7 +614,7 @@ void splineFDBase::PrepForReweight() {
 
 //****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
+void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
 //****************************************
   //No point evaluating a flat spline
   int nPoints = splinevec_Monolith[splineindex]->GetNp();
@@ -651,7 +651,7 @@ void splineFDBase::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray,
 //****************************************
 //ETA - this may need to be virtual and then we can define this in the experiment.
 //Equally though could just use KinematicVariable to map back
-std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
+std::string BinnedSplineHandler::getDimLabel(int iSample, unsigned int Axis)
 //****************************************
 {
   if(Axis > DimensionLabels[iSample].size()){
@@ -664,7 +664,7 @@ std::string splineFDBase::getDimLabel(int iSample, unsigned int Axis)
 
 //****************************************
 //Returns sample index in
-int splineFDBase::getSampleIndex(const std::string& SampleName){
+int BinnedSplineHandler::getSampleIndex(const std::string& SampleName){
 //****************************************
   for (size_t iSample = 0; iSample < SampleNames.size(); ++iSample) {
     if (SampleName == SampleNames[iSample]) {
@@ -676,7 +676,7 @@ int splineFDBase::getSampleIndex(const std::string& SampleName){
 }
 
 //****************************************
-void splineFDBase::PrintSampleDetails(const std::string& SampleName)
+void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName)
 //****************************************
 {
   const int iSample = getSampleIndex(SampleName);
@@ -689,7 +689,7 @@ void splineFDBase::PrintSampleDetails(const std::string& SampleName)
 }
 
 //****************************************
-void splineFDBase::PrintArrayDetails(const std::string& SampleName)
+void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleName)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
@@ -715,7 +715,7 @@ void splineFDBase::PrintArrayDetails(const std::string& SampleName)
 }
 
 //****************************************
-bool splineFDBase::isValidSplineIndex(const std::string& SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
+bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
@@ -754,7 +754,7 @@ bool splineFDBase::isValidSplineIndex(const std::string& SampleName, int iOscCha
 }
 
 //****************************************
-void splineFDBase::PrintBinning(TAxis *Axis)
+void BinnedSplineHandler::PrintBinning(TAxis *Axis)
 //****************************************
 {
   const int NBins = Axis->GetNbins();
@@ -766,7 +766,7 @@ void splineFDBase::PrintBinning(TAxis *Axis)
 }
 
 //****************************************
-std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
 //****************************************
 {
   std::vector<std::vector<int>> ReturnVec;
@@ -832,7 +832,7 @@ std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string Sample
 
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
-std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
+std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
 
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
@@ -868,7 +868,7 @@ std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< 
   return ReturnVec;
 }
 
-void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)
+void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)
 {
   int iSample = getSampleIndex(SampleName);
   int nOscChannels = nOscChans[iSample];

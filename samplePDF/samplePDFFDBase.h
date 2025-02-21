@@ -1,7 +1,7 @@
 #pragma once
 
 //MaCh3 includes
-#include "splines/splineFDBase.h"
+#include "splines/BinnedSplineHandler.h"
 
 #include "covariance/covarianceXsec.h"
 #include "covariance/covarianceOsc.h"
@@ -124,7 +124,7 @@ public:
   void Initialise();
   
   /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
-  std::unique_ptr<splineFDBase> SplineHandler;
+  std::unique_ptr<BinnedSplineHandler> SplineHandler;
   //===============================================================================
   void fillSplineBins();
 

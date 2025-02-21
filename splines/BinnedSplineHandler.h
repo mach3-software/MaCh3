@@ -15,14 +15,14 @@ _MaCh3_Safe_Include_End_ //}
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Henry Wallace
-class splineFDBase : public SplineBase {
+class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
 	/// @brief Constructor
-  splineFDBase(covarianceXsec *xsec_, MaCh3Modes *Modes_);
+  BinnedSplineHandler(covarianceXsec *xsec_, MaCh3Modes *Modes_);
 	/// @brief Destructor
 	/// @todo it need some love
-	virtual ~splineFDBase();
+	virtual ~BinnedSplineHandler();
 
 	/// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays 
 	/// to store the weights; probably the best one here! Same thing but pass parameter 
