@@ -10,7 +10,8 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 
   std::string GetMaCh3ModeName(const int Index);
   NModes = 0;
-
+  nCCModes = 0;
+  
   Title = config["Title"].as<std::string>();
   Generator = config["GeneratorName"].as<std::string>();
 
@@ -24,6 +25,10 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 		   config[names[i]]["GeneratorMaping"].as<std::vector<int>>(),
 		   config[names[i]]["IsNC"].as<bool>(),
 		   config[names[i]]["SplineSuffix"].as<std::string>());
+
+    if (!config[names[i]]["IsNC"].as<bool>()) {
+      nCCModes += 1;
+    }
   }
   // Add unknown category, it's better to have garbage category where all undefined modes will go rather than get random crashes
   DeclareNewMode("UNKNOWN_BAD",
