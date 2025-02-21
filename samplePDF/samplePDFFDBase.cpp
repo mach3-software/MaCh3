@@ -1826,7 +1826,7 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   double PDFIntegral = 0;
 
-  std::vector< std::vector< TH2* > > IntegralList;
+  std::vector< std::vector< TH1* > > IntegralList;
   IntegralList.resize(Modes->GetNModes());
 
   std::vector<double> ChannelIntegral;
@@ -1834,7 +1834,15 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
   
   for (int i=0;i<Modes->GetNModes();i++) {
-    IntegralList[i] = ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle);
+    if (GetNDim()==1) {
+      IntegralList[i] = ReturnHistsBySelection1D(XVarStr,1,i,WeightStyle);
+    } else {
+      std::vector<TH2*> Vec = ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle);
+      IntegralList[i].resize(Vec.size());
+      for (size_t iVec=0;iVec<Vec.size();iVec++) {
+	IntegralList[i][iVec] = static_cast<TH1*>(Vec[iVec]);
+      }
+    }
   }
 
   MACH3LOG_INFO("-------------------------------------------------");
