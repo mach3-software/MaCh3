@@ -38,7 +38,8 @@ class splineFDBase : public SplineBase {
     /// @brief Remove setup variables not needed for spline evaluations
     void cleanUpMemory();
 
-    void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
+    // DB Add virtual so it can be overridden in experiment specific (if needed)
+    virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
     std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
