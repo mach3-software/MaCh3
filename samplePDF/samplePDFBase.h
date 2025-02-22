@@ -35,7 +35,7 @@ class samplePDFBase
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
   /// @brief Return pointer to MaCh3 modes
-  MaCh3Modes* GetMaCh3Modes() const { return Modes; }
+  MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
 
   TH1D* get1DHist();                                               
   TH2D* get2DHist();
@@ -107,8 +107,8 @@ protected:
   /// Name of Sample
   std::vector<std::string> SampleName;
 
-  //GetterForModes
-  MaCh3Modes* Modes;
+  /// Holds information about used Generator and MaCh3 modes
+  std::unique_ptr<MaCh3Modes> Modes;
 
   TH1D *dathist; // tempstore for likelihood calc
   TH2D *dathist2d;

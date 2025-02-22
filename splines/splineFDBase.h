@@ -38,7 +38,8 @@ class splineFDBase : public SplineBase {
     /// @brief Remove setup variables not needed for spline evaluations
     void cleanUpMemory();
 
-    // DB Add virtual so it can be overridden in experiment specific (if needed)
+    /// @brief Loads and processes splines from ROOT files for a given sample.
+    /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
     virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline

@@ -88,6 +88,22 @@ TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH
 /// @param hist_1d refence hist from which we take entries to be filled
 void FastViolinFill(TH2D* violin, TH1D* hist_1d);
 
+/// @brief Converts a vector of pointers from a derived type to a base type.
+/// @tparam Derived The derived class type.
+/// @tparam Base The base class type.
+/// @param inputVec A `std::vector` of pointers to `Derived` objects.
+/// @return A `std::vector` of pointers to `Base` objects.
+template <typename Derived, typename Base>
+std::vector<Base*> CastVector(const std::vector<Derived*>& inputVec) {
+  std::vector<Base*> outputVec;
+  // Reserve space for efficiency
+  outputVec.reserve(inputVec.size());
+  for (auto* ptr : inputVec) {
+    outputVec.push_back(static_cast<Base*>(ptr));
+  }
+  return outputVec;
+}
+
 /// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {
   std::ifstream infile(filename.c_str());
