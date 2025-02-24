@@ -1019,7 +1019,7 @@ void covarianceBase::printIndivStepScale() const {
   MACH3LOG_INFO("============================================================");
   MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
   for (int iParam = 0; iParam < _fNumPar; iParam++) {
-    MACH3LOG_INFO("{:<{}} | {:<11}", _fNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
+    MACH3LOG_INFO("{:<{}} | {:<11}", _fFancyNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
   }
   MACH3LOG_INFO("============================================================");
 }
