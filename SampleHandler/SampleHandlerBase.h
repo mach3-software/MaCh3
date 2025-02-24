@@ -4,8 +4,8 @@
 #include <assert.h>
 
 //MaCh3 includes
-#include "samplePDF/Structs.h"
-#include "samplePDF/HistogramUtils.h"
+#include "SampleHandler/Structs.h"
+#include "SampleHandler/HistogramUtils.h"
 #include "manager/manager.h"
 #include "manager/MaCh3Modes.h"
 
@@ -30,7 +30,7 @@ class SampleHandlerBase
   virtual ~SampleHandlerBase();
 
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
-  virtual inline std::string GetName()const {return "samplePDF";};
+  virtual inline std::string GetName()const {return "SampleHandler";};
   virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 

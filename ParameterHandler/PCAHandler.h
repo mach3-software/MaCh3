@@ -2,7 +2,7 @@
 
 // MaCh3 Includes
 #include "manager/manager.h"
-#include "covariance/CovarianceUtils.h"
+#include "ParameterHandler/ParameterHandlerUtils.h"
 
 #ifdef DEBUG
   #define DEBUG_PCA 1

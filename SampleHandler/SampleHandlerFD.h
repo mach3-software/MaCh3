@@ -3,11 +3,11 @@
 //MaCh3 includes
 #include "splines/BinnedSplineHandler.h"
 
-#include "covariance/SystematicHandlerGeneric.h"
-#include "covariance/ParameterHandlerOsc.h"
+#include "ParameterHandler/ParameterHandlerGeneric.h"
+#include "ParameterHandler/ParameterHandlerOsc.h"
 
-#include "samplePDF/SampleHandlerBase.h"
-#include "samplePDF/FarDetectorCoreInfoStruct.h"
+#include "SampleHandler/SampleHandlerBase.h"
+#include "SampleHandler/FarDetectorCoreInfoStruct.h"
 
 #include "THStack.h"
 #include "TLegend.h"
@@ -23,7 +23,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
@@ -204,11 +204,11 @@ public:
   std::vector<double> YBinEdges;
 
   /// DB Array to be filled after reweighting
-  double** samplePDFFD_array;
+  double** SampleHandlerFD_array;
   /// KS Array used for MC stat
-  double** samplePDFFD_array_w2;
+  double** SampleHandlerFD_array_w2;
   /// DB Array to be filled in AddData
-  double** samplePDFFD_data;
+  double** SampleHandlerFD_data;
   //===============================================================================
 
   //===============================================================================
@@ -226,7 +226,7 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
-  SystematicHandlerGeneric *XsecCov = nullptr;
+  ParameterHandlerGeneric *XsecCov = nullptr;
   ParameterHandlerOsc *OscCov = nullptr;
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning

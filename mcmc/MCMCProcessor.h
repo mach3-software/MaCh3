@@ -10,7 +10,7 @@
 
 // MaCh3 includes
 #include "mcmc/StatisticalUtils.h"
-#include "samplePDF/HistogramUtils.h"
+#include "SampleHandler/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

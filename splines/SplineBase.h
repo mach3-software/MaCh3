@@ -5,7 +5,7 @@
 #include <iomanip>
 
 // MaCh3  includes
-#include "manager/MaCh3Logger.h"
+//#include "manager/MaCh3Logger.h"
 #include "splines/SplineStructs.h"
 #include "splines/SplineCommon.h"
 

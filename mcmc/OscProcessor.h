@@ -2,7 +2,7 @@
 
 // MaCh3 includes
 #include "mcmc/MCMCProcessor.h"
-#include "samplePDF/HistogramUtils.h"
+#include "SampleHandler/HistogramUtils.h"
 
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski

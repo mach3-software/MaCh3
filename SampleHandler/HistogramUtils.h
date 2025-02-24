@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "samplePDF/Structs.h"
+#include "SampleHandler/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include

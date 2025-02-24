@@ -29,7 +29,7 @@ set_target_properties(Splines PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Splines)
 
-target_link_libraries(Splines PUBLIC Covariance MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+target_link_libraries(Splines PUBLIC ParameterHandler MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 target_link_libraries(Splines PRIVATE MaCh3Warnings)
 
 target_include_directories(Splines PUBLIC

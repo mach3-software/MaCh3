@@ -10,7 +10,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 //****************************************
-BinnedSplineHandler::BinnedSplineHandler(SystematicHandlerGeneric *xsec_, MaCh3Modes *Modes_) : SplineBase() {
+BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_) : SplineBase() {
 //****************************************
   if (!xsec_) {
     MACH3LOG_ERROR("Trying to create splineFDBase with uninitialized covariance object");

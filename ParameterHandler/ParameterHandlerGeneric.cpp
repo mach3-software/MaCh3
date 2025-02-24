@@ -1,11 +1,11 @@
-#include "covariance/SystematicHandlerGeneric.h"
-#include "samplePDF/Structs.h"
+#include "ParameterHandler/ParameterHandlerGeneric.h"
+#include "SampleHandler/Structs.h"
 
 // ********************************************
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
-SystematicHandlerGeneric::SystematicHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
+ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
                : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // ********************************************
   InitXsecFromConfig();
@@ -24,7 +24,7 @@ SystematicHandlerGeneric::SystematicHandlerGeneric(const std::vector<std::string
 }
 
 // ********************************************
-void SystematicHandlerGeneric::InitXsecFromConfig() {
+void ParameterHandlerGeneric::InitXsecFromConfig() {
 // ********************************************
   _fSystToGlobalSystIndexMap.resize(SystType::kSystTypes);
 
@@ -96,14 +96,14 @@ void SystematicHandlerGeneric::InitXsecFromConfig() {
 }
 
 // ********************************************
-SystematicHandlerGeneric::~SystematicHandlerGeneric() {
+ParameterHandlerGeneric::~ParameterHandlerGeneric() {
 // ********************************************
   MACH3LOG_DEBUG("Deleting covarianceXsec");
 }
 
 // ********************************************
 // DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> SystematicHandlerGeneric::GetSplineParsNamesFromDetID(const std::string& DetID) {
+const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<std::string> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -118,7 +118,7 @@ const std::vector<std::string> SystematicHandlerGeneric::GetSplineParsNamesFromD
 }
 
 // ********************************************
-const std::vector<SplineInterpolation> SystematicHandlerGeneric::GetSplineInterpolationFromDetID(const std::string& DetID) {
+const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -134,7 +134,7 @@ const std::vector<SplineInterpolation> SystematicHandlerGeneric::GetSplineInterp
 
 // ********************************************
 // DB Grab the Spline Modes for the relevant DetID
-const std::vector< std::vector<int> > SystematicHandlerGeneric::GetSplineModeVecFromDetID(const std::string& DetID) {
+const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
@@ -151,7 +151,7 @@ const std::vector< std::vector<int> > SystematicHandlerGeneric::GetSplineModeVec
 
 // ********************************************
 // Get Norm params
-XsecNorms4 SystematicHandlerGeneric::GetXsecNorm(const YAML::Node& param, const int Index) {
+XsecNorms4 ParameterHandlerGeneric::GetXsecNorm(const YAML::Node& param, const int Index) {
 // ********************************************
   XsecNorms4 norm;
   norm.name = GetParFancyName(Index);
@@ -210,7 +210,7 @@ XsecNorms4 SystematicHandlerGeneric::GetXsecNorm(const YAML::Node& param, const 
 // ********************************************
 // Grab the global syst index for the relevant DetID
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> SystematicHandlerGeneric::GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -225,7 +225,7 @@ const std::vector<int> SystematicHandlerGeneric::GetGlobalSystIndexFromDetID(con
 // ********************************************
 // Grab the global syst index for the relevant DetID
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> SystematicHandlerGeneric::GetSystIndexFromDetID(const std::string& DetID,  const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromDetID(const std::string& DetID,  const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -240,7 +240,7 @@ const std::vector<int> SystematicHandlerGeneric::GetSystIndexFromDetID(const std
 
 // ********************************************
 // Get Norm params
-XsecSplines1 SystematicHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
+XsecSplines1 ParameterHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
 // ********************************************
   XsecSplines1 Spline;
 
@@ -264,7 +264,7 @@ XsecSplines1 SystematicHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
-const std::vector<XsecNorms4> SystematicHandlerGeneric::GetNormParsFromDetID(const std::string& DetID) {
+const std::vector<XsecNorms4> ParameterHandlerGeneric::GetNormParsFromDetID(const std::string& DetID) {
 // ********************************************
   std::vector<XsecNorms4> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
@@ -279,7 +279,7 @@ const std::vector<XsecNorms4> SystematicHandlerGeneric::GetNormParsFromDetID(con
 
 // ********************************************
 // DB Grab the number of parameters for the relevant DetID
-int SystematicHandlerGeneric::GetNumParamsFromDetID(const std::string& DetID, const SystType Type) {
+int ParameterHandlerGeneric::GetNumParamsFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   int returnVal = 0;
   IterateOverParams(DetID,
@@ -291,7 +291,7 @@ int SystematicHandlerGeneric::GetNumParamsFromDetID(const std::string& DetID, co
 
 // ********************************************
 // DB Grab the parameter names for the relevant DetID
-const std::vector<std::string> SystematicHandlerGeneric::GetParsNamesFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   std::vector<std::string> returnVec;
   IterateOverParams(DetID,
@@ -303,7 +303,7 @@ const std::vector<std::string> SystematicHandlerGeneric::GetParsNamesFromDetID(c
 
 // ********************************************
 // DB DB Grab the parameter indices for the relevant DetID
-const std::vector<int> SystematicHandlerGeneric::GetParsIndexFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromDetID(const std::string& DetID, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   IterateOverParams(DetID,
@@ -315,7 +315,7 @@ const std::vector<int> SystematicHandlerGeneric::GetParsIndexFromDetID(const std
 
 // ********************************************
 template <typename FilterFunc, typename ActionFunc>
-void SystematicHandlerGeneric::IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action) {
+void ParameterHandlerGeneric::IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
@@ -325,7 +325,7 @@ void SystematicHandlerGeneric::IterateOverParams(const std::string& DetID, Filte
 }
 
 // ********************************************
-void SystematicHandlerGeneric::initParams() {
+void ParameterHandlerGeneric::initParams() {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
@@ -355,7 +355,7 @@ void SystematicHandlerGeneric::initParams() {
 
 // ********************************************
 // Print everything we know about the inputs we're Getting
-void SystematicHandlerGeneric::Print() {
+void ParameterHandlerGeneric::Print() {
 // ********************************************
   MACH3LOG_INFO("#################################################");
   MACH3LOG_INFO("Printing covarianceXsec:");
@@ -377,7 +377,7 @@ void SystematicHandlerGeneric::Print() {
 } // End
 
 // ********************************************
-void SystematicHandlerGeneric::PrintGlobablInfo() {
+void ParameterHandlerGeneric::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
   MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
@@ -397,7 +397,7 @@ void SystematicHandlerGeneric::PrintGlobablInfo() {
 }
 
 // ********************************************
-void SystematicHandlerGeneric::PrintNormParams() {
+void ParameterHandlerGeneric::PrintNormParams() {
 // ********************************************
   // Output the normalisation parameters as a sanity check!
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
@@ -469,7 +469,7 @@ void SystematicHandlerGeneric::PrintNormParams() {
 }
 
 // ********************************************
-void SystematicHandlerGeneric::PrintSplineParams() {
+void ParameterHandlerGeneric::PrintSplineParams() {
 // ********************************************
   MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobalSystIndexMap[SystType::kSpline].size());
   if(_fSystToGlobalSystIndexMap[SystType::kSpline].size() == 0) return;
@@ -491,7 +491,7 @@ void SystematicHandlerGeneric::PrintSplineParams() {
 }
 
 // ********************************************
-void SystematicHandlerGeneric::PrintFunctionalParams() {
+void ParameterHandlerGeneric::PrintFunctionalParams() {
 // ********************************************
   MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[SystType::kFunc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kFunc].size() == 0) return;
@@ -507,7 +507,7 @@ void SystematicHandlerGeneric::PrintFunctionalParams() {
 }
 
 // ********************************************
-void SystematicHandlerGeneric::PrintParameterGroups() {
+void ParameterHandlerGeneric::PrintParameterGroups() {
 // ********************************************
   // KS: Create a map to store the counts of unique strings, in principle this could be in header file
   std::unordered_map<std::string, int> paramCounts;
@@ -526,7 +526,7 @@ void SystematicHandlerGeneric::PrintParameterGroups() {
 
 // ********************************************
 // KS: Check if matrix is correctly initialised
-void SystematicHandlerGeneric::CheckCorrectInitialisation() {
+void ParameterHandlerGeneric::CheckCorrectInitialisation() {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
   auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
@@ -549,7 +549,7 @@ void SystematicHandlerGeneric::CheckCorrectInitialisation() {
 
 // ********************************************
 // Function to set to prior parameters of a given group
-void SystematicHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) {
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) {
 // ********************************************
   if(!pca) {
     for (int i = 0; i < _fNumPar; i++) {
@@ -563,7 +563,7 @@ void SystematicHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) 
 
 // ********************************************
 // Checks if parameter belongs to a given group
-bool SystematicHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) {
+bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) {
 // ********************************************
   std::string groupLower = Group;
   std::string paramGroupLower = _ParameterGroup[i];
@@ -577,7 +577,7 @@ bool SystematicHandlerGeneric::IsParFromGroup(const int i, const std::string& Gr
 
 // ********************************************
 // Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
-void SystematicHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
+void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
 // ********************************************
   TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
 

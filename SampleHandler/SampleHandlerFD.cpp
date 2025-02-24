@@ -1,5 +1,5 @@
 #include "SampleHandlerFD.h"
-#include "samplePDF/Structs.h"
+#include "SampleHandler/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
@@ -9,7 +9,7 @@ _MaCh3_Safe_Include_End_ //}
 #include <algorithm>
 #include <memory>
 
-SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov) : SampleHandlerBase()
+SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov) : SampleHandlerBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
@@ -29,27 +29,27 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, SystematicHandlerGe
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
 
-  samplePDFFD_array = nullptr;
-  samplePDFFD_data = nullptr;
+  SampleHandlerFD_array = nullptr;
+  SampleHandlerFD_data = nullptr;
   SampleDetID = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
 SampleHandlerFD::~SampleHandlerFD()
 {
-  MACH3LOG_DEBUG("I'm deleting samplePDFFDBase");
+  MACH3LOG_DEBUG("I'm deleting SampleHandlerFDBase");
   
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
-    if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array[yBin];}
-    delete[] samplePDFFD_array_w2[yBin];
+    if(SampleHandlerFD_array != nullptr){delete[] SampleHandlerFD_array[yBin];}
+    delete[] SampleHandlerFD_array_w2[yBin];
     //ETA - there is a chance that you haven't added any data...
-    if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data[yBin];}
+    if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data[yBin];}
   }
 
-  if(samplePDFFD_array != nullptr){delete[] samplePDFFD_array;}
-  delete[] samplePDFFD_array_w2;
+  if(SampleHandlerFD_array != nullptr){delete[] SampleHandlerFD_array;}
+  delete[] SampleHandlerFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
-  if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
+  if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data;}
  
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
     delete NuOscProbCalcers[iCalc];
@@ -68,7 +68,7 @@ void SampleHandlerFD::ReadSampleConfig()
   EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
   
   //Default TestStatistic is kPoisson
-  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
+  //ETA: this can be configured with SampleHandlerBase::SetTestStatistic()
   if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
     fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
   } else {
@@ -243,7 +243,7 @@ void SampleHandlerFD::fill1DHist()
   _hPDF1D->Reset();
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     for (unsigned int xBin=0;xBin<(XBinEdges.size()-1);xBin++) {
-      _hPDF1D->AddBinContent(xBin+1,samplePDFFD_array[yBin][xBin]);
+      _hPDF1D->AddBinContent(xBin+1,SampleHandlerFD_array[yBin][xBin]);
     }
   }
 }
@@ -255,13 +255,13 @@ void SampleHandlerFD::fill2DHist()
   _hPDF2D->Reset();
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     for (unsigned int xBin=0;xBin<(XBinEdges.size()-1);xBin++) {
-      _hPDF2D->SetBinContent(xBin+1,yBin+1,samplePDFFD_array[yBin][xBin]);
+      _hPDF2D->SetBinContent(xBin+1,yBin+1,SampleHandlerFD_array[yBin][xBin]);
     }
   }
 }
 
 // ************************************************
-/// @function samplePDFFDBase::SetupSampleBinning()
+/// @function SampleHandlerFDBase::SetupSampleBinning()
 /// @brief Function to setup the binning of your sample histograms and the underlying
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
@@ -367,11 +367,11 @@ void SampleHandlerFD::reweight() {
 }
 
 //************************************************
-/// @function samplePDFFDBase::fillArray()
+/// @function SampleHandlerFDBase::fillArray()
 /// Function which does the core reweighting. This assumes that oscillation weights have 
-/// already been calculated and stored in samplePDFFDBase[iSample].osc_w[iEvent]. This 
+/// already been calculated and stored in SampleHandlerFDBase[iSample].osc_w[iEvent]. This 
 /// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
-/// It also follows the ND code reweighting pretty closely. This function fills the samplePDFFD 
+/// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD 
 /// array array which is binned to match the sample binning, such that bin[1][1] is the 
 /// equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void SampleHandlerFD::fillArray() {
@@ -383,7 +383,7 @@ void SampleHandlerFD::fillArray() {
 #ifdef MULTITHREAD
   fillArray_MP();
 #else
-  //ETA we should probably store this in samplePDFFDBase
+  //ETA we should probably store this in SampleHandlerFDBase
   size_t nXBins = int(XBinEdges.size()-1);
   //size_t nYBins = int(YBinEdges.size()-1);
 
@@ -471,8 +471,8 @@ void SampleHandlerFD::fillArray() {
       
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
-        samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        SampleHandlerFD_array[YBinToFill][XBinToFill] += totalweight;
+        SampleHandlerFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
     }
   }
@@ -495,22 +495,22 @@ void SampleHandlerFD::fillArray_MP()  {
   }
 
   //This is stored as [y][x] due to shifts only occurring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses
-  double** samplePDFFD_array_private = nullptr;
-  double** samplePDFFD_array_private_w2 = nullptr;
+  double** SampleHandlerFD_array_private = nullptr;
+  double** SampleHandlerFD_array_private_w2 = nullptr;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
-#pragma omp parallel private(samplePDFFD_array_private, samplePDFFD_array_private_w2)
+#pragma omp parallel private(SampleHandlerFD_array_private, SampleHandlerFD_array_private_w2)
   {
     // private to each thread
     // ETA - maybe we can use parallel firstprivate to initialise these?
-    samplePDFFD_array_private = new double*[nYBins];
-    samplePDFFD_array_private_w2 = new double*[nYBins];
+    SampleHandlerFD_array_private = new double*[nYBins];
+    SampleHandlerFD_array_private_w2 = new double*[nYBins];
     for (size_t yBin=0;yBin<nYBins;yBin++) {
-      samplePDFFD_array_private[yBin] = new double[nXBins];
-      samplePDFFD_array_private_w2[yBin] = new double[nXBins];
+      SampleHandlerFD_array_private[yBin] = new double[nXBins];
+      SampleHandlerFD_array_private_w2[yBin] = new double[nXBins];
 
-      std::fill_n(samplePDFFD_array_private[yBin], nXBins, 0.0);
-      std::fill_n(samplePDFFD_array_private_w2[yBin], nXBins, 0.0);
+      std::fill_n(SampleHandlerFD_array_private[yBin], nXBins, 0.0);
+      std::fill_n(SampleHandlerFD_array_private_w2[yBin], nXBins, 0.0);
     }
     
     //DB - Brain dump of speedup ideas
@@ -523,7 +523,7 @@ void SampleHandlerFD::fillArray_MP()  {
     // 5. Do explict check on adjacent bins when finding event XBin instead of looping over all BinEdge indices - Implemented but doesn't significantly affect s/step
     //
     //Other aspects
-    // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside samplePDFFD_array_class[yBin][xBin]
+    // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandlerFD_array_class[yBin][xBin]
     //
     // We will hit <0.1 s/step eventually! :D
     
@@ -622,29 +622,29 @@ void SampleHandlerFD::fillArray_MP()  {
         //Might save us an extra if call?
         //DB Fill relevant part of thread array
         if (XBinToFill != -1 && YBinToFill != -1) {
-          samplePDFFD_array_private[YBinToFill][XBinToFill] += totalweight;
-          samplePDFFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+          SampleHandlerFD_array_private[YBinToFill][XBinToFill] += totalweight;
+          SampleHandlerFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
         }
       }
     }    
     //End of Calc Weights and fill Array
     //==================================================
-    // DB Copy contents of 'samplePDFFD_array_private' into 'samplePDFFD_array' which can then be used in GetLikelihood
+    // DB Copy contents of 'SampleHandlerFD_array_private' into 'SampleHandlerFD_array' which can then be used in GetLikelihood
     for (size_t yBin = 0; yBin < nYBins; ++yBin) {
       for (size_t xBin = 0; xBin < nXBins; ++xBin) {
         #pragma omp atomic
-        samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
+        SampleHandlerFD_array[yBin][xBin] += SampleHandlerFD_array_private[yBin][xBin];
         #pragma omp atomic
-        samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        SampleHandlerFD_array_w2[yBin][xBin] += SampleHandlerFD_array_private_w2[yBin][xBin];
       }
     }
     
     for (size_t yBin = 0; yBin < nYBins; ++yBin) {
-      delete[] samplePDFFD_array_private[yBin];
-      delete[] samplePDFFD_array_private_w2[yBin];
+      delete[] SampleHandlerFD_array_private[yBin];
+      delete[] SampleHandlerFD_array_private_w2[yBin];
     }
-    delete[] samplePDFFD_array_private;
-    delete[] samplePDFFD_array_private_w2;
+    delete[] SampleHandlerFD_array_private;
+    delete[] SampleHandlerFD_array_private_w2;
   } //end of parallel region
 }
 #endif
@@ -659,8 +659,8 @@ void SampleHandlerFD::ResetHistograms() {
   //DB Reset values stored in PDF array to 0.
   for (size_t yBin = 0; yBin < nYBins; ++yBin) {
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 } // end function
@@ -859,14 +859,14 @@ void SampleHandlerFD::set1DBinning(std::vector<double> &XVec){
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
+  SampleHandlerFD_array = new double*[nYBins];
+  SampleHandlerFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    SampleHandlerFD_array[yBin] = new double[nXBins];
+    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
   FindNominalBinAndEdges1D();
@@ -887,14 +887,14 @@ void SampleHandlerFD::set2DBinning(std::vector<double> &XVec, std::vector<double
   int nXBins = int(XVec.size()-1);
   int nYBins = int(YVec.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
+  SampleHandlerFD_array = new double*[nYBins];
+  SampleHandlerFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    SampleHandlerFD_array[yBin] = new double[nXBins];
+    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -902,7 +902,7 @@ void SampleHandlerFD::set2DBinning(std::vector<double> &XVec, std::vector<double
 }
 
 //ETA
-//New versions of set binning functions is samplePDFBase
+//New versions of set binning functions is SampleHandlerBase
 //so that we can set the values of the bin and lower/upper
 //edges in the skmc_base. Hopefully we can use this to make
 //fill1Dhist and fill2Dhist quicker
@@ -931,14 +931,14 @@ void SampleHandlerFD::set1DBinning(int nbins, double* boundaries)
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
+  SampleHandlerFD_array = new double*[nYBins];
+  SampleHandlerFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    SampleHandlerFD_array[yBin] = new double[nXBins];
+    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -966,14 +966,14 @@ void SampleHandlerFD::set1DBinning(int nbins, double low, double high)
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
+  SampleHandlerFD_array = new double*[nYBins];
+  SampleHandlerFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    SampleHandlerFD_array[yBin] = new double[nXBins];
+    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
   FindNominalBinAndEdges1D();
@@ -1048,14 +1048,14 @@ void SampleHandlerFD::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
+  SampleHandlerFD_array = new double*[nYBins];
+  SampleHandlerFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    SampleHandlerFD_array[yBin] = new double[nXBins];
+    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -1084,14 +1084,14 @@ void SampleHandlerFD::set2DBinning(int nbins1, double low1, double high1, int nb
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_array = new double*[nYBins];
-  samplePDFFD_array_w2 = new double*[nYBins];
+  SampleHandlerFD_array = new double*[nYBins];
+  SampleHandlerFD_array_w2 = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_array[yBin] = new double[nXBins];
-    samplePDFFD_array_w2[yBin] = new double[nXBins];
+    SampleHandlerFD_array[yBin] = new double[nXBins];
+    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      SampleHandlerFD_array[yBin][xBin] = 0.;
+      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 
@@ -1173,11 +1173,11 @@ void SampleHandlerFD::addData(std::vector<double> &data) {
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
   
-  samplePDFFD_data = new double*[nYBins];
+  SampleHandlerFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_data[yBin] = new double[nXBins];
+    SampleHandlerFD_data[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_data[yBin][xBin] = dathist->GetBinContent(xBin+1);
+      SampleHandlerFD_data[yBin][xBin] = dathist->GetBinContent(xBin+1);
     }
   }
 }
@@ -1199,11 +1199,11 @@ void SampleHandlerFD::addData(std::vector< std::vector <double> > &data) {
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_data = new double*[nYBins];
+  SampleHandlerFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_data[yBin] = new double[nXBins];
+    SampleHandlerFD_data[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
+      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
   }
 }
@@ -1220,11 +1220,11 @@ void SampleHandlerFD::addData(TH1D* Data) {
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
   
-  samplePDFFD_data = new double*[nYBins];
+  SampleHandlerFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_data[yBin] = new double[nXBins];
+    SampleHandlerFD_data[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_data[yBin][xBin] = Data->GetBinContent(xBin+1);
+      SampleHandlerFD_data[yBin][xBin] = Data->GetBinContent(xBin+1);
     }
   }
 }
@@ -1241,11 +1241,11 @@ void SampleHandlerFD::addData(TH2D* Data) {
   int nXBins = int(XBinEdges.size()-1);
   int nYBins = int(YBinEdges.size()-1);
 
-  samplePDFFD_data = new double*[nYBins];
+  SampleHandlerFD_data = new double*[nYBins];
   for (int yBin=0;yBin<nYBins;yBin++) {
-    samplePDFFD_data[yBin] = new double[nXBins];
+    SampleHandlerFD_data[yBin] = new double[nXBins];
     for (int xBin=0;xBin<nXBins;xBin++) {
-      samplePDFFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
+      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
     }
   }
 }
@@ -1260,7 +1260,7 @@ void SampleHandlerFD::SetupNuOscillator() {
   }
 
   //DB's explanation of EqualBinningPerOscChannel:
-  //In the situation where we are applying binning oscillation probabilities to a samplePDF object, it maybe the case that there is identical binning per oscillation channel
+  //In the situation where we are applying binning oscillation probabilities to a SampleHandler object, it maybe the case that there is identical binning per oscillation channel
   //In which case, and remembering that each NuOscillator::Oscillator object calculate the oscillation probabilities for all channels, we just have to create one Oscillator object and use the results from that
   //This means that we can get upto a factor of 12 reduction in the calculation time of the oscillation probabilities, because we don't need to repeat the operation per oscillation channel
 
@@ -1431,7 +1431,7 @@ void SampleHandlerFD::fillSplineBins() {
 // ************************************************
 double SampleHandlerFD::GetLikelihood() {
 // ************************************************
-  if (samplePDFFD_data == nullptr) {
+  if (SampleHandlerFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -1448,9 +1448,9 @@ double SampleHandlerFD::GetLikelihood() {
   {
     for (int yBin = 0; yBin < nYBins; ++yBin)
     {
-      const double DataVal = samplePDFFD_data[yBin][xBin];
-      const double MCPred = samplePDFFD_array[yBin][xBin];
-      const double w2 = samplePDFFD_array_w2[yBin][xBin];
+      const double DataVal = SampleHandlerFD_data[yBin][xBin];
+      const double MCPred = SampleHandlerFD_array[yBin][xBin];
+      const double w2 = SampleHandlerFD_array_w2[yBin][xBin];
       
       //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
       negLogL += getTestStatLLH(DataVal, MCPred, w2);

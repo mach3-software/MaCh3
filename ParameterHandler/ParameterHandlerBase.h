@@ -2,9 +2,9 @@
 
 // MaCh3 includes
 #include "manager/manager.h"
-#include "covariance/CovarianceUtils.h"
-#include "covariance/AdaptiveMCMCHandler.h"
-#include "covariance/PCAHandler.h"
+#include "ParameterHandler/ParameterHandlerUtils.h"
+#include "ParameterHandler/AdaptiveMCMCHandler.h"
+#include "ParameterHandler/PCAHandler.h"
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).

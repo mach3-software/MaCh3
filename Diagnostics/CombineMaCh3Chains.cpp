@@ -3,7 +3,7 @@
 
 // MaCh3 includes
 #include "manager/manager.h"
-#include "samplePDF/Structs.h"
+#include "SampleHandler/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

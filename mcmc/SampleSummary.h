@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "samplePDF/SampleHandlerBase.h"
+#include "SampleHandler/SampleHandlerBase.h"
 #include "mcmc/StatisticalUtils.h"
 #include "mcmc/MCMCProcessor.h"
 

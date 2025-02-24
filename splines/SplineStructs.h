@@ -1,8 +1,8 @@
 #pragma once
 
 // MaCh3  includes
-#include "covariance/SystematicHandlerGeneric.h"
-#include "samplePDF/Structs.h"
+#include "ParameterHandler/ParameterHandlerGeneric.h"
+#include "SampleHandler/Structs.h"
 
 #include <cmath>
 
@@ -48,7 +48,7 @@ struct FastSplineInfo {
 
 // ***************************************************************************
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
-inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, SystematicHandlerGeneric* XsecCov) {
+inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, ParameterHandlerGeneric* XsecCov) {
 // ***************************************************************************
   if(xsecgraph == NULL){
     MACH3LOG_ERROR("ERROR: hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in xsecgraph yet", XsecCov->GetParFancyName(splineParsIndex));

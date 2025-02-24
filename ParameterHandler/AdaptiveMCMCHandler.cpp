@@ -1,4 +1,4 @@
-#include "covariance/AdaptiveMCMCHandler.h"
+#include "ParameterHandler/AdaptiveMCMCHandler.h"
 
 namespace adaptive_mcmc{
 

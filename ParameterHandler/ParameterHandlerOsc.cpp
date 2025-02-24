@@ -1,4 +1,4 @@
-#include "covariance/ParameterHandlerOsc.h"
+#include "ParameterHandler/ParameterHandlerOsc.h"
 
 // *************************************
 ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)

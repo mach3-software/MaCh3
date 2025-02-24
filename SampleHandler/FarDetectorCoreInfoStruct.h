@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "samplePDF/Structs.h"
+#include "SampleHandler/Structs.h"
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {

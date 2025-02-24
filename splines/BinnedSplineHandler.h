@@ -1,7 +1,7 @@
 #pragma once
 
 //MaCh3 includes
-#include "samplePDF/Structs.h"
+#include "SampleHandler/Structs.h"
 #include "splines/SplineBase.h"
 #include "manager/MaCh3Modes.h"
 
@@ -19,7 +19,7 @@ class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
 	/// @brief Constructor
-  BinnedSplineHandler(SystematicHandlerGeneric *xsec_, MaCh3Modes *Modes_);
+  BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
 	/// @brief Destructor
 	/// @todo it need some love
 	virtual ~BinnedSplineHandler();
@@ -79,7 +79,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Calc total event weight, not used by Bin-by-bin splines
     void ModifyWeights() override {return;};
     /// Pointer to covariance from which we get information about spline params
-    SystematicHandlerGeneric* xsec;
+    ParameterHandlerGeneric* xsec;
 
     //And now the actual member variables
     std::vector<std::string> SampleNames;

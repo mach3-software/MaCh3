@@ -230,7 +230,7 @@ void FitterBase::SaveOutput() {
 
 // *************************
 // Add samplePDF object to the Markov Chain
-void FitterBase::addSamplePDF(SampleHandlerBase * const sample) {
+void FitterBase::addSampleHandler(SampleHandlerBase * const sample) {
 // *************************
   TotalNSamples += sample->GetNsamples();
   MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());

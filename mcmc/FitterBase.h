@@ -6,8 +6,8 @@
 #include <sstream>
 
 // MaCh3 Includes
-#include "samplePDF/SampleHandlerBase.h"
-#include "covariance/ParameterHandlerBase.h"
+#include "SampleHandler/SampleHandlerBase.h"
+#include "ParameterHandler/ParameterHandlerBase.h"
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"
 
@@ -29,8 +29,8 @@ class FitterBase {
   virtual ~FitterBase();
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
-  /// @param sample A pointer to a sample PDF object derived from samplePDFBase.
-  void addSamplePDF(SampleHandlerBase* sample);
+  /// @param sample A pointer to a sample PDF object derived from ParameterHandlerBase.
+  void addSampleHandler(SampleHandlerBase* sample);
 
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from covarianceBase.

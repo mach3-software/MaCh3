@@ -36,7 +36,7 @@ set_target_properties(MCMC PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME MCMC)
 
-target_link_libraries(MCMC PUBLIC SamplePDF)
+target_link_libraries(MCMC PUBLIC SampleHandler)
 target_link_libraries(MCMC PRIVATE MaCh3Warnings)
 
 target_include_directories(MCMC PUBLIC
