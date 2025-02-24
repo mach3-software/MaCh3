@@ -1,5 +1,5 @@
 //MaCh3 includes
-#include "mcmc/StatisticalUtils.h"
+#include "Fitter/StatisticalUtils.h"
 
 // **************************
 std::string GetJeffreysScale(const double BayesFactor){

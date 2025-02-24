@@ -244,7 +244,7 @@ add_subdirectory(manager)
 add_subdirectory(ParameterHandler)
 add_subdirectory(splines)
 add_subdirectory(Samples)
-add_subdirectory(mcmc)
+add_subdirectory(Fitter)
 add_subdirectory(Diagnostics)
 add_subdirectory(plotting)
 if (MaCh3_PYTHON_ENABLED)
@@ -255,7 +255,7 @@ endif()
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC Samples ParameterHandler Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+target_link_libraries(MaCh3 INTERFACE Fitter Samples ParameterHandler Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

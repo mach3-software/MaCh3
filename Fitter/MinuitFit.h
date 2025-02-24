@@ -1,7 +1,7 @@
 #pragma once
 
 //MaCh3 includes
-#include "mcmc/LikelihoodFit.h"
+#include "Fitter/LikelihoodFit.h"
 
 // ROOT includes
 #include "Math/Minimizer.h"

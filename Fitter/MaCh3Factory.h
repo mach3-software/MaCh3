@@ -1,12 +1,12 @@
 #pragma once
 
 // MaCh3 includes
-#include "mcmc/FitterBase.h"
-#include "mcmc/mcmc.h"
-#include "mcmc/PSO.h"
-#include "mcmc/LikelihoodFit.h"
+#include "Fitter/FitterBase.h"
+#include "Fitter/mcmc.h"
+#include "Fitter/PSO.h"
+#include "Fitter/LikelihoodFit.h"
 #ifdef MaCh3_MINUIT2
-#include "mcmc/MinuitFit.h"
+#include "Fitter/MinuitFit.h"
 #endif
 
 #include "ParameterHandler/ParameterHandlerGeneric.h"

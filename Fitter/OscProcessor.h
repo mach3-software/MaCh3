@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "mcmc/MCMCProcessor.h"
+#include "Fitter/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
 
 /// @author Clarence Wret

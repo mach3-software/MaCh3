@@ -9,10 +9,10 @@ set(HEADERS
     SampleSummary.h
     MaCh3Factory.h
     StatisticalUtils.h
-    gpuMCMCProcessorUtils.cuh
+    gpuFitterProcessorUtils.cuh
 )
 
-add_library(MCMC SHARED
+add_library(Fitter SHARED
     FitterBase.cpp
     mcmc.cpp
     LikelihoodFit.cpp
@@ -23,30 +23,30 @@ add_library(MCMC SHARED
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
-    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
+    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuFitterProcessorUtils.cu>
 )
 
 if(MaCh3_GPU_ENABLED)
-    set_target_properties(MCMC PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    set_target_properties(Fitter PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
-    set_property(TARGET MCMC PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+    set_property(TARGET Fitter PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-set_target_properties(MCMC PROPERTIES
+set_target_properties(Fitter PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
-    EXPORT_NAME MCMC)
+    EXPORT_NAME Fitter)
 
-target_link_libraries(MCMC PUBLIC Samples)
-target_link_libraries(MCMC PRIVATE MaCh3Warnings)
+target_link_libraries(Fitter PUBLIC Samples)
+target_link_libraries(Fitter PRIVATE MaCh3Warnings)
 
-target_include_directories(MCMC PUBLIC
+target_include_directories(Fitter PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
 )
 
-install(TARGETS MCMC
+install(TARGETS Fitter
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/mcmc)
 
-add_library(MaCh3::MCMC ALIAS MCMC)
+add_library(MaCh3::Fitter ALIAS Fitter)

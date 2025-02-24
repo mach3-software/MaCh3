@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mcmc/FitterBase.h"
+#include "Fitter/FitterBase.h"
 
 /// @brief Implementation of MR2T2 algorithm
 /// @author Asher Kaboth

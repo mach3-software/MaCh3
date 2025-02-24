@@ -9,7 +9,7 @@
 #include "Samples/SampleHandlerBase.h"
 #include "ParameterHandler/ParameterHandlerBase.h"
 #include "manager/manager.h"
-#include "mcmc/MCMCProcessor.h"
+#include "Fitter/MCMCProcessor.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TRandom3;
