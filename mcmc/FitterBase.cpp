@@ -1061,9 +1061,9 @@ void FitterBase::RunSigmaVar() {
   bool PlotLLHperBin = false;
 
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
