@@ -47,6 +47,6 @@ target_include_directories(Fitter PUBLIC
 install(TARGETS Fitter
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/mcmc)
+        PUBLIC_HEADER DESTINATION include/Fitter)
 
 add_library(MaCh3::Fitter ALIAS Fitter)
