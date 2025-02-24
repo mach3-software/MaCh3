@@ -1,6 +1,7 @@
 #ignore any object files
 *.o
 *.sif
+*.idx
 
 build*/
 install/
