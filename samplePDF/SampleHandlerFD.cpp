@@ -54,39 +54,18 @@ SampleHandlerFD::~SampleHandlerFD()
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
     delete NuOscProbCalcers[iCalc];
   }
+
+  if(THStackLeg != nullptr) delete THStackLeg;
 }
 
 void SampleHandlerFD::ReadSampleConfig() 
 {
-  if (!CheckNodeExists(SampleManager->raw(), "MaCh3ModeConfig")) {
-    MACH3LOG_ERROR("MaCh3ModeConfig not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  Modes = new MaCh3Modes(SampleManager->raw()["MaCh3ModeConfig"].as<std::string>());
-  
-  if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
-    MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  samplename = SampleManager->raw()["SampleName"].as<std::string>();
-    
-  if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
-    MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  SampleDetID = SampleManager->raw()["DetID"].as<std::string>();
-
-  if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
-    MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
-
-  if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "EqualBinningPerOscChannel")) {
-    MACH3LOG_ERROR("NuOsc::EqualBinningPerOscChannel is not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  EqualBinningPerOscChannel = SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"].as<bool>();
+  auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
+  Modes = new MaCh3Modes(ModeName);
+  samplename = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
+  SampleDetID = Get<std::string>(SampleManager->raw()["DetID"], __FILE__ , __LINE__);
+  NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
+  EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
   
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
@@ -184,7 +163,7 @@ void SampleHandlerFD::ReadSampleConfig()
       std::string modeStr = Modes->GetMaCh3ModeName(iMode);
       if( SampleManager->raw()["NominalWeights"][modeStr] ) {
         double modeWeight = SampleManager->raw()["NominalWeights"][modeStr].as<double>();
-	_modeNomWeightMap[Modes->GetMaCh3ModeName(iMode)] *= modeWeight;
+        _modeNomWeightMap[Modes->GetMaCh3ModeName(iMode)] *= modeWeight;
       }
     }
   }
@@ -195,7 +174,6 @@ void SampleHandlerFD::ReadSampleConfig()
     std::string modeStr = Modes->GetMaCh3ModeName(iMode);
     MACH3LOG_INFO("    - {}: {}", modeStr, _modeNomWeightMap.at(modeStr));
   }
-
 }
 
 void SampleHandlerFD::Initialise() {
@@ -1824,9 +1802,9 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     outcsv.precision(7);
   }
 
-  double PDFIntegral = 0;
+  double PDFIntegral = 0.;
 
-  std::vector< std::vector< TH2* > > IntegralList;
+  std::vector< std::vector< TH1* > > IntegralList;
   IntegralList.resize(Modes->GetNModes());
 
   std::vector<double> ChannelIntegral;
@@ -1834,7 +1812,11 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
   
   for (int i=0;i<Modes->GetNModes();i++) {
-    IntegralList[i] = ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle);
+    if (GetNDim()==1) {
+      IntegralList[i] = ReturnHistsBySelection1D(XVarStr,1,i,WeightStyle);
+    } else {
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle));
+    }
   }
 
   MACH3LOG_INFO("-------------------------------------------------");
@@ -1853,7 +1835,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   }
 
   if(printToCSV){
-    // HI Probably a better way but oh well, here I go making MaCh3 messy again
+    // HW Probably a better way but oh well, here I go making MaCh3 messy again
     outcsv<<"Integral Breakdown for sample :"<<GetName()<<"\n";
   }
   
@@ -1937,7 +1919,6 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     outfile << std::endl;
     outfile.close();
   }
-
 }
 
 std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {

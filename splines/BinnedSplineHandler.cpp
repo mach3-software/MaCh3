@@ -13,13 +13,13 @@ _MaCh3_Safe_Include_End_ //}
 BinnedSplineHandler::BinnedSplineHandler(SystematicHandlerGeneric *xsec_, MaCh3Modes *Modes_) : SplineBase() {
 //****************************************
   if (!xsec_) {
-    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised covariance object");
+    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialized covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
 
-  if (!Modes) {
-    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialised MaCh3Modes object");
+  if (!Modes_) {
+    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialized MaCh3Modes object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   Modes = Modes_;
@@ -48,27 +48,14 @@ void BinnedSplineHandler::cleanUpMemory() {
   CleanVector(SplineModeVecs);
   CleanVector(UniqueSystNames);
   CleanVector(SplineInterpolationTypes);
-
-  for (auto& Binning2D : SplineBinning) {
-    for (auto& Binning1D : Binning2D) {
-      for (TAxis* axis : Binning1D) {
-        delete axis;
-      }
-      Binning1D.clear();
-      Binning1D.shrink_to_fit();
-    }
-    Binning2D.clear();
-    Binning2D.shrink_to_fit();
-  }
-  SplineBinning.clear();
-  SplineBinning.shrink_to_fit();
-
-  //Really make sure all the memory is cleared
-  for(auto Spline : splinevec_Monolith){
-    if(Spline){delete Spline;}
-  }
-  splinevec_Monolith.clear();
-  splinevec_Monolith.shrink_to_fit();
+  CleanVector(nOscChans);
+  CleanVector(nSplineParams);
+  CleanVector(DetIDs);
+  CleanVector(DimensionLabels);
+  CleanVector(SampleNames);
+  CleanVector(Dimensions);
+  CleanContainer(splinevec_Monolith);
+  CleanContainer(SplineBinning);
   if(isflatarray) delete [] isflatarray;
 }
 
@@ -649,9 +636,8 @@ void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &
 }
 
 //****************************************
-//ETA - this may need to be virtual and then we can define this in the experiment.
 //Equally though could just use KinematicVariable to map back
-std::string BinnedSplineHandler::getDimLabel(int iSample, unsigned int Axis)
+std::string BinnedSplineHandler::getDimLabel(const int iSample, const unsigned int Axis) const
 //****************************************
 {
   if(Axis > DimensionLabels[iSample].size()){
@@ -664,7 +650,7 @@ std::string BinnedSplineHandler::getDimLabel(int iSample, unsigned int Axis)
 
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::getSampleIndex(const std::string& SampleName){
+int BinnedSplineHandler::getSampleIndex(const std::string& SampleName) const{
 //****************************************
   for (size_t iSample = 0; iSample < SampleNames.size(); ++iSample) {
     if (SampleName == SampleNames[iSample]) {
@@ -676,7 +662,7 @@ int BinnedSplineHandler::getSampleIndex(const std::string& SampleName){
 }
 
 //****************************************
-void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName)
+void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName) const
 //****************************************
 {
   const int iSample = getSampleIndex(SampleName);
@@ -689,7 +675,7 @@ void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName)
 }
 
 //****************************************
-void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleName)
+void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleName) const
 //****************************************
 {
   int iSample = getSampleIndex(SampleName);
@@ -754,7 +740,7 @@ bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleName, int 
 }
 
 //****************************************
-void BinnedSplineHandler::PrintBinning(TAxis *Axis)
+void BinnedSplineHandler::PrintBinning(TAxis *Axis) const
 //****************************************
 {
   const int NBins = Axis->GetNbins();
@@ -797,7 +783,6 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(std::string
   }
 
   int Var3Bin = SplineBinning[SampleIndex][iOscChan][2]->FindBin(Var3Val)-1;
-
   if (Var3Bin < 0 || Var3Bin >= SplineBinning[SampleIndex][iOscChan][2]->GetNbins()){
     return ReturnVec;
   }
@@ -810,18 +795,10 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(std::string
     for(int iMode = 0; iMode<nSampleModes ; iMode++){
       //Only consider if the event mode (Mode) matches ones of the spline modes
       if (Mode == spline_modes[iMode]) {
-        std::vector<int> event_vec(7);
-        event_vec[0]=SampleIndex;
-        event_vec[1]=iOscChan;
-        event_vec[2]=iSyst;
-        event_vec[3]=iMode;
-        event_vec[4]=Var1Bin;
-        event_vec[5]=Var2Bin;
-        event_vec[6]=Var3Bin;
         int splineID=indexvec[SampleIndex][iOscChan][iSyst][iMode][Var1Bin][Var2Bin][Var3Bin];
         //Also check that the spline isn't flat
         if(!isflatarray[splineID]){
-          ReturnVec.push_back(event_vec);
+          ReturnVec.push_back({SampleIndex, iOscChan, iSyst, iMode, Var1Bin, Var2Bin, Var3Bin});
         }
       }
     }
@@ -853,7 +830,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(std::v
         if (ModeName == TestString) {
           IncludeMode = false;
           break;
-	}
+        }
       }
 
       if (IncludeMode) {
@@ -864,7 +841,6 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(std::v
 
     ReturnVec[iSyst] = TmpVec;
   }
-
   return ReturnVec;
 }
 
@@ -881,6 +857,8 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
     int nKnots, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin = M3::_BAD_INT_;
     double x,y, Eval = M3::_BAD_DOUBLE_;
     bool isFlat = true;
+
+    std::set<std::string> SplineFileNames;
 
     auto File = std::unique_ptr<TFile>(TFile::Open(OscChanFileNames[iOscChan].c_str()));
 
@@ -899,11 +877,18 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
       }
 
       std::string FullSplineName = std::string(Key->GetName());
+
+      if (SplineFileNames.count(FullSplineName) > 0) {
+	MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName); 
+	continue;
+      }
+      SplineFileNames.insert(FullSplineName);
+
       std::vector<std::string> Tokens = GetTokensFromSplineName(FullSplineName);
 
       if (Tokens.size() != kNTokens) {
-	std::cerr << "Invalid tokens from spline name - Expected " << kNTokens << " tokens. Check implementation in GetTokensFromSplineName()" << std::endl;
-	throw;
+        MACH3LOG_ERROR("Invalid tokens from spline name - Expected {} tokens. Check implementation in GetTokensFromSplineName()", static_cast<int>(kNTokens));
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
       
       Syst = Tokens[kSystToken];
@@ -914,7 +899,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
 
       SystNum = -1;
       for (unsigned iSyst = 0; iSyst < SplineFileParPrefixNames[iSample].size(); iSyst++) {
-        if (strcmp(Syst, SplineFileParPrefixNames[iSample][iSyst].c_str()) == 0) {
+        if (Syst == SplineFileParPrefixNames[iSample][iSyst]) {
           SystNum = iSyst;
           break;
         }
@@ -929,15 +914,17 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
 
       ModeNum = -1;
       for (unsigned int iMode = 0; iMode < SplineModeVecs[iSample][SystNum].size(); iMode++) {
-        if (strcmp(Mode, Modes->GetSplineSuffixFromMaCh3Mode(SplineModeVecs[iSample][SystNum][iMode]).c_str()) == 0) {
+        if (Mode == Modes->GetSplineSuffixFromMaCh3Mode(SplineModeVecs[iSample][SystNum][iMode])) {
           ModeNum = iMode;
           break;
         }
       }
 
       if (ModeNum == -1) {
-        MACH3LOG_ERROR("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
-        throw;
+	//DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+	//     Therefore include as debug warning and continue instead
+        MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
+	continue;
       }
 
       mySpline = Key->ReadObject<TSpline3>();

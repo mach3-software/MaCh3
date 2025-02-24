@@ -107,7 +107,7 @@ protected:
   /// Name of Sample
   std::vector<std::string> SampleName;
 
-  //GetterForModes
+  /// Holds information about used Generator and MaCh3 modes
   MaCh3Modes* Modes;
 
   TH1D *dathist; // tempstore for likelihood calc

@@ -6,12 +6,14 @@ SampleHandlerBase::SampleHandlerBase()
   rnd = new TRandom3(0);
   dathist = NULL;
   dathist2d = NULL;
+  Modes = nullptr;
 }
 
 SampleHandlerBase::~SampleHandlerBase()
 {
   if(dathist != NULL) delete dathist;
   if(dathist2d != NULL) delete dathist2d;
+  if(Modes != nullptr) delete Modes;
   delete rnd;
 }
 
