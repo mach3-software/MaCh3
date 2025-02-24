@@ -1078,7 +1078,7 @@ void FitterBase::RunSigmaVar() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    bool isxsec = (cov->getName() == "xsec_cov");
+    isxsec = (cov->getName() == "xsec_cov");
     // Loop over xsec parameters
     for (int i = 0; i < cov->GetNumParams(); ++i)
     {
