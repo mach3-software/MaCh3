@@ -1,6 +1,6 @@
 // MaCh3 includes
 #include "manager/manager.h"
-#include "SampleHandler/Structs.h"
+#include "Samples/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

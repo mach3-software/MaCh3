@@ -1,6 +1,6 @@
 // MaCh3 includes
 #include "mcmc/MCMCProcessor.h"
-#include "SampleHandler/HistogramUtils.h"
+#include "Samples/HistogramUtils.h"
 
 /// @file PlotMCMCDiag.cpp
 /// @brief KS: This script is used to analyse output form DiagMCMC.

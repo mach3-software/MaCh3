@@ -9,9 +9,9 @@
 #include <cmath>
 
 //MaCh3 includes
-#include "SampleHandler/Structs.h"
+#include "Samples/Structs.h"
 #include "manager/manager.h"
-#include "SampleHandler/HistogramUtils.h"
+#include "Samples/HistogramUtils.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"

@@ -6,8 +6,8 @@
 #include "ParameterHandler/ParameterHandlerGeneric.h"
 #include "ParameterHandler/ParameterHandlerOsc.h"
 
-#include "SampleHandler/SampleHandlerBase.h"
-#include "SampleHandler/FarDetectorCoreInfoStruct.h"
+#include "Samples/SampleHandlerBase.h"
+#include "Samples/FarDetectorCoreInfoStruct.h"
 
 #include "THStack.h"
 #include "TLegend.h"

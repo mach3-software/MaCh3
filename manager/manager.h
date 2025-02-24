@@ -2,7 +2,7 @@
 
 // MaCh3 Includes
 //#include "manager/MaCh3Logger.h"
-#include "SampleHandler/Structs.h"
+#include "Samples/Structs.h"
 #include "manager/YamlHelper.h"
 #include "manager/Monitor.h"
 #include "manager/MaCh3Exception.h"

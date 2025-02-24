@@ -6,7 +6,7 @@
 #include <sstream>
 
 // MaCh3 Includes
-#include "SampleHandler/SampleHandlerBase.h"
+#include "Samples/SampleHandlerBase.h"
 #include "ParameterHandler/ParameterHandlerBase.h"
 #include "manager/manager.h"
 #include "mcmc/MCMCProcessor.h"

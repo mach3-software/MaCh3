@@ -5,7 +5,7 @@
 
 #include "plottingUtils/plottingUtils.h"
 #include "plottingUtils/plottingManager.h"
-#include "SampleHandler/Structs.h"
+#include "Samples/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
