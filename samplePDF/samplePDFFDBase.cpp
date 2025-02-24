@@ -61,7 +61,7 @@ samplePDFFDBase::~samplePDFFDBase()
 void samplePDFFDBase::ReadSampleConfig() 
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
-  Modes = std::make_unique<MaCh3Modes>(ModeName);
+  Modes = new MaCh3Modes(ModeName);
   samplename = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
   SampleDetID = Get<std::string>(SampleManager->raw()["DetID"], __FILE__ , __LINE__);
   NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
