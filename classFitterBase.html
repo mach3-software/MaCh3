@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.4.4</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.4.5</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -1532,322 +1532,307 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno"> 1067</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Found skip vector with {} entries&quot;</span>, SkipVector.size());</div>
 <div class="line"><span class="lineno"> 1068</span>  }</div>
 <div class="line"><span class="lineno"> 1069</span> </div>
-<div class="line"><span class="lineno"> 1070</span>  <span class="keywordtype">bool</span> isxsec = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1071</span>  <span class="keywordflow">for</span> (<a class="code hl_class" href="classcovarianceBase.html">covarianceBase</a> *cov : <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>)</div>
-<div class="line"><span class="lineno"> 1072</span>  {</div>
-<div class="line"><span class="lineno"> 1073</span>    TMatrixDSym *Cov = cov-&gt;getCovMatrix();</div>
-<div class="line"><span class="lineno"> 1074</span> </div>
-<div class="line"><span class="lineno"> 1075</span>    <span class="keywordflow">if</span>(cov-&gt;IsPCA())</div>
-<div class="line"><span class="lineno"> 1076</span>    {</div>
-<div class="line"><span class="lineno"> 1077</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Using PCAed matrix not implemented within sigma var code, I am sorry :(&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1078</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno"> 1079</span>    }</div>
-<div class="line"><span class="lineno"> 1080</span> </div>
-<div class="line"><span class="lineno"> 1081</span>    <span class="keywordflow">if</span> (cov-&gt;getName() == <span class="stringliteral">&quot;xsec_cov&quot;</span>)</div>
-<div class="line"><span class="lineno"> 1082</span>    {</div>
-<div class="line"><span class="lineno"> 1083</span>      isxsec = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1084</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno"> 1085</span>      isxsec = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1086</span>    }</div>
-<div class="line"><span class="lineno"> 1087</span> </div>
-<div class="line"><span class="lineno"> 1088</span>    <span class="comment">// Loop over xsec parameters</span></div>
-<div class="line"><span class="lineno"> 1089</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cov-&gt;GetNumParams(); ++i)</div>
-<div class="line"><span class="lineno"> 1090</span>    {</div>
-<div class="line"><span class="lineno"> 1091</span>      <span class="comment">// Get the parameter name</span></div>
-<div class="line"><span class="lineno"> 1092</span>      std::string name = cov-&gt;GetParName(i);</div>
-<div class="line"><span class="lineno"> 1093</span>      <span class="comment">// For xsec we can get the actual name, hurray for being informative</span></div>
-<div class="line"><span class="lineno"> 1094</span>      <span class="keywordflow">if</span> (isxsec) name = cov-&gt;GetParFancyName(i);</div>
-<div class="line"><span class="lineno"> 1095</span>      <span class="keywordtype">bool</span> skip = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1096</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> is = 0; is &lt; SkipVector.size(); is++)</div>
-<div class="line"><span class="lineno"> 1097</span>      {</div>
-<div class="line"><span class="lineno"> 1098</span>        <span class="keywordflow">if</span>(name.substr(0, SkipVector[is].length()) == SkipVector[is])</div>
-<div class="line"><span class="lineno"> 1099</span>        {</div>
-<div class="line"><span class="lineno"> 1100</span>          skip = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1101</span>          <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno"> 1102</span>        }</div>
-<div class="line"><span class="lineno"> 1103</span>      }</div>
-<div class="line"><span class="lineno"> 1104</span>      <span class="keywordflow">if</span>(skip) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno"> 1105</span> </div>
-<div class="line"><span class="lineno"> 1106</span>      <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1107</span>      TDirectory* dirArryDial = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(name.c_str());</div>
-<div class="line"><span class="lineno"> 1108</span>      std::vector&lt;TDirectory*&gt; dirArrySample(<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>);</div>
-<div class="line"><span class="lineno"> 1109</span> </div>
-<div class="line"><span class="lineno"> 1110</span>      <span class="keywordtype">int</span> SampleIterator = 0;</div>
-<div class="line"><span class="lineno"> 1111</span>      <span class="comment">// Get each sample and how it&#39;s responded to our reweighted parameter</span></div>
-<div class="line"><span class="lineno"> 1112</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
-<div class="line"><span class="lineno"> 1113</span>      {</div>
-<div class="line"><span class="lineno"> 1114</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); k++ )</div>
-<div class="line"><span class="lineno"> 1115</span>        {</div>
-<div class="line"><span class="lineno"> 1116</span>          std::string title = std::string(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>());</div>
-<div class="line"><span class="lineno"> 1117</span>          dirArryDial-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1118</span>          dirArrySample[SampleIterator] = dirArryDial-&gt;mkdir(title.c_str());</div>
-<div class="line"><span class="lineno"> 1119</span>          SampleIterator++;</div>
-<div class="line"><span class="lineno"> 1120</span>        }</div>
-<div class="line"><span class="lineno"> 1121</span>      }</div>
-<div class="line"><span class="lineno"> 1122</span> </div>
-<div class="line"><span class="lineno"> 1123</span>      <span class="comment">// Get the initial value of ith parameter</span></div>
-<div class="line"><span class="lineno"> 1124</span>      <span class="keywordtype">double</span> init = cov-&gt;getParInit(i);</div>
-<div class="line"><span class="lineno"> 1125</span> </div>
-<div class="line"><span class="lineno"> 1126</span>      TH1D ***sigmaArray_x = <span class="keyword">new</span> TH1D**[numVar]();</div>
-<div class="line"><span class="lineno"> 1127</span>      TH1D ***sigmaArray_y = <span class="keyword">new</span> TH1D**[numVar]();</div>
-<div class="line"><span class="lineno"> 1128</span>      TH1D ***sigmaArray_x_norm = <span class="keyword">new</span> TH1D**[numVar]();</div>
-<div class="line"><span class="lineno"> 1129</span>      TH1D ***sigmaArray_y_norm = <span class="keyword">new</span> TH1D**[numVar]();</div>
-<div class="line"><span class="lineno"> 1130</span> </div>
-<div class="line"><span class="lineno"> 1131</span>      <span class="comment">// Set up for single mode</span></div>
-<div class="line"><span class="lineno"> 1132</span>      TH1D ****sigmaArray_mode_x = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1133</span>      TH1D ****sigmaArray_mode_y = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1134</span>      <span class="keywordflow">if</span> (DoByMode)</div>
-<div class="line"><span class="lineno"> 1135</span>      {</div>
-<div class="line"><span class="lineno"> 1136</span>        sigmaArray_mode_x = <span class="keyword">new</span> TH1D***[numVar]();</div>
-<div class="line"><span class="lineno"> 1137</span>        sigmaArray_mode_y = <span class="keyword">new</span> TH1D***[numVar]();</div>
-<div class="line"><span class="lineno"> 1138</span>      }</div>
-<div class="line"><span class="lineno"> 1139</span> </div>
-<div class="line"><span class="lineno"> 1140</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;20}{}&quot;</span>, name, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1141</span> </div>
-<div class="line"><span class="lineno"> 1142</span>      <span class="comment">// Make asymmetric errors just in case</span></div>
-<div class="line"><span class="lineno"> 1143</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; numVar; ++j)</div>
-<div class="line"><span class="lineno"> 1144</span>      {</div>
-<div class="line"><span class="lineno"> 1145</span>        <span class="comment">// New value = prior + variation*1sigma uncertainty</span></div>
-<div class="line"><span class="lineno"> 1146</span>        <span class="keywordtype">double</span> paramVal = cov-&gt;getParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));</div>
-<div class="line"><span class="lineno"> 1147</span> </div>
-<div class="line"><span class="lineno"> 1148</span>        <span class="comment">// Check the bounds on the parameter</span></div>
-<div class="line"><span class="lineno"> 1149</span>        paramVal = std::max(cov-&gt;GetLowerBound(i), std::min(paramVal, cov-&gt;GetUpperBound(i)));</div>
+<div class="line"><span class="lineno"> 1070</span>  <span class="keywordflow">for</span> (<a class="code hl_class" href="classcovarianceBase.html">covarianceBase</a> *cov : <a class="code hl_variable" href="classFitterBase.html#a3a15d2348b7bf0a639aaab52b9294bbf">systematics</a>)</div>
+<div class="line"><span class="lineno"> 1071</span>  {</div>
+<div class="line"><span class="lineno"> 1072</span>    TMatrixDSym *Cov = cov-&gt;getCovMatrix();</div>
+<div class="line"><span class="lineno"> 1073</span> </div>
+<div class="line"><span class="lineno"> 1074</span>    <span class="keywordflow">if</span>(cov-&gt;IsPCA())</div>
+<div class="line"><span class="lineno"> 1075</span>    {</div>
+<div class="line"><span class="lineno"> 1076</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Using PCAed matrix not implemented within sigma var code, I am sorry :(&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1077</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno"> 1078</span>    }</div>
+<div class="line"><span class="lineno"> 1079</span> </div>
+<div class="line"><span class="lineno"> 1080</span>    <span class="keywordtype">bool</span> isxsec = (cov-&gt;getName() == <span class="stringliteral">&quot;xsec_cov&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1081</span>    <span class="comment">// Loop over xsec parameters</span></div>
+<div class="line"><span class="lineno"> 1082</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; cov-&gt;GetNumParams(); ++i)</div>
+<div class="line"><span class="lineno"> 1083</span>    {</div>
+<div class="line"><span class="lineno"> 1084</span>      <span class="comment">// Get the parameter name</span></div>
+<div class="line"><span class="lineno"> 1085</span>      std::string name = cov-&gt;GetParName(i);</div>
+<div class="line"><span class="lineno"> 1086</span>      <span class="comment">// For xsec we can get the actual name, hurray for being informative</span></div>
+<div class="line"><span class="lineno"> 1087</span>      <span class="keywordflow">if</span> (isxsec) name = cov-&gt;GetParFancyName(i);</div>
+<div class="line"><span class="lineno"> 1088</span>      <span class="keywordtype">bool</span> skip = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1089</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> is = 0; is &lt; SkipVector.size(); is++)</div>
+<div class="line"><span class="lineno"> 1090</span>      {</div>
+<div class="line"><span class="lineno"> 1091</span>        <span class="keywordflow">if</span>(name.substr(0, SkipVector[is].length()) == SkipVector[is])</div>
+<div class="line"><span class="lineno"> 1092</span>        {</div>
+<div class="line"><span class="lineno"> 1093</span>          skip = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1094</span>          <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno"> 1095</span>        }</div>
+<div class="line"><span class="lineno"> 1096</span>      }</div>
+<div class="line"><span class="lineno"> 1097</span>      <span class="keywordflow">if</span>(skip) <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno"> 1098</span> </div>
+<div class="line"><span class="lineno"> 1099</span>      <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1100</span>      TDirectory* dirArryDial = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(name.c_str());</div>
+<div class="line"><span class="lineno"> 1101</span>      std::vector&lt;TDirectory*&gt; dirArrySample(<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>);</div>
+<div class="line"><span class="lineno"> 1102</span> </div>
+<div class="line"><span class="lineno"> 1103</span>      <span class="keywordtype">int</span> SampleIterator = 0;</div>
+<div class="line"><span class="lineno"> 1104</span>      <span class="comment">// Get each sample and how it&#39;s responded to our reweighted parameter</span></div>
+<div class="line"><span class="lineno"> 1105</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno"> 1106</span>      {</div>
+<div class="line"><span class="lineno"> 1107</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); k++ )</div>
+<div class="line"><span class="lineno"> 1108</span>        {</div>
+<div class="line"><span class="lineno"> 1109</span>          std::string title = std::string(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>());</div>
+<div class="line"><span class="lineno"> 1110</span>          dirArryDial-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1111</span>          dirArrySample[SampleIterator] = dirArryDial-&gt;mkdir(title.c_str());</div>
+<div class="line"><span class="lineno"> 1112</span>          SampleIterator++;</div>
+<div class="line"><span class="lineno"> 1113</span>        }</div>
+<div class="line"><span class="lineno"> 1114</span>      }</div>
+<div class="line"><span class="lineno"> 1115</span> </div>
+<div class="line"><span class="lineno"> 1116</span>      <span class="comment">// Get the initial value of ith parameter</span></div>
+<div class="line"><span class="lineno"> 1117</span>      <span class="keywordtype">double</span> init = cov-&gt;getParInit(i);</div>
+<div class="line"><span class="lineno"> 1118</span> </div>
+<div class="line"><span class="lineno"> 1119</span>      std::vector&lt;std::vector&lt;TH1D*&gt;&gt; sigmaArray_x(numVar);</div>
+<div class="line"><span class="lineno"> 1120</span>      std::vector&lt;std::vector&lt;TH1D*&gt;&gt; sigmaArray_y(numVar);</div>
+<div class="line"><span class="lineno"> 1121</span>      std::vector&lt;std::vector&lt;TH1D*&gt;&gt; sigmaArray_x_norm(numVar);</div>
+<div class="line"><span class="lineno"> 1122</span>      std::vector&lt;std::vector&lt;TH1D*&gt;&gt; sigmaArray_y_norm(numVar);</div>
+<div class="line"><span class="lineno"> 1123</span> </div>
+<div class="line"><span class="lineno"> 1124</span>      <span class="comment">// Set up for single mode</span></div>
+<div class="line"><span class="lineno"> 1125</span>      TH1D ****sigmaArray_mode_x = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1126</span>      TH1D ****sigmaArray_mode_y = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1127</span>      <span class="keywordflow">if</span> (DoByMode)</div>
+<div class="line"><span class="lineno"> 1128</span>      {</div>
+<div class="line"><span class="lineno"> 1129</span>        sigmaArray_mode_x = <span class="keyword">new</span> TH1D***[numVar]();</div>
+<div class="line"><span class="lineno"> 1130</span>        sigmaArray_mode_y = <span class="keyword">new</span> TH1D***[numVar]();</div>
+<div class="line"><span class="lineno"> 1131</span>      }</div>
+<div class="line"><span class="lineno"> 1132</span> </div>
+<div class="line"><span class="lineno"> 1133</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;20}{}&quot;</span>, name, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1134</span> </div>
+<div class="line"><span class="lineno"> 1135</span>      <span class="comment">// Make asymmetric errors just in case</span></div>
+<div class="line"><span class="lineno"> 1136</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; numVar; ++j)</div>
+<div class="line"><span class="lineno"> 1137</span>      {</div>
+<div class="line"><span class="lineno"> 1138</span>        <span class="comment">// New value = prior + variation*1sigma uncertainty</span></div>
+<div class="line"><span class="lineno"> 1139</span>        <span class="keywordtype">double</span> paramVal = cov-&gt;getParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));</div>
+<div class="line"><span class="lineno"> 1140</span> </div>
+<div class="line"><span class="lineno"> 1141</span>        <span class="comment">// Check the bounds on the parameter</span></div>
+<div class="line"><span class="lineno"> 1142</span>        paramVal = std::max(cov-&gt;GetLowerBound(i), std::min(paramVal, cov-&gt;GetUpperBound(i)));</div>
+<div class="line"><span class="lineno"> 1143</span> </div>
+<div class="line"><span class="lineno"> 1144</span>        <span class="comment">// Set the parameter</span></div>
+<div class="line"><span class="lineno"> 1145</span>        cov-&gt;setParProp(i, paramVal);</div>
+<div class="line"><span class="lineno"> 1146</span>        <span class="comment">// And reweight the sample</span></div>
+<div class="line"><span class="lineno"> 1147</span>        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++) {</div>
+<div class="line"><span class="lineno"> 1148</span>          <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;reweight();</div>
+<div class="line"><span class="lineno"> 1149</span>        }</div>
 <div class="line"><span class="lineno"> 1150</span> </div>
-<div class="line"><span class="lineno"> 1151</span>        <span class="comment">// Set the parameter</span></div>
-<div class="line"><span class="lineno"> 1152</span>        cov-&gt;setParProp(i, paramVal);</div>
-<div class="line"><span class="lineno"> 1153</span>        <span class="comment">// And reweight the sample</span></div>
-<div class="line"><span class="lineno"> 1154</span>        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++) {</div>
-<div class="line"><span class="lineno"> 1155</span>          <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;reweight();</div>
-<div class="line"><span class="lineno"> 1156</span>        }</div>
-<div class="line"><span class="lineno"> 1157</span> </div>
-<div class="line"><span class="lineno"> 1158</span>        sigmaArray_x[j] = <span class="keyword">new</span> TH1D*[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
-<div class="line"><span class="lineno"> 1159</span>        sigmaArray_y[j] = <span class="keyword">new</span> TH1D*[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
-<div class="line"><span class="lineno"> 1160</span>        sigmaArray_x_norm[j] = <span class="keyword">new</span> TH1D*[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
-<div class="line"><span class="lineno"> 1161</span>        sigmaArray_y_norm[j] = <span class="keyword">new</span> TH1D*[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
-<div class="line"><span class="lineno"> 1162</span> </div>
-<div class="line"><span class="lineno"> 1163</span>        <span class="keywordflow">if</span> (DoByMode)</div>
-<div class="line"><span class="lineno"> 1164</span>        {</div>
-<div class="line"><span class="lineno"> 1165</span>          sigmaArray_mode_x[j] = <span class="keyword">new</span> TH1D**[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
-<div class="line"><span class="lineno"> 1166</span>          sigmaArray_mode_y[j] = <span class="keyword">new</span> TH1D**[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
-<div class="line"><span class="lineno"> 1167</span>        }</div>
-<div class="line"><span class="lineno"> 1168</span> </div>
-<div class="line"><span class="lineno"> 1169</span>        SampleIterator = 0;</div>
-<div class="line"><span class="lineno"> 1170</span>        <span class="comment">// Get each sample and how it&#39;s responded to our reweighted parameter</span></div>
-<div class="line"><span class="lineno"> 1171</span>        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
-<div class="line"><span class="lineno"> 1172</span>        {</div>
-<div class="line"><span class="lineno"> 1173</span>          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
-<div class="line"><span class="lineno"> 1174</span>          {</div>
-<div class="line"><span class="lineno"> 1175</span>            <span class="comment">// Make a string of the double</span></div>
-<div class="line"><span class="lineno"> 1176</span>            std::ostringstream ss;</div>
-<div class="line"><span class="lineno"> 1177</span>            ss &lt;&lt; paramVal;</div>
-<div class="line"><span class="lineno"> 1178</span>            std::string parVarTitle = name + <span class="stringliteral">&quot;_&quot;</span> + ss.str();</div>
+<div class="line"><span class="lineno"> 1151</span>        sigmaArray_x[j].resize(<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>);</div>
+<div class="line"><span class="lineno"> 1152</span>        sigmaArray_y[j].resize(<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>);</div>
+<div class="line"><span class="lineno"> 1153</span>        sigmaArray_x_norm[j].resize(<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>);</div>
+<div class="line"><span class="lineno"> 1154</span>        sigmaArray_y_norm[j].resize(<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>);</div>
+<div class="line"><span class="lineno"> 1155</span> </div>
+<div class="line"><span class="lineno"> 1156</span>        <span class="keywordflow">if</span> (DoByMode)</div>
+<div class="line"><span class="lineno"> 1157</span>        {</div>
+<div class="line"><span class="lineno"> 1158</span>          sigmaArray_mode_x[j] = <span class="keyword">new</span> TH1D**[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
+<div class="line"><span class="lineno"> 1159</span>          sigmaArray_mode_y[j] = <span class="keyword">new</span> TH1D**[<a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a>]();</div>
+<div class="line"><span class="lineno"> 1160</span>        }</div>
+<div class="line"><span class="lineno"> 1161</span> </div>
+<div class="line"><span class="lineno"> 1162</span>        SampleIterator = 0;</div>
+<div class="line"><span class="lineno"> 1163</span>        <span class="comment">// Get each sample and how it&#39;s responded to our reweighted parameter</span></div>
+<div class="line"><span class="lineno"> 1164</span>        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno"> 1165</span>        {</div>
+<div class="line"><span class="lineno"> 1166</span>          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
+<div class="line"><span class="lineno"> 1167</span>          {</div>
+<div class="line"><span class="lineno"> 1168</span>            <span class="comment">// Make a string of the double</span></div>
+<div class="line"><span class="lineno"> 1169</span>            std::ostringstream ss;</div>
+<div class="line"><span class="lineno"> 1170</span>            ss &lt;&lt; paramVal;</div>
+<div class="line"><span class="lineno"> 1171</span>            std::string parVarTitle = name + <span class="stringliteral">&quot;_&quot;</span> + ss.str();</div>
+<div class="line"><span class="lineno"> 1172</span> </div>
+<div class="line"><span class="lineno"> 1173</span>            <span class="comment">// This is a TH2D</span></div>
+<div class="line"><span class="lineno"> 1174</span> </div>
+<div class="line"><span class="lineno"> 1175</span>            std::unique_ptr&lt;TH2Poly&gt; currSamp(<span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;Clone()));</div>
+<div class="line"><span class="lineno"> 1176</span>            currSamp-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1177</span>            <span class="comment">// Set a descriptiv-ish title</span></div>
+<div class="line"><span class="lineno"> 1178</span>            std::string title_long = std::string(currSamp-&gt;GetName())+<span class="stringliteral">&quot;_&quot;</span>+parVarTitle;</div>
 <div class="line"><span class="lineno"> 1179</span> </div>
-<div class="line"><span class="lineno"> 1180</span>            <span class="comment">// This is a TH2D</span></div>
-<div class="line"><span class="lineno"> 1181</span> </div>
-<div class="line"><span class="lineno"> 1182</span>            std::unique_ptr&lt;TH2Poly&gt; currSamp(<span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;Clone()));</div>
-<div class="line"><span class="lineno"> 1183</span>            currSamp-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1184</span>            <span class="comment">// Set a descriptiv-ish title</span></div>
-<div class="line"><span class="lineno"> 1185</span>            std::string title_long = std::string(currSamp-&gt;GetName())+<span class="stringliteral">&quot;_&quot;</span>+parVarTitle;</div>
-<div class="line"><span class="lineno"> 1186</span> </div>
-<div class="line"><span class="lineno"> 1187</span>            <span class="comment">// Enable the mode histograms AFTER addSelection is called</span></div>
-<div class="line"><span class="lineno"> 1188</span>            <span class="comment">//Get the 1d binning we want. Let&#39;s just use SetupBinning to get this as it already exists</span></div>
-<div class="line"><span class="lineno"> 1189</span>            std::vector&lt;double&gt; xbins;</div>
-<div class="line"><span class="lineno"> 1190</span>            std::vector&lt;double&gt; ybins;</div>
-<div class="line"><span class="lineno"> 1191</span>            <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;SetupBinning(<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(k), xbins, ybins);</div>
+<div class="line"><span class="lineno"> 1180</span>            <span class="comment">// Enable the mode histograms AFTER addSelection is called</span></div>
+<div class="line"><span class="lineno"> 1181</span>            <span class="comment">//Get the 1d binning we want. Let&#39;s just use SetupBinning to get this as it already exists</span></div>
+<div class="line"><span class="lineno"> 1182</span>            std::vector&lt;double&gt; xbins;</div>
+<div class="line"><span class="lineno"> 1183</span>            std::vector&lt;double&gt; ybins;</div>
+<div class="line"><span class="lineno"> 1184</span>            <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;SetupBinning(<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(k), xbins, ybins);</div>
+<div class="line"><span class="lineno"> 1185</span> </div>
+<div class="line"><span class="lineno"> 1186</span>            <span class="comment">//KS:here we loop over all reaction modes defined in &quot;RelevantModes[nRelevantModes]&quot;</span></div>
+<div class="line"><span class="lineno"> 1187</span>            <span class="keywordflow">if</span> (DoByMode)</div>
+<div class="line"><span class="lineno"> 1188</span>            {</div>
+<div class="line"><span class="lineno"> 1189</span>              <span class="comment">//KS: this is only relevant if PlotByMode is turned on</span></div>
+<div class="line"><span class="lineno"> 1190</span>              <span class="comment">//Checking each mode is time consuming so we only consider one which are relevant for particular analysis</span></div>
+<div class="line"><span class="lineno"> 1191</span>              <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> RelevantModes[nRelevantModes] = {<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;CCQE&quot;</span>), <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;2p2h&quot;</span>)};</div>
 <div class="line"><span class="lineno"> 1192</span> </div>
-<div class="line"><span class="lineno"> 1193</span>            <span class="comment">//KS:here we loop over all reaction modes defined in &quot;RelevantModes[nRelevantModes]&quot;</span></div>
-<div class="line"><span class="lineno"> 1194</span>            <span class="keywordflow">if</span> (DoByMode)</div>
-<div class="line"><span class="lineno"> 1195</span>            {</div>
-<div class="line"><span class="lineno"> 1196</span>              <span class="comment">//KS: this is only relevant if PlotByMode is turned on</span></div>
-<div class="line"><span class="lineno"> 1197</span>              <span class="comment">//Checking each mode is time consuming so we only consider one which are relevant for particular analysis</span></div>
-<div class="line"><span class="lineno"> 1198</span>              <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> RelevantModes[nRelevantModes] = {<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;CCQE&quot;</span>), <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;2p2h&quot;</span>)};</div>
-<div class="line"><span class="lineno"> 1199</span> </div>
-<div class="line"><span class="lineno"> 1200</span>              sigmaArray_mode_x[j][SampleIterator] = <span class="keyword">new</span> TH1D*[nRelevantModes]();</div>
-<div class="line"><span class="lineno"> 1201</span>              sigmaArray_mode_y[j][SampleIterator] = <span class="keyword">new</span> TH1D*[nRelevantModes]();</div>
-<div class="line"><span class="lineno"> 1202</span>              <span class="comment">// Now get the TH2D mode variations</span></div>
-<div class="line"><span class="lineno"> 1203</span>              std::string mode_title_long;</div>
-<div class="line"><span class="lineno"> 1204</span> </div>
-<div class="line"><span class="lineno"> 1205</span>              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ir = 0; ir &lt; nRelevantModes; ir++)</div>
-<div class="line"><span class="lineno"> 1206</span>              {</div>
-<div class="line"><span class="lineno"> 1207</span>                std::unique_ptr&lt;TH2Poly&gt; currSampMode(<span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDFMode(k, RelevantModes[ir])-&gt;Clone()));</div>
-<div class="line"><span class="lineno"> 1208</span>                currSampMode-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1209</span> </div>
-<div class="line"><span class="lineno"> 1210</span>                mode_title_long = title_long + <span class="stringliteral">&quot;_&quot;</span> + <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMaCh3ModeName(RelevantModes[ir]);</div>
-<div class="line"><span class="lineno"> 1211</span>                currSampMode-&gt;SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());</div>
-<div class="line"><span class="lineno"> 1212</span>                dirArrySample[SampleIterator]-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1213</span>                currSampMode-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1193</span>              sigmaArray_mode_x[j][SampleIterator] = <span class="keyword">new</span> TH1D*[nRelevantModes]();</div>
+<div class="line"><span class="lineno"> 1194</span>              sigmaArray_mode_y[j][SampleIterator] = <span class="keyword">new</span> TH1D*[nRelevantModes]();</div>
+<div class="line"><span class="lineno"> 1195</span>              <span class="comment">// Now get the TH2D mode variations</span></div>
+<div class="line"><span class="lineno"> 1196</span>              std::string mode_title_long;</div>
+<div class="line"><span class="lineno"> 1197</span> </div>
+<div class="line"><span class="lineno"> 1198</span>              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ir = 0; ir &lt; nRelevantModes; ir++)</div>
+<div class="line"><span class="lineno"> 1199</span>              {</div>
+<div class="line"><span class="lineno"> 1200</span>                std::unique_ptr&lt;TH2Poly&gt; currSampMode(<span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDFMode(k, RelevantModes[ir])-&gt;Clone()));</div>
+<div class="line"><span class="lineno"> 1201</span>                currSampMode-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1202</span> </div>
+<div class="line"><span class="lineno"> 1203</span>                mode_title_long = title_long + <span class="stringliteral">&quot;_&quot;</span> + <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMaCh3ModeName(RelevantModes[ir]);</div>
+<div class="line"><span class="lineno"> 1204</span>                currSampMode-&gt;SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());</div>
+<div class="line"><span class="lineno"> 1205</span>                dirArrySample[SampleIterator]-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1206</span>                currSampMode-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1207</span> </div>
+<div class="line"><span class="lineno"> 1208</span>                sigmaArray_mode_x[j][SampleIterator][ir] = <a class="code hl_function" href="HistogramUtils_8cpp.html#a1ab7c868447cffff71227e07655b47ad">PolyProjectionX</a>(currSampMode.get(), (mode_title_long+<span class="stringliteral">&quot;_xProj&quot;</span>).c_str(), xbins);</div>
+<div class="line"><span class="lineno"> 1209</span>                sigmaArray_mode_x[j][SampleIterator][ir]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1210</span>                sigmaArray_mode_y[j][SampleIterator][ir] = <a class="code hl_function" href="HistogramUtils_8cpp.html#aa26af438a657c81f2fb3f1506c6e35f6">PolyProjectionY</a>(currSampMode.get(), (mode_title_long+<span class="stringliteral">&quot;_yProj&quot;</span>).c_str(), ybins);</div>
+<div class="line"><span class="lineno"> 1211</span>                sigmaArray_mode_y[j][SampleIterator][ir]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1212</span>              }</div>
+<div class="line"><span class="lineno"> 1213</span>            }</div>
 <div class="line"><span class="lineno"> 1214</span> </div>
-<div class="line"><span class="lineno"> 1215</span>                sigmaArray_mode_x[j][SampleIterator][ir] = <a class="code hl_function" href="HistogramUtils_8cpp.html#a1ab7c868447cffff71227e07655b47ad">PolyProjectionX</a>(currSampMode.get(), (mode_title_long+<span class="stringliteral">&quot;_xProj&quot;</span>).c_str(), xbins);</div>
-<div class="line"><span class="lineno"> 1216</span>                sigmaArray_mode_x[j][SampleIterator][ir]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1217</span>                sigmaArray_mode_y[j][SampleIterator][ir] = <a class="code hl_function" href="HistogramUtils_8cpp.html#aa26af438a657c81f2fb3f1506c6e35f6">PolyProjectionY</a>(currSampMode.get(), (mode_title_long+<span class="stringliteral">&quot;_yProj&quot;</span>).c_str(), ybins);</div>
-<div class="line"><span class="lineno"> 1218</span>                sigmaArray_mode_y[j][SampleIterator][ir]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1219</span>              }</div>
-<div class="line"><span class="lineno"> 1220</span>            }</div>
-<div class="line"><span class="lineno"> 1221</span> </div>
-<div class="line"><span class="lineno"> 1222</span>            <span class="comment">//KS: This will give different results depending if data or Asimov, both have their uses</span></div>
-<div class="line"><span class="lineno"> 1223</span>            <span class="keywordflow">if</span> (PlotLLHperBin)</div>
-<div class="line"><span class="lineno"> 1224</span>            {</div>
-<div class="line"><span class="lineno"> 1225</span>              std::unique_ptr&lt;TH2Poly&gt; currLLHSamp(<span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;Clone()));</div>
-<div class="line"><span class="lineno"> 1226</span>              currLLHSamp-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1227</span>              currLLHSamp-&gt;Reset(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1228</span>              currLLHSamp-&gt;Fill(0.0, 0.0, 0.0);</div>
-<div class="line"><span class="lineno"> 1229</span> </div>
-<div class="line"><span class="lineno"> 1230</span>              TH2Poly* MCpdf = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k));</div>
-<div class="line"><span class="lineno"> 1231</span>              TH2Poly* Datapdf = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getData(k));</div>
-<div class="line"><span class="lineno"> 1232</span>              TH2Poly* W2pdf = <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getW2(k);</div>
-<div class="line"><span class="lineno"> 1233</span> </div>
-<div class="line"><span class="lineno"> 1234</span>              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> bin = 1; bin &lt; currLLHSamp-&gt;GetNumberOfBins()+1; bin++)</div>
-<div class="line"><span class="lineno"> 1235</span>              {</div>
-<div class="line"><span class="lineno"> 1236</span>                <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCpdf-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno"> 1237</span>                <span class="keyword">const</span> <span class="keywordtype">double</span> dat = Datapdf-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno"> 1238</span>                <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2pdf-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno"> 1239</span>                currLLHSamp-&gt;SetBinContent(bin, <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getTestStatLLH(dat, mc, w2));</div>
-<div class="line"><span class="lineno"> 1240</span>              }</div>
-<div class="line"><span class="lineno"> 1241</span>              currLLHSamp-&gt;SetNameTitle((title_long+<span class="stringliteral">&quot;_LLH&quot;</span>).c_str() ,(title_long+<span class="stringliteral">&quot;_LLH&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1242</span>              dirArrySample[SampleIterator]-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1243</span>              currLLHSamp-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1244</span>            }</div>
-<div class="line"><span class="lineno"> 1245</span> </div>
-<div class="line"><span class="lineno"> 1246</span>            <span class="comment">// Project down onto x axis</span></div>
-<div class="line"><span class="lineno"> 1247</span>            sigmaArray_x[j][SampleIterator] = <a class="code hl_function" href="HistogramUtils_8cpp.html#a1ab7c868447cffff71227e07655b47ad">PolyProjectionX</a>(currSamp.get(), (title_long+<span class="stringliteral">&quot;_xProj&quot;</span>).c_str(), xbins);</div>
-<div class="line"><span class="lineno"> 1248</span>            sigmaArray_x[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1249</span>            sigmaArray_x[j][SampleIterator]-&gt;GetXaxis()-&gt;SetTitle(currSamp-&gt;GetXaxis()-&gt;GetTitle());</div>
-<div class="line"><span class="lineno"> 1250</span>            sigmaArray_y[j][SampleIterator] = <a class="code hl_function" href="HistogramUtils_8cpp.html#aa26af438a657c81f2fb3f1506c6e35f6">PolyProjectionY</a>(currSamp.get(), (title_long+<span class="stringliteral">&quot;_yProj&quot;</span>).c_str(), ybins);</div>
-<div class="line"><span class="lineno"> 1251</span>            sigmaArray_y[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1252</span>            sigmaArray_y[j][SampleIterator]-&gt;GetXaxis()-&gt;SetTitle(currSamp-&gt;GetYaxis()-&gt;GetTitle());</div>
+<div class="line"><span class="lineno"> 1215</span>            <span class="comment">//KS: This will give different results depending if data or Asimov, both have their uses</span></div>
+<div class="line"><span class="lineno"> 1216</span>            <span class="keywordflow">if</span> (PlotLLHperBin)</div>
+<div class="line"><span class="lineno"> 1217</span>            {</div>
+<div class="line"><span class="lineno"> 1218</span>              std::unique_ptr&lt;TH2Poly&gt; currLLHSamp(<span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;Clone()));</div>
+<div class="line"><span class="lineno"> 1219</span>              currLLHSamp-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1220</span>              currLLHSamp-&gt;Reset(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1221</span>              currLLHSamp-&gt;Fill(0.0, 0.0, 0.0);</div>
+<div class="line"><span class="lineno"> 1222</span> </div>
+<div class="line"><span class="lineno"> 1223</span>              TH2Poly* MCpdf = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k));</div>
+<div class="line"><span class="lineno"> 1224</span>              TH2Poly* Datapdf = <span class="keyword">static_cast&lt;</span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getData(k));</div>
+<div class="line"><span class="lineno"> 1225</span>              TH2Poly* W2pdf = <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getW2(k);</div>
+<div class="line"><span class="lineno"> 1226</span> </div>
+<div class="line"><span class="lineno"> 1227</span>              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> bin = 1; bin &lt; currLLHSamp-&gt;GetNumberOfBins()+1; bin++)</div>
+<div class="line"><span class="lineno"> 1228</span>              {</div>
+<div class="line"><span class="lineno"> 1229</span>                <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCpdf-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno"> 1230</span>                <span class="keyword">const</span> <span class="keywordtype">double</span> dat = Datapdf-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno"> 1231</span>                <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2pdf-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno"> 1232</span>                currLLHSamp-&gt;SetBinContent(bin, <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getTestStatLLH(dat, mc, w2));</div>
+<div class="line"><span class="lineno"> 1233</span>              }</div>
+<div class="line"><span class="lineno"> 1234</span>              currLLHSamp-&gt;SetNameTitle((title_long+<span class="stringliteral">&quot;_LLH&quot;</span>).c_str() ,(title_long+<span class="stringliteral">&quot;_LLH&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1235</span>              dirArrySample[SampleIterator]-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1236</span>              currLLHSamp-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1237</span>            }</div>
+<div class="line"><span class="lineno"> 1238</span> </div>
+<div class="line"><span class="lineno"> 1239</span>            <span class="comment">// Project down onto x axis</span></div>
+<div class="line"><span class="lineno"> 1240</span>            sigmaArray_x[j][SampleIterator] = <a class="code hl_function" href="HistogramUtils_8cpp.html#a1ab7c868447cffff71227e07655b47ad">PolyProjectionX</a>(currSamp.get(), (title_long+<span class="stringliteral">&quot;_xProj&quot;</span>).c_str(), xbins);</div>
+<div class="line"><span class="lineno"> 1241</span>            sigmaArray_x[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1242</span>            sigmaArray_x[j][SampleIterator]-&gt;GetXaxis()-&gt;SetTitle(currSamp-&gt;GetXaxis()-&gt;GetTitle());</div>
+<div class="line"><span class="lineno"> 1243</span>            sigmaArray_y[j][SampleIterator] = <a class="code hl_function" href="HistogramUtils_8cpp.html#aa26af438a657c81f2fb3f1506c6e35f6">PolyProjectionY</a>(currSamp.get(), (title_long+<span class="stringliteral">&quot;_yProj&quot;</span>).c_str(), ybins);</div>
+<div class="line"><span class="lineno"> 1244</span>            sigmaArray_y[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1245</span>            sigmaArray_y[j][SampleIterator]-&gt;GetXaxis()-&gt;SetTitle(currSamp-&gt;GetYaxis()-&gt;GetTitle());</div>
+<div class="line"><span class="lineno"> 1246</span> </div>
+<div class="line"><span class="lineno"> 1247</span>            sigmaArray_x_norm[j][SampleIterator] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(sigmaArray_x[j][SampleIterator]-&gt;Clone());</div>
+<div class="line"><span class="lineno"> 1248</span>            sigmaArray_x_norm[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1249</span>            sigmaArray_x_norm[j][SampleIterator]-&gt;Scale(1., <span class="stringliteral">&quot;width&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1250</span>            sigmaArray_y_norm[j][SampleIterator] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(sigmaArray_y[j][SampleIterator]-&gt;Clone());</div>
+<div class="line"><span class="lineno"> 1251</span>            sigmaArray_y_norm[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1252</span>            sigmaArray_y_norm[j][SampleIterator]-&gt;Scale(1., <span class="stringliteral">&quot;width&quot;</span>);</div>
 <div class="line"><span class="lineno"> 1253</span> </div>
-<div class="line"><span class="lineno"> 1254</span>            sigmaArray_x_norm[j][SampleIterator] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(sigmaArray_x[j][SampleIterator]-&gt;Clone());</div>
-<div class="line"><span class="lineno"> 1255</span>            sigmaArray_x_norm[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1256</span>            sigmaArray_x_norm[j][SampleIterator]-&gt;Scale(1., <span class="stringliteral">&quot;width&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1257</span>            sigmaArray_y_norm[j][SampleIterator] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(sigmaArray_y[j][SampleIterator]-&gt;Clone());</div>
-<div class="line"><span class="lineno"> 1258</span>            sigmaArray_y_norm[j][SampleIterator]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1259</span>            sigmaArray_y_norm[j][SampleIterator]-&gt;Scale(1., <span class="stringliteral">&quot;width&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1260</span> </div>
-<div class="line"><span class="lineno"> 1261</span>            currSamp-&gt;SetNameTitle(title_long.c_str(), title_long.c_str());</div>
-<div class="line"><span class="lineno"> 1262</span>            dirArrySample[k]-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1263</span>            currSamp-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1254</span>            currSamp-&gt;SetNameTitle(title_long.c_str(), title_long.c_str());</div>
+<div class="line"><span class="lineno"> 1255</span>            dirArrySample[k]-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1256</span>            currSamp-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1257</span> </div>
+<div class="line"><span class="lineno"> 1258</span>            sigmaArray_x[j][k]-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1259</span>            sigmaArray_y[j][k]-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1260</span>            SampleIterator++;</div>
+<div class="line"><span class="lineno"> 1261</span>          }<span class="comment">//End loop over samples</span></div>
+<div class="line"><span class="lineno"> 1262</span>        }</div>
+<div class="line"><span class="lineno"> 1263</span>      } <span class="comment">// End looping over variation</span></div>
 <div class="line"><span class="lineno"> 1264</span> </div>
-<div class="line"><span class="lineno"> 1265</span>            sigmaArray_x[j][k]-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1266</span>            sigmaArray_y[j][k]-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1267</span>            SampleIterator++;</div>
-<div class="line"><span class="lineno"> 1268</span>          }<span class="comment">//End loop over samples</span></div>
-<div class="line"><span class="lineno"> 1269</span>        }</div>
-<div class="line"><span class="lineno"> 1270</span>      } <span class="comment">// End looping over variation</span></div>
-<div class="line"><span class="lineno"> 1271</span> </div>
-<div class="line"><span class="lineno"> 1272</span>      <span class="comment">// Restore the parameter to prior value</span></div>
-<div class="line"><span class="lineno"> 1273</span>      cov-&gt;setParProp(i, init);</div>
-<div class="line"><span class="lineno"> 1274</span> </div>
-<div class="line"><span class="lineno"> 1275</span>      SampleIterator = 0;</div>
-<div class="line"><span class="lineno"> 1276</span>      <span class="comment">// Get each sample and how it&#39;s responded to our reweighted parameter</span></div>
-<div class="line"><span class="lineno"> 1277</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
-<div class="line"><span class="lineno"> 1278</span>      {</div>
-<div class="line"><span class="lineno"> 1279</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
-<div class="line"><span class="lineno"> 1280</span>        {</div>
-<div class="line"><span class="lineno"> 1281</span>          std::string title = std::string(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>()) + <span class="stringliteral">&quot;_&quot;</span> + name;</div>
-<div class="line"><span class="lineno"> 1282</span>          TGraphAsymmErrors *var_x = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+<span class="stringliteral">&quot;_X&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1283</span>          TGraphAsymmErrors *var_y = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+<span class="stringliteral">&quot;_Y&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1284</span> </div>
-<div class="line"><span class="lineno"> 1285</span>          TGraphAsymmErrors *var_x_norm = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+<span class="stringliteral">&quot;_X_norm&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1286</span>          TGraphAsymmErrors *var_y_norm = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+<span class="stringliteral">&quot;_Y_norm&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1287</span> </div>
-<div class="line"><span class="lineno"> 1288</span>          dirArrySample[SampleIterator]-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1289</span>          var_x-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1290</span>          var_y-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1291</span>          var_x_norm-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1292</span>          var_y_norm-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1293</span>          <span class="keyword">delete</span> var_x;</div>
-<div class="line"><span class="lineno"> 1294</span>          <span class="keyword">delete</span> var_y;</div>
-<div class="line"><span class="lineno"> 1295</span>          <span class="keyword">delete</span> var_x_norm;</div>
-<div class="line"><span class="lineno"> 1296</span>          <span class="keyword">delete</span> var_y_norm;</div>
+<div class="line"><span class="lineno"> 1265</span>      <span class="comment">// Restore the parameter to prior value</span></div>
+<div class="line"><span class="lineno"> 1266</span>      cov-&gt;setParProp(i, init);</div>
+<div class="line"><span class="lineno"> 1267</span> </div>
+<div class="line"><span class="lineno"> 1268</span>      SampleIterator = 0;</div>
+<div class="line"><span class="lineno"> 1269</span>      <span class="comment">// Get each sample and how it&#39;s responded to our reweighted parameter</span></div>
+<div class="line"><span class="lineno"> 1270</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno"> 1271</span>      {</div>
+<div class="line"><span class="lineno"> 1272</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
+<div class="line"><span class="lineno"> 1273</span>        {</div>
+<div class="line"><span class="lineno"> 1274</span>          std::string title = std::string(<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;getPDF(k)-&gt;<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>()) + <span class="stringliteral">&quot;_&quot;</span> + name;</div>
+<div class="line"><span class="lineno"> 1275</span>          TGraphAsymmErrors *var_x = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+<span class="stringliteral">&quot;_X&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1276</span>          TGraphAsymmErrors *var_y = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+<span class="stringliteral">&quot;_Y&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1277</span> </div>
+<div class="line"><span class="lineno"> 1278</span>          TGraphAsymmErrors *var_x_norm = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+<span class="stringliteral">&quot;_X_norm&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1279</span>          TGraphAsymmErrors *var_y_norm = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+<span class="stringliteral">&quot;_Y_norm&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1280</span> </div>
+<div class="line"><span class="lineno"> 1281</span>          dirArrySample[SampleIterator]-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1282</span>          var_x-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1283</span>          var_y-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1284</span>          var_x_norm-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1285</span>          var_y_norm-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1286</span>          <span class="keyword">delete</span> var_x;</div>
+<div class="line"><span class="lineno"> 1287</span>          <span class="keyword">delete</span> var_y;</div>
+<div class="line"><span class="lineno"> 1288</span>          <span class="keyword">delete</span> var_x_norm;</div>
+<div class="line"><span class="lineno"> 1289</span>          <span class="keyword">delete</span> var_y_norm;</div>
+<div class="line"><span class="lineno"> 1290</span> </div>
+<div class="line"><span class="lineno"> 1291</span>          <span class="comment">//KS: here we loop over all reaction modes defined in &quot;RelevantModes[nRelevantModes]&quot;</span></div>
+<div class="line"><span class="lineno"> 1292</span>          <span class="keywordflow">if</span> (DoByMode)</div>
+<div class="line"><span class="lineno"> 1293</span>          {</div>
+<div class="line"><span class="lineno"> 1294</span>            <span class="comment">//KS: this is only relevant if PlotByMode is turned on</span></div>
+<div class="line"><span class="lineno"> 1295</span>            <span class="comment">//Checking each mode is time consuming so we only consider one which are relevant for particular analysis</span></div>
+<div class="line"><span class="lineno"> 1296</span>            <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> RelevantModes[nRelevantModes] = {<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;CCQE&quot;</span>), <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;2p2h&quot;</span>)};</div>
 <div class="line"><span class="lineno"> 1297</span> </div>
-<div class="line"><span class="lineno"> 1298</span>          <span class="comment">//KS: here we loop over all reaction modes defined in &quot;RelevantModes[nRelevantModes]&quot;</span></div>
-<div class="line"><span class="lineno"> 1299</span>          <span class="keywordflow">if</span> (DoByMode)</div>
-<div class="line"><span class="lineno"> 1300</span>          {</div>
-<div class="line"><span class="lineno"> 1301</span>            <span class="comment">//KS: this is only relevant if PlotByMode is turned on</span></div>
-<div class="line"><span class="lineno"> 1302</span>            <span class="comment">//Checking each mode is time consuming so we only consider one which are relevant for particular analysis</span></div>
-<div class="line"><span class="lineno"> 1303</span>            <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> RelevantModes[nRelevantModes] = {<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;CCQE&quot;</span>), <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMode(<span class="stringliteral">&quot;2p2h&quot;</span>)};</div>
-<div class="line"><span class="lineno"> 1304</span> </div>
-<div class="line"><span class="lineno"> 1305</span>            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ir = 0; ir &lt; nRelevantModes;ir++)</div>
-<div class="line"><span class="lineno"> 1306</span>            {</div>
-<div class="line"><span class="lineno"> 1307</span>              TGraphAsymmErrors* var_mode_x = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+<span class="stringliteral">&quot;_&quot;</span>+<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMaCh3ModeName(RelevantModes[ir])+<span class="stringliteral">&quot;_X&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1308</span>              TGraphAsymmErrors* var_mode_y = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+<span class="stringliteral">&quot;_&quot;</span>+<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMaCh3ModeName(RelevantModes[ir])+<span class="stringliteral">&quot;_Y&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno"> 1309</span> </div>
-<div class="line"><span class="lineno"> 1310</span>              dirArrySample[SampleIterator]-&gt;cd();</div>
-<div class="line"><span class="lineno"> 1311</span>              var_mode_x-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1312</span>              var_mode_y-&gt;Write();</div>
-<div class="line"><span class="lineno"> 1313</span> </div>
-<div class="line"><span class="lineno"> 1314</span>              <span class="keyword">delete</span> var_mode_x;</div>
-<div class="line"><span class="lineno"> 1315</span>              <span class="keyword">delete</span> var_mode_y;</div>
-<div class="line"><span class="lineno"> 1316</span>            } <span class="comment">// end for nRelevantModes</span></div>
-<div class="line"><span class="lineno"> 1317</span>          } <span class="comment">// end if mode</span></div>
-<div class="line"><span class="lineno"> 1318</span> </div>
-<div class="line"><span class="lineno"> 1319</span>          SampleIterator++;</div>
-<div class="line"><span class="lineno"> 1320</span>        }<span class="comment">//End loop over samples(k)</span></div>
-<div class="line"><span class="lineno"> 1321</span>      }<span class="comment">//end looping over sample object</span></div>
-<div class="line"><span class="lineno"> 1322</span>      SampleIterator = 0;</div>
-<div class="line"><span class="lineno"> 1323</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
-<div class="line"><span class="lineno"> 1324</span>      {</div>
-<div class="line"><span class="lineno"> 1325</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
-<div class="line"><span class="lineno"> 1326</span>        {</div>
-<div class="line"><span class="lineno"> 1327</span>          dirArrySample[SampleIterator]-&gt;Close();</div>
-<div class="line"><span class="lineno"> 1328</span>          <span class="keyword">delete</span> dirArrySample[SampleIterator];</div>
-<div class="line"><span class="lineno"> 1329</span>          SampleIterator++;</div>
-<div class="line"><span class="lineno"> 1330</span>        }</div>
-<div class="line"><span class="lineno"> 1331</span>      }</div>
-<div class="line"><span class="lineno"> 1332</span> </div>
-<div class="line"><span class="lineno"> 1333</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; numVar; ++j)</div>
-<div class="line"><span class="lineno"> 1334</span>      {</div>
-<div class="line"><span class="lineno"> 1335</span>        SampleIterator = 0;</div>
-<div class="line"><span class="lineno"> 1336</span>        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
-<div class="line"><span class="lineno"> 1337</span>        {</div>
-<div class="line"><span class="lineno"> 1338</span>          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
-<div class="line"><span class="lineno"> 1339</span>          {</div>
-<div class="line"><span class="lineno"> 1340</span>            <span class="keyword">delete</span> sigmaArray_x[j][SampleIterator];</div>
-<div class="line"><span class="lineno"> 1341</span>            <span class="keyword">delete</span> sigmaArray_y[j][SampleIterator];</div>
-<div class="line"><span class="lineno"> 1342</span>            <span class="keyword">delete</span> sigmaArray_x_norm[j][SampleIterator];</div>
-<div class="line"><span class="lineno"> 1343</span>            <span class="keyword">delete</span> sigmaArray_y_norm[j][SampleIterator];</div>
-<div class="line"><span class="lineno"> 1344</span>            SampleIterator++;</div>
-<div class="line"><span class="lineno"> 1345</span>          }</div>
-<div class="line"><span class="lineno"> 1346</span>        }</div>
-<div class="line"><span class="lineno"> 1347</span>        <span class="keyword">delete</span>[] sigmaArray_x[j];</div>
-<div class="line"><span class="lineno"> 1348</span>        <span class="keyword">delete</span>[] sigmaArray_y[j];</div>
-<div class="line"><span class="lineno"> 1349</span>        <span class="keyword">delete</span>[] sigmaArray_x_norm[j];</div>
-<div class="line"><span class="lineno"> 1350</span>        <span class="keyword">delete</span>[] sigmaArray_y_norm[j];</div>
-<div class="line"><span class="lineno"> 1351</span>      }</div>
-<div class="line"><span class="lineno"> 1352</span>      <span class="keyword">delete</span>[] sigmaArray_x;</div>
-<div class="line"><span class="lineno"> 1353</span>      <span class="keyword">delete</span>[] sigmaArray_y;</div>
-<div class="line"><span class="lineno"> 1354</span>      <span class="keyword">delete</span>[] sigmaArray_x_norm;</div>
-<div class="line"><span class="lineno"> 1355</span>      <span class="keyword">delete</span>[] sigmaArray_y_norm;</div>
-<div class="line"><span class="lineno"> 1356</span> </div>
-<div class="line"><span class="lineno"> 1357</span>      dirArryDial-&gt;Close();</div>
-<div class="line"><span class="lineno"> 1358</span>      <span class="keyword">delete</span> dirArryDial;</div>
-<div class="line"><span class="lineno"> 1359</span> </div>
-<div class="line"><span class="lineno"> 1360</span>      <span class="keywordflow">if</span> (DoByMode)</div>
-<div class="line"><span class="lineno"> 1361</span>      {</div>
-<div class="line"><span class="lineno"> 1362</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; numVar; ++j)</div>
-<div class="line"><span class="lineno"> 1363</span>        {</div>
-<div class="line"><span class="lineno"> 1364</span>          SampleIterator = 0;</div>
-<div class="line"><span class="lineno"> 1365</span>          <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
-<div class="line"><span class="lineno"> 1366</span>          {</div>
-<div class="line"><span class="lineno"> 1367</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
-<div class="line"><span class="lineno"> 1368</span>            {</div>
-<div class="line"><span class="lineno"> 1369</span>              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ir = 0; ir &lt; nRelevantModes;ir++)</div>
-<div class="line"><span class="lineno"> 1370</span>              {</div>
-<div class="line"><span class="lineno"> 1371</span>                <span class="keyword">delete</span> sigmaArray_mode_x[j][SampleIterator][ir];</div>
-<div class="line"><span class="lineno"> 1372</span>                <span class="keyword">delete</span> sigmaArray_mode_y[j][SampleIterator][ir];</div>
-<div class="line"><span class="lineno"> 1373</span>              }<span class="comment">// end for nRelevantModes</span></div>
-<div class="line"><span class="lineno"> 1374</span>              <span class="keyword">delete</span>[] sigmaArray_mode_x[j][SampleIterator];</div>
-<div class="line"><span class="lineno"> 1375</span>              <span class="keyword">delete</span>[] sigmaArray_mode_y[j][SampleIterator];</div>
-<div class="line"><span class="lineno"> 1376</span>              SampleIterator++;</div>
-<div class="line"><span class="lineno"> 1377</span>            }<span class="comment">// end for samples</span></div>
-<div class="line"><span class="lineno"> 1378</span>          }</div>
-<div class="line"><span class="lineno"> 1379</span>        }</div>
-<div class="line"><span class="lineno"> 1380</span>        <span class="keyword">delete</span>[] sigmaArray_mode_x;</div>
-<div class="line"><span class="lineno"> 1381</span>        <span class="keyword">delete</span>[] sigmaArray_mode_y;</div>
-<div class="line"><span class="lineno"> 1382</span>      }</div>
-<div class="line"><span class="lineno"> 1383</span>    } <span class="comment">// end looping over xsec parameters (i)</span></div>
-<div class="line"><span class="lineno"> 1384</span>  } <span class="comment">// end looping over covarianceBase objects</span></div>
-<div class="line"><span class="lineno"> 1385</span>}</div>
+<div class="line"><span class="lineno"> 1298</span>            <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ir = 0; ir &lt; nRelevantModes;ir++)</div>
+<div class="line"><span class="lineno"> 1299</span>            {</div>
+<div class="line"><span class="lineno"> 1300</span>              TGraphAsymmErrors* var_mode_x = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+<span class="stringliteral">&quot;_&quot;</span>+<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMaCh3ModeName(RelevantModes[ir])+<span class="stringliteral">&quot;_X&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1301</span>              TGraphAsymmErrors* var_mode_y = <a class="code hl_function" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a>(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+<span class="stringliteral">&quot;_&quot;</span>+<a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetMaCh3Modes()-&gt;GetMaCh3ModeName(RelevantModes[ir])+<span class="stringliteral">&quot;_Y&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1302</span> </div>
+<div class="line"><span class="lineno"> 1303</span>              dirArrySample[SampleIterator]-&gt;cd();</div>
+<div class="line"><span class="lineno"> 1304</span>              var_mode_x-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1305</span>              var_mode_y-&gt;Write();</div>
+<div class="line"><span class="lineno"> 1306</span> </div>
+<div class="line"><span class="lineno"> 1307</span>              <span class="keyword">delete</span> var_mode_x;</div>
+<div class="line"><span class="lineno"> 1308</span>              <span class="keyword">delete</span> var_mode_y;</div>
+<div class="line"><span class="lineno"> 1309</span>            } <span class="comment">// end for nRelevantModes</span></div>
+<div class="line"><span class="lineno"> 1310</span>          } <span class="comment">// end if mode</span></div>
+<div class="line"><span class="lineno"> 1311</span> </div>
+<div class="line"><span class="lineno"> 1312</span>          SampleIterator++;</div>
+<div class="line"><span class="lineno"> 1313</span>        }<span class="comment">//End loop over samples(k)</span></div>
+<div class="line"><span class="lineno"> 1314</span>      }<span class="comment">//end looping over sample object</span></div>
+<div class="line"><span class="lineno"> 1315</span>      SampleIterator = 0;</div>
+<div class="line"><span class="lineno"> 1316</span>      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno"> 1317</span>      {</div>
+<div class="line"><span class="lineno"> 1318</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
+<div class="line"><span class="lineno"> 1319</span>        {</div>
+<div class="line"><span class="lineno"> 1320</span>          dirArrySample[SampleIterator]-&gt;Close();</div>
+<div class="line"><span class="lineno"> 1321</span>          <span class="keyword">delete</span> dirArrySample[SampleIterator];</div>
+<div class="line"><span class="lineno"> 1322</span>          SampleIterator++;</div>
+<div class="line"><span class="lineno"> 1323</span>        }</div>
+<div class="line"><span class="lineno"> 1324</span>      }</div>
+<div class="line"><span class="lineno"> 1325</span> </div>
+<div class="line"><span class="lineno"> 1326</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; numVar; ++j)</div>
+<div class="line"><span class="lineno"> 1327</span>      {</div>
+<div class="line"><span class="lineno"> 1328</span>        SampleIterator = 0;</div>
+<div class="line"><span class="lineno"> 1329</span>        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno"> 1330</span>        {</div>
+<div class="line"><span class="lineno"> 1331</span>          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
+<div class="line"><span class="lineno"> 1332</span>          {</div>
+<div class="line"><span class="lineno"> 1333</span>            <span class="keyword">delete</span> sigmaArray_x[j][SampleIterator];</div>
+<div class="line"><span class="lineno"> 1334</span>            <span class="keyword">delete</span> sigmaArray_y[j][SampleIterator];</div>
+<div class="line"><span class="lineno"> 1335</span>            <span class="keyword">delete</span> sigmaArray_x_norm[j][SampleIterator];</div>
+<div class="line"><span class="lineno"> 1336</span>            <span class="keyword">delete</span> sigmaArray_y_norm[j][SampleIterator];</div>
+<div class="line"><span class="lineno"> 1337</span>            SampleIterator++;</div>
+<div class="line"><span class="lineno"> 1338</span>          }</div>
+<div class="line"><span class="lineno"> 1339</span>        }</div>
+<div class="line"><span class="lineno"> 1340</span>      }</div>
+<div class="line"><span class="lineno"> 1341</span> </div>
+<div class="line"><span class="lineno"> 1342</span>      dirArryDial-&gt;Close();</div>
+<div class="line"><span class="lineno"> 1343</span>      <span class="keyword">delete</span> dirArryDial;</div>
+<div class="line"><span class="lineno"> 1344</span> </div>
+<div class="line"><span class="lineno"> 1345</span>      <span class="keywordflow">if</span> (DoByMode)</div>
+<div class="line"><span class="lineno"> 1346</span>      {</div>
+<div class="line"><span class="lineno"> 1347</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; numVar; ++j)</div>
+<div class="line"><span class="lineno"> 1348</span>        {</div>
+<div class="line"><span class="lineno"> 1349</span>          SampleIterator = 0;</div>
+<div class="line"><span class="lineno"> 1350</span>          <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ivs = 0; ivs &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>.size(); ivs++ )</div>
+<div class="line"><span class="lineno"> 1351</span>          {</div>
+<div class="line"><span class="lineno"> 1352</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; <a class="code hl_variable" href="classFitterBase.html#afac0dcceb1df194159c07945e8dc0069">samples</a>[ivs]-&gt;GetNsamples(); ++k)</div>
+<div class="line"><span class="lineno"> 1353</span>            {</div>
+<div class="line"><span class="lineno"> 1354</span>              <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ir = 0; ir &lt; nRelevantModes;ir++)</div>
+<div class="line"><span class="lineno"> 1355</span>              {</div>
+<div class="line"><span class="lineno"> 1356</span>                <span class="keyword">delete</span> sigmaArray_mode_x[j][SampleIterator][ir];</div>
+<div class="line"><span class="lineno"> 1357</span>                <span class="keyword">delete</span> sigmaArray_mode_y[j][SampleIterator][ir];</div>
+<div class="line"><span class="lineno"> 1358</span>              }<span class="comment">// end for nRelevantModes</span></div>
+<div class="line"><span class="lineno"> 1359</span>              <span class="keyword">delete</span>[] sigmaArray_mode_x[j][SampleIterator];</div>
+<div class="line"><span class="lineno"> 1360</span>              <span class="keyword">delete</span>[] sigmaArray_mode_y[j][SampleIterator];</div>
+<div class="line"><span class="lineno"> 1361</span>              SampleIterator++;</div>
+<div class="line"><span class="lineno"> 1362</span>            }<span class="comment">// end for samples</span></div>
+<div class="line"><span class="lineno"> 1363</span>          }</div>
+<div class="line"><span class="lineno"> 1364</span>        }</div>
+<div class="line"><span class="lineno"> 1365</span>        <span class="keyword">delete</span>[] sigmaArray_mode_x;</div>
+<div class="line"><span class="lineno"> 1366</span>        <span class="keyword">delete</span>[] sigmaArray_mode_y;</div>
+<div class="line"><span class="lineno"> 1367</span>      }</div>
+<div class="line"><span class="lineno"> 1368</span>    } <span class="comment">// end looping over xsec parameters (i)</span></div>
+<div class="line"><span class="lineno"> 1369</span>  } <span class="comment">// end looping over covarianceBase objects</span></div>
+<div class="line"><span class="lineno"> 1370</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a1ab7c868447cffff71227e07655b47ad"><div class="ttname"><a href="HistogramUtils_8cpp.html#a1ab7c868447cffff71227e07655b47ad">PolyProjectionX</a></div><div class="ttdeci">TH1D * PolyProjectionX(TObject *poly, std::string TempName, const std::vector&lt; double &gt; &amp;xbins, const bool computeErrors)</div><div class="ttdoc">WP: Poly Projectors.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00063">HistogramUtils.cpp:63</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a3b61160c5ff362348884cb311e827221"><div class="ttname"><a href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a></div><div class="ttdeci">TGraphAsymmErrors * MakeAsymGraph(TH1D *sigmaArrayLeft, TH1D *sigmaArrayCentr, TH1D *sigmaArrayRight, const std::string &amp;title)</div><div class="ttdoc">Used by sigma variation, check how 1 sigma changes spectra.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00516">HistogramUtils.cpp:516</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_aa26af438a657c81f2fb3f1506c6e35f6"><div class="ttname"><a href="HistogramUtils_8cpp.html#aa26af438a657c81f2fb3f1506c6e35f6">PolyProjectionY</a></div><div class="ttdeci">TH1D * PolyProjectionY(TObject *poly, std::string TempName, const std::vector&lt; double &gt; &amp;ybins, const bool computeErrors)</div><div class="ttdoc">WP: Poly Projectors.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00131">HistogramUtils.cpp:131</a></div></div>
