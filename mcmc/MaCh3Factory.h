@@ -136,7 +136,7 @@ std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& S
     Sample->reweight();
 
     // Obtain sample name and create a TString version for histogram naming
-    std::string name = Sample->GetName();
+    std::string name = Sample->GetTitle();
     TString NameTString = TString(name.c_str());
 
     // Clone the 1D histogram with a modified name

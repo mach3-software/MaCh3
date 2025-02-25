@@ -417,10 +417,10 @@ protected:
   /// @cite haario2001adaptive
   void updateAdaptiveCovariance();
 
-  /// @brief Check if parameter is affecting given det ID
+  /// @brief Check if parameter is affecting given sample name
   /// @param SystIndex number of parameter
   /// @param DetID The Detector ID used to filter parameters.
-  bool AppliesToDetID(const int SystIndex, const std::string& DetID) const;
+  bool AppliesToSampleName(const int SystIndex, const std::string& SampleName) const;
 
   /// The input root file we read in
   const std::string inputFile;

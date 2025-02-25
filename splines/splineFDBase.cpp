@@ -72,23 +72,23 @@ void splineFDBase::AddSample(const std::string& SampleName,
   DimensionLabels.push_back(SplineVarNames);
   DetIDs.push_back(DetID);
 
-  int nSplineParam = xsec->GetNumParamsFromDetID(DetID, SystType::kSpline);
+  int nSplineParam = xsec->GetNumParamsFromSampleName(DetID, SystType::kSpline);
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromSampleName(DetID, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
-  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromDetID(DetID);
+  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromSampleName(DetID);
   // Keep track of this for all samples
   SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
 
-  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
+  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromSampleName(DetID);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   MACH3LOG_INFO("Create SplineModeVecs_Sample");
-  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromSampleName(DetID));
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
 
