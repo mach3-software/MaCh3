@@ -31,7 +31,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
 
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
-  SampleDetID = "";
+  SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
@@ -64,17 +64,17 @@ void samplePDFFDBase::ReadSampleConfig()
   }
   Modes = new MaCh3Modes(SampleManager->raw()["MaCh3ModeConfig"].as<std::string>());
   
+  if (!CheckNodeExists(SampleManager->raw(), "SampleTitle")) {
+    MACH3LOG_ERROR("SampleTitle not defined in {}, please add this!", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  SampleTitle = SampleManager->raw()["SampleTitle"].as<std::string>();
+    
   if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
     MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  samplename = SampleManager->raw()["SampleName"].as<std::string>();
-    
-  if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
-    MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  SampleDetID = SampleManager->raw()["DetID"].as<std::string>();
+  SampleName = SampleManager->raw()["SampleName"].as<std::string>();
 
   if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
     MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
@@ -298,10 +298,10 @@ void samplePDFFDBase::SetupSampleBinning(){
   //The binning here is arbitrary, now we get info from cfg so the
   //set1DBinning and set2Dbinning calls below will make the binning
   //to be what we actually want
-  _hPDF1D   = new TH1D("h"+histname1d+samplename,histtitle, 1, 0, 1);
-  dathist   = new TH1D("d"+histname1d+samplename,histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
+  _hPDF1D   = new TH1D("h"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  dathist   = new TH1D("d"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
 
   //Make some arrays so we can initialise _hPDF1D and _hPDF2D with these
   XBinEdges.reserve(SampleXBins.size());
@@ -726,7 +726,7 @@ M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent)
 }
 
 void samplePDFFDBase::SetupNormParameters() {  
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
+  xsec_norms = XsecCov->GetNormParsFromDetID(SampleName);
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
@@ -1397,7 +1397,7 @@ void samplePDFFDBase::SetupNuOscillator() {
   }// end loop over channels
   delete OscillFactory;
 
-  OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
+  OscParams = OscCov->GetOscParsFromDetID(SampleName);
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
@@ -1422,10 +1422,10 @@ void samplePDFFDBase::fillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          EventSplines = SplineHandler->GetEventSplines(GetTitle(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          EventSplines = SplineHandler->GetEventSplines(GetTitle(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
           break;
         default:
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
@@ -1546,7 +1546,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
+  SplineHandler->AddSample(SampleTitle, SampleName, spline_filepaths, SplineVarNames);
   SplineHandler->CountNumberOfLoadedSplines(false, 1);
   SplineHandler->TransferToMonolith();
 
@@ -1850,8 +1850,8 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   if (printToFile) {
     outfile << "\\begin{table}[ht]" << std::endl;
     outfile << "\\begin{center}" << std::endl;
-    outfile << "\\caption{Integral breakdown for sample: " << GetName() << "}" << std::endl;
-    outfile << "\\label{" << GetName() << "-EventRate}" << std::endl;
+    outfile << "\\caption{Integral breakdown for sample: " << GetTitle() << "}" << std::endl;
+    outfile << "\\label{" << GetTitle() << "-EventRate}" << std::endl;
     
     TString nColumns;
     for (int i=0;i<getNMCSamples();i++) {nColumns+="|c";}
@@ -1862,10 +1862,10 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   if(printToCSV){
     // HI Probably a better way but oh well, here I go making MaCh3 messy again
-    outcsv<<"Integral Breakdown for sample :"<<GetName()<<"\n";
+    outcsv<<"Integral Breakdown for sample :"<<GetTitle()<<"\n";
   }
   
-  MACH3LOG_INFO("Integral breakdown for sample: {}", GetName());
+  MACH3LOG_INFO("Integral breakdown for sample: {}", GetTitle());
   MACH3LOG_INFO("");
 
   if (printToFile) {outfile << std::setw(space) << "Mode:";}
@@ -2013,7 +2013,7 @@ std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string Kinemati
 
 THStack* samplePDFFDBase::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
   std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
-  THStack* StackHist = new THStack((GetName()+"_"+KinematicProjection+"_Stack").c_str(),"");
+  THStack* StackHist = new THStack((GetTitle()+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {
     StackHist->Add(HistList[i]);
   }
