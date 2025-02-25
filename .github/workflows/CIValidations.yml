@@ -36,10 +36,10 @@ jobs:
             test_1: ./CIValidations/CovarianceValidations
             test_2: ./CIValidations/MaCh3ModeValidations
             test_3: ./CIValidations/pValueValidations 
-            test_4: ./CIValidations/UnitTests/manager_tests
-            test_5: ./CIValidations/UnitTests/histogram_tests
-            test_6: ./CIValidations/UnitTests/statistical_tests
-            test_7: empty
+            test_4: ./CIValidations/SigmaVarValidations
+            test_5: ./CIValidations/UnitTests/manager_tests
+            test_6: ./CIValidations/UnitTests/histogram_tests
+            test_7: ./CIValidations/UnitTests/statistical_tests
             test_8: empty
             test_9: empty
 

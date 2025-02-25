@@ -906,7 +906,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
 
       // If the syst doesn't match any of the spline names then skip it
       if (SystNum == -1){
-        MACH3LOG_WARN("Couldn't match!!");
+        MACH3LOG_DEBUG("Couldn't match!!");
         MACH3LOG_DEBUG("Couldn't Match any systematic name in xsec yaml with spline name: {}" , FullSplineName);
         continue;
       }

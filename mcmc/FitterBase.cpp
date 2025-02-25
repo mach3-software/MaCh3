@@ -1061,13 +1061,12 @@ void FitterBase::RunSigmaVar() {
   bool PlotLLHperBin = false;
 
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
-  bool isxsec = false;
   for (covarianceBase *cov : systematics)
   {
     TMatrixDSym *Cov = cov->getCovMatrix();
@@ -1078,13 +1077,7 @@ void FitterBase::RunSigmaVar() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    if (cov->getName() == "xsec_cov")
-    {
-      isxsec = true;
-    } else {
-      isxsec = false;
-    }
-
+    bool isxsec = (cov->getName() == "xsec_cov");
     // Loop over xsec parameters
     for (int i = 0; i < cov->GetNumParams(); ++i)
     {
@@ -1123,10 +1116,10 @@ void FitterBase::RunSigmaVar() {
       // Get the initial value of ith parameter
       double init = cov->getParInit(i);
 
-      TH1D ***sigmaArray_x = new TH1D**[numVar]();
-      TH1D ***sigmaArray_y = new TH1D**[numVar]();
-      TH1D ***sigmaArray_x_norm = new TH1D**[numVar]();
-      TH1D ***sigmaArray_y_norm = new TH1D**[numVar]();
+      std::vector<std::vector<TH1D*>> sigmaArray_x(numVar);
+      std::vector<std::vector<TH1D*>> sigmaArray_y(numVar);
+      std::vector<std::vector<TH1D*>> sigmaArray_x_norm(numVar);
+      std::vector<std::vector<TH1D*>> sigmaArray_y_norm(numVar);
 
       // Set up for single mode
       TH1D ****sigmaArray_mode_x = nullptr;
@@ -1155,10 +1148,10 @@ void FitterBase::RunSigmaVar() {
           samples[ivs]->reweight();
         }
 
-        sigmaArray_x[j] = new TH1D*[TotalNSamples]();
-        sigmaArray_y[j] = new TH1D*[TotalNSamples]();
-        sigmaArray_x_norm[j] = new TH1D*[TotalNSamples]();
-        sigmaArray_y_norm[j] = new TH1D*[TotalNSamples]();
+        sigmaArray_x[j].resize(TotalNSamples);
+        sigmaArray_y[j].resize(TotalNSamples);
+        sigmaArray_x_norm[j].resize(TotalNSamples);
+        sigmaArray_y_norm[j].resize(TotalNSamples);
 
         if (DoByMode)
         {
@@ -1344,15 +1337,7 @@ void FitterBase::RunSigmaVar() {
             SampleIterator++;
           }
         }
-        delete[] sigmaArray_x[j];
-        delete[] sigmaArray_y[j];
-        delete[] sigmaArray_x_norm[j];
-        delete[] sigmaArray_y_norm[j];
       }
-      delete[] sigmaArray_x;
-      delete[] sigmaArray_y;
-      delete[] sigmaArray_x_norm;
-      delete[] sigmaArray_y_norm;
 
       dirArryDial->Close();
       delete dirArryDial;

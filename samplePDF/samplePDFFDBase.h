@@ -288,7 +288,7 @@ public:
   std::unordered_map<std::string, double> _modeNomWeightMap;
   
   //===============================================================================
-  //DB Miscellaneous Variables
+  /// DB Miscellaneous Variables
   TLegend* THStackLeg = nullptr;
   //===============================================================================
 };
