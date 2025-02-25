@@ -726,7 +726,7 @@ M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent)
 }
 
 void samplePDFFDBase::SetupNormParameters() {  
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleName);
+  xsec_norms = XsecCov->GetNormParsFromSampleName(SampleName);
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
@@ -1397,7 +1397,7 @@ void samplePDFFDBase::SetupNuOscillator() {
   }// end loop over channels
   delete OscillFactory;
 
-  OscParams = OscCov->GetOscParsFromDetID(SampleName);
+  OscParams = OscCov->GetOscParsFromSampleName(SampleName);
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {

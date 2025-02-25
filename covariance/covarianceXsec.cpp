@@ -102,14 +102,14 @@ covarianceXsec::~covarianceXsec() {
 }
 
 // ********************************************
-// DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const std::string& DetID) {
+// DB Grab the Spline Names for the relevant SampleName
+const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<std::string> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required Sample
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
 
@@ -118,14 +118,14 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromDetID(const
 }
 
 // ********************************************
-const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFromDetID(const std::string& DetID) {
+const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
 
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required DetID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
   }
@@ -133,8 +133,8 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
 }
 
 // ********************************************
-// DB Grab the Spline Modes for the relevant DetID
-const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(const std::string& DetID) {
+// DB Grab the Spline Modes for the relevant SampleName
+const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
@@ -142,7 +142,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required DetID
       returnVec.push_back(SplineParams.at(SplineIndex)._fSplineModes);
     }
   }
@@ -208,14 +208,14 @@ XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index)
 }
 
 // ********************************************
-// Grab the global syst index for the relevant DetID
+// Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<int> covarianceXsec::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required DetID
       returnVec.push_back(SystIndex);
     }
   }
@@ -223,15 +223,15 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromDetID(const std::st
 }
 
 // ********************************************
-// Grab the global syst index for the relevant DetID
+// Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> covarianceXsec::GetSystIndexFromDetID(const std::string& DetID,  const SystType Type) {
+const std::vector<int> covarianceXsec::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
     auto &systIndex = pair.second;
-    if (AppliesToDetID(systIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(systIndex, SampleName)) { //If parameter applies to required DetID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -263,14 +263,14 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
 }
 
 // ********************************************
-// DB Grab the Normalisation parameters for the relevant DetID
-const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const std::string& DetID) {
+// DB Grab the Normalisation parameters for the relevant SampleName
+const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<XsecNorms4> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
     auto &NormIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    if (AppliesToDetID(GlobalIndex, DetID)) {
+    if (AppliesToSampleName(GlobalIndex, SampleName)) {
       returnVec.push_back(NormParams[NormIndex]);
     }
   }
@@ -278,11 +278,11 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromDetID(const std::st
 }
 
 // ********************************************
-// DB Grab the number of parameters for the relevant DetID
-int covarianceXsec::GetNumParamsFromDetID(const std::string& DetID, const SystType Type) {
+// DB Grab the number of parameters for the relevant SampleName
+int covarianceXsec::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   int returnVal = 0;
-  IterateOverParams(DetID,
+  IterateOverParams(SampleName,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
     [&](int) { returnVal += 1; } // Action to perform if filter passes
   );
@@ -290,11 +290,11 @@ int covarianceXsec::GetNumParamsFromDetID(const std::string& DetID, const SystTy
 }
 
 // ********************************************
-// DB Grab the parameter names for the relevant DetID
-const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const std::string& DetID, const SystType Type) {
+// DB Grab the parameter names for the relevant SampleName
+const std::vector<std::string> covarianceXsec::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   std::vector<std::string> returnVec;
-  IterateOverParams(DetID,
+  IterateOverParams(SampleName,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
     [&](int i) { returnVec.push_back(GetParFancyName(i)); } // Action to perform if filter passes
   );
@@ -302,11 +302,11 @@ const std::vector<std::string> covarianceXsec::GetParsNamesFromDetID(const std::
 }
 
 // ********************************************
-// DB DB Grab the parameter indices for the relevant DetID
-const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const std::string& DetID, const SystType Type) {
+// DB DB Grab the parameter indices for the relevant SampleName
+const std::vector<int> covarianceXsec::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
-  IterateOverParams(DetID,
+  IterateOverParams(SampleName,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
     [&](int i) { returnVec.push_back(i); } // Action to perform if filter passes
   );
@@ -315,10 +315,10 @@ const std::vector<int> covarianceXsec::GetParsIndexFromDetID(const std::string& 
 
 // ********************************************
 template <typename FilterFunc, typename ActionFunc>
-void covarianceXsec::IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action) {
+void covarianceXsec::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
+    if ((AppliesToSampleName(i, SampleName)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }

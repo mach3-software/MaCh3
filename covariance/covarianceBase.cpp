@@ -1210,14 +1210,14 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
 }
 
 // ********************************************
-bool covarianceBase::AppliesToDetID(const int SystIndex, const std::string& DetID) const {
+bool covarianceBase::AppliesToSampleName(const int SystIndex, const std::string& SampleName) const {
 // ********************************************
   // Empty means apply to all
   if (_fDetID[SystIndex].size() == 0) return true;
 
   // Make a copy and to lower case to not be case sensitive
-  std::string DetIDCopy = DetID;
-  std::transform(DetIDCopy.begin(), DetIDCopy.end(), DetIDCopy.begin(), ::tolower);
+  std::string SampleNameCopy = SampleName;
+  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);
   bool Applies = false;
 
   for (size_t i = 0; i < _fDetID[SystIndex].size(); i++) {
@@ -1229,7 +1229,7 @@ bool covarianceBase::AppliesToDetID(const int SystIndex, const std::string& DetI
     std::string regexPattern = "^" + std::regex_replace(pattern, std::regex("\\*"), ".*") + "$";
     try {
       std::regex regex(regexPattern);
-      if (std::regex_match(DetIDCopy, regex)) {
+      if (std::regex_match(SampleNameCopy, regex)) {
         Applies = true;
         break;
       }

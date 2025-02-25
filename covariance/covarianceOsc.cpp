@@ -102,11 +102,11 @@ void covarianceOsc::Print() {
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant DetID
-std::vector<const double*> covarianceOsc::GetOscParsFromDetID(const std::string& DetID) {
+std::vector<const double*> covarianceOsc::GetOscParsFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<const double*> returnVec;
   for (int i = 0; i < _fNumPar; ++i) {
-    if (AppliesToDetID(i, DetID)) {
+    if (AppliesToSampleName(i, SampleName)) {
       returnVec.push_back(retPointer(i));
     }
   }

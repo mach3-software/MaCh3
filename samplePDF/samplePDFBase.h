@@ -30,7 +30,7 @@ class samplePDFBase
   virtual ~samplePDFBase();
 
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
-  virtual inline std::string GetName()const {return "samplePDF";};
+  virtual inline std::string GetTitle()const {return "samplePDF";};
   virtual std::string GetSampleName(int Sample);
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
