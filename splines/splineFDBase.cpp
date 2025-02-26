@@ -769,8 +769,19 @@ std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string Sample
   }
   
   int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
-  //ETA- this is already a MaCh3 mode
-  int Mode = EventMode;
+
+
+  int Mode = -1;
+  std::string SuffixForEventMode = Modes->GetSplineSuffixFromMaCh3Mode(EventMode);
+  for (int iMode=0;iMode<Modes->GetNModes();iMode++) {
+    if (SuffixForEventMode == Modes->GetSplineSuffixFromMaCh3Mode(iMode)) {
+      Mode = iMode;
+      break;
+    }
+  }
+  if (Mode == -1) {
+    return ReturnVec;
+  }
 
   int Var1Bin = SplineBinning[SampleIndex][iOscChan][0]->FindBin(Var1Val)-1;
   if (Var1Bin < 0 || Var1Bin >= SplineBinning[SampleIndex][iOscChan][0]->GetNbins()) {
