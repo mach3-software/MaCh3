@@ -2046,9 +2046,7 @@ void MCMCProcessor::ScanInput() {
   PrintInfo();
 
   nSteps = Chain->GetMaximum("step");
-  // Set the step cut to be 20%
-  int cut = nSteps/5;
-  SetStepCut(cut);
+  SetStepCut(0);
 }
 
 // ****************************

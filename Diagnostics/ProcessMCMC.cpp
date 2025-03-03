@@ -97,6 +97,17 @@ void ProcessMCMC(const std::string& inputFile)
   Processor->SetPost2DPlotThreshold(GetFromManager<double>(Settings["Post2DPlotThreshold"], 0.2));
 
   Processor->Initialise();
+
+  if(Settings["BurnInSteps"])
+  {
+    Processor->SetStepCut(Settings["BurnInSteps"].as<int>());
+  }
+  else
+  {
+    MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
+    Processor->SetStepCut(static_cast<int>(Processor->GetnSteps()/5));
+  }
+
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
