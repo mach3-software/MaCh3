@@ -232,6 +232,14 @@ void FitterBase::SaveOutput() {
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // *************************
+  //Check if the sample has a unique name
+  for (const auto &s : samples) {
+    if (s->GetTitle() == sample->GetTitle()) {
+      MACH3LOG_ERROR("SamplePDF with name '{}' already exists!", sample->GetTitle());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
   TotalNSamples += sample->GetNsamples();
   MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetTitle(), sample->GetNsamples());
   samples.push_back(sample);

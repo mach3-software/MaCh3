@@ -109,7 +109,7 @@ const std::vector<std::string> covarianceXsec::GetSplineParsNamesFromSampleName(
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required Sample
+    if (AppliesToSampleID(SystIndex, SampleName)) { //If parameter applies to required Sample
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
 
@@ -125,7 +125,7 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
 
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required SampleID
+    if (AppliesToSampleID(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
   }
@@ -142,7 +142,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromSample
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required SampleID
+    if (AppliesToSampleID(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineParams.at(SplineIndex)._fSplineModes);
     }
   }
@@ -215,7 +215,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromSampleName(const st
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required SampleID
+    if (AppliesToSampleID(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SystIndex);
     }
   }
@@ -231,7 +231,7 @@ const std::vector<int> covarianceXsec::GetSystIndexFromSampleName(const std::str
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
     auto &systIndex = pair.second;
-    if (AppliesToSampleName(systIndex, SampleName)) { //If parameter applies to required SampleID
+    if (AppliesToSampleID(systIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -270,7 +270,7 @@ const std::vector<XsecNorms4> covarianceXsec::GetNormParsFromSampleName(const st
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
     auto &NormIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    if (AppliesToSampleName(GlobalIndex, SampleName)) {
+    if (AppliesToSampleID(GlobalIndex, SampleName)) {
       returnVec.push_back(NormParams[NormIndex]);
     }
   }
@@ -318,7 +318,7 @@ template <typename FilterFunc, typename ActionFunc>
 void covarianceXsec::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((AppliesToSampleName(i, SampleName)) && filter(i)) { // Common filter logic
+    if ((AppliesToSampleID(i, SampleName)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }

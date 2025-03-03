@@ -1524,7 +1524,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  SplineHandler->AddSample(SampleTitle, SampleName, spline_filepaths, SplineVarNames);
+  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
   SplineHandler->CountNumberOfLoadedSplines(false, 1);
   SplineHandler->TransferToMonolith();
 

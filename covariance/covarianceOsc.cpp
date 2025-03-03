@@ -106,7 +106,7 @@ std::vector<const double*> covarianceOsc::GetOscParsFromSampleName(const std::st
 // ********************************************
   std::vector<const double*> returnVec;
   for (int i = 0; i < _fNumPar; ++i) {
-    if (AppliesToSampleName(i, SampleName)) {
+    if (AppliesToSampleID(i, SampleName)) {
       returnVec.push_back(retPointer(i));
     }
   }

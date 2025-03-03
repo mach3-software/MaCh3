@@ -1210,7 +1210,7 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
 }
 
 // ********************************************
-bool covarianceBase::AppliesToSampleName(const int SystIndex, const std::string& SampleName) const {
+bool covarianceBase::AppliesToSampleID(const int SystIndex, const std::string& SampleName) const {
 // ********************************************
   // Empty means apply to all
   if (_fSampleID[SystIndex].size() == 0) return true;
