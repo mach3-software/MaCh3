@@ -30,7 +30,7 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
   CheckInitialisation("sin2th_23", kSinTheta23);
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
-  flipdelM = false;
+  flipdelM = true;
 
   randomize();
   Print();
