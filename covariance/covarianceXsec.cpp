@@ -59,7 +59,7 @@ void covarianceXsec::InitXsecFromConfig() {
       }
 
       //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
-      //to the Systematic index i.e. the counter for things like _fDetID and _fDetID
+      //to the Systematic index i.e. the counter for things like _fSampleID
       _fSystToGlobalSystIndexMap[SystType::kSpline].insert(std::make_pair(ParamCounter[SystType::kSpline], i));
       ParamCounter[SystType::kSpline]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
@@ -125,7 +125,7 @@ const std::vector<SplineInterpolation> covarianceXsec::GetSplineInterpolationFro
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
 
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
   }
@@ -142,7 +142,7 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromSample
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineParams.at(SplineIndex)._fSplineModes);
     }
   }
@@ -215,7 +215,7 @@ const std::vector<int> covarianceXsec::GetGlobalSystIndexFromSampleName(const st
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SystIndex);
     }
   }
@@ -231,7 +231,7 @@ const std::vector<int> covarianceXsec::GetSystIndexFromSampleName(const std::str
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
     auto &systIndex = pair.second;
-    if (AppliesToSampleName(systIndex, SampleName)) { //If parameter applies to required DetID
+    if (AppliesToSampleName(systIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -380,18 +380,18 @@ void covarianceXsec::Print() {
 void covarianceXsec::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleID", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
-    std::string detIdString = "";
-    for (const auto& detID : _fDetID[i]) {
-      if (!detIdString.empty()) {
-        detIdString += ", ";
+    std::string SampleIdString = "";
+    for (const auto& SampleID : _fSampleID[i]) {
+      if (!SampleIdString.empty()) {
+        SampleIdString += ", ";
       }
-      detIdString += detID;
+      SampleIdString += SampleID;
     }
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", detIdString, "|", SystType_ToString(_fParamType[i]));
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleIdString, "|", SystType_ToString(_fParamType[i]));
   }
   MACH3LOG_INFO("============================================================================================================================================================");
 }

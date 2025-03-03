@@ -83,19 +83,19 @@ void covarianceOsc::Print() {
 
   MACH3LOG_INFO("=================================================================================================================================");
   MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10} {:2} {:<15} {:2} {:<15} {:2} {:<10} {:2} {:<10}",
-                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "DetID");
+                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "SampleID");
   MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < _fNumPar; i++) {
-    std::string detIdString = "";
-    for (const auto& detID : _fDetID[i]) {
-      if (!detIdString.empty()) {
-        detIdString += ", ";
+    std::string SampleIdString = "";
+    for (const auto& SampleID : _fSampleID[i]) {
+      if (!SampleIdString.empty()) {
+        SampleIdString += ", ";
       }
-      detIdString += detID;
+      SampleIdString += SampleID;
     }
 
     MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10.4f} {:2} {:<15.2f} {:2} {:<15.4f} {:2} {:<10} {:2} {:<10}",
-                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", detIdString);
+                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", SampleIdString);
   }
   MACH3LOG_INFO("=================================================================================================================================");
 }

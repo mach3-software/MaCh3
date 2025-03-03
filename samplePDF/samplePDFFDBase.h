@@ -29,7 +29,6 @@ public:
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
   std::string GetTitle() const {return SampleTitle;}
-  //std::string GetTitle() const {return SampleDetID;}
 
   std::string GetXBinVarName() {return XVarStr;}
   std::string GetYBinVarName() {return YVarStr;}

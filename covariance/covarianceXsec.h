@@ -24,7 +24,7 @@ class covarianceXsec : public covarianceBase {
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.
     /// @param i parameter index
-    inline std::vector<std::string> GetParDetID(const int i) const { return _fDetID[i];};
+    inline std::vector<std::string> GetParSampleID(const int i) const { return _fSampleID[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
     inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
@@ -116,7 +116,7 @@ class covarianceXsec : public covarianceBase {
     /// @brief Iterates over parameters and applies a filter and action function.
     ///
     /// This template function provides a way to iterate over parameters associated
-    /// with a specific Detector ID (SampleName). It applies a filter function to determine
+    /// with a specific Sample ID (SampleName). It applies a filter function to determine
     /// which parameters to process and an action function to define what to do
     /// with the selected parameters.
     ///
@@ -124,7 +124,7 @@ class covarianceXsec : public covarianceBase {
     /// which parameters to include.
     /// @tparam ActionFunc The type of the action function applied to each selected
     /// parameter.
-    /// @param SampleName The Detector ID used to filter parameters.
+    /// @param SampleName The Sample ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
     void IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action);
 

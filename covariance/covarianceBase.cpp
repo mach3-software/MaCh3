@@ -195,7 +195,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     _fGenerated[i] = Get<double>(param["Systematic"]["ParameterValues"]["Generated"], __FILE__ , __LINE__);
     _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
-    _fDetID[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["DetID"], {}, __FILE__, __LINE__);
+    _fSampleID[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleID"], {}, __FILE__, __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -323,7 +323,7 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
   _fUpBound = std::vector<double>(SizeVec);
   _fFlatPrior = std::vector<bool>(SizeVec);
   _fIndivStepScale = std::vector<double>(SizeVec);
-  _fDetID = std::vector<std::vector<std::string>>(_fNumPar);
+  _fSampleID = std::vector<std::vector<std::string>>(_fNumPar);
 
   corr_throw = new double[SizeVec]();
   // set random parameter vector (for correlated steps)
@@ -1213,16 +1213,16 @@ void covarianceBase::SaveUpdatedMatrixConfig() {
 bool covarianceBase::AppliesToSampleName(const int SystIndex, const std::string& SampleName) const {
 // ********************************************
   // Empty means apply to all
-  if (_fDetID[SystIndex].size() == 0) return true;
+  if (_fSampleID[SystIndex].size() == 0) return true;
 
   // Make a copy and to lower case to not be case sensitive
   std::string SampleNameCopy = SampleName;
   std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);
   bool Applies = false;
 
-  for (size_t i = 0; i < _fDetID[SystIndex].size(); i++) {
+  for (size_t i = 0; i < _fSampleID[SystIndex].size(); i++) {
     // Convert to low case to not be case sensitive
-    std::string pattern = _fDetID[SystIndex][i];
+    std::string pattern = _fSampleID[SystIndex][i];
     std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
 
     // Replace '*' in the pattern with '.*' for regex matching
