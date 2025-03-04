@@ -174,11 +174,14 @@ void mcmc::ProposeStep() {
   // if we're using the multicanonical method, we need to add the penalty to the likelihood now prior to the Large LLH check
   if (multicanonical){
     // MACH3LOG_INFO("LLH before multicanonical penalty: {}", llh);
+
+    // get the proposed value of delta_cp and apply the multicanonical pentalty, weighting it using the beta value to increase or decrease the strenght of the penalty
     delta_cp_value = systematics[oscCovVar]->getParProp(multicanonicalVar);
-    // MACH3LOG_INFO("Delta CP value: {}", delta_cp_value);
-    multicanonical_penalty = pow(GetMulticanonicalWeight(delta_cp_value),1-multicanonicalBeta);
-    // MACH3LOG_INFO("Multicanonical penalty: {}", multicanonical_penalty);
+    multicanonical_penalty = GetMulticanonicalWeight(delta_cp_value)*(multicanonicalBeta);
     llh += multicanonical_penalty;
+    
+    // MACH3LOG_INFO("Delta CP value: {}", delta_cp_value);
+    // MACH3LOG_INFO("Multicanonical penalty: {}", multicanonical_penalty);
     // MACH3LOG_INFO("LLH after multicanonical penalty: {}", llh);
   }
 
@@ -228,16 +231,19 @@ void mcmc::ProposeStep() {
 }
 
 inline double mcmc::GetMulticanonicalWeight(double deltacp){
-
+  // precalculate constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
-  constexpr double neg_half_sigma = -0.5;
+  constexpr double sigma = 0.5;
+  constexpr double neg_half_sigma_sq = -1/(2*sigma*sigma); // sigma = 1 => -0.5; sigma = 0.5 => -2
 
-  double exp1 = std::exp(neg_half_sigma * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
-  double exp2 = std::exp(neg_half_sigma * (deltacp) * (deltacp));
-  double exp3 = std::exp(neg_half_sigma * (deltacp + TMath::Pi()) * (deltacp + TMath::Pi()));
+  // three gaussians centered at -pi, 0, pi with sigma pre-defined above
+  double exp1 = std::exp(neg_half_sigma_sq * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
+  double exp2 = std::exp(neg_half_sigma_sq * (deltacp) * (deltacp));
+  double exp3 = std::exp(neg_half_sigma_sq * (deltacp + TMath::Pi()) * (deltacp + TMath::Pi()));
   ///delta_cp_log_likelihood = -TMath::Log(TMath::Gaus(deltacp,TMath::Pi(),1,kTRUE)+TMath::Gaus(deltacp,0,1,kTRUE)+TMath::Gaus(deltacp,-TMath::Pi(),1,kTRUE));
 
-  return -std::log(inv_sqrt_2pi * (exp1 + exp2 + exp3));
+  // return the log likelihood, ie the log of the normalised sum of the gaussians
+  return -std::log(inv_sqrt_2pi * (1/sigma) * (exp1 + exp2 + exp3));
 }
 
 // *******************
