@@ -170,6 +170,12 @@ void MultipleProcessMCMC()
   //constexpr Style_t PosteriorStyle[] = {kSolid, kDashed, kDotted};
   nFiles = int(FileNames.size());
   std::vector<std::unique_ptr<MCMCProcessor>> Processor(nFiles);
+
+  if(!Settings["BurnInSteps"])
+  {
+    MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
+  }
+
   for (int ik = 0; ik < nFiles;  ik++)
   {
     MACH3LOG_INFO("File for study: {}", FileNames[ik]);
@@ -186,6 +192,15 @@ void MultipleProcessMCMC()
     Processor[ik]->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false));
     Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true));
     Processor[ik]->Initialise();
+
+    if(Settings["BurnInSteps"])
+    {
+      Processor[ik]->SetStepCut(Settings["BurnInSteps"].as<int>());
+    }
+    else
+    {
+      Processor[ik]->SetStepCut(static_cast<int>(Processor[ik]->GetnSteps()/5));
+    }
   }
   //KS: Multithreading here is very tempting but there are some issues with root that need to be resovled :(
   for (int ik = 0; ik < nFiles;  ik++)
