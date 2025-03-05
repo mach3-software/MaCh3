@@ -151,8 +151,8 @@ void mcmc::ProposeStep() {
         std::string total_steps_str = std::to_string(AdaptiveHandler->total_steps);
         std::string syst_name_str = systematics[s]->getName();
         TMatrixDSym* adacov_save = static_cast<TMatrixDSym*>(AdaptiveHandler->adaptive_covariance->Clone());
-        TVectorD* outMeanVec = new TVectorD((int) AdaptiveHandler->par_means.size());
-        for(int i = 0; i < (int)AdaptiveHandler->par_means.size(); i++){
+        TVectorD* outMeanVec = new TVectorD(static_cast<int>(AdaptiveHandler->par_means.size()));
+        for(int i = 0; i < static_cast<int>(AdaptiveHandler->par_means.size()); i++){
           (*outMeanVec)(i) = AdaptiveHandler->par_means[i];
         }
         std::string adacov_name = total_steps_str+'_'+syst_name_str+std::string ("_throw_matrix");

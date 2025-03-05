@@ -35,6 +35,7 @@ void covarianceXsec::InitXsecFromConfig() {
   //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
   NormParams.reserve(_fNumPar);
   SplineParams.reserve(_fNumPar);
+  FuncParams.reserve(_fNumPar);
 
   int i = 0;
   unsigned int ParamCounter[SystType::kSystTypes] = {0};
@@ -71,6 +72,7 @@ void covarianceXsec::InitXsecFromConfig() {
       ParamCounter[SystType::kNorm]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
       _fParamType[i] = SystType::kFunc;
+      FuncParams.push_back(GetFuncPars(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
       ParamCounter[SystType::kFunc]++;
     } else{
@@ -95,6 +97,7 @@ void covarianceXsec::InitXsecFromConfig() {
   //KS We resized them above to all params to fight memory fragmentation, now let's resize to fit only allocated memory to save RAM
   NormParams.shrink_to_fit();
   SplineParams.shrink_to_fit();
+  FuncParams.shrink_to_fit();
 }
 
 // ********************************************
@@ -149,6 +152,47 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
     }
   }
   return returnVec;
+}
+
+// ********************************************
+// Get Func params
+FuncPars covarianceXsec::GetFuncPars(const YAML::Node& param, const int Index) {
+// ********************************************
+  FuncPars func;
+  func.name = GetParFancyName(Index);
+  func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
+  func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
+  func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
+  func.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], std::vector<int>(), __FILE__ , __LINE__);
+  std::cout << "Hi this is GetFuncPars" << std::endl;
+  std::cout << "Index: " << Index << std::endl;
+  std::cout << "func.name: " << func.name << std::endl;
+  // HH - Copied from GetXsecNorm
+  int NumKinematicCuts = 0;
+  if(param["KinematicCuts"]){
+
+    NumKinematicCuts = int(param["KinematicCuts"].size());
+
+    std::vector<std::string> TempKinematicStrings;
+    std::vector<std::vector<double>> TempKinematicBounds;
+    //First element of TempKinematicBounds is always -999, and size is then 3
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
+      //ETA: This is a bit messy, Kinematic cuts is a list of maps
+      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
+        TempKinematicStrings.push_back(it->first.as<std::string>());
+        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+      }
+      if(TempKinematicStrings.size() == 0) {
+        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("For Param {}", func.name);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }//KinVar_i
+    func.KinematicVarStr = TempKinematicStrings;
+    func.Selection = TempKinematicBounds;
+  }
+  func.index = Index;
+  return func;
 }
 
 // ********************************************
@@ -262,6 +306,21 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
   Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 
   return Spline;
+}
+
+// ********************************************
+// HH: Grab the Functional parameters for the relevant DetID
+const std::vector<FuncPars> covarianceXsec::GetFuncParsFromDetID(const int DetID) {
+  // ********************************************
+  std::vector<FuncPars> returnVec;
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
+    auto &FuncIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+    if (AppliesToDetID(GlobalIndex, DetID)) {
+      returnVec.push_back(FuncParams[FuncIndex]);
+    }
+  }
+  return returnVec;
 }
 
 // ********************************************

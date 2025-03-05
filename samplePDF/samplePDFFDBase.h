@@ -216,6 +216,9 @@ public:
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
 
+  /// @brief Information to store for functional parameters
+  std::vector<FuncPars> funcParsVec;
+
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
