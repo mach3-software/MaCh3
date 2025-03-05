@@ -108,8 +108,9 @@ CovType* MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
   CovObject->setStepScale(StepScale);
 
   // Adaptive MCMC stuff
-  if(FitManager->raw()["AdaptionOptions"])
-    CovObject->initialiseAdaption(FitManager->raw());
+  // HH: Commented out the check for AdaptiveMCMC, as it should be set in Fit.cpp or RunAdaptiveMCMC.cpp.
+  // if(FitManager->raw()["AdaptionOptions"])
+  //   CovObject->initialiseAdaption(FitManager->raw());
 
   MACH3LOG_INFO("Factory successful");
 
