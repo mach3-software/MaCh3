@@ -873,9 +873,24 @@ void FitterBase::Run2DLLHScan() {
   }
 
   // Number of points we do for each LLH scan
-  constexpr int n_points = 20;
+  const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["2DLLHScanPoints"], 20, __FILE__ , __LINE__);
   // We print 5 reweights
-  constexpr int countwidth = double(n_points)/double(5);
+  const int countwidth = int(double(n_points)/double(5));
+
+  std::map<std::string, std::vector<double>> scanRanges;
+  bool isScanRanges = false;
+  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
+    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
+    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
+      std::string itname = it->first.as<std::string>();
+      std::vector<double> itrange = it->second.as<std::vector<double>>();
+      // Set the mapping as param_name:param_range
+      scanRanges[itname] = itrange;
+    }
+    isScanRanges = true;
+  } else {
+    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
+  }
 
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
@@ -913,6 +928,17 @@ void FitterBase::Run2DLLHScan() {
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+      }
+      // If param ranges are specified in scanRanges node, extract it from there
+      if(isScanRanges){
+        // Find matching entries through std::maps
+        auto it = scanRanges.find(name_x);
+        if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+          lower_x = it->second[0];
+          upper_x = it->second[1];
+          MACH3LOG_INFO("Found matching param name for setting specified range for {}", name_x);
+          MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name_x, lower_x, upper_x);
+        }
       }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
@@ -968,6 +994,17 @@ void FitterBase::Run2DLLHScan() {
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+        }
+        // If param ranges are specified in scanRanges node, extract it from there
+        if(isScanRanges){
+          // Find matching entries through std::maps
+          auto it = scanRanges.find(name_y);
+          if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+            lower_y = it->second[0];
+            upper_y = it->second[1];
+            MACH3LOG_INFO("Found matching param name for setting specified range for {}", name_y);
+            MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name_y, lower_y, upper_y);
+          }
         }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
