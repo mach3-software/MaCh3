@@ -420,7 +420,7 @@ protected:
   /// @brief Check if parameter is affecting given sample name
   /// @param SystIndex number of parameter
   /// @param SampleName The Sample name used to filter parameters.
-  bool AppliesToSampleID(const int SystIndex, const std::string& SampleName) const;
+  bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
 
   /// The input root file we read in
   const std::string inputFile;
@@ -474,7 +474,7 @@ protected:
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
-  std::vector<std::vector<std::string>> _fSampleID;
+  std::vector<std::vector<std::string>> _fSampleNames;
 
   /// perform PCA or not
   bool pca;

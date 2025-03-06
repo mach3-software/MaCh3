@@ -83,30 +83,30 @@ void covarianceOsc::Print() {
 
   MACH3LOG_INFO("=================================================================================================================================");
   MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10} {:2} {:<15} {:2} {:<15} {:2} {:<10} {:2} {:<10}",
-                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "SampleID");
+                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "SampleNames");
   MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < _fNumPar; i++) {
-    std::string SampleIdString = "";
-    for (const auto& SampleID : _fSampleID[i]) {
-      if (!SampleIdString.empty()) {
-        SampleIdString += ", ";
+    std::string SampleNameString = "";
+    for (const auto& SampleName : _fSampleNames[i]) {
+      if (!SampleNameString.empty()) {
+        SampleNameString += ", ";
       }
-      SampleIdString += SampleID;
+      SampleNameString += SampleName;
     }
 
     MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10.4f} {:2} {:<15.2f} {:2} {:<15.4f} {:2} {:<10} {:2} {:<10}",
-                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", SampleIdString);
+                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", SampleNameString);
   }
   MACH3LOG_INFO("=================================================================================================================================");
 }
 
 // ********************************************
-// DB Grab the Normalisation parameters for the relevant DetID
+// DB Grab the Normalisation parameters for the relevant sample name
 std::vector<const double*> covarianceOsc::GetOscParsFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<const double*> returnVec;
   for (int i = 0; i < _fNumPar; ++i) {
-    if (AppliesToSampleID(i, SampleName)) {
+    if (AppliesToSample(i, SampleName)) {
       returnVec.push_back(retPointer(i));
     }
   }

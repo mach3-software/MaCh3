@@ -24,7 +24,7 @@ class covarianceXsec : public covarianceBase {
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.
     /// @param i parameter index
-    inline std::vector<std::string> GetParSampleID(const int i) const { return _fSampleID[i];};
+    inline std::vector<std::string> GetParSampleID(const int i) const { return _fSampleNames[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
     inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
