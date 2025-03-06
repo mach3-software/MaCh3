@@ -68,9 +68,9 @@ void covarianceOsc::proposeStep() {
 void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
 // *************************************
   if(_fPropVal[index] > UpBound) {
-    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
   } else if (_fPropVal[index] < LowBound) {
-    _fPropVal[index] = UpBound + std::fmod(_fPropVal[index], UpBound);
+    _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
   }
 }
 
