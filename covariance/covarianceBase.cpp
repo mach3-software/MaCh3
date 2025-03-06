@@ -195,7 +195,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
     _fGenerated[i] = Get<double>(param["Systematic"]["ParameterValues"]["Generated"], __FILE__ , __LINE__);
     _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
-    _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleID"], {}, __FILE__, __LINE__);
+    _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleNames"], {}, __FILE__, __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
       throw MaCh3Exception(__FILE__ , __LINE__ );

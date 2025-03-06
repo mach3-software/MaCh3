@@ -28,6 +28,7 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  std::string GetName() const {return SampleName;}
   std::string GetTitle() const {return SampleTitle;}
 
   std::string GetXBinVarName() {return XVarStr;}
