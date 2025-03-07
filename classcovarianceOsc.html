@@ -766,9 +766,9 @@ Asher Kaboth </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">   68</span>                                                                                              {</div>
 <div class="line"><span class="lineno">   69</span><span class="comment">// *************************************</span></div>
 <div class="line"><span class="lineno">   70</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] &gt; UpBound) {</div>
-<div class="line"><span class="lineno">   71</span>    <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] = LowBound + std::fmod(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index], UpBound);</div>
+<div class="line"><span class="lineno">   71</span>    <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] = LowBound + std::fmod(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] - UpBound, UpBound - LowBound);</div>
 <div class="line"><span class="lineno">   72</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] &lt; LowBound) {</div>
-<div class="line"><span class="lineno">   73</span>    <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] = UpBound + std::fmod(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index], UpBound);</div>
+<div class="line"><span class="lineno">   73</span>    <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index] = UpBound - std::fmod(LowBound - <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[index], UpBound - LowBound);</div>
 <div class="line"><span class="lineno">   74</span>  }</div>
 <div class="line"><span class="lineno">   75</span>}</div>
 </div><!-- fragment -->
