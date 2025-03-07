@@ -387,7 +387,8 @@ void samplePDFFDBase::fillArray() {
   size_t nXBins = int(XBinEdges.size()-1);
   //size_t nYBins = int(YBinEdges.size()-1);
 
-  PrepFunctionalParameters();
+  // HH todo: remove prepfunctionalparameters after checking with ETA
+  // PrepFunctionalParameters();
   if(SplineHandler){
     SplineHandler->Evaluate();
   }
@@ -487,7 +488,7 @@ void samplePDFFDBase::fillArray_MP()  {
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
 
-  PrepFunctionalParameters();
+  // PrepFunctionalParameters();
   //==================================================
   //Calc Weights and fill Array
   if(SplineHandler){
@@ -664,6 +665,69 @@ void samplePDFFDBase::ResetHistograms() {
     }
   }
 } // end function
+
+void samplePDFFDBase::SetupFunctionalParameters() {
+  MACH3LOG_INFO("Setting up functional parameters");
+  funcParsVec = XsecCov->GetFuncParsFromDetID(SampleDetID);
+  RegisterFunctionalParameters();
+  // Mostly the same as CalcXsecNormsBins
+  // For each event, make a vector of pointers to the functional parameters
+  for (std::size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    funcParsGrid[iSample].resize(static_cast<std::size_t>(MCSamples[iSample].nEvents));
+    for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(MCSamples[iSample].nEvents); ++iEvent) {
+      // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
+      for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+        // Check whether the interaction modes match
+        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCSamples[iSample].mode[iEvent]))));
+        if (!ModeMatch) {
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCSamples[iSample].mode[iEvent]), (*it).name);
+          continue;
+        }
+        // Now check whether within kinematic bounds
+        bool IsSelected = true;
+        if ((*it).hasKinBounds) {
+          for (std::size_t iKinPar = 0; iKinPar < (*it).KinematicVarStr.size(); ++iKinPar) {
+            // Check lower bound
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) <= (*it).Selection[iKinPar][0]) {
+              IsSelected = false;
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              continue;
+            }
+            // Check upper bound
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) > (*it).Selection[iKinPar][1]) {
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              IsSelected = false;
+              continue;
+            }
+          }
+        }
+        // Need to then break the event loop
+        if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
+          continue;
+        }
+        auto funcparenum = funcParsNamesMap[(*it).name];
+        funcParsGrid.at(iSample).at(iEvent).push_back(funcparenum);
+      }
+    }
+  }
+  MACH3LOG_INFO("Finished setting up functional parameters");
+}
+
+void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
+  // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
+  for (std::vector<int>::iterator it = funcParsGrid.at(iSample).at(iEvent).begin(); it != funcParsGrid.at(iSample).at(iEvent).end(); ++it) {
+    // Check if func exists
+    // HH: Commented this out because this if statemnt will get checked very often so very slow. 
+    // if (funcParsMap.find(*it) == funcParsMap.end()) {
+    //   MACH3LOG_ERROR("Functional parameter {} not found in map", *it);
+    //   throw MaCh3Exception(__FILE__, __LINE__);
+    // }
+    funcParsFuncMap[*it](XsecCov->retPointer(funcParsMap[*it]->index), iSample, iEvent);
+  }
+}
+// =================================
+
 
 // ***************************************************************************
 // Calculate the spline weight for one event

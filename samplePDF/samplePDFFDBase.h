@@ -147,12 +147,29 @@ public:
   std::vector<double> SampleYBins;
   //===============================================================================
 
+  // ----- Functional Parameters -----
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
-  virtual void SetupFunctionalParameters(){};
+  virtual void SetupFunctionalParameters();
+  /// @brief HH - a experiment-specific function where the maps to actual functions are set up
+  virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
-  virtual void PrepFunctionalParameters(){};
+  // HH: I don't think this function will be needed
+  // virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
+  virtual void applyShifts(int iSample, int iEvent);
+  /// @brief HH - a vector that stores all the FuncPars struct
+  std::vector<FuncPars> funcParsVec;
+  /// @brief HH - a map that relates the name of the functional parameter to funcpar enum
+  std::unordered_map<std::string, int> funcParsNamesMap;
+  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars struct
+  std::unordered_map<int, FuncPars*> funcParsMap;
+  /// @brief HH - a map that relates the funcpar enum to pointer of the actual function
+  std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
+  /// @brief HH - a grid of vectors of enums for each sample and event
+  std::vector<std::vector<std::vector<int>>> funcParsGrid;
+  // --------------------------------
+
+
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
 

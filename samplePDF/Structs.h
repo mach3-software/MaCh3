@@ -117,6 +117,43 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
   return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
 
+// HH - a shorthand type for funcpar functions
+using FuncParFuncType = std::function<void (const double*, std::size_t, std::size_t)>;
+// *******************
+/// @brief HH - Functional parameters
+/// Carrier for whether you want to apply a systematic to an event or not
+struct FuncPars {
+// *******************
+  /// Name of parameters
+  std::string name;
+  /// Mode which parameter applies to
+  std::vector<int> modes;
+  /// Horn currents which parameter applies to
+  std::vector<int> horncurrents;
+  /// PDG which parameter applies to
+  std::vector<int> pdgs;
+  /// Preosc PDG which parameter applies to
+  std::vector<int> preoscpdgs;
+  /// Targets which parameter applies to
+  std::vector<int> targets;
+  /// Does this parameter have kinematic bounds
+  bool hasKinBounds;
+  /// Generic vector contain enum relating to a kinematic variable
+  /// and lower and upper bounds. This can then be passed to IsEventSelected
+  std::vector< std::vector<double> > Selection;
+
+  /// Generic vector containing the string of kinematic type
+  /// This then needs to be converted to a kinematic type enum
+  /// within a samplePDF daughter class
+  /// The bounds for each kinematic variable are given in Selection
+  std::vector< std::string > KinematicVarStr;
+
+  /// Parameter number of this functional in current systematic model
+  int index;
+
+};
+
+
 // *******************
 /// @brief ETA - Normalisations for cross-section parameters
 /// Carrier for whether you want to apply a systematic to an event or not
