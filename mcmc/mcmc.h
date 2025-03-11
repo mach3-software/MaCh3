@@ -51,13 +51,15 @@ class mcmc : public FitterBase {
   /// simulated annealing temperature
   double AnnealTemp;
 
-  /// multi-canonical method
+  /// multi-canonical method toggle on/off
   bool multicanonical;
   /// multi-canonical beta
   double multicanonicalBeta;
+  /// multi-canonical sigma
+  double multicanonicalSigma;
   /// multi-canonical penalty
   double multicanonical_penalty;
-  /// osc_cov systematic
+  /// osc_cov systematic variable we wish to apply multicanonical to
   int oscCovVar;
   /// multi-canonical par number
   int multicanonicalVar;

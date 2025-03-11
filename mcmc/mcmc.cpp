@@ -84,6 +84,7 @@ void mcmc::runMCMC() {
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
   if (multicanonical) {
     multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
+    multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
     MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
     MACH3LOG_INFO("Looping over systematics to find delta_cp parameter");
     for (size_t s = 0; s < systematics.size(); s++) {
@@ -233,8 +234,8 @@ void mcmc::ProposeStep() {
 inline double mcmc::GetMulticanonicalWeight(double deltacp){
   // precalculate constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
-  constexpr double sigma = 0.5;
-  constexpr double neg_half_sigma_sq = -1/(2*sigma*sigma); // sigma = 1 => -0.5; sigma = 0.5 => -2
+  double sigma = multicanonicalSigma;
+  double neg_half_sigma_sq = -1/(2*sigma*sigma); // sigma = 1 => -0.5; sigma = 0.5 => -2
 
   // three gaussians centered at -pi, 0, pi with sigma pre-defined above
   double exp1 = std::exp(neg_half_sigma_sq * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
