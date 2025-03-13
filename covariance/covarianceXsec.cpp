@@ -301,6 +301,7 @@ FuncPars covarianceXsec::GetFuncPars(const YAML::Node& param, const int Index) {
     func.Selection = TempKinematicBounds;
   }
   func.index = Index;
+  func.valuePtr = retPointer(Index);
   return func;
 }
 

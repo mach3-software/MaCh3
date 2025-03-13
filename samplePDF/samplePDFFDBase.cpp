@@ -387,8 +387,7 @@ void samplePDFFDBase::fillArray() {
   size_t nXBins = int(XBinEdges.size()-1);
   //size_t nYBins = int(YBinEdges.size()-1);
 
-  // HH todo: remove prepfunctionalparameters after checking with ETA
-  // PrepFunctionalParameters();
+  PrepFunctionalParameters();
   if(SplineHandler){
     SplineHandler->Evaluate();
   }
@@ -488,7 +487,7 @@ void samplePDFFDBase::fillArray_MP()  {
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
 
-  // PrepFunctionalParameters();
+  PrepFunctionalParameters();
   //==================================================
   //Calc Weights and fill Array
   if(SplineHandler){
@@ -716,6 +715,7 @@ void samplePDFFDBase::SetupFunctionalParameters() {
 
 void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
+  // HH: .at() can be replaced with [] for speed if necessary
   for (std::vector<int>::iterator it = funcParsGrid.at(iSample).at(iEvent).begin(); it != funcParsGrid.at(iSample).at(iEvent).end(); ++it) {
     // Check if func exists
     // HH: Commented this out because this if statemnt will get checked very often so very slow. 
@@ -723,7 +723,7 @@ void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
     //   MACH3LOG_ERROR("Functional parameter {} not found in map", *it);
     //   throw MaCh3Exception(__FILE__, __LINE__);
     // }
-    funcParsFuncMap[*it](XsecCov->retPointer(funcParsMap[*it]->index), iSample, iEvent);
+    funcParsFuncMap[*it](funcParsMap[*it]->valuePtr, iSample, iEvent);
   }
 }
 // =================================

@@ -154,7 +154,7 @@ public:
   virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   // HH: I don't think this function will be needed
-  // virtual void PrepFunctionalParameters(){};
+  virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent);
   /// @brief HH - a vector that stores all the FuncPars struct

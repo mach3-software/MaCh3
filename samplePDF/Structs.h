@@ -151,6 +151,9 @@ struct FuncPars {
   /// Parameter number of this functional in current systematic model
   int index;
 
+  /// Parameter value pointer
+  const double* valuePtr;
+
 };
 
 
