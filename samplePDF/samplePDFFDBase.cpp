@@ -66,6 +66,11 @@ void samplePDFFDBase::ReadSampleConfig()
   SampleDetID = Get<std::string>(SampleManager->raw()["DetID"], __FILE__ , __LINE__);
   NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
+
+  // TN override the sample setting if not using binned oscillation
+  if (EqualBinningPerOscChannel) {
+    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() != "Binned") EqualBinningPerOscChannel = false;
+  }
   
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
