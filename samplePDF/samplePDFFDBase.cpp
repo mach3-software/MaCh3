@@ -69,7 +69,10 @@ void samplePDFFDBase::ReadSampleConfig()
 
   // TN override the sample setting if not using binned oscillation
   if (EqualBinningPerOscChannel) {
-    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() != "Binned") EqualBinningPerOscChannel = false;
+    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() != "Binned") {
+      MACH3LOG_WARN("Tried using EqualBinningPerOscChannel while using Unbinned oscillation calculation, changing EqualBinningPerOscChannel to false");
+      EqualBinningPerOscChannel = false;
+    }
   }
   
   //Default TestStatistic is kPoisson
