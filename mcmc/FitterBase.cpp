@@ -136,7 +136,7 @@ void FitterBase::SaveSettings() {
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->getName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i)
-    MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNsamples());
+    MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetTitle(), samples[i]->GetNsamples());
 
   SettingsSaved = true;
 }
@@ -232,8 +232,16 @@ void FitterBase::SaveOutput() {
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // *************************
+  //Check if the sample has a unique name
+  for (const auto &s : samples) {
+    if (s->GetTitle() == sample->GetTitle()) {
+      MACH3LOG_ERROR("SamplePDF with name '{}' already exists!", sample->GetTitle());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
   TotalNSamples += sample->GetNsamples();
-  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());
+  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetTitle(), sample->GetNsamples());
   samples.push_back(sample);
 }
 
@@ -404,7 +412,7 @@ void FitterBase::DragRace(const int NLaps) {
       samples[ivs]->reweight();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
@@ -416,7 +424,7 @@ void FitterBase::DragRace(const int NLaps) {
       samples[ivs]->GetLikelihood();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   // Get vector of proposed steps. If we want to run LLH scan or something else after we need to revert changes after proposing steps multiple times
@@ -485,7 +493,7 @@ void FitterBase::RunLLHScan() {
   std::vector<TDirectory *> SampleClass_LLH(samples.size());
   for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
-    std::string NameTemp = samples[ivs]->GetName();
+    std::string NameTemp = samples[ivs]->GetTitle();
     SampleClass_LLH[ivs] = outputFile->mkdir(NameTemp.c_str());
   }
 
@@ -613,7 +621,7 @@ void FitterBase::RunLLHScan() {
       std::vector<double> nSamLLH(samples.size());
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
-        std::string NameTemp = samples[ivs]->GetName();
+        std::string NameTemp = samples[ivs]->GetTitle();
         hScanSample[ivs] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
         hScanSample[ivs]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
         nSamLLH[ivs] = 0.;
