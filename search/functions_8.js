@@ -11,8 +11,8 @@ var searchData=
   ['initgpu_5fsegments_8',['InitGPU_Segments',['../classSMonolithGPU.html#ab674ec40c136d89b56b7c25d9337c48a',1,'SMonolithGPU']]],
   ['initgpu_5fsplinemonolith_9',['InitGPU_SplineMonolith',['../classSMonolithGPU.html#a713a47fd41a93d2b6d40c4b392158aae',1,'SMonolithGPU']]],
   ['initgpu_5fvals_10',['InitGPU_Vals',['../classSMonolithGPU.html#a3fbbb94f6db65b73a394ab541f94fba6',1,'SMonolithGPU']]],
-  ['initialise_11',['Initialise',['../classSMonolith.html#a45cece9dcbe699e00a7b5fdff4806c1e',1,'SMonolith::Initialise()'],['../classsamplePDFFDBase.html#a467d6daa511ba737b72508b81424f771',1,'samplePDFFDBase::Initialise()'],['../classMCMCProcessor.html#a224995a0b47bd9cbd04e099cc3ca634c',1,'MCMCProcessor::Initialise()']]],
-  ['initialise_12',['initialise',['../classMaCh3Plotting_1_1PlottingManager.html#a20fbe3c9673f14adb46d3cd8919e306d',1,'MaCh3Plotting::PlottingManager']]],
+  ['initialise_11',['initialise',['../classMaCh3Plotting_1_1PlottingManager.html#a20fbe3c9673f14adb46d3cd8919e306d',1,'MaCh3Plotting::PlottingManager']]],
+  ['initialise_12',['Initialise',['../classSMonolith.html#a45cece9dcbe699e00a7b5fdff4806c1e',1,'SMonolith::Initialise()'],['../classsamplePDFFDBase.html#a467d6daa511ba737b72508b81424f771',1,'samplePDFFDBase::Initialise()'],['../classMCMCProcessor.html#a224995a0b47bd9cbd04e099cc3ca634c',1,'MCMCProcessor::Initialise()']]],
   ['initialiseadaption_13',['initialiseAdaption',['../classcovarianceBase.html#a715900cc67fcc598090399ee931938e9',1,'covarianceBase']]],
   ['initialisearrays_14',['InitialiseArrays',['../RHat__HighMem_8cpp.html#a3efe8085dcbead1e66a6cf54fc77ab5e',1,'InitialiseArrays():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#a3efe8085dcbead1e66a6cf54fc77ab5e',1,'InitialiseArrays():&#160;RHat.cpp']]],
   ['initialisesinglefdmcobject_15',['InitialiseSingleFDMCObject',['../classsamplePDFFDBase.html#aa6cc1362cd06179646b70626f0136f44',1,'samplePDFFDBase']]],
@@ -36,5 +36,5 @@ var searchData=
   ['isparfromgroup_33',['IsParFromGroup',['../classcovarianceXsec.html#a5dc8900054a498107e39cc41641879a8',1,'covarianceXsec']]],
   ['ispca_34',['IsPCA',['../classcovarianceBase.html#a30f3f34243be0f6bc901e525497e7f56',1,'covarianceBase']]],
   ['isvalidsplineindex_35',['isValidSplineIndex',['../classsplineFDBase.html#a2b026cd74035f56db3790f1eea49de92',1,'splineFDBase']]],
-  ['iterateoverparams_36',['IterateOverParams',['../classcovarianceXsec.html#aac73e73f40bb12093fad83cac21dcc1c',1,'covarianceXsec']]]
+  ['iterateoverparams_36',['IterateOverParams',['../classcovarianceXsec.html#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb',1,'covarianceXsec']]]
 ];

@@ -139,9 +139,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af84383b735f450c33c9c34f7ca207a66"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#af84383b735f450c33c9c34f7ca207a66">~covarianceXsec</a> ()</td></tr>
 <tr class="memdesc:af84383b735f450c33c9c34f7ca207a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <br /></td></tr>
 <tr class="separator:af84383b735f450c33c9c34f7ca207a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57481989a97f1e2f9e094db3f253cc51"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a57481989a97f1e2f9e094db3f253cc51">GetParDetID</a> (const int i) const</td></tr>
-<tr class="memdesc:a57481989a97f1e2f9e094db3f253cc51"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - just return the int of the DetID, this can be removed to do a string comp at some point.  <br /></td></tr>
-<tr class="separator:a57481989a97f1e2f9e094db3f253cc51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a80b4fdbe06578c1a3e62c4fe689a10"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a4a80b4fdbe06578c1a3e62c4fe689a10">GetParSampleID</a> (const int i) const</td></tr>
+<tr class="memdesc:a4a80b4fdbe06578c1a3e62c4fe689a10"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.  <br /></td></tr>
+<tr class="separator:a4a80b4fdbe06578c1a3e62c4fe689a10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a917350cc0ea76530145086b8943b0d23"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a917350cc0ea76530145086b8943b0d23">GetParamTypeString</a> (const int i) const</td></tr>
 <tr class="memdesc:a917350cc0ea76530145086b8943b0d23"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - just return a string of "spline", "norm" or "functional".  <br /></td></tr>
 <tr class="separator:a917350cc0ea76530145086b8943b0d23"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,45 +151,45 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6e7661f9bd67500b66c7499f776b594d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a6e7661f9bd67500b66c7499f776b594d">GetParSplineInterpolation</a> (const int i)</td></tr>
 <tr class="memdesc:a6e7661f9bd67500b66c7499f776b594d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get interpolation type for a given parameter.  <br /></td></tr>
 <tr class="separator:a6e7661f9bd67500b66c7499f776b594d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31ec21d902da40866b905e6ef55aef1e"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a31ec21d902da40866b905e6ef55aef1e">GetSplineInterpolationFromDetID</a> (const std::string &amp;DetID)</td></tr>
-<tr class="memdesc:a31ec21d902da40866b905e6ef55aef1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the interpolation types for splines affecting a particular DetID.  <br /></td></tr>
-<tr class="separator:a31ec21d902da40866b905e6ef55aef1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12d5c8f313a02b91759dd6dee5c91055"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a12d5c8f313a02b91759dd6dee5c91055">GetSplineInterpolationFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:a12d5c8f313a02b91759dd6dee5c91055"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the interpolation types for splines affecting a particular SampleName.  <br /></td></tr>
+<tr class="separator:a12d5c8f313a02b91759dd6dee5c91055"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adce4b39e20a140acd8314049e2cca05b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#adce4b39e20a140acd8314049e2cca05b">GetParSplineName</a> (const int i)</td></tr>
 <tr class="memdesc:adce4b39e20a140acd8314049e2cca05b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the spline associated with the spline at index i.  <br /></td></tr>
 <tr class="separator:adce4b39e20a140acd8314049e2cca05b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac580752fdcf84f1f6298c29e15b7fbb5"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ac580752fdcf84f1f6298c29e15b7fbb5">GetGlobalSystIndexFromDetID</a> (const std::string &amp;DetID, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
-<tr class="memdesc:ac580752fdcf84f1f6298c29e15b7fbb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given DetID.  <br /></td></tr>
-<tr class="separator:ac580752fdcf84f1f6298c29e15b7fbb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa935df1b6684ce8809ab7dd5053727b9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#aa935df1b6684ce8809ab7dd5053727b9">GetGlobalSystIndexFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:aa935df1b6684ce8809ab7dd5053727b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:aa935df1b6684ce8809ab7dd5053727b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac612a0f939f2f070906af574f98590d6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ac612a0f939f2f070906af574f98590d6">GetParSplineKnotUpperBound</a> (const int i)</td></tr>
 <tr class="memdesc:ac612a0f939f2f070906af574f98590d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">EM: value at which we cap spline knot weight.  <br /></td></tr>
 <tr class="separator:ac612a0f939f2f070906af574f98590d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ea6bd6b0e021f154ebd1f23605ff3e5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a9ea6bd6b0e021f154ebd1f23605ff3e5">GetParSplineKnotLowerBound</a> (const int i)</td></tr>
 <tr class="memdesc:a9ea6bd6b0e021f154ebd1f23605ff3e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">EM: value at which we cap spline knot weight.  <br /></td></tr>
 <tr class="separator:a9ea6bd6b0e021f154ebd1f23605ff3e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4f92efb89282448bc65d69238147566"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ab4f92efb89282448bc65d69238147566">GetNumParamsFromDetID</a> (const std::string &amp;DetID, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
-<tr class="memdesc:ab4f92efb89282448bc65d69238147566"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the number of parameters for the relevant DetID.  <br /></td></tr>
-<tr class="separator:ab4f92efb89282448bc65d69238147566"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2feb6b63bd5cd34d3e65157541c1b8d"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ad2feb6b63bd5cd34d3e65157541c1b8d">GetParsNamesFromDetID</a> (const std::string &amp;DetID, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
-<tr class="memdesc:ad2feb6b63bd5cd34d3e65157541c1b8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the parameter names for the relevant DetID.  <br /></td></tr>
-<tr class="separator:ad2feb6b63bd5cd34d3e65157541c1b8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add6dd5652399eb3d0798ae6710c61197"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#add6dd5652399eb3d0798ae6710c61197">GetParsIndexFromDetID</a> (const std::string &amp;DetID, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
-<tr class="memdesc:add6dd5652399eb3d0798ae6710c61197"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the parameter indices for the relevant DetID.  <br /></td></tr>
-<tr class="separator:add6dd5652399eb3d0798ae6710c61197"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9e3666595988885e95c288f6ffd4ff6"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ae9e3666595988885e95c288f6ffd4ff6">GetSplineParsNamesFromDetID</a> (const std::string &amp;DetID)</td></tr>
-<tr class="memdesc:ae9e3666595988885e95c288f6ffd4ff6"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given DetID.  <br /></td></tr>
-<tr class="separator:ae9e3666595988885e95c288f6ffd4ff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8ea9884b81a91ca925c8e6fee5024c2"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#af8ea9884b81a91ca925c8e6fee5024c2">GetSplineFileParsNamesFromDetID</a> (const std::string &amp;DetID)</td></tr>
-<tr class="memdesc:af8ea9884b81a91ca925c8e6fee5024c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given DetID.  <br /></td></tr>
-<tr class="separator:af8ea9884b81a91ca925c8e6fee5024c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4559ca9cbbc02e63d230ee868997d252"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a4559ca9cbbc02e63d230ee868997d252">GetSplineModeVecFromDetID</a> (const std::string &amp;DetID)</td></tr>
-<tr class="memdesc:a4559ca9cbbc02e63d230ee868997d252"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the Spline Modes for the relevant DetID.  <br /></td></tr>
-<tr class="separator:a4559ca9cbbc02e63d230ee868997d252"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5414f8ec095caa4f9f551bdbbec1100"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ab5414f8ec095caa4f9f551bdbbec1100">GetSystIndexFromDetID</a> (const std::string &amp;DetID, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
-<tr class="memdesc:ab5414f8ec095caa4f9f551bdbbec1100"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grab the index of the syst relative to global numbering.  <br /></td></tr>
-<tr class="separator:ab5414f8ec095caa4f9f551bdbbec1100"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09876b9f2541f264f9d8069e468e360f"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structXsecNorms4.html">XsecNorms4</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a09876b9f2541f264f9d8069e468e360f">GetNormParsFromDetID</a> (const std::string &amp;DetID)</td></tr>
-<tr class="memdesc:a09876b9f2541f264f9d8069e468e360f"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get norm/func parameters depending on given DetID.  <br /></td></tr>
-<tr class="separator:a09876b9f2541f264f9d8069e468e360f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28a42828cd75038d671c269484c07be8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a28a42828cd75038d671c269484c07be8">GetNumParamsFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:a28a42828cd75038d671c269484c07be8"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the number of parameters for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:a28a42828cd75038d671c269484c07be8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d07d2528fd814c3961d5c5866873167"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a8d07d2528fd814c3961d5c5866873167">GetParsNamesFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:a8d07d2528fd814c3961d5c5866873167"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the parameter names for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:a8d07d2528fd814c3961d5c5866873167"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8576d0d53a87d74d616bb65d5b74922"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ae8576d0d53a87d74d616bb65d5b74922">GetParsIndexFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:ae8576d0d53a87d74d616bb65d5b74922"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the parameter indices for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:ae8576d0d53a87d74d616bb65d5b74922"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c27ce7331cbb95504feac39fc8c3322"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a2c27ce7331cbb95504feac39fc8c3322">GetSplineParsNamesFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:a2c27ce7331cbb95504feac39fc8c3322"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:a2c27ce7331cbb95504feac39fc8c3322"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a907071ad6ca8cdcda3ca0d3f08afd8c6"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a907071ad6ca8cdcda3ca0d3f08afd8c6">GetSplineFileParsNamesFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:a907071ad6ca8cdcda3ca0d3f08afd8c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:a907071ad6ca8cdcda3ca0d3f08afd8c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fe91a79eb65d4a5116cd88fd4fb50b9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a9fe91a79eb65d4a5116cd88fd4fb50b9">GetSplineModeVecFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:a9fe91a79eb65d4a5116cd88fd4fb50b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the Spline Modes for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:a9fe91a79eb65d4a5116cd88fd4fb50b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e3861cdf9020430f49b8d608544ea68"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a4e3861cdf9020430f49b8d608544ea68">GetSystIndexFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:a4e3861cdf9020430f49b8d608544ea68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grab the index of the syst relative to global numbering.  <br /></td></tr>
+<tr class="separator:a4e3861cdf9020430f49b8d608544ea68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c13113774952dfcae4420b4f399dbc"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structXsecNorms4.html">XsecNorms4</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#ab7c13113774952dfcae4420b4f399dbc">GetNormParsFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:ab7c13113774952dfcae4420b4f399dbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get norm/func parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:ab7c13113774952dfcae4420b4f399dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98cf4b870e62badc83bcda99ae3574ae"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a98cf4b870e62badc83bcda99ae3574ae">getNominalArray</a> () override</td></tr>
 <tr class="memdesc:a98cf4b870e62badc83bcda99ae3574ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different.  <br /></td></tr>
 <tr class="separator:a98cf4b870e62badc83bcda99ae3574ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -509,10 +509,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a688e670224e9e1fac3d6de97a2016f1a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#a688e670224e9e1fac3d6de97a2016f1a">CheckCorrectInitialisation</a> ()</td></tr>
 <tr class="memdesc:a688e670224e9e1fac3d6de97a2016f1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Check if matrix is correctly initialised.  <br /></td></tr>
 <tr class="separator:a688e670224e9e1fac3d6de97a2016f1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac73e73f40bb12093fad83cac21dcc1c"><td class="memTemplParams" colspan="2">template&lt;typename FilterFunc , typename ActionFunc &gt; </td></tr>
-<tr class="memitem:aac73e73f40bb12093fad83cac21dcc1c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#aac73e73f40bb12093fad83cac21dcc1c">IterateOverParams</a> (const std::string &amp;DetID, FilterFunc filter, ActionFunc action)</td></tr>
-<tr class="memdesc:aac73e73f40bb12093fad83cac21dcc1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over parameters and applies a filter and action function.  <br /></td></tr>
-<tr class="separator:aac73e73f40bb12093fad83cac21dcc1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf6cd7e7b9d93ae8811ae3b0a9ee41cb"><td class="memTemplParams" colspan="2">template&lt;typename FilterFunc , typename ActionFunc &gt; </td></tr>
+<tr class="memitem:aaf6cd7e7b9d93ae8811ae3b0a9ee41cb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb">IterateOverParams</a> (const std::string &amp;SampleName, FilterFunc filter, ActionFunc action)</td></tr>
+<tr class="memdesc:aaf6cd7e7b9d93ae8811ae3b0a9ee41cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over parameters and applies a filter and action function.  <br /></td></tr>
+<tr class="separator:aaf6cd7e7b9d93ae8811ae3b0a9ee41cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea65a8b1ad6399f0b9f356810249bfd1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceXsec.html#aea65a8b1ad6399f0b9f356810249bfd1">initParams</a> ()</td></tr>
 <tr class="memdesc:aea65a8b1ad6399f0b9f356810249bfd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the systematic parameters from the configuration file. This function loads parameters like normalizations and splines from the provided YAML file.  <br /></td></tr>
 <tr class="separator:aea65a8b1ad6399f0b9f356810249bfd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -547,9 +547,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a50ce8ebb96ebd64190dc37e4bf950a9b inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b">updateAdaptiveCovariance</a> ()</td></tr>
 <tr class="memdesc:a50ce8ebb96ebd64190dc37e4bf950a9b inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to update adaptive MCMC <a class="el" href="citelist.html#CITEREF_haario2001adaptive">[10]</a>.  <br /></td></tr>
 <tr class="separator:a50ce8ebb96ebd64190dc37e4bf950a9b inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c83deb921c0ee4107645752ff84e91b inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a> (const int SystIndex, const std::string &amp;DetID) const</td></tr>
-<tr class="memdesc:a6c83deb921c0ee4107645752ff84e91b inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if parameter is affecting given det ID.  <br /></td></tr>
-<tr class="separator:a6c83deb921c0ee4107645752ff84e91b inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f867c9d5f0b8c593de65d7b6e71c8b9 inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a> (const int SystIndex, const std::string &amp;SampleName) const</td></tr>
+<tr class="memdesc:a5f867c9d5f0b8c593de65d7b6e71c8b9 inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if parameter is affecting given sample name.  <br /></td></tr>
+<tr class="separator:a5f867c9d5f0b8c593de65d7b6e71c8b9 inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -641,9 +641,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ad9c47deb7009bff81210f666e80012eb inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a></td></tr>
 <tr class="memdesc:ad9c47deb7009bff81210f666e80012eb inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to apply flat prior or not.  <br /></td></tr>
 <tr class="separator:ad9c47deb7009bff81210f666e80012eb inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a267523bb0f78c27208000b2856f741da inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">_fDetID</a></td></tr>
-<tr class="memdesc:a267523bb0f78c27208000b2856f741da inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells to which samples object param should be applied.  <br /></td></tr>
-<tr class="separator:a267523bb0f78c27208000b2856f741da inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a956f7099f28f05eb9fac8b5be625463c inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a></td></tr>
+<tr class="memdesc:a956f7099f28f05eb9fac8b5be625463c inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells to which samples object param should be applied.  <br /></td></tr>
+<tr class="separator:a956f7099f28f05eb9fac8b5be625463c inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4b7f96d3e977a0b3307ceecbd0baeb4 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a></td></tr>
 <tr class="memdesc:ab4b7f96d3e977a0b3307ceecbd0baeb4 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">perform PCA or not  <br /></td></tr>
 <tr class="separator:ab4b7f96d3e977a0b3307ceecbd0baeb4 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -988,17 +988,17 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ac580752fdcf84f1f6298c29e15b7fbb5" name="ac580752fdcf84f1f6298c29e15b7fbb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac580752fdcf84f1f6298c29e15b7fbb5">&#9670;&#160;</a></span>GetGlobalSystIndexFromDetID()</h2>
+<a id="aa935df1b6684ce8809ab7dd5053727b9" name="aa935df1b6684ce8809ab7dd5053727b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa935df1b6684ce8809ab7dd5053727b9">&#9670;&#160;</a></span>GetGlobalSystIndexFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; int &gt; covarianceXsec::GetGlobalSystIndexFromDetID </td>
+          <td class="memname">const std::vector&lt; int &gt; covarianceXsec::GetGlobalSystIndexFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em>, </td>
+          <td class="paramname"><em>SampleName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1014,21 +1014,21 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>DB Get spline parameters depending on given DetID. </p>
+<p>DB Get spline parameters depending on given SampleName. </p>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00213">213</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  213</span>                                                                                                            {</div>
+<div class="fragment"><div class="line"><span class="lineno">  213</span>                                                                                                                      {</div>
 <div class="line"><span class="lineno">  214</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  215</span>  std::vector&lt;int&gt; returnVec;</div>
 <div class="line"><span class="lineno">  216</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
 <div class="line"><span class="lineno">  217</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  218</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(SystIndex, DetID)) { <span class="comment">//If parameter applies to required DetID</span></div>
+<div class="line"><span class="lineno">  218</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
 <div class="line"><span class="lineno">  219</span>      returnVec.push_back(SystIndex);</div>
 <div class="line"><span class="lineno">  220</span>    }</div>
 <div class="line"><span class="lineno">  221</span>  }</div>
 <div class="line"><span class="lineno">  222</span>  <span class="keywordflow">return</span> returnVec;</div>
 <div class="line"><span class="lineno">  223</span>}</div>
-<div class="ttc" id="aclasscovarianceBase_html_a6c83deb921c0ee4107645752ff84e91b"><div class="ttname"><a href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">covarianceBase::AppliesToDetID</a></div><div class="ttdeci">bool AppliesToDetID(const int SystIndex, const std::string &amp;DetID) const</div><div class="ttdoc">Check if parameter is affecting given det ID.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01213">covarianceBase.cpp:1213</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a5f867c9d5f0b8c593de65d7b6e71c8b9"><div class="ttname"><a href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">covarianceBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01213">covarianceBase.cpp:1213</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1070,32 +1070,32 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a09876b9f2541f264f9d8069e468e360f" name="a09876b9f2541f264f9d8069e468e360f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09876b9f2541f264f9d8069e468e360f">&#9670;&#160;</a></span>GetNormParsFromDetID()</h2>
+<a id="ab7c13113774952dfcae4420b4f399dbc" name="ab7c13113774952dfcae4420b4f399dbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7c13113774952dfcae4420b4f399dbc">&#9670;&#160;</a></span>GetNormParsFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; <a class="el" href="structXsecNorms4.html">XsecNorms4</a> &gt; covarianceXsec::GetNormParsFromDetID </td>
+          <td class="memname">const std::vector&lt; <a class="el" href="structXsecNorms4.html">XsecNorms4</a> &gt; covarianceXsec::GetNormParsFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em></td><td>)</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>DB Get norm/func parameters depending on given DetID. </p>
+<p>DB Get norm/func parameters depending on given SampleName. </p>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00267">267</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  267</span>                                                                                       {</div>
+<div class="fragment"><div class="line"><span class="lineno">  267</span>                                                                                                 {</div>
 <div class="line"><span class="lineno">  268</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  269</span>  std::vector&lt;XsecNorms4&gt; returnVec;</div>
 <div class="line"><span class="lineno">  270</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[SystType::kNorm]) {</div>
 <div class="line"><span class="lineno">  271</span>    <span class="keyword">auto</span> &amp;NormIndex = pair.first;</div>
 <div class="line"><span class="lineno">  272</span>    <span class="keyword">auto</span> &amp;GlobalIndex = pair.second;</div>
-<div class="line"><span class="lineno">  273</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(GlobalIndex, DetID)) {</div>
+<div class="line"><span class="lineno">  273</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(GlobalIndex, SampleName)) {</div>
 <div class="line"><span class="lineno">  274</span>      returnVec.push_back(<a class="code hl_variable" href="classcovarianceXsec.html#acd6c2346a5b808c6917e4828bbb633f5">NormParams</a>[NormIndex]);</div>
 <div class="line"><span class="lineno">  275</span>    }</div>
 <div class="line"><span class="lineno">  276</span>  }</div>
@@ -1105,17 +1105,17 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ab4f92efb89282448bc65d69238147566" name="ab4f92efb89282448bc65d69238147566"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4f92efb89282448bc65d69238147566">&#9670;&#160;</a></span>GetNumParamsFromDetID()</h2>
+<a id="a28a42828cd75038d671c269484c07be8" name="a28a42828cd75038d671c269484c07be8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28a42828cd75038d671c269484c07be8">&#9670;&#160;</a></span>GetNumParamsFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int covarianceXsec::GetNumParamsFromDetID </td>
+          <td class="memname">int covarianceXsec::GetNumParamsFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em>, </td>
+          <td class="paramname"><em>SampleName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1131,7 +1131,7 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>DB Grab the number of parameters for the relevant DetID. </p>
+<p>DB Grab the number of parameters for the relevant SampleName. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
@@ -1140,17 +1140,17 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00282">282</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  282</span>                                                                                     {</div>
+<div class="fragment"><div class="line"><span class="lineno">  282</span>                                                                                               {</div>
 <div class="line"><span class="lineno">  283</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  284</span>  <span class="keywordtype">int</span> returnVal = 0;</div>
-<div class="line"><span class="lineno">  285</span>  <a class="code hl_function" href="classcovarianceXsec.html#aac73e73f40bb12093fad83cac21dcc1c">IterateOverParams</a>(DetID,</div>
+<div class="line"><span class="lineno">  285</span>  <a class="code hl_function" href="classcovarianceXsec.html#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb">IterateOverParams</a>(SampleName,</div>
 <div class="line"><span class="lineno">  286</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceXsec.html#a50cca3de3274be7a57d25cc1b454e890">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
 <div class="line"><span class="lineno">  287</span>    [&amp;](int) { returnVal += 1; } <span class="comment">// Action to perform if filter passes</span></div>
 <div class="line"><span class="lineno">  288</span>  );</div>
 <div class="line"><span class="lineno">  289</span>  <span class="keywordflow">return</span> returnVal;</div>
 <div class="line"><span class="lineno">  290</span>}</div>
 <div class="ttc" id="aclasscovarianceXsec_html_a50cca3de3274be7a57d25cc1b454e890"><div class="ttname"><a href="classcovarianceXsec.html#a50cca3de3274be7a57d25cc1b454e890">covarianceXsec::GetParamType</a></div><div class="ttdeci">SystType GetParamType(const int i) const</div><div class="ttdoc">Returns enum describing our param type.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceXsec_8h_source.html#l00033">covarianceXsec.h:33</a></div></div>
-<div class="ttc" id="aclasscovarianceXsec_html_aac73e73f40bb12093fad83cac21dcc1c"><div class="ttname"><a href="classcovarianceXsec.html#aac73e73f40bb12093fad83cac21dcc1c">covarianceXsec::IterateOverParams</a></div><div class="ttdeci">void IterateOverParams(const std::string &amp;DetID, FilterFunc filter, ActionFunc action)</div><div class="ttdoc">Iterates over parameters and applies a filter and action function.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceXsec_8cpp_source.html#l00318">covarianceXsec.cpp:318</a></div></div>
+<div class="ttc" id="aclasscovarianceXsec_html_aaf6cd7e7b9d93ae8811ae3b0a9ee41cb"><div class="ttname"><a href="classcovarianceXsec.html#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb">covarianceXsec::IterateOverParams</a></div><div class="ttdeci">void IterateOverParams(const std::string &amp;SampleName, FilterFunc filter, ActionFunc action)</div><div class="ttdoc">Iterates over parameters and applies a filter and action function.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceXsec_8cpp_source.html#l00318">covarianceXsec.cpp:318</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1230,8 +1230,8 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a57481989a97f1e2f9e094db3f253cc51" name="a57481989a97f1e2f9e094db3f253cc51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57481989a97f1e2f9e094db3f253cc51">&#9670;&#160;</a></span>GetParDetID()</h2>
+<a id="a4a80b4fdbe06578c1a3e62c4fe689a10" name="a4a80b4fdbe06578c1a3e62c4fe689a10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a80b4fdbe06578c1a3e62c4fe689a10">&#9670;&#160;</a></span>GetParSampleID()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1240,7 +1240,7 @@ Kamil Skwarczynski </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::string &gt; covarianceXsec::GetParDetID </td>
+          <td class="memname">std::vector&lt; std::string &gt; covarianceXsec::GetParSampleID </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>i</em></td><td>)</td>
@@ -1254,7 +1254,7 @@ Kamil Skwarczynski </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>ETA - just return the int of the DetID, this can be removed to do a string comp at some point. </p>
+<p>ETA - just return the int of the SampleName, this can be removed to do a string comp at some point. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">i</td><td>parameter index </td></tr>
@@ -1263,22 +1263,22 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8h_source.html#l00027">27</a> of file <a class="el" href="covarianceXsec_8h_source.html">covarianceXsec.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   27</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">_fDetID</a>[i];};</div>
-<div class="ttc" id="aclasscovarianceBase_html_a267523bb0f78c27208000b2856f741da"><div class="ttname"><a href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">covarianceBase::_fDetID</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fDetID</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00477">covarianceBase.h:477</a></div></div>
+<div class="fragment"><div class="line"><span class="lineno">   27</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[i];};</div>
+<div class="ttc" id="aclasscovarianceBase_html_a956f7099f28f05eb9fac8b5be625463c"><div class="ttname"><a href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">covarianceBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00477">covarianceBase.h:477</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="add6dd5652399eb3d0798ae6710c61197" name="add6dd5652399eb3d0798ae6710c61197"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add6dd5652399eb3d0798ae6710c61197">&#9670;&#160;</a></span>GetParsIndexFromDetID()</h2>
+<a id="ae8576d0d53a87d74d616bb65d5b74922" name="ae8576d0d53a87d74d616bb65d5b74922"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8576d0d53a87d74d616bb65d5b74922">&#9670;&#160;</a></span>GetParsIndexFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; int &gt; covarianceXsec::GetParsIndexFromDetID </td>
+          <td class="memname">const std::vector&lt; int &gt; covarianceXsec::GetParsIndexFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em>, </td>
+          <td class="paramname"><em>SampleName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1294,7 +1294,7 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>DB Grab the parameter indices for the relevant DetID. </p>
+<p>DB Grab the parameter indices for the relevant SampleName. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
@@ -1303,10 +1303,10 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00306">306</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  306</span>                                                                                                      {</div>
+<div class="fragment"><div class="line"><span class="lineno">  306</span>                                                                                                                {</div>
 <div class="line"><span class="lineno">  307</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  308</span>  std::vector&lt;int&gt; returnVec;</div>
-<div class="line"><span class="lineno">  309</span>  <a class="code hl_function" href="classcovarianceXsec.html#aac73e73f40bb12093fad83cac21dcc1c">IterateOverParams</a>(DetID,</div>
+<div class="line"><span class="lineno">  309</span>  <a class="code hl_function" href="classcovarianceXsec.html#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb">IterateOverParams</a>(SampleName,</div>
 <div class="line"><span class="lineno">  310</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceXsec.html#a50cca3de3274be7a57d25cc1b454e890">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
 <div class="line"><span class="lineno">  311</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(i); } <span class="comment">// Action to perform if filter passes</span></div>
 <div class="line"><span class="lineno">  312</span>  );</div>
@@ -1315,17 +1315,17 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ad2feb6b63bd5cd34d3e65157541c1b8d" name="ad2feb6b63bd5cd34d3e65157541c1b8d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2feb6b63bd5cd34d3e65157541c1b8d">&#9670;&#160;</a></span>GetParsNamesFromDetID()</h2>
+<a id="a8d07d2528fd814c3961d5c5866873167" name="a8d07d2528fd814c3961d5c5866873167"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d07d2528fd814c3961d5c5866873167">&#9670;&#160;</a></span>GetParsNamesFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; std::string &gt; covarianceXsec::GetParsNamesFromDetID </td>
+          <td class="memname">const std::vector&lt; std::string &gt; covarianceXsec::GetParsNamesFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em>, </td>
+          <td class="paramname"><em>SampleName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1341,7 +1341,7 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>DB Grab the parameter names for the relevant DetID. </p>
+<p>DB Grab the parameter names for the relevant SampleName. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
@@ -1350,10 +1350,10 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00294">294</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  294</span>                                                                                                            {</div>
+<div class="fragment"><div class="line"><span class="lineno">  294</span>                                                                                                                      {</div>
 <div class="line"><span class="lineno">  295</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  296</span>  std::vector&lt;std::string&gt; returnVec;</div>
-<div class="line"><span class="lineno">  297</span>  <a class="code hl_function" href="classcovarianceXsec.html#aac73e73f40bb12093fad83cac21dcc1c">IterateOverParams</a>(DetID,</div>
+<div class="line"><span class="lineno">  297</span>  <a class="code hl_function" href="classcovarianceXsec.html#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb">IterateOverParams</a>(SampleName,</div>
 <div class="line"><span class="lineno">  298</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceXsec.html#a50cca3de3274be7a57d25cc1b454e890">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
 <div class="line"><span class="lineno">  299</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(<a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i)); } <span class="comment">// Action to perform if filter passes</span></div>
 <div class="line"><span class="lineno">  300</span>  );</div>
@@ -1511,53 +1511,53 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="af8ea9884b81a91ca925c8e6fee5024c2" name="af8ea9884b81a91ca925c8e6fee5024c2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af8ea9884b81a91ca925c8e6fee5024c2">&#9670;&#160;</a></span>GetSplineFileParsNamesFromDetID()</h2>
+<a id="a907071ad6ca8cdcda3ca0d3f08afd8c6" name="a907071ad6ca8cdcda3ca0d3f08afd8c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a907071ad6ca8cdcda3ca0d3f08afd8c6">&#9670;&#160;</a></span>GetSplineFileParsNamesFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; std::string &gt; covarianceXsec::GetSplineFileParsNamesFromDetID </td>
+          <td class="memname">const std::vector&lt; std::string &gt; covarianceXsec::GetSplineFileParsNamesFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em></td><td>)</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>DB Get spline parameters depending on given DetID. </p>
+<p>DB Get spline parameters depending on given SampleName. </p>
 
 </div>
 </div>
-<a id="a31ec21d902da40866b905e6ef55aef1e" name="a31ec21d902da40866b905e6ef55aef1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31ec21d902da40866b905e6ef55aef1e">&#9670;&#160;</a></span>GetSplineInterpolationFromDetID()</h2>
+<a id="a12d5c8f313a02b91759dd6dee5c91055" name="a12d5c8f313a02b91759dd6dee5c91055"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12d5c8f313a02b91759dd6dee5c91055">&#9670;&#160;</a></span>GetSplineInterpolationFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; <a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a> &gt; covarianceXsec::GetSplineInterpolationFromDetID </td>
+          <td class="memname">const std::vector&lt; <a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a> &gt; covarianceXsec::GetSplineInterpolationFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em></td><td>)</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get the interpolation types for splines affecting a particular DetID. </p>
+<p>Get the interpolation types for splines affecting a particular SampleName. </p>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00121">121</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  121</span>                                                                                                           {</div>
+<div class="fragment"><div class="line"><span class="lineno">  121</span>                                                                                                                     {</div>
 <div class="line"><span class="lineno">  122</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  123</span>  std::vector&lt;SplineInterpolation&gt; returnVec;</div>
 <div class="line"><span class="lineno">  124</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
 <div class="line"><span class="lineno">  125</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
 <div class="line"><span class="lineno">  126</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
 <div class="line"><span class="lineno">  127</span> </div>
-<div class="line"><span class="lineno">  128</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(SystIndex, DetID)) { <span class="comment">//If parameter applies to required DetID</span></div>
+<div class="line"><span class="lineno">  128</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
 <div class="line"><span class="lineno">  129</span>      returnVec.push_back(<a class="code hl_variable" href="classcovarianceXsec.html#ae95bafab0c674dc838635aaeca40bc2c">SplineParams</a>.at(SplineIndex)._SplineInterpolationType);</div>
 <div class="line"><span class="lineno">  130</span>    }</div>
 <div class="line"><span class="lineno">  131</span>  }</div>
@@ -1566,26 +1566,26 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a4559ca9cbbc02e63d230ee868997d252" name="a4559ca9cbbc02e63d230ee868997d252"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4559ca9cbbc02e63d230ee868997d252">&#9670;&#160;</a></span>GetSplineModeVecFromDetID()</h2>
+<a id="a9fe91a79eb65d4a5116cd88fd4fb50b9" name="a9fe91a79eb65d4a5116cd88fd4fb50b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fe91a79eb65d4a5116cd88fd4fb50b9">&#9670;&#160;</a></span>GetSplineModeVecFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; std::vector&lt; int &gt; &gt; covarianceXsec::GetSplineModeVecFromDetID </td>
+          <td class="memname">const std::vector&lt; std::vector&lt; int &gt; &gt; covarianceXsec::GetSplineModeVecFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em></td><td>)</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>DB Grab the Spline Modes for the relevant DetID. </p>
+<p>DB Grab the Spline Modes for the relevant SampleName. </p>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00137">137</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  137</span>                                                                                                  {</div>
+<div class="fragment"><div class="line"><span class="lineno">  137</span>                                                                                                            {</div>
 <div class="line"><span class="lineno">  138</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  139</span>  std::vector&lt; std::vector&lt;int&gt; &gt; returnVec;</div>
 <div class="line"><span class="lineno">  140</span>  <span class="comment">//Need a counter or something to correctly get the index in _fSplineModes since it&#39;s not of length nPars</span></div>
@@ -1593,7 +1593,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  142</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
 <div class="line"><span class="lineno">  143</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
 <div class="line"><span class="lineno">  144</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  145</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(SystIndex, DetID)) { <span class="comment">//If parameter applies to required DetID</span></div>
+<div class="line"><span class="lineno">  145</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
 <div class="line"><span class="lineno">  146</span>      returnVec.push_back(<a class="code hl_variable" href="classcovarianceXsec.html#ae95bafab0c674dc838635aaeca40bc2c">SplineParams</a>.at(SplineIndex)._fSplineModes);</div>
 <div class="line"><span class="lineno">  147</span>    }</div>
 <div class="line"><span class="lineno">  148</span>  }</div>
@@ -1602,32 +1602,32 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ae9e3666595988885e95c288f6ffd4ff6" name="ae9e3666595988885e95c288f6ffd4ff6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9e3666595988885e95c288f6ffd4ff6">&#9670;&#160;</a></span>GetSplineParsNamesFromDetID()</h2>
+<a id="a2c27ce7331cbb95504feac39fc8c3322" name="a2c27ce7331cbb95504feac39fc8c3322"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c27ce7331cbb95504feac39fc8c3322">&#9670;&#160;</a></span>GetSplineParsNamesFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; std::string &gt; covarianceXsec::GetSplineParsNamesFromDetID </td>
+          <td class="memname">const std::vector&lt; std::string &gt; covarianceXsec::GetSplineParsNamesFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em></td><td>)</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>DB Get spline parameters depending on given DetID. </p>
+<p>DB Get spline parameters depending on given SampleName. </p>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00106">106</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  106</span>                                                                                             {</div>
+<div class="fragment"><div class="line"><span class="lineno">  106</span>                                                                                                       {</div>
 <div class="line"><span class="lineno">  107</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  108</span>  std::vector&lt;std::string&gt; returnVec;</div>
 <div class="line"><span class="lineno">  109</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
 <div class="line"><span class="lineno">  110</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
 <div class="line"><span class="lineno">  111</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  112</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(SystIndex, DetID)) { <span class="comment">//If parameter applies to required DetID</span></div>
+<div class="line"><span class="lineno">  112</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required Sample</span></div>
 <div class="line"><span class="lineno">  113</span>      returnVec.push_back(<a class="code hl_variable" href="classcovarianceXsec.html#a4d3074db3c9edb7465a4409abd9c91fc">_fSplineNames</a>.at(SplineIndex));</div>
 <div class="line"><span class="lineno">  114</span>    }</div>
 <div class="line"><span class="lineno">  115</span> </div>
@@ -1637,17 +1637,17 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ab5414f8ec095caa4f9f551bdbbec1100" name="ab5414f8ec095caa4f9f551bdbbec1100"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5414f8ec095caa4f9f551bdbbec1100">&#9670;&#160;</a></span>GetSystIndexFromDetID()</h2>
+<a id="a4e3861cdf9020430f49b8d608544ea68" name="a4e3861cdf9020430f49b8d608544ea68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e3861cdf9020430f49b8d608544ea68">&#9670;&#160;</a></span>GetSystIndexFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt; int &gt; covarianceXsec::GetSystIndexFromDetID </td>
+          <td class="memname">const std::vector&lt; int &gt; covarianceXsec::GetSystIndexFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em>, </td>
+          <td class="paramname"><em>SampleName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1672,13 +1672,13 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00228">228</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  228</span>                                                                                                       {</div>
+<div class="fragment"><div class="line"><span class="lineno">  228</span>                                                                                                                 {</div>
 <div class="line"><span class="lineno">  229</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  230</span>  std::vector&lt;int&gt; returnVec;</div>
 <div class="line"><span class="lineno">  231</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
 <div class="line"><span class="lineno">  232</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
 <div class="line"><span class="lineno">  233</span>    <span class="keyword">auto</span> &amp;systIndex = pair.second;</div>
-<div class="line"><span class="lineno">  234</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(systIndex, DetID)) { <span class="comment">//If parameter applies to required DetID</span></div>
+<div class="line"><span class="lineno">  234</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(systIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
 <div class="line"><span class="lineno">  235</span>      returnVec.push_back(SplineIndex);</div>
 <div class="line"><span class="lineno">  236</span>    }</div>
 <div class="line"><span class="lineno">  237</span>  }</div>
@@ -1993,7 +1993,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   59</span>      }</div>
 <div class="line"><span class="lineno">   60</span> </div>
 <div class="line"><span class="lineno">   61</span>      <span class="comment">//Insert the mapping from the spline index i.e. the length of _fSplineNames etc</span></div>
-<div class="line"><span class="lineno">   62</span>      <span class="comment">//to the Systematic index i.e. the counter for things like _fDetID and _fDetID</span></div>
+<div class="line"><span class="lineno">   62</span>      <span class="comment">//to the Systematic index i.e. the counter for things like _fSampleID</span></div>
 <div class="line"><span class="lineno">   63</span>      <a class="code hl_variable" href="classcovarianceXsec.html#adddfbaa235113603542826df331ed61e">_fSystToGlobalSystIndexMap</a>[SystType::kSpline].insert(std::make_pair(ParamCounter[SystType::kSpline], i));</div>
 <div class="line"><span class="lineno">   64</span>      ParamCounter[SystType::kSpline]++;</div>
 <div class="line"><span class="lineno">   65</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(param[<span class="stringliteral">&quot;Systematic&quot;</span>][<span class="stringliteral">&quot;Type&quot;</span>].as&lt;std::string&gt;() == <a class="code hl_function" href="Structs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a>(SystType::kNorm)) {</div>
@@ -2087,8 +2087,8 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="aac73e73f40bb12093fad83cac21dcc1c" name="aac73e73f40bb12093fad83cac21dcc1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac73e73f40bb12093fad83cac21dcc1c">&#9670;&#160;</a></span>IterateOverParams()</h2>
+<a id="aaf6cd7e7b9d93ae8811ae3b0a9ee41cb" name="aaf6cd7e7b9d93ae8811ae3b0a9ee41cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf6cd7e7b9d93ae8811ae3b0a9ee41cb">&#9670;&#160;</a></span>IterateOverParams()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2102,7 +2102,7 @@ template&lt;typename FilterFunc , typename ActionFunc &gt; </div>
           <td class="memname">void covarianceXsec::IterateOverParams </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em>, </td>
+          <td class="paramname"><em>SampleName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2130,7 +2130,7 @@ template&lt;typename FilterFunc , typename ActionFunc &gt; </div>
 </div><div class="memdoc">
 
 <p>Iterates over parameters and applies a filter and action function. </p>
-<p>This template function provides a way to iterate over parameters associated with a specific Detector ID (DetID). It applies a filter function to determine which parameters to process and an action function to define what to do with the selected parameters.</p>
+<p>This template function provides a way to iterate over parameters associated with a specific Sample ID (SampleName). It applies a filter function to determine which parameters to process and an action function to define what to do with the selected parameters.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">FilterFunc</td><td>The type of the filter function used to determine which parameters to include. </td></tr>
@@ -2140,16 +2140,16 @@ template&lt;typename FilterFunc , typename ActionFunc &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">DetID</td><td>The Detector ID used to filter parameters. </td></tr>
+    <tr><td class="paramname">SampleName</td><td>The Sample ID used to filter parameters. </td></tr>
   </table>
   </dd>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="covarianceXsec_8cpp_source.html#l00318">318</a> of file <a class="el" href="covarianceXsec_8cpp_source.html">covarianceXsec.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  318</span>                                                                                                   {</div>
+<div class="fragment"><div class="line"><span class="lineno">  318</span>                                                                                                        {</div>
 <div class="line"><span class="lineno">  319</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  320</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  321</span>    <span class="keywordflow">if</span> ((<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(i, DetID)) &amp;&amp; filter(i)) { <span class="comment">// Common filter logic</span></div>
+<div class="line"><span class="lineno">  321</span>    <span class="keywordflow">if</span> ((<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(i, SampleName)) &amp;&amp; filter(i)) { <span class="comment">// Common filter logic</span></div>
 <div class="line"><span class="lineno">  322</span>      action(i); <span class="comment">// Specific action for each function</span></div>
 <div class="line"><span class="lineno">  323</span>    }</div>
 <div class="line"><span class="lineno">  324</span>  }</div>
@@ -2284,18 +2284,18 @@ template&lt;typename FilterFunc , typename ActionFunc &gt; </div>
 <div class="fragment"><div class="line"><span class="lineno">  380</span>                                      {</div>
 <div class="line"><span class="lineno">  381</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  382</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;============================================================================================================================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">  383</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;40} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>, <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Gen.&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Prior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Error&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Lower&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Upper&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;StepScale&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;DetID&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Type&quot;</span>);</div>
+<div class="line"><span class="lineno">  383</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;40} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>, <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Gen.&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Prior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Error&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Lower&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Upper&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;StepScale&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;SampleNames&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Type&quot;</span>);</div>
 <div class="line"><span class="lineno">  384</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;------------------------------------------------------------------------------------------------------------------------------------------------------------&quot;</span>);</div>
 <div class="line"><span class="lineno">  385</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_function" href="classcovarianceBase.html#a87f80dff42b1f82433aaa7f69966343a">GetNumParams</a>(); i++) {</div>
 <div class="line"><span class="lineno">  386</span>    std::string ErrString = fmt::format(<span class="stringliteral">&quot;{:.2f}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i]);</div>
-<div class="line"><span class="lineno">  387</span>    std::string detIdString = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  388</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; detID : <a class="code hl_variable" href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">_fDetID</a>[i]) {</div>
-<div class="line"><span class="lineno">  389</span>      <span class="keywordflow">if</span> (!detIdString.empty()) {</div>
-<div class="line"><span class="lineno">  390</span>        detIdString += <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><span class="lineno">  387</span>    std::string SampleNameString = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  388</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; SampleName : <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[i]) {</div>
+<div class="line"><span class="lineno">  389</span>      <span class="keywordflow">if</span> (!SampleNameString.empty()) {</div>
+<div class="line"><span class="lineno">  390</span>        SampleNameString += <span class="stringliteral">&quot;, &quot;</span>;</div>
 <div class="line"><span class="lineno">  391</span>      }</div>
-<div class="line"><span class="lineno">  392</span>      detIdString += detID;</div>
+<div class="line"><span class="lineno">  392</span>      SampleNameString += SampleName;</div>
 <div class="line"><span class="lineno">  393</span>    }</div>
-<div class="line"><span class="lineno">  394</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;40} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>, i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i), <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a9b753f52711600a9f8d648531d95b044">_fGenerated</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;+/- &quot;</span> + ErrString, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a8f1d94838f188cc85c4f82557c0b0b66">_fLowBound</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a31e636cb6de871bd0c2c8e7e299df9e7">_fUpBound</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[i], <span class="stringliteral">&quot;|&quot;</span>, detIdString, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_function" href="Structs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a>(<a class="code hl_variable" href="classcovarianceXsec.html#aae3338ca71027adab7fdfd3e828c0f79">_fParamType</a>[i]));</div>
+<div class="line"><span class="lineno">  394</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;40} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>, i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i), <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a9b753f52711600a9f8d648531d95b044">_fGenerated</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;+/- &quot;</span> + ErrString, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a8f1d94838f188cc85c4f82557c0b0b66">_fLowBound</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a31e636cb6de871bd0c2c8e7e299df9e7">_fUpBound</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[i], <span class="stringliteral">&quot;|&quot;</span>, SampleNameString, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_function" href="Structs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a>(<a class="code hl_variable" href="classcovarianceXsec.html#aae3338ca71027adab7fdfd3e828c0f79">_fParamType</a>[i]));</div>
 <div class="line"><span class="lineno">  395</span>  }</div>
 <div class="line"><span class="lineno">  396</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;============================================================================================================================================================&quot;</span>);</div>
 <div class="line"><span class="lineno">  397</span>}</div>

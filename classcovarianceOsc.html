@@ -138,9 +138,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aad7ee2764232f61af5a6deab075ee142"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceOsc.html#aad7ee2764232f61af5a6deab075ee142">setFlipDeltaM23</a> (bool flip)</td></tr>
 <tr class="memdesc:aad7ee2764232f61af5a6deab075ee142"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets whether to flip delta M23.  <br /></td></tr>
 <tr class="separator:aad7ee2764232f61af5a6deab075ee142"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17806a8f003dda140403342b08dcc118"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceOsc.html#a17806a8f003dda140403342b08dcc118">GetOscParsFromDetID</a> (const std::string &amp;DetID)</td></tr>
-<tr class="memdesc:a17806a8f003dda140403342b08dcc118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointers to Osc params from detId.  <br /></td></tr>
-<tr class="separator:a17806a8f003dda140403342b08dcc118"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5aabc999ca20b2ab3a37edd3c28cd849"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceOsc.html#a5aabc999ca20b2ab3a37edd3c28cd849">GetOscParsFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:a5aabc999ca20b2ab3a37edd3c28cd849"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointers to Osc params from Sample name.  <br /></td></tr>
+<tr class="separator:a5aabc999ca20b2ab3a37edd3c28cd849"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f098e51551a6d175cce56027ddfd31f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceOsc.html#a6f098e51551a6d175cce56027ddfd31f">Print</a> ()</td></tr>
 <tr class="memdesc:a6f098e51551a6d175cce56027ddfd31f"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Print all useful information's after initialization.  <br /></td></tr>
 <tr class="separator:a6f098e51551a6d175cce56027ddfd31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -455,9 +455,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a50ce8ebb96ebd64190dc37e4bf950a9b inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b">updateAdaptiveCovariance</a> ()</td></tr>
 <tr class="memdesc:a50ce8ebb96ebd64190dc37e4bf950a9b inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to update adaptive MCMC <a class="el" href="citelist.html#CITEREF_haario2001adaptive">[10]</a>.  <br /></td></tr>
 <tr class="separator:a50ce8ebb96ebd64190dc37e4bf950a9b inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c83deb921c0ee4107645752ff84e91b inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a> (const int SystIndex, const std::string &amp;DetID) const</td></tr>
-<tr class="memdesc:a6c83deb921c0ee4107645752ff84e91b inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if parameter is affecting given det ID.  <br /></td></tr>
-<tr class="separator:a6c83deb921c0ee4107645752ff84e91b inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f867c9d5f0b8c593de65d7b6e71c8b9 inherit pro_methods_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a> (const int SystIndex, const std::string &amp;SampleName) const</td></tr>
+<tr class="memdesc:a5f867c9d5f0b8c593de65d7b6e71c8b9 inherit pro_methods_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if parameter is affecting given sample name.  <br /></td></tr>
+<tr class="separator:a5f867c9d5f0b8c593de65d7b6e71c8b9 inherit pro_methods_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -543,9 +543,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ad9c47deb7009bff81210f666e80012eb inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a></td></tr>
 <tr class="memdesc:ad9c47deb7009bff81210f666e80012eb inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to apply flat prior or not.  <br /></td></tr>
 <tr class="separator:ad9c47deb7009bff81210f666e80012eb inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a267523bb0f78c27208000b2856f741da inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">_fDetID</a></td></tr>
-<tr class="memdesc:a267523bb0f78c27208000b2856f741da inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells to which samples object param should be applied.  <br /></td></tr>
-<tr class="separator:a267523bb0f78c27208000b2856f741da inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a956f7099f28f05eb9fac8b5be625463c inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a></td></tr>
+<tr class="memdesc:a956f7099f28f05eb9fac8b5be625463c inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells to which samples object param should be applied.  <br /></td></tr>
+<tr class="separator:a956f7099f28f05eb9fac8b5be625463c inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4b7f96d3e977a0b3307ceecbd0baeb4 inherit pro_attribs_classcovarianceBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a></td></tr>
 <tr class="memdesc:ab4b7f96d3e977a0b3307ceecbd0baeb4 inherit pro_attribs_classcovarianceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">perform PCA or not  <br /></td></tr>
 <tr class="separator:ab4b7f96d3e977a0b3307ceecbd0baeb4 inherit pro_attribs_classcovarianceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -774,36 +774,36 @@ Asher Kaboth </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a17806a8f003dda140403342b08dcc118" name="a17806a8f003dda140403342b08dcc118"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17806a8f003dda140403342b08dcc118">&#9670;&#160;</a></span>GetOscParsFromDetID()</h2>
+<a id="a5aabc999ca20b2ab3a37edd3c28cd849" name="a5aabc999ca20b2ab3a37edd3c28cd849"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5aabc999ca20b2ab3a37edd3c28cd849">&#9670;&#160;</a></span>GetOscParsFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; const double * &gt; covarianceOsc::GetOscParsFromDetID </td>
+          <td class="memname">std::vector&lt; const double * &gt; covarianceOsc::GetOscParsFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>DetID</em></td><td>)</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get pointers to Osc params from detId. </p>
+<p>Get pointers to Osc params from Sample name. </p>
 
 <p class="definition">Definition at line <a class="el" href="covarianceOsc_8cpp_source.html#l00105">105</a> of file <a class="el" href="covarianceOsc_8cpp_source.html">covarianceOsc.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  105</span>                                                                                  {</div>
+<div class="fragment"><div class="line"><span class="lineno">  105</span>                                                                                            {</div>
 <div class="line"><span class="lineno">  106</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  107</span>  std::vector&lt;const double*&gt; returnVec;</div>
 <div class="line"><span class="lineno">  108</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">AppliesToDetID</a>(i, DetID)) {</div>
+<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">AppliesToSample</a>(i, SampleName)) {</div>
 <div class="line"><span class="lineno">  110</span>      returnVec.push_back(<a class="code hl_function" href="classcovarianceBase.html#aa970d7a68497a3765723bf34629f79f7">retPointer</a>(i));</div>
 <div class="line"><span class="lineno">  111</span>    }</div>
 <div class="line"><span class="lineno">  112</span>  }</div>
 <div class="line"><span class="lineno">  113</span>  <span class="keywordflow">return</span> returnVec;</div>
 <div class="line"><span class="lineno">  114</span>}</div>
-<div class="ttc" id="aclasscovarianceBase_html_a6c83deb921c0ee4107645752ff84e91b"><div class="ttname"><a href="classcovarianceBase.html#a6c83deb921c0ee4107645752ff84e91b">covarianceBase::AppliesToDetID</a></div><div class="ttdeci">bool AppliesToDetID(const int SystIndex, const std::string &amp;DetID) const</div><div class="ttdoc">Check if parameter is affecting given det ID.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01213">covarianceBase.cpp:1213</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a5f867c9d5f0b8c593de65d7b6e71c8b9"><div class="ttname"><a href="classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9">covarianceBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01213">covarianceBase.cpp:1213</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_aa970d7a68497a3765723bf34629f79f7"><div class="ttname"><a href="classcovarianceBase.html#aa970d7a68497a3765723bf34629f79f7">covarianceBase::retPointer</a></div><div class="ttdeci">const double * retPointer(const int iParam)</div><div class="ttdoc">DB Pointer return to param position.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00211">covarianceBase.h:211</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -833,27 +833,27 @@ Asher Kaboth </dd></dl>
 <div class="line"><span class="lineno">   83</span> </div>
 <div class="line"><span class="lineno">   84</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;=================================================================================================================================&quot;</span>);</div>
 <div class="line"><span class="lineno">   85</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;25} {:2} {:&lt;10} {:2} {:&lt;15} {:2} {:&lt;15} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>,</div>
-<div class="line"><span class="lineno">   86</span>                <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Prior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;IndivStepScale&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Error&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;FlatPrior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;DetID&quot;</span>);</div>
+<div class="line"><span class="lineno">   86</span>                <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Prior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;IndivStepScale&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Error&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;FlatPrior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;SampleNames&quot;</span>);</div>
 <div class="line"><span class="lineno">   87</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;---------------------------------------------------------------------------------------------------------------------------------&quot;</span>);</div>
 <div class="line"><span class="lineno">   88</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">   89</span>    std::string detIdString = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">   90</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; detID : <a class="code hl_variable" href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">_fDetID</a>[i]) {</div>
-<div class="line"><span class="lineno">   91</span>      <span class="keywordflow">if</span> (!detIdString.empty()) {</div>
-<div class="line"><span class="lineno">   92</span>        detIdString += <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><span class="lineno">   89</span>    std::string SampleNameString = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   90</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; SampleName : <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[i]) {</div>
+<div class="line"><span class="lineno">   91</span>      <span class="keywordflow">if</span> (!SampleNameString.empty()) {</div>
+<div class="line"><span class="lineno">   92</span>        SampleNameString += <span class="stringliteral">&quot;, &quot;</span>;</div>
 <div class="line"><span class="lineno">   93</span>      }</div>
-<div class="line"><span class="lineno">   94</span>      detIdString += detID;</div>
+<div class="line"><span class="lineno">   94</span>      SampleNameString += SampleName;</div>
 <div class="line"><span class="lineno">   95</span>    }</div>
 <div class="line"><span class="lineno">   96</span> </div>
 <div class="line"><span class="lineno">   97</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;25} {:2} {:&lt;10.4f} {:2} {:&lt;15.2f} {:2} {:&lt;15.4f} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>,</div>
-<div class="line"><span class="lineno">   98</span>                  i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str(), <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[i], <span class="stringliteral">&quot;|&quot;</span>, detIdString);</div>
+<div class="line"><span class="lineno">   98</span>                  i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str(), <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[i], <span class="stringliteral">&quot;|&quot;</span>, SampleNameString);</div>
 <div class="line"><span class="lineno">   99</span>  }</div>
 <div class="line"><span class="lineno">  100</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;=================================================================================================================================&quot;</span>);</div>
 <div class="line"><span class="lineno">  101</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a26618d3f5633b33ce20e38ce8261b3ee"><div class="ttname"><a href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">covarianceBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00429">covarianceBase.h:429</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a267523bb0f78c27208000b2856f741da"><div class="ttname"><a href="classcovarianceBase.html#a267523bb0f78c27208000b2856f741da">covarianceBase::_fDetID</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fDetID</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00477">covarianceBase.h:477</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a34f877fc160b4a93a3aab1b3a8977858"><div class="ttname"><a href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">covarianceBase::_fError</a></div><div class="ttdeci">std::vector&lt; double &gt; _fError</div><div class="ttdoc">Prior error on the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00467">covarianceBase.h:467</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a3cda39026e336a49cef482efd4062561"><div class="ttname"><a href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">covarianceBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00473">covarianceBase.h:473</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a956f7099f28f05eb9fac8b5be625463c"><div class="ttname"><a href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">covarianceBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00477">covarianceBase.h:477</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_ad9c47deb7009bff81210f666e80012eb"><div class="ttname"><a href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">covarianceBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00475">covarianceBase.h:475</a></div></div>
 </div><!-- fragment -->
 </div>

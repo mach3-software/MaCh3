@@ -129,8 +129,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ade4338d5ad1bc53ebfdba18c71af12b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d691bd9b033f80ebbce926b46972e97"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsamplePDFBase.html#a1d691bd9b033f80ebbce926b46972e97">GetNsamples</a> ()</td></tr>
 <tr class="separator:a1d691bd9b033f80ebbce926b46972e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d89044c7ad25a5782673075842565de"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsamplePDFBase.html#a1d89044c7ad25a5782673075842565de">GetName</a> () const</td></tr>
-<tr class="separator:a1d89044c7ad25a5782673075842565de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84d17e62ac4d7f60b880b34fc83a6a5d"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsamplePDFBase.html#a84d17e62ac4d7f60b880b34fc83a6a5d">GetTitle</a> () const</td></tr>
+<tr class="separator:a84d17e62ac4d7f60b880b34fc83a6a5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35ced08988cee48ac111024c70a2c7c2"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsamplePDFBase.html#a35ced08988cee48ac111024c70a2c7c2">GetSampleName</a> (int Sample)</td></tr>
 <tr class="separator:a35ced08988cee48ac111024c70a2c7c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a850aef19dec9a2ac0047c416e3fa3b1d"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsamplePDFBase.html#a850aef19dec9a2ac0047c416e3fa3b1d">getSampleLikelihood</a> (const int isample)</td></tr>
@@ -772,36 +772,6 @@ Protected Attributes</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a1d89044c7ad25a5782673075842565de" name="a1d89044c7ad25a5782673075842565de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d89044c7ad25a5782673075842565de">&#9670;&#160;</a></span>GetName()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::string samplePDFBase::GetName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classsamplePDFFDBase.html#aaf40e576ea7ff23a39d50f2a64f3330e">samplePDFFDBase</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="samplePDFBase_8h_source.html#l00033">33</a> of file <a class="el" href="samplePDFBase_8h_source.html">samplePDFBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   33</span>{<span class="keywordflow">return</span> <span class="stringliteral">&quot;samplePDF&quot;</span>;};</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="ac747ab7507485400cc0531a20e867187" name="ac747ab7507485400cc0531a20e867187"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac747ab7507485400cc0531a20e867187">&#9670;&#160;</a></span>getNEventsInSample()</h2>
 
@@ -1260,6 +1230,36 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  111</span>  </div>
 <div class="line"><span class="lineno">  112</span>  <span class="keywordflow">return</span> negLogL; </div>
 <div class="line"><span class="lineno">  113</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a84d17e62ac4d7f60b880b34fc83a6a5d" name="a84d17e62ac4d7f60b880b34fc83a6a5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84d17e62ac4d7f60b880b34fc83a6a5d">&#9670;&#160;</a></span>GetTitle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string samplePDFBase::GetTitle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classsamplePDFFDBase.html#ab29390aef9c08816a40990f5a2cbbfc6">samplePDFFDBase</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="samplePDFBase_8h_source.html#l00033">33</a> of file <a class="el" href="samplePDFBase_8h_source.html">samplePDFBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   33</span>{<span class="keywordflow">return</span> <span class="stringliteral">&quot;samplePDF&quot;</span>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
