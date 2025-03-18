@@ -256,19 +256,14 @@ std::string samplePDFBase::GetSampleName(int Sample) {
 // ***************************************************************************
   if(Sample > nSamples)
   {
-    MACH3LOG_ERROR("You are asking for sample {}. I only have {}", Sample, nSamples);
-   throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_ERROR("You are asking for sample {} of the samplePDF {}. It has only {} samples!", Sample, GetName(), nSamples);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if(SampleName.size() <= Sample)
   {
-    unsigned int origsize = SampleName.size();
-    SampleName.resize(Sample+1);
-    
-    for (unsigned int i = origsize; i <= Sample; ++i) {
-     MACH3LOG_WARN("The name for sample {} was not initialized. I will set it to \"{}_NoNameSample_{}\".", i, GetName(), i);
-     SampleName[i] = GetName()+"_NoNameSample_"+std::to_string(i); 
-    }
+    MACH3LOG_ERROR("The name for sample {} of the samplePDF {} was not initialized! Check whether you have set all the sample names correctly first!", i, GetName());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   return SampleName[Sample];
