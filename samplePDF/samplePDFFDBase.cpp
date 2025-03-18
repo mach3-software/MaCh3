@@ -1452,9 +1452,9 @@ double samplePDFFDBase::GetLikelihood() {
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2) reduction(+:negLogL)
   #endif
-  for (int xBin = 0; xBin < nXBins; ++xBin)
+  for (int yBin = 0; yBin < nYBins; ++yBin)
   {
-    for (int yBin = 0; yBin < nYBins; ++yBin)
+    for (int xBin = 0; xBin < nXBins; ++xBin)
     {
       const double DataVal = samplePDFFD_data[yBin][xBin];
       const double MCPred = samplePDFFD_array[yBin][xBin];
