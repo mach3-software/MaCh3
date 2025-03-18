@@ -728,7 +728,7 @@ void FitterBase::RunLLHScan() {
           {
             for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
             {
-              hScanSamSplit[is]->SetBinContent(j+1, 2*sampleSplitllh[is]);
+              hScanSamSplit[SampleIterator]->SetBinContent(j+1, 2*sampleSplitllh[SampleIterator]);
               SampleIterator++;
             }
           }
