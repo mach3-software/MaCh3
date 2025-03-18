@@ -28,7 +28,8 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName() const {return samplename;}
+  std::string GetName() const {return SampleName;}
+  std::string GetTitle() const {return SampleTitle;}
 
   std::string GetXBinVarName() {return XVarStr;}
   std::string GetYBinVarName() {return YVarStr;}
@@ -237,12 +238,12 @@ public:
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = M3::_BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  std::string SampleDetID;
+  std::string SampleName;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
   /// @brief the name of this sample e.g."muon-like"
-  std::string samplename;
+  std::string SampleTitle;
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;

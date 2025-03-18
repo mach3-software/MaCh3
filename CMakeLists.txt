@@ -28,7 +28,7 @@ add_library(MaCh3GPUCompilerOptions INTERFACE)
 
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND AND NOT(MaCh3_GPU_ENABLED))
+if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED)
   cmessage(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED ON)
   enable_language(CUDA)
