@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.4.5</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -2236,9 +2236,9 @@ Ed Atkin </dd></dl>
 <div class="line"><span class="lineno"> 1452</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
 <div class="line"><span class="lineno"> 1453</span><span class="preprocessor">  #pragma omp parallel for collapse(2) reduction(+:negLogL)</span></div>
 <div class="line"><span class="lineno"> 1454</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1455</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> yBin = 0; yBin &lt; nYBins; ++yBin)</div>
+<div class="line"><span class="lineno"> 1455</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> xBin = 0; xBin &lt; nXBins; ++xBin)</div>
 <div class="line"><span class="lineno"> 1456</span>  {</div>
-<div class="line"><span class="lineno"> 1457</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> xBin = 0; xBin &lt; nXBins; ++xBin)</div>
+<div class="line"><span class="lineno"> 1457</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> yBin = 0; yBin &lt; nYBins; ++yBin)</div>
 <div class="line"><span class="lineno"> 1458</span>    {</div>
 <div class="line"><span class="lineno"> 1459</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> DataVal = <a class="code hl_variable" href="classsamplePDFFDBase.html#a409599f48f580c86ff4c774aea81986e">samplePDFFD_data</a>[yBin][xBin];</div>
 <div class="line"><span class="lineno"> 1460</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> MCPred = <a class="code hl_variable" href="classsamplePDFFDBase.html#a057d66f6ba12cdd55ea90b6efcdb8f62">samplePDFFD_array</a>[yBin][xBin];</div>

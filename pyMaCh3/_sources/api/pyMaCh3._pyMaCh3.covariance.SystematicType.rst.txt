@@ -1,0 +1,27 @@
+SystematicType
+==============
+
+.. currentmodule:: pyMaCh3._pyMaCh3.covariance
+
+.. autoclass:: SystematicType
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SystematicType.Functional
+      ~SystematicType.N_Systematic_Types
+      ~SystematicType.Normalisation
+      ~SystematicType.Spline
+      ~SystematicType.name
+      ~SystematicType.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: Functional
+   .. autoattribute:: N_Systematic_Types
+   .. autoattribute:: Normalisation
+   .. autoattribute:: Spline
+   .. autoattribute:: name
+   .. autoattribute:: value
