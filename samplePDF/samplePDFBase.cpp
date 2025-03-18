@@ -263,9 +263,10 @@ std::string samplePDFBase::GetSampleName(int Sample) {
   if(SampleName.size() <= Sample)
   {
     unsigned int origsize = SampleName.size();
-    MACH3LOG_WARN("The name for sample {} was not initialized. I will set it to \"{}_NoNameSample_{}\".", Sample, GetName(), Sample);
     SampleName.resize(Sample+1);
+    
     for (unsigned int i = origsize; i <= Sample; ++i) {
+     MACH3LOG_WARN("The name for sample {} was not initialized. I will set it to \"{}_NoNameSample_{}\".", i, GetName(), i);
      SampleName[i] = GetName()+"_NoNameSample_"+std::to_string(i); 
     }
   }
