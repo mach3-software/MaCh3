@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.4.7 LANGUAGES CXX)
+project(MaCh3 VERSION 1.4.8 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -28,7 +28,7 @@ add_library(MaCh3GPUCompilerOptions INTERFACE)
 
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND AND NOT(MaCh3_GPU_ENABLED))
+if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED)
   cmessage(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED ON)
   enable_language(CUDA)
