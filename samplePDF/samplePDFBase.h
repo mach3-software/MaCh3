@@ -31,7 +31,7 @@ class samplePDFBase
 
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
   virtual inline std::string GetTitle()const {return "samplePDF";};
-  virtual std::string GetSampleName(int Sample) = 0;
+  virtual std::string GetSampleName(int Sample) const = 0;
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
   /// @brief Return pointer to MaCh3 modes

@@ -1389,8 +1389,12 @@ void samplePDFFDBase::SetupNuOscillator() {
   OscParams = OscCov->GetOscParsFromSampleName(SampleName);
 }
 
-std::string samplePDFFDBase::GetSampleName(int iSample) {
+std::string samplePDFFDBase::GetSampleName(int iSample) const {
+  //ETA - this is just to suppress a warning for an unused variable
   (void)iSample;
+
+  //ETA - extra safety to make sure SampleName is actually set
+  // probably unnecessary due to the requirement for it to be in the yaml config
   if(SampleName.length() == 0){
     MACH3LOG_ERROR("No sample name provided");
     MACH3LOG_ERROR("Please provide a SampleName in your configuration file: {}", SampleManager->GetFileName());
