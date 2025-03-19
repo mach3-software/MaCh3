@@ -1,4 +1,5 @@
 #include "samplePDFFDBase.h"
+#include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
@@ -62,7 +63,9 @@ void samplePDFFDBase::ReadSampleConfig()
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = new MaCh3Modes(ModeName);
+  //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
   SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
+  //SampleName has to be provided in the sample yaml otherwise this will throw an exception
   SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
   NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
@@ -712,7 +715,7 @@ M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent)
 }
 
 void samplePDFFDBase::SetupNormParameters() {  
-  xsec_norms = XsecCov->GetNormParsFromSampleName(SampleName);
+  xsec_norms = XsecCov->GetNormParsFromSampleName(GetSampleName());
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
@@ -1386,6 +1389,16 @@ void samplePDFFDBase::SetupNuOscillator() {
   OscParams = OscCov->GetOscParsFromSampleName(SampleName);
 }
 
+std::string samplePDFFDBase::GetSampleName(int iSample) {
+  (void)iSample;
+  if(SampleName.length() == 0){
+    MACH3LOG_ERROR("No sample name provided");
+    MACH3LOG_ERROR("Please provide a SampleName in your configuration file: {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return SampleName;
+}
+
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
   M3::float_t totalweight = 1.0;
   #ifdef MULTITHREAD
@@ -1408,10 +1421,10 @@ void samplePDFFDBase::fillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
           break;
         default:
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
