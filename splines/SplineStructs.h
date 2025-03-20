@@ -23,22 +23,20 @@ struct FastSplineInfo {
   /// @brief Constructor
   FastSplineInfo() {
     nPts = -999;
-    xPts = nullptr;
     CurrSegment = 0;
     splineParsPointer = nullptr;
   }
 
   /// @brief Destructor
   virtual ~FastSplineInfo() {
-    // Free dynamically allocated memory
-    if(xPts != nullptr) delete[] xPts;
+
   }
 
   /// Number of points in spline
   M3::int_t nPts;
 
   /// Array of the knots positions
-  M3::float_t *xPts;
+  std::vector<M3::float_t> xPts;
 
   /// Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration
   M3::int_t CurrSegment;

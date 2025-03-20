@@ -3,11 +3,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.4.0 LANGUAGES CXX)
+project(MaCh3 VERSION 1.4.7 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
-#LP - This option name is confusing, but I wont change it now.
-option(USE_CPU "Whether to *only* use the CPU (i.e. no GPU)" OFF)
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 option(MaCh3_LOW_MEMORY_STRUCTS_ENABLED "This will use float/short string for many structures" OFF)
@@ -16,23 +14,28 @@ option(MaCh3_DEBUG_ENABLED "Enable special debugging mode, with additional print
 option(MaCh3_DependancyGraph "Will produce dependency graph" OFF)
 option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
+option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
+
+#KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
+include(MaCh3Utils)
 
 add_library(MaCh3CompileDefinitions INTERFACE)
-#Create a seperate target for GPU compiler options
+#Create a separate target for GPU compiler options
 #if GPU is not enabled nothing will be added to this and it will be empty
 # this saves a few if statements
 add_library(MaCh3GPUCompilerOptions INTERFACE)
 
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND AND NOT(USE_CPU))
-  message(STATUS "CUDA found. Adding CUDA support.")
-  set(MaCh3_GPU_ENABLED TRUE)
+if(CUDAToolkit_FOUND AND NOT(MaCh3_GPU_ENABLED))
+  cmessage(STATUS "CUDA found. Adding CUDA support.")
+  set(MaCh3_GPU_ENABLED ON)
   enable_language(CUDA)
   set(CPU_ONLY FALSE)
 else()
-  message(STATUS "CUDA not found. Proceeding without CUDA support.")
-  set(MaCh3_GPU_ENABLED FALSE)
+  cmessage(STATUS "CUDA not found. Proceeding without CUDA support.")
+  set(MaCh3_GPU_ENABLED OFF)
   set(CPU_ONLY TRUE)
 endif()
 
@@ -48,10 +51,6 @@ endif()
 # Use the compilers found in the path
 find_program(CMAKE_C_COMPILER NAMES $ENV{CC} gcc PATHS ENV PATH NO_DEFAULT_PATH)
 find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PATH)
-
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
-#KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
-include(MaCh3Utils)
 
 ################################## Dependencies ################################
 include(MaCh3Dependencies)
@@ -178,17 +177,13 @@ endif()
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
-  target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
-  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
   # KS: Not a clue why clang need different...
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  else()
+    target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
-
-endif()
-
-if(CPU_ONLY)
-  target_compile_definitions(MaCh3CompileDefinitions INTERFACE CPU_ONLY)
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
 endif()
 
 if(MaCh3_GPU_ENABLED) 

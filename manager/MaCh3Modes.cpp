@@ -10,7 +10,8 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 
   std::string GetMaCh3ModeName(const int Index);
   NModes = 0;
-
+  nCCModes = 0;
+  
   Title = config["Title"].as<std::string>();
   Generator = config["GeneratorName"].as<std::string>();
 
@@ -19,13 +20,23 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
   for(size_t i = 0; i < names.size(); i++)
   {
     DeclareNewMode(names[i],
-                    config[names[i]]["Name"].as<std::string>(),
-                    config[names[i]]["GeneratorMaping"].as<std::vector<int>>());
+		   config[names[i]]["Name"].as<std::string>(),
+		   config[names[i]]["PlotColor"].as<int>(),
+		   config[names[i]]["GeneratorMaping"].as<std::vector<int>>(),
+		   config[names[i]]["IsNC"].as<bool>(),
+		   config[names[i]]["SplineSuffix"].as<std::string>());
+
+    if (!config[names[i]]["IsNC"].as<bool>()) {
+      nCCModes += 1;
+    }
   }
   // Add unknown category, it's better to have garbage category where all undefined modes will go rather than get random crashes
   DeclareNewMode("UNKNOWN_BAD",
                  "UNKNOWN_BAD",
-                 {});
+                 kBlack,
+                 {},
+                false,
+                "UNKNOWN_BAD");
   // This is hack to not have bad mode
   NModes--;
 
@@ -78,13 +89,19 @@ MaCh3Modes_t MaCh3Modes::EnsureModeNameRegistered(std::string const &name) {
 
 // *******************
 void MaCh3Modes::DeclareNewMode(std::string const &name,
-                    std::string const &fancyname,
-                    std::vector<int> const &GenMap) {
+				std::string const &fancyname,
+				int PlotColor,
+				std::vector<int> const &GenMap,
+				bool IsNC,
+				std::string SplineSuffix) {
 // *******************
   MaCh3ModeInfo newinfo;
   newinfo.GeneratorMaping = GenMap;
   newinfo.FancyName = fancyname;
+  newinfo.PlotColor = PlotColor;
   newinfo.Name = name;
+  newinfo.IsNC = IsNC;
+  newinfo.SplineSuffix = SplineSuffix;
 
   MaCh3Modes_t index = EnsureModeNameRegistered(name);
 
@@ -136,6 +153,22 @@ std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
 }
 
 // *******************
+bool MaCh3Modes::IsMaCh3ModeNC(const int Index) {
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
+  
+  // return UNKNOWN_BAD if out of boundary
+  if(Index > NModes)
+  {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    return fMode[NModes].IsNC;
+  }
+
+  return fMode[Index].IsNC;
+}
+// *******************
+
+// *******************
 std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
 // *******************
   // return UNKNOWN_BAD if out of boundary
@@ -168,10 +201,41 @@ MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
 
-  if(Index > NModes)
+  if(Index >= static_cast<int>(ModeMap.size()))
   {
     MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
     return NModes;
   }
+
   return ModeMap[Index];
+}
+
+// *******************
+int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) {
+// *******************
+  // return UNKNOWN_BAD if out of boundary
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
+
+  if(Index > NModes)
+  {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].PlotColor);
+    return fMode[NModes].PlotColor;
+  }
+  return fMode[Index].PlotColor;
+}
+
+// *******************
+std::string MaCh3Modes::GetSplineSuffixFromMaCh3Mode(const int Index) {
+  // *******************
+  // return UNKNOWN_BAD if out of boundary
+  if(Index < 0)
+    MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
+
+  if(Index > NModes) {
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].SplineSuffix);
+    return fMode[NModes].SplineSuffix;
+  }
+
+  return fMode[Index].SplineSuffix;
 }

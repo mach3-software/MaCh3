@@ -155,7 +155,7 @@ double GetBetaParameter(const double data, const double mc, const double w2, Tes
 // ****************
   double Beta = 0.0;
 
-  if (TestStat == kDembinskiAbdelmottele) {
+  if (TestStat == kDembinskiAbdelmotteleb) {
     //the so-called effective count
     const double k = mc*mc / w2;
     //Calculate beta which is scaling factor between true and generated MC

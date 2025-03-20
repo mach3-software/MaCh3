@@ -30,7 +30,7 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
   CheckInitialisation("sin2th_23", kSinTheta23);
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
-  flipdelM = false;
+  flipdelM = true;
 
   randomize();
   Print();
@@ -68,9 +68,9 @@ void covarianceOsc::proposeStep() {
 void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
 // *************************************
   if(_fPropVal[index] > UpBound) {
-    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
   } else if (_fPropVal[index] < LowBound) {
-    _fPropVal[index] = UpBound + std::fmod(_fPropVal[index], UpBound);
+    _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
   }
 }
 

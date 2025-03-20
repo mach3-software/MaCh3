@@ -7,6 +7,7 @@
 #include "samplePDF/Structs.h"
 #include "samplePDF/HistogramUtils.h"
 #include "manager/manager.h"
+#include "manager/MaCh3Modes.h"
 
 _MaCh3_Safe_Include_Start_ //{
 //ROOT includes
@@ -106,7 +107,7 @@ protected:
   /// Name of Sample
   std::vector<std::string> SampleName;
 
-  //GetterForModes
+  /// Holds information about used Generator and MaCh3 modes
   MaCh3Modes* Modes;
 
   TH1D *dathist; // tempstore for likelihood calc
@@ -117,6 +118,4 @@ protected:
   TH2D*_hPDF2D;
 
   TRandom3* rnd;
-
-  double pot;
 };
