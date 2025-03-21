@@ -665,10 +665,27 @@ void samplePDFFDBase::ResetHistograms() {
   }
 } // end function
 
+void samplePDFFDBase::RegisterIndividualFuncPar(std::string fpName, int fpEnum, FuncParFuncType fpFunc){
+  funcParsNamesMap[fpName] = fpEnum;
+  funcParsNamesVec.push_back(fpName);
+  funcParsFuncMap[fpEnum] = fpFunc;
+}
+
 void samplePDFFDBase::SetupFunctionalParameters() {
   MACH3LOG_INFO("Setting up functional parameters");
   funcParsVec = XsecCov->GetFuncParsFromDetID(SampleDetID);
   RegisterFunctionalParameters();
+
+  // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
+  for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+    if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), (*it).name) != funcParsNamesVec.end()) {
+      std::cout << "Adding functional parameter: " << (*it).name << std::endl;
+      std::cout << "Adding it into funcParsMap with key: " << funcParsNamesMap[(*it).name] << std::endl;
+      std::cout << "The address of the function is: " << &(*it) << std::endl;
+      funcParsMap[funcParsNamesMap[(*it).name]] = &(*it);
+    }
+  }
+
   // Mostly the same as CalcXsecNormsBins
   // For each event, make a vector of pointers to the functional parameters
   for (std::size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
@@ -715,6 +732,8 @@ void samplePDFFDBase::SetupFunctionalParameters() {
 
 void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
+  // First reset shifted array back to nominal values
+  resetShifts(iSample, iEvent);
   // HH: .at() can be replaced with [] for speed if necessary
   for (std::vector<int>::iterator it = funcParsGrid.at(iSample).at(iEvent).begin(); it != funcParsGrid.at(iSample).at(iEvent).end(); ++it) {
     // Check if func exists
@@ -1279,6 +1298,7 @@ void samplePDFFDBase::addData(TH1D* Data) {
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+    MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );}
   
   int nXBins = int(XBinEdges.size()-1);

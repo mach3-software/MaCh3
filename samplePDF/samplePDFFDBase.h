@@ -150,13 +150,16 @@ public:
   // ----- Functional Parameters -----
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
   virtual void SetupFunctionalParameters();
+  /// @brief HH - a helper function for RegisterFunctionalParameter
+  void RegisterIndividualFuncPar(std::string fpName, int fpEnum, FuncParFuncType fpFunc);
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
-  // HH: I don't think this function will be needed
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
   virtual void applyShifts(int iSample, int iEvent);
+  /// @brief HH - reset the shifted values to the original values
+  virtual void resetShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
   std::vector<FuncPars> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to funcpar enum
@@ -167,9 +170,9 @@ public:
   std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
   /// @brief HH - a grid of vectors of enums for each sample and event
   std::vector<std::vector<std::vector<int>>> funcParsGrid;
+  /// @brief HH - a vector of string names for each functional parameter
+  std::vector<std::string> funcParsNamesVec = {};
   // --------------------------------
-
-
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
 
