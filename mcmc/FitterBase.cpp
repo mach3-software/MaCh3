@@ -513,6 +513,7 @@ void FitterBase::RunLLHScan() {
   }
   // Number of points we do for each LLH scan
   const int n_points = GetFromManager<int>(fitMan->raw()["General"]["LLHScanPoints"], 100);
+  double nSigma = GetFromManager<int>(fitMan->raw()["General"]["LLHScanSigma"], 1.);
 
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
@@ -556,8 +557,8 @@ void FitterBase::RunLLHScan() {
       if (IsPCA) prior = cov->getParCurr_PCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
-      double nSigma = 1;
-      if (IsPCA) nSigma = 0.5;
+      // double nSigma = 1;
+      // if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
       double lower = prior - nSigma*cov->getDiagonalError(i);
       double upper = prior + nSigma*cov->getDiagonalError(i);
@@ -856,6 +857,7 @@ void FitterBase::Run2DLLHScan() {
   constexpr int n_points = 20;
   // We print 5 reweights
   constexpr int countwidth = double(n_points)/double(5);
+  double nSigma = GetFromManager<int>(fitMan->raw()["General"]["LLHScanSigma"], 1.);
 
   bool isxsec = false;
   // Loop over the covariance classes
@@ -885,8 +887,8 @@ void FitterBase::Run2DLLHScan() {
       if (IsPCA) prior_x = cov->getParCurr_PCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
-      double nSigma = 1;
-      if (IsPCA) nSigma = 0.5;
+      // double nSigma = 1;
+      // if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
       double lower_x = prior_x - nSigma*cov->getDiagonalError(i);
       double upper_x = prior_x + nSigma*cov->getDiagonalError(i);
