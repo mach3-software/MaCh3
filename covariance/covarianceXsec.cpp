@@ -155,47 +155,6 @@ const std::vector< std::vector<int> > covarianceXsec::GetSplineModeVecFromDetID(
 }
 
 // ********************************************
-// Get Func params
-FuncPars covarianceXsec::GetFuncPars(const YAML::Node& param, const int Index) {
-// ********************************************
-  FuncPars func;
-  func.name = GetParFancyName(Index);
-  func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
-  func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
-  func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
-  func.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], std::vector<int>(), __FILE__ , __LINE__);
-  std::cout << "Hi this is GetFuncPars" << std::endl;
-  std::cout << "Index: " << Index << std::endl;
-  std::cout << "func.name: " << func.name << std::endl;
-  // HH - Copied from GetXsecNorm
-  int NumKinematicCuts = 0;
-  if(param["KinematicCuts"]){
-
-    NumKinematicCuts = int(param["KinematicCuts"].size());
-
-    std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<double>> TempKinematicBounds;
-    //First element of TempKinematicBounds is always -999, and size is then 3
-    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
-      //ETA: This is a bit messy, Kinematic cuts is a list of maps
-      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
-        TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
-      }
-      if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-        MACH3LOG_ERROR("For Param {}", func.name);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    }//KinVar_i
-    func.KinematicVarStr = TempKinematicStrings;
-    func.Selection = TempKinematicBounds;
-  }
-  func.index = Index;
-  return func;
-}
-
-// ********************************************
 // Get Norm params
 XsecNorms4 covarianceXsec::GetXsecNorm(const YAML::Node& param, const int Index) {
 // ********************************************
@@ -306,6 +265,46 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
   Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 
   return Spline;
+}
+
+// ********************************************
+// Get Func params
+FuncPars covarianceXsec::GetFuncPars(const YAML::Node& param, const int Index) {
+// ********************************************
+  FuncPars func;
+  func.name = GetParFancyName(Index);
+  func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
+  func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
+  func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
+  func.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], std::vector<int>(), __FILE__ , __LINE__);
+
+  // HH - Copied from GetXsecNorm
+  int NumKinematicCuts = 0;
+  if(param["KinematicCuts"]){
+
+    NumKinematicCuts = int(param["KinematicCuts"].size());
+
+    std::vector<std::string> TempKinematicStrings;
+    std::vector<std::vector<double>> TempKinematicBounds;
+    //First element of TempKinematicBounds is always -999, and size is then 3
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
+      //ETA: This is a bit messy, Kinematic cuts is a list of maps
+      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
+        TempKinematicStrings.push_back(it->first.as<std::string>());
+        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+      }
+      if(TempKinematicStrings.size() == 0) {
+        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("For Param {}", func.name);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }//KinVar_i
+    func.KinematicVarStr = TempKinematicStrings;
+    func.Selection = TempKinematicBounds;
+    func.hasKinBounds = true;
+  }
+  func.index = Index;
+  return func;
 }
 
 // ********************************************
