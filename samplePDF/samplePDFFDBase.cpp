@@ -748,7 +748,7 @@ void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
     //   MACH3LOG_ERROR("Functional parameter {} not found in map", *it);
     //   throw MaCh3Exception(__FILE__, __LINE__);
     // }
-    funcParsFuncMap[*it](XsecCov->retPointer(funcParsMap[*it]->index), iSample, iEvent);
+    funcParsFuncMap[*it](funcParsMap[*it]->valuePtr, iSample, iEvent);
   }
 }
 // =================================

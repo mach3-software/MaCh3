@@ -304,6 +304,7 @@ FuncPars covarianceXsec::GetFuncPars(const YAML::Node& param, const int Index) {
     func.hasKinBounds = true;
   }
   func.index = Index;
+  func.valuePtr = retPointer(Index);
   return func;
 }
 
