@@ -1172,7 +1172,10 @@ void covarianceBase::updateAdaptiveCovariance(){
   // First we update the total means
 
   // Skip this if we're at a large number of steps
-  if(AdaptiveHandler.SkipAdaption()) return;
+  if(AdaptiveHandler.SkipAdaption()) {
+    AdaptiveHandler.total_steps++;
+    return;
+  }
 
   // Call main adaption function
   AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
