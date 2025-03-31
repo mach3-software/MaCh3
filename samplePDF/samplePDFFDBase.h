@@ -136,7 +136,8 @@ public:
   /// @brief HH - a map that relates the name of the functional parameter to funcpar enum
   std::unordered_map<std::string, int> funcParsNamesMap;
   /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars struct
-  std::unordered_map<int, FuncPars*> funcParsMap;
+  // HH - Changed to a vector of pointers since it's faster than unordered_map and we are using ints as keys
+  std::vector<FuncPars*> funcParsMap;
   /// @brief HH - a map that relates the funcpar enum to pointer of the actual function
   std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
   /// @brief HH - a grid of vectors of enums for each sample and event

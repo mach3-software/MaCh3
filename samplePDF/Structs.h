@@ -174,6 +174,9 @@ struct FuncPars {
 
   /// Parameter value pointer
   const double* valuePtr;
+
+  /// Function pointer
+  FuncParFuncType* funcPtr;
 };
 
 /// Make an enum of the spline interpolation type
