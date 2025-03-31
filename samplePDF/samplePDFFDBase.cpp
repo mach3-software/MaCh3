@@ -1,5 +1,7 @@
 #include "samplePDFFDBase.h"
+#include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"
+#include <cstddef>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
@@ -675,14 +677,19 @@ void samplePDFFDBase::SetupFunctionalParameters() {
   MACH3LOG_INFO("Setting up functional parameters");
   funcParsVec = XsecCov->GetFuncParsFromDetID(SampleDetID);
   RegisterFunctionalParameters();
+  funcParsMap.resize(funcParsNamesMap.size());
+  funcParsGrid.resize(MCSamples.size());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
-  for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
-    if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), (*it).name) != funcParsNamesVec.end()) {
-      std::cout << "Adding functional parameter: " << (*it).name << std::endl;
-      std::cout << "Adding it into funcParsMap with key: " << funcParsNamesMap[(*it).name] << std::endl;
-      std::cout << "The address of the function is: " << &(*it) << std::endl;
-      funcParsMap[funcParsNamesMap[(*it).name]] = &(*it);
+  for (FuncPars & fp : funcParsVec) {
+    for (std::string name : funcParsNamesVec) {
+      if (fp.name == name) {
+        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
+        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
+        // MACH3LOG_INFO("The address of fp.funcPtr is: {}", fp.funcPtr);
+        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
+        continue;
+      }
     }
   }
 
@@ -734,15 +741,15 @@ void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
   // First reset shifted array back to nominal values
   resetShifts(iSample, iEvent);
-  // HH: .at() can be replaced with [] for speed if necessary
-  for (std::vector<int>::iterator it = funcParsGrid.at(iSample).at(iEvent).begin(); it != funcParsGrid.at(iSample).at(iEvent).end(); ++it) {
-    // Check if func exists
-    // HH: Commented this out because this if statemnt will get checked very often so very slow. 
-    // if (funcParsMap.find(*it) == funcParsMap.end()) {
-    //   MACH3LOG_ERROR("Functional parameter {} not found in map", *it);
+  for (int fpEnum : funcParsGrid[iSample][iEvent]) {
+    FuncPars *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
+    // if (fp->funcPtr) {
+    //   (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+    // } else {
+    //   MACH3LOG_ERROR("Functional parameter function pointer for {} is null for event {} in sample {}", fp->name, iEvent, iSample);
     //   throw MaCh3Exception(__FILE__, __LINE__);
     // }
-    funcParsFuncMap[*it](funcParsMap[*it]->valuePtr, iSample, iEvent);
+    (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
   }
 }
 // =================================
