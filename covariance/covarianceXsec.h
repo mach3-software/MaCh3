@@ -22,9 +22,9 @@ class covarianceXsec : public covarianceBase {
     ~covarianceXsec();
 
     // General Getter functions not split by detector
-    /// @brief ETA - just return the int of the DetID, this can be removed to do a string comp at some point.
+    /// @brief ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.
     /// @param i parameter index
-    inline std::vector<std::string> GetParDetID(const int i) const { return _fDetID[i];};
+    inline std::vector<std::string> GetParSampleID(const int i) const { return _fSampleNames[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
     inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
@@ -35,14 +35,14 @@ class covarianceXsec : public covarianceBase {
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
-    /// @brief Get the interpolation types for splines affecting a particular DetID
-    const std::vector<SplineInterpolation> GetSplineInterpolationFromDetID(const std::string& DetID);
+    /// @brief Get the interpolation types for splines affecting a particular SampleName
+    const std::vector<SplineInterpolation> GetSplineInterpolationFromSampleName(const std::string& SampleName);
     /// @brief Get the name of the spline associated with the spline at index i
     /// @param i spline parameter index, not to be confused with global index
     std::string GetParSplineName(const int i) {return _fSplineNames[i];}
 
-    /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<int> GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type);
+    /// @brief DB Get spline parameters depending on given SampleName
+    const std::vector<int> GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i)._SplineKnotUpBound;}
@@ -50,30 +50,30 @@ class covarianceXsec : public covarianceBase {
     /// @param i spline parameter index, not confuse with global index
     inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i)._SplineKnotLowBound;}
 
-    /// @brief DB Grab the number of parameters for the relevant DetID
+    /// @brief DB Grab the number of parameters for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    int GetNumParamsFromDetID(const std::string& DetID, const SystType Type);
-    /// @brief DB Grab the parameter names for the relevant DetID
+    int GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type);
+    /// @brief DB Grab the parameter names for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<std::string> GetParsNamesFromDetID(const std::string& DetID, const SystType Type);
-    /// @brief DB Grab the parameter indices for the relevant DetID
+    const std::vector<std::string> GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type);
+    /// @brief DB Grab the parameter indices for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<int> GetParsIndexFromDetID(const std::string& DetID, const SystType Type);
+    const std::vector<int> GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type);
 
-    /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineParsNamesFromDetID(const std::string& DetID);
-    /// @brief DB Get spline parameters depending on given DetID
-    const std::vector<std::string> GetSplineFileParsNamesFromDetID(const std::string& DetID);
+    /// @brief DB Get spline parameters depending on given SampleName
+    const std::vector<std::string> GetSplineParsNamesFromSampleName(const std::string& SampleName);
+    /// @brief DB Get spline parameters depending on given SampleName
+    const std::vector<std::string> GetSplineFileParsNamesFromSampleName(const std::string& SampleName);
 
-    /// @brief DB Grab the Spline Modes for the relevant DetID
-    const std::vector< std::vector<int> > GetSplineModeVecFromDetID(const std::string& DetID);
+    /// @brief DB Grab the Spline Modes for the relevant SampleName
+    const std::vector< std::vector<int> > GetSplineModeVecFromSampleName(const std::string& SampleName);
     /// @brief Grab the index of the syst relative to global numbering.
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<int> GetSystIndexFromDetID(const std::string& DetID, const SystType Type);
-    /// @brief DB Get norm/func parameters depending on given DetID
-    const std::vector<XsecNorms4> GetNormParsFromDetID(const std::string& DetID);
-    /// @brief HH Get functional parameters for the relevant DetID
-    const std::vector<FuncPars> GetFuncParsFromDetID(const std::string& DetID);
+    const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
+    /// @brief DB Get norm/func parameters depending on given SampleName
+    const std::vector<XsecNorms4> GetNormParsFromSampleName(const std::string& SampleName);
+    /// @brief HH Get functional parameters for the relevant SampleName
+    const std::vector<FuncPars> GetFuncParsFromSampleName(const std::string& SampleName);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> getNominalArray() override
@@ -118,7 +118,7 @@ class covarianceXsec : public covarianceBase {
     /// @brief Iterates over parameters and applies a filter and action function.
     ///
     /// This template function provides a way to iterate over parameters associated
-    /// with a specific Detector ID (DetID). It applies a filter function to determine
+    /// with a specific Sample ID (SampleName). It applies a filter function to determine
     /// which parameters to process and an action function to define what to do
     /// with the selected parameters.
     ///
@@ -126,9 +126,9 @@ class covarianceXsec : public covarianceBase {
     /// which parameters to include.
     /// @tparam ActionFunc The type of the action function applied to each selected
     /// parameter.
-    /// @param DetID The Detector ID used to filter parameters.
+    /// @param SampleName The Sample ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
-    void IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action);
+    void IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action);
 
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.

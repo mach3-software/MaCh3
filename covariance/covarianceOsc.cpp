@@ -30,7 +30,7 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
   CheckInitialisation("sin2th_23", kSinTheta23);
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
-  flipdelM = false;
+  flipdelM = true;
 
   randomize();
   Print();
@@ -68,9 +68,9 @@ void covarianceOsc::proposeStep() {
 void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
 // *************************************
   if(_fPropVal[index] > UpBound) {
-    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index], UpBound);
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
   } else if (_fPropVal[index] < LowBound) {
-    _fPropVal[index] = UpBound + std::fmod(_fPropVal[index], UpBound);
+    _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
   }
 }
 
@@ -83,30 +83,30 @@ void covarianceOsc::Print() {
 
   MACH3LOG_INFO("=================================================================================================================================");
   MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10} {:2} {:<15} {:2} {:<15} {:2} {:<10} {:2} {:<10}",
-                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "DetID");
+                "#", "|", "Name", "|", "Prior", "|", "IndivStepScale", "|", "Error", "|", "FlatPrior", "|", "SampleNames");
   MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < _fNumPar; i++) {
-    std::string detIdString = "";
-    for (const auto& detID : _fDetID[i]) {
-      if (!detIdString.empty()) {
-        detIdString += ", ";
+    std::string SampleNameString = "";
+    for (const auto& SampleName : _fSampleNames[i]) {
+      if (!SampleNameString.empty()) {
+        SampleNameString += ", ";
       }
-      detIdString += detID;
+      SampleNameString += SampleName;
     }
 
     MACH3LOG_INFO("{:<5} {:2} {:<25} {:2} {:<10.4f} {:2} {:<15.2f} {:2} {:<15.4f} {:2} {:<10} {:2} {:<10}",
-                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", detIdString);
+                  i, "|", _fNames[i].c_str(), "|", _fPreFitValue[i], "|", _fIndivStepScale[i], "|", _fError[i], "|", _fFlatPrior[i], "|", SampleNameString);
   }
   MACH3LOG_INFO("=================================================================================================================================");
 }
 
 // ********************************************
-// DB Grab the Normalisation parameters for the relevant DetID
-std::vector<const double*> covarianceOsc::GetOscParsFromDetID(const std::string& DetID) {
+// DB Grab the Normalisation parameters for the relevant sample name
+std::vector<const double*> covarianceOsc::GetOscParsFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<const double*> returnVec;
   for (int i = 0; i < _fNumPar; ++i) {
-    if (AppliesToDetID(i, DetID)) {
+    if (AppliesToSample(i, SampleName)) {
       returnVec.push_back(retPointer(i));
     }
   }
