@@ -865,7 +865,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
     TSpline3_red* Spline = nullptr;
     TString Syst, Mode;
     int nKnots, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin = M3::_BAD_INT_;
-    double x,y, Eval = M3::_BAD_DOUBLE_;
+    double x,y = M3::_BAD_DOUBLE_;
     bool isFlat = true;
 
     std::set<std::string> SplineFileNames;
@@ -946,9 +946,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
         isFlat = true;
         for (int iKnot = 0; iKnot < nKnots; iKnot++) {
           mySpline->GetKnot(iKnot, x, y);
-
-          Eval = mySpline->Eval(x);
-          if (Eval < 0.99999 || Eval > 1.00001)
+          if (y < 0.99999 || y > 1.00001)
           {
             isFlat = false;
             break;

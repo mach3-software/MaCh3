@@ -67,6 +67,14 @@ void samplePDFFDBase::ReadSampleConfig()
   NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
   
+  // TN override the sample setting if not using binned oscillation
+  if (EqualBinningPerOscChannel) {
+    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() != "Binned") {
+      MACH3LOG_WARN("Tried using EqualBinningPerOscChannel while using Unbinned oscillation calculation, changing EqualBinningPerOscChannel to false");
+      EqualBinningPerOscChannel = false;
+    }
+  }
+
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with samplePDFBase::SetTestStatistic()
   if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
@@ -1444,9 +1452,9 @@ double samplePDFFDBase::GetLikelihood() {
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2) reduction(+:negLogL)
   #endif
-  for (int xBin = 0; xBin < nXBins; ++xBin)
+  for (int yBin = 0; yBin < nYBins; ++yBin)
   {
-    for (int yBin = 0; yBin < nYBins; ++yBin)
+    for (int xBin = 0; xBin < nXBins; ++xBin)
     {
       const double DataVal = samplePDFFD_data[yBin][xBin];
       const double MCPred = samplePDFFD_array[yBin][xBin];
