@@ -59,7 +59,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       }
 
       //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
-      //to the Systematic index i.e. the counter for things like _fDetID and _fDetID
+      //to the Systematic index i.e. the counter for things like _fSampleID
       _fSystToGlobalSystIndexMap[SystType::kSpline].insert(std::make_pair(ParamCounter[SystType::kSpline], i));
       ParamCounter[SystType::kSpline]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
@@ -102,14 +102,14 @@ ParameterHandlerGeneric::~ParameterHandlerGeneric() {
 }
 
 // ********************************************
-// DB Grab the Spline Names for the relevant DetID
-const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromDetID(const std::string& DetID) {
+// DB Grab the Spline Names for the relevant SampleName
+const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<std::string> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required Sample
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
 
@@ -118,14 +118,14 @@ const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromDe
 }
 
 // ********************************************
-const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromDetID(const std::string& DetID) {
+const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
 
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
     }
   }
@@ -133,8 +133,8 @@ const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpo
 }
 
 // ********************************************
-// DB Grab the Spline Modes for the relevant DetID
-const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromDetID(const std::string& DetID) {
+// DB Grab the Spline Modes for the relevant SampleName
+const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
@@ -142,7 +142,7 @@ const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecF
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineParams.at(SplineIndex)._fSplineModes);
     }
   }
@@ -208,14 +208,14 @@ XsecNorms4 ParameterHandlerGeneric::GetXsecNorm(const YAML::Node& param, const i
 }
 
 // ********************************************
-// Grab the global syst index for the relevant DetID
+// Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromDetID(const std::string& DetID, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SystIndex = pair.second;
-    if (AppliesToDetID(SystIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SystIndex);
     }
   }
@@ -223,15 +223,15 @@ const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromDetID(cons
 }
 
 // ********************************************
-// Grab the global syst index for the relevant DetID
+// Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromDetID(const std::string& DetID,  const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
     auto &SplineIndex = pair.first;
     auto &systIndex = pair.second;
-    if (AppliesToDetID(systIndex, DetID)) { //If parameter applies to required DetID
+    if (AppliesToSample(systIndex, SampleName)) { //If parameter applies to required SampleID
       returnVec.push_back(SplineIndex);
     }
   }
@@ -263,14 +263,14 @@ XsecSplines1 ParameterHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
 }
 
 // ********************************************
-// DB Grab the Normalisation parameters for the relevant DetID
-const std::vector<XsecNorms4> ParameterHandlerGeneric::GetNormParsFromDetID(const std::string& DetID) {
+// DB Grab the Normalisation parameters for the relevant SampleName
+const std::vector<XsecNorms4> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) {
 // ********************************************
   std::vector<XsecNorms4> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
     auto &NormIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    if (AppliesToDetID(GlobalIndex, DetID)) {
+    if (AppliesToSample(GlobalIndex, SampleName)) {
       returnVec.push_back(NormParams[NormIndex]);
     }
   }
@@ -278,11 +278,11 @@ const std::vector<XsecNorms4> ParameterHandlerGeneric::GetNormParsFromDetID(cons
 }
 
 // ********************************************
-// DB Grab the number of parameters for the relevant DetID
-int ParameterHandlerGeneric::GetNumParamsFromDetID(const std::string& DetID, const SystType Type) {
+// DB Grab the number of parameters for the relevant SampleName
+int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   int returnVal = 0;
-  IterateOverParams(DetID,
+  IterateOverParams(SampleName,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
     [&](int) { returnVal += 1; } // Action to perform if filter passes
   );
@@ -290,11 +290,11 @@ int ParameterHandlerGeneric::GetNumParamsFromDetID(const std::string& DetID, con
 }
 
 // ********************************************
-// DB Grab the parameter names for the relevant DetID
-const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromDetID(const std::string& DetID, const SystType Type) {
+// DB Grab the parameter names for the relevant SampleName
+const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   std::vector<std::string> returnVec;
-  IterateOverParams(DetID,
+  IterateOverParams(SampleName,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
     [&](int i) { returnVec.push_back(GetParFancyName(i)); } // Action to perform if filter passes
   );
@@ -302,11 +302,11 @@ const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromDetID(co
 }
 
 // ********************************************
-// DB DB Grab the parameter indices for the relevant DetID
-const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromDetID(const std::string& DetID, const SystType Type) {
+// DB DB Grab the parameter indices for the relevant SampleName
+const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) {
 // ********************************************
   std::vector<int> returnVec;
-  IterateOverParams(DetID,
+  IterateOverParams(SampleName,
     [&](int i) { return GetParamType(i) == Type; }, // Filter condition
     [&](int i) { returnVec.push_back(i); } // Action to perform if filter passes
   );
@@ -315,10 +315,10 @@ const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromDetID(const std:
 
 // ********************************************
 template <typename FilterFunc, typename ActionFunc>
-void ParameterHandlerGeneric::IterateOverParams(const std::string& DetID, FilterFunc filter, ActionFunc action) {
+void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    if ((AppliesToDetID(i, DetID)) && filter(i)) { // Common filter logic
+    if ((AppliesToSample(i, SampleName)) && filter(i)) { // Common filter logic
       action(i); // Specific action for each function
     }
   }
@@ -380,18 +380,18 @@ void ParameterHandlerGeneric::Print() {
 void ParameterHandlerGeneric::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "DetID", "|", "Type");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleNames", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
-    std::string detIdString = "";
-    for (const auto& detID : _fDetID[i]) {
-      if (!detIdString.empty()) {
-        detIdString += ", ";
+    std::string SampleNameString = "";
+    for (const auto& SampleName : _fSampleNames[i]) {
+      if (!SampleNameString.empty()) {
+        SampleNameString += ", ";
       }
-      detIdString += detID;
+      SampleNameString += SampleName;
     }
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", detIdString, "|", SystType_ToString(_fParamType[i]));
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleNameString, "|", SystType_ToString(_fParamType[i]));
   }
   MACH3LOG_INFO("============================================================================================================================================================");
 }

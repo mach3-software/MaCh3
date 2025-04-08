@@ -417,10 +417,10 @@ protected:
   /// @cite haario2001adaptive
   void updateAdaptiveCovariance();
 
-  /// @brief Check if parameter is affecting given det ID
+  /// @brief Check if parameter is affecting given sample name
   /// @param SystIndex number of parameter
-  /// @param DetID The Detector ID used to filter parameters.
-  bool AppliesToDetID(const int SystIndex, const std::string& DetID) const;
+  /// @param SampleName The Sample name used to filter parameters.
+  bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
 
   /// The input root file we read in
   const std::string inputFile;
@@ -474,7 +474,7 @@ protected:
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
-  std::vector<std::vector<std::string>> _fDetID;
+  std::vector<std::vector<std::string>> _fSampleNames;
 
   /// perform PCA or not
   bool pca;

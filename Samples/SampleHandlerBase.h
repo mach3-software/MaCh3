@@ -30,8 +30,8 @@ class SampleHandlerBase
   virtual ~SampleHandlerBase();
 
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
-  virtual inline std::string GetName()const {return "SampleHandler";};
-  virtual std::string GetSampleName(int Sample);
+  virtual inline std::string GetTitle()const {return "SampleHandler";};
+  virtual std::string GetSampleName(int Sample) const = 0;
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
   /// @brief Return pointer to MaCh3 modes
@@ -104,8 +104,6 @@ protected:
   M3::int_t nSamples;
   /// KS: number of dimension for this sample
   int nDims;
-  /// Name of Sample
-  std::vector<std::string> SampleName;
 
   /// Holds information about used Generator and MaCh3 modes
   MaCh3Modes* Modes;

@@ -50,7 +50,6 @@ void BinnedSplineHandler::cleanUpMemory() {
   CleanVector(SplineInterpolationTypes);
   CleanVector(nOscChans);
   CleanVector(nSplineParams);
-  CleanVector(DetIDs);
   CleanVector(DimensionLabels);
   CleanVector(SampleNames);
   CleanVector(Dimensions);
@@ -61,7 +60,6 @@ void BinnedSplineHandler::cleanUpMemory() {
 
 //****************************************
 void BinnedSplineHandler::AddSample(const std::string& SampleName,
-                             const std::string& DetID,
                              const std::vector<std::string>& OscChanFileNames,
                              const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
@@ -70,25 +68,24 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
   SampleNames.push_back(SampleName);
   Dimensions.push_back(int(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
-  DetIDs.push_back(DetID);
 
-  int nSplineParam = xsec->GetNumParamsFromDetID(DetID, SystType::kSpline);
+  int nSplineParam = xsec->GetNumParamsFromSampleName(SampleName, SystType::kSpline);
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromSampleName(SampleName, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
-  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromDetID(DetID);
+  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromSampleName(SampleName);
   // Keep track of this for all samples
   SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
 
-  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
+  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromSampleName(SampleName);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   MACH3LOG_INFO("Create SplineModeVecs_Sample");
-  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromSampleName(SampleName));
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
 
@@ -669,7 +666,6 @@ void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName) cons
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
-  MACH3LOG_INFO("\t DetID: {:<35}", DetIDs[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
 }
@@ -769,8 +765,19 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(std::string
   }
   
   int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
-  //ETA- this is already a MaCh3 mode
-  int Mode = EventMode;
+
+
+  int Mode = -1;
+  std::string SuffixForEventMode = Modes->GetSplineSuffixFromMaCh3Mode(EventMode);
+  for (int iMode=0;iMode<Modes->GetNModes();iMode++) {
+    if (SuffixForEventMode == Modes->GetSplineSuffixFromMaCh3Mode(iMode)) {
+      Mode = iMode;
+      break;
+    }
+  }
+  if (Mode == -1) {
+    return ReturnVec;
+  }
 
   int Var1Bin = SplineBinning[SampleIndex][iOscChan][0]->FindBin(Var1Val)-1;
   if (Var1Bin < 0 || Var1Bin >= SplineBinning[SampleIndex][iOscChan][0]->GetNbins()) {
@@ -855,7 +862,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
     TSpline3_red* Spline = nullptr;
     TString Syst, Mode;
     int nKnots, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin = M3::_BAD_INT_;
-    double x,y, Eval = M3::_BAD_DOUBLE_;
+    double x,y = M3::_BAD_DOUBLE_;
     bool isFlat = true;
 
     std::set<std::string> SplineFileNames;
@@ -879,8 +886,8 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
       std::string FullSplineName = std::string(Key->GetName());
 
       if (SplineFileNames.count(FullSplineName) > 0) {
-	MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName); 
-	continue;
+        MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName);
+        continue;
       }
       SplineFileNames.insert(FullSplineName);
 
@@ -907,7 +914,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
 
       // If the syst doesn't match any of the spline names then skip it
       if (SystNum == -1){
-        MACH3LOG_WARN("Couldn't match!!");
+        MACH3LOG_DEBUG("Couldn't match!!");
         MACH3LOG_DEBUG("Couldn't Match any systematic name in xsec yaml with spline name: {}" , FullSplineName);
         continue;
       }
@@ -921,10 +928,10 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
       }
 
       if (ModeNum == -1) {
-	//DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
-	//     Therefore include as debug warning and continue instead
+      //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+      //     Therefore include as debug warning and continue instead
         MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
-	continue;
+        continue;
       }
 
       mySpline = Key->ReadObject<TSpline3>();
@@ -936,9 +943,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
         isFlat = true;
         for (int iKnot = 0; iKnot < nKnots; iKnot++) {
           mySpline->GetKnot(iKnot, x, y);
-
-          Eval = mySpline->Eval(x);
-          if (Eval < 0.99999 || Eval > 1.00001)
+          if (y < 0.99999 || y > 1.00001)
           {
             isFlat = false;
             break;

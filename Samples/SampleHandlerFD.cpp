@@ -31,7 +31,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
   SampleHandlerFD_array = nullptr;
   SampleHandlerFD_data = nullptr;
-  SampleDetID = "";
+  SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 }
 
@@ -62,10 +62,20 @@ void SampleHandlerFD::ReadSampleConfig()
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = new MaCh3Modes(ModeName);
-  samplename = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
-  SampleDetID = Get<std::string>(SampleManager->raw()["DetID"], __FILE__ , __LINE__);
+  //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
+  SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
+  //SampleName has to be provided in the sample yaml otherwise this will throw an exception
+  SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
   NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
+
+  // TN override the sample setting if not using binned oscillation
+  if (EqualBinningPerOscChannel) {
+    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() != "Binned") {
+      MACH3LOG_WARN("Tried using EqualBinningPerOscChannel while using Unbinned oscillation calculation, changing EqualBinningPerOscChannel to false");
+      EqualBinningPerOscChannel = false;
+    }
+  }
   
   //Default TestStatistic is kPoisson
   //ETA: this can be configured with SampleHandlerBase::SetTestStatistic()
@@ -276,10 +286,10 @@ void SampleHandlerFD::SetupSampleBinning(){
   //The binning here is arbitrary, now we get info from cfg so the
   //set1DBinning and set2Dbinning calls below will make the binning
   //to be what we actually want
-  _hPDF1D   = new TH1D("h"+histname1d+samplename,histtitle, 1, 0, 1);
-  dathist   = new TH1D("d"+histname1d+samplename,histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
+  _hPDF1D   = new TH1D("h"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  dathist   = new TH1D("d"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
 
   //Make some arrays so we can initialise _hPDF1D and _hPDF2D with these
   XBinEdges.reserve(SampleXBins.size());
@@ -703,8 +713,12 @@ M3::float_t SampleHandlerFD::CalcWeightNorm(const int iSample, const int iEvent)
   return xsecw;
 }
 
-void SampleHandlerFD::SetupNormParameters() {  
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
+
+// ***************************************************************************
+// Setup the norm parameters
+void sampleHandlerFD::SetupNormParameters() {  
+// ***************************************************************************
+  xsec_norms = XsecCov->GetNormParsFromSampleName(GetSampleName());
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
@@ -1375,7 +1389,21 @@ void SampleHandlerFD::SetupNuOscillator() {
   }// end loop over channels
   delete OscillFactory;
 
-  OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
+  OscParams = OscCov->GetOscParsFromSampleName(SampleName);
+}
+
+std::string samplePDFFDBase::GetSampleName(int iSample) const {
+  //ETA - this is just to suppress a warning for an unused variable
+  (void)iSample;
+
+  //ETA - extra safety to make sure SampleName is actually set
+  // probably unnecessary due to the requirement for it to be in the yaml config
+  if(SampleName.length() == 0){
+    MACH3LOG_ERROR("No sample name provided");
+    MACH3LOG_ERROR("Please provide a SampleName in your configuration file: {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return SampleName;
 }
 
 M3::float_t SampleHandlerFD::GetEventWeight(const int iSample, const int iEntry) const {
@@ -1400,10 +1428,10 @@ void SampleHandlerFD::fillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
           break;
         default:
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
@@ -1444,9 +1472,9 @@ double SampleHandlerFD::GetLikelihood() {
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2) reduction(+:negLogL)
   #endif
-  for (int xBin = 0; xBin < nXBins; ++xBin)
+  for (int yBin = 0; yBin < nYBins; ++yBin)
   {
-    for (int yBin = 0; yBin < nYBins; ++yBin)
+    for (int xBin = 0; xBin < nXBins; ++xBin)
     {
       const double DataVal = SampleHandlerFD_data[yBin][xBin];
       const double MCPred = SampleHandlerFD_array[yBin][xBin];
@@ -1524,7 +1552,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
+  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
   SplineHandler->CountNumberOfLoadedSplines(false, 1);
   SplineHandler->TransferToMonolith();
 
@@ -1824,8 +1852,8 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   if (printToFile) {
     outfile << "\\begin{table}[ht]" << std::endl;
     outfile << "\\begin{center}" << std::endl;
-    outfile << "\\caption{Integral breakdown for sample: " << GetName() << "}" << std::endl;
-    outfile << "\\label{" << GetName() << "-EventRate}" << std::endl;
+    outfile << "\\caption{Integral breakdown for sample: " << GetTitle() << "}" << std::endl;
+    outfile << "\\label{" << GetTitle() << "-EventRate}" << std::endl;
     
     TString nColumns;
     for (int i=0;i<getNMCSamples();i++) {nColumns+="|c";}
@@ -1836,10 +1864,10 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   if(printToCSV){
     // HW Probably a better way but oh well, here I go making MaCh3 messy again
-    outcsv<<"Integral Breakdown for sample :"<<GetName()<<"\n";
+    outcsv<<"Integral Breakdown for sample :"<<GetTitle()<<"\n";
   }
   
-  MACH3LOG_INFO("Integral breakdown for sample: {}", GetName());
+  MACH3LOG_INFO("Integral breakdown for sample: {}", GetTitle());
   MACH3LOG_INFO("");
 
   if (printToFile) {outfile << std::setw(space) << "Mode:";}
@@ -1986,7 +2014,7 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string Kinemati
 
 THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
   std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
-  THStack* StackHist = new THStack((GetName()+"_"+KinematicProjection+"_Stack").c_str(),"");
+  THStack* StackHist = new THStack((GetTitle()+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {
     StackHist->Add(HistList[i]);
   }

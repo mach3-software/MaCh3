@@ -31,7 +31,6 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
-                   const std::string& DetID,
                    const std::vector<std::string>& OscChanFileNames,
                    const std::vector<std::string>& SplineVarNames);
     /// @brief flatten multidimensional spline array into proper monolith
@@ -62,7 +61,7 @@ class BinnedSplineHandler : public SplineBase {
     void PrepForReweight();
     void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
     void PrintBinning(TAxis* Axis) const;
-    /// @brief Print info like DetID number of spline params etc.
+    /// @brief Print info like Sample ID of spline params etc.
     void PrintSampleDetails(const std::string& SampleName) const;
     void PrintArrayDetails(const std::string& SampleName) const;
 
@@ -85,7 +84,6 @@ class BinnedSplineHandler : public SplineBase {
     std::vector<std::string> SampleNames;
     std::vector<int> Dimensions;
     std::vector<std::vector<std::string>> DimensionLabels;
-    std::vector<std::string> DetIDs;
     std::vector<int> nSplineParams;
     std::vector<int> nOscChans;
 
@@ -100,7 +98,7 @@ class BinnedSplineHandler : public SplineBase {
     /// systematics which affect that sample.
     std::vector< std::vector<int> > GlobalSystIndex;
     /// @brief spline interpolation types for each sample. These vectors are from
-    /// a call to GetSplineInterpolationFromDetID()
+    /// a call to GetSplineInterpolationFromSampleID()
     std::vector< std::vector<SplineInterpolation> > SplineInterpolationTypes;
 
     /// name of each spline parameter

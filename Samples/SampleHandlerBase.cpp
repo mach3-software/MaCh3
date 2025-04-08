@@ -264,6 +264,7 @@ std::string SampleHandlerBase::GetSampleName(int Sample) {
 }
 
 // ***************************************************************************
+
 // CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
 void SampleHandlerBase::QuietPlease() {
 // ***************************************************************************
