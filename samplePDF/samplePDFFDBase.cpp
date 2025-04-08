@@ -675,15 +675,29 @@ void samplePDFFDBase::ResetHistograms() {
   }
 } // end function
 
-void samplePDFFDBase::RegisterIndividualFuncPar(std::string fpName, int fpEnum, FuncParFuncType fpFunc){
+void samplePDFFDBase::RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+  // Add protections to not add the same functional parameter twice
+  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
+    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   funcParsNamesMap[fpName] = fpEnum;
   funcParsNamesVec.push_back(fpName);
   funcParsFuncMap[fpEnum] = fpFunc;
 }
 
 void samplePDFFDBase::SetupFunctionalParameters() {
-  MACH3LOG_INFO("Setting up functional parameters");
   funcParsVec = XsecCov->GetFuncParsFromSampleName(SampleName);
+  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
   funcParsGrid.resize(MCSamples.size());
@@ -694,10 +708,14 @@ void samplePDFFDBase::SetupFunctionalParameters() {
       if (fp.name == name) {
         MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
         fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
-        // MACH3LOG_INFO("The address of fp.funcPtr is: {}", fp.funcPtr);
         funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
         continue;
       }
+    }
+    // If we don't find a match, we need to throw an error
+    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
+      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
 

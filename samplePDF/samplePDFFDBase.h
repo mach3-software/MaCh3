@@ -152,7 +152,7 @@ public:
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
   virtual void SetupFunctionalParameters();
   /// @brief HH - a helper function for RegisterFunctionalParameter
-  void RegisterIndividualFuncPar(std::string fpName, int fpEnum, FuncParFuncType fpFunc);
+  void RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
