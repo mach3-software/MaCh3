@@ -32,7 +32,7 @@ class SampleHandlerBase
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
   virtual inline std::string GetTitle()const {return "SampleHandler";};
   virtual std::string GetSampleName(int Sample) const = 0;
-  virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
+  virtual inline double GetSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
   /// @brief Return pointer to MaCh3 modes
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
@@ -42,7 +42,7 @@ class SampleHandlerBase
   TH1D* get1DDataHist(){return dathist;}
   TH2D* get2DDataHist(){return dathist2d;}
       
-  virtual void reweight()=0;
+  virtual void Reweight()=0;
   virtual double GetLikelihood() = 0;
 
   virtual int getNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }

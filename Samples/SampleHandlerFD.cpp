@@ -19,12 +19,12 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
     MACH3LOG_ERROR("You've passed me a nullptr to a SystematicHandlerGeneric... I need this to setup splines!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  XsecCov = xsec_cov;
+  ParHandler = xsec_cov;
 
   if(!osc_cov){
     MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
   }
-  OscCov = osc_cov;
+  OscParHandler = osc_cov;
   
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
@@ -347,14 +347,14 @@ bool SampleHandlerFD::IsEventSelected(const int iSample, const int iEvent) {
 
 //************************************************
 // Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
-void SampleHandlerFD::reweight() {
+void SampleHandlerFD::Reweight() {
 //************************************************
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
   //You only need to do these things if OscCov has been initialised
   //if not then you're not considering oscillations
-  if (OscCov) {
+  if (OscParHandler) {
     std::vector<M3::float_t> OscVec(OscParams.size());
     for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
       #pragma GCC diagnostic push
@@ -679,16 +679,16 @@ void SampleHandlerFD::ResetHistograms() {
 // Calculate the spline weight for one event
 M3::float_t SampleHandlerFD::CalcWeightSpline(const int iSample, const int iEvent) const {
 // ***************************************************************************
-  M3::float_t xsecw = 1.0;
+  M3::float_t spline_weight = 1.0;
   //DB Xsec syst
   //Loop over stored spline pointers
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
   for (int iSpline = 0; iSpline < MCSamples[iSample].nxsec_spline_pointers[iEvent]; ++iSpline) {
-    xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
+    spline_weight *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
   }
-  return xsecw;
+  return spline_weight;
 }
 
 // ***************************************************************************
@@ -716,18 +716,18 @@ M3::float_t SampleHandlerFD::CalcWeightNorm(const int iSample, const int iEvent)
 
 // ***************************************************************************
 // Setup the norm parameters
-void sampleHandlerFD::SetupNormParameters() {  
+void SampleHandlerFD::SetupNormParameters() {  
 // ***************************************************************************
-  xsec_norms = XsecCov->GetNormParsFromSampleName(GetSampleName());
+  norm_parameters = ParHandler->GetNormParsFromSampleName(GetSampleName());
 
-  if(!XsecCov){
-    MACH3LOG_ERROR("XsecCov is not setup!");
+  if(!ParHandler){
+    MACH3LOG_ERROR("ParHandler is not setup!");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // Assign xsec norm bins in MCSamples tree
   for (unsigned int iSample = 0; iSample < MCSamples.size(); ++iSample) {
-    CalcXsecNormsBins(iSample);
+    CalcNormsBins(iSample);
   }
 
   //DB
@@ -742,7 +742,7 @@ void sampleHandlerFD::SetupNormParameters() {
       MCSamples[iSample].xsec_norm_pointers[iEvent].resize(MCSamples[iSample].nxsec_norm_pointers[iEvent]);
 
       for(auto const & norm_bin: MCSamples[iSample].xsec_norms_bins[iEvent]) {
-        MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = XsecCov->retPointer(norm_bin);
+        MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = ParHandler->retPointer(norm_bin);
         counter += 1;
       }
     }
@@ -758,15 +758,15 @@ void sampleHandlerFD::SetupNormParameters() {
 
 // ************************************************
 //A way to check whether a normalisation parameter applies to an event or not
-void SampleHandlerFD::CalcXsecNormsBins(int iSample) {
+void SampleHandlerFD::CalcNormsBins(int iSample) {
 // ************************************************
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   #ifdef DEBUG
   std::vector<int> VerboseCounter(xsec_norms.size(), 0);
   #endif
   for(int iEvent = 0; iEvent < fdobj->nEvents; ++iEvent){
-    std::vector< int > XsecBins = {};
-    if (XsecCov) {
+    std::vector< int > NormBins = {};
+    if (ParHandler) {
       // Skip oscillated NC events
       // Not strictly needed, but these events don't get included in oscillated predictions, so
       // no need to waste our time calculating and storing information about xsec parameters
@@ -775,7 +775,7 @@ void SampleHandlerFD::CalcXsecNormsBins(int iSample) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
         continue;
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-      for (std::vector<XsecNorms4>::iterator it = xsec_norms.begin(); it != xsec_norms.end(); ++it) {
+      for (std::vector<XsecNorms4>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
         bool TargetMatch = MatchCondition((*it).targets, *(fdobj->Target[iEvent]));
         if (!TargetMatch) {
@@ -830,15 +830,15 @@ void SampleHandlerFD::CalcXsecNormsBins(int iSample) {
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
         int bin = (*it).index;
 
-        XsecBins.push_back(bin);
+        NormBins.push_back(bin);
         MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
         #ifdef DEBUG
         VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
         #endif
         //}
       } // end iteration over xsec_norms
-    } // end if (xsecCov)
-    fdobj->xsec_norms_bins[iEvent] = XsecBins;
+    } // end if (ParHandler)
+    fdobj->xsec_norms_bins[iEvent] = NormBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("Channel {}", iSample);
@@ -848,7 +848,7 @@ void SampleHandlerFD::CalcXsecNormsBins(int iSample) {
     double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
 
     MACH3LOG_DEBUG("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
-                  XsecCov->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
+                  ParHandler->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
   }
   MACH3LOG_DEBUG("└──────────────────────────────────────────────────────────┘");
   #endif
@@ -1268,7 +1268,7 @@ void SampleHandlerFD::addData(TH2D* Data) {
 void SampleHandlerFD::SetupNuOscillator() {
 // ************************************************
   OscillatorFactory* OscillFactory = new OscillatorFactory();
-  if (!OscCov) {
+  if (!OscParHandler) {
     MACH3LOG_WARN("Attempted to setup NuOscillator without covarianceOsc object");
     return;
   }
@@ -1389,10 +1389,10 @@ void SampleHandlerFD::SetupNuOscillator() {
   }// end loop over channels
   delete OscillFactory;
 
-  OscParams = OscCov->GetOscParsFromSampleName(SampleName);
+  OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
 }
 
-std::string samplePDFFDBase::GetSampleName(int iSample) const {
+std::string SampleHandlerFD::GetSampleName(int iSample) const {
   //ETA - this is just to suppress a warning for an unused variable
   (void)iSample;
 

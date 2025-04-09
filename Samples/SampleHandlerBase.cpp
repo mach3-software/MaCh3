@@ -251,20 +251,6 @@ double SampleHandlerBase::getTestStatLLH(const double data, const double mc, con
 }
 
 // ***************************************************************************
-//KS: Sample getter
-std::string SampleHandlerBase::GetSampleName(int Sample) {
-// ***************************************************************************
-  if(Sample > nSamples)
-  {
-    MACH3LOG_ERROR("You are asking for sample {}. I only have {}", Sample, nSamples);
-   throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  return SampleName[Sample];
-}
-
-// ***************************************************************************
-
 // CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
 void SampleHandlerBase::QuietPlease() {
 // ***************************************************************************

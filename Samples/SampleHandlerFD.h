@@ -49,7 +49,7 @@ public:
   double GetLikelihood() override;
   //===============================================================================
 
-  void reweight() override;
+  void Reweight() override;
   M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
@@ -158,7 +158,7 @@ public:
   bool IsEventSelected(const int iSample, const int iEvent);
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcXsecNormsBins(int iSample);
+  void CalcNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
   M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
@@ -227,8 +227,8 @@ public:
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to samplePDFBase to be honest
-  ParameterHandlerGeneric *XsecCov = nullptr;
-  ParameterHandlerOsc *OscCov = nullptr;
+  ParameterHandlerGeneric *ParHandler = nullptr;
+  ParameterHandlerOsc *OscParHandler = nullptr;
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel = false;
@@ -246,7 +246,7 @@ public:
   std::string SampleTitle;
 
   /// @brief Information to store for normalisation pars
-  std::vector<XsecNorms4> xsec_norms;
+  std::vector<XsecNorms4> norm_parameters;
   /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
   std::vector<const double*> OscParams;
   //===========================================================================
