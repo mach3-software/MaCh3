@@ -120,7 +120,7 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 // *******************
 /// @brief ETA - Normalisations for cross-section parameters
 /// Carrier for whether you want to apply a systematic to an event or not
-struct XsecNorms4 {
+struct NormParameter {
 // *******************
   /// Name of parameters
   std::string name;
@@ -264,7 +264,7 @@ enum SystType {
 
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
-struct XsecSplines1 {
+struct SplineParameter {
 // *******************
   /// Spline interpolation vector
   SplineInterpolation _SplineInterpolationType;

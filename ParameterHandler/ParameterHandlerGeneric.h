@@ -71,7 +71,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Type Type of syst, for example kNorm, kSpline etc
     const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Get norm/func parameters depending on given SampleName
-    const std::vector<XsecNorms4> GetNormParsFromSampleName(const std::string& SampleName);
+    const std::vector<NormParameter> GetNormParsFromSampleName(const std::string& SampleName);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> getNominalArray() override
@@ -138,10 +138,10 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Get Norm params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    inline XsecNorms4 GetXsecNorm(const YAML::Node& param, const int Index);
+    inline NormParameter GetNormParameter(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
-    inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
+    inline SplineParameter GetSplineParameter(const YAML::Node& param);
 
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
@@ -156,8 +156,8 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     std::vector<std::map<int, int>> _fSystToGlobalSystIndexMap;
 
     /// Vector containing info for normalisation systematics
-    std::vector<XsecSplines1> SplineParams;
+    std::vector<SplineParameter> SplineParams;
 
     /// Vector containing info for normalisation systematics
-    std::vector<XsecNorms4> NormParams;
+    std::vector<NormParameter> NormParams;
 };

@@ -246,7 +246,7 @@ public:
   std::string SampleTitle;
 
   /// @brief Information to store for normalisation pars
-  std::vector<XsecNorms4> norm_parameters;
+  std::vector<NormParameter> norm_parameters;
   /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
   std::vector<const double*> OscParams;
   //===========================================================================

@@ -775,7 +775,7 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
         continue;
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-      for (std::vector<XsecNorms4>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
+      for (std::vector<NormParameter>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
         bool TargetMatch = MatchCondition((*it).targets, *(fdobj->Target[iEvent]));
         if (!TargetMatch) {

@@ -52,7 +52,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       //Set param type
       _fParamType[i] = SystType::kSpline;
       // Fill Spline info
-      SplineParams.push_back(GetXsecSpline(param["Systematic"]));
+      SplineParams.push_back(GetSplineParameter(param["Systematic"]));
 
       if (param["Systematic"]["SplineInformation"]["SplineName"]) {
         _fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
@@ -64,7 +64,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       ParamCounter[SystType::kSpline]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
       _fParamType[i] = SystType::kNorm;
-      NormParams.push_back(GetXsecNorm(param["Systematic"], i));
+      NormParams.push_back(GetNormParameter(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kNorm].insert(std::make_pair(ParamCounter[SystType::kNorm], i));
       ParamCounter[SystType::kNorm]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
@@ -151,9 +151,9 @@ const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecF
 
 // ********************************************
 // Get Norm params
-XsecNorms4 ParameterHandlerGeneric::GetXsecNorm(const YAML::Node& param, const int Index) {
+NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) {
 // ********************************************
-  XsecNorms4 norm;
+  NormParameter norm;
   norm.name = GetParFancyName(Index);
 
   // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
@@ -240,9 +240,9 @@ const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const
 
 // ********************************************
 // Get Norm params
-XsecSplines1 ParameterHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
+SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param) {
 // ********************************************
-  XsecSplines1 Spline;
+  SplineParameter Spline;
 
   //Now get the Spline interpolation type
   if (param["SplineInformation"]["InterpolationType"]){
@@ -264,9 +264,9 @@ XsecSplines1 ParameterHandlerGeneric::GetXsecSpline(const YAML::Node& param) {
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant SampleName
-const std::vector<XsecNorms4> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) {
+const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) {
 // ********************************************
-  std::vector<XsecNorms4> returnVec;
+  std::vector<NormParameter> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
     auto &NormIndex = pair.first;
     auto &GlobalIndex = pair.second;
