@@ -1,5 +1,7 @@
 #include "SampleHandlerFD.h"
 #include "Samples/Structs.h"
+#include "manager/MaCh3Exception.h"
+#include "manager/MaCh3Logger.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
@@ -393,9 +395,6 @@ void SampleHandlerFD::fillArray() {
 #ifdef MULTITHREAD
   fillArray_MP();
 #else
-  //ETA we should probably store this in SampleHandlerFDBase
-  size_t nXBins = int(XBinEdges.size()-1);
-  //size_t nYBins = int(YBinEdges.size()-1);
 
   PrepFunctionalParameters();
   if(SplineHandler){
@@ -494,9 +493,6 @@ void SampleHandlerFD::fillArray() {
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::fillArray_MP()  {
 // ************************************************
-  size_t nXBins = int(XBinEdges.size()-1);
-  size_t nYBins = int(YBinEdges.size()-1);
-
   PrepFunctionalParameters();
   //==================================================
   //Calc Weights and fill Array
@@ -662,10 +658,7 @@ void SampleHandlerFD::fillArray_MP()  {
 // **************************************************
 // Helper function to reset the data and MC histograms
 void SampleHandlerFD::ResetHistograms() {
-// **************************************************
-  size_t nXBins = int(XBinEdges.size()-1);
-  size_t nYBins = int(YBinEdges.size()-1);
-  
+// **************************************************  
   //DB Reset values stored in PDF array to 0.
   for (size_t yBin = 0; yBin < nYBins; ++yBin) {
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
@@ -870,15 +863,16 @@ void SampleHandlerFD::set1DBinning(std::vector<double> &XVec){
   _hPDF2D  ->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
   dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
 
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
+  //Set the number of X and Y bins now
+  nXBins = XBinEdges.size() - 1;
+  nYBins = YBinEdges.size() - 1;
 
   SampleHandlerFD_array = new double*[nYBins];
   SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_array[yBin] = new double[nXBins];
     SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
@@ -897,16 +891,16 @@ void SampleHandlerFD::set2DBinning(std::vector<double> &XVec, std::vector<double
   _hPDF2D->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
   dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
 
-  //ETA - maybe need to be careful here
-  int nXBins = int(XVec.size()-1);
-  int nYBins = int(YVec.size()-1);
+  //Set the number of X and Y bins now
+  nXBins = XVec.size() - 1;
+  nYBins = YVec.size() - 1;
 
   SampleHandlerFD_array = new double*[nYBins];
   SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_array[yBin] = new double[nXBins];
     SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
@@ -942,15 +936,16 @@ void SampleHandlerFD::set1DBinning(int nbins, double* boundaries)
   _hPDF2D->SetBins(nbins,boundaries,1,YBinEdges_Arr);
   dathist2d->SetBins(nbins,boundaries,1,YBinEdges_Arr);
 
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
+  //Set the number of X and Y bins now
+  nXBins = XBinEdges.size() - 1;
+  nYBins = YBinEdges.size() - 1;
 
   SampleHandlerFD_array = new double*[nYBins];
   SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_array[yBin] = new double[nXBins];
     SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
@@ -977,15 +972,16 @@ void SampleHandlerFD::set1DBinning(int nbins, double low, double high)
   _hPDF2D->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
   dathist2d->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
 
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
+  //Set the number of X and Y bins now
+  nXBins = XBinEdges.size() - 1;
+  nYBins = YBinEdges.size() - 1;
 
   SampleHandlerFD_array = new double*[nYBins];
   SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_array[yBin] = new double[nXBins];
     SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
@@ -1022,14 +1018,15 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
       }
       
       if ((bin-1) >= 0 && (bin-1) < int(XBinEdges.size()-1)) {
-		  MCSamples[mc_i].NomXBin[event_i] = bin-1;
-	  } else {
-		  MCSamples[mc_i].NomXBin[event_i] = -1;
-		  low_edge = M3::_DEFAULT_RETURN_VAL_;
-		  upper_edge = M3::_DEFAULT_RETURN_VAL_;
-		  low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-		  upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-	  }
+		    MCSamples[mc_i].NomXBin[event_i] = bin-1;
+      } else {
+        MCSamples[mc_i].NomXBin[event_i] = -1;
+        low_edge = M3::_DEFAULT_RETURN_VAL_;
+        upper_edge = M3::_DEFAULT_RETURN_VAL_;
+        low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+        upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+      }
+
       MCSamples[mc_i].NomYBin[event_i] = 0;
       
       MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
@@ -1059,15 +1056,16 @@ void SampleHandlerFD::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
   
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
+  //Set the number of X and Y bins now
+  nXBins = XBinEdges.size() - 1;
+  nYBins = YBinEdges.size() - 1;
 
   SampleHandlerFD_array = new double*[nYBins];
   SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_array[yBin] = new double[nXBins];
     SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
@@ -1095,15 +1093,16 @@ void SampleHandlerFD::set2DBinning(int nbins1, double low1, double high1, int nb
     YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
   }
 
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
+  //Set the number of X and Y bins now
+  nXBins = XBinEdges.size() - 1;
+  nYBins = YBinEdges.size() - 1;
 
   SampleHandlerFD_array = new double*[nYBins];
   SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_array[yBin] = new double[nXBins];
     SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
@@ -1180,18 +1179,15 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  for (int i = 0; i < int(data.size()); i++) {
-    dathist->Fill(data.at(i));
+  for (auto const& data_point : data){
+    dathist->Fill(data_point);
   }
-  
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
-  
+    
   SampleHandlerFD_data = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_data[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      SampleHandlerFD_data[yBin][xBin] = dathist->GetBinContent(xBin+1);
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
+      SampleHandlerFD_data[yBin][xBin] = dathist->GetBinContent(static_cast<int>(xBin+1));
     }
   }
 }
@@ -1206,18 +1202,20 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
+  //TODO: this assumes that std::vector is of length 2 and then both data.at(0) and data
+  //ETA: I think this might just be wrong? We should probably just make this AddData(std::vector<double> data_x, std::vector<double> data_y)
+  // or maybe something like AddData(std::vector<std::pair<double, double>> data)?
   for (int i = 0; i < int(data.size()); i++) {
     dathist2d->Fill(data.at(0)[i],data.at(1)[i]);
   }
 
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
-
   SampleHandlerFD_data = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_data[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
+      //Need to cast to an int (Int_t) for ROOT
+      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(static_cast<int>(xBin+1),static_cast<int>(yBin+1));
     }
   }
 }
@@ -1229,16 +1227,16 @@ void SampleHandlerFD::AddData(TH1D* Data) {
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
-    throw MaCh3Exception(__FILE__ , __LINE__ );}
-  
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
-  
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+    
   SampleHandlerFD_data = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_data[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      SampleHandlerFD_data[yBin][xBin] = Data->GetBinContent(xBin+1);
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
+      //Need to cast to an int (Int_t) for ROOT
+      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+      SampleHandlerFD_data[yBin][xBin] = Data->GetBinContent(static_cast<int>(xBin+1));
     }
   }
 }
@@ -1251,15 +1249,14 @@ void SampleHandlerFD::AddData(TH2D* Data) {
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
     throw MaCh3Exception(__FILE__ , __LINE__ );}	
-  
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
-
+   
   SampleHandlerFD_data = new double*[nYBins];
-  for (int yBin=0;yBin<nYBins;yBin++) {
+  for (size_t yBin=0;yBin<nYBins;yBin++) {
     SampleHandlerFD_data[yBin] = new double[nXBins];
-    for (int xBin=0;xBin<nXBins;xBin++) {
-      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(xBin+1,yBin+1);
+    for (size_t xBin=0;xBin<nXBins;xBin++) {
+      //Need to cast to an int (Int_t) for ROOT
+      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(static_cast<int>(xBin+1),static_cast<int>(yBin+1));
     }
   }
 }
@@ -1463,18 +1460,14 @@ double SampleHandlerFD::GetLikelihood() {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
-  //This can be done only once and stored
-  int nXBins = int(XBinEdges.size()-1);
-  int nYBins = int(YBinEdges.size()-1);
-  
+    
   double negLogL = 0.;
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2) reduction(+:negLogL)
   #endif
-  for (int yBin = 0; yBin < nYBins; ++yBin)
+  for (size_t yBin = 0; yBin < nYBins; ++yBin)
   {
-    for (int xBin = 0; xBin < nXBins; ++xBin)
+    for (size_t xBin = 0; xBin < nXBins; ++xBin)
     {
       const double DataVal = SampleHandlerFD_data[yBin][xBin];
       const double MCPred = SampleHandlerFD_array[yBin][xBin];
