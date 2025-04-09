@@ -1016,8 +1016,8 @@ void SampleSummary::MakePredictive() {
       double TempLLH_Mode = 0.0;
       
       //KS:Get LLH contribution getTestStatLLH can calculate Barlow Beeston/IceCube or Poisson
-      TempLLH_Mean = SamplePDF->getTestStatLLH(nData, nMean, nW2Mean);
-      TempLLH_Mode = SamplePDF->getTestStatLLH(nData, nMode, nW2Mode);
+      TempLLH_Mean = SamplePDF->GetTestStatLLH(nData, nMean, nW2Mean);
+      TempLLH_Mode = SamplePDF->GetTestStatLLH(nData, nMode, nW2Mode);
 
       // Increment -2LLH
       //KS: do times 2 because banff reports chi2
@@ -1102,7 +1102,7 @@ void SampleSummary::MakePredictive() {
       const double nW2Mean = W2MeanProjectX->GetBinContent(j);
 
       double TempLLH_Mean = 0.0;
-      TempLLH_Mean = SamplePDF->getTestStatLLH(nData, nMean, nW2Mean);
+      TempLLH_Mean = SamplePDF->GetTestStatLLH(nData, nMean, nW2Mean);
 
       //KS: do times 2 because banff reports chi2
       lnLHist_Mean_ProjectX[SampleNum]->SetBinContent(j, 2.0*TempLLH_Mean);
@@ -1278,12 +1278,12 @@ void SampleSummary::MakeChi2Hists() {
 
 //Rate Based p-value
       // Likelihood between the drawn histogram and the data
-      const double RateDataDrawLLH = SamplePDF->getTestStatLLH(NoOverflowIntegral(DataHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
+      const double RateDataDrawLLH = SamplePDF->GetTestStatLLH(NoOverflowIntegral(DataHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
       llh_rate_data_draw[SampleNum] += RateDataDrawLLH;
       total_llh_rate_data_draw_temp += RateDataDrawLLH;
 
       // Likelihood between drawn histogram and fluctuated posterior predictive distribution using rate
-      const double RatePredFlucDrawLLH = SamplePDF->getTestStatLLH(NoOverflowIntegral(FluctHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
+      const double RatePredFlucDrawLLH = SamplePDF->GetTestStatLLH(NoOverflowIntegral(FluctHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
       llh_rate_predfluc_draw[SampleNum] += RatePredFlucDrawLLH;
       total_llh_rate_predfluc_draw_temp += RatePredFlucDrawLLH;
 
@@ -1587,7 +1587,7 @@ double SampleSummary::GetLLH(TH2Poly * const & DatHist, TH2Poly * const & MCHist
     const double data = DatHist->GetBinContent(i);
     const double mc = MCHist->GetBinContent(i);
     const double w2 = W2Hist->GetBinContent(i);
-    llh += SamplePDF->getTestStatLLH(data, mc, w2);
+    llh += SamplePDF->GetTestStatLLH(data, mc, w2);
   }
   //KS: do times 2 because banff reports chi2
   return 2*llh;
@@ -1602,7 +1602,7 @@ double SampleSummary::GetLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D
     const double data = DatHist->GetBinContent(i);
     const double mc = MCHist->GetBinContent(i);
     const double w2 = W2Hist->GetBinContent(i);
-    llh += SamplePDF->getTestStatLLH(data, mc, w2);
+    llh += SamplePDF->GetTestStatLLH(data, mc, w2);
   }
   //KS: do times 2 because banff reports chi2
   return 2*llh;
@@ -2305,7 +2305,7 @@ void SampleSummary::StudyWAIC() {
         const double w2 = W2MCVector[s][SampleNum]->GetBinContent(i);
 
         // Get the -log-likelihood for this sample and bin
-        double neg_LLH_temp = SamplePDF->getTestStatLLH(data, mc, w2);
+        double neg_LLH_temp = SamplePDF->GetTestStatLLH(data, mc, w2);
 
         // Negate the negative log-likelihood to get the actual log-likelihood
         double LLH_temp = -neg_LLH_temp;

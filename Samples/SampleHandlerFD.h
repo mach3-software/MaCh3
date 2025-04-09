@@ -42,9 +42,9 @@ public:
   //ETA - abstract these to samplePDFFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
   void addData(TH1D* Data) override;
-  void addData(TH2D* Data) override;
-  void addData(std::vector<double> &data) override;
-  void addData(std::vector< std::vector <double> > &data) override;
+  void AddData(TH2D* Data) override;
+  void AddData(std::vector<double> &data) override;
+  void AddData(std::vector< std::vector <double> > &data) override;
   /// @brief DB Multi-threaded GetLikelihood
   double GetLikelihood() override;
   //===============================================================================
@@ -59,10 +59,10 @@ public:
 
   void ReadSampleConfig();
 
-  int getNMCSamples() override {return int(MCSamples.size());}
+  int GetNMCSamples() override {return int(MCSamples.size());}
 
-  int getNEventsInSample(int iSample) {
-    if (iSample < 0 || iSample > getNMCSamples()) {
+  int GetNEventsInSample(int iSample) {
+    if (iSample < 0 || iSample > GetNMCSamples()) {
       MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
       throw MaCh3Exception(__FILE__ , __LINE__);
     }
@@ -70,7 +70,7 @@ public:
   }
   
   std::string getFlavourName(int iSample) {
-    if (iSample < 0 || iSample > getNMCSamples()) {
+    if (iSample < 0 || iSample > GetNMCSamples()) {
       MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
       throw MaCh3Exception(__FILE__ , __LINE__);      
     }
@@ -183,8 +183,8 @@ public:
   //===============================================================================
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from samplePDF_array
-  void fill1DHist();
-  void fill2DHist();
+  void Fill1DHist();
+  void Fill2DHist();
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD

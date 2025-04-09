@@ -37,45 +37,45 @@ class SampleHandlerBase
   /// @brief Return pointer to MaCh3 modes
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
 
-  TH1D* get1DHist();                                               
-  TH2D* get2DHist();
-  TH1D* get1DDataHist(){return dathist;}
-  TH2D* get2DDataHist(){return dathist2d;}
+  TH1D* Get1DHist();                                               
+  TH2D* Get2DHist();
+  TH1D* Get1DDataHist(){return dathist;}
+  TH2D* Get2DDataHist(){return dathist2d;}
       
   virtual void Reweight()=0;
   virtual double GetLikelihood() = 0;
 
-  virtual int getNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-  virtual int getNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual int GetNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual int GetNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
 
-  virtual void addData(std::vector<double> &dat);
-  virtual void addData(std::vector< std::vector <double> > &dat);
-  virtual void addData(TH1D* binneddata);
-  virtual void addData(TH2D* binneddata);
+  virtual void AddData(std::vector<double> &dat);
+  virtual void AddData(std::vector< std::vector <double> > &dat);
+  virtual void AddData(TH1D* binneddata);
+  virtual void AddData(TH2D* binneddata);
 
   // WARNING KS: Needed for sigma var
   virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
     (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
-  virtual TH1* getData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-  virtual TH2Poly* getW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
-  virtual TH1* getPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
-  virtual inline TH1* getPDFMode(const int Selection, const int Mode) {
+  virtual TH1* GetData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual TH2Poly* GetW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  virtual TH1* GetPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  virtual inline TH1* GetPDFMode(const int Selection, const int Mode) {
     (void) Selection; (void) Mode; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
-  double getTestStatLLH(double data, double mc) const;
+  double GetTestStatLLH(double data, double mc) const;
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-  double getTestStatLLH(const double data, const double mc, const double w2) const;
+  double GetTestStatLLH(const double data, const double mc, const double w2) const;
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
   inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
 
-  virtual void fill1DHist()=0;
-  virtual void fill2DHist()=0;
+  virtual void Fill1DHist()=0;
+  virtual void Fill2DHist()=0;
 
 protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries

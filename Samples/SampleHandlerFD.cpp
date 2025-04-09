@@ -246,7 +246,7 @@ void SampleHandlerFD::SetupKinematicMap() {
   }
 }
 
-void SampleHandlerFD::fill1DHist()
+void SampleHandlerFD::Fill1DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
@@ -258,7 +258,7 @@ void SampleHandlerFD::fill1DHist()
   }
 }
 
-void SampleHandlerFD::fill2DHist()
+void SampleHandlerFD::Fill2DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
@@ -1243,7 +1243,7 @@ void SampleHandlerFD::addData(TH1D* Data) {
   }
 }
 
-void SampleHandlerFD::addData(TH2D* Data) {
+void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetName(), Data->Integral());
   dathist2d = Data;
   dathist = nullptr;
@@ -1481,7 +1481,7 @@ double SampleHandlerFD::GetLikelihood() {
       const double w2 = SampleHandlerFD_array_w2[yBin][xBin];
       
       //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
-      negLogL += getTestStatLLH(DataVal, MCPred, w2);
+      negLogL += GetTestStatLLH(DataVal, MCPred, w2);
     }
   }
   return negLogL;
@@ -1604,8 +1604,8 @@ TH1* SampleHandlerFD::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   }
 
   //DB Loop over all events
-  for (int iSample=0;iSample<getNMCSamples();iSample++) {
-    for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
+  for (int iSample=0;iSample<GetNMCSamples();iSample++) {
+    for (int iEvent=0;iEvent<GetNEventsInSample(iSample);iEvent++) {
       if (IsEventSelected(iSample,iEvent)) {
         double Weight = GetEventWeight(iSample,iEvent);
         if (WeightStyle==1) {
@@ -1665,8 +1665,8 @@ TH2* SampleHandlerFD::get2DVarHist(std::string ProjectionVar_StrX, std::string P
   }
 
   //DB Loop over all events
-  for (int iSample=0;iSample<getNMCSamples();iSample++) {
-    for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
+  for (int iSample=0;iSample<GetNMCSamples();iSample++) {
+    for (int iEvent=0;iEvent<GetNEventsInSample(iSample);iEvent++) {
       if (IsEventSelected(iSample,iEvent)) {
         double Weight = GetEventWeight(iSample,iEvent);
         if (WeightStyle==1) {
@@ -1716,8 +1716,8 @@ TH1* SampleHandlerFD::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str
   bool fMode;
 
   if (kChannelToFill!=-1) {
-    if (kChannelToFill>getNMCSamples()) {
-      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", getNMCSamples());
+    if (kChannelToFill>GetNMCSamples()) {
+      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", GetNMCSamples());
       MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
       MACH3LOG_ERROR("Exiting.");
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1765,8 +1765,8 @@ TH2* SampleHandlerFD::get2DVarHistByModeAndChannel(std::string ProjectionVar_Str
   bool fMode;
 
   if (kChannelToFill!=-1) {
-    if (kChannelToFill>getNMCSamples()) {
-      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", getNMCSamples());
+    if (kChannelToFill>GetNMCSamples()) {
+      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", GetNMCSamples());
       MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
       MACH3LOG_ERROR("Exiting.");
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1836,7 +1836,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   IntegralList.resize(Modes->GetNModes());
 
   std::vector<double> ChannelIntegral;
-  ChannelIntegral.resize(getNMCSamples());
+  ChannelIntegral.resize(GetNMCSamples());
   for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
   
   for (int i=0;i<Modes->GetNModes();i++) {
@@ -1856,7 +1856,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     outfile << "\\label{" << GetTitle() << "-EventRate}" << std::endl;
     
     TString nColumns;
-    for (int i=0;i<getNMCSamples();i++) {nColumns+="|c";}
+    for (int i=0;i<GetNMCSamples();i++) {nColumns+="|c";}
     nColumns += "|c|";
     outfile << "\\begin{tabular}{|l" << nColumns.Data() << "}" << std::endl;
     outfile << "\\hline" << std::endl;
@@ -1875,7 +1875,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   std::string table_headings = fmt::format("| {:<8} |", "Mode");
   std::string table_footline = "------------"; //Scalable table horizontal line
-  for (int i=0;i<getNMCSamples();i++) {
+  for (int i=0;i<GetNMCSamples();i++) {
     table_headings += fmt::format(" {:<17} |", MCSamples[i].flavourName);
     table_footline += "--------------------";
     if (printToFile) {outfile << "&" << std::setw(space) << MCSamples[i].flavourName_Latex << " ";}
@@ -1961,7 +1961,7 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
     iMax = Modes->GetNModes();
   }
   if (Selection1 == 1) {
-    iMax = getNMCSamples();
+    iMax = GetNMCSamples();
   }
   if (iMax == -1) {
     MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
@@ -1993,7 +1993,7 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string Kinemati
     iMax = Modes->GetNModes();
   }
   if (Selection1 == 1) {
-    iMax = getNMCSamples();
+    iMax = GetNMCSamples();
   }
   if (iMax == -1) {
     MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");

@@ -17,7 +17,7 @@ SampleHandlerBase::~SampleHandlerBase()
   delete rnd;
 }
 
-void SampleHandlerBase::addData(std::vector<double> &data)
+void SampleHandlerBase::AddData(std::vector<double> &data)
 {
   if(nDims != 0 && nDims != 1)
   {
@@ -36,7 +36,7 @@ void SampleHandlerBase::addData(std::vector<double> &data)
   }
 }
 
-void SampleHandlerBase::addData(std::vector< std::vector <double> > &data)
+void SampleHandlerBase::AddData(std::vector< std::vector <double> > &data)
 {
   if(nDims != 0 && nDims != 2)
   {
@@ -68,7 +68,7 @@ void SampleHandlerBase::addData(TH1D* binneddata)
   dathist = binneddata;
 }
 
-void SampleHandlerBase::addData(TH2D* binneddata)
+void SampleHandlerBase::AddData(TH2D* binneddata)
 {
   if(nDims != 0 && nDims != 2)
   {
@@ -82,21 +82,21 @@ void SampleHandlerBase::addData(TH2D* binneddata)
   dathist2d = binneddata;
 }
 
-TH1D* SampleHandlerBase::get1DHist()
+TH1D* SampleHandlerBase::Get1DHist()
 {
-  fill1DHist();
+  Fill1DHist();
   return _hPDF1D;
 }
 
-TH2D* SampleHandlerBase::get2DHist()
+TH2D* SampleHandlerBase::Get2DHist()
 {
-  fill2DHist();
+  Fill2DHist();
   return _hPDF2D;
 }
 
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double SampleHandlerBase::getTestStatLLH(const double data, const double mc) const {
+double SampleHandlerBase::GetTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Need some MC
   if(mc == 0) return 0.;
@@ -114,7 +114,7 @@ double SampleHandlerBase::getTestStatLLH(const double data, const double mc) con
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double SampleHandlerBase::getTestStatLLH(const double data, const double mc, const double w2) const {
+double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
   // Need some MC
   if (mc == 0) return 0.0;
@@ -238,7 +238,7 @@ double SampleHandlerBase::getTestStatLLH(const double data, const double mc, con
     {
       //Just call getTestStatLLH which doesn't take in weights
       //and is a Poisson likelihood comparison.
-      return getTestStatLLH(data, mc);
+      return GetTestStatLLH(data, mc);
     }
     break;
     case TestStatistic::kNTestStatistics:
