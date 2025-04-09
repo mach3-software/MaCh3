@@ -1152,7 +1152,7 @@ void FitterBase::RunSigmaVar() {
       {
         for(int k = 0; k < samples[ivs]->GetNsamples(); k++ )
         {
-          std::string title = std::string(samples[ivs]->getPDF(k)->GetName());
+          std::string title = std::string(samples[ivs]->GetPDF(k)->GetName());
           dirArryDial->cd();
           dirArrySample[SampleIterator] = dirArryDial->mkdir(title.c_str());
           SampleIterator++;
@@ -1218,7 +1218,7 @@ void FitterBase::RunSigmaVar() {
 
             // This is a TH2D
 
-            std::unique_ptr<TH2Poly> currSamp(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone()));
+            std::unique_ptr<TH2Poly> currSamp(static_cast<TH2Poly*>(samples[ivs]->GetPDF(k)->Clone()));
             currSamp->SetDirectory(nullptr);
             // Set a descriptiv-ish title
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
@@ -1243,7 +1243,7 @@ void FitterBase::RunSigmaVar() {
 
               for(int ir = 0; ir < nRelevantModes; ir++)
               {
-                std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone()));
+                std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->GetPDFMode(k, RelevantModes[ir])->Clone()));
                 currSampMode->SetDirectory(nullptr);
 
                 mode_title_long = title_long + "_" + samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir]);
@@ -1261,21 +1261,21 @@ void FitterBase::RunSigmaVar() {
             //KS: This will give different results depending if data or Asimov, both have their uses
             if (PlotLLHperBin)
             {
-              std::unique_ptr<TH2Poly> currLLHSamp(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone()));
+              std::unique_ptr<TH2Poly> currLLHSamp(static_cast<TH2Poly*>(samples[ivs]->GetPDF(k)->Clone()));
               currLLHSamp->SetDirectory(nullptr);
               currLLHSamp->Reset("");
               currLLHSamp->Fill(0.0, 0.0, 0.0);
 
-              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->getPDF(k));
-              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->getData(k));
-              TH2Poly* W2pdf = samples[ivs]->getW2(k);
+              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->GetPDF(k));
+              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->GetData(k));
+              TH2Poly* W2pdf = samples[ivs]->GetW2(k);
 
               for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; bin++)
               {
                 const double mc = MCpdf->GetBinContent(bin);
                 const double dat = Datapdf->GetBinContent(bin);
                 const double w2 = W2pdf->GetBinContent(bin);
-                currLLHSamp->SetBinContent(bin, samples[ivs]->getTestStatLLH(dat, mc, w2));
+                currLLHSamp->SetBinContent(bin, samples[ivs]->GetTestStatLLH(dat, mc, w2));
               }
               currLLHSamp->SetNameTitle((title_long+"_LLH").c_str() ,(title_long+"_LLH").c_str());
               dirArrySample[SampleIterator]->cd();
@@ -1317,7 +1317,7 @@ void FitterBase::RunSigmaVar() {
       {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
-          std::string title = std::string(samples[ivs]->getPDF(k)->GetName()) + "_" + name;
+          std::string title = std::string(samples[ivs]->GetPDF(k)->GetName()) + "_" + name;
           TGraphAsymmErrors *var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
           TGraphAsymmErrors *var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
 

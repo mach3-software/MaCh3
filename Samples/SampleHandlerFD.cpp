@@ -1170,7 +1170,7 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
   }
 }
 
-void SampleHandlerFD::addData(std::vector<double> &data) {
+void SampleHandlerFD::AddData(std::vector<double> &data) {
   dathist2d = nullptr;
   dathist->Reset(); 
   
@@ -1196,7 +1196,7 @@ void SampleHandlerFD::addData(std::vector<double> &data) {
   }
 }
 
-void SampleHandlerFD::addData(std::vector< std::vector <double> > &data) {
+void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
   dathist = nullptr;
   dathist2d->Reset();                                                       
 
@@ -1222,7 +1222,7 @@ void SampleHandlerFD::addData(std::vector< std::vector <double> > &data) {
   }
 }
 
-void SampleHandlerFD::addData(TH1D* Data) {
+void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetName(), Data->Integral());
   dathist2d = nullptr;
   dathist = Data;

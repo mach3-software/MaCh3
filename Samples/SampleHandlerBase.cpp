@@ -54,7 +54,7 @@ void SampleHandlerBase::AddData(std::vector< std::vector <double> > &data)
     dathist2d->Fill(data.at(0)[i], data.at(1)[i]);
 }
 
-void SampleHandlerBase::addData(TH1D* binneddata)
+void SampleHandlerBase::AddData(TH1D* binneddata)
 {
   if(nDims != 0 && nDims != 1)
   {

@@ -41,7 +41,7 @@ public:
 
   //ETA - abstract these to samplePDFFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void addData(TH1D* Data) override;
+  void AddData(TH1D* Data) override;
   void AddData(TH2D* Data) override;
   void AddData(std::vector<double> &data) override;
   void AddData(std::vector< std::vector <double> > &data) override;
@@ -183,8 +183,8 @@ public:
   //===============================================================================
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from samplePDF_array
-  void Fill1DHist();
-  void Fill2DHist();
+  void Fill1DHist() override;
+  void Fill2DHist() override;
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
