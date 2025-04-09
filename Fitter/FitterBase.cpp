@@ -409,7 +409,7 @@ void FitterBase::DragRace(const int NLaps) {
     TStopwatch clockRace;
     clockRace.Start();
     for(int Lap = 0; Lap < NLaps; ++Lap) {
-      samples[ivs]->reweight();
+      samples[ivs]->Reweight();
     }
     clockRace.Stop();
     MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
@@ -674,7 +674,7 @@ void FitterBase::RunLLHScan() {
         // Reweight the MC
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          samples[ivs]->reweight();
+          samples[ivs]->Reweight();
         }
         //Total LLH
         double totalllh = 0;
@@ -703,7 +703,7 @@ void FitterBase::RunLLHScan() {
           {
             for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
             {
-              sampleSplitllh[SampleIterator] = samples[ivs]->getSampleLikelihood(is);
+              sampleSplitllh[SampleIterator] = samples[ivs]->GetSampleLikelihood(is);
               SampleIterator++;
             }
           }
@@ -1052,7 +1052,7 @@ void FitterBase::Run2DLLHScan() {
             // Reweight the MC
             //double *fake = 0;
             for(unsigned int ivs = 0; ivs < samples.size(); ++ivs) {
-              samples[ivs]->reweight();
+              samples[ivs]->Reweight();
             }
 
             // Get the -log L likelihoods
@@ -1191,7 +1191,7 @@ void FitterBase::RunSigmaVar() {
         cov->setParProp(i, paramVal);
         // And reweight the sample
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
-          samples[ivs]->reweight();
+          samples[ivs]->Reweight();
         }
 
         sigmaArray_x[j].resize(TotalNSamples);

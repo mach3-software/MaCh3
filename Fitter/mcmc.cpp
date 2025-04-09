@@ -162,7 +162,7 @@ void mcmc::ProposeStep() {
     // But since sample reweight is multi-threaded it's probably better to do that
     for (size_t i = 0; i < samples.size(); ++i)
     {
-      samples[i]->reweight();
+      samples[i]->Reweight();
     }
 
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
