@@ -1,52 +1,52 @@
 <map id="samplePDFFDBase" name="samplePDFFDBase">
-<area shape="rect" id="node1" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="3084,1019,3231,1045"/>
-<area shape="rect" id="node2" href="$classsamplePDFBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1385,537,1513,562"/>
-<area shape="rect" id="node3" title=" " alt="" coords="473,647,660,673"/>
-<area shape="rect" id="node11" href="$classsplineFDBase.html" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="2312,1019,2423,1045"/>
-<area shape="rect" id="node13" href="$classcovarianceXsec.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1853,718,1977,743"/>
-<area shape="rect" id="node14" href="$classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1386,1105,1511,1130"/>
-<area shape="rect" id="node28" href="$structXsecNorms4.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="951,1341,1055,1366"/>
-<area shape="rect" id="node4" title=" " alt="" coords="233,401,319,426"/>
-<area shape="rect" id="node6" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="947,483,1058,509"/>
-<area shape="rect" id="node7" title=" " alt="" coords="485,393,648,433"/>
-<area shape="rect" id="node37" href="$structFarDetectorCoreInfo.html" title="constructors are same for all three so put in here" alt="" coords="1839,1779,1991,1805"/>
-<area shape="rect" id="node46" title=" " alt="" coords="684,273,836,313"/>
-<area shape="rect" id="node47" title=" " alt="" coords="1169,331,1321,371"/>
-<area shape="rect" id="node49" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="527,109,607,134"/>
-<area shape="rect" id="node50" title=" " alt="" coords="1588,123,1757,163"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,393,144,433"/>
-<area shape="rect" id="node8" title=" " alt="" coords="475,535,658,575"/>
-<area shape="rect" id="node9" title=" " alt="" coords="497,1509,636,1534"/>
-<area shape="rect" id="node21" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="860,1206,1145,1231"/>
-<area shape="rect" id="node26" href="$structXsecSplines1.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="949,799,1057,825"/>
-<area shape="rect" id="node10" title=" " alt="" coords="2673,1019,2912,1045"/>
-<area shape="rect" id="node12" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="1867,1155,1962,1181"/>
-<area shape="rect" id="node45" href="$classcovarianceOsc.html" title="Class responsible for handling of neutrino oscillation parameters." alt="" coords="2500,1190,2617,1215"/>
-<area shape="rect" id="node15" title=" " alt="" coords="479,1847,654,1887"/>
-<area shape="rect" id="node16" title=" " alt="" coords="193,1854,359,1879"/>
-<area shape="rect" id="node17" title=" " alt="" coords="913,991,1092,1031"/>
-<area shape="rect" id="node18" title=" " alt="" coords="928,1055,1077,1081"/>
-<area shape="rect" id="node19" title=" " alt="" coords="915,849,1090,889"/>
-<area shape="rect" id="node20" title=" " alt="" coords="889,1105,1116,1130"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1359,753,1538,778"/>
-<area shape="rect" id="node23" title=" " alt="" coords="1367,688,1530,728"/>
-<area shape="rect" id="node24" title=" " alt="" coords="927,698,1078,723"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1345,802,1552,827"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1347,1253,1550,1278"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1809,819,2021,859"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1823,1432,2006,1472"/>
-<area shape="rect" id="node31" title=" " alt="" coords="1361,1352,1536,1392"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1819,933,2010,973"/>
-<area shape="rect" id="node33" title=" " alt="" coords="1793,997,2036,1067"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1833,1091,1996,1131"/>
-<area shape="rect" id="node35" title=" " alt="" coords="1353,1302,1544,1327"/>
-<area shape="rect" id="node36" title=" " alt="" coords="2468,1617,2649,1657"/>
-<area shape="rect" id="node38" title=" " alt="" coords="1374,2097,1523,2122"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1378,1617,1519,1657"/>
-<area shape="rect" id="node40" title=" " alt="" coords="932,2028,1073,2068"/>
-<area shape="rect" id="node41" title=" " alt="" coords="1361,1911,1536,1951"/>
-<area shape="rect" id="node42" title=" " alt="" coords="1355,1681,1542,1721"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1378,1847,1519,1887"/>
-<area shape="rect" id="node44" title=" " alt="" coords="2679,1269,2906,1294"/>
-<area shape="rect" id="node48" title=" " alt="" coords="2060,94,2267,119"/>
+<area shape="rect" id="node1" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="3084,662,3231,687"/>
+<area shape="rect" id="node2" href="$classsamplePDFBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="2495,1691,2623,1717"/>
+<area shape="rect" id="node3" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="947,1425,1058,1450"/>
+<area shape="rect" id="node10" href="$classsplineFDBase.html" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="2312,1054,2423,1079"/>
+<area shape="rect" id="node4" title=" " alt="" coords="485,1368,648,1408"/>
+<area shape="rect" id="node5" title=" " alt="" coords="233,847,319,873"/>
+<area shape="rect" id="node13" href="$classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1386,598,1511,623"/>
+<area shape="rect" id="node17" title=" " alt="" coords="473,1241,660,1266"/>
+<area shape="rect" id="node28" href="$structXsecNorms4.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="951,929,1055,954"/>
+<area shape="rect" id="node37" href="$structFarDetectorCoreInfo.html" title="constructors are same for all three so put in here" alt="" coords="1839,1802,1991,1827"/>
+<area shape="rect" id="node46" title=" " alt="" coords="684,332,836,372"/>
+<area shape="rect" id="node47" title=" " alt="" coords="1169,127,1321,167"/>
+<area shape="rect" id="node49" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="527,299,607,325"/>
+<area shape="rect" id="node50" title=" " alt="" coords="1588,457,1757,497"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,840,144,880"/>
+<area shape="rect" id="node7" title=" " alt="" coords="475,1432,658,1472"/>
+<area shape="rect" id="node8" title=" " alt="" coords="497,1031,636,1057"/>
+<area shape="rect" id="node21" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="860,549,1145,574"/>
+<area shape="rect" id="node26" href="$structXsecSplines1.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="949,978,1057,1003"/>
+<area shape="rect" id="node9" title=" " alt="" coords="2673,774,2912,799"/>
+<area shape="rect" id="node11" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="1867,1029,1962,1054"/>
+<area shape="rect" id="node12" href="$classcovarianceXsec.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1853,745,1977,770"/>
+<area shape="rect" id="node45" href="$classcovarianceOsc.html" title="Class responsible for handling of neutrino oscillation parameters." alt="" coords="2105,545,2222,570"/>
+<area shape="rect" id="node14" title=" " alt="" coords="479,455,654,495"/>
+<area shape="rect" id="node15" title=" " alt="" coords="193,359,359,385"/>
+<area shape="rect" id="node16" title=" " alt="" coords="913,648,1092,688"/>
+<area shape="rect" id="node18" title=" " alt="" coords="928,713,1077,738"/>
+<area shape="rect" id="node19" title=" " alt="" coords="915,864,1090,904"/>
+<area shape="rect" id="node20" title=" " alt="" coords="889,598,1116,623"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1359,749,1538,774"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1367,857,1530,897"/>
+<area shape="rect" id="node24" title=" " alt="" coords="927,1106,1078,1131"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1345,801,1552,826"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1347,699,1550,725"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1809,1129,2021,1169"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1823,964,2006,1004"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1361,1177,1536,1217"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1819,1193,2010,1233"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1793,1257,2036,1327"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1833,1351,1996,1391"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1353,1443,1544,1469"/>
+<area shape="rect" id="node36" title=" " alt="" coords="2468,1771,2649,1811"/>
+<area shape="rect" id="node38" title=" " alt="" coords="1374,1882,1523,1907"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1378,1932,1519,1972"/>
+<area shape="rect" id="node40" title=" " alt="" coords="932,1813,1073,1853"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1361,1696,1536,1736"/>
+<area shape="rect" id="node42" title=" " alt="" coords="1355,1996,1542,2036"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1378,2060,1519,2100"/>
+<area shape="rect" id="node44" title=" " alt="" coords="2679,823,2906,849"/>
+<area shape="rect" id="node48" title=" " alt="" coords="2060,282,2267,307"/>
 </map>
