@@ -199,12 +199,12 @@ void SampleHandlerFD::Initialise() {
   for(M3::int_t iSample=0 ; iSample < nSamples ; iSample++){
     MACH3LOG_INFO("=============================================");
     MACH3LOG_INFO("Initialising sample: {}/{}", iSample, nSamples);
-    MCSamples[iSample].nEvents = setupExperimentMC(iSample);
+    MCSamples[iSample].nEvents = SetupExperimentMC(iSample);
     MACH3LOG_INFO("Number of events processed: {}", MCSamples[iSample].nEvents);
     TotalMCEvents += MCSamples[iSample].nEvents;
     MACH3LOG_INFO("Initialising FDMC object..");
     InitialiseSingleFDMCObject(iSample, MCSamples[iSample].nEvents);
-    setupFDMC(iSample);
+    SetupFDMC(iSample);
     MACH3LOG_INFO("Initialised sample: {}/{}", iSample, nSamples);
   }
   MACH3LOG_INFO("=============================================");
@@ -321,11 +321,11 @@ void SampleHandlerFD::SetupSampleBinning(){
   //Check whether you are setting up 1D or 2D binning
   if(nDimensions == 1){
     MACH3LOG_INFO("Setting up 1D binning with {}", XVarStr);
-    set1DBinning(SampleXBins);  
+    Set1DBinning(SampleXBins);  
   }
   else if(nDimensions == 2){
     MACH3LOG_INFO("Setting up 2D binning with {} and {}", XVarStr, YVarStr);
-    set2DBinning(SampleXBins, SampleYBins);
+    Set2DBinning(SampleXBins, SampleYBins);
   }
   else{
     MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
@@ -375,7 +375,7 @@ void SampleHandlerFD::Reweight() {
     
   }
   
-  fillArray();
+  FillArray();
 }
 
 //************************************************
@@ -386,14 +386,14 @@ void SampleHandlerFD::Reweight() {
 /// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD 
 /// array array which is binned to match the sample binning, such that bin[1][1] is the 
 /// equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
-void SampleHandlerFD::fillArray() {
+void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
   // Call entirely different routine if we're running with openMP
 #ifdef MULTITHREAD
-  fillArray_MP();
+  FillArray_MP();
 #else
 
   PrepFunctionalParameters();
@@ -491,7 +491,7 @@ void SampleHandlerFD::fillArray() {
 #ifdef MULTITHREAD
 // ************************************************ 
 /// Multithreaded version of fillArray @see fillArray()
-void SampleHandlerFD::fillArray_MP()  {
+void SampleHandlerFD::FillArray_MP()  {
 // ************************************************
   PrepFunctionalParameters();
   //==================================================
@@ -538,7 +538,7 @@ void SampleHandlerFD::fillArray_MP()  {
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
         //ETA - generic functions to apply shifts to kinematic variables
         // Apply this before IsEventSelected is called.
-        applyShifts(iSample, iEvent);
+        ApplyShifts(iSample, iEvent);
 
         //ETA - generic functions to apply shifts to kinematic variable
         //this is going to be slow right now due to string comps under the hood.
@@ -848,7 +848,7 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
 }
 
 //ETA - this is all a bit (less) stupid
-void SampleHandlerFD::set1DBinning(std::vector<double> &XVec){
+void SampleHandlerFD::Set1DBinning(std::vector<double> &XVec){
   _hPDF1D->Reset();
   _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
   dathist->SetBins(int(XVec.size()-1), XVec.data());
@@ -881,7 +881,7 @@ void SampleHandlerFD::set1DBinning(std::vector<double> &XVec){
 }
 
 //ETA - this is all a bit stupid
-void SampleHandlerFD::set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
+void SampleHandlerFD::Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
@@ -914,7 +914,7 @@ void SampleHandlerFD::set2DBinning(std::vector<double> &XVec, std::vector<double
 //so that we can set the values of the bin and lower/upper
 //edges in the skmc_base. Hopefully we can use this to make
 //fill1Dhist and fill2Dhist quicker
-void SampleHandlerFD::set1DBinning(int nbins, double* boundaries)
+void SampleHandlerFD::Set1DBinning(int nbins, double* boundaries)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins,boundaries);
@@ -954,7 +954,7 @@ void SampleHandlerFD::set1DBinning(int nbins, double* boundaries)
   FindNominalBinAndEdges1D();
 }
 
-void SampleHandlerFD::set1DBinning(int nbins, double low, double high)
+void SampleHandlerFD::Set1DBinning(int nbins, double low, double high)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins,low,high);
@@ -1027,8 +1027,7 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
         upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       }
 
-      MCSamples[mc_i].NomYBin[event_i] = 0;
-      
+      MCSamples[mc_i].NomYBin[event_i] = 0;     
       MCSamples[mc_i].rw_lower_xbinedge[event_i] = low_edge;
       MCSamples[mc_i].rw_upper_xbinedge[event_i] = upper_edge;
       MCSamples[mc_i].rw_lower_lower_xbinedge[event_i] = low_lower_edge;
@@ -1037,7 +1036,7 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
   }
 }
 
-void SampleHandlerFD::set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
+void SampleHandlerFD::Set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins1,boundaries1);
@@ -1074,7 +1073,7 @@ void SampleHandlerFD::set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   FindNominalBinAndEdges2D();
 }
 
-void SampleHandlerFD::set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2)
+void SampleHandlerFD::Set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2)
 {
   _hPDF1D->Reset();
   _hPDF1D->SetBins(nbins1,low1,high1);
@@ -1418,7 +1417,7 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iSample, const int iEntry)
 /// @func fillSplineBins()
 /// @brief Finds the binned spline that an event should apply to and stored them in a
 /// a vector for easy evaluation in the fillArray() function.
-void SampleHandlerFD::fillSplineBins() {
+void SampleHandlerFD::FillSplineBins() {
   for (int i = 0; i < int(MCSamples.size()); ++i) {
     //Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
@@ -1552,12 +1551,12 @@ void SampleHandlerFD::InitialiseSplineObject() {
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
 
-  fillSplineBins();
+  FillSplineBins();
 
   SplineHandler->cleanUpMemory();
 }
 
-TH1* SampleHandlerFD::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::Get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
@@ -1616,7 +1615,7 @@ TH1* SampleHandlerFD::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   return _h1DVar;
 }
 
-TH2* SampleHandlerFD::get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* SampleHandlerFD::Get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
@@ -1704,7 +1703,7 @@ std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int Kinema
   return "";
 }
 
-TH1* SampleHandlerFD::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
 
@@ -1750,10 +1749,10 @@ TH1* SampleHandlerFD::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str
     SelectionVec.push_back(SelecChannel);
   }
 
-  return get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
+  return Get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* SampleHandlerFD::get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   bool fChannel;
   bool fMode;
 
@@ -1799,7 +1798,7 @@ TH2* SampleHandlerFD::get2DVarHistByModeAndChannel(std::string ProjectionVar_Str
     SelectionVec.push_back(SelecChannel);
   }
 
-  return get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
+  return Get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
 }
 
 void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
@@ -1963,14 +1962,14 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
 
   for (int i=0;i<iMax;i++) {
     if (Selection1==0) {
-      hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
+      hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
 
       hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
       hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
     if (Selection1==1) {
-      hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
+      hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(MCSamples[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
   }
@@ -1995,10 +1994,10 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string Kinemati
 
   for (int i=0;i<iMax;i++) {
     if (Selection1==0) {
-      hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
+      hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
     }
     if (Selection1==1) {
-      hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
+      hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
     }
   }
 

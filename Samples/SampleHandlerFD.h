@@ -29,7 +29,7 @@ public:
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
   std::string GetSampleName(int iSample = 0) const override;
-  std::string GetTitle() const {return SampleTitle;}
+  std::string GetTitle() const override {return SampleTitle;}
 
   std::string GetXBinVarName() {return XVarStr;}
   std::string GetYBinVarName() {return YVarStr;}
@@ -61,7 +61,7 @@ public:
 
   int GetNMCSamples() override {return int(MCSamples.size());}
 
-  int GetNEventsInSample(int iSample) {
+  int GetNEventsInSample(int iSample) override {
     if (iSample < 0 || iSample > GetNMCSamples()) {
       MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
       throw MaCh3Exception(__FILE__ , __LINE__);
@@ -69,7 +69,7 @@ public:
     return MCSamples[iSample].nEvents;
   }
   
-  std::string getFlavourName(int iSample) {
+  std::string GetFlavourName(int iSample) {
     if (iSample < 0 || iSample > GetNMCSamples()) {
       MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
       throw MaCh3Exception(__FILE__ , __LINE__);      
@@ -77,17 +77,17 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
-  TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHist(std::string ProjectionVarX, std::string ProjectionVarY, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* Get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* Get2DVarHist(std::string ProjectionVarX, std::string ProjectionVarY, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
-  TH1* get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* Get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* Get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
-  TH1 *getModeHist1D(int s, int m, int style = 0) {
-    return get1DVarHistByModeAndChannel(XVarStr,m,s,style);
+  TH1 *GetModeHist1D(int s, int m, int style = 0) {
+    return Get1DVarHistByModeAndChannel(XVarStr,m,s,style);
   }
-  TH2 *getModeHist2D(int s, int m, int style = 0) {
-    return get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
+  TH2 *GetModeHist2D(int s, int m, int style = 0) {
+    return Get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
   }
 
   std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
@@ -116,10 +116,10 @@ public:
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
-  virtual int setupExperimentMC(int iSample) = 0;
+  virtual int SetupExperimentMC(int iSample) = 0;
 
   /// @brief Function which translates experiment struct into core struct
-  virtual void setupFDMC(int iSample) = 0;
+  virtual void SetupFDMC(int iSample) = 0;
 
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
@@ -127,7 +127,7 @@ public:
   /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
   std::unique_ptr<BinnedSplineHandler> SplineHandler;
   //===============================================================================
-  void fillSplineBins();
+  void FillSplineBins();
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges1D();
@@ -135,12 +135,12 @@ public:
 
   //DB Overrided functions of base class which calculate erec bin and boundaries for reweighting speedup in beam samples
   //ETA - this can be done using the core info stored in the new fdmc_struct
-  void set1DBinning(int nbins, double* boundaries);
-  void set1DBinning(int nbins, double low, double high);
-  void set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
-  void set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
-  void set1DBinning(std::vector<double> &XVec);
-  void set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
+  void Set1DBinning(int nbins, double* boundaries);
+  void Set1DBinning(int nbins, double low, double high);
+  void Set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
+  void Set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
+  void Set1DBinning(std::vector<double> &XVec);
+  void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
   void SetupSampleBinning();
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
@@ -153,7 +153,7 @@ public:
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
+  virtual void ApplyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
 
@@ -189,20 +189,26 @@ public:
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
   /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting but multithreaded
-  void fillArray_MP();
+  void FillArray_MP();
 #endif
   /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting
-  void fillArray();
+  void FillArray();
 
   /// @brief Helper function to reset histograms
   inline void ResetHistograms();
   
   //===============================================================================
   //DB Variables required for GetLikelihood
-  //
-  /// DB Vectors to hold bin edges
+  /// Vector to hold x-axis bin-edges
   std::vector<double> XBinEdges;
+  /// Vector to hold y-axis bin-edges
   std::vector<double> YBinEdges;
+
+  // ETA: also makes sense to store the number of X and Y bins
+  /// Number of X axis bins in the histogram used for likelihood calculation
+  size_t nXBins;
+  /// Number of Y axis bins in the histogram used for likelihood calculation
+  size_t nYBins;
 
   /// DB Array to be filled after reweighting
   double** SampleHandlerFD_array;
@@ -226,7 +232,7 @@ public:
   //===============================================================================
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
-  //these should be added to samplePDFBase to be honest
+  //these should be added to SampleHandlerBase to be honest
   ParameterHandlerGeneric *ParHandler = nullptr;
   ParameterHandlerOsc *OscParHandler = nullptr;
 
@@ -274,7 +280,10 @@ public:
   /// Mapping between kinematic enum and string
   const std::unordered_map<int, std::string>* ReversedKinematicParameters;
 
+  /// The manager object used to read the sample yaml file
   std::unique_ptr<manager> SampleManager;
+  /// @brief function to create the member of the FarDetectorInfo struct so
+  /// they are the appropriate size.
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 

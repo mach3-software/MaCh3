@@ -104,9 +104,6 @@ protected:
   M3::int_t nSamples;
   /// KS: number of dimension for this sample
   int nDims;
-  /// ETA: also makes sense to store the number of X and Y bins
-  size_t nXBins;
-  size_t nYBins;
 
   /// Holds information about used Generator and MaCh3 modes
   MaCh3Modes* Modes;
