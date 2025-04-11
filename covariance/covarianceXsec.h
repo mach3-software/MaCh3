@@ -72,6 +72,8 @@ class covarianceXsec : public covarianceBase {
     const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Get norm/func parameters depending on given SampleName
     const std::vector<XsecNorms4> GetNormParsFromSampleName(const std::string& SampleName);
+    /// @brief HH Get functional parameters for the relevant SampleName
+    const std::vector<FuncPars> GetFuncParsFromSampleName(const std::string& SampleName);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> getNominalArray() override
@@ -139,6 +141,10 @@ class covarianceXsec : public covarianceBase {
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
     inline XsecNorms4 GetXsecNorm(const YAML::Node& param, const int Index);
+    /// @brief Get Func params
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    inline FuncPars GetFuncPars(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
     inline XsecSplines1 GetXsecSpline(const YAML::Node& param);
@@ -160,4 +166,7 @@ class covarianceXsec : public covarianceBase {
 
     /// Vector containing info for normalisation systematics
     std::vector<XsecNorms4> NormParams;
+
+    /// Vector containing info for functional systematics
+    std::vector<FuncPars> FuncParams;
 };

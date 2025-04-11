@@ -1,6 +1,7 @@
 #include "samplePDFFDBase.h"
 #include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"
+#include <cstddef>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
@@ -676,6 +677,112 @@ void samplePDFFDBase::ResetHistograms() {
   }
 } // end function
 
+void samplePDFFDBase::RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+  // Add protections to not add the same functional parameter twice
+  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
+    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  funcParsNamesMap[fpName] = fpEnum;
+  funcParsNamesVec.push_back(fpName);
+  funcParsFuncMap[fpEnum] = fpFunc;
+}
+
+void samplePDFFDBase::SetupFunctionalParameters() {
+  funcParsVec = XsecCov->GetFuncParsFromSampleName(SampleName);
+  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
+  RegisterFunctionalParameters();
+  funcParsMap.resize(funcParsNamesMap.size());
+  funcParsGrid.resize(MCSamples.size());
+
+  // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
+  for (FuncPars & fp : funcParsVec) {
+    for (std::string name : funcParsNamesVec) {
+      if (fp.name == name) {
+        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
+        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
+        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
+        continue;
+      }
+    }
+    // If we don't find a match, we need to throw an error
+    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
+      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  // Mostly the same as CalcXsecNormsBins
+  // For each event, make a vector of pointers to the functional parameters
+  for (std::size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    funcParsGrid[iSample].resize(static_cast<std::size_t>(MCSamples[iSample].nEvents));
+    for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(MCSamples[iSample].nEvents); ++iEvent) {
+      // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
+      for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+        // Check whether the interaction modes match
+        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCSamples[iSample].mode[iEvent]))));
+        if (!ModeMatch) {
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCSamples[iSample].mode[iEvent]), (*it).name);
+          continue;
+        }
+        // Now check whether within kinematic bounds
+        bool IsSelected = true;
+        if ((*it).hasKinBounds) {
+          for (std::size_t iKinPar = 0; iKinPar < (*it).KinematicVarStr.size(); ++iKinPar) {
+            // Check lower bound
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) <= (*it).Selection[iKinPar][0]) {
+              IsSelected = false;
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              continue;
+            }
+            // Check upper bound
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) > (*it).Selection[iKinPar][1]) {
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              IsSelected = false;
+              continue;
+            }
+          }
+        }
+        // Need to then break the event loop
+        if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
+          continue;
+        }
+        auto funcparenum = funcParsNamesMap[(*it).name];
+        funcParsGrid.at(iSample).at(iEvent).push_back(funcparenum);
+      }
+    }
+  }
+  MACH3LOG_INFO("Finished setting up functional parameters");
+}
+
+void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
+  // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
+  // First reset shifted array back to nominal values
+  resetShifts(iSample, iEvent);
+  for (int fpEnum : funcParsGrid[iSample][iEvent]) {
+    FuncPars *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
+    // if (fp->funcPtr) {
+    //   (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+    // } else {
+    //   MACH3LOG_ERROR("Functional parameter function pointer for {} is null for event {} in sample {}", fp->name, iEvent, iSample);
+    //   throw MaCh3Exception(__FILE__, __LINE__);
+    // }
+    (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+  }
+}
+// =================================
+
+
 // ***************************************************************************
 // Calculate the spline weight for one event
 M3::float_t samplePDFFDBase::CalcWeightSpline(const int iSample, const int iEvent) const {
@@ -1226,6 +1333,7 @@ void samplePDFFDBase::addData(TH1D* Data) {
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+    MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );}
   
   int nXBins = int(XBinEdges.size()-1);
