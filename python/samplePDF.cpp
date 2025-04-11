@@ -198,6 +198,15 @@ public:
                            /* Argument(s) */
         );
     }
+
+    void RegisterFunctionalParameters() override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,
+            samplePDFFDBase,
+            "register_functional_parameters",
+            RegisterFunctionalParameters
+        );
+    }
 };
 
 void initSamplePDF(py::module &m){
