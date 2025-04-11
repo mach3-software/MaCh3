@@ -35,5 +35,13 @@ var searchData=
   ['fparticles_32',['fParticles',['../classPSO.html#a9e9da89144237a7f3369b9b3739e73ad',1,'PSO']]],
   ['ftestlikelihood_33',['fTestLikelihood',['../classFitterBase.html#ada898e35bab22af470f2cd1e28af609b',1,'FitterBase']]],
   ['fteststatistic_34',['fTestStatistic',['../classsamplePDFBase.html#adc5cd0002708ad049ba4fb5e3c62075d',1,'samplePDFBase']]],
-  ['ftwo_35',['fTwo',['../classPSO.html#a56539eb264d11e1c37674ad55504d454',1,'PSO']]]
+  ['ftwo_35',['fTwo',['../classPSO.html#a56539eb264d11e1c37674ad55504d454',1,'PSO']]],
+  ['funcparams_36',['FuncParams',['../classcovarianceXsec.html#a759495db2699a27e1448f39bfc769027',1,'covarianceXsec']]],
+  ['funcparsfuncmap_37',['funcParsFuncMap',['../classsamplePDFFDBase.html#a8b123fddc0ec9f1709e2ea655d7828d6',1,'samplePDFFDBase']]],
+  ['funcparsgrid_38',['funcParsGrid',['../classsamplePDFFDBase.html#a221f6848b8866d83785509bedaee23b0',1,'samplePDFFDBase']]],
+  ['funcparsmap_39',['funcParsMap',['../classsamplePDFFDBase.html#a2b0e12c9e7c4ef15f560aa454dc3e45f',1,'samplePDFFDBase']]],
+  ['funcparsnamesmap_40',['funcParsNamesMap',['../classsamplePDFFDBase.html#aa32c253ffaa8c9dc146024878b886fb9',1,'samplePDFFDBase']]],
+  ['funcparsnamesvec_41',['funcParsNamesVec',['../classsamplePDFFDBase.html#a462cf7c025ee7092b30d6b9a8f0949d4',1,'samplePDFFDBase']]],
+  ['funcparsvec_42',['funcParsVec',['../classsamplePDFFDBase.html#ae2491fe598ecdd993298a8299d9f970a',1,'samplePDFFDBase']]],
+  ['funcptr_43',['funcPtr',['../structFuncPars.html#a7baac66e2b8f1e1f6cec9b952307e68f',1,'FuncPars']]]
 ];

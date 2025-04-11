@@ -15,7 +15,7 @@ var searchData=
   ['kfunc_12',['kFunc',['../Structs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d',1,'Structs.h']]],
   ['kicecube_13',['kIceCube',['../Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472',1,'Structs.h']]],
   ['kinematicparameters_14',['KinematicParameters',['../classsamplePDFFDBase.html#a1751d1118a542faf1757289fb70a2773',1,'samplePDFFDBase']]],
-  ['kinematicvarstr_15',['KinematicVarStr',['../structXsecNorms4.html#a67a1d237f1fdb41a0c11898fada0f00c',1,'XsecNorms4']]],
+  ['kinematicvarstr_15',['KinematicVarStr',['../structFuncPars.html#a6526d12e543f65e0a6f774a3858992c4',1,'FuncPars::KinematicVarStr()'],['../structXsecNorms4.html#a67a1d237f1fdb41a0c11898fada0f00c',1,'XsecNorms4::KinematicVarStr()']]],
   ['kinfcrit_16',['kInfCrit',['../namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7a',1,'M3']]],
   ['kinfcrits_17',['kInfCrits',['../namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aa6658ca8eff798dbb482882a913e26f8c',1,'M3']]],
   ['klinear_18',['kLinear',['../Structs_8h.html#a6720d732608767153550aebebcf8fbf4ac188c019178783e5be55110601309d7d',1,'Structs.h']]],

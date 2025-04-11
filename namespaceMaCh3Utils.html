@@ -380,68 +380,68 @@ Functions</h2></td></tr>
 
 <p>Return mass for given PDG. </p>
 
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00504">504</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  504</span>                                              {</div>
-<div class="line"><span class="lineno">  505</span>    <span class="comment">// *****************************</span></div>
-<div class="line"><span class="lineno">  506</span>    <span class="keywordflow">switch</span> (abs(PDG)) {</div>
-<div class="line"><span class="lineno">  507</span>      <span class="keywordflow">case</span> 11:</div>
-<div class="line"><span class="lineno">  508</span>        <span class="keywordflow">return</span> 0.511E-3;</div>
-<div class="line"><span class="lineno">  509</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  510</span>      <span class="keywordflow">case</span> 13:</div>
-<div class="line"><span class="lineno">  511</span>        <span class="keywordflow">return</span> 105.658E-3;</div>
-<div class="line"><span class="lineno">  512</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  513</span>      <span class="keywordflow">case</span> 15:</div>
-<div class="line"><span class="lineno">  514</span>        <span class="keywordflow">return</span> 1.77682;</div>
-<div class="line"><span class="lineno">  515</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  516</span>      <span class="keywordflow">case</span> 22:</div>
-<div class="line"><span class="lineno">  517</span>        <span class="keywordflow">return</span> 0.;</div>
-<div class="line"><span class="lineno">  518</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  519</span>      <span class="keywordflow">case</span> 211:</div>
-<div class="line"><span class="lineno">  520</span>        <span class="keywordflow">return</span> 139.57E-3;</div>
-<div class="line"><span class="lineno">  521</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  522</span>      <span class="keywordflow">case</span> 111:</div>
-<div class="line"><span class="lineno">  523</span>        <span class="keywordflow">return</span> 134.98E-3;</div>
-<div class="line"><span class="lineno">  524</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  525</span>      <span class="keywordflow">case</span> 2112:</div>
-<div class="line"><span class="lineno">  526</span>        <span class="keywordflow">return</span> 939.565E-3;</div>
-<div class="line"><span class="lineno">  527</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  528</span>      <span class="keywordflow">case</span> 2212:</div>
-<div class="line"><span class="lineno">  529</span>        <span class="keywordflow">return</span> 938.27E-3;</div>
-<div class="line"><span class="lineno">  530</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  531</span>        <span class="comment">//Oxygen nucleus</span></div>
-<div class="line"><span class="lineno">  532</span>      <span class="keywordflow">case</span> 1000080160:</div>
-<div class="line"><span class="lineno">  533</span>        <span class="keywordflow">return</span> 14.89926;</div>
-<div class="line"><span class="lineno">  534</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  535</span>        <span class="comment">//eta</span></div>
-<div class="line"><span class="lineno">  536</span>      <span class="keywordflow">case</span> 221:</div>
-<div class="line"><span class="lineno">  537</span>        <span class="keywordflow">return</span> 547.862E-3;</div>
-<div class="line"><span class="lineno">  538</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  539</span>        <span class="comment">//K^0 (s or l)</span></div>
-<div class="line"><span class="lineno">  540</span>      <span class="keywordflow">case</span> 311:</div>
-<div class="line"><span class="lineno">  541</span>      <span class="keywordflow">case</span> 130:</div>
-<div class="line"><span class="lineno">  542</span>      <span class="keywordflow">case</span> 310:</div>
-<div class="line"><span class="lineno">  543</span>        <span class="keywordflow">return</span> 497.611E-3;</div>
-<div class="line"><span class="lineno">  544</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  545</span>      <span class="keywordflow">case</span> 321:</div>
-<div class="line"><span class="lineno">  546</span>        <span class="keywordflow">return</span> 493.677E-3;</div>
-<div class="line"><span class="lineno">  547</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  548</span>        <span class="comment">// Lambda baryon</span></div>
-<div class="line"><span class="lineno">  549</span>      <span class="keywordflow">case</span> 3122:</div>
-<div class="line"><span class="lineno">  550</span>        <span class="keywordflow">return</span> 1115.683E-3;</div>
-<div class="line"><span class="lineno">  551</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  552</span>      <span class="keywordflow">case</span> 12:</div>
-<div class="line"><span class="lineno">  553</span>      <span class="keywordflow">case</span> 14:</div>
-<div class="line"><span class="lineno">  554</span>      <span class="keywordflow">case</span> 16:</div>
-<div class="line"><span class="lineno">  555</span>        <span class="keywordflow">return</span> 0.0;</div>
+<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00545">545</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  545</span>                                              {</div>
+<div class="line"><span class="lineno">  546</span>    <span class="comment">// *****************************</span></div>
+<div class="line"><span class="lineno">  547</span>    <span class="keywordflow">switch</span> (abs(PDG)) {</div>
+<div class="line"><span class="lineno">  548</span>      <span class="keywordflow">case</span> 11:</div>
+<div class="line"><span class="lineno">  549</span>        <span class="keywordflow">return</span> 0.511E-3;</div>
+<div class="line"><span class="lineno">  550</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  551</span>      <span class="keywordflow">case</span> 13:</div>
+<div class="line"><span class="lineno">  552</span>        <span class="keywordflow">return</span> 105.658E-3;</div>
+<div class="line"><span class="lineno">  553</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  554</span>      <span class="keywordflow">case</span> 15:</div>
+<div class="line"><span class="lineno">  555</span>        <span class="keywordflow">return</span> 1.77682;</div>
 <div class="line"><span class="lineno">  556</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  557</span>      <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  558</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Haven&#39;t got a saved mass for PDG: {}&quot;</span>, PDG);</div>
-<div class="line"><span class="lineno">  559</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please implement me!&quot;</span>);</div>
-<div class="line"><span class="lineno">  560</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  561</span>    } <span class="comment">// End switch</span></div>
-<div class="line"><span class="lineno">  562</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning, didn&#39;t catch a saved mass&quot;</span>);</div>
-<div class="line"><span class="lineno">  563</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  564</span>  }</div>
+<div class="line"><span class="lineno">  557</span>      <span class="keywordflow">case</span> 22:</div>
+<div class="line"><span class="lineno">  558</span>        <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">  559</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  560</span>      <span class="keywordflow">case</span> 211:</div>
+<div class="line"><span class="lineno">  561</span>        <span class="keywordflow">return</span> 139.57E-3;</div>
+<div class="line"><span class="lineno">  562</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  563</span>      <span class="keywordflow">case</span> 111:</div>
+<div class="line"><span class="lineno">  564</span>        <span class="keywordflow">return</span> 134.98E-3;</div>
+<div class="line"><span class="lineno">  565</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  566</span>      <span class="keywordflow">case</span> 2112:</div>
+<div class="line"><span class="lineno">  567</span>        <span class="keywordflow">return</span> 939.565E-3;</div>
+<div class="line"><span class="lineno">  568</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  569</span>      <span class="keywordflow">case</span> 2212:</div>
+<div class="line"><span class="lineno">  570</span>        <span class="keywordflow">return</span> 938.27E-3;</div>
+<div class="line"><span class="lineno">  571</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  572</span>        <span class="comment">//Oxygen nucleus</span></div>
+<div class="line"><span class="lineno">  573</span>      <span class="keywordflow">case</span> 1000080160:</div>
+<div class="line"><span class="lineno">  574</span>        <span class="keywordflow">return</span> 14.89926;</div>
+<div class="line"><span class="lineno">  575</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  576</span>        <span class="comment">//eta</span></div>
+<div class="line"><span class="lineno">  577</span>      <span class="keywordflow">case</span> 221:</div>
+<div class="line"><span class="lineno">  578</span>        <span class="keywordflow">return</span> 547.862E-3;</div>
+<div class="line"><span class="lineno">  579</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  580</span>        <span class="comment">//K^0 (s or l)</span></div>
+<div class="line"><span class="lineno">  581</span>      <span class="keywordflow">case</span> 311:</div>
+<div class="line"><span class="lineno">  582</span>      <span class="keywordflow">case</span> 130:</div>
+<div class="line"><span class="lineno">  583</span>      <span class="keywordflow">case</span> 310:</div>
+<div class="line"><span class="lineno">  584</span>        <span class="keywordflow">return</span> 497.611E-3;</div>
+<div class="line"><span class="lineno">  585</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  586</span>      <span class="keywordflow">case</span> 321:</div>
+<div class="line"><span class="lineno">  587</span>        <span class="keywordflow">return</span> 493.677E-3;</div>
+<div class="line"><span class="lineno">  588</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  589</span>        <span class="comment">// Lambda baryon</span></div>
+<div class="line"><span class="lineno">  590</span>      <span class="keywordflow">case</span> 3122:</div>
+<div class="line"><span class="lineno">  591</span>        <span class="keywordflow">return</span> 1115.683E-3;</div>
+<div class="line"><span class="lineno">  592</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  593</span>      <span class="keywordflow">case</span> 12:</div>
+<div class="line"><span class="lineno">  594</span>      <span class="keywordflow">case</span> 14:</div>
+<div class="line"><span class="lineno">  595</span>      <span class="keywordflow">case</span> 16:</div>
+<div class="line"><span class="lineno">  596</span>        <span class="keywordflow">return</span> 0.0;</div>
+<div class="line"><span class="lineno">  597</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  598</span>      <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  599</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Haven&#39;t got a saved mass for PDG: {}&quot;</span>, PDG);</div>
+<div class="line"><span class="lineno">  600</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please implement me!&quot;</span>);</div>
+<div class="line"><span class="lineno">  601</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  602</span>    } <span class="comment">// End switch</span></div>
+<div class="line"><span class="lineno">  603</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning, didn&#39;t catch a saved mass&quot;</span>);</div>
+<div class="line"><span class="lineno">  604</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  605</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -720,34 +720,34 @@ Functions</h2></td></tr>
 
 <p>Convert from PDG flavour to NuOscillator type beware that in the case of anti-neutrinos the NuOscillator type simply gets multiplied by -1. </p>
 
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00571">571</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  571</span>                                                {</div>
-<div class="line"><span class="lineno">  572</span>    <span class="keywordtype">int</span> NuOscillatorFlavour = <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>;</div>
-<div class="line"><span class="lineno">  573</span>    <span class="keywordflow">switch</span>(std::abs(NuPdg)){</div>
-<div class="line"><span class="lineno">  574</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">NuPDG::kNue</a>:</div>
-<div class="line"><span class="lineno">  575</span>        NuOscillatorFlavour = NuOscillator::kElectron;</div>
-<div class="line"><span class="lineno">  576</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  577</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">NuPDG::kNumu</a>:</div>
-<div class="line"><span class="lineno">  578</span>        NuOscillatorFlavour = NuOscillator::kMuon;</div>
-<div class="line"><span class="lineno">  579</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  580</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">NuPDG::kNutau</a>:</div>
-<div class="line"><span class="lineno">  581</span>        NuOscillatorFlavour = NuOscillator::kTau;</div>
-<div class="line"><span class="lineno">  582</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  583</span>      <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  584</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Unknown Nuetrino PDG {}, cannot convert to NuOscillator type&quot;</span>, NuPdg);</div>
-<div class="line"><span class="lineno">  585</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  586</span>    }</div>
-<div class="line"><span class="lineno">  587</span> </div>
-<div class="line"><span class="lineno">  588</span>    <span class="comment">//This is very cheeky but if the PDG is negative then multiply the PDG by -1</span></div>
-<div class="line"><span class="lineno">  589</span>    <span class="comment">// This is consistent with the treatment that NuOscillator expects as enums only</span></div>
-<div class="line"><span class="lineno">  590</span>    <span class="comment">// exist for the generic matter flavour and not the anti-matter version</span></div>
-<div class="line"><span class="lineno">  591</span>    <span class="keywordflow">if</span>(NuPdg &lt; 0){NuOscillatorFlavour *= -1;}</div>
-<div class="line"><span class="lineno">  592</span> </div>
-<div class="line"><span class="lineno">  593</span>    <span class="keywordflow">return</span> NuOscillatorFlavour;</div>
-<div class="line"><span class="lineno">  594</span>  }</div>
-<div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">kNutau</a></div><div class="ttdeci">@ kNutau</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00370">Structs.h:370</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">kNue</a></div><div class="ttdeci">@ kNue</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00368">Structs.h:368</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">kNumu</a></div><div class="ttdeci">@ kNumu</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00369">Structs.h:369</a></div></div>
+<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00612">612</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  612</span>                                                {</div>
+<div class="line"><span class="lineno">  613</span>    <span class="keywordtype">int</span> NuOscillatorFlavour = <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>;</div>
+<div class="line"><span class="lineno">  614</span>    <span class="keywordflow">switch</span>(std::abs(NuPdg)){</div>
+<div class="line"><span class="lineno">  615</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">NuPDG::kNue</a>:</div>
+<div class="line"><span class="lineno">  616</span>        NuOscillatorFlavour = NuOscillator::kElectron;</div>
+<div class="line"><span class="lineno">  617</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  618</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">NuPDG::kNumu</a>:</div>
+<div class="line"><span class="lineno">  619</span>        NuOscillatorFlavour = NuOscillator::kMuon;</div>
+<div class="line"><span class="lineno">  620</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  621</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">NuPDG::kNutau</a>:</div>
+<div class="line"><span class="lineno">  622</span>        NuOscillatorFlavour = NuOscillator::kTau;</div>
+<div class="line"><span class="lineno">  623</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  624</span>      <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  625</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Unknown Nuetrino PDG {}, cannot convert to NuOscillator type&quot;</span>, NuPdg);</div>
+<div class="line"><span class="lineno">  626</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  627</span>    }</div>
+<div class="line"><span class="lineno">  628</span> </div>
+<div class="line"><span class="lineno">  629</span>    <span class="comment">//This is very cheeky but if the PDG is negative then multiply the PDG by -1</span></div>
+<div class="line"><span class="lineno">  630</span>    <span class="comment">// This is consistent with the treatment that NuOscillator expects as enums only</span></div>
+<div class="line"><span class="lineno">  631</span>    <span class="comment">// exist for the generic matter flavour and not the anti-matter version</span></div>
+<div class="line"><span class="lineno">  632</span>    <span class="keywordflow">if</span>(NuPdg &lt; 0){NuOscillatorFlavour *= -1;}</div>
+<div class="line"><span class="lineno">  633</span> </div>
+<div class="line"><span class="lineno">  634</span>    <span class="keywordflow">return</span> NuOscillatorFlavour;</div>
+<div class="line"><span class="lineno">  635</span>  }</div>
+<div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">kNutau</a></div><div class="ttdeci">@ kNutau</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00411">Structs.h:411</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">kNue</a></div><div class="ttdeci">@ kNue</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00409">Structs.h:409</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">kNumu</a></div><div class="ttdeci">@ kNumu</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00410">Structs.h:410</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aed6ca6561a78ba6c90a98ddfa22353aa"><div class="ttname"><a href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a></div><div class="ttdeci">static constexpr const int _BAD_INT_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00041">Core.h:41</a></div></div>
 </div><!-- fragment -->
 </div>

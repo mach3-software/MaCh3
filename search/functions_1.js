@@ -1,8 +1,8 @@
 var searchData=
 [
   ['acceptanceprobabilities_0',['AcceptanceProbabilities',['../classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61',1,'MCMCProcessor']]],
-  ['acceptstep_1',['acceptStep',['../classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457',1,'covarianceBase']]],
-  ['acceptstep_2',['AcceptStep',['../classPCAHandler.html#a7298eb3c337becf349d628c3049834f7',1,'PCAHandler']]],
+  ['acceptstep_1',['AcceptStep',['../classPCAHandler.html#a7298eb3c337becf349d628c3049834f7',1,'PCAHandler']]],
+  ['acceptstep_2',['acceptStep',['../classcovarianceBase.html#a54712c01de98adcaaa0ecb5a650a3457',1,'covarianceBase']]],
   ['adaptionupdate_3',['AdaptionUpdate',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a39a099e5712cf605190a53a4355c700c',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adaptivemcmchandler_4',['AdaptiveMCMCHandler',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8c1c9c62865ad7e2a9c9bdfa24ad54be',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adddata_5',['AddData',['../classSampleSummary.html#a681bee322172bef35a64e86c23c415b6',1,'SampleSummary']]],
@@ -17,7 +17,7 @@ var searchData=
   ['adduseroption_14',['addUserOption',['../classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6',1,'MaCh3Plotting::PlottingManager']]],
   ['appliestosample_15',['AppliesToSample',['../classcovarianceBase.html#a5f867c9d5f0b8c593de65d7b6e71c8b9',1,'covarianceBase']]],
   ['applyknotweightcap_16',['ApplyKnotWeightCap',['../SplineStructs_8h.html#ab440d2db15109691e0f68d55a4fb9c7d',1,'SplineStructs.h']]],
-  ['applyshifts_17',['applyShifts',['../classsamplePDFFDBase.html#aecf3addcc9045e2da648b8bf1f99d84b',1,'samplePDFFDBase']]],
+  ['applyshifts_17',['applyShifts',['../classsamplePDFFDBase.html#a65292ce95688e254e30d5d2625b54759',1,'samplePDFFDBase']]],
   ['autocorrelation_18',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],
   ['autocorrelation_5ffft_19',['AutoCorrelation_FFT',['../classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79',1,'MCMCProcessor']]]
 ];

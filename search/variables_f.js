@@ -20,7 +20,7 @@ var searchData=
   ['parstep_17',['ParStep',['../classMCMCProcessor.html#a087dca88a306acdc28afea7213e3623c',1,'MCMCProcessor']]],
   ['pca_18',['pca',['../classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4',1,'covarianceBase']]],
   ['pcaobj_19',['PCAObj',['../classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165',1,'covarianceBase']]],
-  ['pdgs_20',['pdgs',['../structXsecNorms4.html#afed4b95759559016df72bfed03763b6e',1,'XsecNorms4']]],
+  ['pdgs_20',['pdgs',['../structFuncPars.html#a805b3770cd1abf916450b026106651bb',1,'FuncPars::pdgs()'],['../structXsecNorms4.html#afed4b95759559016df72bfed03763b6e',1,'XsecNorms4::pdgs()']]],
   ['personal_5fbest_5fposition_21',['personal_best_position',['../classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f',1,'particle']]],
   ['personal_5fbest_5fvalue_22',['personal_best_value',['../classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b',1,'particle']]],
   ['plotbinvalue_23',['plotBinValue',['../classMCMCProcessor.html#aa7611f55ac3c0ea70607761d037fbd91',1,'MCMCProcessor']]],
@@ -41,7 +41,7 @@ var searchData=
   ['postfithistvec_38',['PostfitHistVec',['../GetPostfitParamPlots_8cpp.html#adf27e2a8c89392ebe0a2d6d7a65dab9e',1,'GetPostfitParamPlots.cpp']]],
   ['postfitvalues_39',['postFitValues',['../structMaCh3Plotting_1_1InputFile.html#a9fda9461129b12fd18c6aad0aae12241',1,'MaCh3Plotting::InputFile']]],
   ['prefit_40',['Prefit',['../GetPostfitParamPlots_8cpp.html#a3622d45d00f446252f0ea513d7f1f6cb',1,'GetPostfitParamPlots.cpp']]],
-  ['preoscpdgs_41',['preoscpdgs',['../structXsecNorms4.html#ac2e3b749d0c629e425861d2f6ecf82b0',1,'XsecNorms4']]],
+  ['preoscpdgs_41',['preoscpdgs',['../structFuncPars.html#a2351a4e5085c4efd955bf544d232cbdf',1,'FuncPars::preoscpdgs()'],['../structXsecNorms4.html#ac2e3b749d0c629e425861d2f6ecf82b0',1,'XsecNorms4::preoscpdgs()']]],
   ['printlength_42',['PrintLength',['../classcovarianceBase.html#a8d821ce805f2426fe95549170866821f',1,'covarianceBase']]],
   ['printtopdf_43',['printToPDF',['../classMCMCProcessor.html#ad73755714ae3d6dc951158d5513c6eee',1,'MCMCProcessor']]],
   ['prior_44',['prior',['../classPSO.html#afac1699007d3838da90d466bf4b69b31',1,'PSO']]]

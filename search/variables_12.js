@@ -2,7 +2,7 @@ var searchData=
 [
   ['target_0',['Target',['../structFarDetectorCoreInfo.html#a23013785a91a3a417914c2e7c79e8fef',1,'FarDetectorCoreInfo']]],
   ['targetcompression_1',['targetCompression',['../CombineMaCh3Chains_8cpp.html#a8ea7adaa7c7b0783e5562e9e8673fbe1',1,'CombineMaCh3Chains.cpp']]],
-  ['targets_2',['targets',['../structXsecNorms4.html#a0f6b21994200f446f21c42ec1cebf9bb',1,'XsecNorms4']]],
+  ['targets_2',['targets',['../structXsecNorms4.html#a0f6b21994200f446f21c42ec1cebf9bb',1,'XsecNorms4::targets()'],['../structFuncPars.html#aea0708fc8a8ce746e7034ade3e110a17',1,'FuncPars::targets()']]],
   ['text_5fcoeff_5fx_3',['text_coeff_x',['../classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c',1,'SMonolithGPU']]],
   ['text_5fnparamperevent_4',['text_nParamPerEvent',['../classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f',1,'SMonolithGPU']]],
   ['text_5fnparamperevent_5ftf1_5',['text_nParamPerEvent_TF1',['../classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e',1,'SMonolithGPU']]],

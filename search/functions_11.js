@@ -79,7 +79,7 @@ var searchData=
   ['setupbinning_76',['SetupBinning',['../classsamplePDFBase.html#aa3ac45cabba791d5ea5baabcc277384b',1,'samplePDFBase']]],
   ['setupexperimentmc_77',['setupExperimentMC',['../classPySamplePDFFDBase.html#a74136a3f21f582ecf0d3ff9d4e82cae9',1,'PySamplePDFFDBase::setupExperimentMC()'],['../classsamplePDFFDBase.html#a6e93b78b6850fe767f682734130499ff',1,'samplePDFFDBase::setupExperimentMC()']]],
   ['setupfdmc_78',['setupFDMC',['../classPySamplePDFFDBase.html#a05a62ecc2d5763bba3530d5f8e43686f',1,'PySamplePDFFDBase::setupFDMC()'],['../classsamplePDFFDBase.html#a728d28eee3aa42a2a87d13cdb183828e',1,'samplePDFFDBase::setupFDMC(int iSample)=0']]],
-  ['setupfunctionalparameters_79',['SetupFunctionalParameters',['../classsamplePDFFDBase.html#ab8575024419105ce457dc198e4cf9cc3',1,'samplePDFFDBase']]],
+  ['setupfunctionalparameters_79',['SetupFunctionalParameters',['../classsamplePDFFDBase.html#a82ec59302a3c1890db409dfdb43f6cf6',1,'samplePDFFDBase']]],
   ['setupinfo_80',['SetupInfo',['../MatrixPlotter_8cpp.html#a036ec4a114644b25af09cc1e0dab023a',1,'MatrixPlotter.cpp']]],
   ['setupkinematicmap_81',['SetupKinematicMap',['../classsamplePDFFDBase.html#a386aa5c1b53b3aa25411eb05e3574750',1,'samplePDFFDBase']]],
   ['setupnormparameters_82',['SetupNormParameters',['../classsamplePDFFDBase.html#a9bda6382715dc3b7d265bd7b79d206fa',1,'samplePDFFDBase']]],

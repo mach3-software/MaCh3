@@ -4,7 +4,7 @@ var searchData=
   ['targetcompression_1',['targetCompression',['../CombineMaCh3Chains_8cpp.html#a8ea7adaa7c7b0783e5562e9e8673fbe1',1,'CombineMaCh3Chains.cpp']]],
   ['targetmat_2',['TargetMat',['../Structs_8h.html#a706416000041de040e97d5dbe0bdb580',1,'Structs.h']]],
   ['targetmat_5ftostring_3',['TargetMat_ToString',['../Structs_8h.html#a36b7eae1e9918d93ac6912d88c498a24',1,'Structs.h']]],
-  ['targets_4',['targets',['../structXsecNorms4.html#a0f6b21994200f446f21c42ec1cebf9bb',1,'XsecNorms4']]],
+  ['targets_4',['targets',['../structXsecNorms4.html#a0f6b21994200f446f21c42ec1cebf9bb',1,'XsecNorms4::targets()'],['../structFuncPars.html#aea0708fc8a8ce746e7034ade3e110a17',1,'FuncPars::targets()']]],
   ['terminaltostring_5',['TerminalToString',['../namespaceMaCh3Utils.html#a10a037c1bcf48073ae105968128a55c5',1,'MaCh3Utils']]],
   ['teststatistic_6',['TestStatistic',['../Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67',1,'Structs.h']]],
   ['teststatistic_5ftostring_7',['TestStatistic_ToString',['../Structs_8h.html#afe33f23691e6b5e3e0f5ab97aaeb7726',1,'Structs.h']]],
