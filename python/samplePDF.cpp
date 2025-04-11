@@ -13,6 +13,16 @@ public:
     using samplePDFBase::samplePDFBase;
 
     /* Trampoline (need one for each virtual function) */
+    std::string GetSampleName(int iSample) const override {
+        PYBIND11_OVERRIDE_PURE(
+            std::string,          /* Return type */
+            samplePDFBase, /* Parent class */
+            GetSampleName, /* Name of function in C++ (must match Python name) */
+            iSample         /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
     void reweight() override {
         PYBIND11_OVERRIDE_PURE(
             void,          /* Return type */
