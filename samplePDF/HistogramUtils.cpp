@@ -595,8 +595,8 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
     mNeff = 0.93827203 - Eb / 1000.;
     mNoth = 0.93956536;
   }
-
-  double mLep = 0.10565837;
+  /// @todo WARNING this is hardcoded
+  constexpr double mLep = 0.10565837;
   double eLep = sqrt(PLep * PLep + mLep * mLep);
 
   double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
