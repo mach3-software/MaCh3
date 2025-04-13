@@ -35,6 +35,8 @@ namespace MaCh3Utils {
   void GetCPUInfo();
   /// @brief KS: Check what GPU you are using
   void GetGPUInfo();
+  /// @brief KS: Check if user is not using huge number of threads and throw error
+  void NThreadsSanity();
   /// @brief KS: Convoluted code to grab output from terminal to string
   /// @param cmd The terminal command to execute.
   /// @return The output of the terminal command as a string.
