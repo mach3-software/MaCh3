@@ -9,7 +9,7 @@ DefineEnabledRequiredSwitch(NuFastLinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(NuSQUIDSLinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(OscProb_ENABLED FALSE)
 
-#KS: If all Oscillators are turned off then enable CUDAProb3Linear_ENABLED
+#KS: If all Oscillators are turned off then enable NuFastLinear_ENABLED and CUDAProb3_ENABLED
 if (NOT CUDAProb3Linear_ENABLED AND
     NOT CUDAProb3_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
@@ -18,6 +18,7 @@ if (NOT CUDAProb3Linear_ENABLED AND
     NOT NuSQUIDSLinear_ENABLED AND
     NOT OscProb_ENABLED)
     set(NuFastLinear_ENABLED TRUE)
+    set(CUDAProb3_ENABLED TRUE)
 endif()
 
 #KS: Save which oscillators are being used
