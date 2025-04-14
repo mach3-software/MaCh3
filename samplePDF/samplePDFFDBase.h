@@ -77,11 +77,14 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
-  TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHist(std::string ProjectionVarX, std::string ProjectionVarY, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* get1DVarHist(const std::string& ProjectionVar, const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                    const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
-  TH1* get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
   TH1 *getModeHist1D(int s, int m, int style = 0) {
     return get1DVarHistByModeAndChannel(XVarStr,m,s,style);
@@ -312,4 +315,9 @@ public:
   /// DB Miscellaneous Variables
   TLegend* THStackLeg = nullptr;
   //===============================================================================
+
+  /// KS:Super hacky to update W2 or not
+  bool FirstTimeW2;
+  /// KS:Super hacky to update W2 or not
+  bool UpdateW2;
 };

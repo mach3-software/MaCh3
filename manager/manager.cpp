@@ -102,6 +102,8 @@ int manager::GetMCStatLLH() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   } else {
+    MACH3LOG_WARN("Didn't find a TestStatistic specified");
+    MACH3LOG_WARN("Defaulting to using a {} likelihood", TestStatistic_ToString(kPoisson));
     mc_stat_llh = kPoisson;
   }
   return mc_stat_llh;
