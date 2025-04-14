@@ -46,7 +46,6 @@ jobs:
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag: rocky9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF -DNuFastLinear_ENABLED=ON
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
           - os: Alma9 NoMultithreading
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
