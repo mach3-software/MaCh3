@@ -10,12 +10,13 @@ var searchData=
   ['unity_7',['Unity',['../namespaceM3.html#ad582417b26dd0d182e18790ab760caca',1,'M3']]],
   ['unity_5ff_8',['Unity_F',['../namespaceM3.html#a0888fc3177e4a0c3ddbed03a5bd358b0',1,'M3']]],
   ['unity_5fint_9',['Unity_Int',['../namespaceM3.html#a562b8b4a9a841b9fb76d69a33489aefe',1,'M3']]],
-  ['updateadaptivecovariance_10',['updateAdaptiveCovariance',['../classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b',1,'covarianceBase']]],
-  ['updateadaptivecovariance_11',['UpdateAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a828e12f4ecb82252341af5f5e54f7ad3',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
+  ['updateadaptivecovariance_10',['UpdateAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a828e12f4ecb82252341af5f5e54f7ad3',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
+  ['updateadaptivecovariance_11',['updateAdaptiveCovariance',['../classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b',1,'covarianceBase']]],
   ['updatematrixadapt_12',['UpdateMatrixAdapt',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a217c72a492c9d3e1b3a7b14626d19ab2',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['updatethrowmatrix_13',['updateThrowMatrix',['../classcovarianceBase.html#a7e2d3623bbbf3edee558e04737fe2add',1,'covarianceBase']]],
-  ['uppercut_14',['UpperCut',['../classMCMCProcessor.html#a840c686f15f419c0156df01c4ed62931',1,'MCMCProcessor']]],
-  ['usage_15',['usage',['../classMaCh3Plotting_1_1PlottingManager.html#a8910c157ce1ec6698f3bacdf521789ff',1,'MaCh3Plotting::PlottingManager::usage()'],['../CombineMaCh3Chains_8cpp.html#a2ef30c42cbc289d899a8be5d2d8f77d0',1,'usage():&#160;CombineMaCh3Chains.cpp']]],
-  ['use_5fadaptive_16',['use_adaptive',['../classcovarianceBase.html#a838731abd6716940043b484b2b266f86',1,'covarianceBase']]],
-  ['usefftautocorrelation_17',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]]
+  ['updatew2_14',['UpdateW2',['../classsamplePDFFDBase.html#a3dc696aa2a08e19d5ab3c12cd3440a80',1,'samplePDFFDBase']]],
+  ['uppercut_15',['UpperCut',['../classMCMCProcessor.html#a840c686f15f419c0156df01c4ed62931',1,'MCMCProcessor']]],
+  ['usage_16',['usage',['../classMaCh3Plotting_1_1PlottingManager.html#a8910c157ce1ec6698f3bacdf521789ff',1,'MaCh3Plotting::PlottingManager::usage()'],['../CombineMaCh3Chains_8cpp.html#a2ef30c42cbc289d899a8be5d2d8f77d0',1,'usage():&#160;CombineMaCh3Chains.cpp']]],
+  ['use_5fadaptive_17',['use_adaptive',['../classcovarianceBase.html#a838731abd6716940043b484b2b266f86',1,'covarianceBase']]],
+  ['usefftautocorrelation_18',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]]
 ];

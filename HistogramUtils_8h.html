@@ -306,6 +306,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>WARNING this is hardcoded </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00589">589</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  589</span>                                                                        {</div>
@@ -317,8 +318,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  595</span>    mNeff = 0.93827203 - Eb / 1000.;</div>
 <div class="line"><span class="lineno">  596</span>    mNoth = 0.93956536;</div>
 <div class="line"><span class="lineno">  597</span>  }</div>
-<div class="line"><span class="lineno">  598</span> </div>
-<div class="line"><span class="lineno">  599</span>  <span class="keywordtype">double</span> mLep = 0.10565837;</div>
+<div class="line"><span class="lineno">  599</span>  <span class="keyword">constexpr</span> <span class="keywordtype">double</span> mLep = 0.10565837;</div>
 <div class="line"><span class="lineno">  600</span>  <span class="keywordtype">double</span> eLep = sqrt(PLep * PLep + mLep * mLep);</div>
 <div class="line"><span class="lineno">  601</span> </div>
 <div class="line"><span class="lineno">  602</span>  <span class="keywordtype">double</span> Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));</div>
