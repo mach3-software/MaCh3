@@ -135,16 +135,43 @@ public:
 
   //DB Overrided functions of base class which calculate erec bin and boundaries for reweighting speedup in beam samples
   //ETA - this can be done using the core info stored in the new fdmc_struct
+  /// @brief sets the binning used for the likelihood calculation, used for both data and MC
+  /// @param nbins number of total bins
+  /// @param boundaries the bin edges e.g. 0, 0.1, 0.2, 0.3 
   void Set1DBinning(int nbins, double* boundaries);
+  /// @brief set the binning used for likelihood calculation using uniform binning
+  /// @param nbins number of total bins
+  /// @param low lower bound of the binning
+  /// @param high upper bound of the binning
   void Set1DBinning(int nbins, double low, double high);
+  /// @brief set the binning for 2D sample used for the likelihood calculation
+  /// @param nbins1 number of bins in axis 1 (the x-axis)
+  /// @param nbins2 number of bins in axis 2 (the y-axis)
+  /// @param boundaries1 the bin boundaries used in axis 1 (the x-axis)
+  /// @param boundaries2 the bin boundaries used in axis 2 (the y-axis)
   void Set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
+  /// @brief set the binning for 2D sample used for the likelihood calculation
+  /// @param nbins1 number of bins in axis 1 (the x-axis)
+  /// @param low1 lower bound of binning in axis 1 (the x-axis)
+  /// @param high1 upper bound of binning in axis 1 (the x-axis)
+  /// @param nbins2 number of bins in axis 2 (the y-axis)
+  /// @param low2 lower bound of binning in axis 2 (the y-axis)
   void Set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
+  /// @brief set the binning for 1D sample used for the likelihood calculation
+  /// @param XVec vector containing the binning in axis 1 (the x-axis)
   void Set1DBinning(std::vector<double> &XVec);
+  /// @brief set the binning for 2D sample used for the likelihood calculation
+  /// @param XVec vector containing the binning in axis 1 (the x-axis)
+  /// @param YVec vector containing the binning in axis 2 (the y-axis)
   void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
+  /// @brief wrapper to call set binning functions based on sample config info
   void SetupSampleBinning();
+  /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
+  /// @brief vector of the binning used in axis 1 (the x-axis)
   std::vector<double> SampleXBins;
+  /// @brief vector of the binning used in axis 2 (the y-axis)
   std::vector<double> SampleYBins;
   //===============================================================================
 
@@ -171,10 +198,13 @@ public:
   /// This way func weight shall be used in GetEventWeight
   virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
 
+  /// @brief Return the value of an assocaited kinematic parameter for an event
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
+  /// @brief Return the value of an assocaited kinematic parameter for an event
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
 
-  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
+  /// @brief Return the binning used to draw a kinematic parameter
+  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0;
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
 
@@ -183,7 +213,9 @@ public:
   //===============================================================================
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from samplePDF_array
+  /// @brief Fill a 1D histogram with the event-level information used in the fit
   void Fill1DHist() override;
+  /// @brief Fill a 2D histogram with the event-level information used in the fit
   void Fill2DHist() override;
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
