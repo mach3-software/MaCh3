@@ -25,7 +25,7 @@ jobs:
           - os: Ubuntu22.04 Debug
             file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
             tag: ubuntu22.04latest
-            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON
+            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON
           - os: Fedora32 Low Memory
             file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
             tag: fedora32latest
@@ -49,7 +49,7 @@ jobs:
           - os: Alma9 NoMultithreading
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF -DNuFastLinear_ENABLED=ON
           - os: Alma9 Native
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
@@ -57,7 +57,7 @@ jobs:
           - os: Ubuntu24.10 Clang NoMultithreading
             file: Doc/MaCh3DockerFiles/Ubuntu24.10/Dockerfile
             tag: ubuntu24.10latest
-            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF -DMaCh3_PYTHON_ENABLED=ON
+            cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON
 
     name: Build CI ${{ matrix.os }}
 
