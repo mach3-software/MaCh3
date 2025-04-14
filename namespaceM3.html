@@ -315,15 +315,15 @@ template&lt;typename T &gt; </div>
 
 <p>number of threads which we need for example for TRandom3 </p>
 
-<p class="definition">Definition at line <a class="el" href="Monitor_8cpp_source.html#l00295">295</a> of file <a class="el" href="Monitor_8cpp_source.html">Monitor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  295</span>                  {</div>
-<div class="line"><span class="lineno">  296</span><span class="comment">// ***************************************************************************</span></div>
-<div class="line"><span class="lineno">  297</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  298</span>  <span class="keywordflow">return</span> omp_get_max_threads();</div>
-<div class="line"><span class="lineno">  299</span><span class="preprocessor">  #else</span></div>
-<div class="line"><span class="lineno">  300</span>  <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">  301</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  302</span>}</div>
+<p class="definition">Definition at line <a class="el" href="Monitor_8cpp_source.html#l00313">313</a> of file <a class="el" href="Monitor_8cpp_source.html">Monitor.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  313</span>                  {</div>
+<div class="line"><span class="lineno">  314</span><span class="comment">// ***************************************************************************</span></div>
+<div class="line"><span class="lineno">  315</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  316</span>  <span class="keywordflow">return</span> omp_get_max_threads();</div>
+<div class="line"><span class="lineno">  317</span><span class="preprocessor">  #else</span></div>
+<div class="line"><span class="lineno">  318</span>  <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">  319</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  320</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -352,14 +352,14 @@ template&lt;typename T &gt; </div>
 
 <p>thread index inside parallel loop </p>
 
-<p class="definition">Definition at line <a class="el" href="Monitor_8h_source.html#l00080">80</a> of file <a class="el" href="Monitor_8h_source.html">Monitor.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   80</span>                              {</div>
-<div class="line"><span class="lineno">   81</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">return</span> omp_get_thread_num();</div>
-<div class="line"><span class="lineno">   83</span><span class="preprocessor">    #else</span></div>
-<div class="line"><span class="lineno">   84</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">   85</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">   86</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="Monitor_8h_source.html#l00082">82</a> of file <a class="el" href="Monitor_8h_source.html">Monitor.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   82</span>                              {</div>
+<div class="line"><span class="lineno">   83</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   84</span>    <span class="keywordflow">return</span> omp_get_thread_num();</div>
+<div class="line"><span class="lineno">   85</span><span class="preprocessor">    #else</span></div>
+<div class="line"><span class="lineno">   86</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">   87</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   88</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
