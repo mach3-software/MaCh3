@@ -138,32 +138,32 @@ public:
   /// @brief sets the binning used for the likelihood calculation, used for both data and MC
   /// @param nbins number of total bins
   /// @param boundaries the bin edges e.g. 0, 0.1, 0.2, 0.3 
-  void Set1DBinning(int nbins, double* boundaries);
+  void Set1DBinning(size_t nbins, double* boundaries);
   /// @brief set the binning used for likelihood calculation using uniform binning
   /// @param nbins number of total bins
   /// @param low lower bound of the binning
   /// @param high upper bound of the binning
-  void Set1DBinning(int nbins, double low, double high);
+  void Set1DBinning(size_t nbins, double low, double high);
   /// @brief set the binning for 2D sample used for the likelihood calculation
   /// @param nbins1 number of bins in axis 1 (the x-axis)
   /// @param nbins2 number of bins in axis 2 (the y-axis)
   /// @param boundaries1 the bin boundaries used in axis 1 (the x-axis)
   /// @param boundaries2 the bin boundaries used in axis 2 (the y-axis)
-  void Set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2);
+  void Set2DBinning(size_t nbins1, double* boundaries1, size_t nbins2, double* boundaries2);
   /// @brief set the binning for 2D sample used for the likelihood calculation
   /// @param nbins1 number of bins in axis 1 (the x-axis)
   /// @param low1 lower bound of binning in axis 1 (the x-axis)
   /// @param high1 upper bound of binning in axis 1 (the x-axis)
   /// @param nbins2 number of bins in axis 2 (the y-axis)
   /// @param low2 lower bound of binning in axis 2 (the y-axis)
-  void Set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2);
+  void Set2DBinning(size_t nbins1, double low1, double high1, size_t nbins2, double low2, double high2);
   /// @brief set the binning for 1D sample used for the likelihood calculation
   /// @param XVec vector containing the binning in axis 1 (the x-axis)
-  void Set1DBinning(std::vector<double> &XVec);
+  void Set1DBinning(std::vector<double> &XVec) {Set1DBinning(XVec.size()-1, XVec.data());};
   /// @brief set the binning for 2D sample used for the likelihood calculation
   /// @param XVec vector containing the binning in axis 1 (the x-axis)
   /// @param YVec vector containing the binning in axis 2 (the y-axis)
-  void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec);
+  void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec) {Set2DBinning(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());};
   /// @brief wrapper to call set binning functions based on sample config info
   void SetupSampleBinning();
   /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"

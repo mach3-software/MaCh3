@@ -847,82 +847,20 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
   #endif
 }
 
-//ETA - this is all a bit (less) stupid
-void SampleHandlerFD::Set1DBinning(std::vector<double> &XVec){
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
-  dathist->SetBins(int(XVec.size()-1), XVec.data());
-
-  //This will overwrite XBinEdges with whatever you pass this function
-  XBinEdges = XVec;
-  YBinEdges = std::vector<double>(2);
-  YBinEdges[0] = -1e8;
-  YBinEdges[1] = 1e8;
-
-  _hPDF2D->Reset();
-  _hPDF2D  ->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
-  dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YBinEdges.size()-1), YBinEdges.data());
-
-  //Set the number of X and Y bins now
-  nXBins = XBinEdges.size() - 1;
-  nYBins = YBinEdges.size() - 1;
-
-  SampleHandlerFD_array = new double*[nYBins];
-  SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (size_t yBin=0;yBin<nYBins;yBin++) {
-    SampleHandlerFD_array[yBin] = new double[nXBins];
-    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (size_t xBin=0;xBin<nXBins;xBin++) {
-      SampleHandlerFD_array[yBin][xBin] = 0.;
-      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
-  FindNominalBinAndEdges1D();
-}
-
-//ETA - this is all a bit stupid
-void SampleHandlerFD::Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec)
-{
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(int(XVec.size()-1), XVec.data());
-  dathist->SetBins(int(XVec.size()-1), XVec.data());
-
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
-  dathist2d->SetBins(int(XVec.size()-1), XVec.data(), int(YVec.size()-1), YVec.data());
-
-  //Set the number of X and Y bins now
-  nXBins = XVec.size() - 1;
-  nYBins = YVec.size() - 1;
-
-  SampleHandlerFD_array = new double*[nYBins];
-  SampleHandlerFD_array_w2 = new double*[nYBins];
-  for (size_t yBin=0;yBin<nYBins;yBin++) {
-    SampleHandlerFD_array[yBin] = new double[nXBins];
-    SampleHandlerFD_array_w2[yBin] = new double[nXBins];
-    for (size_t xBin=0;xBin<nXBins;xBin++) {
-      SampleHandlerFD_array[yBin][xBin] = 0.;
-      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
-    }
-  }
-
-  FindNominalBinAndEdges2D();
-}
-
 //ETA
 //New versions of set binning functions is SampleHandlerBase
 //so that we can set the values of the bin and lower/upper
 //edges in the skmc_base. Hopefully we can use this to make
 //fill1Dhist and fill2Dhist quicker
-void SampleHandlerFD::Set1DBinning(int nbins, double* boundaries)
+void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
 {
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(nbins,boundaries);
-  dathist->SetBins(nbins,boundaries);
+  _hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
+  dathist->SetBins(static_cast<int>(nbins),boundaries);
 
   XBinEdges = std::vector<double>(nbins+1);
-  for (int i=0;i<nbins+1;i++) {
-    XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(i+1);
+  for (size_t i=0;i<nbins+1;i++) {
+    XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
   }
   YBinEdges = std::vector<double>(2);
   YBinEdges[0] = -1e8;
@@ -933,8 +871,8 @@ void SampleHandlerFD::Set1DBinning(int nbins, double* boundaries)
   YBinEdges_Arr[1] = YBinEdges[1];
 
   _hPDF2D->Reset();
-  _hPDF2D->SetBins(nbins,boundaries,1,YBinEdges_Arr);
-  dathist2d->SetBins(nbins,boundaries,1,YBinEdges_Arr);
+  _hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
+  dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
 
   //Set the number of X and Y bins now
   nXBins = XBinEdges.size() - 1;
@@ -954,23 +892,23 @@ void SampleHandlerFD::Set1DBinning(int nbins, double* boundaries)
   FindNominalBinAndEdges1D();
 }
 
-void SampleHandlerFD::Set1DBinning(int nbins, double low, double high)
+void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
 {
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(nbins,low,high);
-  dathist->SetBins(nbins,low,high);
+  _hPDF1D->SetBins(static_cast<int>(nbins),low,high);
+  dathist->SetBins(static_cast<int>(nbins),low,high);
 
   XBinEdges = std::vector<double>(nbins+1);
-  for (int i=0;i<nbins+1;i++) {
-    XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(i+1);
+  for (size_t i=0;i<nbins+1;i++) {
+    XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
   }
   YBinEdges = std::vector<double>(2);
   YBinEdges[0] = -1e8;
   YBinEdges[1] = 1e8;
 
   _hPDF2D->Reset();
-  _hPDF2D->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
-  dathist2d->SetBins(nbins,low,high,1,YBinEdges[0],YBinEdges[1]);
+  _hPDF2D->SetBins(static_cast<int>(nbins),low,high,1,YBinEdges[0],YBinEdges[1]);
+  dathist2d->SetBins(static_cast<int>(nbins),low,high,1,YBinEdges[0],YBinEdges[1]);
 
   //Set the number of X and Y bins now
   nXBins = XBinEdges.size() - 1;
@@ -1036,23 +974,23 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
   }
 }
 
-void SampleHandlerFD::Set2DBinning(int nbins1, double* boundaries1, int nbins2, double* boundaries2)
+void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nbins2, double* boundaries2)
 {
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(nbins1,boundaries1);
-  dathist->SetBins(nbins1,boundaries1);
+  _hPDF1D->SetBins(static_cast<int>(nbins1),boundaries1);
+  dathist->SetBins(static_cast<int>(nbins1),boundaries1);
 
   _hPDF2D->Reset();
-  _hPDF2D->SetBins(nbins1,boundaries1,nbins2,boundaries2);
-  dathist2d->SetBins(nbins1,boundaries1,nbins2,boundaries2);
+  _hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
+  dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
 
   XBinEdges = std::vector<double>(nbins1+1);
-  for (int i=0;i<nbins1+1;i++) {
-    XBinEdges[i] = _hPDF2D->GetXaxis()->GetBinLowEdge(i+1);
+  for (size_t i=0;i<nbins1+1;i++) {
+    XBinEdges[i] = _hPDF2D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
   }
   YBinEdges = std::vector<double>(nbins2+1);
-  for (int i=0;i<nbins2+1;i++) {
-    YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
+  for (size_t i=0;i<nbins2+1;i++) {
+    YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(static_cast<int>(i+1));
   }
   
   //Set the number of X and Y bins now
@@ -1073,23 +1011,23 @@ void SampleHandlerFD::Set2DBinning(int nbins1, double* boundaries1, int nbins2, 
   FindNominalBinAndEdges2D();
 }
 
-void SampleHandlerFD::Set2DBinning(int nbins1, double low1, double high1, int nbins2, double low2, double high2)
+void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, size_t nbins2, double low2, double high2)
 {
   _hPDF1D->Reset();
-  _hPDF1D->SetBins(nbins1,low1,high1);
-  dathist->SetBins(nbins1,low1,high1);
+  _hPDF1D->SetBins(static_cast<int>(nbins1),low1,high1);
+  dathist->SetBins(static_cast<int>(nbins1),low1,high1);
 
   _hPDF2D->Reset();
-  _hPDF2D->SetBins(nbins1,low1,high1,nbins2,low2,high2);
-  dathist2d->SetBins(nbins1,low1,high1,nbins2,low2,high2);
+  _hPDF2D->SetBins(static_cast<int>(nbins1),low1,high1,static_cast<int>(nbins2),low2,high2);
+  dathist2d->SetBins(static_cast<int>(nbins1),low1,high1,static_cast<int>(nbins2),low2,high2);
 
   XBinEdges = std::vector<double>(nbins1+1);
-  for (int i=0;i<nbins1+1;i++) {
-    XBinEdges[i] = _hPDF2D->GetXaxis()->GetBinLowEdge(i+1);
+  for (size_t i=0;i<nbins1+1;i++) {
+    XBinEdges[i] = _hPDF2D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
   }
   YBinEdges = std::vector<double>(nbins2+1);
-  for (int i=0;i<nbins2+1;i++) {
-    YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(i+1);
+  for (size_t i=0;i<nbins2+1;i++) {
+    YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(static_cast<int>(i+1));
   }
 
   //Set the number of X and Y bins now
