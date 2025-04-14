@@ -138,10 +138,12 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       double penalty = 0;
       // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
       const double fractional = std::sqrt(w2)/mc;
+      // fractional^2 to avoid doing same operation several times
+      const double fractional2 = fractional*fractional;
       // b in quadratic equation
-      const double temp = mc*fractional*fractional-1;
+      const double temp = mc*fractional2-1;
       // b^2 - 4ac in quadratic equation
-      const double temp2 = temp*temp + 4*data*fractional*fractional;
+      const double temp2 = temp*temp + 4*data*fractional2;
       if (temp2 < 0) {
         MACH3LOG_ERROR("Negative square root in Barlow Beeston coefficient calculation!");
         throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -150,7 +152,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       const double beta = (-1*temp+sqrt(temp2))/2.;
       newmc = mc*beta;
       // And penalise the movement in beta relative the mc uncertainty
-      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional2);
       else penalty = 0;
 
       // Calculate the new Poisson likelihood

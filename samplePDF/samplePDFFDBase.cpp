@@ -35,6 +35,10 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   samplePDFFD_data = nullptr;
   SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
+
+  // Variables related to MC stat
+  FirstTimeW2 = true;
+  UpdateW2 = false;
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -78,17 +82,10 @@ void samplePDFFDBase::ReadSampleConfig()
       EqualBinningPerOscChannel = false;
     }
   }
-  
-  //Default TestStatistic is kPoisson
-  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
-  if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
-    fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
-  } else {
-    MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
-    MACH3LOG_WARN("Defaulting to using a poisson likelihood");
-    fTestStatistic = kPoisson;
+  fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
+  if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
+    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
-  
   //Binning
   nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
@@ -372,10 +369,16 @@ void samplePDFFDBase::reweight() {
         NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
       }
     }
-    
   }
-  
+  #ifdef MULTITHREAD
+  // Call entirely different routine if we're running with openMP
+  fillArray_MP();
+  #else
   fillArray();
+  #endif
+
+  //KS: If you want to not update W2 wights then uncomment this line
+  if(!UpdateW2) FirstTimeW2 = false;
 }
 
 //************************************************
@@ -391,10 +394,6 @@ void samplePDFFDBase::fillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
-  // Call entirely different routine if we're running with openMP
-#ifdef MULTITHREAD
-  fillArray_MP();
-#else
   //ETA we should probably store this in samplePDFFDBase
   size_t nXBins = int(XBinEdges.size()-1);
   //size_t nYBins = int(YBinEdges.size()-1);
@@ -412,9 +411,9 @@ void samplePDFFDBase::fillArray() {
         continue;
       } 
 
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double totalweight = 1.0;
+      M3::float_t splineweight = 1.0;
+      M3::float_t normweight = 1.0;
+      M3::float_t totalweight = 1.0;
       
       if(SplineHandler){
         splineweight = CalcWeightSpline(iSample, iEvent);
@@ -484,11 +483,10 @@ void samplePDFFDBase::fillArray() {
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
         samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        if (FirstTimeW2) samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
     }
   }
-#endif // end the else in openMP
 }
 
 #ifdef MULTITHREAD
@@ -496,6 +494,9 @@ void samplePDFFDBase::fillArray() {
 /// Multithreaded version of fillArray @see fillArray()
 void samplePDFFDBase::fillArray_MP()  {
 // ************************************************
+  //DB Reset which cuts to apply
+  Selection = StoredSelection;
+
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
 
@@ -646,8 +647,10 @@ void samplePDFFDBase::fillArray_MP()  {
       for (size_t xBin = 0; xBin < nXBins; ++xBin) {
         #pragma omp atomic
         samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
-        #pragma omp atomic
-        samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        if(FirstTimeW2) {
+          #pragma omp atomic
+          samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        }
       }
     }
     
@@ -669,7 +672,11 @@ void samplePDFFDBase::ResetHistograms() {
   size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
+  // Don't openMP this; no significant gain
   for (size_t yBin = 0; yBin < nYBins; ++yBin) {
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       samplePDFFD_array[yBin][xBin] = 0.;
       samplePDFFD_array_w2[yBin][xBin] = 0.;
@@ -1669,7 +1676,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< std::vector<double> >& SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
@@ -1727,8 +1734,12 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
 
   return _h1DVar;
 }
+// ************************************************
+TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
+                                   const std::vector< std::vector<double> >& SelectionVec,
+                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+// ************************************************
 
-TH2* samplePDFFDBase::get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
@@ -1816,7 +1827,7 @@ std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int Kinema
   return "";
 }
 
-TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
 
@@ -1865,7 +1876,7 @@ TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str
   return get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   bool fChannel;
   bool fMode;
 
