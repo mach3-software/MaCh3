@@ -411,9 +411,9 @@ void samplePDFFDBase::fillArray() {
         continue;
       } 
 
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double totalweight = 1.0;
+      M3::float_t splineweight = 1.0;
+      M3::float_t normweight = 1.0;
+      M3::float_t totalweight = 1.0;
       
       if(SplineHandler){
         splineweight = CalcWeightSpline(iSample, iEvent);
