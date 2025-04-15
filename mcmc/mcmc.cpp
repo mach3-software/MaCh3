@@ -165,7 +165,7 @@ void mcmc::ProposeStep() {
         std::cout << "Saving adaptive throw matrix at step " << total_steps_str << " for systematic " << systematics[s]->getName() << std::endl;
         TMatrixDSym *throwMatrix = systematics[s]->getThrowMatrix();
         for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
-            std::cout << (*throwMatrix)(i, i) << " ";
+          std::cout << (*throwMatrix)(i, i) << " ";
         }
         std::cout << std::endl;
       }

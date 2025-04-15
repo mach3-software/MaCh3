@@ -573,8 +573,6 @@ void FitterBase::RunLLHScan() {
       if (IsPCA) prior = cov->getParCurr_PCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
-      // double nSigma = 1;
-      // if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
       lower = prior - nSigma*cov->getDiagonalError(i);
       upper = prior + nSigma*cov->getDiagonalError(i);
@@ -925,8 +923,6 @@ void FitterBase::Run2DLLHScan() {
       if (IsPCA) prior_x = cov->getParCurr_PCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
-      // double nSigma = 1;
-      // if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
       double lower_x = prior_x - nSigma*cov->getDiagonalError(i);
       double upper_x = prior_x + nSigma*cov->getDiagonalError(i);
