@@ -84,28 +84,28 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 
   // Fill the parameter values with their nominal values
   // should _ALWAYS_ be done before overriding with fix or flat
-  CovObject->setParameters();
+  CovObject->SetParameters();
 
   auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "Fix"], {});
 
   // Fixed CovObject parameters loop
   if (FixParams.size() == 1 && FixParams.at(0) == "All") {
     for (int j = 0; j < CovObject->GetNumParams(); j++) {
-      CovObject->toggleFixParameter(j);
+      CovObject->ToggleFixParameter(j);
     }
   } else {
     for (unsigned int j = 0; j < FixParams.size(); j++) {
-      CovObject->toggleFixParameter(FixParams.at(j));
+      CovObject->ToggleFixParameter(FixParams.at(j));
     }
   }
   //Global step scale for matrix
   auto StepScale = Settings[std::string(PreFix) + "StepScale"].as<double>();
 
-  CovObject->setStepScale(StepScale);
+  CovObject->SetStepScale(StepScale);
 
   // Adaptive MCMC stuff
   if(FitManager->raw()["AdaptionOptions"])
-    CovObject->initialiseAdaption(FitManager->raw());
+    CovObject->InitialiseAdaption(FitManager->raw());
 
   return CovObject;
 }
@@ -133,15 +133,15 @@ std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& S
   {
     // Instantiate the sample using the specified class type
     SampleType* Sample = new SampleType(SampleConfig[i], xsec, osc);
-    Sample->reweight();
+    Sample->Reweight();
 
     // Obtain sample name and create a TString version for histogram naming
     std::string name = Sample->GetTitle();
     TString NameTString = TString(name.c_str());
 
     // Clone the 1D histogram with a modified name
-    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->get1DHist()->Clone(NameTString + "_Prior"));
-    Sample->addData(SampleHistogramPrior);
+    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->Get1DHist()->Clone(NameTString + "_Prior"));
+    Sample->AddData(SampleHistogramPrior);
     PDFs[i] = Sample;
   }
   return PDFs;
