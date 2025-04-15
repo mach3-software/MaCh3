@@ -537,7 +537,7 @@ void BinnedSplineHandler::PrepForReweight() {
   {
     SplineInfoArray[iSpline].nPts = static_cast<M3::int_t>(UniqueSystSplines[iSpline]->GetNp());
     SplineInfoArray[iSpline].xPts.resize(SplineInfoArray[iSpline].nPts);
-    SplineInfoArray[iSpline].splineParsPointer = xsec->retPointer(UniqueSystIndices[iSpline]);
+    SplineInfoArray[iSpline].splineParsPointer = xsec->RetPointer(UniqueSystIndices[iSpline]);
     for (int iKnot = 0; iKnot < SplineInfoArray[iSpline].nPts; iKnot++)
     {
       M3::float_t xPoint;

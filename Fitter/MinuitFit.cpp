@@ -21,7 +21,7 @@ MinuitFit::~MinuitFit() {
 
 // *******************
 // Run the Minuit with all the systematic objects added
-void MinuitFit::runMCMC() {
+void MinuitFit::RunMCMC() {
 // *******************
 
   PrepareFit();
@@ -50,11 +50,11 @@ void MinuitFit::runMCMC() {
       for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
         //KS: Index, name, prior, step scale [differrent to MCMC],
-        minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->getParInit(i), (*it)->getDiagonalError(i)/10);
-        minuit->SetVariableValue(ParCounter, (*it)->getParInit(i));
+        minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->GetParInit(i), (*it)->GetDiagonalError(i)/10);
+        minuit->SetVariableValue(ParCounter, (*it)->GetParInit(i));
         //KS: lower bound, upper bound, if Mirroring eneabled then ignore
         if(!fMirroring) minuit->SetVariableLimits(ParCounter, (*it)->GetLowerBound(i), (*it)->GetUpperBound(i));
-        if((*it)->isParameterFixed(i))
+        if((*it)->IsParameterFixed(i))
         {
           minuit->FixVariable(ParCounter);
         }
@@ -62,10 +62,10 @@ void MinuitFit::runMCMC() {
     }
     else
     {
-      for(int i = 0; i < (*it)->getNpars(); ++i, ++ParCounter)
+      for(int i = 0; i < (*it)->GetNParameters(); ++i, ++ParCounter)
       {
-        minuit->SetVariable(ParCounter, Form("%i_PCA", i), (*it)->getParProp_PCA(i), (*it)->getEigenValuesMaster()[i]/10);
-        if((*it)->isParameterFixedPCA(i))
+        minuit->SetVariable(ParCounter, Form("%i_PCA", i), (*it)->GetParPropPCA(i), (*it)->GetEigenValuesMaster()[i]/10);
+        if((*it)->IsParameterFixedPCA(i))
         {
           minuit->FixVariable(ParCounter);
         }
@@ -122,9 +122,9 @@ void MinuitFit::runMCMC() {
         (*MinuitParValue)(ParCounter) = ParVal;
         (*MinuitParError)(ParCounter) = err[ParCounter];
         //KS: For fixed params HESS will not calcuate error so we need to pass prior error
-        if((*it)->isParameterFixed(i))
+        if((*it)->IsParameterFixed(i))
         {
-          (*MinuitParError)(ParCounter) = (*it)->getDiagonalError(i);
+          (*MinuitParError)(ParCounter) = (*it)->GetDiagonalError(i);
           (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);
         }
       }
@@ -133,30 +133,30 @@ void MinuitFit::runMCMC() {
     {
       //KS: We need to convert parameters from PCA to normal base
       TVectorD ParVals((*it)->GetNumParams());
-      TVectorD ParVals_PCA((*it)->getNpars());
+      TVectorD ParVals_PCA((*it)->GetNParameters());
 
       TVectorD ErrorVals((*it)->GetNumParams());
-      TVectorD ErrorVals_PCA((*it)->getNpars());
+      TVectorD ErrorVals_PCA((*it)->GetNParameters());
 
       TMatrixD MatrixVals((*it)->GetNumParams(), (*it)->GetNumParams());
-      TMatrixD MatrixVals_PCA((*it)->getNpars(), (*it)->getNpars());
+      TMatrixD MatrixVals_PCA((*it)->GetNParameters(), (*it)->GetNParameters());
 
       //First save them
       //KS: This code is super convoluted as MaCh3 can store separate matrices while Minuit has one matrix. In future this will be simplified, keep it like this for now.
       const int StartVal = ParCounter;
-      for(int i = 0; i < (*it)->getNpars(); ++i, ++ParCounter)
+      for(int i = 0; i < (*it)->GetNParameters(); ++i, ++ParCounter)
       {
         ParVals_PCA(i) = X[ParCounter];
         ErrorVals_PCA(i) = err[ParCounter];
         int ParCounterMatrix = StartVal;
-        for(int j = 0; j < (*it)->getNpars(); ++j, ++ParCounterMatrix)
+        for(int j = 0; j < (*it)->GetNParameters(); ++j, ++ParCounterMatrix)
         {
           MatrixVals_PCA(i,j) = minuit->CovMatrix(ParCounter,ParCounterMatrix);
         }
       }
-      ParVals = ((*it)->getTransferMatrix())*ParVals_PCA;
-      ErrorVals = ((*it)->getTransferMatrix())*ErrorVals_PCA;
-      MatrixVals.Mult(((*it)->getTransferMatrix()),MatrixVals_PCA);
+      ParVals = ((*it)->GetTransferMatrix())*ParVals_PCA;
+      ErrorVals = ((*it)->GetTransferMatrix())*ErrorVals_PCA;
+      MatrixVals.Mult(((*it)->GetTransferMatrix()),MatrixVals_PCA);
 
       ParCounter = StartVal;
       //KS: Now after going from PCA to normal let';s save it
@@ -170,9 +170,9 @@ void MinuitFit::runMCMC() {
           (*Postmatrix)(ParCounter,ParCounterMatrix)  = MatrixVals(i,j);
         }
         //If fixed take prior
-        if((*it)->isParameterFixedPCA(i))
+        if((*it)->IsParameterFixedPCA(i))
         {
-          (*MinuitParError)(ParCounter) = (*it)->getDiagonalError(i);
+          (*MinuitParError)(ParCounter) = (*it)->GetDiagonalError(i);
           (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);
         }
       }

@@ -30,14 +30,14 @@ class FitterBase {
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
   /// @param sample A pointer to a sample PDF object derived from ParameterHandlerBase.
-  void addSampleHandler(SampleHandlerBase* sample);
+  void AddSampleHandler(SampleHandlerBase* sample);
 
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from covarianceBase.
-  void addSystObj(ParameterHandlerBase* cov);
+  void AddSystObj(ParameterHandlerBase* cov);
 
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
-  virtual void runMCMC() = 0;
+  virtual void RunMCMC() = 0;
 
   /// @brief Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan's feature
   /// @param NLaps number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time

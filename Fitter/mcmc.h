@@ -13,7 +13,7 @@ class mcmc : public FitterBase {
   virtual ~mcmc();
 
   /// @brief Actual implementation of MCMC fitting algorithm
-  void runMCMC() override;
+  void RunMCMC() override;
 
   /// @brief Set how long chain should be
   inline void setChainLength(unsigned int L) { chainLength = L; };

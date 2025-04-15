@@ -62,7 +62,7 @@ void mcmc::CheckStep() {
 
     // Loop over systematics and accept
     for (size_t s = 0; s < systematics.size(); ++s) {
-      systematics[s]->acceptStep();
+      systematics[s]->AcceptStep();
     }
   }
 
@@ -75,7 +75,7 @@ void mcmc::CheckStep() {
 
 // *******************
 // Run the Markov chain with all the systematic objects added
-void mcmc::runMCMC() {
+void mcmc::RunMCMC() {
 // *******************
   // Save the settings into the output file
   SaveSettings();
@@ -134,7 +134,7 @@ void mcmc::ProposeStep() {
   for (size_t s = 0; s < systematics.size(); ++s) {
     // Could throw the initial value here to do MCMC stability studies
     // Propose the steps for the systematics
-    systematics[s]->proposeStep();
+    systematics[s]->ProposeStep();
 
     // Get the likelihood from the systematics
     syst_llh[s] = systematics[s]->GetLikelihood();
@@ -198,9 +198,9 @@ void mcmc::PrintProgress() {
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
   for (ParameterHandlerBase *cov : systematics) {
-    if (cov->getName() == "xsec_cov") {
+    if (cov->GetName() == "xsec_cov") {
       MACH3LOG_INFO("Cross-section parameters: ");
-      cov->printNominalCurrProp();
+      cov->PrintNominalCurrProp();
     }
   }
   #ifdef DEBUG

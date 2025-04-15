@@ -19,7 +19,7 @@ class MinuitFit : public LikelihoodFit {
   virtual ~MinuitFit();
 
   /// @brief Actual implementation of Minuit Fit algorithm
-  void runMCMC() override;
+  void RunMCMC() override;
 
   /// @brief Get name of class
   inline std::string GetName()const {return "MinuitFit";};

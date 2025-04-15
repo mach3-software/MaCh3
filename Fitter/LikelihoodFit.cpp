@@ -29,7 +29,7 @@ void LikelihoodFit::PrepareFit() {
   
   for (size_t s = 0; s < systematics.size(); ++s) {
     NPars += systematics[s]->GetNumParams();
-    NParsPCA += systematics[s]->getNpars();
+    NParsPCA += systematics[s]->GetNParameters();
   }
 
   //KS: If PCA is note enabled NParsPCA == NPars
@@ -74,12 +74,12 @@ double LikelihoodFit::CalcChi2(const double* x) {
         }
         pars[i] = ParVal;
       }
-      (*it)->setParameters(pars);
+      (*it)->SetParameters(pars);
     }
     else
     {
       std::vector<double> pars;
-      const int NumPar = (*it)->getNpars();
+      const int NumPar = (*it)->GetNParameters();
       //KS: Avoid push back as they are slow
       pars.resize(NumPar);
       for(int i = 0; i < NumPar; ++i, ++ParCounter)
@@ -88,9 +88,9 @@ double LikelihoodFit::CalcChi2(const double* x) {
         //KS: Basically apply mirroring for parameters out of bounds
         pars[i] = ParVal;
       }
-      (*it)->setParameters_PCA(pars);
+      (*it)->SetParametersPCA(pars);
     }
-    (*it)->acceptStep();
+    (*it)->AcceptStep();
   }
 
   // Loop over the systematics and propose the initial step

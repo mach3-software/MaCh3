@@ -129,21 +129,21 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
   #endif
 
   // Make the PCA parameter arrays
-  fParCurr_PCA.ResizeTo(_fNumParPCA);
-  fParProp_PCA.ResizeTo(_fNumParPCA);
-  _fPreFitValue_PCA.resize(_fNumParPCA);
+  _fParCurrPCA.ResizeTo(_fNumParPCA);
+  _fParPropPCA.ResizeTo(_fNumParPCA);
+  _fPreFitValuePCA.resize(_fNumParPCA);
 
   //KS: make easy map so we could easily find un-decomposed parameters
-  isDecomposed_PCA.resize(_fNumParPCA);
-  fParSigma_PCA.resize(_fNumParPCA);
+  isDecomposedPCA.resize(_fNumParPCA);
+  _fParSigmaPCA.resize(_fNumParPCA);
   for (int i = 0; i < _fNumParPCA; ++i)
   {
-    fParSigma_PCA[i] = 1;
-    isDecomposed_PCA[i] = -1;
+    _fParSigmaPCA[i] = 1;
+    isDecomposedPCA[i] = -1;
   }
-  for (int i = 0; i < FirstPCAdpar; ++i) isDecomposed_PCA[i] = i;
+  for (int i = 0; i < FirstPCAdpar; ++i) isDecomposedPCA[i] = i;
 
-  for (int i = FirstPCAdpar+nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposed_PCA[i] = i+(_fNumPar-_fNumParPCA);
+  for (int i = FirstPCAdpar+nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-_fNumParPCA);
 }
 
 // ********************************************
@@ -155,7 +155,7 @@ void PCAHandler::AcceptStep() _noexcept_ {
   #pragma omp parallel for
   #endif
   for (int i = 0; i < NumParPCA; ++i) {
-    fParCurr_PCA(i) = fParProp_PCA(i);
+    _fParCurrPCA(i) = _fParPropPCA(i);
   }
   // Then update the parameter basis
   TransferToParam();
@@ -174,14 +174,14 @@ void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
   #endif
   for (int i = 0; i < NumParPCA; ++i)
   {
-    if (fParSigma_PCA[i] > 0.)
+    if (_fParSigmaPCA[i] > 0.)
     {
       double IndStepScale = 1.;
       //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
-      if(isDecomposed_PCA[i] >= 0)
+      if(isDecomposedPCA[i] >= 0)
       {
-        IndStepScale *= IndivStepScale[isDecomposed_PCA[i]];
-        IndStepScale *= corr_throw[isDecomposed_PCA[i]];
+        IndStepScale *= IndivStepScale[isDecomposedPCA[i]];
+        IndStepScale *= corr_throw[isDecomposedPCA[i]];
       }
       //If decomposed apply only random number
       else
@@ -190,7 +190,7 @@ void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
         //KS: All PCA-ed parameters have the same step scale
         IndStepScale *= IndivStepScale[FirstPCAdpar];
       }
-      fParProp_PCA(i) = fParCurr_PCA(i)+GlobalStepScale*IndStepScale*eigen_values_master[i];
+      _fParPropPCA(i) = _fParCurrPCA(i)+GlobalStepScale*IndStepScale*eigen_values_master[i];
     }
   }
   // Then update the parameter basis
@@ -209,8 +209,8 @@ void PCAHandler::TransferToPCA() {
     fParProp_vec(i) = (*_pPropVal)[i];
   }
 
-  fParCurr_PCA = TransferMatT*fParCurr_vec;
-  fParProp_PCA = TransferMatT*fParProp_vec;
+  _fParCurrPCA = TransferMatT*fParCurr_vec;
+  _fParPropPCA = TransferMatT*fParProp_vec;
 }
 
 // ********************************************
@@ -218,8 +218,8 @@ void PCAHandler::TransferToPCA() {
 void PCAHandler::TransferToParam() {
 // ********************************************
   // Make the temporary vectors
-  TVectorD fParProp_vec = TransferMat*fParProp_PCA;
-  TVectorD fParCurr_vec = TransferMat*fParCurr_PCA;
+  TVectorD fParProp_vec = TransferMat*_fParPropPCA;
+  TVectorD fParCurr_vec = TransferMat*_fParCurrPCA;
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif

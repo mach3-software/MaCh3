@@ -76,7 +76,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     const std::vector<FuncPars> GetFuncParsFromSampleName(const std::string& SampleName);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
-    std::vector<double> getNominalArray() override
+    std::vector<double> GetNominalArray() override
     {
       std::vector<double> prior(_fNumPar);
       for (int i = 0; i < _fNumPar; i++) {
@@ -133,7 +133,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.
-    void initParams();
+    void InitParams();
 
     /// @brief Parses the YAML configuration to set up cross-section parameters.
     /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.

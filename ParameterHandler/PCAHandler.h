@@ -62,15 +62,15 @@ class PCAHandler{
   #endif
 
   /// Prefit value for PCA params
-  std::vector<double> _fPreFitValue_PCA;
+  std::vector<double> _fPreFitValuePCA;
   /// CW: Current parameter value in PCA base
-  TVectorD fParProp_PCA;
+  TVectorD _fParPropPCA;
   /// CW: Proposed parameter value in PCA base
-  TVectorD fParCurr_PCA;
+  TVectorD _fParCurrPCA;
   /// Tells if parameter is fixed in PCA base or not
-  std::vector<double> fParSigma_PCA;
+  std::vector<double> _fParSigmaPCA;
   /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
-  std::vector<int> isDecomposed_PCA;
+  std::vector<int> isDecomposedPCA;
   /// Number of parameters in PCA base
   int NumParPCA;
 

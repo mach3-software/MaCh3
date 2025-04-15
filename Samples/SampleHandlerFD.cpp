@@ -854,7 +854,7 @@ void SampleHandlerFD::SetupNormParameters() {
       MCSamples[iSample].xsec_norm_pointers[iEvent].resize(MCSamples[iSample].nxsec_norm_pointers[iEvent]);
 
       for(auto const & norm_bin: MCSamples[iSample].xsec_norms_bins[iEvent]) {
-        MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = ParHandler->retPointer(norm_bin);
+        MCSamples[iSample].xsec_norm_pointers[iEvent][counter] = ParHandler->RetPointer(norm_bin);
         counter += 1;
       }
     }

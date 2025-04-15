@@ -18,7 +18,7 @@ ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>&
   } // end the for loop
 
   MACH3LOG_DEBUG("Constructing instance of covarianceXsec");
-  initParams();
+  InitParams();
   // Print
   Print();
 }
@@ -301,7 +301,7 @@ FuncPars ParameterHandlerGeneric::GetFuncPars(const YAML::Node& param, const int
     func.Selection = TempKinematicBounds;
   }
   func.index = Index;
-  func.valuePtr = retPointer(Index);
+  func.valuePtr = RetPointer(Index);
   return func;
 }
 
@@ -383,7 +383,7 @@ void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, F
 }
 
 // ********************************************
-void ParameterHandlerGeneric::initParams() {
+void ParameterHandlerGeneric::InitParams() {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
@@ -400,13 +400,13 @@ void ParameterHandlerGeneric::initParams() {
       _fIndivStepScale[i] = _fIndivStepScale[LastPCAdpar-1];
     }
   }
-  randomize();
+  Randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   if (pca)
   {
     PCAObj->TransferToPCA();
     for (int i = 0; i < _fNumParPCA; ++i) {
-      PCAObj->_fPreFitValue_PCA[i] = PCAObj->fParCurr_PCA(i);
+      PCAObj->_fPreFitValuePCA[i] = PCAObj->_fParCurrPCA(i);
     }
   }
 }

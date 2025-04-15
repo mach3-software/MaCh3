@@ -22,7 +22,7 @@ PSO::PSO(manager *man) : LikelihoodFit(man) {
 }
 
 // ***************
-void PSO::runMCMC(){
+void PSO::RunMCMC(){
 // ***************
   PrepareFit();
 
@@ -69,8 +69,8 @@ void PSO::init(){
         fDim += (*it)->GetNumParams();
         for(int i = 0; i < (*it)->GetNumParams(); ++i)
         {
-          double curr = (*it)->getParInit(i);
-          double lim = 10.0*(*it)->getDiagonalError(i);
+          double curr = (*it)->GetParInit(i);
+          double lim = 10.0*(*it)->GetDiagonalError(i);
           double low = (*it)->GetLowerBound(i);
           double high = (*it)->GetUpperBound(i);
           if(low > curr - lim) ranges_min.push_back(low);
@@ -79,7 +79,7 @@ void PSO::init(){
           else ranges_min.push_back(curr + lim);
           prior.push_back(curr);
 
-          if((*it)->isParameterFixed(i)){
+          if((*it)->IsParameterFixed(i)){
             fixed.push_back(1);
           }
           else{
@@ -89,13 +89,13 @@ void PSO::init(){
       }
       else
       {
-        fDim += (*it)->getNpars();
-        for(int i = 0; i < (*it)->getNpars(); ++i)
+        fDim += (*it)->GetNParameters();
+        for(int i = 0; i < (*it)->GetNParameters(); ++i)
         {
           ranges_min.push_back(-100.0);
           ranges_max.push_back(100.0);
-          prior.push_back((*it)->getParInit(i));
-          if((*it)->isParameterFixedPCA(i)){
+          prior.push_back((*it)->GetParInit(i));
+          if((*it)->IsParameterFixedPCA(i)){
             fixed.push_back(1);
           }
           else{
@@ -471,9 +471,9 @@ void PSO::WriteOutput(){
           (*PSOParValue)(ParCounter) = ParVal;
           (*PSOParError)(ParCounter) = (uncertainties[ParCounter][0]+uncertainties[ParCounter][1])/2.0;
           //KS: For fixed params HESS will not calcuate error so we need to pass prior error
-          if((*it)->isParameterFixed(i))
+          if((*it)->IsParameterFixed(i))
           {
-            (*PSOParError)(ParCounter) = (*it)->getDiagonalError(i);
+            (*PSOParError)(ParCounter) = (*it)->GetDiagonalError(i);
           }
         }
       }
@@ -481,21 +481,21 @@ void PSO::WriteOutput(){
       {
         //KS: We need to convert parameters from PCA to normal base
         TVectorD ParVals((*it)->GetNumParams());
-        TVectorD ParVals_PCA((*it)->getNpars());
+        TVectorD ParVals_PCA((*it)->GetNParameters());
 
         TVectorD ErrorVals((*it)->GetNumParams());
-        TVectorD ErrorVals_PCA((*it)->getNpars());
+        TVectorD ErrorVals_PCA((*it)->GetNParameters());
 
         //First save them
         //KS: This code is super convoluted as MaCh3 can store separate matrices while PSO has one matrix. In future this will be simplified, keep it like this for now.
         const int StartVal = ParCounter;
-        for(int i = 0; i < (*it)->getNpars(); ++i, ++ParCounter)
+        for(int i = 0; i < (*it)->GetNParameters(); ++i, ++ParCounter)
         {
           ParVals_PCA(i) = minimum[ParCounter];
           ErrorVals_PCA(i) = (uncertainties[ParCounter][0]+uncertainties[ParCounter][1])/2.0;
         }
-        ParVals = ((*it)->getTransferMatrix())*ParVals_PCA;
-        ErrorVals = ((*it)->getTransferMatrix())*ErrorVals_PCA;
+        ParVals = ((*it)->GetTransferMatrix())*ParVals_PCA;
+        ErrorVals = ((*it)->GetTransferMatrix())*ErrorVals_PCA;
 
         ParCounter = StartVal;
         //KS: Now after going from PCA to normal let';s save it
@@ -505,9 +505,9 @@ void PSO::WriteOutput(){
           (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));
           //int ParCounterMatrix = StartVal;
           //If fixed take prior
-          if((*it)->isParameterFixedPCA(i))
+          if((*it)->IsParameterFixedPCA(i))
           {
-            (*PSOParError)(ParCounter) = (*it)->getDiagonalError(i);
+            (*PSOParError)(ParCounter) = (*it)->GetDiagonalError(i);
           }
         }
       }

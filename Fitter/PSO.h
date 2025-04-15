@@ -94,7 +94,7 @@ class PSO : public LikelihoodFit {
     void uncertainty_check(std::vector<double> previous_pos);
     void run();
     void WriteOutput();
-    void runMCMC() override;
+    void RunMCMC() override;
     double CalcChi2(const double* x);
     double rastriginFunc(const double* x);
     double swarmIterate();

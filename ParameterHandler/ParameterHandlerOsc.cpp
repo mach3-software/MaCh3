@@ -32,7 +32,7 @@ ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFil
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
   flipdelM = true;
 
-  randomize();
+  Randomize();
   Print();
 }
 
@@ -43,9 +43,9 @@ ParameterHandlerOsc::~ParameterHandlerOsc() {
 }
 
 // *************************************
-void ParameterHandlerOsc::proposeStep() {
+void ParameterHandlerOsc::ProposeStep() {
 // *************************************
-  ParameterHandlerBase::proposeStep();
+  ParameterHandlerBase::ProposeStep();
 
   // HW It should now automatically set dcp to be with [-pi, pi]
   CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
@@ -107,7 +107,7 @@ std::vector<const double*> ParameterHandlerOsc::GetOscParsFromSampleName(const s
   std::vector<const double*> returnVec;
   for (int i = 0; i < _fNumPar; ++i) {
     if (AppliesToSample(i, SampleName)) {
-      returnVec.push_back(retPointer(i));
+      returnVec.push_back(RetPointer(i));
     }
   }
   return returnVec;

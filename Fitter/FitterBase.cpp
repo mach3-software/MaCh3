@@ -132,7 +132,7 @@ void FitterBase::SaveSettings() {
   MACH3LOG_INFO("#####Current Setup#####");
   MACH3LOG_INFO("Number of covariances: {}", systematics.size());
   for(unsigned int i = 0; i < systematics.size(); ++i)
-    MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->getName(), systematics[i]->GetNumParams());
+    MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i)
     MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetTitle(), samples[i]->GetNsamples());
@@ -178,7 +178,7 @@ void FitterBase::PrepareOutput() {
 
     for (size_t i = 0; i < systematics.size(); ++i) {
       std::stringstream oss, oss2;
-      oss << "LogL_systematic_" << systematics[i]->getName();
+      oss << "LogL_systematic_" << systematics[i]->GetName();
       oss2 << oss.str() << "/D";
       outTree->Branch(oss.str().c_str(), &syst_llh[i], oss2.str().c_str());
     }
@@ -229,7 +229,7 @@ void FitterBase::SaveOutput() {
 
 // *************************
 // Add samplePDF object to the Markov Chain
-void FitterBase::addSampleHandler(SampleHandlerBase * const sample) {
+void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 // *************************
   //Check if the sample has a unique name
   for (const auto &s : samples) {
@@ -246,27 +246,27 @@ void FitterBase::addSampleHandler(SampleHandlerBase * const sample) {
 
 // *************************
 // Add flux systematics, cross-section systematics, ND systematics to the chain
-void FitterBase::addSystObj(ParameterHandlerBase * const cov) {
+void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
 // *************************
-  MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->getName(), cov->GetNumParams());
+  MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->GetName(), cov->GetNumParams());
   systematics.push_back(cov);
 
   CovFolder->cd();
   std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i)
-    n_vec[i] = cov->getParInit(i);
+    n_vec[i] = cov->GetParInit(i);
 
-  cov->getCovMatrix()->Write(cov->getName().c_str());
+  cov->GetCovMatrix()->Write(cov->GetName().c_str());
 
   TH2D* CorrMatrix = cov->GetCorrelationMatrix();
-  CorrMatrix->Write((cov->getName() + std::string("_Corr")).c_str());
+  CorrMatrix->Write((cov->GetName() + std::string("_Corr")).c_str());
   delete CorrMatrix;
 
   // If we have yaml config file for covariance let's save it
   YAML::Node Config = cov->GetConfig();
   if(!Config.IsNull())
   {
-    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + cov->getName()));
+    TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + cov->GetName()));
     ConfigSave.Write();
   }
 
@@ -289,7 +289,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
   {
     TDirectory* CovarianceFolder = infile->Get<TDirectory>("CovarianceFolder");
 
-    std::string ConfigName = "Config_" + systematics[s]->getName();
+    std::string ConfigName = "Config_" + systematics[s]->GetName();
     TMacro *ConfigCov = CovarianceFolder->Get<TMacro>(ConfigName.c_str());
     // KS: Not every covariance uses yaml, if it uses yaml make sure they are identical
     if (ConfigCov != nullptr) {
@@ -324,11 +324,11 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
-    systematics[s]->setParameters(branch_vals);
-    systematics[s]->acceptStep();
+    systematics[s]->SetParameters(branch_vals);
+    systematics[s]->AcceptStep();
 
-    MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
-    systematics[s]->printNominalCurrProp();
+    MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
+    systematics[s]->PrintNominalCurrProp();
 
     // Resetting branch adressed to nullptr as we don't want to write into a delected vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
@@ -342,8 +342,8 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
   delete infile;
 
   for (size_t s = 0; s < systematics.size(); ++s) {
-    if(systematics[s]->getDoAdaption()){ //Use separate throw matrix for xsec
-      systematics[s]->setNumberOfSteps(step_val);
+    if(systematics[s]->GetDoAdaption()){ //Use separate throw matrix for xsec
+      systematics[s]->SetNumberOfSteps(step_val);
     }
   }
 }
@@ -429,20 +429,20 @@ void FitterBase::DragRace(const int NLaps) {
   // Get vector of proposed steps. If we want to run LLH scan or something else after we need to revert changes after proposing steps multiple times
   std::vector<std::vector<double>> StepsValuesBefore(systematics.size());
   for (size_t s = 0; s < systematics.size(); ++s) {
-    StepsValuesBefore[s] = systematics[s]->getProposed();
+    StepsValuesBefore[s] = systematics[s]->GetProposed();
   }
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
     for(int Lap = 0; Lap < NLaps; ++Lap) {
-      systematics[s]->proposeStep();
+      systematics[s]->ProposeStep();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to propose step {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
+    MACH3LOG_INFO("It took {:.4f} s to propose step {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->GetName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   for (size_t s = 0; s < systematics.size(); ++s) {
-    systematics[s]->setParameters(StepsValuesBefore[s]);
+    systematics[s]->SetParameters(StepsValuesBefore[s]);
   }
 
   for (size_t s = 0; s < systematics.size(); ++s) {
@@ -452,7 +452,7 @@ void FitterBase::DragRace(const int NLaps) {
       systematics[s]->GetLikelihood();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to calculate  get likelihood {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->getName());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  get likelihood {} times cov:  {}",  clockRace.RealTime(), NLaps, systematics[s]->GetName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   MACH3LOG_INFO("End of race");
@@ -484,7 +484,7 @@ void FitterBase::RunLLHScan() {
   std::vector<TDirectory *> Cov_LLH(systematics.size());
   for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
   {
-    std::string NameTemp = systematics[ivc]->getName();
+    std::string NameTemp = systematics[ivc]->GetName();
     NameTemp = NameTemp.substr(0, NameTemp.find("_cov")) + "_LLH";
     Cov_LLH[ivc] = outputFile->mkdir(NameTemp.c_str());
   }
@@ -538,13 +538,13 @@ void FitterBase::RunLLHScan() {
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
   {
-    bool isxsec = (cov->getName() == "xsec_cov");
+    bool isxsec = (cov->GetName() == "xsec_cov");
 
     // Scan over all the parameters
     // Get the number of parameters
     int npars = cov->GetNumParams();
     bool IsPCA = cov->IsPCA();
-    if (IsPCA) npars = cov->getNpars();
+    if (IsPCA) npars = cov->GetNParameters();
     for (int i = 0; i < npars; ++i)
     {
       // Get the parameter name
@@ -567,20 +567,20 @@ void FitterBase::RunLLHScan() {
       double lower;
       double upper;
       // Get the parameter priors and bounds
-      double prior = cov->getParInit(i);
-      if (IsPCA) prior = cov->getParCurr_PCA(i);
+      double prior = cov->GetParInit(i);
+      if (IsPCA) prior = cov->GetParCurrPCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
       double nSigma = 1;
       if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
-      lower = prior - nSigma*cov->getDiagonalError(i);
-      upper = prior + nSigma*cov->getDiagonalError(i);
+      lower = prior - nSigma*cov->GetDiagonalError(i);
+      upper = prior + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower = prior - nSigma*std::sqrt((cov->getEigenValues())(i));
-        upper = prior + nSigma*std::sqrt((cov->getEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(i));
+        lower = prior - nSigma*std::sqrt((cov->GetEigenValues())(i));
+        upper = prior + nSigma*std::sqrt((cov->GetEigenValues())(i));
+        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetEigenValues()(i));
         MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
@@ -630,7 +630,7 @@ void FitterBase::RunLLHScan() {
       std::vector<double> nCovLLH(systematics.size());
       for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
       {
-        std::string NameTemp = systematics[ivc]->getName();
+        std::string NameTemp = systematics[ivc]->GetName();
         NameTemp = NameTemp.substr(0, NameTemp.find("_cov"));
 
         hScanCov[ivc] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
@@ -664,10 +664,10 @@ void FitterBase::RunLLHScan() {
 
         // For PCA we have to do it differently
         if (IsPCA) {
-          cov->setParProp_PCA(i, hScan->GetBinCenter(j+1));
+          cov->SetParPropPCA(i, hScan->GetBinCenter(j+1));
         } else {
           // Set the parameter
-          cov->setParProp(i, hScan->GetBinCenter(j+1));
+          cov->SetParProp(i, hScan->GetBinCenter(j+1));
         }
 
         // Reweight the MC
@@ -768,9 +768,9 @@ void FitterBase::RunLLHScan() {
 
       // Reset the parameters to their prior central values
       if (IsPCA) {
-        cov->setParProp_PCA(i, prior);
+        cov->SetParPropPCA(i, prior);
       } else {
-        cov->setParProp(i, prior);
+        cov->SetParProp(i, prior);
       }
     }//end loop over systematics
   }//end loop covariance classes
@@ -823,7 +823,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
 
   for (ParameterHandlerBase *cov : systematics)
   {
-    bool isxsec = (cov->getName() == "xsec_cov");
+    bool isxsec = (cov->GetName() == "xsec_cov");
 
     const int npars = cov->GetNumParams();
     std::vector<double> StepScale(npars);
@@ -857,7 +857,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
       MACH3LOG_DEBUG("Sigma: {}", approxSigma);
       MACH3LOG_DEBUG("optimal Step Size: {}", NewStepScale);
     }
-    cov->setIndivStepScale(StepScale);
+    cov->SetIndivStepScale(StepScale);
     cov->SaveUpdatedMatrixConfig();
   }
 }
@@ -902,12 +902,12 @@ void FitterBase::Run2DLLHScan() {
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
   {
-    bool isxsec = (cov->getName() == "xsec_cov");
+    bool isxsec = (cov->GetName() == "xsec_cov");
     // Scan over all the parameters
     // Get the number of parameters
     int npars = cov->GetNumParams();
     bool IsPCA = cov->IsPCA();
-    if (IsPCA) npars = cov->getNpars();
+    if (IsPCA) npars = cov->GetNParameters();
 
     for (int i = 0; i < npars; ++i)
     {
@@ -917,20 +917,20 @@ void FitterBase::Run2DLLHScan() {
       if (isxsec) name_x = cov->GetParFancyName(i);
 
       // Get the parameter priors and bounds
-      double prior_x = cov->getParInit(i);
-      if (IsPCA) prior_x = cov->getParCurr_PCA(i);
+      double prior_x = cov->GetParInit(i);
+      if (IsPCA) prior_x = cov->GetParCurrPCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
       double nSigma = 1;
       if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
-      double lower_x = prior_x - nSigma*cov->getDiagonalError(i);
-      double upper_x = prior_x + nSigma*cov->getDiagonalError(i);
+      double lower_x = prior_x - nSigma*cov->GetDiagonalError(i);
+      double upper_x = prior_x + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower_x = prior_x - nSigma*std::sqrt((cov->getEigenValues())(i));
-        upper_x = prior_x + nSigma*std::sqrt((cov->getEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(i));
+        lower_x = prior_x - nSigma*std::sqrt((cov->GetEigenValues())(i));
+        upper_x = prior_x + nSigma*std::sqrt((cov->GetEigenValues())(i));
+        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetEigenValues()(i));
         MACH3LOG_INFO("prior {} = {:.2f}", i, prior_x);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
@@ -986,17 +986,17 @@ void FitterBase::Run2DLLHScan() {
         if(skip) continue;
 
         // Get the parameter priors and bounds
-        double prior_y = cov->getParInit(j);
-        if (IsPCA) prior_y = cov->getParCurr_PCA(j);
+        double prior_y = cov->GetParInit(j);
+        if (IsPCA) prior_y = cov->GetParCurrPCA(j);
 
         // Set lower and upper bounds relative the prior
-        double lower_y = prior_y - nSigma*cov->getDiagonalError(j);
-        double upper_y = prior_y + nSigma*cov->getDiagonalError(j);
+        double lower_y = prior_y - nSigma*cov->GetDiagonalError(j);
+        double upper_y = prior_y + nSigma*cov->GetDiagonalError(j);
         // If PCA, transform these parameter values to the PCA basis
         if (IsPCA) {
-          lower_y = prior_y - nSigma*std::sqrt((cov->getEigenValues())(j));
-          upper_y = prior_y + nSigma*std::sqrt((cov->getEigenValues())(j));
-          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->getEigenValues()(j));
+          lower_y = prior_y - nSigma*std::sqrt((cov->GetEigenValues())(j));
+          upper_y = prior_y + nSigma*std::sqrt((cov->GetEigenValues())(j));
+          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetEigenValues()(j));
           MACH3LOG_INFO("prior {} = {:.2f}", i, prior_y);
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
@@ -1040,12 +1040,12 @@ void FitterBase::Run2DLLHScan() {
           {
             // For PCA we have to do it differently
             if (IsPCA) {
-              cov->setParProp_PCA(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
-              cov->setParProp_PCA(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
+              cov->SetParPropPCA(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
+              cov->SetParPropPCA(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
             } else {
               // Set the parameter
-              cov->setParProp(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
-              cov->setParProp(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
+              cov->SetParProp(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
+              cov->SetParProp(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
             }
 
             // Reweight the MC
@@ -1067,11 +1067,11 @@ void FitterBase::Run2DLLHScan() {
         hScanSam->Write();
         // Reset the parameters to their prior central values
         if (IsPCA) {
-          cov->setParProp_PCA(i, prior_x);
-          cov->setParProp_PCA(j, prior_y);
+          cov->SetParPropPCA(i, prior_x);
+          cov->SetParPropPCA(j, prior_y);
         } else {
-          cov->setParProp(i, prior_x);
-          cov->setParProp(j, prior_y);
+          cov->SetParProp(i, prior_x);
+          cov->SetParProp(j, prior_y);
         }
       } //end loop over systematics y
     }//end loop over systematics X
@@ -1114,7 +1114,7 @@ void FitterBase::RunSigmaVar() {
   bool isxsec = false;
   for (ParameterHandlerBase *cov : systematics)
   {
-    TMatrixDSym *Cov = cov->getCovMatrix();
+    TMatrixDSym *Cov = cov->GetCovMatrix();
 
     if(cov->IsPCA())
     {
@@ -1122,7 +1122,7 @@ void FitterBase::RunSigmaVar() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    isxsec = (cov->getName() == "xsec_cov");
+    isxsec = (cov->GetName() == "xsec_cov");
     // Loop over xsec parameters
     for (int i = 0; i < cov->GetNumParams(); ++i)
     {
@@ -1159,7 +1159,7 @@ void FitterBase::RunSigmaVar() {
       }
 
       // Get the initial value of ith parameter
-      double init = cov->getParInit(i);
+      double init = cov->GetParInit(i);
 
       std::vector<std::vector<TH1D*>> sigmaArray_x(numVar);
       std::vector<std::vector<TH1D*>> sigmaArray_y(numVar);
@@ -1181,13 +1181,13 @@ void FitterBase::RunSigmaVar() {
       for (int j = 0; j < numVar; ++j)
       {
         // New value = prior + variation*1sigma uncertainty
-        double paramVal = cov->getParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));
+        double paramVal = cov->GetParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));
 
         // Check the bounds on the parameter
         paramVal = std::max(cov->GetLowerBound(i), std::min(paramVal, cov->GetUpperBound(i)));
 
         // Set the parameter
-        cov->setParProp(i, paramVal);
+        cov->SetParProp(i, paramVal);
         // And reweight the sample
         for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
           samples[ivs]->Reweight();
@@ -1308,7 +1308,7 @@ void FitterBase::RunSigmaVar() {
       } // End looping over variation
 
       // Restore the parameter to prior value
-      cov->setParProp(i, init);
+      cov->SetParProp(i, init);
 
       SampleIterator = 0;
       // Get each sample and how it's responded to our reweighted parameter

@@ -16,7 +16,7 @@ class LikelihoodFit : public FitterBase {
     inline int GetNPars(){return NPars;};
 
     /// @brief Implementation of fitting algorithm
-    virtual void runMCMC() = 0;
+    virtual void RunMCMC() = 0;
 
     /// @brief Get name of class
     virtual inline std::string GetName()const {return "LikelihoodFit";};
