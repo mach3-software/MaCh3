@@ -11,7 +11,6 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 
-
 /// @file SplineStructs.h
 /// @brief Contains structures and helper functions for handling spline representations of systematic parameters in the MaCh3.
 /// @author Clarence Wret
@@ -24,22 +23,20 @@ struct FastSplineInfo {
   /// @brief Constructor
   FastSplineInfo() {
     nPts = -999;
-    xPts = NULL;
     CurrSegment = 0;
-    splineParsPointer = NULL;
+    splineParsPointer = nullptr;
   }
 
   /// @brief Destructor
-  ~FastSplineInfo() {
-    // Free dynamically allocated memory
-    if(xPts != NULL) delete[] xPts;
+  virtual ~FastSplineInfo() {
+
   }
 
   /// Number of points in spline
   M3::int_t nPts;
 
   /// Array of the knots positions
-  M3::float_t *xPts;
+  std::vector<M3::float_t> xPts;
 
   /// Array of what segment of spline we're currently interested in. Gets updated once per MCMC iteration
   M3::int_t CurrSegment;
@@ -80,7 +77,6 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianc
 
     // EM: check if our cap made the spline flat, if so we set to 1 knot to avoid problems later on
     bool isFlat = true;
-
     for(int knotId = 0; knotId < xsecgraph->GetN(); knotId++){
       double x,y;
 
@@ -89,7 +85,6 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianc
         MACH3LOG_ERROR("Invalid knot requested: {}", knotId);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-
       if(std::abs(y - 1.0) > 1e-5) isFlat = false;
     }
 
@@ -129,7 +124,7 @@ public:
   }
 
   /// @brief Empty destructor
-  ~TF1_red() {
+  virtual ~TF1_red() {
     if (Par != NULL) {
       delete[] Par;
       Par = NULL;
@@ -549,7 +544,7 @@ public:
   }
 
   /// @brief Empty destructor
-  ~TSpline3_red() {
+  virtual ~TSpline3_red() {
     if(Par != NULL) {
       for (int i = 0; i < nPoints; ++i) {
         if (Par[i] != NULL) {

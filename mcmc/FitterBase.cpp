@@ -1,9 +1,11 @@
 #include "FitterBase.h"
 
+_MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
+_MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
@@ -12,28 +14,25 @@
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-
   //Get mach3 modes from manager
-  Modes = fitMan->GetMaCh3Modes();
   random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
   accCount = 0;
   step = 0;
+  stepStart = 0;
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
   #ifdef DEBUG
   // Fit summary and debug info
-  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false);
+  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
   #endif
 
-  auto outfile = fitMan->raw()["General"]["OutputFile"].as<std::string>();
+  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
   // Save output every auto_save steps
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = fitMan->raw()["General"]["MCMC"]["AutoSave"].as<int>();
-  // Do we want to save the nominal parameters to output
-  save_nominal = true;
+  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
 
   // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
   SaveProposal = false;
@@ -106,13 +105,10 @@ void FitterBase::SaveSettings() {
   header_path += "/version.h";
   FILE* file = fopen(header_path.c_str(), "r");
   //KS: It is better to use experiment specific header file. If given experiment didn't provide it we gonna use one given by Core MaCh3.
-  if (!file)
-  {
+  if (!file) {
     header_path = std::string(std::getenv("MaCh3_ROOT"));
     header_path += "/version.h";
-  }
-  else
-  {
+  } else {
     fclose(file);
   }
 
@@ -140,7 +136,7 @@ void FitterBase::SaveSettings() {
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->getName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i)
-    MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNsamples());
+    MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetTitle(), samples[i]->GetNsamples());
 
   SettingsSaved = true;
 }
@@ -149,7 +145,6 @@ void FitterBase::SaveSettings() {
 // Prepare the output tree
 void FitterBase::PrepareOutput() {
 // *******************
-
   if(OutputPrepared) return;
   //MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not
   if(!fTestLikelihood)
@@ -219,7 +214,7 @@ void FitterBase::SaveOutput() {
   outputFile->cd();
   outTree->Write();
 
-  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step, clock->RealTime(), clock->RealTime() / step);
+  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
   #ifdef DEBUG
   if (debug)
@@ -237,11 +232,17 @@ void FitterBase::SaveOutput() {
 // Add samplePDF object to the Markov Chain
 void FitterBase::addSamplePDF(samplePDFBase * const sample) {
 // *************************
-  TotalNSamples += sample->GetNsamples();
-  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());
-  samples.push_back(sample);
+  //Check if the sample has a unique name
+  for (const auto &s : samples) {
+    if (s->GetTitle() == sample->GetTitle()) {
+      MACH3LOG_ERROR("SamplePDF with name '{}' already exists!", sample->GetTitle());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
 
-  return;
+  TotalNSamples += sample->GetNsamples();
+  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetTitle(), sample->GetNsamples());
+  samples.push_back(sample);
 }
 
 // *************************
@@ -255,9 +256,6 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i)
     n_vec[i] = cov->getParInit(i);
-
-  TVectorT<double> t_vec(cov->GetNumParams(), n_vec.data());
-  t_vec.Write((cov->getName() + "_prior").c_str());
 
   cov->getCovMatrix()->Write(cov->getName().c_str());
 
@@ -274,8 +272,6 @@ void FitterBase::addSystObj(covarianceBase * const cov) {
   }
 
   outputFile->cd();
-
-  return;
 }
 
 // *******************
@@ -286,7 +282,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
   TFile *infile = new TFile(FitName.c_str(), "READ");
   TTree *posts = infile->Get<TTree>("posteriors");
   int step_val = 0;
-  double log_val = _LARGE_LOGL_;
+  double log_val = M3::_LARGE_LOGL_;
   posts->SetBranchAddress("step",&step_val);
   posts->SetBranchAddress("LogL",&log_val);
 
@@ -308,18 +304,21 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-    }
-    if(ConfigCov == nullptr) delete ConfigCov;
 
-    std::vector<double> branch_vals(systematics[s]->GetNumParams());
+      delete ConfigCov;
+    }
+
+    CovarianceFolder->Close();
+    delete CovarianceFolder;
+
+    std::vector<double> branch_vals(systematics[s]->GetNumParams(), M3::_BAD_DOUBLE_);
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      branch_vals[i] = _BAD_DOUBLE_;
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
     }
     posts->GetEntry(posts->GetEntries()-1);
 
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      if(branch_vals[i] == _BAD_DOUBLE_)
+      if(branch_vals[i] == M3::_BAD_DOUBLE_)
       {
         MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
         MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);
@@ -332,11 +331,14 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->getName());
     systematics[s]->printNominalCurrProp();
 
-    CovarianceFolder->Close();
-    delete CovarianceFolder;
+    // Resetting branch adressed to nullptr as we don't want to write into a delected vector out of scope...
+    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
+      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
+    }
   }
   logLCurr = log_val;
 
+  delete posts;
   infile->Close();
   delete infile;
 
@@ -354,8 +356,7 @@ void FitterBase::ProcessMCMC() {
   if (fitMan == nullptr) return;
 
   // Process the MCMC
-  if (fitMan->raw()["General"]["ProcessMCMC"].as<bool>()) {
-
+  if (GetFromManager<bool>(fitMan->raw()["General"]["ProcessMCMC"], false, __FILE__ , __LINE__)){
     // Make the processor
     MCMCProcessor Processor(std::string(outputFile->GetName()));
 
@@ -384,7 +385,7 @@ void FitterBase::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       MACH3LOG_INFO("Opening output again to update with means..");
-      outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
+      outputFile = new TFile(Get<std::string>(fitMan->raw()["General"]["Output"]["Filename"], __FILE__, __LINE__).c_str(), "UPDATE");
     }
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
@@ -400,28 +401,30 @@ void FitterBase::ProcessMCMC() {
 void FitterBase::DragRace(const int NLaps) {
 // *************************
   MACH3LOG_INFO("Let the Race Begin!");
+  MACH3LOG_INFO("All tests will be performed with {} threads", M3::GetNThreads());
+
   // Reweight the MC
-  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
   {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       samples[ivs]->reweight();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
-  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
   {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       samples[ivs]->GetLikelihood();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   // Get vector of proposed steps. If we want to run LLH scan or something else after we need to revert changes after proposing steps multiple times
@@ -432,7 +435,7 @@ void FitterBase::DragRace(const int NLaps) {
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       systematics[s]->proposeStep();
     }
     clockRace.Stop();
@@ -446,7 +449,7 @@ void FitterBase::DragRace(const int NLaps) {
   for (size_t s = 0; s < systematics.size(); ++s) {
     TStopwatch clockRace;
     clockRace.Start();
-    for(int Lap = 0; Lap < NLaps; Lap++) {
+    for(int Lap = 0; Lap < NLaps; ++Lap) {
       systematics[s]->GetLikelihood();
     }
     clockRace.Stop();
@@ -467,20 +470,20 @@ void FitterBase::RunLLHScan() {
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotAllNDsamplesLLH = false;
-  if(fitMan->raw()["General"]["LLHScanBySample"])
-    PlotAllNDsamplesLLH = fitMan->raw()["General"]["LLHScanBySample"].as<bool>();
+  if(fitMan->raw()["LLHScan"]["LLHScanBySample"])
+    PlotAllNDsamplesLLH = Get<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], __FILE__, __LINE__);
 
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
   std::vector<TDirectory *> Cov_LLH(systematics.size());
-  for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+  for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
   {
     std::string NameTemp = systematics[ivc]->getName();
     NameTemp = NameTemp.substr(0, NameTemp.find("_cov")) + "_LLH";
@@ -488,9 +491,9 @@ void FitterBase::RunLLHScan() {
   }
 
   std::vector<TDirectory *> SampleClass_LLH(samples.size());
-  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
-    std::string NameTemp = samples[ivs]->GetName();
+    std::string NameTemp = samples[ivs]->GetTitle();
     SampleClass_LLH[ivs] = outputFile->mkdir(NameTemp.c_str());
   }
 
@@ -502,9 +505,9 @@ void FitterBase::RunLLHScan() {
   {
     SampleSplit_LLH.resize(TotalNSamples);
     int SampleIterator = 0;
-    for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+    for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
     {
-      for(int is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
       {
         SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleName(is)+ "_LLH").c_str());
         SampleIterator++;
@@ -512,22 +515,32 @@ void FitterBase::RunLLHScan() {
     }
   }
   // Number of points we do for each LLH scan
-  const int n_points = GetFromManager<int>(fitMan->raw()["General"]["LLHScanPoints"], 100);
-  double nSigma = GetFromManager<int>(fitMan->raw()["General"]["LLHScanSigma"], 1.);
+  const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 100, __FILE__ , __LINE__);
+  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
 
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
 
-  bool isxsec = false;
+  // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  std::map<std::string, std::vector<double>> scanRanges;
+  bool isScanRanges = false;
+  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
+    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
+    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
+      std::string itname = it->first.as<std::string>();
+      std::vector<double> itrange = it->second.as<std::vector<double>>();
+      // Set the mapping as param_name:param_range
+      scanRanges[itname] = itrange;
+    }
+    isScanRanges = true;
+  } else {
+    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
+  }
+   
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
-    if (cov->getName() == "xsec_cov")
-    {
-      isxsec = true;
-    } else {
-      isxsec = false;
-    }
+    bool isxsec = (cov->getName() == "xsec_cov");
 
     // Scan over all the parameters
     // Get the number of parameters
@@ -542,7 +555,7 @@ void FitterBase::RunLLHScan() {
       // For xsec we can get the actual name, hurray for being informative
       if (isxsec) name = cov->GetParFancyName(i);
       bool skip = false;
-      for(unsigned int is = 0; is < SkipVector.size(); is++)
+      for(unsigned int is = 0; is < SkipVector.size(); ++is)
       {
         if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
         {
@@ -552,6 +565,9 @@ void FitterBase::RunLLHScan() {
       }
       if(skip) continue;
 
+      // Set the parameter ranges between which LLH points are scanned  
+      double lower;
+      double upper;
       // Get the parameter priors and bounds
       double prior = cov->getParInit(i);
       if (IsPCA) prior = cov->getParCurr_PCA(i);
@@ -560,8 +576,8 @@ void FitterBase::RunLLHScan() {
       // double nSigma = 1;
       // if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
-      double lower = prior - nSigma*cov->getDiagonalError(i);
-      double upper = prior + nSigma*cov->getDiagonalError(i);
+      lower = prior - nSigma*cov->getDiagonalError(i);
+      upper = prior + nSigma*cov->getDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
         lower = prior - nSigma*std::sqrt((cov->getEigenValues())(i));
@@ -571,16 +587,29 @@ void FitterBase::RunLLHScan() {
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+      }  
+      // Implementation suggested by D. Barrow  
+      // If param ranges are specified in scanRanges node, extract it from there 
+      if(isScanRanges){
+        // Find matching entries through std::maps
+        auto it = scanRanges.find(name);
+        if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+          lower = it->second[0];
+          upper = it->second[1];
+          MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
+          MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
+        }
       }
-
+      
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
+      // This also applies for other parameters like osc, etc.
       if (lower < cov->GetLowerBound(i)) {
         lower = cov->GetLowerBound(i);
       }
       if (upper > cov->GetUpperBound(i)) {
         upper = cov->GetUpperBound(i);
       }
-      MACH3LOG_INFO("Scanning {} with {} steps, from {:.2f} - {:.2f}, prior = {:.2f}", name, n_points, lower, upper, prior);
+      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
       auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
@@ -591,9 +620,9 @@ void FitterBase::RunLLHScan() {
 
       std::vector<TH1D*> hScanSample(samples.size());
       std::vector<double> nSamLLH(samples.size());
-      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
-        std::string NameTemp = samples[ivs]->GetName();
+        std::string NameTemp = samples[ivs]->GetTitle();
         hScanSample[ivs] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
         hScanSample[ivs]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
         nSamLLH[ivs] = 0.;
@@ -601,7 +630,7 @@ void FitterBase::RunLLHScan() {
 
       std::vector<TH1D*> hScanCov(systematics.size());
       std::vector<double> nCovLLH(systematics.size());
-      for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+      for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
       {
         std::string NameTemp = systematics[ivc]->getName();
         NameTemp = NameTemp.substr(0, NameTemp.find("_cov"));
@@ -616,11 +645,11 @@ void FitterBase::RunLLHScan() {
       if(PlotAllNDsamplesLLH)
       {
         int SampleIterator = 0;
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
           hScanSamSplit.resize(TotalNSamples);
           sampleSplitllh.resize(TotalNSamples);
-          for(int is = 0; is < samples[ivs]->GetNsamples(); is++ )
+          for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
           {
             hScanSamSplit[SampleIterator] = new TH1D((name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper);
             hScanSamSplit[SampleIterator]->SetTitle((std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
@@ -630,7 +659,7 @@ void FitterBase::RunLLHScan() {
       }
 
       // Scan over the parameter space
-      for (int j = 0; j < n_points; j++)
+      for (int j = 0; j < n_points; ++j)
       {
         if (j % countwidth == 0)
           MaCh3Utils::PrintProgressBar(j, n_points);
@@ -644,7 +673,7 @@ void FitterBase::RunLLHScan() {
         }
 
         // Reweight the MC
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
           samples[ivs]->reweight();
         }
@@ -654,13 +683,13 @@ void FitterBase::RunLLHScan() {
         // Get the -log L likelihoods
         double samplellh = 0;
 
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
           nSamLLH[ivs] = samples[ivs]->GetLikelihood();
           samplellh += nSamLLH[ivs];
         }
 
-        for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+        for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
         {
           nCovLLH[ivc] = systematics[ivc]->GetLikelihood();
           totalllh += nCovLLH[ivc];
@@ -671,9 +700,9 @@ void FitterBase::RunLLHScan() {
         if(PlotAllNDsamplesLLH)
         {
           int SampleIterator = 0;
-          for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+          for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
           {
-            for(int is = 0; is < samples[ivs]->GetNsamples(); is++)
+            for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
             {
               sampleSplitllh[SampleIterator] = samples[ivs]->getSampleLikelihood(is);
               SampleIterator++;
@@ -681,11 +710,11 @@ void FitterBase::RunLLHScan() {
           }
         }
 
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
           hScanSample[ivs]->SetBinContent(j+1, 2*nSamLLH[ivs]);
         }
-        for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+        for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
         {
           hScanCov[ivc]->SetBinContent(j+1, 2*nCovLLH[ivc]);
         }
@@ -696,24 +725,24 @@ void FitterBase::RunLLHScan() {
         if(PlotAllNDsamplesLLH)
         {
           int SampleIterator = 0;
-          for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+          for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
           {
-            for(int is = 0; is < samples[ivs]->GetNsamples(); is++)
+            for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
             {
-              hScanSamSplit[is]->SetBinContent(j+1, 2*sampleSplitllh[is]);
+              hScanSamSplit[SampleIterator]->SetBinContent(j+1, 2*sampleSplitllh[SampleIterator]);
               SampleIterator++;
             }
           }
         }
       }
-      for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+      for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
       {
         Cov_LLH[ivc]->cd();
         hScanCov[ivc]->Write();
         delete hScanCov[ivc];
       }
 
-      for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+      for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
         SampleClass_LLH[ivs]->cd();
         hScanSample[ivs]->Write();
@@ -727,9 +756,9 @@ void FitterBase::RunLLHScan() {
       if(PlotAllNDsamplesLLH)
       {
         int SampleIterator = 0;
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          for(int is = 0; is < samples[ivs]->GetNsamples(); is++)
+          for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
           {
             SampleSplit_LLH[SampleIterator]->cd();
             hScanSamSplit[SampleIterator]->Write();
@@ -748,13 +777,13 @@ void FitterBase::RunLLHScan() {
     }//end loop over systematics
   }//end loop covariance classes
 
-  for(unsigned int ivc = 0; ivc < systematics.size(); ivc++ )
+  for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
   {
     Cov_LLH[ivc]->Write();
     delete Cov_LLH[ivc];
   }
 
-  for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
     SampleClass_LLH[ivs]->Write();
     delete SampleClass_LLH[ivs];
@@ -769,9 +798,9 @@ void FitterBase::RunLLHScan() {
   if(PlotAllNDsamplesLLH)
   {
     int SampleIterator = 0;
-    for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
+    for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
     {
-      for(int is = 0; is < samples[ivs]->GetNsamples(); is++ )
+      for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
       {
         SampleSplit_LLH[SampleIterator]->Write();
         delete SampleSplit_LLH[SampleIterator];
@@ -839,7 +868,6 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
 // Run 2D LLH scan
 void FitterBase::Run2DLLHScan() {
 // *************************
-
   // Save the settings into the output file
   SaveSettings();
 
@@ -847,28 +875,38 @@ void FitterBase::Run2DLLHScan() {
 
   TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
   // Number of points we do for each LLH scan
-  constexpr int n_points = 20;
+  const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["2DLLHScanPoints"], 20, __FILE__ , __LINE__);
   // We print 5 reweights
-  constexpr int countwidth = double(n_points)/double(5);
-  double nSigma = GetFromManager<int>(fitMan->raw()["General"]["LLHScanSigma"], 1.);
+  const int countwidth = int(double(n_points)/double(5));
 
-  bool isxsec = false;
+  std::map<std::string, std::vector<double>> scanRanges;
+  bool isScanRanges = false;
+  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
+    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
+    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
+      std::string itname = it->first.as<std::string>();
+      std::vector<double> itrange = it->second.as<std::vector<double>>();
+      // Set the mapping as param_name:param_range
+      scanRanges[itname] = itrange;
+    }
+    isScanRanges = true;
+  } else {
+    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
+  }
+
+  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
+
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
-    if (cov->getName() == "xsec_cov")
-    {
-      isxsec = true;
-    } else {
-      isxsec = false;
-    }
+    bool isxsec = (cov->getName() == "xsec_cov");
     // Scan over all the parameters
     // Get the number of parameters
     int npars = cov->GetNumParams();
@@ -902,6 +940,17 @@ void FitterBase::Run2DLLHScan() {
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
       }
+      // If param ranges are specified in scanRanges node, extract it from there
+      if(isScanRanges){
+        // Find matching entries through std::maps
+        auto it = scanRanges.find(name_x);
+        if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+          lower_x = it->second[0];
+          upper_x = it->second[1];
+          MACH3LOG_INFO("Found matching param name for setting specified range for {}", name_x);
+          MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name_x, lower_x, upper_x);
+        }
+      }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
       if (lower_x < cov->GetLowerBound(i)) {
@@ -912,7 +961,7 @@ void FitterBase::Run2DLLHScan() {
       }
 
       bool skip = false;
-      for(unsigned int is = 0; is < SkipVector.size(); is++)
+      for(unsigned int is = 0; is < SkipVector.size(); ++is)
       {
         if(name_x.substr(0, SkipVector[is].length()) == SkipVector[is])
         {
@@ -930,7 +979,7 @@ void FitterBase::Run2DLLHScan() {
         if (isxsec) name_y = cov->GetParFancyName(j);
 
         skip = false;
-        for(unsigned int is = 0; is < SkipVector.size(); is++)
+        for(unsigned int is = 0; is < SkipVector.size(); ++is)
         {
           if(name_y.substr(0, SkipVector[is].length()) == SkipVector[is])
           {
@@ -957,6 +1006,17 @@ void FitterBase::Run2DLLHScan() {
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
         }
+        // If param ranges are specified in scanRanges node, extract it from there
+        if(isScanRanges){
+          // Find matching entries through std::maps
+          auto it = scanRanges.find(name_y);
+          if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+            lower_y = it->second[0];
+            upper_y = it->second[1];
+            MACH3LOG_INFO("Found matching param name for setting specified range for {}", name_y);
+            MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name_y, lower_y, upper_y);
+          }
+        }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
         if (lower_y < cov->GetLowerBound(j)) {
@@ -975,12 +1035,12 @@ void FitterBase::Run2DLLHScan() {
         hScanSam->GetZaxis()->SetTitle("2LLH_sam");
 
         // Scan over the parameter space
-        for (int x = 0; x < n_points; x++)
+        for (int x = 0; x < n_points; ++x)
         {
           if (x % countwidth == 0)
             MaCh3Utils::PrintProgressBar(x, n_points);
 
-          for (int y = 0; y < n_points; y++)
+          for (int y = 0; y < n_points; ++y)
           {
             // For PCA we have to do it differently
             if (IsPCA) {
@@ -994,13 +1054,13 @@ void FitterBase::Run2DLLHScan() {
 
             // Reweight the MC
             //double *fake = 0;
-            for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
+            for(unsigned int ivs = 0; ivs < samples.size(); ++ivs) {
               samples[ivs]->reweight();
             }
 
             // Get the -log L likelihoods
             double samplellh = 0;
-            for(unsigned int ivs = 0; ivs < samples.size(); ivs++) {
+            for(unsigned int ivs = 0; ivs < samples.size(); ++ivs) {
               samplellh += samples[ivs]->GetLikelihood();
             }
             hScanSam->SetBinContent(x+1, y+1, 2*samplellh);
@@ -1042,20 +1102,19 @@ void FitterBase::RunSigmaVar() {
   //KS: this is only relevant if PlotByMode is turned on
   //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
   constexpr int nRelevantModes = 2;
-  MaCh3Modes_t RelevantModes[nRelevantModes] = {Modes->GetMode("CCQE"), Modes->GetMode("2p2h")};
-  bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false);
+
+  bool DoByMode = GetFromManager<int>(fitMan->raw()["General"]["DoByMode"], false, __FILE__ , __LINE__);
 
   //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
   bool PlotLLHperBin = false;
 
   std::vector<std::string> SkipVector;
-  if(fitMan->raw()["General"]["LLHScanSkipVector"])
+  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["General"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
-  bool isxsec = false;
   for (covarianceBase *cov : systematics)
   {
     TMatrixDSym *Cov = cov->getCovMatrix();
@@ -1066,13 +1125,7 @@ void FitterBase::RunSigmaVar() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    if (cov->getName() == "xsec_cov")
-    {
-      isxsec = true;
-    } else {
-      isxsec = false;
-    }
-
+    bool isxsec = (cov->getName() == "xsec_cov");
     // Loop over xsec parameters
     for (int i = 0; i < cov->GetNumParams(); ++i)
     {
@@ -1092,8 +1145,8 @@ void FitterBase::RunSigmaVar() {
       if(skip) continue;
 
       outputFile->cd();
-      TDirectory * dirArryDial = outputFile->mkdir(name.c_str());
-      TDirectory **dirArrySample = new TDirectory*[TotalNSamples];
+      TDirectory* dirArryDial = outputFile->mkdir(name.c_str());
+      std::vector<TDirectory*> dirArrySample(TotalNSamples);
 
       int SampleIterator = 0;
       // Get each sample and how it's responded to our reweighted parameter
@@ -1111,10 +1164,10 @@ void FitterBase::RunSigmaVar() {
       // Get the initial value of ith parameter
       double init = cov->getParInit(i);
 
-      TH1D ***sigmaArray_x = new TH1D**[numVar]();
-      TH1D ***sigmaArray_y = new TH1D**[numVar]();
-      TH1D ***sigmaArray_x_norm = new TH1D**[numVar]();
-      TH1D ***sigmaArray_y_norm = new TH1D**[numVar]();
+      std::vector<std::vector<TH1D*>> sigmaArray_x(numVar);
+      std::vector<std::vector<TH1D*>> sigmaArray_y(numVar);
+      std::vector<std::vector<TH1D*>> sigmaArray_x_norm(numVar);
+      std::vector<std::vector<TH1D*>> sigmaArray_y_norm(numVar);
 
       // Set up for single mode
       TH1D ****sigmaArray_mode_x = nullptr;
@@ -1143,10 +1196,10 @@ void FitterBase::RunSigmaVar() {
           samples[ivs]->reweight();
         }
 
-        sigmaArray_x[j] = new TH1D*[TotalNSamples]();
-        sigmaArray_y[j] = new TH1D*[TotalNSamples]();
-        sigmaArray_x_norm[j] = new TH1D*[TotalNSamples]();
-        sigmaArray_y_norm[j] = new TH1D*[TotalNSamples]();
+        sigmaArray_x[j].resize(TotalNSamples);
+        sigmaArray_y[j].resize(TotalNSamples);
+        sigmaArray_x_norm[j].resize(TotalNSamples);
+        sigmaArray_y_norm[j].resize(TotalNSamples);
 
         if (DoByMode)
         {
@@ -1181,16 +1234,21 @@ void FitterBase::RunSigmaVar() {
             //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
             if (DoByMode)
             {
+              //KS: this is only relevant if PlotByMode is turned on
+              //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+              MaCh3Modes_t RelevantModes[nRelevantModes] = {samples[ivs]->GetMaCh3Modes()->GetMode("CCQE"), samples[ivs]->GetMaCh3Modes()->GetMode("2p2h")};
+
               sigmaArray_mode_x[j][SampleIterator] = new TH1D*[nRelevantModes]();
               sigmaArray_mode_y[j][SampleIterator] = new TH1D*[nRelevantModes]();
               // Now get the TH2D mode variations
               std::string mode_title_long;
+
               for(int ir = 0; ir < nRelevantModes; ir++)
               {
                 std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone()));
                 currSampMode->SetDirectory(nullptr);
 
-                mode_title_long = title_long + "_" + Modes->GetMaCh3ModeName(RelevantModes[ir]);
+                mode_title_long = title_long + "_" + samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir]);
                 currSampMode->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
                 dirArrySample[SampleIterator]->cd();
                 currSampMode->Write();
@@ -1281,10 +1339,14 @@ void FitterBase::RunSigmaVar() {
           //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
           if (DoByMode)
           {
+            //KS: this is only relevant if PlotByMode is turned on
+            //Checking each mode is time consuming so we only consider one which are relevant for particular analysis
+            MaCh3Modes_t RelevantModes[nRelevantModes] = {samples[ivs]->GetMaCh3Modes()->GetMode("CCQE"), samples[ivs]->GetMaCh3Modes()->GetMode("2p2h")};
+
             for(int ir = 0; ir < nRelevantModes;ir++)
             {
-              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
-              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+Modes->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
+              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
 
               dirArrySample[SampleIterator]->cd();
               var_mode_x->Write();
@@ -1308,7 +1370,6 @@ void FitterBase::RunSigmaVar() {
           SampleIterator++;
         }
       }
-      delete[] dirArrySample;
 
       for (int j = 0; j < numVar; ++j)
       {
@@ -1324,15 +1385,7 @@ void FitterBase::RunSigmaVar() {
             SampleIterator++;
           }
         }
-        delete[] sigmaArray_x[j];
-        delete[] sigmaArray_y[j];
-        delete[] sigmaArray_x_norm[j];
-        delete[] sigmaArray_y_norm[j];
       }
-      delete[] sigmaArray_x;
-      delete[] sigmaArray_y;
-      delete[] sigmaArray_x_norm;
-      delete[] sigmaArray_y_norm;
 
       dirArryDial->Close();
       delete dirArryDial;

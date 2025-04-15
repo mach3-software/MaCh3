@@ -53,7 +53,7 @@ TH2D* GetSubMatrix(TH2D *MatrixFull, const std::string& Title, const std::vector
 void SetupInfo(const std::string& Config, std::vector<std::string>& Title, std::vector<std::vector<std::string>>& Params)
 {
   // Load the YAML file
-  YAML::Node config = YAML::LoadFile(Config);
+  YAML::Node config = M3OpenConfig(Config);
 
   // Access the "MatrixPlotter" section
   YAML::Node settings = config["MatrixPlotter"];

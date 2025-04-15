@@ -3,11 +3,10 @@
 #include "samplePDF/Structs.h"
 #include <cstddef>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
+_MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 #include <algorithm>
 #include <memory>
@@ -29,10 +28,17 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   }
   OscCov = osc_cov;
   
+  KinematicParameters = nullptr;
+  ReversedKinematicParameters = nullptr;
+
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
-  
+  SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
+
+  // Variables related to MC stat
+  FirstTimeW2 = true;
+  UpdateW2 = false;
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -54,45 +60,32 @@ samplePDFFDBase::~samplePDFFDBase()
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
     delete NuOscProbCalcers[iCalc];
   }
+
+  if(THStackLeg != nullptr) delete THStackLeg;
 }
 
 void samplePDFFDBase::ReadSampleConfig() 
 {
-  if (!CheckNodeExists(SampleManager->raw(), "SampleName")) {
-    MACH3LOG_ERROR("SampleName not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  samplename = SampleManager->raw()["SampleName"].as<std::string>();
-  
-  if (!CheckNodeExists(SampleManager->raw(), "NSubSamples")) {
-    MACH3LOG_ERROR("NSubSamples not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  nSamples = SampleManager->raw()["NSubSamples"].as<M3::int_t>();
+  auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
+  Modes = new MaCh3Modes(ModeName);
+  //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
+  SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
+  //SampleName has to be provided in the sample yaml otherwise this will throw an exception
+  SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
+  NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
+  EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
 
-  if (!CheckNodeExists(SampleManager->raw(), "DetID")) {
-    MACH3LOG_ERROR("ID not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
+  // TN override the sample setting if not using binned oscillation
+  if (EqualBinningPerOscChannel) {
+    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() != "Binned") {
+      MACH3LOG_WARN("Tried using EqualBinningPerOscChannel while using Unbinned oscillation calculation, changing EqualBinningPerOscChannel to false");
+      EqualBinningPerOscChannel = false;
+    }
   }
-  SampleDetID = SampleManager->raw()["DetID"].as<int>();
-
-  if (!CheckNodeExists(SampleManager->raw(), "NuOsc", "NuOscConfigFile")) {
-    MACH3LOG_ERROR("NuOsc::NuOscConfigFile is not defined in {}, please add this!", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
+  fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
+  if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
+    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
-  NuOscillatorConfigFile = SampleManager->raw()["NuOsc"]["NuOscConfigFile"].as<std::string>();
-  MCSamples.resize(nSamples);
-  
-  //Default TestStatistic is kPoisson
-  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
-  if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
-    fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
-  } else {
-    MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
-    MACH3LOG_WARN("Defaulting to using a poisson likelihood");
-    fTestStatistic = kPoisson;
-  }
-  
   //Binning
   nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
@@ -108,7 +101,7 @@ void samplePDFFDBase::ReadSampleConfig()
   SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
   if(YVarStr.length() > 0){
     if(XVarStr.length() == 0){
-      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+      MACH3LOG_ERROR("Please specify an Y-variable string in sample config {}", SampleManager->GetFileName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     nDimensions++;
@@ -138,11 +131,14 @@ void samplePDFFDBase::ReadSampleConfig()
   std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
   std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
   
+  nSamples = static_cast<M3::int_t>(SampleManager->raw()["SubSamples"].size());
+  MCSamples.resize(nSamples);
+  
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-    oscchan_flavnames.push_back(osc_channel["name"].as<std::string>());
+    oscchan_flavnames.push_back(osc_channel["Name"].as<std::string>());
+    oscchan_flavnames_Latex.push_back(osc_channel["LatexName"].as<std::string>());
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
-    sample_vecno.push_back(osc_channel["samplevecno"].as<int>());
     sample_nupdgunosc.push_back(static_cast<NuPDG>(osc_channel["nutype"].as<int>()));
     sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
   }
@@ -164,6 +160,29 @@ void samplePDFFDBase::ReadSampleConfig()
     StoredSelection.push_back(SelectionVec);
   }
   NSelections = int(SelectionStr.size());
+
+  // EM: initialise the mode weight map
+  for( int iMode=0; iMode < Modes->GetNModes(); iMode++ ) {
+    _modeNomWeightMap[Modes->GetMaCh3ModeName(iMode)] = 1.0;
+  }
+
+  // EM: multiply by the nominal weight specified in the sample config file
+  if ( SampleManager->raw()["NominalWeights"] ) {
+    for( int iMode=0; iMode<Modes->GetNModes(); iMode++ ) {
+      std::string modeStr = Modes->GetMaCh3ModeName(iMode);
+      if( SampleManager->raw()["NominalWeights"][modeStr] ) {
+        double modeWeight = SampleManager->raw()["NominalWeights"][modeStr].as<double>();
+        _modeNomWeightMap[Modes->GetMaCh3ModeName(iMode)] *= modeWeight;
+      }
+    }
+  }
+
+  // EM: print em out
+  MACH3LOG_INFO("  Nominal mode weights to apply: ");
+  for( int iMode=0; iMode<Modes->GetNModes(); iMode++ ) {
+    std::string modeStr = Modes->GetMaCh3ModeName(iMode);
+    MACH3LOG_INFO("    - {}: {}", modeStr, _modeNomWeightMap.at(modeStr));
+  }
 }
 
 void samplePDFFDBase::Initialise() {
@@ -203,8 +222,30 @@ void samplePDFFDBase::Initialise() {
   SetupFunctionalParameters();
   MACH3LOG_INFO("Setting up Weight Pointers..");
   SetupWeightPointers();
-
+  MACH3LOG_INFO("Setting up Kinematic Map..");
+  SetupKinematicMap();
   MACH3LOG_INFO("=======================================================");
+}
+
+// ************************************************
+void samplePDFFDBase::SetupKinematicMap() {
+// ************************************************
+  if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr) {
+    MACH3LOG_INFO("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  // KS: Ensure maps exist correctly
+  for (const auto& pair : *KinematicParameters) {
+    const auto& key = pair.first;
+    const auto& value = pair.second;
+
+    auto it = ReversedKinematicParameters->find(value);
+    if (it == ReversedKinematicParameters->end() || it->second != key) {
+      MACH3LOG_ERROR("Mismatch found: {} -> {} but {} -> {}",
+                     key, value, value, (it != ReversedKinematicParameters->end() ? it->second : "NOT FOUND"));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
 }
 
 void samplePDFFDBase::fill1DHist()
@@ -233,7 +274,7 @@ void samplePDFFDBase::fill2DHist()
 
 // ************************************************
 /// @function samplePDFFDBase::SetupSampleBinning()
-/// @brief Function to setup the binning of your sample histograms and the underlying 
+/// @brief Function to setup the binning of your sample histograms and the underlying
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
 /// This "passing" can be removed. 
@@ -247,10 +288,10 @@ void samplePDFFDBase::SetupSampleBinning(){
   //The binning here is arbitrary, now we get info from cfg so the
   //set1DBinning and set2Dbinning calls below will make the binning
   //to be what we actually want
-  _hPDF1D   = new TH1D("h"+histname1d+samplename,histtitle, 1, 0, 1);
-  dathist   = new TH1D("d"+histname1d+samplename,histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
+  _hPDF1D   = new TH1D("h"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  dathist   = new TH1D("d"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
 
   //Make some arrays so we can initialise _hPDF1D and _hPDF2D with these
   XBinEdges.reserve(SampleXBins.size());
@@ -302,44 +343,6 @@ bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
       return false;
     }
   }
-  
-  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
-  return true;
-}
-
-// ************************************************
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr, const int iSample, const int iEvent) {
-// ************************************************
-  double Val;
-  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    if ((Val<SelectionBounds[iSelection][0])||(Val>=SelectionBounds[iSelection][1])) {
-      return false;
-    }
-  }
-  
-  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
-  return true;
-}
-
-// ************************************************
-//Same as the function above but just acts on the vector and the event
-bool samplePDFFDBase::IsEventSelected(const std::vector< std::string >& ParameterStr,
-                                      const std::vector< std::vector<double> > &SelectionCuts,
-                                      const int iSample, const int iEvent) {
-// ************************************************
-  
-  double Val;
-  for (unsigned int iSelection=0;iSelection<ParameterStr.size();iSelection++) {
-    
-    Val = ReturnKinematicParameter(ParameterStr[iSelection], iSample, iEvent);
-    if(Val >= SelectionCuts[iSelection][1] && SelectionCuts[iSelection][0] != -999){
-      return false;
-    }
-    else if(Val < SelectionCuts[iSelection][0] && SelectionCuts[iSelection][1] != -999){
-      return false;
-    }
-  }
   //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
@@ -354,19 +357,31 @@ void samplePDFFDBase::reweight() {
   //You only need to do these things if OscCov has been initialised
   //if not then you're not considering oscillations
   if (OscCov) {
-    std::vector<M3::float_t> OscVec(OscCov->GetNumParams());
-    for (int iPar=0;iPar<OscCov->GetNumParams();iPar++) {
+    std::vector<M3::float_t> OscVec(OscParams.size());
+    for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wuseless-cast"
-      OscVec[iPar] = M3::float_t(OscCov->getParProp(iPar));
+      OscVec[iPar] = M3::float_t(*OscParams[iPar]);
       #pragma GCC diagnostic pop
-    } 
-    for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
-      NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+    }
+
+    if (EqualBinningPerOscChannel) {
+      NuOscProbCalcers[0]->CalculateProbabilities(OscVec);
+    } else {
+      for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
+        NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
+      }
     }
   }
-
+  #ifdef MULTITHREAD
+  // Call entirely different routine if we're running with openMP
+  fillArray_MP();
+  #else
   fillArray();
+  #endif
+
+  //KS: If you want to not update W2 wights then uncomment this line
+  if(!UpdateW2) FirstTimeW2 = false;
 }
 
 //************************************************
@@ -382,13 +397,9 @@ void samplePDFFDBase::fillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
-  // Call entirely different routine if we're running with openMP
-#ifdef MULTITHREAD
-  fillArray_MP();
-#else
   //ETA we should probably store this in samplePDFFDBase
   size_t nXBins = int(XBinEdges.size()-1);
-  size_t nYBins = int(YBinEdges.size()-1);
+  //size_t nYBins = int(YBinEdges.size()-1);
 
   PrepFunctionalParameters();
   if(SplineHandler){
@@ -403,12 +414,12 @@ void samplePDFFDBase::fillArray() {
         continue;
       } 
 
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double totalweight = 1.0;
+      M3::float_t splineweight = 1.0;
+      M3::float_t normweight = 1.0;
+      M3::float_t totalweight = 1.0;
       
       if(SplineHandler){
-        splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+        splineweight = CalcWeightSpline(iSample, iEvent);
       }
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
       if (splineweight <= 0.){
@@ -417,7 +428,7 @@ void samplePDFFDBase::fillArray() {
       }
       
       //Loop over stored normalisation and function pointers 
-      normweight *= CalcXsecWeightNorm(iSample, iEvent);
+      normweight = CalcWeightNorm(iSample, iEvent);
       
       //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
       if (normweight <= 0.){
@@ -475,11 +486,10 @@ void samplePDFFDBase::fillArray() {
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
         samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        if (FirstTimeW2) samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
     }
   }
-#endif // end the else in openMP
 }
 
 #ifdef MULTITHREAD
@@ -487,8 +497,18 @@ void samplePDFFDBase::fillArray() {
 /// Multithreaded version of fillArray @see fillArray()
 void samplePDFFDBase::fillArray_MP()  {
 // ************************************************
+  //DB Reset which cuts to apply
+  Selection = StoredSelection;
+
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
+
+  PrepFunctionalParameters();
+  //==================================================
+  //Calc Weights and fill Array
+  if(SplineHandler){
+    SplineHandler->Evaluate();
+  }
 
   //This is stored as [y][x] due to shifts only occurring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses
   double** samplePDFFD_array_private = nullptr;
@@ -504,10 +524,9 @@ void samplePDFFDBase::fillArray_MP()  {
     for (size_t yBin=0;yBin<nYBins;yBin++) {
       samplePDFFD_array_private[yBin] = new double[nXBins];
       samplePDFFD_array_private_w2[yBin] = new double[nXBins];
-      for (size_t xBin=0;xBin<nXBins;xBin++) {
-        samplePDFFD_array_private[yBin][xBin] = 0.;
-        samplePDFFD_array_private_w2[yBin][xBin] = 0.;
-      }
+
+      std::fill_n(samplePDFFD_array_private[yBin], nXBins, 0.0);
+      std::fill_n(samplePDFFD_array_private_w2[yBin], nXBins, 0.0);
     }
     
     //DB - Brain dump of speedup ideas
@@ -524,14 +543,6 @@ void samplePDFFDBase::fillArray_MP()  {
     //
     // We will hit <0.1 s/step eventually! :D
     
-    //ETA - does these three calls need to be inside the omp parrallel region? 
-    //I don't think this will affect anything but maybe should check.
-    PrepFunctionalParameters();
-    //==================================================
-    //Calc Weights and fill Array
-    if(SplineHandler){
-      SplineHandler->Evaluate();
-    }
     for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
       #pragma omp for
       for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -554,7 +565,7 @@ void samplePDFFDBase::fillArray_MP()  {
         //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
 
         if(SplineHandler){
-          splineweight *= CalcXsecWeightSpline(iSample, iEvent);
+          splineweight = CalcWeightSpline(iSample, iEvent);
         }
         //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
         if (splineweight <= 0.){
@@ -562,7 +573,7 @@ void samplePDFFDBase::fillArray_MP()  {
           continue;
         }
 
-        normweight *= CalcXsecWeightNorm(iSample, iEvent);
+        normweight = CalcWeightNorm(iSample, iEvent);
         //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
         if (normweight <= 0.){
           MCSamples[iSample].xsec_w[iEvent] = 0.;
@@ -596,7 +607,7 @@ void samplePDFFDBase::fillArray_MP()  {
         int YBinToFill = MCSamples[iSample].NomYBin[iEvent];
 
         //DB Check to see if momentum shift has moved bins
-        //DB - First, check to see if the event is still in the nominal bin	
+        //DB - First, check to see if the event is still in the nominal bin
         if (XVar < MCSamples[iSample].rw_upper_xbinedge[iEvent] && XVar >= MCSamples[iSample].rw_lower_xbinedge[iEvent]) {
           XBinToFill = MCSamples[iSample].NomXBin[iEvent];
         }
@@ -639,8 +650,10 @@ void samplePDFFDBase::fillArray_MP()  {
       for (size_t xBin = 0; xBin < nXBins; ++xBin) {
         #pragma omp atomic
         samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
-        #pragma omp atomic
-        samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        if(FirstTimeW2) {
+          #pragma omp atomic
+          samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        }
       }
     }
     
@@ -654,7 +667,6 @@ void samplePDFFDBase::fillArray_MP()  {
 }
 #endif
 
-
 // **************************************************
 // Helper function to reset the data and MC histograms
 void samplePDFFDBase::ResetHistograms() {
@@ -663,7 +675,11 @@ void samplePDFFDBase::ResetHistograms() {
   size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
+  // Don't openMP this; no significant gain
   for (size_t yBin = 0; yBin < nYBins; ++yBin) {
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       samplePDFFD_array[yBin][xBin] = 0.;
       samplePDFFD_array_w2[yBin][xBin] = 0.;
@@ -671,15 +687,29 @@ void samplePDFFDBase::ResetHistograms() {
   }
 } // end function
 
-void samplePDFFDBase::RegisterIndividualFuncPar(std::string fpName, int fpEnum, FuncParFuncType fpFunc){
+void samplePDFFDBase::RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+  // Add protections to not add the same functional parameter twice
+  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
+    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   funcParsNamesMap[fpName] = fpEnum;
   funcParsNamesVec.push_back(fpName);
   funcParsFuncMap[fpEnum] = fpFunc;
 }
 
 void samplePDFFDBase::SetupFunctionalParameters() {
-  MACH3LOG_INFO("Setting up functional parameters");
-  funcParsVec = XsecCov->GetFuncParsFromDetID(SampleDetID);
+  funcParsVec = XsecCov->GetFuncParsFromSampleName(SampleName);
+  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
   funcParsGrid.resize(MCSamples.size());
@@ -690,10 +720,14 @@ void samplePDFFDBase::SetupFunctionalParameters() {
       if (fp.name == name) {
         MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
         fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
-        // MACH3LOG_INFO("The address of fp.funcPtr is: {}", fp.funcPtr);
         funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
         continue;
       }
+    }
+    // If we don't find a match, we need to throw an error
+    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
+      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
 
@@ -715,7 +749,6 @@ void samplePDFFDBase::SetupFunctionalParameters() {
         if ((*it).hasKinBounds) {
           for (std::size_t iKinPar = 0; iKinPar < (*it).KinematicVarStr.size(); ++iKinPar) {
             // Check lower bound
-            // HH todo: check if <= or < should be used
             if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) <= (*it).Selection[iKinPar][0]) {
               IsSelected = false;
               MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
@@ -759,13 +792,17 @@ void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
 }
 // =================================
 
+
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int iEvent) const {
+M3::float_t samplePDFFDBase::CalcWeightSpline(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //DB Xsec syst
   //Loop over stored spline pointers
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int iSpline = 0; iSpline < MCSamples[iSample].nxsec_spline_pointers[iEvent]; ++iSpline) {
     xsecw *= *(MCSamples[iSample].xsec_spline_pointers[iEvent][iSpline]);
   }
@@ -774,10 +811,13 @@ M3::float_t samplePDFFDBase::CalcXsecWeightSpline(const int iSample, const int i
 
 // ***************************************************************************
 // Calculate the normalisation weight for one event
-M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEvent) const {
+M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
   for (int iParam = 0; iParam < MCSamples[iSample].nxsec_norm_pointers[iEvent]; ++iParam)
   {
 #pragma GCC diagnostic push
@@ -792,7 +832,7 @@ M3::float_t samplePDFFDBase::CalcXsecWeightNorm(const int iSample, const int iEv
 }
 
 void samplePDFFDBase::SetupNormParameters() {  
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
+  xsec_norms = XsecCov->GetNormParsFromSampleName(GetSampleName());
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
@@ -821,6 +861,13 @@ void samplePDFFDBase::SetupNormParameters() {
       }
     }
   }
+  // If not debugging let's clear memory
+  #ifndef DEBUG
+  for (size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    MCSamples[iSample].xsec_norms_bins.clear();
+    MCSamples[iSample].xsec_norms_bins.shrink_to_fit();
+  }
+  #endif
 }
 
 // ************************************************
@@ -897,17 +944,15 @@ void samplePDFFDBase::CalcXsecNormsBins(int iSample) {
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
         int bin = (*it).index;
 
-        //If syst on applies to a particular detector
-        if ((XsecCov->GetParDetID(bin) & SampleDetID)==SampleDetID) {
-          XsecBins.push_back(bin);
-          MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
-          #ifdef DEBUG
-          VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
-          #endif
-        }
+        XsecBins.push_back(bin);
+        MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
+        #ifdef DEBUG
+        VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
+        #endif
+        //}
       } // end iteration over xsec_norms
     } // end if (xsecCov)
-    fdobj->xsec_norms_bins[iEvent]=XsecBins;
+    fdobj->xsec_norms_bins[iEvent] = XsecBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("Channel {}", iSample);
@@ -1069,11 +1114,11 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       
       //Set x_var and y_var values based on XVarStr and YVarStr
       MCSamples[mc_i].x_var[event_i] = GetPointerToKinematicParameter(XVarStr, mc_i, event_i);
-      //Give y_var _BAD_DOUBLE_ value for the 1D case since this won't be used
-      MCSamples[mc_i].y_var[event_i] = &(_BAD_DOUBLE_);
+      //Give y_var M3::_BAD_DOUBLE_ value for the 1D case since this won't be used
+      MCSamples[mc_i].y_var[event_i] = &(M3::_BAD_DOUBLE_);
       int bin = _hPDF1D->FindBin(*(MCSamples[mc_i].x_var[event_i]));
       
-      double low_lower_edge = _DEFAULT_RETURN_VAL_;
+      double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin==0) {
         low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
       } else {
@@ -1083,7 +1128,7 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
       double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
       double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
       
-      double upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin<(_hPDF1D->GetNbinsX()-2)) {
         upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
       } else {
@@ -1094,10 +1139,10 @@ void samplePDFFDBase::FindNominalBinAndEdges1D() {
 		  MCSamples[mc_i].NomXBin[event_i] = bin-1;
 	  } else {
 		  MCSamples[mc_i].NomXBin[event_i] = -1;
-		  low_edge = _DEFAULT_RETURN_VAL_;
-		  upper_edge = _DEFAULT_RETURN_VAL_;
-		  low_lower_edge = _DEFAULT_RETURN_VAL_;
-		  upper_upper_edge = _DEFAULT_RETURN_VAL_;
+		  low_edge = M3::_DEFAULT_RETURN_VAL_;
+		  upper_edge = M3::_DEFAULT_RETURN_VAL_;
+		  low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+		  upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
 	  }
       MCSamples[mc_i].NomYBin[event_i] = 0;
       
@@ -1201,7 +1246,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
       _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
       //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
       
-      double low_lower_edge = _DEFAULT_RETURN_VAL_;
+      double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin==0) {
         low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
       } else {
@@ -1211,7 +1256,7 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
       double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
       double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
       
-      double upper_upper_edge = _DEFAULT_RETURN_VAL_;
+      double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       if (bin<(_hPDF2D->GetNbinsX()-2)) {
         upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
       } else {
@@ -1222,10 +1267,10 @@ void samplePDFFDBase::FindNominalBinAndEdges2D() {
         MCSamples[mc_i].NomXBin[event_i] = bin_x-1;
       } else {
         MCSamples[mc_i].NomXBin[event_i] = -1;
-        low_edge = _DEFAULT_RETURN_VAL_;
-        upper_edge = _DEFAULT_RETURN_VAL_;
-        low_lower_edge = _DEFAULT_RETURN_VAL_;
-        upper_upper_edge = _DEFAULT_RETURN_VAL_;
+        low_edge = M3::_DEFAULT_RETURN_VAL_;
+        upper_edge = M3::_DEFAULT_RETURN_VAL_;
+        low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+        upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
       }
       MCSamples[mc_i].NomYBin[event_i] = bin_y-1; 
       if(MCSamples[mc_i].NomYBin[event_i] < 0){
@@ -1337,77 +1382,102 @@ void samplePDFFDBase::addData(TH2D* Data) {
 // ************************************************
 void samplePDFFDBase::SetupNuOscillator() {
 // ************************************************
-  OscillatorFactory* OscillFactory = new OscillatorFactory();  
+  OscillatorFactory* OscillFactory = new OscillatorFactory();
+  if (!OscCov) {
+    MACH3LOG_WARN("Attempted to setup NuOscillator without covarianceOsc object");
+    return;
+  }
 
-  NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
-  for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
-    if(OscCov){
+  //DB's explanation of EqualBinningPerOscChannel:
+  //In the situation where we are applying binning oscillation probabilities to a samplePDF object, it maybe the case that there is identical binning per oscillation channel
+  //In which case, and remembering that each NuOscillator::Oscillator object calculate the oscillation probabilities for all channels, we just have to create one Oscillator object and use the results from that
+  //This means that we can get upto a factor of 12 reduction in the calculation time of the oscillation probabilities, because we don't need to repeat the operation per oscillation channel
+
+  if (EqualBinningPerOscChannel) {
+    NuOscProbCalcers = std::vector<OscillatorBase*>(1);
+    LoggerPrint("NuOscillator",
+		[](const std::string& message) { MACH3LOG_INFO("{}", message); },
+		[this, &OscillFactory]() {
+		  this->NuOscProbCalcers[0] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
+		});
+
+    if (!NuOscProbCalcers[0]->EvalPointsSetInConstructor()) {
+      MACH3LOG_ERROR("Attempted to use equal binning per oscillation channel, but not binning has been set in the NuOscillator::Oscillator object");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    NuOscProbCalcers[0]->Setup();
+  } else {
+    NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
+    for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
       MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
-
+      
       LoggerPrint("NuOscillator",
-                  [](const std::string& message) { MACH3LOG_INFO("{}", message); },
-                  [this, iSample, &OscillFactory]() {
-                    this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
-                  });
-
+		  [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+		  [this, iSample, &OscillFactory]() {
+		    this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
+		  });
+      
       if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-        std::vector<M3::float_t> EnergyArray;
-        for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-          if (!MCSamples[iSample].isNC[iEvent]) {
-            EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
-          }
-        }
-        std::sort(EnergyArray.begin(),EnergyArray.end());
-        NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
-
-        //============================================================================
-        //DB Atmospheric only part
-        if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
-          std::vector<M3::float_t> CosineZArray;
-          for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-            //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-            if (!MCSamples[iSample].isNC[iEvent]) {
-              CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
-            }
-          }
-          std::sort(CosineZArray.begin(),CosineZArray.end());
-
-          NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
-        }
+	std::vector<M3::float_t> EnergyArray;
+	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+	  if (!MCSamples[iSample].isNC[iEvent]) {
+	    EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
+	  }
+	}
+	std::sort(EnergyArray.begin(),EnergyArray.end());
+	NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
+	
+	//============================================================================
+	//DB Atmospheric only part
+	if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+	  std::vector<M3::float_t> CosineZArray;
+	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+	    //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+	    if (!MCSamples[iSample].isNC[iEvent]) {
+	      CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
+	    }
+	  }
+	  std::sort(CosineZArray.begin(),CosineZArray.end());
+	  
+	  NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
+	}
       }
       NuOscProbCalcers[iSample]->Setup();
-    } 
+    }
+  }
+  
+  for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       // KS: Sry but if we use low memory we need to point to float not double...
 #ifdef _LOW_MEMORY_STRUCTS_
-      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+      MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity_F;
 #else
-      MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+      MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
 #endif
       if (MCSamples[iSample].isNC[iEvent]) {
         if (*MCSamples[iSample].nupdg[iEvent] != *MCSamples[iSample].nupdgUnosc[iEvent]) {
 #ifdef _LOW_MEMORY_STRUCTS_
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero_F;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Zero_F;
 #else
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Zero;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Zero;
 #endif
         } else {
 #ifdef _LOW_MEMORY_STRUCTS_
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity_F;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity_F;
 #else
-          MCSamples[iSample].osc_w_pointer[iEvent] = &Unity;
+          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
 #endif
         }
       } else {
-        int InitFlav = _BAD_INT_;
-        int FinalFlav = _BAD_INT_;
+        int InitFlav = M3::_BAD_INT_;
+        int FinalFlav = M3::_BAD_INT_;
 
         InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdgUnosc[iEvent]));
         FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iSample].nupdg[iEvent]));
 
-        if (InitFlav == _BAD_INT_ || FinalFlav == _BAD_INT_) {
+        if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
           MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples[iSample].nutype and the enum used within NuOscillator");
           MACH3LOG_ERROR("MCSamples[iSample].nupdgUnosc: {}", (*MCSamples[iSample].nupdgUnosc[iEvent]));
           MACH3LOG_ERROR("InitFlav: {}", InitFlav);
@@ -1416,19 +1486,39 @@ void samplePDFFDBase::SetupNuOscillator() {
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
-        if(OscCov){
-          if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
-            //Atmospherics
-            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
-          } else {
-            //Beam
-            MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[iSample]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
-          }
+	int Index = 0;
+	if (!EqualBinningPerOscChannel) {
+	  Index = static_cast<int>(iSample);
+	}
+	if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
+	  //Atmospherics
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[Index]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
+	} else {
+	  //Beam
+	  MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[Index]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
         }
+
+	
       } // end if NC
     } // end loop over events
   }// end loop over channels
   delete OscillFactory;
+
+  OscParams = OscCov->GetOscParsFromSampleName(SampleName);
+}
+
+std::string samplePDFFDBase::GetSampleName(int iSample) const {
+  //ETA - this is just to suppress a warning for an unused variable
+  (void)iSample;
+
+  //ETA - extra safety to make sure SampleName is actually set
+  // probably unnecessary due to the requirement for it to be in the yaml config
+  if(SampleName.length() == 0){
+    MACH3LOG_ERROR("No sample name provided");
+    MACH3LOG_ERROR("Please provide a SampleName in your configuration file: {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return SampleName;
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
@@ -1453,15 +1543,16 @@ void samplePDFFDBase::fillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
           break;
         default:
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
           MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
           MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+          throw MaCh3Exception(__FILE__, __LINE__);
           break;
       }
       MCSamples[i].nxsec_spline_pointers[j] = int(EventSplines.size());
@@ -1469,10 +1560,12 @@ void samplePDFFDBase::fillSplineBins() {
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       MCSamples[i].xsec_spline_pointers[j].resize(MCSamples[i].nxsec_spline_pointers[j]);
-      for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){          
+      for(int spline=0; spline<MCSamples[i].nxsec_spline_pointers[j]; spline++){
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1], EventSplines[spline][2], 
-            EventSplines[spline][3], EventSplines[spline][4], EventSplines[spline][5], EventSplines[spline][6]);
+        MCSamples[i].xsec_spline_pointers[j][spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                                                 EventSplines[spline][2], EventSplines[spline][3],
+                                                                                 EventSplines[spline][4], EventSplines[spline][5],
+                                                                                 EventSplines[spline][6]);
       }
     }
   }
@@ -1481,7 +1574,6 @@ void samplePDFFDBase::fillSplineBins() {
 // ************************************************
 double samplePDFFDBase::GetLikelihood() {
 // ************************************************
-
   if (samplePDFFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1493,11 +1585,11 @@ double samplePDFFDBase::GetLikelihood() {
   
   double negLogL = 0.;
   #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:negLogL)
+  #pragma omp parallel for collapse(2) reduction(+:negLogL)
   #endif
-  for (int xBin = 0; xBin < nXBins; ++xBin)
+  for (int yBin = 0; yBin < nYBins; ++yBin)
   {
-    for (int yBin = 0; yBin < nYBins; ++yBin)
+    for (int xBin = 0; xBin < nXBins; ++xBin)
     {
       const double DataVal = samplePDFFD_data[yBin][xBin];
       const double MCPred = samplePDFFD_array[yBin][xBin];
@@ -1521,12 +1613,13 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   
   fdobj->nEvents = nEvents_;
   fdobj->flavourName = oscchan_flavnames[iSample];
+  fdobj->flavourName_Latex = oscchan_flavnames_Latex[iSample];
   fdobj->ChannelIndex = iSample;
   
   int nEvents = fdobj->nEvents;
-  fdobj->x_var.resize(nEvents, &Unity);
-  fdobj->y_var.resize(nEvents, &Unity);
-  fdobj->rw_etru.resize(nEvents, &Unity);
+  fdobj->x_var.resize(nEvents, &M3::Unity);
+  fdobj->y_var.resize(nEvents, &M3::Unity);
+  fdobj->rw_etru.resize(nEvents, &M3::Unity);
   fdobj->XBin.resize(nEvents, -1);
   fdobj->YBin.resize(nEvents, -1);
   fdobj->NomXBin.resize(nEvents, -1);
@@ -1535,7 +1628,7 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
-  fdobj->mode.resize(nEvents, &Unity);
+  fdobj->mode.resize(nEvents, &M3::Unity);
   fdobj->nxsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
@@ -1549,11 +1642,10 @@ void samplePDFFDBase::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->total_weight_pointers.resize(nEvents);
   fdobj->Target.resize(nEvents, 0);
 #ifdef _LOW_MEMORY_STRUCTS_
-  fdobj->osc_w_pointer.resize(nEvents, &Unity_F);
+  fdobj->osc_w_pointer.resize(nEvents, &M3::Unity_F);
 #else
-  fdobj->osc_w_pointer.resize(nEvents, &Unity); 
+  fdobj->osc_w_pointer.resize(nEvents, &M3::Unity);
 #endif
-  fdobj->SampleDetID = -1;
 
   for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
     fdobj->isNC[iEvent] = false;
@@ -1575,8 +1667,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
-  SplineHandler->PrintArrayDimension();
+  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
   SplineHandler->CountNumberOfLoadedSplines(false, 1);
   SplineHandler->TransferToMonolith();
 
@@ -1588,10 +1679,9 @@ void samplePDFFDBase::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< std::vector<double> >& SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
-
 
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
@@ -1646,4 +1736,406 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   Selection = tmp_Selection;
 
   return _h1DVar;
+}
+// ************************************************
+TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
+                                   const std::vector< std::vector<double> >& SelectionVec,
+                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+// ************************************************
+
+  //DB Grab the associated enum with the argument string
+  int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+  int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
+
+  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
+  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
+  std::vector< std::vector<double> > tmp_Selection = Selection;
+  std::vector< std::vector<double> > SelectionVecToApply;
+
+  //DB Add all the predefined selections to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
+    SelectionVecToApply.emplace_back(Selection[iSelec]);
+  }
+
+  //DB Add all requested cuts from the argument to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  }
+
+  //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
+  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
+    if (SelectionVecToApply[iSelec].size()!=3) {
+      MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  //DB Set the member variable to be the cuts to apply
+  Selection = SelectionVecToApply;
+
+  //DB Define the histogram which will be returned
+  TH2D* _h2DVar;
+  if (AxisX && AxisY) {
+    _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
+  } else {
+    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrX);
+    std::vector<double> yBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrY);
+    _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
+  }
+
+  //DB Loop over all events
+  for (int iSample=0;iSample<getNMCSamples();iSample++) {
+    for (int iEvent=0;iEvent<getNEventsInSample(iSample);iEvent++) {
+      if (IsEventSelected(iSample,iEvent)) {
+        double Weight = GetEventWeight(iSample,iEvent);
+        if (WeightStyle==1) {
+          Weight = 1.;
+        }
+        double VarX = ReturnKinematicParameter(ProjectionVar_IntX,iSample,iEvent);
+	double VarY = ReturnKinematicParameter(ProjectionVar_IntY,iSample,iEvent);
+        _h2DVar->Fill(VarX,VarY,Weight);
+      }
+    }
+  }
+  
+  //DB Reset the saved selection
+  Selection = tmp_Selection;
+
+  return _h2DVar;
+}
+
+// ************************************************
+int samplePDFFDBase::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
+// ************************************************
+  auto it = KinematicParameters->find(KinematicParameterStr);
+  if (it != KinematicParameters->end()) return it->second;
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameterStr);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return -999;
+}
+
+// ************************************************
+std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
+// ************************************************
+  auto it = ReversedKinematicParameters->find(KinematicParameter);
+  if (it != ReversedKinematicParameters->end()) {
+    return it->second;
+  }
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameter);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return "";
+}
+
+TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+  bool fChannel;
+  bool fMode;
+
+  if (kChannelToFill!=-1) {
+    if (kChannelToFill>getNMCSamples()) {
+      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", getNMCSamples());
+      MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
+      MACH3LOG_ERROR("Exiting.");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fChannel = true;
+  } else {
+    fChannel = false;
+  }
+
+  if (kModeToFill!=-1) {
+    if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
+      MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
+      MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
+      MACH3LOG_ERROR("Exiting..");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fMode = true;
+  } else {
+    fMode = false;
+  }
+
+  std::vector< std::vector<double> > SelectionVec;
+
+  if (fMode) {
+    std::vector<double> SelecMode(3);
+    SelecMode[0] = ReturnKinematicParameterFromString("Mode");
+    SelecMode[1] = kModeToFill;
+    SelecMode[2] = kModeToFill+1;
+    SelectionVec.push_back(SelecMode);
+  }
+
+  if (fChannel) {
+    std::vector<double> SelecChannel(3);
+    SelecChannel[0] = ReturnKinematicParameterFromString("OscillationChannel");
+    SelecChannel[1] = kChannelToFill;
+    SelecChannel[2] = kChannelToFill+1;
+    SelectionVec.push_back(SelecChannel);
+  }
+
+  return get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
+}
+
+TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+  bool fChannel;
+  bool fMode;
+
+  if (kChannelToFill!=-1) {
+    if (kChannelToFill>getNMCSamples()) {
+      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", getNMCSamples());
+      MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
+      MACH3LOG_ERROR("Exiting.");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fChannel = true;
+  } else {
+    fChannel = false;
+  }
+
+  if (kModeToFill!=-1) {
+    if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
+      MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
+      MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
+      MACH3LOG_ERROR("Exiting..");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    fMode = true;
+  } else {
+    fMode = false;
+  }
+
+  std::vector< std::vector<double> > SelectionVec;
+
+  if (fMode) {
+    std::vector<double> SelecMode(3);
+    SelecMode[0] = ReturnKinematicParameterFromString("Mode");
+    SelecMode[1] = kModeToFill;
+    SelecMode[2] = kModeToFill+1;
+    SelectionVec.push_back(SelecMode);
+  }
+
+  if (fChannel) {
+    std::vector<double> SelecChannel(3);
+    SelecChannel[0] = ReturnKinematicParameterFromString("OscillationChannel");
+    SelecChannel[1] = kChannelToFill;
+    SelecChannel[2] = kChannelToFill+1;
+    SelectionVec.push_back(SelecChannel);
+  }
+
+  return get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
+}
+
+void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
+  int space = 14;
+
+  bool printToFile=false;
+  if (OutputFileName.CompareTo("/dev/null")) {printToFile = true;}
+
+  bool printToCSV=false;
+  if(OutputCSVFileName.CompareTo("/dev/null")) printToCSV=true;
+  
+  std::ofstream outfile;
+  if (printToFile) {
+    outfile.open(OutputFileName.Data(), std::ios_base::app);
+    outfile.precision(7);
+  }
+
+  std::ofstream outcsv;
+  if(printToCSV){
+    outcsv.open(OutputCSVFileName, std::ios_base::app); // Appened to CSV
+    outcsv.precision(7);
+  }
+
+  double PDFIntegral = 0.;
+
+  std::vector< std::vector< TH1* > > IntegralList;
+  IntegralList.resize(Modes->GetNModes());
+
+  std::vector<double> ChannelIntegral;
+  ChannelIntegral.resize(getNMCSamples());
+  for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
+  
+  for (int i=0;i<Modes->GetNModes();i++) {
+    if (GetNDim()==1) {
+      IntegralList[i] = ReturnHistsBySelection1D(XVarStr,1,i,WeightStyle);
+    } else {
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle));
+    }
+  }
+
+  MACH3LOG_INFO("-------------------------------------------------");
+
+  if (printToFile) {
+    outfile << "\\begin{table}[ht]" << std::endl;
+    outfile << "\\begin{center}" << std::endl;
+    outfile << "\\caption{Integral breakdown for sample: " << GetTitle() << "}" << std::endl;
+    outfile << "\\label{" << GetTitle() << "-EventRate}" << std::endl;
+    
+    TString nColumns;
+    for (int i=0;i<getNMCSamples();i++) {nColumns+="|c";}
+    nColumns += "|c|";
+    outfile << "\\begin{tabular}{|l" << nColumns.Data() << "}" << std::endl;
+    outfile << "\\hline" << std::endl;
+  }
+
+  if(printToCSV){
+    // HW Probably a better way but oh well, here I go making MaCh3 messy again
+    outcsv<<"Integral Breakdown for sample :"<<GetTitle()<<"\n";
+  }
+  
+  MACH3LOG_INFO("Integral breakdown for sample: {}", GetTitle());
+  MACH3LOG_INFO("");
+
+  if (printToFile) {outfile << std::setw(space) << "Mode:";}
+  if(printToCSV) {outcsv<<"Mode,";}
+
+  std::string table_headings = fmt::format("| {:<8} |", "Mode");
+  std::string table_footline = "------------"; //Scalable table horizontal line
+  for (int i=0;i<getNMCSamples();i++) {
+    table_headings += fmt::format(" {:<17} |", MCSamples[i].flavourName);
+    table_footline += "--------------------";
+    if (printToFile) {outfile << "&" << std::setw(space) << MCSamples[i].flavourName_Latex << " ";}
+    if (printToCSV)  {outcsv << MCSamples[i].flavourName << ",";}
+  }
+  if (printToFile) {outfile << "&" << std::setw(space) << "Total:" << "\\\\ \\hline" << std::endl;}
+  if (printToCSV)  {outcsv <<"Total\n";}
+  table_headings += fmt::format(" {:<10} |", "Total");
+  table_footline += "-------------";
+
+  MACH3LOG_INFO("{}", table_headings);
+  MACH3LOG_INFO("{}", table_footline);
+  
+  for (unsigned int i=0;i<IntegralList.size();i++) {
+    double ModeIntegral = 0;
+    if (printToFile) {outfile << std::setw(space) << Modes->GetMaCh3ModeName(i);}
+    if(printToCSV)   {outcsv << Modes->GetMaCh3ModeName(i) << ",";}
+
+    table_headings = fmt::format("| {:<8} |", Modes->GetMaCh3ModeName(i)); //Start string with mode name
+
+    for (unsigned int j=0;j<IntegralList[i].size();j++) {
+      double Integral = IntegralList[i][j]->Integral();
+
+      if (Integral<1e-100) {Integral=0;}
+
+      ModeIntegral += Integral;
+      ChannelIntegral[j] += Integral;
+      PDFIntegral += Integral;
+      
+      if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",Integral) << " ";}
+      if (printToCSV)  {outcsv << Form("%4.5f", Integral) << ",";}
+
+      table_headings += fmt::format(" {:<17.4f} |", Integral);
+    }
+    if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",ModeIntegral) <<  " \\\\ \\hline" << std::endl;}
+    if (printToCSV)  {outcsv << Form("%4.5f", ModeIntegral) << "\n";}
+    
+    table_headings += fmt::format(" {:<10.4f} |", ModeIntegral);
+    
+    MACH3LOG_INFO("{}", table_headings);
+  }
+
+  if (printToFile) {outfile << std::setw(space) << "Total:";}
+  if (printToCSV)  {outcsv << "Total,";}
+
+  //Clear the table_headings to print last row of totals
+  table_headings = fmt::format("| {:<8} |", "Total");
+  for (unsigned int i=0;i<ChannelIntegral.size();i++) {
+    if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",ChannelIntegral[i]) << " ";}
+    if (printToCSV)  {outcsv << Form("%4.5f", ChannelIntegral[i]) << ",";}
+    table_headings += fmt::format(" {:<17.4f} |", ChannelIntegral[i]);
+  }
+  if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",PDFIntegral) << " \\\\ \\hline" << std::endl;}
+  if (printToCSV)  {outcsv << Form("%4.5f", PDFIntegral) << "\n\n\n\n";} // Let's have a few new lines!
+
+  table_headings += fmt::format(" {:<10.4f} |", PDFIntegral);
+  MACH3LOG_INFO("{}", table_headings);
+  MACH3LOG_INFO("{}", table_footline);
+
+  if (printToFile) {
+    outfile << "\\end{tabular}" << std::endl;
+    outfile << "\\end{center}" << std::endl;
+    outfile << "\\end{table}" << std::endl;
+  }
+
+  MACH3LOG_INFO("");
+
+  if (printToFile) {
+    outfile << std::endl;
+    outfile.close();
+  }
+}
+
+std::vector<TH1*> samplePDFFDBase::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+  std::vector<TH1*> hHistList;
+  std::string legendEntry;
+
+  if (THStackLeg != nullptr) {delete THStackLeg;}
+  THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
+
+  int iMax = -1;
+  if (Selection1 == 0) {
+    iMax = Modes->GetNModes();
+  }
+  if (Selection1 == 1) {
+    iMax = getNMCSamples();
+  }
+  if (iMax == -1) {
+    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  for (int i=0;i<iMax;i++) {
+    if (Selection1==0) {
+      hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
+      THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
+
+      hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
+      hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
+    }
+    if (Selection1==1) {
+      hHistList.push_back(get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
+      THStackLeg->AddEntry(hHistList[i],(MCSamples[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
+    }
+  }
+
+  return hHistList;
+}
+
+std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis, TAxis* YAxis) {
+  std::vector<TH2*> hHistList;
+
+  int iMax = -1;
+  if (Selection1 == 0) {
+    iMax = Modes->GetNModes();
+  }
+  if (Selection1 == 1) {
+    iMax = getNMCSamples();
+  }
+  if (iMax == -1) {
+    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  for (int i=0;i<iMax;i++) {
+    if (Selection1==0) {
+      hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
+    }
+    if (Selection1==1) {
+      hHistList.push_back(get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
+    }
+  }
+
+  return hHistList;
+}
+
+THStack* samplePDFFDBase::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+  std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
+  THStack* StackHist = new THStack((GetTitle()+"_"+KinematicProjection+"_Stack").c_str(),"");
+  for (unsigned int i=0;i<HistList.size();i++) {
+    StackHist->Add(HistList[i]);
+  }
+  return StackHist;
 }

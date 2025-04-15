@@ -1,12 +1,9 @@
 #pragma once
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TMatrixT.h"
 #include "TMatrixDSym.h"
@@ -24,26 +21,10 @@
 #include "TMatrixDSymEigen.h"
 #include "TMatrixDEigen.h"
 #include "TDecompSVD.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
-namespace MaCh3Utils
+namespace M3
 {
-  /// @brief number of threads which we need for example for TRandom3
-  inline int GetNThreads()
-  {
-    #ifdef MULTITHREAD
-    int nThreads = omp_get_max_threads();
-    #else
-    int nThreads = 1;
-    #endif
-
-    return nThreads;
-  }
-
   /// @brief CW: Multi-threaded matrix multiplication
   inline double* MatrixMult(double *A, double *B, int n) {
     //CW: First transpose to increse cache hits

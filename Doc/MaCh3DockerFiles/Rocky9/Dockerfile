@@ -5,6 +5,8 @@ FROM kamilskwarczynski/nukamil:latest AS mach3_build
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
+LABEL compiler="GNU 11.4.1"
+LABEL root_version="v6.30.04"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
@@ -40,6 +42,13 @@ ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
+
+#KS: If GPU is not being compiled this must mean ill configured cmake somewhere in MaCh3
+RUN if ! mach3-config --has-feature GPU; then \
+        echo "ERROR: MaCh3 was built without GPU support." >&2; \
+        exit 1; \
+    fi
+
 RUN pip install .
 
 # Start from MaCh3 install dir

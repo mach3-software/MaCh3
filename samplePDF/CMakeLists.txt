@@ -20,7 +20,7 @@ target_include_directories(SamplePDF PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-if(NOT CPU_ONLY)
+if(MaCh3_GPU_ENABLED)
     set_target_properties(SamplePDF PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     set_property(TARGET SamplePDF PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()

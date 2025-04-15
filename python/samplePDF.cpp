@@ -13,6 +13,16 @@ public:
     using samplePDFBase::samplePDFBase;
 
     /* Trampoline (need one for each virtual function) */
+    std::string GetSampleName(int iSample) const override {
+        PYBIND11_OVERRIDE_PURE(
+            std::string,          /* Return type */
+            samplePDFBase, /* Parent class */
+            GetSampleName, /* Name of function in C++ (must match Python name) */
+            iSample         /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
     void reweight() override {
         PYBIND11_OVERRIDE_PURE(
             void,          /* Return type */
@@ -113,7 +123,7 @@ public:
         );
     }
 
-    int ReturnKinematicParameterFromString(std::string) override {
+    int ReturnKinematicParameterFromString(std::string) {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,                     /* Return type */
             samplePDFFDBase,            /* Parent class */
@@ -123,7 +133,7 @@ public:
         );
     }
     
-    std::string ReturnStringFromKinematicParameter(int) override {
+    std::string ReturnStringFromKinematicParameter(int) {
         PYBIND11_OVERRIDE_PURE_NAME(
             std::string,                /* Return type */
             samplePDFFDBase,            /* Parent class */
@@ -198,6 +208,15 @@ public:
                            /* Argument(s) */
         );
     }
+
+    void RegisterFunctionalParameters() override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,
+            samplePDFFDBase,
+            "register_functional_parameters",
+            RegisterFunctionalParameters
+        );
+    }
 };
 
 void initSamplePDF(py::module &m){
@@ -212,7 +231,7 @@ void initSamplePDF(py::module &m){
         .value("Barlow_Beeston", TestStatistic::kBarlowBeeston)
         .value("Ice_Cube", TestStatistic::kIceCube)
         .value("Pearson", TestStatistic::kPearson)
-        .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmottele)
+        .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmotteleb)
         .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
 
     py::class_<samplePDFBase, PySamplePDFBase /* <--- trampoline*/>(m_sample_pdf, "SamplePDFBase")

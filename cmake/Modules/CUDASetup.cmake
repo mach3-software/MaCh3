@@ -1,11 +1,6 @@
 enable_language(CUDA)
 add_compile_definitions(CUDA)
 
-#KS: If Debug is not defined disable it by default
-if(NOT DEFINED MaCh3_DEBUG_ENABLED)
-  set(MaCh3_DEBUG_ENABLED FALSE)
-endif()
-
 EXECUTE_PROCESS( COMMAND uname -m OUTPUT_VARIABLE OS_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(NOT "x86_64 " STREQUAL "${OS_ARCH} ")

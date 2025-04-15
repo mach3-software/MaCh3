@@ -6,12 +6,14 @@ samplePDFBase::samplePDFBase()
   rnd = new TRandom3(0);
   dathist = NULL;
   dathist2d = NULL;
+  Modes = nullptr;
 }
 
 samplePDFBase::~samplePDFBase()
 {
   if(dathist != NULL) delete dathist;
   if(dathist2d != NULL) delete dathist2d;
+  if(Modes != nullptr) delete Modes;
   delete rnd;
 }
 
@@ -19,7 +21,7 @@ void samplePDFBase::addData(std::vector<double> &data)
 {
   if(nDims != 0 && nDims != 1)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 1", nDims);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
@@ -38,8 +40,7 @@ void samplePDFBase::addData(std::vector< std::vector <double> > &data)
 {
   if(nDims != 0 && nDims != 2)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 2", nDims);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 2;  
@@ -57,12 +58,11 @@ void samplePDFBase::addData(TH1D* binneddata)
 {
   if(nDims != 0 && nDims != 1)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 1"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 1", nDims);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
-  std::cout << "adding 1D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
+  MACH3LOG_INFO("Adding 1D data histogram: {} with {} events.", binneddata->GetName(), binneddata->Integral());
   //KS: If exist delete to avoid memory leak
   if(dathist != NULL) delete dathist;
   dathist = binneddata;
@@ -72,12 +72,11 @@ void samplePDFBase::addData(TH2D* binneddata)
 {
   if(nDims != 0 && nDims != 2)
   {
-    std::cerr<<"You have initialised this sample with "<<nDims<<" dimensions already and now trying to set dimentison to 2"<<std::endl;
-    std::cerr<<"This will not work, you can find me here "<< __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 2", nDims);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 2;
-  std::cout << "adding 2D data histogram : " << binneddata -> GetName() << " with " << binneddata->Integral() << " events." << std::endl;
+  MACH3LOG_INFO("Adding 2D data histogram: {} with {} events.", binneddata->GetName(), binneddata->Integral());
   //KS: If exist delete to avoid memory leak
   if(dathist2d != NULL) delete dathist;
   dathist2d = binneddata;
@@ -105,8 +104,8 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
   double negLogL = 0;
   if(mc > 0 && data > 0)
   {
-     //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-     negLogL += (mc - data + data * std::log(data/mc));
+    //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+    negLogL += (mc - data + data * std::log(data/mc));
   }
   else if(mc > 0 && data == 0) negLogL += mc;
   
@@ -117,7 +116,6 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc) const {
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
 double samplePDFBase::getTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
-
   // Need some MC
   if (mc == 0) return 0.0;
 
@@ -140,10 +138,12 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       double penalty = 0;
       // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
       const double fractional = std::sqrt(w2)/mc;
+      // fractional^2 to avoid doing same operation several times
+      const double fractional2 = fractional*fractional;
       // b in quadratic equation
-      const double temp = mc*fractional*fractional-1;
+      const double temp = mc*fractional2-1;
       // b^2 - 4ac in quadratic equation
-      const double temp2 = temp*temp + 4*data*fractional*fractional;
+      const double temp2 = temp*temp + 4*data*fractional2;
       if (temp2 < 0) {
         MACH3LOG_ERROR("Negative square root in Barlow Beeston coefficient calculation!");
         throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -152,7 +152,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
       const double beta = (-1*temp+sqrt(temp2))/2.;
       newmc = mc*beta;
       // And penalise the movement in beta relative the mc uncertainty
-      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional2);
       else penalty = 0;
 
       // Calculate the new Poisson likelihood
@@ -169,7 +169,7 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     }
     break;
     //KS: Alternative calculation of Barlow-Beeston following Hans Dembinski and Ahmed Abdelmottele arXiv:2206.12346v2
-    case (kDembinskiAbdelmottele):
+    case (kDembinskiAbdelmotteleb):
     {
       //KS: code follows authors implementation from:
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
@@ -240,27 +240,16 @@ double samplePDFBase::getTestStatLLH(const double data, const double mc, const d
     {
       //Just call getTestStatLLH which doesn't take in weights
       //and is a Poisson likelihood comparison.
-      return getTestStatLLH(data, mc);//stat;
+      return getTestStatLLH(data, mc);
     }
     break;
-
+    case TestStatistic::kNTestStatistics:
+      MACH3LOG_ERROR("kNTestStatistics is not a valid TestStatistic!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     default:
-    std::cerr << "Couldn't find TestStatistic " << fTestStatistic << " exiting!" << std::endl;
+    MACH3LOG_ERROR("Couldn't find TestStatistic {} exiting!", static_cast<int>(fTestStatistic));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   } // end switch
-}
-
-// ***************************************************************************
-//KS: Sample getter
-std::string samplePDFBase::GetSampleName(int Sample) {
-// ***************************************************************************
-  if(Sample > nSamples)
-  {
-   std::cerr<<" You are asking for sample "<< Sample <<" I only have "<< nSamples<<std::endl;
-   throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  return SampleName[Sample];
 }
 
 // ***************************************************************************

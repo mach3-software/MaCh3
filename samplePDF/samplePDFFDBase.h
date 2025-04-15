@@ -9,6 +9,9 @@
 #include "samplePDF/samplePDFBase.h"
 #include "samplePDF/FarDetectorCoreInfoStruct.h"
 
+#include "THStack.h"
+#include "TLegend.h"
+
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;
 
@@ -21,11 +24,18 @@ public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
   samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  /// @brief destructor
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName() const {return samplename;}
+  std::string GetSampleName(int iSample = 0) const override;
+  std::string GetTitle() const {return SampleTitle;}
 
+  std::string GetXBinVarName() {return XVarStr;}
+  std::string GetYBinVarName() {return YVarStr;}
+
+  void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
+  
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
@@ -67,22 +77,45 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
-  TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
+  TH1* get1DVarHist(const std::string& ProjectionVar, const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                    const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
-  //ETA - new function to generically convert a string from xsec cov to a kinematic type
-  virtual int ReturnKinematicParameterFromString(std::string KinematicStr) = 0;
-  virtual std::string ReturnStringFromKinematicParameter(int KinematicVariable) = 0;
+  TH1* get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+
+  TH1 *getModeHist1D(int s, int m, int style = 0) {
+    return get1DVarHistByModeAndChannel(XVarStr,m,s,style);
+  }
+  TH2 *getModeHist2D(int s, int m, int style = 0) {
+    return get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
+  }
+
+  std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
+  THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  TLegend* ReturnStackHistLegend() {return THStackLeg;}
+  
+  /// ETA function to generically convert a string from xsec cov to a kinematic type
+  int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
+  /// ETA function to generically convert a kinematic type from xsec cov to a string
+  std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
+
+  /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
+  void SetupKinematicMap();
 
   /// @todo abstract the spline initialisation completely to core
   /// @brief initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up
   virtual void SetupSplines() = 0;
 
   //DB Require all objects to have a function which reads in the MC
-  // @brief Initialise any variables that your experiment specific samplePDF needs
+  /// @brief Initialise any variables that your experiment specific samplePDF needs
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
@@ -122,7 +155,7 @@ public:
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
   virtual void SetupFunctionalParameters();
   /// @brief HH - a helper function for RegisterFunctionalParameter
-  void RegisterIndividualFuncPar(std::string fpName, int fpEnum, FuncParFuncType fpFunc);
+  void RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
@@ -147,15 +180,13 @@ public:
   // --------------------------------
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
-  bool IsEventSelected(const std::vector<std::string>& ParameterStr, const int iSample, const int iEvent);
-  bool IsEventSelected(const std::vector<std::string>& ParameterStr, const std::vector<std::vector<double>> &SelectionCuts, const int iSample, const int iEvent);
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcXsecNormsBins(int iSample);
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcXsecWeightSpline(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcXsecWeightNorm(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightNorm(const int iSample, const int iEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -166,6 +197,7 @@ public:
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
   virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
@@ -222,28 +254,32 @@ public:
   covarianceXsec *XsecCov = nullptr;
   covarianceOsc *OscCov = nullptr;
 
+  /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
+  bool EqualBinningPerOscChannel = false;
+  
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
-  int nDimensions = _BAD_INT_;
+  int nDimensions = M3::_BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  int SampleDetID = _BAD_INT_;
+  std::string SampleName;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
   /// @brief the name of this sample e.g."muon-like"
-  std::string samplename;
+  std::string SampleTitle;
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
-
+  /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
+  std::vector<const double*> OscParams;
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
   /// @brief the Number of selections in the 
-  int NSelections = _BAD_INT_;
+  int NSelections = M3::_BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
@@ -257,14 +293,31 @@ public:
   std::vector< std::vector<double> > Selection;
    //===========================================================================
 
+  /// Mapping between string and kinematic enum
+  const std::unordered_map<std::string, int>* KinematicParameters;
+  /// Mapping between kinematic enum and string
+  const std::unordered_map<int, std::string>* ReversedKinematicParameters;
+
   std::unique_ptr<manager> SampleManager;
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 
   std::vector<std::string> oscchan_flavnames;
+  std::vector<std::string> oscchan_flavnames_Latex;
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
-  std::vector<int> sample_vecno;
   std::vector<int> sample_nupdg;
   std::vector<int> sample_nupdgunosc;
+
+  std::unordered_map<std::string, double> _modeNomWeightMap;
+  
+  //===============================================================================
+  /// DB Miscellaneous Variables
+  TLegend* THStackLeg = nullptr;
+  //===============================================================================
+
+  /// KS:Super hacky to update W2 or not
+  bool FirstTimeW2;
+  /// KS:Super hacky to update W2 or not
+  bool UpdateW2;
 };

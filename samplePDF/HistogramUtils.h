@@ -1,20 +1,14 @@
 #pragma once
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "samplePDF/Structs.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TGraphAsymmErrors.h"
 #include "TObjString.h"
 #include "TRandom3.h"
-#pragma GCC diagnostic pop
-
-// MaCh3 inlcudes
-#include "samplePDF/Structs.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file HistogramUtils.h
 /// @author Will Parker
@@ -93,6 +87,22 @@ TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH
 /// @param violin hist that will be filled
 /// @param hist_1d refence hist from which we take entries to be filled
 void FastViolinFill(TH2D* violin, TH1D* hist_1d);
+
+/// @brief Converts a vector of pointers from a derived type to a base type.
+/// @tparam Derived The derived class type.
+/// @tparam Base The base class type.
+/// @param inputVec A `std::vector` of pointers to `Derived` objects.
+/// @return A `std::vector` of pointers to `Base` objects.
+template <typename Derived, typename Base>
+std::vector<Base*> CastVector(const std::vector<Derived*>& inputVec) {
+  std::vector<Base*> outputVec;
+  // Reserve space for efficiency
+  outputVec.reserve(inputVec.size());
+  for (auto* ptr : inputVec) {
+    outputVec.push_back(static_cast<Base*>(ptr));
+  }
+  return outputVec;
+}
 
 /// @brief Helper to check if files exist or not
 inline std::string file_exists(std::string filename) {

@@ -20,7 +20,7 @@ class SMonolith : public SplineBase {
               const bool SaveFlatTree = false);
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
-    SMonolith(std::string FileName);
+    SMonolith(const std::string& FileName);
     /// @brief Destructor for SMonolith class.
     virtual ~SMonolith();
 
@@ -28,10 +28,7 @@ class SMonolith : public SplineBase {
     void Evaluate() override;
 
     /// @brief Get class name
-    inline std::string GetName()const {return "SplineMonolith";};
-
-    /// @brief Get number of spline parameters
-    short int GetNParams()const {return nParams;};
+    inline std::string GetName() const {return "SplineMonolith";};
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     void SynchroniseMemTransfer();
@@ -51,7 +48,7 @@ class SMonolith : public SplineBase {
     /// The returned gpu weights, read by the GPU
     float* cpu_weights;
     /// KS: This holds the total CPU weights that gets read in samplePDFND
-    float *cpu_total_weights;
+    float* cpu_total_weights;
 
   private:
     /// @brief KS: Set everything to null etc.
@@ -93,8 +90,6 @@ class SMonolith : public SplineBase {
     /// @param manyArray Array holding coefficients for each knot
     inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
 
-    /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
-    inline void FindSplineSegment() override;
     /// @brief CPU based code which eval weight for each spline
     inline void CalcSplineWeights() override;
     /// @brief Calc total event weight
@@ -108,20 +103,11 @@ class SMonolith : public SplineBase {
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
     inline void LoadSplineFile(std::string FileName);
 
-    /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
-    /// Method identical to TSpline3::Eval(double) but faster because less operations
-    std::vector<FastSplineInfo> SplineInfoArray;
-    /// Store currently found segment they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
-    short int *segments;
-    /// Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
-    float *ParamValues;
     /// This holds pointer to parameter position which we later copy paste it to GPU
     std::vector< const double* > splineParsPointer;
 
     /// Number of events
     unsigned int NEvents;
-    /// Number of NIWG parameters that have splines
-    short int nParams;
     /// Max knots for production
     short int _max_knots;
     /// holds the index for good splines; don't do unsigned since starts with negative value!

@@ -6,20 +6,21 @@ set(HEADERS
     Monitor.h
     MaCh3Exception.h
     gpuUtils.cuh
+    Core.h
 )
 
 add_library(Manager SHARED
     manager.cpp
     MaCh3Modes.cpp
     Monitor.cpp
-    $<$<NOT:$<BOOL:${CPU_ONLY}>>:gpuUtils.cu>
+    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuUtils.cu>
 )
 
 set_target_properties(Manager PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Manager)
 
-if(NOT CPU_ONLY)
+if(MaCh3_GPU_ENABLED)
     set_target_properties(Manager PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
     set_property(TARGET Manager PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES}) 

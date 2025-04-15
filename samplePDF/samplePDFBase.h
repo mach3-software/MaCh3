@@ -3,13 +3,13 @@
 //C++ includes
 #include <assert.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+//MaCh3 includes
+#include "samplePDF/Structs.h"
+#include "samplePDF/HistogramUtils.h"
+#include "manager/manager.h"
+#include "manager/MaCh3Modes.h"
+
+_MaCh3_Safe_Include_Start_ //{
 //ROOT includes
 #include "TTree.h"
 #include "TH1D.h"
@@ -19,12 +19,7 @@
 #include "TROOT.h"
 #include "TRandom3.h"
 #include "TString.h"
-#pragma GCC diagnostic pop
-
-//MaCh3 includes
-#include "samplePDF/Structs.h"
-#include "samplePDF/HistogramUtils.h"
-#include "manager/manager.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 class samplePDFBase
@@ -35,8 +30,8 @@ class samplePDFBase
   virtual ~samplePDFBase();
 
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
-  virtual inline std::string GetName()const {return "samplePDF";};
-  virtual std::string GetSampleName(int Sample);
+  virtual inline std::string GetTitle()const {return "samplePDF";};
+  virtual std::string GetSampleName(int Sample) const = 0;
   virtual inline double getSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
   /// @brief Return pointer to MaCh3 modes
@@ -109,10 +104,8 @@ protected:
   M3::int_t nSamples;
   /// KS: number of dimension for this sample
   int nDims;
-  /// Name of Sample
-  std::vector<std::string> SampleName;
 
-  //GetterForModes
+  /// Holds information about used Generator and MaCh3 modes
   MaCh3Modes* Modes;
 
   TH1D *dathist; // tempstore for likelihood calc
@@ -123,6 +116,4 @@ protected:
   TH2D*_hPDF2D;
 
   TRandom3* rnd;
-
-  double pot;
 };

@@ -4,13 +4,12 @@
 #include <cstdlib>
 #include <iomanip>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3  includes
+#include "manager/MaCh3Logger.h"
+#include "splines/SplineStructs.h"
+#include "splines/SplineCommon.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT include
 #include "TFile.h"
 #include "TH1F.h"
@@ -21,16 +20,7 @@
 #include "TCanvas.h"
 #include "TStyle.h"
 #include "TTree.h"
-#pragma GCC diagnostic pop
-
-#ifdef MULTITHREAD
-#include "omp.h"
-#endif
-
-// MaCh3  includes
-#include "manager/MaCh3Logger.h"
-#include "splines/SplineStructs.h"
-#include "splines/SplineCommon.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Base class for calculating weight from spline
 class SplineBase {
@@ -46,10 +36,12 @@ class SplineBase {
     /// @brief Get class name
     virtual inline std::string GetName()const {return "SplineBase";};
 
-  protected:
+    /// @brief Get number of spline parameters
+    short int GetNParams()const {return nParams;};
 
+  protected:
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
-    virtual void FindSplineSegment() = 0;
+    void FindSplineSegment();
     /// @brief CPU based code which eval weight for each spline
     virtual void CalcSplineWeights() = 0;
     /// @brief Calc total event weight
@@ -60,4 +52,15 @@ class SplineBase {
     /// @param nPoints number of knots
     /// @param coeffs Array holding coefficients for each knot
     void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
+
+    /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
+    /// Method identical to TSpline3::Eval(double) but faster because less operations
+    std::vector<FastSplineInfo> SplineInfoArray;
+    /// Store currently found segment they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
+    /// @warning this is being used sometimes by GPU, therefore must be raw pointer!
+    short int *SplineSegments;
+    /// Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
+    float *ParamValues;
+    /// Number of parameters that have splines
+    short int nParams;
 };

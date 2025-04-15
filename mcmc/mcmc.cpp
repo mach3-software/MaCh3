@@ -10,7 +10,7 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
 
   // Starting parameters should be thrown
   reject = false;
-  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<unsigned>();
+  chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
 
   AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
   if(AnnealTemp < 0) anneal = false;
@@ -76,8 +76,7 @@ void mcmc::CheckStep() {
 // *******************
 // Run the Markov chain with all the systematic objects added
 void mcmc::runMCMC() {
-  // *******************
-
+// *******************
   // Save the settings into the output file
   SaveSettings();
 
@@ -125,7 +124,6 @@ void mcmc::runMCMC() {
 // Do the initial reconfigure of the MCMC
 void mcmc::ProposeStep() {
 // *******************
-
   // Initial likelihood
   double llh = 0.0;
 
@@ -176,7 +174,7 @@ void mcmc::ProposeStep() {
 
   // Check if we've hit a boundary in the systematics
   // In this case we can save time by not having to reconfigure the simulation
-  if (llh >= _LARGE_LOGL_) {
+  if (llh >= M3::_LARGE_LOGL_) {
     reject = true;
     #ifdef DEBUG
     if (debug) debugFile << "Rejecting based on boundary" << std::endl;
@@ -208,7 +206,7 @@ void mcmc::ProposeStep() {
   } else {
     for (size_t i = 0; i < samples.size(); ++i) {
       // Set the sample_llh[i] to be madly high also to signify a step out of bounds
-      sample_llh[i] = _LARGE_LOGL_;
+      sample_llh[i] = M3::_LARGE_LOGL_;
       #ifdef DEBUG
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
       #endif
@@ -223,7 +221,6 @@ void mcmc::ProposeStep() {
 // Print the fit output progress
 void mcmc::PrintProgress() {
 // *******************
-
   MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
@@ -250,12 +247,12 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
   // For MCMC we also need to set stepStart
   TFile *infile = new TFile(FitName.c_str(), "READ");
   TTree *posts = infile->Get<TTree>("posteriors");
-  int step_val = 0;
+  int step_val = -1;
 
   posts->SetBranchAddress("step",&step_val);
   posts->GetEntry(posts->GetEntries()-1);
 
-  stepStart = step_val;
+  stepStart = step_val + 1;
   infile->Close();
   delete infile;
 }

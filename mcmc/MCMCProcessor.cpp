@@ -1,15 +1,9 @@
 #include "MCMCProcessor.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TF1.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
 #ifdef CUDA
@@ -44,10 +38,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   SystValues = nullptr;
   AccProbValues = nullptr;
   AccProbBatchedAverages = nullptr;
-    
-  //KS: WARNING this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
-  PlotJarlskog = false;
-  
+
   //KS:Hardcoded should be a way to get it via config or something
   plotRelativeToPrior = false;
   printToPDF = false;
@@ -150,8 +141,6 @@ MCMCProcessor::~MCMCProcessor() {
   }
   if(StepNumber != nullptr) delete[] StepNumber;
 
-  if(hviolin != nullptr) delete hviolin;
-  if(hviolin_prior != nullptr) delete hviolin_prior;
   if(OutputFile != nullptr) OutputFile->Close();
   if(OutputFile != nullptr) delete OutputFile;
   delete Chain;
@@ -272,9 +261,7 @@ void MCMCProcessor::MakePostfit() {
     }
     OutputFile->cd();
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
-    
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
 
     // This holds the posterior density
@@ -322,9 +309,7 @@ void MCMCProcessor::MakePostfit() {
 
     //KS: This need to be before SetMaximum(), this way plot is nicer as line end at the maximum
     auto hpd = std::make_unique<TLine>((*Means_HPD)(i), hpost[i]->GetMinimum(), (*Means_HPD)(i), hpost[i]->GetMaximum());
-    hpd->SetLineColor(kBlack);
-    hpd->SetLineWidth(2);
-    hpd->SetLineStyle(kSolid);
+    SetTLineStyle(hpd.get(), kBlack, 2, kSolid);
     
     hpost[i]->SetLineWidth(2);
     hpost[i]->SetLineColor(kBlue-1);
@@ -334,20 +319,14 @@ void MCMCProcessor::MakePostfit() {
     
     // Now make the TLine for the Asimov
     auto Asimov = std::make_unique<TLine>(Prior, hpost[i]->GetMinimum(), Prior, hpost[i]->GetMaximum());
-    Asimov->SetLineColor(kRed-3);
-    Asimov->SetLineWidth(2);
-    Asimov->SetLineStyle(kDashed);
+    SetTLineStyle(Asimov.get(), kRed-3, 2, kDashed);
 
     auto leg = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
-    leg->SetTextSize(0.04);
+    SetLegendStyle(leg.get(), 0.04);
     leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
     leg->AddEntry(Gauss, Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
     leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
     leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
-    leg->SetLineColor(0);
-    leg->SetLineStyle(0);
-    leg->SetFillColor(0);
-    leg->SetFillStyle(0);
 
     //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
@@ -577,7 +556,7 @@ void MCMCProcessor::DrawPostfit() {
   CompLeg->SetLineStyle(0);
   CompLeg->SetBorderSize(0);
 
-  const double BottomMargin = Posterior->GetBottomMargin();
+  const std::vector<double> Margins = GetMargins(Posterior);
   Posterior->SetBottomMargin(0.2);
 
   OutputFile->cd();
@@ -692,7 +671,7 @@ void MCMCProcessor::DrawPostfit() {
   delete paramPlot_HPD;
 
   //KS: Return Margin to default one
-  Posterior->SetBottomMargin(BottomMargin);
+  SetMargins(Posterior, Margins);
 }
 
 // *********************
@@ -761,23 +740,14 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
 
     // Now make the TLine for the Asimov
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
-
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
 
     auto Asimov = std::make_unique<TLine>(Prior, hpost_copy[i]->GetMinimum(), Prior, hpost_copy[i]->GetMaximum());
-    Asimov->SetLineColor(kRed-3);
-    Asimov->SetLineWidth(2);
-    Asimov->SetLineStyle(kDashed);
+    SetTLineStyle(Asimov.get(), kRed-3, 2, kDashed);
 
     auto legend = std::make_unique<TLegend>(0.20, 0.7, 0.4, 0.92);
-    legend->SetTextSize(0.03);
-    legend->SetFillColor(0);
-    legend->SetFillStyle(0);
-    legend->SetLineColor(0);
-    legend->SetLineStyle(0);
-    legend->SetBorderSize(0);
+    SetLegendStyle(legend.get(), 0.03);
     hpost_copy[i]->Draw("HIST");
 
     for (int j = 0; j < nCredible; ++j)
@@ -839,11 +809,12 @@ void MCMCProcessor::MakeViolin() {
   }
 
   const int vBins = (maxi_y-mini_y)*25;
-  hviolin = new TH2D("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y);
-
+  hviolin = std::make_unique<TH2D>("hviolin", "hviolin", nDraw, 0, nDraw, vBins, mini_y, maxi_y);
+  hviolin->SetDirectory(nullptr);
   //KS: Prior has larger errors so we increase range and number of bins
   constexpr int PriorFactor = 4;
-  hviolin_prior = new TH2D("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
+  hviolin_prior = std::make_unique<TH2D>("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
+  hviolin_prior->SetDirectory(nullptr);
 
   auto rand = std::make_unique<TRandom3>(0);
   std::vector<double> PriorVec(nDraw);
@@ -1445,8 +1416,7 @@ void MCMCProcessor::DrawCovariance() {
 void MCMCProcessor::DrawCorrelations1D() {
 // *********************
   //KS: Store it as we go back to them at the end
-  const double TopMargin  = Posterior->GetTopMargin();
-  const double BottomMargin  = Posterior->GetBottomMargin();
+  const std::vector<double> Margins = GetMargins(Posterior);
   const int OptTitle = gStyle->GetOptTitle();
 
   Posterior->SetTopMargin(0.1);
@@ -1469,8 +1439,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   for(int i = 0; i < nDraw; ++i)
   {
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
 
     Corr1DHist[i].resize(Nhists);
@@ -1531,15 +1500,10 @@ void MCMCProcessor::DrawCorrelations1D() {
     }
 
     auto leg = std::make_unique<TLegend>(0.3, 0.75, 0.6, 0.90);
-    leg->SetTextSize(0.02);
+    SetLegendStyle(leg.get(), 0.02);
     for(int k = 0; k < Nhists; k++) {
       leg->AddEntry(Corr1DHist[i][k].get(), Form("%.2f > |Corr| >= %.2f", Thresholds[k+1], Thresholds[k]), "f");
     }
-    leg->SetLineColor(0);
-    leg->SetLineStyle(0);
-    leg->SetFillColor(0);
-    leg->SetFillStyle(0);
-    leg->SetBorderSize(0);
     leg->Draw("SAME");
 
     Posterior->Write(Corr1DHist[i][0]->GetTitle());
@@ -1577,8 +1541,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   delete CorrDir;
   OutputFile->cd();
 
-  Posterior->SetTopMargin(TopMargin);
-  Posterior->SetBottomMargin(BottomMargin);
+  SetMargins(Posterior, Margins);
   gStyle->SetOptTitle(OptTitle);
 }
 
@@ -1642,12 +1605,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
 
       auto legend = std::make_unique<TLegend>(0.20, 0.7, 0.4, 0.92);
       legend->SetTextColor(kRed);
-      legend->SetTextSize(0.03);
-      legend->SetFillColor(0);
-      legend->SetFillStyle(0);
-      legend->SetLineColor(0);
-      legend->SetLineStyle(0);
-      legend->SetBorderSize(0);
+      SetLegendStyle(legend.get(), 0.03);
 
       //Get Best point
       auto bestfitM = std::make_unique<TGraph>(1);
@@ -1736,10 +1694,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   }
 
   //KS: Store it as we go back to them at the end
-  const double TopMargin    = Posterior->GetTopMargin();
-  const double BottomMargin = Posterior->GetBottomMargin();
-  const double LeftMargin   = Posterior->GetLeftMargin();
-  const double RighMargin   = Posterior->GetRightMargin();
+  const std::vector<double> Margins = GetMargins(Posterior);
   Posterior->SetTopMargin(0.001);
   Posterior->SetBottomMargin(0.001);
   Posterior->SetLeftMargin(0.001);
@@ -1932,12 +1887,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 
   Posterior->cd();
   auto legend = std::make_unique<TLegend>(0.60, 0.7, 0.9, 0.9);
-  legend->SetTextSize(0.03);
-  legend->SetFillColor(0);
-  legend->SetFillStyle(0);
-  legend->SetLineColor(0);
-  legend->SetLineStyle(0);
-  legend->SetBorderSize(0);
+  SetLegendStyle(legend.get(), 0.03);
   //KS: Legend is shared so just take first histograms
   for (int j = nCredibleIntervals-1; j >= 0; --j)
   {
@@ -1970,25 +1920,20 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   for(int i = 0; i < nParamPlot; i++)
   {
     delete hpost_copy[i];
-    for (int j = 0; j < nCredibleIntervals; ++j)
-    {
+    for (int j = 0; j < nCredibleIntervals; ++j) {
       delete hpost_cl[i][j];
     }
   }
   for(int i = 0; i < Npad - nParamPlot; i++)
   {
     delete hpost_2D_copy[i];
-    for (int j = 0; j < nCredibleRegions; ++j)
-    {
+    for (int j = 0; j < nCredibleRegions; ++j) {
       delete hpost_2D_cl[i][j];
     }
   }
 
   //KS: Restore margin
-  Posterior->SetTopMargin(TopMargin);
-  Posterior->SetLeftMargin(BottomMargin);
-  Posterior->SetLeftMargin(LeftMargin);
-  Posterior->SetRightMargin(RighMargin);
+  SetMargins(Posterior, Margins);
 }
 
 // **************************
@@ -2490,22 +2435,6 @@ void MCMCProcessor::ReadOSCFile() {
     if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
     ParamFlat[kOSCPar].push_back( flat );
   }
-  if(PlotJarlskog)
-  {
-    Chain->SetAlias("J_cp", "TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)");
-    BranchNames.push_back("J_cp");
-    ParamType.push_back(kOSCPar);
-    nParam[kOSCPar]++;
-    nDraw++;
-
-    /// @todo we should actually calculate central value and prior error but leave it for now...
-    ParamNom[kOSCPar].push_back( 0. );
-    ParamCentral[kOSCPar].push_back( 0. );
-    ParamErrors[kOSCPar].push_back( 1. );
-    // Push back the name
-    ParamNames[kOSCPar].push_back("J_cp");
-    ParamFlat[kOSCPar].push_back( false );
-  }
 }
 
 // ***************
@@ -2563,9 +2492,7 @@ int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
   for (int i = 0; i < nDraw; ++i)
   {
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
-
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
 
     if(Name == Title)
@@ -2601,10 +2528,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 // **************************
   if(hpost[0] == nullptr) MakePostfit();
 
-  const double TopMargin = Posterior->GetTopMargin();
-  const double BottomMargin = Posterior->GetBottomMargin();
-  const double LeftMargin = Posterior->GetLeftMargin();
-  const double RightMargin = Posterior->GetRightMargin();
+  std::vector<double> Margins = GetMargins(Posterior);
 
   Posterior->SetTopMargin(0.1);
   Posterior->SetBottomMargin(0.1);
@@ -2627,8 +2551,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
     }
 
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(ParamNo, Prior, PriorError, Title);
 
     std::vector<double> x_val(nBins);
@@ -2665,10 +2588,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
 
   OutputFile->cd();
 
-  Posterior->SetTopMargin(TopMargin);
-  Posterior->SetBottomMargin(BottomMargin);
-  Posterior->SetLeftMargin(LeftMargin);
-  Posterior->SetRightMargin(RightMargin);
+  SetMargins(Posterior, Margins);
 }
 
 // **************************
@@ -2724,7 +2644,7 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
     MACH3LOG_INFO("{} for {}", Name, ParNames[k]);
     MACH3LOG_INFO("Following Jeffreys Scale = {}", JeffreysScale);
     MACH3LOG_INFO("Following Dunne-Kaboth Scale = {}", DunneKabothScale);
-    std::cout<<std::endl;
+    MACH3LOG_INFO("");
   }
 }
 
@@ -2757,8 +2677,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     }
     
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     bool FlatPrior = false;
     GetNthParameter(ParamNo, Prior, PriorError, Title);
     
@@ -2845,15 +2764,10 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     PriorPoint->Draw("P same");
     
     auto legend = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
-    legend->SetTextSize(0.04);
+    SetLegendStyle(legend.get(), 0.04);
     legend->AddEntry(PriorHist, "Prior", "l");
     legend->AddEntry(PosteriorHist, "Posterior", "l");
     legend->AddEntry(PostPoint.get(), Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
-    legend->SetLineColor(0);
-    legend->SetLineStyle(0);
-    legend->SetFillColor(0);
-    legend->SetFillStyle(0);
-    legend->SetBorderSize(0);
     legend->Draw("same");
   
     Posterior->Print(CanvasName);
@@ -2899,8 +2813,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
     }
 
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(ParamNo, Prior, PriorError, Title);
 
     Param.push_back(ParamNo);
@@ -2950,12 +2863,9 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
       double old_chi = -1;
       double old_prior = -1;
-      if(FlatPrior[j])
-      {
+      if(FlatPrior[j]) {
         old_prior = 1.0;
-      }
-      else
-      {
+      } else {
         old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
         old_prior = std::exp(-0.5 * old_chi * old_chi);
       }
@@ -2991,7 +2901,6 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
     }
 
     const int IntervalsSize = nSteps/NIntervals[k];
-
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
     int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
     if (ret != 0){
@@ -3047,7 +2956,6 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 // Diagnose the MCMC
 void MCMCProcessor::DiagMCMC() {
 // **************************
-
   // Prepare branches etc for DiagMCMC
   PrepareDiagMCMC();
 
@@ -3251,8 +3159,7 @@ void MCMCProcessor::ParamTraces() {
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nDraw; ++j) {
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Trace", Title.Data(), BranchNames[j].Data());
@@ -3349,12 +3256,12 @@ void MCMCProcessor::AutoCorrelation_FFT() {
   std::vector<std::vector<double>> LagL(nDraw);
 
   // Arrays needed to perform FFT using ROOT
-  double* ACFFT = new double[nEntries](); // Main autocorrelation array
-  double* ParVals = new double[nEntries](); // Param values for full chain
-  double* ParValsFFTR = new double[nEntries](); // FFT Real part
-  double* ParValsFFTI = new double[nEntries](); // FFT Imaginary part
-  double* ParValsFFTSquare = new double[nEntries](); // FFT Absolute square
-  double* ParValsComplex = new double[nEntries](); // Input Imaginary values (0)
+  std::vector<double> ACFFT(nEntries, 0.0);  // Main autocorrelation array
+  std::vector<double> ParVals(nEntries, 0.0);  // Param values for full chain
+  std::vector<double> ParValsFFTR(nEntries, 0.0);  // FFT Real part
+  std::vector<double> ParValsFFTI(nEntries, 0.0);  // FFT Imaginary part
+  std::vector<double> ParValsFFTSquare(nEntries, 0.0);  // FFT Absolute square
+  std::vector<double> ParValsComplex(nEntries, 0.0);  // Input Imaginary values (0)
 
   // Create forward and reverse FFT objects. I don't love using ROOT here,
   // but it works so I can't complain
@@ -3371,9 +3278,9 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     }
 
     // Transform
-    fftf->SetPointsComplex(ParVals, ParValsComplex);
+    fftf->SetPointsComplex(ParVals.data(), ParValsComplex.data());
     fftf->Transform();
-    fftf->GetPointsComplex(ParValsFFTR, ParValsFFTI);
+    fftf->GetPointsComplex(ParValsFFTR.data(), ParValsFFTI.data());
 
     // Square the results to get the power spectrum
     for (int i = 0; i < nEntries; ++i) {
@@ -3381,9 +3288,9 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     }
 
     // Transforming back gives the autocovariance
-    fftb->SetPointsComplex(ParValsFFTSquare, ParValsComplex);
+    fftb->SetPointsComplex(ParValsFFTSquare.data(), ParValsComplex.data());
     fftb->Transform();
-    fftb->GetPointsComplex(ACFFT, ParValsComplex);
+    fftb->GetPointsComplex(ACFFT.data(), ParValsComplex.data());
 
     // Divide by norm to get autocorrelation
     double normAC = ACFFT[0];
@@ -3393,8 +3300,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
 
     // Get plotting info
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
 
@@ -3417,14 +3323,6 @@ void MCMCProcessor::AutoCorrelation_FFT() {
 
   //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
   CalculateESS(nLags, LagL);
-
-  // Clean up
-  delete[] ACFFT;
-  delete[] ParVals;
-  delete[] ParValsFFTR;
-  delete[] ParValsFFTI;
-  delete[] ParValsFFTSquare;
-  delete[] ParValsComplex;
 
   AutoCorrDir->Close();
   delete AutoCorrDir;
@@ -3468,8 +3366,7 @@ void MCMCProcessor::AutoCorrelation() {
 
     // Make TH1Ds for each parameter which hold the lag
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
@@ -3687,8 +3584,7 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
     for (int j = 0; j < nDraw; ++j)
     {
       TString Title = "";
-      double Prior = 1.0;
-      double PriorError = 1.0;
+      double Prior = 1.0, PriorError = 1.0;
       GetNthParameter(j, Prior, PriorError, Title);
       EffectiveSampleSizeHist[i]->GetXaxis()->SetBinLabel(j+1, Title.Data());
     }
@@ -3741,16 +3637,11 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   }
 
   auto leg = std::make_unique<TLegend>(0.2, 0.7, 0.6, 0.95);
-  leg->SetTextSize(0.03);
+  SetLegendStyle(leg.get(), 0.03);
   for(int i = 0; i < Nhists; ++i)
   {
     leg->AddEntry(EffectiveSampleSizeHist[i].get(), Form("%.4f >= N_{eff}/N > %.4f", Thresholds[i], Thresholds[i+1]), "f");
-  }
-  leg->SetLineColor(0);
-  leg->SetLineStyle(0);
-  leg->SetFillColor(0);
-  leg->SetFillStyle(0);
-  leg->Draw("SAME");
+  }  leg->Draw("SAME");
 
   Posterior->Write("EffectiveSampleSizeCanvas");
 
@@ -3769,8 +3660,7 @@ void MCMCProcessor::BatchedMeans() {
   std::vector<TH1D*> BatchedParamPlots(nDraw);
   for (int j = 0; j < nDraw; ++j) {
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     
     GetNthParameter(j, Prior, PriorError, Title);
     
@@ -4002,9 +3892,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     TGraph* plot = new TGraph(v_size, k_j[j].data(), P_j[j].data());
 
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
-
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(j, Prior, PriorError, Title);
 
     std::string name = Form("Power Spectrum of %s;k;P(k)", Title.Data());
@@ -4080,8 +3968,7 @@ void MCMCProcessor::GewekeDiagnostic() {
   for (int j = 0; j < nDraw; ++j)
   {
     TString Title = "";
-    double Prior = 1.0;
-    double PriorError = 1.0;
+    double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Geweke", Title.Data(), BranchNames[j].Data());
     GewekePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100 * UpperThreshold);
@@ -4316,4 +4203,48 @@ void MCMCProcessor::PrintInfo() const {
   MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
   MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
   MACH3LOG_INFO("************************************************");
+}
+
+
+// **************************
+std::vector<double> MCMCProcessor::GetMargins(const std::unique_ptr<TCanvas>& Canv) const {
+// **************************
+  return std::vector<double>{Canv->GetTopMargin(), Canv->GetBottomMargin(),
+                              Canv->GetLeftMargin(), Canv->GetRightMargin()};
+}
+
+// **************************
+void MCMCProcessor::SetMargins(std::unique_ptr<TCanvas>& Canv, const std::vector<double>& margins) {
+// **************************
+  if (!Canv) {
+    MACH3LOG_ERROR("Canv is nullptr");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (margins.size() != 4) {
+    MACH3LOG_ERROR("Margin vector must have exactly 4 elements");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  Canv->SetTopMargin(margins[0]);
+  Canv->SetBottomMargin(margins[1]);
+  Canv->SetLeftMargin(margins[2]);
+  Canv->SetRightMargin(margins[3]);
+}
+
+// **************************
+void MCMCProcessor::SetTLineStyle(TLine* Line, const Color_t Colour, const Width_t Width, const ELineStyle Style) const {
+// **************************
+  Line->SetLineColor(Colour);
+  Line->SetLineWidth(Width);
+  Line->SetLineStyle(Style);
+}
+
+// **************************
+void MCMCProcessor::SetLegendStyle(TLegend* Legend, const double size) const {
+// **************************
+  Legend->SetTextSize(size);
+  Legend->SetLineColor(0);
+  Legend->SetLineStyle(0);
+  Legend->SetFillColor(0);
+  Legend->SetFillStyle(0);
+  Legend->SetBorderSize(0);
 }

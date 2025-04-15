@@ -8,13 +8,11 @@
 #include <complex>
 #include <cstdio>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+// MaCh3 includes
+#include "mcmc/StatisticalUtils.h"
+#include "samplePDF/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TFile.h"
 #include "TBranch.h"
@@ -38,12 +36,8 @@
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
 #include "TVirtualFFT.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
-
-// MaCh3 includes
-#include "mcmc/StatisticalUtils.h"
-#include "samplePDF/HistogramUtils.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
@@ -211,9 +205,9 @@ class MCMCProcessor {
     /// @param j parameter index Y
     inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
     /// @brief Get Violin plot for all parameters with posterior values
-    inline TH2D* GetViolin() { return hviolin; };
+    inline TH2D* GetViolin() { return hviolin.get(); };
     /// @brief Get Violin plot for all parameters with prior values
-    inline TH2D* GetViolinPrior() { return hviolin_prior; };
+    inline TH2D* GetViolinPrior() { return hviolin_prior.get(); };
 
     //Covariance getters
     inline std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
@@ -278,7 +272,7 @@ class MCMCProcessor {
     inline void SetOutputSuffix(const std::string Suffix){OutputSuffix = Suffix; };
     /// @brief Allow to set addtional cuts based on ROOT TBrowser cut, for to only affect one mass ordering
     inline void SetPosterior1DCut(const std::string Cut){Posterior1DCut = Cut; };
-  private:
+  protected:
     /// @brief Prepare prefit histogram for parameter overlay plot
     inline std::unique_ptr<TH1D> MakePrefit();
     /// @brief prepare output root file and canvas to which we will save EVERYTHING
@@ -298,7 +292,7 @@ class MCMCProcessor {
     /// @brief Read the FD cov file and get the input central values and errors
     inline void ReadFDFile();
     /// @brief Read the Osc cov file and get the input central values and errors
-    inline void ReadOSCFile();
+    virtual void ReadOSCFile();
     /// @brief Remove parameter specified in config
     inline void RemoveParameters();
     /// @brief Print info like how many params have been loaded etc
@@ -348,6 +342,21 @@ class MCMCProcessor {
     /// @cite Dunkley:2004sv
     /// @author Richard Calland
     inline void PowerSpectrumAnalysis();
+
+    /// @brief Get TCanvas margins, to be able to reset them if particular function need different margins
+    std::vector<double> GetMargins(const std::unique_ptr<TCanvas>& Canv) const;
+    /// @brief Set TCanvas margins to specified values
+    void SetMargins(std::unique_ptr<TCanvas>& Canv, const std::vector<double>& margins);
+    /// @brief Configures a TLine object with the specified style parameters.
+    /// @param Line Pointer to the TLine object to modify. Must not be nullptr.
+    /// @param Colour The color to set for the line.
+    /// @param Width The width of the line.
+    /// @param Style The line style (e.g., solid, dashed, etc.).
+    void SetTLineStyle(TLine* Line, const Color_t Colour, const Width_t Width, const ELineStyle Style) const;
+    /// @brief Configures the style of a TLegend object.
+    /// @param Legend Pointer to the TLegend object to modify
+    /// @param size The text size to set for the legend
+    void SetLegendStyle(TLegend* Legend, const double size) const;
 
     /// Name of MCMC file
     std::string MCMCFile;
@@ -417,8 +426,6 @@ class MCMCProcessor {
 
     /// Whether we plot flat prior or not, we usually provide error even for flat prior params
     bool PlotFlatPrior;
-    /// Will plot Jarlskog Invariant using information in the chain
-    bool PlotJarlskog;
     
     //Even more flags
     /// Whether we plot relative to prior or nominal, in most cases is prior
@@ -480,9 +487,9 @@ class MCMCProcessor {
     /// Holds 2D Posterior Distributions
     std::vector<std::vector<TH2D*>> hpost2D;
     /// Holds violin plot for all dials
-    TH2D *hviolin;
+    std::unique_ptr<TH2D> hviolin;
     /// Holds prior violin plot for all dials,
-    TH2D *hviolin_prior;
+    std::unique_ptr<TH2D> hviolin_prior;
 
     /// Array holding values for all parameters
     double** ParStep;
