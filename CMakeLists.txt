@@ -146,7 +146,7 @@ endif()
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -Og                                  # Turn off any optimisation to have best debug experience
+    -O0                                  # Turn off any optimisation to have best debug experience
     -mno-avx
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
