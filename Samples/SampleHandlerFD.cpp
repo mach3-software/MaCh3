@@ -2,6 +2,7 @@
 #include "Samples/Structs.h"
 #include "manager/MaCh3Exception.h"
 #include "manager/MaCh3Logger.h"
+#include <cstddef>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
@@ -35,6 +36,10 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   SampleHandlerFD_data = nullptr;
   SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
+
+  // Variables related to MC stat
+  FirstTimeW2 = true;
+  UpdateW2 = false;
 }
 
 SampleHandlerFD::~SampleHandlerFD()
@@ -78,17 +83,10 @@ void SampleHandlerFD::ReadSampleConfig()
       EqualBinningPerOscChannel = false;
     }
   }
-  
-  //Default TestStatistic is kPoisson
-  //ETA: this can be configured with SampleHandlerBase::SetTestStatistic()
-  if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
-    fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
-  } else {
-    MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
-    MACH3LOG_WARN("Defaulting to using a poisson likelihood");
-    fTestStatistic = kPoisson;
+  fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
+  if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
+    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
-  
   //Binning
   nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
@@ -372,10 +370,13 @@ void SampleHandlerFD::Reweight() {
         NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
       }
     }
-    
   }
   
   FillArray();
+
+  //KS: If you want to not update W2 wights then uncomment this line
+  if(!UpdateW2) FirstTimeW2 = false;
+
 }
 
 //************************************************
@@ -395,6 +396,9 @@ void SampleHandlerFD::FillArray() {
 #ifdef MULTITHREAD
   FillArray_MP();
 #else
+  //ETA we should probably store this in samplePDFFDBase
+  size_t nXBins = int(XBinEdges.size()-1);
+  //size_t nYBins = int(YBinEdges.size()-1);
 
   PrepFunctionalParameters();
   if(SplineHandler){
@@ -409,9 +413,9 @@ void SampleHandlerFD::FillArray() {
         continue;
       } 
 
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double totalweight = 1.0;
+      M3::float_t splineweight = 1.0;
+      M3::float_t normweight = 1.0;
+      M3::float_t totalweight = 1.0;
       
       if(SplineHandler){
         splineweight = CalcWeightSpline(iSample, iEvent);
@@ -481,11 +485,11 @@ void SampleHandlerFD::FillArray() {
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
         SampleHandlerFD_array[YBinToFill][XBinToFill] += totalweight;
-        SampleHandlerFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        if (FirstTimeW2) SampleHandlerFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
     }
   }
-#endif // end the else in openMP
+  #endif
 }
 
 #ifdef MULTITHREAD
@@ -493,6 +497,9 @@ void SampleHandlerFD::FillArray() {
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP()  {
 // ************************************************
+  //DB Reset which cuts to apply
+  Selection = StoredSelection;
+
   PrepFunctionalParameters();
   //==================================================
   //Calc Weights and fill Array
@@ -640,8 +647,10 @@ void SampleHandlerFD::FillArray_MP()  {
       for (size_t xBin = 0; xBin < nXBins; ++xBin) {
         #pragma omp atomic
         SampleHandlerFD_array[yBin][xBin] += SampleHandlerFD_array_private[yBin][xBin];
-        #pragma omp atomic
-        SampleHandlerFD_array_w2[yBin][xBin] += SampleHandlerFD_array_private_w2[yBin][xBin];
+        if(FirstTimeW2) {
+          #pragma omp atomic
+          SampleHandlerFD_array_w2[yBin][xBin] += SampleHandlerFD_array_private_w2[yBin][xBin];
+        }
       }
     }
     
@@ -660,13 +669,123 @@ void SampleHandlerFD::FillArray_MP()  {
 void SampleHandlerFD::ResetHistograms() {
 // **************************************************  
   //DB Reset values stored in PDF array to 0.
+  // Don't openMP this; no significant gain
   for (size_t yBin = 0; yBin < nYBins; ++yBin) {
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
       SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 } // end function
+
+void SampleHandlerFD::RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+  // Add protections to not add the same functional parameter twice
+  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
+    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  funcParsNamesMap[fpName] = fpEnum;
+  funcParsNamesVec.push_back(fpName);
+  funcParsFuncMap[fpEnum] = fpFunc;
+}
+
+void SampleHandlerFD::SetupFunctionalParameters() {
+  funcParsVec = ParHandler->GetFuncParsFromSampleName(SampleName);
+  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
+  RegisterFunctionalParameters();
+  funcParsMap.resize(funcParsNamesMap.size());
+  funcParsGrid.resize(MCSamples.size());
+
+  // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
+  for (FuncPars & fp : funcParsVec) {
+    for (std::string name : funcParsNamesVec) {
+      if (fp.name == name) {
+        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
+        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
+        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
+        continue;
+      }
+    }
+    // If we don't find a match, we need to throw an error
+    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
+      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  // Mostly the same as CalcXsecNormsBins
+  // For each event, make a vector of pointers to the functional parameters
+  for (std::size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    funcParsGrid[iSample].resize(static_cast<std::size_t>(MCSamples[iSample].nEvents));
+    for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(MCSamples[iSample].nEvents); ++iEvent) {
+      // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
+      for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+        // Check whether the interaction modes match
+        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCSamples[iSample].mode[iEvent]))));
+        if (!ModeMatch) {
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCSamples[iSample].mode[iEvent]), (*it).name);
+          continue;
+        }
+        // Now check whether within kinematic bounds
+        bool IsSelected = true;
+        if ((*it).hasKinBounds) {
+          for (std::size_t iKinPar = 0; iKinPar < (*it).KinematicVarStr.size(); ++iKinPar) {
+            // Check lower bound
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) <= (*it).Selection[iKinPar][0]) {
+              IsSelected = false;
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              continue;
+            }
+            // Check upper bound
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) > (*it).Selection[iKinPar][1]) {
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              IsSelected = false;
+              continue;
+            }
+          }
+        }
+        // Need to then break the event loop
+        if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
+          continue;
+        }
+        auto funcparenum = funcParsNamesMap[(*it).name];
+        funcParsGrid.at(iSample).at(iEvent).push_back(funcparenum);
+      }
+    }
+  }
+  MACH3LOG_INFO("Finished setting up functional parameters");
+}
+
+void SampleHandlerFD::ApplyShifts(int iSample, int iEvent) {
+  // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
+  // First reset shifted array back to nominal values
+  resetShifts(iSample, iEvent);
+  for (int fpEnum : funcParsGrid[iSample][iEvent]) {
+    FuncPars *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
+    // if (fp->funcPtr) {
+    //   (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+    // } else {
+    //   MACH3LOG_ERROR("Functional parameter function pointer for {} is null for event {} in sample {}", fp->name, iEvent, iSample);
+    //   throw MaCh3Exception(__FILE__, __LINE__);
+    // }
+    (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+  }
+}
+// =================================
+
 
 // ***************************************************************************
 // Calculate the spline weight for one event
@@ -1164,6 +1283,7 @@ void SampleHandlerFD::AddData(TH1D* Data) {
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+    MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
     
@@ -1494,7 +1614,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* SampleHandlerFD::Get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< std::vector<double> >& SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
@@ -1553,7 +1673,11 @@ TH1* SampleHandlerFD::Get1DVarHist(std::string ProjectionVar_Str, std::vector< s
   return _h1DVar;
 }
 
-TH2* SampleHandlerFD::Get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+// ************************************************
+TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
+                                   const std::vector< std::vector<double> >& SelectionVec,
+                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+// ************************************************
   //DB Grab the associated enum with the argument string
   int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
@@ -1641,7 +1765,9 @@ std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int Kinema
   return "";
 }
 
-TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str,
+                                                   int kModeToFill, int kChannelToFill,
+                                                   int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
 
@@ -1690,7 +1816,11 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(std::string ProjectionVar_Str
   return Get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX,
+                                                   const std::string& ProjectionVar_StrY,
+                                                   int kModeToFill, int kChannelToFill,
+                                                   int WeightStyle, TAxis* AxisX,
+                                                   TAxis* AxisY) {
   bool fChannel;
   bool fMode;
 

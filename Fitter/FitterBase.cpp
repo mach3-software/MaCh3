@@ -15,7 +15,6 @@ _MaCh3_Safe_Include_End_ //}
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
   //Get mach3 modes from manager
-
   random = std::make_unique<TRandom3>(fitMan->raw()["General"]["Seed"].as<int>());
 
   // Counter of the accepted # of steps
@@ -385,7 +384,7 @@ void FitterBase::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       MACH3LOG_INFO("Opening output again to update with means..");
-      outputFile = new TFile(fitMan->raw()["General"]["Output"]["Filename"].as<std::string>().c_str(), "UPDATE");
+      outputFile = new TFile(Get<std::string>(fitMan->raw()["General"]["Output"]["Filename"], __FILE__, __LINE__).c_str(), "UPDATE");
     }
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
@@ -471,12 +470,12 @@ void FitterBase::RunLLHScan() {
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotAllNDsamplesLLH = false;
   if(fitMan->raw()["LLHScan"]["LLHScanBySample"])
-    PlotAllNDsamplesLLH = fitMan->raw()["LLHScan"]["LLHScanBySample"].as<bool>();
+    PlotAllNDsamplesLLH = Get<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], __FILE__, __LINE__);
 
   std::vector<std::string> SkipVector;
   if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
@@ -876,7 +875,7 @@ void FitterBase::Run2DLLHScan() {
   std::vector<std::string> SkipVector;
   if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 
@@ -1108,7 +1107,7 @@ void FitterBase::RunSigmaVar() {
   std::vector<std::string> SkipVector;
   if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
   {
-    SkipVector = fitMan->raw()["LLHScan"]["LLHScanSkipVector"].as<std::vector<std::string>>();
+    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
     MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
   }
 

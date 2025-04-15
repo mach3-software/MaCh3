@@ -10,7 +10,7 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
 
   // Starting parameters should be thrown
   reject = false;
-  chainLength = fitMan->raw()["General"]["MCMC"]["NSteps"].as<unsigned>();
+  chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
 
   AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
   if(AnnealTemp < 0) anneal = false;

@@ -72,6 +72,8 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Get norm/func parameters depending on given SampleName
     const std::vector<NormParameter> GetNormParsFromSampleName(const std::string& SampleName);
+    /// @brief HH Get functional parameters for the relevant SampleName
+    const std::vector<FuncPars> GetFuncParsFromSampleName(const std::string& SampleName);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> getNominalArray() override
@@ -132,13 +134,19 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.
     void initParams();
+
     /// @brief Parses the YAML configuration to set up cross-section parameters.
     /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.
     inline void InitXsecFromConfig();
+
     /// @brief Get Norm params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
     inline NormParameter GetNormParameter(const YAML::Node& param, const int Index);
+    /// @brief Get Func params
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    inline FuncPars GetFuncPars(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
     inline SplineParameter GetSplineParameter(const YAML::Node& param);
@@ -160,4 +168,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// Vector containing info for normalisation systematics
     std::vector<NormParameter> NormParams;
+
+    /// Vector containing info for functional systematics
+    std::vector<FuncPars> FuncParams;
 };
