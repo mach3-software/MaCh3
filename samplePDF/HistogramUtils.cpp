@@ -513,9 +513,9 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
 }
 
 // *************************
-TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
+std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
 // *************************
-  TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
+  auto var = std::make_unique<TGraphAsymmErrors>(sigmaArrayCentr);
   var->SetNameTitle((title).c_str(), (title).c_str());
 
   // Need to draw TGraphs to set axes labels

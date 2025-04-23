@@ -1311,21 +1311,17 @@ void FitterBase::RunSigmaVar() {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
           std::string title = std::string(samples[ivs]->getPDF(k)->GetName()) + "_" + name;
-          TGraphAsymmErrors *var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
-          TGraphAsymmErrors *var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
+          auto var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
+          auto var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
 
-          TGraphAsymmErrors *var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+"_X_norm").c_str());
-          TGraphAsymmErrors *var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+"_Y_norm").c_str());
+          auto var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+"_X_norm").c_str());
+          auto var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+"_Y_norm").c_str());
 
           dirArrySample[SampleIterator]->cd();
           var_x->Write();
           var_y->Write();
           var_x_norm->Write();
           var_y_norm->Write();
-          delete var_x;
-          delete var_y;
-          delete var_x_norm;
-          delete var_y_norm;
 
           //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
           if (DoByMode)
@@ -1336,15 +1332,12 @@ void FitterBase::RunSigmaVar() {
 
             for(int ir = 0; ir < nRelevantModes;ir++)
             {
-              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
-              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
+              auto var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+              auto var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
 
               dirArrySample[SampleIterator]->cd();
               var_mode_x->Write();
               var_mode_y->Write();
-
-              delete var_mode_x;
-              delete var_mode_y;
             } // end for nRelevantModes
           } // end if mode
 

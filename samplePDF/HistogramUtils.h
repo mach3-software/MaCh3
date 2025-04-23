@@ -81,7 +81,7 @@ int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
 /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
 /// @param title A tittle for returned object
 /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
 
 /// @brief KS: Fill Violin histogram with entry from a toy
 /// @param violin hist that will be filled
@@ -135,9 +135,6 @@ namespace M3 {
 /// @return std::unique_ptr<ObjectType> Owning pointer to the cloned object.
 template <typename ObjectType>
 std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name = "") {
-  if (!obj) {
-    throw MaCh3Exception(__FILE__, __LINE__, "Clone(): Cannot clone a nullptr object.");
-  }
   std::string cloneName = name.empty() ? obj->GetName() : name;
 
   std::unique_ptr<ObjectType> Hist(static_cast<ObjectType*>(obj->Clone(cloneName.c_str())));
