@@ -125,3 +125,25 @@ double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 
 
 /// @brief Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
 double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
+
+
+namespace M3 {
+/// @brief Creates a copy of a ROOT-like object and wraps it in a smart pointer.
+///
+/// @tparam ObjectType The type of the object to clone for example TH1D or TH2Poly.
+/// @param obj Pointer to the object to clone.
+/// @return std::unique_ptr<ObjectType> Owning pointer to the cloned object.
+template <typename ObjectType>
+std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name = "") {
+  if (!obj) {
+    throw MaCh3Exception(__FILE__, __LINE__, "Clone(): Cannot clone a nullptr object.");
+  }
+  std::string cloneName = name.empty() ? obj->GetName() : name;
+
+  std::unique_ptr<ObjectType> Hist(static_cast<ObjectType*>(obj->Clone(cloneName.c_str())));
+  // Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter
+  Hist->SetDirectory(nullptr);
+
+  return Hist;
+}
+}

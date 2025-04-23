@@ -1214,10 +1214,7 @@ void FitterBase::RunSigmaVar() {
             ss << paramVal;
             std::string parVarTitle = name + "_" + ss.str();
 
-            // This is a TH2D
-
-            std::unique_ptr<TH2Poly> currSamp(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone()));
-            currSamp->SetDirectory(nullptr);
+            auto currSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)));
             // Set a descriptiv-ish title
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
 
@@ -1241,8 +1238,7 @@ void FitterBase::RunSigmaVar() {
 
               for(int ir = 0; ir < nRelevantModes; ir++)
               {
-                std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone()));
-                currSampMode->SetDirectory(nullptr);
+                auto currSampMode = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])));
 
                 mode_title_long = title_long + "_" + samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir]);
                 currSampMode->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
@@ -1259,8 +1255,7 @@ void FitterBase::RunSigmaVar() {
             //KS: This will give different results depending if data or Asimov, both have their uses
             if (PlotLLHperBin)
             {
-              std::unique_ptr<TH2Poly> currLLHSamp(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone()));
-              currLLHSamp->SetDirectory(nullptr);
+              auto currLLHSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)));
               currLLHSamp->Reset("");
               currLLHSamp->Fill(0.0, 0.0, 0.0);
 
