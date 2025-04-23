@@ -601,12 +601,8 @@ void FitterBase::RunLLHScan() {
       
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
       // This also applies for other parameters like osc, etc.
-      if (lower < cov->GetLowerBound(i)) {
-        lower = cov->GetLowerBound(i);
-      }
-      if (upper > cov->GetUpperBound(i)) {
-        upper = cov->GetUpperBound(i);
-      }
+      lower = std::max(lower, cov->GetLowerBound(i));
+      upper = std::min(upper, cov->GetUpperBound(i));
       MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
@@ -949,12 +945,8 @@ void FitterBase::Run2DLLHScan() {
       }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-      if (lower_x < cov->GetLowerBound(i)) {
-        lower_x = cov->GetLowerBound(i);
-      }
-      if (upper_x > cov->GetUpperBound(i)) {
-        upper_x = cov->GetUpperBound(i);
-      }
+      lower_x = std::max(lower_x, cov->GetLowerBound(i));
+      upper_x = std::min(upper_x, cov->GetUpperBound(i));
 
       bool skip = false;
       for(unsigned int is = 0; is < SkipVector.size(); ++is)
@@ -1015,12 +1007,8 @@ void FitterBase::Run2DLLHScan() {
         }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-        if (lower_y < cov->GetLowerBound(j)) {
-          lower_y = cov->GetLowerBound(j);
-        }
-        if (upper_y > cov->GetUpperBound(j)) {
-          upper_y = cov->GetUpperBound(j);
-        }
+        lower_y = std::max(lower_y, cov->GetLowerBound(j));
+        upper_y = std::min(upper_y, cov->GetUpperBound(j));
         MACH3LOG_INFO("Scanning X {} with {} steps, from {} - {}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
         MACH3LOG_INFO("Scanning Y {} with {} steps, from {} - {}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
 
