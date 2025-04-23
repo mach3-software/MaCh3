@@ -35,8 +35,11 @@ class mcmc : public FitterBase {
   /// @brief Do we accept the step
   inline void CheckStep();
 
-  /// @brief Get the multicanonical weight for a given delta_cp value
-  double GetMulticanonicalWeight(double kDeltacp);
+  /// @brief Get the multicanonical weight for a given delta_cp value from a set of Gaussians
+  double GetMulticanonicalWeightGaussian(double kDeltacp);
+
+  /// @brief Get the multicanonical weight for a given delta_cp value from a spline
+  double GetMulticanonicalWeightSpline(double kDeltacp, TGraph *dcp_spline);
 
   /// @brief Print the progress
   inline void PrintProgress();
@@ -53,6 +56,11 @@ class mcmc : public FitterBase {
 
   /// multi-canonical method toggle on/off
   bool multicanonical;
+
+  /// multi-canonical spline toggle on/off
+  bool multicanonicalSpline;
+  /// multi-canonical spline object
+  TGraph *dcp_spline;
   /// multi-canonical beta
   double multicanonicalBeta;
   /// multi-canonical sigma

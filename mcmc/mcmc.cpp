@@ -78,15 +78,36 @@ void mcmc::CheckStep() {
 void mcmc::runMCMC() {
 
   // *******************
-
-  // Set up the multicanonical weight on the delta_cp parameter
+  // Multicanonical method toggle from spline
   multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"],false);
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
+
+  multicanonicalSpline = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSpline"],false);
+
   if (multicanonical) {
+
+    if (multicanonicalSpline){
+      std::string splineFile = fitMan->raw()["General"]["MCMC"]["MulticanonicalSplineFile"].as<std::string>();
+      dcp_spline = new TGraph(splineFile.c_str());
+      MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
+      
+      // check for empty splines
+      if (dcp_spline->GetN() == 0) {
+        MACH3LOG_ERROR("Spline file {} is empty", splineFile);
+        throw std::runtime_error("Spline file is empty");
+      }
+    } else {
+      // Get the multicanonical sigma values from the configuration file
+      multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
+    }
+
+    // Get the multicanonical beta value from the configuration file
     multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
-    multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
     MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
+
+
     MACH3LOG_INFO("Looping over systematics to find delta_cp parameter");
+    // Loop over the systematics and find the osc_cov systematic and the delta_cp parameter number
     for (size_t s = 0; s < systematics.size(); s++) {
       MACH3LOG_INFO("Systematic: {}", systematics[static_cast<int>(s)]->getName());
       if (systematics[static_cast<int>(s)]->getName() == "osc_cov") {
@@ -178,7 +199,14 @@ void mcmc::ProposeStep() {
 
     // get the proposed value of delta_cp and apply the multicanonical pentalty, weighting it using the beta value to increase or decrease the strenght of the penalty
     delta_cp_value = systematics[oscCovVar]->getParProp(multicanonicalVar);
-    multicanonical_penalty = GetMulticanonicalWeight(delta_cp_value)*(multicanonicalBeta);
+    
+    if (multicanonicalSpline) {
+      // Get the multicanonical weight from the spline
+      multicanonical_penalty = GetMulticanonicalWeightSpline(delta_cp_value, dcp_spline)*(multicanonicalBeta);
+    } else {
+      // Get the multicanonical weight from the Gaussian
+      multicanonical_penalty = GetMulticanonicalWeightGaussian(delta_cp_value)*(multicanonicalBeta);
+    }
     llh += multicanonical_penalty;
     
     // MACH3LOG_INFO("Delta CP value: {}", delta_cp_value);
@@ -231,7 +259,7 @@ void mcmc::ProposeStep() {
   logLProp = llh;
 }
 
-inline double mcmc::GetMulticanonicalWeight(double deltacp){
+inline double mcmc::GetMulticanonicalWeightGaussian(double deltacp){
   // precalculate constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   double sigma = multicanonicalSigma;
@@ -245,6 +273,16 @@ inline double mcmc::GetMulticanonicalWeight(double deltacp){
 
   // return the log likelihood, ie the log of the normalised sum of the gaussians
   return -std::log(inv_sqrt_2pi * (1/sigma) * (exp1 + exp2 + exp3));
+}
+
+inline double mcmc::GetMulticanonicalWeightSpline(double deltacp, TGraph *dcp_spline){
+  
+  // calculate likelihood from spline at given dcp value
+  double dcp_spline_val = dcp_spline->Eval(deltacp);
+
+  // return the log likelihood, ie the log of the normalised sum of the gaussians
+  std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << std::endl;
+  return -std::log(dcp_spline_val);
 }
 
 // *******************
