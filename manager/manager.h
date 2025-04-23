@@ -19,6 +19,11 @@ public:
   /// @brief Constructs a manager object with the specified file name.
   /// @param filename The name of the configuration file.
   explicit manager(std::string const &filename);
+  /// @brief Constructs a manager object with the specified YAML
+  /// @note This is primarily used when initializing from a previous chain, allowing the creation of a manager instance based embedded YAML in that chain.
+  /// @param ConfigNode Actual YAML config
+  manager(const YAML::Node ConfigNode);
+
   /// @brief Destroys the manager object.
   virtual ~manager();
 
@@ -49,6 +54,9 @@ public:
   }
 
 private:
+  /// @brief Common inialiser for both constructors
+  void Initialise();
+
   /// The YAML node containing the configuration data.
   YAML::Node config;
   /// The name of the configuration file.
