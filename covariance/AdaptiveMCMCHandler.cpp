@@ -1,4 +1,6 @@
 #include "covariance/AdaptiveMCMCHandler.h"
+#include "manager/YamlHelper.h"
+#include <cstddef>
 
 namespace adaptive_mcmc{
 
@@ -10,6 +12,7 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   end_adaptive_update   = 1;
   adaptive_update_step  = 1000;
   total_steps = 0;
+  iteration_counter = 0;
 
   par_means = {};
   adaptive_covariance = nullptr;
@@ -41,6 +44,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
    * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix
    * AdaptionStartUpdate [int]    :    Do we skip the first N steps?
    * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
+   * AdaptionSaveNIterations [int]:    You don't have to save every adaptive stage so decide how often you want to save
    * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
    */
 
@@ -60,6 +64,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"], 0);
   end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
   adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
+  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionSaveNIterations"], 1);
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
@@ -97,10 +102,12 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
 
   if(block_indices.size()==0 || block_indices[0].size()==0) return;
 
+  int block_size = static_cast<int>(block_indices.size());
   // Now we loop over our blocks
-  for(int iblock=0; iblock<int(block_indices.size()); iblock++){
+  for(int iblock=0; iblock < block_size; iblock++){
     // Loop over blocks in the block
-    for(int isubblock=0; isubblock<int(block_indices[iblock].size())-1; isubblock+=2){
+    int sub_block_size = static_cast<int>(block_indices.size()-1);
+    for(int isubblock=0; isubblock < sub_block_size ; isubblock+=2){
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
@@ -244,7 +251,14 @@ bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
 bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 // ********************************************
   if(total_steps >= start_adaptive_throw &&
-    (total_steps - start_adaptive_throw)%adaptive_update_step == 0) return true;
+    // Check whether the number of steps is divisible by the adaptive update step
+    // e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true
+    (total_steps - start_adaptive_throw)%adaptive_update_step == 0) {
+    // update the iteration counter as well which will be used to decide if you want to save this iteration
+    // of the matrix or not
+    iteration_counter = (total_steps - start_adaptive_throw) / adaptive_update_step;
+    return true;
+  } 
   else return false;
 }
 

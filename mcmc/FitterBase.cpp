@@ -56,7 +56,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 
   //Create TDirectory
   CovFolder = outputFile->mkdir("CovarianceFolder");
-  AdaptiveFolder = outputFile->mkdir("AdaptiveFolder");
   outputFile->cd();
 
   #ifdef DEBUG

@@ -76,6 +76,13 @@ class AdaptiveMCMCHandler{
   /// Steps between changing throw matrix
   int adaptive_update_step;
 
+  /// If you don't want to save every adpation then
+  /// you can specify this here
+  int adaptive_save_n_iterations;
+
+  /// Count the number of adaptive iterations performed
+  int iteration_counter;
+
   /// Indices for block-matrix adaption
   std::vector<int> adapt_block_matrix_indices;
 
