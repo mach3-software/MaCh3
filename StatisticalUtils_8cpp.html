@@ -186,18 +186,18 @@ Functions</h2></td></tr>
 <tr class="memitem:aaf9d02010c94cac104e7987880adfb24"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#aaf9d02010c94cac104e7987880adfb24">GetHPD</a> (TH1D *const hist, double &amp;<a class="el" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, double &amp;Error, double &amp;Error_p, double &amp;Error_m, const double coverage)</td></tr>
 <tr class="memdesc:aaf9d02010c94cac104e7987880adfb24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get Highest Posterior Density (HPD)  <br /></td></tr>
 <tr class="separator:aaf9d02010c94cac104e7987880adfb24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acde2a2d3a63538215e4e468c24aa8821"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#acde2a2d3a63538215e4e468c24aa8821">GetCredibleInterval</a> (TH1D *const hist, TH1D *hpost_copy, const double coverage)</td></tr>
-<tr class="memdesc:acde2a2d3a63538215e4e468c24aa8821"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading.  <br /></td></tr>
-<tr class="separator:acde2a2d3a63538215e4e468c24aa8821"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330e012c4b76ad3dbc5095c10e1eb2fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#a330e012c4b76ad3dbc5095c10e1eb2fb">GetCredibleIntervalSig</a> (TH1D *const hist, TH1D *hpost_copy, const bool CredibleInSigmas, const double coverage)</td></tr>
-<tr class="memdesc:a330e012c4b76ad3dbc5095c10e1eb2fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading.  <br /></td></tr>
-<tr class="separator:a330e012c4b76ad3dbc5095c10e1eb2fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f27b5ae9457e87d23c52f2b7ee3fd2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#a6f27b5ae9457e87d23c52f2b7ee3fd2b">GetCredibleRegion</a> (TH2D *const hist2D, const double coverage)</td></tr>
-<tr class="memdesc:a6f27b5ae9457e87d23c52f2b7ee3fd2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Set 2D contour within some coverage.  <br /></td></tr>
-<tr class="separator:a6f27b5ae9457e87d23c52f2b7ee3fd2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7679ed4cc0f915500e223e1f51b34821"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#a7679ed4cc0f915500e223e1f51b34821">GetCredibleRegionSig</a> (TH2D *const hist2D, const bool CredibleInSigmas, const double coverage)</td></tr>
-<tr class="memdesc:a7679ed4cc0f915500e223e1f51b34821"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Set 2D contour within some coverage.  <br /></td></tr>
-<tr class="separator:a7679ed4cc0f915500e223e1f51b34821"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf3eda78705f828edb0a6b150413ba36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#abf3eda78705f828edb0a6b150413ba36">GetCredibleInterval</a> (const std::unique_ptr&lt; TH1D &gt; &amp;hist, std::unique_ptr&lt; TH1D &gt; &amp;hpost_copy, const double coverage)</td></tr>
+<tr class="memdesc:abf3eda78705f828edb0a6b150413ba36"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading.  <br /></td></tr>
+<tr class="separator:abf3eda78705f828edb0a6b150413ba36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83d228a56830a0b5800ac956216c424b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#a83d228a56830a0b5800ac956216c424b">GetCredibleIntervalSig</a> (const std::unique_ptr&lt; TH1D &gt; &amp;hist, std::unique_ptr&lt; TH1D &gt; &amp;hpost_copy, const bool CredibleInSigmas, const double coverage)</td></tr>
+<tr class="memdesc:a83d228a56830a0b5800ac956216c424b"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading.  <br /></td></tr>
+<tr class="separator:a83d228a56830a0b5800ac956216c424b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8057f3bef3e98fdcd42b57bc283bc806"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#a8057f3bef3e98fdcd42b57bc283bc806">GetCredibleRegion</a> (std::unique_ptr&lt; TH2D &gt; &amp;hist2D, const double coverage)</td></tr>
+<tr class="memdesc:a8057f3bef3e98fdcd42b57bc283bc806"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Set 2D contour within some coverage.  <br /></td></tr>
+<tr class="separator:a8057f3bef3e98fdcd42b57bc283bc806"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0babebde48f51680e675beaa1dd8c33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#ab0babebde48f51680e675beaa1dd8c33">GetCredibleRegionSig</a> (std::unique_ptr&lt; TH2D &gt; &amp;hist2D, const bool CredibleInSigmas, const double coverage)</td></tr>
+<tr class="memdesc:ab0babebde48f51680e675beaa1dd8c33"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Set 2D contour within some coverage.  <br /></td></tr>
+<tr class="separator:ab0babebde48f51680e675beaa1dd8c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94e492e3e9142db9e1cb1c4c027259f3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8cpp.html#a94e492e3e9142db9e1cb1c4c027259f3">GetIQR</a> (TH1D *Hist)</td></tr>
 <tr class="memdesc:a94e492e3e9142db9e1cb1c4c027259f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interquartile Range (IQR)  <br /></td></tr>
 <tr class="separator:a94e492e3e9142db9e1cb1c4c027259f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -719,8 +719,8 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="acde2a2d3a63538215e4e468c24aa8821" name="acde2a2d3a63538215e4e468c24aa8821"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acde2a2d3a63538215e4e468c24aa8821">&#9670;&#160;</a></span>GetCredibleInterval()</h2>
+<a id="abf3eda78705f828edb0a6b150413ba36" name="abf3eda78705f828edb0a6b150413ba36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf3eda78705f828edb0a6b150413ba36">&#9670;&#160;</a></span>GetCredibleInterval()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -728,13 +728,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void GetCredibleInterval </td>
           <td>(</td>
-          <td class="paramtype">TH1D *const&#160;</td>
+          <td class="paramtype">const std::unique_ptr&lt; TH1D &gt; &amp;&#160;</td>
           <td class="paramname"><em>hist</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramtype">std::unique_ptr&lt; TH1D &gt; &amp;&#160;</td>
           <td class="paramname"><em>hpost_copy</em>, </td>
         </tr>
         <tr>
@@ -764,7 +764,7 @@ Functions</h2></td></tr>
 <p>Replace bin value by -1 so it is not looped over as being maximum bin again</p>
 
 <p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00316">316</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  316</span>                                                                                    {</div>
+<div class="fragment"><div class="line"><span class="lineno">  316</span>                                                                                                                  {</div>
 <div class="line"><span class="lineno">  317</span><span class="comment">// ***************</span></div>
 <div class="line"><span class="lineno">  318</span>  <span class="keywordflow">if</span>(coverage &gt; 1)</div>
 <div class="line"><span class="lineno">  319</span>  {</div>
@@ -813,8 +813,8 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a330e012c4b76ad3dbc5095c10e1eb2fb" name="a330e012c4b76ad3dbc5095c10e1eb2fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a330e012c4b76ad3dbc5095c10e1eb2fb">&#9670;&#160;</a></span>GetCredibleIntervalSig()</h2>
+<a id="a83d228a56830a0b5800ac956216c424b" name="a83d228a56830a0b5800ac956216c424b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83d228a56830a0b5800ac956216c424b">&#9670;&#160;</a></span>GetCredibleIntervalSig()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -822,13 +822,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void GetCredibleIntervalSig </td>
           <td>(</td>
-          <td class="paramtype">TH1D *const&#160;</td>
+          <td class="paramtype">const std::unique_ptr&lt; TH1D &gt; &amp;&#160;</td>
           <td class="paramname"><em>hist</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramtype">std::unique_ptr&lt; TH1D &gt; &amp;&#160;</td>
           <td class="paramname"><em>hpost_copy</em>, </td>
         </tr>
         <tr>
@@ -862,24 +862,24 @@ Functions</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00367">367</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  367</span>                                                                                                                    {</div>
+<div class="fragment"><div class="line"><span class="lineno">  367</span>                                                                                                                                                  {</div>
 <div class="line"><span class="lineno">  368</span><span class="comment">// ***************</span></div>
 <div class="line"><span class="lineno">  369</span>  <span class="comment">//KS: Slightly different approach depending if intervals are in percentage or sigmas</span></div>
 <div class="line"><span class="lineno">  370</span>  <span class="keywordflow">if</span>(CredibleInSigmas) {</div>
 <div class="line"><span class="lineno">  371</span>    <span class="comment">//KS: Convert sigmas into percentage</span></div>
 <div class="line"><span class="lineno">  372</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> CredReg = <a class="code hl_function" href="StatisticalUtils_8cpp.html#a04394b98587b44b98b003bd1226606ed">GetSigmaValue</a>(<span class="keywordtype">int</span>(std::round(coverage)));</div>
-<div class="line"><span class="lineno">  373</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#acde2a2d3a63538215e4e468c24aa8821">GetCredibleInterval</a>(hist, hpost_copy, CredReg);</div>
+<div class="line"><span class="lineno">  373</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#abf3eda78705f828edb0a6b150413ba36">GetCredibleInterval</a>(hist, hpost_copy, CredReg);</div>
 <div class="line"><span class="lineno">  374</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  375</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#acde2a2d3a63538215e4e468c24aa8821">GetCredibleInterval</a>(hist, hpost_copy, coverage);</div>
+<div class="line"><span class="lineno">  375</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#abf3eda78705f828edb0a6b150413ba36">GetCredibleInterval</a>(hist, hpost_copy, coverage);</div>
 <div class="line"><span class="lineno">  376</span>  }</div>
 <div class="line"><span class="lineno">  377</span>}</div>
 <div class="ttc" id="aStatisticalUtils_8cpp_html_a04394b98587b44b98b003bd1226606ed"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a04394b98587b44b98b003bd1226606ed">GetSigmaValue</a></div><div class="ttdeci">double GetSigmaValue(const int sigma)</div><div class="ttdoc">KS: Convert sigma from normal distribution into percentage.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00036">StatisticalUtils.cpp:36</a></div></div>
-<div class="ttc" id="aStatisticalUtils_8cpp_html_acde2a2d3a63538215e4e468c24aa8821"><div class="ttname"><a href="StatisticalUtils_8cpp.html#acde2a2d3a63538215e4e468c24aa8821">GetCredibleInterval</a></div><div class="ttdeci">void GetCredibleInterval(TH1D *const hist, TH1D *hpost_copy, const double coverage)</div><div class="ttdoc">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning,...</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00316">StatisticalUtils.cpp:316</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_abf3eda78705f828edb0a6b150413ba36"><div class="ttname"><a href="StatisticalUtils_8cpp.html#abf3eda78705f828edb0a6b150413ba36">GetCredibleInterval</a></div><div class="ttdeci">void GetCredibleInterval(const std::unique_ptr&lt; TH1D &gt; &amp;hist, std::unique_ptr&lt; TH1D &gt; &amp;hpost_copy, const double coverage)</div><div class="ttdoc">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning,...</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00316">StatisticalUtils.cpp:316</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a6f27b5ae9457e87d23c52f2b7ee3fd2b" name="a6f27b5ae9457e87d23c52f2b7ee3fd2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f27b5ae9457e87d23c52f2b7ee3fd2b">&#9670;&#160;</a></span>GetCredibleRegion()</h2>
+<a id="a8057f3bef3e98fdcd42b57bc283bc806" name="a8057f3bef3e98fdcd42b57bc283bc806"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8057f3bef3e98fdcd42b57bc283bc806">&#9670;&#160;</a></span>GetCredibleRegion()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -887,7 +887,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void GetCredibleRegion </td>
           <td>(</td>
-          <td class="paramtype">TH2D *const&#160;</td>
+          <td class="paramtype">std::unique_ptr&lt; TH2D &gt; &amp;&#160;</td>
           <td class="paramname"><em>hist2D</em>, </td>
         </tr>
         <tr>
@@ -918,7 +918,7 @@ Functions</h2></td></tr>
 <p>Replace bin value by -1 so it is not looped over as being maximum bin again</p>
 
 <p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00380">380</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  380</span>                                                                  {</div>
+<div class="fragment"><div class="line"><span class="lineno">  380</span>                                                                           {</div>
 <div class="line"><span class="lineno">  381</span><span class="comment">// ***************</span></div>
 <div class="line"><span class="lineno">  382</span>  <span class="keywordflow">if</span>(coverage &gt; 1)</div>
 <div class="line"><span class="lineno">  383</span>  {</div>
@@ -967,8 +967,8 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a7679ed4cc0f915500e223e1f51b34821" name="a7679ed4cc0f915500e223e1f51b34821"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7679ed4cc0f915500e223e1f51b34821">&#9670;&#160;</a></span>GetCredibleRegionSig()</h2>
+<a id="ab0babebde48f51680e675beaa1dd8c33" name="ab0babebde48f51680e675beaa1dd8c33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0babebde48f51680e675beaa1dd8c33">&#9670;&#160;</a></span>GetCredibleRegionSig()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -976,7 +976,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void GetCredibleRegionSig </td>
           <td>(</td>
-          <td class="paramtype">TH2D *const&#160;</td>
+          <td class="paramtype">std::unique_ptr&lt; TH2D &gt; &amp;&#160;</td>
           <td class="paramname"><em>hist2D</em>, </td>
         </tr>
         <tr>
@@ -1009,17 +1009,17 @@ Functions</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00431">431</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  431</span>                                                                                                  {</div>
+<div class="fragment"><div class="line"><span class="lineno">  431</span>                                                                                                           {</div>
 <div class="line"><span class="lineno">  432</span><span class="comment">// ***************</span></div>
 <div class="line"><span class="lineno">  433</span>  <span class="keywordflow">if</span>(CredibleInSigmas) {</div>
 <div class="line"><span class="lineno">  434</span>    <span class="comment">//KS: Convert sigmas into percentage</span></div>
 <div class="line"><span class="lineno">  435</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> CredReg = <a class="code hl_function" href="StatisticalUtils_8cpp.html#a04394b98587b44b98b003bd1226606ed">GetSigmaValue</a>(<span class="keywordtype">int</span>(std::round(coverage)));</div>
-<div class="line"><span class="lineno">  436</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a6f27b5ae9457e87d23c52f2b7ee3fd2b">GetCredibleRegion</a>(hist2D, CredReg);</div>
+<div class="line"><span class="lineno">  436</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a8057f3bef3e98fdcd42b57bc283bc806">GetCredibleRegion</a>(hist2D, CredReg);</div>
 <div class="line"><span class="lineno">  437</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  438</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a6f27b5ae9457e87d23c52f2b7ee3fd2b">GetCredibleRegion</a>(hist2D, coverage);</div>
+<div class="line"><span class="lineno">  438</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a8057f3bef3e98fdcd42b57bc283bc806">GetCredibleRegion</a>(hist2D, coverage);</div>
 <div class="line"><span class="lineno">  439</span>  }</div>
 <div class="line"><span class="lineno">  440</span>}</div>
-<div class="ttc" id="aStatisticalUtils_8cpp_html_a6f27b5ae9457e87d23c52f2b7ee3fd2b"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a6f27b5ae9457e87d23c52f2b7ee3fd2b">GetCredibleRegion</a></div><div class="ttdeci">void GetCredibleRegion(TH2D *const hist2D, const double coverage)</div><div class="ttdoc">KS: Set 2D contour within some coverage.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00380">StatisticalUtils.cpp:380</a></div></div>
+<div class="ttc" id="aStatisticalUtils_8cpp_html_a8057f3bef3e98fdcd42b57bc283bc806"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a8057f3bef3e98fdcd42b57bc283bc806">GetCredibleRegion</a></div><div class="ttdeci">void GetCredibleRegion(std::unique_ptr&lt; TH2D &gt; &amp;hist2D, const double coverage)</div><div class="ttdoc">KS: Set 2D contour within some coverage.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00380">StatisticalUtils.cpp:380</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

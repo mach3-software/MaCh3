@@ -119,6 +119,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">GetThreadIndex</a> ()</td></tr>
 <tr class="memdesc:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="mdescLeft">&#160;</td><td class="mdescRight">thread index inside parallel loop  <br /></td></tr>
 <tr class="separator:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa374c88684482cdd66297f6ae828372d"><td class="memTemplParams" colspan="2">template&lt;typename ObjectType &gt; </td></tr>
+<tr class="memitem:aa374c88684482cdd66297f6ae828372d"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; ObjectType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">Clone</a> (const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</td></tr>
+<tr class="memdesc:aa374c88684482cdd66297f6ae828372d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.  <br /></td></tr>
+<tr class="separator:aa374c88684482cdd66297f6ae828372d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae577be53e3bb2051d10f34fd054c3e5d"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">MatrixMult</a> (double *A, double *B, int n)</td></tr>
 <tr class="memdesc:ae577be53e3bb2051d10f34fd054c3e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
 <tr class="separator:ae577be53e3bb2051d10f34fd054c3e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,6 +247,62 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="aa374c88684482cdd66297f6ae828372d" name="aa374c88684482cdd66297f6ae828372d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa374c88684482cdd66297f6ae828372d">&#9670;&#160;</a></span>Clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ObjectType &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; ObjectType &gt; M3::Clone </td>
+          <td>(</td>
+          <td class="paramtype">const ObjectType *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ObjectType</td><td>The type of the object to clone for example TH1D or TH2Poly. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">obj</td><td>Pointer to the object to clone. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::unique_ptr&lt;ObjectType&gt; Owning pointer to the cloned object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00137">137</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  137</span>                                                                                   {</div>
+<div class="line"><span class="lineno">  138</span>  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
+<div class="line"><span class="lineno">  141</span>  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
+<div class="line"><span class="lineno">  142</span>  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  143</span> </div>
+<div class="line"><span class="lineno">  144</span>  <span class="keywordflow">return</span> Hist;</div>
+<div class="line"><span class="lineno">  145</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ad501f876b26ca2cef7bb5f434deaffb8" name="ad501f876b26ca2cef7bb5f434deaffb8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad501f876b26ca2cef7bb5f434deaffb8">&#9670;&#160;</a></span>fmaf_t()</h2>
 

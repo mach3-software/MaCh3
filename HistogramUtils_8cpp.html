@@ -195,9 +195,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa22d114df73293219d5360244921248a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8cpp.html#aa22d114df73293219d5360244921248a">MakeFluctuatedHistogramAlternative</a> (TH2Poly *FluctHist, TH2Poly *PolyHist, TRandom3 *rand)</td></tr>
 <tr class="memdesc:aa22d114df73293219d5360244921248a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check.  <br /></td></tr>
 <tr class="separator:aa22d114df73293219d5360244921248a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b61160c5ff362348884cb311e827221"><td class="memItemLeft" align="right" valign="top">TGraphAsymmErrors *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8cpp.html#a3b61160c5ff362348884cb311e827221">MakeAsymGraph</a> (TH1D *sigmaArrayLeft, TH1D *sigmaArrayCentr, TH1D *sigmaArrayRight, const std::string &amp;title)</td></tr>
-<tr class="memdesc:a3b61160c5ff362348884cb311e827221"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by sigma variation, check how 1 sigma changes spectra.  <br /></td></tr>
-<tr class="separator:a3b61160c5ff362348884cb311e827221"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a792a2482c0eaaececd33ce9aaf1f3caf"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; TGraphAsymmErrors &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8cpp.html#a792a2482c0eaaececd33ce9aaf1f3caf">MakeAsymGraph</a> (TH1 *sigmaArrayLeft, TH1 *sigmaArrayCentr, TH1 *sigmaArrayRight, const std::string &amp;title)</td></tr>
+<tr class="memdesc:a792a2482c0eaaececd33ce9aaf1f3caf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by sigma variation, check how 1 sigma changes spectra.  <br /></td></tr>
+<tr class="separator:a792a2482c0eaaececd33ce9aaf1f3caf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5057e3deaf657180213e52d3f5bc41cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="HistogramUtils_8cpp.html#a5057e3deaf657180213e52d3f5bc41cc">FastViolinFill</a> (TH2D *violin, TH1D *hist_1d)</td></tr>
 <tr class="memdesc:a5057e3deaf657180213e52d3f5bc41cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Fill Violin histogram with entry from a toy.  <br /></td></tr>
 <tr class="separator:a5057e3deaf657180213e52d3f5bc41cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -623,28 +623,28 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a3b61160c5ff362348884cb311e827221" name="a3b61160c5ff362348884cb311e827221"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b61160c5ff362348884cb311e827221">&#9670;&#160;</a></span>MakeAsymGraph()</h2>
+<a id="a792a2482c0eaaececd33ce9aaf1f3caf" name="a792a2482c0eaaececd33ce9aaf1f3caf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a792a2482c0eaaececd33ce9aaf1f3caf">&#9670;&#160;</a></span>MakeAsymGraph()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TGraphAsymmErrors * MakeAsymGraph </td>
+          <td class="memname">std::unique_ptr&lt; TGraphAsymmErrors &gt; MakeAsymGraph </td>
           <td>(</td>
-          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramtype">TH1 *&#160;</td>
           <td class="paramname"><em>sigmaArrayLeft</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramtype">TH1 *&#160;</td>
           <td class="paramname"><em>sigmaArrayCentr</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramtype">TH1 *&#160;</td>
           <td class="paramname"><em>sigmaArrayRight</em>, </td>
         </tr>
         <tr>
@@ -674,9 +674,9 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A <code>TGraphAsymmErrors</code> object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00516">516</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  516</span>                                                                                                                             {</div>
+<div class="fragment"><div class="line"><span class="lineno">  516</span>                                                                                                                                        {</div>
 <div class="line"><span class="lineno">  517</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  518</span>  TGraphAsymmErrors *var = <span class="keyword">new</span> TGraphAsymmErrors(sigmaArrayCentr);</div>
+<div class="line"><span class="lineno">  518</span>  <span class="keyword">auto</span> var = std::make_unique&lt;TGraphAsymmErrors&gt;(sigmaArrayCentr);</div>
 <div class="line"><span class="lineno">  519</span>  var-&gt;SetNameTitle((title).c_str(), (title).c_str());</div>
 <div class="line"><span class="lineno">  520</span> </div>
 <div class="line"><span class="lineno">  521</span>  <span class="comment">// Need to draw TGraphs to set axes labels</span></div>
