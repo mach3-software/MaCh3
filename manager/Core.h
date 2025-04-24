@@ -48,8 +48,8 @@ namespace M3 {
   constexpr static const float Zero_F = 0.;
   constexpr static const int Unity_Int = 1;
 
-  constexpr static const double KinematicLowBound = -1e16;
-  constexpr static const double KinematicUpBound = 1e16;
+  constexpr static const double KinematicLowBound = std::numeric_limits<double>::lowest();
+  constexpr static const double KinematicUpBound = std::numeric_limits<double>::max();
 
   /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
   constexpr static const double _LARGE_LOGL_ = 1234567890.0;
