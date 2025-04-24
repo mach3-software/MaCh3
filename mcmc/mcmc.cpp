@@ -183,11 +183,16 @@ void mcmc::ProposeStep() {
         CovFolder->GetFile()->Flush();
 
         MACH3LOG_INFO("Saving adaptive throw matrix at step {} for systematic {}", total_steps_str, systematics[s]->getName());
-        TMatrixDSym *throwMatrix = systematics[s]->getThrowMatrix();
-        for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
-          std::cout << (*throwMatrix)(i, i) << " ";
+        #ifdef DEBUG
+        if (debug) {
+          TMatrixDSym *throwMatrix = systematics[s]->getThrowMatrix();
+          debugFile << "Saving adaptive throw matrix at step " << total_steps_str << " for systematic " << systematics[s]->getName() << std::endl;
+          for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
+            debugFile << (*throwMatrix)(i, i) << " ";
+          }
+          debugFile << std::endl;
         }
-        std::cout << std::endl;
+        #endif
       }
     }
   }
