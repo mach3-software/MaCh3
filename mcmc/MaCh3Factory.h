@@ -1,6 +1,7 @@
 #pragma once
 
 // MaCh3 includes
+#include "manager/YamlHelper.h"
 #include "mcmc/FitterBase.h"
 #include "mcmc/mcmc.h"
 #include "mcmc/PSO.h"
@@ -103,6 +104,11 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 
   CovObject->setStepScale(StepScale);
 
+  // Adaptive MCMC stuff
+  if (CheckNodeExists(FitManager->raw(), "AdaptionOptions")) {
+    CovObject->initialiseAdaption(FitManager->raw());
+  }
+  
   return CovObject;
 }
 
