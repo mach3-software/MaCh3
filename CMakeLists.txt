@@ -103,7 +103,6 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
-  -march=native           # Optimize for the native architecture
 )
 # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
