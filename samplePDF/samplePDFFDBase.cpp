@@ -147,15 +147,16 @@ void samplePDFFDBase::ReadSampleConfig()
   double low_bound = 0;
   double up_bound = 0;
   double KinematicParamter = 0;
+
   std::vector<double> SelectionVec;
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
     SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
-    SelectionBounds.push_back(SelectionCuts["Bounds"].as<std::vector<double>>());
-    low_bound = SelectionBounds.back().at(0);
-    up_bound = SelectionBounds.back().at(1);
+    auto TempBoundsVec = GetBounds(SelectionCuts["Bounds"]);
+    low_bound = TempBoundsVec[0];
+    up_bound = TempBoundsVec[1];
     KinematicParamter = static_cast<double>(ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>()));
-    MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), SelectionBounds.back().at(0), SelectionBounds.back().at(1));
+    MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), TempBoundsVec[0], TempBoundsVec[1]);
     SelectionVec = {KinematicParamter, low_bound, up_bound};
     StoredSelection.push_back(SelectionVec);
   }
