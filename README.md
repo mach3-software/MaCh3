@@ -170,7 +170,7 @@ Based on several test here are recommended version:
 
 ## Help and Guidelines
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
-- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
