@@ -140,6 +140,10 @@ void mcmc::ProposeStep() {
     syst_llh[s] = systematics[s]->GetLikelihood();
     llh += syst_llh[s];
 
+    #ifdef DEBUG
+    if (debug) debugFile << "LLH after " << systematics[s]->getName() << " " << llh << std::endl;
+    #endif
+
     // HH: Save the adaptive proposal matrix if needed
     if (systematics[s]->getUseAdaptive()) {
       adaptive_mcmc::AdaptiveMCMCHandler *AdaptiveHandler = systematics[s]->getAdaptiveHandler();
