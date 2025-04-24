@@ -46,6 +46,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
    * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
    * AdaptionSaveNIterations [int]:    You don't have to save every adaptive stage so decide how often you want to save
    * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
+   * OuputFileName [std::string]  :    Name of the file that the adaptive matrices will be saved into
    */
 
   // setAdaptionDefaults();
@@ -60,11 +61,18 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
     return false;
   }
 
+  if(!CheckNodeExists(adapt_manager, "AdaptionOptions", "Settings", "AdaptiveOutputFileName")) {
+    MACH3LOG_ERROR("No AdaptiveOutputFileName specified in AdaptionOptions::Settings into your config file");
+    MACH3LOG_ERROR("This is required if you are using adaptive MCMC");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartThrow"], 10);
   start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"], 0);
   end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
   adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionSaveNIterations"], 1);
+  output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptiveOutputFileName"], "");
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
@@ -127,23 +135,43 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
 
 // ********************************************
 //HW: Truly adaptive MCMC!
-void AdaptiveMCMCHandler::SaveAdaptiveToFile(const TString& outFileName, const TString& systematicName){
-// ********************************************
-  TFile* outFile = new TFile(outFileName, "UPDATE");
-  if(outFile->IsZombie()){
-    MACH3LOG_ERROR("Couldn't find {}", outFileName);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
+                                             const std::string &systematicName, bool is_final) {
+  // ********************************************
+
+  if (iteration_counter % adaptive_save_n_iterations == 0 || is_final) {
+
+    TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
+    if (outFile->IsZombie()) {
+      MACH3LOG_ERROR("Couldn't find {}", outFileName);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    TVectorD *outMeanVec = new TVectorD(int(par_means.size()));
+    for (int i = 0; i < int(par_means.size()); i++) {
+      (*outMeanVec)(i) = par_means[i];
+    }
+
+    std::string adaptive_cov_name = systematicName + "_posfit_matrix";
+    std::string mean_vec_name = systematicName + "_mean_vec";
+    if (!is_final) {
+      // Some string to make the name of the saved adaptive matrix clear
+      std::string total_steps_str =
+          std::to_string(total_steps);
+      std::string syst_name_str = systematicName;
+      adaptive_cov_name =
+          total_steps_str + '_' + syst_name_str + std::string("_throw_matrix");
+      mean_vec_name =
+          total_steps_str + '_' + syst_name_str + std::string("_mean_vec");
+    }
+
+    outFile->cd();
+    adaptive_covariance->Write(adaptive_cov_name.c_str());
+    outMeanVec->Write(mean_vec_name.c_str());
+    outFile->Close();
+    delete outMeanVec;
+    delete outFile;
   }
-  TVectorD* outMeanVec = new TVectorD(int(par_means.size()));
-  for(int i = 0; i < int(par_means.size()); i++){
-    (*outMeanVec)(i) = par_means[i];
-  }
-  outFile->cd();
-  adaptive_covariance->Write(systematicName+"_postfit_matrix");
-  outMeanVec->Write(systematicName+"_mean_vec");
-  outFile->Close();
-  delete outMeanVec;
-  delete outFile;
 }
 
 // ********************************************

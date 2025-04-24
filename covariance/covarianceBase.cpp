@@ -1094,7 +1094,10 @@ void covarianceBase::updateAdaptiveCovariance(){
   if(AdaptiveHandler.UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
+    //Also Save the adaptive to file
+    AdaptiveHandler.SaveAdaptiveToFile(AdaptiveHandler.output_file_name,getName());
   }
+
   AdaptiveHandler.total_steps++;
 }
 

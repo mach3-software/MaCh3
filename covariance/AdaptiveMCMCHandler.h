@@ -34,7 +34,7 @@ class AdaptiveMCMCHandler{
   void SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices, const int Npars);
 
   /// @brief HW: Save adaptive throw matrix to file
-  void SaveAdaptiveToFile(const TString& outFileName, const TString& systematicName);
+  void SaveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName, const bool is_final=false);
 
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
@@ -82,6 +82,9 @@ class AdaptiveMCMCHandler{
 
   /// Count the number of adaptive iterations performed
   int iteration_counter;
+
+  /// Name of the file to save the adpative matrices into
+  std::string output_file_name;
 
   /// Indices for block-matrix adaption
   std::vector<int> adapt_block_matrix_indices;

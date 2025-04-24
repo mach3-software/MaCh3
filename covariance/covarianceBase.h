@@ -171,7 +171,7 @@ class covarianceBase {
   /// @param adapt_manager Node having from which we load all adaptation options
   void initialiseAdaption(const YAML::Node& adapt_manager);
   /// @brief Save adaptive throw matrix to file
-  void saveAdaptiveToFile(const TString& outFileName, const TString& systematicName) {
+  void saveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName) {
     AdaptiveHandler.SaveAdaptiveToFile(outFileName, systematicName); }
 
   /// @brief Do we adapt or not
