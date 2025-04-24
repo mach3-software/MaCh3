@@ -12,6 +12,7 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file HistogramUtils.h
 /// @author Will Parker
+/// @author Kamil Skwarczynski
 
 /// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly);
@@ -126,9 +127,8 @@ double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 
 /// @brief Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
 double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
 
-
 namespace M3 {
-/// @brief Creates a copy of a ROOT-like object and wraps it in a smart pointer.
+/// @brief KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.
 ///
 /// @tparam ObjectType The type of the object to clone for example TH1D or TH2Poly.
 /// @param obj Pointer to the object to clone.
