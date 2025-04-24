@@ -1092,26 +1092,6 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 
   if(AdaptiveHandler.UpdateMatrixAdapt()) {
-    std::cout << "==== Updating throw matrix ====" << std::endl;
-    std::cout << "Current step:" << AdaptiveHandler.total_steps << std::endl;
-    std::cout << "Cov matrix: " << std::endl;
-    for (int i = 0; i < covMatrix->GetNrows(); ++i) {
-        std::cout << (*covMatrix)(i, i) << " ";
-    }
-    std::cout << std::endl;
-    
-    std::cout << "Old matrix: " << std::endl;
-    for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
-        std::cout << (*throwMatrix)(i, i) << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "New matrix: " << std::endl;
-    for (int i = 0; i < AdaptiveHandler.adaptive_covariance->GetNrows(); ++i) {
-        std::cout << (*AdaptiveHandler.adaptive_covariance)(i, i) << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "===============================" << std::endl;
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
   }
