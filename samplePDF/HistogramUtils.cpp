@@ -513,7 +513,7 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
 }
 
 // *************************
-std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
+std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title) {
 // *************************
   auto var = std::make_unique<TGraphAsymmErrors>(sigmaArrayCentr);
   var->SetNameTitle((title).c_str(), (title).c_str());

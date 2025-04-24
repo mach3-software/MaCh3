@@ -82,7 +82,7 @@ int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
 /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
 /// @param title A tittle for returned object
 /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title);
 
 /// @brief KS: Fill Violin histogram with entry from a toy
 /// @param violin hist that will be filled
