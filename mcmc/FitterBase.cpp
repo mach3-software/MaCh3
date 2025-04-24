@@ -601,12 +601,8 @@ void FitterBase::RunLLHScan() {
       
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
       // This also applies for other parameters like osc, etc.
-      if (lower < cov->GetLowerBound(i)) {
-        lower = cov->GetLowerBound(i);
-      }
-      if (upper > cov->GetUpperBound(i)) {
-        upper = cov->GetUpperBound(i);
-      }
+      lower = std::max(lower, cov->GetLowerBound(i));
+      upper = std::min(upper, cov->GetUpperBound(i));
       MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], prior = {:.2f}", name, n_points, lower, upper, prior);
 
       // Make the TH1D
@@ -949,12 +945,8 @@ void FitterBase::Run2DLLHScan() {
       }
 
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-      if (lower_x < cov->GetLowerBound(i)) {
-        lower_x = cov->GetLowerBound(i);
-      }
-      if (upper_x > cov->GetUpperBound(i)) {
-        upper_x = cov->GetUpperBound(i);
-      }
+      lower_x = std::max(lower_x, cov->GetLowerBound(i));
+      upper_x = std::min(upper_x, cov->GetUpperBound(i));
 
       bool skip = false;
       for(unsigned int is = 0; is < SkipVector.size(); ++is)
@@ -1015,12 +1007,8 @@ void FitterBase::Run2DLLHScan() {
         }
 
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-        if (lower_y < cov->GetLowerBound(j)) {
-          lower_y = cov->GetLowerBound(j);
-        }
-        if (upper_y > cov->GetUpperBound(j)) {
-          upper_y = cov->GetUpperBound(j);
-        }
+        lower_y = std::max(lower_y, cov->GetLowerBound(j));
+        upper_y = std::min(upper_y, cov->GetUpperBound(j));
         MACH3LOG_INFO("Scanning X {} with {} steps, from {} - {}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
         MACH3LOG_INFO("Scanning Y {} with {} steps, from {} - {}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
 
@@ -1214,10 +1202,7 @@ void FitterBase::RunSigmaVar() {
             ss << paramVal;
             std::string parVarTitle = name + "_" + ss.str();
 
-            // This is a TH2D
-
-            std::unique_ptr<TH2Poly> currSamp(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone()));
-            currSamp->SetDirectory(nullptr);
+            auto currSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)));
             // Set a descriptiv-ish title
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
 
@@ -1241,8 +1226,7 @@ void FitterBase::RunSigmaVar() {
 
               for(int ir = 0; ir < nRelevantModes; ir++)
               {
-                std::unique_ptr<TH2Poly> currSampMode(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])->Clone()));
-                currSampMode->SetDirectory(nullptr);
+                auto currSampMode = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->getPDFMode(k, RelevantModes[ir])));
 
                 mode_title_long = title_long + "_" + samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir]);
                 currSampMode->SetNameTitle(mode_title_long.c_str(), mode_title_long.c_str());
@@ -1259,8 +1243,7 @@ void FitterBase::RunSigmaVar() {
             //KS: This will give different results depending if data or Asimov, both have their uses
             if (PlotLLHperBin)
             {
-              std::unique_ptr<TH2Poly> currLLHSamp(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)->Clone()));
-              currLLHSamp->SetDirectory(nullptr);
+              auto currLLHSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->getPDF(k)));
               currLLHSamp->Reset("");
               currLLHSamp->Fill(0.0, 0.0, 0.0);
 
@@ -1316,21 +1299,17 @@ void FitterBase::RunSigmaVar() {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
           std::string title = std::string(samples[ivs]->getPDF(k)->GetName()) + "_" + name;
-          TGraphAsymmErrors *var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
-          TGraphAsymmErrors *var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
+          auto var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
+          auto var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
 
-          TGraphAsymmErrors *var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+"_X_norm").c_str());
-          TGraphAsymmErrors *var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+"_Y_norm").c_str());
+          auto var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+"_X_norm").c_str());
+          auto var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+"_Y_norm").c_str());
 
           dirArrySample[SampleIterator]->cd();
           var_x->Write();
           var_y->Write();
           var_x_norm->Write();
           var_y_norm->Write();
-          delete var_x;
-          delete var_y;
-          delete var_x_norm;
-          delete var_y_norm;
 
           //KS: here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
           if (DoByMode)
@@ -1341,15 +1320,12 @@ void FitterBase::RunSigmaVar() {
 
             for(int ir = 0; ir < nRelevantModes;ir++)
             {
-              TGraphAsymmErrors* var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
-              TGraphAsymmErrors* var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
+              auto var_mode_x = MakeAsymGraph(sigmaArray_mode_x[1][SampleIterator][ir], sigmaArray_mode_x[2][SampleIterator][ir], sigmaArray_mode_x[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_X").c_str());
+              auto var_mode_y = MakeAsymGraph(sigmaArray_mode_y[1][SampleIterator][ir], sigmaArray_mode_y[2][SampleIterator][ir], sigmaArray_mode_y[3][SampleIterator][ir], (title+"_"+samples[ivs]->GetMaCh3Modes()->GetMaCh3ModeName(RelevantModes[ir])+"_Y").c_str());
 
               dirArrySample[SampleIterator]->cd();
               var_mode_x->Write();
               var_mode_y->Write();
-
-              delete var_mode_x;
-              delete var_mode_y;
             } // end for nRelevantModes
           } // end if mode
 
