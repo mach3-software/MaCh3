@@ -1,6 +1,4 @@
 #include "covariance/AdaptiveMCMCHandler.h"
-#include "manager/MaCh3Logger.h"
-#include <cstddef>
 
 namespace adaptive_mcmc{
 
