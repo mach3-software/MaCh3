@@ -1,7 +1,6 @@
 #pragma once
 
 // MaCh3 includes
-#include "manager/YamlHelper.h"
 #include "mcmc/FitterBase.h"
 #include "mcmc/mcmc.h"
 #include "mcmc/PSO.h"

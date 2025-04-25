@@ -1,5 +1,4 @@
 #include "mcmc.h"
-#include "manager/MaCh3Logger.h"
 
 // *************************
 // Initialise the manager and make it an object of mcmc class
