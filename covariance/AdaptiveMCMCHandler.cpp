@@ -61,18 +61,18 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
     return false;
   }
 
-  if(!CheckNodeExists(adapt_manager, "AdaptionOptions", "Settings", "AdaptiveOutputFileName")) {
+  if(!CheckNodeExists(adapt_manager, "AdaptionOptions", "Settings", "OutputFileName")) {
     MACH3LOG_ERROR("No AdaptiveOutputFileName specified in AdaptionOptions::Settings into your config file");
     MACH3LOG_ERROR("This is required if you are using adaptive MCMC");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartThrow"], 10);
-  start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"], 0);
-  end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
-  adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
-  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionSaveNIterations"], 1);
-  output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptiveOutputFileName"], "");
+  start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartThrow"], 10);
+  start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartUpdate"], 0);
+  end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["EndUpdate"], 10000);
+  adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["UpdateStep"], 100);
+  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1);
+  output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
