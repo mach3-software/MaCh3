@@ -9,7 +9,7 @@ _MaCh3_Safe_Include_End_ //}
 #include <algorithm>
 #include <memory>
 
-samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov) : samplePDFBase()
+samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov, OscillatorBase* OscillatorObj_) : samplePDFBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
@@ -25,7 +25,12 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
     MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
   }
   OscCov = osc_cov;
-  
+
+  if (OscillatorObj_ != nullptr) {
+    MACH3LOG_WARN("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
+    NuOscProbCalcers.push_back(OscillatorObj_);
+  }
+
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
 
@@ -52,7 +57,7 @@ samplePDFFDBase::~samplePDFFDBase()
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
  
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
-    delete NuOscProbCalcers[iCalc];
+    if (NuOscProbCalcers[iCalc] != nullptr) delete NuOscProbCalcers[iCalc];
   }
 
   if(THStackLeg != nullptr) delete THStackLeg;
@@ -207,7 +212,15 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
   MACH3LOG_INFO("Setting up NuOscillator..");
-  SetupNuOscillator(); 
+  if (NuOscProbCalcers.size() != 0) {
+    MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
+    MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
+    EqualBinningPerOscChannel = true;
+  } else {
+    InitialiseNuOscillatorObjects();
+  }
+  SetupNuOscillatorPointers();
+  OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -1259,7 +1272,7 @@ void samplePDFFDBase::addData(TH2D* Data) {
 }
 
 // ************************************************
-void samplePDFFDBase::SetupNuOscillator() {
+void samplePDFFDBase::InitialiseNuOscillatorObjects() {
 // ************************************************
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   if (!OscCov) {
@@ -1325,7 +1338,11 @@ void samplePDFFDBase::SetupNuOscillator() {
       NuOscProbCalcers[iSample]->Setup();
     }
   }
-  
+
+  delete OscillFactory;
+}
+
+void samplePDFFDBase::SetupNuOscillatorPointers() {
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -1381,9 +1398,7 @@ void samplePDFFDBase::SetupNuOscillator() {
       } // end if NC
     } // end loop over events
   }// end loop over channels
-  delete OscillFactory;
 
-  OscParams = OscCov->GetOscParsFromDetID(SampleDetID);
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
