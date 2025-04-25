@@ -152,10 +152,6 @@ Variables</h2></td></tr>
 <tr class="separator:a2c65b735b4367784c25f7a02a75ec218"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a562b8b4a9a841b9fb76d69a33489aefe"><td class="memItemLeft" align="right" valign="top">static constexpr const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a562b8b4a9a841b9fb76d69a33489aefe">Unity_Int</a> = 1</td></tr>
 <tr class="separator:a562b8b4a9a841b9fb76d69a33489aefe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a889843c4944ea4c89dd03ef2d1000a96"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">KinematicLowBound</a> = std::numeric_limits&lt;double&gt;::lowest()</td></tr>
-<tr class="separator:a889843c4944ea4c89dd03ef2d1000a96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae55af9a5eb2878e4c5e4bbe5c2af029d"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">KinematicUpBound</a> = std::numeric_limits&lt;double&gt;::max()</td></tr>
-<tr class="separator:ae55af9a5eb2878e4c5e4bbe5c2af029d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">_LARGE_LOGL_</a> = 1234567890.0</td></tr>
 <tr class="memdesc:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed.  <br /></td></tr>
 <tr class="separator:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,7 +171,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00028">28</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00026">26</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -191,7 +187,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00029">29</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00027">27</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -207,7 +203,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00030">30</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00028">28</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -351,14 +347,14 @@ template&lt;typename T &gt; </div>
 
 <p>Function template for fused multiply-add. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00035">35</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   35</span>                                    {</div>
-<div class="line"><span class="lineno">   36</span><span class="preprocessor">    #ifdef _LOW_MEMORY_STRUCTS_</span></div>
-<div class="line"><span class="lineno">   37</span>    <span class="keywordflow">return</span> std::fmaf(x, y, z);</div>
-<div class="line"><span class="lineno">   38</span><span class="preprocessor">    #else</span></div>
-<div class="line"><span class="lineno">   39</span>    <span class="keywordflow">return</span> std::fma(x, y, z);</div>
-<div class="line"><span class="lineno">   40</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">   41</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00033">33</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   33</span>                                    {</div>
+<div class="line"><span class="lineno">   34</span><span class="preprocessor">    #ifdef _LOW_MEMORY_STRUCTS_</span></div>
+<div class="line"><span class="lineno">   35</span>    <span class="keywordflow">return</span> std::fmaf(x, y, z);</div>
+<div class="line"><span class="lineno">   36</span><span class="preprocessor">    #else</span></div>
+<div class="line"><span class="lineno">   37</span>    <span class="keywordflow">return</span> std::fma(x, y, z);</div>
+<div class="line"><span class="lineno">   38</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   39</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -651,7 +647,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00042">42</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00040">40</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -675,7 +671,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00043">43</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00041">41</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -699,7 +695,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00044">44</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00042">42</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -725,55 +721,7 @@ template&lt;typename T &gt; </div>
 
 <p>Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00057">57</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
-
-</div>
-</div>
-<a id="a889843c4944ea4c89dd03ef2d1000a96" name="a889843c4944ea4c89dd03ef2d1000a96"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a889843c4944ea4c89dd03ef2d1000a96">&#9670;&#160;</a></span>KinematicLowBound</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr const double M3::KinematicLowBound = std::numeric_limits&lt;double&gt;::lowest()</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00053">53</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
-
-</div>
-</div>
-<a id="ae55af9a5eb2878e4c5e4bbe5c2af029d" name="ae55af9a5eb2878e4c5e4bbe5c2af029d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae55af9a5eb2878e4c5e4bbe5c2af029d">&#9670;&#160;</a></span>KinematicUpBound</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr const double M3::KinematicUpBound = std::numeric_limits&lt;double&gt;::max()</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00054">54</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00052">52</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -799,7 +747,7 @@ template&lt;typename T &gt; </div>
 
 <p>Some commonly used variables to which we set pointers to. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00047">47</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00045">45</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -823,7 +771,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00049">49</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00047">47</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -847,7 +795,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00051">51</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00049">49</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -871,7 +819,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00048">48</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00046">46</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -895,7 +843,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00050">50</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00048">48</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>

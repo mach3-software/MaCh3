@@ -103,7 +103,7 @@ var searchData=
   ['str2int_100',['str2int',['../Structs_8h.html#ab29c200876205c3add1d71f053195658',1,'Structs.h']]],
   ['strendswith_101',['strEndsWith',['../classMaCh3Plotting_1_1InputManager.html#a9f98ca215112178b1de36e328424aa35',1,'MaCh3Plotting::InputManager']]],
   ['stringtoyaml_102',['STRINGtoYAML',['../YamlHelper_8h.html#a3ff1f2154c0a70ad5a145fcc5891e7ec',1,'YamlHelper.h']]],
-  ['stripduplicatedmodes_103',['StripDuplicatedModes',['../classsplineFDBase.html#a12ca4766e2a8d10c1474f5af55a1572d',1,'splineFDBase']]],
+  ['stripduplicatedmodes_103',['StripDuplicatedModes',['../classsplineFDBase.html#a4926750455273cdfc56ebe7cadc16ef5',1,'splineFDBase']]],
   ['studybic_104',['StudyBIC',['../classSampleSummary.html#a3560f062913ea70912e7b9a1cb93e2a5',1,'SampleSummary']]],
   ['studydic_105',['StudyDIC',['../classSampleSummary.html#a8e73fe07b8b8dfb1e2ee9245df4e7a4b',1,'SampleSummary']]],
   ['studyinformationcriterion_106',['StudyInformationCriterion',['../classSampleSummary.html#a02dcccd537e6e9a9ffc46b31429306ce',1,'SampleSummary']]],

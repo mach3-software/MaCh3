@@ -358,86 +358,53 @@ $(function() {
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>  }</div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>}</div>
 <div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="comment">// **********************</span></div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">  331</a></span><span class="comment"></span><span class="keyword">inline</span> <span class="keyword">const</span> YAML::Node &amp; <a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(<span class="keyword">const</span> YAML::Node &amp;n) {</div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="comment">// **********************</span></div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>  <span class="keywordflow">return</span> n;</div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>}</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span> </div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span><span class="comment">// **********************</span></div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">  347</a></span><span class="comment"></span><span class="keyword">inline</span> YAML::Node <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(YAML::Node a, YAML::Node b) {</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="comment">// **********************</span></div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>  <span class="keywordflow">if</span> (!b.IsMap()) {</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    <span class="comment">// If b is not a map, merge result is b, unless b is null</span></div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    <span class="keywordflow">return</span> b.IsNull() ? a : b;</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>  }</div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>  <span class="keywordflow">if</span> (!a.IsMap()) {</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    <span class="comment">// If a is not a map, merge result is b</span></div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="keywordflow">return</span> b;</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>  }</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>  <span class="keywordflow">if</span> (!b.size()) {</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <span class="comment">// If a is a map, and b is an empty map, return a</span></div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>  }</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>  <span class="comment">// Create a new map &#39;c&#39; with the same mappings as a, merged with b</span></div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>  <span class="keyword">auto</span> c = YAML::Node(YAML::NodeType::Map);</div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : a) {</div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <span class="keywordflow">if</span> (n.first.IsScalar()) {</div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>      <span class="keyword">const</span> std::string &amp; key = n.first.Scalar();</div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>      <span class="keyword">auto</span> t = (<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(b)[key]);</div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>      <span class="keywordflow">if</span> (t) {</div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>        c[n.first] = <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(n.second, t);</div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>      }</div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>    }</div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>    c[n.first] = n.second;</div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>  }</div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>  <span class="comment">// Add the mappings from &#39;b&#39; not already in &#39;c&#39;</span></div>
-<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : b) {</div>
-<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>    <span class="keywordflow">if</span> (!n.first.IsScalar() || !<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(c)[n.first.Scalar()]) {</div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>      c[n.first] = n.second;</div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    }</div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>  }</div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>  <span class="keywordflow">return</span> c;</div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>}</div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span> </div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span> </div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span><span class="comment">// **********************</span></div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">  396</a></span><span class="comment"></span><span class="keyword">inline</span> std::vector&lt;double&gt; <a class="code hl_function" href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a>(<span class="keyword">const</span> YAML::Node&amp; node, <span class="keyword">const</span> std::string&amp; File, <span class="keyword">const</span> <span class="keywordtype">int</span> Line) {</div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span><span class="comment">// **********************</span></div>
-<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>  std::vector&lt;double&gt; bounds;</div>
-<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span> </div>
-<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>  <span class="keywordflow">if</span> (!node || !node.IsSequence() || node.size() != 2) {</div>
-<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Bounds must be a sequence of exactly 2 elements, got size {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(node.size()));</div>
-<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>  }</div>
-<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span> </div>
-<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>  <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; 2; ++i) {</div>
-<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    <span class="keyword">const</span> YAML::Node&amp; val = node[i];</div>
-<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span> </div>
-<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>    <span class="keywordflow">if</span> (!val || val.IsNull() || (val.IsScalar() &amp;&amp; val.Scalar().empty())) {</div>
-<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>      bounds.push_back(i == 0 ? <a class="code hl_variable" href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a> : <a class="code hl_variable" href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">M3::KinematicUpBound</a>);</div>
-<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (val.IsScalar()) {</div>
-<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>      <span class="keywordflow">try</span> {</div>
-<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>        bounds.push_back(val.as&lt;<span class="keywordtype">double</span>&gt;());</div>
-<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>      } <span class="keywordflow">catch</span> (<span class="keyword">const</span> YAML::BadConversion&amp; e) {</div>
-<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid value in Bounds[{}]: &#39;{}&#39;. Expected a number or empty string.&quot;</span>,</div>
-<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>                       <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i), <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(val.Scalar()));</div>
-<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>      }</div>
-<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid type in Bounds[{}]&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
-<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>    }</div>
-<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>  }</div>
-<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>  <span class="keywordflow">return</span> bounds;</div>
-<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>}</div>
-<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span> </div>
-<div class="line"><a id="l00427" name="l00427"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">  427</a></span><span class="preprocessor">#define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)</span></div>
-<div class="line"><a id="l00428" name="l00428"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#ae828b8f0cb6b6bbd5fd4e7e5aaf9632f">  428</a></span><span class="preprocessor">#define GetBounds(filename) ParseBounds((filename), __FILE__, __LINE__)</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">  328</a></span><span class="preprocessor">#define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)</span></div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span> </div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span><span class="comment">// **********************</span></div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">  334</a></span><span class="comment"></span><span class="keyword">inline</span> <span class="keyword">const</span> YAML::Node &amp; <a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(<span class="keyword">const</span> YAML::Node &amp;n) {</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="comment">// **********************</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>  <span class="keywordflow">return</span> n;</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>}</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span> </div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="comment">// **********************</span></div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno"><a class="line" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">  350</a></span><span class="comment"></span><span class="keyword">inline</span> YAML::Node <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(YAML::Node a, YAML::Node b) {</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span><span class="comment">// **********************</span></div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>  <span class="keywordflow">if</span> (!b.IsMap()) {</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    <span class="comment">// If b is not a map, merge result is b, unless b is null</span></div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    <span class="keywordflow">return</span> b.IsNull() ? a : b;</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>  }</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>  <span class="keywordflow">if</span> (!a.IsMap()) {</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="comment">// If a is not a map, merge result is b</span></div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <span class="keywordflow">return</span> b;</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>  }</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>  <span class="keywordflow">if</span> (!b.size()) {</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    <span class="comment">// If a is a map, and b is an empty map, return a</span></div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>  }</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>  <span class="comment">// Create a new map &#39;c&#39; with the same mappings as a, merged with b</span></div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>  <span class="keyword">auto</span> c = YAML::Node(YAML::NodeType::Map);</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : a) {</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>    <span class="keywordflow">if</span> (n.first.IsScalar()) {</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>      <span class="keyword">const</span> std::string &amp; key = n.first.Scalar();</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>      <span class="keyword">auto</span> t = (<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(b)[key]);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>      <span class="keywordflow">if</span> (t) {</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>        c[n.first] = <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(n.second, t);</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>      }</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>    }</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>    c[n.first] = n.second;</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>  }</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>  <span class="comment">// Add the mappings from &#39;b&#39; not already in &#39;c&#39;</span></div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : b) {</div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <span class="keywordflow">if</span> (!n.first.IsScalar() || !<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(c)[n.first.Scalar()]) {</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>      c[n.first] = n.second;</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    }</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>  }</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>  <span class="keywordflow">return</span> c;</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>}</div>
 <div class="ttc" id="aCore_8h_html"><div class="ttname"><a href="Core_8h.html">Core.h</a></div></div>
-<div class="ttc" id="aCore_8h_html_a46b8fa28114cf68de4549061568b5ade"><div class="ttname"><a href="Core_8h.html#a46b8fa28114cf68de4549061568b5ade">_MaCh3_Safe_Include_Start_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_Start_</div><div class="ttdoc">KS: Avoiding warning checking for headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00085">Core.h:85</a></div></div>
-<div class="ttc" id="aCore_8h_html_a91209a17295738b34b124b79faa68a1b"><div class="ttname"><a href="Core_8h.html#a91209a17295738b34b124b79faa68a1b">_MaCh3_Safe_Include_End_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_End_</div><div class="ttdoc">KS: Restore warning checking after including external headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00096">Core.h:96</a></div></div>
+<div class="ttc" id="aCore_8h_html_a46b8fa28114cf68de4549061568b5ade"><div class="ttname"><a href="Core_8h.html#a46b8fa28114cf68de4549061568b5ade">_MaCh3_Safe_Include_Start_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_Start_</div><div class="ttdoc">KS: Avoiding warning checking for headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00080">Core.h:80</a></div></div>
+<div class="ttc" id="aCore_8h_html_a91209a17295738b34b124b79faa68a1b"><div class="ttname"><a href="Core_8h.html#a91209a17295738b34b124b79faa68a1b">_MaCh3_Safe_Include_End_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_End_</div><div class="ttdoc">KS: Restore warning checking after including external headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00091">Core.h:91</a></div></div>
 <div class="ttc" id="aMaCh3Exception_8h_html"><div class="ttname"><a href="MaCh3Exception_8h.html">MaCh3Exception.h</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a1247d9088f9521c2758d1d7c21dcfa87"><div class="ttname"><a href="YamlHelper_8h.html#a1247d9088f9521c2758d1d7c21dcfa87">GetFromManager</a></div><div class="ttdeci">Type GetFromManager(const YAML::Node &amp;node, Type defval, const std::string File=&quot;&quot;, const int Line=1)</div><div class="ttdoc">Get content of config file if node is not found take default value specified.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00282">YamlHelper.h:282</a></div></div>
@@ -446,9 +413,8 @@ $(function() {
 <div class="ttc" id="aYamlHelper_8h_html_a2a8231c2076b91564e31e55567018f00"><div class="ttname"><a href="YamlHelper_8h.html#a2a8231c2076b91564e31e55567018f00">FindFromManager</a></div><div class="ttdeci">T FindFromManager(const YAML::Node &amp;node, Args... args)</div><div class="ttdoc">Wrapper function to call the recursive helper.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00082">YamlHelper.h:82</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a2d4f3247b6e13ef8c127ff66e699d3cb"><div class="ttname"><a href="YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb">YAMLtoTMacro</a></div><div class="ttdeci">TMacro YAMLtoTMacro(const YAML::Node &amp;yaml_node, const std::string &amp;name)</div><div class="ttdoc">Convert a YAML node to a ROOT TMacro object.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00159">YamlHelper.h:159</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a2ec5eac7a7a860300203a9c418e802ee"><div class="ttname"><a href="YamlHelper_8h.html#a2ec5eac7a7a860300203a9c418e802ee">CheckNodeExistsHelper</a></div><div class="ttdeci">bool CheckNodeExistsHelper(const T &amp;node)</div><div class="ttdoc">Use this like this CheckNodeExists(config, &quot;LikelihoodOptions&quot;, &quot;TestStatistic&quot;); KS: Base case for r...</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00032">YamlHelper.h:32</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_a30fc1dad7dde70247024fbb1c8f89bdc"><div class="ttname"><a href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a></div><div class="ttdeci">const YAML::Node &amp; Cnode(const YAML::Node &amp;n)</div><div class="ttdoc">KS: Convenience wrapper to return a YAML node as-is.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00331">YamlHelper.h:331</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_a372c930e488d1e260c1184dc25921fe3"><div class="ttname"><a href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a></div><div class="ttdeci">YAML::Node MergeNodes(YAML::Node a, YAML::Node b)</div><div class="ttdoc">KS: Recursively merges two YAML nodes.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00347">YamlHelper.h:347</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_a3c6595806e439f4ff22e04c22bbe18f9"><div class="ttname"><a href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a></div><div class="ttdeci">std::vector&lt; double &gt; ParseBounds(const YAML::Node &amp;node, const std::string &amp;File, const int Line)</div><div class="ttdoc">KS: Get bounds from YAML for example for selection cuts.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00396">YamlHelper.h:396</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_a30fc1dad7dde70247024fbb1c8f89bdc"><div class="ttname"><a href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a></div><div class="ttdeci">const YAML::Node &amp; Cnode(const YAML::Node &amp;n)</div><div class="ttdoc">KS: Convenience wrapper to return a YAML node as-is.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00334">YamlHelper.h:334</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_a372c930e488d1e260c1184dc25921fe3"><div class="ttname"><a href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a></div><div class="ttdeci">YAML::Node MergeNodes(YAML::Node a, YAML::Node b)</div><div class="ttdoc">KS: Recursively merges two YAML nodes.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00350">YamlHelper.h:350</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a3ff1f2154c0a70ad5a145fcc5891e7ec"><div class="ttname"><a href="YamlHelper_8h.html#a3ff1f2154c0a70ad5a145fcc5891e7ec">STRINGtoYAML</a></div><div class="ttdeci">YAML::Node STRINGtoYAML(const std::string &amp;yaml_string)</div><div class="ttdoc">Function to convert a YAML string to a YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00090">YamlHelper.h:90</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a57276bf6624191db1d835a88b711e096"><div class="ttname"><a href="YamlHelper_8h.html#a57276bf6624191db1d835a88b711e096">DemangleTypeName</a></div><div class="ttdeci">std::string DemangleTypeName(const std::string &amp;mangledName)</div><div class="ttdoc">Function to demangle type names.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00247">YamlHelper.h:247</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a7d9483510cc8dcf165dc9e13f85a7e3e"><div class="ttname"><a href="YamlHelper_8h.html#a7d9483510cc8dcf165dc9e13f85a7e3e">LoadYamlConfig</a></div><div class="ttdeci">YAML::Node LoadYamlConfig(const std::string &amp;filename, const std::string &amp;File, const int Line)</div><div class="ttdoc">Open YAML file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00309">YamlHelper.h:309</a></div></div>
@@ -459,8 +425,6 @@ $(function() {
 <div class="ttc" id="aYamlHelper_8h_html_ab5a40370dca062f6b2c87fabece7db27"><div class="ttname"><a href="YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27">Get</a></div><div class="ttdeci">Type Get(const YAML::Node &amp;node, const std::string File, const int Line)</div><div class="ttdoc">Get content of config file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00260">YamlHelper.h:260</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad2340a340fd6649a6d220abc16d4757b"><div class="ttname"><a href="YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b">CheckNodeExists</a></div><div class="ttdeci">bool CheckNodeExists(const YAML::Node &amp;node, Args... args)</div><div class="ttdoc">KS: Wrapper function to call the recursive helper.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00053">YamlHelper.h:53</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a889843c4944ea4c89dd03ef2d1000a96"><div class="ttname"><a href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a></div><div class="ttdeci">static constexpr const double KinematicLowBound</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00053">Core.h:53</a></div></div>
-<div class="ttc" id="anamespaceM3_html_ae55af9a5eb2878e4c5e4bbe5c2af029d"><div class="ttname"><a href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">M3::KinematicUpBound</a></div><div class="ttdeci">static constexpr const double KinematicUpBound</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00054">Core.h:54</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
