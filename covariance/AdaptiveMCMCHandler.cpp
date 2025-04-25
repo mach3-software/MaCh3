@@ -1,4 +1,5 @@
 #include "covariance/AdaptiveMCMCHandler.h"
+#include "manager/MaCh3Logger.h"
 #include "manager/YamlHelper.h"
 #include <cstddef>
 
@@ -62,7 +63,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   }
 
   if(!CheckNodeExists(adapt_manager, "AdaptionOptions", "Settings", "OutputFileName")) {
-    MACH3LOG_ERROR("No AdaptiveOutputFileName specified in AdaptionOptions::Settings into your config file");
+    MACH3LOG_ERROR("No OutputFileName specified in AdaptionOptions::Settings into your config file");
     MACH3LOG_ERROR("This is required if you are using adaptive MCMC");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -313,6 +314,8 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Adaption Matrix Start Update       : {}", start_adaptive_update);
   MACH3LOG_INFO("Adaption Matrix Ending Updates     : {}", end_adaptive_update);
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
+  MACH3LOG_INFO("Saving matrices to file            : {}", output_file_name);
+  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
 }
 
 } //end adaptive_mcmc
