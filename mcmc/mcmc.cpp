@@ -151,57 +151,6 @@ void mcmc::ProposeStep() {
     #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[s]->getName() << " " << llh << std::endl;
     #endif
-
-    // HH: Save the adaptive proposal matrix if needed
-    //if (systematics[s]->getUseAdaptive()) {
-    //  adaptive_mcmc::AdaptiveMCMCHandler *AdaptiveHandler = systematics[s]->getAdaptiveHandler();
-    //  if (AdaptiveHandler->UpdateMatrixAdapt() && 
-    //    // Also check if want to save this specific iteration
-    //    // e.g. if you are adapting every 10k steps and the total steps is currently 50k
-    //    // the adaptive iteration would only be save if adaptive_save_n_iterations is 1 or 5
-    //    AdaptiveHandler->iteration_counter % AdaptiveHandler->adaptive_save_n_iterations == 0) {
-    //    // HH: Save the adaptive throw matrix and mean vector
-    //    CovFolder->cd();
-
-    //    //Get the adaptive covaraince matrix so we can save it to file
-    //    TMatrixDSym* adacov_save = static_cast<TMatrixDSym*>(AdaptiveHandler->adaptive_covariance->Clone());
-
-    //    //Need to keep track of the parameter value means
-    //    TVectorD* outMeanVec = new TVectorD(static_cast<int>(AdaptiveHandler->par_means.size()));
-    //    for(int i = 0; i < static_cast<int>(AdaptiveHandler->par_means.size()); i++){
-    //      (*outMeanVec)(i) = AdaptiveHandler->par_means[i];
-    //    }
-
-    //    //Some string to make the name of the saved adaptive matrix clear
-    //    std::string total_steps_str = std::to_string(AdaptiveHandler->total_steps);
-    //    std::string syst_name_str = systematics[s]->getName();
-    //    std::string adacov_name = total_steps_str+'_'+syst_name_str+std::string ("_throw_matrix");
-    //    std::string adamean_name = total_steps_str+'_'+syst_name_str+std::string ("_mean_vec");
-    //    adacov_save->Write(adacov_name.c_str());
-    //    outMeanVec->Write(adamean_name.c_str());
-
-    //    //Now clean up a little
-    //    delete adacov_save;
-    //    delete outMeanVec;
-
-    //    //Now update the CovFolder
-    //    CovFolder->Write();
-    //    // HH: We need to flush the file to make sure the data is written  
-    //    CovFolder->GetFile()->Flush();
-
-    //    MACH3LOG_INFO("Saving adaptive throw matrix at step {} for systematic {}", total_steps_str, systematics[s]->getName());
-    //    #ifdef DEBUG
-    //    if (debug) {
-    //      TMatrixDSym *throwMatrix = systematics[s]->getThrowMatrix();
-    //      debugFile << "Saving adaptive throw matrix at step " << total_steps_str << " for systematic " << systematics[s]->getName() << std::endl;
-    //      for (int i = 0; i < throwMatrix->GetNrows(); ++i) {
-    //        debugFile << (*throwMatrix)(i, i) << " ";
-    //      }
-    //      debugFile << std::endl;
-    //    }
-    //    #endif
-    //  }
-    //}
   }
 
   // Check if we've hit a boundary in the systematics
