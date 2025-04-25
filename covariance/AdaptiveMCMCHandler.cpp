@@ -13,7 +13,6 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   end_adaptive_update   = 1;
   adaptive_update_step  = 1000;
   total_steps = 0;
-  iteration_counter = 0;
 
   par_means = {};
   adaptive_covariance = nullptr;
@@ -140,7 +139,7 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
                                              const std::string &systematicName, bool is_final) {
   // ********************************************
 
-  if (iteration_counter % adaptive_save_n_iterations == 0 || is_final) {
+  if (((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0 || is_final) {
 
     TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
     if (outFile->IsZombie()) {
@@ -283,9 +282,6 @@ bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
     // Check whether the number of steps is divisible by the adaptive update step
     // e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true
     (total_steps - start_adaptive_throw)%adaptive_update_step == 0) {
-    // update the iteration counter as well which will be used to decide if you want to save this iteration
-    // of the matrix or not
-    iteration_counter = (total_steps - start_adaptive_throw) / adaptive_update_step;
     return true;
   } 
   else return false;
