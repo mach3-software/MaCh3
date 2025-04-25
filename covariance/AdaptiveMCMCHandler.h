@@ -80,9 +80,6 @@ class AdaptiveMCMCHandler{
   /// you can specify this here
   int adaptive_save_n_iterations;
 
-  /// Count the number of adaptive iterations performed
-  int iteration_counter;
-
   /// Name of the file to save the adpative matrices into
   std::string output_file_name;
 
