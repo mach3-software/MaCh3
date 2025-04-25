@@ -53,7 +53,7 @@ var searchData=
   ['getenabledllhbysample_50',['getEnabledLLHBySample',['../classMaCh3Plotting_1_1InputManager.html#ae2d12152db0ed06d1d862dad2cb4cc9e',1,'MaCh3Plotting::InputManager']]],
   ['getenabledmcmcchain_51',['getEnabledMCMCchain',['../classMaCh3Plotting_1_1InputManager.html#aeac58645b18dbc0784adc4b44ee0b33b',1,'MaCh3Plotting::InputManager']]],
   ['geterror_52',['GetError',['../group__Setters.html#ga8302ee285a54445832506fcd0a1bf274',1,'covarianceBase']]],
-  ['geteventsplines_53',['GetEventSplines',['../classsplineFDBase.html#adbfd0004315a7f2c14d3172485a8c469',1,'splineFDBase']]],
+  ['geteventsplines_53',['GetEventSplines',['../classsplineFDBase.html#a6ae7d5d4ff39bf9ab1035dfaf2d087f1',1,'splineFDBase']]],
   ['geteventweight_54',['GetEventWeight',['../classsamplePDFFDBase.html#a1b5a95bfad60e1f630f62a712721a198',1,'samplePDFFDBase']]],
   ['getfdcov_55',['GetFDCov',['../classMCMCProcessor.html#ab831ff0257b1f3137e1711df115a8b8d',1,'MCMCProcessor']]],
   ['getfile_56',['getFile',['../classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49',1,'MaCh3Plotting::InputManager']]],
