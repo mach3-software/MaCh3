@@ -324,9 +324,6 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
   }
 }
 
-/// Macro to simplify calling LoadYaml with file and line info
-#define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)
-
 // **********************
 /// @brief KS: Convenience wrapper to return a YAML node as-is.
 /// @param n Input YAML node.
@@ -382,3 +379,50 @@ inline YAML::Node MergeNodes(YAML::Node a, YAML::Node b) {
   }
   return c;
 }
+
+
+// **********************
+/// @brief KS: Get bounds from YAML for example for selection cuts
+///
+/// This function expects a YAML node of exactly two elements. If any of the elements
+/// is an empty string or null, it is replaced with a default kinematic bound.
+/// If the element is a non-empty string and cannot be converted to a double,
+/// an exception is thrown.
+///
+/// @param node The YAML node containing the bounds.
+/// @param File The name of the file calling this function (for error context).
+/// @param Line The line number in the file calling this function.
+/// @return std::vector<double> A vector of size 2 with the parsed bounds.
+inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string& File, const int Line) {
+// **********************
+  std::vector<double> bounds;
+
+  if (!node || !node.IsSequence() || node.size() != 2) {
+    MACH3LOG_ERROR("Bounds must be a sequence of exactly 2 elements, got size {}", static_cast<int>(node.size()));
+    throw MaCh3Exception(File, Line);
+  }
+
+  for (std::size_t i = 0; i < 2; ++i) {
+    const YAML::Node& val = node[i];
+
+    if (!val || val.IsNull() || (val.IsScalar() && val.Scalar().empty())) {
+      bounds.push_back(i == 0 ? M3::KinematicLowBound : M3::KinematicUpBound);
+    } else if (val.IsScalar()) {
+      try {
+        bounds.push_back(val.as<double>());
+      } catch (const YAML::BadConversion& e) {
+        MACH3LOG_ERROR("Invalid value in Bounds[{}]: '{}'. Expected a number or empty string.",
+                       static_cast<int>(i), static_cast<std::string>(val.Scalar()));
+        throw MaCh3Exception(File, Line);
+      }
+    } else {
+      MACH3LOG_ERROR("Invalid type in Bounds[{}]", static_cast<int>(i));
+      throw MaCh3Exception(File, Line);
+    }
+  }
+  return bounds;
+}
+
+/// Macro to simplify calling LoadYaml with file and line info
+#define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)
+#define GetBounds(filename) ParseBounds((filename), __FILE__, __LINE__)
