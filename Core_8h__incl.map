@@ -1,9 +1,10 @@
 <map id="manager/Core.h" name="manager/Core.h">
-<area shape="rect" id="node1" title=" " alt="" coords="227,5,354,31"/>
+<area shape="rect" id="node1" title=" " alt="" coords="275,5,402,31"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,79,80,104"/>
 <area shape="rect" id="node3" title=" " alt="" coords="105,79,178,104"/>
 <area shape="rect" id="node4" title=" " alt="" coords="203,79,283,104"/>
 <area shape="rect" id="node5" title=" " alt="" coords="307,79,370,104"/>
 <area shape="rect" id="node6" title=" " alt="" coords="395,79,469,104"/>
 <area shape="rect" id="node7" title=" " alt="" coords="494,79,557,104"/>
+<area shape="rect" id="node8" title=" " alt="" coords="581,79,640,104"/>
 </map>

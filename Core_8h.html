@@ -98,18 +98,20 @@ $(function() {
 <code>#include &lt;vector&gt;</code><br />
 <code>#include &lt;iomanip&gt;</code><br />
 <code>#include &lt;cmath&gt;</code><br />
+<code>#include &lt;limits&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Core.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="Core_8h__incl.png" border="0" usemap="#amanager_2Core_8h" alt=""/></div>
 <map name="amanager_2Core_8h" id="amanager_2Core_8h">
-<area shape="rect" title=" " alt="" coords="227,5,354,31"/>
+<area shape="rect" title=" " alt="" coords="275,5,402,31"/>
 <area shape="rect" title=" " alt="" coords="5,79,80,104"/>
 <area shape="rect" title=" " alt="" coords="105,79,178,104"/>
 <area shape="rect" title=" " alt="" coords="203,79,283,104"/>
 <area shape="rect" title=" " alt="" coords="307,79,370,104"/>
 <area shape="rect" title=" " alt="" coords="395,79,469,104"/>
 <area shape="rect" title=" " alt="" coords="494,79,557,104"/>
+<area shape="rect" title=" " alt="" coords="581,79,640,104"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -230,6 +232,10 @@ Variables</h2></td></tr>
 <tr class="separator:a2c65b735b4367784c25f7a02a75ec218"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a562b8b4a9a841b9fb76d69a33489aefe"><td class="memItemLeft" align="right" valign="top">static constexpr const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a562b8b4a9a841b9fb76d69a33489aefe">M3::Unity_Int</a> = 1</td></tr>
 <tr class="separator:a562b8b4a9a841b9fb76d69a33489aefe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a889843c4944ea4c89dd03ef2d1000a96"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a> = std::numeric_limits&lt;double&gt;::lowest()</td></tr>
+<tr class="separator:a889843c4944ea4c89dd03ef2d1000a96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae55af9a5eb2878e4c5e4bbe5c2af029d"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">M3::KinematicUpBound</a> = std::numeric_limits&lt;double&gt;::max()</td></tr>
+<tr class="separator:ae55af9a5eb2878e4c5e4bbe5c2af029d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a> = 1234567890.0</td></tr>
 <tr class="memdesc:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed.  <br /></td></tr>
 <tr class="separator:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -257,7 +263,7 @@ Luke Pickering </dd></dl>
 
 <p>KS: Restore warning checking after including external headers. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00091">91</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00096">96</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -284,7 +290,7 @@ Luke Pickering </dd></dl>
 <p>KS: Avoiding warning checking for headers. </p>
 <p>Many external files don't strictly adhere to rigorous C++ standards. Inline functions in such headers may cause errors when compiled with strict MaCh3 compiler flags. </p><dl class="section warning"><dt>Warning</dt><dd>Use this for any external header file to avoid warnings. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00080">80</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00085">85</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -302,7 +308,7 @@ Luke Pickering </dd></dl>
 
 <p>KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00057">57</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00062">62</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -320,7 +326,7 @@ Luke Pickering </dd></dl>
 
 <p>KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have <b>restrict</b>. As always we use <em>restrict</em> to more easily turn off restrict in the code. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00064">64</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00069">69</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -338,7 +344,7 @@ Luke Pickering </dd></dl>
 
 <p>Number of overflow bins in TH2Poly,. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00070">70</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00075">75</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
