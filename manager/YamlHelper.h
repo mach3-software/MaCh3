@@ -326,3 +326,59 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
 
 /// Macro to simplify calling LoadYaml with file and line info
 #define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)
+
+// **********************
+/// @brief KS: Convenience wrapper to return a YAML node as-is.
+/// @param n Input YAML node.
+/// @return Reference to the same YAML node.
+inline const YAML::Node & Cnode(const YAML::Node &n) {
+// **********************
+  return n;
+}
+
+// **********************
+/// @brief KS: Recursively merges two YAML nodes.
+///
+/// If both nodes are maps, their keys are merged. Scalar or null values in `b`
+/// will override those in `a`. If `b` is null, `a` is returned unchanged.
+///
+/// @note Based on https://stackoverflow.com/a/41337824
+///
+/// @param a The base YAML node.
+/// @param b The YAML node to merge into `a`.
+/// @return A new YAML node representing the merged result.
+inline YAML::Node MergeNodes(YAML::Node a, YAML::Node b) {
+// **********************
+  if (!b.IsMap()) {
+    // If b is not a map, merge result is b, unless b is null
+    return b.IsNull() ? a : b;
+  }
+  if (!a.IsMap()) {
+    // If a is not a map, merge result is b
+    return b;
+  }
+  if (!b.size()) {
+    // If a is a map, and b is an empty map, return a
+    return a;
+  }
+  // Create a new map 'c' with the same mappings as a, merged with b
+  auto c = YAML::Node(YAML::NodeType::Map);
+  for (auto n : a) {
+    if (n.first.IsScalar()) {
+      const std::string & key = n.first.Scalar();
+      auto t = (Cnode(b)[key]);
+      if (t) {
+        c[n.first] = MergeNodes(n.second, t);
+        continue;
+      }
+    }
+    c[n.first] = n.second;
+  }
+  // Add the mappings from 'b' not already in 'c'
+  for (auto n : b) {
+    if (!n.first.IsScalar() || !Cnode(c)[n.first.Scalar()]) {
+      c[n.first] = n.second;
+    }
+  }
+  return c;
+}
