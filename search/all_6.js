@@ -36,7 +36,7 @@ var searchData=
   ['findpostfitparamerror_33',['findPostFitParamError',['../classMaCh3Plotting_1_1InputManager.html#ab379210534dceaf26a6b3506fd47da27',1,'MaCh3Plotting::InputManager']]],
   ['findrawchainsteps_34',['findRawChainSteps',['../classMaCh3Plotting_1_1InputManager.html#ab547af49427a637364a6d58f484c6826',1,'MaCh3Plotting::InputManager']]],
   ['findrootobject_35',['findRootObject',['../classMaCh3Plotting_1_1InputManager.html#a7e9f932d7591cbdd6c99c56c2da75f85',1,'MaCh3Plotting::InputManager']]],
-  ['findsplinebinning_36',['FindSplineBinning',['../classsplineFDBase.html#a00c0e93b4c4799ffacaa58578e5dcf6b',1,'splineFDBase']]],
+  ['findsplinebinning_36',['FindSplineBinning',['../classsplineFDBase.html#a748088069e6a32f836401fe37644ca5d',1,'splineFDBase']]],
   ['findsplinesegment_37',['FindSplineSegment',['../classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f',1,'PySplineBase::FindSplineSegment()'],['../classSplineBase.html#a589011b547ff70262ed43021a016ef30',1,'SplineBase::FindSplineSegment()']]],
   ['findx_38',['FindX',['../classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf',1,'TSpline3_red']]],
   ['finertia_39',['fInertia',['../classPSO.html#a9b3d14a97a9d838a9f009f9cc54968d3',1,'PSO']]],
