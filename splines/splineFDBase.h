@@ -42,12 +42,12 @@ class splineFDBase : public SplineBase {
     virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
-    std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
+    std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
     /// @brief Return the splines which affect a given event
-    std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
+    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
 
     /// @brief Grab histograms with spline binning
-    std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
+    std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleName);
 
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
     std::string getDimLabel(const int BinningOpt, const unsigned int Axis) const;
