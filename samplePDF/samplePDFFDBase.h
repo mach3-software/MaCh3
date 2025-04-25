@@ -285,9 +285,7 @@ public:
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
   std::vector< std::vector<double> > StoredSelection;
   /// @brief the strings grabbed from the sample config specifying the selections
-  std::vector< std::string > SelectionStr; 
-  /// @brief the bounds for each selection lower and upper
-  std::vector< std::vector<double> > SelectionBounds;
+  std::vector< std::string > SelectionStr;
   /// @brief a way to store selection cuts which you may push back in the get1DVar functions
   /// most of the time this is just the same as StoredSelection
   std::vector< std::vector<double> > Selection;

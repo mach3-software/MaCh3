@@ -201,11 +201,7 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     //ETA - a bit of a fudge but works
-    auto TempBoundsVec = Get<std::vector<double>>(param["Systematic"]["ParameterBounds"], __FILE__ , __LINE__);
-    if(TempBoundsVec.size() != 2) {
-      MACH3LOG_ERROR("Size of param bounds isn't 2 and is equal to {}", TempBoundsVec.size());
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+    auto TempBoundsVec = GetBounds(param["Systematic"]["ParameterBounds"]);
     _fLowBound[i] = TempBoundsVec[0];
     _fUpBound[i] = TempBoundsVec[1];
 

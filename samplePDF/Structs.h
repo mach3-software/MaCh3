@@ -79,6 +79,40 @@ void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
 
 // *******************
 /// @brief Generic cleanup function
+/// @todo Use recursive to make it more scalable in future
+template <typename T>
+void CleanVector(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T>>>>>>> &vec) {
+// *******************
+  for (auto& v6 : vec) {
+    for (auto& v5 : v6) {
+      for (auto& v4 : v5) {
+        for (auto& v3 : v4) {
+          for (auto& v2 : v3) {
+            for (auto& v1 : v2) {
+              v1.clear();
+              v1.shrink_to_fit();
+            }
+            v2.clear();
+            v2.shrink_to_fit();
+          }
+          v3.clear();
+          v3.shrink_to_fit();
+        }
+        v4.clear();
+        v4.shrink_to_fit();
+      }
+      v5.clear();
+      v5.shrink_to_fit();
+    }
+    v6.clear();
+    v6.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
 template <typename T>
 void CleanContainer(std::vector<T*>& container) {
 // *******************

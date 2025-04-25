@@ -52,6 +52,10 @@ IsTrue(MaCh3_MULTITHREAD_ENABLED DAN_USE_MULTITHREAD)
 IsTrue(MaCh3_LOW_MEMORY_STRUCTS_ENABLED DAN_DOUBLE)
 SwitchLogic(DAN_DOUBLE)
 
+# Diable GPU at NuOsc
+if(NOT MaCh3_NuOsc_GPU_ENABLED)
+  set(DAN_USE_GPU 0)
+endif()
 # Get the CPU compile options for MaCh3CompilerOptions
 get_target_property(cpu_compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
 
