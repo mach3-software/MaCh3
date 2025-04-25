@@ -12,6 +12,7 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file HistogramUtils.h
 /// @author Will Parker
+/// @author Kamil Skwarczynski
 
 /// @brief WP: Helper function for calculating unbinned Integral of TH2Poly i.e including overflow
 double OverflowIntegral(TH2Poly* poly);
@@ -81,7 +82,7 @@ int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
 /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
 /// @param title A tittle for returned object
 /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title);
+std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title);
 
 /// @brief KS: Fill Violin histogram with entry from a toy
 /// @param violin hist that will be filled
@@ -125,3 +126,21 @@ double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 
 
 /// @brief Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
 double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
+
+namespace M3 {
+/// @brief KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.
+///
+/// @tparam ObjectType The type of the object to clone for example TH1D or TH2Poly.
+/// @param obj Pointer to the object to clone.
+/// @return std::unique_ptr<ObjectType> Owning pointer to the cloned object.
+template <typename ObjectType>
+std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name = "") {
+  std::string cloneName = name.empty() ? obj->GetName() : name;
+
+  std::unique_ptr<ObjectType> Hist(static_cast<ObjectType*>(obj->Clone(cloneName.c_str())));
+  // Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter
+  Hist->SetDirectory(nullptr);
+
+  return Hist;
+}
+}
