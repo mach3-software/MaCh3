@@ -100,9 +100,11 @@ Collaboration diagram for adaptive_mcmc::AdaptiveMCMCHandler:</div>
 <div class="dyncontent">
 <div class="center"><img src="classadaptive__mcmc_1_1AdaptiveMCMCHandler__coll__graph.png" border="0" usemap="#aadaptive__mcmc_1_1AdaptiveMCMCHandler_coll__map" alt="Collaboration graph"/></div>
 <map name="aadaptive__mcmc_1_1AdaptiveMCMCHandler_coll__map" id="aadaptive__mcmc_1_1AdaptiveMCMCHandler_coll__map">
-<area shape="rect" title="Contains information about adaptive covariance matrix ." alt="" coords="20,123,305,148"/>
-<area shape="rect" title=" " alt="" coords="5,5,144,31"/>
-<area shape="rect" title=" " alt="" coords="168,5,333,31"/>
+<area shape="rect" title="Contains information about adaptive covariance matrix ." alt="" coords="80,212,365,237"/>
+<area shape="rect" title=" " alt="" coords="31,95,118,120"/>
+<area shape="rect" title=" " alt="" coords="5,5,144,45"/>
+<area shape="rect" title=" " alt="" coords="153,95,292,120"/>
+<area shape="rect" title=" " alt="" coords="316,95,481,120"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -126,9 +128,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac47f80e6e94cbeb1cdb1a72563f35fe6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac47f80e6e94cbeb1cdb1a72563f35fe6">SetAdaptiveBlocks</a> (std::vector&lt; std::vector&lt; int &gt; &gt; block_indices, const int Npars)</td></tr>
 <tr class="memdesc:ac47f80e6e94cbeb1cdb1a72563f35fe6"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: sets adaptive block matrix.  <br /></td></tr>
 <tr class="separator:ac47f80e6e94cbeb1cdb1a72563f35fe6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a752d312d5fdd755af88b58880a9845ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a752d312d5fdd755af88b58880a9845ec">SaveAdaptiveToFile</a> (const TString &amp;outFileName, const TString &amp;systematicName)</td></tr>
-<tr class="memdesc:a752d312d5fdd755af88b58880a9845ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: Save adaptive throw matrix to file.  <br /></td></tr>
-<tr class="separator:a752d312d5fdd755af88b58880a9845ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c324072616a7a61b24ea4668e6c57ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a4c324072616a7a61b24ea4668e6c57ce">SaveAdaptiveToFile</a> (const std::string &amp;outFileName, const std::string &amp;systematicName, const bool is_final=false)</td></tr>
+<tr class="memdesc:a4c324072616a7a61b24ea4668e6c57ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: Save adaptive throw matrix to file.  <br /></td></tr>
+<tr class="separator:a4c324072616a7a61b24ea4668e6c57ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd1df26766a9f106fe6ce4255ceb0d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aebd1df26766a9f106fe6ce4255ceb0d9">SetThrowMatrixFromFile</a> (const std::string &amp;matrix_file_name, const std::string &amp;matrix_name, const std::string &amp;means_name, bool &amp;use_adaptive, const int Npars)</td></tr>
 <tr class="memdesc:aebd1df26766a9f106fe6ce4255ceb0d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets throw matrix from a file  <br /></td></tr>
 <tr class="separator:aebd1df26766a9f106fe6ce4255ceb0d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,6 +163,11 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ac29758f6988af2d8271fe9950989baf4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a></td></tr>
 <tr class="memdesc:ac29758f6988af2d8271fe9950989baf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Steps between changing throw matrix.  <br /></td></tr>
 <tr class="separator:ac29758f6988af2d8271fe9950989baf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b9bc927e28230929be740d471fb2b6b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_save_n_iterations</a></td></tr>
+<tr class="separator:a7b9bc927e28230929be740d471fb2b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3635f63cb8108f58a76b90250894c31c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a></td></tr>
+<tr class="memdesc:a3635f63cb8108f58a76b90250894c31c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Name of the file to save the adpative matrices into.  <br /></td></tr>
+<tr class="separator:a3635f63cb8108f58a76b90250894c31c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23d17e906a663e2b48dd4dfc96300b02"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a></td></tr>
 <tr class="memdesc:a23d17e906a663e2b48dd4dfc96300b02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices for block-matrix adaption.  <br /></td></tr>
 <tr class="separator:a23d17e906a663e2b48dd4dfc96300b02"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -213,13 +220,13 @@ Public Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   14</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a> = {};</div>
 <div class="line"><span class="lineno">   15</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">   16</span>}</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a066984e9598e073d04edec51511cdf0a"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">adaptive_mcmc::AdaptiveMCMCHandler::par_means</a></div><div class="ttdeci">std::vector&lt; double &gt; par_means</div><div class="ttdoc">Mean values for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00087">AdaptiveMCMCHandler.h:87</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a066984e9598e073d04edec51511cdf0a"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">adaptive_mcmc::AdaptiveMCMCHandler::par_means</a></div><div class="ttdeci">std::vector&lt; double &gt; par_means</div><div class="ttdoc">Mean values for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00094">AdaptiveMCMCHandler.h:94</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a59d194f84b46b159d367477f3d436e10"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">adaptive_mcmc::AdaptiveMCMCHandler::start_adaptive_update</a></div><div class="ttdeci">int start_adaptive_update</div><div class="ttdoc">When do we stop update the adaptive matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00071">AdaptiveMCMCHandler.h:71</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a9708ad2c46d0e7a9ac78f5377fbf8839"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">adaptive_mcmc::AdaptiveMCMCHandler::start_adaptive_throw</a></div><div class="ttdeci">int start_adaptive_throw</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00068">AdaptiveMCMCHandler.h:68</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_aa7d3703d1de3c3fbf32f37cadf58be08"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">adaptive_mcmc::AdaptiveMCMCHandler::end_adaptive_update</a></div><div class="ttdeci">int end_adaptive_update</div><div class="ttdoc">Steps between changing throw matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00074">AdaptiveMCMCHandler.h:74</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ab2837af4566e2d62db7b76f9527fb6d7"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">adaptive_mcmc::AdaptiveMCMCHandler::total_steps</a></div><div class="ttdeci">int total_steps</div><div class="ttdoc">Total number of MCMC steps.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00093">AdaptiveMCMCHandler.h:93</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ab2837af4566e2d62db7b76f9527fb6d7"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">adaptive_mcmc::AdaptiveMCMCHandler::total_steps</a></div><div class="ttdeci">int total_steps</div><div class="ttdoc">Total number of MCMC steps.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00100">AdaptiveMCMCHandler.h:100</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac29758f6988af2d8271fe9950989baf4"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_update_step</a></div><div class="ttdeci">int adaptive_update_step</div><div class="ttdoc">Steps between changing throw matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00077">AdaptiveMCMCHandler.h:77</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_afd61e64f18f5c25dbbd6bb2bd619a268"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_covariance</a></div><div class="ttdeci">TMatrixDSym * adaptive_covariance</div><div class="ttdoc">Full adaptive covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00090">AdaptiveMCMCHandler.h:90</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_afd61e64f18f5c25dbbd6bb2bd619a268"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_covariance</a></div><div class="ttdeci">TMatrixDSym * adaptive_covariance</div><div class="ttdoc">Full adaptive covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00097">AdaptiveMCMCHandler.h:97</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -276,12 +283,12 @@ Public Attributes</h2></td></tr>
 
 <p>To be fair not a clue... </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00260">260</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  260</span>                                         {</div>
-<div class="line"><span class="lineno">  261</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  262</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &lt;= <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  263</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  264</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00296">296</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  296</span>                                         {</div>
+<div class="line"><span class="lineno">  297</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  298</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &lt;= <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  299</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  300</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -303,13 +310,13 @@ Public Attributes</h2></td></tr>
 
 <p>If we don't have a covariance matrix to start from for adaptive tune we need to make one! </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00075">75</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   75</span>                                                                     {</div>
-<div class="line"><span class="lineno">   76</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">   77</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a> = <span class="keyword">new</span> TMatrixDSym(Npars);</div>
-<div class="line"><span class="lineno">   78</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>-&gt;Zero();</div>
-<div class="line"><span class="lineno">   79</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a> = std::vector&lt;double&gt;(Npars, 0);</div>
-<div class="line"><span class="lineno">   80</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00085">85</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   85</span>                                                                     {</div>
+<div class="line"><span class="lineno">   86</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">   87</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a> = <span class="keyword">new</span> TMatrixDSym(Npars);</div>
+<div class="line"><span class="lineno">   88</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>-&gt;Zero();</div>
+<div class="line"><span class="lineno">   89</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a> = std::vector&lt;double&gt;(Npars, 0);</div>
+<div class="line"><span class="lineno">   90</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -330,12 +337,12 @@ Public Attributes</h2></td></tr>
 
 <p>Tell whether we want reset step scale or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00237">237</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  237</span>                                              {</div>
-<div class="line"><span class="lineno">  238</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  239</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> == <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  240</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  241</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00269">269</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  269</span>                                              {</div>
+<div class="line"><span class="lineno">  270</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  271</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> == <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  272</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  273</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -397,37 +404,52 @@ Public Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   41</span><span class="comment">   * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix</span></div>
 <div class="line"><span class="lineno">   42</span><span class="comment">   * AdaptionStartUpdate [int]    :    Do we skip the first N steps?</span></div>
 <div class="line"><span class="lineno">   43</span><span class="comment">   * AdaptionUpdateStep [int]     :    Number of steps between matrix updates</span></div>
-<div class="line"><span class="lineno">   44</span><span class="comment">   * Adaption blocks [vector&lt;vector&lt;int&gt;&gt;] : Splits the throw matrix into several block matrices</span></div>
-<div class="line"><span class="lineno">   45</span><span class="comment">   */</span></div>
-<div class="line"><span class="lineno">   46</span> </div>
-<div class="line"><span class="lineno">   47</span>  <span class="comment">// setAdaptionDefaults();</span></div>
-<div class="line"><span class="lineno">   48</span>  <span class="keywordflow">if</span>(!adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][matrix_name_str]) {</div>
-<div class="line"><span class="lineno">   49</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Adaptive Settings not found for {}, this is fine if you don&#39;t want adaptive MCMC&quot;</span>, matrix_name_str);</div>
-<div class="line"><span class="lineno">   50</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   51</span>  }</div>
-<div class="line"><span class="lineno">   52</span> </div>
-<div class="line"><span class="lineno">   53</span>  <span class="comment">// We&quot;re going to grab this info from the YAML manager</span></div>
-<div class="line"><span class="lineno">   54</span>  <span class="keywordflow">if</span>(!GetFromManager&lt;bool&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][matrix_name_str][<span class="stringliteral">&quot;DoAdaption&quot;</span>], <span class="keyword">false</span>)) {</div>
-<div class="line"><span class="lineno">   55</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Not using adaption for {}&quot;</span>, matrix_name_str);</div>
-<div class="line"><span class="lineno">   56</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   57</span>  }</div>
-<div class="line"><span class="lineno">   58</span> </div>
-<div class="line"><span class="lineno">   59</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>  = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;AdaptionStartThrow&quot;</span>], 10);</div>
-<div class="line"><span class="lineno">   60</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a> = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;AdaptionStartUpdate&quot;</span>], 0);</div>
-<div class="line"><span class="lineno">   61</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">end_adaptive_update</a>   = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;AdaptionEndUpdate&quot;</span>], 10000);</div>
-<div class="line"><span class="lineno">   62</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a>  = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;AdaptionUpdateStep&quot;</span>], 100);</div>
-<div class="line"><span class="lineno">   63</span> </div>
-<div class="line"><span class="lineno">   64</span>  <span class="comment">// We also want to check for &quot;blocks&quot; by default all parameters &quot;know&quot; about each other</span></div>
-<div class="line"><span class="lineno">   65</span>  <span class="comment">// but we can split the matrix into independent block matrices</span></div>
+<div class="line"><span class="lineno">   44</span><span class="comment">   * AdaptionSaveNIterations [int]:    You don&#39;t have to save every adaptive stage so decide how often you want to save</span></div>
+<div class="line"><span class="lineno">   45</span><span class="comment">   * Adaption blocks [vector&lt;vector&lt;int&gt;&gt;] : Splits the throw matrix into several block matrices</span></div>
+<div class="line"><span class="lineno">   46</span><span class="comment">   * OuputFileName [std::string]  :    Name of the file that the adaptive matrices will be saved into</span></div>
+<div class="line"><span class="lineno">   47</span><span class="comment">   */</span></div>
+<div class="line"><span class="lineno">   48</span> </div>
+<div class="line"><span class="lineno">   49</span>  <span class="comment">// setAdaptionDefaults();</span></div>
+<div class="line"><span class="lineno">   50</span>  <span class="keywordflow">if</span>(!adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][matrix_name_str]) {</div>
+<div class="line"><span class="lineno">   51</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Adaptive Settings not found for {}, this is fine if you don&#39;t want adaptive MCMC&quot;</span>, matrix_name_str);</div>
+<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   53</span>  }</div>
+<div class="line"><span class="lineno">   54</span> </div>
+<div class="line"><span class="lineno">   55</span>  <span class="comment">// We&quot;re going to grab this info from the YAML manager</span></div>
+<div class="line"><span class="lineno">   56</span>  <span class="keywordflow">if</span>(!GetFromManager&lt;bool&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][matrix_name_str][<span class="stringliteral">&quot;DoAdaption&quot;</span>], <span class="keyword">false</span>)) {</div>
+<div class="line"><span class="lineno">   57</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Not using adaption for {}&quot;</span>, matrix_name_str);</div>
+<div class="line"><span class="lineno">   58</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   59</span>  }</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>  <span class="keywordflow">if</span>(!<a class="code hl_function" href="YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b">CheckNodeExists</a>(adapt_manager, <span class="stringliteral">&quot;AdaptionOptions&quot;</span>, <span class="stringliteral">&quot;Settings&quot;</span>, <span class="stringliteral">&quot;OutputFileName&quot;</span>)) {</div>
+<div class="line"><span class="lineno">   62</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;No OutputFileName specified in AdaptionOptions::Settings into your config file&quot;</span>);</div>
+<div class="line"><span class="lineno">   63</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This is required if you are using adaptive MCMC&quot;</span>);</div>
+<div class="line"><span class="lineno">   64</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   65</span>  }</div>
 <div class="line"><span class="lineno">   66</span> </div>
-<div class="line"><span class="lineno">   67</span>  <span class="comment">// We&quot;ll set a dummy variable here</span></div>
-<div class="line"><span class="lineno">   68</span>  <span class="keyword">auto</span> matrix_blocks = GetFromManager&lt;std::vector&lt;std::vector&lt;int&gt;&gt;&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][matrix_name_str][<span class="stringliteral">&quot;MatrixBlocks&quot;</span>], {{}});</div>
-<div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>  <a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac47f80e6e94cbeb1cdb1a72563f35fe6">SetAdaptiveBlocks</a>(matrix_blocks, Npars);</div>
-<div class="line"><span class="lineno">   71</span>  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   72</span>}</div>
+<div class="line"><span class="lineno">   67</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>  = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;StartThrow&quot;</span>], 10);</div>
+<div class="line"><span class="lineno">   68</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a> = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;StartUpdate&quot;</span>], 0);</div>
+<div class="line"><span class="lineno">   69</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">end_adaptive_update</a>   = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;EndUpdate&quot;</span>], 10000);</div>
+<div class="line"><span class="lineno">   70</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a>  = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;UpdateStep&quot;</span>], 100);</div>
+<div class="line"><span class="lineno">   71</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_save_n_iterations</a>  = GetFromManager&lt;int&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;SaveNIterations&quot;</span>], 1);</div>
+<div class="line"><span class="lineno">   72</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a> = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Settings&quot;</span>][<span class="stringliteral">&quot;OutputFileName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">   73</span> </div>
+<div class="line"><span class="lineno">   74</span>  <span class="comment">// We also want to check for &quot;blocks&quot; by default all parameters &quot;know&quot; about each other</span></div>
+<div class="line"><span class="lineno">   75</span>  <span class="comment">// but we can split the matrix into independent block matrices</span></div>
+<div class="line"><span class="lineno">   76</span> </div>
+<div class="line"><span class="lineno">   77</span>  <span class="comment">// We&quot;ll set a dummy variable here</span></div>
+<div class="line"><span class="lineno">   78</span>  <span class="keyword">auto</span> matrix_blocks = GetFromManager&lt;std::vector&lt;std::vector&lt;int&gt;&gt;&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][matrix_name_str][<span class="stringliteral">&quot;MatrixBlocks&quot;</span>], {{}});</div>
+<div class="line"><span class="lineno">   79</span> </div>
+<div class="line"><span class="lineno">   80</span>  <a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac47f80e6e94cbeb1cdb1a72563f35fe6">SetAdaptiveBlocks</a>(matrix_blocks, Npars);</div>
+<div class="line"><span class="lineno">   81</span>  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   82</span>}</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac47f80e6e94cbeb1cdb1a72563f35fe6"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac47f80e6e94cbeb1cdb1a72563f35fe6">adaptive_mcmc::AdaptiveMCMCHandler::SetAdaptiveBlocks</a></div><div class="ttdeci">void SetAdaptiveBlocks(std::vector&lt; std::vector&lt; int &gt; &gt; block_indices, const int Npars)</div><div class="ttdoc">HW: sets adaptive block matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00083">AdaptiveMCMCHandler.cpp:83</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad2340a340fd6649a6d220abc16d4757b"><div class="ttname"><a href="YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b">CheckNodeExists</a></div><div class="ttdeci">bool CheckNodeExists(const YAML::Node &amp;node, Args... args)</div><div class="ttdoc">KS: Wrapper function to call the recursive helper.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00053">YamlHelper.h:53</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3635f63cb8108f58a76b90250894c31c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</a></div><div class="ttdeci">std::string output_file_name</div><div class="ttdoc">Name of the file to save the adpative matrices into.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00084">AdaptiveMCMCHandler.h:84</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a7b9bc927e28230929be740d471fb2b6b"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_save_n_iterations</a></div><div class="ttdeci">int adaptive_save_n_iterations</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00081">AdaptiveMCMCHandler.h:81</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac47f80e6e94cbeb1cdb1a72563f35fe6"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac47f80e6e94cbeb1cdb1a72563f35fe6">adaptive_mcmc::AdaptiveMCMCHandler::SetAdaptiveBlocks</a></div><div class="ttdeci">void SetAdaptiveBlocks(std::vector&lt; std::vector&lt; int &gt; &gt; block_indices, const int Npars)</div><div class="ttdoc">HW: sets adaptive block matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00093">AdaptiveMCMCHandler.cpp:93</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -448,21 +470,23 @@ Public Attributes</h2></td></tr>
 
 <p>Print all class members. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00267">267</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  267</span>                                {</div>
-<div class="line"><span class="lineno">  268</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  269</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adaptive MCMC Info:&quot;</span>);</div>
-<div class="line"><span class="lineno">  270</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Throwing from New Matrix from Step : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>);</div>
-<div class="line"><span class="lineno">  271</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adaption Matrix Start Update       : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a>);</div>
-<div class="line"><span class="lineno">  272</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adaption Matrix Ending Updates     : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">end_adaptive_update</a>);</div>
-<div class="line"><span class="lineno">  273</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Steps Between Updates              : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a>);</div>
-<div class="line"><span class="lineno">  274</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00303">303</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  303</span>                                {</div>
+<div class="line"><span class="lineno">  304</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  305</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adaptive MCMC Info:&quot;</span>);</div>
+<div class="line"><span class="lineno">  306</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Throwing from New Matrix from Step : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>);</div>
+<div class="line"><span class="lineno">  307</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adaption Matrix Start Update       : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a>);</div>
+<div class="line"><span class="lineno">  308</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adaption Matrix Ending Updates     : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">end_adaptive_update</a>);</div>
+<div class="line"><span class="lineno">  309</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Steps Between Updates              : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a>);</div>
+<div class="line"><span class="lineno">  310</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Saving matrices to file            : {}&quot;</span>, <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a>);</div>
+<div class="line"><span class="lineno">  311</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Will only save every {} iterations&quot;</span>     , <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_save_n_iterations</a>);</div>
+<div class="line"><span class="lineno">  312</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a752d312d5fdd755af88b58880a9845ec" name="a752d312d5fdd755af88b58880a9845ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a752d312d5fdd755af88b58880a9845ec">&#9670;&#160;</a></span>SaveAdaptiveToFile()</h2>
+<a id="a4c324072616a7a61b24ea4668e6c57ce" name="a4c324072616a7a61b24ea4668e6c57ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c324072616a7a61b24ea4668e6c57ce">&#9670;&#160;</a></span>SaveAdaptiveToFile()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -470,14 +494,20 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">void adaptive_mcmc::AdaptiveMCMCHandler::SaveAdaptiveToFile </td>
           <td>(</td>
-          <td class="paramtype">const TString &amp;&#160;</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>outFileName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const TString &amp;&#160;</td>
-          <td class="paramname"><em>systematicName</em>&#160;</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>systematicName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>is_final</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -489,27 +519,44 @@ Public Attributes</h2></td></tr>
 
 <p>HW: Save adaptive throw matrix to file. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00123">123</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  123</span>                                                                                                     {</div>
-<div class="line"><span class="lineno">  124</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  125</span>  TFile* outFile = <span class="keyword">new</span> TFile(outFileName, <span class="stringliteral">&quot;UPDATE&quot;</span>);</div>
-<div class="line"><span class="lineno">  126</span>  <span class="keywordflow">if</span>(outFile-&gt;IsZombie()){</div>
-<div class="line"><span class="lineno">  127</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find {}&quot;</span>, outFileName);</div>
-<div class="line"><span class="lineno">  128</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  129</span>  }</div>
-<div class="line"><span class="lineno">  130</span>  TVectorD* outMeanVec = <span class="keyword">new</span> TVectorD(<span class="keywordtype">int</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>.size()));</div>
-<div class="line"><span class="lineno">  131</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; int(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>.size()); i++){</div>
-<div class="line"><span class="lineno">  132</span>    (*outMeanVec)(i) = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[i];</div>
-<div class="line"><span class="lineno">  133</span>  }</div>
-<div class="line"><span class="lineno">  134</span>  outFile-&gt;cd();</div>
-<div class="line"><span class="lineno">  135</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>-&gt;Write(systematicName+<span class="stringliteral">&quot;_postfit_matrix&quot;</span>);</div>
-<div class="line"><span class="lineno">  136</span>  outMeanVec-&gt;Write(systematicName+<span class="stringliteral">&quot;_mean_vec&quot;</span>);</div>
-<div class="line"><span class="lineno">  137</span>  outFile-&gt;Close();</div>
-<div class="line"><span class="lineno">  138</span>  <span class="keyword">delete</span> outMeanVec;</div>
-<div class="line"><span class="lineno">  139</span>  <span class="keyword">delete</span> outFile;</div>
-<div class="line"><span class="lineno">  140</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
-<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00135">135</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  136</span>                                                                                             {</div>
+<div class="line"><span class="lineno">  137</span>  <span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  138</span> </div>
+<div class="line"><span class="lineno">  139</span>  <span class="keywordflow">if</span> (((<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> - <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>) / <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a>) % <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_save_n_iterations</a> == 0 || is_final) {</div>
+<div class="line"><span class="lineno">  140</span> </div>
+<div class="line"><span class="lineno">  141</span>    TFile *outFile = <span class="keyword">new</span> TFile(outFileName.c_str(), <span class="stringliteral">&quot;UPDATE&quot;</span>);</div>
+<div class="line"><span class="lineno">  142</span>    <span class="keywordflow">if</span> (outFile-&gt;IsZombie()) {</div>
+<div class="line"><span class="lineno">  143</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find {}&quot;</span>, outFileName);</div>
+<div class="line"><span class="lineno">  144</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  145</span>    }</div>
+<div class="line"><span class="lineno">  146</span> </div>
+<div class="line"><span class="lineno">  147</span>    TVectorD *outMeanVec = <span class="keyword">new</span> TVectorD(<span class="keywordtype">int</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>.size()));</div>
+<div class="line"><span class="lineno">  148</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; int(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>.size()); i++) {</div>
+<div class="line"><span class="lineno">  149</span>      (*outMeanVec)(i) = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[i];</div>
+<div class="line"><span class="lineno">  150</span>    }</div>
+<div class="line"><span class="lineno">  151</span> </div>
+<div class="line"><span class="lineno">  152</span>    std::string adaptive_cov_name = systematicName + <span class="stringliteral">&quot;_posfit_matrix&quot;</span>;</div>
+<div class="line"><span class="lineno">  153</span>    std::string mean_vec_name = systematicName + <span class="stringliteral">&quot;_mean_vec&quot;</span>;</div>
+<div class="line"><span class="lineno">  154</span>    <span class="keywordflow">if</span> (!is_final) {</div>
+<div class="line"><span class="lineno">  155</span>      <span class="comment">// Some string to make the name of the saved adaptive matrix clear</span></div>
+<div class="line"><span class="lineno">  156</span>      std::string total_steps_str =</div>
+<div class="line"><span class="lineno">  157</span>          std::to_string(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>);</div>
+<div class="line"><span class="lineno">  158</span>      std::string syst_name_str = systematicName;</div>
+<div class="line"><span class="lineno">  159</span>      adaptive_cov_name =</div>
+<div class="line"><span class="lineno">  160</span>          total_steps_str + <span class="charliteral">&#39;_&#39;</span> + syst_name_str + std::string(<span class="stringliteral">&quot;_throw_matrix&quot;</span>);</div>
+<div class="line"><span class="lineno">  161</span>      mean_vec_name =</div>
+<div class="line"><span class="lineno">  162</span>          total_steps_str + <span class="charliteral">&#39;_&#39;</span> + syst_name_str + std::string(<span class="stringliteral">&quot;_mean_vec&quot;</span>);</div>
+<div class="line"><span class="lineno">  163</span>    }</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>    outFile-&gt;cd();</div>
+<div class="line"><span class="lineno">  166</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>-&gt;Write(adaptive_cov_name.c_str());</div>
+<div class="line"><span class="lineno">  167</span>    outMeanVec-&gt;Write(mean_vec_name.c_str());</div>
+<div class="line"><span class="lineno">  168</span>    outFile-&gt;Close();</div>
+<div class="line"><span class="lineno">  169</span>    <span class="keyword">delete</span> outMeanVec;</div>
+<div class="line"><span class="lineno">  170</span>    <span class="keyword">delete</span> outFile;</div>
+<div class="line"><span class="lineno">  171</span>  }</div>
+<div class="line"><span class="lineno">  172</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -547,47 +594,48 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00083">83</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   83</span>                                                                                                    {</div>
-<div class="line"><span class="lineno">   84</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">   85</span>  <span class="comment">/*</span></div>
-<div class="line"><span class="lineno">   86</span><span class="comment">   *   In order to adapt efficient we want to setup our throw matrix to be a serious of block-diagonal (ish) matrices</span></div>
-<div class="line"><span class="lineno">   87</span><span class="comment">   *</span></div>
-<div class="line"><span class="lineno">   88</span><span class="comment">   *   To do this we set sub-block in the config by parameter index. For example having</span></div>
-<div class="line"><span class="lineno">   89</span><span class="comment">   *   [[0,4],[4, 6]] in your config will set up two blocks one with all indices 0&lt;=i&lt;4 and the other with 4&lt;=i&lt;6</span></div>
-<div class="line"><span class="lineno">   90</span><span class="comment">   */</span></div>
-<div class="line"><span class="lineno">   91</span>  <span class="comment">// Set up block regions</span></div>
-<div class="line"><span class="lineno">   92</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a> = std::vector&lt;int&gt;(Npars, 0);</div>
-<div class="line"><span class="lineno">   93</span> </div>
-<div class="line"><span class="lineno">   94</span>  <span class="comment">// Should also make a matrix of block sizes</span></div>
-<div class="line"><span class="lineno">   95</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a> = std::vector&lt;int&gt;(block_indices.size()+1, 0);</div>
-<div class="line"><span class="lineno">   96</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a>[0] = Npars;</div>
-<div class="line"><span class="lineno">   97</span> </div>
-<div class="line"><span class="lineno">   98</span>  <span class="keywordflow">if</span>(block_indices.size()==0 || block_indices[0].size()==0) <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   99</span> </div>
-<div class="line"><span class="lineno">  100</span>  <span class="comment">// Now we loop over our blocks</span></div>
-<div class="line"><span class="lineno">  101</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iblock=0; iblock&lt;int(block_indices.size()); iblock++){</div>
-<div class="line"><span class="lineno">  102</span>    <span class="comment">// Loop over blocks in the block</span></div>
-<div class="line"><span class="lineno">  103</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> isubblock=0; isubblock&lt;int(block_indices[iblock].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>())-1; isubblock+=2){</div>
-<div class="line"><span class="lineno">  104</span>      <span class="keywordtype">int</span> block_lb = block_indices[iblock][isubblock];</div>
-<div class="line"><span class="lineno">  105</span>      <span class="keywordtype">int</span> block_ub = block_indices[iblock][isubblock+1];</div>
-<div class="line"><span class="lineno">  106</span> </div>
-<div class="line"><span class="lineno">  107</span>      <span class="keywordflow">if</span>(block_lb &gt; Npars || block_ub &gt; Npars){</div>
-<div class="line"><span class="lineno">  108</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Cannot set matrix block with edges {}, {} for matrix of size {}&quot;</span>,</div>
-<div class="line"><span class="lineno">  109</span>                       block_lb, block_ub, Npars);</div>
-<div class="line"><span class="lineno">  110</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);;</div>
-<div class="line"><span class="lineno">  111</span>      }</div>
-<div class="line"><span class="lineno">  112</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ipar = block_lb; ipar &lt; block_ub; ipar++){</div>
-<div class="line"><span class="lineno">  113</span>        <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[ipar] = iblock+1;</div>
-<div class="line"><span class="lineno">  114</span>        <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a>[iblock+1] += 1;</div>
-<div class="line"><span class="lineno">  115</span>        <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a>[0] -= 1;</div>
-<div class="line"><span class="lineno">  116</span>      }</div>
-<div class="line"><span class="lineno">  117</span>    }</div>
-<div class="line"><span class="lineno">  118</span>  }</div>
-<div class="line"><span class="lineno">  119</span>}</div>
-<div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00037">GetPenaltyTerm.cpp:37</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a23d17e906a663e2b48dd4dfc96300b02"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_matrix_indices</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_matrix_indices</div><div class="ttdoc">Indices for block-matrix adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00080">AdaptiveMCMCHandler.h:80</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a639f1d4935965556ce4e3d36aef844ec"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_sizes</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_sizes</div><div class="ttdoc">Size of blocks for adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00083">AdaptiveMCMCHandler.h:83</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00093">93</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   93</span>                                                                                                    {</div>
+<div class="line"><span class="lineno">   94</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">   95</span>  <span class="comment">/*</span></div>
+<div class="line"><span class="lineno">   96</span><span class="comment">   *   In order to adapt efficient we want to setup our throw matrix to be a serious of block-diagonal (ish) matrices</span></div>
+<div class="line"><span class="lineno">   97</span><span class="comment">   *</span></div>
+<div class="line"><span class="lineno">   98</span><span class="comment">   *   To do this we set sub-block in the config by parameter index. For example having</span></div>
+<div class="line"><span class="lineno">   99</span><span class="comment">   *   [[0,4],[4, 6]] in your config will set up two blocks one with all indices 0&lt;=i&lt;4 and the other with 4&lt;=i&lt;6</span></div>
+<div class="line"><span class="lineno">  100</span><span class="comment">   */</span></div>
+<div class="line"><span class="lineno">  101</span>  <span class="comment">// Set up block regions</span></div>
+<div class="line"><span class="lineno">  102</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a> = std::vector&lt;int&gt;(Npars, 0);</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>  <span class="comment">// Should also make a matrix of block sizes</span></div>
+<div class="line"><span class="lineno">  105</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a> = std::vector&lt;int&gt;(block_indices.size()+1, 0);</div>
+<div class="line"><span class="lineno">  106</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a>[0] = Npars;</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>  <span class="keywordflow">if</span>(block_indices.size()==0 || block_indices[0].size()==0) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  109</span> </div>
+<div class="line"><span class="lineno">  110</span>  <span class="keywordtype">int</span> block_size = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(block_indices.size());</div>
+<div class="line"><span class="lineno">  111</span>  <span class="comment">// Now we loop over our blocks</span></div>
+<div class="line"><span class="lineno">  112</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iblock=0; iblock &lt; block_size; iblock++){</div>
+<div class="line"><span class="lineno">  113</span>    <span class="comment">// Loop over blocks in the block</span></div>
+<div class="line"><span class="lineno">  114</span>    <span class="keywordtype">int</span> sub_block_size = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(block_indices.size()-1);</div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> isubblock=0; isubblock &lt; sub_block_size ; isubblock+=2){</div>
+<div class="line"><span class="lineno">  116</span>      <span class="keywordtype">int</span> block_lb = block_indices[iblock][isubblock];</div>
+<div class="line"><span class="lineno">  117</span>      <span class="keywordtype">int</span> block_ub = block_indices[iblock][isubblock+1];</div>
+<div class="line"><span class="lineno">  118</span> </div>
+<div class="line"><span class="lineno">  119</span>      <span class="keywordflow">if</span>(block_lb &gt; Npars || block_ub &gt; Npars){</div>
+<div class="line"><span class="lineno">  120</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Cannot set matrix block with edges {}, {} for matrix of size {}&quot;</span>,</div>
+<div class="line"><span class="lineno">  121</span>                       block_lb, block_ub, Npars);</div>
+<div class="line"><span class="lineno">  122</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);;</div>
+<div class="line"><span class="lineno">  123</span>      }</div>
+<div class="line"><span class="lineno">  124</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ipar = block_lb; ipar &lt; block_ub; ipar++){</div>
+<div class="line"><span class="lineno">  125</span>        <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[ipar] = iblock+1;</div>
+<div class="line"><span class="lineno">  126</span>        <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a>[iblock+1] += 1;</div>
+<div class="line"><span class="lineno">  127</span>        <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adapt_block_sizes</a>[0] -= 1;</div>
+<div class="line"><span class="lineno">  128</span>      }</div>
+<div class="line"><span class="lineno">  129</span>    }</div>
+<div class="line"><span class="lineno">  130</span>  }</div>
+<div class="line"><span class="lineno">  131</span>}</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a23d17e906a663e2b48dd4dfc96300b02"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_matrix_indices</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_matrix_indices</div><div class="ttdoc">Indices for block-matrix adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00087">AdaptiveMCMCHandler.h:87</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a639f1d4935965556ce4e3d36aef844ec"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_sizes</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_sizes</div><div class="ttdoc">Size of blocks for adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00090">AdaptiveMCMCHandler.h:90</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -645,54 +693,54 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00145">145</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  149</span>                                                                  {</div>
-<div class="line"><span class="lineno">  150</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  151</span>  <span class="comment">// Lets you set the throw matrix externally</span></div>
-<div class="line"><span class="lineno">  152</span>  <span class="comment">// Open file</span></div>
-<div class="line"><span class="lineno">  153</span>  std::unique_ptr&lt;TFile&gt;matrix_file(<span class="keyword">new</span> TFile(matrix_file_name.c_str()));</div>
-<div class="line"><span class="lineno">  154</span>  use_adaptive = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  155</span> </div>
-<div class="line"><span class="lineno">  156</span>  <span class="keywordflow">if</span>(matrix_file-&gt;IsZombie()){</div>
-<div class="line"><span class="lineno">  157</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find {}&quot;</span>, matrix_file_name);</div>
-<div class="line"><span class="lineno">  158</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  159</span>  }</div>
-<div class="line"><span class="lineno">  160</span> </div>
-<div class="line"><span class="lineno">  161</span>  <span class="comment">// Next we grab our matrix</span></div>
-<div class="line"><span class="lineno">  162</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a> = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(matrix_file-&gt;Get(matrix_name.c_str()));</div>
-<div class="line"><span class="lineno">  163</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>){</div>
-<div class="line"><span class="lineno">  164</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find {} in {}&quot;</span>, matrix_name, matrix_file_name);</div>
-<div class="line"><span class="lineno">  165</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  166</span>  }</div>
-<div class="line"><span class="lineno">  167</span> </div>
-<div class="line"><span class="lineno">  168</span>  <span class="comment">// Finally we grab the means vector</span></div>
-<div class="line"><span class="lineno">  169</span>  TVectorD* means_vector = <span class="keyword">static_cast&lt;</span>TVectorD*<span class="keyword">&gt;</span>(matrix_file-&gt;Get(means_name.c_str()));</div>
-<div class="line"><span class="lineno">  170</span> </div>
-<div class="line"><span class="lineno">  171</span>  <span class="comment">// This is fine to not exist!</span></div>
-<div class="line"><span class="lineno">  172</span>  <span class="keywordflow">if</span>(means_vector){</div>
-<div class="line"><span class="lineno">  173</span>    <span class="comment">// Yay our vector exists! Let&#39;s loop and fill it</span></div>
-<div class="line"><span class="lineno">  174</span>    <span class="comment">// Should check this is done</span></div>
-<div class="line"><span class="lineno">  175</span>    <span class="keywordflow">if</span>(means_vector-&gt;GetNrows()){</div>
-<div class="line"><span class="lineno">  176</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;External means vec size ({}) != matrix size ({})&quot;</span>, means_vector-&gt;GetNrows(), Npars);</div>
-<div class="line"><span class="lineno">  177</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  178</span>    }</div>
-<div class="line"><span class="lineno">  179</span> </div>
-<div class="line"><span class="lineno">  180</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a> = std::vector&lt;double&gt;(Npars);</div>
-<div class="line"><span class="lineno">  181</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; Npars; i++){</div>
-<div class="line"><span class="lineno">  182</span>      <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[i] = (*means_vector)(i);</div>
-<div class="line"><span class="lineno">  183</span>    }</div>
-<div class="line"><span class="lineno">  184</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Found Means in External File, Will be able to adapt&quot;</span>);</div>
-<div class="line"><span class="lineno">  185</span>  }</div>
-<div class="line"><span class="lineno">  186</span>  <span class="comment">// Totally fine if it doesn&#39;t exist, we just can&#39;t do adaption</span></div>
-<div class="line"><span class="lineno">  187</span>  <span class="keywordflow">else</span>{</div>
-<div class="line"><span class="lineno">  188</span>    <span class="comment">// We don&#39;t need a means vector, set the adaption=false</span></div>
-<div class="line"><span class="lineno">  189</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Cannot find means vector in {}, therefore I will not be able to adapt!&quot;</span>, matrix_file_name);</div>
-<div class="line"><span class="lineno">  190</span>    use_adaptive = <span class="keyword">false</span>;</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00177">177</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  181</span>                                                                  {</div>
+<div class="line"><span class="lineno">  182</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  183</span>  <span class="comment">// Lets you set the throw matrix externally</span></div>
+<div class="line"><span class="lineno">  184</span>  <span class="comment">// Open file</span></div>
+<div class="line"><span class="lineno">  185</span>  std::unique_ptr&lt;TFile&gt;matrix_file(<span class="keyword">new</span> TFile(matrix_file_name.c_str()));</div>
+<div class="line"><span class="lineno">  186</span>  use_adaptive = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  187</span> </div>
+<div class="line"><span class="lineno">  188</span>  <span class="keywordflow">if</span>(matrix_file-&gt;IsZombie()){</div>
+<div class="line"><span class="lineno">  189</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find {}&quot;</span>, matrix_file_name);</div>
+<div class="line"><span class="lineno">  190</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno">  191</span>  }</div>
 <div class="line"><span class="lineno">  192</span> </div>
-<div class="line"><span class="lineno">  193</span>  matrix_file-&gt;Close();</div>
-<div class="line"><span class="lineno">  194</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Set up matrix from external file&quot;</span>);</div>
-<div class="line"><span class="lineno">  195</span>}</div>
+<div class="line"><span class="lineno">  193</span>  <span class="comment">// Next we grab our matrix</span></div>
+<div class="line"><span class="lineno">  194</span>  <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a> = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(matrix_file-&gt;Get(matrix_name.c_str()));</div>
+<div class="line"><span class="lineno">  195</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>){</div>
+<div class="line"><span class="lineno">  196</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find {} in {}&quot;</span>, matrix_name, matrix_file_name);</div>
+<div class="line"><span class="lineno">  197</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  198</span>  }</div>
+<div class="line"><span class="lineno">  199</span> </div>
+<div class="line"><span class="lineno">  200</span>  <span class="comment">// Finally we grab the means vector</span></div>
+<div class="line"><span class="lineno">  201</span>  TVectorD* means_vector = <span class="keyword">static_cast&lt;</span>TVectorD*<span class="keyword">&gt;</span>(matrix_file-&gt;Get(means_name.c_str()));</div>
+<div class="line"><span class="lineno">  202</span> </div>
+<div class="line"><span class="lineno">  203</span>  <span class="comment">// This is fine to not exist!</span></div>
+<div class="line"><span class="lineno">  204</span>  <span class="keywordflow">if</span>(means_vector){</div>
+<div class="line"><span class="lineno">  205</span>    <span class="comment">// Yay our vector exists! Let&#39;s loop and fill it</span></div>
+<div class="line"><span class="lineno">  206</span>    <span class="comment">// Should check this is done</span></div>
+<div class="line"><span class="lineno">  207</span>    <span class="keywordflow">if</span>(means_vector-&gt;GetNrows()){</div>
+<div class="line"><span class="lineno">  208</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;External means vec size ({}) != matrix size ({})&quot;</span>, means_vector-&gt;GetNrows(), Npars);</div>
+<div class="line"><span class="lineno">  209</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  210</span>    }</div>
+<div class="line"><span class="lineno">  211</span> </div>
+<div class="line"><span class="lineno">  212</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a> = std::vector&lt;double&gt;(Npars);</div>
+<div class="line"><span class="lineno">  213</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; Npars; i++){</div>
+<div class="line"><span class="lineno">  214</span>      <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[i] = (*means_vector)(i);</div>
+<div class="line"><span class="lineno">  215</span>    }</div>
+<div class="line"><span class="lineno">  216</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Found Means in External File, Will be able to adapt&quot;</span>);</div>
+<div class="line"><span class="lineno">  217</span>  }</div>
+<div class="line"><span class="lineno">  218</span>  <span class="comment">// Totally fine if it doesn&#39;t exist, we just can&#39;t do adaption</span></div>
+<div class="line"><span class="lineno">  219</span>  <span class="keywordflow">else</span>{</div>
+<div class="line"><span class="lineno">  220</span>    <span class="comment">// We don&#39;t need a means vector, set the adaption=false</span></div>
+<div class="line"><span class="lineno">  221</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Cannot find means vector in {}, therefore I will not be able to adapt!&quot;</span>, matrix_file_name);</div>
+<div class="line"><span class="lineno">  222</span>    use_adaptive = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  223</span>  }</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>  matrix_file-&gt;Close();</div>
+<div class="line"><span class="lineno">  226</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Set up matrix from external file&quot;</span>);</div>
+<div class="line"><span class="lineno">  227</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -713,13 +761,13 @@ Public Attributes</h2></td></tr>
 
 <p>Tell if we are Skipping Adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00252">252</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  252</span>                                       {</div>
-<div class="line"><span class="lineno">  253</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  254</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &gt; <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">end_adaptive_update</a> ||</div>
-<div class="line"><span class="lineno">  255</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>&lt; <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  256</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  257</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00288">288</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  288</span>                                       {</div>
+<div class="line"><span class="lineno">  289</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  290</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &gt; <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">end_adaptive_update</a> ||</div>
+<div class="line"><span class="lineno">  291</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>&lt; <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a>) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  292</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  293</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -757,44 +805,44 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00198">198</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  198</span>                                                                                                      {</div>
-<div class="line"><span class="lineno">  199</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  200</span>  std::vector&lt;double&gt; par_means_prev = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>;</div>
-<div class="line"><span class="lineno">  201</span> </div>
-<div class="line"><span class="lineno">  202</span>  <span class="keywordtype">int</span> steps_post_burn = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> - <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a>;</div>
-<div class="line"><span class="lineno">  203</span> </div>
-<div class="line"><span class="lineno">  204</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  205</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno">  206</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  207</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iRow = 0; iRow &lt; Npars; iRow++) {</div>
-<div class="line"><span class="lineno">  208</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[iRow] = (_fCurrVal[iRow]+<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[iRow]*steps_post_burn)/(steps_post_burn+1);</div>
-<div class="line"><span class="lineno">  209</span>  }</div>
-<div class="line"><span class="lineno">  210</span> </div>
-<div class="line"><span class="lineno">  211</span>  <span class="comment">//Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)</span></div>
-<div class="line"><span class="lineno">  212</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  213</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno">  214</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  215</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> irow = 0; irow &lt; Npars; irow++){</div>
-<div class="line"><span class="lineno">  216</span>    <span class="keywordtype">int</span> block = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[irow];</div>
-<div class="line"><span class="lineno">  217</span>    <span class="comment">// int scale_factor = 5.76/double(adapt_block_sizes[block]);</span></div>
-<div class="line"><span class="lineno">  218</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> icol = 0; icol &lt;= irow; icol++){</div>
-<div class="line"><span class="lineno">  219</span>      <span class="keywordtype">double</span> cov_val=0;</div>
-<div class="line"><span class="lineno">  220</span>      <span class="comment">// Not in the same blocks</span></div>
-<div class="line"><span class="lineno">  221</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[icol] == block){</div>
-<div class="line"><span class="lineno">  222</span>        <span class="comment">// Calculate Covariance for block</span></div>
-<div class="line"><span class="lineno">  223</span>        <span class="comment">// https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full</span></div>
-<div class="line"><span class="lineno">  224</span>        cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;</div>
-<div class="line"><span class="lineno">  225</span>        cov_val += par_means_prev[irow]*par_means_prev[icol]; <span class="comment">//First we remove the current means</span></div>
-<div class="line"><span class="lineno">  226</span>        cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); <span class="comment">//Now get mean(iRow*iCol)</span></div>
-<div class="line"><span class="lineno">  227</span>        cov_val -= <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[icol]*<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[irow];</div>
-<div class="line"><span class="lineno">  228</span>        cov_val*=5.6644/Npars;</div>
-<div class="line"><span class="lineno">  229</span>      }</div>
-<div class="line"><span class="lineno">  230</span>      (*adaptive_covariance)(icol, irow) = cov_val;</div>
-<div class="line"><span class="lineno">  231</span>      (*adaptive_covariance)(irow, icol) = cov_val;</div>
-<div class="line"><span class="lineno">  232</span>    }</div>
-<div class="line"><span class="lineno">  233</span>  }</div>
-<div class="line"><span class="lineno">  234</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00230">230</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  230</span>                                                                                                      {</div>
+<div class="line"><span class="lineno">  231</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  232</span>  std::vector&lt;double&gt; par_means_prev = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>;</div>
+<div class="line"><span class="lineno">  233</span> </div>
+<div class="line"><span class="lineno">  234</span>  <span class="keywordtype">int</span> steps_post_burn = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> - <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">start_adaptive_update</a>;</div>
+<div class="line"><span class="lineno">  235</span> </div>
+<div class="line"><span class="lineno">  236</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  237</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">  238</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  239</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iRow = 0; iRow &lt; Npars; iRow++) {</div>
+<div class="line"><span class="lineno">  240</span>    <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[iRow] = (_fCurrVal[iRow]+<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[iRow]*steps_post_burn)/(steps_post_burn+1);</div>
+<div class="line"><span class="lineno">  241</span>  }</div>
+<div class="line"><span class="lineno">  242</span> </div>
+<div class="line"><span class="lineno">  243</span>  <span class="comment">//Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)</span></div>
+<div class="line"><span class="lineno">  244</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  245</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">  246</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  247</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> irow = 0; irow &lt; Npars; irow++){</div>
+<div class="line"><span class="lineno">  248</span>    <span class="keywordtype">int</span> block = <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[irow];</div>
+<div class="line"><span class="lineno">  249</span>    <span class="comment">// int scale_factor = 5.76/double(adapt_block_sizes[block]);</span></div>
+<div class="line"><span class="lineno">  250</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> icol = 0; icol &lt;= irow; icol++){</div>
+<div class="line"><span class="lineno">  251</span>      <span class="keywordtype">double</span> cov_val=0;</div>
+<div class="line"><span class="lineno">  252</span>      <span class="comment">// Not in the same blocks</span></div>
+<div class="line"><span class="lineno">  253</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[icol] == block){</div>
+<div class="line"><span class="lineno">  254</span>        <span class="comment">// Calculate Covariance for block</span></div>
+<div class="line"><span class="lineno">  255</span>        <span class="comment">// https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full</span></div>
+<div class="line"><span class="lineno">  256</span>        cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;</div>
+<div class="line"><span class="lineno">  257</span>        cov_val += par_means_prev[irow]*par_means_prev[icol]; <span class="comment">//First we remove the current means</span></div>
+<div class="line"><span class="lineno">  258</span>        cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); <span class="comment">//Now get mean(iRow*iCol)</span></div>
+<div class="line"><span class="lineno">  259</span>        cov_val -= <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[icol]*<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>[irow];</div>
+<div class="line"><span class="lineno">  260</span>        cov_val*=5.6644/Npars;</div>
+<div class="line"><span class="lineno">  261</span>      }</div>
+<div class="line"><span class="lineno">  262</span>      (*adaptive_covariance)(icol, irow) = cov_val;</div>
+<div class="line"><span class="lineno">  263</span>      (*adaptive_covariance)(irow, icol) = cov_val;</div>
+<div class="line"><span class="lineno">  264</span>    }</div>
+<div class="line"><span class="lineno">  265</span>  }</div>
+<div class="line"><span class="lineno">  266</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -815,13 +863,17 @@ Public Attributes</h2></td></tr>
 
 <p>Tell whether matrix should be updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00244">244</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  244</span>                                            {</div>
-<div class="line"><span class="lineno">  245</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  246</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &gt;= <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a> &amp;&amp;</div>
-<div class="line"><span class="lineno">  247</span>    (<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> - <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>)%<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a> == 0) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  248</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  249</span>}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00276">276</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  276</span>                                            {</div>
+<div class="line"><span class="lineno">  277</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  278</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &gt;= <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a> &amp;&amp;</div>
+<div class="line"><span class="lineno">  279</span>    <span class="comment">// Check whether the number of steps is divisible by the adaptive update step</span></div>
+<div class="line"><span class="lineno">  280</span>    <span class="comment">// e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true</span></div>
+<div class="line"><span class="lineno">  281</span>    (<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> - <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">start_adaptive_throw</a>)%<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_update_step</a> == 0) {</div>
+<div class="line"><span class="lineno">  282</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  283</span>  } </div>
+<div class="line"><span class="lineno">  284</span>  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  285</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -840,7 +892,7 @@ Public Attributes</h2></td></tr>
 
 <p>Indices for block-matrix adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00080">80</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00087">87</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -858,7 +910,7 @@ Public Attributes</h2></td></tr>
 
 <p>Size of blocks for adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00083">83</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00090">90</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -876,7 +928,24 @@ Public Attributes</h2></td></tr>
 
 <p>Full adaptive covariance matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00090">90</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00097">97</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+
+</div>
+</div>
+<a id="a7b9bc927e28230929be740d471fb2b6b" name="a7b9bc927e28230929be740d471fb2b6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b9bc927e28230929be740d471fb2b6b">&#9670;&#160;</a></span>adaptive_save_n_iterations</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int adaptive_mcmc::AdaptiveMCMCHandler::adaptive_save_n_iterations</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>If you don't want to save every adpation then you can specify this here </p>
+
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00081">81</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -916,6 +985,24 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a3635f63cb8108f58a76b90250894c31c" name="a3635f63cb8108f58a76b90250894c31c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3635f63cb8108f58a76b90250894c31c">&#9670;&#160;</a></span>output_file_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Name of the file to save the adpative matrices into. </p>
+
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00084">84</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+
+</div>
+</div>
 <a id="a066984e9598e073d04edec51511cdf0a" name="a066984e9598e073d04edec51511cdf0a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a066984e9598e073d04edec51511cdf0a">&#9670;&#160;</a></span>par_means</h2>
 
@@ -930,7 +1017,7 @@ Public Attributes</h2></td></tr>
 
 <p>Mean values for all parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00087">87</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00094">94</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -983,7 +1070,7 @@ Public Attributes</h2></td></tr>
 
 <p>Total number of MCMC steps. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00093">93</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00100">100</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
