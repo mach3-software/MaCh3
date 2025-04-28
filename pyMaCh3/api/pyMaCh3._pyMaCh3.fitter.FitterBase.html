@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitterBase &mdash; pyMaCh3  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="LikelihoodFit" href="pyMaCh3._pyMaCh3.fitter.LikelihoodFit.html" />
+    <link rel="prev" title="Fitter" href="../fitter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyMaCh3
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../mainpage.html">Welcome To MaCh3!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mainpage.html#mach3">MaCh3</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../pyMaCh3.html">pyMaCh3</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manager.html">Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample-pdf.html">Sample PDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splines.html">Splines</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../fitter.html">Fitter</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../fitter.html#module-pyMaCh3._pyMaCh3.fitter">pyMaCh3._pyMaCh3.fitter Module</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../fitter.html#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fitter.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../covariance.html">Covariance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plotting.html">plotting</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyMaCh3</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../pyMaCh3.html">pyMaCh3</a></li>
+          <li class="breadcrumb-item"><a href="../fitter.html">Fitter</a></li>
+      <li class="breadcrumb-item active">FitterBase</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pyMaCh3._pyMaCh3.fitter.FitterBase.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fitterbase">
+<h1>FitterBase<a class="headerlink" href="#fitterbase" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyMaCh3._pyMaCh3.fitter.</span></span><span class="sig-name descname"><span class="pre">FitterBase</span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.add_sample_PDF" title="pyMaCh3._pyMaCh3.fitter.FitterBase.add_sample_PDF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_sample_PDF</span></code></a>(self, sample)</p></td>
+<td><p>This function adds a sample PDF object to the analysis framework.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.add_syst_object" title="pyMaCh3._pyMaCh3.fitter.FitterBase.add_syst_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_syst_object</span></code></a>(self, cov)</p></td>
+<td><p>This function adds a Covariance object to the analysis framework.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.drag_race" title="pyMaCh3._pyMaCh3.fitter.FitterBase.drag_race"><code class="xref py py-obj docutils literal notranslate"><span class="pre">drag_race</span></code></a>(self[, NLaps])</p></td>
+<td><p>Calculates the required time for each sample or covariance object in a drag race simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.get_name" title="pyMaCh3._pyMaCh3.fitter.FitterBase.get_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_name</span></code></a>(self)</p></td>
+<td><p>The name of the algorithm, you should override this with something like.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.get_step_scale_from_LLH_scan" title="pyMaCh3._pyMaCh3.fitter.FitterBase.get_step_scale_from_LLH_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_step_scale_from_LLH_scan</span></code></a>(self)</p></td>
+<td><p>LLH scan is good first estimate of step scale, this will get the rough estimates for the step scales based on running an LLH scan</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run" title="pyMaCh3._pyMaCh3.fitter.FitterBase.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(self)</p></td>
+<td><p>The implementation of the fitter, you should override this with your own desired fitting algorithm</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run_2d_LLH_scan" title="pyMaCh3._pyMaCh3.fitter.FitterBase.run_2d_LLH_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_2d_LLH_scan</span></code></a>(self)</p></td>
+<td><p>Perform a 2D likelihood scan.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run_LLH_scan" title="pyMaCh3._pyMaCh3.fitter.FitterBase.run_LLH_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_LLH_scan</span></code></a>(self)</p></td>
+<td><p>Perform a 1D likelihood scan</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run_sigma_var" title="pyMaCh3._pyMaCh3.fitter.FitterBase.run_sigma_var"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sigma_var</span></code></a>(self)</p></td>
+<td><p>Perform a 2D and 1D sigma var for all samples.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.add_sample_PDF">
+<span class="sig-name descname"><span class="pre">add_sample_PDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">samplePDFBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.add_sample_PDF" title="Link to this definition"></a></dt>
+<dd><p>This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
+:param sample: A sample PDF object derived from samplePDFBase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.add_syst_object">
+<span class="sig-name descname"><span class="pre">add_syst_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">covarianceBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.add_syst_object" title="Link to this definition"></a></dt>
+<dd><p>This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
+:param cov: A Covariance object derived from covarianceBase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.drag_race">
+<span class="sig-name descname"><span class="pre">drag_race</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">NLaps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.drag_race" title="Link to this definition"></a></dt>
+<dd><p>Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan’s feature
+:param NLaps: number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.get_name" title="Link to this definition"></a></dt>
+<dd><p>The name of the algorithm, you should override this with something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="s1">&#39;mySuperCoolAlgoName&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.get_step_scale_from_LLH_scan">
+<span class="sig-name descname"><span class="pre">get_step_scale_from_LLH_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.get_step_scale_from_LLH_scan" title="Link to this definition"></a></dt>
+<dd><p>LLH scan is good first estimate of step scale, this will get the rough estimates for the step scales based on running an LLH scan</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run" title="Link to this definition"></a></dt>
+<dd><p>The implementation of the fitter, you should override this with your own desired fitting algorithm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.run_2d_LLH_scan">
+<span class="sig-name descname"><span class="pre">run_2d_LLH_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run_2d_LLH_scan" title="Link to this definition"></a></dt>
+<dd><p>Perform a 2D likelihood scan.
+:param warning: This operation may take a significant amount of time, especially for complex models.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.run_LLH_scan">
+<span class="sig-name descname"><span class="pre">run_LLH_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run_LLH_scan" title="Link to this definition"></a></dt>
+<dd><p>Perform a 1D likelihood scan</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.fitter.FitterBase.run_sigma_var">
+<span class="sig-name descname"><span class="pre">run_sigma_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.fitter.FitterBase" title="pyMaCh3._pyMaCh3.fitter.FitterBase"><span class="pre">pyMaCh3._pyMaCh3.fitter.FitterBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.fitter.FitterBase.run_sigma_var" title="Link to this definition"></a></dt>
+<dd><p>Perform a 2D and 1D sigma var for all samples.
+:param warning: Code uses TH2Poly</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../fitter.html" class="btn btn-neutral float-left" title="Fitter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyMaCh3._pyMaCh3.fitter.LikelihoodFit.html" class="btn btn-neutral float-right" title="LikelihoodFit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
