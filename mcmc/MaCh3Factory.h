@@ -104,9 +104,10 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
   CovObject->setStepScale(StepScale);
 
   // Adaptive MCMC stuff
-  if(FitManager->raw()["AdaptionOptions"])
+  if (CheckNodeExists(FitManager->raw(), "AdaptionOptions")) {
     CovObject->initialiseAdaption(FitManager->raw());
-
+  }
+  
   return CovObject;
 }
 
