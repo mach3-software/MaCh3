@@ -1,0 +1,61 @@
+---
+name: MaCh3 Valgrind
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Every Monday at midnight
+
+permissions:
+  # Required permissions for GitHub Pages deployment and content updates
+  deployments: write
+  contents: write
+
+jobs:
+  Valgrind:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9v1.3.0
+    steps:
+      - name: Get MaCh3 Validations
+        run: |
+          cd /opt/
+          # Clone the MaCh3Tutorial repository with the current branch
+          git clone --branch main https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+          cd MaCh3Validations
+          mkdir build
+          cd build
+          cmake ../
+          # Install Valgrind
+          dnf install valgrind -y
+
+      - name: Build MaCh3 Validations
+        run: |
+          cd /opt/MaCh3Validations/build
+          make -j4 install # Build and install the project
+
+      - name: Run Valgrind
+        run: |
+          # Source environment setup scripts
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
+          source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
+          cd /opt/MaCh3Validations/build/
+          # Run
+          valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
+          valgrind --tool=massif --massif-out-file=MassifMCMC.txt ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
+
+
+      - name: Checkout different branch and push plot
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git Plot
+          cd Plot
+          git checkout gh-profiling
+          mv /opt/MaCh3Validations/build/ValgrindMCMC.txt .
+          mv /opt/MaCh3Validations/build/MassifMCMC.txt .
+
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git add ValgrindMCMC.txt
+          git add MassifMCMC.txt
+          git commit -m "Update Valgrind files"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git gh-profiling
