@@ -515,6 +515,7 @@ void FitterBase::RunLLHScan() {
   }
   // Number of points we do for each LLH scan
   const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 100, __FILE__ , __LINE__);
+  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
 
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
@@ -571,8 +572,6 @@ void FitterBase::RunLLHScan() {
       if (IsPCA) prior = cov->getParCurr_PCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
-      double nSigma = 1;
-      if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
       lower = prior - nSigma*cov->getDiagonalError(i);
       upper = prior + nSigma*cov->getDiagonalError(i);
@@ -895,6 +894,8 @@ void FitterBase::Run2DLLHScan() {
     MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
   }
 
+  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
+
   // Loop over the covariance classes
   for (covarianceBase *cov : systematics)
   {
@@ -917,8 +918,6 @@ void FitterBase::Run2DLLHScan() {
       if (IsPCA) prior_x = cov->getParCurr_PCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
-      double nSigma = 1;
-      if (IsPCA) nSigma = 0.5;
       // Set lower and upper bounds relative the prior
       double lower_x = prior_x - nSigma*cov->getDiagonalError(i);
       double upper_x = prior_x + nSigma*cov->getDiagonalError(i);

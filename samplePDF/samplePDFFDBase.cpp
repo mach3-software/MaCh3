@@ -208,8 +208,10 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
-  MACH3LOG_INFO("Setting up NuOscillator..");
-  SetupNuOscillator(); 
+  if (OscCov) {
+    MACH3LOG_INFO("Setting up NuOscillator..");
+    SetupNuOscillator();
+  }
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
   MACH3LOG_INFO("Setting up Splines..");
