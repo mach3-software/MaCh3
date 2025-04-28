@@ -311,8 +311,8 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
   // KS: YAML can be dumb and not throw error if you pass toml for example...
   if (!(filename.length() >= 5 && filename.compare(filename.length() - 5, 5, ".yaml") == 0) &&
     !(filename.length() >= 4 && filename.compare(filename.length() - 4, 4, ".yml") == 0)) {
-      MACH3LOG_ERROR("Invalid file extension: {}\n", filename);
-      throw MaCh3Exception(File, Line);
+    MACH3LOG_ERROR("Invalid file extension: {}\n", filename);
+    throw MaCh3Exception(File, Line);
   }
 
   try {
