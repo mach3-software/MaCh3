@@ -36,6 +36,26 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
+  // Check if we are using --override mode
+  if (argc >= 4 && std::string(argv[2]) == "--override") {
+    const std::string overrideFile = argv[3];
+    MACH3LOG_INFO("Merging two configs: {} and {}", argv[1], overrideFile);
+
+    if(argc > 4) {
+      MACH3LOG_ERROR("Looks like you are trying to pass multiple arguments and --override");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    // Load the two YAML files
+    YAML::Node config1 = M3OpenConfig(argv[1]);
+    YAML::Node config2 = M3OpenConfig(overrideFile);
+
+    // Merge them
+    YAML::Node merged = MergeNodes(config1, config2);
+    auto FitManager = std::make_unique<manager>(merged);
+
+    return FitManager;
+  }
+
   // Initialise manger responsible for config handling
   auto FitManager = std::make_unique<manager>(argv[1]);
   
@@ -92,7 +112,7 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
       FitManager->OverrideSettings(section, key, key2, value);
     } else {
       MACH3LOG_ERROR("Invalid override argument format: {}", arg);
-      MACH3LOG_ERROR("Expected format:Section:Key:Key:Valu, Section:Key:Value or Section:Value");
+      MACH3LOG_ERROR("Expected format:Section:Key:Key:Value, Section:Key:Value or Section:Value");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
