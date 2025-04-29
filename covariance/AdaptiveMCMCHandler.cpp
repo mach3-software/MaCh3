@@ -274,8 +274,6 @@ double AdaptiveMCMCHandler::CalculateCyclicalMean(double par_mean, double curr_v
     // Uses approximation that mean(cos(x_{i})) ~= mean(cos(prev mean))*n-1 + cos(x) 
     double sum_sin = TMath::Sin(par_mean) * steps_post_burn + TMath::Sin(curr_val);
     double sum_cos = TMath::Cos(par_mean) * steps_post_burn + TMath::Cos(curr_val);
-    sum_sin += TMath::Sin(curr_val);
-    sum_cos += TMath::Cos(curr_val);
     return TMath::ATan2(sum_sin, sum_cos); // New circular mean
 }
 
