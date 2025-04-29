@@ -277,6 +277,24 @@ double AdaptiveMCMCHandler::CalculateCyclicalMean(double par_mean, double curr_v
     return TMath::ATan2(sum_sin, sum_cos); // New circular mean
 }
 
+double AdaptiveMCMCHandler::CalculateDiff(int ipar, double par_mean, double curr_val) {
+  if (!IsCircular(ipar)) {
+      return curr_val - par_mean;
+  }
+  
+  // For circular parameters (angles)
+  double diff = curr_val - par_mean;
+  
+  // Properly handle wrap-around at ±π boundary
+  if (diff > TMath::Pi()) {
+      diff -= 2*TMath::Pi();
+  } else if (diff < -TMath::Pi()) {
+      diff += 2*TMath::Pi();
+  }
+  
+  return diff;
+}
+
 
 void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
   std::vector<double> par_means_prev = par_means;

@@ -78,14 +78,7 @@ class AdaptiveMCMCHandler{
   /// @brief Calculate Mean of Circular parans
   double CalculateCyclicalMean(double par_mean, double curr_val);
   
-  double CalculateDiff(int ipar, double par_mean, double curr_val){
-    double diff = curr_val - par_mean;
-    if(IsCircular(ipar)){
-      // Loop, for now we assume lower/upper are ±pi 
-      diff = std::fmod(diff + TMath::Pi(), 2 * TMath::Pi()) - TMath::Pi();
-    }
-    return diff;
-  }
+  double CalculateDiff(int ipar, double par_mean, double curr_val);
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
