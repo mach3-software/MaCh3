@@ -21,6 +21,10 @@ class covarianceOsc : public covarianceBase
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization
   void Print();
+  
+  /// @brief Initialise adaptive MCMC
+  /// @param adapt_manager Node having from which we load all adaptation options
+  void initialiseAdaption(const YAML::Node& adapt_manager);
 
  protected:
     /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.

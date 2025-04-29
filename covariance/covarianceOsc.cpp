@@ -36,6 +36,12 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
   Print();
 }
 
+void covarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
+  covarianceBase::initialiseAdaption(adapt_manager);
+  // HW: Set dcp cyclic in AMCMC, bit hacky but "shrug"
+  AdaptiveHandler.SetIsCircular(kDeltaCP);
+}
+
 // *************************************
 covarianceOsc::~covarianceOsc() {
 // *************************************

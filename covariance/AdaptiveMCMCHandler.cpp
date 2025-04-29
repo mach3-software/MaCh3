@@ -12,6 +12,7 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   total_steps = 0;
 
   par_means = {};
+  cyclic_indices = {};
   adaptive_covariance = nullptr;
 }
 
@@ -226,41 +227,101 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   MACH3LOG_INFO("Set up matrix from external file");
 }
 
-// ********************************************
-void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
-// ********************************************
-  std::vector<double> par_means_prev = par_means;
+// // ********************************************
+// void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
+// // ********************************************
+//   std::vector<double> par_means_prev = par_means;
 
+//   int steps_post_burn = total_steps - start_adaptive_update;
+
+//   #ifdef MULTITHREAD
+//   #pragma omp parallel for
+//   #endif
+//   for(int iRow = 0; iRow < Npars; iRow++) {
+//     par_means[iRow] = (_fCurrVal[iRow]+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
+//   }
+
+//   //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
+//   #ifdef MULTITHREAD
+//   #pragma omp parallel for
+//   #endif
+//   for(int irow = 0; irow < Npars; irow++){
+//     int block = adapt_block_matrix_indices[irow];
+//     // int scale_factor = 5.76/double(adapt_block_sizes[block]);
+//     for(int icol = 0; icol <= irow; icol++){
+//       double cov_val=0;
+//       // Not in the same blocks
+//       if(adapt_block_matrix_indices[icol] == block){
+//         // Calculate Covariance for block
+//         // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
+//         cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;
+//         cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
+//         cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
+//         cov_val -= par_means[icol]*par_means[irow];
+//         cov_val*=5.6644/Npars;
+//       }
+//       (*adaptive_covariance)(icol, irow) = cov_val;
+//       (*adaptive_covariance)(irow, icol) = cov_val;
+//     }
+//   }
+// }
+
+double AdaptiveMCMCHandler::CalculateCyclicalMean(double par_mean, double curr_val){
+    // Circular mean update (trigonometric)
+    // https://en.wikipedia.org/wiki/Circular_mean
+    int steps_post_burn = total_steps - start_adaptive_update;
+
+    // Uses approximation that mean(cos(x_{i})) ~= mean(cos(prev mean))*n-1 + cos(x) 
+    double sum_sin = TMath::Sin(par_mean) * steps_post_burn * TMath::Sin(curr_val);
+    double sum_cos = TMath::Cos(par_mean) * steps_post_burn * TMath::Cos(curr_val);
+    sum_sin += TMath::Sin(curr_val);
+    sum_cos += TMath::Cos(curr_val);
+    return TMath::ATan2(sum_sin, sum_cos); // New circular mean
+}
+
+
+void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
+  std::vector<double> par_means_prev = par_means;
   int steps_post_burn = total_steps - start_adaptive_update;
 
+  // Differences
+  std::vector<double> diffs(Npars, 0);
+
+  // --- Step 1: Update means (with circular adjustment) ---
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for(int iRow = 0; iRow < Npars; iRow++) {
-    par_means[iRow] = (_fCurrVal[iRow]+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
+  for (int iRow = 0; iRow < Npars; iRow++) {
+    if (IsCircular(iRow)) {
+      par_means[iRow] = CalculateCyclicalMean(par_means[iRow], _fCurrVal[iRow]);
+    } else {
+      // Standard arithmetic mean for non-circular parameters
+      diffs[iRow] = CalculateDiff(iRow, par_means[iRow], _fCurrVal[iRow]);
+      par_means[iRow] = (_fCurrVal[iRow] + par_means[iRow] * steps_post_burn) / (steps_post_burn + 1);
+    }
   }
 
-  //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
+  // --- Step 2: Update covariances (with circular adjustments) ---
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for(int irow = 0; irow < Npars; irow++){
+  for (int irow = 0; irow < Npars; irow++) {
     int block = adapt_block_matrix_indices[irow];
-    // int scale_factor = 5.76/double(adapt_block_sizes[block]);
-    for(int icol = 0; icol <= irow; icol++){
-      double cov_val=0;
-      // Not in the same blocks
-      if(adapt_block_matrix_indices[icol] == block){
-        // Calculate Covariance for block
+    for (int icol = 0; icol <= irow; icol++) {
+      if (adapt_block_matrix_indices[icol] == block) {
+        // Compute adjusted differences for circular parameters
+
+        // Handle circular parameters
+        // Update covariance (using Haario's recursive formula)
         // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
-        cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;
-        cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
-        cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
-        cov_val -= par_means[icol]*par_means[irow];
-        cov_val*=5.6644/Npars;
+        double cov_val = (*adaptive_covariance)(irow, icol) * steps_post_burn;
+        cov_val += diffs[irow] * diffs[icol];
+        cov_val /= (steps_post_burn + 1);
+        cov_val *= 5.6644 / Npars; // Scaling factor (adjust as needed)
+
+        (*adaptive_covariance)(icol, irow) = cov_val;
+        (*adaptive_covariance)(irow, icol) = cov_val;
       }
-      (*adaptive_covariance)(icol, irow) = cov_val;
-      (*adaptive_covariance)(irow, icol) = cov_val;
     }
   }
 }

@@ -3,6 +3,7 @@
 // MaCh3 Includes
 #include "manager/manager.h"
 #include "covariance/CovarianceUtils.h"
+#include "unordered_set"
 
 namespace adaptive_mcmc{
 
@@ -63,6 +64,29 @@ class AdaptiveMCMCHandler{
   /// @brief Tell if we are Skipping Adaption
   bool SkipAdaption();
 
+  /// @brief Set a parameter to be?
+  /// @param par_index Index of parameter
+  void SetIsCircular(int par_index){
+    cyclic_indices.insert(par_index);
+  }
+
+  /// @brief Is the parameter cyclical?
+  bool IsCircular(int par_index){
+    return cyclic_indices.count(par_index) > 0;
+  }
+
+  /// @brief Calculate Mean of Circular parans
+  double CalculateCyclicalMean(double par_mean, double curr_val);
+  
+  double CalculateDiff(int ipar, double par_mean, double curr_val){
+    double diff = curr_val - par_mean;
+    if(IsCircular(ipar)){
+      // Loop, for now we assume lower/upper are ±pi 
+      diff = std::fmod(diff + TMath::Pi(), 2 * TMath::Pi()) - TMath::Pi();
+    }
+    return diff;
+  }
+
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;
@@ -98,6 +122,10 @@ class AdaptiveMCMCHandler{
 
   /// Total number of MCMC steps
   int total_steps;
+
+  /// Circular parameter indices
+  std::unordered_set<int> cyclic_indices;
+
 };
 
 } // adaptive_mcmc namespace
