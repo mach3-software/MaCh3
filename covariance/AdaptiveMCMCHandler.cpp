@@ -296,9 +296,10 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
       par_means[iRow] = CalculateCyclicalMean(par_means[iRow], _fCurrVal[iRow]);
     } else {
       // Standard arithmetic mean for non-circular parameters
-      diffs[iRow] = CalculateDiff(iRow, par_means[iRow], _fCurrVal[iRow]);
       par_means[iRow] = (_fCurrVal[iRow] + par_means[iRow] * steps_post_burn) / (steps_post_burn + 1);
     }
+    diffs[iRow] = CalculateDiff(iRow, par_means[iRow], _fCurrVal[iRow]);
+
   }
 
   // --- Step 2: Update covariances (with circular adjustments) ---
