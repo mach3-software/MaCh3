@@ -39,10 +39,14 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
   // Check if we are using --override mode
   if (argc >= 4 && std::string(argv[2]) == "--override") {
     const std::string overrideFile = argv[3];
-    MACH3LOG_INFO("Merging two configs: {} and {}", argv[1], overrideFile);
+      MACH3LOG_INFO("Merging configuration files: base config '{}', override config '{}'. "
+                "Options in '{}' will take precedence over '{}'.",
+                argv[1], overrideFile, overrideFile, argv[1]);
 
     if(argc > 4) {
-      MACH3LOG_ERROR("Looks like you are trying to pass multiple arguments and --override");
+      MACH3LOG_ERROR("Too many arguments provided when using '--override'. "
+                   "Expected only two config files. "
+                   "If using override feature, you cannot provide any additional arguments.");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     // Load the two YAML files
