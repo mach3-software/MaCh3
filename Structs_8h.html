@@ -209,6 +209,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structXsecSplines1.html">XsecSplines1</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Struct holding info about Spline Systematics.  <a href="structXsecSplines1.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structKinematicCut.html">KinematicCut</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Small struct used for applying kinematic cuts.  <a href="structKinematicCut.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -274,18 +277,6 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a0dfdd8cf84b8fa3495e9e5e520fe6cd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum to track the incoming neutrino species.  <a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2">More...</a><br /></td></tr>
 <tr class="separator:a0dfdd8cf84b8fa3495e9e5e520fe6cd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a4651943de972b89fd091d11fa7b3d7"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7">ProbNu</a> { <br />
-&#160;&#160;<a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910">kProbNue</a> = 1
-, <a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f">kProbNumu</a> = 2
-, <a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc">kProbNutau</a> = 3
-, <a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce">kProbNueBar</a> = -1
-, <br />
-&#160;&#160;<a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7">kProbNumuBar</a> = -2
-, <a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888">kProbNutauBar</a> = -3
-<br />
- }</td></tr>
-<tr class="memdesc:a5a4651943de972b89fd091d11fa7b3d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum to track neutrino species for Prob3.  <a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7">More...</a><br /></td></tr>
-<tr class="separator:a5a4651943de972b89fd091d11fa7b3d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a960da89e33ac45a56f7bbfac3068dc67"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> { <br />
 &#160;&#160;<a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a>
 , <a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a>
@@ -346,11 +337,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a36b7eae1e9918d93ac6912d88c498a24"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Structs_8h.html#a36b7eae1e9918d93ac6912d88c498a24">TargetMat_ToString</a> (const <a class="el" href="Structs_8h.html#a706416000041de040e97d5dbe0bdb580">TargetMat</a> i)</td></tr>
 <tr class="memdesc:a36b7eae1e9918d93ac6912d88c498a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converted the Target Mat to a string.  <br /></td></tr>
 <tr class="separator:a36b7eae1e9918d93ac6912d88c498a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bff6c239eb0213052f3193d84a7bee0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Structs_8h.html#a7bff6c239eb0213052f3193d84a7bee0">PDGToProbs</a> (<a class="el" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2">NuPDG</a> pdg)</td></tr>
-<tr class="memdesc:a7bff6c239eb0213052f3193d84a7bee0"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter.  <br /></td></tr>
-<tr class="separator:a7bff6c239eb0213052f3193d84a7bee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a602ad839195b7087a4897e8f6b603ee6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Structs_8h.html#a602ad839195b7087a4897e8f6b603ee6">ProbsToPDG</a> (<a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7">ProbNu</a> NuType)</td></tr>
-<tr class="separator:a602ad839195b7087a4897e8f6b603ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe33f23691e6b5e3e0f5ab97aaeb7726"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Structs_8h.html#afe33f23691e6b5e3e0f5ab97aaeb7726">TestStatistic_ToString</a> (<a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> i)</td></tr>
 <tr class="memdesc:afe33f23691e6b5e3e0f5ab97aaeb7726"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a LLH type to a string.  <br /></td></tr>
 <tr class="separator:afe33f23691e6b5e3e0f5ab97aaeb7726"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -431,47 +417,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2a74373d078c38b05c7ce7af9fe89e9f60"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a74373d078c38b05c7ce7af9fe89e9f60">kNueBar</a></div><div class="ttdeci">@ kNueBar</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00446">Structs.h:446</a></div></div>
 <div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">kNue</a></div><div class="ttdeci">@ kNue</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00443">Structs.h:443</a></div></div>
 <div class="ttc" id="aStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20"><div class="ttname"><a href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">kNumu</a></div><div class="ttdeci">@ kNumu</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00444">Structs.h:444</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a5a4651943de972b89fd091d11fa7b3d7" name="a5a4651943de972b89fd091d11fa7b3d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a4651943de972b89fd091d11fa7b3d7">&#9670;&#160;</a></span>ProbNu</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7">ProbNu</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Enum to track neutrino species for Prob3. </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910" name="a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910"></a>kProbNue&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f" name="a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f"></a>kProbNumu&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc" name="a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc"></a>kProbNutau&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce" name="a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce"></a>kProbNueBar&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7" name="a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7"></a>kProbNumuBar&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888" name="a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888"></a>kProbNutauBar&#160;</td><td class="fielddoc"></td></tr>
-</table>
-
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00453">453</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  453</span>            {</div>
-<div class="line"><span class="lineno">  454</span><span class="comment">// *****************</span></div>
-<div class="line"><span class="lineno">  455</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910">kProbNue</a> = 1,</div>
-<div class="line"><span class="lineno">  456</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f">kProbNumu</a> = 2,</div>
-<div class="line"><span class="lineno">  457</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc">kProbNutau</a> = 3,</div>
-<div class="line"><span class="lineno">  458</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce">kProbNueBar</a> = -1,</div>
-<div class="line"><span class="lineno">  459</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7">kProbNumuBar</a> = -2,</div>
-<div class="line"><span class="lineno">  460</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888">kProbNutauBar</a> = -3</div>
-<div class="line"><span class="lineno">  461</span>};</div>
-<div class="ttc" id="aStructs_8h_html_a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc"><div class="ttname"><a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc">kProbNutau</a></div><div class="ttdeci">@ kProbNutau</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00457">Structs.h:457</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888"><div class="ttname"><a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888">kProbNutauBar</a></div><div class="ttdeci">@ kProbNutauBar</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00461">Structs.h:460</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f"><div class="ttname"><a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f">kProbNumu</a></div><div class="ttdeci">@ kProbNumu</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00456">Structs.h:456</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910"><div class="ttname"><a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910">kProbNue</a></div><div class="ttdeci">@ kProbNue</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00455">Structs.h:455</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7"><div class="ttname"><a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7">kProbNumuBar</a></div><div class="ttdeci">@ kProbNumuBar</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00459">Structs.h:459</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce"><div class="ttname"><a href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce">kProbNueBar</a></div><div class="ttdeci">@ kProbNueBar</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00458">Structs.h:458</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -678,21 +623,21 @@ Kamil Skwarczynski </dd></dl>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00526">526</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  526</span>                   {</div>
-<div class="line"><span class="lineno">  527</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a>,                 </div>
-<div class="line"><span class="lineno">  528</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a>,           </div>
-<div class="line"><span class="lineno">  529</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a>,                 </div>
-<div class="line"><span class="lineno">  530</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a>,                 </div>
-<div class="line"><span class="lineno">  531</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a>,  </div>
-<div class="line"><span class="lineno">  532</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee">kNTestStatistics</a>          </div>
-<div class="line"><span class="lineno">  533</span>};</div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee">kNTestStatistics</a></div><div class="ttdeci">@ kNTestStatistics</div><div class="ttdoc">Number of test statistics.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00533">Structs.h:532</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a></div><div class="ttdeci">@ kPearson</div><div class="ttdoc">Standard Pearson likelihood.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00530">Structs.h:530</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a></div><div class="ttdeci">@ kBarlowBeeston</div><div class="ttdoc">Barlow-Beeston following Conway .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00528">Structs.h:528</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a></div><div class="ttdeci">@ kIceCube</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00529">Structs.h:529</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a></div><div class="ttdeci">@ kDembinskiAbdelmotteleb</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00531">Structs.h:531</a></div></div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a></div><div class="ttdeci">@ kPoisson</div><div class="ttdoc">Standard Poisson likelihood.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00527">Structs.h:527</a></div></div>
+<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00453">453</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  453</span>                   {</div>
+<div class="line"><span class="lineno">  454</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a>,                 </div>
+<div class="line"><span class="lineno">  455</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a>,           </div>
+<div class="line"><span class="lineno">  456</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a>,                 </div>
+<div class="line"><span class="lineno">  457</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a>,                 </div>
+<div class="line"><span class="lineno">  458</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a>,  </div>
+<div class="line"><span class="lineno">  459</span>  <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee">kNTestStatistics</a>          </div>
+<div class="line"><span class="lineno">  460</span>};</div>
+<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee">kNTestStatistics</a></div><div class="ttdeci">@ kNTestStatistics</div><div class="ttdoc">Number of test statistics.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00460">Structs.h:459</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a></div><div class="ttdeci">@ kPearson</div><div class="ttdoc">Standard Pearson likelihood.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00457">Structs.h:457</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a></div><div class="ttdeci">@ kBarlowBeeston</div><div class="ttdoc">Barlow-Beeston following Conway .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00455">Structs.h:455</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a></div><div class="ttdeci">@ kIceCube</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00456">Structs.h:456</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a></div><div class="ttdeci">@ kDembinskiAbdelmotteleb</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00458">Structs.h:458</a></div></div>
+<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a></div><div class="ttdeci">@ kPoisson</div><div class="ttdoc">Standard Poisson likelihood.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00454">Structs.h:454</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1010,122 +955,6 @@ template&lt;typename T , size_t N&gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a7bff6c239eb0213052f3193d84a7bee0" name="a7bff6c239eb0213052f3193d84a7bee0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7bff6c239eb0213052f3193d84a7bee0">&#9670;&#160;</a></span>PDGToProbs()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int PDGToProbs </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2">NuPDG</a>&#160;</td>
-          <td class="paramname"><em>pdg</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter. </p>
-
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00465">465</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  465</span>                                {</div>
-<div class="line"><span class="lineno">  466</span><span class="comment">// *****************</span></div>
-<div class="line"><span class="lineno">  467</span>  <span class="keywordtype">int</span> ReturnProbNu = -999;</div>
-<div class="line"><span class="lineno">  468</span> </div>
-<div class="line"><span class="lineno">  469</span>  <span class="keywordflow">switch</span> (pdg){</div>
-<div class="line"><span class="lineno">  470</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">kNue</a>:</div>
-<div class="line"><span class="lineno">  471</span>      ReturnProbNu = <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910">kProbNue</a>;</div>
-<div class="line"><span class="lineno">  472</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  473</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">kNumu</a>:</div>
-<div class="line"><span class="lineno">  474</span>      ReturnProbNu = <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f">kProbNumu</a>;</div>
-<div class="line"><span class="lineno">  475</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  476</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">kNutau</a>:</div>
-<div class="line"><span class="lineno">  477</span>      ReturnProbNu = <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc">kProbNutau</a>;</div>
-<div class="line"><span class="lineno">  478</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  479</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a74373d078c38b05c7ce7af9fe89e9f60">kNueBar</a>:</div>
-<div class="line"><span class="lineno">  480</span>      ReturnProbNu = <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce">kProbNueBar</a>;</div>
-<div class="line"><span class="lineno">  481</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  482</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a4002f8369785cc180fd411cacc50ad6a">kNumuBar</a>:</div>
-<div class="line"><span class="lineno">  483</span>      ReturnProbNu = <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7">kProbNumuBar</a>;</div>
-<div class="line"><span class="lineno">  484</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  485</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a17308656c7ae2206d971d1a8682c5feb">kNutauBar</a>:</div>
-<div class="line"><span class="lineno">  486</span>      ReturnProbNu = <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888">kProbNutauBar</a>;</div>
-<div class="line"><span class="lineno">  487</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  488</span>    <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  489</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Unrecognised pdg for the neutrino so can&#39;t map this to an int for Prob3++&quot;</span>);</div>
-<div class="line"><span class="lineno">  490</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  491</span>  }</div>
-<div class="line"><span class="lineno">  492</span>  <span class="keywordflow">return</span> ReturnProbNu;</div>
-<div class="line"><span class="lineno">  493</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a602ad839195b7087a4897e8f6b603ee6" name="a602ad839195b7087a4897e8f6b603ee6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a602ad839195b7087a4897e8f6b603ee6">&#9670;&#160;</a></span>ProbsToPDG()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int ProbsToPDG </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7">ProbNu</a>&#160;</td>
-          <td class="paramname"><em>NuType</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00495">495</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  495</span>                                    {</div>
-<div class="line"><span class="lineno">  496</span>  <span class="keywordtype">int</span> ReturnNuPDG = -999;</div>
-<div class="line"><span class="lineno">  497</span> </div>
-<div class="line"><span class="lineno">  498</span>  <span class="keywordflow">switch</span> (NuType){</div>
-<div class="line"><span class="lineno">  499</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a5cd6d0de7e8784e41d9b25b568e4a910">kProbNue</a>:</div>
-<div class="line"><span class="lineno">  500</span>      ReturnNuPDG = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">kNue</a>);</div>
-<div class="line"><span class="lineno">  501</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  502</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a06c430fb843a21e2716d7a4ac4b02b8f">kProbNumu</a>:</div>
-<div class="line"><span class="lineno">  503</span>      ReturnNuPDG = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">kNumu</a>);</div>
-<div class="line"><span class="lineno">  504</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  505</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a01745b4e2b8e4c6e585d5256336ec0fc">kProbNutau</a>:</div>
-<div class="line"><span class="lineno">  506</span>      ReturnNuPDG = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">kNutau</a>);</div>
-<div class="line"><span class="lineno">  507</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  508</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a8d16d56aca132d6c241c7bfa76a678ce">kProbNueBar</a>:</div>
-<div class="line"><span class="lineno">  509</span>      ReturnNuPDG = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a74373d078c38b05c7ce7af9fe89e9f60">kNueBar</a>);</div>
-<div class="line"><span class="lineno">  510</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  511</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a72f2254b7daf89baabd39b7b42998ad7">kProbNumuBar</a>:</div>
-<div class="line"><span class="lineno">  512</span>      ReturnNuPDG = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a4002f8369785cc180fd411cacc50ad6a">kNumuBar</a>);</div>
-<div class="line"><span class="lineno">  513</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  514</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a5a4651943de972b89fd091d11fa7b3d7a02ac372b77ed65a76630c2bf8435e888">kProbNutauBar</a>:</div>
-<div class="line"><span class="lineno">  515</span>      ReturnNuPDG = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_enumvalue" href="Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a17308656c7ae2206d971d1a8682c5feb">kNutauBar</a>);</div>
-<div class="line"><span class="lineno">  516</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  517</span>    <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  518</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Unrecognised NuType for the neutrino so can&#39;t map this to a PDG code&quot;</span>);</div>
-<div class="line"><span class="lineno">  519</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  520</span>  }</div>
-<div class="line"><span class="lineno">  521</span>  <span class="keywordflow">return</span> ReturnNuPDG;</div>
-<div class="line"><span class="lineno">  522</span>}</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="af1b80b5456f9b1cb847fb56ddcc3c1ab" name="af1b80b5456f9b1cb847fb56ddcc3c1ab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af1b80b5456f9b1cb847fb56ddcc3c1ab">&#9670;&#160;</a></span>SplineInterpolation_ToRespFuncType()</h2>
 
@@ -1440,37 +1269,37 @@ template&lt;typename T , size_t N&gt; </div>
 
 <p>Convert a LLH type to a string. </p>
 
-<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00537">537</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  537</span>                                                         {</div>
-<div class="line"><span class="lineno">  538</span><span class="comment">// **************************************************</span></div>
-<div class="line"><span class="lineno">  539</span>  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  540</span> </div>
-<div class="line"><span class="lineno">  541</span>  <span class="keywordflow">switch</span>(i) {</div>
-<div class="line"><span class="lineno">  542</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">TestStatistic::kPoisson</a>:</div>
-<div class="line"><span class="lineno">  543</span>    name = <span class="stringliteral">&quot;Poisson&quot;</span>;</div>
-<div class="line"><span class="lineno">  544</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  545</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">TestStatistic::kBarlowBeeston</a>:</div>
-<div class="line"><span class="lineno">  546</span>    name = <span class="stringliteral">&quot;Barlow-Beeston&quot;</span>;</div>
-<div class="line"><span class="lineno">  547</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  548</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">TestStatistic::kIceCube</a>:</div>
-<div class="line"><span class="lineno">  549</span>    name = <span class="stringliteral">&quot;IceCube&quot;</span>;</div>
-<div class="line"><span class="lineno">  550</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  551</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">TestStatistic::kPearson</a>:</div>
-<div class="line"><span class="lineno">  552</span>    name = <span class="stringliteral">&quot;Pearson&quot;</span>;</div>
-<div class="line"><span class="lineno">  553</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  554</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">TestStatistic::kDembinskiAbdelmotteleb</a>:</div>
-<div class="line"><span class="lineno">  555</span>    name = <span class="stringliteral">&quot;Dembinski-Abdelmotteleb&quot;</span>;</div>
-<div class="line"><span class="lineno">  556</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  557</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee">TestStatistic::kNTestStatistics</a>:</div>
-<div class="line"><span class="lineno">  558</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kNTestStatistics is not a valid TestStatistic!&quot;</span>);</div>
-<div class="line"><span class="lineno">  559</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  560</span>    <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  561</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN LIKELIHOOD SPECIFIED!&quot;</span>);</div>
-<div class="line"><span class="lineno">  562</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave test-statistic {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
-<div class="line"><span class="lineno">  563</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  564</span>  }</div>
-<div class="line"><span class="lineno">  565</span>  <span class="keywordflow">return</span> name;</div>
-<div class="line"><span class="lineno">  566</span>}</div>
+<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00464">464</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  464</span>                                                         {</div>
+<div class="line"><span class="lineno">  465</span><span class="comment">// **************************************************</span></div>
+<div class="line"><span class="lineno">  466</span>  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  467</span> </div>
+<div class="line"><span class="lineno">  468</span>  <span class="keywordflow">switch</span>(i) {</div>
+<div class="line"><span class="lineno">  469</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">TestStatistic::kPoisson</a>:</div>
+<div class="line"><span class="lineno">  470</span>    name = <span class="stringliteral">&quot;Poisson&quot;</span>;</div>
+<div class="line"><span class="lineno">  471</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  472</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">TestStatistic::kBarlowBeeston</a>:</div>
+<div class="line"><span class="lineno">  473</span>    name = <span class="stringliteral">&quot;Barlow-Beeston&quot;</span>;</div>
+<div class="line"><span class="lineno">  474</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  475</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">TestStatistic::kIceCube</a>:</div>
+<div class="line"><span class="lineno">  476</span>    name = <span class="stringliteral">&quot;IceCube&quot;</span>;</div>
+<div class="line"><span class="lineno">  477</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  478</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">TestStatistic::kPearson</a>:</div>
+<div class="line"><span class="lineno">  479</span>    name = <span class="stringliteral">&quot;Pearson&quot;</span>;</div>
+<div class="line"><span class="lineno">  480</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  481</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">TestStatistic::kDembinskiAbdelmotteleb</a>:</div>
+<div class="line"><span class="lineno">  482</span>    name = <span class="stringliteral">&quot;Dembinski-Abdelmotteleb&quot;</span>;</div>
+<div class="line"><span class="lineno">  483</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  484</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1459dbcc0f1b68b266cf0ddc37c34aee">TestStatistic::kNTestStatistics</a>:</div>
+<div class="line"><span class="lineno">  485</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kNTestStatistics is not a valid TestStatistic!&quot;</span>);</div>
+<div class="line"><span class="lineno">  486</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  487</span>    <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  488</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN LIKELIHOOD SPECIFIED!&quot;</span>);</div>
+<div class="line"><span class="lineno">  489</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave test-statistic {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
+<div class="line"><span class="lineno">  490</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  491</span>  }</div>
+<div class="line"><span class="lineno">  492</span>  <span class="keywordflow">return</span> name;</div>
+<div class="line"><span class="lineno">  493</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

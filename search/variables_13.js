@@ -9,7 +9,8 @@ var searchData=
   ['unity_5ff_6',['Unity_F',['../namespaceM3.html#a0888fc3177e4a0c3ddbed03a5bd358b0',1,'M3']]],
   ['unity_5fint_7',['Unity_Int',['../namespaceM3.html#a562b8b4a9a841b9fb76d69a33489aefe',1,'M3']]],
   ['updatew2_8',['UpdateW2',['../classsamplePDFFDBase.html#a3dc696aa2a08e19d5ab3c12cd3440a80',1,'samplePDFFDBase']]],
-  ['uppercut_9',['UpperCut',['../classMCMCProcessor.html#a840c686f15f419c0156df01c4ed62931',1,'MCMCProcessor']]],
-  ['use_5fadaptive_10',['use_adaptive',['../classcovarianceBase.html#a838731abd6716940043b484b2b266f86',1,'covarianceBase']]],
-  ['usefftautocorrelation_11',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]]
+  ['upperbound_9',['UpperBound',['../structKinematicCut.html#a244bd4ada65739a6984a2039a5a6f200',1,'KinematicCut']]],
+  ['uppercut_10',['UpperCut',['../classMCMCProcessor.html#a840c686f15f419c0156df01c4ed62931',1,'MCMCProcessor']]],
+  ['use_5fadaptive_11',['use_adaptive',['../classcovarianceBase.html#a838731abd6716940043b484b2b266f86',1,'covarianceBase']]],
+  ['usefftautocorrelation_12',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]]
 ];
