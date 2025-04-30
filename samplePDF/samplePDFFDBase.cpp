@@ -208,16 +208,18 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
-  MACH3LOG_INFO("Setting up NuOscillator.. ");
-  if (NuOscProbCalcers.size() != 0) {
-    MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
-    MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
-    EqualBinningPerOscChannel = true;
-  } else {
-    InitialiseNuOscillatorObjects();
+  if (OscCov) {
+    MACH3LOG_INFO("Setting up NuOscillator.. ");
+    if (NuOscProbCalcers.size() != 0) {
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
+      MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
+      EqualBinningPerOscChannel = true;
+    } else {
+      InitialiseNuOscillatorObjects();
+    }
+    SetupNuOscillatorPointers();
+    OscParams = OscCov->GetOscParsFromSampleName(SampleName);
   }
-  SetupNuOscillatorPointers();
-  OscParams = OscCov->GetOscParsFromSampleName(SampleName);
 
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
