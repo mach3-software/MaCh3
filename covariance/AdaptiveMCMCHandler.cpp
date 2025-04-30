@@ -297,20 +297,19 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
 
       if (adapt_block_matrix_indices[icol] == block) {
         // Compute adjusted differences for circular parameters
-
         // Handle circular parameters
         // Update covariance (using Haario's recursive formula)
         // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
         
         // unset-scale
-        double cov_val = (*adaptive_covariance)(icol, irow) * (steps_post_burn-1) / scale_factor*(steps_post_burn);
+        double cov_val = (*adaptive_covariance)(icol, irow) * (steps_post_burn-1) / (scale_factor*(steps_post_burn));
 
         // Calculate covariance
         double mean_cpt = steps_post_burn*par_means_prev[irow]*par_means_prev[icol];
         mean_cpt -= (steps_post_burn+1)*par_means[irow]*par_means[irow];
         mean_cpt += _fCurrVal[irow]*_fCurrVal[icol];
 
-        cov_val += mean_cpt*scale_factor;
+        cov_val += mean_cpt*scale_factor/(steps_post_burn+1);
 
         // Set the covariance value
         (*adaptive_covariance)(icol, irow) = cov_val;
