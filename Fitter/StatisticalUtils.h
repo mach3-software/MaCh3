@@ -101,24 +101,24 @@ void GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_p, doub
 /// @brief KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
 /// @param hist histograms based on which we calculate credible interval
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage = 0.6827);
+void GetCredibleInterval(const std::unique_ptr<TH1D>& hist, std::unique_ptr<TH1D>& hpost_copy, const double coverage = 0.6827);
 
 /// @brief KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
 /// @param hist histograms based on which we calculate credible interval
 /// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-void GetCredibleIntervalSig(TH1D* const hist, TH1D* hpost_copy, const bool CredibleInSigmas, const double coverage = 0.6827);
+void GetCredibleIntervalSig(const std::unique_ptr<TH1D>& hist, std::unique_ptr<TH1D>& hpost_copy, const bool CredibleInSigmas, const double coverage = 0.6827);
 
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
 /// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-void GetCredibleRegion(TH2D* const hist2D, const double coverage = 0.6827);
+void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage = 0.6827);
 
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
-void GetCredibleRegionSig(TH2D* const hist2D, const bool CredibleInSigmas, const double coverage = 0.6827);
+void GetCredibleRegionSig(std::unique_ptr<TH2D>& hist2D, const bool CredibleInSigmas, const double coverage = 0.6827);
 
 /// @brief Interquartile Range (IQR)
 /// @param hist histograms from which we IQR

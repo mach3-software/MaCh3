@@ -55,6 +55,7 @@ void BinnedSplineHandler::cleanUpMemory() {
   CleanVector(Dimensions);
   CleanContainer(splinevec_Monolith);
   CleanContainer(SplineBinning);
+  CleanVector(UniqueSystIndices);
   if(isflatarray) delete [] isflatarray;
 }
 
@@ -296,7 +297,7 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleName
 }
 
 //****************************************
-std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(std::string FileName, std::string SampleName)
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleName)
 //****************************************
 {
   std::vector<TAxis *> ReturnVec;
@@ -748,7 +749,7 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const
 }
 
 //****************************************
-std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
 //****************************************
 {
   std::vector<std::vector<int>> ReturnVec;
@@ -816,7 +817,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(std::string
 
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
-std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
+std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) {
 
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
@@ -959,7 +960,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
           delete mySpline;
         } else {
           Spline = new TSpline3_red(mySpline, SplineInterpolationTypes[iSample][SystNum]);
-          delete mySpline;
+          if(mySpline) delete mySpline;
 
           splinevec_Monolith.push_back(Spline);
           uniquecoeffindices.push_back(MonolithIndex); //So we can get the unique coefficients and skip flat splines later on!

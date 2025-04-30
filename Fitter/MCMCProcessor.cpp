@@ -689,17 +689,17 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
   // KS: Sanity check of size and ordering is correct
   CheckCredibleIntervalsOrder(CredibleIntervals, CredibleIntervalsColours);
   const int nCredible = int(CredibleIntervals.size());
-  std::vector<TH1D*> hpost_copy(nDraw);
-  std::vector<std::vector<TH1D*>> hpost_cl(nDraw);
+  std::vector<std::unique_ptr<TH1D>> hpost_copy(nDraw);
+  std::vector<std::vector<std::unique_ptr<TH1D>>> hpost_cl(nDraw);
 
   //KS: Copy all histograms to be thread safe
   for (int i = 0; i < nDraw; ++i)
   {
-    hpost_copy[i] = static_cast<TH1D*>(hpost[i]->Clone(Form("hpost_copy_%i", i)));
+    hpost_copy[i] = M3::Clone<TH1D>(hpost[i], Form("hpost_copy_%i", i));
     hpost_cl[i].resize(nCredible);
     for (int j = 0; j < nCredible; ++j)
     {
-      hpost_cl[i][j] = static_cast<TH1D*>(hpost[i]->Clone(Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j])));
+      hpost_cl[i][j] = M3::Clone<TH1D>(hpost[i], Form("hpost_copy_%i_CL_%f", i, CredibleIntervals[j]));
 
       //KS: Reset to get rid to TF1 otherwise we run into segfault :(
       hpost_cl[i][j]->Reset("");
@@ -755,9 +755,9 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
     for (int j = nCredible-1; j >= 0; --j)
     {
       if(CredibleInSigmas)
-        legend->AddEntry(hpost_cl[i][j], Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
+        legend->AddEntry(hpost_cl[i][j].get(), Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
       else
-        legend->AddEntry(hpost_cl[i][j], Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f");
+        legend->AddEntry(hpost_cl[i][j].get(), Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f");
     }
     legend->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
     legend->Draw("SAME");
@@ -772,15 +772,6 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
     CredibleDir->cd();
     Posterior->Write();
   }
-
-  //KS: Remove histograms
-  for (int i = 0; i < nDraw; ++i) {
-    delete hpost_copy[i];
-    for (int j = 0; j < nCredible; ++j) {
-      delete hpost_cl[i][j];
-    }
-  }
-
   CredibleDir->Close();
   delete CredibleDir;
 
@@ -1558,8 +1549,8 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
   CheckCredibleRegionsOrder(CredibleRegions, CredibleRegionStyle, CredibleRegionColor);
   const int nCredible = int(CredibleRegions.size());
 
-  std::vector<std::vector<TH2D*>> hpost_2D_copy(nDraw);
-  std::vector<std::vector<std::vector<TH2D*>>> hpost_2D_cl(nDraw);
+  std::vector<std::vector<std::unique_ptr<TH2D>>> hpost_2D_copy(nDraw);
+  std::vector<std::vector<std::vector<std::unique_ptr<TH2D>>>> hpost_2D_cl(nDraw);
   //KS: Copy all histograms to be thread safe
   for (int i = 0; i < nDraw; ++i)
   {
@@ -1567,11 +1558,11 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
     hpost_2D_cl[i].resize(nDraw);
     for (int j = 0; j <= i; ++j)
     {
-      hpost_2D_copy[i][j] = static_cast<TH2D*>(hpost2D[i][j]->Clone(Form("hpost_copy_%i_%i", i, j)));
+      hpost_2D_copy[i][j] = M3::Clone<TH2D>(hpost2D[i][j], Form("hpost_copy_%i_%i", i, j));
       hpost_2D_cl[i][j].resize(nCredible);
       for (int k = 0; k < nCredible; ++k)
       {
-        hpost_2D_cl[i][j][k] = static_cast<TH2D*>(hpost2D[i][j]->Clone(Form("hpost_copy_%i_%i_CL_%f", i, j, CredibleRegions[k])));
+        hpost_2D_cl[i][j][k] = M3::Clone<TH2D>(hpost2D[i][j], Form("hpost_copy_%i_%i_CL_%f", i, j, CredibleRegions[k]));
       }
     }
   }
@@ -1630,9 +1621,9 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       for (int k = nCredible-1; k >= 0; --k)
       {
         if(CredibleInSigmas)
-          legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f#sigma Credible Interval", CredibleRegions[k]), "l");
+          legend->AddEntry(hpost_2D_cl[i][j][k].get(), Form("%.0f#sigma Credible Interval", CredibleRegions[k]), "l");
         else
-          legend->AddEntry(hpost_2D_cl[i][j][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
+          legend->AddEntry(hpost_2D_cl[i][j][k].get(), Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
       }
       legend->Draw("SAME");
       bestfitM->Draw("SAME.P");
@@ -1650,18 +1641,6 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
   }
 
   OutputFile->cd();
-  //KS: Remove histograms
-  for (int i = 0; i < nDraw; ++i)
-  {
-    for (int j = 0; j <= i; ++j)
-    {
-      delete hpost_2D_copy[i][j];
-      for (int k = 0; k < nCredible; ++k)
-      {
-        delete hpost_2D_cl[i][j][k];
-      }
-    }
-  }
 }
 
 // *********************
@@ -1701,7 +1680,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   Posterior->SetRightMargin(0.001);
 
   // KS: We later format hist several times so make one unfired lambda
-  auto FormatHistogram = [](auto* hist) {
+  auto FormatHistogram = [](auto& hist) {
     hist->GetXaxis()->SetTitle("");
     hist->GetYaxis()->SetTitle("");
     hist->SetTitle("");
@@ -1734,11 +1713,11 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   //KS: Initialise Tpad histograms etc we will need
   std::vector<TPad*> TrianglePad(Npad);
   //KS: 1D copy of posterior, we need it as we modify them
-  std::vector<TH1D*> hpost_copy(nParamPlot);
-  std::vector<std::vector<TH1D*>> hpost_cl(nParamPlot);
+  std::vector<std::unique_ptr<TH1D>> hpost_copy(nParamPlot);
+  std::vector<std::vector<std::unique_ptr<TH1D>>> hpost_cl(nParamPlot);
   std::vector<std::unique_ptr<TText>> TriangleText(nParamPlot * 2);
-  std::vector<TH2D*> hpost_2D_copy(Npad-nParamPlot);
-  std::vector<std::vector<TH2D*>> hpost_2D_cl(Npad-nParamPlot);
+  std::vector<std::unique_ptr<TH2D>> hpost_2D_copy(Npad-nParamPlot);
+  std::vector<std::vector<std::unique_ptr<TH2D>>> hpost_2D_cl(Npad-nParamPlot);
   gStyle->SetPalette(51);
 
   //KS: Super convoluted way of calculating ranges for our pads, trust me it works...
@@ -1797,13 +1776,13 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       //KS:if diagonal plot main posterior
       if(x == y)
       {
-        hpost_copy[counterPost] = static_cast<TH1D*>(hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i", ParamNumber[x])));
+        hpost_copy[counterPost] = M3::Clone<TH1D>(hpost[ParamNumber[x]], Form("hpost_copy_%i", ParamNumber[x]));
         hpost_cl[counterPost].resize(nCredibleIntervals);
         /// Scale the histograms so it shows the posterior probability
         hpost_copy[counterPost]->Scale(1. / hpost_copy[counterPost]->Integral());
         for (int j = 0; j < nCredibleIntervals; ++j)
         {
-          hpost_cl[counterPost][j] = static_cast<TH1D*>(hpost[ParamNumber[x]]->Clone(Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleIntervals[j])));
+          hpost_cl[counterPost][j] = M3::Clone<TH1D>(hpost[ParamNumber[x]], Form("hpost_copy_%i_CL_%f", ParamNumber[x], CredibleIntervals[j]));
           //KS: Reset to get rid to TF1 otherwise we run into segfault :(
           hpost_cl[counterPost][j]->Reset("");
           hpost_cl[counterPost][j]->Fill(0.0, 0.0);
@@ -1832,14 +1811,14 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       //KS: Here we plot 2D credible regions
       else
       {
-        hpost_2D_copy[counter2DPost] = static_cast<TH2D*>(hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone(
-          Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y])));
+        hpost_2D_copy[counter2DPost] = M3::Clone<TH2D>(hpost2D[ParamNumber[x]][ParamNumber[y]],
+                                                       Form("hpost_copy_%i_%i", ParamNumber[x], ParamNumber[y]));
         hpost_2D_cl[counter2DPost].resize(nCredibleRegions);
         //KS: Now copy for every credible region
         for (int k = 0; k < nCredibleRegions; ++k)
         {
-          hpost_2D_cl[counter2DPost][k] = static_cast<TH2D*>(hpost2D[ParamNumber[x]][ParamNumber[y]]->Clone(
-            Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k])));
+          hpost_2D_cl[counter2DPost][k] = M3::Clone<TH2D>(hpost2D[ParamNumber[x]][ParamNumber[y]],
+                                                          Form("hpost_copy_%i_%i_CL_%f", ParamNumber[x], ParamNumber[y], CredibleRegions[k]));
           GetCredibleRegionSig(hpost_2D_cl[counter2DPost][k], CredibleInSigmas, CredibleRegions[k]);
 
           hpost_2D_cl[counter2DPost][k]->SetLineColor(CredibleRegionColor[k]);
@@ -1892,16 +1871,16 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   for (int j = nCredibleIntervals-1; j >= 0; --j)
   {
     if(CredibleInSigmas)
-      legend->AddEntry(hpost_cl[0][j], Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
+      legend->AddEntry(hpost_cl[0][j].get(), Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
     else
-      legend->AddEntry(hpost_cl[0][j], Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
+      legend->AddEntry(hpost_cl[0][j].get(), Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
   }
   for (int k = nCredibleRegions-1; k >= 0; --k)
   {
     if(CredibleInSigmas)
-      legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f#sigma Credible Region", CredibleRegions[k]), "l");
+      legend->AddEntry(hpost_2D_cl[0][k].get(), Form("%.0f#sigma Credible Region", CredibleRegions[k]), "l");
     else
-      legend->AddEntry(hpost_2D_cl[0][k], Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
+      legend->AddEntry(hpost_2D_cl[0][k].get(), Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
   }
   legend->Draw("SAME");
   Posterior->Update();
@@ -1917,20 +1896,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 
   //KS: Remove allocated structures
   for(int i = 0; i < Npad; i++) delete TrianglePad[i];
-  for(int i = 0; i < nParamPlot; i++)
-  {
-    delete hpost_copy[i];
-    for (int j = 0; j < nCredibleIntervals; ++j) {
-      delete hpost_cl[i][j];
-    }
-  }
-  for(int i = 0; i < Npad - nParamPlot; i++)
-  {
-    delete hpost_2D_copy[i];
-    for (int j = 0; j < nCredibleRegions; ++j) {
-      delete hpost_2D_cl[i][j];
-    }
-  }
 
   //KS: Restore margin
   SetMargins(Posterior, Margins);

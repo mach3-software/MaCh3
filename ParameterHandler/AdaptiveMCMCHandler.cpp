@@ -41,7 +41,9 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
    * AdaptionEndUpdate [int]      :    Step we stop updating adaptive matrix
    * AdaptionStartUpdate [int]    :    Do we skip the first N steps?
    * AdaptionUpdateStep [int]     :    Number of steps between matrix updates
+   * AdaptionSaveNIterations [int]:    You don't have to save every adaptive stage so decide how often you want to save
    * Adaption blocks [vector<vector<int>>] : Splits the throw matrix into several block matrices
+   * OuputFileName [std::string]  :    Name of the file that the adaptive matrices will be saved into
    */
 
   // setAdaptionDefaults();
@@ -56,10 +58,18 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
     return false;
   }
 
-  start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartThrow"], 10);
-  start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionStartUpdate"], 0);
-  end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionEndUpdate"], 10000);
-  adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AdaptionUpdateStep"], 100);
+  if(!CheckNodeExists(adapt_manager, "AdaptionOptions", "Settings", "OutputFileName")) {
+    MACH3LOG_ERROR("No OutputFileName specified in AdaptionOptions::Settings into your config file");
+    MACH3LOG_ERROR("This is required if you are using adaptive MCMC");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartThrow"], 10);
+  start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartUpdate"], 0);
+  end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["EndUpdate"], 10000);
+  adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["UpdateStep"], 100);
+  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1);
+  output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
@@ -97,10 +107,12 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
 
   if(block_indices.size()==0 || block_indices[0].size()==0) return;
 
+  int block_size = static_cast<int>(block_indices.size());
   // Now we loop over our blocks
-  for(int iblock=0; iblock<int(block_indices.size()); iblock++){
+  for(int iblock=0; iblock < block_size; iblock++){
     // Loop over blocks in the block
-    for(int isubblock=0; isubblock<int(block_indices[iblock].size())-1; isubblock+=2){
+    int sub_block_size = static_cast<int>(block_indices.size()-1);
+    for(int isubblock=0; isubblock < sub_block_size ; isubblock+=2){
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
@@ -120,23 +132,43 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
 
 // ********************************************
 //HW: Truly adaptive MCMC!
-void AdaptiveMCMCHandler::SaveAdaptiveToFile(const TString& outFileName, const TString& systematicName){
-// ********************************************
-  TFile* outFile = new TFile(outFileName, "UPDATE");
-  if(outFile->IsZombie()){
-    MACH3LOG_ERROR("Couldn't find {}", outFileName);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
+                                             const std::string &systematicName, bool is_final) {
+  // ********************************************
+
+  if (((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0 || is_final) {
+
+    TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
+    if (outFile->IsZombie()) {
+      MACH3LOG_ERROR("Couldn't find {}", outFileName);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    TVectorD *outMeanVec = new TVectorD(int(par_means.size()));
+    for (int i = 0; i < int(par_means.size()); i++) {
+      (*outMeanVec)(i) = par_means[i];
+    }
+
+    std::string adaptive_cov_name = systematicName + "_posfit_matrix";
+    std::string mean_vec_name = systematicName + "_mean_vec";
+    if (!is_final) {
+      // Some string to make the name of the saved adaptive matrix clear
+      std::string total_steps_str =
+          std::to_string(total_steps);
+      std::string syst_name_str = systematicName;
+      adaptive_cov_name =
+          total_steps_str + '_' + syst_name_str + std::string("_throw_matrix");
+      mean_vec_name =
+          total_steps_str + '_' + syst_name_str + std::string("_mean_vec");
+    }
+
+    outFile->cd();
+    adaptive_covariance->Write(adaptive_cov_name.c_str());
+    outMeanVec->Write(mean_vec_name.c_str());
+    outFile->Close();
+    delete outMeanVec;
+    delete outFile;
   }
-  TVectorD* outMeanVec = new TVectorD(int(par_means.size()));
-  for(int i = 0; i < int(par_means.size()); i++){
-    (*outMeanVec)(i) = par_means[i];
-  }
-  outFile->cd();
-  adaptive_covariance->Write(systematicName+"_postfit_matrix");
-  outMeanVec->Write(systematicName+"_mean_vec");
-  outFile->Close();
-  delete outMeanVec;
-  delete outFile;
 }
 
 // ********************************************
@@ -244,7 +276,11 @@ bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
 bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 // ********************************************
   if(total_steps >= start_adaptive_throw &&
-    (total_steps - start_adaptive_throw)%adaptive_update_step == 0) return true;
+    // Check whether the number of steps is divisible by the adaptive update step
+    // e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true
+    (total_steps - start_adaptive_throw)%adaptive_update_step == 0) {
+    return true;
+  } 
   else return false;
 }
 
@@ -271,6 +307,8 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Adaption Matrix Start Update       : {}", start_adaptive_update);
   MACH3LOG_INFO("Adaption Matrix Ending Updates     : {}", end_adaptive_update);
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
+  MACH3LOG_INFO("Saving matrices to file            : {}", output_file_name);
+  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
 }
 
 } //end adaptive_mcmc

@@ -79,6 +79,40 @@ void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
 
 // *******************
 /// @brief Generic cleanup function
+/// @todo Use recursive to make it more scalable in future
+template <typename T>
+void CleanVector(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T>>>>>>> &vec) {
+// *******************
+  for (auto& v6 : vec) {
+    for (auto& v5 : v6) {
+      for (auto& v4 : v5) {
+        for (auto& v3 : v4) {
+          for (auto& v2 : v3) {
+            for (auto& v1 : v2) {
+              v1.clear();
+              v1.shrink_to_fit();
+            }
+            v2.clear();
+            v2.shrink_to_fit();
+          }
+          v3.clear();
+          v3.shrink_to_fit();
+        }
+        v4.clear();
+        v4.shrink_to_fit();
+      }
+      v5.clear();
+      v5.shrink_to_fit();
+    }
+    v6.clear();
+    v6.shrink_to_fit();
+  }
+  vec.clear();
+  vec.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
 template <typename T>
 void CleanContainer(std::vector<T*>& container) {
 // *******************
@@ -414,79 +448,6 @@ enum NuPDG {
   kNutauBar = -16
 };
 
-// *****************
-/// Enum to track neutrino species for Prob3
-enum ProbNu {
-// *****************
-  kProbNue = 1,
-  kProbNumu = 2,
-  kProbNutau = 3,
-  kProbNueBar = -1,
-  kProbNumuBar = -2,
-  kProbNutauBar = -3
-};
-
-// *****************
-/// @brief ETA - Probs3++ doesn't use the PDG codes for the neutrino type so add in a small converter
-inline int PDGToProbs(NuPDG pdg){
-// *****************
-  int ReturnProbNu = -999;
-
-  switch (pdg){
-    case kNue:
-      ReturnProbNu = kProbNue;
-      break;
-    case kNumu:
-      ReturnProbNu = kProbNumu;
-      break;
-    case kNutau:
-      ReturnProbNu = kProbNutau;
-      break;
-    case kNueBar:
-      ReturnProbNu = kProbNueBar;
-      break;
-    case kNumuBar:
-      ReturnProbNu = kProbNumuBar;
-      break;
-    case kNutauBar:
-      ReturnProbNu = kProbNutauBar;
-      break;
-    default:
-      MACH3LOG_WARN("Unrecognised pdg for the neutrino so can't map this to an int for Prob3++");
-      break;
-  }
-  return ReturnProbNu;
-}
-
-inline int ProbsToPDG(ProbNu NuType){
-  int ReturnNuPDG = -999;
-
-  switch (NuType){
-    case kProbNue:
-      ReturnNuPDG = static_cast<int>(kNue);
-      break;
-    case kProbNumu:
-      ReturnNuPDG = static_cast<int>(kNumu);
-      break;
-    case kProbNutau:
-      ReturnNuPDG = static_cast<int>(kNutau);
-      break;
-    case kProbNueBar:
-      ReturnNuPDG = static_cast<int>(kNueBar);
-      break;
-    case kProbNumuBar:
-      ReturnNuPDG = static_cast<int>(kNumuBar);
-      break;
-    case kProbNutauBar:
-      ReturnNuPDG = static_cast<int>(kNutauBar);
-      break;
-    default:
-      MACH3LOG_WARN("Unrecognised NuType for the neutrino so can't map this to a PDG code");
-      break;
-  }
-  return ReturnNuPDG;
-}
-
 /// Make an enum of the test statistic that we're using
 /// @todo KS: Consider adding BakerCousins based on Baker & Cousins, Nucl.Instrum.Meth.A 221 (1984) 437-442
 enum TestStatistic {
@@ -531,17 +492,25 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
   return name;
 }
 
+// ***************************
+/// @brief KS: Small struct used for applying kinematic cuts
+struct KinematicCut {
+// ***************************
+  /// Index or enum value identifying the kinematic variable to cut on.
+  int ParamToCutOnIt = M3::_BAD_INT_;
+  /// Lower bound on which we apply cut
+  double LowerBound = M3::_BAD_DOUBLE_;
+  /// Upper bound on which we apply cut
+  double UpperBound = M3::_BAD_DOUBLE_;
+};
 
 // ***************************
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
-  // ***************************
+// ***************************
 
-  // ***************************
   /// @brief Return mass for given PDG
-  // *****************************
-  // Get the mass of a particle from the PDG
-  // In GeV, not MeV!
+  /// @note Get the mass of a particle from the PDG In GeV, not MeV!
   inline double GetMassFromPDG(const int PDG) {
     // *****************************
     switch (abs(PDG)) {
@@ -622,7 +591,7 @@ namespace MaCh3Utils {
         NuOscillatorFlavour = NuOscillator::kTau;
         break;
       default:
-        MACH3LOG_ERROR("Unknown Nuetrino PDG {}, cannot convert to NuOscillator type", NuPdg);
+        MACH3LOG_ERROR("Unknown Neutrino PDG {}, cannot convert to NuOscillator type", NuPdg);
         break;
     }
 

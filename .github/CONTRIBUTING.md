@@ -5,7 +5,14 @@ New features should be developed on branches in this repository with the branch 
 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
-## PR tittles
+## Versioning of this package
+
+This package will follow this numbering convention for releases
+- Major `X.0.0` for paradigm-shifting breaking changes
+- Minor `0.X.0` for more minor breaking changes (or lots of non-breaking changes + a long time since last release)
+- Patch `0.0.X` for non-breaking changes
+
+## PR titles
 When creating a Pull Request (PR), make sure the title starts with one of the following prefixes to indicate the type of PR:
 
 - **`feat:`**: For new features

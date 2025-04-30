@@ -313,7 +313,7 @@ void GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_p, doub
 }
 
 // ***************
-void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double coverage) {
+void GetCredibleInterval(const std::unique_ptr<TH1D>& hist, std::unique_ptr<TH1D>& hpost_copy, const double coverage) {
 // ***************
   if(coverage > 1)
   {
@@ -364,7 +364,7 @@ void GetCredibleInterval(TH1D* const hist, TH1D* hpost_copy, const double covera
 }
 
 // ***************
-void GetCredibleIntervalSig(TH1D* const hist, TH1D* hpost_copy, const bool CredibleInSigmas, const double coverage) {
+void GetCredibleIntervalSig(const std::unique_ptr<TH1D>& hist, std::unique_ptr<TH1D>& hpost_copy, const bool CredibleInSigmas, const double coverage) {
 // ***************
   //KS: Slightly different approach depending if intervals are in percentage or sigmas
   if(CredibleInSigmas) {
@@ -377,7 +377,7 @@ void GetCredibleIntervalSig(TH1D* const hist, TH1D* hpost_copy, const bool Credi
 }
 
 // ***************
-void GetCredibleRegion(TH2D* const hist2D, const double coverage) {
+void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage) {
 // ***************
   if(coverage > 1)
   {
@@ -428,7 +428,7 @@ void GetCredibleRegion(TH2D* const hist2D, const double coverage) {
 }
 
 // ***************
-void GetCredibleRegionSig(TH2D* const hist2D, const bool CredibleInSigmas, const double coverage) {
+void GetCredibleRegionSig(std::unique_ptr<TH2D>& hist2D, const bool CredibleInSigmas, const double coverage) {
 // ***************
   if(CredibleInSigmas) {
     //KS: Convert sigmas into percentage
