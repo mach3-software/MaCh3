@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <cxxabi.h>
+#include <regex>
 
 // MaCh3 Includes
 #include "manager/MaCh3Exception.h"
@@ -217,7 +218,6 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
   return false;
 }
 
-
 // **********************
 /// @brief Overrides the configuration settings based on provided arguments.
 ///
@@ -311,18 +311,47 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
   // KS: YAML can be dumb and not throw error if you pass toml for example...
   if (!(filename.length() >= 5 && filename.compare(filename.length() - 5, 5, ".yaml") == 0) &&
     !(filename.length() >= 4 && filename.compare(filename.length() - 4, 4, ".yml") == 0)) {
-    MACH3LOG_ERROR("Invalid file extension: {}", filename);
+    MACH3LOG_ERROR("Invalid file extension: {}\n", filename);
     throw MaCh3Exception(File, Line);
   }
 
   try {
-    return YAML::LoadFile(filename);
+    YAML::Node yamlNode = YAML::LoadFile(filename);
+
+    // Convert the YAML file to string
+    std::ifstream fileStream(filename);
+    std::stringstream buffer;
+    buffer << fileStream.rdbuf();
+    std::string fileContent = buffer.str();
+
+    // Use regex to find any line starting with `-` but not followed by space or tab
+    std::regex linePattern(R"(^\s*-\S.*$)");
+    std::istringstream contentStream(fileContent);
+    std::string lineconfig;
+    int lineNumber = 1;
+
+    while (std::getline(contentStream, lineconfig)) {
+      // Log the line for debugging
+      // Ignore lines with '---' (YAML document separator)
+      if (lineconfig.find("---") != std::string::npos) {
+        continue;
+      }
+
+      // Check if the line matches the pattern for missing space after `-`
+      if (std::regex_match(lineconfig, linePattern)) {
+        MACH3LOG_ERROR("Warning: Missing space or tab after '-' at line {}: {}\n", lineNumber, lineconfig);
+       throw MaCh3Exception(File, Line);
+      }
+      lineNumber++;
+    }
+    return yamlNode;
   } catch (const std::exception& e) {
-    MACH3LOG_ERROR("{}", e.what());
-    MACH3LOG_ERROR("Can't open file {}", filename);
+    MACH3LOG_ERROR("{}\n", e.what());
+    MACH3LOG_ERROR("Can't open file {}\n", filename);
     throw MaCh3Exception(File, Line);
   }
 }
+
 
 // **********************
 /// @brief KS: Convenience wrapper to return a YAML node as-is.
