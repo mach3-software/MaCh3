@@ -272,11 +272,11 @@ template&lt;typename CovType &gt; </div>
 <div class="line"><span class="lineno">   69</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">   70</span>  <span class="comment">// config for our matrix</span></div>
 <div class="line"><span class="lineno">   71</span>  YAML::Node Settings = FitManager-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Systematics&quot;</span>];</div>
-<div class="line"><span class="lineno">   72</span>  <span class="keyword">auto</span> CovMatrixName = Settings[std::string(PreFix) + <span class="stringliteral">&quot;CovName&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><span class="lineno">   72</span>  <span class="keyword">auto</span> CovMatrixName = Get&lt;std::string&gt;(Settings[std::string(PreFix) + <span class="stringliteral">&quot;CovName&quot;</span>], __FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">   73</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Initialising {} matrix&quot;</span>, CovMatrixName);</div>
 <div class="line"><span class="lineno">   74</span> </div>
 <div class="line"><span class="lineno">   75</span>  <span class="comment">// yaml files initialising out matrix</span></div>
-<div class="line"><span class="lineno">   76</span>  <span class="keyword">auto</span> CovMatrixFile = Settings[std::string(PreFix) + <span class="stringliteral">&quot;CovFile&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="lineno">   76</span>  <span class="keyword">auto</span> CovMatrixFile = Get&lt;std::vector&lt;std::string&gt;&gt;(Settings[std::string(PreFix) + <span class="stringliteral">&quot;CovFile&quot;</span>], __FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">   77</span> </div>
 <div class="line"><span class="lineno">   78</span>  <span class="comment">// PCA threshold, -1 means no pca</span></div>
 <div class="line"><span class="lineno">   79</span>  <span class="keyword">auto</span> PCAThreshold = GetFromManager&lt;int&gt;(Settings[std::string(PreFix) + <span class="stringliteral">&quot;PCAThreshold&quot;</span>], -1);</div>
@@ -302,7 +302,7 @@ template&lt;typename CovType &gt; </div>
 <div class="line"><span class="lineno">   99</span>    }</div>
 <div class="line"><span class="lineno">  100</span>  }</div>
 <div class="line"><span class="lineno">  101</span>  <span class="comment">//Global step scale for matrix</span></div>
-<div class="line"><span class="lineno">  102</span>  <span class="keyword">auto</span> StepScale = Settings[std::string(PreFix) + <span class="stringliteral">&quot;StepScale&quot;</span>].as&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><span class="lineno">  102</span>  <span class="keyword">auto</span> StepScale = Get&lt;double&gt;(Settings[std::string(PreFix) + <span class="stringliteral">&quot;StepScale&quot;</span>], __FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">  103</span> </div>
 <div class="line"><span class="lineno">  104</span>  CovObject-&gt;setStepScale(StepScale);</div>
 <div class="line"><span class="lineno">  105</span> </div>
