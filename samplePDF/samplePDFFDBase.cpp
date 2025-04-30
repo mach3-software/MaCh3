@@ -213,7 +213,7 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
-  MACH3LOG_INFO("Setting up NuOscillator..");
+  MACH3LOG_INFO("Setting up NuOscillator.. ");
   if (NuOscProbCalcers.size() != 0) {
     MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
     MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
