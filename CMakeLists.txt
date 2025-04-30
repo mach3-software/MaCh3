@@ -15,6 +15,7 @@ option(MaCh3_DependancyGraph "Will produce dependency graph" OFF)
 option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
+option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -146,6 +147,7 @@ endif()
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0                                  # Turn off any optimisation to have best debug experience
+    -mno-avx
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")

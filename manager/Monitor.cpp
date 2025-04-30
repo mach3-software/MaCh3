@@ -120,6 +120,9 @@ void GetCPUInfo() {
 // ************************
 void NThreadsSanity() {
 // ************************
+  //KS: If OMP_NUM_THREADS is exported, assume user did this on purpose
+  if (std::getenv("OMP_NUM_THREADS") != nullptr) return;
+
   const int nThreads = M3::GetNThreads();
   constexpr int MaxAllowedThreads = 16;
   constexpr int RecommendedThreads = 8;

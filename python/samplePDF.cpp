@@ -155,7 +155,7 @@ public:
         );
     }
 
-    double ReturnKinematicParameter(double, int, int) override {
+    double ReturnKinematicParameter(int, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             samplePDFFDBase,            /* Parent class */
