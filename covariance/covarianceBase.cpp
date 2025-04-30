@@ -921,7 +921,7 @@ void covarianceBase::printIndivStepScale() const {
   MACH3LOG_INFO("============================================================");
   MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
   for (int iParam = 0; iParam < _fNumPar; iParam++) {
-    MACH3LOG_INFO("{:<{}} | {:<11}", _fNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
+    MACH3LOG_INFO("{:<{}} | {:<11}", _fFancyNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
   }
   MACH3LOG_INFO("============================================================");
 }
@@ -1074,7 +1074,10 @@ void covarianceBase::updateAdaptiveCovariance(){
   // First we update the total means
 
   // Skip this if we're at a large number of steps
-  if(AdaptiveHandler.SkipAdaption()) return;
+  if(AdaptiveHandler.SkipAdaption()) {
+    AdaptiveHandler.total_steps++;
+    return;
+  }
 
   // Call main adaption function
   AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
@@ -1087,7 +1090,10 @@ void covarianceBase::updateAdaptiveCovariance(){
   if(AdaptiveHandler.UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
     updateThrowMatrix(update_matrix); //Now we update and continue!
+    //Also Save the adaptive to file
+    AdaptiveHandler.SaveAdaptiveToFile(AdaptiveHandler.output_file_name,getName());
   }
+
   AdaptiveHandler.total_steps++;
 }
 

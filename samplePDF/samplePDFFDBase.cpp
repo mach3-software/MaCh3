@@ -33,6 +33,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
 
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
+  samplePDFFD_array_w2 = nullptr;
   SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
 
@@ -143,24 +144,17 @@ void samplePDFFDBase::ReadSampleConfig()
     sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
   }
 
-  //Now get selection cuts
-  double low_bound = 0;
-  double up_bound = 0;
-  double KinematicParamter = 0;
-
-  std::vector<double> SelectionVec;
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
     SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
     auto TempBoundsVec = GetBounds(SelectionCuts["Bounds"]);
-    low_bound = TempBoundsVec[0];
-    up_bound = TempBoundsVec[1];
-    KinematicParamter = static_cast<double>(ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>()));
+    KinematicCut CutObj;
+    CutObj.LowerBound = TempBoundsVec[0];
+    CutObj.UpperBound = TempBoundsVec[1];
+    CutObj.ParamToCutOnIt = ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>());
     MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), TempBoundsVec[0], TempBoundsVec[1]);
-    SelectionVec = {KinematicParamter, low_bound, up_bound};
-    StoredSelection.push_back(SelectionVec);
+    StoredSelection.push_back(CutObj);
   }
-  NSelections = int(SelectionStr.size());
 
   // EM: initialise the mode weight map
   for( int iMode=0; iMode < Modes->GetNModes(); iMode++ ) {
@@ -208,8 +202,10 @@ void samplePDFFDBase::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
-  MACH3LOG_INFO("Setting up NuOscillator..");
-  SetupNuOscillator(); 
+  if (OscCov) {
+    MACH3LOG_INFO("Setting up NuOscillator..");
+    SetupNuOscillator();
+  }
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -334,10 +330,9 @@ void samplePDFFDBase::SetupSampleBinning(){
 // ************************************************
 bool samplePDFFDBase::IsEventSelected(const int iSample, const int iEvent) {
 // ************************************************
-  double Val;
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {  
-    Val = ReturnKinematicParameter(Selection[iSelection][0], iSample, iEvent);
-    if ((Val<Selection[iSelection][1])||(Val>=Selection[iSelection][2])) {
+    const double Val = ReturnKinematicParameter(Selection[iSelection].ParamToCutOnIt, iSample, iEvent);
+    if ((Val < Selection[iSelection].LowerBound) || (Val >= Selection[iSelection].UpperBound)) {
       return false;
     }
   }
@@ -1677,14 +1672,14 @@ void samplePDFFDBase::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< std::vector<double> >& SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
-  std::vector< std::vector<double> > tmp_Selection = Selection;
-  std::vector< std::vector<double> > SelectionVecToApply;
+  std::vector< KinematicCut > tmp_Selection = Selection;
+  std::vector< KinematicCut > SelectionVecToApply;
 
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
@@ -1694,14 +1689,6 @@ TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const s
   //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
     SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
-  }
-
-  //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
-  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
-    if (SelectionVecToApply[iSelec].size()!=3) {
-      MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
   }
 
   //DB Set the member variable to be the cuts to apply
@@ -1737,7 +1724,7 @@ TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const s
 }
 // ************************************************
 TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
-                                   const std::vector< std::vector<double> >& SelectionVec,
+                                   const std::vector< KinematicCut >& SelectionVec,
                                    int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
 // ************************************************
 
@@ -1747,8 +1734,8 @@ TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const 
 
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
-  std::vector< std::vector<double> > tmp_Selection = Selection;
-  std::vector< std::vector<double> > SelectionVecToApply;
+  std::vector< KinematicCut > tmp_Selection = Selection;
+  std::vector< KinematicCut > SelectionVecToApply;
 
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
@@ -1758,14 +1745,6 @@ TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
     SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
-  }
-
-  //DB Check the formatting of all requested cuts, should be [cutPar,lBound,uBound]
-  for (size_t iSelec=0;iSelec<SelectionVecToApply.size();iSelec++) {
-    if (SelectionVecToApply[iSelec].size()!=3) {
-      MACH3LOG_ERROR("Selection Vector[{}] is not formed correctly. Expect size == 3, given: {}",iSelec,SelectionVecToApply[iSelec].size());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
   }
 
   //DB Set the member variable to be the cuts to apply
@@ -1790,7 +1769,7 @@ TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const 
           Weight = 1.;
         }
         double VarX = ReturnKinematicParameter(ProjectionVar_IntX,iSample,iEvent);
-	double VarY = ReturnKinematicParameter(ProjectionVar_IntY,iSample,iEvent);
+        double VarY = ReturnKinematicParameter(ProjectionVar_IntY,iSample,iEvent);
         _h2DVar->Fill(VarX,VarY,Weight);
       }
     }
@@ -1856,21 +1835,21 @@ TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(const std::string& Projection
     fMode = false;
   }
 
-  std::vector< std::vector<double> > SelectionVec;
+  std::vector< KinematicCut > SelectionVec;
 
   if (fMode) {
-    std::vector<double> SelecMode(3);
-    SelecMode[0] = ReturnKinematicParameterFromString("Mode");
-    SelecMode[1] = kModeToFill;
-    SelecMode[2] = kModeToFill+1;
+    KinematicCut SelecMode;
+    SelecMode.ParamToCutOnIt = ReturnKinematicParameterFromString("Mode");
+    SelecMode.LowerBound = kModeToFill;
+    SelecMode.UpperBound = kModeToFill+1;
     SelectionVec.push_back(SelecMode);
   }
 
   if (fChannel) {
-    std::vector<double> SelecChannel(3);
-    SelecChannel[0] = ReturnKinematicParameterFromString("OscillationChannel");
-    SelecChannel[1] = kChannelToFill;
-    SelecChannel[2] = kChannelToFill+1;
+    KinematicCut SelecChannel;
+    SelecChannel.ParamToCutOnIt = ReturnKinematicParameterFromString("OscillationChannel");
+    SelecChannel.LowerBound = kChannelToFill;
+    SelecChannel.UpperBound = kChannelToFill+1;
     SelectionVec.push_back(SelecChannel);
   }
 
@@ -1905,21 +1884,21 @@ TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(const std::string& Projection
     fMode = false;
   }
 
-  std::vector< std::vector<double> > SelectionVec;
+  std::vector< KinematicCut > SelectionVec;
 
   if (fMode) {
-    std::vector<double> SelecMode(3);
-    SelecMode[0] = ReturnKinematicParameterFromString("Mode");
-    SelecMode[1] = kModeToFill;
-    SelecMode[2] = kModeToFill+1;
+    KinematicCut SelecMode;
+    SelecMode.ParamToCutOnIt = ReturnKinematicParameterFromString("Mode");
+    SelecMode.LowerBound = kModeToFill;
+    SelecMode.UpperBound = kModeToFill+1;
     SelectionVec.push_back(SelecMode);
   }
 
   if (fChannel) {
-    std::vector<double> SelecChannel(3);
-    SelecChannel[0] = ReturnKinematicParameterFromString("OscillationChannel");
-    SelecChannel[1] = kChannelToFill;
-    SelecChannel[2] = kChannelToFill+1;
+    KinematicCut SelecChannel;
+    SelecChannel.ParamToCutOnIt = ReturnKinematicParameterFromString("OscillationChannel");
+    SelecChannel.LowerBound = kChannelToFill;
+    SelecChannel.UpperBound = kChannelToFill+1;
     SelectionVec.push_back(SelecChannel);
   }
 

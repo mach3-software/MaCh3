@@ -147,6 +147,7 @@ endif()
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0                                  # Turn off any optimisation to have best debug experience
+    -mno-avx
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
