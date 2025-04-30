@@ -1518,8 +1518,6 @@ void samplePDFFDBase::SetupNuOscillatorPointers() {
     } // end loop over events
   }// end loop over channels
 
-<<<<<<< HEAD
-=======
   OscParams = OscCov->GetOscParsFromSampleName(SampleName);
 }
 
@@ -1535,7 +1533,6 @@ std::string samplePDFFDBase::GetSampleName(int iSample) const {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   return SampleName;
->>>>>>> develop
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
