@@ -23,7 +23,7 @@ class samplePDFFDBase :  public samplePDFBase
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr, OscillatorBase* Oscillator_ = nullptr);
   /// @brief destructor
   virtual ~samplePDFFDBase();
 
@@ -53,7 +53,8 @@ public:
   M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
-  void SetupNuOscillator();
+  void InitialiseNuOscillatorObjects();
+  void SetupNuOscillatorPointers();
 
   virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
 
