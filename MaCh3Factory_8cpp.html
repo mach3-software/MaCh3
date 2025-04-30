@@ -240,69 +240,95 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   36</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">   37</span>  }</div>
 <div class="line"><span class="lineno">   38</span> </div>
-<div class="line"><span class="lineno">   39</span>  <span class="comment">// Initialise manger responsible for config handling</span></div>
-<div class="line"><span class="lineno">   40</span>  <span class="keyword">auto</span> FitManager = std::make_unique&lt;manager&gt;(argv[1]);</div>
-<div class="line"><span class="lineno">   41</span>  </div>
-<div class="line"><span class="lineno">   42</span>  <span class="comment">//KS: Lambda to make sure we are not overwriting setting which should be committed</span></div>
-<div class="line"><span class="lineno">   43</span>  <span class="keyword">auto</span> SanityOverwrite = [](<span class="keyword">const</span> std::string&amp; Name) {</div>
-<div class="line"><span class="lineno">   44</span>    <span class="keywordflow">if</span> (Name.find(<span class="stringliteral">&quot;Systematics&quot;</span>) != std::string::npos ||</div>
-<div class="line"><span class="lineno">   45</span>        Name.find(<span class="stringliteral">&quot;Samples&quot;</span>) != std::string::npos)</div>
-<div class="line"><span class="lineno">   46</span>    {</div>
-<div class="line"><span class="lineno">   47</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;You are overwriting settings ({}) that are highly likely intended to be committed.&quot;</span>, Name);</div>
-<div class="line"><span class="lineno">   48</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">   49</span>    }</div>
-<div class="line"><span class="lineno">   50</span>  };</div>
-<div class="line"><span class="lineno">   51</span>  </div>
-<div class="line"><span class="lineno">   52</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 2; i &lt; argc; ++i)</div>
-<div class="line"><span class="lineno">   53</span>  {</div>
-<div class="line"><span class="lineno">   54</span>    <span class="keyword">const</span> std::string arg = argv[i];</div>
-<div class="line"><span class="lineno">   55</span>    <span class="keyword">const</span> <span class="keywordtype">size_t</span> colonCount = std::count(arg.begin(), arg.end(), <span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   56</span> </div>
-<div class="line"><span class="lineno">   58</span>    <span class="keywordflow">if</span> (colonCount == 1) {</div>
-<div class="line"><span class="lineno">   59</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   60</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
-<div class="line"><span class="lineno">   61</span>      <span class="keyword">const</span> std::string value = arg.substr(firstColon + 1);</div>
+<div class="line"><span class="lineno">   39</span>  <span class="comment">// Check if we are using --override mode</span></div>
+<div class="line"><span class="lineno">   40</span>  <span class="keywordflow">if</span> (argc &gt;= 4 &amp;&amp; std::string(argv[2]) == <span class="stringliteral">&quot;--override&quot;</span>) {</div>
+<div class="line"><span class="lineno">   41</span>    <span class="keyword">const</span> std::string overrideFile = argv[3];</div>
+<div class="line"><span class="lineno">   42</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Merging configuration files: base config &#39;{}&#39;, override config &#39;{}&#39;. &quot;</span></div>
+<div class="line"><span class="lineno">   43</span>                <span class="stringliteral">&quot;Options in &#39;{}&#39; will take precedence over &#39;{}&#39;.&quot;</span>,</div>
+<div class="line"><span class="lineno">   44</span>                argv[1], overrideFile, overrideFile, argv[1]);</div>
+<div class="line"><span class="lineno">   45</span> </div>
+<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">if</span>(argc &gt; 4) {</div>
+<div class="line"><span class="lineno">   47</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Too many arguments provided when using &#39;--override&#39;. &quot;</span></div>
+<div class="line"><span class="lineno">   48</span>                   <span class="stringliteral">&quot;Expected only two config files. &quot;</span></div>
+<div class="line"><span class="lineno">   49</span>                   <span class="stringliteral">&quot;If using override feature, you cannot provide any additional arguments.&quot;</span>);</div>
+<div class="line"><span class="lineno">   50</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   51</span>    }</div>
+<div class="line"><span class="lineno">   52</span>    <span class="comment">// Load the two YAML files</span></div>
+<div class="line"><span class="lineno">   53</span>    YAML::Node config1 = <a class="code hl_define" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(argv[1]);</div>
+<div class="line"><span class="lineno">   54</span>    YAML::Node config2 = <a class="code hl_define" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(overrideFile);</div>
+<div class="line"><span class="lineno">   55</span> </div>
+<div class="line"><span class="lineno">   56</span>    <span class="comment">// Merge them</span></div>
+<div class="line"><span class="lineno">   57</span>    YAML::Node merged = <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(config1, config2);</div>
+<div class="line"><span class="lineno">   58</span>    <span class="keyword">auto</span> FitManager = std::make_unique&lt;manager&gt;(merged);</div>
+<div class="line"><span class="lineno">   59</span> </div>
+<div class="line"><span class="lineno">   60</span>    <span class="keywordflow">return</span> FitManager;</div>
+<div class="line"><span class="lineno">   61</span>  }</div>
 <div class="line"><span class="lineno">   62</span> </div>
-<div class="line"><span class="lineno">   63</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Value={}&quot;</span>, section, value);</div>
-<div class="line"><span class="lineno">   64</span>      SanityOverwrite(section);</div>
-<div class="line"><span class="lineno">   65</span>      FitManager-&gt;OverrideSettings(section, value);</div>
-<div class="line"><span class="lineno">   66</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (colonCount == 2) {</div>
-<div class="line"><span class="lineno">   67</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   68</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> secondColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, firstColon + 1);</div>
-<div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
-<div class="line"><span class="lineno">   71</span>      <span class="keyword">const</span> std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);</div>
-<div class="line"><span class="lineno">   72</span>      <span class="keyword">const</span> std::string value = arg.substr(secondColon + 1);</div>
-<div class="line"><span class="lineno">   73</span> </div>
-<div class="line"><span class="lineno">   74</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Key={}, Value={}&quot;</span>, section, key, value);</div>
-<div class="line"><span class="lineno">   75</span>      SanityOverwrite(section);</div>
-<div class="line"><span class="lineno">   76</span>      SanityOverwrite(key);</div>
-<div class="line"><span class="lineno">   77</span>      FitManager-&gt;OverrideSettings(section, key, value);</div>
-<div class="line"><span class="lineno">   78</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (colonCount == 3) {</div>
-<div class="line"><span class="lineno">   79</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno">   80</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> secondColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, firstColon + 1);</div>
-<div class="line"><span class="lineno">   81</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> thridColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, secondColon + 1);</div>
-<div class="line"><span class="lineno">   82</span> </div>
-<div class="line"><span class="lineno">   83</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
-<div class="line"><span class="lineno">   84</span>      <span class="keyword">const</span> std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);</div>
-<div class="line"><span class="lineno">   85</span>      <span class="keyword">const</span> std::string key2 = arg.substr(secondColon + 1, thridColon - secondColon - 1);</div>
-<div class="line"><span class="lineno">   86</span>      <span class="keyword">const</span> std::string value = arg.substr(thridColon + 1);</div>
-<div class="line"><span class="lineno">   87</span> </div>
-<div class="line"><span class="lineno">   88</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Key={}, Key={}, Value={}&quot;</span>, section, key, key2, value);</div>
-<div class="line"><span class="lineno">   89</span>      SanityOverwrite(section);</div>
-<div class="line"><span class="lineno">   90</span>      SanityOverwrite(key);</div>
-<div class="line"><span class="lineno">   91</span>      SanityOverwrite(key2);</div>
-<div class="line"><span class="lineno">   92</span>      FitManager-&gt;OverrideSettings(section, key, key2, value);</div>
-<div class="line"><span class="lineno">   93</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   94</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid override argument format: {}&quot;</span>, arg);</div>
-<div class="line"><span class="lineno">   95</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Expected format:Section:Key:Key:Valu, Section:Key:Value or Section:Value&quot;</span>);</div>
-<div class="line"><span class="lineno">   96</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   97</span>    }</div>
-<div class="line"><span class="lineno">   98</span>  }</div>
-<div class="line"><span class="lineno">   99</span>  <span class="keywordflow">return</span> FitManager;</div>
-<div class="line"><span class="lineno">  100</span>}</div>
+<div class="line"><span class="lineno">   63</span>  <span class="comment">// Initialise manger responsible for config handling</span></div>
+<div class="line"><span class="lineno">   64</span>  <span class="keyword">auto</span> FitManager = std::make_unique&lt;manager&gt;(argv[1]);</div>
+<div class="line"><span class="lineno">   65</span>  </div>
+<div class="line"><span class="lineno">   66</span>  <span class="comment">//KS: Lambda to make sure we are not overwriting setting which should be committed</span></div>
+<div class="line"><span class="lineno">   67</span>  <span class="keyword">auto</span> SanityOverwrite = [](<span class="keyword">const</span> std::string&amp; Name) {</div>
+<div class="line"><span class="lineno">   68</span>    <span class="keywordflow">if</span> (Name.find(<span class="stringliteral">&quot;Systematics&quot;</span>) != std::string::npos ||</div>
+<div class="line"><span class="lineno">   69</span>        Name.find(<span class="stringliteral">&quot;Samples&quot;</span>) != std::string::npos)</div>
+<div class="line"><span class="lineno">   70</span>    {</div>
+<div class="line"><span class="lineno">   71</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;You are overwriting settings ({}) that are highly likely intended to be committed.&quot;</span>, Name);</div>
+<div class="line"><span class="lineno">   72</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">   73</span>    }</div>
+<div class="line"><span class="lineno">   74</span>  };</div>
+<div class="line"><span class="lineno">   75</span>  </div>
+<div class="line"><span class="lineno">   76</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 2; i &lt; argc; ++i)</div>
+<div class="line"><span class="lineno">   77</span>  {</div>
+<div class="line"><span class="lineno">   78</span>    <span class="keyword">const</span> std::string arg = argv[i];</div>
+<div class="line"><span class="lineno">   79</span>    <span class="keyword">const</span> <span class="keywordtype">size_t</span> colonCount = std::count(arg.begin(), arg.end(), <span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno">   80</span> </div>
+<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">if</span> (colonCount == 1) {</div>
+<div class="line"><span class="lineno">   83</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno">   84</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
+<div class="line"><span class="lineno">   85</span>      <span class="keyword">const</span> std::string value = arg.substr(firstColon + 1);</div>
+<div class="line"><span class="lineno">   86</span> </div>
+<div class="line"><span class="lineno">   87</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Value={}&quot;</span>, section, value);</div>
+<div class="line"><span class="lineno">   88</span>      SanityOverwrite(section);</div>
+<div class="line"><span class="lineno">   89</span>      FitManager-&gt;OverrideSettings(section, value);</div>
+<div class="line"><span class="lineno">   90</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (colonCount == 2) {</div>
+<div class="line"><span class="lineno">   91</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno">   92</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> secondColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, firstColon + 1);</div>
+<div class="line"><span class="lineno">   93</span> </div>
+<div class="line"><span class="lineno">   94</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
+<div class="line"><span class="lineno">   95</span>      <span class="keyword">const</span> std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);</div>
+<div class="line"><span class="lineno">   96</span>      <span class="keyword">const</span> std::string value = arg.substr(secondColon + 1);</div>
+<div class="line"><span class="lineno">   97</span> </div>
+<div class="line"><span class="lineno">   98</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Key={}, Value={}&quot;</span>, section, key, value);</div>
+<div class="line"><span class="lineno">   99</span>      SanityOverwrite(section);</div>
+<div class="line"><span class="lineno">  100</span>      SanityOverwrite(key);</div>
+<div class="line"><span class="lineno">  101</span>      FitManager-&gt;OverrideSettings(section, key, value);</div>
+<div class="line"><span class="lineno">  102</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (colonCount == 3) {</div>
+<div class="line"><span class="lineno">  103</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> firstColon = arg.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno">  104</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> secondColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, firstColon + 1);</div>
+<div class="line"><span class="lineno">  105</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> thridColon = arg.find(<span class="charliteral">&#39;:&#39;</span>, secondColon + 1);</div>
+<div class="line"><span class="lineno">  106</span> </div>
+<div class="line"><span class="lineno">  107</span>      <span class="keyword">const</span> std::string section = arg.substr(0, firstColon);</div>
+<div class="line"><span class="lineno">  108</span>      <span class="keyword">const</span> std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);</div>
+<div class="line"><span class="lineno">  109</span>      <span class="keyword">const</span> std::string key2 = arg.substr(secondColon + 1, thridColon - secondColon - 1);</div>
+<div class="line"><span class="lineno">  110</span>      <span class="keyword">const</span> std::string value = arg.substr(thridColon + 1);</div>
+<div class="line"><span class="lineno">  111</span> </div>
+<div class="line"><span class="lineno">  112</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Overriding setting: Section={}, Key={}, Key={}, Value={}&quot;</span>, section, key, key2, value);</div>
+<div class="line"><span class="lineno">  113</span>      SanityOverwrite(section);</div>
+<div class="line"><span class="lineno">  114</span>      SanityOverwrite(key);</div>
+<div class="line"><span class="lineno">  115</span>      SanityOverwrite(key2);</div>
+<div class="line"><span class="lineno">  116</span>      FitManager-&gt;OverrideSettings(section, key, key2, value);</div>
+<div class="line"><span class="lineno">  117</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  118</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid override argument format: {}&quot;</span>, arg);</div>
+<div class="line"><span class="lineno">  119</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Expected format:Section:Key:Key:Value, Section:Key:Value or Section:Value&quot;</span>);</div>
+<div class="line"><span class="lineno">  120</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  121</span>    }</div>
+<div class="line"><span class="lineno">  122</span>  }</div>
+<div class="line"><span class="lineno">  123</span>  <span class="keywordflow">return</span> FitManager;</div>
+<div class="line"><span class="lineno">  124</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00026">MaCh3Logger.h:26</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_a372c930e488d1e260c1184dc25921fe3"><div class="ttname"><a href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a></div><div class="ttdeci">YAML::Node MergeNodes(YAML::Node a, YAML::Node b)</div><div class="ttdoc">KS: Recursively merges two YAML nodes.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00376">YamlHelper.h:376</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00456">YamlHelper.h:456</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
