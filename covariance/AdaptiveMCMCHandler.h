@@ -78,8 +78,6 @@ class AdaptiveMCMCHandler{
   /// @brief Calculate Mean of Circular parans
   double CalculateCyclicalMean(double par_mean, double curr_val);
   
-  double CalculateDiff(int ipar, double par_mean, double curr_val);
-
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;
@@ -116,7 +114,8 @@ class AdaptiveMCMCHandler{
   /// Total number of MCMC steps
   int total_steps;
 
-  static const std::vector<double> block_scale_factors;
+  /// Scale factor for each adaptive MCMC block
+  std::vector<double> block_scale_factors;
 
   /// Circular parameter indices
   std::unordered_set<int> cyclic_indices;

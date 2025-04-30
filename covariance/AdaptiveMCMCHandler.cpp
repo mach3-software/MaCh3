@@ -133,7 +133,7 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
   block_scale_factors = std::vector<double>(block_size, 0);
   // initialise block scale factors
   for(int i=0; i<block_size; i++){
-    block_scale_factorsp[i] = (2.38*2.38/adapt_block_sizes[i]);
+    block_scale_factors[i] = (2.38*2.38/adapt_block_sizes[i]);
   }
 
 }
@@ -252,8 +252,6 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   // t in the formula from Haario
   int steps_post_burn = total_steps - start_adaptive_update;
 
-  // Differences
-  std::vector<double> diffs(Npars, 0);
 
   // --- Step 1: Update means (with circular adjustment) ---
   #ifdef MULTITHREAD
@@ -278,7 +276,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   for (int irow = 0; irow < Npars; irow++) {
     int block = adapt_block_matrix_indices[irow];
     // Get scale factor for the block
-    float scale_factor = block_scale_factors[block];
+    double scale_factor = block_scale_factors[block];
 
     for (int icol = 0; icol <= irow; icol++) {
 
