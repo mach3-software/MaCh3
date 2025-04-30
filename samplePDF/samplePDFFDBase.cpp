@@ -64,7 +64,10 @@ samplePDFFDBase::~samplePDFFDBase()
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
  
   for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
-    if (NuOscProbCalcers[iCalc] != nullptr) delete NuOscProbCalcers[iCalc];
+    if (NuOscProbCalcers[iCalc] != nullptr) {
+	delete NuOscProbCalcers[iCalc];
+	NuOscProbCalcers[iCalc] = nullptr;
+    }
   }
 
   if(THStackLeg != nullptr) delete THStackLeg;
