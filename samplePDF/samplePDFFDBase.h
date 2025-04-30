@@ -77,10 +77,10 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
-  TH1* get1DVarHist(const std::string& ProjectionVar, const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+  TH1* get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* Axis=nullptr);
   TH2* get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
-                    const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
   TH1* get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
@@ -196,7 +196,7 @@ public:
   virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(int KinematicVariable, int iSample, int iEvent) = 0;
 
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
@@ -263,8 +263,6 @@ public:
   int nDimensions = M3::_BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
   std::string SampleName;
-  /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
-  std::vector<std::string> SplineBinnedVars;
 
   /// @brief the name of this sample e.g."muon-like"
   std::string SampleTitle;
@@ -278,17 +276,15 @@ public:
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
-  /// @brief the Number of selections in the 
-  int NSelections = M3::_BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
-  std::vector< std::vector<double> > StoredSelection;
+  std::vector< KinematicCut > StoredSelection;
   /// @brief the strings grabbed from the sample config specifying the selections
   std::vector< std::string > SelectionStr;
   /// @brief a way to store selection cuts which you may push back in the get1DVar functions
   /// most of the time this is just the same as StoredSelection
-  std::vector< std::vector<double> > Selection;
+  std::vector< KinematicCut > Selection;
    //===========================================================================
 
   /// Mapping between string and kinematic enum
