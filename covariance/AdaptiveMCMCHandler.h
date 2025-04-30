@@ -116,6 +116,8 @@ class AdaptiveMCMCHandler{
   /// Total number of MCMC steps
   int total_steps;
 
+  static const std::vector<double> block_scale_factors;
+
   /// Circular parameter indices
   std::unordered_set<int> cyclic_indices;
 

@@ -127,6 +127,7 @@ The following fitting algorithms are available:
 | Algorithm  | Reference        |Need Ext Lib  |
 |------------|------------------|--------------|
 | MR2T2      | [Ref](https://doi.org/10.1063/1.1699114)       | No       |
+| AMR2T2     | [Ref](https://zbmath.org/?q=an:0989.65004)     | No       |
 | MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
 | PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
 

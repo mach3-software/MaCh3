@@ -129,6 +129,13 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
       }
     }
   }
+
+  block_scale_factors = std::vector<double>(block_size, 0);
+  // initialise block scale factors
+  for(int i=0; i<block_size; i++){
+    block_scale_factorsp[i] = (2.38*2.38/adapt_block_sizes[i]);
+  }
+
 }
 
 // ********************************************
@@ -238,27 +245,11 @@ double AdaptiveMCMCHandler::CalculateCyclicalMean(double par_mean, double curr_v
     return TMath::ATan2(sum_sin, sum_cos); // New circular mean
 }
 
-double AdaptiveMCMCHandler::CalculateDiff(int ipar, double par_mean, double curr_val) {
-  if (!IsCircular(ipar)) {
-      return curr_val - par_mean;
-  }
-  
-  // For circular parameters (angles)
-  double diff = curr_val - par_mean;
-  
-  // Properly handle wrap-around at ±π boundary
-  if (diff > TMath::Pi()) {
-      diff -= 2*TMath::Pi();
-  } else if (diff < -TMath::Pi()) {
-      diff += 2*TMath::Pi();
-  }
-  
-  return diff;
-}
-
 
 void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
   std::vector<double> par_means_prev = par_means;
+
+  // t in the formula from Haario
   int steps_post_burn = total_steps - start_adaptive_update;
 
   // Differences
@@ -269,15 +260,16 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   #pragma omp parallel for
   #endif
   for (int iRow = 0; iRow < Npars; iRow++) {
+
     if (IsCircular(iRow)) {
       par_means[iRow] = CalculateCyclicalMean(par_means[iRow], _fCurrVal[iRow]);
-    } else {
+    } 
+    else{
       // Standard arithmetic mean for non-circular parameters
       par_means[iRow] = (_fCurrVal[iRow] + par_means[iRow] * steps_post_burn) / (steps_post_burn + 1);
     }
-    diffs[iRow] = CalculateDiff(iRow, par_means[iRow], _fCurrVal[iRow]);
-
   }
+  
 
   // --- Step 2: Update covariances (with circular adjustments) ---
   #ifdef MULTITHREAD
@@ -285,15 +277,10 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   #endif
   for (int irow = 0; irow < Npars; irow++) {
     int block = adapt_block_matrix_indices[irow];
-
-    bool row_is_circular = IsCircular(irow);
+    // Get scale factor for the block
+    float scale_factor = block_scale_factors[block];
 
     for (int icol = 0; icol <= irow; icol++) {
-      bool col_is_circular = IsCircular(icol);
-
-      // Determine scaling - use 1.0 for circular, 5.6644/Npars for linear
-      double scale_factor = (row_is_circular || col_is_circular) ? 
-          (1.0 / Npars) : (5.6644 / Npars);
 
       if (adapt_block_matrix_indices[icol] == block) {
         // Compute adjusted differences for circular parameters
@@ -301,15 +288,16 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
         // Update covariance (using Haario's recursive formula)
         // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
         
+        
         // unset-scale
-        double cov_val = (*adaptive_covariance)(icol, irow) * (steps_post_burn-1) / (scale_factor*(steps_post_burn));
+        double cov_val = (*adaptive_covariance)(icol, irow) * (steps_post_burn-1) / (scale_factor*steps_post_burn);
 
         // Calculate covariance
-        double mean_cpt = steps_post_burn*par_means_prev[irow]*par_means_prev[icol];
-        mean_cpt -= (steps_post_burn+1)*par_means[irow]*par_means[irow];
-        mean_cpt += _fCurrVal[irow]*_fCurrVal[icol];
+        double cov_next = steps_post_burn*par_means_prev[irow]*par_means_prev[icol];
+        cov_next -= (steps_post_burn+1)*par_means[irow]*par_means[irow];
+        cov_next += _fCurrVal[irow]*_fCurrVal[icol];
 
-        cov_val += mean_cpt*scale_factor/(steps_post_burn+1);
+        cov_val += cov_next*scale_factor/(steps_post_burn);
 
         // Set the covariance value
         (*adaptive_covariance)(icol, irow) = cov_val;
