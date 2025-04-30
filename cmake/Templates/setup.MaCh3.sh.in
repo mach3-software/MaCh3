@@ -102,7 +102,7 @@ SCRIPT_PATH="$( pwd; )";
 popd  > '/dev/null';
 
 export MaCh3_ROOT=${SCRIPT_PATH}/..
-export MaCh3_VERSION=1.4.8
+export MaCh3_VERSION=@MaCh3_VERSION@
 
 add_to_PATH ${MaCh3_ROOT}/bin
 add_to_LD_LIBRARY_PATH ${MaCh3_ROOT}/lib
