@@ -7,17 +7,34 @@ _MaCh3_Safe_Include_End_ //}
 
 // *************************
 manager::manager(std::string const &filename)
-    : config(M3OpenConfig(filename)) {
+: config(M3OpenConfig(filename)) {
 // *************************
   FileName = filename;
+
+  Initialise();
+}
+
+// *************************
+manager::manager(const YAML::Node ConfigNode) {
+// *************************
+  config = ConfigNode;
+  FileName = "unknown";
+
+  Initialise();
+}
+
+// *************************
+void manager::Initialise() {
+// *************************
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
 
-  MACH3LOG_INFO("Setting config to be: {}", filename);
+  MACH3LOG_INFO("Setting config to be: {}", FileName);
 
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);
 }
+
 
 // *************************
 // Empty destructor, for now...
@@ -102,6 +119,8 @@ int manager::GetMCStatLLH() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   } else {
+    MACH3LOG_WARN("Didn't find a TestStatistic specified");
+    MACH3LOG_WARN("Defaulting to using a {} likelihood", TestStatistic_ToString(kPoisson));
     mc_stat_llh = kPoisson;
   }
   return mc_stat_llh;

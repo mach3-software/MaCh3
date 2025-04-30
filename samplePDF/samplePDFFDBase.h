@@ -28,7 +28,8 @@ public:
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName() const {return samplename;}
+  std::string GetSampleName(int iSample = 0) const override;
+  std::string GetTitle() const {return SampleTitle;}
 
   std::string GetXBinVarName() {return XVarStr;}
   std::string GetYBinVarName() {return YVarStr;}
@@ -77,11 +78,14 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
-  TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHist(std::string ProjectionVarX, std::string ProjectionVarY, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* get1DVarHist(const std::string& ProjectionVar, const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                    const std::vector< std::vector<double> >& SelectionVec = std::vector< std::vector<double> >(),
+                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
-  TH1* get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
   TH1 *getModeHist1D(int s, int m, int style = 0) {
     return get1DVarHistByModeAndChannel(XVarStr,m,s,style);
@@ -148,12 +152,33 @@ public:
   std::vector<double> SampleYBins;
   //===============================================================================
 
+  // ----- Functional Parameters -----
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
-  virtual void SetupFunctionalParameters(){};
+  virtual void SetupFunctionalParameters();
+  /// @brief HH - a helper function for RegisterFunctionalParameter
+  void RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
+  /// @brief HH - a experiment-specific function where the maps to actual functions are set up
+  virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
+  virtual void applyShifts(int iSample, int iEvent);
+  /// @brief HH - reset the shifted values to the original values
+  virtual void resetShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
+  /// @brief HH - a vector that stores all the FuncPars struct
+  std::vector<FuncPars> funcParsVec;
+  /// @brief HH - a map that relates the name of the functional parameter to funcpar enum
+  std::unordered_map<std::string, int> funcParsNamesMap;
+  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars struct
+  // HH - Changed to a vector of pointers since it's faster than unordered_map and we are using ints as keys
+  std::vector<FuncPars*> funcParsMap;
+  /// @brief HH - a map that relates the funcpar enum to pointer of the actual function
+  std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
+  /// @brief HH - a grid of vectors of enums for each sample and event
+  std::vector<std::vector<std::vector<int>>> funcParsGrid;
+  /// @brief HH - a vector of string names for each functional parameter
+  std::vector<std::string> funcParsNamesVec = {};
+  // --------------------------------
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
 
@@ -238,12 +263,12 @@ public:
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = M3::_BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  std::string SampleDetID;
+  std::string SampleName;
   /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
   std::vector<std::string> SplineBinnedVars;
 
   /// @brief the name of this sample e.g."muon-like"
-  std::string samplename;
+  std::string SampleTitle;
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
@@ -291,4 +316,9 @@ public:
   /// DB Miscellaneous Variables
   TLegend* THStackLeg = nullptr;
   //===============================================================================
+
+  /// KS:Super hacky to update W2 or not
+  bool FirstTimeW2;
+  /// KS:Super hacky to update W2 or not
+  bool UpdateW2;
 };

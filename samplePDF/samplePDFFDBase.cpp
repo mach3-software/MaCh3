@@ -1,5 +1,7 @@
 #include "samplePDFFDBase.h"
+#include "manager/MaCh3Logger.h"
 #include "samplePDF/Structs.h"
+#include <cstddef>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
@@ -36,8 +38,12 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
 
   samplePDFFD_array = nullptr;
   samplePDFFD_data = nullptr;
-  SampleDetID = "";
+  SampleName = "";
   SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
+
+  // Variables related to MC stat
+  FirstTimeW2 = true;
+  UpdateW2 = false;
 }
 
 samplePDFFDBase::~samplePDFFDBase()
@@ -67,11 +73,13 @@ void samplePDFFDBase::ReadSampleConfig()
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = new MaCh3Modes(ModeName);
-  samplename = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
-  SampleDetID = Get<std::string>(SampleManager->raw()["DetID"], __FILE__ , __LINE__);
+  //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
+  SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
+  //SampleName has to be provided in the sample yaml otherwise this will throw an exception
+  SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
   NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
-  
+
   // TN override the sample setting if not using binned oscillation
   if (EqualBinningPerOscChannel) {
     if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() == "Unbinned") {
@@ -80,16 +88,10 @@ void samplePDFFDBase::ReadSampleConfig()
     }
   }
 
-  //Default TestStatistic is kPoisson
-  //ETA: this can be configured with samplePDFBase::SetTestStatistic()
-  if (CheckNodeExists(SampleManager->raw(), "TestStatistic")) {
-    fTestStatistic = static_cast<TestStatistic>(SampleManager->raw()["TestStatistic"].as<int>());
-  } else {
-    MACH3LOG_WARN("Didn't find a TestStatistic specified in {}", SampleManager->GetFileName());
-    MACH3LOG_WARN("Defaulting to using a poisson likelihood");
-    fTestStatistic = kPoisson;
+  fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
+  if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
+    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
-  
   //Binning
   nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
@@ -297,10 +299,10 @@ void samplePDFFDBase::SetupSampleBinning(){
   //The binning here is arbitrary, now we get info from cfg so the
   //set1DBinning and set2Dbinning calls below will make the binning
   //to be what we actually want
-  _hPDF1D   = new TH1D("h"+histname1d+samplename,histtitle, 1, 0, 1);
-  dathist   = new TH1D("d"+histname1d+samplename,histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d"+histname2d+samplename,histtitle, 1, 0, 1, 1, 0, 1);
+  _hPDF1D   = new TH1D("h"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  dathist   = new TH1D("d"+histname1d+SampleTitle,histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
 
   //Make some arrays so we can initialise _hPDF1D and _hPDF2D with these
   XBinEdges.reserve(SampleXBins.size());
@@ -381,10 +383,16 @@ void samplePDFFDBase::reweight() {
         NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
       }
     }
-    
   }
-  
+  #ifdef MULTITHREAD
+  // Call entirely different routine if we're running with openMP
+  fillArray_MP();
+  #else
   fillArray();
+  #endif
+
+  //KS: If you want to not update W2 wights then uncomment this line
+  if(!UpdateW2) FirstTimeW2 = false;
 }
 
 //************************************************
@@ -400,10 +408,6 @@ void samplePDFFDBase::fillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
-  // Call entirely different routine if we're running with openMP
-#ifdef MULTITHREAD
-  fillArray_MP();
-#else
   //ETA we should probably store this in samplePDFFDBase
   size_t nXBins = int(XBinEdges.size()-1);
   //size_t nYBins = int(YBinEdges.size()-1);
@@ -421,9 +425,9 @@ void samplePDFFDBase::fillArray() {
         continue;
       } 
 
-      double splineweight = 1.0;
-      double normweight = 1.0;
-      double totalweight = 1.0;
+      M3::float_t splineweight = 1.0;
+      M3::float_t normweight = 1.0;
+      M3::float_t totalweight = 1.0;
       
       if(SplineHandler){
         splineweight = CalcWeightSpline(iSample, iEvent);
@@ -493,11 +497,10 @@ void samplePDFFDBase::fillArray() {
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
         samplePDFFD_array[YBinToFill][XBinToFill] += totalweight;
-        samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        if (FirstTimeW2) samplePDFFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
       }
     }
   }
-#endif // end the else in openMP
 }
 
 #ifdef MULTITHREAD
@@ -505,6 +508,9 @@ void samplePDFFDBase::fillArray() {
 /// Multithreaded version of fillArray @see fillArray()
 void samplePDFFDBase::fillArray_MP()  {
 // ************************************************
+  //DB Reset which cuts to apply
+  Selection = StoredSelection;
+
   size_t nXBins = int(XBinEdges.size()-1);
   size_t nYBins = int(YBinEdges.size()-1);
 
@@ -655,8 +661,10 @@ void samplePDFFDBase::fillArray_MP()  {
       for (size_t xBin = 0; xBin < nXBins; ++xBin) {
         #pragma omp atomic
         samplePDFFD_array[yBin][xBin] += samplePDFFD_array_private[yBin][xBin];
-        #pragma omp atomic
-        samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        if(FirstTimeW2) {
+          #pragma omp atomic
+          samplePDFFD_array_w2[yBin][xBin] += samplePDFFD_array_private_w2[yBin][xBin];
+        }
       }
     }
     
@@ -678,13 +686,123 @@ void samplePDFFDBase::ResetHistograms() {
   size_t nYBins = int(YBinEdges.size()-1);
   
   //DB Reset values stored in PDF array to 0.
+  // Don't openMP this; no significant gain
   for (size_t yBin = 0; yBin < nYBins; ++yBin) {
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       samplePDFFD_array[yBin][xBin] = 0.;
       samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 } // end function
+
+void samplePDFFDBase::RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+  // Add protections to not add the same functional parameter twice
+  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
+    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
+    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  funcParsNamesMap[fpName] = fpEnum;
+  funcParsNamesVec.push_back(fpName);
+  funcParsFuncMap[fpEnum] = fpFunc;
+}
+
+void samplePDFFDBase::SetupFunctionalParameters() {
+  funcParsVec = XsecCov->GetFuncParsFromSampleName(SampleName);
+  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
+  RegisterFunctionalParameters();
+  funcParsMap.resize(funcParsNamesMap.size());
+  funcParsGrid.resize(MCSamples.size());
+
+  // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
+  for (FuncPars & fp : funcParsVec) {
+    for (std::string name : funcParsNamesVec) {
+      if (fp.name == name) {
+        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
+        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
+        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
+        continue;
+      }
+    }
+    // If we don't find a match, we need to throw an error
+    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
+      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  // Mostly the same as CalcXsecNormsBins
+  // For each event, make a vector of pointers to the functional parameters
+  for (std::size_t iSample = 0; iSample < MCSamples.size(); ++iSample) {
+    funcParsGrid[iSample].resize(static_cast<std::size_t>(MCSamples[iSample].nEvents));
+    for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(MCSamples[iSample].nEvents); ++iEvent) {
+      // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
+      for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+        // Check whether the interaction modes match
+        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCSamples[iSample].mode[iEvent]))));
+        if (!ModeMatch) {
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCSamples[iSample].mode[iEvent]), (*it).name);
+          continue;
+        }
+        // Now check whether within kinematic bounds
+        bool IsSelected = true;
+        if ((*it).hasKinBounds) {
+          for (std::size_t iKinPar = 0; iKinPar < (*it).KinematicVarStr.size(); ++iKinPar) {
+            // Check lower bound
+            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) <= (*it).Selection[iKinPar][0]) {
+              IsSelected = false;
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              continue;
+            }
+            // Check upper bound
+            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) > (*it).Selection[iKinPar][1]) {
+              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
+              IsSelected = false;
+              continue;
+            }
+          }
+        }
+        // Need to then break the event loop
+        if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
+          continue;
+        }
+        auto funcparenum = funcParsNamesMap[(*it).name];
+        funcParsGrid.at(iSample).at(iEvent).push_back(funcparenum);
+      }
+    }
+  }
+  MACH3LOG_INFO("Finished setting up functional parameters");
+}
+
+void samplePDFFDBase::applyShifts(int iSample, int iEvent) {
+  // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
+  // First reset shifted array back to nominal values
+  resetShifts(iSample, iEvent);
+  for (int fpEnum : funcParsGrid[iSample][iEvent]) {
+    FuncPars *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
+    // if (fp->funcPtr) {
+    //   (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+    // } else {
+    //   MACH3LOG_ERROR("Functional parameter function pointer for {} is null for event {} in sample {}", fp->name, iEvent, iSample);
+    //   throw MaCh3Exception(__FILE__, __LINE__);
+    // }
+    (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
+  }
+}
+// =================================
+
 
 // ***************************************************************************
 // Calculate the spline weight for one event
@@ -725,7 +843,7 @@ M3::float_t samplePDFFDBase::CalcWeightNorm(const int iSample, const int iEvent)
 }
 
 void samplePDFFDBase::SetupNormParameters() {  
-  xsec_norms = XsecCov->GetNormParsFromDetID(SampleDetID);
+  xsec_norms = XsecCov->GetNormParsFromSampleName(GetSampleName());
 
   if(!XsecCov){
     MACH3LOG_ERROR("XsecCov is not setup!");
@@ -1236,6 +1354,7 @@ void samplePDFFDBase::addData(TH1D* Data) {
   
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+    MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );}
   
   int nXBins = int(XBinEdges.size()-1);
@@ -1399,6 +1518,24 @@ void samplePDFFDBase::SetupNuOscillatorPointers() {
     } // end loop over events
   }// end loop over channels
 
+<<<<<<< HEAD
+=======
+  OscParams = OscCov->GetOscParsFromSampleName(SampleName);
+}
+
+std::string samplePDFFDBase::GetSampleName(int iSample) const {
+  //ETA - this is just to suppress a warning for an unused variable
+  (void)iSample;
+
+  //ETA - extra safety to make sure SampleName is actually set
+  // probably unnecessary due to the requirement for it to be in the yaml config
+  if(SampleName.length() == 0){
+    MACH3LOG_ERROR("No sample name provided");
+    MACH3LOG_ERROR("Please provide a SampleName in your configuration file: {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return SampleName;
+>>>>>>> develop
 }
 
 M3::float_t samplePDFFDBase::GetEventWeight(const int iSample, const int iEntry) const {
@@ -1423,10 +1560,10 @@ void samplePDFFDBase::fillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(GetName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
           break;
         default:
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
@@ -1547,7 +1684,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
     SplineVarNames.push_back(YVarStr);
   }
   
-  SplineHandler->AddSample(samplename, SampleDetID, spline_filepaths, SplineVarNames);
+  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
   SplineHandler->CountNumberOfLoadedSplines(false, 1);
   SplineHandler->TransferToMonolith();
 
@@ -1559,7 +1696,7 @@ void samplePDFFDBase::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* samplePDFFDBase::get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< std::vector<double> >& SelectionVec, int WeightStyle, TAxis* Axis) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
@@ -1617,8 +1754,12 @@ TH1* samplePDFFDBase::get1DVarHist(std::string ProjectionVar_Str, std::vector< s
 
   return _h1DVar;
 }
+// ************************************************
+TH2* samplePDFFDBase::get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
+                                   const std::vector< std::vector<double> >& SelectionVec,
+                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+// ************************************************
 
-TH2* samplePDFFDBase::get2DVarHist(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, std::vector< std::vector<double> > SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   //DB Grab the associated enum with the argument string
   int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
@@ -1706,7 +1847,7 @@ std::string samplePDFFDBase::ReturnStringFromKinematicParameter(const int Kinema
   return "";
 }
 
-TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
 
@@ -1755,7 +1896,7 @@ TH1* samplePDFFDBase::get1DVarHistByModeAndChannel(std::string ProjectionVar_Str
   return get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+TH2* samplePDFFDBase::get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   bool fChannel;
   bool fMode;
 
@@ -1847,8 +1988,8 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   if (printToFile) {
     outfile << "\\begin{table}[ht]" << std::endl;
     outfile << "\\begin{center}" << std::endl;
-    outfile << "\\caption{Integral breakdown for sample: " << GetName() << "}" << std::endl;
-    outfile << "\\label{" << GetName() << "-EventRate}" << std::endl;
+    outfile << "\\caption{Integral breakdown for sample: " << GetTitle() << "}" << std::endl;
+    outfile << "\\label{" << GetTitle() << "-EventRate}" << std::endl;
     
     TString nColumns;
     for (int i=0;i<getNMCSamples();i++) {nColumns+="|c";}
@@ -1859,10 +2000,10 @@ void samplePDFFDBase::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   if(printToCSV){
     // HW Probably a better way but oh well, here I go making MaCh3 messy again
-    outcsv<<"Integral Breakdown for sample :"<<GetName()<<"\n";
+    outcsv<<"Integral Breakdown for sample :"<<GetTitle()<<"\n";
   }
   
-  MACH3LOG_INFO("Integral breakdown for sample: {}", GetName());
+  MACH3LOG_INFO("Integral breakdown for sample: {}", GetTitle());
   MACH3LOG_INFO("");
 
   if (printToFile) {outfile << std::setw(space) << "Mode:";}
@@ -2009,7 +2150,7 @@ std::vector<TH2*> samplePDFFDBase::ReturnHistsBySelection2D(std::string Kinemati
 
 THStack* samplePDFFDBase::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
   std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
-  THStack* StackHist = new THStack((GetName()+"_"+KinematicProjection+"_Stack").c_str(),"");
+  THStack* StackHist = new THStack((GetTitle()+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {
     StackHist->Add(HistList[i]);
   }

@@ -112,8 +112,27 @@ void GetCPUInfo() {
   MACH3LOG_INFO("{}", TerminalToString("lscpu | grep -m 1 -E '^CPU(:|\\(s\\)):?\\s+[0-9]+'"));
   MACH3LOG_INFO("With available threads                {}", M3::GetNThreads());
 
+  NThreadsSanity();
   //KS: /proc/cpuinfo and lscpu holds much more info I have limited it but one can expand it if needed
 }
+
+
+// ************************
+void NThreadsSanity() {
+// ************************
+  const int nThreads = M3::GetNThreads();
+  constexpr int MaxAllowedThreads = 16;
+  constexpr int RecommendedThreads = 8;
+
+  if (nThreads > MaxAllowedThreads) {
+    MACH3LOG_CRITICAL("You specified more than {} threads ({})", MaxAllowedThreads, nThreads);
+    MACH3LOG_CRITICAL("With so many threads code will be slower, please use:");
+    MACH3LOG_CRITICAL("export OMP_NUM_THREADS={}", RecommendedThreads);
+    MACH3LOG_CRITICAL("To use different number of threads");
+    throw MaCh3Exception(__FILE__, __LINE__, "Too many threads");
+  }
+}
+
 
 // ************************
 //KS: Simple function retrieving GPU info
@@ -132,7 +151,6 @@ void GetGPUInfo(){
   // Print N GPU thread
   MACH3LOG_INFO("Currently used GPU has: {} threads", GetNumGPUThreads());
 #endif
-  return;
 }
 
 // ************************
