@@ -4,7 +4,6 @@
 // *******************
 MaCh3Modes::MaCh3Modes(std::string const &filename) {
 // *******************
-
   // Load config
   YAML::Node config = M3OpenConfig(filename);
 
@@ -15,18 +14,18 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
   Title = config["Title"].as<std::string>();
   Generator = config["GeneratorName"].as<std::string>();
 
-  std::vector<std::string> names = config["MaCh3Modes"].as<std::vector<std::string>>();
+  auto names = Get<std::vector<std::string>>(config["MaCh3Modes"], __FILE__, __LINE__);
 
   for(size_t i = 0; i < names.size(); i++)
   {
     DeclareNewMode(names[i],
-		   config[names[i]]["Name"].as<std::string>(),
-		   config[names[i]]["PlotColor"].as<int>(),
-		   config[names[i]]["GeneratorMaping"].as<std::vector<int>>(),
-		   config[names[i]]["IsNC"].as<bool>(),
-		   config[names[i]]["SplineSuffix"].as<std::string>());
+                   Get<std::string>(config[names[i]]["Name"], __FILE__, __LINE__),
+                   Get<int>(config[names[i]]["PlotColor"], __FILE__, __LINE__),
+                   Get<std::vector<int>>(config[names[i]]["GeneratorMaping"], __FILE__, __LINE__),
+                   Get<bool>(config[names[i]]["IsNC"], __FILE__, __LINE__),
+                   Get<std::string>(config[names[i]]["SplineSuffix"], __FILE__, __LINE__));
 
-    if (!config[names[i]]["IsNC"].as<bool>()) {
+    if (!Get<bool>(config[names[i]]["IsNC"], __FILE__, __LINE__)) {
       nCCModes += 1;
     }
   }
@@ -35,8 +34,8 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
                  "UNKNOWN_BAD",
                  kBlack,
                  {},
-                false,
-                "UNKNOWN_BAD");
+                 false,
+                 "UNKNOWN_BAD");
   // This is hack to not have bad mode
   NModes--;
 
