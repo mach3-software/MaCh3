@@ -40,7 +40,7 @@ target_include_directories(Splines PUBLIC
 install(TARGETS Splines
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/splines)
+        PUBLIC_HEADER DESTINATION include/Splines)
 
 add_library(MaCh3::Splines ALIAS Splines)
 

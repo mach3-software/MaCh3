@@ -244,7 +244,7 @@ endforeach()
 # Build components
 add_subdirectory(manager)
 add_subdirectory(ParameterHandler)
-add_subdirectory(splines)
+add_subdirectory(Splines)
 add_subdirectory(Samples)
 add_subdirectory(Fitter)
 add_subdirectory(Diagnostics)

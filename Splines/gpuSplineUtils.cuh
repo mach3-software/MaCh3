@@ -11,7 +11,7 @@
 
 //MaCh3 included
 #include "manager/gpuUtils.cuh"
-#include "splines/SplineCommon.h"
+#include "Splines/SplineCommon.h"
 
 /// @brief Make sure all Cuda threads finished execution
 __host__ void SynchroniseSplines();

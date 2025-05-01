@@ -1,7 +1,7 @@
 #pragma once
 
 //MaCh3 includes
-#include "splines/BinnedSplineHandler.h"
+#include "Splines/BinnedSplineHandler.h"
 
 #include "ParameterHandler/ParameterHandlerGeneric.h"
 #include "ParameterHandler/ParameterHandlerOsc.h"

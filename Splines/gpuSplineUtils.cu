@@ -1,5 +1,5 @@
 //MaCh3 included
-#include "splines/gpuSplineUtils.cuh"
+#include "Splines/gpuSplineUtils.cuh"
 
 /// Hard code the number of splines
 /// Not entirely necessary: only used for val_gpu and segment_gpu being device constants. Could move them to not being device constants

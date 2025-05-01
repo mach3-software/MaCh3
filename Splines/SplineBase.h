@@ -6,8 +6,8 @@
 
 // MaCh3  includes
 //#include "manager/MaCh3Logger.h"
-#include "splines/SplineStructs.h"
-#include "splines/SplineCommon.h"
+#include "Splines/SplineStructs.h"
+#include "Splines/SplineCommon.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include

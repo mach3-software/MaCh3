@@ -1,7 +1,7 @@
 #include "SplineMonolith.h"
 
 #ifdef CUDA
-#include "splines/gpuSplineUtils.cuh"
+#include "Splines/gpuSplineUtils.cuh"
 #endif
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"

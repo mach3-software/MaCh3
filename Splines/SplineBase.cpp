@@ -1,4 +1,4 @@
-#include "splines/SplineBase.h"
+#include "Splines/SplineBase.h"
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"

@@ -2,7 +2,7 @@
 
 //MaCh3 includes
 #include "Samples/Structs.h"
-#include "splines/SplineBase.h"
+#include "Splines/SplineBase.h"
 #include "manager/MaCh3Modes.h"
 
 _MaCh3_Safe_Include_Start_ //{

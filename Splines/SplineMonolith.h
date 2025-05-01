@@ -1,6 +1,6 @@
 #pragma once
 
-#include "splines/SplineBase.h"
+#include "Splines/SplineBase.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class SMonolithGPU;
