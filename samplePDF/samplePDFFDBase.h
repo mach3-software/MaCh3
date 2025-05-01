@@ -257,7 +257,8 @@ public:
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel = false;
-  
+  /// If using shared NuOsc
+  bool SharedNuOsc = false;
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning

@@ -31,6 +31,7 @@ samplePDFFDBase::samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xse
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
     NuOscProbCalcers.push_back(OscillatorObj_);
+    SharedNuOsc = true;
   }
 
   KinematicParameters = nullptr;
@@ -63,10 +64,10 @@ samplePDFFDBase::~samplePDFFDBase()
   //ETA - there is a chance that you haven't added any data...
   if(samplePDFFD_data != nullptr){delete[] samplePDFFD_data;}
  
-  for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
-    if (NuOscProbCalcers[iCalc] != nullptr) {
-	delete NuOscProbCalcers[iCalc];
-	NuOscProbCalcers[iCalc] = nullptr;
+  if(SharedNuOsc == false)
+  {
+    for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
+      delete NuOscProbCalcers[iCalc];
     }
   }
 
