@@ -6,8 +6,8 @@
 //MaCh3 includes
 #include "Samples/Structs.h"
 #include "Samples/HistogramUtils.h"
-#include "manager/manager.h"
-#include "manager/MaCh3Modes.h"
+#include "Manager/Manager.h"
+#include "Manager/MaCh3Modes.h"
 
 _MaCh3_Safe_Include_Start_ //{
 //ROOT includes

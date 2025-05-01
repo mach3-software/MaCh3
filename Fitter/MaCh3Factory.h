@@ -9,8 +9,8 @@
 #include "Fitter/MinuitFit.h"
 #endif
 
-#include "ParameterHandler/ParameterHandlerGeneric.h"
-#include "ParameterHandler/ParameterHandlerOsc.h"
+#include "Parameters/ParameterHandlerGeneric.h"
+#include "Parameters/ParameterHandlerOsc.h"
 
 /// @file MaCh3Factory.h
 /// @brief Factory methods for MaCh3 software which streamline initialisation of different objects

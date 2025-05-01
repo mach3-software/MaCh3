@@ -7,7 +7,7 @@
 // -Covariance matrix calculations and other matrix operations
 // -Effective Sample Size evaluation
 
-#include "manager/gpuUtils.cuh"
+#include "Manager/gpuUtils.cuh"
 
 /// @file gpuMCMCProcessorUtils
 /// @author Kamil Skwarczynski

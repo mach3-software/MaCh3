@@ -1,5 +1,5 @@
 // MaCh3 includes
-#include "manager/gpuUtils.cuh"
+#include "Manager/gpuUtils.cuh"
 
 // **************************************************
 // Check for a safe call on GPU

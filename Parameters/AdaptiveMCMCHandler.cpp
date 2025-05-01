@@ -1,4 +1,4 @@
-#include "ParameterHandler/AdaptiveMCMCHandler.h"
+#include "Parameters/AdaptiveMCMCHandler.h"
 
 namespace adaptive_mcmc{
 

@@ -3,8 +3,8 @@
 //MaCh3 includes
 #include "Splines/BinnedSplineHandler.h"
 
-#include "ParameterHandler/ParameterHandlerGeneric.h"
-#include "ParameterHandler/ParameterHandlerOsc.h"
+#include "Parameters/ParameterHandlerGeneric.h"
+#include "Parameters/ParameterHandlerOsc.h"
 
 #include "Samples/SampleHandlerBase.h"
 #include "Samples/FarDetectorCoreInfoStruct.h"

@@ -10,7 +10,7 @@
 /// Called from samplePDF/samplePDFND.cpp -> splines/SplineMonolith.cpp -> splines/gpuSplineUtils.cu
 
 //MaCh3 included
-#include "manager/gpuUtils.cuh"
+#include "Manager/gpuUtils.cuh"
 #include "Splines/SplineCommon.h"
 
 /// @brief Make sure all Cuda threads finished execution

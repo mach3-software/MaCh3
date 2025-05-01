@@ -1,11 +1,10 @@
 #pragma once
 
 // MaCh3 Includes
-//#include "manager/MaCh3Logger.h"
 #include "Samples/Structs.h"
-#include "manager/YamlHelper.h"
-#include "manager/Monitor.h"
-#include "manager/MaCh3Exception.h"
+#include "Manager/YamlHelper.h"
+#include "Manager/Monitor.h"
+#include "Manager/MaCh3Exception.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;

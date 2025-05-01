@@ -1,4 +1,4 @@
-#include "ParameterHandler/ParameterHandlerOsc.h"
+#include "Parameters/ParameterHandlerOsc.h"
 
 // *************************************
 ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)

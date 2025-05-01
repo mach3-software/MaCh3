@@ -7,7 +7,7 @@ set(HEADERS
     PCAHandler.h
 )
 
-add_library(ParameterHandler SHARED
+add_library(Parameters SHARED
     ParameterHandlerBase.cpp
     ParameterHandlerOsc.cpp
     ParameterHandlerGeneric.cpp
@@ -15,29 +15,29 @@ add_library(ParameterHandler SHARED
     PCAHandler.cpp
 )
 
-set_target_properties(ParameterHandler PROPERTIES
+set_target_properties(Parameters PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
-    EXPORT_NAME ParameterHandler)
+    EXPORT_NAME Parameters)
 
 
 if(MaCh3_GPU_ENABLED)
-    set_target_properties(ParameterHandler PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    set_target_properties(Parameters PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
-    set_property(TARGET ParameterHandler PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+    set_property(TARGET Parameters PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-target_link_libraries(ParameterHandler PUBLIC Manager)
-target_link_libraries(ParameterHandler PRIVATE MaCh3Warnings)
+target_link_libraries(Parameters PUBLIC Manager)
+target_link_libraries(Parameters PRIVATE MaCh3Warnings)
 
-target_include_directories(ParameterHandler PUBLIC
+target_include_directories(Parameters PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS ParameterHandler
+install(TARGETS Parameters
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/ParameterHandler
+        PUBLIC_HEADER DESTINATION include/Parameters
 )
 
-add_library(MaCh3::ParameterHandler ALIAS ParameterHandler)
+add_library(MaCh3::Parameters ALIAS Parameters)
 

@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "ParameterHandler/ParameterHandlerBase.h"
+#include "Parameters/ParameterHandlerBase.h"
 
 /// @brief Class responsible for handling of neutrino oscillation  parameters.
 /// @author Richard Calland

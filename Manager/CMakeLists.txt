@@ -1,5 +1,5 @@
 set(HEADERS
-    manager.h
+    Manager.h
     MaCh3Modes.h
     YamlHelper.h
     MaCh3Logger.h
@@ -10,7 +10,7 @@ set(HEADERS
 )
 
 add_library(Manager SHARED
-    manager.cpp
+    Manager.cpp
     MaCh3Modes.cpp
     Monitor.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuUtils.cu>
@@ -37,7 +37,7 @@ target_include_directories(Manager PUBLIC
 install(TARGETS Manager
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/manager)
+        PUBLIC_HEADER DESTINATION include/Manager)
 
 add_library(MaCh3::Manager ALIAS Manager)
 

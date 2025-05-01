@@ -10,7 +10,7 @@
 
 //MaCh3 includes
 #include "Samples/Structs.h"
-#include "manager/manager.h"
+#include "Manager/Manager.h"
 #include "Samples/HistogramUtils.h"
 
 #pragma GCC diagnostic push

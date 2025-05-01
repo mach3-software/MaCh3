@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 // MaCh3 includes
-#include "manager/manager.h"
+#include "Manager/Manager.h"
 // yaml includes
 #include "yaml-cpp/yaml.h"
 

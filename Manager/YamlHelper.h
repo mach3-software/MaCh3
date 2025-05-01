@@ -8,8 +8,8 @@
 #include <regex>
 
 // MaCh3 Includes
-#include "manager/MaCh3Exception.h"
-#include "manager/Core.h"
+#include "Manager/MaCh3Exception.h"
+#include "Manager/Core.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT Includes

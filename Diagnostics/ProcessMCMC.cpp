@@ -1,6 +1,6 @@
 //MaCh3 includes
 #include "Fitter/MCMCProcessor.h"
-#include "manager/manager.h"
+#include "Manager/Manager.h"
 
 /// @file ProcessMCMC.cpp
 /// @brief Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implantation of methods is in MCMCProcessor

@@ -1,10 +1,10 @@
 #pragma once
 
 // MaCh3 includes
-#include "manager/manager.h"
-#include "ParameterHandler/ParameterHandlerUtils.h"
-#include "ParameterHandler/AdaptiveMCMCHandler.h"
-#include "ParameterHandler/PCAHandler.h"
+#include "Manager/Manager.h"
+#include "Parameters/ParameterHandlerUtils.h"
+#include "Parameters/AdaptiveMCMCHandler.h"
+#include "Parameters/PCAHandler.h"
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).

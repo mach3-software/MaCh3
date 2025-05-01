@@ -6,9 +6,9 @@
 #include <string>
 
 //MaCh3 includes
-#include "manager/YamlHelper.h"
-#include "manager/Monitor.h"
-#include "manager/MaCh3Exception.h"
+#include "Manager/YamlHelper.h"
+#include "Manager/Monitor.h"
+#include "Manager/MaCh3Exception.h"
 
 /// Enumerator of MaCh3Mode
 using MaCh3Modes_t = int;

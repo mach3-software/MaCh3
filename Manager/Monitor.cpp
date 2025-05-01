@@ -1,8 +1,8 @@
-#include "manager/Monitor.h"
+#include "Manager/Monitor.h"
 
 //Only if GPU is enabled
 #ifdef CUDA
-#include "manager/gpuUtils.cuh"
+#include "Manager/gpuUtils.cuh"
 #endif
 
 namespace MaCh3Utils {

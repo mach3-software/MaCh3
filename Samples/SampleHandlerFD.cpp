@@ -1,7 +1,7 @@
 #include "SampleHandlerFD.h"
 #include "Samples/Structs.h"
-#include "manager/MaCh3Exception.h"
-#include "manager/MaCh3Logger.h"
+#include "Manager/MaCh3Exception.h"
+#include "Manager/MaCh3Logger.h"
 #include <cstddef>
 
 _MaCh3_Safe_Include_Start_ //{

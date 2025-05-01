@@ -8,7 +8,7 @@
 #include <exception>
 
 // MaCh3 Includes
-#include "manager/Core.h"
+#include "Manager/Core.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // spdlog Includes

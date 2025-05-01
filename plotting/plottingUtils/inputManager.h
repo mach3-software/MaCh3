@@ -1,9 +1,9 @@
 #pragma once
 
 // MaCh3 Includes
-#include "manager/MaCh3Logger.h"
-#include "manager/YamlHelper.h"
-#include "manager/MaCh3Exception.h"
+#include "Manager/MaCh3Logger.h"
+#include "Manager/YamlHelper.h"
+#include "Manager/MaCh3Exception.h"
 #include "Fitter/MCMCProcessor.h"
 #include "Samples/Structs.h"
 

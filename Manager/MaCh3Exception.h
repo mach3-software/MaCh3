@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 // MaCh3 Includes
-#include "manager/MaCh3Logger.h"
-#include "manager/Core.h"
+#include "Manager/MaCh3Logger.h"
+#include "Manager/Core.h"
 
 /// @brief Custom exception class for MaCh3 errors.
 class MaCh3Exception : public std::exception {

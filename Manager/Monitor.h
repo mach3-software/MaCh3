@@ -8,9 +8,9 @@
 #include <cstdlib>
 
 // MaCh3 includes
-#include "manager/MaCh3Logger.h"
-#include "manager/MaCh3Exception.h"
-#include "manager/YamlHelper.h"
+#include "Manager/MaCh3Logger.h"
+#include "Manager/MaCh3Exception.h"
+#include "Manager/YamlHelper.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include

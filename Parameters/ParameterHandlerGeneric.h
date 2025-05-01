@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "ParameterHandler/ParameterHandlerBase.h"
+#include "Parameters/ParameterHandlerBase.h"
 #include "Samples/Structs.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.

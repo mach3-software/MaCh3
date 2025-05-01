@@ -1,4 +1,4 @@
-#include "ParameterHandler/ParameterHandlerGeneric.h"
+#include "Parameters/ParameterHandlerGeneric.h"
 #include "Samples/Structs.h"
 
 // ********************************************

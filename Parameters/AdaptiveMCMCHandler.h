@@ -1,8 +1,8 @@
 #pragma once
 
 // MaCh3 Includes
-#include "manager/manager.h"
-#include "ParameterHandler/ParameterHandlerUtils.h"
+#include "Manager/Manager.h"
+#include "Parameters/ParameterHandlerUtils.h"
 
 namespace adaptive_mcmc{
 
