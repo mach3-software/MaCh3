@@ -9,10 +9,6 @@
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 
-#ifndef _BAD_SPLINE_
-#define _BAD_SPLINE_ 123456789
-#endif
-
 /// KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code
 #define _nCoeff_  4
 /// KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track

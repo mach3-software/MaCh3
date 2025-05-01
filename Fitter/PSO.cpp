@@ -5,19 +5,19 @@
 // ***************
 PSO::PSO(manager *man) : LikelihoodFit(man) {
 // ***************
-  fConstriction = fitMan->raw()["General"]["PSO"]["Constriction"].as<double>();
-  fInertia = fitMan->raw()["General"]["PSO"]["Inertia"].as<double>()*fConstriction;
-  fOne = fitMan->raw()["General"]["PSO"]["One"].as<double>()*fConstriction;
-  fTwo = fitMan->raw()["General"]["PSO"]["Two"].as<double>()*fConstriction;
-  fParticles = fitMan->raw()["General"]["PSO"]["Particles"].as<int>();
-  fIterations = fitMan->raw()["General"]["PSO"]["Iterations"].as<int>();
-  fConvergence = fitMan->raw()["General"]["PSO"]["Convergence"].as<double>();
+  fConstriction = Get<double>(fitMan->raw()["General"]["PSO"]["Constriction"], __FILE__, __LINE__);
+  fInertia = Get<double>(fitMan->raw()["General"]["PSO"]["Inertia"], __FILE__, __LINE__) * fConstriction;
+  fOne = Get<double>(fitMan->raw()["General"]["PSO"]["One"], __FILE__, __LINE__) * fConstriction;
+  fTwo = Get<double>(fitMan->raw()["General"]["PSO"]["Two"], __FILE__, __LINE__) * fConstriction;
+  fParticles = Get<int>(fitMan->raw()["General"]["PSO"]["Particles"], __FILE__, __LINE__);
+  fIterations = Get<int>(fitMan->raw()["General"]["PSO"]["Iterations"], __FILE__, __LINE__);
+  fConvergence = Get<double>(fitMan->raw()["General"]["PSO"]["Convergence"], __FILE__, __LINE__);
 
   fDim = 0;
 
   if(fTestLikelihood)
   {
-    fDim = fitMan->raw()["General"]["PSO"]["TestLikelihoodDim"].as<int>();
+    fDim = Get<int>(fitMan->raw()["General"]["PSO"]["TestLikelihoodDim"], __FILE__, __LINE__);
   }
 }
 

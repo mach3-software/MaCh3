@@ -69,11 +69,11 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 // ********************************************
   // config for our matrix
   YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
-  auto CovMatrixName = Settings[std::string(PreFix) + "CovName"].as<std::string>();
+  auto CovMatrixName = Get<std::string>(Settings[std::string(PreFix) + "CovName"], __FILE__, __LINE__);
   MACH3LOG_INFO("Initialising {} matrix", CovMatrixName);
 
   // yaml files initialising out matrix
-  auto CovMatrixFile = Settings[std::string(PreFix) + "CovFile"].as<std::vector<std::string>>();
+  auto CovMatrixFile = Get<std::vector<std::string>>(Settings[std::string(PreFix) + "CovFile"], __FILE__, __LINE__);
 
   // PCA threshold, -1 means no pca
   auto PCAThreshold = GetFromManager<int>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
@@ -99,7 +99,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
     }
   }
   //Global step scale for matrix
-  auto StepScale = Settings[std::string(PreFix) + "StepScale"].as<double>();
+  auto StepScale = Get<double>(Settings[std::string(PreFix) + "StepScale"], __FILE__, __LINE__);
 
   CovObject->SetStepScale(StepScale);
 

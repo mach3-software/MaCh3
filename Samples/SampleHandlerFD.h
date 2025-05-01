@@ -23,7 +23,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr, OscillatorBase* Oscillator_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
@@ -53,7 +53,8 @@ public:
   M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
-  void SetupNuOscillator();
+  void InitialiseNuOscillatorObjects();
+  void SetupNuOscillatorPointers();
 
   virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
 
@@ -300,7 +301,8 @@ public:
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel = false;
-  
+  /// If using shared NuOsc
+  bool SharedNuOsc = false;
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning

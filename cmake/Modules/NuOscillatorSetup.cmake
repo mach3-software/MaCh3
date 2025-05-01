@@ -67,7 +67,7 @@ set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 if(NOT DEFINED MaCh3_NuOscillatorBranch)
-  set(MaCh3_NuOscillatorBranch "v1.3.0")
+  set(MaCh3_NuOscillatorBranch "v1.3.1")
 endif()
 
 #Try adding Oscillator Class

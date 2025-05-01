@@ -12,7 +12,7 @@ _MaCh3_Safe_Include_End_ //}
 #include <algorithm>
 #include <memory>
 
-SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov) : SampleHandlerBase()
+SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov, OscillatorBase* OscillatorObj_) : SampleHandlerBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SamplePDFFDBase object");
@@ -28,7 +28,13 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
     MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
   }
   OscParHandler = osc_cov;
-  
+
+  if (OscillatorObj_ != nullptr) {
+    MACH3LOG_WARN("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
+    NuOscProbCalcers.push_back(OscillatorObj_);
+    SharedNuOsc = true;
+  }
+
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
 
@@ -59,8 +65,11 @@ SampleHandlerFD::~SampleHandlerFD()
   //ETA - there is a chance that you haven't added any data...
   if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data;}
  
-  for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
-    delete NuOscProbCalcers[iCalc];
+  if(SharedNuOsc == false)
+  {
+    for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
+      delete NuOscProbCalcers[iCalc];
+    }
   }
 
   if(THStackLeg != nullptr) delete THStackLeg;
@@ -84,6 +93,7 @@ void SampleHandlerFD::ReadSampleConfig()
       EqualBinningPerOscChannel = false;
     }
   }
+
   fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
   if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
     UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
@@ -203,10 +213,19 @@ void SampleHandlerFD::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
-  if (OscCov) {
-    MACH3LOG_INFO("Setting up NuOscillator..");
-    SetupNuOscillator();
+  if (OscParHandler) {
+    MACH3LOG_INFO("Setting up NuOscillator.. ");
+    if (NuOscProbCalcers.size() != 0) {
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
+      MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
+      EqualBinningPerOscChannel = true;
+    } else {
+      InitialiseNuOscillatorObjects();
+    }
+    SetupNuOscillatorPointers();
+    OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
   }
+
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetupSampleBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -348,7 +367,7 @@ void SampleHandlerFD::Reweight() {
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
-  //You only need to do these things if OscCov has been initialised
+  //You only need to do these things if OscParHandler has been initialised
   //if not then you're not considering oscillations
   if (OscParHandler) {
     std::vector<M3::float_t> OscVec(OscParams.size());
@@ -1315,7 +1334,7 @@ void SampleHandlerFD::AddData(TH2D* Data) {
 }
 
 // ************************************************
-void SampleHandlerFD::SetupNuOscillator() {
+void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 // ************************************************
   OscillatorFactory* OscillFactory = new OscillatorFactory();
   if (!OscParHandler) {
@@ -1381,7 +1400,11 @@ void SampleHandlerFD::SetupNuOscillator() {
       NuOscProbCalcers[iSample]->Setup();
     }
   }
-  
+
+  delete OscillFactory;
+}
+
+void SampleHandlerFD::SetupNuOscillatorPointers() {
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -1437,9 +1460,7 @@ void SampleHandlerFD::SetupNuOscillator() {
       } // end if NC
     } // end loop over events
   }// end loop over channels
-  delete OscillFactory;
-
-  OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+  
 }
 
 std::string SampleHandlerFD::GetSampleName(int iSample) const {
