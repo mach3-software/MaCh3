@@ -484,11 +484,11 @@ void covarianceBase::proposeStep() {
   randomize();
   CorrelateSteps();
 
-  std::string par_str = "";
-  for(int i=0; i<_fNumPar; i++){
-    par_str += _fNames[i] + ": " + std::to_string(_fPropVal[i]) + " | ";
-  }
-  MACH3LOG_INFO("Setting {}", par_str);
+  // std::string par_str = "";
+  // for(int i=0; i<_fNumPar; i++){
+  //   par_str += _fNames[i] + ": " + std::to_string(_fPropVal[i]) + " | ";
+  // }
+  // MACH3LOG_INFO("Setting {}", par_str);
 
   if(use_adaptive) updateAdaptiveCovariance();
 }
@@ -1016,9 +1016,8 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   }
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
-  // if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) MakePosDef(throwMatrix);
-  // else MakePosDef(throwMatrix);
-  MakePosDef(throwMatrix);
+  if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) makeClosestPosDef(throwMatrix);
+  else MakePosDef(throwMatrix);
 
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
   

@@ -126,10 +126,11 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
 
   for(int iblock=0; iblock < block_size; iblock++){
     // Loop over blocks in the block
-    int sub_block_size = static_cast<int>(block_indices.size()-1);
+    int sub_block_size = static_cast<int>(block_indices[iblock].size())-1;
     for(int isubblock=0; isubblock < sub_block_size ; isubblock+=2){
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
+      
 
       if(block_lb > Npars || block_ub > Npars){
         MACH3LOG_ERROR("Cannot set matrix block with edges {}, {} for matrix of size {}",
@@ -144,13 +145,9 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
     }
   }
 
-
   for(int i=0; i<block_size+1; i++){
     block_scale_factors[i] = (2.38*2.38/adapt_block_sizes[i]);
   }
-
-
-
 }
 
 // ********************************************
@@ -290,9 +287,8 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
       // Reset step_wrapped
       step_wrapped[i] = 0;
     } else {
-      par_means[i] += (1.0 / (steps_post_burn+1)) * (_fCurrVal[i] - par_means[i]);
-      dev[i] = _fCurrVal[i] - par_means_prev[i];
-      
+      par_means[i] =  (_fCurrVal[i] + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
+      dev[i] = _fCurrVal[i] - par_means_prev[i];   
     }
   }
 
@@ -318,14 +314,13 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
 
       if (steps_post_burn > 0) {
         // Haario-style update
-        double term1 = cov_prev * (steps_post_burn - 1) / steps_post_burn;
-        double term2 = steps_post_burn * par_means_prev[i] * par_means_prev[j];
-        double term3 = (steps_post_burn + 1) * par_means[i] * par_means[j];
-        double term4 = (par_means_prev[i] + dev[i]) * (par_means_prev[j] + dev[j]);
+        double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
+        double prev_means_t = steps_post_burn * par_means_prev[i] * par_means_prev[j];
+        double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
+        double curr_step_t = (par_means_prev[i] + dev[i]) * (par_means_prev[j] + dev[j]);
 
-        cov_updated = term1 + scale_factor * (term4 - term2 - term3) / steps_post_burn;
+        cov_updated = cov_t + scale_factor * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
       }
-
       (*adaptive_covariance)(i, j) = cov_updated;
       (*adaptive_covariance)(j, i) = cov_updated;
     }
