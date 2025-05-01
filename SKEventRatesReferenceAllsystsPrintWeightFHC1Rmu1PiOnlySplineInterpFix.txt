@@ -1,1 +1,0 @@
--bash: ./build/bin/SKEventRates: No such file or directory
