@@ -78,7 +78,7 @@ class AdaptiveMCMCHandler{
   /// @brief Calculate Mean of Circular parans
   double CalculateCyclicalMean(int ipar, double curr_val);
   
-  double CalculateCircularDeviation(double mean, double value, int wrapped);
+  double CalculateCircularDeviation(double mean, double value);
   void StepWrapped(int ipar, float direction);
 /// @brief Set to track errros
   void SetFixed(std::vector<double>* errs){

@@ -206,7 +206,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   use_adaptive = true;
 
   if(matrix_file->IsZombie()){
-    MACH3LOG_ERROR("Couldn't find {}", matrix_file_name);
+    MACH3LOG_ERROR("Couldn't find {} please specify external matrix", matrix_file_name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -256,15 +256,15 @@ double AdaptiveMCMCHandler::CalculateCyclicalMean(int ipar, double curr_val){
     return TMath::ATan2(sum_sin[ipar], sum_cos[ipar]); // New circular mean
 }
 
-double AdaptiveMCMCHandler::CalculateCircularDeviation(double mean, double value, int wrapped) {
+double AdaptiveMCMCHandler::CalculateCircularDeviation(double mean, double value) {
   // Calculate smallest angular difference accounting for wrap-around
   // Want to go back to the step before it got jumped
   double diff = value - mean;
-  if(wrapped<0){
-    diff = TMath::Pi()*2 + diff;
+  if(diff<TMath::Pi()){
+    diff += TMath::Pi()*2 + diff;
   }
-  else if(wrapped>0){
-    diff = diff-TMath::Pi()*2;
+  else if(diff>TMath::Pi()){
+    diff -= TMath::Pi()*2;
   }
   return diff;
 
@@ -283,13 +283,13 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
     if (IsCircular(i)) {
       // Use trigonometric mean formula
       par_means[i] = CalculateCyclicalMean(i, _fCurrVal[i]);
-      dev[i] = CalculateCircularDeviation(par_means_prev[i], _fCurrVal[i], step_wrapped[i]);
+      // dev[i] = CalculateCircularDeviation(par_means_prev[i], _fCurrVal[i]);
       // Reset step_wrapped
       step_wrapped[i] = 0;
     } else {
       par_means[i] =  (_fCurrVal[i] + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
-      dev[i] = _fCurrVal[i] - par_means_prev[i];   
     }
+    dev[i] = _fCurrVal[i] - par_means_prev[i];   
   }
 
   // Step 2: Update covariance
@@ -314,28 +314,22 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
 
       if (steps_post_burn > 0) {
         // Haario-style update
-        double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
-        double prev_means_t = steps_post_burn * par_means_prev[i] * par_means_prev[j];
-        double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
-        double curr_step_t = (par_means_prev[i] + dev[i]) * (par_means_prev[j] + dev[j]);
 
-        cov_updated = cov_t + scale_factor * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
+        if(IsCircular(i) && i==j){
+          cov_updated = 1-par_means[i];
+        }
+        else{
+          double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
+          double prev_means_t = steps_post_burn * par_means_prev[i] * par_means_prev[j];
+          double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
+          double curr_step_t = (par_means_prev[i] + dev[i]) * (par_means_prev[j] + dev[j]);
+
+          cov_updated = cov_t + scale_factor * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
+        }
       }
       (*adaptive_covariance)(i, j) = cov_updated;
       (*adaptive_covariance)(j, i) = cov_updated;
     }
-  }
-}
-
-void AdaptiveMCMCHandler::StepWrapped(int ipar, float direction){
-  if (direction > 0){
-    step_wrapped[ipar] = 1;
-  }
-  else if (direction < 0){
-    step_wrapped[ipar] = -1;
-  }
-  else{
-    step_wrapped[ipar] = 0;  
   }
 }
 
