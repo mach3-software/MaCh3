@@ -483,6 +483,13 @@ void covarianceBase::proposeStep() {
   // Make the random numbers for the step proposal
   randomize();
   CorrelateSteps();
+
+  std::string par_str = "";
+  for(int i=0; i<_fNumPar; i++){
+    par_str += _fNames[i] + ": " + std::to_string(_fPropVal[i]) + " | ";
+  }
+  MACH3LOG_INFO("Setting {}", par_str);
+
   if(use_adaptive) updateAdaptiveCovariance();
 }
 
@@ -964,6 +971,14 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
   if (!CanDecomp) {
     MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
+
+    MACH3LOG_ERROR("Matrix: {}", matrixName);
+    for(int i = 0; i < _fNumPar; ++i) {
+     for(int j = 0; j < _fNumPar; ++j) {
+        MACH3LOG_ERROR("Element {} {}: {}", i, j, (*cov)(i,j));
+      }
+    }
+
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(AdaptiveHandler.total_steps < 2) {
@@ -1001,9 +1016,10 @@ void covarianceBase::setThrowMatrix(TMatrixDSym *cov){
   }
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
-  if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) makeClosestPosDef(throwMatrix);
-  else MakePosDef(throwMatrix);
-  
+  // if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) MakePosDef(throwMatrix);
+  // else MakePosDef(throwMatrix);
+  MakePosDef(throwMatrix);
+
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
   
   if(!TDecompChol_throwMatrix.Decompose()) {
@@ -1043,6 +1059,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, getNpars());
+  AdaptiveHandler.SetFixed(&_fError);
   if(!success) return;
   AdaptiveHandler.Print();
 
@@ -1062,6 +1079,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
 
   AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
+
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }

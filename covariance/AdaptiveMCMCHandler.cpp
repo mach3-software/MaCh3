@@ -12,7 +12,10 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   total_steps = 0;
 
   par_means = {};
+  sum_sin = {};
+  sum_cos = {};
   cyclic_indices = {};
+  step_wrapped = {};
   adaptive_covariance = nullptr;
 }
 
@@ -72,6 +75,8 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
+  errors = nullptr;
+
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
 
@@ -79,6 +84,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
 
   SetAdaptiveBlocks(matrix_blocks, Npars);
+
   return true;
 }
 
@@ -88,7 +94,11 @@ void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance(const int Npars) {
   adaptive_covariance = new TMatrixDSym(Npars);
   adaptive_covariance->Zero();
   par_means = std::vector<double>(Npars, 0);
+  sum_sin = std::vector<double>(Npars, 0);
+  sum_cos = std::vector<double>(Npars, 0);
+  step_wrapped = std::vector<int>(Npars, 0);
 }
+
 
 // ********************************************
 void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices, const int Npars) {
@@ -105,11 +115,15 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
   // Should also make a matrix of block sizes
   adapt_block_sizes = std::vector<int>(block_indices.size()+1, 0);
   adapt_block_sizes[0] = Npars;
-
-  if(block_indices.size()==0 || block_indices[0].size()==0) return;
-
+  
   int block_size = static_cast<int>(block_indices.size());
-  // Now we loop over our blocks
+
+  block_scale_factors = std::vector<double>(block_size+1, 0);
+
+  if(block_indices.size()==0 || block_indices[0].size()==0){
+    block_scale_factors[0] = 2.38*2.38/Npars;
+  };
+
   for(int iblock=0; iblock < block_size; iblock++){
     // Loop over blocks in the block
     int sub_block_size = static_cast<int>(block_indices.size()-1);
@@ -130,11 +144,12 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
     }
   }
 
-  block_scale_factors = std::vector<double>(block_size, 0);
-  // initialise block scale factors
-  for(int i=0; i<block_size; i++){
+
+  for(int i=0; i<block_size+1; i++){
     block_scale_factors[i] = (2.38*2.38/adapt_block_sizes[i]);
   }
+
+
 
 }
 
@@ -234,75 +249,98 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   MACH3LOG_INFO("Set up matrix from external file");
 }
 
-double AdaptiveMCMCHandler::CalculateCyclicalMean(double par_mean, double curr_val){
+double AdaptiveMCMCHandler::CalculateCyclicalMean(int ipar, double curr_val){
     // Circular mean update (trigonometric)
     // https://en.wikipedia.org/wiki/Circular_mean
-    int steps_post_burn = total_steps - start_adaptive_update;
 
     // Uses approximation that mean(cos(x_{i})) ~= mean(cos(prev mean))*n-1 + cos(x) 
-    double sum_sin = TMath::Sin(par_mean) * steps_post_burn + TMath::Sin(curr_val);
-    double sum_cos = TMath::Cos(par_mean) * steps_post_burn + TMath::Cos(curr_val);
-    return TMath::ATan2(sum_sin, sum_cos); // New circular mean
+    sum_sin[ipar] += TMath::Sin(curr_val);
+    sum_cos[ipar] += TMath::Cos(curr_val);
+    return TMath::ATan2(sum_sin[ipar], sum_cos[ipar]); // New circular mean
+}
+
+double AdaptiveMCMCHandler::CalculateCircularDeviation(double mean, double value, int wrapped) {
+  // Calculate smallest angular difference accounting for wrap-around
+  // Want to go back to the step before it got jumped
+  double diff = value - mean;
+  if(wrapped<0){
+    diff = TMath::Pi()*2 + diff;
+  }
+  else if(wrapped>0){
+    diff = diff-TMath::Pi()*2;
+  }
+  return diff;
+
 }
 
 
 void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
   std::vector<double> par_means_prev = par_means;
-
-  // t in the formula from Haario
   int steps_post_burn = total_steps - start_adaptive_update;
+  std::vector<double> dev(Npars, 0.0);
 
+  // Step 1: Update means and compute deviations
+  for (int i = 0; i < Npars; ++i) {
+    if (IsFixed(i)) continue;
 
-  // --- Step 1: Update means (with circular adjustment) ---
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int iRow = 0; iRow < Npars; iRow++) {
-
-    if (IsCircular(iRow)) {
-      par_means[iRow] = CalculateCyclicalMean(par_means[iRow], _fCurrVal[iRow]);
-    } 
-    else{
-      // Standard arithmetic mean for non-circular parameters
-      par_means[iRow] = (_fCurrVal[iRow] + par_means[iRow] * steps_post_burn) / (steps_post_burn + 1);
+    if (IsCircular(i)) {
+      // Use trigonometric mean formula
+      par_means[i] = CalculateCyclicalMean(i, _fCurrVal[i]);
+      dev[i] = CalculateCircularDeviation(par_means_prev[i], _fCurrVal[i], step_wrapped[i]);
+      // Reset step_wrapped
+      step_wrapped[i] = 0;
+    } else {
+      par_means[i] += (1.0 / (steps_post_burn+1)) * (_fCurrVal[i] - par_means[i]);
+      dev[i] = _fCurrVal[i] - par_means_prev[i];
+      
     }
   }
-  
 
-  // --- Step 2: Update covariances (with circular adjustments) ---
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int irow = 0; irow < Npars; irow++) {
-    int block = adapt_block_matrix_indices[irow];
-    // Get scale factor for the block
-    double scale_factor = block_scale_factors[block];
-
-    for (int icol = 0; icol <= irow; icol++) {
-
-      if (adapt_block_matrix_indices[icol] == block) {
-        // Compute adjusted differences for circular parameters
-        // Handle circular parameters
-        // Update covariance (using Haario's recursive formula)
-        // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
-        
-        
-        // unset-scale
-        double cov_val = (*adaptive_covariance)(icol, irow) * (steps_post_burn-1) / (scale_factor*steps_post_burn);
-
-        // Calculate covariance
-        double cov_next = steps_post_burn*par_means_prev[irow]*par_means_prev[icol];
-        cov_next -= (steps_post_burn+1)*par_means[irow]*par_means[irow];
-        cov_next += _fCurrVal[irow]*_fCurrVal[icol];
-
-        cov_val += cov_next*scale_factor/(steps_post_burn);
-
-        // Set the covariance value
-        (*adaptive_covariance)(icol, irow) = cov_val;
-        (*adaptive_covariance)(irow, icol) = cov_val;  
-
-      }
+  // Step 2: Update covariance
+  for (int i = 0; i < Npars; ++i) {
+    if (IsFixed(i)) {
+      (*adaptive_covariance)(i, i) = 1.0;
+      continue;
     }
+
+    int block_i = adapt_block_matrix_indices[i];
+    double scale_factor = block_scale_factors[block_i];
+
+    for (int j = 0; j <= i; ++j) {
+      if (IsFixed(j) || adapt_block_matrix_indices[j] != block_i) {
+        (*adaptive_covariance)(i, j) = 0.0;
+        (*adaptive_covariance)(j, i) = 0.0;
+        continue;
+      }
+
+      double cov_prev = (*adaptive_covariance)(i, j);
+      double cov_updated = 0.0;
+
+      if (steps_post_burn > 0) {
+        // Haario-style update
+        double term1 = cov_prev * (steps_post_burn - 1) / steps_post_burn;
+        double term2 = steps_post_burn * par_means_prev[i] * par_means_prev[j];
+        double term3 = (steps_post_burn + 1) * par_means[i] * par_means[j];
+        double term4 = (par_means_prev[i] + dev[i]) * (par_means_prev[j] + dev[j]);
+
+        cov_updated = term1 + scale_factor * (term4 - term2 - term3) / steps_post_burn;
+      }
+
+      (*adaptive_covariance)(i, j) = cov_updated;
+      (*adaptive_covariance)(j, i) = cov_updated;
+    }
+  }
+}
+
+void AdaptiveMCMCHandler::StepWrapped(int ipar, float direction){
+  if (direction > 0){
+    step_wrapped[ipar] = 1;
+  }
+  else if (direction < 0){
+    step_wrapped[ipar] = -1;
+  }
+  else{
+    step_wrapped[ipar] = 0;  
   }
 }
 

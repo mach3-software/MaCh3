@@ -76,8 +76,25 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Calculate Mean of Circular parans
-  double CalculateCyclicalMean(double par_mean, double curr_val);
+  double CalculateCyclicalMean(int ipar, double curr_val);
   
+  double CalculateCircularDeviation(double mean, double value, int wrapped);
+  void StepWrapped(int ipar, float direction);
+/// @brief Set to track errros
+  void SetFixed(std::vector<double>* errs){
+    errors = errs;
+  }
+
+  bool IsFixed(int ipar){
+
+    if(!errors){
+      return false;
+    }
+
+
+    return ((*errors)[ipar] < 0);
+  }
+
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;
@@ -119,6 +136,13 @@ class AdaptiveMCMCHandler{
 
   /// Circular parameter indices
   std::unordered_set<int> cyclic_indices;
+
+  // Circular nonsense
+  std::vector<double> sum_sin;
+  std::vector<double> sum_cos;
+  std::vector<int> step_wrapped;
+
+  std::vector<double>* errors;
 
 };
 
