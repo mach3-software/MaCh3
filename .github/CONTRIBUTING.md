@@ -26,7 +26,7 @@ MaCh3 undergoes rigorous checks via multiple continuous integration (CI) process
 
 CI heavily depends on the setup in the [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial).
 
-### PR Merge Requirements:
+### PR Merge Requirements
 - **CI Success**: All CI checks must pass before a PR can be merged.
 - **Backward Compatibility**: If a PR introduces breaking changes, it will fail the CI tests. In this case, the following steps are required:
     1. **Update MaCh3 Tutorial**: A separate PR must be made to update the [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial).
