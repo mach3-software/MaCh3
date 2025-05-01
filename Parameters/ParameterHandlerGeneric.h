@@ -73,7 +73,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief DB Get norm/func parameters depending on given SampleName
     const std::vector<NormParameter> GetNormParsFromSampleName(const std::string& SampleName);
     /// @brief HH Get functional parameters for the relevant SampleName
-    const std::vector<FuncPars> GetFuncParsFromSampleName(const std::string& SampleName);
+    const std::vector<FunctionalParameter> GetFunctionalParametersFromSampleName(const std::string& SampleName);
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> GetNominalArray() override
@@ -146,7 +146,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Get Func params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    inline FuncPars GetFuncPars(const YAML::Node& param, const int Index);
+    inline FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
     inline SplineParameter GetSplineParameter(const YAML::Node& param);
@@ -170,5 +170,5 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     std::vector<NormParameter> NormParams;
 
     /// Vector containing info for functional systematics
-    std::vector<FuncPars> FuncParams;
+    std::vector<FunctionalParameter> FuncParams;
 };

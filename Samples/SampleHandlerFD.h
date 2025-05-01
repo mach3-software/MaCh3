@@ -183,7 +183,7 @@ public:
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
   virtual void SetupFunctionalParameters();
   /// @brief HH - a helper function for RegisterFunctionalParameter
-  void RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
+  void RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
@@ -199,7 +199,7 @@ public:
     (void)iEvent;
   };
   /// @brief HH - a vector that stores all the FuncPars struct
-  std::vector<FuncPars> funcParsVec;
+  std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
   /// funcpar enum
   std::unordered_map<std::string, int> funcParsNamesMap;
@@ -207,7 +207,7 @@ public:
   /// struct
   // HH - Changed to a vector of pointers since it's faster than unordered_map
   // and we are using ints as keys
-  std::vector<FuncPars *> funcParsMap;
+  std::vector<FunctionalParameter *> funcParsMap;
   /// @brief HH - a map that relates the funcpar enum to pointer of the actual
   /// function
   std::unordered_map<int, FuncParFuncType> funcParsFuncMap;

@@ -189,7 +189,7 @@ using FuncParFuncType = std::function<void (const double*, std::size_t, std::siz
 // *******************
 /// @brief HH - Functional parameters
 /// Carrier for whether you want to apply a systematic to an event or not
-struct FuncPars {
+struct FunctionalParameter {
 // *******************
   /// Name of parameters
   std::string name;

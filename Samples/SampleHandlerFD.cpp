@@ -696,7 +696,7 @@ void SampleHandlerFD::ResetHistograms() {
   }
 } // end function
 
-void SampleHandlerFD::RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
   // Add protections to not add the same functional parameter twice
   if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
     MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
@@ -716,7 +716,7 @@ void SampleHandlerFD::RegisterIndividualFuncPar(const std::string& fpName, int f
 }
 
 void SampleHandlerFD::SetupFunctionalParameters() {
-  funcParsVec = ParHandler->GetFuncParsFromSampleName(SampleName);
+  funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleName);
   // RegisterFunctionalParameters is implemented in experiment-specific code, 
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
@@ -724,7 +724,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
   funcParsGrid.resize(MCSamples.size());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
-  for (FuncPars & fp : funcParsVec) {
+  for (FunctionalParameter & fp : funcParsVec) {
     for (std::string name : funcParsNamesVec) {
       if (fp.name == name) {
         MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
@@ -746,7 +746,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
     funcParsGrid[iSample].resize(static_cast<std::size_t>(MCSamples[iSample].nEvents));
     for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(MCSamples[iSample].nEvents); ++iEvent) {
       // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
-      for (std::vector<FuncPars>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+      for (std::vector<FunctionalParameter>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
         // Check whether the interaction modes match
         bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCSamples[iSample].mode[iEvent]))));
         if (!ModeMatch) {
@@ -789,7 +789,7 @@ void SampleHandlerFD::ApplyShifts(int iSample, int iEvent) {
   // First reset shifted array back to nominal values
   resetShifts(iSample, iEvent);
   for (int fpEnum : funcParsGrid[iSample][iEvent]) {
-    FuncPars *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
+    FunctionalParameter *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
     // if (fp->funcPtr) {
     //   (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
     // } else {

@@ -70,7 +70,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       ParamCounter[SystType::kNorm]++;
     } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
       _fParamType[i] = SystType::kFunc;
-      FuncParams.push_back(GetFuncPars(param["Systematic"], i));
+      FuncParams.push_back(GetFunctionalParameters(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
       ParamCounter[SystType::kFunc]++;
     } else{
@@ -267,9 +267,9 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
 
 // ********************************************
 // Get Func params
-FuncPars ParameterHandlerGeneric::GetFuncPars(const YAML::Node& param, const int Index) {
+FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) {
 // ********************************************
-  FuncPars func;
+  FunctionalParameter func;
   func.name = GetParFancyName(Index);
   func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
   func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
@@ -307,9 +307,9 @@ FuncPars ParameterHandlerGeneric::GetFuncPars(const YAML::Node& param, const int
 
 // ********************************************
 // HH: Grab the Functional parameters for the relevant SampleName
-const std::vector<FuncPars> ParameterHandlerGeneric::GetFuncParsFromSampleName(const std::string& SampleName) {
+const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) {
   // ********************************************
-  std::vector<FuncPars> returnVec;
+  std::vector<FunctionalParameter> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
     auto &FuncIndex = pair.first;
     auto &GlobalIndex = pair.second;
