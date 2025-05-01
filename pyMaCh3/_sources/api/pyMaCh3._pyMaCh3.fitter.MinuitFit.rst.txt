@@ -1,0 +1,7 @@
+MinuitFit
+=========
+
+.. currentmodule:: pyMaCh3._pyMaCh3.fitter
+
+.. autoclass:: MinuitFit
+   :show-inheritance:
