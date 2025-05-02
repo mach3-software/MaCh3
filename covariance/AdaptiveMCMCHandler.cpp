@@ -15,7 +15,6 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   sum_sin = {};
   sum_cos = {};
   cyclic_indices = {};
-  step_wrapped = {};
   adaptive_covariance = nullptr;
 }
 
@@ -96,7 +95,6 @@ void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance(const int Npars) {
   par_means = std::vector<double>(Npars, 0);
   sum_sin = std::vector<double>(Npars, 0);
   sum_cos = std::vector<double>(Npars, 0);
-  step_wrapped = std::vector<int>(Npars, 0);
 }
 
 
@@ -280,15 +278,8 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   for (int i = 0; i < Npars; ++i) {
     if (IsFixed(i)) continue;
 
-    if (IsCircular(i)) {
-      // Use trigonometric mean formula
-      par_means[i] = CalculateCyclicalMean(i, _fCurrVal[i]);
-      // dev[i] = CalculateCircularDeviation(par_means_prev[i], _fCurrVal[i]);
-      // Reset step_wrapped
-      step_wrapped[i] = 0;
-    } else {
-      par_means[i] =  (_fCurrVal[i] + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
-    }
+    par_means[i] =  (_fCurrVal[i] + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
+    // Left over from cyclic means
     dev[i] = _fCurrVal[i] - par_means_prev[i];   
   }
 

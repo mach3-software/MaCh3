@@ -38,8 +38,6 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
 
 void covarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
   covarianceBase::initialiseAdaption(adapt_manager);
-  // HW: Set dcp cyclic in AMCMC, bit hacky but "shrug"
-  AdaptiveHandler.SetIsCircular(kDeltaCP);
 }
 
 // *************************************
@@ -75,15 +73,9 @@ void covarianceOsc::CircularPrior(const int index, const double LowBound, const 
 // *************************************
   if(_fPropVal[index] > UpBound) {
     _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
-    if(use_adaptive){
-      AdaptiveHandler.StepWrapped(index, 1);
-    }
 
   } else if (_fPropVal[index] < LowBound) {
     _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
-    if(use_adaptive){
-      AdaptiveHandler.StepWrapped(index, -1);
-    }
   }
 }
 

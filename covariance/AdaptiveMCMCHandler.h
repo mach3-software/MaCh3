@@ -79,7 +79,6 @@ class AdaptiveMCMCHandler{
   double CalculateCyclicalMean(int ipar, double curr_val);
   
   double CalculateCircularDeviation(double mean, double value);
-  void StepWrapped(int ipar, float direction);
 /// @brief Set to track errros
   void SetFixed(std::vector<double>* errs){
     errors = errs;
@@ -140,7 +139,6 @@ class AdaptiveMCMCHandler{
   // Circular nonsense
   std::vector<double> sum_sin;
   std::vector<double> sum_cos;
-  std::vector<int> step_wrapped;
 
   std::vector<double>* errors;
 
