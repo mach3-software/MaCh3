@@ -17,6 +17,8 @@ class covarianceOsc : public covarianceBase
   void proposeStep() override;
   /// @brief Sets whether to flip delta M23.
   void setFlipDeltaM23(bool flip){flipdelM = flip;}
+  /// @brief Sets whether to flip octant.
+  void setFlipOctant(bool flip){flipOctant = flip;}
   /// @brief Get pointers to Osc params from Sample name
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization
@@ -32,6 +34,8 @@ class covarianceOsc : public covarianceBase
     void CircularPrior(const int i, const double LowBound, const double UpBound);
     /// Do we flip DeltaM23 or not
     bool flipdelM;
+    /// Flip octant?
+    bool flipOctant;
     /// There is special treatment for delta CP, therefore store enum keeping track when to apply special treatment
     int kDeltaCP;
     /// There is special treatment for DeltaM23, therefore store enum keeping track when to apply special treatment

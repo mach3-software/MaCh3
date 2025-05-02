@@ -207,6 +207,8 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
 
     //ETA - now for parameters which are optional and have default values
     _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
+    _fNovaPrior[i] = GetFromManager<bool>(param["Systematic"]["NovaPrior"], false, __FILE__ , __LINE__);
+
 
     // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
     if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
@@ -318,6 +320,7 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
   _fLowBound = std::vector<double>(SizeVec);
   _fUpBound = std::vector<double>(SizeVec);
   _fFlatPrior = std::vector<bool>(SizeVec);
+  _fNovaPrior = std::vector<bool>(SizeVec);
   _fIndivStepScale = std::vector<double>(SizeVec);
   _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
 
@@ -335,6 +338,7 @@ void covarianceBase::ReserveMemory(const int SizeVec) {
     _fLowBound.at(i) = -999.99;
     _fUpBound.at(i) = 999.99;
     _fFlatPrior.at(i) = false;
+    _fNovaPrior.at(i) = false;
     _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
   }
@@ -667,16 +671,31 @@ double covarianceBase::CalcLikelihood() const _noexcept_ {
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
-  for(int i = 0; i < _fNumPar; ++i){
+  for(int i = 0; i < _fNumPar; ++i){ 
+    // HW: If we have a nova-like prior the parameter is-flat but still contribute
+    if(_fNovaPrior[i]){
+      double root_prior = TMath::Sin(0.25*(_fPropVal[i] + TMath::TwoPi()));
+      logL -= TMath::Log(0.5*root_prior*root_prior);
+      continue;
+    }
+
+
+    // HW: Flat so no LLH contribution
+    if(_fFlatPrior[i]){
+      continue;
+    }
+
     #ifdef MULTITHREAD
     #pragma omp simd
     #endif
     for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
-        //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-        double scale = (i != j) ? 1. : 0.5;
-        logL += scale * (_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
+      if (_fFlatPrior[j]) {
+        continue;
       }
+
+      //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
+      double scale = (i != j) ? 1. : 0.5;
+      logL += scale * (_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
     }
   }
   return logL;
@@ -1057,8 +1076,7 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, getNpars());
-  AdaptiveHandler.SetFixed(&_fError);
+  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
   if(!success) return;
   AdaptiveHandler.Print();
 
@@ -1068,7 +1086,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
-    AdaptiveHandler.CreateNewAdaptiveCovariance(_fNumPar);
+    AdaptiveHandler.CreateNewAdaptiveCovariance();
     return;
   }
 
@@ -1077,7 +1095,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
   auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
 
-  AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
+  AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
 
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
@@ -1097,7 +1115,7 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 
   // Call main adaption function
-  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
+  AdaptiveHandler.UpdateAdaptiveCovariance();
 
   //This is likely going to be the slow bit!
   if(AdaptiveHandler.IndivStepScaleAdapt()) {

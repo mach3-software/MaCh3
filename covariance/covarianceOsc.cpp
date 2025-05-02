@@ -30,7 +30,8 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
   CheckInitialisation("sin2th_23", kSinTheta23);
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
-  flipdelM = true;
+  flipdelM = false;
+  flipOctant = false;
 
   randomize();
   Print();
@@ -52,7 +53,10 @@ void covarianceOsc::proposeStep() {
   covarianceBase::proposeStep();
 
   // HW It should now automatically set dcp to be with [-pi, pi]
-  CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
+  if(!_fNovaPrior[kDeltaCP]){
+    MACH3LOG_INFO("Still using circular prior for delta_cp");
+    CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
+  }
 
   // Okay now we've done the standard steps, we can add in our nice flips
   // hierarchy flip first
@@ -60,7 +64,7 @@ void covarianceOsc::proposeStep() {
     _fPropVal[kDeltaM23] *= -1;
   }
   // now octant flip
-  if(random_number[0]->Uniform() < 0.5) {
+  if(random_number[0]->Uniform() < 0.5 && flipOctant){
     // flip octant around point of maximal disappearance (0.5112)
     // this ensures we move to a parameter value which has the same oscillation probability
     _fPropVal[kSinTheta23] = 0.5112 - (_fPropVal[kSinTheta23] - 0.5112);
@@ -71,6 +75,7 @@ void covarianceOsc::proposeStep() {
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
 void covarianceOsc::CircularPrior(const int index, const double LowBound, const double UpBound) {
 // *************************************
+  MACH3LOG_INFO("JUMPING");
   if(_fPropVal[index] > UpBound) {
     _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
 

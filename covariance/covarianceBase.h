@@ -73,6 +73,8 @@ class covarianceBase {
   /// \ingroup Setters
   void setFlatPrior(const int i, const bool eL);
   
+  void setNovaPrior(const int i, const bool eL) { _fNovaPrior[i] = eL; }
+
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
@@ -482,6 +484,8 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
+  std::vector<bool> _fNovaPrior;
+
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
 
